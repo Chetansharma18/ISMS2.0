@@ -105,26 +105,7 @@ export type FontSize = 'sm' | 'md' | 'lg';
 
           <span class="hidden md:block text-slate-300">|</span>
 
-          <!-- Language Switcher: English | हिंदी -->
-          <div class="flex items-center space-x-1 sm:space-x-1.5 text-xs">
-            <button 
-              (click)="setLanguage('en')" 
-              [class.text-[#092244]]="currentLanguage() === 'en'"
-              [class.font-bold]="currentLanguage() === 'en'" 
-              class="hover:text-blue-700 transition cursor-pointer">
-              English
-            </button>
-            <span class="text-slate-300">|</span>
-            <button 
-              (click)="setLanguage('hi')" 
-              [class.text-[#092244]]="currentLanguage() === 'hi'"
-              [class.font-bold]="currentLanguage() === 'hi'" 
-              class="hover:text-blue-700 transition cursor-pointer">
-              हिंदी
-            </button>
-          </div>
 
-          <span class="text-slate-300">|</span>
 
           <!-- User's Personal Name & Profile (As input during profile creation) -->
           <div *ngIf="userProfile$ | async as profile" class="flex items-center gap-2 sm:gap-2.5 pl-0.5 sm:pl-1 cursor-pointer" routerLink="/profile" title="View & Edit Profile">

@@ -50,7 +50,6 @@ import { Observable } from 'rxjs';
             <!-- Window Title Bar (#131A4D) -->
             <div class="bg-[#131A4D] text-white px-5 py-3 flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <span class="text-base">📋</span>
                 <h2 class="text-sm font-bold tracking-wide">
                   Published Tenders & Live Submissions
                 </h2>
@@ -105,7 +104,8 @@ import { Observable } from 'rxjs';
                     </td>
 
                     <!-- Submission Deadline -->
-                    <td class="p-3 border-r border-slate-200 font-mono text-red-700 font-bold">
+                    <td class="p-3 border-r border-slate-200 font-mono font-bold"
+                        [ngClass]="scheme.status === 'Closed' ? 'text-slate-400' : 'text-red-700'">
                       {{ scheme.submissionLastDate }}
                     </td>
 

@@ -143,11 +143,7 @@ import { Observable } from 'rxjs';
               </table>
             </div>
 
-            <!-- Bottom Information Footer -->
-            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 text-xs text-slate-500 flex justify-between items-center">
-              <span>Rajasthan Government e-Tendering & Scrutiny Portal</span>
-              <span>RSLDC Scrutiny Node 2026-v2</span>
-            </div>
+
 
           </div>
 

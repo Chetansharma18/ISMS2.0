@@ -41,6 +41,8 @@ export interface LandingTranslations {
     categoryLabel: string;
     dateLabel: string;
     allTendersCount: string;
+    searchPlaceholder?: string;
+    noTendersFound?: string;
   };
   newsTicker: {
     badge: string;
@@ -187,12 +189,14 @@ export const LANDING_TRANSLATIONS: Record<'en' | 'hi', LandingTranslations> = {
       modalSubtitle: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
       close: 'Close',
       downloadPdf: 'Download PDF',
-      activeStatus: 'Active',
+      activeStatus: 'Open',
       hoverToPause: 'Hover to pause',
       refNo: 'Ref No',
       categoryLabel: 'Category',
       dateLabel: 'Published Date',
-      allTendersCount: 'Total Tenders'
+      allTendersCount: 'Total Tenders',
+      searchPlaceholder: 'Search by title, reference number or category...',
+      noTendersFound: 'No tenders found matching your search criteria.'
     },
     newsTicker: {
       badge: 'Press Releases',
@@ -337,12 +341,14 @@ export const LANDING_TRANSLATIONS: Record<'en' | 'hi', LandingTranslations> = {
       modalSubtitle: 'राजस्थान कौशल एवं आजीविका विकास निगम (RSLDC)',
       close: 'बंद करें',
       downloadPdf: 'पीडीएफ डाउनलोड',
-      activeStatus: 'सक्रिय',
+      activeStatus: 'Open',
       hoverToPause: 'रोकने के लिए कर्सर लाएं',
       refNo: 'संदर्भ क्र.',
       categoryLabel: 'श्रेणी',
       dateLabel: 'प्रकाशन तिथि',
-      allTendersCount: 'कुल निविदाएं'
+      allTendersCount: 'कुल निविदाएं',
+      searchPlaceholder: 'शीर्षक, संदर्भ संख्या या श्रेणी से खोजें...',
+      noTendersFound: 'खोजे गए विवरण से संबंधित कोई निविदा उपलब्ध नहीं है।'
     },
     newsTicker: {
       badge: 'प्रेस विज्ञप्ति',

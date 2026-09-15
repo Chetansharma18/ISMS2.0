@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { LanguageService } from '../../../core/services/language.service';
 
 export interface TenderItem {
@@ -24,6 +24,20 @@ export class HeroComponent {
 
   readonly isModalOpen = signal<boolean>(false);
   readonly selectedTender = signal<TenderItem | null>(null);
+  readonly searchQuery = signal<string>('');
+
+  readonly filteredTenders = computed(() => {
+    const q = this.searchQuery().trim().toLowerCase();
+    if (!q) {
+      return this.tenders;
+    }
+    return this.tenders.filter(t =>
+      t.title.toLowerCase().includes(q) ||
+      t.refNo.toLowerCase().includes(q) ||
+      t.category.toLowerCase().includes(q) ||
+      t.date.toLowerCase().includes(q)
+    );
+  });
 
   scrollToAbout(): void {
     const el = document.getElementById('about');
@@ -93,12 +107,19 @@ export class HeroComponent {
 
   openModal(tender?: TenderItem): void {
     this.selectedTender.set(tender || null);
+    this.searchQuery.set('');
     this.isModalOpen.set(true);
   }
 
   closeModal(): void {
     this.isModalOpen.set(false);
     this.selectedTender.set(null);
+    this.searchQuery.set('');
+  }
+
+  onSearchInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.searchQuery.set(target?.value ?? '');
   }
 
   downloadDoc(item: TenderItem, event?: Event): void {
@@ -106,7 +127,7 @@ export class HeroComponent {
       event.stopPropagation();
     }
     const docName = `${item.refNo.replace(/[\/\s]/g, '_')}.pdf`;
-    const content = `Rajasthan Skill and Livelihoods Development Corporation (RSLDC)\nNotice Inviting Tender / RFP\n\nReference No: ${item.refNo}\nDate: ${item.date}\nCategory: ${item.category}\nTitle: ${item.title}\nStatus: Active`;
+    const content = `Rajasthan Skill and Livelihoods Development Corporation (RSLDC)\nNotice Inviting Tender / RFP\n\nReference No: ${item.refNo}\nDate: ${item.date}\nCategory: ${item.category}\nTitle: ${item.title}\nStatus: Open`;
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');

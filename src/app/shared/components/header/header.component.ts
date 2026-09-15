@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, Input } from '@angular/core';
+import { Component, OnInit, signal, inject, Input, HostListener } from '@angular/core';
 import { RouterLink, RouterModule } from '@angular/router';
 import { CommonModule, NgIf, AsyncPipe } from '@angular/common';
 import { EoiStateService, UserProfile } from '../../../core/services/eoi-state.service';
@@ -108,7 +108,7 @@ export type FontSize = 'sm' | 'md' | 'lg';
 
 
           <!-- User's Personal Name & Profile (As input during profile creation) -->
-          <div *ngIf="userProfile$ | async as profile" class="relative">
+          <div *ngIf="userProfile$ | async as profile" class="relative" id="profileDropdownContainer">
             <div class="flex items-center gap-2 sm:gap-2.5 pl-0.5 sm:pl-1 cursor-pointer" (click)="toggleProfileMenu()" title="Profile Options">
               
               <!-- Avatar Circle with Initial (Before name) -->
@@ -233,6 +233,14 @@ export class HeaderComponent implements OnInit {
   readonly fontSize = signal<FontSize>('md');
   readonly mobileMenuOpen = signal<boolean>(false);
   readonly profileMenuOpen = signal<boolean>(false);
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (target && !target.closest('#profileDropdownContainer')) {
+      this.profileMenuOpen.set(false);
+    }
+  }
 
   toggleProfileMenu(): void {
     this.profileMenuOpen.update(v => !v);

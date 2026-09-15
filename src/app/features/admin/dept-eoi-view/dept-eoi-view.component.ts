@@ -72,7 +72,7 @@ import { Observable } from 'rxjs';
                     <th class="p-3 border-r border-[#1a4f78]">Published</th>
                     <th class="p-3 border-r border-[#1a4f78]">Deadline</th>
                     <th class="p-3 border-r border-[#1a4f78] text-center">Status</th>
-                    <th class="p-3 border-r border-[#1a4f78] text-center bg-[#093354]">No. of Responses</th>
+                    <th class="p-3 border-r border-[#1a4f78] text-center">No. of Responses</th>
                     <th class="p-3 text-center">Action</th>
                   </tr>
                 </thead>
@@ -116,15 +116,12 @@ import { Observable } from 'rxjs';
                       </span>
                     </td>
 
-                    <!-- No. of Responses (Clickable Link to Responses List) -->
-                    <td class="p-3 border-r border-slate-200 text-center bg-blue-50/50">
-                      <a 
-                        [routerLink]="['/admin/responses', scheme.id]"
-                        class="inline-flex items-center gap-1 px-3 py-1 bg-[#131A4D] text-white font-mono font-bold text-xs rounded hover:bg-[#004d73] transition-colors shadow-2xs"
-                        title="Click to view applicant list">
-                        <span>{{ scheme.responseCount || 14 }}</span>
-                        <span class="text-[10px] font-sans font-normal opacity-90">EOIs →</span>
-                      </a>
+                    <!-- No. of Responses (Plain Text) -->
+                    <td class="p-3 border-r border-slate-200 text-center">
+                      <span class="font-mono font-bold text-[#131A4D] text-sm">
+                        {{ scheme.responseCount || 14 }}
+                      </span>
+                      <span class="text-[10px] font-sans font-semibold text-slate-600 ml-1">EOIs</span>
                     </td>
 
                     <!-- Action -->

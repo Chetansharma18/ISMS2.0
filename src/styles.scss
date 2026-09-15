@@ -1,0 +1,100 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* Global Base Styles */
+html, body {
+  font-family: "Poppins", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #0F172A;
+  background-color: #F8FAFC;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Heading & Typography with Poppins */
+h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display {
+  font-family: "Poppins", sans-serif;
+  letter-spacing: -0.015em;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Accessible Focus Outline (Saffron Gold) */
+:focus-visible {
+  outline: 2px solid #E87A24 !important;
+  outline-offset: 2px !important;
+}
+
+/* Tabular Numbers */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Document / Certificate Card Style */
+.doc-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  position: relative;
+}
+
+/* Seal Stamp Animation */
+@keyframes sealStamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.6) rotate(-8deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.95) rotate(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.animate-seal-stamp {
+  animation: sealStamp 240ms cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-seal-stamp {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Thin Rule Section Dividers */
+.section-rule {
+  border-bottom: 1px solid #E2E8F0;
+}
+
+/* Form Spine max width */
+.form-spine {
+  max-width: 720px;
+}
+
+.doc-spine {
+  max-width: 640px;
+}
+
+/* Arpit Form CSS Variables */
+:root {
+  --color-header-navy: #131A4D;
+  --color-primary-blue: #131A4D;
+  --color-active-underline: #131A4D;
+  --color-text-main: #1E293B;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748B;
+  --color-border: #E2E8F0;
+  --color-input-border: #CBD5E1;
+  --color-input-focus: #131A4D;
+  --color-bg-white: #FFFFFF;
+  --color-bg-light: #F8FAFC;
+  --color-bg-table-head: #F1F5F9;
+  --color-required: #DC2626;
+  --color-success: #16A34A;
+  --color-error-bg: #FEF2F2;
+}

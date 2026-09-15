@@ -1,0 +1,348 @@
+<header class="w-full bg-[#f0f6fc] border-b border-slate-200/80 font-sans shadow-2xs">
+
+  <!-- Top Header Row -->
+  <div
+    class="max-w-[1400px] mx-auto py-2 sm:py-2.5 lg:py-3 px-3 sm:px-6 lg:px-8 flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 lg:gap-6">
+
+    <!-- Top Bar Main Content: Logos, Title, Branding & Mobile Hamburger -->
+    <div class="flex items-center justify-between gap-2 sm:gap-4 select-none w-full lg:w-auto">
+
+      <!-- Left Branding Group: Emblems + Department Text + Divider + ISMS -->
+      <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 min-w-0">
+
+        <!-- Official Ashoka Lion Capital (State Emblem of India) with Satyameva Jayate -->
+        <div class="flex-shrink-0 w-8 h-11 xs:w-10 xs:h-13 sm:w-13 sm:h-17 lg:w-[64px] lg:h-[82px] flex items-center justify-center">
+          <img src="emblem.png" alt="Government of Rajasthan - State Emblem of India"
+            class="h-full w-auto object-contain select-none" />
+        </div>
+
+        <!-- Official RSLDC Circular Emblem -->
+        <div class="flex-shrink-0 w-8 h-8 xs:w-9 xs:h-9 sm:w-13 sm:h-13 lg:w-[66px] lg:h-[66px] flex items-center justify-center">
+          <img src="rsldc-logo.png" alt="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)"
+            class="h-full w-full object-contain select-none drop-shadow-2xs" />
+        </div>
+
+        <!-- Department Text Block (3 Lines) -->
+        <div class="text-left flex flex-col justify-center min-w-0">
+          <div class="text-[9.5px] xs:text-[11.5px] sm:text-[13px] lg:text-[13.5px] font-bold text-[#092244] leading-[1.2] whitespace-nowrap">
+            {{ t().navbar.govtRajasthan }}
+          </div>
+          <div class="text-[9px] xs:text-[11px] sm:text-[12.5px] lg:text-[13px] font-bold text-[#092244] leading-[1.2] whitespace-nowrap">
+            {{ t().navbar.rsldcLine1 }}
+          </div>
+          <div class="text-[9px] xs:text-[11px] sm:text-[12.5px] lg:text-[13px] font-bold text-[#092244] leading-[1.2] whitespace-nowrap">
+            {{ t().navbar.rsldcLine2 }}
+          </div>
+        </div>
+
+        <!-- Thin Vertical Divider Line (Hidden on tiny screens, shown on sm+) -->
+        <div class="hidden sm:block h-9 lg:h-10 w-[1.5px] bg-slate-300 mx-1 sm:mx-2 lg:mx-3 shrink-0"></div>
+
+        <!-- System Branding: ISMS in Navy, 2.0 in Orange/Amber (Desktop and sm+) -->
+        <div class="hidden sm:flex text-left flex-col justify-center shrink-0">
+          <div class="flex items-baseline leading-none">
+            <span class="text-xl sm:text-2xl lg:text-[27px] font-extrabold text-[#092244] tracking-tight">ISMS</span>
+            <span class="text-xl sm:text-2xl lg:text-[27px] font-extrabold text-[#f59e0b] ml-1">2.0</span>
+          </div>
+          <div class="text-[10.5px] sm:text-[11.5px] lg:text-[12px] text-slate-600 font-medium tracking-tight mt-0.5 sm:mt-1">
+            {{ t().navbar.ismsSubtitle }}
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Mobile Right Group (< lg): Compact ISMS 2.0 badge on screens >= xs + Hamburger Toggle -->
+      <div class="flex items-center gap-1.5 xs:gap-2 lg:hidden shrink-0">
+        <!-- ISMS 2.0 badge on screens between xs and sm -->
+        <div class="hidden xs:block sm:hidden text-right leading-none mr-0.5">
+          <div class="flex items-baseline justify-end">
+            <span class="text-base font-extrabold text-[#092244] tracking-tight">ISMS</span>
+            <span class="text-base font-extrabold text-[#f59e0b] ml-0.5">2.0</span>
+          </div>
+        </div>
+
+        <!-- Mobile Menu Toggle Button (Hamburger / Close) -->
+        <button type="button" (click)="toggleMobileMenu()"
+          class="p-1.5 rounded-lg text-[#002244] hover:bg-slate-200/70 border border-slate-300/80 transition-colors cursor-pointer focus:outline-none"
+          [attr.aria-expanded]="isMobileMenuOpen()" aria-label="Toggle navigation menu">
+          @if (!isMobileMenuOpen()) {
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+          } @else {
+          <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          }
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Desktop Utilities: Font Sizing, Language, and Login (Preserved 100% on lg) -->
+    <div class="hidden lg:flex items-center justify-end gap-3 sm:gap-4 select-none">
+
+      <!-- Font sizing: A- A A+ -->
+      <div class="flex items-center space-x-2 text-slate-700">
+        <button type="button" (click)="setFontSize('sm')" [attr.aria-label]="t().navbar.fontDecreaseAria"
+          [title]="'Decrease font size (A-)'" [class.font-extrabold]="fontSize() === 'sm'"
+          [class.text-[#002244]]="fontSize() === 'sm'" [class.underline]="fontSize() === 'sm'"
+          class="hover:text-blue-700 text-[11px] transition cursor-pointer">A-</button>
+        <button type="button" (click)="setFontSize('md')" [attr.aria-label]="t().navbar.fontStandardAria"
+          [title]="'Normal font size (A)'" [class.font-extrabold]="fontSize() === 'md'"
+          [class.text-[#002244]]="fontSize() === 'md'" [class.underline]="fontSize() === 'md'"
+          class="hover:text-blue-700 text-xs transition cursor-pointer">A</button>
+        <button type="button" (click)="setFontSize('lg')" [attr.aria-label]="t().navbar.fontIncreaseAria"
+          [title]="'Increase font size (A+)'" [class.font-extrabold]="fontSize() === 'lg'"
+          [class.text-[#002244]]="fontSize() === 'lg'" [class.underline]="fontSize() === 'lg'"
+          class="hover:text-blue-700 text-xs font-semibold transition cursor-pointer">A+</button>
+      </div>
+
+      <span class="text-slate-300">|</span>
+
+      <!-- English | हिंदी -->
+      <div class="flex items-center space-x-1.5 text-[12px]">
+        <button (click)="setLanguage('en')" [class.text-[#092244]]="currentLanguage() === 'en'"
+          [class.font-bold]="currentLanguage() === 'en'" class="hover:text-blue-700 transition">
+          English
+        </button>
+        <span class="text-slate-300">|</span>
+        <button (click)="setLanguage('hi')" [class.text-[#092244]]="currentLanguage() === 'hi'"
+          [class.font-bold]="currentLanguage() === 'hi'" class="hover:text-blue-700 transition">
+          हिंदी
+        </button>
+      </div>
+
+      <!-- Login Button: Displays on Landing Page and routes directly to Rajasthan SSO login screen -->
+      <a 
+        routerLink="/auth/login"
+        class="ml-1 sm:ml-2 px-4 sm:px-5 py-2 rounded-md bg-[#002752] hover:bg-[#003873] text-white text-xs sm:text-[13px] font-semibold tracking-wide shadow-2xs transition inline-flex items-center gap-1.5 cursor-pointer"
+        [title]="t().navbar.loginTitle">
+        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+        </svg>
+        <span>{{ t().navbar.loginText }}</span>
+      </a>
+
+    </div>
+
+  </div>
+
+  <!-- Mobile Collapsible Menu Drawer (< lg) -->
+  @if (isMobileMenuOpen()) {
+  <div class="lg:hidden w-full bg-white border-t border-slate-200/90 py-3 px-4 shadow-md animate-in slide-in-from-top-2 duration-150 select-none">
+    <div class="max-w-[1400px] mx-auto flex flex-col gap-3">
+      <!-- Row: Accessibility Font Sizing + Language Switch -->
+      <div class="flex items-center justify-between py-1 border-b border-slate-100">
+        <!-- Font sizing: A- A A+ -->
+        <div class="flex items-center gap-2 text-slate-700">
+          <span class="text-[11px] text-slate-500 font-medium mr-1">Text:</span>
+          <button type="button" (click)="setFontSize('sm')"
+            [class.font-extrabold]="fontSize() === 'sm'" [class.text-[#002244]]="fontSize() === 'sm'" [class.underline]="fontSize() === 'sm'"
+            class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-xs font-semibold">A-</button>
+          <button type="button" (click)="setFontSize('md')"
+            [class.font-extrabold]="fontSize() === 'md'" [class.text-[#002244]]="fontSize() === 'md'" [class.underline]="fontSize() === 'md'"
+            class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-xs font-semibold">A</button>
+          <button type="button" (click)="setFontSize('lg')"
+            [class.font-extrabold]="fontSize() === 'lg'" [class.text-[#002244]]="fontSize() === 'lg'" [class.underline]="fontSize() === 'lg'"
+            class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-xs font-semibold">A+</button>
+        </div>
+
+        <!-- Language switch -->
+        <div class="flex items-center gap-1.5 text-xs font-semibold bg-slate-100 px-2 py-1 rounded-md">
+          <button (click)="setLanguage('en')" [class.text-[#002244]]="currentLanguage() === 'en'"
+            [class.font-bold]="currentLanguage() === 'en'" [class.bg-white]="currentLanguage() === 'en'"
+            class="px-2 py-0.5 rounded transition">
+            English
+          </button>
+          <span class="text-slate-300">|</span>
+          <button (click)="setLanguage('hi')" [class.text-[#002244]]="currentLanguage() === 'hi'"
+            [class.font-bold]="currentLanguage() === 'hi'" [class.bg-white]="currentLanguage() === 'hi'"
+            class="px-2 py-0.5 rounded transition">
+            हिंदी
+          </button>
+        </div>
+      </div>
+
+      <!-- Action: Raj SSO Login Button (Routes to SSO login page) -->
+      <a 
+        routerLink="/auth/login"
+        (click)="closeMobileMenu()"
+        class="w-full py-2.5 rounded-lg bg-[#002752] hover:bg-[#003873] text-white text-sm font-semibold tracking-wide shadow-xs transition flex items-center justify-center gap-2 cursor-pointer"
+        [title]="t().navbar.loginTitle">
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+        </svg>
+        <span>{{ t().navbar.loginText }}</span>
+      </a>
+    </div>
+  </div>
+  }
+
+  <!-- Deep Navy Bar: News Ticker Strip extending up to the Search Bar -->
+  <div class="w-full bg-[#002244] text-white border-t border-[#0a2e5c] relative z-20 shadow-xs font-['Poppins',sans-serif]">
+    <div
+      class="max-w-[1400px] mx-auto px-2.5 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4 h-10 sm:h-11 lg:h-12">
+
+      <!-- Left / Center: News Ticker Strip (Extending right up to the Search Bar) -->
+      <div class="flex-1 flex items-center h-full min-w-0 overflow-hidden">
+        <!-- Live Press Releases Badge -->
+        <div
+          class="relative z-20 flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-[#ea580c] to-[#f97316] text-white px-2 sm:px-4 h-full font-bold text-[10px] sm:text-[12.5px] tracking-wide shrink-0 shadow-xs cursor-pointer select-none"
+          (click)="openNewsModal()"
+          title="Click to view all press releases">
+          <!-- Live Pulse Indicator -->
+          <span class="relative flex h-1.5 w-1.5 sm:h-2.5 sm:w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-80"></span>
+            <span class="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2.5 sm:w-2.5 bg-amber-200"></span>
+          </span>
+
+          <span class="whitespace-nowrap uppercase tracking-wider font-extrabold flex items-center gap-1 sm:gap-1.5">
+            <svg class="w-3 h-3 sm:w-4 sm:h-4 fill-current shrink-0" viewBox="0 0 24 24">
+              <path
+                d="M18 11v2h4v-2h-4zm-2 6.61c.96.71 2.21 1.65 3.2 2.39.4-.53.8-1.07 1.2-1.6-.99-.74-2.24-1.68-3.2-2.4-.4.54-.8 1.08-1.2 1.61zM20.4 4.6c-.4-.53-.8-1.07-1.2-1.6-.99.74-2.24 1.68-3.2 2.4.4.53.8 1.07 1.2 1.6.96-.72 2.21-1.65 3.2-2.4zM4 9c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v4h2v-4h1l5 3V6L8 9H4zm11.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" />
+            </svg>
+            <span class="hidden xs:inline">{{ t().newsTicker.badge }}</span>
+            <span class="xs:hidden">NEWS</span>
+          </span>
+
+          <!-- Angled stylish arrow pointer on right edge of badge -->
+          <div
+            class="hidden sm:block absolute right-0 top-0 bottom-0 translate-x-full w-0 h-0 border-y-[20px] sm:border-y-[24px] border-y-transparent border-l-[8px] sm:border-l-[12px] border-l-[#f97316] pointer-events-none">
+          </div>
+        </div>
+
+        <!-- Center Ticker Track (Continuous horizontal scrolling marquee, pauses on hover) -->
+        <div class="ticker-viewport flex-1 overflow-hidden h-full flex items-center relative pl-1.5 sm:pl-6 select-none">
+          <div class="ticker-track flex items-center whitespace-nowrap">
+            <!-- Loop 1 -->
+            @for (item of pressReleases; track item.id) {
+            <div class="inline-flex items-center gap-1.5 sm:gap-2 mx-2 sm:mx-5 shrink-0 group/item cursor-pointer"
+              (click)="openNewsModal()">
+              <span
+                class="bg-white/15 text-amber-300 font-semibold px-1 sm:px-2 py-0.5 rounded text-[9.5px] sm:text-[11px] tracking-tight border border-amber-400/25">
+                {{ item.date }}
+              </span>
+              <span
+                class="text-white group-hover/item:text-amber-300 text-[11px] sm:text-[13px] font-medium tracking-normal transition-colors">
+                {{ item.title }}
+              </span>
+              <span class="text-amber-400/70 font-black text-xs select-none ml-1 sm:ml-2">✦</span>
+            </div>
+            }
+
+            <!-- Loop 2 (Seamless continuous loop) -->
+            @for (item of pressReleases; track 'loop2-' + item.id) {
+            <div class="inline-flex items-center gap-1.5 sm:gap-2 mx-2 sm:mx-5 shrink-0 group/item cursor-pointer"
+              (click)="openNewsModal()">
+              <span
+                class="bg-white/15 text-amber-300 font-semibold px-1 sm:px-2 py-0.5 rounded text-[9.5px] sm:text-[11px] tracking-tight border border-amber-400/25">
+                {{ item.date }}
+              </span>
+              <span
+                class="text-white group-hover/item:text-amber-300 text-[11px] sm:text-[13px] font-medium tracking-normal transition-colors">
+                {{ item.title }}
+              </span>
+              <span class="text-amber-400/70 font-black text-xs select-none ml-1 sm:ml-2">✦</span>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Search Bar -->
+      <div class="flex items-center justify-end w-24 xs:w-32 sm:w-48 lg:w-64 flex-shrink-0">
+        <form (submit)="onSearch($event)"
+          class="relative flex items-center w-full h-[28px] sm:h-[32px] bg-white border border-slate-300 rounded-md overflow-hidden shadow-2xs">
+          <input type="text" [value]="searchQuery()" (input)="searchQuery.set($any($event.target).value)"
+            [placeholder]="t().navbar.searchPlaceholder"
+            class="w-full h-full bg-white px-2 sm:px-2.5 text-[10.5px] sm:text-xs text-slate-800 placeholder-slate-400 focus:outline-none min-w-0" />
+          <button type="submit"
+            class="h-full bg-[#002752] hover:bg-[#003873] text-white px-2 sm:px-3 flex items-center justify-center transition flex-shrink-0 cursor-pointer"
+            [attr.aria-label]="t().navbar.searchAria">
+            <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Press Releases Modal Dialog -->
+  @if (isNewsModalOpen()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200 select-none"
+    (click)="closeNewsModal()">
+    <div
+      class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200"
+      (click)="$event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="bg-[#002244] text-white px-5 py-4 flex items-center justify-between border-b border-amber-500/40">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path
+                d="M18 11v2h4v-2h-4zm-2 6.61c.96.71 2.21 1.65 3.2 2.39.4-.53.8-1.07 1.2-1.6-.99-.74-2.24-1.68-3.2-2.4-.4.54-.8 1.08-1.2 1.61zM20.4 4.6c-.4-.53-.8-1.07-1.2-1.6-.99.74-2.24 1.68-3.2 2.4.4.53.8 1.07 1.2 1.6.96-.72 2.21-1.65 3.2-2.4zM4 9c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v4h2v-4h1l5 3V6L8 9H4zm11.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-white tracking-tight">
+              {{ t().newsTicker.modalTitle }}
+            </h3>
+            <p class="text-xs text-slate-300">
+              {{ t().newsTicker.modalSubtitle }}
+            </p>
+          </div>
+        </div>
+
+        <button type="button" (click)="closeNewsModal()"
+          class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+          aria-label="Close modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Body (All 5 Press Releases list) -->
+      <div class="p-5 overflow-y-auto space-y-4 divide-y divide-slate-100">
+        @for (pr of pressReleases; track pr.id) {
+        <div class="pt-3 first:pt-0 group">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="inline-block bg-[#002244] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+              {{ pr.date }}
+            </span>
+            @if (pr.category) {
+            <span
+              class="text-[10px] font-semibold text-orange-600 bg-orange-50 px-2 py-0.5 rounded border border-orange-200">
+              {{ pr.category }}
+            </span>
+            }
+          </div>
+          <p class="text-sm text-slate-800 font-medium leading-relaxed group-hover:text-[#002244] transition-colors">
+            {{ pr.title }}
+          </p>
+        </div>
+        }
+      </div>
+
+      <!-- Modal Footer -->
+      <div
+        class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+        <span>{{ t().newsTicker.modalSource }}</span>
+        <button type="button" (click)="closeNewsModal()"
+          class="px-4 py-1.5 rounded-lg bg-[#002244] hover:bg-[#001730] text-white font-medium transition-colors cursor-pointer">
+          {{ t().newsTicker.close }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+  }
+
+</header>

@@ -1,0 +1,4 @@
+/* Clean, understated government styling for About section */
+:host {
+  display: block;
+}

@@ -1,0 +1,297 @@
+.gov-step-nav-bar {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid var(--color-border);
+  width: 100%;
+  max-width: 100vw;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-sizing: border-box;
+}
+
+.step-nav-container {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 10px 32px;
+  box-sizing: border-box;
+}
+
+.step-stepper-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.stepper-step {
+  display: flex;
+  align-items: center;
+  flex: 1 1 0;
+  position: relative;
+  min-width: 0;
+}
+
+.stepper-step:last-child {
+  flex: 0 0 auto;
+}
+
+.stepper-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+  min-height: 44px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.stepper-btn:hover {
+  background-color: #F1F5F9;
+}
+
+.stepper-btn:focus-visible {
+  outline: 2px solid var(--color-primary-blue);
+  outline-offset: 2px;
+}
+
+/* Badge Styling */
+.stepper-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  background-color: #F1F5F9;
+  color: #64748B;
+  border: 2px solid #CBD5E1;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stepper-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.step-super {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94A3B8;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.step-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Active Step */
+.stepper-step.active .stepper-badge {
+  background: linear-gradient(135deg, #1E4D8F 0%, #163B6E 100%);
+  border-color: #1E4D8F;
+  color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(30, 77, 143, 0.22);
+  transform: scale(1.04);
+}
+
+.stepper-step.active .step-super {
+  color: var(--color-primary-blue);
+}
+
+.stepper-step.active .step-title {
+  color: var(--color-primary-blue);
+  font-weight: 700;
+}
+
+/* Completed Step */
+.stepper-step.completed .stepper-badge {
+  background-color: #10B981;
+  border-color: #10B981;
+  color: #FFFFFF;
+}
+
+.stepper-step.completed .step-title {
+  color: #1E293B;
+}
+
+.badge-icon {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+/* Connector Line */
+.stepper-connector {
+  flex: 1 1 8px;
+  height: 2px;
+  background-color: #E2E8F0;
+  margin: 0 10px;
+  transition: background-color 0.25s ease;
+  border-radius: 1px;
+  min-width: 6px;
+}
+
+.stepper-step.completed .stepper-connector {
+  background-color: #10B981;
+}
+
+/* ========================================================================= */
+/* RESPONSIVE MEDIA QUERIES (Laptops, Tablets, Foldables, Mobiles)           */
+/* ========================================================================= */
+
+/* Large Tablets & Small Laptops (iPad Pro, Surface Pro 7, Nest Hub Max: 769px - 1024px) */
+@media (max-width: 1024px) {
+  .step-nav-container {
+    padding: 8px 18px;
+  }
+  
+  .stepper-btn {
+    padding: 6px 8px;
+    gap: 8px;
+    min-height: 40px;
+  }
+  
+  .stepper-badge {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+  
+  .step-super {
+    font-size: 9.5px;
+  }
+
+  .step-title {
+    font-size: 12px;
+    max-width: 120px;
+  }
+  
+  .stepper-connector {
+    margin: 0 6px;
+  }
+}
+
+/* Tablets, Foldables & Large Mobiles (iPad Mini, Surface Duo, Asus Zenbook Fold: 541px - 768px) */
+@media (max-width: 768px) {
+  .step-nav-container {
+    padding: 8px 12px;
+  }
+
+  .step-stepper-track {
+    gap: 4px;
+  }
+
+  .stepper-step {
+    flex: 1 1 0;
+  }
+
+  .stepper-btn {
+    padding: 4px 6px;
+    gap: 6px;
+    min-height: 38px;
+  }
+
+  .stepper-badge {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .step-super {
+    display: none;
+  }
+
+  .step-title {
+    font-size: 11px;
+    max-width: 72px;
+  }
+
+  .stepper-connector {
+    margin: 0 4px;
+    min-width: 6px;
+  }
+}
+
+/* Standard Mobiles & iPhones (iPhone SE, XR, 12-16 Pro Max, Pixel 7-10, Galaxy S8-S20, A51/71: 361px - 540px) */
+@media (max-width: 540px) {
+  .step-nav-container {
+    padding: 6px 8px;
+  }
+
+  .step-stepper-track {
+    gap: 2px;
+  }
+
+  .stepper-btn {
+    padding: 4px 5px;
+    gap: 5px;
+    min-height: 36px;
+  }
+
+  .stepper-step:not(.active) .step-title {
+    display: none;
+  }
+
+  .stepper-step.active .step-title {
+    display: inline-block;
+    max-width: 85px;
+    font-size: 11px;
+  }
+  
+  .stepper-badge {
+    width: 26px;
+    height: 26px;
+    font-size: 11px;
+    border-width: 1.5px;
+  }
+  
+  .stepper-connector {
+    margin: 0 3px;
+    min-width: 6px;
+  }
+}
+
+/* Ultra-Compact & Folded Screens (Galaxy Z Fold 5 Cover screen: <= 360px) */
+@media (max-width: 360px) {
+  .step-nav-container {
+    padding: 5px 4px;
+  }
+
+  .stepper-step.active .step-title {
+    max-width: 68px;
+    font-size: 10px;
+  }
+
+  .stepper-badge {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+
+  .stepper-connector {
+    margin: 0 2px;
+    min-width: 4px;
+  }
+}

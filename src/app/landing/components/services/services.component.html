@@ -1,0 +1,141 @@
+<section id="services"
+  class="w-full bg-[#f8fafc] py-14 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 border-t border-slate-200/80 select-none relative overflow-hidden"
+  aria-label="Skill Development Services">
+  <div class="max-w-[1400px] mx-auto">
+
+    <!-- Section Header Matching Design Option 13 -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10 lg:mb-12 relative">
+
+      <!-- Left: Main Heading with Orange Bar -->
+      <div>
+        <!-- Main Title with Accent Bar -->
+        <div class="flex items-center gap-4">
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#002244] tracking-tight">
+            Skill Development Services
+          </h2>
+          <div class="hidden sm:block w-12 h-1 bg-[#ea580c] rounded-full mt-1"></div>
+        </div>
+      </div>
+
+      <!-- Right: Heritage Skyline Silhouette + View All Services Action -->
+      <div class="mt-4 md:mt-0 flex items-center gap-4 relative">
+        <!-- Rajasthan Heritage Skyline Watermark -->
+        <div class="hidden lg:block absolute right-36 -top-8 w-64 h-16 pointer-events-none opacity-40">
+          <img src="services-skyline.png" alt="" class="w-full h-full object-contain object-right" />
+        </div>
+
+        <!-- View All Services Link Button -->
+        <a href="#services"
+          class="relative z-10 inline-flex items-center gap-2.5 text-xs sm:text-sm font-bold text-[#002244] hover:text-[#ea580c] transition-colors group">
+          <span>View All Services</span>
+          <span
+            class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#ea580c] text-white flex items-center justify-center group-hover:bg-[#c2410c] transition-colors shadow-2xs">
+            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 transform group-hover:translate-x-0.5 transition-transform"
+              fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </span>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- 6 Clean Service Cards in 3x2 Layout Matching Reference -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+
+      <!-- Loop through 6 Services -->
+      @for (service of services; track service.id) {
+      <div
+        class="group bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col justify-between cursor-pointer">
+
+        <!-- Top Area: Real Photograph (Clearly Visible, Crisp Crop) -->
+        <div class="w-full h-44 sm:h-48 overflow-hidden bg-slate-100 relative">
+          <img [src]="service.image" [alt]="service.title"
+            class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" />
+        </div>
+
+        <!-- Bottom Area: Clean White Content Area -->
+        <div class="p-4 sm:p-5 bg-white flex items-center justify-between border-t border-slate-100">
+
+          <!-- Left: Icon Box + Service Name -->
+          <div class="flex items-center gap-3.5 min-w-0">
+
+            <!-- Icon Box (Alternating Orange/Blue Tint) -->
+            <div
+              class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105 shadow-2xs"
+              [ngClass]="service.theme === 'orange' ? 'bg-[#fff4eb] text-[#ea580c]' : 'bg-[#f0f6ff] text-[#1d4ed8]'">
+
+              <!-- Training & Attendance Icon (Trainees Group) -->
+              @if (service.iconType === 'training') {
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              }
+
+              <!-- Assessment & Certification Icon (Certificate Document) -->
+              @if (service.iconType === 'assessment') {
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              }
+
+              <!-- Placement & Verification Icon (Briefcase) -->
+              @if (service.iconType === 'placement') {
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              }
+
+              <!-- Payment & Financial Management Icon (Ledger / Card) -->
+              @if (service.iconType === 'payment') {
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              }
+
+              <!-- Inspection & Monitoring Icon (Magnifying Lens) -->
+              @if (service.iconType === 'inspection') {
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              }
+
+              <!-- MIS & Reports Icon (Bar Chart) -->
+              @if (service.iconType === 'mis') {
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              }
+
+            </div>
+
+            <!-- Service Name -->
+            <h3
+              class="text-sm sm:text-base font-bold text-[#002244] group-hover:text-[#003366] leading-snug tracking-tight">
+              {{ service.title }}
+            </h3>
+          </div>
+
+          <!-- Right: Small Arrow Action Circle -->
+          <div
+            class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-slate-300 group-hover:border-[#002244] group-hover:bg-[#002244] group-hover:text-white flex items-center justify-center text-slate-500 transition-all duration-200 shrink-0 ml-2 shadow-2xs">
+            <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none"
+              stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
+
+        </div>
+
+      </div>
+      }
+
+    </div>
+
+  </div>
+</section>

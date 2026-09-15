@@ -1,0 +1,434 @@
+import { Injectable, signal } from '@angular/core';
+import { 
+  TpPiaRegistrationData, 
+  OfficerInCharge, 
+  AuthorizedPersonOrg, 
+  AuthorizedPersonProject, 
+  BankDetails, 
+  AwardItem
+} from '../models/tp-pia-registration.model';
+
+export const VALIDATION_PATTERNS = {
+  mobile: /^[6-9]\d{9}$/,
+  email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+  pan: /^[A-Z]{5}[0-9]{4}[A-Z]$/,
+  gstin: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/,
+  pincode: /^\d{6}$/,
+  aadhaar: /^\d{12}$/,
+  ifsc: /^[A-Z]{4}0[A-Z0-9]{6}$/,
+  micr: /^\d{9}$/,
+  cin: /^[a-zA-Z0-9]{21}$/,
+  bankAccount: /^\d{9,18}$/,
+};
+
+export interface TabValidationResult {
+  isValid: boolean;
+  errors: Record<string, string>;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class FormValidationService {
+  // Tracks tabs where the user attempted to proceed (Next Step / Review & Submit)
+  readonly submittedTabs = signal<Set<number>>(new Set<number>());
+  // Tracks tabs that have been completed by the user
+  readonly completedTabs = signal<Set<number>>(new Set<number>());
+  readonly toastMessage = signal<{ type: 'error' | 'success' | 'info'; text: string } | null>(null);
+
+  markTabSubmitted(tabId: number) {
+    this.submittedTabs.update(prev => {
+      const next = new Set(prev);
+      next.add(tabId);
+      return next;
+    });
+  }
+
+  isTabSubmitted(tabId: number): boolean {
+    return this.submittedTabs().has(tabId);
+  }
+
+  markTabCompleted(tabId: number) {
+    this.completedTabs.update(prev => {
+      const next = new Set(prev);
+      next.add(tabId);
+      return next;
+    });
+  }
+
+  unmarkTabCompleted(tabId: number) {
+    this.completedTabs.update(prev => {
+      const next = new Set(prev);
+      next.delete(tabId);
+      return next;
+    });
+  }
+
+  isTabCompleted(tabId: number, data: TpPiaRegistrationData): boolean {
+    return this.completedTabs().has(tabId) && this.isTabValid(tabId, data);
+  }
+
+  resetSubmitted() {
+    this.submittedTabs.set(new Set<number>());
+    this.completedTabs.set(new Set<number>());
+  }
+
+  showToast(text: string, type: 'error' | 'success' | 'info' = 'error') {
+    this.toastMessage.set({ type, text });
+  }
+
+  clearToast() {
+    this.toastMessage.set(null);
+  }
+
+  // --- VALIDATOR HELPERS ---
+
+  isValidMobile(val: string): boolean {
+    return VALIDATION_PATTERNS.mobile.test((val || '').trim());
+  }
+
+  isValidEmail(val: string): boolean {
+    return VALIDATION_PATTERNS.email.test((val || '').trim());
+  }
+
+  isValidPan(val: string): boolean {
+    return VALIDATION_PATTERNS.pan.test((val || '').trim().toUpperCase());
+  }
+
+  isValidGst(val: string): boolean {
+    return VALIDATION_PATTERNS.gstin.test((val || '').trim().toUpperCase());
+  }
+
+  isValidCin(val: string): boolean {
+    return VALIDATION_PATTERNS.cin.test((val || '').trim());
+  }
+
+  isValidPincode(val: string): boolean {
+    return VALIDATION_PATTERNS.pincode.test((val || '').trim());
+  }
+
+  isValidAadhaar(val: string): boolean {
+    return VALIDATION_PATTERNS.aadhaar.test((val || '').trim());
+  }
+
+  isValidIfsc(val: string): boolean {
+    return VALIDATION_PATTERNS.ifsc.test((val || '').trim().toUpperCase());
+  }
+
+  isValidMicr(val: string): boolean {
+    return VALIDATION_PATTERNS.micr.test((val || '').trim());
+  }
+
+  isValidBankAccount(val: string): boolean {
+    return VALIDATION_PATTERNS.bankAccount.test((val || '').trim());
+  }
+
+  // --- TAB 1 VALIDATION ---
+  validateTab1(data: TpPiaRegistrationData): TabValidationResult {
+    const errors: Record<string, string> = {};
+
+    // Left Side Mandatory Fields
+    const fullName = (data.basicInfo.fullName || '').trim();
+    if (!fullName) {
+      errors['basicInfo.fullName'] = 'TP/PIA Full Name is required';
+    }
+
+    const shortName = (data.basicInfo.shortName || '').trim();
+    if (!shortName) {
+      errors['basicInfo.shortName'] = 'TP/PIA Short Name is required';
+    }
+
+    const contactNo = (data.basicInfo.contactNo || '').trim();
+    if (!contactNo) {
+      errors['basicInfo.contactNo'] = 'Organisation Contact No. is required';
+    } else if (!this.isValidMobile(contactNo)) {
+      errors['basicInfo.contactNo'] = 'Enter a valid 10-digit mobile number';
+    }
+
+    const emailId = (data.basicInfo.emailId || '').trim();
+    if (!emailId) {
+      errors['basicInfo.emailId'] = 'Company Email-ID is required';
+    } else if (!this.isValidEmail(emailId)) {
+      errors['basicInfo.emailId'] = 'Enter a valid email address';
+    }
+
+    // Optional PAN in Basic Info
+    const panNo = (data.basicInfo.panNo || '').trim().toUpperCase();
+    if (panNo && !this.isValidPan(panNo)) {
+      errors['basicInfo.panNo'] = 'Enter a valid 10-character PAN (e.g. ABCDE1234F)';
+    }
+
+    // Mandatory Registered Address
+    if (!(data.registeredAddress.address || '').trim()) {
+      errors['registeredAddress.address'] = 'Registered address is required';
+    }
+    if (!(data.registeredAddress.state || '').trim()) {
+      errors['registeredAddress.state'] = 'State/UT is required';
+    }
+    if (!(data.registeredAddress.district || '').trim()) {
+      errors['registeredAddress.district'] = 'District is required';
+    }
+    const regPin = (data.registeredAddress.pincode || '').trim();
+    if (!regPin) {
+      errors['registeredAddress.pincode'] = 'Pincode is required';
+    } else if (!this.isValidPincode(regPin)) {
+      errors['registeredAddress.pincode'] = 'Enter a valid 6-digit pincode';
+    }
+
+    // Right Side Mandatory Fields
+    const turnOver = (data.entityInfo.turnOver || '').toString().trim();
+    if (!turnOver) {
+      errors['entityInfo.turnOver'] = 'Turn Over is required';
+    } else {
+      const num = parseFloat(turnOver);
+      if (isNaN(num) || num < 0) {
+        errors['entityInfo.turnOver'] = 'Turn Over must be a valid number';
+      }
+    }
+
+    // Mandatory Postal Address
+    if (!data.sameAsRegistered) {
+      if (!(data.postalAddress.address || '').trim()) {
+        errors['postalAddress.address'] = 'Postal address is required';
+      }
+    }
+
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors
+    };
+  }
+
+  // --- TAB 2 VALIDATION: Authorized Person Details (Organisation Level) ---
+  validateTab2(data: TpPiaRegistrationData): TabValidationResult {
+    const errors: Record<string, string> = {};
+    const org = data.authorizedOrg;
+
+    // 1. Name *
+    if (!(org.name || '').trim()) {
+      errors['authorizedOrg.name'] = 'Authorized Person Name is required';
+    }
+
+    // 2. Mobile No. *
+    const contact = (org.contactNo || '').trim();
+    if (!contact) {
+      errors['authorizedOrg.contactNo'] = 'Mobile No. is required';
+    } else if (!this.isValidMobile(contact)) {
+      errors['authorizedOrg.contactNo'] = 'Enter a valid 10-digit mobile number';
+    }
+
+    // 3. PAN *
+    const pan = (org.pan || '').trim().toUpperCase();
+    if (!pan) {
+      errors['authorizedOrg.pan'] = 'PAN is required';
+    } else if (!this.isValidPan(pan)) {
+      errors['authorizedOrg.pan'] = 'Enter a valid 10-character PAN (e.g. ABCDE1234F)';
+    }
+
+    // Optional format validations if filled
+    const email = (org.emailId || '').trim();
+    if (email && !this.isValidEmail(email)) {
+      errors['authorizedOrg.emailId'] = 'Enter a valid email address';
+    }
+
+    const aadhaar = (org.aadhaarNo || '').trim();
+    if (aadhaar && !this.isValidAadhaar(aadhaar)) {
+      errors['authorizedOrg.aadhaarNo'] = 'Aadhaar must be exactly 12 digits';
+    }
+
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors
+    };
+  }
+
+  validateOfficer(officer: OfficerInCharge): TabValidationResult {
+    const errors: Record<string, string> = {};
+
+    if (!(officer.name || '').trim()) {
+      errors['name'] = 'Officer name is required';
+    }
+    if (!(officer.designation || '').trim()) {
+      errors['designation'] = 'Designation is required';
+    }
+
+    const mobile = (officer.mobileNo || '').trim();
+    if (!mobile) {
+      errors['mobileNo'] = 'Mobile No. is required';
+    } else if (!this.isValidMobile(mobile)) {
+      errors['mobileNo'] = 'Enter a valid 10-digit mobile number';
+    }
+
+    const email = (officer.emailId || '').trim();
+    if (!email) {
+      errors['emailId'] = 'Email ID is required';
+    } else if (!this.isValidEmail(email)) {
+      errors['emailId'] = 'Enter a valid email address';
+    }
+
+    const pan = (officer.pan || '').trim().toUpperCase();
+    if (pan && !this.isValidPan(pan)) {
+      errors['pan'] = 'Enter a valid 10-character PAN (e.g. ABCDE1234F)';
+    }
+
+    const aadhaar = (officer.aadhaarNo || '').trim();
+    if (aadhaar && !this.isValidAadhaar(aadhaar)) {
+      errors['aadhaarNo'] = 'Aadhaar must be exactly 12 digits';
+    }
+
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors
+    };
+  }
+
+  // --- TAB 3 VALIDATION: Bank Details ---
+  validateTab3(data: TpPiaRegistrationData): TabValidationResult {
+    const errors: Record<string, string> = {};
+    const bank = data.bankDetails;
+
+    // 1. Name of the Bank *
+    if (!(bank.bankName || '').trim()) {
+      errors['bankDetails.bankName'] = 'Name of the Bank is required';
+    }
+
+    // 2. Account No. *
+    const accNo = (bank.accountNo || '').trim();
+    if (!accNo) {
+      errors['bankDetails.accountNo'] = 'Account No. is required';
+    } else if (!this.isValidBankAccount(accNo)) {
+      errors['bankDetails.accountNo'] = 'Enter a valid Account Number (9 to 18 digits)';
+    }
+
+    // 3. IFSC Code *
+    const ifsc = (bank.ifscCode || '').trim().toUpperCase();
+    if (!ifsc) {
+      errors['bankDetails.ifscCode'] = 'IFSC Code is required';
+    } else if (!this.isValidIfsc(ifsc)) {
+      errors['bankDetails.ifscCode'] = 'Enter a valid 11-character IFSC (e.g. SBIN0004129)';
+    }
+
+    // 4. Branch Name *
+    if (!(bank.branchName || '').trim()) {
+      errors['bankDetails.branchName'] = 'Branch Name is required';
+    }
+
+    // 5. Branch Address *
+    if (!(bank.branchAddress || '').trim()) {
+      errors['bankDetails.branchAddress'] = 'Branch Address is required';
+    }
+
+    // Optional: MICR Code (must be 9 digits if entered)
+    const micr = (bank.micrCode || '').trim();
+    if (micr && !this.isValidMicr(micr)) {
+      errors['bankDetails.micrCode'] = 'MICR Code must be 9 digits';
+    }
+
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors
+    };
+  }
+
+  // --- TAB 4 VALIDATION: Document Upload ---
+  validateTab4(data: TpPiaRegistrationData): TabValidationResult {
+    const errors: Record<string, string> = {};
+    const mandatoryDocs = data.documents.filter(d => d.required);
+    const missingDocs = mandatoryDocs.filter(d => d.status !== 'uploaded' || !d.fileName);
+
+    if (missingDocs.length > 0) {
+      errors['documents'] = `${missingDocs.length} mandatory document(s) must be uploaded`;
+      for (const doc of missingDocs) {
+        errors[`doc_${doc.id}`] = `${doc.label} is required`;
+      }
+    }
+
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors
+    };
+  }
+
+  // --- TAB 5 VALIDATION (Delegated to Bank Details or future step) ---
+  validateTab5(data: TpPiaRegistrationData): TabValidationResult {
+    return this.validateTab3(data);
+  }
+
+  // --- TAB 6 VALIDATION ---
+  validateAward(award: AwardItem): TabValidationResult {
+    const errors: Record<string, string> = {};
+    if (!(award.awardName || '').trim()) {
+      errors['awardName'] = 'Award Name is required';
+    }
+    if (!(award.awardingAgency || '').trim()) {
+      errors['awardingAgency'] = 'Awarding Agency is required';
+    }
+    const year = (award.year || '').toString().trim();
+    if (year && (!/^\d{4}$/.test(year) || parseInt(year, 10) < 1950 || parseInt(year, 10) > 2100)) {
+      errors['year'] = 'Enter a valid 4-digit year (e.g. 2024)';
+    }
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors
+    };
+  }
+
+  validateTab6(data: TpPiaRegistrationData): TabValidationResult {
+    const errors: Record<string, string> = {};
+    for (let i = 0; i < data.awards.length; i++) {
+      const res = this.validateAward(data.awards[i]);
+      if (!res.isValid) {
+        errors[`awards[${i}]`] = `Award #${i + 1} has invalid details`;
+      }
+    }
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors
+    };
+  }
+
+  // --- TAB 7 VALIDATION ---
+  validateTab7(data: TpPiaRegistrationData): TabValidationResult {
+    return this.validateTab4(data);
+  }
+
+  // Memoization cache to avoid recalculating validations multiple times per change detection cycle
+  private validationCache = new Map<number, { dataRef: any; result: TabValidationResult }>();
+
+  clearValidationCache() {
+    this.validationCache.clear();
+  }
+
+  // --- OVERALL AUDIT ---
+  getTabValidation(tabId: number, data: TpPiaRegistrationData): TabValidationResult {
+    const cached = this.validationCache.get(tabId);
+    if (cached && cached.dataRef === data) {
+      return cached.result;
+    }
+
+    let result: TabValidationResult;
+    switch (tabId) {
+      case 1: result = this.validateTab1(data); break;
+      case 2: result = this.validateTab2(data); break;
+      case 3: result = this.validateTab3(data); break;
+      case 4: result = this.validateTab4(data); break;
+      default: result = { isValid: true, errors: {} }; break;
+    }
+
+    this.validationCache.set(tabId, { dataRef: data, result });
+    return result;
+  }
+
+  isTabValid(tabId: number, data: TpPiaRegistrationData): boolean {
+    return this.getTabValidation(tabId, data).isValid;
+  }
+
+  getFirstInvalidTab(data: TpPiaRegistrationData): number | null {
+    for (let tabId = 1; tabId <= 4; tabId++) {
+      if (!this.isTabValid(tabId, data)) {
+        return tabId;
+      }
+    }
+    return null;
+  }
+}

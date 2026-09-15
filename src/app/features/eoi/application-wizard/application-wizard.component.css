@@ -1,0 +1,2714 @@
+/* ========================================================================= */
+/* ISMS 2.0 PORTAL STYLES (Government of Rajasthan Standard Architecture)    */
+/* ========================================================================= */
+
+.gov-portal-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  background-color: #FFFFFF;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Main Container */
+.gov-main-container {
+  flex: 1;
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 32px 40px 60px 40px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Page Header & Step Meta */
+.page-title-section {
+  margin-bottom: 24px;
+}
+
+.title-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.title-meta-left {
+  flex: 1;
+  min-width: 260px;
+}
+
+.title-meta-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.gov-step-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: var(--color-primary-blue);
+  background-color: #EBF3FC;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #D0E2F7;
+  white-space: nowrap;
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-header-navy);
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.section-subtitle {
+  font-size: 13.5px;
+  color: #64748B;
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+.doc-summary-badge,
+.payment-total-pill,
+.preview-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #F8FAFC;
+  border: 1px solid var(--color-border);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: #334155;
+}
+
+.total-amount-val {
+  color: var(--color-primary-blue);
+  font-size: 14px;
+}
+
+.status-dot-green {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10B981;
+  display: inline-block;
+}
+
+.title-separator {
+  height: 1px;
+  background-color: var(--color-border);
+  margin-top: 16px;
+  width: 100%;
+}
+
+/* Info Callout */
+.gov-info-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background-color: #F0F7FF;
+  border: 1px solid #BAE6FD;
+  border-left: 4px solid var(--color-primary-blue);
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #1E3A8A;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.callout-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Form Section Card Layout */
+.gov-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.gov-card-section {
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.gov-card-header {
+  background-color: #F8FAFC;
+  border-bottom: 1px solid var(--color-border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.card-badge {
+  background-color: var(--color-primary-blue);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1E293B;
+  margin: 0;
+}
+
+.card-hint-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #0369A1;
+  background-color: #E0F2FE;
+  border: 1px solid #BAE6FD;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.gov-card-body {
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* ========================================================================= */
+/* 0. EOI LISTING / NOTICE STAGE (Apply Now Hero)                            */
+/* ========================================================================= */
+
+.gov-listing-stage {
+  padding: 10px 0;
+}
+
+.eoi-notice-hero-card {
+  background-color: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.notice-top-tag-row {
+  background-color: #131A4D;
+  color: #FFFFFF;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.notice-badge {
+  background-color: #E67E22;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 3px 10px;
+  border-radius: 4px;
+}
+
+.notice-deadline-tag {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.notice-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 28px;
+  padding: 28px;
+}
+
+.eoi-ref-label {
+  display: inline-block;
+  font-size: 12px;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.notice-headline {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-header-navy);
+  line-height: 1.35;
+  margin-bottom: 12px;
+}
+
+.notice-desc {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.notice-highlights-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.highlight-chip {
+  background-color: #F8FAFC;
+  border: 1px solid var(--color-border);
+  padding: 10px 14px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chip-label {
+  font-size: 11px;
+  color: #64748B;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.chip-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1E293B;
+}
+
+.notice-action-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.apply-cta-card {
+  background-color: #F0F7FF;
+  border: 1px solid #BAE6FD;
+  border-radius: 6px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.cta-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cta-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #16A34A;
+}
+
+.cta-status-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: #15803D;
+  text-transform: uppercase;
+}
+
+.cta-guideline {
+  font-size: 13px;
+  color: #334155;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.gov-btn-apply-now {
+  background: linear-gradient(135deg, #1E4D8F 0%, #163B6E 100%);
+  color: #FFFFFF;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 6px;
+  border: 1px solid #163B6E;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 6px rgba(30, 77, 143, 0.25);
+  transition: all 0.2s ease;
+  min-height: 46px;
+}
+
+.gov-btn-apply-now:hover {
+  background: linear-gradient(135deg, #163B6E 0%, #102A4E 100%);
+  box-shadow: 0 4px 10px rgba(30, 77, 143, 0.35);
+  transform: translateY(-1px);
+}
+
+.cta-meta-note {
+  font-size: 11px;
+  color: #64748B;
+  text-align: center;
+}
+
+/* ========================================================================= */
+/* 1. DOCUMENT UPLOAD SLOTS (7 Slots Architecture)                          */
+/* ========================================================================= */
+
+.doc-slots-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.doc-slot-row {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 16px 20px;
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.doc-slot-row:hover {
+  border-color: #CBD5E1;
+  background-color: #FAFAFA;
+}
+
+.doc-slot-row.is-uploaded {
+  border-color: #CBD5E1;
+  background-color: #FFFFFF;
+}
+
+.doc-slot-row.has-slot-error {
+  border-color: #FCA5A5;
+  background-color: #FEF2F2;
+}
+
+.slot-info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex: 1 1 420px;
+  min-width: 0;
+}
+
+.slot-number-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #F1F5F9;
+  border: 1.5px solid #CBD5E1;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.slot-number-badge.badge-mandatory {
+  border-color: #DC2626;
+  color: #DC2626;
+  background-color: #FEF2F2;
+}
+
+.slot-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.slot-title-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.slot-main-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #1E293B;
+}
+
+.status-chip {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+}
+
+.chip-mandatory {
+  background-color: #FEE2E2;
+  color: #B91C1C;
+  border: 1px solid #FECACA;
+}
+
+.chip-optional {
+  background-color: #F1F5F9;
+  color: #64748B;
+  border: 1px solid #E2E8F0;
+}
+
+.chip-core {
+  background-color: #E0E7FF;
+  color: #3730A3;
+  border: 1px solid #C7D2FE;
+}
+
+.slot-sub-title {
+  font-size: 12px;
+  color: #64748B;
+  line-height: 1.4;
+}
+
+.uploaded-file-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.uploaded-filename {
+  font-weight: 600;
+  color: #1E293B;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.uploaded-filesize {
+  color: #64748B;
+}
+
+.uploaded-status-check {
+  color: #475569;
+  font-weight: 500;
+  font-size: 11.5px;
+}
+
+.slot-inline-error {
+  color: #DC2626;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.slot-actions-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.upload-btn-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gov-btn-choose-file {
+  background-color: #FFFFFF;
+  border: 1.5px solid var(--color-primary-blue);
+  color: var(--color-primary-blue);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  min-height: 36px;
+}
+
+.gov-btn-choose-file:hover {
+  background-color: #F0F7FF;
+  box-shadow: 0 1px 4px rgba(30, 77, 143, 0.15);
+}
+
+.no-file-text {
+  font-size: 11.5px;
+  color: #94A3B8;
+}
+
+.uploaded-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.doc-action-btn {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid #CBD5E1;
+  background-color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.doc-action-btn.btn-view {
+  color: #1E40AF;
+  border-color: #CBD5E1;
+  background-color: #FFFFFF;
+}
+
+.doc-action-btn.btn-view:hover {
+  background-color: #F8FAFC;
+  border-color: #94A3B8;
+}
+
+.doc-action-btn.btn-change {
+  color: #334155;
+  border-color: #CBD5E1;
+  background-color: #FFFFFF;
+}
+
+.doc-action-btn.btn-change:hover {
+  background-color: #F8FAFC;
+  border-color: #94A3B8;
+}
+
+.doc-action-btn.btn-remove {
+  color: #DC2626;
+  border-color: #CBD5E1;
+  background-color: #FFFFFF;
+}
+
+.doc-action-btn.btn-remove:hover {
+  background-color: #FEF2F2;
+  border-color: #FCA5A5;
+}
+
+/* ========================================================================= */
+/* 2. FEE PAYMENT STAGE & DYNAMIC CALCULATION                                */
+/* ========================================================================= */
+
+.fees-page-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+
+.fees-main-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fee-section-note {
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.fee-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fee-selection-card {
+  border: 1.5px solid var(--color-border);
+  border-radius: 6px;
+  padding: 16px 18px;
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fee-selection-card:hover {
+  border-color: #94A3B8;
+  background-color: #F8FAFC;
+}
+
+.fee-selection-card.is-selected {
+  border-color: var(--color-primary-blue);
+  background-color: #F0F7FF;
+}
+
+.gov-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary-blue);
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.fee-details-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fee-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fee-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #1E293B;
+}
+
+.fee-amount-tag {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-primary-blue);
+}
+
+.fee-sub-desc {
+  font-size: 12px;
+  color: #64748B;
+  line-height: 1.4;
+}
+
+.fee-error-msg {
+  margin-top: 12px;
+  font-size: 12.5px;
+}
+
+/* Payment Methods Grid */
+.payment-methods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.payment-method-card {
+  border: 1.5px solid var(--color-border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.payment-method-card:hover {
+  border-color: #94A3B8;
+  background-color: #F8FAFC;
+}
+
+.payment-method-card.is-selected {
+  border-color: var(--color-primary-blue);
+  background-color: #F0F7FF;
+}
+
+.gov-radio {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--color-primary-blue);
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.method-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.method-icon {
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+
+.method-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1E293B;
+}
+
+.method-sub {
+  font-size: 11px;
+  color: #64748B;
+}
+
+/* Payment Summary Sidebar */
+.payment-summary-sticky-card {
+  background-color: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 70px;
+  overflow: hidden;
+}
+
+.summary-card-header {
+  background-color: #131A4D;
+  color: #FFFFFF;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.summary-header-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+
+.summary-eoi-tag {
+  font-size: 10.5px;
+  background-color: rgba(255, 255, 255, 0.18);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.summary-card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-fee-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13.5px;
+}
+
+.fee-item-name {
+  color: #475569;
+}
+
+.fee-item-val {
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.fee-item-val.is-zero {
+  color: #94A3B8;
+  text-decoration: line-through;
+}
+
+.summary-divider {
+  height: 1px;
+  background-color: var(--color-border);
+  margin: 4px 0;
+}
+
+.summary-total-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.total-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.total-big-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-primary-blue);
+}
+
+.selected-method-indicator {
+  font-size: 12px;
+  color: #0369A1;
+  background-color: #E0F2FE;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+
+.gov-btn-pay-action {
+  width: 100%;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 12px 16px;
+  min-height: 44px;
+}
+
+.summary-secure-note {
+  font-size: 11px;
+  color: #94A3B8;
+  text-align: center;
+  margin: 0;
+}
+
+/* ========================================================================= */
+/* 3. COMPLETE EOI DETAILS PREVIEW (Sections 5 to 13)                        */
+/* ========================================================================= */
+
+.preview-summary-strip {
+  background-color: #F8FAFC;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 14px 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.summary-meta-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.meta-label {
+  font-size: 11.5px;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.meta-val {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1E293B;
+}
+
+.preview-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-edit-btn {
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  color: #0F172A;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.section-edit-btn:hover {
+  background-color: #F1F5F9;
+  border-color: var(--color-primary-blue);
+  color: var(--color-primary-blue);
+}
+
+.payment-status-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.badge-success {
+  background-color: #DCFCE7;
+  color: #15803D;
+  border: 1px solid #BBF7D0;
+}
+
+.preview-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px 24px;
+}
+
+.preview-field-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.preview-field-item.full-span {
+  grid-column: 1 / -1;
+}
+
+.p-label {
+  font-size: 12px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.p-value {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1E293B;
+  line-height: 1.4;
+}
+
+.badge-status-active {
+  background-color: #DCFCE7;
+  color: #15803D;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+/* Preview Docs List */
+.preview-docs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.preview-doc-item {
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  background-color: #F8FAFC;
+}
+
+.preview-doc-item.not-uploaded {
+  opacity: 0.75;
+}
+
+.p-doc-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 300px;
+}
+
+.p-doc-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.p-doc-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.p-doc-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.p-doc-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1E293B;
+}
+
+.p-doc-sub {
+  font-size: 11.5px;
+  color: #64748B;
+}
+
+.p-doc-status-col {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.p-uploaded-tag {
+  font-size: 12px;
+  color: #15803D;
+  font-weight: 600;
+}
+
+.p-not-uploaded-tag {
+  font-size: 12px;
+  color: #94A3B8;
+}
+
+.preview-view-doc-btn {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 8px;
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #0284C7;
+}
+
+.bank-proof-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.badge-mode {
+  background-color: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #DBEAFE;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.text-link {
+  color: #0284C7;
+  text-decoration: underline;
+}
+
+.preview-view-doc-btn:hover {
+  background-color: #F0F9FF;
+}
+
+.preview-doc-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview-change-doc-btn {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 8px;
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.preview-change-doc-btn:hover {
+  background-color: #F8FAFC;
+  border-color: #94A3B8;
+  color: #0F172A;
+}
+
+@keyframes sectionHighlightFlash {
+  0% {
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.45);
+    border-color: #0284C7;
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(2, 132, 199, 0.2);
+    border-color: #0284C7;
+  }
+  100% {
+    box-shadow: none;
+    border-color: #E2E8F0;
+  }
+}
+
+.section-highlight-pulse {
+  animation: sectionHighlightFlash 2.5s ease-out;
+}
+
+/* Section Edit Banner */
+.section-edit-banner {
+  background-color: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 6px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.banner-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  background-color: #2563EB;
+  color: #FFFFFF;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+.banner-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1E40AF;
+  display: inline;
+  margin: 0;
+}
+
+.modification-active-alert {
+  background-color: #FFFBEB;
+  border: 1.5px solid #FCD34D;
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.mod-alert-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mod-alert-icon {
+  font-size: 22px;
+}
+
+.mod-alert-text strong {
+  color: #92400E;
+  font-size: 14.5px;
+  display: block;
+}
+
+.mod-alert-text p {
+  color: #78350F;
+  font-size: 13px;
+  margin: 2px 0 0 0;
+}
+
+/* ========================================================================= */
+/* 4. SUBMISSION RECEIPT & MODIFICATION WINDOW                              */
+/* ========================================================================= */
+
+.modification-window-banner {
+  background-color: #F0F9FF;
+  border: 1.5px solid #BAE6FD;
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.modification-window-banner.window-closed {
+  background-color: #FEF2F2;
+  border-color: #FECACA;
+}
+
+.mod-banner-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1 1 450px;
+}
+
+.mod-icon-box {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.mod-text-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mod-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mod-main-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0369A1;
+}
+
+.modification-window-banner.window-closed .mod-main-title {
+  color: #B91C1C;
+}
+
+.mod-countdown-tag {
+  background-color: #0284C7;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.mod-expired-tag {
+  background-color: #DC2626;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.mod-sub-desc {
+  font-size: 12.5px;
+  color: #334155;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.mod-banner-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.gov-btn-edit-app {
+  background-color: #FFFFFF;
+  border: 1.5px solid #0284C7;
+  color: #0284C7;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  min-height: 38px;
+  transition: all 0.15s ease;
+}
+
+.gov-btn-edit-app:hover:not(:disabled) {
+  background-color: #0284C7;
+  color: #FFFFFF;
+}
+
+.gov-btn-edit-app:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #CBD5E1;
+  color: #94A3B8;
+}
+
+.gov-btn-test-toggle {
+  font-size: 10.5px;
+  color: #64748B;
+  background: transparent;
+  border: 1px dashed #CBD5E1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.gov-btn-test-toggle:hover {
+  background-color: #FFFFFF;
+  color: #1E293B;
+}
+
+/* Receipt Card */
+.receipt-card {
+  border: 2px solid #1D246B;
+}
+
+.receipt-header-banner {
+  background: linear-gradient(135deg, #131A4D 0%, #1D246B 100%);
+  color: #FFFFFF;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  border-bottom: 3px solid #E67E22;
+}
+
+.receipt-emblem-wrap {
+  flex-shrink: 0;
+}
+
+.receipt-emblem {
+  height: 60px;
+  filter: brightness(0) invert(1);
+}
+
+.receipt-titles-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.receipt-govt-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #F8B471;
+}
+
+.receipt-dept-tag {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.receipt-main-title {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  margin: 2px 0;
+}
+
+.receipt-scheme-tag {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.receipt-status-stamp {
+  background-color: #10B981;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 4px;
+  letter-spacing: 0.8px;
+}
+
+.receipt-ref-bar {
+  background-color: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 6px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ref-col {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ref-label {
+  font-size: 13px;
+  color: #475569;
+}
+
+.ref-number-big {
+  font-size: 17px;
+  color: var(--color-header-navy);
+  font-family: monospace;
+}
+
+.receipt-copy-btn {
+  background-color: #FFFFFF;
+  border: 1px solid #93C5FD;
+  color: #1E40AF;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.receipt-copy-btn:hover {
+  background-color: #DBEAFE;
+}
+
+.receipt-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px 20px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.receipt-meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.r-label {
+  font-size: 11.5px;
+  color: #64748B;
+  text-transform: uppercase;
+}
+
+.r-val {
+  font-size: 13.5px;
+  color: #1E293B;
+}
+
+.receipt-sec-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-header-navy);
+  letter-spacing: 0.4px;
+  margin-bottom: 10px;
+}
+
+.receipt-payment-table-wrap {
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.receipt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.receipt-table thead th {
+  background-color: #F1F5F9;
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+  color: #334155;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.receipt-table tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #ECECEC;
+  color: #1E293B;
+}
+
+.r-tag-paid {
+  font-size: 11px;
+  font-weight: 700;
+  color: #15803D;
+  background-color: #DCFCE7;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.receipt-total-row td {
+  background-color: #F8FAFC;
+}
+
+.receipt-txn-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #64748B;
+  padding: 6px 4px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.receipt-official-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px dashed #CBD5E1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.receipt-disclaimer {
+  font-size: 11.5px;
+  color: #64748B;
+  max-width: 580px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.receipt-signature-stamp {
+  border: 2px solid var(--color-primary-blue);
+  border-radius: 6px;
+  padding: 6px 14px;
+  text-align: center;
+  color: var(--color-primary-blue);
+}
+
+.stamp-org {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+
+.stamp-sub {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+/* ========================================================================= */
+/* BUTTONS & FOOTER ACTIONS                                                 */
+/* ========================================================================= */
+
+.gov-form-footer {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.footer-left,
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gov-btn {
+  height: 42px;
+  padding: 0 22px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  min-height: 42px;
+}
+
+.gov-btn-draft {
+  background-color: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  color: #334155;
+}
+
+.gov-btn-draft:hover {
+  background-color: #F8FAFC;
+  border-color: #94A3B8;
+  color: #0F172A;
+}
+
+.gov-btn-secondary {
+  background-color: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  color: #334155;
+}
+
+.gov-btn-secondary:hover {
+  background-color: #F1F5F9;
+  border-color: var(--color-primary-blue);
+  color: var(--color-primary-blue);
+}
+
+.gov-btn-primary {
+  background: linear-gradient(135deg, #1E4D8F 0%, #163B6E 100%);
+  border: 1px solid #163B6E;
+  color: #FFFFFF;
+  box-shadow: 0 2px 4px rgba(30, 77, 143, 0.2);
+}
+
+.gov-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #163B6E 0%, #102A4E 100%);
+  box-shadow: 0 4px 8px rgba(30, 77, 143, 0.3);
+}
+
+.gov-btn-submit {
+  background: linear-gradient(135deg, #16A34A 0%, #15803D 100%);
+  border: 1px solid #15803D;
+  color: #FFFFFF;
+  font-weight: 700;
+  padding: 0 26px;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+}
+
+.gov-btn-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #15803D 0%, #166534 100%);
+  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.35);
+}
+
+.gov-btn-add {
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-primary-blue);
+  color: var(--color-primary-blue);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  min-height: 30px;
+}
+
+.gov-btn-add:hover {
+  background-color: #F0F7FF;
+}
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #FFFFFF;
+  border-radius: 50%;
+  animation: btnSpin 0.65s linear infinite;
+  display: inline-block;
+}
+
+@keyframes btnSpin {
+  to { transform: rotate(360deg); }
+}
+
+.btn-spinner-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ========================================================================= */
+/* MODALS & DIALOGS                                                          */
+/* ========================================================================= */
+
+.gov-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.65);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  animation: fadeInBackdrop 0.2s ease;
+}
+
+@keyframes fadeInBackdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.gov-modal-box {
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 520px;
+  overflow: hidden;
+  animation: popModal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+@keyframes popModal {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.gov-modal-header {
+  background-color: #F8FAFC;
+  border-bottom: 1px solid var(--color-border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gov-modal-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1E293B;
+  margin: 0;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #64748B;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.modal-close-btn:hover {
+  color: #0F172A;
+}
+
+.gov-modal-body {
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.gov-modal-footer {
+  background-color: #F8FAFC;
+  border-top: 1px solid var(--color-border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Confirmation Dialog */
+.confirm-dialog-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.confirm-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.icon-submit-wrap {
+  background-color: #F0FDF4;
+  border-color: #BBF7D0;
+}
+
+.confirm-main-prompt {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1E293B;
+  margin: 0 0 6px 0;
+}
+
+.confirm-sub-prompt {
+  font-size: 13px;
+  color: #64748B;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Payment Success Modal */
+.payment-success-modal-box {
+  max-width: 460px;
+}
+
+.payment-success-header {
+  background: linear-gradient(135deg, #15803D 0%, #166534 100%);
+  color: #FFFFFF;
+  padding: 24px 20px 18px 20px;
+  text-align: center;
+}
+
+.success-animated-tick {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  color: #15803D;
+  font-size: 28px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.payment-success-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0 0 4px 0;
+}
+
+.payment-success-sub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.payment-success-detail-card {
+  background-color: #F8FAFC;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pay-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.d-label {
+  color: #64748B;
+}
+
+.d-val {
+  color: #1E293B;
+}
+
+.pay-continue-note {
+  font-size: 12px;
+  color: #64748B;
+  margin-top: 14px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.gov-btn-full {
+  width: 100%;
+}
+
+/* PDF Viewer Modal */
+.pdf-viewer-modal-box {
+  max-width: 620px;
+}
+
+.pdf-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: #0369A1;
+  background-color: #E0F2FE;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 2px;
+}
+
+.mock-pdf-page {
+  background-color: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.pdf-top-bar {
+  background-color: #1E293B;
+  color: #FFFFFF;
+  font-size: 11.5px;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.mock-pdf-content {
+  background-color: #FFFFFF;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  min-height: 220px;
+}
+
+.mock-pdf-emblem-wrap h4 {
+  font-size: 13px;
+  color: #1E293B;
+  margin: 6px 0 2px 0;
+}
+
+.mock-pdf-emblem-wrap p {
+  font-size: 11px;
+  color: #64748B;
+  margin: 0;
+}
+
+.mock-pdf-lines {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.mock-line {
+  height: 6px;
+  background-color: #E2E8F0;
+  border-radius: 3px;
+}
+
+.line-wide { width: 85%; }
+.line-med { width: 65%; }
+.line-short { width: 45%; }
+
+.pdf-certified-stamp {
+  border: 1.5px dashed #16A34A;
+  color: #16A34A;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+/* Toast Banner */
+.gov-toast-banner {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: #1E293B;
+  color: #FFFFFF;
+  padding: 12px 18px;
+  border-radius: 6px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 2000;
+  animation: slideToast 0.25s ease;
+}
+
+@keyframes slideToast {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Data Tables */
+.table-responsive {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  display: block;
+}
+
+.gov-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.gov-data-table thead th {
+  background-color: var(--color-bg-table-head);
+  color: var(--color-header-navy);
+  font-weight: 600;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border);
+  border-right: 1px solid #E5E9EE;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.gov-data-table tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #ECECEC;
+  border-right: 1px solid #F0F0F0;
+  color: #1E293B;
+}
+
+.table-input {
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.action-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 14px;
+}
+
+.action-btn-delete {
+  color: #DC2626;
+}
+
+/* Form Controls in edit sections */
+.gov-form-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.gov-form-row {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.gov-label {
+  flex: 0 0 280px;
+  max-width: 280px;
+  min-width: 0;
+  padding-top: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--color-text-main);
+  line-height: 1.4;
+  padding-right: 20px;
+  box-sizing: border-box;
+}
+
+.gov-control-wrapper {
+  flex: 1 1 auto;
+  max-width: 550px;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.gov-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  font-size: 13.5px;
+  outline: none;
+}
+
+.gov-input:focus {
+  border-color: var(--color-primary-blue);
+  box-shadow: 0 0 0 3px rgba(30, 77, 143, 0.15);
+}
+
+.gov-textarea {
+  min-height: 70px;
+  padding: 8px 12px;
+  font-family: inherit;
+}
+
+.gov-select {
+  height: 38px;
+  background-color: #FFFFFF;
+}
+
+.field-hint {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.error-feedback {
+  color: #DC2626;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.req-star {
+  color: #DC2626;
+  font-weight: 600;
+}
+
+/* Site Footer */
+.gov-site-footer {
+  border-top: 1px solid var(--color-border);
+  background-color: #F8FAFC;
+  padding: 16px 40px;
+  font-size: 12px;
+  color: #64748B;
+  margin-top: auto;
+}
+
+.gov-footer-inner {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-meta-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ========================================================================= */
+/* RESPONSIVE MEDIA QUERIES (Laptops, Tablets, Foldables, Mobiles)           */
+/* ========================================================================= */
+
+/* Large Tablets & Small Laptops (iPad Pro, Surface Pro 7, Nest Hub Max: 769px - 1024px) */
+@media (max-width: 1024px) {
+  .gov-main-container {
+    padding: 24px 20px 48px 20px;
+  }
+
+  .notice-content-grid,
+  .fees-page-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .payment-summary-sticky-card {
+    position: static;
+    margin-top: 8px;
+  }
+
+  .preview-fields-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px 18px;
+  }
+
+  .receipt-meta-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+/* Medium Tablets, Foldables & Phablets (iPad Mini, Surface Duo, Asus Zenbook Fold: 541px - 768px) */
+@media (max-width: 768px) {
+  .gov-main-container {
+    padding: 16px 14px 40px 14px;
+  }
+
+  .section-title {
+    font-size: 19px;
+  }
+
+  .section-subtitle {
+    font-size: 12.5px;
+  }
+
+  .title-header-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .title-meta-right {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  /* Form edit section layout */
+  .gov-form-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .gov-label {
+    flex: none;
+    max-width: 100%;
+    padding-top: 0;
+    padding-right: 0;
+    font-size: 13px;
+  }
+
+  .gov-control-wrapper {
+    max-width: 100%;
+  }
+
+  /* Document upload slots on Step 1 */
+  .doc-slot-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .slot-info-box {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .uploaded-filename {
+    max-width: clamp(140px, 60vw, 300px);
+  }
+
+  .slot-actions-box {
+    justify-content: flex-start;
+    width: 100%;
+    border-top: 1px dashed #E2E8F0;
+    padding-top: 10px;
+  }
+
+  .upload-btn-wrap {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .uploaded-actions-group {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .doc-action-btn {
+    flex: 1 1 auto;
+    min-height: 38px;
+  }
+
+  /* Fees and Payment on Step 2 */
+  .payment-methods-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .fee-name-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* Step 3 Preview Checklist */
+  .preview-doc-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .p-doc-main {
+    flex: 1 1 100%;
+  }
+
+  .p-doc-status-col {
+    width: 100%;
+    justify-content: space-between;
+    border-top: 1px dashed #E2E8F0;
+    padding-top: 8px;
+  }
+
+  .preview-doc-btn-group {
+    display: flex;
+    gap: 8px;
+  }
+
+  .preview-view-doc-btn,
+  .preview-change-doc-btn {
+    min-height: 34px;
+    padding: 6px 12px;
+  }
+
+  /* Form actions footer */
+  .gov-form-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .footer-left,
+  .footer-right {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .footer-left .gov-btn,
+  .footer-right .gov-btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  /* Receipt Page */
+  .receipt-header-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .receipt-ref-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .receipt-official-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .receipt-signature-stamp {
+    align-self: flex-start;
+  }
+
+  .receipt-actions-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .receipt-actions-bar .gov-btn {
+    width: 100%;
+  }
+
+  /* Modals */
+  .gov-modal-backdrop {
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .gov-modal-box {
+    max-height: 90vh;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .gov-modal-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .gov-modal-footer .gov-btn {
+    width: 100%;
+    min-height: 42px;
+  }
+}
+
+/* Compact Mobile Phones & iPhones (iPhone SE, XR, 12-16 Pro Max, Pixel 7-10, Galaxy S8-S20, A51/71: 361px - 540px) */
+@media (max-width: 540px) {
+  .gov-main-container {
+    padding: 12px 10px 32px 10px;
+  }
+
+  .section-title {
+    font-size: 17px;
+  }
+
+  .section-subtitle {
+    font-size: 12px;
+  }
+
+  .gov-card-header {
+    padding: 12px 14px;
+  }
+
+  .gov-card-body {
+    padding: 14px 12px;
+  }
+
+  .card-title {
+    font-size: 14px;
+  }
+
+  .preview-fields-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .payment-methods-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fee-selection-card {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .fee-title {
+    font-size: 13.5px;
+  }
+
+  .fee-amount-tag {
+    font-size: 14px;
+  }
+
+  .total-big-val {
+    font-size: 18px;
+  }
+
+  .notice-headline {
+    font-size: 17px;
+  }
+
+  .notice-highlights-row {
+    grid-template-columns: 1fr;
+  }
+
+  .notice-content-grid {
+    padding: 16px 12px;
+  }
+
+  .gov-info-callout {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .gov-site-footer {
+    padding: 14px 12px;
+  }
+
+  .gov-footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .footer-meta-links {
+    flex-wrap: wrap;
+  }
+}
+
+/* Ultra-Compact & Folded Phones (Galaxy Z Fold 5 Cover Screen: <= 360px) */
+@media (max-width: 360px) {
+  .gov-main-container {
+    padding: 10px 6px 28px 6px;
+  }
+
+  .section-title {
+    font-size: 15.5px;
+  }
+
+  .gov-card-header {
+    padding: 10px 10px;
+  }
+
+  .gov-card-body {
+    padding: 12px 8px;
+  }
+
+  .slot-main-title {
+    font-size: 13px;
+  }
+
+  .slot-sub-title {
+    font-size: 11px;
+  }
+
+  .gov-btn {
+    font-size: 12.5px;
+    padding: 0 14px;
+  }
+}
+
+/* ========================================================================= */
+/* PRINT MEDIA (Clean A4 Receipt)                                            */
+/* ========================================================================= */
+
+@media print {
+  body {
+    background-color: #FFFFFF !important;
+  }
+
+  .gov-top-header,
+  .gov-step-nav-bar,
+  .gov-scheme-summary-card,
+  .modification-window-banner,
+  .receipt-actions-bar,
+  .gov-site-footer,
+  .gov-toast-banner {
+    display: none !important;
+  }
+
+  .gov-main-container {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .receipt-card {
+    border: 1px solid #1D246B !important;
+    box-shadow: none !important;
+  }
+}
+
+/* ========================================================================= */
+/* SELECTED SCHEME & EOI TENDER SUMMARY CARD (Step 1 Top Banner)            */
+/* ========================================================================= */
+
+.gov-scheme-summary-card {
+  background: #FFFFFF;
+  border: 1.5px solid #002244;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 34, 68, 0.08);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.scheme-summary-top-bar {
+  background: linear-gradient(135deg, #002244 0%, #003366 100%);
+  color: #FFFFFF;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-bottom: 2px solid #F59E0B;
+}
+
+.scheme-tag-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.scheme-badge-primary {
+  background-color: #EA580C;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.scheme-code-badge {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #FDE68A;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(253, 230, 138, 0.3);
+}
+
+.scheme-category-badge {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #E2E8F0;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.scheme-change-btn {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.scheme-change-btn:hover {
+  background: #F59E0B;
+  color: #002244;
+  border-color: #F59E0B;
+}
+
+.scheme-summary-main {
+  padding: 16px 20px 18px;
+  background-color: #FCFDFE;
+}
+
+.scheme-summary-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #002244;
+  margin: 0 0 6px;
+  line-height: 1.35;
+}
+
+.scheme-summary-desc {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+.scheme-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px 16px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  background-color: #F8FAFC;
+  border: 1px solid #E2E8F0;
+}
+
+.scheme-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sm-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.sm-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F172A;
+  line-height: 1.3;
+}
+
+.sm-value.text-danger {
+  color: #DC2626;
+}
+
+.sm-sub {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #64748B;
+}

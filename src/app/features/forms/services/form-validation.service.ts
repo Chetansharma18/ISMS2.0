@@ -225,15 +225,18 @@ export class FormValidationService {
       errors['authorizedOrg.pan'] = 'Enter a valid 10-character PAN (e.g. ABCDE1234F)';
     }
 
+    // 4. Aadhaar *
+    const aadhaar = (org.aadhaarNo || '').trim();
+    if (!aadhaar) {
+      errors['authorizedOrg.aadhaarNo'] = 'Aadhaar Number is required';
+    } else if (!this.isValidAadhaar(aadhaar)) {
+      errors['authorizedOrg.aadhaarNo'] = 'Aadhaar must be exactly 12 digits';
+    }
+
     // Optional format validations if filled
     const email = (org.emailId || '').trim();
     if (email && !this.isValidEmail(email)) {
       errors['authorizedOrg.emailId'] = 'Enter a valid email address';
-    }
-
-    const aadhaar = (org.aadhaarNo || '').trim();
-    if (aadhaar && !this.isValidAadhaar(aadhaar)) {
-      errors['authorizedOrg.aadhaarNo'] = 'Aadhaar must be exactly 12 digits';
     }
 
     return {

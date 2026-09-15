@@ -319,7 +319,7 @@ export class EoiStateService {
       processingFee: 2500,
       attachedFile: 'EOI_MMKVY_RSLDC_2026.pdf',
       department: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
-      status: 'Open',
+      status: 'Closed',
       responseCount: 14,
       targetBeneficiaries: 'Youth of Rajasthan (Aged 18-35) with priority to rural and underprivileged categories.',
       eligibilityPreview: [
@@ -398,7 +398,7 @@ export class EoiStateService {
       processingFee: 1800,
       attachedFile: 'EOI_SAMARTH_Technical_Specs.pdf',
       department: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
-      status: 'Open',
+      status: 'Closed',
       responseCount: 8,
       targetBeneficiaries: 'Diploma holders, ITI graduates, and engineering dropouts seeking industrial certifications.',
       eligibilityPreview: [

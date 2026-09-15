@@ -169,19 +169,7 @@ import { Observable } from 'rxjs';
             <span class="tracking-tight">EOI Requests Desk</span>
           </a>
 
-          <!-- 2. Scrutiny Desk -->
-          <a 
-            routerLink="/admin/responses" 
-            routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
-            class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
-            <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-              </svg>
-            </div>
-            <span class="tracking-tight">Application Scrutiny Desk</span>
-          </a>
+
         </ng-container>
 
         <!-- ================= SUPER ADMIN ================= -->

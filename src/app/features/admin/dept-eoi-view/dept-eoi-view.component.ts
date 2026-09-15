@@ -19,7 +19,7 @@ import { Observable } from 'rxjs';
         <app-sidebar class="hidden md:block"></app-sidebar>
 
         <!-- Main Department Content Area -->
-        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto">
+        <main class="flex-grow px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto">
           
           <!-- Top Breadcrumb & Department Header -->
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 mb-6" *ngIf="userProfile$ | async as profile">

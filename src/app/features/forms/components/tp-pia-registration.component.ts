@@ -34,7 +34,7 @@ export interface TabItem {
       <div>
         <!-- 1. Government of Rajasthan Official Header -->
         <header class="relative bg-[#1a2656] text-white shadow-md">
-          <div class="w-full px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex items-center">
+          <div class="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex items-center">
             <!-- Left: Ashoka Lion Emblem & State Portal Titles -->
             <div class="flex items-center gap-2.5 sm:gap-3.5">
               <!-- Official State Emblem (Ashoka Lion Capital with Satyameva Jayate) -->
@@ -66,19 +66,19 @@ export interface TabItem {
 
         <!-- 2. Connected Stepper Bar (Responsive & Smoothly Scrollable) -->
         <nav class="bg-white border-b border-slate-200 shadow-2xs">
-          <div class="w-full px-2.5 sm:px-5 lg:px-8 py-2 sm:py-2.5">
+          <div class="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-2.5">
             <div class="flex items-center justify-start md:justify-between overflow-x-auto no-scrollbar scroll-smooth gap-1 sm:gap-2 w-full pb-0.5">
               @for (tab of tabs; track tab.id; let idx = $index; let last = $last) {
                 <button 
                   type="button" 
                   [id]="'step-btn-' + tab.id"
                   (click)="switchTab(tab.id)"
-                  class="flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer text-left group focus:outline-none py-1 px-1.5 sm:px-2 rounded-lg hover:bg-slate-50 transition"
+                  class="flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer text-left group focus:outline-none py-1 px-1.5 sm:px-2 rounded-lg hover:bg-slate-50 transition-all duration-200 active:scale-97"
                   [attr.aria-label]="tab.label"
                 >
                   <!-- Step Circle -->
                   <div 
-                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition"
+                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all duration-200"
                     [ngClass]="activeTab() === tab.id 
                       ? 'bg-[#1a2656] text-white shadow-xs' 
                       : tabStatuses()[tab.id].isCompleted
@@ -123,249 +123,420 @@ export interface TabItem {
         </nav>
 
         <!-- 3. Main Form Container -->
-        <main class="w-full px-3 sm:px-6 lg:px-8 mt-4 sm:mt-5 pb-24 sm:pb-28">
+        <main class="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-4 sm:mt-6 pb-12 sm:pb-16">
           <!-- Step Title & Subtitle Banner -->
           <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 sm:pb-3.5 mb-4 sm:mb-5 border-b border-slate-200 gap-2">
             <div>
               <h2 class="text-lg sm:text-2xl font-bold text-slate-900 tracking-tight leading-snug">
                 {{ currentStepInfo.title }}
               </h2>
-              <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-                {{ currentStepInfo.subtitle }}
+              <p class="text-xs sm:text-sm text-slate-500 mt-0.5 flex flex-wrap items-center gap-x-2">
+                <span>{{ currentStepInfo.subtitle }}</span>
+                <span class="text-slate-300 hidden sm:inline">•</span>
+                <span class="text-slate-500 font-medium">Fields with <span class="text-rose-500 font-bold">*</span> are mandatory</span>
               </p>
             </div>
 
-            <!-- Step Badge & Quick Preview -->
+            <!-- Auto-Save Status Indicator -->
             <div class="self-start sm:self-center shrink-0 flex items-center gap-2">
-              <button 
-                type="button" 
-                (click)="openPreviewModal()"
-                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 transition cursor-pointer shadow-2xs"
-                title="Preview full application form"
-              >
-                <svg class="w-3.5 h-3.5 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                <span>Preview</span>
-              </button>
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-800 border border-sky-200">
-                Step {{ activeTab() }} of {{ tabs.length }}
-              </span>
+              @if (service.autoSaveStatus() === 'saving') {
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200/80 transition-all duration-200 shadow-2xs">
+                  <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                  </span>
+                  <span>Auto-saving...</span>
+                </div>
+              } @else if (service.autoSaveStatus() === 'saved') {
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200 transition-all duration-200 shadow-2xs">
+                  <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Auto-saved <span class="font-normal text-emerald-700">({{ service.lastSavedTime() }})</span></span>
+                </div>
+              }
             </div>
           </div>
 
-          <!-- Active Step Component -->
+          <!-- Active Step Component with Smooth Transitions -->
           <div class="w-full">
-            <div [class.hidden]="activeTab() !== 1">
+            <div [class.hidden]="activeTab() !== 1" [class.step-content-smooth]="activeTab() === 1">
               <app-tab-org-details />
             </div>
-            <div [class.hidden]="activeTab() !== 2">
+            <div [class.hidden]="activeTab() !== 2" [class.step-content-smooth]="activeTab() === 2">
               <app-tab-authorized-org />
             </div>
-            <div [class.hidden]="activeTab() !== 3">
+            <div [class.hidden]="activeTab() !== 3" [class.step-content-smooth]="activeTab() === 3">
               <app-tab-bank-details />
             </div>
-            <div [class.hidden]="activeTab() !== 4">
+            <div [class.hidden]="activeTab() !== 4" [class.step-content-smooth]="activeTab() === 4">
               <app-tab-documents />
+            </div>
+
+            <!-- Step 5: Application Review & Final Submission (3 Editable Blocks + Documents & Declaration) -->
+            <div [class.hidden]="activeTab() !== 5" [class.step-content-smooth]="activeTab() === 5">
+              <div class="space-y-6">
+
+                <!-- Block 1: Organisation Details (Step 1) -->
+                <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
+                  <div class="px-4 sm:px-6 py-3.5 bg-slate-50/90 border-b border-slate-200 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-blue-700"></span>
+                      <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800">
+                        1. Organisation & Basic Details
+                      </h3>
+                    </div>
+                    <button 
+                      type="button" 
+                      (click)="switchTab(1)"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-900 border border-blue-200 hover:border-blue-300 rounded-md text-xs font-semibold transition cursor-pointer shadow-2xs"
+                    >
+                      <svg class="w-3.5 h-3.5 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                      <span>Edit Step 1</span>
+                    </button>
+                  </div>
+                  <div class="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs sm:text-sm">
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Application No:</span>
+                      <b class="font-mono text-slate-800">{{ data.basicInfo.applicationNo }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Date of Registration:</span>
+                      <b class="text-slate-800">{{ data.basicInfo.dateOfRegistration || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">TP/PIA Full Name:</span>
+                      <b class="text-slate-800">{{ data.basicInfo.fullName || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">TP/PIA Short Name:</span>
+                      <b class="font-mono uppercase text-slate-800">{{ data.basicInfo.shortName || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Registration Number:</span>
+                      <b class="font-mono text-slate-800">{{ data.basicInfo.registrationNumber || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Organisation PAN:</span>
+                      <b class="font-mono uppercase text-slate-800">{{ data.basicInfo.panNo || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Business / Activity:</span>
+                      <b class="text-slate-800">{{ data.entityInfo.businessActivity || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">State Where Registered:</span>
+                      <b class="text-slate-800">{{ data.entityInfo.stateWhereRegistered || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Annual Turnover:</span>
+                      <b class="text-slate-800">₹ {{ data.entityInfo.turnOver || '0' }} Lakhs</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Contact No:</span>
+                      <b class="font-mono text-slate-800">+91 {{ data.basicInfo.contactNo || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Company Email-ID:</span>
+                      <b class="text-slate-800">{{ data.basicInfo.emailId || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Official Website:</span>
+                      <b class="text-slate-800">{{ data.basicInfo.website || '—' }}</b>
+                    </div>
+                    <div class="sm:col-span-2 lg:col-span-3 pt-2 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <span class="text-slate-500 font-medium block text-xs">Registered Office Address:</span>
+                        <b class="text-slate-800">{{ data.registeredAddress.address || '—' }}, {{ data.registeredAddress.district || '' }}, {{ data.registeredAddress.state || '' }} - {{ data.registeredAddress.pincode || '' }}</b>
+                      </div>
+                      <div>
+                        <span class="text-slate-500 font-medium block text-xs">Postal / Mailing Address:</span>
+                        <b class="text-slate-800">{{ data.postalAddress.address || '—' }}</b>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Block 2: Authorized Person Details (Step 2) -->
+                <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
+                  <div class="px-4 sm:px-6 py-3.5 bg-slate-50/90 border-b border-slate-200 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                      <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800">
+                        2. Authorized Person & Signatory Profile
+                      </h3>
+                    </div>
+                    <button 
+                      type="button" 
+                      (click)="switchTab(2)"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-900 border border-blue-200 hover:border-blue-300 rounded-md text-xs font-semibold transition cursor-pointer shadow-2xs"
+                    >
+                      <svg class="w-3.5 h-3.5 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                      <span>Edit Step 2</span>
+                    </button>
+                  </div>
+                  <div class="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs sm:text-sm">
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Authorized Person Name:</span>
+                      <b class="text-slate-800">{{ data.authorizedOrg.name || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Father's / Husband's Name:</span>
+                      <b class="text-slate-800">{{ data.authorizedOrg.guardianName || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Date of Birth & Age:</span>
+                      <b class="text-slate-800">{{ data.authorizedOrg.dob || '—' }} {{ data.authorizedOrg.age ? '(' + data.authorizedOrg.age + ' Years)' : '' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Designation:</span>
+                      <b class="text-slate-800">{{ data.authorizedOrg.designation || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Mobile No:</span>
+                      <b class="font-mono text-slate-800">+91 {{ data.authorizedOrg.contactNo || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Email-ID:</span>
+                      <b class="text-slate-800">{{ data.authorizedOrg.emailId || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">PAN:</span>
+                      <b class="font-mono uppercase text-slate-800">{{ data.authorizedOrg.pan || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Aadhaar No:</span>
+                      <b class="font-mono text-slate-800">{{ data.authorizedOrg.aadhaarNo || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">ID Proof:</span>
+                      <b class="text-slate-800">{{ data.authorizedOrg.typeIdProof || '—' }} {{ data.authorizedOrg.idNo ? '(' + data.authorizedOrg.idNo + ')' : '' }}</b>
+                    </div>
+                    @if (data.authorizedOrg.bhamashahNo) {
+                      <div>
+                        <span class="text-slate-500 font-medium block text-xs">Bhamashah No:</span>
+                        <b class="font-mono text-slate-800">{{ data.authorizedOrg.bhamashahNo }}</b>
+                      </div>
+                    }
+                    @if (data.authorizedOrg.voterIdNo) {
+                      <div>
+                        <span class="text-slate-500 font-medium block text-xs">Voter ID No:</span>
+                        <b class="font-mono text-slate-800">{{ data.authorizedOrg.voterIdNo }}</b>
+                      </div>
+                    }
+                    @if (data.authorizedOrg.passportNo) {
+                      <div>
+                        <span class="text-slate-500 font-medium block text-xs">Passport No:</span>
+                        <b class="font-mono text-slate-800">{{ data.authorizedOrg.passportNo }}</b>
+                      </div>
+                    }
+                    <div class="sm:col-span-2 lg:col-span-3 pt-2 border-t border-slate-100">
+                      <span class="text-slate-500 font-medium block text-xs">Residential Address:</span>
+                      <b class="text-slate-800">{{ data.authorizedOrg.residenceAddress || '—' }} {{ data.authorizedOrg.state ? ', ' + data.authorizedOrg.state : '' }}</b>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Block 3: Bank Details (Step 3) -->
+                <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
+                  <div class="px-4 sm:px-6 py-3.5 bg-slate-50/90 border-b border-slate-200 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-amber-600"></span>
+                      <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800">
+                        3. Bank Account & Verification Details
+                      </h3>
+                    </div>
+                    <button 
+                      type="button" 
+                      (click)="switchTab(3)"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-900 border border-blue-200 hover:border-blue-300 rounded-md text-xs font-semibold transition cursor-pointer shadow-2xs"
+                    >
+                      <svg class="w-3.5 h-3.5 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                      <span>Edit Step 3</span>
+                    </button>
+                  </div>
+                  <div class="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs sm:text-sm">
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Bank Name:</span>
+                      <b class="text-slate-800">{{ data.bankDetails.bankName || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Account Number:</span>
+                      <b class="font-mono text-slate-800">{{ data.bankDetails.accountNo || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">IFSC Code:</span>
+                      <b class="font-mono uppercase text-slate-800">{{ data.bankDetails.ifscCode || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Type of Account:</span>
+                      <b class="text-slate-800">{{ data.bankDetails.accountType || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Transfer Mode:</span>
+                      <b class="text-slate-800">{{ data.bankDetails.electronicTransferMode || '—' }}</b>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Branch Name:</span>
+                      <b class="text-slate-800">{{ data.bankDetails.branchName || '—' }}</b>
+                    </div>
+                    @if (data.bankDetails.micrCode) {
+                      <div>
+                        <span class="text-slate-500 font-medium block text-xs">MICR Code:</span>
+                        <b class="font-mono text-slate-800">{{ data.bankDetails.micrCode }}</b>
+                      </div>
+                    }
+                    <div>
+                      <span class="text-slate-500 font-medium block text-xs">Cancelled Cheque:</span>
+                      <span class="font-semibold text-emerald-700">{{ data.bankDetails.cancelledChequeFileName || 'Attached' }}</span>
+                    </div>
+                    <div class="sm:col-span-2 lg:col-span-3 pt-2 border-t border-slate-100">
+                      <span class="text-slate-500 font-medium block text-xs">Branch Address:</span>
+                      <b class="text-slate-800">{{ data.bankDetails.branchAddress || '—' }}</b>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Block 4: Uploaded Documents Summary (Step 4) -->
+                <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
+                  <div class="px-4 sm:px-6 py-3.5 bg-slate-50/90 border-b border-slate-200 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-sky-600"></span>
+                      <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800">
+                        4. Uploaded Compliance Documents
+                      </h3>
+                    </div>
+                    <button 
+                      type="button" 
+                      (click)="switchTab(4)"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-900 border border-blue-200 hover:border-blue-300 rounded-md text-xs font-semibold transition cursor-pointer shadow-2xs"
+                    >
+                      <svg class="w-3.5 h-3.5 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                      <span>Edit Step 4</span>
+                    </button>
+                  </div>
+                  <div class="p-4 sm:p-6">
+                    <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+                      <span class="text-xs font-semibold text-slate-700">Document Upload Summary:</span>
+                      <span class="inline-flex items-center gap-1.5 px-3 py-1 font-bold text-xs rounded-full"
+                        [ngClass]="uploadedRequiredCount === totalRequiredCount ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'">
+                        ✓ {{ uploadedRequiredCount }} / {{ totalRequiredCount }} Mandatory Uploaded
+                      </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      @for (doc of data.documents; track doc.id) {
+                        <div class="flex items-center justify-between p-2.5 rounded-lg border text-xs"
+                          [ngClass]="doc.status === 'uploaded' ? 'bg-emerald-50/50 border-emerald-200' : 'bg-slate-50 border-slate-200'">
+                          <div class="flex items-center gap-2 min-w-0">
+                            @if (doc.status === 'uploaded') {
+                              <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                              </svg>
+                            } @else {
+                              <span class="w-4 h-4 rounded-full border border-slate-300 shrink-0"></span>
+                            }
+                            <span class="font-medium text-slate-800 truncate" [title]="doc.label">{{ doc.label }}</span>
+                          </div>
+                          <span class="text-[11px] shrink-0 font-medium ml-2"
+                            [ngClass]="doc.status === 'uploaded' ? 'text-emerald-700' : 'text-slate-400'">
+                            {{ doc.status === 'uploaded' ? (doc.fileName || 'Uploaded') : (doc.required ? 'Pending *' : 'Optional') }}
+                          </span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Final Declaration Checkbox -->
+                <div class="p-4 bg-blue-50/70 border border-blue-200/80 rounded-xl">
+                  <label class="flex items-start gap-3 cursor-pointer select-none">
+                    <input 
+                      type="checkbox" 
+                      [(ngModel)]="declarationAgreed" 
+                      class="mt-1 w-4 h-4 rounded border-slate-300 text-blue-900 focus:ring-blue-900 cursor-pointer shrink-0" 
+                    />
+                    <span class="text-xs sm:text-sm text-slate-800 leading-relaxed">
+                      <b>Declaration:</b> I hereby declare and confirm that all particulars, documents, and credentials furnished in this application are authentic, complete, and correct to the best of my knowledge as per official records.
+                    </span>
+                  </label>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action Buttons (Inside Form) -->
+          <div class="mt-6 sm:mt-8 pt-4 sm:pt-5 border-t border-slate-200 flex items-center justify-between gap-3">
+            <button 
+              type="button" 
+              (click)="prevTab()"
+              [disabled]="activeTab() === 1"
+              class="h-9 sm:h-10 px-3.5 sm:px-5 border border-slate-300 bg-white rounded-full text-slate-700 font-semibold hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-1.5 cursor-pointer text-xs sm:text-sm shadow-2xs shrink-0 active:scale-95"
+              title="Back"
+            >
+              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Back</span>
+            </button>
+
+            <!-- Status Indicator in Bottom Bar -->
+            <div class="hidden sm:flex items-center gap-2 text-xs text-slate-500 font-medium">
+              @if (service.autoSaveStatus() === 'saving') {
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                </span>
+                <span class="text-amber-700">Auto-saving draft...</span>
+              } @else if (service.autoSaveStatus() === 'saved') {
+                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-slate-600">Draft saved automatically <span class="text-slate-400 font-normal">({{ service.lastSavedTime() }})</span></span>
+              }
+            </div>
+
+            <div class="flex items-center gap-2">
+              @if (activeTab() < 5) {
+                <button 
+                  type="button" 
+                  (click)="nextTab()"
+                  class="h-9 sm:h-10 px-4 sm:px-6 bg-[#0f1738] hover:bg-[#19245a] text-white rounded-full font-semibold transition-all duration-200 flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95 text-xs sm:text-sm shrink-0"
+                >
+                  <span class="hidden sm:inline">Next Step</span>
+                  <span class="sm:hidden">Next</span>
+                  <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              } @else {
+                <button 
+                  type="button" 
+                  (click)="submitFinalApplication()"
+                  [disabled]="!declarationAgreed"
+                  class="h-9 sm:h-10 px-4 sm:px-6 bg-emerald-700 hover:bg-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-full font-bold tracking-wide transition-all duration-200 shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95 text-xs sm:text-sm shrink-0"
+                >
+                  <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Submit Application</span>
+                </button>
+              }
             </div>
           </div>
         </main>
       </div>
 
-      <!-- 4. Fixed Bottom Action Bar (100% Responsive on All Screen Sizes) -->
-      <footer class="fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 shadow-[0_-2px_12px_rgba(0,0,0,0.06)] py-2 sm:py-2.5 will-change-transform">
-        <div class="w-full px-2.5 sm:px-6 lg:px-8 pr-12 sm:pr-6 flex items-center justify-between gap-1.5 sm:gap-3">
-          <!-- Left: Reset Action & Progress Info -->
-          <div class="flex items-center gap-1.5 sm:gap-3">
-            <button 
-              type="button" 
-              (click)="resetFormWithConfirm()"
-              class="h-9 px-2.5 sm:px-3.5 rounded-full border border-rose-200 bg-rose-50/60 hover:bg-rose-100 text-rose-700 font-semibold text-xs sm:text-sm flex items-center gap-1 sm:gap-1.5 transition cursor-pointer shadow-2xs whitespace-nowrap shrink-0"
-              title="Reset all form fields"
-            >
-              <svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span class="hidden sm:inline">Reset Form</span>
-              <span class="sm:hidden">Reset</span>
-            </button>
 
-            <div class="h-4 sm:h-5 w-px bg-slate-200"></div>
-
-            <div class="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm whitespace-nowrap">
-              <span class="font-bold text-slate-800">
-                <span class="sm:hidden">Step </span><span class="hidden sm:inline">Tab </span>{{ activeTab() }}/4
-              </span>
-              <span class="hidden md:inline font-semibold text-blue-900 bg-blue-50/70 border border-blue-200/60 px-2.5 py-0.5 rounded-full truncate max-w-36 lg:max-w-64">
-                {{ tabs[activeTab() - 1].label }}
-              </span>
-            </div>
-
-            <!-- Sleek Progress Bar -->
-            <div class="hidden sm:flex items-center gap-2">
-              <div class="w-20 lg:w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
-                <div 
-                  class="h-full bg-linear-to-r from-blue-700 to-indigo-700 transition-all duration-300 rounded-full"
-                  [style.width.%]="(activeTab() / 4) * 100"
-                ></div>
-              </div>
-              <span class="text-xs font-bold font-mono text-slate-600">{{ Math.round((activeTab() / 4) * 100) }}%</span>
-            </div>
-          </div>
-
-          <!-- Right: Action Buttons -->
-          <div class="flex items-center gap-1 sm:gap-2">
-            <button 
-              type="button" 
-              (click)="prevTab()"
-              [disabled]="activeTab() === 1"
-              class="h-9 sm:h-10 px-2.5 sm:px-4 border border-slate-300 bg-white rounded-full text-slate-700 font-semibold hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1 sm:gap-1.5 cursor-pointer text-xs sm:text-sm whitespace-nowrap shrink-0"
-              title="Previous Step"
-            >
-              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-              </svg>
-              <span class="hidden sm:inline">Previous</span>
-              <span class="sm:hidden">Prev</span>
-            </button>
-
-            <button 
-              type="button" 
-              (click)="saveDraft()"
-              class="h-9 sm:h-10 px-2.5 sm:px-4 border border-blue-900 text-blue-900 bg-blue-50/40 hover:bg-blue-100/60 rounded-full font-semibold transition cursor-pointer text-xs sm:text-sm flex items-center gap-1 sm:gap-1.5 whitespace-nowrap shrink-0"
-              title="Save Draft"
-            >
-              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-              </svg>
-              <span class="hidden sm:inline">Save Draft</span>
-              <span class="sm:hidden">Save</span>
-            </button>
-
-            <!-- Preview Button -->
-            <button 
-              type="button" 
-              (click)="openPreviewModal()"
-              class="h-9 sm:h-10 px-3 sm:px-4.5 border border-indigo-950/40 bg-indigo-50/80 hover:bg-indigo-100 text-[#0f1738] rounded-full font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 text-xs sm:text-sm whitespace-nowrap shrink-0"
-              title="Preview complete application form"
-            >
-              <svg class="w-4 h-4 text-[#0f1738]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              <span>Preview</span>
-            </button>
-
-            @if (activeTab() < 4) {
-              <button 
-                type="button" 
-                (click)="nextTab()"
-                class="h-9 sm:h-10 px-3 sm:px-5 bg-[#0f1738] hover:bg-[#19245a] text-white rounded-full font-semibold transition flex items-center gap-1 sm:gap-1.5 shadow-sm cursor-pointer active:scale-98 text-xs sm:text-sm whitespace-nowrap shrink-0"
-              >
-                <span class="hidden sm:inline">Next Step</span>
-                <span class="sm:hidden">Next</span>
-                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            } @else {
-              <button 
-                type="button" 
-                (click)="openReviewModal()"
-                class="h-9 sm:h-10 px-3 sm:px-5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-full font-bold tracking-wide transition shadow-sm flex items-center gap-1 sm:gap-1.5 cursor-pointer active:scale-98 text-xs sm:text-sm whitespace-nowrap shrink-0"
-              >
-                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span class="hidden sm:inline">Submit Application</span>
-                <span class="sm:hidden">Submit</span>
-              </button>
-            }
-          </div>
-        </div>
-      </footer>
-
-      <!-- Review & Confirmation Modal -->
-      @if (showReviewModal()) {
-        <div class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6">
-          <div class="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-3xl w-full border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div class="bg-[#0f1738] text-white px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                <h4 class="text-sm sm:text-base font-bold uppercase tracking-wider truncate">Application Preview (ISMS 2.0)</h4>
-              </div>
-              <button type="button" (click)="showReviewModal.set(false)" class="text-slate-300 hover:text-white text-2xl font-bold cursor-pointer leading-none">&times;</button>
-            </div>
-
-            <div class="p-4 sm:p-6 space-y-4 max-h-[75vh] overflow-y-auto text-xs sm:text-sm">
-              <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-                <div><span class="text-slate-500 font-medium">Application No:</span> <b class="font-mono text-slate-800">{{ data.basicInfo.applicationNo }}</b></div>
-                <div><span class="text-slate-500 font-medium">TP/PIA Full Name:</span> <b class="text-slate-800">{{ data.basicInfo.fullName || '—' }}</b></div>
-                <div><span class="text-slate-500 font-medium">TP/PIA Short Name:</span> <b class="font-mono uppercase text-slate-800">{{ data.basicInfo.shortName || '—' }}</b></div>
-                <div><span class="text-slate-500 font-medium">Registration No:</span> <b class="font-mono text-slate-800">{{ data.basicInfo.registrationNumber || '—' }}</b></div>
-                <div><span class="text-slate-500 font-medium">Contact:</span> <b class="text-slate-800">{{ data.basicInfo.contactNo || '—' }}</b></div>
-                <div><span class="text-slate-500 font-medium">Email:</span> <b class="text-slate-800">{{ data.basicInfo.emailId || '—' }}</b></div>
-                <div><span class="text-slate-500 font-medium">PAN:</span> <b class="font-mono uppercase text-slate-800">{{ data.basicInfo.panNo || '—' }}</b></div>
-                <div><span class="text-slate-500 font-medium">Turnover:</span> <b class="text-slate-800">₹ {{ data.entityInfo.turnOver || '0' }} Lakhs</b></div>
-                <div><span class="text-slate-500 font-medium">Registered Address:</span> <b class="text-slate-800">{{ data.registeredAddress.address || '—' }}, {{ data.registeredAddress.district || '' }}, {{ data.registeredAddress.state || '' }} - {{ data.registeredAddress.pincode || '' }}</b></div>
-                <div><span class="text-slate-500 font-medium">Postal Address:</span> <b class="text-slate-800">{{ data.postalAddress.address || '—' }}</b></div>
-              </div>
-
-              <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-                <div><span class="text-slate-500 font-medium">Org Signatory:</span> <b class="text-slate-800">{{ data.authorizedOrg.name || '—' }} ({{ data.authorizedOrg.designation || '—' }})</b></div>
-                <div><span class="text-slate-500 font-medium">Signatory Mobile:</span> <b class="text-slate-800">{{ data.authorizedOrg.contactNo || '—' }}</b></div>
-                <div><span class="text-slate-500 font-medium">Bank & IFSC:</span> <b class="text-slate-800">{{ data.bankDetails.bankName || '—' }} ({{ data.bankDetails.ifscCode || '—' }})</b></div>
-                <div><span class="text-slate-500 font-medium">Bank Account:</span> <b class="font-mono text-slate-800">{{ data.bankDetails.accountNo || '—' }}</b></div>
-                <div class="sm:col-span-2"><span class="text-slate-500 font-medium">Mandatory Documents:</span> <b class="text-emerald-700 font-bold">{{ uploadedRequiredCount }} / {{ totalRequiredCount }} Uploaded</b></div>
-              </div>
-
-              <div class="pt-1 sm:pt-2">
-                <label class="flex items-start gap-2.5 sm:gap-3 cursor-pointer p-3 bg-blue-50/60 rounded-lg border border-blue-200/70">
-                  <input type="checkbox" [(ngModel)]="declarationAgreed" class="mt-0.5 w-4 h-4 rounded border-slate-300 cursor-pointer shrink-0" style="accent-color: #1e3a8a;" />
-                  <span class="text-slate-800 text-xs sm:text-sm leading-relaxed">
-                    I confirm that all particulars provided in this registration form are true, valid, and accurate as per official records.
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            <div class="bg-slate-50 px-4 sm:px-6 py-3 sm:py-3.5 border-t border-slate-200 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3">
-              <button 
-                type="button" 
-                (click)="printAcknowledgement()"
-                class="px-4 py-2 border border-slate-300 bg-white hover:bg-slate-100 rounded-lg text-slate-700 font-semibold transition cursor-pointer text-xs sm:text-sm text-center flex items-center justify-center gap-1.5"
-              >
-                <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                <span>Print / Download Preview</span>
-              </button>
-
-              <div class="flex items-center gap-2 sm:gap-3 justify-end">
-                <button 
-                  type="button" 
-                  (click)="showReviewModal.set(false)"
-                  class="px-4 py-2 border border-slate-300 bg-white rounded-lg text-slate-700 font-semibold hover:bg-slate-100 transition cursor-pointer text-xs sm:text-sm text-center"
-                >
-                  Back to Edit
-                </button>
-                <button 
-                  type="button" 
-                  (click)="confirmSubmit()"
-                  [disabled]="!declarationAgreed"
-                  class="px-5 py-2 bg-emerald-700 hover:bg-emerald-600 disabled:opacity-50 text-white rounded-lg font-bold transition cursor-pointer text-xs sm:text-sm shadow-sm text-center"
-                >
-                  Confirm & Submit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      }
 
       <!-- Submission Success Modal -->
       @if (showSuccessModal()) {
@@ -445,6 +616,7 @@ export class TpPiaRegistrationComponent {
     { id: 2, label: 'Auth Person (Org)', shortLabel: 'Auth (Org)', icon: '✍️' },
     { id: 3, label: 'Bank Details', shortLabel: 'Bank Details', icon: '🏦' },
     { id: 4, label: 'Document Upload', shortLabel: 'Documents', icon: '📁' },
+    { id: 5, label: 'Review & Submit', shortLabel: 'Review', icon: '📋' },
   ];
 
   get currentStepInfo(): { title: string; subtitle: string } {
@@ -468,6 +640,11 @@ export class TpPiaRegistrationComponent {
         return {
           title: 'Step 4: Document Upload',
           subtitle: 'Mandatory statutory compliance documents, registration certificate, PAN, GST, and affidavits'
+        };
+      case 5:
+        return {
+          title: 'Step 5: Review & Final Submission',
+          subtitle: 'Review all application details, edit any section if needed, and submit the application'
         };
       default:
         return {
@@ -495,8 +672,10 @@ export class TpPiaRegistrationComponent {
     const completed = this.valService.completedTabs();
 
     const map: Record<number, { isCompleted: boolean; isSubmittedInvalid: boolean }> = {};
-    for (let id = 1; id <= 4; id++) {
-      const isValid = this.valService.isTabValid(id, data);
+    for (let id = 1; id <= 5; id++) {
+      const isValid = id === 5
+        ? (this.valService.isTabValid(1, data) && this.valService.isTabValid(2, data) && this.valService.isTabValid(3, data) && this.valService.isTabValid(4, data))
+        : this.valService.isTabValid(id, data);
       map[id] = {
         isCompleted: completed.has(id) && isValid,
         isSubmittedInvalid: submitted.has(id) && !isValid,
@@ -533,8 +712,10 @@ export class TpPiaRegistrationComponent {
     if (this.valService.isTabValid(current, this.data)) {
       this.valService.markTabCompleted(current);
     }
+    this.service.saveDraftSync();
     this.activeTab.set(tabId);
     this.valService.clearToast();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     this.scrollStepIntoView(tabId);
   }
 
@@ -542,45 +723,38 @@ export class TpPiaRegistrationComponent {
     const current = this.activeTab();
     this.valService.markTabSubmitted(current);
 
-    if (!this.valService.isTabValid(current, this.data)) {
+    if (current <= 4 && !this.valService.isTabValid(current, this.data)) {
       const tabName = this.tabs[current - 1]?.label || `Tab ${current}`;
       this.valService.showToast(`Please fill all required fields correctly in "${tabName}" before proceeding.`);
-      window.scrollTo({ top: 0, behavior: 'auto' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     this.valService.markTabCompleted(current);
     this.valService.clearToast();
-    if (current < 4) {
+    this.service.saveDraftSync();
+    if (current < 5) {
       const nextId = current + 1;
       this.activeTab.set(nextId);
-      window.scrollTo({ top: 0, behavior: 'auto' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       this.scrollStepIntoView(nextId);
     }
   }
 
   prevTab() {
     if (this.activeTab() > 1) {
+      this.service.saveDraftSync();
       const prevId = this.activeTab() - 1;
       this.activeTab.set(prevId);
       this.valService.clearToast();
-      window.scrollTo({ top: 0, behavior: 'auto' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       this.scrollStepIntoView(prevId);
     }
   }
 
-  saveDraft() {
-    this.service.saveDraft();
-    const current = this.activeTab();
-    if (this.valService.isTabValid(current, this.data)) {
-      this.valService.markTabCompleted(current);
-    }
-    this.valService.showToast('Draft progress saved successfully.', 'success');
-  }
-
   populateDemo() {
     this.service.populateSampleData();
-    for (let t = 1; t <= 4; t++) {
+    for (let t = 1; t <= 5; t++) {
       if (this.valService.isTabValid(t, this.data)) {
         this.valService.markTabCompleted(t);
       }
@@ -588,21 +762,20 @@ export class TpPiaRegistrationComponent {
     this.valService.showToast('Sample government demo data loaded.', 'success');
   }
 
-  resetFormWithConfirm() {
-    if (confirm('Are you sure you want to reset all fields? All unsaved data will be cleared.')) {
-      this.service.resetForm();
-      this.valService.resetSubmitted();
-      this.valService.clearToast();
-      this.activeTab.set(1);
-    }
-  }
-
   openPreviewModal() {
-    this.valService.clearToast();
-    this.showReviewModal.set(true);
+    this.switchTab(5);
   }
 
   openReviewModal() {
+    this.switchTab(5);
+  }
+
+  submitFinalApplication() {
+    if (!this.declarationAgreed) {
+      this.valService.showToast('Please check the declaration checkbox before submitting.');
+      return;
+    }
+
     for (let t = 1; t <= 4; t++) {
       this.valService.markTabSubmitted(t);
     }
@@ -610,20 +783,20 @@ export class TpPiaRegistrationComponent {
     const firstInvalid = this.valService.getFirstInvalidTab(this.data);
     if (firstInvalid !== null) {
       this.activeTab.set(firstInvalid);
-      const tabName = this.tabs[firstInvalid - 1]?.label || `Tab ${firstInvalid}`;
-      this.valService.showToast(`Cannot review application: Please complete all mandatory fields in "${tabName}".`);
+      const tabName = this.tabs[firstInvalid - 1]?.label || `Step ${firstInvalid}`;
+      this.valService.showToast(`Cannot submit application: Please complete mandatory fields in "${tabName}".`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
+    this.valService.markTabCompleted(5);
     this.valService.clearToast();
-    this.showReviewModal.set(true);
+    this.service.updateFormData(curr => ({ ...curr, status: 'Submitted' }));
+    this.showSuccessModal.set(true);
   }
 
   confirmSubmit() {
-    this.service.updateFormData(curr => ({ ...curr, status: 'Submitted' }));
-    this.showReviewModal.set(false);
-    this.showSuccessModal.set(true);
+    this.submitFinalApplication();
   }
 
   printAcknowledgement() {

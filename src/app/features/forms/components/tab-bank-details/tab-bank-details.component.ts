@@ -13,27 +13,13 @@ import { FormValidationService } from '../../services/form-validation.service';
     <div class="space-y-4">
       <!-- Main Card: Bank Details (Step 3) -->
       <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
-        <!-- Card Header -->
-        <div class="px-4 sm:px-6 py-3.5 bg-white border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div class="flex items-center gap-2.5 min-w-0">
-            <span class="px-2.5 py-1 rounded bg-[#1a2656] text-white text-xs font-bold tracking-wide select-none shrink-0">
-              STEP 3
-            </span>
-            <h2 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
-              Bank Details
-            </h2>
-          </div>
-          <span class="text-xs text-slate-500 font-medium">
-            Fields with <span class="text-rose-500 font-bold">*</span> are mandatory
-          </span>
-        </div>
 
         <!-- Card Body: 2-Column Responsive Layout (Left Side & Right Side) -->
         <div class="p-4 sm:p-6 lg:p-8">
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
             
             <!-- ================= LEFT SIDE: Bank & Account Credentials ================= -->
-            <div class="space-y-4 sm:space-y-4.5">
+            <div class="space-y-3.5">
               <div class="pb-1 border-b border-slate-100 flex items-center justify-between">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">
                   Bank & Account Credentials
@@ -42,10 +28,10 @@ import { FormValidationService } from '../../services/form-validation.service';
 
               <!-- 1. Name of the Bank * -->
               <div>
-                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">
                   Name of the Bank <span class="text-rose-500 font-bold">*</span>
                 </label>
-                <div class="relative">
+                <div class="relative w-full">
                   <input 
                     type="text" 
                     list="bankOptionsList"
@@ -53,7 +39,7 @@ import { FormValidationService } from '../../services/form-validation.service';
                     [(ngModel)]="data.bankDetails.bankName" 
                     (ngModelChange)="onDataChange()"
                     [ngClass]="isFieldInvalid('bankDetails.bankName') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
-                    class="w-full h-10 px-3.5 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" 
+                    class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" 
                     required
                   />
                   <datalist id="bankOptionsList">
@@ -69,7 +55,7 @@ import { FormValidationService } from '../../services/form-validation.service';
 
               <!-- 2. Account No. * -->
               <div>
-                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">
                   Account No. <span class="text-rose-500 font-bold">*</span>
                 </label>
                 <input 
@@ -78,7 +64,7 @@ import { FormValidationService } from '../../services/form-validation.service';
                   [(ngModel)]="data.bankDetails.accountNo" 
                   (ngModelChange)="onDataChange()"
                   [ngClass]="isFieldInvalid('bankDetails.accountNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
-                  class="w-full h-10 px-3.5 border rounded-md text-sm text-slate-800 font-mono tracking-wider placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" 
+                  class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 font-mono tracking-wider placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" 
                   required
                 />
                 @if (isFieldInvalid('bankDetails.accountNo')) {
@@ -88,7 +74,7 @@ import { FormValidationService } from '../../services/form-validation.service';
 
               <!-- 3. IFSC Code * -->
               <div>
-                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">
                   IFSC Code <span class="text-rose-500 font-bold">*</span>
                 </label>
                 <input 
@@ -98,7 +84,7 @@ import { FormValidationService } from '../../services/form-validation.service';
                   [(ngModel)]="data.bankDetails.ifscCode" 
                   (ngModelChange)="data.bankDetails.ifscCode = (data.bankDetails.ifscCode || '').toUpperCase(); onDataChange()"
                   [ngClass]="isFieldInvalid('bankDetails.ifscCode') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
-                  class="w-full h-10 px-3.5 border rounded-md text-sm text-slate-800 uppercase font-mono tracking-widest placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" 
+                  class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 uppercase font-mono tracking-widest placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" 
                   required
                 />
                 @if (isFieldInvalid('bankDetails.ifscCode')) {
@@ -108,13 +94,13 @@ import { FormValidationService } from '../../services/form-validation.service';
 
               <!-- 4. Type of Account -->
               <div>
-                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">
                   Type of Account
                 </label>
                 <select 
                   [(ngModel)]="data.bankDetails.accountType" 
                   (change)="onDataChange()"
-                  class="w-full h-10 px-3 border border-slate-300 rounded-md text-sm text-slate-800 bg-white hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none cursor-pointer"
+                  class="w-full h-9 px-2.5 border border-slate-300 rounded-md text-sm text-slate-800 bg-white hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none cursor-pointer"
                 >
                   <option value="">-- Select Type of Account --</option>
                   @for (type of accountTypes; track type) {
@@ -125,13 +111,13 @@ import { FormValidationService } from '../../services/form-validation.service';
 
               <!-- 5. Mode of electronic transfer -->
               <div>
-                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">
                   Mode of electronic transfer
                 </label>
                 <select 
                   [(ngModel)]="data.bankDetails.electronicTransferMode" 
                   (change)="onDataChange()"
-                  class="w-full h-10 px-3 border border-slate-300 rounded-md text-sm text-slate-800 bg-white hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none cursor-pointer"
+                  class="w-full h-9 px-2.5 border border-slate-300 rounded-md text-sm text-slate-800 bg-white hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none cursor-pointer"
                 >
                   <option value="">-- Select Mode of Electronic Transfer --</option>
                   @for (mode of transferModes; track mode) {
@@ -143,7 +129,7 @@ import { FormValidationService } from '../../services/form-validation.service';
             </div>
 
             <!-- ================= RIGHT SIDE: Branch & Cheque Verification ================= -->
-            <div class="space-y-4 sm:space-y-4.5">
+            <div class="space-y-3.5">
               <div class="pb-1 border-b border-slate-100 flex items-center justify-between">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">
                   Branch & Verification Details
@@ -152,7 +138,7 @@ import { FormValidationService } from '../../services/form-validation.service';
 
               <!-- 6. Branch Name * -->
               <div>
-                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">
                   Branch Name <span class="text-rose-500 font-bold">*</span>
                 </label>
                 <input 
@@ -161,7 +147,7 @@ import { FormValidationService } from '../../services/form-validation.service';
                   [(ngModel)]="data.bankDetails.branchName" 
                   (ngModelChange)="onDataChange()"
                   [ngClass]="isFieldInvalid('bankDetails.branchName') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
-                  class="w-full h-10 px-3.5 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" 
+                  class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" 
                   required
                 />
                 @if (isFieldInvalid('bankDetails.branchName')) {
@@ -171,7 +157,7 @@ import { FormValidationService } from '../../services/form-validation.service';
 
               <!-- 7. MICR Code -->
               <div>
-                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">
                   MICR Code
                 </label>
                 <input 
@@ -181,7 +167,7 @@ import { FormValidationService } from '../../services/form-validation.service';
                   [(ngModel)]="data.bankDetails.micrCode" 
                   (ngModelChange)="onDataChange()"
                   [ngClass]="isFieldInvalid('bankDetails.micrCode') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
-                  class="w-full h-10 px-3.5 border rounded-md text-sm text-slate-800 font-mono tracking-widest placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" 
+                  class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 font-mono tracking-widest placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" 
                 />
                 @if (isFieldInvalid('bankDetails.micrCode')) {
                   <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('bankDetails.micrCode') }}</p>
@@ -190,7 +176,7 @@ import { FormValidationService } from '../../services/form-validation.service';
 
               <!-- 8. Branch Address * -->
               <div>
-                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">
                   Branch Address <span class="text-rose-500 font-bold">*</span>
                 </label>
                 <textarea 
@@ -199,7 +185,7 @@ import { FormValidationService } from '../../services/form-validation.service';
                   [(ngModel)]="data.bankDetails.branchAddress" 
                   (ngModelChange)="onDataChange()"
                   [ngClass]="isFieldInvalid('bankDetails.branchAddress') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
-                  class="w-full p-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" 
+                  class="w-full p-2.5 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none resize-none" 
                   required
                 ></textarea>
                 @if (isFieldInvalid('bankDetails.branchAddress')) {

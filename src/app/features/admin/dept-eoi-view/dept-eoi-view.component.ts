@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { NgIf, NgFor, AsyncPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { NgIf, NgFor, AsyncPipe, DatePipe, DecimalPipe, NgClass } from '@angular/common';
 import { EoiStateService, Scheme, UserProfile } from '../../../core/services/eoi-state.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 @Component({
   selector: 'app-dept-eoi-view',
   standalone: true,
-  imports: [RouterLink, NgIf, NgFor, AsyncPipe, DatePipe, DecimalPipe, HeaderComponent, SidebarComponent],
+  imports: [RouterLink, NgIf, NgFor, AsyncPipe, DatePipe, DecimalPipe, NgClass, HeaderComponent, SidebarComponent],
   template: `
     <div class="min-h-screen flex flex-col bg-[#F4F7F9] font-sans text-slate-800 antialiased">
       <app-header></app-header>
@@ -72,7 +72,7 @@ import { Observable } from 'rxjs';
                     <th class="p-3 border-r border-[#1a4f78]">Published</th>
                     <th class="p-3 border-r border-[#1a4f78]">Deadline</th>
                     <th class="p-3 border-r border-[#1a4f78] text-center">Status</th>
-                    <th class="p-3 border-r border-[#1a4f78] text-center bg-[#093354]">No. of Responses</th>
+                    <th class="p-3 border-r border-[#1a4f78] text-center">No. of Responses</th>
                     <th class="p-3 text-center">Action</th>
                   </tr>
                 </thead>
@@ -111,29 +111,31 @@ import { Observable } from 'rxjs';
 
                     <!-- Status Badge -->
                     <td class="p-3 border-r border-slate-200 text-center">
-                      <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold rounded-xs">
+                      <span class="px-2 py-0.5 border text-[10px] font-bold rounded-xs"
+                            [ngClass]="scheme.status === 'Open' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200'">
                         {{ scheme.status }}
                       </span>
                     </td>
 
-                    <!-- No. of Responses (Clickable Link to Responses List) -->
-                    <td class="p-3 border-r border-slate-200 text-center bg-blue-50/50">
-                      <a 
-                        [routerLink]="['/admin/responses', scheme.id]"
-                        class="inline-flex items-center gap-1 px-3 py-1 bg-[#131A4D] text-white font-mono font-bold text-xs rounded hover:bg-[#004d73] transition-colors shadow-2xs"
-                        title="Click to view applicant list">
-                        <span>{{ scheme.responseCount || 14 }}</span>
-                        <span class="text-[10px] font-sans font-normal opacity-90">EOIs →</span>
-                      </a>
+                    <!-- No. of Responses (Plain Text) -->
+                    <td class="p-3 border-r border-slate-200 text-center">
+                      <span class="font-mono font-bold text-[#131A4D] text-sm">
+                        {{ scheme.responseCount || 14 }}
+                      </span>
+                      <span class="text-[10px] font-sans font-semibold text-slate-600 ml-1">EOIs</span>
                     </td>
 
                     <!-- Action -->
                     <td class="p-3 text-center">
-                      <a 
+                      <a *ngIf="scheme.status === 'Closed'"
                         [routerLink]="['/admin/responses', scheme.id]" 
-                        class="px-2.5 py-1 text-xs text-[#131A4D] font-bold hover:underline">
+                        class="px-2.5 py-1 text-xs text-[#131A4D] font-bold hover:underline cursor-pointer transition-colors inline-block">
                         View List
                       </a>
+                      <span *ngIf="scheme.status !== 'Closed'"
+                        class="px-2.5 py-1 text-xs text-slate-400 font-bold cursor-not-allowed inline-block" title="List can only be viewed once status is Closed">
+                        View List
+                      </span>
                     </td>
 
                   </tr>

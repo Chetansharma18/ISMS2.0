@@ -12,10 +12,10 @@ import { Observable } from 'rxjs';
     <aside class="w-64 bg-white border-r border-slate-200 flex flex-col h-full font-sans text-xs flex-shrink-0 select-none shadow-2xs">
       
       <!-- Top Section: Company / Organization Name (Directly displayed without uppercase category tag) -->
-      <div class="p-4 border-b border-slate-200 bg-slate-50/70" *ngIf="userProfile$ | async as profile">
+      <ng-container *ngIf="userProfile$ | async as profile">
+      <div class="p-4 border-b border-slate-200 bg-slate-50/70" *ngIf="profile.role === 'applicant'">
         
         <!-- Applicant Header: Focused directly on Company Name -->
-        <ng-container *ngIf="profile.role === 'applicant'">
           
           <!-- Incomplete / Unregistered Profile State -->
           <ng-container *ngIf="profile.userState === 'new' || !profile.isRegistered">
@@ -52,39 +52,8 @@ import { Observable } from 'rxjs';
             </div>
           </ng-container>
 
-        </ng-container>
-
-        <!-- Department Admin Header -->
-        <ng-container *ngIf="profile.role === 'dept_admin'">
-          <div class="font-extrabold text-[13px] text-[#002244] leading-snug">
-            {{ profile.department || 'RSLDC Scrutiny Cell' }}
-          </div>
-          <div class="mt-1 flex items-center gap-1.5">
-            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-cyan-800 bg-cyan-100 border border-cyan-300 px-2 py-0.5 rounded-xs">
-              🏛 Scrutiny Authority
-            </span>
-          </div>
-          <div class="text-[11px] text-slate-500 mt-2 border-t border-slate-200 pt-1.5">
-            Officer: <strong class="text-[#002244]">{{ profile.personal.fullName }}</strong>
-          </div>
-        </ng-container>
-
-        <!-- Super Admin Header -->
-        <ng-container *ngIf="profile.role === 'super_admin'">
-          <div class="font-extrabold text-[13px] text-[#002244] leading-snug">
-            ISMS 2.0 Central Governance
-          </div>
-          <div class="mt-1 flex items-center gap-1.5">
-            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-purple-800 bg-purple-100 border border-purple-300 px-2 py-0.5 rounded-xs">
-              ⚙ State Super Admin
-            </span>
-          </div>
-          <div class="text-[11px] text-slate-500 mt-2 border-t border-slate-200 pt-1.5">
-            Admin: <strong class="text-[#002244]">{{ profile.personal.fullName }}</strong>
-          </div>
-        </ng-container>
-
       </div>
+      </ng-container>
 
       <!-- Main Navigation Menu (Stylish, Bold Typography & Modern Hover/Active Accents) -->
       <nav class="flex-grow py-3 px-2.5 space-y-1.5 overflow-y-auto" *ngIf="userProfile$ | async as profile">

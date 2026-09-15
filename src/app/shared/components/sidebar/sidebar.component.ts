@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive, NgIf, AsyncPipe],
   template: `
-    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col h-full font-sans text-xs flex-shrink-0 select-none shadow-2xs">
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col h-full text-xs flex-shrink-0 select-none shadow-2xs">
       
       <!-- Top Section: Company / Organization Name (Directly displayed without uppercase category tag) -->
       <ng-container *ngIf="userProfile$ | async as profile">

@@ -22,7 +22,7 @@ import { HelpdeskChatComponent } from './components/helpdesk-chat/helpdesk-chat.
     HelpdeskChatComponent
   ],
   template: `
-    <div class="min-h-screen bg-[#f0f6fc] flex flex-col selection:bg-amber-400 selection:text-slate-900 overflow-x-hidden w-full max-w-full">
+    <div class="min-h-screen bg-[#f0f6fc] flex flex-col selection:bg-amber-400 selection:text-slate-900 overflow-x-hidden w-full max-w-full scroll-smooth">
       <app-navbar />
       <main id="main-content" class="flex-grow">
         <app-hero />
@@ -30,8 +30,10 @@ import { HelpdeskChatComponent } from './components/helpdesk-chat/helpdesk-chat.
         <!-- <app-services /> -->
         <app-mobile-app />
       </main>
-      <app-important-links />
-      <app-footer />
+      <div class="w-full bg-[#001f3f]">
+        <app-important-links />
+        <app-footer />
+      </div>
       <app-helpdesk-chat />
     </div>
   `

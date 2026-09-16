@@ -123,6 +123,75 @@ export class FormValidationService {
     return VALIDATION_PATTERNS.bankAccount.test((val || '').trim());
   }
 
+  // --- DATE & LIMIT VALIDATION HELPER ---
+  validateDate(
+    val: string, 
+    label: string, 
+    options?: { maxDate?: Date; minDate?: Date; required?: boolean; futureError?: string; minAgeError?: string }
+  ): string | null {
+    const trimmed = (val || '').trim();
+    if (!trimmed) {
+      if (options?.required) {
+        return `${label} is required`;
+      }
+      return null;
+    }
+
+    let day = 0, month = 0, year = 0;
+    if (trimmed.includes('/')) {
+      const parts = trimmed.split('/');
+      if (parts.length !== 3 || parts[0].length !== 2 || parts[1].length !== 2 || parts[2].length !== 4) {
+        return `Enter a complete date (DD/MM/YYYY)`;
+      }
+      day = parseInt(parts[0], 10);
+      month = parseInt(parts[1], 10);
+      year = parseInt(parts[2], 10);
+    } else if (trimmed.includes('-')) {
+      const parts = trimmed.split('-');
+      if (parts.length !== 3 || parts[0].length !== 4 || parts[1].length !== 2 || parts[2].length !== 2) {
+        return `Enter a complete date (DD/MM/YYYY)`;
+      }
+      year = parseInt(parts[0], 10);
+      month = parseInt(parts[1], 10);
+      day = parseInt(parts[2], 10);
+    } else {
+      return `Enter date in DD/MM/YYYY format`;
+    }
+
+    if (isNaN(day) || isNaN(month) || isNaN(year)) {
+      return `Enter valid numbers for date`;
+    }
+    if (month < 1 || month > 12) {
+      return `Month must be between 01 and 12`;
+    }
+    if (year < 1900) {
+      return `Year must be after 1900`;
+    }
+
+    const daysInMonth = new Date(year, month, 0).getDate();
+    if (day < 1 || day > daysInMonth) {
+      return `Invalid day for this month (Max ${daysInMonth} days)`;
+    }
+
+    const inputDate = new Date(year, month - 1, day);
+
+    if (options?.maxDate) {
+      const max = new Date(options.maxDate.getFullYear(), options.maxDate.getMonth(), options.maxDate.getDate(), 23, 59, 59);
+      if (inputDate > max) {
+        return options.futureError || options.minAgeError || `${label} cannot be a future date`;
+      }
+    }
+
+    if (options?.minDate) {
+      const min = new Date(options.minDate.getFullYear(), options.minDate.getMonth(), options.minDate.getDate(), 0, 0, 0);
+      if (inputDate < min) {
+        return `${label} exceeds minimum allowed limit (${options.minDate.getFullYear()})`;
+      }
+    }
+
+    return null;
+  }
+
   // --- TAB 1 VALIDATION ---
   validateTab1(data: TpPiaRegistrationData): TabValidationResult {
     const errors: Record<string, string> = {};
@@ -131,11 +200,31 @@ export class FormValidationService {
     const fullName = (data.basicInfo.fullName || '').trim();
     if (!fullName) {
       errors['basicInfo.fullName'] = 'TP/PIA Full Name is required';
+    } else if (fullName.length < 3) {
+      errors['basicInfo.fullName'] = 'Full Name must be at least 3 characters';
+    } else if (fullName.length > 150) {
+      errors['basicInfo.fullName'] = 'Full Name cannot exceed 150 characters';
     }
 
     const shortName = (data.basicInfo.shortName || '').trim();
     if (!shortName) {
       errors['basicInfo.shortName'] = 'TP/PIA Short Name is required';
+    } else if (shortName.length < 2) {
+      errors['basicInfo.shortName'] = 'Short Name must be at least 2 characters';
+    } else if (shortName.length > 50) {
+      errors['basicInfo.shortName'] = 'Short Name cannot exceed 50 characters';
+    }
+
+    // Date of Registration (Optional, but if entered must be valid DD/MM/YYYY and cannot be in future)
+    if (data.basicInfo.dateOfRegistration) {
+      const dateErr = this.validateDate(data.basicInfo.dateOfRegistration, 'Date of Registration', {
+        maxDate: new Date(),
+        minDate: new Date(1900, 0, 1),
+        futureError: 'Date of Registration cannot be in the future'
+      });
+      if (dateErr) {
+        errors['basicInfo.dateOfRegistration'] = dateErr;
+      }
     }
 
     const contactNo = (data.basicInfo.contactNo || '').trim();
@@ -182,7 +271,9 @@ export class FormValidationService {
     } else {
       const num = parseFloat(turnOver);
       if (isNaN(num) || num < 0) {
-        errors['entityInfo.turnOver'] = 'Turn Over must be a valid number';
+        errors['entityInfo.turnOver'] = 'Turn Over cannot be negative';
+      } else if (num > 10000000) {
+        errors['entityInfo.turnOver'] = 'Turn Over exceeds maximum allowed limit';
       }
     }
 
@@ -190,6 +281,10 @@ export class FormValidationService {
     if (!data.sameAsRegistered) {
       if (!(data.postalAddress.address || '').trim()) {
         errors['postalAddress.address'] = 'Postal address is required';
+      }
+      const postPin = (data.postalAddress.pincode || '').trim();
+      if (postPin && !this.isValidPincode(postPin)) {
+        errors['postalAddress.pincode'] = 'Enter a valid 6-digit pincode';
       }
     }
 
@@ -207,9 +302,37 @@ export class FormValidationService {
     // 1. Name *
     if (!(org.name || '').trim()) {
       errors['authorizedOrg.name'] = 'Authorized Person Name is required';
+    } else if (org.name.trim().length < 3) {
+      errors['authorizedOrg.name'] = 'Name must be at least 3 characters';
     }
 
-    // 2. Mobile No. *
+    // 2. Date of Birth (Must be >= 18 years and <= 100 years old)
+    if (org.dob) {
+      const today = new Date();
+      const maxDob = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+      const minDob = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
+
+      const dobErr = this.validateDate(org.dob, 'Date of Birth', {
+        maxDate: maxDob,
+        minDate: minDob,
+        minAgeError: 'Authorized Person must be at least 18 years old'
+      });
+      if (dobErr) {
+        errors['authorizedOrg.dob'] = dobErr;
+      }
+    }
+
+    // 3. Age (Limit: 18 to 100)
+    if (org.age !== undefined && org.age !== null && String(org.age).trim() !== '') {
+      const ageNum = Number(org.age);
+      if (isNaN(ageNum) || ageNum < 18) {
+        errors['authorizedOrg.age'] = 'Age must be at least 18 years';
+      } else if (ageNum > 100) {
+        errors['authorizedOrg.age'] = 'Age cannot exceed 100 years';
+      }
+    }
+
+    // 4. Mobile No. *
     const contact = (org.contactNo || '').trim();
     if (!contact) {
       errors['authorizedOrg.contactNo'] = 'Mobile No. is required';
@@ -217,7 +340,7 @@ export class FormValidationService {
       errors['authorizedOrg.contactNo'] = 'Enter a valid 10-digit mobile number';
     }
 
-    // 3. PAN *
+    // 5. PAN *
     const pan = (org.pan || '').trim().toUpperCase();
     if (!pan) {
       errors['authorizedOrg.pan'] = 'PAN is required';
@@ -225,15 +348,18 @@ export class FormValidationService {
       errors['authorizedOrg.pan'] = 'Enter a valid 10-character PAN (e.g. ABCDE1234F)';
     }
 
+    // 6. Aadhaar *
+    const aadhaar = (org.aadhaarNo || '').trim();
+    if (!aadhaar) {
+      errors['authorizedOrg.aadhaarNo'] = 'Aadhaar Number is required';
+    } else if (!this.isValidAadhaar(aadhaar)) {
+      errors['authorizedOrg.aadhaarNo'] = 'Aadhaar must be exactly 12 digits';
+    }
+
     // Optional format validations if filled
     const email = (org.emailId || '').trim();
     if (email && !this.isValidEmail(email)) {
       errors['authorizedOrg.emailId'] = 'Enter a valid email address';
-    }
-
-    const aadhaar = (org.aadhaarNo || '').trim();
-    if (aadhaar && !this.isValidAadhaar(aadhaar)) {
-      errors['authorizedOrg.aadhaarNo'] = 'Aadhaar must be exactly 12 digits';
     }
 
     return {

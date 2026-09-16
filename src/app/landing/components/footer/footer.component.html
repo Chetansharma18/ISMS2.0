@@ -1,98 +1,79 @@
-<footer class="relative w-full bg-[#001f3f] text-white select-none overflow-visible">
+<footer class="relative w-full max-w-full bg-[#001f3f] text-white select-none overflow-x-hidden flex flex-col justify-between">
   <!-- Main Footer Content -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-8 sm:pt-12 sm:pb-10">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
+  <div class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8 sm:pt-10 sm:pb-12 lg:pt-10 lg:pb-12">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-12 gap-x-4 sm:gap-x-6 lg:gap-x-10 gap-y-7 sm:gap-y-8 lg:gap-y-10">
 
-      <!-- Col 1: ISMS 2.0 & RSLDC Emblem Branding -->
-      <div class="lg:col-span-4 flex flex-col justify-start">
-        <div class="flex items-baseline gap-1 mb-0.5">
-          <span class="text-2xl font-extrabold text-white tracking-tight">ISMS</span>
-          <span class="text-2xl font-extrabold text-[#f59e0b] tracking-tight">2.0</span>
-        </div>
-        <p class="text-xs text-slate-300/90 mb-5 tracking-normal">
-          {{ t().footer.ismsSubtitle }}
-        </p>
-
-        <div class="flex items-center gap-3 sm:gap-3.5 select-none">
-          <!-- State Emblem of India (White) -->
-          <img src="emblem-white.png" alt="State Emblem of India" class="h-14 w-auto object-contain shrink-0" />
+      <!-- Col 1: Two Logos on Top, ISMS 2.0 & Subtitle Underneath -->
+      <div class="col-span-2 md:col-span-1 lg:col-span-5 flex flex-col justify-start">
+        <!-- Logos Row (Emblem + RSLDC Logo side-by-side) -->
+        <div class="flex items-center gap-3 sm:gap-4 select-none mb-3 sm:mb-3.5">
+          <!-- State Emblem of India (White version for dark footer) -->
+          <div class="flex-shrink-0 flex items-center justify-center">
+            <img src="footer-images/emblem-white.png" alt="State Emblem of India" width="44" height="44"
+              class="footer-emblem object-contain shrink-0" />
+          </div>
 
           <!-- Official Circular RSLDC Logo -->
-          <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-white/10 p-0.5 flex items-center justify-center shrink-0 border border-white/20 shadow-xs">
-            <img src="rsldc-logo.png" alt="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)"
-              class="h-full w-full object-contain drop-shadow-xs" />
+          <div class="flex-shrink-0 flex items-center justify-center">
+            <img src="footer-images/rsldc-logo.png" alt="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)" width="44" height="44"
+              class="footer-rsldc-img object-contain shrink-0 drop-shadow-sm" />
           </div>
+        </div>
 
-          <!-- Department Name -->
-          <div class="text-xs sm:text-sm font-semibold text-white leading-snug">
-            <div>{{ t().footer.rsldcLine1 }}</div>
-            <div class="text-slate-200/90">{{ t().footer.rsldcLine2 }}</div>
+        <!-- System Branding: ISMS 2.0 and Subtitle Underneath the Logos -->
+        <div class="flex flex-col text-left">
+          <div class="flex items-baseline leading-none mb-1">
+            <span class="text-xl sm:text-2xl lg:text-[26px] font-extrabold text-white tracking-tight">ISMS</span>
+            <span class="text-xl sm:text-2xl lg:text-[26px] font-extrabold text-[#f59e0b] ml-1">2.0</span>
           </div>
+          <p class="text-xs sm:text-[12.5px] text-slate-300/90 tracking-normal max-w-sm leading-relaxed">
+            {{ t().footer.ismsSubtitle }}
+          </p>
         </div>
       </div>
 
-      <!-- Col 2: Quick Links -->
-      <div class="lg:col-span-2 sm:pl-2">
-        <h4 class="text-sm font-bold text-white mb-3.5 tracking-wide">
-          {{ t().footer.quickLinks }}
-        </h4>
-        <ul class="space-y-2 text-xs">
-          <li>
-            <a href="#" (click)="$event.preventDefault(); scrollToTop()"
-              class="text-slate-300 hover:text-white transition-colors duration-150 cursor-pointer">
-              {{ t().footer.home }}
-            </a>
-          </li>
-          <li>
-            <a href="#about" class="text-slate-300 hover:text-white transition-colors duration-150">
-              {{ t().footer.about }}
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Col 3: Important Links -->
-      <div class="lg:col-span-3">
+      <!-- Col 2: Important Links (left column on mobile: col-span-1, 1 col on md, 3 cols on lg) -->
+      <div class="col-span-1 md:col-span-1 lg:col-span-3 md:pl-2 lg:pl-4">
         <h4 class="text-sm font-bold text-white mb-3.5 tracking-wide">
           {{ t().footer.importantLinks }}
         </h4>
         <ul class="space-y-2 text-xs">
           <li>
             <a href="https://rajasthan.gov.in" target="_blank" rel="noopener noreferrer"
-              class="text-slate-300 hover:text-white transition-colors duration-150">
+              class="text-slate-300 hover:text-amber-400 transition-colors duration-150 inline-block py-0.5">
               {{ t().footer.rajGovt }}
             </a>
           </li>
           <li>
             <a href="https://livelihoods.rajasthan.gov.in" target="_blank" rel="noopener noreferrer"
-              class="text-slate-300 hover:text-white transition-colors duration-150">
+              class="text-slate-300 hover:text-amber-400 transition-colors duration-150 inline-block py-0.5">
               {{ t().footer.rsldc }}
             </a>
           </li>
           <li>
-            <a href="#privacy" class="text-slate-300 hover:text-white transition-colors duration-150">
+            <a href="#privacy" class="text-slate-300 hover:text-amber-400 transition-colors duration-150 inline-block py-0.5">
               {{ t().footer.privacy }}
             </a>
           </li>
           <li>
-            <a href="#terms" class="text-slate-300 hover:text-white transition-colors duration-150">
+            <a href="#terms" class="text-slate-300 hover:text-amber-400 transition-colors duration-150 inline-block py-0.5">
               {{ t().footer.terms }}
             </a>
           </li>
         </ul>
       </div>
 
-      <!-- Col 4: Connect With Us & Helpline -->
-      <div class="lg:col-span-3">
+      <!-- Col 3: Connect With Us & Helpline (right column on mobile: col-span-1, 1 col on md, 4 cols on lg) -->
+      <div class="col-span-1 md:col-span-1 lg:col-span-4 md:pl-2 lg:pl-4">
         <h4 class="text-sm font-bold text-white mb-3 tracking-wide">
           {{ t().footer.connectWithUs }}
         </h4>
 
         <!-- Social Media Icons (White Circles) -->
-        <div class="flex items-center gap-2.5 mb-3.5">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-3 sm:mb-3.5">
           <!-- YouTube -->
           <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"
-            class="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#002244] hover:bg-slate-200 transition-colors shadow-sm"
+            class="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#002244] hover:bg-amber-400 hover:text-slate-950 transition-colors shadow-sm cursor-pointer"
             aria-label="YouTube">
             <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
               <path
@@ -102,7 +83,7 @@
 
           <!-- Twitter / X -->
           <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"
-            class="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#002244] hover:bg-slate-200 transition-colors shadow-sm"
+            class="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#002244] hover:bg-amber-400 hover:text-slate-950 transition-colors shadow-sm cursor-pointer"
             aria-label="Twitter">
             <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
               <path
@@ -112,7 +93,7 @@
 
           <!-- Facebook -->
           <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"
-            class="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#002244] hover:bg-slate-200 transition-colors shadow-sm"
+            class="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#002244] hover:bg-amber-400 hover:text-slate-950 transition-colors shadow-sm cursor-pointer"
             aria-label="Facebook">
             <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
               <path
@@ -122,7 +103,7 @@
 
           <!-- LinkedIn -->
           <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"
-            class="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#002244] hover:bg-slate-200 transition-colors shadow-sm"
+            class="w-7 h-7 rounded-full bg-white flex items-center justify-center text-[#002244] hover:bg-amber-400 hover:text-slate-950 transition-colors shadow-sm cursor-pointer"
             aria-label="LinkedIn">
             <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
               <path
@@ -139,19 +120,19 @@
           <p class="text-xs font-semibold text-slate-200">
             {{ t().footer.helpline }}
           </p>
-          <div class="flex items-center gap-2 text-xs text-slate-300">
+          <div class="flex items-center gap-1.5 sm:gap-2 text-[11.5px] sm:text-xs text-slate-300">
             <svg class="w-3.5 h-3.5 text-slate-300 shrink-0" fill="currentColor" viewBox="0 0 24 24">
               <path
                 d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-2.2 2.2a15.053 15.053 0 01-6.59-6.59l2.2-2.21a.96.96 0 00.25-1.01A11.36 11.36 0 018.57 3.9c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.52c0-.55-.45-1-.99-1z" />
             </svg>
-            <span>0141-xxxxxxx</span>
+            <a href="tel:0141xxxxxxx" class="hover:text-white transition-colors">0141-xxxxxxx</a>
           </div>
-          <div class="flex items-center gap-2 text-xs text-slate-300">
-            <svg class="w-3.5 h-3.5 text-slate-300 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+          <div class="flex items-start sm:items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-slate-300 min-w-0">
+            <svg class="w-3.5 h-3.5 text-slate-300 shrink-0 mt-0.5 sm:mt-0" fill="currentColor" viewBox="0 0 24 24">
               <path
                 d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
             </svg>
-            <span>support&#64;isms.rajasthan.gov.in</span>
+            <a href="mailto:support@isms.rajasthan.gov.in" class="hover:text-white transition-colors break-all">support&#64;isms.rajasthan.gov.in</a>
           </div>
         </div>
       </div>
@@ -159,24 +140,25 @@
     </div>
   </div>
 
-  <!-- Bottom Divider & Copyright Bar -->
+  <!-- Bottom Divider & Tagline Bar -->
   <div class="border-t border-white/10 relative">
-    <div
-      class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 relative flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] sm:text-xs text-slate-300/80 text-center sm:text-left">
-      <div>
-        &copy; {{ currentYear }} {{ t().footer.copyright }}
-      </div>
-      <div class="sm:mr-20">
-        {{ t().footer.tagline }}
-      </div>
+    <!-- Upward arrow button commented out for now:
+    <button
+      type="button"
+      (click)="scrollToTop()"
+      class="absolute right-[74px] sm:right-[94px] translate-x-1/2 -top-5 sm:-top-5.5 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white hover:bg-amber-400 text-[#001f3f] hover:text-slate-950 shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-95 border border-white/20 z-20 group"
+      [attr.aria-label]="t().footer.scrollToTopAria"
+      title="Scroll to top">
+      <svg class="w-5 h-5 transition-transform group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+      </svg>
+    </button>
+    -->
 
-      <button type="button" (click)="scrollToTop()"
-        class="absolute right-4 sm:right-28 -top-5 sm:-top-5.5 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white text-[#1d4ed8] shadow-lg flex items-center justify-center hover:bg-slate-100 hover:scale-105 active:scale-95 transition-all duration-150 focus:outline-none z-20 cursor-pointer"
-        [attr.aria-label]="t().footer.scrollToTopAria">
-        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-        </svg>
-      </button>
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-4 sm:pt-6 sm:pb-5 text-center text-xs sm:text-[13px] text-slate-300/85">
+      <p class="leading-relaxed font-normal max-w-2xl mx-auto">
+        {{ t().footer.tagline }}
+      </p>
     </div>
   </div>
 </footer>

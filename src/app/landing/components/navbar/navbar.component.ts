@@ -1,8 +1,7 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterModule } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { LanguageService, Language } from '../../../core/services/language.service';
-import { EoiStateService } from '../../../core/services/eoi-state.service';
 
 export type { Language };
 export type FontSize = 'sm' | 'md' | 'lg';
@@ -17,28 +16,40 @@ export interface PressRelease {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent implements OnInit {
   protected readonly languageService = inject(LanguageService);
-  private readonly eoiStateService = inject(EoiStateService);
-  private readonly router = inject(Router);
-
   readonly currentLanguage = this.languageService.currentLanguage;
   readonly t = this.languageService.t;
   readonly fontSize = signal<FontSize>('md');
   readonly searchQuery = signal<string>('');
   readonly isNewsModalOpen = signal<boolean>(false);
   readonly isMobileMenuOpen = signal<boolean>(false);
+  readonly isMobileSearchOpen = signal<boolean>(false);
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen.update(v => !v);
+    if (this.isMobileMenuOpen()) {
+      this.isMobileSearchOpen.set(false);
+    }
   }
 
   closeMobileMenu(): void {
     this.isMobileMenuOpen.set(false);
+  }
+
+  toggleMobileSearch(): void {
+    this.isMobileSearchOpen.update(v => !v);
+    if (this.isMobileSearchOpen()) {
+      this.isMobileMenuOpen.set(false);
+    }
+  }
+
+  closeMobileSearch(): void {
+    this.isMobileSearchOpen.set(false);
   }
 
   pressReleases: PressRelease[] = [
@@ -107,13 +118,9 @@ export class NavbarComponent implements OnInit {
       document.body.classList.remove('font-scale-sm', 'font-scale-md', 'font-scale-lg');
       document.body.classList.add(`font-scale-${size}`);
 
-      if (size === 'sm') {
-        (document.body.style as any).zoom = '0.9';
-      } else if (size === 'lg') {
-        (document.body.style as any).zoom = '1.12';
-      } else {
-        (document.body.style as any).zoom = '1';
-      }
+      const zoomValue = size === 'sm' ? '0.9' : size === 'lg' ? '1.12' : '1';
+      document.body.style.setProperty('zoom', zoomValue);
+      (document.body.style as any).zoom = zoomValue;
 
       try {
         localStorage.setItem('isms_font_size', size);

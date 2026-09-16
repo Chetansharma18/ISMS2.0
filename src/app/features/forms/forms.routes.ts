@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { TpPiaRegistrationComponent } from './components/tp-pia-registration.component';
+import { TpPiaRegistrationComponent } from './components/tp-pia-registration/tp-pia-registration.component';
 
 export const FORMS_ROUTES: Routes = [
   {

@@ -33,53 +33,46 @@ export interface TabItem {
   template: `
     <div class="min-h-screen bg-[#f8fafc] text-slate-900 font-sans text-sm relative">
       <div>
-        <!-- Government of Rajasthan Official Header -->
-        <header class="bg-gradient-to-r from-[#131A4D] via-[#18205C] to-[#1D246B] text-white border-b-[3px] border-[#E67E22] shadow-md">
-          <div class="w-full px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex items-center justify-between">
-            <!-- Left: Emblem & Title -->
-            <div class="flex items-center gap-2.5 sm:gap-3.5">
-              <div class="shrink-0 flex items-center justify-center">
-                <img
-                  src="ashok.png"
-                  alt="State Emblem of India - Satyameva Jayate"
-                  class="h-11 sm:h-12 w-auto object-contain brightness-0 invert drop-shadow-xs select-none"
-                  onerror="this.src='/emblem.png'"
-                />
+        <!-- Government of Rajasthan Official Header matching ISMS Portal Theme -->
+        <header class="w-full bg-[#f0f6fc] border-b border-slate-200/90 font-['Poppins',sans-serif] shadow-2xs select-none">
+          <div class="max-w-[1400px] mx-auto py-2 sm:py-2.5 lg:py-3 px-2.5 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
+            
+            <!-- Left Branding Group: Emblems + Divider + ISMS 2.0 -->
+            <div class="flex items-center gap-1.5 sm:gap-3.5 lg:gap-4 min-w-0 cursor-pointer" routerLink="/">
+              <!-- Official Ashoka Lion Capital (State Emblem of India) -->
+              <div class="flex-shrink-0 flex items-center justify-center">
+                <img src="emblem-new.png" alt="State Emblem of India" class="h-9 sm:h-[52px] lg:h-[60px] w-auto object-contain select-none" />
               </div>
-              <div class="min-w-0">
-                <p class="text-[10px] sm:text-xs text-[#F8B471] font-semibold tracking-wide truncate">
-                  राजस्थान सरकार &nbsp;•&nbsp; Government of Rajasthan
-                </p>
-                <h1 class="text-lg sm:text-2xl font-black text-white tracking-wide leading-none mt-0.5">
-                  ISMS 2.0
-                </h1>
-                <p class="text-[10px] sm:text-xs text-white/80 font-normal mt-0.5 truncate">
-                  Integrated Scheme Management System · TP / PIA One-Time Registration
-                </p>
+              <!-- Official RSLDC Circular Emblem -->
+              <div class="flex-shrink-0 flex items-center justify-center">
+                <img src="rsldc-logo.png" alt="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)" class="h-9 w-9 sm:h-[52px] sm:w-[52px] lg:h-[60px] lg:w-[60px] object-contain select-none drop-shadow-2xs" />
+              </div>
+
+              <!-- Thin Vertical Divider Line -->
+              <div class="h-7 sm:h-10 lg:h-11 w-[1.5px] bg-slate-300 mx-0.5 sm:mx-2 lg:mx-2.5 shrink-0"></div>
+
+              <!-- System Branding: ISMS in Navy, 2.0 in Orange/Amber -->
+              <div class="flex text-left flex-col justify-center shrink-0">
+                <div class="flex items-baseline leading-none">
+                  <span class="text-lg sm:text-2xl lg:text-[27px] font-extrabold text-[#092244] tracking-tight">ISMS</span>
+                  <span class="text-lg sm:text-2xl lg:text-[27px] font-extrabold text-[#f59e0b] ml-1">2.0</span>
+                </div>
+                <div class="hidden sm:block text-[10.5px] sm:text-[11.5px] lg:text-[12px] text-slate-600 font-medium tracking-tight mt-0.5 sm:mt-1">
+                  Integrated Scheme Management System · One-Time Registration (OTR)
+                </div>
               </div>
             </div>
 
-            <!-- Right: Skip Button -->
-            <button
-              type="button"
-              (click)="skipToPortal()"
-              class="shrink-0 px-3.5 py-1.5 border border-white/30 hover:border-white/60 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xs transition-colors flex items-center gap-1.5 shadow-xs"
-              title="Skip registration and continue as citizen">
-              Skip → Citizen Portal
-            </button>
-          </div>
-
-          <!-- SSO Identity Banner -->
-          <div class="bg-[#0b1b38] border-t border-white/10 px-3 sm:px-6 lg:px-8 py-2 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-2 text-xs">
-              <span class="w-5 h-5 rounded-full bg-white/15 text-[#f6b024] flex items-center justify-center font-bold text-[10px] shrink-0">SSO</span>
-              <span class="text-slate-300">Authenticated as:</span>
-              <span class="font-mono font-bold text-[#f6b024]">{{ currentSsoId }}</span>
-              <span class="text-slate-400 text-[11px]">🔒</span>
+            <!-- Right: Skip to Citizen Portal Button -->
+            <div class="flex items-center shrink-0">
+              <button
+                type="button"
+                (click)="skipToPortal()"
+                class="px-2.5 py-1 sm:px-4 sm:py-2 bg-[#002244] hover:bg-[#001730] text-white text-[11px] sm:text-sm font-bold rounded-lg shadow-xs tracking-tight transition-colors flex items-center gap-1 sm:gap-1.5 cursor-pointer whitespace-nowrap"
+                title="Skip registration and continue as citizen">
+                <span>Skip → Citizen<span class="hidden sm:inline"> Portal</span></span>
+              </button>
             </div>
-            <span class="text-[11px] text-emerald-300 font-semibold flex items-center gap-1">
-              <span>✓ SSO Verified</span>
-            </span>
           </div>
         </header>
 
@@ -579,7 +572,7 @@ export class RegistrationShellComponent implements OnInit {
   }
 
   skipToPortal() {
-    this.eoiService.updateProfile({ userState: 'new', isRegistered: false });
+    this.eoiService.resetToRegisteredApplicant(this.currentSsoId || 'applicant_rj');
     this.router.navigate(['/schemes']);
   }
 }

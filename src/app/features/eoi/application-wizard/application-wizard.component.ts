@@ -1,9 +1,14 @@
-import { Component, inject, signal, computed, effect, HostListener, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, effect, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from './components/header/header.component';
 import { StepNavComponent } from './components/step-nav/step-nav.component';
+import { SchemeBannerComponent } from './components/scheme-banner/scheme-banner.component';
+import { StepDocumentsComponent } from './components/step-documents/step-documents.component';
+import { StepPaymentComponent } from './components/step-payment/step-payment.component';
+import { StepPreviewComponent } from './components/step-preview/step-preview.component';
+import { StepReceiptComponent } from './components/step-receipt/step-receipt.component';
 import { EoiService } from './services/eoi.service';
 import { EoiStateService, Scheme } from '../../../core/services/eoi-state.service';
 import { PdfGeneratorService } from './services/pdf-generator.service';
@@ -16,10 +21,16 @@ import { RAJASTHAN_DISTRICTS, EOI_SECTIONS } from './models/eoi.model';
     CommonModule,
     FormsModule,
     HeaderComponent,
-    StepNavComponent
+    StepNavComponent,
+    SchemeBannerComponent,
+    StepDocumentsComponent,
+    StepPaymentComponent,
+    StepPreviewComponent,
+    StepReceiptComponent
   ],
   templateUrl: './application-wizard.component.html',
-  styleUrls: ['./application-wizard.component.css']
+  styleUrls: ['./application-wizard.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class ApplicationWizardComponent implements OnInit {
   readonly router = inject(Router);
@@ -33,33 +44,6 @@ export class ApplicationWizardComponent implements OnInit {
   // Currently selected Scheme & Tender info
   readonly selectedScheme = signal<Scheme | null>(null);
 
-  ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const schemeId = params.get('id') || 'EOI-MMKVY-2026-01';
-      this.loadSchemeDetails(schemeId);
-    });
-  }
-
-  private loadSchemeDetails(schemeId: string): void {
-    this.eoiStateService.schemes$.subscribe(schemes => {
-      const found = schemes.find(s => s.id === schemeId || s.schemeCode === schemeId || s.tenderId === schemeId);
-      const active = found || (schemes.length > 0 ? schemes[0] : null);
-      if (active) {
-        this.selectedScheme.set(active);
-        this.eoiService.setSchemeFees(
-          active.processingFee,
-          active.emdAmount,
-          active.name,
-          active.eoiReferenceNo
-        );
-      }
-    });
-  }
-
-  goToAllSchemes(): void {
-    this.router.navigate(['/schemes']);
-  }
-
   // Modals state
   readonly showDocConfirmModal = signal<boolean>(false);
   readonly showPaymentSuccessModal = signal<boolean>(false);
@@ -72,9 +56,6 @@ export class ApplicationWizardComponent implements OnInit {
 
   // Receipt copy state
   readonly copiedRef = signal<boolean>(false);
-
-  // Today's date for date inputs
-  readonly todayDate = new Date().toISOString().split('T')[0];
 
   constructor() {
     // Lock body scroll when any modal is active
@@ -104,6 +85,34 @@ export class ApplicationWizardComponent implements OnInit {
     });
   }
 
+  ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      const schemeId = params.get('id') || 'EOI-MMKVY-2026-01';
+      this.loadSchemeDetails(schemeId);
+    });
+  }
+
+  private loadSchemeDetails(schemeId: string): void {
+    this.eoiStateService.schemes$.subscribe(schemes => {
+      const found = schemes.find(s => s.id === schemeId || s.schemeCode === schemeId || s.tenderId === schemeId);
+      const active = found || (schemes.length > 0 ? schemes[0] : null);
+      if (active) {
+        this.selectedScheme.set(active);
+        this.eoiService.setSchemeFees(
+          active.processingFee,
+          active.emdAmount,
+          active.name,
+          active.eoiReferenceNo,
+          active.id || active.schemeCode
+        );
+      }
+    });
+  }
+
+  goToAllSchemes(): void {
+    this.router.navigate(['/schemes']);
+  }
+
   // Keyboard accessibility: Escape closes open modal
   @HostListener('document:keydown.escape')
   onEscapePress(): void {
@@ -112,41 +121,9 @@ export class ApplicationWizardComponent implements OnInit {
     if (this.showPdfViewerModal()) this.showPdfViewerModal.set(false);
   }
 
-  // 1. File Upload Handler (PDF only, Max 5MB)
-  onFileSelected(slotId: string, event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      const success = this.eoiService.uploadDocument(slotId, file);
-      if (success) {
-        this.clearError(`doc_${slotId}`);
-      }
-      input.value = ''; // Reset input to allow re-uploading same file
-    }
-  }
-
-  // Preview Document Upload/Change Handler
-  onPreviewFileSelected(sNo: number, event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      this.eoiService.uploadPreviewDocument(sNo, file);
-      input.value = '';
-    }
-  }
-
-  // Remove uploaded document
-  removeUploadedFile(slotId: string): void {
-    this.eoiService.removeDocument(slotId);
-  }
-
-  // View PDF modal
-  viewDocument(title: string, fileName: string | null, fileSize: string | null): void {
-    this.currentViewingDoc.set({
-      title,
-      fileName: fileName || 'Document_Preview.pdf',
-      fileSize: fileSize || '1.5 MB'
-    });
+  // Document view helper
+  onViewDocument(doc: { title: string; fileName: string; fileSize: string }): void {
+    this.currentViewingDoc.set(doc);
     this.showPdfViewerModal.set(true);
   }
 
@@ -155,7 +132,7 @@ export class ApplicationWizardComponent implements OnInit {
     this.currentViewingDoc.set(null);
   }
 
-  // 2. Step 1 Documents: Save & Next
+  // 1. Step 1 Documents: Save & Next
   handleDocumentsNext(): void {
     const errors: Record<string, string> = {};
     const slots = this.eoiService.uploadSlots();
@@ -170,28 +147,24 @@ export class ApplicationWizardComponent implements OnInit {
     if (Object.keys(errors).length > 0) {
       this.validationErrors.set(errors);
       this.eoiService.showToast('Please upload all mandatory documents (* Required) before proceeding.');
-      // Scroll to first error
       window.scrollTo({ top: 180, behavior: 'smooth' });
       return;
     }
 
     this.validationErrors.set({});
-    // Open Confirmation Modal
     this.showDocConfirmModal.set(true);
   }
 
-  // Confirmation Modal Action: Yes -> Go to Fee Payment
   confirmProceedToFees(): void {
     this.showDocConfirmModal.set(false);
     this.eoiService.goToFees();
   }
 
-  // Confirmation Modal Action: No -> Stay on Document page
   closeDocConfirmModal(): void {
     this.showDocConfirmModal.set(false);
   }
 
-  // 3. Step 2 Fees: Proceed to Payment
+  // 2. Step 2 Fees: Proceed to Payment
   handleProceedToPayment(): void {
     const pay = this.eoiService.paymentData();
     const errors: Record<string, string> = {};
@@ -201,7 +174,6 @@ export class ApplicationWizardComponent implements OnInit {
     const procFeeStr = '₹' + procFee.toLocaleString('en-IN');
     const emdFeeStr = '₹' + emdFee.toLocaleString('en-IN');
 
-    // Validate that BOTH fees are selected (compulsory)
     if (!pay.processingFeeSelected && !pay.emdFeeSelected) {
       errors['fees_selection'] = `Both Processing Fee (${procFeeStr}) and Earnest Money Deposit (EMD ${emdFeeStr}) are compulsory. Please select both fees to proceed.`;
     } else if (!pay.processingFeeSelected) {
@@ -210,7 +182,6 @@ export class ApplicationWizardComponent implements OnInit {
       errors['fees_selection'] = `Earnest Money Deposit (EMD ${emdFeeStr}) is compulsory. Please select it to proceed.`;
     }
 
-    // Validate payment method
     if (!pay.paymentMethod) {
       errors['payment_method'] = 'Please select a payment method.';
     }
@@ -222,22 +193,29 @@ export class ApplicationWizardComponent implements OnInit {
     }
 
     this.validationErrors.set({});
-    // Execute mock payment gateway
     this.eoiService.processMockPayment(() => {
       this.showPaymentSuccessModal.set(true);
     });
   }
 
-  // Payment Success Modal: Continue to Preview
   continueToPreview(): void {
     this.showPaymentSuccessModal.set(false);
     this.eoiService.goToPreview();
   }
 
-  // 4. Step 3 Preview: Section-level Edit & Submit
+  // 3. Step 3 Preview: Section-level Edit & Submit
   editSection(sectionId: number): void {
+    this.validationErrors.set({});
     this.eoiService.editIndividualSection(sectionId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  clearFieldError(field: string): void {
+    if (this.validationErrors()[field]) {
+      const current = { ...this.validationErrors() };
+      delete current[field];
+      this.validationErrors.set(current);
+    }
   }
 
   private scrollToPreviewSection(secId: number | null): void {
@@ -254,12 +232,56 @@ export class ApplicationWizardComponent implements OnInit {
 
   saveSectionAndReturn(): void {
     const targetSecId = this.eoiService.activeEditSectionId();
+    const form = this.eoiService.formData();
+    const errors: Record<string, string> = {};
+
+    if (targetSecId === 1) {
+      const org = form.orgBasicDetails;
+      if (!String(org.tp_full_name || '').trim()) errors['tp_full_name'] = 'TP/PIA Full Name is required';
+      if (!String(org.tp_short_name || '').trim()) errors['tp_short_name'] = 'TP/PIA Short Name is required';
+      if (!String(org.organisation_contact_no || '').trim()) errors['organisation_contact_no'] = 'Contact Number is required';
+      if (!String(org.company_email || '').trim()) errors['company_email'] = 'Company Email is required';
+      if (!String(org.registered_address || '').trim()) errors['registered_address'] = 'Registered Address is required';
+      if (!String(org.state_ut || '').trim()) errors['state_ut'] = 'State / UT is required';
+      if (!String(org.district || '').trim()) errors['district'] = 'District is required';
+      if (!String(org.pincode || '').trim()) errors['pincode'] = 'Pincode is required';
+      if (!String(org.turnover_lakhs ?? '').trim()) errors['turnover_lakhs'] = 'Turnover is required';
+      if (!String(org.postal_address || '').trim()) errors['postal_address'] = 'Postal Address is required';
+    } else if (targetSecId === 2) {
+      const auth = form.authPersonDetails;
+      if (!String(auth.auth_name || '').trim()) errors['auth_name'] = 'Authorized Person Name is required';
+      if (!String(auth.auth_mobile || '').trim()) errors['auth_mobile'] = 'Mobile Number is required';
+      if (!String(auth.auth_pan || '').trim()) errors['auth_pan'] = 'PAN is required';
+    } else if (targetSecId === 3) {
+      const bank = form.bankDetails;
+      if (!String(bank.bank_name || '').trim()) errors['bank_name'] = 'Bank Name is required';
+      if (!String(bank.bank_account_no || '').trim()) errors['bank_account_no'] = 'Account Number is required';
+      if (!String(bank.bank_ifsc || '').trim()) errors['bank_ifsc'] = 'IFSC Code is required';
+      if (!String(bank.bank_branch_name || '').trim()) errors['bank_branch_name'] = 'Branch Name is required';
+      if (!String(bank.bank_branch_address || '').trim()) errors['bank_branch_address'] = 'Branch Address is required';
+    } else if (targetSecId === 5) {
+      const sec5 = form.section6;
+      if (!String(sec5.district_city || '').trim()) errors['district_city'] = 'District / City is required';
+      if (!String(sec5.training_center_name || '').trim()) errors['training_center_name'] = 'Training Centre Name is required';
+      if (!String(sec5.telephone_number || '').trim()) errors['telephone_number'] = 'Telephone Number is required';
+      if (!String(sec5.number_of_classrooms ?? '').trim()) errors['number_of_classrooms'] = 'Number of Classrooms is required';
+      if (!String(sec5.full_address || '').trim()) errors['full_address'] = 'Full Address is required';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      this.validationErrors.set(errors);
+      this.eoiService.showToast('Please fill all compulsory fields marked with * before saving.');
+      return;
+    }
+
+    this.validationErrors.set({});
     this.eoiService.saveAndReturnToPreview();
     this.scrollToPreviewSection(targetSecId);
   }
 
   cancelSectionAndReturn(): void {
     const targetSecId = this.eoiService.activeEditSectionId();
+    this.validationErrors.set({});
     this.eoiService.editingSectionId.set(null);
     this.eoiService.setFlowStage('preview');
     this.scrollToPreviewSection(targetSecId);
@@ -278,7 +300,7 @@ export class ApplicationWizardComponent implements OnInit {
     this.eoiService.finalizeSubmission();
   }
 
-  // 5. Step 4 Receipt & Post-Submission Edit
+  // 4. Step 4 Receipt Actions
   printReceipt(): void {
     window.print();
   }
@@ -334,137 +356,5 @@ export class ApplicationWizardComponent implements OnInit {
       ? 'Simulated: Modification Deadline Expired (Modification Window Closed)'
       : 'Simulated: Within Deadline (22 days remaining until 30 Sep 2026)';
     this.eoiService.showToast(msg);
-  }
-
-  clearError(fieldKey: string): void {
-    if (this.validationErrors()[fieldKey]) {
-      const errs = { ...this.validationErrors() };
-      delete errs[fieldKey];
-      this.validationErrors.set(errs);
-    }
-  }
-
-  // Numeric input filters
-  onlyNumeric(
-    event: KeyboardEvent,
-    fieldKey: string,
-    fieldLabel: string,
-    maxDigits?: number,
-    maxValue?: number,
-    allowDecimal: boolean = false
-  ): void {
-    const allowedKeys = [
-      'Backspace',
-      'Delete',
-      'Tab',
-      'Escape',
-      'Enter',
-      'ArrowLeft',
-      'ArrowRight',
-      'ArrowUp',
-      'ArrowDown',
-      'Home',
-      'End'
-    ];
-
-    if (allowedKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
-      return;
-    }
-
-    if (allowDecimal && event.key === '.') {
-      const input = event.target as HTMLInputElement;
-      if (!input.value.includes('.')) {
-        return;
-      }
-    }
-
-    if (!/^\d$/.test(event.key)) {
-      event.preventDefault();
-      const current = { ...this.validationErrors() };
-      current[fieldKey] = `Numbers only are required for ${fieldLabel}. Alphabets are not allowed.`;
-      this.validationErrors.set(current);
-      return;
-    }
-
-    const input = event.target as HTMLInputElement;
-    const currentVal = input.value !== null && input.value !== undefined ? String(input.value) : '';
-    let start: number = input.selectionStart ?? currentVal.length;
-    let end: number = input.selectionEnd ?? start;
-
-    const futureVal = currentVal.substring(0, start) + event.key + currentVal.substring(end);
-
-    if (maxDigits && futureVal.length > maxDigits) {
-      event.preventDefault();
-      const current = { ...this.validationErrors() };
-      current[fieldKey] = `Maximum limit is ${maxDigits} digits for ${fieldLabel}.`;
-      this.validationErrors.set(current);
-      return;
-    }
-
-    if (maxValue !== undefined) {
-      const num = Number(futureVal);
-      if (num > maxValue) {
-        event.preventDefault();
-        const current = { ...this.validationErrors() };
-        current[fieldKey] = `Maximum limit allowed for ${fieldLabel} is ${maxValue}.`;
-        this.validationErrors.set(current);
-        return;
-      }
-    }
-
-    if (this.validationErrors()[fieldKey]) {
-      this.clearError(fieldKey);
-    }
-  }
-
-  onNumericPaste(
-    event: ClipboardEvent,
-    fieldKey: string,
-    fieldLabel: string,
-    maxDigits: number = 10,
-    maxValue?: number,
-    allowDecimal: boolean = false
-  ): void {
-    const clipboardData = event.clipboardData?.getData('text') || '';
-    const regex = allowDecimal ? /^\d*\.?\d*$/ : /^\d+$/;
-    if (!regex.test(clipboardData.trim())) {
-      event.preventDefault();
-      const current = { ...this.validationErrors() };
-      current[fieldKey] = `Invalid input. Numbers only are required for ${fieldLabel}.`;
-      this.validationErrors.set(current);
-      return;
-    }
-
-    if (maxDigits && clipboardData.trim().length > maxDigits) {
-      event.preventDefault();
-      const current = { ...this.validationErrors() };
-      current[fieldKey] = `Pasted number exceeds the maximum length (${maxDigits} digits) for ${fieldLabel}.`;
-      this.validationErrors.set(current);
-      return;
-    }
-
-    if (maxValue !== undefined && Number(clipboardData.trim()) > maxValue) {
-      event.preventDefault();
-      const current = { ...this.validationErrors() };
-      current[fieldKey] = `Pasted number exceeds the maximum limit (${maxValue}) for ${fieldLabel}.`;
-      this.validationErrors.set(current);
-      return;
-    }
-
-    if (this.validationErrors()[fieldKey]) {
-      this.clearError(fieldKey);
-    }
-  }
-
-  trackBySlotId(index: number, slot: { id: string }): string {
-    return slot.id;
-  }
-
-  trackByIndex(index: number): number {
-    return index;
-  }
-
-  trackByRowId(index: number, item: { id: string }): string {
-    return item.id;
   }
 }

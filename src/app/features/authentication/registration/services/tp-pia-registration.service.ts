@@ -83,8 +83,6 @@ export const MARK_TO_ROLES: string[] = [
 ];
 
 export const ID_PROOF_TYPES: string[] = [
-  'Aadhaar Card',
-  'PAN Card',
   'Voter ID Card',
   'Passport',
   'Driving License'

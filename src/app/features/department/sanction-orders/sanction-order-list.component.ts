@@ -1,18 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { UiTableComponent, TableColumn } from '../../../shared/components/ui/ui-table/ui-table.component';
-
-interface SanctionOrder {
-  id: string;
-  ref: string;
-  tender: string;
-  eoi: string;
-  tpName: string;
-  tpId: string;
-  status: 'DRAFT' | 'PENDING_RELEASE' | 'RELEASED';
-  target?: number;
-}
+import { SanctionOrderService, SanctionOrder } from '../../../core/services/sanction-order.service';
 
 @Component({
   selector: 'app-sanction-order-list',
@@ -32,7 +22,7 @@ interface SanctionOrder {
 
       <app-ui-table
         [columns]="columns"
-        [data]="orders"
+        [data]="(orders$ | async) || []"
         emptyMessage="No Sanction Orders found.">
         
         <ng-template #rowTemplate let-order let-col="column">
@@ -82,6 +72,10 @@ interface SanctionOrder {
   `
 })
 export class SanctionOrderListComponent {
+  private sanctionOrderService = inject(SanctionOrderService);
+  
+  orders$ = this.sanctionOrderService.orders$;
+
   columns: TableColumn[] = [
     { key: 'ref', label: 'Order Ref' },
     { key: 'tender', label: 'Tender / EOI' },
@@ -90,30 +84,8 @@ export class SanctionOrderListComponent {
     { key: 'action', label: 'Action', align: 'right' }
   ];
 
-  orders: SanctionOrder[] = [
-    {
-      id: '1',
-      ref: '-',
-      tender: 'TND-2026-001',
-      eoi: 'EOI-2026-9871',
-      tpName: 'TechTrain India Pvt Ltd',
-      tpId: 'TP001',
-      status: 'DRAFT'
-    },
-    {
-      id: '2',
-      ref: 'SO-2026-4412',
-      tender: 'TND-2026-001',
-      eoi: 'EOI-2026-9871',
-      tpName: 'SkillMasters Rajasthan',
-      tpId: 'TP042',
-      status: 'PENDING_RELEASE',
-      target: 500
-    }
-  ];
-
   releaseOrder(order: SanctionOrder) {
     alert('Sanction Order Released! The TP can now create an SDC.');
-    order.status = 'RELEASED';
+    this.sanctionOrderService.updateStatus(order.id, 'RELEASED');
   }
 }

@@ -4,6 +4,7 @@ import { RouterLink, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UiInputComponent } from '../../../shared/components/ui/ui-input/ui-input.component';
 import { UiSelectComponent } from '../../../shared/components/ui/ui-select/ui-select.component';
+import { SanctionOrderService } from '../../../core/services/sanction-order.service';
 
 @Component({
   selector: 'app-sanction-order-create',
@@ -101,7 +102,7 @@ import { UiSelectComponent } from '../../../shared/components/ui/ui-select/ui-se
         <button routerLink="/department/sanction-orders" class="px-6 py-3 text-slate-600 font-bold hover:bg-slate-100 rounded-lg transition-colors">
           Cancel
         </button>
-        <button class="px-6 py-3 border-2 border-[#131A4D] text-[#131A4D] font-bold rounded-lg hover:bg-slate-50 transition-colors">
+        <button (click)="saveDraft()" class="px-6 py-3 border-2 border-[#131A4D] text-[#131A4D] font-bold rounded-lg hover:bg-slate-50 transition-colors">
           Save as Draft
         </button>
         <button (click)="submit()" [disabled]="soForm.invalid" class="px-6 py-3 bg-[#131A4D] text-white font-bold rounded-lg shadow-md hover:bg-[#0a0e29] hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -118,6 +119,7 @@ import { UiSelectComponent } from '../../../shared/components/ui/ui-select/ui-se
 export class SanctionOrderCreateComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private sanctionOrderService = inject(SanctionOrderService);
 
   soForm = this.fb.group({
     tenderId: ['TND-2026-001', Validators.required],
@@ -129,7 +131,20 @@ export class SanctionOrderCreateComponent {
 
   submit() {
     if (this.soForm.valid) {
+      this.sanctionOrderService.addOrder({
+        status: 'PENDING_RELEASE',
+        target: this.soForm.value.capacity ?? undefined
+      });
       this.router.navigate(['/department/sanction-orders']);
     }
+  }
+
+  saveDraft() {
+    this.sanctionOrderService.addOrder({
+      status: 'DRAFT',
+      target: this.soForm.value.capacity ?? undefined
+    });
+    alert('Sanction Order saved as draft successfully!');
+    this.router.navigate(['/department/sanction-orders']);
   }
 }

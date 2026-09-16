@@ -8,7 +8,7 @@
 
       <!-- Tender Box Header: Website Navy & Amber Theme (#002244) -->
       <div
-        class="bg-gradient-to-r from-[#002244] via-[#002855] to-[#003366] px-3.5 sm:px-4 py-2.5 sm:py-3.5 flex items-center justify-between shadow-sm z-20 shrink-0 border-b border-amber-500/30">
+        class="bg-gradient-to-r from-[#002244] via-[#002855] to-[#003366] px-4 py-2.5 sm:py-3.5 flex items-center justify-between shadow-sm z-20 shrink-0 border-b border-amber-500/30">
         <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
           <span class="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5 shrink-0">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -42,7 +42,7 @@
           @for (item of tenders; track item.id) {
             <div
               (click)="openModal(item)"
-              class="p-3 sm:p-3.5 px-3.5 sm:px-4 border-b border-slate-100 hover:bg-blue-50/60 transition-all cursor-pointer group/item flex flex-col justify-center">
+              class="p-3 sm:p-3.5 px-4 border-b border-slate-100 hover:bg-blue-50/60 transition-all cursor-pointer group/item flex flex-col justify-center">
               <div class="flex items-center justify-between gap-2 mb-1">
                 <span class="text-[11px] font-medium text-slate-500 font-sans">
                   {{ item.date }}
@@ -71,7 +71,7 @@
           @for (item of tenders; track 'dup-' + item.id) {
             <div
               (click)="openModal(item)"
-              class="p-3 sm:p-3.5 px-3.5 sm:px-4 border-b border-slate-100 hover:bg-blue-50/60 transition-all cursor-pointer group/item flex flex-col justify-center">
+              class="p-3 sm:p-3.5 px-4 border-b border-slate-100 hover:bg-blue-50/60 transition-all cursor-pointer group/item flex flex-col justify-center">
               <div class="flex items-center justify-between gap-2 mb-1">
                 <span class="text-[11px] font-medium text-slate-500 font-sans">
                   {{ item.date }}

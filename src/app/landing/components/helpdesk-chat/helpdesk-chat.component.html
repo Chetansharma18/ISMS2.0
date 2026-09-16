@@ -108,7 +108,7 @@
                 </span>
 
                 <!-- Bot Options Pills -->
-                @if (msg.options && msg.options.length > 0) {
+                @if ((msg.options?.length || 0) > 0) {
                   <div class="flex flex-wrap gap-1.5 mt-2">
                     @for (opt of msg.options; track opt.action) {
                       <button

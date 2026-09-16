@@ -29,17 +29,17 @@
       </button>
 
       <!-- Slider Viewport (Exact clipping) -->
-      <div class="w-full overflow-hidden py-1">
+      <div class="w-full overflow-hidden py-2">
         <div class="flex transition-transform duration-500 ease-in-out"
           [style.transform]="'translateX(-' + (currentIndex() * (100 / itemsPerPage())) + '%)'">
           @for (item of links; track item.id) {
-          <div class="shrink-0 px-1.5 sm:px-2.5" [style.width]="(100 / itemsPerPage()) + '%'">
+          <div class="shrink-0 px-1.5 sm:px-2.5 md:px-3" [style.width]="(100 / itemsPerPage()) + '%'">
             <a [href]="item.url" target="_blank" rel="noopener noreferrer"
               [title]="item.name + (item.tagline ? ' - ' + item.tagline : '')"
-              class="bg-white rounded-xl sm:rounded-2xl shadow-md hover:shadow-xl border border-slate-100 hover:border-amber-400 p-2 sm:p-3 flex items-center justify-center h-20 xs:h-24 sm:h-28 lg:h-28 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] cursor-pointer group">
+              class="bg-white rounded-xl sm:rounded-2xl shadow-md hover:shadow-xl border border-slate-100 hover:border-amber-400 p-2 sm:p-3 flex items-center justify-center h-28 sm:h-36 lg:h-44 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] cursor-pointer group">
               <img [src]="item.logo" [alt]="item.name"
                 (error)="onImageError($event, item.logo.split('/').pop() || '')"
-                class="max-h-12 xs:max-h-16 sm:max-h-20 lg:max-h-20 w-auto max-w-[85%] object-contain select-none transition-transform duration-300 group-hover:scale-105 filter drop-shadow-xs" />
+                class="max-h-[88%] sm:max-h-[92%] w-auto max-w-[95%] object-contain select-none transition-transform duration-300 group-hover:scale-105 filter drop-shadow-sm" />
             </a>
           </div>
           }

@@ -37,7 +37,7 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
       hindiName: 'मानक: पथप्रदर्शक:',
       tagline: 'The National Standards Body of India',
       url: 'https://www.bis.gov.in/',
-      logo: '/assets/links/bis.png'
+      logo: 'footer-images/bis.png'
     },
     {
       id: 'bis-care',
@@ -45,7 +45,7 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
       hindiName: 'बीआईएस केयर ऐप',
       tagline: 'Bureau of Indian Standards Mobile App',
       url: 'https://www.bis.gov.in/bis-apps/',
-      logo: '/assets/links/bis-care.png'
+      logo: 'footer-images/bis-care.png'
     },
     {
       id: 'acb',
@@ -53,7 +53,7 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
       hindiName: 'मांगे कोई रिश्वत तो कॉल करें',
       tagline: 'Toll Free: 1064 | WhatsApp: 9413502834',
       url: 'https://home.rajasthan.gov.in/content/homeportal/en/acbdepartment.html',
-      logo: '/assets/links/acb.png'
+      logo: 'footer-images/acb.png'
     },
     {
       id: 'pledge',
@@ -61,7 +61,7 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
       hindiName: 'Save lives today',
       tagline: 'One Donor Can Save 8 Lives - Register for Pledge',
       url: 'https://notto.abdm.gov.in/register/',
-      logo: '/assets/links/pledge.jpeg'
+      logo: 'footer-images/pledge.jpeg'
     },
     {
       id: 'jansoochna',
@@ -69,7 +69,7 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
       hindiName: 'जन सूचना पोर्टल-2019',
       tagline: 'Government of Rajasthan',
       url: 'https://jansoochna.rajasthan.gov.in/',
-      logo: '/assets/links/jansoochna.png'
+      logo: 'footer-images/jansoochna.png'
     }
   ];
 
@@ -164,8 +164,12 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
 
   onImageError(event: Event, fallbackName: string) {
     const target = event.target as HTMLImageElement;
-    if (target && fallbackName && !target.src.endsWith('/' + fallbackName)) {
-      target.src = '/' + fallbackName;
+    if (target && fallbackName) {
+      if (target.src.includes('footer-images')) {
+        target.src = '/' + fallbackName;
+      } else {
+        target.src = '/footer-images/' + fallbackName;
+      }
     }
   }
 }

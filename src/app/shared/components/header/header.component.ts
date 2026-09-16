@@ -269,7 +269,7 @@ export class HeaderComponent implements OnInit {
         if (saved && (saved === 'sm' || saved === 'md' || saved === 'lg')) {
           initialSize = saved;
         }
-      } catch (e) {}
+      } catch (e) { }
       this.setFontSize(initialSize);
     }
   }
@@ -296,7 +296,7 @@ export class HeaderComponent implements OnInit {
 
       try {
         localStorage.setItem('isms_font_size', size);
-      } catch (e) {}
+      } catch (e) { }
     }
   }
 }

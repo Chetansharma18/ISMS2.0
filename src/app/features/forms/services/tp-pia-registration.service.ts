@@ -83,8 +83,6 @@ export const MARK_TO_ROLES: string[] = [
 ];
 
 export const ID_PROOF_TYPES: string[] = [
-  'Aadhaar Card',
-  'PAN Card',
   'Voter ID Card',
   'Passport',
   'Driving License',
@@ -117,8 +115,7 @@ export const TRANSFER_MODES: string[] = [
 
 export const ACCOUNT_TYPES: string[] = [
   'Current Account',
-  'Savings Account',
-  'Zero Balance Escrow Account'
+  'Savings Account'
 ];
 
 @Injectable({
@@ -215,7 +212,7 @@ export class TpPiaRegistrationService {
         emailId: '',
         pan: '',
         aadhaarNo: '',
-        typeIdProof: 'Aadhaar Card',
+        typeIdProof: '',
         idNo: '',
         bhamashahNo: '',
         voterIdNo: '',
@@ -378,8 +375,8 @@ export class TpPiaRegistrationService {
         emailId: 'm.sharma@kushalfoundation.org',
         pan: 'ABCPS1234E',
         aadhaarNo: '887654321908',
-        typeIdProof: 'Aadhaar Card',
-        idNo: '887654321908',
+        typeIdProof: 'Voter ID Card',
+        idNo: 'RJ/04/123/98765',
         bhamashahNo: 'BHAM-8971201',
         voterIdNo: 'RJ/04/123/98765',
         passportNo: 'Z9876543',

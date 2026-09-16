@@ -1,0 +1,2391 @@
+<div class="min-h-screen bg-[#f8fafc] text-slate-900 font-sans text-sm relative">
+  <div>
+    <!-- 1. Government of Rajasthan Official Header -->
+    <header class="relative bg-[#1a2656] text-white shadow-md">
+      <div class="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4.5 flex items-center">
+        <!-- Left: Ashoka Lion Emblem & State Portal Titles -->
+        <div class="flex items-center gap-3 sm:gap-4.5">
+          <!-- Official State Emblem (Ashoka Lion Capital with Satyameva Jayate) -->
+          <div class="shrink-0 flex items-center justify-center">
+            <img src="/emblem.png" alt="State Emblem of India - Satyameva Jayate"
+              class="h-14 sm:h-16 md:h-18 w-auto object-contain drop-shadow-md select-none"
+              style="height: 60px; max-height: 68px; width: auto;" />
+          </div>
+
+          <div class="min-w-0">
+            <p class="text-xs sm:text-sm text-slate-200 font-semibold tracking-wide">
+              राजस्थान सरकार &nbsp;•&nbsp; Government of Rajasthan
+            </p>
+            <h1
+              class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-tight mt-0.5 drop-shadow-sm">
+              TP/PIA One Time Register
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-200/90 font-medium mt-0.5">
+              Integrated Scheme Management System (ISMS 2.0)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Saffron / Orange Accent Stripe -->
+      <div class="h-1 bg-[#ea580c] w-full"></div>
+    </header>
+
+    <!-- 2. Connected Stepper Bar (Responsive & Smoothly Scrollable) -->
+    <nav class="bg-white border-b border-slate-200 shadow-2xs">
+      <div class="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-2.5">
+        <div
+          class="flex items-center justify-start md:justify-between overflow-x-auto no-scrollbar scroll-smooth gap-1 sm:gap-2 w-full pb-0.5">
+          @for (tab of tabs; track tab.id; let idx = $index; let last = $last) {
+          <button type="button" [id]="'step-btn-' + tab.id" (click)="switchTab(tab.id)"
+            class="flex items-center gap-1.5 sm:gap-2 shrink-0 cursor-pointer text-left group focus:outline-none py-1 px-1.5 sm:px-2 rounded-lg hover:bg-slate-50 transition-all duration-200 active:scale-97"
+            [attr.aria-label]="tab.label">
+            <!-- Step Circle -->
+            <div
+              class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all duration-200"
+              [ngClass]="activeTab() === tab.id 
+                  ? 'bg-[#1a2656] text-white shadow-xs' 
+                  : tabStatuses()[tab.id].isCompleted
+                    ? 'bg-emerald-600 text-white'
+                    : tabStatuses()[tab.id].isSubmittedInvalid
+                      ? 'bg-rose-500 text-white'
+                      : 'bg-white border-2 border-slate-300 text-slate-500 group-hover:border-slate-400'">
+              @if (activeTab() === tab.id) {
+              {{ tab.id }}
+              } @else if (tabStatuses()[tab.id].isCompleted) {
+              ✓
+              } @else if (tabStatuses()[tab.id].isSubmittedInvalid) {
+              !
+              } @else {
+              {{ tab.id }}
+              }
+            </div>
+
+            <!-- Step Label -->
+            <div>
+              <div class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-tight">
+                STEP {{ tab.id }}
+              </div>
+              <div class="text-[11px] sm:text-xs lg:text-sm font-semibold whitespace-nowrap transition leading-tight"
+                [ngClass]="activeTab() === tab.id ? 'text-[#1a2656] font-bold' : 'text-slate-700 group-hover:text-slate-900'">
+                <span class="inline md:hidden">{{ tab.shortLabel }}</span>
+                <span class="hidden md:inline">{{ tab.label }}</span>
+              </div>
+            </div>
+          </button>
+
+          <!-- Connector Line between steps -->
+          @if (!last) {
+          <div class="h-0.5 bg-slate-200 flex-1 min-w-[8px] sm:min-w-[12px] mx-0.5 sm:mx-1 shrink-0"></div>
+          }
+          }
+        </div>
+      </div>
+    </nav>
+
+    <!-- 3. Main Form Container -->
+    <main class="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-4 sm:mt-6 pb-12 sm:pb-16">
+      <!-- Step Title & Subtitle Banner -->
+      <div
+        class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 sm:pb-3.5 mb-4 sm:mb-5 border-b border-slate-200 gap-2">
+        <div>
+          <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight leading-snug">
+            {{ currentStepInfo.title }}
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5 flex flex-wrap items-center gap-x-2">
+            <span>{{ currentStepInfo.subtitle }}</span>
+            <span class="text-slate-300 hidden sm:inline">•</span>
+            <span class="text-slate-500 font-medium">Fields with <span class="text-rose-500 font-bold">*</span> are
+              mandatory</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Active Step Component with Smooth Transitions -->
+      <div class="w-full">
+
+        <!-- ================= STEP 1: ORGANISATION DETAILS ================= -->
+        <div [class.hidden]="activeTab() !== 1" [class.step-content-smooth]="activeTab() === 1">
+          <div class="space-y-4">
+            <!-- 1.1 ORGANISATION PROFILE & LEGAL CONSTITUTION (Collapsible Dropdown) -->
+            <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs"
+              [ngClass]="isOrgProfileOpen() ? 'overflow-visible' : 'overflow-hidden'">
+              <button type="button" (click)="isOrgProfileOpen.set(!isOrgProfileOpen())"
+                class="w-full flex items-center justify-between px-5 sm:px-6 py-3.5 bg-slate-50/90 hover:bg-slate-100/80 transition-colors cursor-pointer text-left select-none border-b"
+                [ngClass]="isOrgProfileOpen() ? 'border-slate-200/80' : 'border-transparent'">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-700"></span>
+                  <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800">
+                    Organisation Profile & Legal Constitution
+                  </h3>
+                </div>
+                <div class="flex items-center gap-2 text-slate-400 hover:text-slate-700">
+                  <span class="text-[11px] font-medium hidden sm:inline text-slate-400">
+                    {{ isOrgProfileOpen() ? 'Collapse' : 'Expand' }}
+                  </span>
+                  <svg class="w-4 h-4 transform transition-transform duration-200 text-slate-500"
+                    [class.rotate-180]="!isOrgProfileOpen()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </button>
+
+              @if (isOrgProfileOpen()) {
+              <div class="p-5 sm:p-7">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                  <!-- Row 1: Application No. & Date of Registration -->
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                      Application No.
+                    </label>
+                    <input type="text" placeholder="Application Number" maxlength="50"
+                      [(ngModel)]="data.basicInfo.applicationNo" (ngModelChange)="onDataChange()"
+                      class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 bg-slate-50 font-mono focus:bg-white hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                      Date of Registration
+                    </label>
+                    <div class="relative">
+                      <input type="text" placeholder="DD/MM/YYYY" maxlength="10"
+                        [value]="formatDateDisplay(data.basicInfo.dateOfRegistration)"
+                        (input)="onDateInput($event, 'registration')"
+                        [ngClass]="isFieldInvalid('basicInfo.dateOfRegistration') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                        class="w-full h-9 px-3 pr-9 border rounded-md text-sm text-slate-800 hover:border-slate-400 focus:ring-1 transition outline-none" />
+                      <input #regDatePicker type="date" tabindex="-1" [max]="todayIso" min="1900-01-01"
+                        [value]="getIsoDate(data.basicInfo.dateOfRegistration)"
+                        (change)="onDatePick($event, 'registration')"
+                        class="absolute opacity-0 pointer-events-none w-0 h-0 -z-10" />
+                      <button type="button" (click)="openPicker(regDatePicker)"
+                        title="Select Date of Registration (Max: Today)"
+                        class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-700 p-1 focus:outline-none transition cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </button>
+                    </div>
+                    @if (isFieldInvalid('basicInfo.dateOfRegistration')) {
+                    <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('basicInfo.dateOfRegistration')
+                      }}</p>
+                    }
+                  </div>
+
+                  <!-- Row 2: TP/PIA Full Name * & TP/PIA Short Name * -->
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                      TP/PIA Full Name <span class="text-rose-500 font-bold">*</span>
+                    </label>
+                    <input type="text" placeholder="Enter TP/PIA Full Name" maxlength="150"
+                      [(ngModel)]="data.basicInfo.fullName" (ngModelChange)="onDataChange()"
+                      [ngClass]="isFieldInvalid('basicInfo.fullName') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                      class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none"
+                      required />
+                    @if (isFieldInvalid('basicInfo.fullName')) {
+                    <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('basicInfo.fullName') }}</p>
+                    }
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                      TP/PIA Short Name <span class="text-rose-500 font-bold">*</span>
+                    </label>
+                    <input type="text" placeholder="e.g. KUSHAL / SKILL-ORG" maxlength="50"
+                      [(ngModel)]="data.basicInfo.shortName" (ngModelChange)="onDataChange()"
+                      [ngClass]="isFieldInvalid('basicInfo.shortName') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                      class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none"
+                      required />
+                    @if (isFieldInvalid('basicInfo.shortName')) {
+                    <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('basicInfo.shortName') }}</p>
+                    }
+                  </div>
+
+                  <!-- Row 3: Registration Number & Organisation PAN No. -->
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                      Entity Registration Number
+                    </label>
+                    <input type="text" placeholder="Enter Entity Registration Number" maxlength="50"
+                      [(ngModel)]="data.basicInfo.registrationNumber" (ngModelChange)="onDataChange()"
+                      class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono" />
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                      Organisation PAN No.
+                    </label>
+                    <input type="text" placeholder="10-character PAN (e.g. ABCDE1234F)" maxlength="10"
+                      [(ngModel)]="data.basicInfo.panNo"
+                      (ngModelChange)="data.basicInfo.panNo = (data.basicInfo.panNo || '').toUpperCase(); onDataChange()"
+                      [ngClass]="isFieldInvalid('basicInfo.panNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                      class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none uppercase font-mono" />
+                    @if (isFieldInvalid('basicInfo.panNo')) {
+                    <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('basicInfo.panNo') }}</p>
+                    }
+                  </div>
+
+                  <!-- Row 4: Type of business/activity & State Where Registered -->
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                      Type of Business / Activity
+                    </label>
+                    <select [(ngModel)]="data.entityInfo.businessActivity" (change)="onDataChange()"
+                      class="w-full h-9 px-2.5 border border-slate-300 rounded-md text-sm text-slate-800 bg-white hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none cursor-pointer">
+                      <option value="">-- Select Business Activity --</option>
+                      @for (act of businessActivities; track act) {
+                      <option [value]="act">{{ act }}</option>
+                      }
+                    </select>
+                  </div>
+
+                  <!-- Searchable State Where Registered (Opens Downwards) -->
+                  <div class="relative statereg-dropdown-container">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                      State Where Registered
+                    </label>
+                    <button type="button" (click)="toggleStateRegDropdown($event)"
+                      class="w-full h-9 px-2.5 border border-slate-300 hover:border-slate-400 focus:border-blue-900 focus:ring-1 focus:ring-blue-900/20 rounded-md text-sm text-left flex items-center justify-between bg-white transition outline-none cursor-pointer"
+                      [attr.aria-expanded]="isStateRegDropdownOpen()">
+                      <span class="truncate text-xs sm:text-sm"
+                        [ngClass]="data.entityInfo.stateWhereRegistered ? 'text-slate-800 font-medium' : 'text-slate-400'">
+                        {{ data.entityInfo.stateWhereRegistered || '-- Select State --' }}
+                      </span>
+                      <div class="flex items-center gap-1 shrink-0 ml-1.5">
+                        @if (data.entityInfo.stateWhereRegistered) {
+                        <span (click)="clearStateReg($event)" title="Clear state"
+                          class="w-4 h-4 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition">
+                          ✕
+                        </span>
+                        }
+                        <svg class="w-4 h-4 text-slate-400 transition-transform duration-200"
+                          [class.rotate-180]="isStateRegDropdownOpen()" fill="none" stroke="currentColor"
+                          viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </button>
+
+                    @if (isStateRegDropdownOpen()) {
+                    <div
+                      class="absolute top-full left-0 mt-1 w-full min-w-[210px] bg-white rounded-lg border border-slate-200 shadow-xl z-50 overflow-hidden text-sm"
+                      (click)="$event.stopPropagation()">
+                      <div class="p-2 border-b border-slate-100 bg-slate-50/90 sticky top-0 z-10">
+                        <div class="relative">
+                          <span
+                            class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                          </span>
+                          <input id="statereg-search-input" type="text" placeholder="Search state..."
+                            [ngModel]="stateRegSearchQuery()" (ngModelChange)="stateRegSearchQuery.set($event)"
+                            class="w-full h-8 pl-8 pr-7 text-xs bg-white border border-slate-200 rounded-md text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900/20 transition" />
+                          @if (stateRegSearchQuery()) {
+                          <button type="button" (click)="stateRegSearchQuery.set('')"
+                            class="absolute inset-y-0 right-0 pr-2 flex items-center text-slate-400 hover:text-slate-600 text-xs">
+                            ✕
+                          </button>
+                          }
+                        </div>
+                      </div>
+
+                      <div class="max-h-56 overflow-y-auto py-1 divide-y divide-slate-50">
+                        @for (st of filteredStatesReg(); track st) {
+                        <button type="button" (click)="selectStateReg(st)"
+                          class="w-full px-3 py-1.5 text-left text-xs sm:text-sm flex items-center justify-between transition-colors cursor-pointer"
+                          [ngClass]="data.entityInfo.stateWhereRegistered === st ? 'bg-blue-50 text-blue-900 font-semibold' : 'text-slate-700 hover:bg-slate-100'">
+                          <span>{{ st }}</span>
+                          @if (data.entityInfo.stateWhereRegistered === st) {
+                          <svg class="w-4 h-4 text-blue-900 shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                              d="M5 13l4 4L19 7" />
+                          </svg>
+                          }
+                        </button>
+                        } @empty {
+                        <div class="px-3 py-4 text-center text-xs text-slate-400">
+                          No state found
+                        </div>
+                        }
+                      </div>
+                    </div>
+                    }
+                  </div>
+
+                  <!-- Row 5: Turn Over * & Website (No spinner arrows on turnover) -->
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                      Annual Turnover (₹ in Lakhs) <span class="text-rose-500 font-bold">*</span>
+                    </label>
+                    <div class="relative">
+                      <span
+                        class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium select-none">₹</span>
+                      <input type="number" step="0.01" placeholder="Turnover (e.g. 150.00)"
+                        [(ngModel)]="data.entityInfo.turnOver" (ngModelChange)="onDataChange()"
+                        [ngClass]="isFieldInvalid('entityInfo.turnOver') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                        class="w-full h-9 pl-7 pr-12 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none font-mono no-spinners [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        required />
+                      <span
+                        class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium select-none">Lakhs</span>
+                    </div>
+                    @if (isFieldInvalid('entityInfo.turnOver')) {
+                    <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('entityInfo.turnOver') }}</p>
+                    }
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                      Official Website
+                    </label>
+                    <input type="url" placeholder="https://www.organisation.org" maxlength="100"
+                      [(ngModel)]="data.basicInfo.website" (ngModelChange)="onDataChange()"
+                      class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
+                  </div>
+                </div>
+              </div>
+              }
+            </section>
+
+            <!-- 1.2 CONTACT & COMMUNICATION DETAILS (Collapsible Dropdown) -->
+            <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs"
+              [ngClass]="isContactDetailsOpen() ? 'overflow-visible' : 'overflow-hidden'">
+              <button type="button" (click)="isContactDetailsOpen.set(!isContactDetailsOpen())"
+                class="w-full flex items-center justify-between px-5 sm:px-6 py-3.5 bg-slate-50/90 hover:bg-slate-100/80 transition-colors cursor-pointer text-left select-none border-b"
+                [ngClass]="isContactDetailsOpen() ? 'border-slate-200/80' : 'border-transparent'">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                  <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800">
+                    Contact & Communication Details
+                  </h3>
+                </div>
+                <div class="flex items-center gap-2 text-slate-400 hover:text-slate-700">
+                  <span class="text-[11px] font-medium hidden sm:inline text-slate-400">
+                    {{ isContactDetailsOpen() ? 'Collapse' : 'Expand' }}
+                  </span>
+                  <svg class="w-4 h-4 transform transition-transform duration-200 text-slate-500"
+                    [class.rotate-180]="!isContactDetailsOpen()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </button>
+
+              @if (isContactDetailsOpen()) {
+              <div class="p-5 sm:p-7">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                  <!-- Organisation Contact No. * -->
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                      Organisation Contact No. <span class="text-rose-500 font-bold">*</span>
+                    </label>
+                    <div class="relative">
+                      <span
+                        class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-mono select-none">+91</span>
+                      <input type="tel" placeholder="10-digit mobile number" maxlength="10"
+                        [(ngModel)]="data.basicInfo.contactNo" (ngModelChange)="onDataChange()"
+                        [ngClass]="isFieldInvalid('basicInfo.contactNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                        class="w-full h-9 pl-11 pr-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none font-mono"
+                        required />
+                    </div>
+                    @if (isFieldInvalid('basicInfo.contactNo')) {
+                    <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('basicInfo.contactNo') }}</p>
+                    }
+                  </div>
+
+                  <!-- Company Email-ID * -->
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                      Company Official Email-ID <span class="text-rose-500 font-bold">*</span>
+                    </label>
+                    <input type="email" placeholder="info@organisation.org" maxlength="80"
+                      [(ngModel)]="data.basicInfo.emailId" (ngModelChange)="onDataChange()"
+                      [ngClass]="isFieldInvalid('basicInfo.emailId') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                      class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none"
+                      required />
+                    @if (isFieldInvalid('basicInfo.emailId')) {
+                    <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('basicInfo.emailId') }}</p>
+                    }
+                  </div>
+                </div>
+              </div>
+              }
+            </section>
+
+            <!-- 1.3 OFFICE ADDRESS RECORDS (Collapsible Dropdown) -->
+            <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs"
+              [ngClass]="isAddressRecordsOpen() ? 'overflow-visible' : 'overflow-hidden'">
+              <button type="button" (click)="isAddressRecordsOpen.set(!isAddressRecordsOpen())"
+                class="w-full flex items-center justify-between px-5 sm:px-6 py-3.5 bg-slate-50/90 hover:bg-slate-100/80 transition-colors cursor-pointer text-left select-none border-b"
+                [ngClass]="isAddressRecordsOpen() ? 'border-slate-200/80' : 'border-transparent'">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-600"></span>
+                  <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800">
+                    Office Address Records
+                  </h3>
+                </div>
+                <div class="flex items-center gap-2 text-slate-400 hover:text-slate-700">
+                  <span class="text-[11px] font-medium hidden sm:inline text-slate-400">
+                    {{ isAddressRecordsOpen() ? 'Collapse' : 'Expand' }}
+                  </span>
+                  <svg class="w-4 h-4 transform transition-transform duration-200 text-slate-500"
+                    [class.rotate-180]="!isAddressRecordsOpen()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </button>
+
+              @if (isAddressRecordsOpen()) {
+              <div class="p-5 sm:p-7">
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  <!-- Left Card: Registered Office Address -->
+                  <div
+                    class="bg-slate-50/70 rounded-xl p-4 sm:p-5 border border-slate-200/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-200">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                          <span>Registered Office Address</span>
+                          <span class="text-rose-500 font-bold">*</span>
+                        </h4>
+                        <span class="text-[10px] text-slate-500 font-medium">As per Certificate</span>
+                      </div>
+
+                      <!-- Street / Premises -->
+                      <div class="mb-3">
+                        <div class="flex items-center justify-between mb-1">
+                          <label class="block text-xs font-semibold text-slate-700">
+                            Premises / Building, Street & Area <span class="text-rose-500 font-bold">*</span>
+                          </label>
+                          <span class="text-[10px] text-slate-400 font-mono">{{ data.registeredAddress.address.length ||
+                            0 }}/250</span>
+                        </div>
+                        <textarea rows="2" placeholder="Enter Building, Street, Landmark" maxlength="250"
+                          [(ngModel)]="data.registeredAddress.address" (ngModelChange)="onRegisteredAddressChange()"
+                          [ngClass]="isFieldInvalid('registeredAddress.address') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                          class="w-full p-2.5 bg-white border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none resize-none"
+                          required></textarea>
+                        @if (isFieldInvalid('registeredAddress.address')) {
+                        <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('registeredAddress.address')
+                          }}</p>
+                        }
+                      </div>
+
+                      <!-- State, District, Pincode -->
+                      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <!-- Searchable State/UT Dropdown (Opens Downwards) -->
+                        <div class="relative stateaddr-dropdown-container">
+                          <label class="block text-xs font-semibold text-slate-700 mb-1">
+                            State/UT <span class="text-rose-500 font-bold">*</span>
+                          </label>
+                          <button type="button" (click)="toggleStateAddrDropdown($event)"
+                            class="w-full h-9 px-2.5 border border-slate-300 hover:border-slate-400 focus:border-blue-900 focus:ring-1 focus:ring-blue-900/20 rounded-md text-sm text-left flex items-center justify-between bg-white transition outline-none cursor-pointer shadow-2xs"
+                            [attr.aria-expanded]="isStateAddrDropdownOpen()">
+                            <span class="truncate text-xs sm:text-sm"
+                              [ngClass]="data.registeredAddress.state ? 'text-slate-800 font-medium' : 'text-slate-400'">
+                              {{ data.registeredAddress.state || '-- State/UT --' }}
+                            </span>
+                            <div class="flex items-center gap-1 shrink-0 ml-1">
+                              @if (data.registeredAddress.state) {
+                              <span (click)="clearStateAddr($event)" title="Clear state"
+                                class="w-4 h-4 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition">
+                                ✕
+                              </span>
+                              }
+                              <svg class="w-4 h-4 text-slate-400 transition-transform duration-200"
+                                [class.rotate-180]="isStateAddrDropdownOpen()" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </div>
+                          </button>
+
+                          @if (isStateAddrDropdownOpen()) {
+                          <div
+                            class="absolute top-full left-0 mt-1 w-full min-w-[210px] bg-white rounded-lg border border-slate-200 shadow-xl z-50 overflow-hidden text-sm"
+                            (click)="$event.stopPropagation()">
+                            <div class="p-2 border-b border-slate-100 bg-slate-50/90 sticky top-0 z-10">
+                              <div class="relative">
+                                <span
+                                  class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-slate-400">
+                                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                  </svg>
+                                </span>
+                                <input id="stateaddr-search-input" type="text" placeholder="Search state..."
+                                  [ngModel]="stateAddrSearchQuery()" (ngModelChange)="stateAddrSearchQuery.set($event)"
+                                  class="w-full h-8 pl-8 pr-7 text-xs bg-white border border-slate-200 rounded-md text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900/20 transition" />
+                                @if (stateAddrSearchQuery()) {
+                                <button type="button" (click)="stateAddrSearchQuery.set('')"
+                                  class="absolute inset-y-0 right-0 pr-2 flex items-center text-slate-400 hover:text-slate-600 text-xs">
+                                  ✕
+                                </button>
+                                }
+                              </div>
+                            </div>
+
+                            <div class="max-h-56 overflow-y-auto py-1 divide-y divide-slate-50">
+                              @for (st of filteredStatesAddr(); track st) {
+                              <button type="button" (click)="selectStateAddr(st)"
+                                class="w-full px-3 py-1.5 text-left text-xs sm:text-sm flex items-center justify-between transition-colors cursor-pointer"
+                                [ngClass]="data.registeredAddress.state === st ? 'bg-blue-50 text-blue-900 font-semibold' : 'text-slate-700 hover:bg-slate-100'">
+                                <span>{{ st }}</span>
+                                @if (data.registeredAddress.state === st) {
+                                <svg class="w-4 h-4 text-blue-900 shrink-0" fill="none" stroke="currentColor"
+                                  viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M5 13l4 4L19 7" />
+                                </svg>
+                                }
+                              </button>
+                              } @empty {
+                              <div class="px-3 py-4 text-center text-xs text-slate-400">
+                                No state found
+                              </div>
+                              }
+                            </div>
+                          </div>
+                          }
+                        </div>
+
+                        <div class="relative district-dropdown-container">
+                          <label class="block text-xs font-semibold text-slate-700 mb-1">
+                            District <span class="text-rose-500 font-bold">*</span>
+                          </label>
+                          @if (data.registeredAddress.state === 'Rajasthan') {
+                          <!-- Searchable Dropdown Trigger Button -->
+                          <button type="button" (click)="toggleDistrictDropdown($event)"
+                            [ngClass]="isFieldInvalid('registeredAddress.district') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 hover:border-slate-400 focus:border-blue-900 focus:ring-1 focus:ring-blue-900/20 bg-white'"
+                            class="w-full h-9 px-2.5 border rounded-md text-sm text-left flex items-center justify-between transition outline-none cursor-pointer"
+                            [attr.aria-expanded]="isDistrictDropdownOpen()">
+                            <span class="truncate text-xs sm:text-sm"
+                              [ngClass]="data.registeredAddress.district ? 'text-slate-800 font-medium' : 'text-slate-400'">
+                              {{ data.registeredAddress.district || '-- District --' }}
+                            </span>
+                            <div class="flex items-center gap-1 shrink-0 ml-1.5">
+                              @if (data.registeredAddress.district) {
+                              <span (click)="clearDistrict($event)" title="Clear district"
+                                class="w-4 h-4 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition">
+                                ✕
+                              </span>
+                              }
+                              <svg class="w-4 h-4 text-slate-400 transition-transform duration-200"
+                                [class.rotate-180]="isDistrictDropdownOpen()" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </div>
+                          </button>
+
+                          <!-- Searchable Dropdown Menu (Strictly positioned downwards: top-full mt-1) -->
+                          @if (isDistrictDropdownOpen()) {
+                          <div
+                            class="absolute top-full left-0 mt-1 w-full min-w-[210px] bg-white rounded-lg border border-slate-200 shadow-xl z-50 overflow-hidden text-sm"
+                            (click)="$event.stopPropagation()">
+                            <!-- Search Input Header -->
+                            <div class="p-2 border-b border-slate-100 bg-slate-50/90 sticky top-0 z-10">
+                              <div class="relative">
+                                <span
+                                  class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-slate-400">
+                                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                  </svg>
+                                </span>
+                                <input id="district-search-input" type="text" placeholder="Search district..."
+                                  [ngModel]="districtSearchQuery()" (ngModelChange)="districtSearchQuery.set($event)"
+                                  class="w-full h-8 pl-8 pr-7 text-xs bg-white border border-slate-200 rounded-md text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900/20 transition" />
+                                @if (districtSearchQuery()) {
+                                <button type="button" (click)="districtSearchQuery.set('')"
+                                  class="absolute inset-y-0 right-0 pr-2 flex items-center text-slate-400 hover:text-slate-600 text-xs">
+                                  ✕
+                                </button>
+                                }
+                              </div>
+                            </div>
+
+                            <!-- Scrollable Districts List -->
+                            <div class="max-h-56 overflow-y-auto py-1 divide-y divide-slate-50">
+                              @for (dist of filteredDistricts(); track dist) {
+                              <button type="button" (click)="selectDistrict(dist)"
+                                class="w-full px-3 py-1.5 text-left text-xs sm:text-sm flex items-center justify-between transition-colors cursor-pointer"
+                                [ngClass]="data.registeredAddress.district === dist ? 'bg-blue-50 text-blue-900 font-semibold' : 'text-slate-700 hover:bg-slate-100'">
+                                <span>{{ dist }}</span>
+                                @if (data.registeredAddress.district === dist) {
+                                <svg class="w-4 h-4 text-blue-900 shrink-0" fill="none" stroke="currentColor"
+                                  viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M5 13l4 4L19 7" />
+                                </svg>
+                                }
+                              </button>
+                              } @empty {
+                              <div class="px-3 py-4 text-center text-xs text-slate-400">
+                                No district found
+                              </div>
+                              }
+                            </div>
+                          </div>
+                          }
+                          } @else {
+                          <input type="text" placeholder="District" [(ngModel)]="data.registeredAddress.district"
+                            (ngModelChange)="onRegisteredAddressChange()"
+                            class="w-full h-9 px-2.5 bg-white border border-slate-300 rounded-md text-sm text-slate-800 transition outline-none" />
+                          }
+                          @if (isFieldInvalid('registeredAddress.district')) {
+                          <p class="text-[11px] text-rose-600 mt-0.5 font-medium">Required</p>
+                          }
+                        </div>
+
+                        <div>
+                          <label class="block text-xs font-semibold text-slate-700 mb-1">
+                            Pincode <span class="text-rose-500 font-bold">*</span>
+                          </label>
+                          <input type="text" placeholder="6 digits" maxlength="6"
+                            [(ngModel)]="data.registeredAddress.pincode" (ngModelChange)="onRegisteredAddressChange()"
+                            [ngClass]="isFieldInvalid('registeredAddress.pincode') ? 'border-rose-400' : 'border-slate-300'"
+                            class="w-full h-9 px-2.5 bg-white border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono"
+                            required />
+                          @if (isFieldInvalid('registeredAddress.pincode')) {
+                          <p class="text-[11px] text-rose-600 mt-0.5 font-medium">{{
+                            getFieldError('registeredAddress.pincode') }}</p>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Right Card: Postal / Communication Address -->
+                  <div
+                    class="bg-slate-50/70 rounded-xl p-4 sm:p-5 border border-slate-200/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-200">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                          <span>Postal / Mailing Address</span>
+                          <span class="text-rose-500 font-bold">*</span>
+                        </h4>
+                        <label
+                          class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-blue-950 bg-blue-100/80 hover:bg-blue-200/80 px-2.5 py-1 rounded-md transition select-none">
+                          <input type="checkbox" [(ngModel)]="data.sameAsRegistered" (change)="toggleSameAddress()"
+                            class="rounded border-slate-300 text-blue-900 focus:ring-blue-900 w-3.5 h-3.5 cursor-pointer" />
+                          <span>Same as Registered</span>
+                        </label>
+                      </div>
+
+                      <!-- Street / Premises -->
+                      <div class="mb-3">
+                        <div class="flex items-center justify-between mb-1">
+                          <label class="block text-xs font-semibold text-slate-700">
+                            Premises / Building, Street, Area, City & Pincode <span
+                              class="text-rose-500 font-bold">*</span>
+                          </label>
+                          <span class="text-[10px] text-slate-400 font-mono">{{ data.postalAddress.address.length || 0
+                            }}/250</span>
+                        </div>
+                        <textarea rows="2" placeholder="Enter Postal Address details" maxlength="250"
+                          [(ngModel)]="data.postalAddress.address" (ngModelChange)="onDataChange()"
+                          [disabled]="data.sameAsRegistered"
+                          [ngClass]="isFieldInvalid('postalAddress.address') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                          class="w-full p-2.5 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none resize-none disabled:bg-slate-100 disabled:text-slate-600 disabled:cursor-not-allowed bg-white"
+                          required></textarea>
+                        @if (isFieldInvalid('postalAddress.address')) {
+                        <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('postalAddress.address') }}
+                        </p>
+                        }
+                      </div>
+
+                      <!-- Status Note -->
+                      @if (data.sameAsRegistered) {
+                      <div
+                        class="flex items-center gap-2 py-2 px-3 bg-emerald-50 border border-emerald-200/80 rounded-md text-xs text-emerald-800 font-medium">
+                        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor"
+                          viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7">
+                          </path>
+                        </svg>
+                        <span>Automatically synchronized with Registered Office Address</span>
+                      </div>
+                      } @else {
+                      <p class="text-xs text-slate-500">
+                        Provide official correspondence address if different from the registered office.
+                      </p>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+              }
+            </section>
+          </div>
+        </div>
+
+        <!-- ================= STEP 2: AUTHORIZED PERSON (ORG LEVEL) ================= -->
+        <div [class.hidden]="activeTab() !== 2" [class.step-content-smooth]="activeTab() === 2">
+          <div class="space-y-4">
+            <!-- Main Card: Authorized Person Details (Organisation Level) -->
+            <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
+              <!-- Card Body: 2-Column Responsive Layout (Left Side & Right Side) -->
+              <div class="p-4 sm:p-6 lg:p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
+
+                  <!-- ================= LEFT SIDE: Personal & Contact Details ================= -->
+                  <div class="space-y-3.5">
+                    <div class="pb-1 border-b border-slate-100 flex items-center justify-between">
+                      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Personal & Communication Profile
+                      </h3>
+                    </div>
+
+                    <!-- 1. Name * -->
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Name <span class="text-rose-500 font-bold">*</span>
+                      </label>
+                      <input type="text" placeholder="Enter Authorized Person Full Name" maxlength="100"
+                        [(ngModel)]="data.authorizedOrg.name" (ngModelChange)="onDataChange()"
+                        [ngClass]="isFieldInvalid('authorizedOrg.name') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                        class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none"
+                        required />
+                      @if (isFieldInvalid('authorizedOrg.name')) {
+                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('authorizedOrg.name') }}</p>
+                      }
+                    </div>
+
+                    <!-- 2. S/O, D/O, W/O -->
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        S/O, D/O, W/O
+                      </label>
+                      <input type="text" placeholder="Father's / Husband's / Guardian's Name" maxlength="100"
+                        [(ngModel)]="data.authorizedOrg.guardianName" (ngModelChange)="onDataChange()"
+                        class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
+                    </div>
+
+                    <!-- Row: Date of Birth & Age -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+                      <!-- 3. Date of Birth -->
+                      <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">
+                          Date of Birth (Min 18 Years)
+                        </label>
+                        <div class="relative">
+                          <input type="text" placeholder="DD/MM/YYYY" maxlength="10"
+                            [value]="formatDateDisplay(data.authorizedOrg.dob)" (input)="onDateInput($event, 'dob')"
+                            [ngClass]="isFieldInvalid('authorizedOrg.dob') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                            class="w-full h-9 px-2.5 pr-8 border rounded-md text-sm text-slate-800 hover:border-slate-400 focus:ring-1 transition outline-none" />
+                          <input #dobPicker type="date" tabindex="-1" [max]="maxDobIso" [min]="minDobIso"
+                            [value]="getIsoDate(data.authorizedOrg.dob)" (change)="onDatePick($event, 'dob')"
+                            class="absolute opacity-0 pointer-events-none w-0 h-0 -z-10" />
+                          <button type="button" (click)="openPicker(dobPicker)"
+                            title="Select Date of Birth (Age: 18 - 100)"
+                            class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-700 p-1 focus:outline-none transition cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </button>
+                        </div>
+                        @if (isFieldInvalid('authorizedOrg.dob')) {
+                        <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('authorizedOrg.dob') }}</p>
+                        }
+                      </div>
+
+                      <!-- 4. Age -->
+                      <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">
+                          Age (Years: 18 - 100)
+                        </label>
+                        <input type="number" min="18" max="100" placeholder="Age (Years)"
+                          [(ngModel)]="data.authorizedOrg.age" (ngModelChange)="onDataChange()"
+                          [ngClass]="isFieldInvalid('authorizedOrg.age') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                          class="w-full h-9 px-2.5 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none font-mono no-spinners [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                        @if (isFieldInvalid('authorizedOrg.age')) {
+                        <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('authorizedOrg.age') }}</p>
+                        }
+                      </div>
+                    </div>
+
+                    <!-- 5. Designation -->
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Designation
+                      </label>
+                      <input type="text" placeholder="e.g. Director / Managing Partner / Trustee" maxlength="80"
+                        [(ngModel)]="data.authorizedOrg.designation" (ngModelChange)="onDataChange()"
+                        class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
+                    </div>
+
+                    <!-- 6. Mobile No. * -->
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Mobile No. <span class="text-rose-500 font-bold">*</span>
+                      </label>
+                      <div class="relative w-full">
+                        <span
+                          class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-mono select-none">+91</span>
+                        <input type="tel" placeholder="10-digit mobile number" maxlength="10"
+                          [(ngModel)]="data.authorizedOrg.contactNo" (ngModelChange)="onDataChange()"
+                          [ngClass]="isFieldInvalid('authorizedOrg.contactNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                          class="w-full h-9 pl-11 pr-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none font-mono"
+                          required />
+                      </div>
+                      @if (isFieldInvalid('authorizedOrg.contactNo')) {
+                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('authorizedOrg.contactNo') }}
+                      </p>
+                      }
+                    </div>
+
+                    <!-- 7. Email-Id -->
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Email-Id
+                      </label>
+                      <input type="email" placeholder="e.g. signatory@organisation.org" maxlength="80"
+                        [(ngModel)]="data.authorizedOrg.emailId" (ngModelChange)="onDataChange()"
+                        [ngClass]="isFieldInvalid('authorizedOrg.emailId') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                        class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" />
+                      @if (isFieldInvalid('authorizedOrg.emailId')) {
+                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('authorizedOrg.emailId') }}</p>
+                      }
+                    </div>
+
+                    <!-- 8. Residence Address -->
+                    <div>
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          Residence Address
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.residenceAddress.length
+                          || 0 }}/250</span>
+                      </div>
+                      <textarea rows="2" placeholder="House / Flat No., Premises, Street, Area" maxlength="250"
+                        [(ngModel)]="data.authorizedOrg.residenceAddress" (ngModelChange)="onDataChange()"
+                        class="w-full p-2.5 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none resize-none"></textarea>
+                    </div>
+
+                    <!-- 9. Searchable State Dropdown (Opens Downwards) -->
+                    <div class="relative stateauth-dropdown-container">
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        State
+                      </label>
+                      <button type="button" (click)="toggleStateAuthDropdown($event)"
+                        class="w-full h-9 px-2.5 border border-slate-300 hover:border-slate-400 focus:border-blue-900 focus:ring-1 focus:ring-blue-900/20 rounded-md text-sm text-left flex items-center justify-between bg-white transition outline-none cursor-pointer shadow-2xs"
+                        [attr.aria-expanded]="isStateAuthDropdownOpen()">
+                        <span class="truncate text-xs sm:text-sm"
+                          [ngClass]="data.authorizedOrg.state ? 'text-slate-800 font-medium' : 'text-slate-400'">
+                          {{ data.authorizedOrg.state || '-- Select State --' }}
+                        </span>
+                        <div class="flex items-center gap-1 shrink-0 ml-1.5">
+                          @if (data.authorizedOrg.state) {
+                          <span (click)="clearStateAuth($event)" title="Clear state"
+                            class="w-4 h-4 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition">
+                            ✕
+                          </span>
+                          }
+                          <svg class="w-4 h-4 text-slate-400 transition-transform duration-200"
+                            [class.rotate-180]="isStateAuthDropdownOpen()" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </button>
+
+                      @if (isStateAuthDropdownOpen()) {
+                      <div
+                        class="absolute top-full left-0 mt-1 w-full min-w-[210px] bg-white rounded-lg border border-slate-200 shadow-xl z-50 overflow-hidden text-sm"
+                        (click)="$event.stopPropagation()">
+                        <div class="p-2 border-b border-slate-100 bg-slate-50/90 sticky top-0 z-10">
+                          <div class="relative">
+                            <span
+                              class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-slate-400">
+                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                              </svg>
+                            </span>
+                            <input id="stateauth-search-input" type="text" placeholder="Search state..."
+                              [ngModel]="stateAuthSearchQuery()" (ngModelChange)="stateAuthSearchQuery.set($event)"
+                              class="w-full h-8 pl-8 pr-7 text-xs bg-white border border-slate-200 rounded-md text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900/20 transition" />
+                            @if (stateAuthSearchQuery()) {
+                            <button type="button" (click)="stateAuthSearchQuery.set('')"
+                              class="absolute inset-y-0 right-0 pr-2 flex items-center text-slate-400 hover:text-slate-600 text-xs">
+                              ✕
+                            </button>
+                            }
+                          </div>
+                        </div>
+
+                        <div class="max-h-56 overflow-y-auto py-1 divide-y divide-slate-50">
+                          @for (st of filteredStatesAuth(); track st) {
+                          <button type="button" (click)="selectStateAuth(st)"
+                            class="w-full px-3 py-1.5 text-left text-xs sm:text-sm flex items-center justify-between transition-colors cursor-pointer"
+                            [ngClass]="data.authorizedOrg.state === st ? 'bg-blue-50 text-blue-900 font-semibold' : 'text-slate-700 hover:bg-slate-100'">
+                            <span>{{ st }}</span>
+                            @if (data.authorizedOrg.state === st) {
+                            <svg class="w-4 h-4 text-blue-900 shrink-0" fill="none" stroke="currentColor"
+                              viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M5 13l4 4L19 7" />
+                            </svg>
+                            }
+                          </button>
+                          } @empty {
+                          <div class="px-3 py-4 text-center text-xs text-slate-400">
+                            No state found
+                          </div>
+                          }
+                        </div>
+                      </div>
+                      }
+                    </div>
+                  </div>
+
+
+                  <!-- ================= RIGHT SIDE: Statutory Identification & Proofs ================= -->
+                  <div class="space-y-3.5">
+                    <div class="pb-1 border-b border-slate-100 flex items-center justify-between">
+                      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Statutory Identification & Proofs
+                      </h3>
+                    </div>
+
+                    <!-- 1. PAN Card No. * -->
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        PAN Card No. <span class="text-rose-500 font-bold">*</span>
+                      </label>
+                      <input type="text" placeholder="10-character PAN (e.g. ABCDE1234F)" maxlength="10"
+                        [(ngModel)]="data.authorizedOrg.pan"
+                        (ngModelChange)="data.authorizedOrg.pan = (data.authorizedOrg.pan || '').toUpperCase(); onDataChange()"
+                        [ngClass]="isFieldInvalid('authorizedOrg.pan') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                        class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none uppercase font-mono"
+                        required />
+                      @if (isFieldInvalid('authorizedOrg.pan')) {
+                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('authorizedOrg.pan') }}</p>
+                      }
+                    </div>
+
+                    <!-- 2. Aadhaar No. * -->
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Aadhaar No. <span class="text-rose-500 font-bold">*</span>
+                      </label>
+                      <input type="text" placeholder="12-digit Aadhaar Number" maxlength="12"
+                        [(ngModel)]="data.authorizedOrg.aadhaarNo" (ngModelChange)="onAadhaarChange()"
+                        [ngClass]="isFieldInvalid('authorizedOrg.aadhaarNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                        class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none font-mono"
+                        required />
+                      @if (isFieldInvalid('authorizedOrg.aadhaarNo')) {
+                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('authorizedOrg.aadhaarNo') }}
+                      </p>
+                      }
+                    </div>
+
+                    <!-- 3. Type ID Proof (Other IDs) -->
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Type ID Proof <span class="text-slate-400 font-normal">(Optional)</span>
+                      </label>
+                      <select [(ngModel)]="data.authorizedOrg.typeIdProof" (change)="onTypeIdProofChange()"
+                        class="w-full h-9 px-2.5 border border-slate-300 rounded-md text-sm text-slate-800 bg-white hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none cursor-pointer">
+                        <option value="">-- Select ID Proof Type --</option>
+                        @for (t of idTypes; track t) {
+                        <option [value]="t">{{ t }}</option>
+                        }
+                      </select>
+                    </div>
+
+                    <!-- 4. Dynamic ID Proof Field (Shows other ID selected in Type ID Proof) -->
+                    @if (data.authorizedOrg.typeIdProof === 'Voter ID Card') {
+                    <div class="step-content-smooth">
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Voter Id No.
+                      </label>
+                      <input type="text" placeholder="e.g. RJ/04/123/98765" maxlength="50"
+                        [(ngModel)]="data.authorizedOrg.voterIdNo" (ngModelChange)="onVoterIdChange()"
+                        class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono uppercase" />
+                    </div>
+                    } @else if (data.authorizedOrg.typeIdProof === 'Passport') {
+                    <div class="step-content-smooth">
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Passport No.
+                      </label>
+                      <input type="text" placeholder="e.g. Z1234567" maxlength="50"
+                        [(ngModel)]="data.authorizedOrg.passportNo" (ngModelChange)="onPassportChange()"
+                        class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono uppercase" />
+                    </div>
+                    } @else if (data.authorizedOrg.typeIdProof === 'Driving License') {
+                    <div class="step-content-smooth">
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Driving License No.
+                      </label>
+                      <input type="text" placeholder="e.g. RJ14 20200012345" maxlength="50"
+                        [(ngModel)]="data.authorizedOrg.idNo" (ngModelChange)="onDataChange()"
+                        class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono uppercase" />
+                    </div>
+                    } @else if (data.authorizedOrg.typeIdProof === 'Bhamashah Card') {
+                    <div class="step-content-smooth">
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Bhamashah No.
+                      </label>
+                      <input type="text" placeholder="e.g. BHAM-12345678" maxlength="50"
+                        [(ngModel)]="data.authorizedOrg.bhamashahNo" (ngModelChange)="onBhamashahChange()"
+                        class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono" />
+                    </div>
+                    } @else if (data.authorizedOrg.typeIdProof && data.authorizedOrg.typeIdProof !== 'PAN Card' &&
+                    data.authorizedOrg.typeIdProof !== 'Aadhaar Card') {
+                    <div class="step-content-smooth">
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        {{ data.authorizedOrg.typeIdProof }} No.
+                      </label>
+                      <input type="text" placeholder="Enter {{ data.authorizedOrg.typeIdProof }} Number" maxlength="50"
+                        [(ngModel)]="data.authorizedOrg.idNo" (ngModelChange)="onDataChange()"
+                        class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono" />
+                    </div>
+                    }
+                  </div>
+
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- ================= STEP 3: BANK DETAILS ================= -->
+        <div [class.hidden]="activeTab() !== 3" [class.step-content-smooth]="activeTab() === 3">
+          <div class="space-y-4">
+            <!-- Main Card: Bank Details (Step 3) -->
+            <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-visible">
+
+              <!-- Card Body: 2-Column Responsive Layout (Left Side & Right Side) -->
+              <div class="p-4 sm:p-6 lg:p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
+
+                  <!-- ================= LEFT SIDE: Bank & Account Credentials ================= -->
+                  <div class="space-y-3.5">
+                    <div class="pb-1 border-b border-slate-100 flex items-center justify-between">
+                      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Bank & Account Credentials
+                      </h3>
+                    </div>
+
+                    <!-- 1. Name of the Bank * (Searchable Dropdown Opening Downwards) -->
+                    <div class="relative bank-dropdown-container">
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Name of the Bank <span class="text-rose-500 font-bold">*</span>
+                      </label>
+                      <button type="button" (click)="toggleBankDropdown($event)"
+                        [ngClass]="isFieldInvalid('bankDetails.bankName') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 hover:border-slate-400 focus:border-blue-900 focus:ring-1 focus:ring-blue-900/20 bg-white'"
+                        class="w-full h-9 px-2.5 border rounded-md text-sm text-left flex items-center justify-between transition outline-none cursor-pointer shadow-2xs"
+                        [attr.aria-expanded]="isBankDropdownOpen()">
+                        <span class="truncate text-xs sm:text-sm"
+                          [ngClass]="data.bankDetails.bankName ? 'text-slate-800 font-medium' : 'text-slate-400'">
+                          {{ data.bankDetails.bankName || '-- Select Bank Name --' }}
+                        </span>
+                        <div class="flex items-center gap-1 shrink-0 ml-1.5">
+                          @if (data.bankDetails.bankName) {
+                          <span (click)="clearBank($event)" title="Clear bank"
+                            class="w-4 h-4 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition">
+                            ✕
+                          </span>
+                          }
+                          <svg class="w-4 h-4 text-slate-400 transition-transform duration-200"
+                            [class.rotate-180]="isBankDropdownOpen()" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </button>
+
+                      @if (isBankDropdownOpen()) {
+                      <div
+                        class="absolute top-full left-0 mt-1 w-full min-w-[240px] bg-white rounded-lg border border-slate-200 shadow-xl z-50 overflow-hidden text-sm"
+                        (click)="$event.stopPropagation()">
+                        <div class="p-2 border-b border-slate-100 bg-slate-50/90 sticky top-0 z-10">
+                          <div class="relative">
+                            <span
+                              class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-slate-400">
+                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                              </svg>
+                            </span>
+                            <input id="bank-search-input" type="text" placeholder="Search bank name..."
+                              [ngModel]="bankSearchQuery()" (ngModelChange)="bankSearchQuery.set($event)"
+                              class="w-full h-8 pl-8 pr-7 text-xs bg-white border border-slate-200 rounded-md text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-900 focus:ring-1 focus:ring-blue-900/20 transition" />
+                            @if (bankSearchQuery()) {
+                            <button type="button" (click)="bankSearchQuery.set('')"
+                              class="absolute inset-y-0 right-0 pr-2 flex items-center text-slate-400 hover:text-slate-600 text-xs">
+                              ✕
+                            </button>
+                            }
+                          </div>
+                        </div>
+
+                        <div class="max-h-56 overflow-y-auto py-1 divide-y divide-slate-50">
+                          @for (b of filteredBanks(); track b) {
+                          <button type="button" (click)="selectBank(b)"
+                            class="w-full px-3 py-1.5 text-left text-xs sm:text-sm flex items-center justify-between transition-colors cursor-pointer"
+                            [ngClass]="data.bankDetails.bankName === b ? 'bg-blue-50 text-blue-900 font-semibold' : 'text-slate-700 hover:bg-slate-100'">
+                            <span>{{ b }}</span>
+                            @if (data.bankDetails.bankName === b) {
+                            <svg class="w-4 h-4 text-blue-900 shrink-0" fill="none" stroke="currentColor"
+                              viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M5 13l4 4L19 7" />
+                            </svg>
+                            }
+                          </button>
+                          } @empty {
+                          <div class="px-3 py-4 text-center text-xs text-slate-400">
+                            No bank found
+                          </div>
+                          }
+                        </div>
+                      </div>
+                      }
+                      @if (isFieldInvalid('bankDetails.bankName')) {
+                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('bankDetails.bankName') }}</p>
+                      }
+                    </div>
+
+                    <!-- 2. Account No. * -->
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Account No. <span class="text-rose-500 font-bold">*</span>
+                      </label>
+                      <input type="text" placeholder="Enter Bank Account Number (9 to 18 digits)" maxlength="20"
+                        [(ngModel)]="data.bankDetails.accountNo" (ngModelChange)="onDataChange()"
+                        [ngClass]="isFieldInvalid('bankDetails.accountNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                        class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 font-mono tracking-wider placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none"
+                        required />
+                      @if (isFieldInvalid('bankDetails.accountNo')) {
+                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('bankDetails.accountNo') }}</p>
+                      }
+                    </div>
+
+                    <!-- 3. IFSC Code * -->
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        IFSC Code <span class="text-rose-500 font-bold">*</span>
+                      </label>
+                      <input type="text" maxlength="11" placeholder="e.g. SBIN0004129"
+                        [(ngModel)]="data.bankDetails.ifscCode"
+                        (ngModelChange)="data.bankDetails.ifscCode = (data.bankDetails.ifscCode || '').toUpperCase(); onDataChange()"
+                        [ngClass]="isFieldInvalid('bankDetails.ifscCode') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                        class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 uppercase font-mono tracking-widest placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none"
+                        required />
+                      @if (isFieldInvalid('bankDetails.ifscCode')) {
+                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('bankDetails.ifscCode') }}</p>
+                      }
+                    </div>
+
+                    <!-- 4. Type of Account -->
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Type of Account
+                      </label>
+                      <select [(ngModel)]="data.bankDetails.accountType" (change)="onDataChange()"
+                        class="w-full h-9 px-2.5 border border-slate-300 rounded-md text-sm text-slate-800 bg-white hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none cursor-pointer">
+                        <option value="">-- Select Type of Account --</option>
+                        @for (type of accountTypes; track type) {
+                        <option [value]="type">{{ type }}</option>
+                        }
+                      </select>
+                    </div>
+
+                    <!-- 5. Mode of electronic transfer -->
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Mode of electronic transfer
+                      </label>
+                      <select [(ngModel)]="data.bankDetails.electronicTransferMode" (change)="onDataChange()"
+                        class="w-full h-9 px-2.5 border border-slate-300 rounded-md text-sm text-slate-800 bg-white hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none cursor-pointer">
+                        <option value="">-- Select Mode of Electronic Transfer --</option>
+                        @for (mode of transferModes; track mode) {
+                        <option [value]="mode">{{ mode }}</option>
+                        }
+                      </select>
+                    </div>
+
+                  </div>
+
+                  <!-- ================= RIGHT SIDE: Branch & Cheque Verification ================= -->
+                  <div class="space-y-3.5">
+                    <div class="pb-1 border-b border-slate-100 flex items-center justify-between">
+                      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Branch & Verification Details
+                      </h3>
+                    </div>
+
+                    <!-- 6. Branch Name * -->
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Branch Name <span class="text-rose-500 font-bold">*</span>
+                      </label>
+                      <input type="text" placeholder="e.g. Malviya Nagar Branch, Jaipur" maxlength="100"
+                        [(ngModel)]="data.bankDetails.branchName" (ngModelChange)="onDataChange()"
+                        [ngClass]="isFieldInvalid('bankDetails.branchName') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                        class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none"
+                        required />
+                      @if (isFieldInvalid('bankDetails.branchName')) {
+                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('bankDetails.branchName') }}
+                      </p>
+                      }
+                    </div>
+
+                    <!-- 7. MICR Code -->
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        MICR Code
+                      </label>
+                      <input type="text" maxlength="9" placeholder="9-digit MICR code (e.g. 302002018)"
+                        [(ngModel)]="data.bankDetails.micrCode" (ngModelChange)="onDataChange()"
+                        [ngClass]="isFieldInvalid('bankDetails.micrCode') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                        class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 font-mono tracking-widest placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" />
+                      @if (isFieldInvalid('bankDetails.micrCode')) {
+                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('bankDetails.micrCode') }}</p>
+                      }
+                    </div>
+
+                    <!-- 8. Branch Address * -->
+                    <div>
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          Branch Address <span class="text-rose-500 font-bold">*</span>
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.bankDetails.branchAddress.length || 0
+                          }}/250</span>
+                      </div>
+                      <textarea rows="2" placeholder="Enter complete postal address of the bank branch" maxlength="250"
+                        [(ngModel)]="data.bankDetails.branchAddress" (ngModelChange)="onDataChange()"
+                        [ngClass]="isFieldInvalid('bankDetails.branchAddress') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                        class="w-full p-2.5 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none resize-none"
+                        required></textarea>
+                      @if (isFieldInvalid('bankDetails.branchAddress')) {
+                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('bankDetails.branchAddress') }}
+                      </p>
+                      }
+                    </div>
+
+                    <!-- 9. Upload Cancel Check -->
+                    <div>
+                      <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                        Upload Cancel Check
+                      </label>
+
+                      @if (data.bankDetails.cancelledChequeFileName) {
+                      <!-- Uploaded File Card -->
+                      <div
+                        class="flex items-center justify-between p-3 sm:p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-lg">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                          <div
+                            class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                          <div class="min-w-0">
+                            <p class="text-xs sm:text-sm font-bold text-slate-800 truncate"
+                              [title]="data.bankDetails.cancelledChequeFileName">
+                              {{ data.bankDetails.cancelledChequeFileName }}
+                            </p>
+                            <p class="text-[11px] text-emerald-700 font-medium mt-0.5">
+                              {{ data.bankDetails.cancelledChequeFileSize || 'Verified Document' }} • Ready
+                            </p>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0 ml-2">
+                          <label
+                            class="cursor-pointer text-xs font-semibold text-blue-900 hover:text-blue-700 underline">
+                            <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onBankFileSelected($event)"
+                              class="sr-only" />
+                            Change
+                          </label>
+                          <span class="text-slate-300">|</span>
+                          <button type="button" (click)="removeBankFile()"
+                            class="text-xs font-semibold text-rose-600 hover:text-rose-800 underline cursor-pointer">
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                      } @else {
+                      <!-- Dropzone Box -->
+                      <div (dragover)="onBankDragOver($event)" (dragleave)="onBankDragLeave($event)"
+                        (drop)="onBankFileDrop($event)" [ngClass]="{'border-blue-500 bg-blue-50/50': isBankDragging()}"
+                        class="border-2 border-dashed border-slate-300 hover:border-slate-400 bg-slate-50/60 hover:bg-slate-50 rounded-lg p-4 sm:p-5 text-center transition cursor-pointer relative group">
+                        <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onBankFileSelected($event)"
+                          class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                        <div class="flex flex-col items-center justify-center gap-1.5">
+                          <div
+                            class="w-9 h-9 rounded-full bg-blue-50 text-blue-900 flex items-center justify-center group-hover:scale-105 transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                          </div>
+                          <p class="text-xs sm:text-sm font-semibold text-slate-700">
+                            Click to upload or drag & drop Cancelled Cheque
+                          </p>
+                          <p class="text-[11px] text-slate-400">
+                            Supported formats: PDF, JPG, PNG (Max 5 MB)
+                          </p>
+                        </div>
+                      </div>
+                      }
+
+                      @if (bankFileError()) {
+                      <p class="text-xs text-rose-600 font-medium mt-1">{{ bankFileError() }}</p>
+                      }
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- ================= STEP 4: DOCUMENT UPLOAD ================= -->
+        <div [class.hidden]="activeTab() !== 4" [class.step-content-smooth]="activeTab() === 4">
+          <div class="space-y-5 sm:space-y-6">
+            <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
+              <div
+                class="px-4 sm:px-6 py-3.5 bg-white border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div class="flex items-center flex-wrap gap-2 text-xs font-medium">
+                  <span class="text-slate-500 hidden sm:inline">Supported: PDF, JPG, PNG (Max 5 MB)</span>
+                  <span
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 font-bold border rounded text-xs whitespace-nowrap"
+                    [ngClass]="uploadedRequiredCount === totalRequiredCount 
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+                      : 'bg-blue-50 text-blue-900 border-blue-200'">
+                    Uploaded: {{ uploadedRequiredCount }} / {{ totalRequiredCount }} Mandatory
+                  </span>
+                </div>
+              </div>
+
+              <div class="p-4 sm:p-6">
+                @if (isTab4Invalid) {
+                <div
+                  class="mb-4 p-3.5 bg-rose-50 border border-rose-200 rounded-lg text-xs sm:text-sm text-rose-700 flex items-center gap-2 font-medium">
+                  <svg class="w-4 h-4 shrink-0 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span>Please upload all {{ totalRequiredCount }} mandatory documents marked with an asterisk before
+                    proceeding to submission.</span>
+                </div>
+                }
+
+                @if (docErrorMessage()) {
+                <div
+                  class="mb-4 p-3.5 bg-rose-50 border border-rose-200 rounded-lg text-xs sm:text-sm text-rose-700 flex items-center justify-between">
+                  <span>{{ docErrorMessage() }}</span>
+                  <button type="button" (click)="docErrorMessage.set('')"
+                    class="text-rose-500 hover:text-rose-700 font-bold text-lg cursor-pointer leading-none">&times;</button>
+                </div>
+                }
+
+                <!-- Mobile Card View (block md:hidden) -->
+                <div class="block md:hidden space-y-3">
+                  @for (doc of documents; track doc.id; let idx = $index) {
+                  <div class="bg-white border rounded-xl p-3.5 shadow-2xs space-y-2.5 transition" [ngClass]="doc.required && doc.status !== 'uploaded' && isTab4Submitted 
+                        ? 'border-rose-300 bg-rose-50/20' 
+                        : 'border-slate-200 hover:border-slate-300'">
+                    <div class="flex items-start justify-between gap-2">
+                      <div class="min-w-0">
+                        <div class="flex items-center gap-1.5">
+                          <span class="font-mono text-xs font-bold text-slate-400">#{{ idx + 1 }}</span>
+                          <h4 class="font-bold text-slate-900 text-sm">
+                            {{ doc.label }}
+                            @if (doc.required) {
+                            <span class="text-rose-500 font-bold">*</span>
+                            }
+                          </h4>
+                        </div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">{{ doc.docType }}</div>
+                      </div>
+                      <span class="inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded shrink-0"
+                        [ngClass]="doc.required ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'">
+                        {{ doc.required ? 'Mandatory' : 'Optional' }}
+                      </span>
+                    </div>
+
+                    <!-- File status -->
+                    <div class="pt-1.5 border-t border-slate-100 text-xs">
+                      @if (doc.status === 'uploaded' && doc.fileName) {
+                      <div class="flex items-center gap-1.5 text-emerald-800 font-medium">
+                        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor"
+                          viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7">
+                          </path>
+                        </svg>
+                        <span class="truncate font-semibold" [title]="doc.fileName">{{ doc.fileName }}</span>
+                        <span class="text-[11px] text-slate-400 font-mono shrink-0">({{ doc.fileSize }})</span>
+                      </div>
+                      } @else {
+                      <span class="text-slate-400 italic text-xs">Not uploaded yet</span>
+                      }
+                    </div>
+
+                    <!-- Action button -->
+                    <div class="pt-2 flex items-center justify-between border-t border-slate-100">
+                      <span class="text-[11px] text-slate-500">
+                        {{ doc.uploadDate ? 'Uploaded on: ' + doc.uploadDate : 'Allowed: PDF, JPG, PNG' }}
+                      </span>
+                      @if (doc.status === 'uploaded') {
+                      <div class="flex items-center gap-2">
+                        <button type="button" (click)="previewingDoc.set(doc)"
+                          class="inline-flex items-center gap-1 text-xs font-semibold text-blue-900 hover:text-blue-700 underline cursor-pointer"
+                          title="Preview Document">
+                          <svg class="w-3.5 h-3.5 text-blue-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          Preview
+                        </button>
+                        <span class="text-slate-300">|</span>
+                        <label class="cursor-pointer text-xs text-slate-600 font-semibold hover:underline">
+                          <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onDocFileSelected($event, doc.id)"
+                            class="sr-only" />
+                          Replace
+                        </label>
+                        <span class="text-slate-300">|</span>
+                        <button type="button" (click)="removeDocument(doc.id)"
+                          class="text-xs text-rose-600 font-semibold hover:underline cursor-pointer">
+                          Remove
+                        </button>
+                      </div>
+                      } @else {
+                      <div class="flex items-center gap-2">
+                        <button type="button" (click)="previewingDoc.set(doc)"
+                          class="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-blue-900 hover:underline cursor-pointer"
+                          title="Preview Requirements">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          Preview
+                        </button>
+                        <span class="text-slate-300">|</span>
+                        <label
+                          class="inline-flex items-center gap-1 cursor-pointer px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-900 rounded-lg text-xs font-semibold transition">
+                          <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onDocFileSelected($event, doc.id)"
+                            class="sr-only" />
+                          <svg class="w-3.5 h-3.5 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                          </svg>
+                          Browse
+                        </label>
+                      </div>
+                      }
+                    </div>
+                  </div>
+                  }
+                </div>
+
+                <!-- Desktop Document Table (hidden md:block) -->
+                <div class="hidden md:block overflow-x-auto border border-slate-200 rounded-xl shadow-2xs">
+                  <table class="w-full text-left text-sm text-slate-700">
+                    <thead
+                      class="bg-slate-50/90 border-b border-slate-200 text-slate-800 font-semibold uppercase tracking-wider text-xs">
+                      <tr>
+                        <th class="py-3.5 px-4 w-12 text-center">#</th>
+                        <th class="py-3.5 px-4">Document Description</th>
+                        <th class="py-3.5 px-4 w-36">Requirement</th>
+                        <th class="py-3.5 px-4">Uploaded File Details</th>
+                        <th class="py-3.5 px-4 w-44 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                      @for (doc of documents; track doc.id; let idx = $index) {
+                      <tr class="transition" [ngClass]="doc.required && doc.status !== 'uploaded' && isTab4Submitted 
+                            ? 'bg-rose-50/40 hover:bg-rose-50/60' 
+                            : 'hover:bg-slate-50/70'">
+                        <td class="py-3.5 px-4 font-mono text-slate-400 text-xs text-center">{{ idx + 1 }}</td>
+                        <td class="py-3.5 px-4">
+                          <div class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                            {{ doc.label }}
+                            @if (doc.required) {
+                            <span class="text-rose-500 font-bold text-sm">*</span>
+                            }
+                          </div>
+                          <div class="text-xs text-slate-400 mt-0.5">{{ doc.docType }}</div>
+                          @if (doc.required && doc.status !== 'uploaded' && isTab4Submitted) {
+                          <span class="text-xs text-rose-600 font-medium mt-0.5 block">Upload required</span>
+                          }
+                        </td>
+                        <td class="py-3.5 px-4">
+                          <span class="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-md"
+                            [ngClass]="doc.required ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'">
+                            {{ doc.required ? 'Mandatory' : 'Optional' }}
+                          </span>
+                        </td>
+                        <td class="py-3.5 px-4">
+                          @if (doc.status === 'uploaded' && doc.fileName) {
+                          <div class="space-y-0.5">
+                            <div class="flex items-center gap-1.5 text-emerald-800 font-medium">
+                              <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                  d="M5 13l4 4L19 7"></path>
+                              </svg>
+                              <span class="truncate max-w-xs font-semibold" [title]="doc.fileName">{{ doc.fileName
+                                }}</span>
+                              <span class="text-xs text-slate-400 font-mono">({{ doc.fileSize }})</span>
+                            </div>
+                            <div class="text-[11px] text-slate-400">Uploaded on: {{ doc.uploadDate }}</div>
+                          </div>
+                          } @else {
+                          <span class="text-slate-400 italic text-xs">Not uploaded yet</span>
+                          }
+                        </td>
+                        <td class="py-3.5 px-4 text-right">
+                          @if (doc.status === 'uploaded') {
+                          <div class="inline-flex items-center gap-2 justify-end">
+                            <button type="button" (click)="previewingDoc.set(doc)"
+                              class="inline-flex items-center gap-1 text-xs font-semibold text-blue-900 hover:text-blue-700 underline cursor-pointer"
+                              title="Preview Document">
+                              <svg class="w-3.5 h-3.5 text-blue-900" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              Preview
+                            </button>
+                            <span class="text-slate-300">|</span>
+                            <label class="cursor-pointer text-xs text-blue-900 font-semibold hover:underline">
+                              <input type="file" accept=".pdf,.jpg,.jpeg,.png"
+                                (change)="onDocFileSelected($event, doc.id)" class="sr-only" />
+                              Replace
+                            </label>
+                            <span class="text-slate-300">|</span>
+                            <button type="button" (click)="removeDocument(doc.id)"
+                              class="text-xs text-rose-600 font-semibold hover:underline cursor-pointer">
+                              Remove
+                            </button>
+                          </div>
+                          } @else {
+                          <div class="inline-flex items-center gap-2 justify-end">
+                            <button type="button" (click)="previewingDoc.set(doc)"
+                              class="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-blue-900 hover:underline cursor-pointer"
+                              title="Preview Requirements">
+                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              Preview
+                            </button>
+                            <span class="text-slate-300">|</span>
+                            <label
+                              class="inline-flex items-center gap-1.5 cursor-pointer px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-900 rounded-lg text-xs font-semibold transition">
+                              <input type="file" accept=".pdf,.jpg,.jpeg,.png"
+                                (change)="onDocFileSelected($event, doc.id)" class="sr-only" />
+                              <svg class="w-3.5 h-3.5 text-blue-800" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                              </svg>
+                              Browse
+                            </label>
+                          </div>
+                          }
+                        </td>
+                      </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- ================= STEP 5: REVIEW & FINAL SUBMISSION ================= -->
+        <div [class.hidden]="activeTab() !== 5" [class.step-content-smooth]="activeTab() === 5">
+          <div class="space-y-6">
+
+            <!-- Block 1: Organisation Details (Step 1) -->
+            <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
+              <div (click)="isReviewStep1Open.set(!isReviewStep1Open())"
+                class="px-4 sm:px-6 py-3.5 bg-slate-50/90 border-b border-slate-200 flex items-center justify-between cursor-pointer select-none hover:bg-slate-100/70 transition-colors">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-700"></span>
+                  <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800">
+                    1. Organisation & Basic Details
+                  </h3>
+                </div>
+                <div class="flex items-center gap-2.5">
+                  <button type="button" (click)="$event.stopPropagation(); switchTab(1)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-900 border border-blue-200 hover:border-blue-300 rounded-md text-xs font-semibold transition cursor-pointer shadow-2xs">
+                    <svg class="w-3.5 h-3.5 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    <span>Edit Step 1</span>
+                  </button>
+                  <svg class="w-4 h-4 text-slate-500 transform transition-transform duration-200"
+                    [class.rotate-180]="!isReviewStep1Open()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+
+              @if (isReviewStep1Open()) {
+              <div class="p-4 sm:p-6 space-y-4">
+                <!-- 1.1 Organisation Profile & Legal Constitution (Review Dropdown) -->
+                <div class="border border-slate-200/90 rounded-lg overflow-hidden bg-slate-50/40">
+                  <button type="button" (click)="isReviewOrgProfileOpen.set(!isReviewOrgProfileOpen())"
+                    class="w-full flex items-center justify-between px-4 py-2.5 bg-slate-100/80 hover:bg-slate-100 transition cursor-pointer text-left border-b"
+                    [ngClass]="isReviewOrgProfileOpen() ? 'border-slate-200' : 'border-transparent'">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-blue-700"></span>
+                      <span class="text-xs font-bold uppercase tracking-wider text-slate-800">Organisation Profile &
+                        Legal Constitution</span>
+                    </div>
+                    <svg class="w-3.5 h-3.5 text-slate-500 transform transition-transform duration-200"
+                      [class.rotate-180]="!isReviewOrgProfileOpen()" fill="none" stroke="currentColor"
+                      viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  @if (isReviewOrgProfileOpen()) {
+                  <div class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs sm:text-sm">
+                    <div><span class="text-slate-500 font-medium block text-xs">Application No:</span><b
+                        class="font-mono text-slate-800">{{ data.basicInfo.applicationNo || '—' }}</b></div>
+                    <div><span class="text-slate-500 font-medium block text-xs">Registration Date:</span><b
+                        class="text-slate-800">{{ formatDateDisplay(data.basicInfo.dateOfRegistration) || '—' }}</b>
+                    </div>
+                    <div><span class="text-slate-500 font-medium block text-xs">Full Name:</span><b
+                        class="text-slate-800">{{ data.basicInfo.fullName || '—' }}</b></div>
+                    <div><span class="text-slate-500 font-medium block text-xs">Short Name:</span><b
+                        class="text-slate-800">{{ data.basicInfo.shortName || '—' }}</b></div>
+                    <div><span class="text-slate-500 font-medium block text-xs">Reg. Number:</span><b
+                        class="font-mono text-slate-800">{{ data.basicInfo.registrationNumber || '—' }}</b></div>
+                    <div><span class="text-slate-500 font-medium block text-xs">Org. PAN:</span><b
+                        class="font-mono uppercase text-slate-800">{{ data.basicInfo.panNo || '—' }}</b></div>
+                    <div><span class="text-slate-500 font-medium block text-xs">Business Activity:</span><b
+                        class="text-slate-800">{{ data.entityInfo.businessActivity || '—' }}</b></div>
+                    <div><span class="text-slate-500 font-medium block text-xs">Registered State:</span><b
+                        class="text-slate-800">{{ data.entityInfo.stateWhereRegistered || '—' }}</b></div>
+                    <div><span class="text-slate-500 font-medium block text-xs">Turnover (Lakhs):</span><b
+                        class="font-mono text-slate-800">₹ {{ data.entityInfo.turnOver ? data.entityInfo.turnOver + '
+                        Lakhs' : '—' }}</b></div>
+                    <div><span class="text-slate-500 font-medium block text-xs">Official Website:</span><b
+                        class="text-blue-900 truncate block">{{ data.basicInfo.website || '—' }}</b></div>
+                  </div>
+                  }
+                </div>
+
+                <!-- 1.2 Contact & Communication Details (Review Dropdown) -->
+                <div class="border border-slate-200/90 rounded-lg overflow-hidden bg-slate-50/40">
+                  <button type="button" (click)="isReviewContactOpen.set(!isReviewContactOpen())"
+                    class="w-full flex items-center justify-between px-4 py-2.5 bg-slate-100/80 hover:bg-slate-100 transition cursor-pointer text-left border-b"
+                    [ngClass]="isReviewContactOpen() ? 'border-slate-200' : 'border-transparent'">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                      <span class="text-xs font-bold uppercase tracking-wider text-slate-800">Contact & Communication
+                        Details</span>
+                    </div>
+                    <svg class="w-3.5 h-3.5 text-slate-500 transform transition-transform duration-200"
+                      [class.rotate-180]="!isReviewContactOpen()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  @if (isReviewContactOpen()) {
+                  <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+                    <div><span class="text-slate-500 font-medium block text-xs">Organisation Contact No:</span><b
+                        class="font-mono text-slate-800">+91 {{ data.basicInfo.contactNo || '—' }}</b></div>
+                    <div><span class="text-slate-500 font-medium block text-xs">Company Official Email-ID:</span><b
+                        class="text-slate-800">{{ data.basicInfo.emailId || '—' }}</b></div>
+                  </div>
+                  }
+                </div>
+
+                <!-- 1.3 Office Address Records (Review Dropdown) -->
+                <div class="border border-slate-200/90 rounded-lg overflow-hidden bg-slate-50/40">
+                  <button type="button" (click)="isReviewAddressOpen.set(!isReviewAddressOpen())"
+                    class="w-full flex items-center justify-between px-4 py-2.5 bg-slate-100/80 hover:bg-slate-100 transition cursor-pointer text-left border-b"
+                    [ngClass]="isReviewAddressOpen() ? 'border-slate-200' : 'border-transparent'">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-amber-600"></span>
+                      <span class="text-xs font-bold uppercase tracking-wider text-slate-800">Office Address
+                        Records</span>
+                    </div>
+                    <svg class="w-3.5 h-3.5 text-slate-500 transform transition-transform duration-200"
+                      [class.rotate-180]="!isReviewAddressOpen()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  @if (isReviewAddressOpen()) {
+                  <div class="p-4 space-y-2.5 text-xs sm:text-sm">
+                    <div><span class="text-slate-500 font-medium block text-xs">Registered Office Address:</span><b
+                        class="text-slate-800">{{ data.registeredAddress.address || '—' }}, {{
+                        data.registeredAddress.district || '—' }}, {{ data.registeredAddress.state || '—' }} - {{
+                        data.registeredAddress.pincode || '—' }}</b></div>
+                    <div class="pt-2 border-t border-slate-200/60"><span
+                        class="text-slate-500 font-medium block text-xs">Postal Address:</span><b
+                        class="text-slate-800">{{ data.sameAsRegistered ? '(Same as Registered Office)' :
+                        (data.postalAddress.address || '—') }}</b></div>
+                  </div>
+                  }
+                </div>
+              </div>
+              }
+            </section>
+
+            <!-- Block 2: Authorized Person (Step 2) -->
+            <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
+              <div (click)="isReviewAuthPersonOpen.set(!isReviewAuthPersonOpen())"
+                class="px-4 sm:px-6 py-3.5 bg-slate-50/90 border-b border-slate-200 flex items-center justify-between cursor-pointer select-none hover:bg-slate-100/70 transition-colors">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                  <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800">
+                    2. Authorized Person Details (Organisation Level)
+                  </h3>
+                </div>
+                <div class="flex items-center gap-2.5">
+                  <button type="button" (click)="$event.stopPropagation(); switchTab(2)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-900 border border-blue-200 hover:border-blue-300 rounded-md text-xs font-semibold transition cursor-pointer shadow-2xs">
+                    <svg class="w-3.5 h-3.5 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    <span>Edit Step 2</span>
+                  </button>
+                  <svg class="w-4 h-4 text-slate-500 transform transition-transform duration-200"
+                    [class.rotate-180]="!isReviewAuthPersonOpen()" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              @if (isReviewAuthPersonOpen()) {
+              <div class="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs sm:text-sm">
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">Signatory Name:</span>
+                  <b class="text-slate-800">{{ data.authorizedOrg.name || '—' }}</b>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">S/O, D/O, W/O:</span>
+                  <b class="text-slate-800">{{ data.authorizedOrg.guardianName || '—' }}</b>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">DOB & Age:</span>
+                  <b class="text-slate-800">{{ formatDateDisplay(data.authorizedOrg.dob) || '—' }} {{
+                    data.authorizedOrg.age ? '(' + data.authorizedOrg.age + ' Years)' : '' }}</b>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">Designation:</span>
+                  <b class="text-slate-800">{{ data.authorizedOrg.designation || '—' }}</b>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">Mobile No:</span>
+                  <b class="font-mono text-slate-800">+91 {{ data.authorizedOrg.contactNo || '—' }}</b>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">Email-ID:</span>
+                  <b class="text-slate-800">{{ data.authorizedOrg.emailId || '—' }}</b>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">PAN:</span>
+                  <b class="font-mono uppercase text-slate-800">{{ data.authorizedOrg.pan || '—' }}</b>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">Aadhaar No:</span>
+                  <b class="font-mono text-slate-800">{{ data.authorizedOrg.aadhaarNo || '—' }}</b>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">ID Proof:</span>
+                  <b class="text-slate-800">{{ data.authorizedOrg.typeIdProof || '—' }} {{ data.authorizedOrg.idNo ? '('
+                    + data.authorizedOrg.idNo + ')' : '' }}</b>
+                </div>
+                @if (data.authorizedOrg.bhamashahNo) {
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">Bhamashah No:</span>
+                  <b class="font-mono text-slate-800">{{ data.authorizedOrg.bhamashahNo }}</b>
+                </div>
+                }
+                @if (data.authorizedOrg.voterIdNo) {
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">Voter ID No:</span>
+                  <b class="font-mono text-slate-800">{{ data.authorizedOrg.voterIdNo }}</b>
+                </div>
+                }
+                @if (data.authorizedOrg.passportNo) {
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">Passport No:</span>
+                  <b class="font-mono text-slate-800">{{ data.authorizedOrg.passportNo }}</b>
+                </div>
+                }
+                <div class="sm:col-span-2 lg:col-span-3 pt-2 border-t border-slate-100">
+                  <span class="text-slate-500 font-medium block text-xs">Residential Address:</span>
+                  <b class="text-slate-800">{{ data.authorizedOrg.residenceAddress || '—' }} {{ data.authorizedOrg.state
+                    ? ', ' + data.authorizedOrg.state : '' }}</b>
+                </div>
+              </div>
+              }
+            </section>
+
+            <!-- Block 3: Bank Details (Step 3) -->
+            <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
+              <div (click)="isReviewBankOpen.set(!isReviewBankOpen())"
+                class="px-4 sm:px-6 py-3.5 bg-slate-50/90 border-b border-slate-200 flex items-center justify-between cursor-pointer select-none hover:bg-slate-100/70 transition-colors">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                  <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800">
+                    3. Bank Details & Account Credentials
+                  </h3>
+                </div>
+                <div class="flex items-center gap-2.5">
+                  <button type="button" (click)="$event.stopPropagation(); switchTab(3)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-900 border border-blue-200 hover:border-blue-300 rounded-md text-xs font-semibold transition cursor-pointer shadow-2xs">
+                    <svg class="w-3.5 h-3.5 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    <span>Edit Step 3</span>
+                  </button>
+                  <svg class="w-4 h-4 text-slate-500 transform transition-transform duration-200"
+                    [class.rotate-180]="!isReviewBankOpen()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              @if (isReviewBankOpen()) {
+              <div class="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs sm:text-sm">
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">Bank Name:</span>
+                  <b class="text-slate-800">{{ data.bankDetails.bankName || '—' }}</b>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">Account Number:</span>
+                  <b class="font-mono text-slate-800">{{ data.bankDetails.accountNo || '—' }}</b>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">IFSC Code:</span>
+                  <b class="font-mono uppercase text-slate-800">{{ data.bankDetails.ifscCode || '—' }}</b>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">Account Type:</span>
+                  <b class="text-slate-800">{{ data.bankDetails.accountType || '—' }}</b>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">Electronic Transfer Mode:</span>
+                  <b class="text-slate-800">{{ data.bankDetails.electronicTransferMode || '—' }}</b>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">MICR Code:</span>
+                  <b class="font-mono text-slate-800">{{ data.bankDetails.micrCode || '—' }}</b>
+                </div>
+                <div>
+                  <span class="text-slate-500 font-medium block text-xs">Branch Name:</span>
+                  <b class="text-slate-800">{{ data.bankDetails.branchName || '—' }}</b>
+                </div>
+                <div class="sm:col-span-2">
+                  <span class="text-slate-500 font-medium block text-xs">Branch Address:</span>
+                  <b class="text-slate-800">{{ data.bankDetails.branchAddress || '—' }}</b>
+                </div>
+                <div class="sm:col-span-2 lg:col-span-3 pt-2 border-t border-slate-100 flex items-center gap-2">
+                  <span class="text-slate-500 font-medium text-xs">Cancelled Cheque:</span>
+                  @if (data.bankDetails.cancelledChequeFileName) {
+                  <span
+                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-md">
+                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {{ data.bankDetails.cancelledChequeFileName }}
+                  </span>
+                  } @else {
+                  <span class="text-slate-400 italic text-xs">Not uploaded</span>
+                  }
+                </div>
+              </div>
+              }
+            </section>
+
+            <!-- Block 4: Uploaded Documents Summary (Step 4) -->
+            <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
+              <div (click)="isReviewDocsOpen.set(!isReviewDocsOpen())"
+                class="px-4 sm:px-6 py-3.5 bg-slate-50/90 border-b border-slate-200 flex items-center justify-between cursor-pointer select-none hover:bg-slate-100/70 transition-colors">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+                  <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800">
+                    4. Statutory Compliance Documents
+                  </h3>
+                </div>
+                <div class="flex items-center gap-2.5">
+                  <button type="button" (click)="$event.stopPropagation(); switchTab(4)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-900 border border-blue-200 hover:border-blue-300 rounded-md text-xs font-semibold transition cursor-pointer shadow-2xs">
+                    <svg class="w-3.5 h-3.5 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    <span>Edit Step 4</span>
+                  </button>
+                  <svg class="w-4 h-4 text-slate-500 transform transition-transform duration-200"
+                    [class.rotate-180]="!isReviewDocsOpen()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              @if (isReviewDocsOpen()) {
+              <div class="p-4 sm:p-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  @for (doc of documents; track doc.id) {
+                  <div class="p-3 rounded-lg border flex items-center justify-between gap-2"
+                    [ngClass]="doc.status === 'uploaded' ? 'bg-emerald-50/50 border-emerald-200' : (doc.required ? 'bg-rose-50/50 border-rose-200' : 'bg-slate-50/50 border-slate-200')">
+                    <div class="min-w-0">
+                      <p class="font-bold text-slate-900 truncate">
+                        {{ doc.label }}
+                        @if (doc.required) { <span class="text-rose-500 font-bold">*</span> }
+                      </p>
+                      <p class="text-slate-500 mt-0.5 font-mono text-[11px] truncate">
+                        {{ doc.fileName || 'Not uploaded yet' }}
+                      </p>
+                    </div>
+                    <span class="text-[11px] font-bold px-2 py-0.5 rounded shrink-0"
+                      [ngClass]="doc.status === 'uploaded' ? 'bg-emerald-100 text-emerald-800' : (doc.required ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-600')">
+                      {{ doc.status === 'uploaded' ? 'Uploaded' : (doc.required ? 'Pending *' : 'Optional') }}
+                    </span>
+                  </div>
+                  }
+                </div>
+              </div>
+              }
+            </section>
+
+            <!-- Final Legal Declaration & Undertaking -->
+            <div class="bg-blue-50/60 border border-blue-200/80 rounded-xl p-4 sm:p-5">
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="declarationAgreed"
+                  class="mt-1 w-4 h-4 rounded border-slate-300 text-blue-900 focus:ring-blue-900 cursor-pointer shrink-0" />
+                <span class="text-xs sm:text-sm text-slate-800 leading-relaxed">
+                  <b>Declaration:</b> I hereby declare and confirm that all particulars, documents, and credentials
+                  furnished in this application are authentic, complete, and correct to the best of my knowledge as per
+                  official records.
+                </span>
+              </label>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Action Buttons (Inside Form) -->
+      <div class="mt-6 sm:mt-8 pt-4 sm:pt-5 border-t border-slate-200 flex items-center justify-between gap-3">
+        <button type="button" (click)="prevTab()" [disabled]="activeTab() === 1"
+          class="h-9 sm:h-10 px-3.5 sm:px-5 border border-slate-300 bg-white rounded-full text-slate-700 font-semibold hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-1.5 cursor-pointer text-xs sm:text-sm shadow-2xs shrink-0 active:scale-95"
+          title="Back">
+          <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          <span>Back</span>
+        </button>
+
+        <div class="flex items-center gap-2">
+          @if (activeTab() < 5) { <button type="button" (click)="nextTab()"
+            class="h-9 sm:h-10 px-4 sm:px-6 bg-[#0f1738] hover:bg-[#19245a] text-white rounded-full font-semibold transition-all duration-200 flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95 text-xs sm:text-sm shrink-0">
+            <span class="hidden sm:inline">Next Step</span>
+            <span class="sm:hidden">Next</span>
+            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+            </button>
+            } @else {
+            <button type="button" (click)="submitFinalApplication()" [disabled]="!declarationAgreed"
+              class="h-9 sm:h-10 px-4 sm:px-6 bg-emerald-700 hover:bg-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-full font-bold tracking-wide transition-all duration-200 shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95 text-xs sm:text-sm shrink-0">
+              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Submit Final Application</span>
+            </button>
+            }
+        </div>
+      </div>
+    </main>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- Document Preview Modal (from tab-documents) -->
+    @if (previewingDoc()) {
+    <div
+      class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6">
+      <div
+        class="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-lg w-full border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <!-- Modal Header -->
+        <div class="bg-[#0f1738] text-white px-4 sm:px-6 py-3.5 flex items-center justify-between">
+          <div class="flex items-center gap-2 min-w-0">
+            <svg class="w-5 h-5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h4 class="text-sm sm:text-base font-bold truncate">{{ previewingDoc()?.label }}</h4>
+          </div>
+          <button type="button" (click)="previewingDoc.set(null)"
+            class="text-slate-300 hover:text-white text-2xl font-bold cursor-pointer leading-none">&times;</button>
+        </div>
+
+        <!-- Modal Content -->
+        <div class="p-4 sm:p-6 space-y-4">
+          <!-- Meta Card -->
+          <div
+            class="bg-slate-50 border border-slate-200 rounded-lg p-3 sm:p-4 grid grid-cols-2 gap-2 text-xs sm:text-sm">
+            <div><span class="text-slate-500">Document Type:</span> <b class="text-slate-800 block truncate">{{
+                previewingDoc()?.docType }}</b></div>
+            <div><span class="text-slate-500">Requirement:</span> <b [class.text-rose-600]="previewingDoc()?.required"
+                class="block">{{ previewingDoc()?.required ? 'Mandatory *' : 'Optional' }}</b></div>
+            <div><span class="text-slate-500">File Name:</span> <b class="font-mono text-slate-800 truncate block">{{
+                previewingDoc()?.fileName || 'specimen_template.pdf' }}</b></div>
+            <div><span class="text-slate-500">Status:</span> <b class="text-emerald-700 font-semibold block">{{
+                previewingDoc()?.status === 'uploaded' ? 'Uploaded & Verified' : 'Sample Specification' }}</b></div>
+          </div>
+
+          <!-- Document Visual Preview Frame -->
+          <div
+            class="border-2 border-slate-200 rounded-xl bg-slate-100/80 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden min-h-48">
+            <div
+              class="absolute inset-0 opacity-5 flex items-center justify-center select-none pointer-events-none text-3xl font-black uppercase tracking-widest text-slate-900">
+              ISMS 2.0 RAJASTHAN
+            </div>
+            <div
+              class="w-16 h-16 rounded-2xl bg-white shadow-md flex items-center justify-center text-rose-600 mb-3 border border-slate-200">
+              <svg class="w-9 h-9" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM6 20V4h7v5h5v11H6z" />
+              </svg>
+            </div>
+            <h5 class="text-sm font-bold text-slate-800 truncate max-w-sm">{{ previewingDoc()?.fileName ||
+              previewingDoc()?.label + '.pdf' }}</h5>
+            <p class="text-xs text-slate-500 mt-1">Official Statutory Document • Department of Skills & Livelihoods</p>
+            <div
+              class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Format Verified (PDF / PNG / JPG)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="bg-slate-50 px-4 sm:px-6 py-3 border-t border-slate-200 flex justify-end gap-2">
+          <button type="button" (click)="previewingDoc.set(null)"
+            class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 font-semibold hover:bg-slate-100 transition cursor-pointer text-xs sm:text-sm">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Officer In-Charge Modal (from tab-officer-incharge) -->
+    @if (showOfficerModal()) {
+    <div
+      class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6">
+      <div
+        class="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-2xl w-full border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div class="bg-[#0f1738] text-white px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between">
+          <h4 class="text-sm sm:text-base font-bold uppercase tracking-wider truncate">
+            {{ isOfficerEditing() ? 'Edit Officer In-Charge' : 'Add Officer In-Charge' }}
+          </h4>
+          <button type="button" (click)="closeOfficerModal()"
+            class="text-slate-300 hover:text-white text-2xl font-bold cursor-pointer leading-none">&times;</button>
+        </div>
+
+        <div class="p-4 sm:p-6 space-y-3.5 sm:space-y-4 max-h-[75vh] overflow-y-auto">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div>
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                Name <span class="text-rose-500 font-bold">*</span>
+              </label>
+              <input type="text" maxlength="100" [(ngModel)]="currentOfficer.name" placeholder="Full legal name"
+                [ngClass]="isOfficerModalFieldInvalid('name') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none"
+                required />
+              @if (isOfficerModalFieldInvalid('name')) {
+              <p class="text-xs text-rose-600 mt-1 font-medium">{{ getOfficerModalFieldError('name') }}</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                Designation <span class="text-rose-500 font-bold">*</span>
+              </label>
+              <input type="text" maxlength="80" [(ngModel)]="currentOfficer.designation"
+                placeholder="e.g. Officer In-Charge"
+                [ngClass]="isOfficerModalFieldInvalid('designation') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none"
+                required />
+              @if (isOfficerModalFieldInvalid('designation')) {
+              <p class="text-xs text-rose-600 mt-1 font-medium">{{ getOfficerModalFieldError('designation') }}</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                Mobile No. <span class="text-rose-500 font-bold">*</span>
+              </label>
+              <input type="tel" maxlength="10" [(ngModel)]="currentOfficer.mobileNo" placeholder="10 digit mobile"
+                [ngClass]="isOfficerModalFieldInvalid('mobileNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 font-mono placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none"
+                required />
+              @if (isOfficerModalFieldInvalid('mobileNo')) {
+              <p class="text-xs text-rose-600 mt-1 font-medium">{{ getOfficerModalFieldError('mobileNo') }}</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                Email ID <span class="text-rose-500 font-bold">*</span>
+              </label>
+              <input type="email" maxlength="80" [(ngModel)]="currentOfficer.emailId" placeholder="officer@domain.org"
+                [ngClass]="isOfficerModalFieldInvalid('emailId') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none"
+                required />
+              @if (isOfficerModalFieldInvalid('emailId')) {
+              <p class="text-xs text-rose-600 mt-1 font-medium">{{ getOfficerModalFieldError('emailId') }}</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                PAN
+              </label>
+              <input type="text" maxlength="10" [(ngModel)]="currentOfficer.pan"
+                (ngModelChange)="currentOfficer.pan = (currentOfficer.pan || '').toUpperCase()" placeholder="ABCDE1234F"
+                [ngClass]="isOfficerModalFieldInvalid('pan') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 uppercase font-mono placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none" />
+              @if (isOfficerModalFieldInvalid('pan')) {
+              <p class="text-xs text-rose-600 mt-1 font-medium">{{ getOfficerModalFieldError('pan') }}</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                Aadhaar No.
+              </label>
+              <input type="text" maxlength="12" [(ngModel)]="currentOfficer.aadhaarNo" placeholder="12 digit Aadhaar"
+                [ngClass]="isOfficerModalFieldInvalid('aadhaarNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 font-mono placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none" />
+              @if (isOfficerModalFieldInvalid('aadhaarNo')) {
+              <p class="text-xs text-rose-600 mt-1 font-medium">{{ getOfficerModalFieldError('aadhaarNo') }}</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                Bhamashah No.
+              </label>
+              <input type="text" maxlength="50" [(ngModel)]="currentOfficer.bhamashahNo" placeholder="Bhamashah ID"
+                class="w-full h-10 px-3.5 border border-slate-300 rounded-lg text-sm text-slate-800 font-mono placeholder-slate-400 hover:border-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
+            </div>
+
+            <div>
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                Voter ID No.
+              </label>
+              <input type="text" maxlength="50" [(ngModel)]="currentOfficer.voterIdNo" placeholder="EPIC / Voter ID"
+                class="w-full h-10 px-3.5 border border-slate-300 rounded-lg text-sm text-slate-800 uppercase font-mono placeholder-slate-400 hover:border-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                Passport No.
+              </label>
+              <input type="text" maxlength="50" [(ngModel)]="currentOfficer.passportNo" placeholder="Passport number"
+                class="w-full h-10 px-3.5 border border-slate-300 rounded-lg text-sm text-slate-800 uppercase font-mono placeholder-slate-400 hover:border-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="bg-slate-50 px-4 sm:px-6 py-3 sm:py-4 border-t border-slate-200 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3">
+          <button type="button" (click)="closeOfficerModal()"
+            class="px-4 py-2 border border-slate-300 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 transition cursor-pointer text-center">
+            Cancel
+          </button>
+          <button type="button" (click)="saveOfficer()"
+            class="px-5 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-xs sm:text-sm font-semibold transition cursor-pointer shadow-xs text-center">
+            {{ isOfficerEditing() ? 'Update Officer' : 'Save Officer' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Award Record Modal (from tab-awards) -->
+    @if (showAwardModal()) {
+    <div
+      class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6">
+      <div
+        class="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-xl w-full border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div class="bg-[#0f1738] text-white px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between">
+          <h4 class="text-sm sm:text-base font-bold uppercase tracking-wider truncate">
+            {{ isAwardEditing() ? 'Edit Award Record' : 'Add Award Record' }}
+          </h4>
+          <button type="button" (click)="closeAwardModal()"
+            class="text-slate-300 hover:text-white text-2xl font-bold cursor-pointer leading-none">&times;</button>
+        </div>
+
+        <div class="p-4 sm:p-6 space-y-3.5 sm:space-y-4 max-h-[75vh] overflow-y-auto">
+          <div>
+            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+              Award / Recognition Name <span class="text-rose-500 font-bold">*</span>
+            </label>
+            <input type="text" [(ngModel)]="currentAward.awardName" placeholder="e.g. Best Skill Development Partner"
+              [ngClass]="isAwardModalFieldInvalid('awardName') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+              class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none"
+              required />
+            @if (isAwardModalFieldInvalid('awardName')) {
+            <p class="text-xs text-rose-600 mt-1 font-medium">{{ getAwardModalFieldError('awardName') }}</p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+              Awarding Agency / Body <span class="text-rose-500 font-bold">*</span>
+            </label>
+            <input type="text" [(ngModel)]="currentAward.awardingAgency"
+              placeholder="e.g. NSDC / Ministry of Skill Development"
+              [ngClass]="isAwardModalFieldInvalid('awardingAgency') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+              class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none"
+              required />
+            @if (isAwardModalFieldInvalid('awardingAgency')) {
+            <p class="text-xs text-rose-600 mt-1 font-medium">{{ getAwardModalFieldError('awardingAgency') }}</p>
+            }
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div>
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                Year of Award
+              </label>
+              <input type="number" [(ngModel)]="currentAward.year" placeholder="2025"
+                [ngClass]="isAwardModalFieldInvalid('year') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 font-mono placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none" />
+              @if (isAwardModalFieldInvalid('year')) {
+              <p class="text-xs text-rose-600 mt-1 font-medium">{{ getAwardModalFieldError('year') }}</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                Level
+              </label>
+              <select [(ngModel)]="currentAward.level"
+                class="w-full h-10 px-3 border border-slate-300 rounded-lg text-sm text-slate-800 bg-white hover:border-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none">
+                <option value="">-- Select Level --</option>
+                <option value="State">State Level</option>
+                <option value="National">National Level</option>
+                <option value="International">International Level</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+              Description / Remarks
+            </label>
+            <input type="text" [(ngModel)]="currentAward.description"
+              placeholder="Brief details about the recognition..."
+              class="w-full h-10 px-3.5 border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
+          </div>
+
+          <div>
+            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+              Supporting Document
+            </label>
+            <input type="file" (change)="onAwardFileSelected($event)" accept=".pdf,.jpg,.jpeg,.png"
+              class="block w-full text-xs sm:text-sm text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-900 hover:file:bg-blue-100 cursor-pointer" />
+            @if (currentAward.documentName) {
+            <p class="text-xs text-emerald-600 mt-1 font-medium">Attached: {{ currentAward.documentName }}</p>
+            }
+          </div>
+        </div>
+
+        <div
+          class="bg-slate-50 px-4 sm:px-6 py-3 sm:py-4 border-t border-slate-200 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3">
+          <button type="button" (click)="closeAwardModal()"
+            class="px-4 py-2 border border-slate-300 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 transition cursor-pointer text-center">
+            Cancel
+          </button>
+          <button type="button" (click)="saveAward()"
+            class="px-5 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-xs sm:text-sm font-semibold transition cursor-pointer shadow-xs text-center">
+            {{ isAwardEditing() ? 'Update Award' : 'Save Award' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- 4. Final Submission Success Modal -->
+    @if (showSuccessModal()) {
+    <div
+      class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div
+        class="bg-white rounded-2xl shadow-2xl max-w-md w-full border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150 p-6 sm:p-8 text-center space-y-4">
+        <div
+          class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-sm">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+
+        <div>
+          <span
+            class="inline-block px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-full mb-2">
+            Registration Successful
+          </span>
+          <h3 class="text-lg sm:text-xl font-extrabold text-slate-900">Application Submitted!</h3>
+          <p class="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
+            Your Training Partner (TP/PIA) registration dossier has been received by RSLDC / Department of Skills.
+          </p>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs text-left space-y-1.5">
+          <div class="flex justify-between">
+            <span class="text-slate-500">Application Reference:</span>
+            <b class="font-mono text-slate-900">{{ data.basicInfo.applicationNo || 'RJ-ISMS-2026-0042' }}</b>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Organisation:</span>
+            <b class="text-slate-900 truncate max-w-48">{{ data.basicInfo.fullName || 'Registered Entity' }}</b>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Submission Date:</span>
+            <b class="text-slate-900">Today, 2026</b>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center gap-3 pt-2">
+          <button type="button" (click)="printAcknowledgement()"
+            class="px-5 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold transition cursor-pointer text-xs sm:text-sm shadow-sm">
+            Print Acknowledgement
+          </button>
+          <button type="button" (click)="showSuccessModal.set(false)"
+            class="px-5 py-2.5 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg font-semibold transition cursor-pointer text-xs sm:text-sm">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+</div>

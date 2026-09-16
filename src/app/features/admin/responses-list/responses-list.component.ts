@@ -183,11 +183,7 @@ import { Observable } from 'rxjs';
               </table>
             </div>
 
-            <!-- Bottom Information Footer -->
-            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 text-xs text-slate-500 flex justify-between items-center">
-              <span>RSLDC Directorate of Technical Scrutiny & Evaluation</span>
-              <span class="font-mono">Secure Admin Desk</span>
-            </div>
+
 
           </div>
 

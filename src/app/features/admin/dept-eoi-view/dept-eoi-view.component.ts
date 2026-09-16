@@ -111,15 +111,11 @@ import { Observable } from 'rxjs';
 
                     <!-- Action -->
                     <td class="p-3 text-center">
-                      <a *ngIf="scheme.status === 'Closed'"
+                      <a 
                         [routerLink]="['/admin/responses', scheme.id]" 
                         class="px-2.5 py-1 text-xs text-[#131A4D] font-bold hover:underline cursor-pointer transition-colors inline-block">
                         View List
                       </a>
-                      <span *ngIf="scheme.status !== 'Closed'"
-                        class="px-2.5 py-1 text-xs text-slate-400 font-bold cursor-not-allowed inline-block" title="List can only be viewed once status is Closed">
-                        View List
-                      </span>
                     </td>
 
                   </tr>

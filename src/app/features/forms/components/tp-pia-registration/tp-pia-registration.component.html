@@ -388,16 +388,16 @@
               }
             </section>
 
-            <!-- 1.2 CONTACT & COMMUNICATION DETAILS (Collapsible Dropdown) -->
+            <!-- 1.2 CONTACT, COMMUNICATION & ADDRESS (Merged Collapsible Section) -->
             <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs"
-              [ngClass]="isContactDetailsOpen() ? 'overflow-visible' : 'overflow-hidden'">
-              <button type="button" (click)="isContactDetailsOpen.set(!isContactDetailsOpen())"
+              [ngClass]="isContactDetailsOpen() || isAddressRecordsOpen() ? 'overflow-visible' : 'overflow-hidden'">
+              <button type="button" (click)="isContactDetailsOpen.set(!isContactDetailsOpen()); isAddressRecordsOpen.set(!isAddressRecordsOpen())"
                 class="w-full flex items-center justify-between px-5 sm:px-6 py-3.5 bg-slate-50/90 hover:bg-slate-100/80 transition-colors cursor-pointer text-left select-none border-b"
                 [ngClass]="isContactDetailsOpen() ? 'border-slate-200/80' : 'border-transparent'">
                 <div class="flex items-center gap-2.5">
                   <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
                   <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800">
-                    Contact & Communication Details
+                    Contact, Communication & Address Details
                   </h3>
                 </div>
                 <div class="flex items-center gap-2 text-slate-400 hover:text-slate-700">
@@ -412,8 +412,9 @@
               </button>
 
               @if (isContactDetailsOpen()) {
-              <div class="p-5 sm:p-7">
+              <div class="p-5 sm:p-7 space-y-6">
 
+                <!-- Contact Fields Row -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                   <!-- Organisation Contact No. * -->
                   <div>
@@ -457,36 +458,11 @@
                     }
                   </div>
                 </div>
-              </div>
-              }
-            </section>
 
-            <!-- 1.3 OFFICE ADDRESS RECORDS (Collapsible Dropdown) -->
-            <section class="bg-white rounded-xl border border-slate-200/90 shadow-xs"
-              [ngClass]="isAddressRecordsOpen() ? 'overflow-visible' : 'overflow-hidden'">
-              <button type="button" (click)="isAddressRecordsOpen.set(!isAddressRecordsOpen())"
-                class="w-full flex items-center justify-between px-5 sm:px-6 py-3.5 bg-slate-50/90 hover:bg-slate-100/80 transition-colors cursor-pointer text-left select-none border-b"
-                [ngClass]="isAddressRecordsOpen() ? 'border-slate-200/80' : 'border-transparent'">
-                <div class="flex items-center gap-2.5">
-                  <span class="w-2.5 h-2.5 rounded-full bg-amber-600"></span>
-                  <h3 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800">
-                    Office Address Records
-                  </h3>
-                </div>
-                <div class="flex items-center gap-2 text-slate-400 hover:text-slate-700">
-                  <span class="text-[11px] font-medium hidden sm:inline text-slate-400">
-                    {{ isAddressRecordsOpen() ? 'Collapse' : 'Expand' }}
-                  </span>
-                  <svg class="w-4 h-4 transform transition-transform duration-200 text-slate-500"
-                    [class.rotate-180]="!isAddressRecordsOpen()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </button>
+                <!-- Divider -->
+                <div class="border-t border-slate-100"></div>
 
-              @if (isAddressRecordsOpen()) {
-              <div class="p-5 sm:p-7">
-
+                <!-- Address Cards -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
                   <!-- Left Card: Registered Office Address -->
                   <div
@@ -504,7 +480,7 @@
                       <div class="mb-3">
                         <div class="flex items-center justify-between mb-1">
                           <label class="block text-xs font-semibold text-slate-700">
-                            Premises / Building, Street & Area <span class="text-rose-500 font-bold">*</span>
+                            Premises / Building, Street &amp; Area <span class="text-rose-500 font-bold">*</span>
                           </label>
                           <span class="text-[10px] text-slate-400 font-mono">{{ data.registeredAddress.address.length ||
                             0 }}/250</span>
@@ -739,7 +715,7 @@
                       <div class="mb-3">
                         <div class="flex items-center justify-between mb-1">
                           <label class="block text-xs font-semibold text-slate-700">
-                            Premises / Building, Street, Area, City & Pincode <span
+                            Premises / Building, Street, Area, City &amp; Pincode <span
                               class="text-rose-500 font-bold">*</span>
                           </label>
                           <span class="text-[10px] text-slate-400 font-mono">{{ data.postalAddress.address.length || 0
@@ -775,7 +751,8 @@
                       }
                     </div>
                   </div>
-                </div>
+                 </div>
+
               </div>
               }
             </section>

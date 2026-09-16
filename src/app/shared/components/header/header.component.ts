@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, Input, HostListener } from '@angular/core';
-import { RouterLink, RouterModule } from '@angular/router';
+import { RouterLink, RouterModule, Router } from '@angular/router';
 import { CommonModule, NgIf, AsyncPipe } from '@angular/common';
 import { EoiStateService, UserProfile } from '../../../core/services/eoi-state.service';
 import { LanguageService, Language } from '../../../core/services/language.service';
@@ -226,6 +226,7 @@ export class HeaderComponent implements OnInit {
 
   protected readonly languageService = inject(LanguageService);
   private readonly eoiStateService = inject(EoiStateService);
+  private readonly router = inject(Router);
 
   readonly userProfile$: Observable<UserProfile> = this.eoiStateService.userProfile$;
   readonly currentLanguage = this.languageService.currentLanguage;
@@ -249,7 +250,7 @@ export class HeaderComponent implements OnInit {
   logout(): void {
     this.profileMenuOpen.set(false);
     console.log('Logging out...');
-    // Additional logout logic goes here
+    this.router.navigate(['/auth/login']);
   }
 
   toggleMobileMenu(): void {

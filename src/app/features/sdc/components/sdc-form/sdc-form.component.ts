@@ -4,11 +4,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { CourseProposalService, CourseProposal } from '../../../../core/services/course-proposal.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { UiInputComponent } from '../../../../shared/components/ui/ui-input/ui-input.component';
+import { UiSelectComponent, SelectOption } from '../../../../shared/components/ui/ui-select/ui-select.component';
 
 @Component({
   selector: 'app-sdc-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, UiInputComponent, UiSelectComponent],
   template: `
     <div class="bg-white rounded-xl shadow-2xs border border-slate-200 p-6 font-sans">
       
@@ -53,49 +55,60 @@ import { map } from 'rxjs/operators';
         <div *ngIf="currentStep === 1" class="animate-in fade-in slide-in-from-right-4 duration-300">
           <h2 class="text-lg font-bold text-rsldc-navy border-b pb-2 mb-4">Section A: Organization Details</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Scheme <span class="text-red-500">*</span></label>
-              <select formControlName="schemeId" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy bg-slate-50">
-                <option value="">Select Scheme</option>
-                <option value="SCH-001">SAMARTH (State Fund)</option>
-                <option value="SCH-002">PMKVY (Central Fund)</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">SDC Name <span class="text-red-500">*</span></label>
-              <input formControlName="name" type="text" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy bg-slate-50" placeholder="e.g. Jaipur Excellence Center">
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">MoU Reference No. <span class="text-red-500">*</span></label>
-              <input formControlName="mouNo" type="text" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy bg-slate-50" placeholder="MOU/2026/001">
-            </div>
+            <app-ui-select
+              formControlName="schemeId"
+              label="Scheme"
+              [required]="true"
+              placeholder="Select Scheme"
+              [options]="schemeOptions">
+            </app-ui-select>
+
+            <app-ui-input
+              formControlName="name"
+              label="SDC Name"
+              [required]="true"
+              placeholder="e.g. Jaipur Excellence Center">
+            </app-ui-input>
+
+            <app-ui-input
+              formControlName="mouNo"
+              label="MoU Reference No."
+              [required]="true"
+              placeholder="MOU/2026/001">
+            </app-ui-input>
           </div>
         </div>
 
         <!-- STEP 2: LOCATION & DETAILS -->
         <div *ngIf="currentStep === 2" class="animate-in fade-in slide-in-from-right-4 duration-300">
           <h2 class="text-lg font-bold text-rsldc-navy border-b pb-2 mb-4">Section B & C: Location and Centre Details</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">State <span class="text-red-500">*</span></label>
-              <select class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm bg-slate-100" disabled>
-                <option>Rajasthan</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">District <span class="text-red-500">*</span></label>
-              <select formControlName="district" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy">
-                <option value="">Select District</option>
-                <option value="Jaipur">Jaipur</option>
-                <option value="Ajmer">Ajmer</option>
-                <option value="Jodhpur">Jodhpur</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">SDC Capacity <span class="text-red-500">*</span></label>
-              <input formControlName="capacity" type="number" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy" placeholder="Max students">
-            </div>
-            <div class="md:col-span-3">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-2">
+            <app-ui-select
+              label="State"
+              [required]="true"
+              [options]="[{label: 'Rajasthan', value: 'Rajasthan'}]"
+              placeholder="Rajasthan"
+              [disabled]="true"
+              class="w-full">
+            </app-ui-select>
+
+            <app-ui-select
+              formControlName="district"
+              label="District"
+              [required]="true"
+              placeholder="Select District"
+              [options]="districtOptions">
+            </app-ui-select>
+
+            <app-ui-input
+              formControlName="capacity"
+              type="number"
+              label="SDC Capacity"
+              [required]="true"
+              placeholder="Max students">
+            </app-ui-input>
+
+            <div class="md:col-span-3 -mt-2">
               <label class="block text-sm font-semibold text-slate-700 mb-1">Full Address <span class="text-red-500">*</span></label>
               <textarea formControlName="address" rows="2" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy"></textarea>
             </div>
@@ -107,17 +120,23 @@ import { map } from 'rxjs/operators';
               
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Inputs -->
-                <div class="space-y-4">
-                  <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Latitude (-90 to +90)</label>
-                    <input formControlName="latitude" type="number" step="0.000001" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy bg-slate-50" placeholder="e.g. 26.9124">
-                  </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Longitude (-180 to +180)</label>
-                    <input formControlName="longitude" type="number" step="0.000001" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy bg-slate-50" placeholder="e.g. 75.7873">
-                  </div>
+                <div class="space-y-1">
+                  <app-ui-input
+                    formControlName="latitude"
+                    type="number"
+                    label="Latitude (-90 to +90)"
+                    placeholder="e.g. 26.9124">
+                  </app-ui-input>
+                  
+                  <app-ui-input
+                    formControlName="longitude"
+                    type="number"
+                    label="Longitude (-180 to +180)"
+                    placeholder="e.g. 75.7873">
+                  </app-ui-input>
+
                   <div class="flex gap-2">
-                    <button type="button" (click)="useCurrentLocation()" class="flex-1 py-2 bg-blue-100 text-blue-800 font-bold text-xs rounded shadow-xs hover:bg-blue-200 transition-colors flex items-center justify-center gap-1">
+                    <button type="button" (click)="useCurrentLocation()" class="w-full py-2 bg-blue-100 text-blue-800 font-bold text-xs rounded shadow-xs hover:bg-blue-200 transition-colors flex items-center justify-center gap-1">
                       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
                       Use My Location
                     </button>
@@ -126,9 +145,7 @@ import { map } from 'rxjs/operators';
 
                 <!-- Map Mock -->
                 <div class="bg-slate-200 rounded-lg overflow-hidden border border-slate-300 relative min-h-[200px] flex items-center justify-center">
-                  <!-- Fake Map Background -->
                   <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 20px 20px;"></div>
-                  
                   <div class="relative flex flex-col items-center">
                     <svg class="w-8 h-8 text-red-600 drop-shadow-md -mt-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
                     <span class="bg-white px-2 py-1 rounded shadow-md text-[10px] font-bold mt-2">
@@ -136,10 +153,7 @@ import { map } from 'rxjs/operators';
                       Lng: {{ sdcForm.value.longitude || 'Not set' }}
                     </span>
                   </div>
-                  
-                  <div class="absolute bottom-2 right-2 bg-white/80 px-2 py-1 text-[9px] font-bold text-slate-600 rounded">
-                    Map Preview
-                  </div>
+                  <div class="absolute bottom-2 right-2 bg-white/80 px-2 py-1 text-[9px] font-bold text-slate-600 rounded">Map Preview</div>
                 </div>
               </div>
             </div>
@@ -156,17 +170,15 @@ import { map } from 'rxjs/operators';
               <span class="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded uppercase">From Approved Proposals</span>
             </div>
             <p class="text-xs text-slate-500 mb-3">You can only select courses that have been explicitly approved for your TP by the Department.</p>
-            <div class="flex gap-4">
-              <select formControlName="courseId" class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700">
-                <option value="">Select an Approved Course...</option>
-                <ng-container *ngFor="let course of allCourses$ | async">
-                  <option [value]="course.courseCode" [disabled]="course.status !== 'APPROVED'">
-                    {{ course.courseName }} ({{ course.courseCode }}) - {{ course.status === 'APPROVED' ? course.nsqfLevel : course.status.replace('_', ' ') }}
-                  </option>
-                </ng-container>
-              </select>
-            </div>
-            <div class="mt-3 text-right">
+            
+            <app-ui-select
+              formControlName="courseId"
+              [options]="(courseOptions$ | async) || []"
+              placeholder="Select an Approved Course..."
+              class="block w-full">
+            </app-ui-select>
+            
+            <div class="mt-2 text-right">
                <a routerLink="/tp/courses" class="text-xs font-bold text-blue-600 hover:underline">Manage My Proposed Courses &rarr;</a>
             </div>
           </div>
@@ -219,7 +231,7 @@ import { map } from 'rxjs/operators';
           class="px-5 py-2 border border-slate-300 text-slate-700 rounded-lg font-bold text-sm hover:bg-slate-50 transition">
           Back
         </button>
-        <div *ngIf="currentStep === 1"></div> <!-- Spacer -->
+        <div *ngIf="currentStep === 1"></div>
 
         <button 
           *ngIf="currentStep < 4" 
@@ -247,6 +259,18 @@ export class SdcFormComponent implements OnInit {
 
   currentStep = 1;
   allCourses$!: Observable<CourseProposal[]>;
+  courseOptions$!: Observable<SelectOption[]>;
+
+  schemeOptions: SelectOption[] = [
+    { label: 'SAMARTH (State Fund)', value: 'SCH-001' },
+    { label: 'PMKVY (Central Fund)', value: 'SCH-002' }
+  ];
+
+  districtOptions: SelectOption[] = [
+    { label: 'Jaipur', value: 'Jaipur' },
+    { label: 'Ajmer', value: 'Ajmer' },
+    { label: 'Jodhpur', value: 'Jodhpur' }
+  ];
 
   sdcForm: FormGroup = this.fb.group({
     schemeId: ['', Validators.required],
@@ -262,6 +286,13 @@ export class SdcFormComponent implements OnInit {
 
   ngOnInit() {
     this.allCourses$ = this.courseService.getProposalsByTp('TP042');
+    this.courseOptions$ = this.allCourses$.pipe(
+      map(courses => courses.map(c => ({
+        label: `${c.courseName} (${c.courseCode}) - ${c.status === 'APPROVED' ? c.nsqfLevel : c.status.replace('_', ' ')}`,
+        value: c.courseCode,
+        disabled: c.status !== 'APPROVED'
+      })))
+    );
   }
 
   useCurrentLocation() {

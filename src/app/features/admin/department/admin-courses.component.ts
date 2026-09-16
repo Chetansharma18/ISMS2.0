@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { CourseProposalService, CourseProposal } from '../../../core/services/course-proposal.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { UiTableComponent, TableColumn } from '../../../shared/components/ui/ui-table/ui-table.component';
+import { UiModalComponent } from '../../../shared/components/ui/ui-modal/ui-modal.component';
 
 @Component({
   selector: 'app-admin-courses',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, UiTableComponent, UiModalComponent],
   template: `
     <div class="space-y-6">
       <div class="flex justify-between items-end">
@@ -17,77 +19,64 @@ import { map } from 'rxjs/operators';
         </div>
       </div>
 
-      <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-50 border-b border-slate-200">
-                <th class="p-4 text-xs font-bold text-slate-500 uppercase">TP Details</th>
-                <th class="p-4 text-xs font-bold text-slate-500 uppercase">Proposed Course</th>
-                <th class="p-4 text-xs font-bold text-slate-500 uppercase">Capacity & Duration</th>
-                <th class="p-4 text-xs font-bold text-slate-500 uppercase text-center">Infrastructure</th>
-                <th class="p-4 text-xs font-bold text-slate-500 uppercase text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-200">
-              <!-- Dynamic Proposals -->
-              <tr *ngFor="let p of pendingProposals$ | async" class="hover:bg-amber-50/30 transition-colors">
-                <td class="p-4">
-                  <div class="font-bold text-[#131A4D]">{{ p.tpName }}</div>
-                  <div class="text-[10px] text-slate-500 uppercase">{{ p.tpId }}</div>
-                </td>
-                <td class="p-4">
-                  <div class="font-bold text-slate-700">{{ p.courseName }} ({{ p.courseCode }})</div>
-                  <div class="text-[10px] text-slate-500 uppercase">{{ p.sector }} • {{ p.nsqfLevel }}</div>
-                </td>
-                <td class="p-4">
-                  <div class="font-bold text-slate-700">{{ p.targetCapacity }} Aspirants</div>
-                  <div class="text-[10px] text-slate-500 uppercase">{{ p.durationHrs }} Hrs</div>
-                </td>
-                <td class="p-4 text-center">
-                  <button (click)="viewInfra(p.infrastructure)" class="px-2 py-1 bg-slate-100 border border-slate-300 text-slate-600 rounded text-[10px] font-bold hover:bg-slate-200">
-                    View Requirements
-                  </button>
-                </td>
-                <td class="p-4 text-right">
-                  <div class="flex justify-end gap-2">
-                    <button (click)="reject(p.id)" class="px-3 py-1 bg-white border border-red-200 text-red-600 rounded text-xs font-bold hover:bg-red-50 shadow-xs">
-                      Reject
-                    </button>
-                    <button (click)="approve(p.id)" class="px-3 py-1 bg-approve-700 text-white rounded text-xs font-bold hover:bg-green-800 shadow-xs">
-                      Approve
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr *ngIf="(pendingProposals$ | async)?.length === 0">
-                <td colspan="5" class="p-8 text-center text-slate-500">
-                  No pending course proposals to review.
-                </td>
-              </tr>            </tbody>
-          </table>
-        </div>
-      </div>
+      <app-ui-table
+        [columns]="columns"
+        [data]="(pendingProposals$ | async) || []"
+        emptyMessage="No pending course proposals to review.">
+        
+        <ng-template #rowTemplate let-p let-col="column">
+          
+          <ng-container *ngIf="col.key === 'tp'">
+            <div class="font-bold text-[#131A4D]">{{ p.tpName }}</div>
+            <div class="text-[10px] text-slate-500 uppercase">{{ p.tpId }}</div>
+          </ng-container>
+
+          <ng-container *ngIf="col.key === 'course'">
+            <div class="font-bold text-slate-700">{{ p.courseName }} ({{ p.courseCode }})</div>
+            <div class="text-[10px] text-slate-500 uppercase">{{ p.sector }} • {{ p.nsqfLevel }}</div>
+          </ng-container>
+
+          <ng-container *ngIf="col.key === 'capacity'">
+            <div class="font-bold text-slate-700">{{ p.targetCapacity }} Aspirants</div>
+            <div class="text-[10px] text-slate-500 uppercase">{{ p.durationHrs }} Hrs</div>
+          </ng-container>
+
+          <ng-container *ngIf="col.key === 'infra'">
+            <button (click)="viewInfra(p.infrastructure)" class="px-2 py-1 bg-slate-100 border border-slate-300 text-slate-600 rounded text-[10px] font-bold hover:bg-slate-200">
+              View Requirements
+            </button>
+          </ng-container>
+
+          <ng-container *ngIf="col.key === 'action'">
+            <div class="flex justify-end gap-2">
+              <button (click)="reject(p.id)" class="px-3 py-1 bg-white border border-red-200 text-red-600 rounded text-xs font-bold hover:bg-red-50 shadow-xs">
+                Reject
+              </button>
+              <button (click)="approve(p.id)" class="px-3 py-1 bg-approve-700 text-white rounded text-xs font-bold hover:bg-green-800 shadow-xs">
+                Approve
+              </button>
+            </div>
+          </ng-container>
+
+        </ng-template>
+      </app-ui-table>
 
       <!-- Infrastructure Modal -->
-      <div *ngIf="selectedInfra !== null" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
-          <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
-            <h3 class="font-bold text-[#131A4D] text-lg">Infrastructure Requirements</h3>
-            <button (click)="closeInfra()" class="text-slate-400 hover:text-slate-600">
-              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
-            </button>
-          </div>
-          <div class="p-6">
-            <p class="text-slate-600 text-sm whitespace-pre-wrap">{{ selectedInfra }}</p>
-          </div>
-          <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end">
-            <button (click)="closeInfra()" class="px-4 py-2 bg-[#131A4D] text-white rounded font-bold text-sm hover:bg-[#002855] transition-colors shadow-sm">
-              Close
-            </button>
-          </div>
+      <app-ui-modal 
+        [isOpen]="selectedInfra !== null" 
+        title="Infrastructure Requirements" 
+        maxWidth="md"
+        [showFooter]="true"
+        (closed)="closeInfra()">
+        
+        <p class="text-slate-600 text-sm whitespace-pre-wrap">{{ selectedInfra }}</p>
+        
+        <div modal-footer>
+          <button (click)="closeInfra()" class="px-4 py-2 bg-[#131A4D] text-white rounded font-bold text-sm hover:bg-[#002855] transition-colors shadow-sm">
+            Close
+          </button>
         </div>
-      </div>
+      </app-ui-modal>
 
     </div>
   `
@@ -95,6 +84,14 @@ import { map } from 'rxjs/operators';
 export class AdminCoursesComponent implements OnInit {
   pendingProposals$!: Observable<CourseProposal[]>;
   selectedInfra: string | null = null;
+
+  columns: TableColumn[] = [
+    { key: 'tp', label: 'TP Details' },
+    { key: 'course', label: 'Proposed Course' },
+    { key: 'capacity', label: 'Capacity & Duration' },
+    { key: 'infra', label: 'Infrastructure', align: 'center' },
+    { key: 'action', label: 'Action', align: 'right' }
+  ];
 
   constructor(private courseService: CourseProposalService) {}
 

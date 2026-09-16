@@ -1,13 +1,16 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { UiInputComponent } from '../../../shared/components/ui/ui-input/ui-input.component';
+import { UiSelectComponent } from '../../../shared/components/ui/ui-select/ui-select.component';
 
 @Component({
   selector: 'app-sanction-order-create',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, UiInputComponent, UiSelectComponent],
   template: `
-    <div class="max-w-4xl mx-auto space-y-6">
+    <div class="max-w-4xl mx-auto space-y-6 pb-12">
       
       <!-- Header -->
       <div class="flex items-center gap-4">
@@ -23,22 +26,25 @@ import { RouterLink, Router } from '@angular/router';
       </div>
 
       <!-- Form Skeleton -->
-      <div class="bg-white border border-slate-200 rounded-xl shadow-xs p-6 md:p-8 space-y-8">
+      <form [formGroup]="soForm" (ngSubmit)="submit()" class="bg-white border border-slate-200 rounded-xl shadow-xs p-6 md:p-8 space-y-8">
         
         <!-- Selection -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="space-y-2">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Tender</label>
-            <select class="w-full p-3 border border-slate-300 rounded-lg bg-slate-50 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-              <option>TND-2026-001 (MMKAY)</option>
-            </select>
-          </div>
-          <div class="space-y-2">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Approved TP</label>
-            <select class="w-full p-3 border border-slate-300 rounded-lg bg-slate-50 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-              <option>SkillMasters Rajasthan (TP042)</option>
-            </select>
-          </div>
+          <app-ui-select
+            formControlName="tenderId"
+            label="Select Tender"
+            [required]="true"
+            [options]="[{label: 'TND-2026-001 (MMKAY)', value: 'TND-2026-001'}]"
+            placeholder="Select a Tender">
+          </app-ui-select>
+
+          <app-ui-select
+            formControlName="tpId"
+            label="Select Approved TP"
+            [required]="true"
+            [options]="[{label: 'SkillMasters Rajasthan (TP042)', value: 'TP042'}]"
+            placeholder="Select an Approved TP">
+          </app-ui-select>
         </div>
 
         <hr class="border-slate-100">
@@ -48,18 +54,27 @@ import { RouterLink, Router } from '@angular/router';
           <h3 class="text-lg font-bold text-[#131A4D]">Capacity & Validity</h3>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="space-y-2">
-              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Approved Capacity (Aspirants)</label>
-              <input type="number" value="500" class="w-full p-3 border border-slate-300 rounded-lg bg-white text-slate-800 font-bold focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-            </div>
-            <div class="space-y-2">
-              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Valid From</label>
-              <input type="date" class="w-full p-3 border border-slate-300 rounded-lg bg-white text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-            </div>
-            <div class="space-y-2">
-              <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Valid To</label>
-              <input type="date" class="w-full p-3 border border-slate-300 rounded-lg bg-white text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-            </div>
+            <app-ui-input
+              formControlName="capacity"
+              type="number"
+              label="Approved Capacity (Aspirants)"
+              [required]="true"
+              placeholder="e.g. 500">
+            </app-ui-input>
+
+            <app-ui-input
+              formControlName="validFrom"
+              type="date"
+              label="Valid From"
+              [required]="true">
+            </app-ui-input>
+
+            <app-ui-input
+              formControlName="validTo"
+              type="date"
+              label="Valid To"
+              [required]="true">
+            </app-ui-input>
           </div>
         </div>
 
@@ -79,17 +94,17 @@ import { RouterLink, Router } from '@angular/router';
             <p class="text-xs text-slate-500 mt-1">Maximum file size 5MB.</p>
           </div>
         </div>
-      </div>
+      </form>
 
       <!-- Actions -->
-      <div class="flex items-center justify-end gap-4">
+      <div class="flex items-center justify-end gap-4 mt-6">
         <button routerLink="/department/sanction-orders" class="px-6 py-3 text-slate-600 font-bold hover:bg-slate-100 rounded-lg transition-colors">
           Cancel
         </button>
         <button class="px-6 py-3 border-2 border-[#131A4D] text-[#131A4D] font-bold rounded-lg hover:bg-slate-50 transition-colors">
           Save as Draft
         </button>
-        <button (click)="submit()" class="px-6 py-3 bg-[#131A4D] text-white font-bold rounded-lg shadow-md hover:bg-[#0a0e29] hover:shadow-lg transition-all flex items-center gap-2">
+        <button (click)="submit()" [disabled]="soForm.invalid" class="px-6 py-3 bg-[#131A4D] text-white font-bold rounded-lg shadow-md hover:bg-[#0a0e29] hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
           Save & Submit for Release
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -101,9 +116,20 @@ import { RouterLink, Router } from '@angular/router';
   `
 })
 export class SanctionOrderCreateComponent {
-  constructor(private router: Router) {}
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+
+  soForm = this.fb.group({
+    tenderId: ['TND-2026-001', Validators.required],
+    tpId: ['TP042', Validators.required],
+    capacity: [500, Validators.required],
+    validFrom: ['', Validators.required],
+    validTo: ['', Validators.required],
+  });
 
   submit() {
-    this.router.navigate(['/department/sanction-orders']);
+    if (this.soForm.valid) {
+      this.router.navigate(['/department/sanction-orders']);
+    }
   }
 }

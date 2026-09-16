@@ -1,11 +1,23 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { UiTableComponent, TableColumn } from '../../../shared/components/ui/ui-table/ui-table.component';
+
+interface SanctionOrder {
+  id: string;
+  ref: string;
+  tender: string;
+  eoi: string;
+  tpName: string;
+  tpId: string;
+  status: 'DRAFT' | 'PENDING_RELEASE' | 'RELEASED';
+  target?: number;
+}
 
 @Component({
   selector: 'app-sanction-order-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, UiTableComponent],
   template: `
     <div class="space-y-6">
       <div class="flex justify-between items-end">
@@ -18,81 +30,90 @@ import { RouterLink } from '@angular/router';
         </button>
       </div>
 
-      <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-50 border-b border-slate-200">
-                <th class="p-4 text-xs font-bold text-slate-500 uppercase">Order Ref</th>
-                <th class="p-4 text-xs font-bold text-slate-500 uppercase">Tender / EOI</th>
-                <th class="p-4 text-xs font-bold text-slate-500 uppercase">Training Provider</th>
-                <th class="p-4 text-xs font-bold text-slate-500 uppercase">Status</th>
-                <th class="p-4 text-xs font-bold text-slate-500 uppercase text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-200">
-              
-              <!-- Draft Order -->
-              <tr class="hover:bg-slate-50 transition-colors">
-                <td class="p-4">
-                  <div class="font-bold text-[#131A4D]">-</div>
-                  <div class="text-xs text-slate-500">Draft</div>
-                </td>
-                <td class="p-4">
-                  <div class="font-bold text-slate-700">TND-2026-001</div>
-                  <div class="text-xs text-slate-500">EOI-2026-9871</div>
-                </td>
-                <td class="p-4">
-                  <div class="font-bold text-slate-800">TechTrain India Pvt Ltd</div>
-                  <div class="text-[10px] text-slate-500">TP001 • Approved</div>
-                </td>
-                <td class="p-4">
-                  <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-800">
-                    DRAFT
-                  </span>
-                </td>
-                <td class="p-4 text-right">
-                  <button class="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-bold rounded shadow-xs transition-colors">
-                    Edit
-                  </button>
-                </td>
-              </tr>
+      <app-ui-table
+        [columns]="columns"
+        [data]="orders"
+        emptyMessage="No Sanction Orders found.">
+        
+        <ng-template #rowTemplate let-order let-col="column">
+          
+          <ng-container *ngIf="col.key === 'ref'">
+            <div class="font-bold text-[#131A4D]">{{ order.ref }}</div>
+            <div *ngIf="order.status === 'DRAFT'" class="text-xs text-slate-500">Draft</div>
+            <div *ngIf="order.status !== 'DRAFT'" class="text-xs text-slate-500">Target: {{ order.target }} Aspirants</div>
+          </ng-container>
 
-              <!-- Pending Release -->
-              <tr class="hover:bg-slate-50 transition-colors bg-blue-50/30">
-                <td class="p-4">
-                  <div class="font-bold text-[#131A4D]">SO-2026-4412</div>
-                  <div class="text-xs text-slate-500">Target: 500 Aspirants</div>
-                </td>
-                <td class="p-4">
-                  <div class="font-bold text-slate-700">TND-2026-001</div>
-                  <div class="text-xs text-slate-500">EOI-2026-9871</div>
-                </td>
-                <td class="p-4">
-                  <div class="font-bold text-slate-800">SkillMasters Rajasthan</div>
-                  <div class="text-[10px] text-slate-500">TP042 • Approved</div>
-                </td>
-                <td class="p-4">
-                  <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                    PENDING_RELEASE
-                  </span>
-                </td>
-                <td class="p-4 text-right">
-                  <button (click)="releaseOrder()" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded shadow-xs transition-colors">
-                    Release Order
-                  </button>
-                </td>
-              </tr>
+          <ng-container *ngIf="col.key === 'tender'">
+            <div class="font-bold text-slate-700">{{ order.tender }}</div>
+            <div class="text-xs text-slate-500">{{ order.eoi }}</div>
+          </ng-container>
 
-            </tbody>
-          </table>
-        </div>
-      </div>
+          <ng-container *ngIf="col.key === 'tp'">
+            <div class="font-bold text-slate-800">{{ order.tpName }}</div>
+            <div class="text-[10px] text-slate-500 uppercase">{{ order.tpId }} • Approved</div>
+          </ng-container>
+
+          <ng-container *ngIf="col.key === 'status'">
+            <span *ngIf="order.status === 'DRAFT'" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-800 uppercase inline-block border border-slate-200">
+              Draft
+            </span>
+            <span *ngIf="order.status === 'PENDING_RELEASE'" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 uppercase inline-block border border-amber-200">
+              Pending Release
+            </span>
+            <span *ngIf="order.status === 'RELEASED'" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase inline-block border border-green-200">
+              Released
+            </span>
+          </ng-container>
+
+          <ng-container *ngIf="col.key === 'action'">
+            <div class="flex justify-end gap-2">
+              <button *ngIf="order.status === 'DRAFT'" class="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-bold rounded shadow-xs transition-colors">
+                Edit
+              </button>
+              <button *ngIf="order.status === 'PENDING_RELEASE'" (click)="releaseOrder(order)" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded shadow-xs transition-colors">
+                Release Order
+              </button>
+            </div>
+          </ng-container>
+
+        </ng-template>
+      </app-ui-table>
     </div>
   `
 })
 export class SanctionOrderListComponent {
-  releaseOrder() {
+  columns: TableColumn[] = [
+    { key: 'ref', label: 'Order Ref' },
+    { key: 'tender', label: 'Tender / EOI' },
+    { key: 'tp', label: 'Training Provider' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Action', align: 'right' }
+  ];
+
+  orders: SanctionOrder[] = [
+    {
+      id: '1',
+      ref: '-',
+      tender: 'TND-2026-001',
+      eoi: 'EOI-2026-9871',
+      tpName: 'TechTrain India Pvt Ltd',
+      tpId: 'TP001',
+      status: 'DRAFT'
+    },
+    {
+      id: '2',
+      ref: 'SO-2026-4412',
+      tender: 'TND-2026-001',
+      eoi: 'EOI-2026-9871',
+      tpName: 'SkillMasters Rajasthan',
+      tpId: 'TP042',
+      status: 'PENDING_RELEASE',
+      target: 500
+    }
+  ];
+
+  releaseOrder(order: SanctionOrder) {
     alert('Sanction Order Released! The TP can now create an SDC.');
+    order.status = 'RELEASED';
   }
 }

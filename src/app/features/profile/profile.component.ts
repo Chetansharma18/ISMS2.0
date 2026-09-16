@@ -85,10 +85,10 @@ export interface OfficialDocItem {
 
             <!-- ================= STATE 1: INCOMPLETE PROFILE CALLOUT BANNER ================= -->
             <div *ngIf="!profile.isRegistered || profile.userState === 'new'" 
-              class="p-5 bg-gradient-to-r from-amber-50 via-white to-amber-50/80 border-2 border-amber-300 rounded-xl shadow-xs relative overflow-hidden">
+              class="p-5 bg-gradient-to-r from-amber-50 via-white to-amber-50/80 border-2 border-amber-300 rounded-xs shadow-xs relative overflow-hidden">
               <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="flex items-start gap-3.5">
-                  <div class="w-10 h-10 rounded-xl bg-amber-500 text-[#002244] font-black flex items-center justify-center text-lg shrink-0 shadow-xs">
+                  <div class="w-10 h-10 rounded-xs bg-amber-500 text-[#002244] font-black flex items-center justify-center text-lg shrink-0 shadow-xs">
                     ⚠️
                   </div>
                   <div>
@@ -103,7 +103,7 @@ export interface OfficialDocItem {
 
                 <a 
                   routerLink="/auth/register" 
-                  class="shrink-0 w-full sm:w-auto text-center px-5 py-2.5 bg-[#002244] hover:bg-[#003366] text-white font-bold text-xs rounded-lg transition-colors shadow-xs flex items-center justify-center gap-2">
+                  class="shrink-0 w-full sm:w-auto text-center px-5 py-2.5 bg-[#002244] hover:bg-[#003366] text-white font-bold text-xs rounded-xs transition-colors shadow-xs flex items-center justify-center gap-2">
                   <span>Start OTR Registration</span>
                   <span>→</span>
                 </a>
@@ -111,219 +111,218 @@ export interface OfficialDocItem {
             </div>
 
             <!-- ================= 1. ORGANISATION / COMPANY BASIC DETAILS (17 FIELDS) ================= -->
-            <div *ngIf="activeSection === 1" class="bg-white border border-slate-200 rounded-xl p-6 sm:p-7 shadow-xs space-y-5">
+            <div *ngIf="activeSection === 1" class="bg-white border border-slate-200 rounded-xs p-6 sm:p-7 shadow-sm space-y-5">
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-200">
                 <div>
-                  <h3 class="text-sm font-bold text-[#002244] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">1</span>
+                  <h3 class="text-base sm:text-lg font-bold text-[#002244] flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-xs bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">1</span>
                     <span>Organisation / Company Basic Details (17 Fields)</span>
                   </h3>
-                  <p class="text-[11px] text-slate-500 mt-0.5">Corporate entity details, legal incorporation, address, and turnover</p>
+                  <p class="text-xs text-slate-500 mt-0.5">Corporate entity details, legal incorporation, address, and turnover</p>
                 </div>
                 
                 <div class="flex items-center gap-2">
                   <button 
                     *ngIf="editingSection !== 1"
                     (click)="startEditingSection(1)"
-                    class="px-3 py-1 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs font-bold rounded transition-colors inline-flex items-center gap-1 cursor-pointer">
-                    <span>✏️</span>
+                    class="px-3.5 py-1.5 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs sm:text-[13px] font-bold rounded-xs transition-colors inline-flex items-center gap-1 cursor-pointer">
                     <span>Edit Section</span>
                   </button>
                 </div>
               </div>
 
               <!-- VIEW MODE: SECTION 1 (17 Fields) -->
-              <div *ngIf="editingSection !== 1" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-5 text-xs">
+              <div *ngIf="editingSection !== 1" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-5 text-xs sm:text-[13px]">
                 <div>
-                  <span class="text-slate-500 font-medium block">1. Application No.</span>
-                  <span class="font-mono font-bold text-[#002244] block mt-0.5">{{ orgData.application_no }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">1. Application No.</span>
+                  <span class="font-mono font-bold text-[#002244] block mt-0.5 text-xs sm:text-[13px]">{{ orgData.application_no }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">2. TP/PIA Full Name <span class="text-red-500">*</span></span>
-                  <span class="font-bold text-slate-900 block mt-0.5">{{ orgData.tp_full_name }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">2. TP/PIA Full Name <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.tp_full_name }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">3. TP/PIA Short Name <span class="text-red-500">*</span></span>
-                  <span class="font-mono font-semibold text-slate-800 block mt-0.5">{{ orgData.tp_short_name }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">3. TP/PIA Short Name <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-semibold text-slate-800 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.tp_short_name }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">4. Registration Number</span>
-                  <span class="font-mono font-bold text-slate-900 block mt-0.5">{{ orgData.registration_number }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">4. Registration Number</span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.registration_number }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">5. Organisation Contact No. <span class="text-red-500">*</span></span>
-                  <span class="font-bold text-slate-900 block mt-0.5">{{ orgData.organisation_contact_no }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">5. Organisation Contact No. <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.organisation_contact_no }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">6. Company Email-ID <span class="text-red-500">*</span></span>
-                  <span class="font-mono text-slate-900 block mt-0.5">{{ orgData.company_email }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">6. Company Email-ID <span class="text-red-500">*</span></span>
+                  <span class="font-mono text-slate-900 font-semibold block mt-0.5 text-xs sm:text-[13px]">{{ orgData.company_email }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">7. Organisation PAN No.</span>
-                  <span class="font-mono font-bold text-[#002244] block mt-0.5">
+                  <span class="text-slate-500 font-medium block text-xs">7. Organisation PAN No.</span>
+                  <span class="font-mono font-bold text-[#002244] block mt-0.5 text-xs sm:text-[13px]">
                     {{ orgData.organisation_pan }}
-                    <span class="ml-1 text-[10px] text-emerald-700 font-sans font-bold">✓ Validated</span>
+                    <span class="ml-1 text-[11px] text-emerald-700 font-sans font-bold">✓ Validated</span>
                   </span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">8. Website</span>
-                  <a *ngIf="orgData.website" [href]="'https://' + orgData.website.replace('https://', '').replace('http://', '')" target="_blank" class="text-blue-700 hover:underline font-mono block mt-0.5 truncate">
+                  <span class="text-slate-500 font-medium block text-xs">8. Website</span>
+                  <a *ngIf="orgData.website" [href]="'https://' + orgData.website.replace('https://', '').replace('http://', '')" target="_blank" class="text-blue-700 hover:underline font-mono font-semibold block mt-0.5 truncate text-xs sm:text-[13px]">
                     {{ orgData.website }}
                   </a>
-                  <span *ngIf="!orgData.website" class="text-slate-400 italic font-mono block mt-0.5">—</span>
+                  <span *ngIf="!orgData.website" class="text-slate-400 italic font-mono block mt-0.5 text-xs sm:text-[13px]">—</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">10. State / UT <span class="text-red-500">*</span></span>
-                  <span class="font-semibold text-slate-900 block mt-0.5">{{ orgData.state_ut }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">10. State / UT <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.state_ut }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">11. District <span class="text-red-500">*</span></span>
-                  <span class="font-semibold text-slate-900 block mt-0.5">{{ orgData.district }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">11. District <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.district }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">12. Pincode <span class="text-red-500">*</span></span>
-                  <span class="font-mono font-bold text-slate-900 block mt-0.5">{{ orgData.pincode }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">12. Pincode <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.pincode }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">13. Turn Over (₹ in Lakhs) <span class="text-red-500">*</span></span>
-                  <span class="font-bold text-[#002244] block mt-0.5">₹ {{ orgData.turnover_lakhs }} Lakhs</span>
+                  <span class="text-slate-500 font-medium block text-xs">13. Turn Over (₹ in Lakhs) <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-[#002244] block mt-0.5 text-xs sm:text-[13px]">₹ {{ orgData.turnover_lakhs }} Lakhs</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">14. Date of Registration</span>
-                  <span class="font-semibold text-slate-900 block mt-0.5">{{ orgData.date_of_registration }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">14. Date of Registration</span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.date_of_registration }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">15. State Where Registered</span>
-                  <span class="font-semibold text-slate-900 block mt-0.5">{{ orgData.state_where_registered }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">15. State Where Registered</span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.state_where_registered }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">16. Type of Business / Activity</span>
-                  <span class="font-medium text-slate-900 block mt-0.5">{{ orgData.type_of_business }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">16. Type of Business / Activity</span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.type_of_business }}</span>
                 </div>
 
                 <div class="sm:col-span-2 lg:col-span-3">
-                  <span class="text-slate-500 font-medium block">9. Registered Office Address <span class="text-red-500">*</span></span>
-                  <span class="font-medium text-slate-900 block mt-0.5">{{ orgData.registered_address }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">9. Registered Office Address <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.registered_address }}</span>
                 </div>
 
                 <div class="sm:col-span-2 lg:col-span-3">
-                  <span class="text-slate-500 font-medium block">17. Postal / Communication Address <span class="text-red-500">*</span></span>
-                  <span class="font-medium text-slate-900 block mt-0.5">{{ orgData.postal_address }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">17. Postal / Communication Address <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.postal_address }}</span>
                 </div>
               </div>
 
               <!-- EDIT MODE: SECTION 1 -->
-              <div *ngIf="editingSection === 1" class="space-y-4 bg-slate-50 p-4 sm:p-5 rounded-lg border border-slate-300">
+              <div *ngIf="editingSection === 1" class="space-y-4 bg-slate-50 p-4 sm:p-5 rounded-xs border border-slate-300">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-                  <span class="font-bold text-xs text-[#002244] uppercase tracking-wide">Editing: Organisation Details</span>
-                  <span class="text-[11px] text-slate-500">Fields marked with <span class="text-red-500 font-bold">*</span> are mandatory</span>
+                  <span class="font-bold text-xs sm:text-[13px] text-[#002244] uppercase tracking-wide">Editing: Organisation Details</span>
+                  <span class="text-xs text-slate-500">Fields marked with <span class="text-red-500 font-bold">*</span> are mandatory</span>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs sm:text-[13px]">
                   <div class="sm:col-span-2 lg:col-span-2">
                     <label class="block font-bold text-slate-700 mb-1">2. TP/PIA Full Name <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="orgEdit.tp_full_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244] font-bold" />
+                    <input [(ngModel)]="orgEdit.tp_full_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] font-bold text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">3. TP/PIA Short Name <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="orgEdit.tp_short_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="orgEdit.tp_short_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">4. Registration Number</label>
-                    <input [(ngModel)]="orgEdit.registration_number" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244] font-mono" />
+                    <input [(ngModel)]="orgEdit.registration_number" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] font-mono text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">5. Contact No. <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="orgEdit.organisation_contact_no" maxlength="12" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="orgEdit.organisation_contact_no" maxlength="12" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">6. Company Email-ID <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="orgEdit.company_email" type="email" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="orgEdit.company_email" type="email" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">7. Organisation PAN</label>
-                    <input [(ngModel)]="orgEdit.organisation_pan" maxlength="10" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 uppercase font-mono focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="orgEdit.organisation_pan" maxlength="10" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 uppercase font-mono focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">8. Website</label>
-                    <input [(ngModel)]="orgEdit.website" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="orgEdit.website" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">10. State / UT <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="orgEdit.state_ut" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="orgEdit.state_ut" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">11. District <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="orgEdit.district" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="orgEdit.district" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">12. Pincode <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="orgEdit.pincode" maxlength="6" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 font-mono focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="orgEdit.pincode" maxlength="6" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 font-mono focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">13. Turn Over (₹ in Lakhs) <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="orgEdit.turnover_lakhs" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 font-bold focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="orgEdit.turnover_lakhs" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 font-bold focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">14. Date of Registration</label>
-                    <input [(ngModel)]="orgEdit.date_of_registration" type="date" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="orgEdit.date_of_registration" type="date" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">15. State Where Registered</label>
-                    <input [(ngModel)]="orgEdit.state_where_registered" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="orgEdit.state_where_registered" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
-                    <label class="block font-bold text-slate-700 mb-1">16. Type of Business</label>
-                    <input [(ngModel)]="orgEdit.type_of_business" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <label class="block font-bold text-slate-700 mb-1">16. Type of Business / Activity</label>
+                    <input [(ngModel)]="orgEdit.type_of_business" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div class="sm:col-span-2 lg:col-span-3">
-                    <label class="block font-bold text-slate-700 mb-1">9. Registered Address <span class="text-red-500">*</span></label>
-                    <textarea [(ngModel)]="orgEdit.registered_address" rows="2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]"></textarea>
+                    <label class="block font-bold text-slate-700 mb-1">9. Registered Office Address <span class="text-red-500">*</span></label>
+                    <textarea [(ngModel)]="orgEdit.registered_address" rows="2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]"></textarea>
                   </div>
 
                   <div class="sm:col-span-2 lg:col-span-3">
                     <label class="block font-bold text-slate-700 mb-1">17. Postal / Communication Address <span class="text-red-500">*</span></label>
-                    <textarea [(ngModel)]="orgEdit.postal_address" rows="2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]"></textarea>
+                    <textarea [(ngModel)]="orgEdit.postal_address" rows="2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]"></textarea>
                   </div>
                 </div>
 
                 <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
                   <button 
                     (click)="cancelEditing()"
-                    class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded hover:bg-slate-100 transition-colors cursor-pointer">
+                    class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs sm:text-[13px] rounded-xs hover:bg-slate-100 transition-colors cursor-pointer">
                     Cancel
                   </button>
                   <button 
                     (click)="saveSection(1)"
-                    class="px-5 py-2 bg-[#002244] text-white font-bold text-xs rounded hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
+                    class="px-5 py-2 bg-[#002244] text-white font-bold text-xs sm:text-[13px] rounded-xs hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
                     ✓ Save Section 1 Details
                   </button>
                 </div>
@@ -331,201 +330,200 @@ export interface OfficialDocItem {
             </div>
 
             <!-- ================= 2. AUTHORIZED PERSON DETAILS (17 FIELDS) ================= -->
-            <div *ngIf="activeSection === 2" class="bg-white border border-slate-200 rounded-xl p-6 sm:p-7 shadow-xs space-y-5">
+            <div *ngIf="activeSection === 2" class="bg-white border border-slate-200 rounded-xs p-6 sm:p-7 shadow-sm space-y-5">
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-200">
                 <div>
-                  <h3 class="text-sm font-bold text-[#002244] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">2</span>
+                  <h3 class="text-base sm:text-lg font-bold text-[#002244] flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-xs bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">2</span>
                     <span>Authorized Person Details (Organisation Level) (17 Fields)</span>
                   </h3>
-                  <p class="text-[11px] text-slate-500 mt-0.5">Authorized signatory credentials, Aadhaar e-KYC, identity proofs, and contact</p>
+                  <p class="text-xs text-slate-500 mt-0.5">Authorized signatory credentials, Aadhaar e-KYC, identity proofs, and contact</p>
                 </div>
                 
                 <div class="flex items-center gap-2">
                   <button 
                     *ngIf="editingSection !== 2"
                     (click)="startEditingSection(2)"
-                    class="px-3 py-1 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs font-bold rounded transition-colors inline-flex items-center gap-1 cursor-pointer">
-                    <span>✏️</span>
+                    class="px-3.5 py-1.5 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs sm:text-[13px] font-bold rounded-xs transition-colors inline-flex items-center gap-1 cursor-pointer">
                     <span>Edit Section</span>
                   </button>
                 </div>
               </div>
 
               <!-- VIEW MODE: SECTION 2 (17 Fields) -->
-              <div *ngIf="editingSection !== 2" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-5 text-xs">
+              <div *ngIf="editingSection !== 2" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-5 text-xs sm:text-[13px]">
                 <div>
-                  <span class="text-slate-500 font-medium block">1. Name <span class="text-red-500">*</span></span>
-                  <span class="font-bold text-slate-900 block mt-0.5 text-sm">{{ authData.auth_name }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">1. Name <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_name }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">2. S/O, D/O, W/O</span>
-                  <span class="font-semibold text-slate-800 block mt-0.5">{{ authData.auth_guardian_name }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">2. S/O, D/O, W/O</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_guardian_name }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">3. Date of Birth</span>
-                  <span class="font-mono text-slate-800 block mt-0.5">{{ authData.auth_dob }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">3. Date of Birth</span>
+                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_dob }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">4. Age</span>
-                  <span class="font-bold text-slate-800 block mt-0.5">{{ authData.auth_age }} Years</span>
+                  <span class="text-slate-500 font-medium block text-xs">4. Age</span>
+                  <span class="font-bold text-slate-800 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_age }} Years</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">5. Designation <span class="text-red-500">*</span></span>
-                  <span class="font-bold text-slate-900 block mt-0.5">{{ authData.auth_designation }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">5. Designation <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_designation }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">6. Mobile No. <span class="text-red-500">*</span></span>
-                  <span class="font-mono font-bold text-slate-900 block mt-0.5">{{ authData.auth_mobile }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">6. Mobile No. <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_mobile }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">7. Email-Id <span class="text-red-500">*</span></span>
-                  <span class="font-mono text-slate-900 block mt-0.5">{{ authData.auth_email }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">7. Email-Id <span class="text-red-500">*</span></span>
+                  <span class="font-mono text-slate-900 font-semibold block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_email }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">8. State</span>
-                  <span class="font-semibold text-slate-900 block mt-0.5">{{ authData.auth_state }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">8. State</span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_state }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">10. PAN <span class="text-red-500">*</span></span>
-                  <span class="font-mono font-bold text-[#002244] block mt-0.5">{{ authData.auth_pan }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">10. PAN <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-[#002244] block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_pan }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">11. Aadhaar No.</span>
-                  <span class="font-mono font-bold text-slate-900 block mt-0.5">
+                  <span class="text-slate-500 font-medium block text-xs">11. Aadhaar No.</span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">
                     {{ authData.auth_aadhaar }}
-                    <span class="ml-1 text-[10px] text-emerald-700 font-sans font-bold">🔒 e-Sign Active</span>
+                    <span class="ml-1 text-[11px] text-emerald-700 font-sans font-bold">🔒 e-Sign Active</span>
                   </span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">12. Type ID Proof</span>
-                  <span class="font-semibold text-slate-800 block mt-0.5">{{ authData.auth_id_proof_type }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">12. Type ID Proof</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_id_proof_type }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">13. ID No.</span>
-                  <span class="font-mono font-bold text-slate-900 block mt-0.5">{{ authData.auth_id_number }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">13. ID No.</span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_id_number }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">14. Bhamashah / Jan Aadhaar</span>
-                  <span class="font-mono text-slate-800 block mt-0.5">{{ authData.auth_bhamashah || '—' }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">14. Bhamashah / Jan Aadhaar</span>
+                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_bhamashah || '—' }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">15. Voter Id No.</span>
-                  <span class="font-mono text-slate-800 block mt-0.5">{{ authData.auth_voter_id || '—' }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">15. Voter Id No.</span>
+                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_voter_id || '—' }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">16. Passport No.</span>
-                  <span class="font-mono text-slate-800 block mt-0.5">{{ authData.auth_passport_no || '—' }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">16. Passport No.</span>
+                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_passport_no || '—' }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">17. Service Tax No.</span>
-                  <span class="font-mono text-slate-800 block mt-0.5">{{ authData.auth_service_tax_no || '—' }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">17. Service Tax No.</span>
+                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_service_tax_no || '—' }}</span>
                 </div>
 
                 <div class="sm:col-span-2 lg:col-span-3">
-                  <span class="text-slate-500 font-medium block">9. Residence Address</span>
-                  <span class="font-medium text-slate-900 block mt-0.5">{{ authData.auth_residence_address }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">9. Residence Address</span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_residence_address }}</span>
                 </div>
               </div>
 
               <!-- EDIT MODE: SECTION 2 -->
-              <div *ngIf="editingSection === 2" class="space-y-4 bg-slate-50 p-4 sm:p-5 rounded-lg border border-slate-300">
+              <div *ngIf="editingSection === 2" class="space-y-4 bg-slate-50 p-4 sm:p-5 rounded-xs border border-slate-300">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-                  <span class="font-bold text-xs text-[#002244] uppercase tracking-wide">Editing: Authorized Person Details</span>
-                  <span class="text-[11px] text-slate-500">Fields marked with <span class="text-red-500 font-bold">*</span> are mandatory</span>
+                  <span class="font-bold text-xs sm:text-[13px] text-[#002244] uppercase tracking-wide">Editing: Authorized Person Details</span>
+                  <span class="text-xs text-slate-500">Fields marked with <span class="text-red-500 font-bold">*</span> are mandatory</span>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs sm:text-[13px]">
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">1. Full Name <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="authEdit.auth_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244] font-bold" />
+                    <input [(ngModel)]="authEdit.auth_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] font-bold text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">2. S/O, D/O, W/O (Guardian)</label>
-                    <input [(ngModel)]="authEdit.auth_guardian_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="authEdit.auth_guardian_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">3. Date of Birth</label>
-                    <input [(ngModel)]="authEdit.auth_dob" type="date" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="authEdit.auth_dob" type="date" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">4. Age</label>
-                    <input [(ngModel)]="authEdit.auth_age" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="authEdit.auth_age" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">5. Designation <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="authEdit.auth_designation" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="authEdit.auth_designation" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">6. Mobile No. <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="authEdit.auth_mobile" maxlength="10" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="authEdit.auth_mobile" maxlength="10" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">7. Email-Id <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="authEdit.auth_email" type="email" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="authEdit.auth_email" type="email" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">8. State</label>
-                    <input [(ngModel)]="authEdit.auth_state" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="authEdit.auth_state" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">10. PAN <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="authEdit.auth_pan" maxlength="10" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 uppercase font-mono focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="authEdit.auth_pan" maxlength="10" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 uppercase font-mono focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">11. Aadhaar No.</label>
-                    <input [(ngModel)]="authEdit.auth_aadhaar" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 font-mono focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="authEdit.auth_aadhaar" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 font-mono focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">12. ID Proof Type</label>
-                    <input [(ngModel)]="authEdit.auth_id_proof_type" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="authEdit.auth_id_proof_type" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">13. ID Number</label>
-                    <input [(ngModel)]="authEdit.auth_id_number" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 font-mono focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="authEdit.auth_id_number" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 font-mono focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div class="sm:col-span-2 lg:col-span-3">
                     <label class="block font-bold text-slate-700 mb-1">9. Residence Address</label>
-                    <textarea [(ngModel)]="authEdit.auth_residence_address" rows="2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]"></textarea>
+                    <textarea [(ngModel)]="authEdit.auth_residence_address" rows="2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]"></textarea>
                   </div>
                 </div>
 
                 <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
                   <button 
                     (click)="cancelEditing()"
-                    class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded hover:bg-slate-100 transition-colors cursor-pointer">
+                    class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs sm:text-[13px] rounded-xs hover:bg-slate-100 transition-colors cursor-pointer">
                     Cancel
                   </button>
                   <button 
                     (click)="saveSection(2)"
-                    class="px-5 py-2 bg-[#002244] text-white font-bold text-xs rounded hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
+                    class="px-5 py-2 bg-[#002244] text-white font-bold text-xs sm:text-[13px] rounded-xs hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
                     ✓ Save Section 2 Details
                   </button>
                 </div>
@@ -533,81 +531,80 @@ export interface OfficialDocItem {
             </div>
 
             <!-- ================= 3. BANK DETAILS (9 FIELDS) ================= -->
-            <div *ngIf="activeSection === 3" class="bg-white border border-slate-200 rounded-xl p-6 sm:p-7 shadow-xs space-y-5">
+            <div *ngIf="activeSection === 3" class="bg-white border border-slate-200 rounded-xs p-6 sm:p-7 shadow-sm space-y-5">
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-200">
                 <div>
-                  <h3 class="text-sm font-bold text-[#002244] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">3</span>
+                  <h3 class="text-base sm:text-lg font-bold text-[#002244] flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-xs bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">3</span>
                     <span>Bank Details (9 Fields)</span>
                   </h3>
-                  <p class="text-[11px] text-slate-500 mt-0.5">Government PFMS verified bank mandate for electronic EMD refunds and grant transfers</p>
+                  <p class="text-xs text-slate-500 mt-0.5">Government PFMS verified bank mandate for electronic EMD refunds and grant transfers</p>
                 </div>
                 
                 <div class="flex items-center gap-2">
                   <button 
                     *ngIf="editingSection !== 3"
                     (click)="startEditingSection(3)"
-                    class="px-3 py-1 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs font-bold rounded transition-colors inline-flex items-center gap-1 cursor-pointer">
-                    <span>✏️</span>
+                    class="px-3.5 py-1.5 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs sm:text-[13px] font-bold rounded-xs transition-colors inline-flex items-center gap-1 cursor-pointer">
                     <span>Edit Section</span>
                   </button>
                 </div>
               </div>
 
               <!-- VIEW MODE: SECTION 3 (9 Fields) -->
-              <div *ngIf="editingSection !== 3" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-5 text-xs">
+              <div *ngIf="editingSection !== 3" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-5 text-xs sm:text-[13px]">
                 <div>
-                  <span class="text-slate-500 font-medium block">1. Name of the Bank <span class="text-red-500">*</span></span>
-                  <span class="font-bold text-[#002244] block mt-0.5 text-sm">{{ bankData.bank_name }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">1. Name of the Bank <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-[#002244] block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_name }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">2. Account No. <span class="text-red-500">*</span></span>
-                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-sm">{{ bankData.bank_account_no }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">2. Account No. <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_account_no }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">3. IFSC Code <span class="text-red-500">*</span></span>
-                  <span class="font-mono font-bold text-[#002244] block mt-0.5">{{ bankData.bank_ifsc }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">3. IFSC Code <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-[#002244] block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_ifsc }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">4. Type of Account <span class="text-red-500">*</span></span>
-                  <span class="font-semibold text-slate-900 block mt-0.5">{{ bankData.bank_account_type }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">4. Type of Account <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_account_type }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">5. Mode of Electronic Transfer</span>
-                  <span class="font-medium text-slate-800 block mt-0.5">{{ bankData.bank_transfer_mode }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">5. Mode of Electronic Transfer</span>
+                  <span class="font-medium text-slate-800 block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_transfer_mode }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">6. Branch Name <span class="text-red-500">*</span></span>
-                  <span class="font-semibold text-slate-900 block mt-0.5">{{ bankData.bank_branch_name }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">6. Branch Name <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_branch_name }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block">7. MICR Code</span>
-                  <span class="font-mono font-semibold text-slate-800 block mt-0.5">{{ bankData.bank_micr || '—' }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">7. MICR Code</span>
+                  <span class="font-mono font-semibold text-slate-800 block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_micr || '—' }}</span>
                 </div>
 
                 <div class="sm:col-span-2 lg:col-span-2">
-                  <span class="text-slate-500 font-medium block">8. Branch Address <span class="text-red-500">*</span></span>
-                  <span class="font-medium text-slate-900 block mt-0.5">{{ bankData.bank_branch_address }}</span>
+                  <span class="text-slate-500 font-medium block text-xs">8. Branch Address <span class="text-red-500">*</span></span>
+                  <span class="font-medium text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_branch_address }}</span>
                 </div>
 
                 <div class="sm:col-span-2 lg:col-span-3 pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
-                    <span class="text-slate-500 font-medium block">9. Uploaded Cancelled Cheque / Bank Passbook</span>
-                    <span class="font-mono text-slate-800 font-bold text-xs mt-0.5 flex items-center gap-1.5">
+                    <span class="text-slate-500 font-medium block text-xs">9. Uploaded Cancelled Cheque / Bank Passbook</span>
+                    <span class="font-mono text-slate-800 font-bold text-xs sm:text-[13px] mt-0.5 flex items-center gap-1.5">
                       <span>📎</span>
                       <span>{{ bankData.bank_cancelled_cheque_doc }}</span>
-                      <span class="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded font-sans">✓ Uploaded</span>
+                      <span class="text-xs text-emerald-700 font-sans font-bold">✓ Uploaded</span>
                     </span>
                   </div>
                   <button 
                     (click)="downloadDoc(bankData.bank_cancelled_cheque_doc)"
-                    class="px-3 py-1.5 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] text-xs font-bold rounded border border-slate-300 transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                    class="px-3.5 py-1.5 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] text-xs sm:text-[13px] font-bold rounded-xs border border-slate-300 transition-colors cursor-pointer inline-flex items-center gap-1.5">
                     <span>📥</span>
                     <span>Download Cheque Proof</span>
                   </button>
@@ -615,31 +612,31 @@ export interface OfficialDocItem {
               </div>
 
               <!-- EDIT MODE: SECTION 3 -->
-              <div *ngIf="editingSection === 3" class="space-y-4 bg-slate-50 p-4 sm:p-5 rounded-lg border border-slate-300">
+              <div *ngIf="editingSection === 3" class="space-y-4 bg-slate-50 p-4 sm:p-5 rounded-xs border border-slate-300">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-                  <span class="font-bold text-xs text-[#002244] uppercase tracking-wide">Editing: Bank Details &amp; Mandate</span>
-                  <span class="text-[11px] text-slate-500">Fields marked with <span class="text-red-500 font-bold">*</span> are mandatory</span>
+                  <span class="font-bold text-xs sm:text-[13px] text-[#002244] uppercase tracking-wide">Editing: Bank Details &amp; Mandate</span>
+                  <span class="text-xs text-slate-500">Fields marked with <span class="text-red-500 font-bold">*</span> are mandatory</span>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs sm:text-[13px]">
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">1. Bank Name <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="bankEdit.bank_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244] font-bold" />
+                    <input [(ngModel)]="bankEdit.bank_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] font-bold text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">2. Account Number <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="bankEdit.bank_account_no" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 font-mono font-bold focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="bankEdit.bank_account_no" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 font-mono font-bold focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">3. IFSC Code <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="bankEdit.bank_ifsc" maxlength="11" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 uppercase font-mono font-bold focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="bankEdit.bank_ifsc" maxlength="11" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 uppercase font-mono font-bold focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">4. Account Type <span class="text-red-500">*</span></label>
-                    <select [(ngModel)]="bankEdit.bank_account_type" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]">
+                    <select [(ngModel)]="bankEdit.bank_account_type" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]">
                       <option value="Current Account">Current Account</option>
                       <option value="Savings Account">Savings Account</option>
                       <option value="Cash Credit / Overdraft">Cash Credit / Overdraft</option>
@@ -648,39 +645,39 @@ export interface OfficialDocItem {
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">5. Transfer Mode</label>
-                    <input [(ngModel)]="bankEdit.bank_transfer_mode" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="bankEdit.bank_transfer_mode" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">6. Branch Name <span class="text-red-500">*</span></label>
-                    <input [(ngModel)]="bankEdit.bank_branch_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="bankEdit.bank_branch_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div>
                     <label class="block font-bold text-slate-700 mb-1">7. MICR Code</label>
-                    <input [(ngModel)]="bankEdit.bank_micr" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 font-mono focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="bankEdit.bank_micr" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 font-mono focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
 
                   <div class="sm:col-span-2 lg:col-span-2">
                     <label class="block font-bold text-slate-700 mb-1">8. Branch Address <span class="text-red-500">*</span></label>
-                    <textarea [(ngModel)]="bankEdit.bank_branch_address" rows="2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]"></textarea>
+                    <textarea [(ngModel)]="bankEdit.bank_branch_address" rows="2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]"></textarea>
                   </div>
 
                   <div class="sm:col-span-2 lg:col-span-3">
                     <label class="block font-bold text-slate-700 mb-1">9. Cancelled Cheque / Bank Passbook Document</label>
-                    <input [(ngModel)]="bankEdit.bank_cancelled_cheque_doc" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 font-mono focus:outline-none focus:border-[#002244]" />
+                    <input [(ngModel)]="bankEdit.bank_cancelled_cheque_doc" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xs text-slate-900 font-mono focus:outline-none focus:border-[#002244] text-xs sm:text-[13px]" />
                   </div>
                 </div>
 
                 <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
                   <button 
                     (click)="cancelEditing()"
-                    class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded hover:bg-slate-100 transition-colors cursor-pointer">
+                    class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs sm:text-[13px] rounded-xs hover:bg-slate-100 transition-colors cursor-pointer">
                     Cancel
                   </button>
                   <button 
                     (click)="saveSection(3)"
-                    class="px-5 py-2 bg-[#002244] text-white font-bold text-xs rounded hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
+                    class="px-5 py-2 bg-[#002244] text-white font-bold text-xs sm:text-[13px] rounded-xs hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
                     ✓ Save Section 3 Details
                   </button>
                 </div>
@@ -688,57 +685,56 @@ export interface OfficialDocItem {
             </div>
 
             <!-- ================= 4. OFFICIAL UPLOADED DOCUMENTS CHECKLIST (12 DOCS) ================= -->
-            <div *ngIf="activeSection === 4" class="bg-white border border-slate-200 rounded-xl p-6 sm:p-7 shadow-xs space-y-5">
+            <div *ngIf="activeSection === 4" class="bg-white border border-slate-200 rounded-xs p-6 sm:p-7 shadow-sm space-y-5">
               <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-200">
                 <div>
-                  <h3 class="text-sm font-bold text-[#002244] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">4</span>
+                  <h3 class="text-base sm:text-lg font-bold text-[#002244] flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-xs bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">4</span>
                     <span>Official Uploaded Documents Checklist (12 Documents per Spec)</span>
                   </h3>
-                  <p class="text-[11px] text-slate-500 mt-0.5">Statutory certificates, audit balance sheets, pan, GST, and affidavits</p>
+                  <p class="text-xs text-slate-500 mt-0.5">Statutory certificates, audit balance sheets, pan, GST, and affidavits</p>
                 </div>
                 
                 <div class="flex items-center gap-2">
                   <button 
                     *ngIf="editingSection !== 4"
                     (click)="startEditingSection(4)"
-                    class="px-3 py-1 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs font-bold rounded transition-colors inline-flex items-center gap-1 cursor-pointer">
-                    <span>✏️</span>
+                    class="px-3.5 py-1.5 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs sm:text-[13px] font-bold rounded-xs transition-colors inline-flex items-center gap-1 cursor-pointer">
                     <span>Manage / Replace Docs</span>
                   </button>
                 </div>
               </div>
 
               <!-- Documents Table -->
-              <div class="overflow-x-auto">
-                <table class="w-full min-w-[720px] text-xs text-left border-collapse">
+              <div class="overflow-x-auto border border-slate-200 rounded-xs shadow-sm">
+                <table class="w-full min-w-[720px] text-xs sm:text-[13px] text-left border-collapse">
                   <thead>
-                    <tr class="bg-slate-50 border-b border-slate-200 text-[#002244]">
-                      <th class="py-2.5 px-3 font-bold w-12 text-center">S.No.</th>
-                      <th class="py-2.5 px-3 font-bold">Document Title &amp; Category</th>
-                      <th class="py-2.5 px-3 font-bold">Uploaded File</th>
-                      <th class="py-2.5 px-3 font-bold text-center">Size</th>
-                      <th class="py-2.5 px-3 font-bold text-center">Status</th>
-                      <th class="py-2.5 px-3 font-bold text-right">Actions</th>
+                    <tr class="bg-[#002244] text-white border-b-2 border-amber-500">
+                      <th class="py-3 px-3 font-bold w-12 text-center text-xs tracking-wider uppercase border-r border-[#0e3b6e]">S.No.</th>
+                      <th class="py-3 px-3 font-bold text-xs tracking-wider uppercase border-r border-[#0e3b6e]">Document Title &amp; Category</th>
+                      <th class="py-3 px-3 font-bold text-xs tracking-wider uppercase border-r border-[#0e3b6e]">Uploaded File</th>
+                      <th class="py-3 px-3 font-bold text-center text-xs tracking-wider uppercase border-r border-[#0e3b6e]">Size</th>
+                      <th class="py-3 px-3 font-bold text-center text-xs tracking-wider uppercase border-r border-[#0e3b6e]">Status</th>
+                      <th class="py-3 px-3 font-bold text-right text-xs tracking-wider uppercase">Actions</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-slate-100">
                     <tr *ngFor="let doc of officialDocs" class="hover:bg-slate-50/80 transition-colors">
-                      <td class="py-3 px-3 font-mono font-bold text-slate-500 text-center">{{ doc.s_no }}</td>
-                      <td class="py-3 px-3">
+                      <td class="py-3 px-3 font-mono font-bold text-slate-500 text-center border-r border-slate-200">{{ doc.s_no }}</td>
+                      <td class="py-3 px-3 border-r border-slate-200">
                         <div class="font-bold text-slate-900">{{ doc.doc_title }}</div>
-                        <div class="text-[10.5px] text-slate-500 mt-0.5 font-mono">{{ doc.doc_category }}</div>
+                        <div class="text-xs text-slate-500 mt-0.5">{{ doc.doc_category }}</div>
                       </td>
-                      <td class="py-3 px-3">
+                      <td class="py-3 px-3 border-r border-slate-200">
                         <div class="flex items-center gap-2">
-                          <span class="px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-bold text-[10px] border border-red-200">PDF</span>
-                          <span class="font-mono text-slate-800 font-medium truncate max-w-[180px]" [title]="doc.file_name">{{ doc.file_name }}</span>
+                          <span class="px-1.5 py-0.5 bg-red-100 text-red-700 font-bold text-xs border border-red-200 rounded-xs">PDF</span>
+                          <span class="font-mono text-slate-800 font-medium truncate max-w-[200px]" [title]="doc.file_name">{{ doc.file_name }}</span>
                         </div>
-                        <div class="text-[10px] text-slate-400 font-mono mt-0.5">Uploaded: {{ doc.upload_date }}</div>
+                        <div class="text-xs text-slate-400 font-mono mt-0.5">Uploaded: {{ doc.upload_date }}</div>
                       </td>
-                      <td class="py-3 px-3 font-mono text-slate-600 text-center">{{ doc.file_size }}</td>
-                      <td class="py-3 px-3 text-center">
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                      <td class="py-3 px-3 font-mono text-slate-600 text-center border-r border-slate-200">{{ doc.file_size }}</td>
+                      <td class="py-3 px-3 text-center border-r border-slate-200">
+                        <span class="font-bold text-emerald-700 text-xs">
                           ✓ Verified
                         </span>
                       </td>
@@ -746,7 +742,7 @@ export interface OfficialDocItem {
                         <div class="flex items-center justify-end gap-1.5">
                           <button 
                             (click)="downloadDoc(doc.file_name)"
-                            class="p-1.5 rounded hover:bg-slate-200 text-slate-600 hover:text-[#002244] transition-colors cursor-pointer"
+                            class="p-1.5 hover:bg-slate-200 text-slate-600 hover:text-[#002244] transition-colors cursor-pointer rounded-xs"
                             title="Download PDF">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -755,7 +751,7 @@ export interface OfficialDocItem {
                           <button 
                             *ngIf="editingSection === 4"
                             (click)="replaceDocument(doc)"
-                            class="px-2 py-1 bg-[#002244] text-white font-bold text-[10px] rounded hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
+                            class="px-2.5 py-1 bg-[#002244] text-white font-bold text-xs rounded-xs hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
                             Replace
                           </button>
                         </div>
@@ -769,7 +765,7 @@ export interface OfficialDocItem {
                 <span class="text-xs text-slate-500 font-medium">Click "Replace" on any document row to update with a new PDF (Max 5MB).</span>
                 <button 
                   (click)="editingSection = null"
-                  class="px-4 py-1.5 bg-[#002244] text-white text-xs font-bold rounded hover:bg-[#003366] transition-colors cursor-pointer">
+                  class="px-4 py-1.5 bg-[#002244] text-white text-xs sm:text-[13px] font-bold rounded-xs hover:bg-[#003366] transition-colors cursor-pointer">
                   Done Managing
                 </button>
               </div>

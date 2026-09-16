@@ -27,30 +27,6 @@ import { Observable } from 'rxjs';
       <!-- TOP POST-LOGIN HEADER: Dual Logos, User Profile Name, Language/Font Tools (No News Bar) -->
       <app-header></app-header>
 
-      <!-- PENDING PROFILE (OTR) NOTIFICATION BANNER -->
-      <div 
-        *ngIf="(userProfile$ | async) as profile" 
-        class="w-full bg-[#fffbeb] border-b border-amber-200 text-amber-900 px-4 sm:px-6 lg:px-8 py-2.5 shadow-2xs font-['Poppins',sans-serif]">
-        <div 
-          *ngIf="profile.role === 'applicant' && (profile.userState === 'new' || !profile.isRegistered)" 
-          class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs">
-          <div class="flex items-center gap-2.5">
-            <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white font-extrabold text-xs shadow-xs">!</span>
-            <span class="text-amber-950 font-medium">
-              <strong class="font-bold text-amber-900">One-Time Registration (OTR) Pending:</strong>
-              Complete your Organization Master Profile to unlock scheme applications, EMD fee payments, and proposal submissions.
-            </span>
-          </div>
-          <button 
-            type="button"
-            (click)="goToRegistration()" 
-            class="shrink-0 px-3.5 py-1.5 bg-[#002244] hover:bg-[#003366] text-white font-bold text-[11px] rounded-sm shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
-            <span>Complete Profile Now</span>
-            <span>→</span>
-          </button>
-        </div>
-      </div>
-
       <div class="flex flex-grow w-full">
         <!-- PERSISTENT PORTAL SIDEBAR -->
         <app-sidebar class="hidden md:block flex-shrink-0"></app-sidebar>

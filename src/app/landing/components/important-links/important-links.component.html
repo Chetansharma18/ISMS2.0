@@ -1,12 +1,12 @@
 <section id="important-links"
-  class="relative w-full bg-[#001f3f] border-t-2 border-amber-500/30 border-b border-[#001730] py-4 sm:py-6 lg:py-5 select-none overflow-hidden"
+  class="relative w-full bg-[#001f3f] border-t-2 border-amber-500/30 border-b border-[#001730] py-6 sm:py-8 lg:py-7 select-none overflow-hidden"
   (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
   <!-- Background Glow & Subtle Motif -->
-  <div class="absolute inset-0 bg-radial from-blue-900/15 via-transparent to-transparent pointer-events-none"></div>
+  <div class="absolute inset-0 bg-radial from-blue-900/20 via-transparent to-transparent pointer-events-none"></div>
 
   <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
     <!-- Header with decorative horizontal lines -->
-    <div class="flex items-center justify-center gap-3 sm:gap-6 mb-5 sm:mb-6">
+    <div class="flex items-center justify-center gap-3 sm:gap-6 mb-6 sm:mb-7">
       <div
         class="h-[1.5px] flex-1 max-w-[80px] sm:max-w-[160px] md:max-w-[220px] bg-gradient-to-r from-transparent via-amber-400/60 to-amber-400">
       </div>
@@ -19,218 +19,28 @@
     </div>
 
     <!-- Carousel Container with Side Navigation Arrows -->
-    <div class="relative flex items-center justify-center max-w-[1400px] w-full mx-auto px-7 sm:px-12">
+    <div class="relative flex items-center justify-center max-w-[1400px] w-full mx-auto px-8 sm:px-12">
       <!-- Prev Arrow Button -->
       <button type="button" (click)="prev()" [attr.aria-label]="t().importantLinks.prevAria"
-        class="absolute left-0.5 sm:left-1 z-20 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-amber-400 text-white hover:text-slate-950 flex items-center justify-center backdrop-blur-md border border-white/30 hover:border-amber-400 shadow-lg transition-all duration-200 cursor-pointer active:scale-95">
+        class="absolute left-0 sm:left-1 z-20 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-amber-400 text-white hover:text-slate-950 flex items-center justify-center backdrop-blur-md border border-white/30 hover:border-amber-400 shadow-lg transition-all duration-200 cursor-pointer active:scale-95">
         <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
       <!-- Slider Viewport (Exact clipping) -->
-      <div class="w-full overflow-hidden">
+      <div class="w-full overflow-hidden py-2">
         <div class="flex transition-transform duration-500 ease-in-out"
-          [style.transform]="'translateX(-' + (currentPage() * 100) + '%)'">
-          <!-- Loop through pages -->
-          @for (pageIdx of pagesArray(); track pageIdx) {
-          <div class="w-full shrink-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-4">
-            @for (item of getPageLinks(pageIdx); track item.id) {
+          [style.transform]="'translateX(-' + (currentIndex() * (100 / itemsPerPage())) + '%)'">
+          @for (item of links; track item.id) {
+          <div class="shrink-0 px-1.5 sm:px-2.5 md:px-3" [style.width]="(100 / itemsPerPage()) + '%'">
             <a [href]="item.url" target="_blank" rel="noopener noreferrer"
-              [title]="item.name + ' - ' + (item.tagline || '')"
-              class="bg-white rounded-xl sm:rounded-2xl shadow-sm hover:shadow-xl border border-slate-200 hover:border-amber-400 p-2 sm:p-2.5 flex items-center justify-center h-[100px] sm:h-[110px] transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] cursor-pointer group text-slate-800">
-              @switch (item.type) {
-                @case ('acb') {
-                <div class="w-full h-full flex flex-col items-center justify-between py-0.5 text-center">
-                  <div
-                    class="w-full bg-[#15803d] text-white text-[9px] sm:text-[10px] font-bold py-0.5 px-1 rounded-sm leading-tight shadow-xs">
-                    {{ t().importantLinks.acbCallBanner }}
-                  </div>
-                  <div class="flex flex-col items-center justify-center my-0.5">
-                    <div class="text-[9px] font-extrabold text-red-600 uppercase tracking-tight leading-none mb-0.5">
-                      {{ t().importantLinks.acbTollFreeLabel }}
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                      <span
-                        class="inline-flex items-center gap-0.5 bg-red-600 text-white font-black text-[11px] px-1.5 py-0.5 rounded shadow-xs leading-none">
-                        <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
-                          <path
-                            d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
-                        </svg>
-                        1064
-                      </span>
-                      <span class="inline-flex items-center gap-0.5 text-[#002244] font-bold text-[10px] leading-none">
-                        <svg class="w-2.5 h-2.5 text-[#25D366] fill-current" viewBox="0 0 24 24">
-                          <path
-                            d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 012.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 01-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.98-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.4-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.37-.44.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.7 4.29 3.79.6.26 1.07.42 1.44.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.29z" />
-                        </svg>
-                        9413502834
-                      </span>
-                    </div>
-                  </div>
-                  <div
-                    class="w-full bg-[#00386b] text-white text-[9px] sm:text-[10px] font-bold py-0.5 px-1 rounded-sm uppercase tracking-tight leading-tight">
-                    {{ t().importantLinks.acbTitle }}
-                  </div>
-                </div>
-                }
-
-                @case ('pledge') {
-                <div class="w-full h-full flex flex-col items-center justify-between py-0.5 px-1">
-                  <div
-                    class="w-full bg-gradient-to-r from-[#2b6cb0] to-[#3182ce] text-white text-[11px] sm:text-xs font-black py-0.5 px-2 rounded-t text-center leading-tight shadow-xs">
-                    {{ t().importantLinks.saveLivesToday }}
-                  </div>
-                  <div
-                    class="w-full bg-[#c05621] text-white text-[9px] sm:text-[10px] font-semibold py-0.5 px-1 text-center leading-tight">
-                    {{ t().importantLinks.oneDonor8Lives }}
-                  </div>
-                  <div class="w-full py-0.5 px-1 flex justify-center">
-                    <div
-                      class="border border-[#2b6cb0] text-[#1a365d] bg-white font-extrabold text-[10px] sm:text-[11px] px-3 py-0.5 rounded shadow-xs group-hover:bg-[#2b6cb0] group-hover:text-white transition-colors">
-                      {{ t().importantLinks.registerPledge }}
-                    </div>
-                  </div>
-                </div>
-                }
-
-                @case ('jansoochna') {
-                <div class="w-full h-full flex flex-col items-center justify-center p-1 text-center">
-                  <div class="relative w-8 h-8 sm:w-9 sm:h-9 mb-1">
-                    <svg viewBox="0 0 100 100" class="w-full h-full">
-                      <circle cx="50" cy="50" r="10" fill="#f59e0b" />
-                      <circle cx="50" cy="22" r="7" fill="#f59e0b" />
-                      <circle cx="77" cy="41" r="7" fill="#ec4899" />
-                      <circle cx="67" cy="74" r="7" fill="#ef4444" />
-                      <circle cx="33" cy="74" r="7" fill="#b91c1c" />
-                      <circle cx="23" cy="41" r="7" fill="#0284c7" />
-                      <circle cx="50" cy="50" r="28" fill="none" stroke="#0284c7" stroke-width="4.5"
-                        stroke-dasharray="16 5" />
-                    </svg>
-                    <span class="absolute -top-0.5 -right-1 text-[7px] font-bold text-slate-400">TM</span>
-                  </div>
-                  <div class="text-[11px] sm:text-xs font-bold text-slate-900 tracking-tight leading-tight">
-                    {{ t().importantLinks.janSoochnaTitle }}
-                  </div>
-                  <div class="text-[8px] text-slate-500 font-medium">
-                    {{ t().importantLinks.janSoochnaGovt }}
-                  </div>
-                </div>
-                }
-
-                @case ('bis') {
-                <div class="w-full h-full flex items-center justify-center gap-2 p-1.5">
-                  <div class="shrink-0 w-9 h-9 sm:w-10 sm:h-10 text-[#004b87] flex items-center justify-center">
-                    <svg viewBox="0 0 100 100" class="w-full h-full fill-current">
-                      <path d="M50 12 L90 80 L10 80 Z" fill="none" stroke="#004b87" stroke-width="11"
-                        stroke-linejoin="round" />
-                      <circle cx="50" cy="54" r="13" fill="#004b87" />
-                      <rect x="18" y="85" width="64" height="6" rx="2" fill="#004b87" />
-                    </svg>
-                  </div>
-                  <div class="text-left leading-tight">
-                    <div class="text-[10px] sm:text-[11px] font-extrabold text-slate-900 tracking-tight">
-                      {{ t().importantLinks.bisTitle }}
-                    </div>
-                    <div class="text-[8px] sm:text-[9px] text-slate-600 font-medium">
-                      {{ t().importantLinks.bisSubtitle }}
-                    </div>
-                  </div>
-                </div>
-                }
-
-                @case ('skillindia') {
-                <div class="w-full h-full flex items-center justify-center gap-2.5 p-1.5">
-                  <div class="shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center">
-                    <svg viewBox="0 0 100 100" class="w-full h-full">
-                      <circle cx="50" cy="50" r="32" fill="none" stroke="#ea580c" stroke-width="7"
-                        stroke-dasharray="10 4" />
-                      <circle cx="50" cy="50" r="14" fill="none" stroke="#002244" stroke-width="4" />
-                      <path d="M50 38 C35 24 35 14 50 10 C65 14 65 24 50 38 Z" fill="#16a34a" />
-                      <path d="M35 50 C20 40 12 45 10 55 C18 62 28 58 35 50 Z" fill="#ea580c" />
-                      <path d="M65 50 C80 40 88 45 90 55 C82 62 72 58 65 50 Z" fill="#16a34a" />
-                    </svg>
-                  </div>
-                  <div class="text-left leading-tight">
-                    <div class="text-[12px] sm:text-xs font-black text-slate-900">
-                      {{ t().importantLinks.skillIndiaTitle }}
-                    </div>
-                    <div class="text-[9px] sm:text-[10px] font-semibold text-amber-600">
-                      {{ t().importantLinks.skillIndiaTagline }}
-                    </div>
-                    <div class="text-[8px] text-slate-500">
-                      {{ t().importantLinks.skillIndiaGovt }}
-                    </div>
-                  </div>
-                </div>
-                }
-
-                @case ('digitalindia') {
-                <div class="w-full h-full flex items-center justify-center gap-2.5 p-1.5">
-                  <div class="shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center">
-                    <svg viewBox="0 0 100 100" class="w-full h-full">
-                      <path d="M50 15 C70 15 85 30 85 50 C85 58 80 68 72 74 C65 65 68 45 52 35 C42 29 45 18 50 15 Z"
-                        fill="#f97316" />
-                      <path d="M50 85 C30 85 15 70 15 50 C15 42 20 32 28 26 C35 35 32 55 48 65 C58 71 55 82 50 85 Z"
-                        fill="#16a34a" />
-                      <circle cx="50" cy="50" r="10" fill="#002244" />
-                      <circle cx="72" cy="74" r="4" fill="#0284c7" />
-                      <circle cx="28" cy="26" r="4" fill="#0284c7" />
-                    </svg>
-                  </div>
-                  <div class="text-left leading-tight">
-                    <div class="text-[12px] sm:text-xs font-black text-[#002244]">
-                      {{ t().importantLinks.digitalIndiaTitle }}
-                    </div>
-                    <div class="text-[9px] sm:text-[10px] font-bold text-orange-600 tracking-tight">
-                      {{ t().importantLinks.digitalIndiaTagline }}
-                    </div>
-                  </div>
-                </div>
-                }
-
-                @case ('rajsso') {
-                <div class="w-full h-full flex items-center justify-center gap-2 p-1.5">
-                  <div class="shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-[#002244]">
-                    <svg viewBox="0 0 24 24" class="w-full h-full" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#f0f6fc" stroke="#002244" />
-                      <circle cx="12" cy="10" r="3" fill="#f59e0b" stroke="#002244" />
-                      <path d="M12 13v4M10 15h4" stroke="#002244" stroke-linecap="round" />
-                    </svg>
-                  </div>
-                  <div class="text-left leading-tight">
-                    <div class="text-[11px] sm:text-[12px] font-black text-slate-900">
-                      {{ t().importantLinks.ssoTitle }}
-                    </div>
-                    <div class="text-[8px] sm:text-[9px] text-slate-600 font-medium">
-                      {{ t().importantLinks.ssoSubtitle }}
-                    </div>
-                  </div>
-                </div>
-                }
-
-                @case ('sampark') {
-                <div class="w-full h-full flex items-center justify-center gap-2 p-1.5">
-                  <div
-                    class="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-red-50 flex items-center justify-center text-red-600 font-black text-xs border border-red-200">
-                    <div class="flex flex-col items-center leading-none">
-                      <span class="text-[7px] text-slate-500 font-semibold uppercase">{{ t().importantLinks.samparkHelpLabel }}</span>
-                      <span class="text-[12px] font-black text-red-600">181</span>
-                    </div>
-                  </div>
-                  <div class="text-left leading-tight">
-                    <div class="text-[11px] sm:text-[12px] font-bold text-[#002244]">
-                      {{ t().importantLinks.samparkTitle }}
-                    </div>
-                    <div class="text-[8px] sm:text-[9px] text-slate-600 font-medium">
-                      {{ t().importantLinks.samparkSubtitle }}
-                    </div>
-                  </div>
-                </div>
-                }
-              }
+              [title]="item.name + (item.tagline ? ' - ' + item.tagline : '')"
+              class="bg-white rounded-xl sm:rounded-2xl shadow-md hover:shadow-xl border border-slate-100 hover:border-amber-400 p-2 sm:p-3 flex items-center justify-center h-28 sm:h-36 lg:h-44 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] cursor-pointer group">
+              <img [src]="item.logo" [alt]="item.name"
+                (error)="onImageError($event, item.logo.split('/').pop() || '')"
+                class="max-h-[88%] sm:max-h-[92%] w-auto max-w-[95%] object-contain select-none transition-transform duration-300 group-hover:scale-105 filter drop-shadow-sm" />
             </a>
-            }
           </div>
           }
         </div>
@@ -238,7 +48,7 @@
 
       <!-- Next Arrow Button -->
       <button type="button" (click)="next()" [attr.aria-label]="t().importantLinks.nextAria"
-        class="absolute right-0.5 sm:right-1 z-20 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-amber-400 text-white hover:text-slate-950 flex items-center justify-center backdrop-blur-md border border-white/30 hover:border-amber-400 shadow-lg transition-all duration-200 cursor-pointer active:scale-95">
+        class="absolute right-0 sm:right-1 z-20 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-amber-400 text-white hover:text-slate-950 flex items-center justify-center backdrop-blur-md border border-white/30 hover:border-amber-400 shadow-lg transition-all duration-200 cursor-pointer active:scale-95">
         <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
         </svg>
@@ -247,10 +57,10 @@
 
     <!-- Pagination Dots -->
     <div class="flex items-center justify-center gap-2 mt-4 sm:mt-5">
-      @for (pageIdx of pagesArray(); track pageIdx) {
-      <button type="button" (click)="goToPage(pageIdx)" [attr.aria-label]="'Go to slide page ' + (pageIdx + 1)"
+      @for (dotIdx of dotsArray(); track dotIdx) {
+      <button type="button" (click)="goToSlide(dotIdx)" [attr.aria-label]="'Go to slide ' + (dotIdx + 1)"
         class="transition-all duration-300 rounded-full cursor-pointer"
-        [ngClass]="currentPage() === pageIdx ? 'w-6 h-2 bg-amber-400 shadow-sm' : 'w-2 h-2 bg-white/40 hover:bg-white/80'"></button>
+        [ngClass]="currentIndex() === dotIdx ? 'w-6 h-2 bg-amber-400 shadow-sm' : 'w-2 h-2 bg-white/40 hover:bg-white/80'"></button>
       }
     </div>
   </div>

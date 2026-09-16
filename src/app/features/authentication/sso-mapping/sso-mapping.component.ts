@@ -19,7 +19,7 @@ import { EoiStateService } from '../../../core/services/eoi-state.service';
           <div class="flex items-center gap-1.5 sm:gap-3.5 lg:gap-4 min-w-0 cursor-pointer" routerLink="/">
             <!-- Official Ashoka Lion Capital (State Emblem of India) -->
             <div class="flex-shrink-0 flex items-center justify-center">
-              <img src="emblem.png" alt="State Emblem of India" class="h-9 sm:h-[52px] lg:h-[68px] w-auto object-contain select-none" />
+              <img src="emblem-new.png" alt="State Emblem of India" class="h-9 sm:h-[52px] lg:h-[68px] w-auto object-contain select-none" />
             </div>
 
             <!-- Official RSLDC Circular Emblem -->
@@ -145,7 +145,7 @@ export class SsoMappingComponent implements OnInit {
     private fb: FormBuilder,
     private eoiService: EoiStateService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const profile = this.eoiService.getProfile();

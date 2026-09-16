@@ -22,7 +22,7 @@ export type FontSize = 'sm' | 'md' | 'lg';
           <!-- Official Ashoka Lion Capital Emblem of India -->
           <div class="flex-shrink-0 flex items-center justify-center">
             <img 
-              src="emblem.png" 
+              src="emblem-new.png" 
               alt="Government of Rajasthan - State Emblem of India"
               class="h-9 sm:h-[52px] lg:h-[60px] w-auto object-contain select-none" 
             />

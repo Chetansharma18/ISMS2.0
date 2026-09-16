@@ -1,59 +1,59 @@
-<section id="mobile-app" class="relative w-full bg-[#edf5fc] overflow-hidden select-none border-t border-slate-200/80">
-  <!-- Top Tier: Mobile Application Information -->
-  <div class="pt-10 pb-8 sm:pt-12 sm:pb-10 lg:pt-12 lg:pb-10">
-    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+<section id="mobile-app" class="relative w-full bg-[#f0f6fc] py-6 sm:py-8 lg:py-10 select-none border-t border-slate-200/80">
+  <div class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Unified Full-Width Aligned Container Card -->
+    <div class="relative w-full bg-[#edf5fc] rounded-2xl sm:rounded-3xl border border-blue-200/70 shadow-sm overflow-hidden p-4 sm:p-6 lg:p-8">
+
+      <!-- Top Tier: Mobile Application Information & Badges -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-center">
         <!-- Left: Mobile Application Information -->
         <div class="lg:col-span-5 flex flex-col justify-center text-left">
-          <span class="text-xs font-bold uppercase tracking-wider text-blue-600/90 mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-blue-600/90 mb-1.5 sm:mb-2">
             {{ t().mobileApp.tag }}
           </span>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-[#002244] tracking-tight mb-3">
+          <h2 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#002244] tracking-tight mb-2 sm:mb-3">
             {{ t().mobileApp.heading }}
           </h2>
-          <p class="text-sm text-slate-600 leading-relaxed max-w-md">
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-md">
             {{ t().mobileApp.description }}
           </p>
         </div>
 
-        <!-- Center Phone Placeholder Spacer (Visible on Mobile/Tablet, hidden on lg) -->
-        <div class="flex lg:hidden justify-center my-3 sm:my-4">
+        <!-- Center Phone Placeholder (Visible on Mobile/Tablet < lg, hidden on lg) -->
+        <div class="flex lg:hidden justify-center my-2 sm:my-3">
           <img src="mobile-app-phone.png" alt="ISMS 2.0 Mobile App"
-            class="w-36 xs:w-44 sm:w-52 h-auto object-contain drop-shadow-2xl" />
+            class="w-32 xs:w-40 sm:w-48 h-auto object-contain drop-shadow-xl" />
         </div>
-        <div class="hidden lg:block lg:col-span-2">
-          <!-- Space reserved for the centrally anchored smartphone mockup -->
-        </div>
+
+        <!-- Center Spacer reserved on lg for the centrally anchored phone -->
+        <div class="hidden lg:block lg:col-span-2"></div>
 
         <!-- Right: 3 Square Feature Badges -->
         <div class="lg:col-span-5">
-          <div class="grid grid-cols-3 gap-1.5 xs:gap-2 sm:gap-3">
+          <div class="grid grid-cols-3 gap-2 sm:gap-3 items-stretch">
 
-            <!-- Badge 2: Multiple stakeholders -->
+            <!-- Badge 1: Multiple stakeholders -->
             <div
-              class="bg-white rounded-xl sm:rounded-2xl p-2 xs:p-2.5 sm:p-3 flex flex-col items-center justify-center text-center shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100/90 hover:shadow-md transition-shadow min-h-[105px] xs:min-h-[115px] sm:min-h-[124px]">
+              class="bg-white rounded-xl sm:rounded-2xl p-2 xs:p-2.5 sm:p-3 flex flex-col items-center justify-center text-center shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100/90 hover:shadow-md transition-shadow h-full min-h-[105px] xs:min-h-[115px] sm:min-h-[124px]">
               <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-blue-50/90 flex items-center justify-center mb-1.5 sm:mb-2.5 shrink-0">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[#00386b]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   stroke-width="2">
-                  <!-- Front person -->
                   <circle cx="12" cy="7" r="2.5" />
                   <path d="M7.5 17C7.5 14.5 9.5 12.5 12 12.5C14.5 12.5 16.5 14.5 16.5 17" stroke-linecap="round" />
-                  <!-- Left person -->
                   <circle cx="6" cy="9" r="2" />
                   <path d="M2.5 17C2.5 15 4 13.8 5.5 13.5" stroke-linecap="round" />
-                  <!-- Right person -->
                   <circle cx="18" cy="9" r="2" />
                   <path d="M21.5 17C21.5 15 20 13.8 18.5 13.5" stroke-linecap="round" />
                 </svg>
               </div>
-              <p class="text-[10px] xs:text-[11px] sm:text-xs font-semibold text-slate-700 leading-tight">
+              <p class="text-[9.5px] xs:text-[11px] sm:text-xs font-semibold text-slate-700 leading-tight">
                 {{ t().mobileApp.badge2 }}
               </p>
             </div>
 
-            <!-- Badge 3: In English & Hindi -->
+            <!-- Badge 2: In English & Hindi -->
             <div
-              class="bg-white rounded-xl sm:rounded-2xl p-2 xs:p-2.5 sm:p-3 flex flex-col items-center justify-center text-center shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100/90 hover:shadow-md transition-shadow min-h-[105px] xs:min-h-[115px] sm:min-h-[124px]">
+              class="bg-white rounded-xl sm:rounded-2xl p-2 xs:p-2.5 sm:p-3 flex flex-col items-center justify-center text-center shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100/90 hover:shadow-md transition-shadow h-full min-h-[105px] xs:min-h-[115px] sm:min-h-[124px]">
               <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-blue-50/90 flex items-center justify-center mb-1.5 sm:mb-2.5 shrink-0">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none">
                   <text x="2" y="16" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700"
@@ -63,14 +63,14 @@
                     font-weight="700" fill="#00386b">अ</text>
                 </svg>
               </div>
-              <p class="text-[10px] xs:text-[11px] sm:text-xs font-semibold text-slate-700 leading-tight">
+              <p class="text-[9.5px] xs:text-[11px] sm:text-xs font-semibold text-slate-700 leading-tight">
                 {{ t().mobileApp.badge3 }}
               </p>
             </div>
 
-            <!-- Badge 4: Secure and role-based access -->
+            <!-- Badge 3: Secure and role-based access -->
             <div
-              class="bg-white rounded-xl sm:rounded-2xl p-2 xs:p-2.5 sm:p-3 flex flex-col items-center justify-center text-center shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100/90 hover:shadow-md transition-shadow min-h-[105px] xs:min-h-[115px] sm:min-h-[124px]">
+              class="bg-white rounded-xl sm:rounded-2xl p-2 xs:p-2.5 sm:p-3 flex flex-col items-center justify-center text-center shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100/90 hover:shadow-md transition-shadow h-full min-h-[105px] xs:min-h-[115px] sm:min-h-[124px]">
               <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-blue-50/90 flex items-center justify-center mb-1.5 sm:mb-2.5 shrink-0">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[#00386b]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   stroke-width="2">
@@ -79,76 +79,76 @@
                   <path d="M9 12L11 14L15 9.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </div>
-              <p class="text-[10px] xs:text-[11px] sm:text-xs font-semibold text-slate-700 leading-tight">
+              <p class="text-[9.5px] xs:text-[11px] sm:text-xs font-semibold text-slate-700 leading-tight">
                 {{ t().mobileApp.badge4 }}
               </p>
             </div>
+
           </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Divider between Tiers -->
-  <div class="border-t border-blue-200/50 max-w-[1400px] mx-auto"></div>
+      <!-- Divider between Tiers inside Card -->
+      <div class="border-t border-blue-200/70 w-full my-5 sm:my-6 lg:my-8"></div>
 
-  <!-- Bottom Tier: Need Assistance? & Helpdesk Support (Same unified background) -->
-  <div class="pt-8 pb-10 sm:pt-10 sm:pb-12">
-    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+      <!-- Bottom Tier: Need Assistance? & Helpdesk Support -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-center">
         <!-- Left: Need Assistance? -->
         <div class="lg:col-span-5 flex flex-col justify-center text-left">
-          <span class="text-xs font-bold uppercase tracking-wider text-[#ea580c] mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-[#ea580c] mb-1.5 sm:mb-2">
             {{ t().mobileApp.helpTag }}
           </span>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-[#002244] tracking-tight mb-2">
+          <h2 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[#002244] tracking-tight mb-2">
             {{ t().mobileApp.helpHeading }}
           </h2>
-          <p class="text-sm text-slate-600 leading-relaxed max-w-md">
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-md">
             {{ t().mobileApp.helpDescription }}
           </p>
         </div>
 
-        <!-- Center Spacer for Desktop Phone Anchoring -->
-        <div class="hidden lg:block lg:col-span-2">
-          <!-- Space reserved for center phone -->
-        </div>
+        <!-- Center Spacer reserved on lg for the centrally anchored phone -->
+        <div class="hidden lg:block lg:col-span-2"></div>
 
         <!-- Right: Helpdesk Support Card -->
-        <div class="lg:col-span-5 flex items-center gap-4 bg-white/90 p-4 sm:p-5 rounded-2xl shadow-xs border border-blue-200/60">
-          <div class="shrink-0">
-            <svg class="w-12 h-12 text-[#002244]" viewBox="0 0 32 32" fill="none">
-              <!-- Headband -->
-              <path d="M7 16V13C7 8.02944 11.0294 4 16 4C20.9706 4 25 8.02944 25 13V16" stroke="currentColor"
-                stroke-width="2.6" stroke-linecap="round" />
-              <!-- Left earpad -->
-              <rect x="4.5" y="12" width="4.5" height="8" rx="2.25" fill="currentColor" />
-              <!-- Right earpad -->
-              <rect x="23" y="12" width="4.5" height="8" rx="2.25" fill="currentColor" />
-              <!-- Mic arm -->
-              <path d="M25 18V21C25 23.2091 23.2091 25 21 25H18" stroke="currentColor" stroke-width="2.6"
-                stroke-linecap="round" />
-              <!-- Mic tip -->
-              <ellipse cx="16.5" cy="25" rx="2.6" ry="1.9" fill="currentColor" />
-            </svg>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-[#002244] leading-tight">
-              {{ t().mobileApp.helpdeskTitle }}
-            </h3>
-            <p class="text-sm text-slate-500 mt-1">
-              {{ t().mobileApp.helpdeskDesc }}
-            </p>
+        <div class="lg:col-span-5">
+          <div class="bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl shadow-xs border border-blue-200/70 flex items-center gap-3.5 sm:gap-4">
+            <div class="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-blue-50/90 flex items-center justify-center text-[#002244]">
+              <svg class="w-6 h-6 sm:w-7 sm:h-7 text-[#002244]" viewBox="0 0 32 32" fill="none">
+                <!-- Headband -->
+                <path d="M7 16V13C7 8.02944 11.0294 4 16 4C20.9706 4 25 8.02944 25 13V16" stroke="currentColor"
+                  stroke-width="2.6" stroke-linecap="round" />
+                <!-- Left earpad -->
+                <rect x="4.5" y="12" width="4.5" height="8" rx="2.25" fill="currentColor" />
+                <!-- Right earpad -->
+                <rect x="23" y="12" width="4.5" height="8" rx="2.25" fill="currentColor" />
+                <!-- Mic arm -->
+                <path d="M25 18V21C25 23.2091 23.2091 25 21 25H18" stroke="currentColor" stroke-width="2.6"
+                  stroke-linecap="round" />
+                <!-- Mic tip -->
+                <ellipse cx="16.5" cy="25" rx="2.6" ry="1.9" fill="currentColor" />
+              </svg>
+            </div>
+            <div class="min-w-0 flex-1">
+              <h3 class="text-sm sm:text-base font-bold text-[#002244] leading-tight">
+                {{ t().mobileApp.helpdeskTitle }}
+              </h3>
+              <p class="text-xs sm:text-[13px] text-slate-500 mt-1 leading-relaxed">
+                {{ t().mobileApp.helpdeskDesc }}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Desktop Vertically Centered Smartphone Mockup bridging both tiers -->
-  <div
-    class="hidden lg:flex absolute inset-y-0 left-1/2 -translate-x-1/2 items-center justify-center pointer-events-none z-10">
-    <img src="mobile-app-phone.png" alt="ISMS 2.0 Mobile App"
-      class="w-44 xl:w-48 h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,34,68,0.22)] -mt-1" />
+      </div>
+
+      <!-- Desktop Vertically Centered Smartphone Mockup bridging both tiers -->
+      <div
+        class="hidden lg:flex absolute inset-y-0 left-1/2 -translate-x-1/2 items-center justify-center pointer-events-none z-10">
+        <img src="mobile-app-phone.png" alt="ISMS 2.0 Mobile App"
+          class="w-44 xl:w-48 h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,34,68,0.22)] -mt-1" />
+      </div>
+
+    </div>
+
   </div>
 </section>

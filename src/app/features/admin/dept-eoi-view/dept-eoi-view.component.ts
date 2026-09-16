@@ -139,7 +139,7 @@ export class DeptEoiViewComponent implements OnInit {
   schemes$!: Observable<Scheme[]>;
   userProfile$!: Observable<UserProfile>;
 
-  constructor(private eoiService: EoiStateService) {}
+  constructor(private eoiService: EoiStateService) { }
 
   ngOnInit(): void {
     this.schemes$ = this.eoiService.schemes$;

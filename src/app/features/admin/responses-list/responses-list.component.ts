@@ -134,7 +134,7 @@ export class ResponsesListComponent implements OnInit {
   constructor(
     private eoiService: EoiStateService,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.eoiService.applicantResponses$.subscribe(data => {

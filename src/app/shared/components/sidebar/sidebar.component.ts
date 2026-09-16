@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive, NgIf, AsyncPipe],
   template: `
-    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col h-full font-sans text-xs flex-shrink-0 select-none shadow-2xs">
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col h-full text-xs flex-shrink-0 select-none shadow-2xs">
       
       <!-- Top Section: Company / Organization Name (Directly displayed without uppercase category tag) -->
       <ng-container *ngIf="userProfile$ | async as profile">
@@ -160,12 +160,6 @@ import { Observable } from 'rxjs';
             routerLink="/admin/eoi-view" 
             routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
             class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
-            <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-              </svg>
-            </div>
             <span class="tracking-tight">EOI Requests Desk</span>
           </a>
 

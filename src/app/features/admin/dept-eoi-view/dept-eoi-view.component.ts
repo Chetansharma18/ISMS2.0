@@ -14,33 +14,19 @@ import { Observable } from 'rxjs';
     <div class="min-h-screen flex flex-col bg-[#F4F7F9] font-sans text-slate-800 antialiased">
       <app-header></app-header>
 
-      <div class="flex flex-grow">
+      <div class="flex flex-grow font-['Poppins']">
         <!-- Persistent Portal Sidebar -->
         <app-sidebar class="hidden md:block"></app-sidebar>
 
         <!-- Main Department Content Area -->
-        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto">
+        <main class="flex-grow px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto">
           
           <!-- Top Breadcrumb & Department Header -->
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 mb-6" *ngIf="userProfile$ | async as profile">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 mb-6">
             <div>
-              <div class="text-[11px] font-mono text-cyan-800 uppercase tracking-wider font-semibold">
-                Department Scrutiny Cell · {{ profile.department || 'RSLDC' }}
-              </div>
               <h1 class="text-2xl font-bold text-[#131A4D] tracking-tight">
                 EOI View (Department Tenders)
               </h1>
-              <p class="text-xs text-slate-500 mt-0.5">
-                Active schemes and tenders published by your department with incoming Expression of Interest (EOI) applicant response counts.
-              </p>
-            </div>
-
-            <!-- Department Quick Stats Badge -->
-            <div class="flex items-center gap-3 bg-white border border-slate-200 px-4 py-2 shadow-2xs">
-              <div class="text-right">
-                <div class="text-[10px] text-slate-400 uppercase font-mono">Total Responses</div>
-                <div class="text-lg font-bold text-[#131A4D] font-mono">47 Submissions</div>
-              </div>
             </div>
           </div>
 
@@ -50,15 +36,12 @@ import { Observable } from 'rxjs';
             <!-- Window Title Bar (#131A4D) -->
             <div class="bg-[#131A4D] text-white px-5 py-3 flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <span class="text-base">📋</span>
                 <h2 class="text-sm font-bold tracking-wide">
                   Published Tenders & Live Submissions
                 </h2>
               </div>
 
-              <div class="text-xs text-blue-200 font-mono">
-                Showing {{ (schemes$ | async)?.length || 0 }} Tenders
-              </div>
+
             </div>
 
             <!-- Dense Working Table -->
@@ -80,7 +63,7 @@ import { Observable } from 'rxjs';
                   <tr *ngFor="let scheme of schemes$ | async; let i = index" class="hover:bg-blue-50/40 transition-colors">
                     
                     <!-- Index -->
-                    <td class="p-3 font-mono font-bold text-slate-500 border-r border-slate-200">
+                    <td class="p-3 font-bold text-slate-500 border-r border-slate-200">
                       {{ i + 1 }}
                     </td>
 
@@ -89,7 +72,7 @@ import { Observable } from 'rxjs';
                       <div class="font-bold text-slate-900 text-xs">
                         {{ scheme.name }}
                       </div>
-                      <div class="text-[10px] text-slate-500 font-mono mt-0.5">
+                      <div class="text-[10px] text-slate-500 mt-0.5">
                         Ref: {{ scheme.eoiReferenceNo }}
                       </div>
                     </td>
@@ -100,29 +83,30 @@ import { Observable } from 'rxjs';
                     </td>
 
                     <!-- Published Date -->
-                    <td class="p-3 border-r border-slate-200 font-mono text-slate-600">
+                    <td class="p-3 border-r border-slate-200 text-slate-600">
                       {{ scheme.publishDate }}
                     </td>
 
                     <!-- Submission Deadline -->
-                    <td class="p-3 border-r border-slate-200 font-mono text-red-700 font-bold">
+                    <td class="p-3 border-r border-slate-200 font-bold"
+                        [ngClass]="scheme.status === 'Closed' ? 'text-slate-400' : 'text-red-700'">
                       {{ scheme.submissionLastDate }}
                     </td>
 
                     <!-- Status Badge -->
                     <td class="p-3 border-r border-slate-200 text-center">
-                      <span class="px-2 py-0.5 border text-[10px] font-bold rounded-xs"
-                            [ngClass]="scheme.status === 'Open' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200'">
+                      <span class="text-[11px] font-bold tracking-wide"
+                            [ngClass]="scheme.status === 'Open' ? 'text-emerald-700' : 'text-blue-700'">
                         {{ scheme.status }}
                       </span>
                     </td>
 
                     <!-- No. of Responses (Plain Text) -->
                     <td class="p-3 border-r border-slate-200 text-center">
-                      <span class="font-mono font-bold text-[#131A4D] text-sm">
+                      <span class="font-bold text-[#131A4D] text-sm">
                         {{ scheme.responseCount || 14 }}
                       </span>
-                      <span class="text-[10px] font-sans font-semibold text-slate-600 ml-1">EOIs</span>
+                      <span class="text-[10px] font-semibold text-slate-600 ml-1">EOIs</span>
                     </td>
 
                     <!-- Action -->
@@ -143,11 +127,7 @@ import { Observable } from 'rxjs';
               </table>
             </div>
 
-            <!-- Bottom Information Footer -->
-            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 text-xs text-slate-500 flex justify-between items-center">
-              <span>Rajasthan Government e-Tendering & Scrutiny Portal</span>
-              <span class="font-mono">RSLDC Scrutiny Node 2026-v2</span>
-            </div>
+
 
           </div>
 

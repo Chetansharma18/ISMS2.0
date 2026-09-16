@@ -19,7 +19,7 @@ import { Observable } from 'rxjs';
         <app-sidebar class="hidden md:block"></app-sidebar>
 
         <!-- Main Content Area -->
-        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto">
+        <main class="flex-grow px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto">
           
           <!-- Top Title & Navigation Bar -->
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 mb-6">
@@ -32,9 +32,7 @@ import { Observable } from 'rxjs';
               <h1 class="text-2xl font-bold text-[#131A4D] tracking-tight">
                 Applicant Scrutiny Submissions
               </h1>
-              <p class="text-xs text-slate-500 mt-0.5">
-                Working evaluation desk for submitted tenders, technical partner eligibility & EMD verification.
-              </p>
+
             </div>
 
             <!-- Total Submissions Count Badge -->
@@ -51,39 +49,13 @@ import { Observable } from 'rxjs';
             <!-- Window Title Bar (#131A4D) -->
             <div class="bg-[#131A4D] text-white px-5 py-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
               <div class="flex items-center gap-2">
-                <span class="text-base">📑</span>
+
                 <h2 class="text-sm font-bold tracking-wide">
                   Incoming Expressions of Interest (EOI Working Desk)
                 </h2>
               </div>
 
-              <!-- Quick Status Filter Pills -->
-              <div class="flex items-center gap-1.5 text-xs">
-                <button 
-                  (click)="activeFilter = 'ALL'"
-                  [class.bg-white]="activeFilter === 'ALL'"
-                  [class.text-[#131A4D]]="activeFilter === 'ALL'"
-                  [class.font-bold]="activeFilter === 'ALL'"
-                  class="px-2.5 py-1 text-blue-100 hover:bg-white/10 rounded-xs transition-colors">
-                  All ({{ responses.length }})
-                </button>
-                <button 
-                  (click)="activeFilter = 'UNDER_SCRUTINY'"
-                  [class.bg-white]="activeFilter === 'UNDER_SCRUTINY'"
-                  [class.text-[#131A4D]]="activeFilter === 'UNDER_SCRUTINY'"
-                  [class.font-bold]="activeFilter === 'UNDER_SCRUTINY'"
-                  class="px-2.5 py-1 text-blue-100 hover:bg-white/10 rounded-xs transition-colors">
-                  Pending Review (1)
-                </button>
-                <button 
-                  (click)="activeFilter = 'APPROVED'"
-                  [class.bg-white]="activeFilter === 'APPROVED'"
-                  [class.text-[#131A4D]]="activeFilter === 'APPROVED'"
-                  [class.font-bold]="activeFilter === 'APPROVED'"
-                  class="px-2.5 py-1 text-blue-100 hover:bg-white/10 rounded-xs transition-colors">
-                  Approved (2)
-                </button>
-              </div>
+
             </div>
 
             <!-- Dense Working Table -->
@@ -114,10 +86,8 @@ import { Observable } from 'rxjs';
                       <div class="font-bold text-slate-900 text-xs">
                         {{ item.organizationName }}
                       </div>
-                      <div class="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5">
-                        <span>Signatory: <strong>{{ item.applicantName }}</strong></span>
-                        <span>•</span>
-                        <span class="font-mono text-[10px]">{{ item.registrationNumber }}</span>
+                      <div class="text-[10px] text-slate-500 mt-0.5">
+                        {{ item.registrationNumber }}
                       </div>
                     </td>
 
@@ -191,11 +161,7 @@ import { Observable } from 'rxjs';
               </table>
             </div>
 
-            <!-- Bottom Information Footer -->
-            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 text-xs text-slate-500 flex justify-between items-center">
-              <span>RSLDC Directorate of Technical Scrutiny & Evaluation</span>
-              <span class="font-mono">Secure Admin Desk</span>
-            </div>
+
 
           </div>
 

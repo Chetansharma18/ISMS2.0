@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, Input } from '@angular/core';
+import { Component, OnInit, signal, inject, Input, HostListener } from '@angular/core';
 import { RouterLink, RouterModule } from '@angular/router';
 import { CommonModule, NgIf, AsyncPipe } from '@angular/common';
 import { EoiStateService, UserProfile } from '../../../core/services/eoi-state.service';
@@ -105,50 +105,42 @@ export type FontSize = 'sm' | 'md' | 'lg';
 
           <span class="hidden md:block text-slate-300">|</span>
 
-          <!-- Language Switcher: English | हिंदी -->
-          <div class="flex items-center space-x-1 sm:space-x-1.5 text-xs">
-            <button 
-              (click)="setLanguage('en')" 
-              [class.text-[#092244]]="currentLanguage() === 'en'"
-              [class.font-bold]="currentLanguage() === 'en'" 
-              class="hover:text-blue-700 transition cursor-pointer">
-              English
-            </button>
-            <span class="text-slate-300">|</span>
-            <button 
-              (click)="setLanguage('hi')" 
-              [class.text-[#092244]]="currentLanguage() === 'hi'"
-              [class.font-bold]="currentLanguage() === 'hi'" 
-              class="hover:text-blue-700 transition cursor-pointer">
-              हिंदी
-            </button>
-          </div>
 
-          <span class="text-slate-300">|</span>
 
           <!-- User's Personal Name & Profile (As input during profile creation) -->
-          <div *ngIf="userProfile$ | async as profile" class="flex items-center gap-2 sm:gap-2.5 pl-0.5 sm:pl-1 cursor-pointer" routerLink="/profile" title="View & Edit Profile">
-            
-            <!-- Avatar Circle with Initial (Before name) -->
-            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#002244] text-amber-300 border border-[#002244]/20 flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-              {{ (profile.personal.fullName || 'U').charAt(0).toUpperCase() }}
+          <div *ngIf="userProfile$ | async as profile" class="relative" id="profileDropdownContainer">
+            <div class="flex items-center gap-2 sm:gap-2.5 pl-0.5 sm:pl-1 cursor-pointer" (click)="toggleProfileMenu()" title="Profile Options">
+              
+              <!-- Avatar Circle with Initial (Before name) -->
+              <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#002244] text-amber-300 border border-[#002244]/20 flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+                {{ (profile.personal.fullName || 'U').charAt(0).toUpperCase() }}
+              </div>
+
+              <!-- User Name & Role Text Block -->
+              <div class="text-left hidden sm:block leading-none">
+                <div class="text-xs sm:text-[13px] font-extrabold text-[#002244] truncate max-w-[180px]" [title]="profile.personal.fullName">
+                  {{ profile.personal.fullName || 'Authorized Signatory' }}
+                </div>
+                <div class="mt-1 flex items-center justify-start gap-1 text-[10.5px]">
+                  <span *ngIf="profile.isRegistered" class="text-emerald-700 font-semibold truncate">
+                    ✓ {{ profile.personal.designation || 'Signatory Authority' }}
+                  </span>
+                  <span *ngIf="!profile.isRegistered" class="text-amber-700 font-bold">
+                    ⚠️ OTR Pending
+                  </span>
+                </div>
+              </div>
             </div>
 
-            <!-- User Name & Role Text Block -->
-            <div class="text-left hidden sm:block leading-none">
-              <div class="text-xs sm:text-[13px] font-extrabold text-[#002244] truncate max-w-[180px]" [title]="profile.personal.fullName">
-                {{ profile.personal.fullName || 'Authorized Signatory' }}
-              </div>
-              <div class="mt-1 flex items-center justify-start gap-1 text-[10.5px]">
-                <span *ngIf="profile.isRegistered" class="text-emerald-700 font-semibold truncate">
-                  ✓ {{ profile.personal.designation || 'Signatory Authority' }}
-                </span>
-                <span *ngIf="!profile.isRegistered" class="text-amber-700 font-bold">
-                  ⚠️ OTR Pending
-                </span>
-              </div>
+            <!-- Profile Dropdown Menu -->
+            <div *ngIf="profileMenuOpen()" class="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-200 rounded-md shadow-lg z-50 flex flex-col py-1 overflow-hidden">
+              <a routerLink="/profile" (click)="profileMenuOpen.set(false)" class="px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-100 hover:text-[#002244] font-semibold transition-colors text-left flex items-center gap-2 border-b border-slate-100">
+                Profile
+              </a>
+              <button (click)="logout()" class="px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 font-semibold transition-colors text-left flex items-center gap-2">
+                Logout
+              </button>
             </div>
-
           </div>
 
           <!-- Mobile Menu Toggle Button (Visible only on screens < md) -->
@@ -240,6 +232,25 @@ export class HeaderComponent implements OnInit {
   readonly t = this.languageService.t;
   readonly fontSize = signal<FontSize>('md');
   readonly mobileMenuOpen = signal<boolean>(false);
+  readonly profileMenuOpen = signal<boolean>(false);
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (target && !target.closest('#profileDropdownContainer')) {
+      this.profileMenuOpen.set(false);
+    }
+  }
+
+  toggleProfileMenu(): void {
+    this.profileMenuOpen.update(v => !v);
+  }
+
+  logout(): void {
+    this.profileMenuOpen.set(false);
+    console.log('Logging out...');
+    // Additional logout logic goes here
+  }
 
   toggleMobileMenu(): void {
     this.mobileMenuOpen.update(v => !v);

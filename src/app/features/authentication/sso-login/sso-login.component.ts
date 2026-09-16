@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NgIf, NgFor, NgClass } from '@angular/common';
 import { EoiStateService } from '../../../core/services/eoi-state.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-sso-login',
@@ -241,7 +242,7 @@ import { EoiStateService } from '../../../core/services/eoi-state.service';
                     (click)="fillAndSubmitPersona('applicant')"
                     class="p-2 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 border border-slate-200 text-slate-700 text-left transition-colors">
                     <div class="font-bold text-slate-900">2. applicant_rj</div>
-                    <div class="text-[9px] text-blue-700 mt-0.5">Existing TP (Full Nav)</div>
+                    <div class="text-[9px] text-blue-700 mt-0.5">Approved TP (SDC Flow)</div>
                   </button>
 
                   <button 
@@ -251,6 +252,7 @@ import { EoiStateService } from '../../../core/services/eoi-state.service';
                     <div class="font-bold text-cyan-900">3. dept_admin_rj</div>
                     <div class="text-[9px] text-cyan-700 mt-0.5">Dept. Scrutiny Admin</div>
                   </button>
+
 
                   <button 
                     type="button"
@@ -282,6 +284,7 @@ export class SsoLoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private eoiService: EoiStateService,
+    private authService: AuthService,
     private router: Router
   ) {}
 
@@ -373,7 +376,15 @@ export class SsoLoginComponent implements OnInit {
       const rawSsoId = (val.ssoId || 'applicant_rj').trim();
       const ssoLower = rawSsoId.toLowerCase();
 
-      // Branching by Role & User State
+      // New ISMS 2.0 Auth Flow (Bypass EOI legacy if using ISMS roles)
+      if (ssoLower === 'tppia' || ssoLower === 'applicant_rj') {
+        this.authService.login(ssoLower).subscribe(() => {
+          this.router.navigate(['/dashboard']);
+        });
+        return;
+      }
+
+      // Legacy Branching by Role & User State
       if (ssoLower.includes('super') || ssoLower.includes('root') || ssoLower.includes('sysadmin')) {
         // Super Admin -> Dashboard
         this.eoiService.resetToSuperAdmin(rawSsoId);
@@ -387,7 +398,7 @@ export class SsoLoginComponent implements OnInit {
         this.eoiService.resetToNewCitizen(rawSsoId);
         this.router.navigate(['/auth/sso-mapping']);
       } else {
-        // Existing Registered Training Partner / Applicant -> Full Schemes Dashboard
+        // Fallback for any other legacy roles
         this.eoiService.resetToRegisteredApplicant(rawSsoId);
         this.router.navigate(['/schemes']);
       }

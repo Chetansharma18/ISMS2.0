@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule, NgIf, AsyncPipe } from '@angular/common';
 import { EoiStateService, UserProfile } from '../../../core/services/eoi-state.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { Observable, filter } from 'rxjs';
 
 @Component({
@@ -266,14 +267,52 @@ import { Observable, filter } from 'rxjs';
           </a>
         </ng-container>
 
-      </nav>
+        <!-- ================= ISMS 2.0 WORKFLOW MENUS ================= -->
+        <ng-container *ngIf="authService.hasRole(['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'TP_PIA'])">
+          <div class="pt-2 mt-2 border-t border-slate-200">
+             <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+               Execution (ISMS 2.0)
+             </div>
+             
+             <!-- SDC Management -->
+             <a 
+               routerLink="/sdcs" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                   <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                 </svg>
+               </div>
+               <span class="tracking-tight">SDC Management</span>
+             </a>
 
+             <!-- Batch Management -->
+             <a 
+               routerLink="/batches" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                   <circle cx="9" cy="7" r="4"></circle>
+                   <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                   <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Batch Management</span>
+             </a>
+          </div>
+        </ng-container>
+      </nav>
     </aside>
   `
 })
 export class SidebarComponent implements OnInit {
   userProfile$!: Observable<UserProfile>;
   isProfileOpen = true;
+  authService = inject(AuthService);
 
   constructor(private eoiService: EoiStateService, private router: Router) {}
 

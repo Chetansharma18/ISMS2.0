@@ -119,7 +119,7 @@ export interface UploadedDocument {
 }
 
 export interface TpPiaRegistrationData {
-  // Tab 1
+  // Step 1: Organisation Details
   basicInfo: BasicOrgInfo;
   entityInfo: EntityInfo;
   registeredAddress: AddressInfo;
@@ -127,25 +127,23 @@ export interface TpPiaRegistrationData {
   sameAsRegistered: boolean;
   workflowInfo: WorkflowInfo;
 
-  // Tab 2
-  officers: OfficerInCharge[];
-
-  // Tab 3
+  // Step 2: Authorized Person (Organisation Level)
   authorizedOrg: AuthorizedPersonOrg;
 
-  // Tab 4
+  // Additional Authorized Person Entities (Preserved for full domain support)
+  officers: OfficerInCharge[];
   authorizedProject: AuthorizedPersonProject;
 
-  // Tab 5
+  // Step 3: Bank Details
   bankDetails: BankDetails;
 
-  // Tab 6
+  // Awards & Recognitions (Preserved for full domain support)
   awards: AwardItem[];
 
-  // Tab 7
+  // Step 4: Statutory Document Upload
   documents: UploadedDocument[];
   
-  // Metadata
+  // Metadata & Status
   lastSaved?: string;
   status: 'Draft' | 'Submitted';
 }

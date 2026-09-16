@@ -1,24 +1,54 @@
-import { Component, inject, signal, computed, ChangeDetectionStrategy, HostListener, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+  computed
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import {
+import { 
   TpPiaRegistrationService,
   INDIAN_STATES,
   RAJASTHAN_DISTRICTS,
   BUSINESS_ACTIVITIES,
-  ID_PROOF_TYPES,
   COMMON_BANKS,
   TRANSFER_MODES,
-  ACCOUNT_TYPES
+  ACCOUNT_TYPES,
+  ID_PROOF_TYPES
 } from '../../services/tp-pia-registration.service';
 import { FormValidationService } from '../../services/form-validation.service';
 import {
-  OfficerInCharge,
-  AwardItem,
-  UploadedDocument,
-  TpPiaRegistrationData
+  TpPiaRegistrationData,
+  UploadedDocument
 } from '../../models/tp-pia-registration.model';
+import { SearchableDropdownComponent } from '../searchable-dropdown/searchable-dropdown.component';
+import {
+  formatDateDisplay,
+  getIsoDate,
+  onlyLetters,
+  onlyNumbers,
+  onlyAlphanumeric,
+  onlyAlphanumericSymbols,
+  onlyLettersSymbols,
+  onlyDecimals,
+  sanitizeLetters,
+  sanitizeNumbers,
+  sanitizeAlphanumericUpper,
+  sanitizeAlphanumericSymbols,
+  sanitizeAlphanumericSymbolsUpper,
+  sanitizeLettersSymbolsUpper,
+  sanitizeDecimals,
+  getDateBounds
+} from '../../utils/form-input-restrictions';
+import {
+  FormFieldConfig,
+  FormSectionConfig,
+  STEP_1_SECTIONS,
+  STEP_2_SECTIONS,
+  STEP_3_SECTIONS
+} from '../../models/tp-pia-form-schema';
 
 export interface TabItem {
   id: number;
@@ -27,63 +57,154 @@ export interface TabItem {
   icon: string;
 }
 
+export const REGISTRATION_TABS: TabItem[] = [
+  { id: 1, label: 'Organisation Details', shortLabel: 'Organisation', icon: '🏢' },
+  { id: 2, label: 'Auth Person (Org)', shortLabel: 'Auth (Org)', icon: '✍️' },
+  { id: 3, label: 'Bank Details', shortLabel: 'Bank Details', icon: '🏦' },
+  { id: 4, label: 'Document Upload', shortLabel: 'Documents', icon: '📁' },
+  { id: 5, label: 'Review & Submit', shortLabel: 'Review', icon: '📋' },
+];
+
 @Component({
   selector: 'app-tp-pia-registration',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule
-  ],
+  imports: [CommonModule, FormsModule, SearchableDropdownComponent],
   templateUrl: './tp-pia-registration.component.html',
-  styleUrl: './tp-pia-registration.component.scss'
+  styles: [`
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .step-content-smooth { animation: fadeIn 0.2s ease-in-out; }
+    input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+  `]
 })
 export class TpPiaRegistrationComponent implements OnInit {
   readonly service = inject(TpPiaRegistrationService);
   readonly valService = inject(FormValidationService);
-  readonly Math = Math;
 
-  ngOnInit() {
-    if (!this.data.basicInfo.applicationNo) {
-      this.service.updateFormData(curr => ({
-        ...curr,
-        basicInfo: {
-          ...curr.basicInfo,
-          applicationNo: this.service.generateApplicationNo()
-        }
-      }));
-    }
-  }
-
-  // --- STEPPER & TAB STATE ---
+  // --- STEPPER STATE ---
   readonly activeTab = signal<number>(1);
   readonly showSuccessModal = signal<boolean>(false);
   readonly fontScale = signal<'standard' | 'large' | 'xlarge'>('standard');
   declarationAgreed: boolean = false;
 
-  // --- ACCORDION / DROPDOWN STATES ---
-  // Step 1 Sections: 1st is open by default, rest closed
-  readonly isOrgProfileOpen = signal<boolean>(true);
-  readonly isContactDetailsOpen = signal<boolean>(false);
-  readonly isAddressRecordsOpen = signal<boolean>(false);
+  readonly tabs: TabItem[] = REGISTRATION_TABS;
 
-  // Step 5 Review Sections: 1st block & 1st sub-accordion open by default, rest closed
+  // --- SCHEMA CONFIGS ---
+  readonly step1Sections = STEP_1_SECTIONS;
+  readonly step2Sections = STEP_2_SECTIONS;
+  readonly step3Sections = STEP_3_SECTIONS;
+
+  get currentStepSections(): FormSectionConfig[] {
+    switch (this.activeTab()) {
+      case 1: return this.step1Sections;
+      case 2: return this.step2Sections;
+      case 3: return this.step3Sections;
+      default: return [];
+    }
+  }
+
+  // --- STATIC OPTIONS ---
+  readonly states = INDIAN_STATES;
+  readonly districts = RAJASTHAN_DISTRICTS;
+  readonly businessActivities = BUSINESS_ACTIVITIES;
+  readonly commonBanks = COMMON_BANKS;
+  readonly transferModes = TRANSFER_MODES;
+  readonly accountTypes = ACCOUNT_TYPES;
+  readonly idTypes = ID_PROOF_TYPES.filter((t: string) => t !== 'Aadhaar Card' && t !== 'PAN Card');
+
+  // --- STABLE DATE BOUNDS ---
+  readonly dateBounds = getDateBounds();
+  readonly todayIso = this.dateBounds.todayIso;
+  readonly maxDobIso = this.dateBounds.maxDobIso;
+  readonly minDobIso = this.dateBounds.minDobIso;
+
+  // --- EXPOSE UTILS TO TEMPLATE ---
+  readonly formatDateDisplay = formatDateDisplay;
+  readonly getIsoDate = getIsoDate;
+  readonly onlyLetters = onlyLetters;
+  readonly onlyNumbers = onlyNumbers;
+  readonly onlyAlphanumeric = onlyAlphanumeric;
+  readonly onlyAlphanumericSymbols = onlyAlphanumericSymbols;
+  readonly onlyLettersSymbols = onlyLettersSymbols;
+  readonly onlyDecimals = onlyDecimals;
+  readonly sanitizeLetters = sanitizeLetters;
+  readonly sanitizeNumbers = sanitizeNumbers;
+  readonly sanitizeAlphanumericUpper = sanitizeAlphanumericUpper;
+  readonly sanitizeAlphanumericSymbols = sanitizeAlphanumericSymbols;
+  readonly sanitizeAlphanumericSymbolsUpper = sanitizeAlphanumericSymbolsUpper;
+  readonly sanitizeLettersSymbolsUpper = sanitizeLettersSymbolsUpper;
+  readonly sanitizeDecimals = sanitizeDecimals;
+
+  // --- STEP 3 BANK FILE STATE ---
+  readonly isBankDragging = signal<boolean>(false);
+  readonly bankFileError = signal<string>('');
+
+  // --- STEP 4 DOCUMENT STATE ---
+  readonly docErrorMessage = signal<string>('');
+  readonly previewingDoc = signal<UploadedDocument | null>(null);
+
+  // --- STEP 5 REVIEW ACCORDION STATES ---
   readonly isReviewStep1Open = signal<boolean>(true);
-  readonly isReviewOrgProfileOpen = signal<boolean>(true);
-  readonly isReviewContactOpen = signal<boolean>(false);
-  readonly isReviewAddressOpen = signal<boolean>(false);
   readonly isReviewAuthPersonOpen = signal<boolean>(false);
   readonly isReviewBankOpen = signal<boolean>(false);
   readonly isReviewDocsOpen = signal<boolean>(false);
 
-  readonly tabs: TabItem[] = [
-    { id: 1, label: 'Organisation Details', shortLabel: 'Organisation', icon: '🏢' },
-    { id: 2, label: 'Auth Person (Org)', shortLabel: 'Auth (Org)', icon: '✍️' },
-    { id: 3, label: 'Bank Details', shortLabel: 'Bank Details', icon: '🏦' },
-    { id: 4, label: 'Document Upload', shortLabel: 'Documents', icon: '📁' },
-    { id: 5, label: 'Review & Submit', shortLabel: 'Review', icon: '📋' },
-  ];
+  // --- DATA ACCESSOR ---
+  get data(): TpPiaRegistrationData {
+    return this.service.formData();
+  }
+
+  get documents(): UploadedDocument[] {
+    return this.data.documents;
+  }
+
+  get totalRequiredCount(): number {
+    return this.documents.filter(d => d.required).length;
+  }
+
+  get uploadedRequiredCount(): number {
+    return this.documents.filter(d => d.required && d.status === 'uploaded').length;
+  }
+
+  get isTab4Submitted(): boolean {
+    return this.valService.isTabSubmitted(4);
+  }
+
+  get isTab4Invalid(): boolean {
+    return this.isTab4Submitted && (this.uploadedRequiredCount < this.totalRequiredCount);
+  }
+
+  // --- VALIDATION COMPUTATION ---
+  readonly errors = computed(() => {
+    const data = this.service.formData();
+    return {
+      ...this.valService.validateTab1(data).errors,
+      ...this.valService.validateTab2(data).errors,
+      ...this.valService.validateTab3(data).errors,
+      ...this.valService.validateTab4(data).errors,
+    };
+  });
+
+  readonly tabStatuses = computed(() => {
+    const data = this.service.formData();
+    const submitted = this.valService.submittedTabs();
+    const completed = this.valService.completedTabs();
+
+    const map: Record<number, { isCompleted: boolean; isSubmittedInvalid: boolean }> = {};
+    for (let id = 1; id <= 5; id++) {
+      const isValid = id === 5
+        ? (this.valService.isTabValid(1, data) && this.valService.isTabValid(2, data) && this.valService.isTabValid(3, data) && this.valService.isTabValid(4, data))
+        : this.valService.isTabValid(id, data);
+      map[id] = {
+        isCompleted: completed.has(id) && isValid,
+        isSubmittedInvalid: submitted.has(id) && !isValid,
+      };
+    }
+    return map;
+  });
 
   get currentStepInfo(): { title: string; subtitle: string } {
     switch (this.activeTab()) {
@@ -120,11 +241,20 @@ export class TpPiaRegistrationComponent implements OnInit {
     }
   }
 
-  get data(): TpPiaRegistrationData {
-    return this.service.formData();
+  ngOnInit() {
+    this.service.restoreSavedDraft();
+    if (!this.data.basicInfo.applicationNo) {
+      this.service.updateFormData(curr => ({
+        ...curr,
+        basicInfo: {
+          ...curr.basicInfo,
+          applicationNo: this.service.generateApplicationNo()
+        }
+      }));
+    }
   }
 
-  // --- DATA CHANGE DEBOUNCE ---
+  // --- DEBOUNCED FORM UPDATE ---
   private changeTimer: any;
   onDataChange() {
     if (this.changeTimer) clearTimeout(this.changeTimer);
@@ -133,38 +263,144 @@ export class TpPiaRegistrationComponent implements OnInit {
     }, 60);
   }
 
-  // --- VALIDATION COMPUTATIONS & HELPERS ---
-  readonly tab1Errors = computed(() => this.valService.validateTab1(this.service.formData()).errors);
-  readonly tab2Errors = computed(() => this.valService.validateTab2(this.service.formData()).errors);
-  readonly tab3Errors = computed(() => this.valService.validateTab3(this.service.formData()).errors);
-  readonly tab4ProjectErrors = computed(() => this.valService.validateTab4(this.service.formData()).errors);
-
-  readonly errors = computed(() => ({
-    ...this.tab1Errors(),
-    ...this.tab2Errors(),
-    ...this.tab3Errors(),
-    ...this.tab4ProjectErrors(),
-  }));
-
-  private getFieldValue(fieldKey: string): any {
-    const parts = fieldKey.split('.');
-    let curr: any = this.data;
-    for (const part of parts) {
-      if (curr === undefined || curr === null) return undefined;
-      curr = curr[part];
+  // --- GENERIC FIELD ACCESSORS & SCHEMA HELPERS ---
+  getFieldValue(path: string): any {
+    const parts = path.split('.');
+    let obj: any = this.data;
+    for (const p of parts) {
+      if (obj === undefined || obj === null) return '';
+      obj = obj[p];
     }
-    return curr;
+    return obj ?? '';
   }
 
+  setFieldValue(path: string, value: any): void {
+    const parts = path.split('.');
+    let obj: any = this.data;
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (!obj[parts[i]]) obj[parts[i]] = {};
+      obj = obj[parts[i]];
+    }
+    obj[parts[parts.length - 1]] = value;
+
+    if (path.startsWith('registeredAddress') && this.data.sameAsRegistered) {
+      this.toggleSameAddress();
+    }
+    this.onDataChange();
+  }
+
+  getFieldLength(field: FormFieldConfig): number {
+    const val = this.getFieldValue(field.key);
+    return val ? String(val).length : 0;
+  }
+
+  getDateBound(maxDateKey?: 'todayIso' | 'maxDobIso'): string {
+    if (maxDateKey === 'todayIso') return this.todayIso;
+    if (maxDateKey === 'maxDobIso') return this.maxDobIso;
+    return this.todayIso;
+  }
+
+  getSearchableOptions(key?: 'states' | 'rajasthanDistricts' | 'banks'): string[] {
+    if (key === 'states') return this.states;
+    if (key === 'rajasthanDistricts') return this.districts;
+    if (key === 'banks') return this.commonBanks;
+    return [];
+  }
+
+  onFieldKeypress(field: FormFieldConfig, event: KeyboardEvent): boolean {
+    switch (field.restriction) {
+      case 'alpha-hyphen-slash':
+      case 'alphanumeric-symbols':
+        return onlyAlphanumericSymbols(event);
+      case 'alphanumeric':
+      case 'alphanumeric-upper':
+        return onlyAlphanumeric(event);
+      case 'alpha-space':
+        return onlyLetters(event);
+      case 'digits':
+        return onlyNumbers(event);
+      case 'decimal':
+        return onlyDecimals(event, this.getFieldValue(field.key));
+      case 'pan':
+      case 'cin':
+      case 'gst':
+      case 'ifsc':
+        return onlyAlphanumeric(event);
+      default:
+        return true;
+    }
+  }
+
+  handleFieldInput(field: FormFieldConfig, event: any): void {
+    let val = event.target ? event.target.value : event;
+    const max = field.maxlength;
+    switch (field.restriction) {
+      case 'alpha-hyphen-slash':
+      case 'alphanumeric-symbols':
+        val = sanitizeAlphanumericSymbols(val, max);
+        break;
+      case 'alphanumeric':
+      case 'alphanumeric-upper':
+        val = sanitizeAlphanumericUpper(val, max);
+        break;
+      case 'alpha-space':
+        val = sanitizeLetters(val, max);
+        break;
+      case 'digits':
+        val = sanitizeNumbers(val, max);
+        break;
+      case 'decimal':
+        val = sanitizeDecimals(val, max || 10);
+        break;
+      case 'pan':
+        val = sanitizeAlphanumericUpper(val, 10);
+        break;
+      case 'cin':
+        val = sanitizeAlphanumericUpper(val, 21);
+        break;
+      case 'gst':
+        val = sanitizeAlphanumericUpper(val, 15);
+        break;
+      case 'ifsc':
+        val = sanitizeAlphanumericUpper(val, 11);
+        break;
+      default:
+        if (field.uppercase) {
+          val = String(val ?? '').toUpperCase();
+        }
+        if (max && typeof val === 'string') {
+          val = val.slice(0, max);
+        }
+        break;
+    }
+    this.setFieldValue(field.key, val);
+  }
+
+  onFieldChange(field: FormFieldConfig): void {
+    this.onDataChange();
+  }
+
+  onDateChange(field: FormFieldConfig): void {
+    if (field.key === 'authorizedOrg.dob') {
+      this.onDobChange();
+    } else {
+      this.onDataChange();
+    }
+  }
+
+  // --- FIELD VALIDATION HELPERS ---
   isFieldInvalid(fieldKey: string): boolean {
     const error = this.errors()[fieldKey];
     if (!error) return false;
 
-    const val = this.getFieldValue(fieldKey);
-    const hasValue = val !== undefined && val !== null && String(val).trim().length > 0;
-    if (hasValue) {
-      return true;
+    const parts = fieldKey.split('.');
+    let curr: any = this.data;
+    for (const part of parts) {
+      if (curr === undefined || curr === null) return false;
+      curr = curr[part];
     }
+    const hasValue = curr !== undefined && curr !== null && String(curr).trim().length > 0;
+    if (hasValue) return true;
 
     if (fieldKey.startsWith('basicInfo') || fieldKey.startsWith('entityInfo') || fieldKey.startsWith('registeredAddress') || fieldKey.startsWith('postalAddress')) {
       return this.valService.isTabSubmitted(1);
@@ -175,10 +411,6 @@ export class TpPiaRegistrationComponent implements OnInit {
     if (fieldKey.startsWith('bankDetails')) {
       return this.valService.isTabSubmitted(3);
     }
-    if (fieldKey.startsWith('authorizedProject')) {
-      return this.valService.isTabSubmitted(4);
-    }
-
     return this.valService.isTabSubmitted(this.activeTab());
   }
 
@@ -186,517 +418,20 @@ export class TpPiaRegistrationComponent implements OnInit {
     return this.isFieldInvalid(fieldKey) ? (this.errors()[fieldKey] || '') : '';
   }
 
-  readonly tabStatuses = computed(() => {
-    const data = this.service.formData();
-    const submitted = this.valService.submittedTabs();
-    const completed = this.valService.completedTabs();
-
-    const map: Record<number, { isCompleted: boolean; isSubmittedInvalid: boolean }> = {};
-    for (let id = 1; id <= 5; id++) {
-      const isValid = id === 5
-        ? (this.valService.isTabValid(1, data) && this.valService.isTabValid(2, data) && this.valService.isTabValid(3, data) && this.valService.isTabValid(4, data))
-        : this.valService.isTabValid(id, data);
-      map[id] = {
-        isCompleted: completed.has(id) && isValid,
-        isSubmittedInvalid: submitted.has(id) && !isValid,
-      };
-    }
-    return map;
-  });
-
-  isTabValid(tabId: number): boolean {
-    return this.valService.isTabValid(tabId, this.data);
-  }
-
-  isTabCompleted(tabId: number): boolean {
-    return this.tabStatuses()[tabId]?.isCompleted ?? false;
-  }
-
-  isTabSubmittedInvalid(tabId: number): boolean {
-    return this.tabStatuses()[tabId]?.isSubmittedInvalid ?? false;
-  }
-
-  // --- STEP 1: ORGANISATION DETAILS SPECIFICS ---
-  readonly states = INDIAN_STATES;
-  readonly districts = RAJASTHAN_DISTRICTS;
-  readonly businessActivities = BUSINESS_ACTIVITIES;
-  readonly commonBanks = COMMON_BANKS;
-
-  // 1. Searchable District Dropdown
-  readonly isDistrictDropdownOpen = signal<boolean>(false);
-  readonly districtSearchQuery = signal<string>('');
-  readonly filteredDistricts = computed(() => {
-    const q = this.districtSearchQuery().toLowerCase().trim();
-    if (!q) return this.districts;
-    return this.districts.filter(d => d.toLowerCase().includes(q));
-  });
-
-  closeAllDropdowns() {
-    this.isDistrictDropdownOpen.set(false);
-    this.isStateRegDropdownOpen.set(false);
-    this.isStateAddrDropdownOpen.set(false);
-    this.isStateAuthDropdownOpen.set(false);
-    this.isBankDropdownOpen.set(false);
-  }
-
-  toggleDistrictDropdown(event?: MouseEvent) {
-    if (event) event.stopPropagation();
-    const nextState = !this.isDistrictDropdownOpen();
-    this.closeAllDropdowns();
-    this.isDistrictDropdownOpen.set(nextState);
-    if (nextState) {
-      this.districtSearchQuery.set('');
-      setTimeout(() => {
-        const input = document.getElementById('district-search-input');
-        if (input) input.focus();
-      }, 50);
-    }
-  }
-
-  selectDistrict(dist: string) {
-    this.data.registeredAddress.district = dist;
-    this.isDistrictDropdownOpen.set(false);
-    this.districtSearchQuery.set('');
-    this.onRegisteredAddressChange();
-  }
-
-  clearDistrict(event?: MouseEvent) {
-    if (event) event.stopPropagation();
-    this.data.registeredAddress.district = '';
-    this.districtSearchQuery.set('');
-    this.onRegisteredAddressChange();
-  }
-
-  // 2. Searchable State Where Registered Dropdown
-  readonly isStateRegDropdownOpen = signal<boolean>(false);
-  readonly stateRegSearchQuery = signal<string>('');
-  readonly filteredStatesReg = computed(() => {
-    const q = this.stateRegSearchQuery().toLowerCase().trim();
-    if (!q) return this.states;
-    return this.states.filter(s => s.toLowerCase().includes(q));
-  });
-
-  toggleStateRegDropdown(event?: MouseEvent) {
-    if (event) event.stopPropagation();
-    const nextState = !this.isStateRegDropdownOpen();
-    this.closeAllDropdowns();
-    this.isStateRegDropdownOpen.set(nextState);
-    if (nextState) {
-      this.stateRegSearchQuery.set('');
-      setTimeout(() => {
-        const input = document.getElementById('statereg-search-input');
-        if (input) input.focus();
-      }, 50);
-    }
-  }
-
-  selectStateReg(state: string) {
-    this.data.entityInfo.stateWhereRegistered = state;
-    this.isStateRegDropdownOpen.set(false);
-    this.stateRegSearchQuery.set('');
-    this.onDataChange();
-  }
-
-  clearStateReg(event?: MouseEvent) {
-    if (event) event.stopPropagation();
-    this.data.entityInfo.stateWhereRegistered = '';
-    this.stateRegSearchQuery.set('');
-    this.onDataChange();
-  }
-
-  // 3. Searchable State/UT for Registered Address
-  readonly isStateAddrDropdownOpen = signal<boolean>(false);
-  readonly stateAddrSearchQuery = signal<string>('');
-  readonly filteredStatesAddr = computed(() => {
-    const q = this.stateAddrSearchQuery().toLowerCase().trim();
-    if (!q) return this.states;
-    return this.states.filter(s => s.toLowerCase().includes(q));
-  });
-
-  toggleStateAddrDropdown(event?: MouseEvent) {
-    if (event) event.stopPropagation();
-    const nextState = !this.isStateAddrDropdownOpen();
-    this.closeAllDropdowns();
-    this.isStateAddrDropdownOpen.set(nextState);
-    if (nextState) {
-      this.stateAddrSearchQuery.set('');
-      setTimeout(() => {
-        const input = document.getElementById('stateaddr-search-input');
-        if (input) input.focus();
-      }, 50);
-    }
-  }
-
-  selectStateAddr(state: string) {
-    this.data.registeredAddress.state = state;
-    this.isStateAddrDropdownOpen.set(false);
-    this.stateAddrSearchQuery.set('');
-    this.onRegisteredAddressChange();
-  }
-
-  clearStateAddr(event?: MouseEvent) {
-    if (event) event.stopPropagation();
-    this.data.registeredAddress.state = '';
-    this.stateAddrSearchQuery.set('');
-    this.onRegisteredAddressChange();
-  }
-
-  // 4. Searchable State for Authorized Person
-  readonly isStateAuthDropdownOpen = signal<boolean>(false);
-  readonly stateAuthSearchQuery = signal<string>('');
-  readonly filteredStatesAuth = computed(() => {
-    const q = this.stateAuthSearchQuery().toLowerCase().trim();
-    if (!q) return this.states;
-    return this.states.filter(s => s.toLowerCase().includes(q));
-  });
-
-  toggleStateAuthDropdown(event?: MouseEvent) {
-    if (event) event.stopPropagation();
-    const nextState = !this.isStateAuthDropdownOpen();
-    this.closeAllDropdowns();
-    this.isStateAuthDropdownOpen.set(nextState);
-    if (nextState) {
-      this.stateAuthSearchQuery.set('');
-      setTimeout(() => {
-        const input = document.getElementById('stateauth-search-input');
-        if (input) input.focus();
-      }, 50);
-    }
-  }
-
-  selectStateAuth(state: string) {
-    this.data.authorizedOrg.state = state;
-    this.isStateAuthDropdownOpen.set(false);
-    this.stateAuthSearchQuery.set('');
-    this.onDataChange();
-  }
-
-  clearStateAuth(event?: MouseEvent) {
-    if (event) event.stopPropagation();
-    this.data.authorizedOrg.state = '';
-    this.stateAuthSearchQuery.set('');
-    this.onDataChange();
-  }
-
-  // 5. Searchable Bank Name for Step 3
-  readonly isBankDropdownOpen = signal<boolean>(false);
-  readonly bankSearchQuery = signal<string>('');
-  readonly filteredBanks = computed(() => {
-    const q = this.bankSearchQuery().toLowerCase().trim();
-    if (!q) return this.commonBanks;
-    return this.commonBanks.filter(b => b.toLowerCase().includes(q));
-  });
-
-  toggleBankDropdown(event?: MouseEvent) {
-    if (event) event.stopPropagation();
-    const nextState = !this.isBankDropdownOpen();
-    this.closeAllDropdowns();
-    this.isBankDropdownOpen.set(nextState);
-    if (nextState) {
-      this.bankSearchQuery.set('');
-      setTimeout(() => {
-        const input = document.getElementById('bank-search-input');
-        if (input) input.focus();
-      }, 50);
-    }
-  }
-
-  selectBank(bank: string) {
-    this.data.bankDetails.bankName = bank;
-    this.isBankDropdownOpen.set(false);
-    this.bankSearchQuery.set('');
-    this.onDataChange();
-  }
-
-  clearBank(event?: MouseEvent) {
-    if (event) event.stopPropagation();
-    this.data.bankDetails.bankName = '';
-    this.bankSearchQuery.set('');
-    this.onDataChange();
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.district-dropdown-container')) {
-      this.isDistrictDropdownOpen.set(false);
-    }
-    if (!target.closest('.statereg-dropdown-container')) {
-      this.isStateRegDropdownOpen.set(false);
-    }
-    if (!target.closest('.stateaddr-dropdown-container')) {
-      this.isStateAddrDropdownOpen.set(false);
-    }
-    if (!target.closest('.stateauth-dropdown-container')) {
-      this.isStateAuthDropdownOpen.set(false);
-    }
-    if (!target.closest('.bank-dropdown-container')) {
-      this.isBankDropdownOpen.set(false);
-    }
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscapePress() {
-    this.isDistrictDropdownOpen.set(false);
-    this.isStateRegDropdownOpen.set(false);
-    this.isStateAddrDropdownOpen.set(false);
-    this.isStateAuthDropdownOpen.set(false);
-    this.isBankDropdownOpen.set(false);
-  }
-
+  // --- ADDRESS SYNC ---
   toggleSameAddress() {
     if (this.data.sameAsRegistered) {
       const reg = this.data.registeredAddress;
       const full = [reg.address, reg.district, reg.state, reg.pincode ? `PIN: ${reg.pincode}` : ''].filter(Boolean).join(', ');
       this.data.postalAddress.address = full;
-      this.data.postalAddress.state = reg.state;
+      this.data.postalAddress.state = 'Rajasthan';
       this.data.postalAddress.district = reg.district;
       this.data.postalAddress.pincode = reg.pincode;
     }
     this.service.updateFormData(curr => ({ ...curr }));
   }
 
-  onRegisteredAddressChange() {
-    if (this.data.sameAsRegistered) {
-      this.toggleSameAddress();
-    }
-    this.onDataChange();
-  }
-
-  // --- STEP 2: AUTHORIZED PERSON (ORG LEVEL) SPECIFICS ---
-  readonly idTypes = ID_PROOF_TYPES.filter(t => t !== 'Aadhaar Card' && t !== 'PAN Card');
-
-  constructor() {
-    if (this.data.authorizedOrg.typeIdProof === 'PAN Card' || this.data.authorizedOrg.typeIdProof === 'Aadhaar Card') {
-      this.data.authorizedOrg.typeIdProof = '';
-    }
-  }
-
-  // --- DATE DD/MM/YYYY FORMATTING & PICKER HELPERS ---
-  get todayIso(): string {
-    const today = new Date();
-    const y = today.getFullYear();
-    const m = String(today.getMonth() + 1).padStart(2, '0');
-    const d = String(today.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  }
-
-  get maxDobIso(): string {
-    const today = new Date();
-    const y = today.getFullYear() - 18;
-    const m = String(today.getMonth() + 1).padStart(2, '0');
-    const d = String(today.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  }
-
-  get minDobIso(): string {
-    const today = new Date();
-    const y = today.getFullYear() - 100;
-    const m = String(today.getMonth() + 1).padStart(2, '0');
-    const d = String(today.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  }
-
-  // --- REAL-TIME INPUT RESTRICTIONS (CHARACTERS, NUMBERS, ALPHANUMERIC) ---
-
-  /** Allows only numeric keys 0-9 */
-  onlyNumbers(event: KeyboardEvent): boolean {
-    if (event.key.length > 1) return true; // allow Backspace, Tab, Arrows, Enter, Delete
-    if (!/^\d$/.test(event.key)) {
-      event.preventDefault();
-      return false;
-    }
-    return true;
-  }
-
-  /** Allows only alphabetic letters, spaces and dots */
-  onlyLetters(event: KeyboardEvent): boolean {
-    if (event.key.length > 1) return true;
-    if (!/^[a-zA-Z\s.]$/.test(event.key)) {
-      event.preventDefault();
-      return false;
-    }
-    return true;
-  }
-
-  /** Allows letters, spaces, and standard name symbols: & / - . (No numbers) */
-  onlyLettersSymbols(event: KeyboardEvent): boolean {
-    if (event.key.length > 1) return true;
-    if (!/^[a-zA-Z\s/&.-]$/.test(event.key)) {
-      event.preventDefault();
-      return false;
-    }
-    return true;
-  }
-
-  /** Allows letters, numbers, spaces, and common symbols: & / - . */
-  onlyAlphanumericSymbols(event: KeyboardEvent): boolean {
-    if (event.key.length > 1) return true;
-    if (!/^[a-zA-Z0-9\s/&.-]$/.test(event.key)) {
-      event.preventDefault();
-      return false;
-    }
-    return true;
-  }
-
-  /** Allows only strict alphanumeric (letters & numbers) */
-  onlyAlphanumeric(event: KeyboardEvent): boolean {
-    if (event.key.length > 1) return true;
-    if (!/^[a-zA-Z0-9]$/.test(event.key)) {
-      event.preventDefault();
-      return false;
-    }
-    return true;
-  }
-
-  /** Allows only numbers and at most 1 decimal point for currency/turnover */
-  onlyDecimals(event: KeyboardEvent, currentVal: any): boolean {
-    if (event.key.length > 1) return true;
-    if (event.key === '.') {
-      if (String(currentVal || '').includes('.')) {
-        event.preventDefault();
-        return false;
-      }
-      return true;
-    }
-    if (!/^\d$/.test(event.key)) {
-      event.preventDefault();
-      return false;
-    }
-    return true;
-  }
-
-  /** Sanitizes input to digits only */
-  sanitizeNumbers(val: any, maxLen?: number): string {
-    const digits = String(val ?? '').replace(/\D/g, '');
-    return maxLen ? digits.slice(0, maxLen) : digits;
-  }
-
-  /** Sanitizes input to letters, spaces and dots only */
-  sanitizeLetters(val?: string | null, maxLen?: number): string {
-    const letters = String(val ?? '').replace(/[^a-zA-Z\s.]/g, '');
-    return maxLen ? letters.slice(0, maxLen) : letters;
-  }
-
-  /** Sanitizes input to uppercase alphanumeric */
-  sanitizeAlphanumericUpper(val?: string | null, maxLen?: number): string {
-    const clean = String(val ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-    return maxLen ? clean.slice(0, maxLen) : clean;
-  }
-
-  /** Sanitizes input to alphanumeric with common symbols: & / - . */
-  sanitizeAlphanumericSymbols(val?: string | null, maxLen?: number): string {
-    const clean = String(val ?? '').replace(/[^a-zA-Z0-9\s/&.-]/g, '');
-    return maxLen ? clean.slice(0, maxLen) : clean;
-  }
-
-  /** Sanitizes input to uppercase alphanumeric with common symbols: & / - . */
-  sanitizeAlphanumericSymbolsUpper(val?: string | null, maxLen?: number): string {
-    const clean = String(val ?? '').toUpperCase().replace(/[^A-Z0-9\s/&.-]/g, '');
-    return maxLen ? clean.slice(0, maxLen) : clean;
-  }
-
-  /** Sanitizes input to uppercase letters, spaces, and symbols: & / - . (No numbers) */
-  sanitizeLettersSymbolsUpper(val?: string | null, maxLen?: number): string {
-    const clean = String(val ?? '').toUpperCase().replace(/[^A-Z\s/&.-]/g, '');
-    return maxLen ? clean.slice(0, maxLen) : clean;
-  }
-
-  /** Sanitizes decimal numbers (e.g. 150.00) */
-  sanitizeDecimals(val: any, maxLen?: number): string {
-    let str = String(val ?? '').replace(/[^0-9.]/g, '');
-    const firstDot = str.indexOf('.');
-    if (firstDot !== -1) {
-      str = str.slice(0, firstDot + 1) + str.slice(firstDot + 1).replace(/\./g, '');
-    }
-    return maxLen ? str.slice(0, maxLen) : str;
-  }
-
-  formatDateDisplay(dateStr?: string): string {
-    if (!dateStr) return '';
-    const trimmed = dateStr.trim();
-    if (trimmed.includes('-')) {
-      const parts = trimmed.split('-');
-      if (parts.length === 3 && parts[0].length === 4) {
-        return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
-      }
-    }
-    return trimmed;
-  }
-
-  getIsoDate(dateStr?: string): string {
-    if (!dateStr) return '';
-    const trimmed = dateStr.trim();
-    if (trimmed.includes('/')) {
-      const parts = trimmed.split('/');
-      if (parts.length === 3 && parts[2].length === 4) {
-        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-      }
-    }
-    if (trimmed.includes('-')) {
-      const parts = trimmed.split('-');
-      if (parts.length === 3 && parts[0].length === 4) {
-        return trimmed;
-      }
-    }
-    return '';
-  }
-
-  onDateInput(event: Event, field: 'registration' | 'dob') {
-    const input = event.target as HTMLInputElement;
-    const val = input.value || '';
-    const rawDigits = val.replace(/\D/g, '').slice(0, 8);
-    let formatted = '';
-    if (rawDigits.length > 4) {
-      formatted = `${rawDigits.slice(0, 2)}/${rawDigits.slice(2, 4)}/${rawDigits.slice(4)}`;
-    } else if (rawDigits.length > 2) {
-      formatted = `${rawDigits.slice(0, 2)}/${rawDigits.slice(2)}`;
-    } else {
-      formatted = rawDigits;
-    }
-    input.value = formatted;
-
-    if (field === 'registration') {
-      this.data.basicInfo.dateOfRegistration = formatted;
-      this.onDataChange();
-    } else if (field === 'dob') {
-      this.data.authorizedOrg.dob = formatted;
-      this.onDobChange();
-    }
-  }
-
-  onDatePick(event: Event, field: 'registration' | 'dob') {
-    const input = event.target as HTMLInputElement;
-    const isoVal = input.value;
-    if (!isoVal) return;
-    const parts = isoVal.split('-');
-    if (parts.length === 3) {
-      const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
-      if (field === 'registration') {
-        this.data.basicInfo.dateOfRegistration = formatted;
-        this.onDataChange();
-      } else if (field === 'dob') {
-        this.data.authorizedOrg.dob = formatted;
-        this.onDobChange();
-      }
-    }
-  }
-
-  openPicker(picker: HTMLInputElement) {
-    if (picker) {
-      if (typeof picker.showPicker === 'function') {
-        try {
-          picker.showPicker();
-          return;
-        } catch {
-          // fallback
-        }
-      }
-      picker.focus();
-      picker.click();
-    }
-  }
-
+  // --- DOB / AGE COMPUTATION ---
   onDobChange() {
     const val = (this.data.authorizedOrg.dob || '').trim();
     if (val) {
@@ -733,63 +468,7 @@ export class TpPiaRegistrationComponent implements OnInit {
     this.onDataChange();
   }
 
-  onTypeIdProofChange() {
-    const type = this.data.authorizedOrg.typeIdProof;
-    if (type === 'Voter ID Card') {
-      if (this.data.authorizedOrg.voterIdNo) {
-        this.data.authorizedOrg.idNo = this.data.authorizedOrg.voterIdNo;
-      }
-    } else if (type === 'Passport') {
-      if (this.data.authorizedOrg.passportNo) {
-        this.data.authorizedOrg.idNo = this.data.authorizedOrg.passportNo;
-      }
-    } else if (type === 'Bhamashah Card') {
-      if (this.data.authorizedOrg.bhamashahNo) {
-        this.data.authorizedOrg.idNo = this.data.authorizedOrg.bhamashahNo;
-      }
-    } else if (!type) {
-      this.data.authorizedOrg.idNo = '';
-    }
-    this.onDataChange();
-  }
-
-  onAadhaarChange() {
-    if (this.data.authorizedOrg.aadhaarNo) {
-      this.data.authorizedOrg.aadhaarNo = this.data.authorizedOrg.aadhaarNo.replace(/\D/g, '').slice(0, 12);
-    }
-    this.onDataChange();
-  }
-
-  onVoterIdChange() {
-    this.data.authorizedOrg.voterIdNo = (this.data.authorizedOrg.voterIdNo || '').toUpperCase();
-    this.data.authorizedOrg.idNo = this.data.authorizedOrg.voterIdNo;
-    this.onDataChange();
-  }
-
-  onPassportChange() {
-    this.data.authorizedOrg.passportNo = (this.data.authorizedOrg.passportNo || '').toUpperCase();
-    this.data.authorizedOrg.idNo = this.data.authorizedOrg.passportNo;
-    this.onDataChange();
-  }
-
-  onBhamashahChange() {
-    this.data.authorizedOrg.idNo = this.data.authorizedOrg.bhamashahNo || '';
-    this.onDataChange();
-  }
-
-  onPanChange() {
-    this.data.authorizedOrg.pan = (this.data.authorizedOrg.pan || '').toUpperCase();
-    this.data.authorizedOrg.idNo = this.data.authorizedOrg.pan;
-    this.onDataChange();
-  }
-
-  // --- STEP 3: BANK DETAILS SPECIFICS ---
-  readonly transferModes = TRANSFER_MODES;
-  readonly accountTypes = ACCOUNT_TYPES;
-
-  readonly isBankDragging = signal<boolean>(false);
-  readonly bankFileError = signal<string>('');
-
+  // --- STEP 3: Bank Dropdown & Cheque File ---
   onBankDragOver(e: DragEvent) {
     e.preventDefault();
     e.stopPropagation();
@@ -821,7 +500,7 @@ export class TpPiaRegistrationComponent implements OnInit {
 
   private handleBankFile(file: File) {
     this.bankFileError.set('');
-    const maxBytes = 5 * 1024 * 1024; // 5 MB
+    const maxBytes = 5 * 1024 * 1024;
 
     if (file.size > maxBytes) {
       this.bankFileError.set(`"${file.name}" exceeds the maximum 5 MB limit.`);
@@ -874,37 +553,14 @@ export class TpPiaRegistrationComponent implements OnInit {
     }));
   }
 
-  // --- STEP 4: DOCUMENT UPLOAD SPECIFICS ---
-  readonly docErrorMessage = signal<string>('');
-  readonly previewingDoc = signal<UploadedDocument | null>(null);
-
-  get documents(): UploadedDocument[] {
-    return this.service.formData().documents;
-  }
-
-  get totalRequiredCount(): number {
-    return this.documents.filter(d => d.required).length;
-  }
-
-  get uploadedRequiredCount(): number {
-    return this.documents.filter(d => d.required && d.status === 'uploaded').length;
-  }
-
-  get isTab4Submitted(): boolean {
-    return this.valService.isTabSubmitted(4);
-  }
-
-  get isTab4Invalid(): boolean {
-    return this.isTab4Submitted && (this.uploadedRequiredCount < this.totalRequiredCount);
-  }
-
+  // --- STEP 4: Document Upload & Removal ---
   onDocFileSelected(event: Event, docId: string) {
     this.docErrorMessage.set('');
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
     const file = input.files[0];
-    const maxBytes = 5 * 1024 * 1024; // 5 MB
+    const maxBytes = 5 * 1024 * 1024;
 
     if (file.size > maxBytes) {
       this.docErrorMessage.set(`"${file.name}" exceeds the 5 MB maximum limit.`);
@@ -950,192 +606,18 @@ export class TpPiaRegistrationComponent implements OnInit {
     }));
   }
 
-  // --- OFFICER IN-CHARGE LOGIC (from tab-officer-incharge) ---
-  readonly showOfficerModal = signal<boolean>(false);
-  readonly isOfficerEditing = signal<boolean>(false);
-  readonly modalOfficerSubmitted = signal<boolean>(false);
-  readonly isOfficerOpen = signal<boolean>(true);
-  currentOfficer: OfficerInCharge = this.getEmptyOfficer();
-
-  get officers(): OfficerInCharge[] {
-    return this.service.formData().officers;
-  }
-
-  get isOfficerTabInvalid(): boolean {
-    return this.valService.isTabSubmitted(2) && !this.valService.isTabValid(2, this.service.formData());
-  }
-
-  get officerErrors(): Record<string, string> {
-    return this.valService.validateOfficer(this.currentOfficer).errors;
-  }
-
-  isOfficerModalFieldInvalid(field: keyof OfficerInCharge): boolean {
-    const error = this.officerErrors[field];
-    if (!error) return false;
-    const val = this.currentOfficer[field];
-    const hasValue = val !== undefined && val !== null && String(val).trim().length > 0;
-    if (hasValue) return true;
-    return this.modalOfficerSubmitted();
-  }
-
-  getOfficerModalFieldError(field: keyof OfficerInCharge): string {
-    return this.isOfficerModalFieldInvalid(field) ? (this.officerErrors[field] || '') : '';
-  }
-
-  openAddOfficerModal() {
-    this.isOfficerEditing.set(false);
-    this.modalOfficerSubmitted.set(false);
-    this.currentOfficer = this.getEmptyOfficer();
-    this.showOfficerModal.set(true);
-  }
-
-  editOfficer(off: OfficerInCharge) {
-    this.isOfficerEditing.set(true);
-    this.modalOfficerSubmitted.set(false);
-    this.currentOfficer = { ...off };
-    this.showOfficerModal.set(true);
-  }
-
-  deleteOfficer(id: string) {
-    if (confirm('Are you sure you want to remove this officer record?')) {
-      this.service.updateFormData(curr => ({
-        ...curr,
-        officers: curr.officers.filter(o => o.id !== id)
-      }));
-    }
-  }
-
-  saveOfficer() {
-    this.modalOfficerSubmitted.set(true);
-    const validation = this.valService.validateOfficer(this.currentOfficer);
-    if (!validation.isValid) return;
-
-    if (this.isOfficerEditing()) {
-      this.service.updateFormData(curr => ({
-        ...curr,
-        officers: curr.officers.map(o => o.id === this.currentOfficer.id ? this.currentOfficer : o)
-      }));
-    } else {
-      this.service.updateFormData(curr => ({
-        ...curr,
-        officers: [...curr.officers, { ...this.currentOfficer, id: 'off-' + Date.now() }]
-      }));
-    }
-    this.closeOfficerModal();
-  }
-
-  closeOfficerModal() {
-    this.showOfficerModal.set(false);
-  }
-
-  private getEmptyOfficer(): OfficerInCharge {
-    return {
-      id: '',
-      name: '',
-      designation: '',
-      mobileNo: '',
-      emailId: '',
-      pan: '',
-      aadhaarNo: '',
-      bhamashahNo: '',
-      voterIdNo: '',
-      passportNo: '',
-    };
-  }
-
-  // --- AWARDS RECORD LOGIC (from tab-awards) ---
-  readonly showAwardModal = signal<boolean>(false);
-  readonly isAwardEditing = signal<boolean>(false);
-  readonly modalAwardSubmitted = signal<boolean>(false);
-  readonly isAwardOpen = signal<boolean>(true);
-  currentAward: AwardItem = this.getEmptyAward();
-
-  get awards(): AwardItem[] {
-    return this.service.formData().awards;
-  }
-
-  get awardErrors(): Record<string, string> {
-    return this.valService.validateAward(this.currentAward).errors;
-  }
-
-  isAwardModalFieldInvalid(field: keyof AwardItem): boolean {
-    const error = this.awardErrors[field];
-    if (!error) return false;
-    const val = this.currentAward[field];
-    const hasValue = val !== undefined && val !== null && String(val).trim().length > 0;
-    if (hasValue) return true;
-    return this.modalAwardSubmitted();
-  }
-
-  getAwardModalFieldError(field: keyof AwardItem): string {
-    return this.isAwardModalFieldInvalid(field) ? (this.awardErrors[field] || '') : '';
-  }
-
-  openAddAwardModal() {
-    this.isAwardEditing.set(false);
-    this.modalAwardSubmitted.set(false);
-    this.currentAward = this.getEmptyAward();
-    this.showAwardModal.set(true);
-  }
-
-  editAward(award: AwardItem) {
-    this.isAwardEditing.set(true);
-    this.modalAwardSubmitted.set(false);
-    this.currentAward = { ...award };
-    this.showAwardModal.set(true);
-  }
-
-  deleteAward(id: string) {
-    if (confirm('Delete this award record?')) {
-      this.service.updateFormData(curr => ({
-        ...curr,
-        awards: curr.awards.filter(a => a.id !== id)
-      }));
-    }
-  }
-
-  onAwardFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.currentAward.documentName = input.files[0].name;
-    }
-  }
-
-  saveAward() {
-    this.modalAwardSubmitted.set(true);
-    const validation = this.valService.validateAward(this.currentAward);
-    if (!validation.isValid) return;
-
-    if (this.isAwardEditing()) {
-      this.service.updateFormData(curr => ({
-        ...curr,
-        awards: curr.awards.map(a => a.id === this.currentAward.id ? this.currentAward : a)
-      }));
-    } else {
-      this.service.updateFormData(curr => ({
-        ...curr,
-        awards: [...curr.awards, { ...this.currentAward, id: 'aw-' + Date.now() }]
-      }));
-    }
-    this.closeAwardModal();
-  }
-
-  closeAwardModal() {
-    this.showAwardModal.set(false);
-  }
-
-  private getEmptyAward(): AwardItem {
-    return {
-      id: '',
-      awardName: '',
-      awardingAgency: '',
-      year: new Date().getFullYear().toString(),
-      level: 'National',
-      description: '',
-    };
-  }
-
   // --- STEPPER NAVIGATION & FORM ACTIONS ---
+  private scrollToTop() {
+    if (typeof document !== 'undefined') {
+      const mainEl = document.querySelector('main');
+      if (mainEl) {
+        mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }
+
   private scrollStepIntoView(tabId: number) {
     if (typeof document !== 'undefined') {
       requestAnimationFrame(() => {
@@ -1148,7 +630,6 @@ export class TpPiaRegistrationComponent implements OnInit {
   }
 
   switchTab(tabId: number) {
-    this.closeAllDropdowns();
     const current = this.activeTab();
     if (this.valService.isTabValid(current, this.data)) {
       this.valService.markTabCompleted(current);
@@ -1156,19 +637,18 @@ export class TpPiaRegistrationComponent implements OnInit {
     this.service.saveDraftSync();
     this.activeTab.set(tabId);
     this.valService.clearToast();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.scrollToTop();
     this.scrollStepIntoView(tabId);
   }
 
   nextTab() {
-    this.closeAllDropdowns();
     const current = this.activeTab();
     this.valService.markTabSubmitted(current);
 
     if (current <= 4 && !this.valService.isTabValid(current, this.data)) {
       const tabName = this.tabs[current - 1]?.label || `Tab ${current}`;
       this.valService.showToast(`Please fill all required fields correctly in "${tabName}" before proceeding.`);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      this.scrollToTop();
       return;
     }
 
@@ -1178,39 +658,34 @@ export class TpPiaRegistrationComponent implements OnInit {
     if (current < 5) {
       const nextId = current + 1;
       this.activeTab.set(nextId);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      this.scrollToTop();
       this.scrollStepIntoView(nextId);
     }
   }
 
   prevTab() {
-    this.closeAllDropdowns();
     if (this.activeTab() > 1) {
       this.service.saveDraftSync();
       const prevId = this.activeTab() - 1;
       this.activeTab.set(prevId);
       this.valService.clearToast();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      this.scrollToTop();
       this.scrollStepIntoView(prevId);
     }
   }
 
-  populateDemo() {
-    this.service.populateSampleData();
-    for (let t = 1; t <= 5; t++) {
-      if (this.valService.isTabValid(t, this.data)) {
-        this.valService.markTabCompleted(t);
-      }
-    }
-    this.valService.showToast('Sample government demo data loaded.', 'success');
+  resetForm() {
+    this.service.resetForm();
+    this.valService.resetSubmitted();
+    this.activeTab.set(1);
+    this.declarationAgreed = false;
+    this.valService.clearToast();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  openPreviewModal() {
-    this.switchTab(5);
-  }
-
-  openReviewModal() {
-    this.switchTab(5);
+  saveAsDraft() {
+    this.service.saveDraftSync();
+    this.valService.showToast('Application draft saved successfully.', 'success');
   }
 
   submitFinalApplication() {
@@ -1238,19 +713,7 @@ export class TpPiaRegistrationComponent implements OnInit {
     this.showSuccessModal.set(true);
   }
 
-  confirmSubmit() {
-    this.submitFinalApplication();
-  }
-
   printAcknowledgement() {
     window.print();
-  }
-
-  setFontScale(scale: 'standard' | 'large' | 'xlarge') {
-    this.fontScale.set(scale);
-    if (typeof document !== 'undefined') {
-      document.documentElement.classList.remove('font-scale-standard', 'font-scale-large', 'font-scale-xlarge');
-      document.documentElement.classList.add(`font-scale-${scale}`);
-    }
   }
 }

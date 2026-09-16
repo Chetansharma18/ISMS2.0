@@ -1,11 +1,9 @@
 import { Injectable, signal } from '@angular/core';
 import { 
   TpPiaRegistrationData, 
-  OfficerInCharge, 
   AuthorizedPersonOrg, 
   AuthorizedPersonProject, 
-  BankDetails, 
-  AwardItem
+  BankDetails
 } from '../models/tp-pia-registration.model';
 
 export const VALIDATION_PATTERNS = {
@@ -412,48 +410,6 @@ export class FormValidationService {
     };
   }
 
-  validateOfficer(officer: OfficerInCharge): TabValidationResult {
-    const errors: Record<string, string> = {};
-
-    if (!(officer.name || '').trim()) {
-      errors['name'] = 'Officer name is required';
-    } else if (!this.isValidLettersOnly(officer.name)) {
-      errors['name'] = 'Officer name must contain letters and spaces only';
-    }
-    if (!(officer.designation || '').trim()) {
-      errors['designation'] = 'Designation is required';
-    }
-
-    const mobile = (officer.mobileNo || '').trim();
-    if (!mobile) {
-      errors['mobileNo'] = 'Mobile No. is required';
-    } else if (!this.isValidMobile(mobile)) {
-      errors['mobileNo'] = 'Enter a valid 10-digit mobile number';
-    }
-
-    const email = (officer.emailId || '').trim();
-    if (!email) {
-      errors['emailId'] = 'Email ID is required';
-    } else if (!this.isValidEmail(email)) {
-      errors['emailId'] = 'Enter a valid email address';
-    }
-
-    const pan = (officer.pan || '').trim().toUpperCase();
-    if (pan && !this.isValidPan(pan)) {
-      errors['pan'] = 'Enter a valid 10-character PAN (e.g. ABCDE1234F)';
-    }
-
-    const aadhaar = (officer.aadhaarNo || '').trim();
-    if (aadhaar && !this.isValidAadhaar(aadhaar)) {
-      errors['aadhaarNo'] = 'Aadhaar must be exactly 12 digits';
-    }
-
-    return {
-      isValid: Object.keys(errors).length === 0,
-      errors
-    };
-  }
-
   // --- TAB 3 VALIDATION: Bank Details ---
   validateTab3(data: TpPiaRegistrationData): TabValidationResult {
     const errors: Record<string, string> = {};
@@ -526,69 +482,15 @@ export class FormValidationService {
     return this.validateTab3(data);
   }
 
-  // --- TAB 6 VALIDATION ---
-  validateAward(award: AwardItem): TabValidationResult {
-    const errors: Record<string, string> = {};
-    if (!(award.awardName || '').trim()) {
-      errors['awardName'] = 'Award Name is required';
-    }
-    if (!(award.awardingAgency || '').trim()) {
-      errors['awardingAgency'] = 'Awarding Agency is required';
-    }
-    const year = (award.year || '').toString().trim();
-    if (year && (!/^\d{4}$/.test(year) || parseInt(year, 10) < 1950 || parseInt(year, 10) > 2100)) {
-      errors['year'] = 'Enter a valid 4-digit year (e.g. 2024)';
-    }
-    return {
-      isValid: Object.keys(errors).length === 0,
-      errors
-    };
-  }
-
-  validateTab6(data: TpPiaRegistrationData): TabValidationResult {
-    const errors: Record<string, string> = {};
-    for (let i = 0; i < data.awards.length; i++) {
-      const res = this.validateAward(data.awards[i]);
-      if (!res.isValid) {
-        errors[`awards[${i}]`] = `Award #${i + 1} has invalid details`;
-      }
-    }
-    return {
-      isValid: Object.keys(errors).length === 0,
-      errors
-    };
-  }
-
-  // --- TAB 7 VALIDATION ---
-  validateTab7(data: TpPiaRegistrationData): TabValidationResult {
-    return this.validateTab4(data);
-  }
-
-  // Memoization cache to avoid recalculating validations multiple times per change detection cycle
-  private validationCache = new Map<number, { dataRef: any; result: TabValidationResult }>();
-
-  clearValidationCache() {
-    this.validationCache.clear();
-  }
-
   // --- OVERALL AUDIT ---
   getTabValidation(tabId: number, data: TpPiaRegistrationData): TabValidationResult {
-    const cached = this.validationCache.get(tabId);
-    if (cached && cached.dataRef === data) {
-      return cached.result;
-    }
-
-    let result: TabValidationResult;
     switch (tabId) {
-      case 1: result = this.validateTab1(data); break;
-      case 2: result = this.validateTab2(data); break;
-      case 3: result = this.validateTab3(data); break;
-      case 4: result = this.validateTab4(data); break;
-      default: result = { isValid: true, errors: {} }; break;
+      case 1: return this.validateTab1(data);
+      case 2: return this.validateTab2(data);
+      case 3: return this.validateTab3(data);
+      case 4: return this.validateTab4(data);
+      default: return { isValid: true, errors: {} };
     }
-
-    this.validationCache.set(tabId, { dataRef: data, result });
-    return result;
   }
 
   isTabValid(tabId: number, data: TpPiaRegistrationData): boolean {

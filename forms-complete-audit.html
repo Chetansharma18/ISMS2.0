@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ISMS 2.0 — Forms Complete Technical Audit</title>
+<style>
+  @page {
+    size: A4;
+    margin: 1.5cm;
+    @bottom-right {
+      content: counter(page);
+    }
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    line-height: 1.6;
+    font-size: 11pt;
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    color: #0f1738;
+    font-size: 20pt;
+    border-bottom: 3px solid #ea580c;
+    padding-bottom: 8px;
+    margin-top: 0;
+  }
+  h2 {
+    color: #1e3a8a;
+    font-size: 15pt;
+    border-bottom: 1.5px solid #cbd5e1;
+    padding-bottom: 6px;
+    margin-top: 24pt;
+    page-break-after: avoid;
+  }
+  h3 {
+    color: #334155;
+    font-size: 12pt;
+    margin-top: 16pt;
+    page-break-after: avoid;
+  }
+  h4 {
+    color: #475569;
+    font-size: 11pt;
+    margin-top: 12pt;
+    page-break-after: avoid;
+  }
+  p, li {
+    font-size: 10pt;
+    line-height: 1.5;
+  }
+  code {
+    font-family: Consolas, Monaco, "Courier New", Courier, monospace;
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 9pt;
+    border: 1px solid #e2e8f0;
+  }
+  pre {
+    background-color: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px 14px;
+    overflow-x: auto;
+    font-size: 8.5pt;
+    line-height: 1.4;
+    page-break-inside: avoid;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .table-container {
+    overflow-x: auto;
+    margin: 12pt 0;
+    page-break-inside: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+    margin-bottom: 14pt;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+  }
+  tr:nth-child(even) {
+    background-color: #f8fafc;
+  }
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 18pt 0;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 7.5pt;
+    font-weight: 700;
+  }
+  .badge-req {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  .badge-opt {
+    background: #f1f5f9;
+    color: #475569;
+  }
+</style>
+</head>
+<body>
+<h1>ISMS 2.0 — COMPLETE TECHNICAL AUDIT &amp; ARCHITECTURAL DOCUMENTATION</h1>
+<p><strong>Target Feature:</strong> <code>src/app/features/forms</code> (TP/PIA One-Time Registration)  </p>
+<p><strong>System:</strong> Integrated Scheme Management System (ISMS 2.0), Rajasthan  </p>
+<p><strong>Audit Date:</strong> September 16, 2026  </p>
+<p><strong>Target Directory:</strong> <code>d:\ISMS 2.0\ISMS2.0\src\app\features\forms</code>  </p>
+<p><strong>Analysis Classification:</strong> Static Code Analysis, Architecture Inspection &amp; Field-Level Audit (Zero-Modification Mode)  </p>
+<br/>
+<hr/>
+<br/>
+<h2>1. COMPLETE FORMS FOLDER STRUCTURE</h2>
+<br/>
+<p>The <code>src/app/features/forms</code> module houses the one-time registration workflow for Training Partners (TP) and Project Implementing Agencies (PIA). It contains 7 files across 3 subdirectories.</p>
+<br/>
+<h3>File Tree</h3>
+<pre><code>
+d:/ISMS 2.0/ISMS2.0/src/app/features/forms/
+├── forms.routes.ts                                         (12 lines, 343 B)
+├── components/
+│   └── tp-pia-registration/
+│       ├── tp-pia-registration.component.html              (2,565 lines, 175,001 B)
+│       ├── tp-pia-registration.component.scss              (63 lines, 1,251 B)
+│       └── tp-pia-registration.component.ts                (1,257 lines, 40,014 B)
+├── models/
+│   └── tp-pia-registration.model.ts                        (152 lines, 2,979 B)
+└── services/
+    ├── form-validation.service.ts                          (607 lines, 20,513 B)
+    └── tp-pia-registration.service.ts                      (467 lines, 15,005 B)
+</code></pre>
+<br/>
+<h3>File Details &amp; Dependency Matrix</h3>
+<br/>
+<div class="table-container"><table>
+<thead><tr><th>File Path</th><th>Type</th><th>Lines</th><th>Size</th><th>Primary Responsibility</th><th>Downstream Consumers</th><th>Direct Dependencies</th></tr></thead><tbody>
+<tr><td><code>forms.routes.ts</code></td><td>TS (Routes)</td><td>12</td><td>343 B</td><td>Route definitions for forms module; defines <code>FORMS_ROUTES</code> with paths <code>''</code> and <code>'tp-pia-registration'</code>.</td><td><code>src/app/app.routes.ts</code> (lazy loaded)</td><td><code>@angular/router</code>, <code>TpPiaRegistrationComponent</code></td></tr>
+<tr><td><code>models/tp-pia-registration.model.ts</code></td><td>TS (Models)</td><td>152</td><td>2,979 B</td><td>Central domain model definitions (<code>TpPiaRegistrationData</code>, sub-interfaces, enums).</td><td>Component, Validation Service, Registration Service</td><td>None</td></tr>
+<tr><td><code>services/form-validation.service.ts</code></td><td>TS (Service)</td><td>607</td><td>20,513 B</td><td>Synchronous field &amp; tab validators, regex pattern library, error maps, submission trackers, toast messaging.</td><td><code>tp-pia-registration.component.ts</code></td><td><code>@angular/core</code>, <code>tp-pia-registration.model.ts</code></td></tr>
+<tr><td><code>services/tp-pia-registration.service.ts</code></td><td>TS (Service)</td><td>467</td><td>15,005 B</td><td>Reactive state store for form data (<code>signal&lt;TpPiaRegistrationData&gt;</code>), auto-save debouncer, localStorage sync, sample mock data, application number generator, dropdown constant lists.</td><td><code>tp-pia-registration.component.ts</code></td><td><code>@angular/core</code>, <code>tp-pia-registration.model.ts</code></td></tr>
+<tr><td><code>components/tp-pia-registration/tp-pia-registration.component.ts</code></td><td>TS (Component)</td><td>1,257</td><td>40,014 B</td><td>Master wizard controller. Manages 5 tabs, 5 searchable dropdowns, 4 modals, keyboard input filters, date formatters, file upload logic, step navigation, and final submission.</td><td><code>forms.routes.ts</code></td><td><code>@angular/core</code>, <code>@angular/common</code>, <code>@angular/forms</code>, <code>@angular/router</code>, Models, Validation Service, Registration Service</td></tr>
+<tr><td><code>components/tp-pia-registration/tp-pia-registration.component.html</code></td><td>HTML (Template)</td><td>2,565</td><td>175,001 B</td><td>Monolithic template containing Rajasthan portal header, responsive stepper bar, 5 step cards, custom dropdowns, 4 dialog modals, mobile &amp; desktop document tables, and review summary.</td><td><code>tp-pia-registration.component.ts</code></td><td>Binds to TS properties and methods</td></tr>
+<tr><td><code>components/tp-pia-registration/tp-pia-registration.component.scss</code></td><td>SCSS (Styles)</td><td>63</td><td>1,251 B</td><td>Custom styling for scrollbar suppression (<code>.no-scrollbar</code>), smooth step transitions (<code>.step-content-smooth</code>), number input spinner suppression (<code>.no-spinners</code>), and dropdown scrollbars (<code>.dropdown-menu-scroll</code>).</td><td><code>tp-pia-registration.component.ts</code></td><td>Plain CSS/SCSS</td></tr>
+</tbody></table></div>
+<br/>
+<hr/>
+<br/>
+<h2>2. MAIN COMPONENT — COMPLETE ANALYSIS</h2>
+<p><strong>Component:</strong> <code>TpPiaRegistrationComponent</code>  </p>
+<p><strong>Source Path:</strong> <code>d:\ISMS 2.0\ISMS2.0\src\app\features\forms\components\tp-pia-registration\tp-pia-registration.component.ts</code></p>
+<br/>
+<h3>2.1 Imports Inventory &amp; Rationale</h3>
+<br/>
+<h4>Angular Core &amp; Common Imports</h4>
+<li><strong>1.</strong> <strong><code>Component</code></strong> (<code>@angular/core</code>): Decorator required to declare the class as an Angular UI component.</li>
+<li><strong>2.</strong> <strong><code>inject</code></strong> (<code>@angular/core</code>): Functional dependency injection function used to inject <code>TpPiaRegistrationService</code> and <code>FormValidationService</code> directly in property declarations without constructor boilerplate.</li>
+<li><strong>3.</strong> <strong><code>signal</code></strong> (<code>@angular/core</code>): Reactive state primitive used for local interactive states: <code>activeTab</code>, <code>showSuccessModal</code>, <code>fontScale</code>, accordion open/close flags, dropdown open flags, dropdown search query strings, drag-and-drop flags, and modal states.</li>
+<li><strong>4.</strong> <strong><code>computed</code></strong> (<code>@angular/core</code>): Derived reactive primitive used to calculate filtered dropdown option lists, tab-level error dictionaries, aggregate error collections, and tab completion/validity statuses.</li>
+<li><strong>5.</strong> <strong><code>ChangeDetectionStrategy</code></strong> (<code>@angular/core</code>): Configures the component to use <code>OnPush</code> change detection, minimizing template re-evaluations to signal changes and user interactions.</li>
+<li><strong>6.</strong> <strong><code>HostListener</code></strong> (<code>@angular/core</code>): Listens to window/document-level DOM events: <code>document:click</code> (to close searchable dropdowns when clicking outside) and <code>document:keydown.escape</code> (to dismiss dropdowns on Escape).</li>
+<li><strong>7.</strong> <strong><code>OnInit</code></strong> (<code>@angular/core</code>): Lifecycle interface; <code>ngOnInit()</code> verifies whether <code>data.basicInfo.applicationNo</code> exists and generates one if absent.</li>
+<li><strong>8.</strong> <strong><code>CommonModule</code></strong> (<code>@angular/common</code>): Provides core Angular structural directives including <code>ngClass</code> and pipes.</li>
+<li><strong>9.</strong> <strong><code>FormsModule</code></strong> (<code>@angular/forms</code>): Supplies <code>ngModel</code> and <code>ngModelChange</code> directives for two-way data binding across input, select, textarea, and checkbox controls.</li>
+<li><strong>10.</strong> <strong><code>RouterModule</code></strong> (<code>@angular/router</code>): Included in the component <code>imports</code> array for potential routing linkages (currently dormant in template).</li>
+<br/>
+<h4>Service &amp; Constant Imports (<code>../../services/tp-pia-registration.service</code>, <code>../../services/form-validation.service</code>)</h4>
+<li><strong>11.</strong> <strong><code>TpPiaRegistrationService</code></strong>: Primary state container service holding the reactive form data signal and localStorage synchronization routines.</li>
+<li><strong>12.</strong> <strong><code>INDIAN_STATES</code></strong>: Array of 29 Indian States used to populate searchable state dropdowns.</li>
+<li><strong>13.</strong> <strong><code>RAJASTHAN_DISTRICTS</code></strong>: Array of 33 Rajasthan Districts used for district search.</li>
+<li><strong>14.</strong> <strong><code>BUSINESS_ACTIVITIES</code></strong>: Array of 7 business activities for the organization profile select.</li>
+<li><strong>15.</strong> <strong><code>ID_PROOF_TYPES</code></strong>: Array of identity proof types for authorized person.</li>
+<li><strong>16.</strong> <strong><code>COMMON_BANKS</code></strong>: Array of 14 common commercial/scheduled banks for bank search.</li>
+<li><strong>17.</strong> <strong><code>TRANSFER_MODES</code></strong>: Array of 4 electronic transfer modes (<code>RTGS</code>, <code>NEFT</code>, <code>ECS</code>, <code>CBS</code>).</li>
+<li><strong>18.</strong> <strong><code>ACCOUNT_TYPES</code></strong>: Array of 2 bank account types (<code>Current Account</code>, <code>Savings Account</code>).</li>
+<li><strong>19.</strong> <strong><code>FormValidationService</code></strong>: Injected validation service providing synchronous validation rules, tab status tracking, and toast alerts.</li>
+<br/>
+<h4>Model Imports (<code>../../models/tp-pia-registration.model</code>)</h4>
+<li><strong>20.</strong> <strong><code>OfficerInCharge</code></strong>: Model representing an administrative officer record.</li>
+<li><strong>21.</strong> <strong><code>AwardItem</code></strong>: Model representing an organization award/recognition.</li>
+<li><strong>22.</strong> <strong><code>UploadedDocument</code></strong>: Model representing compliance documents and their upload metadata.</li>
+<li><strong>23.</strong> <strong><code>TpPiaRegistrationData</code></strong>: Comprehensive aggregate model for the entire TP/PIA dossier.</li>
+<br/>
+<h3>2.2 Component Configuration &amp; Metadata</h3>
+<li><strong>Selector:</strong> <code>app-tp-pia-registration</code></li>
+<li><strong>Standalone:</strong> <code>true</code></li>
+<li><strong>ChangeDetection:</strong> <code>ChangeDetectionStrategy.OnPush</code></li>
+<li><strong>Imports Array:</strong> <code>[CommonModule, FormsModule, RouterModule]</code></li>
+<li><strong>Template URL:</strong> <code>./tp-pia-registration.component.html</code></li>
+<li><strong>Style URL:</strong> <code>./tp-pia-registration.component.scss</code></li>
+<li><strong>Lifecycle Hook Implementation:</strong> <code>OnInit</code> -&gt; <code>ngOnInit()</code> initializes the application number if not present.</li>
+<br/>
+<h3>2.3 Reactive State Management &amp; Component Properties</h3>
+<br/>
+<div class="table-container"><table>
+<thead><tr><th>Property / Signal</th><th>Type</th><th>Initial Value</th><th>Nature</th><th>Purpose &amp; Scope</th><th>Mutated In</th><th>Read In</th></tr></thead><tbody>
+<tr><td><code>service</code></td><td><code>TpPiaRegistrationService</code></td><td>Injected</td><td>Service</td><td>Central state and draft storage</td><td>None</td><td>Component &amp; template</td></tr>
+<tr><td><code>valService</code></td><td><code>FormValidationService</code></td><td>Injected</td><td>Service</td><td>Validation engine</td><td>None</td><td>Component &amp; template</td></tr>
+<tr><td><code>Math</code></td><td><code>Math</code></td><td>Native Math</td><td>Global</td><td>Exposes native <code>Math</code> to template</td><td>None</td><td>Template</td></tr>
+<tr><td><code>activeTab</code></td><td><code>WritableSignal&lt;number&gt;</code></td><td><code>1</code></td><td>Signal</td><td>Currently active step (1 to 5)</td><td><code>switchTab()</code>, <code>nextTab()</code>, <code>prevTab()</code></td><td>Stepper UI, step containers, header info</td></tr>
+<tr><td><code>showSuccessModal</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Toggles final submission success dialog</td><td><code>submitFinalApplication()</code>, close button</td><td>Success modal template</td></tr>
+<tr><td><code>fontScale</code></td><td>`WritableSignal&lt;'standard'</td><td>'large'</td><td>'xlarge'&gt;`</td><td><code>'standard'</code></td><td>Signal</td><td>UI font size scaling</td><td><code>setFontScale()</code></td><td>HTML documentElement</td></tr>
+<tr><td><code>declarationAgreed</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Property</td><td>Checkbox state for Step 5 legal declaration</td><td><code>[(ngModel)]</code> binding</td><td>Submit button disabled state</td></tr>
+<tr><td><code>isOrgProfileOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>true</code></td><td>Signal</td><td>Accordion toggle for Step 1 Section 1.1</td><td>Toggle button in Section 1.1</td><td>Section 1.1 container visibility</td></tr>
+<tr><td><code>isContactDetailsOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Accordion toggle for Step 1 Section 1.2</td><td>Toggle button in Section 1.2</td><td>Section 1.2 container visibility</td></tr>
+<tr><td><code>isAddressRecordsOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Accordion toggle for Step 1 Section 1.2 (Address)</td><td>Toggled simultaneously with contact details</td><td>Section 1.2 overflow class</td></tr>
+<tr><td><code>isReviewStep1Open</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>true</code></td><td>Signal</td><td>Step 5 review accordion for Organisation block</td><td>Header click</td><td>Step 5 Block 1 visibility</td></tr>
+<tr><td><code>isReviewOrgProfileOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>true</code></td><td>Signal</td><td>Step 5 review sub-accordion for Profile</td><td>Sub-header click</td><td>Step 5 Sub-block 1.1 visibility</td></tr>
+<tr><td><code>isReviewContactOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Step 5 review sub-accordion for Contact</td><td>Sub-header click</td><td>Step 5 Sub-block 1.2 visibility</td></tr>
+<tr><td><code>isReviewAddressOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Step 5 review sub-accordion for Address</td><td>Sub-header click</td><td>Step 5 Sub-block 1.3 visibility</td></tr>
+<tr><td><code>isReviewAuthPersonOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Step 5 review accordion for Authorized Person</td><td>Header click</td><td>Step 5 Block 2 visibility</td></tr>
+<tr><td><code>isReviewBankOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Step 5 review accordion for Bank Details</td><td>Header click</td><td>Step 5 Block 3 visibility</td></tr>
+<tr><td><code>isReviewDocsOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Step 5 review accordion for Documents</td><td>Header click</td><td>Step 5 Block 4 visibility</td></tr>
+<tr><td><code>tabs</code></td><td><code>TabItem[]</code></td><td>5 items</td><td>Readonly Array</td><td>Tab metadata (id, label, shortLabel, icon)</td><td>Immutable</td><td>Stepper rendering loop (<code>@for</code>)</td></tr>
+<tr><td><code>currentStepInfo</code></td><td><code>{ title: string; subtitle: string }</code></td><td>Getter</td><td>Dynamic</td><td>Returns responsive step title and subtitle</td><td>Evaluates <code>activeTab()</code></td><td>Form title banner</td></tr>
+<tr><td><code>data</code></td><td><code>TpPiaRegistrationData</code></td><td>Getter</td><td>Dynamic</td><td>Accessor for <code>service.formData()</code></td><td>Evaluates signal</td><td>All input bindings &amp; TS logic</td></tr>
+<tr><td><code>changeTimer</code></td><td><code>any</code></td><td><code>undefined</code></td><td>Timer</td><td>Debounce timer handle for auto-save dispatch (60ms)</td><td><code>onDataChange()</code></td><td>Timer reset &amp; dispatch</td></tr>
+<tr><td><code>tab1Errors</code></td><td><code>Signal&lt;Record&lt;string, string&gt;&gt;</code></td><td>Computed</td><td>Computed</td><td>Validation errors for Tab 1</td><td>Recomputed on <code>formData()</code></td><td>Merged into <code>errors</code></td></tr>
+<tr><td><code>tab2Errors</code></td><td><code>Signal&lt;Record&lt;string, string&gt;&gt;</code></td><td>Computed</td><td>Computed</td><td>Validation errors for Tab 2</td><td>Recomputed on <code>formData()</code></td><td>Merged into <code>errors</code></td></tr>
+<tr><td><code>tab3Errors</code></td><td><code>Signal&lt;Record&lt;string, string&gt;&gt;</code></td><td>Computed</td><td>Computed</td><td>Validation errors for Tab 3</td><td>Recomputed on <code>formData()</code></td><td>Merged into <code>errors</code></td></tr>
+<tr><td><code>tab4ProjectErrors</code></td><td><code>Signal&lt;Record&lt;string, string&gt;&gt;</code></td><td>Computed</td><td>Computed</td><td>Validation errors for Tab 4</td><td>Recomputed on <code>formData()</code></td><td>Merged into <code>errors</code></td></tr>
+<tr><td><code>errors</code></td><td><code>Signal&lt;Record&lt;string, string&gt;&gt;</code></td><td>Computed</td><td>Computed</td><td>Merged error dictionary for all fields</td><td>Recomputed when any tab error changes</td><td><code>isFieldInvalid()</code>, <code>getFieldError()</code></td></tr>
+<tr><td><code>tabStatuses</code></td><td><code>Signal&lt;Record&lt;number, { isCompleted: boolean; isSubmittedInvalid: boolean }&gt;&gt;</code></td><td>Computed</td><td>Computed</td><td>Tab visual status map (valid, completed, invalid)</td><td>Recomputed on form data or tab state change</td><td>Stepper circle classes &amp; step indicators</td></tr>
+<tr><td><code>isDistrictDropdownOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>District searchable dropdown open state</td><td><code>toggleDistrictDropdown()</code>, outside click</td><td>Dropdown menu popup</td></tr>
+<tr><td><code>districtSearchQuery</code></td><td><code>WritableSignal&lt;string&gt;</code></td><td><code>''</code></td><td>Signal</td><td>District search text filter</td><td>Search input <code>[(ngModel)]</code>, clear</td><td>Filtered computed</td></tr>
+<tr><td><code>filteredDistricts</code></td><td><code>Signal&lt;string[]&gt;</code></td><td>Computed</td><td>Computed</td><td>Filtered list of districts matching query</td><td>Computed from query</td><td>Dropdown option list</td></tr>
+<tr><td><code>isStateRegDropdownOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>State Where Registered dropdown open state</td><td><code>toggleStateRegDropdown()</code>, outside click</td><td>Dropdown menu popup</td></tr>
+<tr><td><code>stateRegSearchQuery</code></td><td><code>WritableSignal&lt;string&gt;</code></td><td><code>''</code></td><td>Signal</td><td>State Where Registered search text filter</td><td>Search input <code>[(ngModel)]</code>, clear</td><td>Filtered computed</td></tr>
+<tr><td><code>filteredStatesReg</code></td><td><code>Signal&lt;string[]&gt;</code></td><td>Computed</td><td>Computed</td><td>Filtered list of states matching query</td><td>Computed from query</td><td>Dropdown option list</td></tr>
+<tr><td><code>isStateAddrDropdownOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Address State/UT dropdown open state</td><td><code>toggleStateAddrDropdown()</code>, outside click</td><td>Dropdown menu popup</td></tr>
+<tr><td><code>stateAddrSearchQuery</code></td><td><code>WritableSignal&lt;string&gt;</code></td><td><code>''</code></td><td>Signal</td><td>Address State search text filter</td><td>Search input <code>[(ngModel)]</code>, clear</td><td>Filtered computed</td></tr>
+<tr><td><code>filteredStatesAddr</code></td><td><code>Signal&lt;string[]&gt;</code></td><td>Computed</td><td>Computed</td><td>Filtered list of states matching query</td><td>Computed from query</td><td>Dropdown option list</td></tr>
+<tr><td><code>isStateAuthDropdownOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Authorized Person State dropdown open state</td><td><code>toggleStateAuthDropdown()</code>, outside click</td><td>Dropdown menu popup</td></tr>
+<tr><td><code>stateAuthSearchQuery</code></td><td><code>WritableSignal&lt;string&gt;</code></td><td><code>''</code></td><td>Signal</td><td>Authorized Person State search text filter</td><td>Search input <code>[(ngModel)]</code>, clear</td><td>Filtered computed</td></tr>
+<tr><td><code>filteredStatesAuth</code></td><td><code>Signal&lt;string[]&gt;</code></td><td>Computed</td><td>Computed</td><td>Filtered list of states matching query</td><td>Computed from query</td><td>Dropdown option list</td></tr>
+<tr><td><code>isBankDropdownOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Bank Name searchable dropdown open state</td><td><code>toggleBankDropdown()</code>, outside click</td><td>Dropdown menu popup</td></tr>
+<tr><td><code>bankSearchQuery</code></td><td><code>WritableSignal&lt;string&gt;</code></td><td><code>''</code></td><td>Signal</td><td>Bank Name search text filter</td><td>Search input <code>[(ngModel)]</code>, clear</td><td>Filtered computed</td></tr>
+<tr><td><code>filteredBanks</code></td><td><code>Signal&lt;string[]&gt;</code></td><td>Computed</td><td>Computed</td><td>Filtered list of banks matching query</td><td>Computed from query</td><td>Dropdown option list</td></tr>
+<tr><td><code>isBankDragging</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Visual drag-over indicator for cheque dropzone</td><td><code>onBankDragOver()</code>, <code>onBankDragLeave()</code></td><td>Dropzone border/background CSS</td></tr>
+<tr><td><code>bankFileError</code></td><td><code>WritableSignal&lt;string&gt;</code></td><td><code>''</code></td><td>Signal</td><td>Error message for cheque upload</td><td><code>handleBankFile()</code>, <code>removeBankFile()</code></td><td>Dropzone error banner</td></tr>
+<tr><td><code>docErrorMessage</code></td><td><code>WritableSignal&lt;string&gt;</code></td><td><code>''</code></td><td>Signal</td><td>Error message for Step 4 document upload</td><td><code>onDocFileSelected()</code></td><td>Step 4 error banner</td></tr>
+<tr><td><code>previewingDoc</code></td><td>`WritableSignal&lt;UploadedDocument</td><td>null&gt;`</td><td><code>null</code></td><td>Signal</td><td>Document instance currently viewed in preview modal</td><td>Preview button click, modal close</td><td>Document preview modal</td></tr>
+<tr><td><code>showOfficerModal</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Officer In-Charge CRUD modal open state</td><td><code>openAddOfficerModal()</code>, <code>closeOfficerModal()</code></td><td>Officer modal template</td></tr>
+<tr><td><code>isOfficerEditing</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Differentiates Add vs Edit mode for officer</td><td><code>openAddOfficerModal()</code>, <code>editOfficer()</code></td><td>Modal title and button text</td></tr>
+<tr><td><code>modalOfficerSubmitted</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Flag tracking if officer save was attempted</td><td><code>saveOfficer()</code>, <code>openAddOfficerModal()</code></td><td>Modal validation error display</td></tr>
+<tr><td><code>isOfficerOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>true</code></td><td>Signal</td><td>Dormant accordion flag for officer list</td><td>Set to <code>true</code></td><td>Unused in active HTML</td></tr>
+<tr><td><code>currentOfficer</code></td><td><code>OfficerInCharge</code></td><td>Blank Officer</td><td>Property</td><td>Model instance backing officer dialog</td><td>Edited in dialog inputs</td><td>Officer dialog input bindings</td></tr>
+<tr><td><code>showAwardModal</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Award Record CRUD modal open state</td><td><code>openAddAwardModal()</code>, <code>closeAwardModal()</code></td><td>Award modal template</td></tr>
+<tr><td><code>isAwardEditing</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Differentiates Add vs Edit mode for award</td><td><code>openAddAwardModal()</code>, <code>editAward()</code></td><td>Modal title and button text</td></tr>
+<tr><td><code>modalAwardSubmitted</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>false</code></td><td>Signal</td><td>Flag tracking if award save was attempted</td><td><code>saveAward()</code>, <code>openAddAwardModal()</code></td><td>Modal validation error display</td></tr>
+<tr><td><code>isAwardOpen</code></td><td><code>WritableSignal&lt;boolean&gt;</code></td><td><code>true</code></td><td>Signal</td><td>Dormant accordion flag for award list</td><td>Set to <code>true</code></td><td>Unused in active HTML</td></tr>
+<tr><td><code>currentAward</code></td><td><code>AwardItem</code></td><td>Blank Award</td><td>Property</td><td>Model instance backing award dialog</td><td>Edited in dialog inputs</td><td>Award dialog input bindings</td></tr>
+<tr><td><code>todayIso</code></td><td><code>string</code></td><td>Getter</td><td>Dynamic</td><td>Today's date (<code>YYYY-MM-DD</code>)</td><td>Evaluates <code>new Date()</code></td><td><code>[max]</code> attribute on registration picker</td></tr>
+<tr><td><code>maxDobIso</code></td><td><code>string</code></td><td>Getter</td><td>Dynamic</td><td>Max DOB (18 years ago, <code>YYYY-MM-DD</code>)</td><td>Evaluates <code>new Date()</code></td><td><code>[max]</code> attribute on DOB picker</td></tr>
+<tr><td><code>minDobIso</code></td><td><code>string</code></td><td>Getter</td><td>Dynamic</td><td>Min DOB (100 years ago, <code>YYYY-MM-DD</code>)</td><td>Evaluates <code>new Date()</code></td><td><code>[min]</code> attribute on DOB picker</td></tr>
+</tbody></table></div>
+<br/>
+<hr/>
+<br/>
+<h3>2.4 Complete Method Inventory (64 Methods)</h3>
+<br/>
+<div class="table-container"><table>
+<thead><tr><th>Method Name</th><th>Parameters</th><th>Return</th><th>Exact Purpose</th><th>Data Read</th><th>Data Written</th><th>Service Invocation</th><th>UI / Behavioral Effect</th></tr></thead><tbody>
+<tr><td><code>ngOnInit</code></td><td>None</td><td><code>void</code></td><td>Initializes application number if not present</td><td><code>data.basicInfo.applicationNo</code></td><td><code>data.basicInfo.applicationNo</code></td><td><code>service.updateFormData()</code>, <code>service.generateApplicationNo()</code></td><td>Sets default application number</td></tr>
+<tr><td><code>currentStepInfo</code> (get)</td><td>None</td><td><code>{title, subtitle}</code></td><td>Returns responsive step header title &amp; subtitle based on activeTab</td><td><code>activeTab()</code></td><td>None</td><td>None</td><td>Updates header banner</td></tr>
+<tr><td><code>data</code> (get)</td><td>None</td><td><code>TpPiaRegistrationData</code></td><td>Accessor for current form data object</td><td><code>service.formData()</code></td><td>None</td><td>None</td><td>Template data source</td></tr>
+<tr><td><code>onDataChange</code></td><td>None</td><td><code>void</code></td><td>Debounces updates (60ms) and triggers auto-save</td><td>None</td><td><code>changeTimer</code></td><td><code>service.updateFormData()</code></td><td>Refreshes reactive signal &amp; triggers auto-save</td></tr>
+<tr><td><code>getFieldValue</code></td><td><code>fieldKey: string</code></td><td><code>any</code></td><td>Traverses dot-delimited property path on form data</td><td><code>data</code>, <code>fieldKey</code></td><td>None</td><td>None</td><td>Resolves field value for validation check</td></tr>
+<tr><td><code>isFieldInvalid</code></td><td><code>fieldKey: string</code></td><td><code>boolean</code></td><td>Evaluates whether field has validation error and should display it</td><td><code>errors()</code>, <code>getFieldValue()</code>, <code>valService.isTabSubmitted()</code></td><td>None</td><td><code>valService.isTabSubmitted()</code></td><td>Toggles red error border and error message</td></tr>
+<tr><td><code>getFieldError</code></td><td><code>fieldKey: string</code></td><td><code>string</code></td><td>Returns error message string if invalid</td><td><code>errors()</code>, <code>isFieldInvalid()</code></td><td>None</td><td>None</td><td>Renders error text in <code>&lt;p&gt;</code> tag</td></tr>
+<tr><td><code>isTabValid</code></td><td><code>tabId: number</code></td><td><code>boolean</code></td><td>Evaluates tab validity</td><td><code>data</code></td><td>None</td><td><code>valService.isTabValid()</code></td><td>Validates tab status</td></tr>
+<tr><td><code>isTabCompleted</code></td><td><code>tabId: number</code></td><td><code>boolean</code></td><td>Checks if tab is completed</td><td><code>tabStatuses()</code></td><td>None</td><td>None</td><td>Sets green checkmark icon in stepper</td></tr>
+<tr><td><code>isTabSubmittedInvalid</code></td><td><code>tabId: number</code></td><td><code>boolean</code></td><td>Checks if tab was submitted with errors</td><td><code>tabStatuses()</code></td><td>None</td><td>None</td><td>Sets red exclamation icon in stepper</td></tr>
+<tr><td><code>closeAllDropdowns</code></td><td>None</td><td><code>void</code></td><td>Closes all 5 searchable dropdowns</td><td>None</td><td>Sets 5 dropdown signals to <code>false</code></td><td>None</td><td>Dismisses open dropdown menus</td></tr>
+<tr><td><code>toggleDistrictDropdown</code></td><td><code>event?: MouseEvent</code></td><td><code>void</code></td><td>Toggles district dropdown and focuses search input</td><td><code>isDistrictDropdownOpen()</code></td><td>Toggles signal, resets query</td><td>None</td><td>Opens/closes district menu &amp; focuses input</td></tr>
+<tr><td><code>selectDistrict</code></td><td><code>dist: string</code></td><td><code>void</code></td><td>Selects district and closes menu</td><td>None</td><td><code>registeredAddress.district</code>, resets query &amp; open signal</td><td>None</td><td>Updates district and runs address change handler</td></tr>
+<tr><td><code>clearDistrict</code></td><td><code>event?: MouseEvent</code></td><td><code>void</code></td><td>Clears selected district</td><td>None</td><td><code>registeredAddress.district = ''</code></td><td>None</td><td>Resets district to empty</td></tr>
+<tr><td><code>toggleStateRegDropdown</code></td><td><code>event?: MouseEvent</code></td><td><code>void</code></td><td>Toggles registered state dropdown</td><td><code>isStateRegDropdownOpen()</code></td><td>Toggles signal, resets query</td><td>None</td><td>Opens/closes state reg menu &amp; focuses input</td></tr>
+<tr><td><code>selectStateReg</code></td><td><code>state: string</code></td><td><code>void</code></td><td>Selects registered state</td><td>None</td><td><code>entityInfo.stateWhereRegistered</code>, resets query &amp; open</td><td>None</td><td>Updates state reg and triggers change</td></tr>
+<tr><td><code>clearStateReg</code></td><td><code>event?: MouseEvent</code></td><td><code>void</code></td><td>Clears registered state</td><td>None</td><td><code>entityInfo.stateWhereRegistered = ''</code></td><td>None</td><td>Resets state reg to empty</td></tr>
+<tr><td><code>toggleStateAddrDropdown</code></td><td><code>event?: MouseEvent</code></td><td><code>void</code></td><td>Toggles address state dropdown</td><td><code>isStateAddrDropdownOpen()</code></td><td>Toggles signal, resets query</td><td>None</td><td>Opens/closes address state menu &amp; focuses input</td></tr>
+<tr><td><code>selectStateAddr</code></td><td><code>state: string</code></td><td><code>void</code></td><td>Selects address state</td><td>None</td><td><code>registeredAddress.state</code>, resets query &amp; open</td><td>None</td><td>Updates address state and syncs postal</td></tr>
+<tr><td><code>clearStateAddr</code></td><td><code>event?: MouseEvent</code></td><td><code>void</code></td><td>Clears address state</td><td>None</td><td><code>registeredAddress.state = ''</code></td><td>None</td><td>Resets address state to empty</td></tr>
+<tr><td><code>toggleStateAuthDropdown</code></td><td><code>event?: MouseEvent</code></td><td><code>void</code></td><td>Toggles authorized state dropdown</td><td><code>isStateAuthDropdownOpen()</code></td><td>Toggles signal, resets query</td><td>None</td><td>Opens/closes auth state menu &amp; focuses input</td></tr>
+<tr><td><code>selectStateAuth</code></td><td><code>state: string</code></td><td><code>void</code></td><td>Selects authorized state</td><td>None</td><td><code>authorizedOrg.state</code>, resets query &amp; open</td><td>None</td><td>Updates auth state and triggers change</td></tr>
+<tr><td><code>clearStateAuth</code></td><td><code>event?: MouseEvent</code></td><td><code>void</code></td><td>Clears authorized state</td><td>None</td><td><code>authorizedOrg.state = ''</code></td><td>None</td><td>Resets auth state to empty</td></tr>
+<tr><td><code>toggleBankDropdown</code></td><td><code>event?: MouseEvent</code></td><td><code>void</code></td><td>Toggles bank dropdown</td><td><code>isBankDropdownOpen()</code></td><td>Toggles signal, resets query</td><td>None</td><td>Opens/closes bank menu &amp; focuses input</td></tr>
+<tr><td><code>selectBank</code></td><td><code>bank: string</code></td><td><code>void</code></td><td>Selects bank name</td><td>None</td><td><code>bankDetails.bankName</code>, resets query &amp; open</td><td>None</td><td>Updates bank name and triggers change</td></tr>
+<tr><td><code>clearBank</code></td><td><code>event?: MouseEvent</code></td><td><code>void</code></td><td>Clears bank name</td><td>None</td><td><code>bankDetails.bankName = ''</code></td><td>None</td><td>Resets bank name to empty</td></tr>
+<tr><td><code>onDocumentClick</code></td><td><code>event: MouseEvent</code></td><td><code>void</code></td><td>Outside-click handler closing dropdowns</td><td>Event target</td><td>Sets 5 dropdown signals to <code>false</code></td><td>None</td><td>Closes menus when clicking outside</td></tr>
+<tr><td><code>onEscapePress</code></td><td>None</td><td><code>void</code></td><td>Escape key listener closing dropdowns</td><td>None</td><td>Sets 5 dropdown signals to <code>false</code></td><td>None</td><td>Dismisses open dropdown menus on Escape</td></tr>
+<tr><td><code>toggleSameAddress</code></td><td>None</td><td><code>void</code></td><td>Syncs postal address with registered address</td><td><code>data.sameAsRegistered</code>, <code>registeredAddress</code></td><td><code>postalAddress</code> fields</td><td><code>service.updateFormData()</code></td><td>Automatically copies address fields</td></tr>
+<tr><td><code>onRegisteredAddressChange</code></td><td>None</td><td><code>void</code></td><td>Triggers postal sync if sameAsRegistered is active</td><td><code>data.sameAsRegistered</code></td><td>None</td><td>Calls <code>toggleSameAddress()</code>, <code>onDataChange()</code></td><td>Keeps postal in sync with registered</td></tr>
+<tr><td><code>todayIso</code> (get)</td><td>None</td><td><code>string</code></td><td>Returns current date in YYYY-MM-DD</td><td>System clock</td><td>None</td><td>None</td><td>Date picker upper bound</td></tr>
+<tr><td><code>maxDobIso</code> (get)</td><td>None</td><td><code>string</code></td><td>Returns date 18 years ago in YYYY-MM-DD</td><td>System clock</td><td>None</td><td>None</td><td>DOB date picker upper bound (18 yrs min age)</td></tr>
+<tr><td><code>minDobIso</code> (get)</td><td>None</td><td><code>string</code></td><td>Returns date 100 years ago in YYYY-MM-DD</td><td>System clock</td><td>None</td><td>None</td><td>DOB date picker lower bound (100 yrs max age)</td></tr>
+<tr><td><code>onlyNumbers</code></td><td><code>event: KeyboardEvent</code></td><td><code>boolean</code></td><td>Prevents non-digit keystrokes</td><td><code>event.key</code></td><td>None</td><td>None</td><td>Blocks character input on numeric fields</td></tr>
+<tr><td><code>onlyLetters</code></td><td><code>event: KeyboardEvent</code></td><td><code>boolean</code></td><td>Allows letters, spaces, and dots</td><td><code>event.key</code></td><td>None</td><td>None</td><td>Blocks digits and special symbols</td></tr>
+<tr><td><code>onlyLettersSymbols</code></td><td><code>event: KeyboardEvent</code></td><td><code>boolean</code></td><td>Allows letters, spaces, and &amp; / - .</td><td><code>event.key</code></td><td>None</td><td>None</td><td>Blocks digits on organization short name</td></tr>
+<tr><td><code>onlyAlphanumericSymbols</code></td><td><code>event: KeyboardEvent</code></td><td><code>boolean</code></td><td>Allows letters, numbers, spaces, &amp; / - .</td><td><code>event.key</code></td><td>None</td><td>None</td><td>Restricts registration number &amp; branch names</td></tr>
+<tr><td><code>onlyAlphanumeric</code></td><td><code>event: KeyboardEvent</code></td><td><code>boolean</code></td><td>Allows letters and numbers only</td><td><code>event.key</code></td><td>None</td><td>None</td><td>Restricts PAN, IFSC, Passport inputs</td></tr>
+<tr><td><code>onlyDecimals</code></td><td><code>event: KeyboardEvent, currentVal: any</code></td><td><code>boolean</code></td><td>Restricts input to digits and max 1 decimal point</td><td><code>event.key</code>, <code>currentVal</code></td><td>None</td><td>None</td><td>Restricts turnover input</td></tr>
+<tr><td><code>sanitizeNumbers</code></td><td><code>val: any, maxLen?: number</code></td><td><code>string</code></td><td>Strips all non-digit characters</td><td><code>val</code></td><td>None</td><td>None</td><td>Sanitizes pasted or typed numbers</td></tr>
+<tr><td><code>sanitizeLetters</code></td><td><code>val?: string, maxLen?: number</code></td><td><code>string</code></td><td>Strips non-letter/space/dot characters</td><td><code>val</code></td><td>None</td><td>None</td><td>Sanitizes full name and guardian name</td></tr>
+<tr><td><code>sanitizeAlphanumericUpper</code></td><td><code>val?: string, maxLen?: number</code></td><td><code>string</code></td><td>Converts to uppercase alphanumeric</td><td><code>val</code></td><td>None</td><td>None</td><td>Sanitizes PAN, IFSC, Passport</td></tr>
+<tr><td><code>sanitizeAlphanumericSymbols</code></td><td><code>val?: string, maxLen?: number</code></td><td><code>string</code></td><td>Strips non-alphanumeric/symbol characters</td><td><code>val</code></td><td>None</td><td>None</td><td>Sanitizes branch and designation</td></tr>
+<tr><td><code>sanitizeAlphanumericSymbolsUpper</code></td><td><code>val?: string, maxLen?: number</code></td><td><code>string</code></td><td>Converts to uppercase alphanumeric with symbols</td><td><code>val</code></td><td>None</td><td>None</td><td>Sanitizes Voter ID, Bhamashah</td></tr>
+<tr><td><code>sanitizeLettersSymbolsUpper</code></td><td><code>val?: string, maxLen?: number</code></td><td><code>string</code></td><td>Converts to uppercase letters and symbols (no numbers)</td><td><code>val</code></td><td>None</td><td>None</td><td>Sanitizes short name</td></tr>
+<tr><td><code>sanitizeDecimals</code></td><td><code>val: any, maxLen?: number</code></td><td><code>string</code></td><td>Strips invalid decimal formats</td><td><code>val</code></td><td>None</td><td>None</td><td>Sanitizes turnover input</td></tr>
+<tr><td><code>formatDateDisplay</code></td><td><code>dateStr?: string</code></td><td><code>string</code></td><td>Converts ISO YYYY-MM-DD to DD/MM/YYYY</td><td><code>dateStr</code></td><td>None</td><td>None</td><td>Formats display text for date fields</td></tr>
+<tr><td><code>getIsoDate</code></td><td><code>dateStr?: string</code></td><td><code>string</code></td><td>Converts DD/MM/YYYY to ISO YYYY-MM-DD</td><td><code>dateStr</code></td><td>None</td><td>None</td><td>Sets native date picker <code>[value]</code></td></tr>
+<tr><td><code>onDateInput</code></td><td>`event: Event, field: 'registration'</td><td>'dob'`</td><td><code>void</code></td><td>Auto-inserts slashes as user types date</td><td><code>event.target.value</code></td><td>Formatted date string in form data</td><td>Calls <code>onDataChange()</code> / <code>onDobChange()</code></td><td>Real-time date typing mask</td></tr>
+<tr><td><code>onDatePick</code></td><td>`event: Event, field: 'registration'</td><td>'dob'`</td><td><code>void</code></td><td>Receives date from native date picker</td><td><code>event.target.value</code></td><td>Formatted date string in form data</td><td>Calls <code>onDataChange()</code> / <code>onDobChange()</code></td><td>Syncs native picker to input</td></tr>
+<tr><td><code>openPicker</code></td><td><code>picker: HTMLInputElement</code></td><td><code>void</code></td><td>Triggers browser native date picker UI</td><td><code>picker</code></td><td>None</td><td>None</td><td>Opens date picker modal</td></tr>
+<tr><td><code>onDobChange</code></td><td>None</td><td><code>void</code></td><td>Calculates age based on DOB string</td><td><code>data.authorizedOrg.dob</code></td><td><code>data.authorizedOrg.age</code></td><td>Calls <code>onDataChange()</code></td><td>Auto-computes age</td></tr>
+<tr><td><code>onTypeIdProofChange</code></td><td>None</td><td><code>void</code></td><td>Syncs <code>idNo</code> when ID type dropdown changes</td><td><code>data.authorizedOrg.typeIdProof</code>, existing IDs</td><td><code>data.authorizedOrg.idNo</code></td><td>Calls <code>onDataChange()</code></td><td>Prepopulates <code>idNo</code> from selected ID</td></tr>
+<tr><td><code>onAadhaarChange</code></td><td>None</td><td><code>void</code></td><td>Sanitizes Aadhaar to 12 digits</td><td><code>data.authorizedOrg.aadhaarNo</code></td><td><code>data.authorizedOrg.aadhaarNo</code></td><td>Calls <code>onDataChange()</code></td><td>Restricts Aadhaar input</td></tr>
+<tr><td><code>onVoterIdChange</code></td><td>None</td><td><code>void</code></td><td>Uppercases Voter ID and syncs with <code>idNo</code></td><td><code>data.authorizedOrg.voterIdNo</code></td><td><code>voterIdNo</code>, <code>idNo</code></td><td>Calls <code>onDataChange()</code></td><td>Syncs Voter ID to master ID</td></tr>
+<tr><td><code>onPassportChange</code></td><td>None</td><td><code>void</code></td><td>Uppercases Passport and syncs with <code>idNo</code></td><td><code>data.authorizedOrg.passportNo</code></td><td><code>passportNo</code>, <code>idNo</code></td><td>Calls <code>onDataChange()</code></td><td>Syncs Passport to master ID</td></tr>
+<tr><td><code>onBhamashahChange</code></td><td>None</td><td><code>void</code></td><td>Syncs Bhamashah to <code>idNo</code></td><td><code>data.authorizedOrg.bhamashahNo</code></td><td><code>idNo</code></td><td>Calls <code>onDataChange()</code></td><td>Syncs Bhamashah to master ID</td></tr>
+<tr><td><code>onPanChange</code></td><td>None</td><td><code>void</code></td><td>Uppercases PAN and syncs with <code>idNo</code></td><td><code>data.authorizedOrg.pan</code></td><td><code>pan</code>, <code>idNo</code></td><td>Calls <code>onDataChange()</code></td><td>Syncs PAN to master ID</td></tr>
+<tr><td><code>onBankDragOver</code></td><td><code>e: DragEvent</code></td><td><code>void</code></td><td>Sets <code>isBankDragging</code> to true</td><td>Drag event</td><td><code>isBankDragging = true</code></td><td>None</td><td>Shows drag-over highlight</td></tr>
+<tr><td><code>onBankDragLeave</code></td><td><code>e: DragEvent</code></td><td><code>void</code></td><td>Sets <code>isBankDragging</code> to false</td><td>Drag event</td><td><code>isBankDragging = false</code></td><td>None</td><td>Removes drag-over highlight</td></tr>
+<tr><td><code>onBankFileDrop</code></td><td><code>e: DragEvent</code></td><td><code>void</code></td><td>Handles dropped cheque file</td><td><code>e.dataTransfer.files</code></td><td>Calls <code>handleBankFile()</code></td><td>None</td><td>Processes dropped file</td></tr>
+<tr><td><code>onBankFileSelected</code></td><td><code>e: Event</code></td><td><code>void</code></td><td>Handles selected cheque file from file input</td><td><code>input.files</code></td><td>Calls <code>handleBankFile()</code></td><td>None</td><td>Processes selected file</td></tr>
+<tr><td><code>handleBankFile</code></td><td><code>file: File</code></td><td><code>void</code></td><td>Validates size (5MB) &amp; ext, saves cheque metadata</td><td><code>file</code></td><td><code>bankFileError</code>, <code>bankDetails.cancelledChequeFileName/Size</code>, updates <code>doc-bank</code></td><td><code>service.updateFormData()</code></td><td>Displays uploaded file card</td></tr>
+<tr><td><code>removeBankFile</code></td><td>None</td><td><code>void</code></td><td>Clears cheque metadata</td><td>None</td><td>Clears cheque properties, resets <code>doc-bank</code> to pending</td><td><code>service.updateFormData()</code></td><td>Reverts dropzone to empty</td></tr>
+<tr><td><code>documents</code> (get)</td><td>None</td><td><code>UploadedDocument[]</code></td><td>Returns list of statutory documents</td><td><code>service.formData().documents</code></td><td>None</td><td>None</td><td>Table &amp; card rendering loop</td></tr>
+<tr><td><code>totalRequiredCount</code> (get)</td><td>None</td><td><code>number</code></td><td>Counts mandatory documents</td><td><code>documents</code></td><td>None</td><td>None</td><td>Displays mandatory count</td></tr>
+<tr><td><code>uploadedRequiredCount</code> (get)</td><td>None</td><td><code>number</code></td><td>Counts uploaded mandatory documents</td><td><code>documents</code></td><td>None</td><td>None</td><td>Displays uploaded count</td></tr>
+<tr><td><code>isTab4Submitted</code> (get)</td><td>None</td><td><code>boolean</code></td><td>Checks if Tab 4 was submitted</td><td>None</td><td>None</td><td><code>valService.isTabSubmitted(4)</code></td><td>Toggles validation styling</td></tr>
+<tr><td><code>isTab4Invalid</code> (get)</td><td>None</td><td><code>boolean</code></td><td>Checks if Tab 4 has missing required docs</td><td><code>isTab4Submitted</code>, counts</td><td>None</td><td>None</td><td>Displays banner on Step 4</td></tr>
+<tr><td><code>onDocFileSelected</code></td><td><code>event: Event, docId: string</code></td><td><code>void</code></td><td>Validates size/type and attaches document</td><td><code>file</code>, <code>docId</code></td><td><code>docErrorMessage</code>, updates document item in array</td><td><code>service.updateFormData()</code></td><td>Updates document row state</td></tr>
+<tr><td><code>removeDocument</code></td><td><code>docId: string</code></td><td><code>void</code></td><td>Detaches document and resets to pending</td><td><code>docId</code></td><td>Resets fileName, fileSize, uploadDate, status</td><td><code>service.updateFormData()</code></td><td>Reverts document row state</td></tr>
+<tr><td><code>showOfficerModal</code> (get)</td><td>None</td><td><code>boolean</code></td><td>Returns officer modal signal</td><td>None</td><td>None</td><td>None</td><td>Dialog visibility</td></tr>
+<tr><td><code>officers</code> (get)</td><td>None</td><td><code>OfficerInCharge[]</code></td><td>Returns officers array from form data</td><td><code>service.formData().officers</code></td><td>None</td><td>None</td><td>Officers list data source</td></tr>
+<tr><td><code>isOfficerTabInvalid</code> (get)</td><td>None</td><td><code>boolean</code></td><td>Evaluates officer tab validity</td><td>None</td><td>None</td><td><code>valService.isTabSubmitted(2)</code>, <code>isTabValid(2)</code></td><td>Error indicator</td></tr>
+<tr><td><code>officerErrors</code> (get)</td><td>None</td><td><code>Record&lt;string, string&gt;</code></td><td>Validates <code>currentOfficer</code></td><td><code>currentOfficer</code></td><td>None</td><td><code>valService.validateOfficer()</code></td><td>Dialog validation</td></tr>
+<tr><td><code>isOfficerModalFieldInvalid</code></td><td><code>field: keyof OfficerInCharge</code></td><td><code>boolean</code></td><td>Checks if officer dialog field is invalid</td><td><code>officerErrors</code>, <code>currentOfficer</code>, <code>modalOfficerSubmitted</code></td><td>None</td><td>None</td><td>Dialog error border</td></tr>
+<tr><td><code>getOfficerModalFieldError</code></td><td><code>field: keyof OfficerInCharge</code></td><td><code>string</code></td><td>Returns error string for officer field</td><td><code>officerErrors</code></td><td>None</td><td>None</td><td>Dialog error message</td></tr>
+<tr><td><code>openAddOfficerModal</code></td><td>None</td><td><code>void</code></td><td>Opens dialog in Add mode</td><td>None</td><td><code>isOfficerEditing = false</code>, resets <code>currentOfficer</code>, <code>showOfficerModal = true</code></td><td>None</td><td>Displays Add Officer dialog</td></tr>
+<tr><td><code>editOfficer</code></td><td><code>off: OfficerInCharge</code></td><td><code>void</code></td><td>Opens dialog in Edit mode</td><td><code>off</code></td><td><code>isOfficerEditing = true</code>, copies officer, <code>showOfficerModal = true</code></td><td>None</td><td>Displays Edit Officer dialog</td></tr>
+<tr><td><code>deleteOfficer</code></td><td><code>id: string</code></td><td><code>void</code></td><td>Confirms and deletes officer record</td><td>User confirm</td><td>Removes officer from <code>officers</code> array</td><td><code>service.updateFormData()</code></td><td>Deletes officer from list</td></tr>
+<tr><td><code>saveOfficer</code></td><td>None</td><td><code>void</code></td><td>Validates and saves officer to array</td><td><code>currentOfficer</code></td><td>Appends or updates officer in array</td><td><code>valService.validateOfficer()</code>, <code>service.updateFormData()</code></td><td>Closes dialog on success</td></tr>
+<tr><td><code>closeOfficerModal</code></td><td>None</td><td><code>void</code></td><td>Closes officer dialog</td><td>None</td><td><code>showOfficerModal = false</code></td><td>None</td><td>Hides modal</td></tr>
+<tr><td><code>getEmptyOfficer</code></td><td>None</td><td><code>OfficerInCharge</code></td><td>Returns blank officer data template</td><td>None</td><td>None</td><td>None</td><td>Initial state factory</td></tr>
+<tr><td><code>awards</code> (get)</td><td>None</td><td><code>AwardItem[]</code></td><td>Returns awards array from form data</td><td><code>service.formData().awards</code></td><td>None</td><td>None</td><td>Awards list data source</td></tr>
+<tr><td><code>awardErrors</code> (get)</td><td>None</td><td><code>Record&lt;string, string&gt;</code></td><td>Validates <code>currentAward</code></td><td><code>currentAward</code></td><td>None</td><td><code>valService.validateAward()</code></td><td>Dialog validation</td></tr>
+<tr><td><code>isAwardModalFieldInvalid</code></td><td><code>field: keyof AwardItem</code></td><td><code>boolean</code></td><td>Checks if award dialog field is invalid</td><td><code>awardErrors</code>, <code>currentAward</code>, <code>modalAwardSubmitted</code></td><td>None</td><td>None</td><td>Dialog error border</td></tr>
+<tr><td><code>getAwardModalFieldError</code></td><td><code>field: keyof AwardItem</code></td><td><code>string</code></td><td>Returns error string for award field</td><td><code>awardErrors</code></td><td>None</td><td>None</td><td>Dialog error message</td></tr>
+<tr><td><code>openAddAwardModal</code></td><td>None</td><td><code>void</code></td><td>Opens dialog in Add mode</td><td>None</td><td><code>isAwardEditing = false</code>, resets <code>currentAward</code>, <code>showAwardModal = true</code></td><td>None</td><td>Displays Add Award dialog</td></tr>
+<tr><td><code>editAward</code></td><td><code>award: AwardItem</code></td><td><code>void</code></td><td>Opens dialog in Edit mode</td><td><code>award</code></td><td><code>isAwardEditing = true</code>, copies award, <code>showAwardModal = true</code></td><td>None</td><td>Displays Edit Award dialog</td></tr>
+<tr><td><code>deleteAward</code></td><td><code>id: string</code></td><td><code>void</code></td><td>Confirms and deletes award record</td><td>User confirm</td><td>Removes award from <code>awards</code> array</td><td><code>service.updateFormData()</code></td><td>Deletes award from list</td></tr>
+<tr><td><code>onAwardFileSelected</code></td><td><code>event: Event</code></td><td><code>void</code></td><td>Attaches file name to <code>currentAward</code></td><td><code>input.files</code></td><td><code>currentAward.documentName</code></td><td>None</td><td>Attaches document to award</td></tr>
+<tr><td><code>saveAward</code></td><td>None</td><td><code>void</code></td><td>Validates and saves award to array</td><td><code>currentAward</code></td><td>Appends or updates award in array</td><td><code>valService.validateAward()</code>, <code>service.updateFormData()</code></td><td>Closes dialog on success</td></tr>
+<tr><td><code>closeAwardModal</code></td><td>None</td><td><code>void</code></td><td>Closes award dialog</td><td>None</td><td><code>showAwardModal = false</code></td><td>None</td><td>Hides modal</td></tr>
+<tr><td><code>getEmptyAward</code></td><td>None</td><td><code>AwardItem</code></td><td>Returns blank award data template</td><td>None</td><td>None</td><td>None</td><td>Initial state factory</td></tr>
+<tr><td><code>scrollStepIntoView</code></td><td><code>tabId: number</code></td><td><code>void</code></td><td>Smoothly scrolls stepper button into viewport</td><td>DOM element <code>#step-btn-{id}</code></td><td>None</td><td>None</td><td>Keeps stepper centered</td></tr>
+<tr><td><code>switchTab</code></td><td><code>tabId: number</code></td><td><code>void</code></td><td>Switches active tab, auto-saves draft, scrolls top</td><td><code>activeTab()</code>, <code>data</code></td><td>Sets <code>activeTab = tabId</code>, saves draft</td><td><code>valService.isTabValid()</code>, <code>service.saveDraftSync()</code></td><td>Navigates to selected step</td></tr>
+<tr><td><code>nextTab</code></td><td>None</td><td><code>void</code></td><td>Validates current step, displays toast if invalid, advances step</td><td><code>activeTab()</code>, <code>data</code></td><td>Sets <code>activeTab = current + 1</code>, saves draft</td><td><code>valService.markTabSubmitted()</code>, <code>valService.showToast()</code>, <code>service.saveDraftSync()</code></td><td>Advances wizard to next step</td></tr>
+<tr><td><code>prevTab</code></td><td>None</td><td><code>void</code></td><td>Navigates to previous step, saves draft</td><td><code>activeTab()</code></td><td>Sets <code>activeTab = current - 1</code>, saves draft</td><td><code>service.saveDraftSync()</code></td><td>Navigates back one step</td></tr>
+<tr><td><code>populateDemo</code></td><td>None</td><td><code>void</code></td><td>Populates sample government demo data</td><td>Sample data</td><td>Updates entire form data, completes all tabs</td><td><code>service.populateSampleData()</code>, <code>valService.markTabCompleted()</code></td><td>Populates all fields with mock data</td></tr>
+<tr><td><code>openPreviewModal</code></td><td>None</td><td><code>void</code></td><td>Wrapper navigating to Step 5 (Review)</td><td>None</td><td>None</td><td>Calls <code>switchTab(5)</code></td><td>Displays Review Step</td></tr>
+<tr><td><code>openReviewModal</code></td><td>None</td><td><code>void</code></td><td>Wrapper navigating to Step 5 (Review)</td><td>None</td><td>None</td><td>Calls <code>switchTab(5)</code></td><td>Displays Review Step</td></tr>
+<tr><td><code>submitFinalApplication</code></td><td>None</td><td><code>void</code></td><td>Final submission verification and modal display</td><td><code>declarationAgreed</code>, <code>data</code></td><td>Marks tabs submitted, updates status to 'Submitted', opens modal</td><td><code>valService.getFirstInvalidTab()</code>, <code>service.updateFormData()</code></td><td>Submits form &amp; displays success dialog</td></tr>
+<tr><td><code>confirmSubmit</code></td><td>None</td><td><code>void</code></td><td>Wrapper delegating to <code>submitFinalApplication()</code></td><td>None</td><td>None</td><td>Calls <code>submitFinalApplication()</code></td><td>Triggers submission</td></tr>
+<tr><td><code>printAcknowledgement</code></td><td>None</td><td><code>void</code></td><td>Triggers browser native print window</td><td>None</td><td>None</td><td>Calls <code>window.print()</code></td><td>Opens print dialog</td></tr>
+<tr><td><code>setFontScale</code></td><td>`scale: 'standard'</td><td>'large'</td><td>'xlarge'`</td><td><code>void</code></td><td>Applies font scale class to document root</td><td><code>scale</code></td><td><code>fontScale</code> signal, documentElement classes</td><td>None</td><td>Resizes typography</td></tr>
+</tbody></table></div>
+<br/>
+<h3>2.5 Code Pattern Categorization &amp; Identification</h3>
+<li><strong>Wrapper / Delegation Methods:</strong></li>
+<li><code>openPreviewModal()</code> -&gt; simply calls <code>switchTab(5)</code>.</li>
+<li><code>openReviewModal()</code> -&gt; simply calls <code>switchTab(5)</code> (duplicate of <code>openPreviewModal</code>).</li>
+<li><code>confirmSubmit()</code> -&gt; simply calls <code>submitFinalApplication()</code>.</li>
+<li><strong>Dormant / Unused Controller Methods in HTML:</strong></li>
+<li><code>openAddOfficerModal()</code>, <code>editOfficer()</code>, <code>deleteOfficer()</code>, <code>saveOfficer()</code>, <code>closeOfficerModal()</code></li>
+<li><code>openAddAwardModal()</code>, <code>editAward()</code>, <code>deleteAward()</code>, <code>saveAward()</code>, <code>closeAwardModal()</code></li>
+<li><code>populateDemo()</code></li>
+<li><code>setFontScale()</code></li>
+<p>  <em>(Note: The modals for Officer and Award are written into the HTML lines 2216–2509, but there are zero buttons or triggers in the 5 main tabs that ever call <code>openAddOfficerModal()</code> or <code>openAddAwardModal()</code>. They are remnants from a previous tab-based architecture).</em></p>
+<li><strong>Repeated Dropdown Logic:</strong></li>
+<li>5 near-identical implementations for District, State Reg, State Addr, State Auth, and Bank Name (toggle, select, clear, outside-click, escape, search filter). Totaling ~150 lines of duplicate logic.</li>
+<br/>
+<br/>
+<hr/>
+<br/>
+<h2>3. FORM WIZARD / STEP FLOW &amp; NAVIGATION</h2>
+<br/>
+<p>The application implements a 5-step sequential wizard with non-blocking direct-tab jumping, validation gating on forward progression, auto-saving drafts on every tab switch, and automatic viewport repositioning.</p>
+<br/>
+<h3>3.1 Step Definitions &amp; Metadata</h3>
+<br/>
+<div class="table-container"><table>
+<thead><tr><th>Step ID</th><th>Label</th><th>Short Label</th><th>Icon</th><th>Header Title</th><th>Header Subtitle</th><th>Primary Data Domain</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td>Organisation Details</td><td>Organisation</td><td>🏢</td><td>Step 1: Organisation / Company Basic Details</td><td>Primary profile, legal constitution, address records, and workflow authority</td><td><code>basicInfo</code>, <code>entityInfo</code>, <code>registeredAddress</code>, <code>postalAddress</code></td></tr>
+<tr><td><strong>2</strong></td><td>Auth Person (Org)</td><td>Auth (Org)</td><td>✍️</td><td>Step 2: Authorized Person Details (Organisation Level)</td><td>Statutory corporate signatory, identity proofs, and legal credentials</td><td><code>authorizedOrg</code></td></tr>
+<tr><td><strong>3</strong></td><td>Bank Details</td><td>Bank Details</td><td>🏦</td><td>Step 3: Bank Details</td><td>PFMS / DBT disbursal dedicated bank account, transfer mode, and verification records</td><td><code>bankDetails</code></td></tr>
+<tr><td><strong>4</strong></td><td>Document Upload</td><td>Documents</td><td>📁</td><td>Step 4: Document Upload</td><td>Mandatory statutory compliance documents, registration certificate, PAN, GST, and affidavits</td><td><code>documents</code></td></tr>
+<tr><td><strong>5</strong></td><td>Review &amp; Submit</td><td>Review</td><td>📋</td><td>Step 5: Review &amp; Final Submission</td><td>Review all application details, edit any section if needed, and submit the application</td><td>Readonly aggregate &amp; declaration</td></tr>
+</tbody></table></div>
+<br/>
+<h3>3.2 Navigation Mechanics</h3>
+<br/>
+<pre><code>
+[Step 1: Org Details]  &lt;---&gt;  [Step 2: Auth Person]  &lt;---&gt;  [Step 3: Bank Details]  &lt;---&gt;  [Step 4: Documents]  &lt;---&gt;  [Step 5: Review &amp; Submit]
+         |                              |                             |                             |                             |
+   (Next Step)                    (Next Step)                   (Next Step)                   (Next Step)                 (Submit Final)
+         v                              v                             v                             v                             v
+  Validate Tab 1                 Validate Tab 2                Validate Tab 3                Validate Tab 4             Validate Tabs 1-4 &amp; Decl.
+  -&gt; Save Draft                  -&gt; Save Draft                 -&gt; Save Draft                 -&gt; Save Draft              -&gt; Set status: 'Submitted'
+  -&gt; Advance to 2                -&gt; Advance to 3               -&gt; Advance to 4               -&gt; Advance to 5            -&gt; Show Success Modal
+</code></pre>
+<br/>
+<li><strong>1.</strong> <strong>Direct Tab Clicking (<code>switchTab(tabId)</code>):</strong></li>
+<li>Users can click any step button in the top stepper at any time.</li>
+<li>If the current tab is valid, it marks it completed via <code>valService.markTabCompleted(current)</code>.</li>
+<li>It performs a synchronous draft save via <code>service.saveDraftSync()</code>.</li>
+<li>It updates <code>activeTab.set(tabId)</code>, clears active toasts, scrolls to top of page, and scrolls the active stepper button into view.</li>
+<li><strong>2.</strong> <strong>Next Step Button (<code>nextTab()</code>):</strong></li>
+<li>Evaluates on current <code>activeTab()</code>.</li>
+<li>Marks the tab as submitted via <code>valService.markTabSubmitted(current)</code>.</li>
+<li>If <code>current &lt;= 4</code> and <code>!valService.isTabValid(current, this.data)</code>:</li>
+<li>Triggers an error toast: <code>"Please fill all required fields correctly in \"{tabName}\" before proceeding."</code></li>
+<li>Aborts forward progression.</li>
+<li>Automatically scrolls window to top to display error highlights.</li>
+<li>If valid:</li>
+<li>Marks current tab completed via <code>valService.markTabCompleted(current)</code>.</li>
+<li>Clears toasts and runs <code>service.saveDraftSync()</code>.</li>
+<li>Increments <code>activeTab</code> to <code>current + 1</code>.</li>
+<li>Scrolls window to top and aligns stepper button in view.</li>
+<li><strong>3.</strong> <strong>Back Step Button (<code>prevTab()</code>):</strong></li>
+<li>Decrements <code>activeTab</code> by 1 if <code>activeTab() &gt; 1</code>.</li>
+<li>Disabled on Step 1.</li>
+<li>Runs <code>service.saveDraftSync()</code> and smoothly scrolls to top.</li>
+<li><strong>4.</strong> <strong>Step Visual Indicator Logic (<code>tabStatuses</code> Computed):</strong></li>
+<li><strong>Active Step:</strong> <code>bg-[#1a2656] text-white</code> (Navy Blue circle showing step number).</li>
+<li><strong>Completed Step:</strong> <code>bg-emerald-600 text-white</code> (Green circle showing checkmark <code>✓</code>).</li>
+<li><strong>Submitted with Errors:</strong> <code>bg-rose-500 text-white</code> (Red circle showing exclamation <code>!</code>).</li>
+<li><strong>Untouched Step:</strong> <code>bg-white border-2 border-slate-300 text-slate-500</code> (Grey outlined circle showing step number).</li>
+<br/>
+<hr/>
+<br/>
+<h2>4. EXHAUSTIVE FORM FIELD INVENTORY</h2>
+<br/>
+<p>The following matrix documents all <strong>65 individual input controls, textareas, selects, dropdowns, checkboxes, and file dropzones</strong> present across the 5 wizard steps and modal dialogs.</p>
+<br/>
+<div class="table-container"><table>
+<thead><tr><th>#</th><th>Step / Location</th><th>Section / Container</th><th>Field Label</th><th>Exact Model Binding</th><th>Control Type</th><th>Req?</th><th>Length Limits</th><th>Placeholder / Default</th><th>Handlers &amp; Keypress</th><th>Sanitization Logic</th><th>Validation Rule &amp; Error Message</th></tr></thead><tbody>
+<tr><td>:-:</td><td>:---:</td><td>:---</td><td>:---</td><td>:---</td><td>:---:</td><td>:---:</td><td>:---:</td><td>:---</td><td>:---</td><td>:---</td><td>:---</td></tr>
+<tr><td>1</td><td>Step 1</td><td>1.1 Org Profile</td><td>Application No.</td><td><code>data.basicInfo.applicationNo</code></td><td>text</td><td>Opt</td><td>Max 30</td><td>Auto-generated / <code>'ISMS-TP-...' </code></td><td>Readonly, tabindex="-1"</td><td>None</td><td>System generated</td></tr>
+<tr><td>2</td><td>Step 1</td><td>1.1 Org Profile</td><td>Date of Registration</td><td><code>data.basicInfo.dateOfRegistration</code></td><td>text + date</td><td>Opt</td><td>Max 10</td><td>"DD/MM/YYYY"</td><td><code>(input)="onDateInput($event, 'registration')"</code>, paired with hidden native picker</td><td>Auto-slash formatting DD/MM/YYYY</td><td>Valid date, DD/MM/YYYY, not future</td></tr>
+<tr><td>3</td><td>Step 1</td><td>1.1 Org Profile</td><td>TP/PIA Full Name</td><td><code>data.basicInfo.fullName</code></td><td>text</td><td><strong>Yes</strong></td><td>3 - 100</td><td>"Enter TP/PIA Full Name (Letters only)"</td><td><code>(keypress)="onlyLetters($event)"</code>, <code>(input)="...sanitizeLetters(..., 100); onDataChange()"</code></td><td>Letters, spaces, dots only</td><td>Required, &gt;=3 chars, &lt;=100 chars, letters only</td></tr>
+<tr><td>4</td><td>Step 1</td><td>1.1 Org Profile</td><td>TP/PIA Short Name</td><td><code>data.basicInfo.shortName</code></td><td>text</td><td><strong>Yes</strong></td><td>2 - 30</td><td>"e.g. KUSHAL / SKILL-ORG"</td><td><code>(keypress)="onlyLettersSymbols($event)"</code>, <code>(input)="...sanitizeLettersSymbolsUpper(..., 30); onDataChange()"</code></td><td>Uppercase letters, spaces, &amp; / - .</td><td>Required, &gt;=2 chars, &lt;=30 chars, uppercase letters &amp; symbols</td></tr>
+<tr><td>5</td><td>Step 1</td><td>1.1 Org Profile</td><td>Entity Registration Number</td><td><code>data.basicInfo.registrationNumber</code></td><td>text</td><td>Opt</td><td>3 - 30</td><td>"Enter Entity Registration Number"</td><td><code>(keypress)="onlyAlphanumericSymbols($event)"</code>, <code>(input)="...sanitizeAlphanumericSymbolsUpper(..., 30); onDataChange()"</code></td><td>Uppercase alphanumeric + symbols</td><td>If entered: &gt;=3 chars, &lt;=30 chars, alphanumeric &amp; symbols</td></tr>
+<tr><td>6</td><td>Step 1</td><td>1.1 Org Profile</td><td>Organisation PAN No.</td><td><code>data.basicInfo.panNo</code></td><td>text</td><td>Opt</td><td>Max 10</td><td>"10-character PAN (e.g. ABCDE1234F)"</td><td><code>(keypress)="onlyAlphanumeric($event)"</code>, <code>(input)="...sanitizeAlphanumericUpper(..., 10); onDataChange()"</code></td><td>Uppercase alphanumeric</td><td>If entered: Valid 10-char PAN (<code>[A-Z]{5}[0-9]{4}[A-Z]</code>)</td></tr>
+<tr><td>7</td><td>Step 1</td><td>1.1 Org Profile</td><td>Type of Business / Activity</td><td><code>data.entityInfo.businessActivity</code></td><td>select</td><td>Opt</td><td>N/A</td><td>"-- Select Business Activity --"</td><td><code>(change)="onDataChange()"</code></td><td>Option list selection</td><td>Optional</td></tr>
+<tr><td>8</td><td>Step 1</td><td>1.1 Org Profile</td><td>State Where Registered</td><td><code>data.entityInfo.stateWhereRegistered</code></td><td>custom dropdown</td><td>Opt</td><td>N/A</td><td>Default: 'Rajasthan'</td><td><code>(click)="toggleStateRegDropdown()"</code>, search query, selection, clear</td><td>Filtered from <code>INDIAN_STATES</code></td><td>Optional</td></tr>
+<tr><td>9</td><td>Step 1</td><td>1.1 Org Profile</td><td>Annual Turnover (₹ in Lakhs)</td><td><code>data.entityInfo.turnOver</code></td><td>text (decimal)</td><td><strong>Yes</strong></td><td>Max 10</td><td>"Turnover (e.g. 150.00)"</td><td><code>(keypress)="onlyDecimals($event, ...)"</code>, <code>(input)="...sanitizeDecimals(..., 10); onDataChange()"</code></td><td>Digits + max 1 decimal point</td><td>Required, numeric &gt;= 0, &lt;= 10,000,000</td></tr>
+<tr><td>10</td><td>Step 1</td><td>1.1 Org Profile</td><td>Official Website</td><td><code>data.basicInfo.website</code></td><td>url</td><td>Opt</td><td>Max 100</td><td>"https://www.organisation.org"</td><td><code>(input)="onDataChange()"</code></td><td>Free text</td><td>If entered: &lt;=100 chars, valid URL pattern</td></tr>
+<tr><td>11</td><td>Step 1</td><td>1.2 Contact</td><td>Organisation Contact No.</td><td><code>data.basicInfo.contactNo</code></td><td>tel</td><td><strong>Yes</strong></td><td>Max 10</td><td>"10-digit mobile number"</td><td><code>(keypress)="onlyNumbers($event)"</code>, <code>(input)="...sanitizeNumbers(..., 10); onDataChange()"</code></td><td>Digits only (max 10)</td><td>Required, valid 10-digit mobile (<code>^[6-9]\d{9}$</code>)</td></tr>
+<tr><td>12</td><td>Step 1</td><td>1.2 Contact</td><td>Company Official Email-ID</td><td><code>data.basicInfo.emailId</code></td><td>email</td><td><strong>Yes</strong></td><td>Max 80</td><td>"info@organisation.org"</td><td><code>(input)="onDataChange()"</code></td><td>Free text</td><td>Required, valid email regex pattern</td></tr>
+<tr><td>13</td><td>Step 1</td><td>1.2 Address</td><td>Premises / Building, Street &amp; Area (Reg)</td><td><code>data.registeredAddress.address</code></td><td>textarea</td><td><strong>Yes</strong></td><td>Max 250</td><td>"Enter Building, Street, Landmark"</td><td><code>(ngModelChange)="onRegisteredAddressChange()"</code></td><td>Free text</td><td>Required, non-empty</td></tr>
+<tr><td>14</td><td>Step 1</td><td>1.2 Address</td><td>State/UT (Registered)</td><td><code>data.registeredAddress.state</code></td><td>custom dropdown</td><td><strong>Yes</strong></td><td>N/A</td><td>Default: 'Rajasthan'</td><td><code>(click)="toggleStateAddrDropdown()"</code>, search query, select, clear</td><td>Filtered from <code>INDIAN_STATES</code></td><td>Required, non-empty</td></tr>
+<tr><td>15</td><td>Step 1</td><td>1.2 Address</td><td>District (Registered)</td><td><code>data.registeredAddress.district</code></td><td>custom dropdown OR text</td><td><strong>Yes</strong></td><td>Max 80</td><td>"-- District --" (or text if outside RJ)</td><td>If RJ: <code>toggleDistrictDropdown()</code>; Else: text input with <code>onlyLetters</code></td><td>RJ: <code>RAJASTHAN_DISTRICTS</code>; Else: letters only</td><td>Required, non-empty</td></tr>
+<tr><td>16</td><td>Step 1</td><td>1.2 Address</td><td>Pincode (Registered)</td><td><code>data.registeredAddress.pincode</code></td><td>text (num)</td><td><strong>Yes</strong></td><td>Max 6</td><td>"6 digits"</td><td><code>(keypress)="onlyNumbers($event)"</code>, <code>(input)="...sanitizeNumbers(..., 6); onRegisteredAddressChange()"</code></td><td>Digits only (max 6)</td><td>Required, exactly 6 digits (<code>^\d{6}$</code>)</td></tr>
+<tr><td>17</td><td>Step 1</td><td>1.2 Address</td><td>Same as Registered (Checkbox)</td><td><code>data.sameAsRegistered</code></td><td>checkbox</td><td>Opt</td><td>N/A</td><td>Default: <code>false</code></td><td><code>(change)="toggleSameAddress()"</code></td><td>Boolean</td><td>Toggles automatic sync to postal address</td></tr>
+<tr><td>18</td><td>Step 1</td><td>1.2 Address</td><td>Postal / Mailing Address</td><td><code>data.postalAddress.address</code></td><td>textarea</td><td><strong>Cond.</strong></td><td>Max 250</td><td>"Enter Postal Address details"</td><td><code>(ngModelChange)="onDataChange()"</code>, disabled if <code>sameAsRegistered</code></td><td>Free text</td><td>Required if <code>!sameAsRegistered</code></td></tr>
+<tr><td>19</td><td>Step 2</td><td>Personal Profile</td><td>Name (Authorized Person)</td><td><code>data.authorizedOrg.name</code></td><td>text</td><td><strong>Yes</strong></td><td>3 - 100</td><td>"Enter Authorized Person Full Name"</td><td><code>(keypress)="onlyLetters($event)"</code>, <code>(input)="...sanitizeLetters(..., 100); onDataChange()"</code></td><td>Letters, spaces, dots</td><td>Required, &gt;=3 chars, letters only</td></tr>
+<tr><td>20</td><td>Step 2</td><td>Personal Profile</td><td>S/O, D/O, W/O (Guardian)</td><td><code>data.authorizedOrg.guardianName</code></td><td>text</td><td>Opt</td><td>Max 100</td><td>"Father's / Husband's / Guardian's Name"</td><td><code>(keypress)="onlyLetters($event)"</code>, <code>(input)="...sanitizeLetters(..., 100); onDataChange()"</code></td><td>Letters, spaces, dots</td><td>If entered: letters, spaces, dots only</td></tr>
+<tr><td>21</td><td>Step 2</td><td>Personal Profile</td><td>Date of Birth</td><td><code>data.authorizedOrg.dob</code></td><td>text + date</td><td>Opt</td><td>Max 10</td><td>"DD/MM/YYYY"</td><td><code>(input)="onDateInput($event, 'dob')"</code>, paired with native picker</td><td>Auto-slash formatting DD/MM/YYYY</td><td>If entered: valid date, age &gt;= 18 &amp; &lt;= 100</td></tr>
+<tr><td>22</td><td>Step 2</td><td>Personal Profile</td><td>Age (Years)</td><td><code>data.authorizedOrg.age</code></td><td>text (num)</td><td>Opt</td><td>Max 3</td><td>"Age (Years)"</td><td><code>(keypress)="onlyNumbers($event)"</code>, <code>(input)="...sanitizeNumbers(..., 3); onDataChange()"</code></td><td>Digits only (max 3)</td><td>If entered: numeric, 18 &lt;= age &lt;= 100</td></tr>
+<tr><td>23</td><td>Step 2</td><td>Personal Profile</td><td>Designation</td><td><code>data.authorizedOrg.designation</code></td><td>text</td><td>Opt</td><td>Max 80</td><td>"e.g. Director / Managing Partner / Trustee"</td><td><code>(keypress)="onlyAlphanumericSymbols($event)"</code>, <code>(input)="...sanitizeAlphanumericSymbols(..., 80); onDataChange()"</code></td><td>Alphanumeric + symbols</td><td>Optional</td></tr>
+<tr><td>24</td><td>Step 2</td><td>Personal Profile</td><td>Residence Address</td><td><code>data.authorizedOrg.residenceAddress</code></td><td>textarea</td><td>Opt</td><td>Max 250</td><td>"House / Flat No., Premises, Street, Area"</td><td><code>(ngModelChange)="onDataChange()"</code></td><td>Free text</td><td>Optional</td></tr>
+<tr><td>25</td><td>Step 2</td><td>Contact &amp; Proofs</td><td>Mobile No. (Authorized Person)</td><td><code>data.authorizedOrg.contactNo</code></td><td>tel</td><td><strong>Yes</strong></td><td>Max 10</td><td>"10-digit mobile number"</td><td><code>(keypress)="onlyNumbers($event)"</code>, <code>(input)="...sanitizeNumbers(..., 10); onDataChange()"</code></td><td>Digits only (max 10)</td><td>Required, valid 10-digit mobile (<code>^[6-9]\d{9}$</code>)</td></tr>
+<tr><td>26</td><td>Step 2</td><td>Contact &amp; Proofs</td><td>Email-Id</td><td><code>data.authorizedOrg.emailId</code></td><td>email</td><td>Opt</td><td>Max 80</td><td>"e.g. signatory@organisation.org"</td><td><code>(input)="onDataChange()"</code></td><td>Free text</td><td>If entered: valid email regex</td></tr>
+<tr><td>27</td><td>Step 2</td><td>Contact &amp; Proofs</td><td>PAN Card No.</td><td><code>data.authorizedOrg.pan</code></td><td>text</td><td><strong>Yes</strong></td><td>Max 10</td><td>"10-character PAN (e.g. ABCDE1234F)"</td><td><code>(keypress)="onlyAlphanumeric($event)"</code>, <code>(input)="...sanitizeAlphanumericUpper(..., 10); onDataChange()"</code></td><td>Uppercase alphanumeric</td><td>Required, valid 10-char PAN (<code>[A-Z]{5}[0-9]{4}[A-Z]</code>)</td></tr>
+<tr><td>28</td><td>Step 2</td><td>Contact &amp; Proofs</td><td>Aadhaar No.</td><td><code>data.authorizedOrg.aadhaarNo</code></td><td>text (num)</td><td><strong>Yes</strong></td><td>Max 12</td><td>"12-digit Aadhaar Number"</td><td><code>(keypress)="onlyNumbers($event)"</code>, <code>(input)="...sanitizeNumbers(..., 12); onAadhaarChange()"</code></td><td>Digits only (max 12)</td><td>Required, exactly 12 digits (<code>^\d{12}$</code>)</td></tr>
+<tr><td>29</td><td>Step 2</td><td>Contact &amp; Proofs</td><td>State (Authorized Person)</td><td><code>data.authorizedOrg.state</code></td><td>custom dropdown</td><td>Opt</td><td>N/A</td><td>Default: 'Rajasthan'</td><td><code>(click)="toggleStateAuthDropdown()"</code>, search query, select, clear</td><td>Filtered from <code>INDIAN_STATES</code></td><td>Optional</td></tr>
+<tr><td>30</td><td>Step 2</td><td>Contact &amp; Proofs</td><td>Type ID Proof (Secondary)</td><td><code>data.authorizedOrg.typeIdProof</code></td><td>select</td><td>Opt</td><td>N/A</td><td>"-- Select ID Proof Type --"</td><td><code>(change)="onTypeIdProofChange()"</code></td><td>Selection from <code>idTypes</code></td><td>Optional</td></tr>
+<tr><td>31</td><td>Step 2</td><td>Contact &amp; Proofs</td><td>Voter Id No. (Dynamic)</td><td><code>data.authorizedOrg.voterIdNo</code></td><td>text</td><td>Cond.</td><td>Max 20</td><td>"e.g. RJ/04/123/98765"</td><td><code>(keypress)="onlyAlphanumericSymbols($event)"</code>, <code>(input)="...sanitizeAlphanumericSymbolsUpper(..., 20); onVoterIdChange()"</code></td><td>Uppercase alphanumeric + symbols</td><td>Displayed if Type ID Proof = 'Voter ID Card'</td></tr>
+<tr><td>32</td><td>Step 2</td><td>Contact &amp; Proofs</td><td>Passport No. (Dynamic)</td><td><code>data.authorizedOrg.passportNo</code></td><td>text</td><td>Cond.</td><td>Max 12</td><td>"e.g. Z1234567"</td><td><code>(keypress)="onlyAlphanumeric($event)"</code>, <code>(input)="...sanitizeAlphanumericUpper(..., 12); onPassportChange()"</code></td><td>Uppercase alphanumeric</td><td>Displayed if Type ID Proof = 'Passport'</td></tr>
+<tr><td>33</td><td>Step 2</td><td>Contact &amp; Proofs</td><td>Driving License No. (Dynamic)</td><td><code>data.authorizedOrg.idNo</code></td><td>text</td><td>Cond.</td><td>Max 20</td><td>"e.g. RJ14 20200012345"</td><td><code>(keypress)="onlyAlphanumericSymbols($event)"</code>, <code>(input)="...sanitizeAlphanumericSymbolsUpper(..., 20); onDataChange()"</code></td><td>Uppercase alphanumeric + symbols</td><td>Displayed if Type ID Proof = 'Driving License'</td></tr>
+<tr><td>34</td><td>Step 2</td><td>Contact &amp; Proofs</td><td>Bhamashah No. (Dynamic)</td><td><code>data.authorizedOrg.bhamashahNo</code></td><td>text</td><td>Cond.</td><td>Max 20</td><td>"e.g. BHAM-12345678"</td><td><code>(keypress)="onlyAlphanumericSymbols($event)"</code>, <code>(input)="...sanitizeAlphanumericSymbolsUpper(..., 20); onBhamashahChange()"</code></td><td>Uppercase alphanumeric + symbols</td><td>Displayed if Type ID Proof = 'Bhamashah Card'</td></tr>
+<tr><td>35</td><td>Step 2</td><td>Contact &amp; Proofs</td><td>Generic Secondary ID (Dynamic)</td><td><code>data.authorizedOrg.idNo</code></td><td>text</td><td>Cond.</td><td>Max 30</td><td>"Enter ID Number"</td><td><code>(keypress)="onlyAlphanumericSymbols($event)"</code>, <code>(input)="...sanitizeAlphanumericSymbols(..., 30); onDataChange()"</code></td><td>Alphanumeric + symbols</td><td>Displayed if other non-empty ID type selected</td></tr>
+<tr><td>36</td><td>Step 3</td><td>Bank Credentials</td><td>Name of the Bank</td><td><code>data.bankDetails.bankName</code></td><td>custom dropdown</td><td><strong>Yes</strong></td><td>N/A</td><td>"-- Select Bank Name --"</td><td><code>(click)="toggleBankDropdown()"</code>, search query, select, clear</td><td>Filtered from <code>COMMON_BANKS</code></td><td>Required, non-empty</td></tr>
+<tr><td>37</td><td>Step 3</td><td>Bank Credentials</td><td>Account No.</td><td><code>data.bankDetails.accountNo</code></td><td>text (num)</td><td><strong>Yes</strong></td><td>9 - 18</td><td>"Enter Bank Account Number (9 to 18 digits)"</td><td><code>(keypress)="onlyNumbers($event)"</code>, <code>(input)="...sanitizeNumbers(..., 18); onDataChange()"</code></td><td>Digits only (max 18)</td><td>Required, 9 to 18 digits (<code>^\d{9,18}$</code>)</td></tr>
+<tr><td>38</td><td>Step 3</td><td>Bank Credentials</td><td>IFSC Code</td><td><code>data.bankDetails.ifscCode</code></td><td>text</td><td><strong>Yes</strong></td><td>Max 11</td><td>"e.g. SBIN0004129"</td><td><code>(keypress)="onlyAlphanumeric($event)"</code>, <code>(input)="...sanitizeAlphanumericUpper(..., 11); onDataChange()"</code></td><td>Uppercase alphanumeric</td><td>Required, 11-char IFSC (<code>^[A-Z]{4}0[A-Z0-9]{6}$</code>)</td></tr>
+<tr><td>39</td><td>Step 3</td><td>Bank Credentials</td><td>Type of Account</td><td><code>data.bankDetails.accountType</code></td><td>select</td><td>Opt</td><td>N/A</td><td>Default: 'Current Account'</td><td><code>(change)="onDataChange()"</code></td><td>Options: Current, Savings</td><td>Optional</td></tr>
+<tr><td>40</td><td>Step 3</td><td>Bank Credentials</td><td>Mode of electronic transfer</td><td><code>data.bankDetails.electronicTransferMode</code></td><td>select</td><td>Opt</td><td>N/A</td><td>Default: 'RTGS'</td><td><code>(change)="onDataChange()"</code></td><td>Options: RTGS, NEFT, ECS, CBS</td><td>Optional</td></tr>
+<tr><td>41</td><td>Step 3</td><td>Branch &amp; Verification</td><td>Branch Name</td><td><code>data.bankDetails.branchName</code></td><td>text</td><td><strong>Yes</strong></td><td>Max 80</td><td>"e.g. Malviya Nagar Branch, Jaipur"</td><td><code>(keypress)="onlyAlphanumericSymbols($event)"</code>, <code>(input)="...sanitizeAlphanumericSymbols(..., 80); onDataChange()"</code></td><td>Alphanumeric + symbols</td><td>Required, non-empty</td></tr>
+<tr><td>42</td><td>Step 3</td><td>Branch &amp; Verification</td><td>MICR Code</td><td><code>data.bankDetails.micrCode</code></td><td>text (num)</td><td>Opt</td><td>Max 9</td><td>"9-digit MICR code (e.g. 302002018)"</td><td><code>(keypress)="onlyNumbers($event)"</code>, <code>(input)="...sanitizeNumbers(..., 9); onDataChange()"</code></td><td>Digits only (max 9)</td><td>If entered: exactly 9 digits (<code>^\d{9}$</code>)</td></tr>
+<tr><td>43</td><td>Step 3</td><td>Branch &amp; Verification</td><td>Branch Address</td><td><code>data.bankDetails.branchAddress</code></td><td>textarea</td><td><strong>Yes</strong></td><td>Max 250</td><td>"Enter complete postal address of branch"</td><td><code>(ngModelChange)="onDataChange()"</code></td><td>Free text</td><td>Required, non-empty</td></tr>
+<tr><td>44</td><td>Step 3</td><td>Branch &amp; Verification</td><td>Cancelled Cheque Upload</td><td><code>data.bankDetails.cancelledChequeFileName</code></td><td>file dropzone</td><td>Opt</td><td>Max 5MB</td><td>Formats: PDF, JPG, PNG</td><td><code>onBankDragOver</code>, <code>onBankFileDrop</code>, <code>onBankFileSelected</code>, <code>removeBankFile</code></td><td>Validates size &lt;=5MB, ext .pdf/.jpg/.jpeg/.png</td><td>Syncs with <code>doc-bank</code> in documents array</td></tr>
+<tr><td>45</td><td>Step 4</td><td>Compliance Documents</td><td>Doc 1: Registration Certificate</td><td><code>documents['doc-reg-cert']</code></td><td>file input</td><td><strong>Yes</strong></td><td>Max 5MB</td><td>PDF, JPG, PNG</td><td><code>onDocFileSelected($event, 'doc-reg-cert')</code>, remove, preview</td><td>File type &amp; size</td><td>Mandatory upload required before step advance</td></tr>
+<tr><td>46</td><td>Step 4</td><td>Compliance Documents</td><td>Doc 2: PAN Card</td><td><code>documents['doc-pan']</code></td><td>file input</td><td><strong>Yes</strong></td><td>Max 5MB</td><td>PDF, JPG, PNG</td><td><code>onDocFileSelected($event, 'doc-pan')</code>, remove, preview</td><td>File type &amp; size</td><td>Mandatory upload required before step advance</td></tr>
+<tr><td>47</td><td>Step 4</td><td>Compliance Documents</td><td>Doc 3: GST Certificate</td><td><code>documents['doc-gst']</code></td><td>file input</td><td><strong>Yes</strong></td><td>Max 5MB</td><td>PDF, JPG, PNG</td><td><code>onDocFileSelected($event, 'doc-gst')</code>, remove, preview</td><td>File type &amp; size</td><td>Mandatory upload required before step advance</td></tr>
+<tr><td>48</td><td>Step 4</td><td>Compliance Documents</td><td>Doc 4: Audited Balance Sheet</td><td><code>documents['doc-turnover']</code></td><td>file input</td><td>Opt</td><td>Max 5MB</td><td>PDF, JPG, PNG</td><td><code>onDocFileSelected($event, 'doc-turnover')</code>, remove, preview</td><td>File type &amp; size</td><td>Optional</td></tr>
+<tr><td>49</td><td>Step 4</td><td>Compliance Documents</td><td>Doc 5: Cancelled Cheque / Bank Passbook</td><td><code>documents['doc-bank']</code></td><td>file input</td><td>Opt</td><td>Max 5MB</td><td>PDF, JPG, PNG</td><td><code>onDocFileSelected($event, 'doc-bank')</code>, remove, preview</td><td>File type &amp; size</td><td>Optional (auto-synced from Step 3 upload)</td></tr>
+<tr><td>50</td><td>Step 4</td><td>Compliance Documents</td><td>Doc 6: Board Resolution / POA</td><td><code>documents['doc-board-res']</code></td><td>file input</td><td>Opt</td><td>Max 5MB</td><td>PDF, JPG, PNG</td><td><code>onDocFileSelected($event, 'doc-board-res')</code>, remove, preview</td><td>File type &amp; size</td><td>Optional</td></tr>
+<tr><td>51</td><td>Step 4</td><td>Compliance Documents</td><td>Doc 7: NSDC Certificate</td><td><code>documents['doc-nsdc']</code></td><td>file input</td><td>Opt</td><td>Max 5MB</td><td>PDF, JPG, PNG</td><td><code>onDocFileSelected($event, 'doc-nsdc')</code>, remove, preview</td><td>File type &amp; size</td><td>Optional</td></tr>
+<tr><td>52</td><td>Step 4</td><td>Compliance Documents</td><td>Doc 8: Additional Supporting Doc</td><td><code>documents['doc-other']</code></td><td>file input</td><td>Opt</td><td>Max 5MB</td><td>PDF, JPG, PNG</td><td><code>onDocFileSelected($event, 'doc-other')</code>, remove, preview</td><td>File type &amp; size</td><td>Optional</td></tr>
+<tr><td>53</td><td>Step 5</td><td>Legal Undertaking</td><td>Declaration Checkbox</td><td><code>declarationAgreed</code></td><td>checkbox</td><td><strong>Yes</strong></td><td>N/A</td><td>Default: <code>false</code></td><td><code>[(ngModel)]="declarationAgreed"</code></td><td>Boolean</td><td>Must be checked (<code>true</code>) to submit application</td></tr>
+<tr><td>54</td><td>Modal</td><td>Officer In-Charge</td><td>Officer Name</td><td><code>currentOfficer.name</code></td><td>text</td><td><strong>Yes</strong></td><td>Max 100</td><td>"Full legal name"</td><td><code>(keypress)="onlyLetters($event)"</code>, <code>(input)="...sanitizeLetters(..., 100)"</code></td><td>Letters, spaces, dots</td><td>Required, letters only</td></tr>
+<tr><td>55</td><td>Modal</td><td>Officer In-Charge</td><td>Designation</td><td><code>currentOfficer.designation</code></td><td>text</td><td><strong>Yes</strong></td><td>Max 80</td><td>"e.g. Officer In-Charge"</td><td><code>(keypress)="onlyAlphanumericSymbols($event)"</code>, <code>(input)="...sanitizeAlphanumericSymbols(..., 80)"</code></td><td>Alphanumeric + symbols</td><td>Required, non-empty</td></tr>
+<tr><td>56</td><td>Modal</td><td>Officer In-Charge</td><td>Mobile No.</td><td><code>currentOfficer.mobileNo</code></td><td>tel</td><td><strong>Yes</strong></td><td>Max 10</td><td>"10 digit mobile"</td><td><code>(keypress)="onlyNumbers($event)"</code>, <code>(input)="...sanitizeNumbers(..., 10)"</code></td><td>Digits only (max 10)</td><td>Required, 10-digit mobile (<code>^[6-9]\d{9}$</code>)</td></tr>
+<tr><td>57</td><td>Modal</td><td>Officer In-Charge</td><td>Email ID</td><td><code>currentOfficer.emailId</code></td><td>email</td><td><strong>Yes</strong></td><td>Max 80</td><td>"officer@domain.org"</td><td>Two-way <code>[(ngModel)]</code></td><td>Free text</td><td>Required, valid email pattern</td></tr>
+<tr><td>58</td><td>Modal</td><td>Officer In-Charge</td><td>PAN</td><td><code>currentOfficer.pan</code></td><td>text</td><td>Opt</td><td>Max 10</td><td>"ABCDE1234F"</td><td><code>(keypress)="onlyAlphanumeric($event)"</code>, <code>(input)="...sanitizeAlphanumericUpper(..., 10)"</code></td><td>Uppercase alphanumeric</td><td>If entered: valid 10-char PAN</td></tr>
+<tr><td>59</td><td>Modal</td><td>Officer In-Charge</td><td>Aadhaar No.</td><td><code>currentOfficer.aadhaarNo</code></td><td>text (num)</td><td>Opt</td><td>Max 12</td><td>"12 digit Aadhaar"</td><td><code>(keypress)="onlyNumbers($event)"</code>, <code>(input)="...sanitizeNumbers(..., 12)"</code></td><td>Digits only (max 12)</td><td>If entered: exactly 12 digits</td></tr>
+<tr><td>60</td><td>Modal</td><td>Officer In-Charge</td><td>Bhamashah No.</td><td><code>currentOfficer.bhamashahNo</code></td><td>text</td><td>Opt</td><td>Max 20</td><td>"Bhamashah ID"</td><td><code>(keypress)="onlyAlphanumericSymbols($event)"</code>, <code>(input)="...sanitizeAlphanumericSymbolsUpper(..., 20)"</code></td><td>Uppercase alphanumeric + symbols</td><td>Optional</td></tr>
+<tr><td>61</td><td>Modal</td><td>Officer In-Charge</td><td>Voter ID No.</td><td><code>currentOfficer.voterIdNo</code></td><td>text</td><td>Opt</td><td>Max 20</td><td>"EPIC / Voter ID"</td><td><code>(keypress)="onlyAlphanumericSymbols($event)"</code>, <code>(input)="...sanitizeAlphanumericSymbolsUpper(..., 20)"</code></td><td>Uppercase alphanumeric + symbols</td><td>Optional</td></tr>
+<tr><td>62</td><td>Modal</td><td>Officer In-Charge</td><td>Passport No.</td><td><code>currentOfficer.passportNo</code></td><td>text</td><td>Opt</td><td>Max 12</td><td>"Passport number"</td><td><code>(keypress)="onlyAlphanumeric($event)"</code>, <code>(input)="...sanitizeAlphanumericUpper(..., 12)"</code></td><td>Uppercase alphanumeric</td><td>Optional</td></tr>
+<tr><td>63</td><td>Modal</td><td>Award Record</td><td>Award / Recognition Name</td><td><code>currentAward.awardName</code></td><td>text</td><td><strong>Yes</strong></td><td>Max 100</td><td>"e.g. Best Skill Development Partner"</td><td>Two-way <code>[(ngModel)]</code></td><td>Free text</td><td>Required, non-empty</td></tr>
+<tr><td>64</td><td>Modal</td><td>Award Record</td><td>Awarding Agency / Body</td><td><code>currentAward.awardingAgency</code></td><td>text</td><td><strong>Yes</strong></td><td>Max 100</td><td>"e.g. NSDC / Ministry of Skill"</td><td>Two-way <code>[(ngModel)]</code></td><td>Free text</td><td>Required, non-empty</td></tr>
+<tr><td>65</td><td>Modal</td><td>Award Record</td><td>Year of Award</td><td><code>currentAward.year</code></td><td>text (num)</td><td>Opt</td><td>Max 4</td><td>"2025"</td><td><code>(keypress)="onlyNumbers($event)"</code>, <code>(input)="...sanitizeNumbers(..., 4)"</code></td><td>Digits only (max 4)</td><td>If entered: 4-digit year 1950 - 2100</td></tr>
+<tr><td>66</td><td>Modal</td><td>Award Record</td><td>Level</td><td><code>currentAward.level</code></td><td>select</td><td>Opt</td><td>N/A</td><td>"-- Select Level --"</td><td>Two-way <code>[(ngModel)]</code></td><td>Options: State, National, International</td><td>Optional</td></tr>
+<tr><td>67</td><td>Modal</td><td>Award Record</td><td>Description / Remarks</td><td><code>currentAward.description</code></td><td>text</td><td>Opt</td><td>Max 200</td><td>"Brief details about recognition..."</td><td>Two-way <code>[(ngModel)]</code></td><td>Free text</td><td>Optional</td></tr>
+<tr><td>68</td><td>Modal</td><td>Award Record</td><td>Supporting Document</td><td><code>currentAward.documentName</code></td><td>file input</td><td>Opt</td><td>N/A</td><td>PDF, JPG, PNG</td><td><code>(change)="onAwardFileSelected($event)"</code></td><td>Attaches file name</td><td>Optional</td></tr>
+</tbody></table></div>
+<br/>
+<hr/>
+<br/>
+<h2>5. TEMPLATE / HTML ARCHITECTURE &amp; REPETITION ANALYSIS</h2>
+<br/>
+<p>The template (<code>tp-pia-registration.component.html</code>) is a <strong>monolithic file of 2,565 lines and 175 KB</strong>.</p>
+<br/>
+<h3>Line Breakdown by Major Structural Segment</h3>
+<br/>
+<div class="table-container"><table>
+<thead><tr><th>Template Segment</th><th>Line Range</th><th>Line Count</th><th>Percent of File</th><th>Key Sub-components / Contents</th></tr></thead><tbody>
+<tr><td><strong>1. Official Portal Header</strong></td><td>1 – 33</td><td>33</td><td>1.3%</td><td>Ashoka Lion Emblem, State Titles, Bilingual Slogan, Saffron Stripe</td></tr>
+<tr><td><strong>2. Stepper Navigation Bar</strong></td><td>34 – 85</td><td>52</td><td>2.0%</td><td>Responsive step circles, labels, connector lines, status badges</td></tr>
+<tr><td><strong>3. Form Title &amp; Mandatory Legend</strong></td><td>86 – 106</td><td>21</td><td>0.8%</td><td>Dynamic <code>currentStepInfo.title</code>, subtitle, mandatory indicator</td></tr>
+<tr><td><strong>4. Step 1: Organisation Details</strong></td><td>107 – 760</td><td>654</td><td>25.5%</td><td>1.1 Profile (Application No, Date, Names, PAN, Turnover, Website), 1.2 Contact &amp; Addresses (Phone, Email, Registered Address, Postal Address, 3 Searchable Dropdowns)</td></tr>
+<tr><td><strong>5. Step 2: Authorized Person</strong></td><td>761 – 1157</td><td>397</td><td>15.5%</td><td>Personal Profile (Name, Guardian, DOB, Age, Designation, Address), Contact &amp; Statutory Proofs (Mobile, Email, PAN, Aadhaar, State Dropdown, Dynamic ID field)</td></tr>
+<tr><td><strong>6. Step 3: Bank Details</strong></td><td>1158 – 1473</td><td>316</td><td>12.3%</td><td>Bank Credentials (Searchable Bank dropdown, Account No, IFSC, Type, Mode), Branch &amp; Verification (Branch Name, MICR, Address, Cheque Dropzone)</td></tr>
+<tr><td><strong>7. Step 4: Document Upload</strong></td><td>1474 – 1737</td><td>264</td><td>10.3%</td><td>Upload counter banner, error alerts, Mobile Card View (<code>block md:hidden</code>), Desktop Table View (<code>hidden md:block</code>), 8 document rows with actions</td></tr>
+<tr><td><strong>8. Step 5: Review &amp; Final Submission</strong></td><td>1738 – 2107</td><td>370</td><td>14.4%</td><td>Collapsible review accordions for Step 1, 2, 3, 4, quick edit jump buttons, legal declaration checkbox, terms</td></tr>
+<tr><td><strong>9. Bottom Action Buttons</strong></td><td>2108 – 2141</td><td>34</td><td>1.3%</td><td>Back button (<code>prevTab</code>), Next Step button (<code>nextTab</code>), Final Submit button (<code>submitFinalApplication</code>)</td></tr>
+<tr><td><strong>10. Dialog Modals</strong></td><td>2142 – 2565</td><td>424</td><td>16.5%</td><td>Document Preview Modal (2146–2214), Officer In-Charge CRUD Modal (2217–2391), Award Record CRUD Modal (2394–2509), Submission Success Modal (2513–2563)</td></tr>
+</tbody></table></div>
+<br/>
+<h3>Redundant and Repeated Markup Patterns</h3>
+<br/>
+<li><strong>1.</strong> <strong>Repeated Input Shell &amp; Character Counter Pattern (Occurs 28 times):</strong></li>
+<pre><code>
+&lt;div class="flex items-center justify-between mb-1"&gt;
+  &lt;label class="block text-xs font-semibold text-slate-700"&gt;
+    Field Label &lt;span class="text-rose-500 font-bold"&gt;*&lt;/span&gt;
+  &lt;/label&gt;
+  &lt;span class="text-[10px] text-slate-400 font-mono"&gt;{{ data.property.length || 0 }}/100&lt;/span&gt;
+&lt;/div&gt;
+&lt;input ... [ngClass]="isFieldInvalid('...') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+  class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" /&gt;
+@if (isFieldInvalid('...')) {
+  &lt;p class="text-xs text-rose-600 mt-1 font-medium"&gt;{{ getFieldError('...') }}&lt;/p&gt;
+}
+</code></pre>
+<p>Every input field manually re-declares the flex label wrapper, character length calculation, ternary <code>ngClass</code> condition with hardcoded Tailwind strings, and <code>@if (isFieldInvalid())</code> error paragraph.</p>
+<br/>
+<li><strong>2.</strong> <strong>Repeated Searchable Dropdown Markup (Occurs 5 times, ~350 lines total):</strong></li>
+<p>Lines 270–343 (State Reg), lines 502–575 (State Addr), lines 578–662 (District), lines 989–1062 (State Auth), and lines 1178–1255 (Bank). Each declares identical button triggers, chevron SVG rotation, floating absolute panel (<code>top-full left-0 mt-1</code>), search input with magnifying glass SVG, clear button (<code>✕</code>), and <code>dropdown-menu-scroll</code> button list.</p>
+<br/>
+<li><strong>3.</strong> <strong>Duplicated Document Presentation Markup (Occurs twice in Step 4, ~240 lines):</strong></li>
+<p>The 8 documents are rendered twice: once in the mobile card list (<code>block md:hidden</code>, lines 1515–1616) and once in the desktop <code>&lt;table&gt;</code> view (<code>hidden md:block</code>, lines 1618–1734). Both iterate over <code>documents</code> and duplicate the file name, status badge, preview button, file input label, and remove button.</p>
+<br/>
+<li><strong>4.</strong> <strong>Duplicated Modal Wrappers (Occurs 4 times, ~400 lines):</strong></li>
+<p>Each modal declares an identical backdrop (<code>fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6</code>), an identical header with close button (<code>&amp;times;</code>), and an identical footer button group.</p>
+<br/>
+<hr/>
+<br/>
+<h2>6. SEARCHABLE DROPDOWNS DEEP DIVE &amp; COMPARISON</h2>
+<br/>
+<p>The component implements 5 custom searchable dropdown components directly in the template and TypeScript.</p>
+<br/>
+<h3>Comparison Matrix</h3>
+<br/>
+<div class="table-container"><table>
+<thead><tr><th>Dropdown Name</th><th>Bound Model Property</th><th>Source Array</th><th>Open Signal</th><th>Search Query Signal</th><th>Filtered Computed</th><th>Outside Click Container Class</th><th>Search Input DOM ID</th><th>Special Conditional Behavior</th></tr></thead><tbody>
+<tr><td><strong>State Where Registered</strong></td><td><code>data.entityInfo.stateWhereRegistered</code></td><td><code>INDIAN_STATES</code> (29)</td><td><code>isStateRegDropdownOpen</code></td><td><code>stateRegSearchQuery</code></td><td><code>filteredStatesReg</code></td><td><code>.statereg-dropdown-container</code></td><td><code>#statereg-search-input</code></td><td>Downward positioning (<code>top-full</code>)</td></tr>
+<tr><td><strong>Address State/UT</strong></td><td><code>data.registeredAddress.state</code></td><td><code>INDIAN_STATES</code> (29)</td><td><code>isStateAddrDropdownOpen</code></td><td><code>stateAddrSearchQuery</code></td><td><code>filteredStatesAddr</code></td><td><code>.stateaddr-dropdown-container</code></td><td><code>#stateaddr-search-input</code></td><td>Downward positioning; triggers postal sync</td></tr>
+<tr><td><strong>Registered District</strong></td><td><code>data.registeredAddress.district</code></td><td><code>RAJASTHAN_DISTRICTS</code> (33)</td><td><code>isDistrictDropdownOpen</code></td><td><code>districtSearchQuery</code></td><td><code>filteredDistricts</code></td><td><code>.district-dropdown-container</code></td><td><code>#district-search-input</code></td><td>Active only when State === 'Rajasthan'; switches to plain text input for other states</td></tr>
+<tr><td><strong>Auth Person State</strong></td><td><code>data.authorizedOrg.state</code></td><td><code>INDIAN_STATES</code> (29)</td><td><code>isStateAuthDropdownOpen</code></td><td><code>stateAuthSearchQuery</code></td><td><code>filteredStatesAuth</code></td><td><code>.stateauth-dropdown-container</code></td><td><code>#stateauth-search-input</code></td><td>Downward positioning</td></tr>
+<tr><td><strong>Bank Name</strong></td><td><code>data.bankDetails.bankName</code></td><td><code>COMMON_BANKS</code> (14)</td><td><code>isBankDropdownOpen</code></td><td><code>bankSearchQuery</code></td><td><code>filteredBanks</code></td><td><code>.bank-dropdown-container</code></td><td><code>#bank-search-input</code></td><td>Downward positioning</td></tr>
+</tbody></table></div>
+<br/>
+<h3>Identical Mechanism Across All 5 Dropdowns</h3>
+<li><strong>1.</strong> <strong>Trigger:</strong> A stylized <code>&lt;button&gt;</code> displaying the currently selected value or placeholder, with a clear icon (<code>✕</code>) when populated, and a chevron SVG that rotates 180° when open.</li>
+<li><strong>2.</strong> <strong>Toggle:</strong> Calls <code>toggleXDropdown($event)</code>, which calls <code>closeAllDropdowns()</code>, flips the signal, clears search query, and uses <code>setTimeout(..., 50)</code> to set DOM focus to the text input.</li>
+<li><strong>3.</strong> <strong>Popup Panel:</strong> Positioned <code>absolute top-full left-0 mt-1 w-full min-w-[240px] z-50</code> with shadow and scrollable menu (<code>.dropdown-menu-scroll</code>).</li>
+<li><strong>4.</strong> <strong>Filtering:</strong> An <code>@for</code> loop over the <code>computed()</code> signal which filters the source array case-insensitively (<code>items.filter(s =&gt; s.toLowerCase().includes(q))</code>).</li>
+<li><strong>5.</strong> <strong>Dismissal:</strong> <code>@HostListener('document:click')</code> inspects <code>target.closest('.*-dropdown-container')</code>; <code>@HostListener('document:keydown.escape')</code> closes all 5 dropdowns.</li>
+<br/>
+<hr/>
+<br/>
+<h2>7. ACCORDIONS &amp; COLLAPSIBLE UI ELEMENTS</h2>
+<br/>
+<p>The component defines 10 reactive signals controlling collapsible UI panels.</p>
+<br/>
+<div class="table-container"><table>
+<thead><tr><th>Accordion Signal</th><th>Initial State</th><th>Controlling Trigger</th><th>Affected Template Block</th><th>Interactions &amp; Anomalies</th></tr></thead><tbody>
+<tr><td><code>isOrgProfileOpen</code></td><td><code>true</code></td><td>Button at line 113</td><td>Step 1, Section 1.1 (Org Profile)</td><td>Independent accordion. Expanded by default.</td></tr>
+<tr><td><code>isContactDetailsOpen</code></td><td><code>false</code></td><td>Button at line 394</td><td>Step 1, Section 1.2 (Contact &amp; Address)</td><td><strong>Coupled:</strong> The button simultaneously inverts BOTH <code>isContactDetailsOpen</code> and <code>isAddressRecordsOpen</code>.</td></tr>
+<tr><td><code>isAddressRecordsOpen</code></td><td><code>false</code></td><td>Button at line 394</td><td>Step 1, Section 1.2 (Address Overflow)</td><td><strong>Coupled:</strong> Toggled together with <code>isContactDetailsOpen</code>.</td></tr>
+<tr><td><code>isReviewStep1Open</code></td><td><code>true</code></td><td>Header at line 1745</td><td>Step 5, Block 1 (Org Details Summary)</td><td>Parent accordion wrapping sub-accordions 1.1, 1.2, 1.3.</td></tr>
+<tr><td><code>isReviewOrgProfileOpen</code></td><td><code>true</code></td><td>Header at line 1773</td><td>Step 5, Sub-block 1.1</td><td>Nested inside <code>isReviewStep1Open</code>.</td></tr>
+<tr><td><code>isReviewContactOpen</code></td><td><code>false</code></td><td>Header at line 1817</td><td>Step 5, Sub-block 1.2</td><td>Nested inside <code>isReviewStep1Open</code>.</td></tr>
+<tr><td><code>isReviewAddressOpen</code></td><td><code>false</code></td><td>Header at line 1842</td><td>Step 5, Sub-block 1.3</td><td>Nested inside <code>isReviewStep1Open</code>.</td></tr>
+<tr><td><code>isReviewAuthPersonOpen</code></td><td><code>false</code></td><td>Header at line 1874</td><td>Step 5, Block 2 (Auth Person Summary)</td><td>Independent accordion in Step 5.</td></tr>
+<tr><td><code>isReviewBankOpen</code></td><td><code>false</code></td><td>Header at line 1967</td><td>Step 5, Block 3 (Bank Details Summary)</td><td>Independent accordion in Step 5.</td></tr>
+<tr><td><code>isReviewDocsOpen</code></td><td><code>false</code></td><td>Header at line 2044</td><td>Step 5, Block 4 (Documents Summary)</td><td>Independent accordion in Step 5.</td></tr>
+<tr><td><code>isOfficerOpen</code></td><td><code>true</code></td><td>None (TS line 957)</td><td>None</td><td><strong>Dormant:</strong> Declared in TypeScript, never bound in HTML.</td></tr>
+<tr><td><code>isAwardOpen</code></td><td><code>true</code></td><td>None (TS line 1050)</td><td>None</td><td><strong>Dormant:</strong> Declared in TypeScript, never bound in HTML.</td></tr>
+</tbody></table></div>
+<br/>
+<hr/>
+<br/>
+<h2>8. MODALS ANALYSIS</h2>
+<br/>
+<p>Four distinct dialog modal structures are defined at the bottom of the HTML template (lines 2144–2565).</p>
+<br/>
+<h3>1. Document Preview Modal (<code>previewingDoc</code>)</h3>
+<li><strong>Trigger:</strong> "Preview" button on any statutory document row in Step 4 (lines 1564, 1589, 1677, 1703).</li>
+<li><strong>Controlling Signal:</strong> <code>previewingDoc: WritableSignal&lt;UploadedDocument | null&gt;</code>.</li>
+<li><strong>Purpose:</strong> Displays document metadata (type, mandatory/optional, filename, upload date) and a mock document frame with a verified badge.</li>
+<li><strong>Dismissal:</strong> Top close button <code>&amp;times;</code> or bottom "Close" button sets <code>previewingDoc.set(null)</code>.</li>
+<br/>
+<h3>2. Officer In-Charge CRUD Modal (<code>showOfficerModal</code>)</h3>
+<li><strong>Trigger:</strong> <code>openAddOfficerModal()</code> or <code>editOfficer(off)</code>.</li>
+<li><strong>Controlling Signals:</strong> <code>showOfficerModal</code>, <code>isOfficerEditing</code>, <code>modalOfficerSubmitted</code>.</li>
+<li><strong>State Model:</strong> <code>currentOfficer: OfficerInCharge</code>.</li>
+<li><strong>Fields Inside Modal:</strong> Name (<em>), Designation (</em>), Mobile No (<em>), Email ID (</em>), PAN, Aadhaar No, Bhamashah No, Voter ID No, Passport No.</li>
+<li><strong>Save Routine (<code>saveOfficer</code>):</strong> Marks <code>modalOfficerSubmitted = true</code>, validates via <code>valService.validateOfficer(this.currentOfficer)</code>, appends to or updates <code>service.formData().officers</code>, closes modal.</li>
+<li><strong>CRITICAL ARCHITECTURAL FINDING:</strong> <strong>Orphaned Feature.</strong> While the modal HTML exists (lines 2217–2391) and the controller has full CRUD methods (<code>openAddOfficerModal</code>, <code>editOfficer</code>, <code>deleteOfficer</code>, <code>saveOfficer</code>), there are <strong>zero buttons in the active 5 steps of the HTML that call <code>openAddOfficerModal()</code></strong>.</li>
+<br/>
+<h3>3. Award Record CRUD Modal (<code>showAwardModal</code>)</h3>
+<li><strong>Trigger:</strong> <code>openAddAwardModal()</code> or <code>editAward(award)</code>.</li>
+<li><strong>Controlling Signals:</strong> <code>showAwardModal</code>, <code>isAwardEditing</code>, <code>modalAwardSubmitted</code>.</li>
+<li><strong>State Model:</strong> <code>currentAward: AwardItem</code>.</li>
+<li><strong>Fields Inside Modal:</strong> Award Name (<em>), Awarding Agency (</em>), Year of Award, Level (State/National/International), Description, Supporting Document file input.</li>
+<li><strong>Save Routine (<code>saveAward</code>):</strong> Marks <code>modalAwardSubmitted = true</code>, validates via <code>valService.validateAward(this.currentAward)</code>, appends to or updates <code>service.formData().awards</code>, closes modal.</li>
+<li><strong>CRITICAL ARCHITECTURAL FINDING:</strong> <strong>Orphaned Feature.</strong> Identical to the Officer modal, the Award modal HTML (lines 2394–2509) and controller methods exist, but there are <strong>zero buttons in the active template that trigger <code>openAddAwardModal()</code></strong>.</li>
+<br/>
+<h3>4. Final Submission Success Modal (<code>showSuccessModal</code>)</h3>
+<li><strong>Trigger:</strong> <code>submitFinalApplication()</code> upon successful validation and declaration agreement.</li>
+<li><strong>Controlling Signal:</strong> <code>showSuccessModal: WritableSignal&lt;boolean&gt;</code>.</li>
+<li><strong>Contents:</strong> Success checkmark icon, "Application Submitted!" heading, summary card with <code>applicationNo</code>, organisation full name, submission date, "Print Acknowledgement" button (<code>window.print()</code>), and "Close" button.</li>
+<br/>
+<br/>
+<hr/>
+<br/>
+<h2>9. DOCUMENT &amp; FILE UPLOAD SUBSYSTEM</h2>
+<br/>
+<p>The module handles file uploads across three distinct domains: Bank Cheque Verification (Step 3), Statutory Compliance Documents (Step 4), and Award Supporting Documents (Modal).</p>
+<br/>
+<h3>9.1 Upload Domain Specifications</h3>
+<br/>
+<div class="table-container"><table>
+<thead><tr><th>Upload Domain</th><th>Bound Model Property</th><th>File Type Constraints</th><th>Max Size</th><th>UI Upload Mechanism</th><th>Handlers in Component</th><th>Synchronization / Side Effects</th></tr></thead><tbody>
+<tr><td><strong>Cancelled Cheque</strong> (Step 3)</td><td><code>bankDetails.cancelledChequeFileName</code>, <code>bankDetails.cancelledChequeFileSize</code></td><td><code>.pdf</code>, <code>.jpg</code>, <code>.jpeg</code>, <code>.png</code></td><td>5 MB</td><td>Drag &amp; Drop Zone + Hidden File Input</td><td><code>onBankDragOver()</code>, <code>onBankDragLeave()</code>, <code>onBankFileDrop()</code>, <code>onBankFileSelected()</code>, <code>removeBankFile()</code></td><td>Automatically synchronizes with <code>doc-bank</code> in <code>data.documents</code> array.</td></tr>
+<tr><td><strong>Statutory Documents</strong> (Step 4)</td><td><code>data.documents[docId].fileName</code>, <code>fileSize</code>, <code>uploadDate</code>, <code>status</code></td><td><code>.pdf</code>, <code>.jpg</code>, <code>.jpeg</code>, <code>.png</code></td><td>5 MB</td><td>Individual "Browse" button per row in table &amp; mobile cards</td><td><code>onDocFileSelected($event, docId)</code>, <code>removeDocument(docId)</code></td><td>Updates <code>status: 'uploaded'</code>; tracked by <code>uploadedRequiredCount</code>.</td></tr>
+<tr><td><strong>Award Document</strong> (Modal)</td><td><code>currentAward.documentName</code></td><td><code>.pdf</code>, <code>.jpg</code>, <code>.jpeg</code>, <code>.png</code></td><td>5 MB</td><td>Standard file input button</td><td><code>onAwardFileSelected($event)</code></td><td>Sets file name string on <code>currentAward</code>.</td></tr>
+</tbody></table></div>
+<br/>
+<h3>9.2 Statutory Compliance Document Inventory (Step 4)</h3>
+<br/>
+<p>Initial documents are seeded via <code>INITIAL_DOCUMENTS</code> in <code>tp-pia-registration.service.ts</code>:</p>
+<br/>
+<div class="table-container"><table>
+<thead><tr><th>Document ID</th><th>Document Type</th><th>Label / Description</th><th>Mandatory?</th><th>Default Status</th></tr></thead><tbody>
+<tr><td><code>doc-reg-cert</code></td><td>Registration Certificate</td><td>Organisation Registration Certificate</td><td><strong>Mandatory (*)</strong></td><td>pending</td></tr>
+<tr><td><code>doc-pan</code></td><td>PAN Card</td><td>Organisation PAN Card</td><td><strong>Mandatory (*)</strong></td><td>pending</td></tr>
+<tr><td><code>doc-gst</code></td><td>GST Certificate</td><td>GST Registration Certificate</td><td><strong>Mandatory (*)</strong></td><td>pending</td></tr>
+<tr><td><code>doc-turnover</code></td><td>Audited Balance Sheet</td><td>Audited Balance Sheet / Turnover Certificate</td><td>Optional</td><td>pending</td></tr>
+<tr><td><code>doc-bank</code></td><td>Bank Proof</td><td>Cancelled Cheque / Bank Passbook</td><td>Optional</td><td>pending</td></tr>
+<tr><td><code>doc-board-res</code></td><td>Board Resolution</td><td>Board Resolution / Power of Attorney for Signatory</td><td>Optional</td><td>pending</td></tr>
+<tr><td><code>doc-nsdc</code></td><td>NSDC Certificate</td><td>NSDC Partner Certificate (If Applicable)</td><td>Optional</td><td>pending</td></tr>
+<tr><td><code>doc-other</code></td><td>Supporting Document</td><td>Additional Supporting Document</td><td>Optional</td><td>pending</td></tr>
+</tbody></table></div>
+<br/>
+<h3>9.3 Validation &amp; Handling Pipeline</h3>
+<li><strong>1.</strong> <strong>Size Validation:</strong> If <code>file.size &gt; 5 <em> 1024 </em> 1024</code> (5 MB), an error is dispatched (<code>"filename exceeds the maximum 5 MB limit"</code>) and processing terminates.</li>
+<li><strong>2.</strong> <strong>Type Validation:</strong> Extracted extension is checked against <code>['pdf', 'jpg', 'jpeg', 'png']</code>. If invalid, error is set.</li>
+<li><strong>3.</strong> <strong>Metadata Calculation:</strong> Formats size string (<code>sizeFormatted = (file.size / (1024 * 1024)).toFixed(2) + ' MB'</code>) and date string (<code>dateFormatted = new Date().toLocaleDateString('en-GB')</code>).</li>
+<li><strong>4.</strong> <strong>State Storage:</strong> Note that <strong>the actual binary File object is NOT stored in the frontend state or uploaded via HTTP multipart</strong>. Only the metadata (<code>fileName</code>, <code>fileSize</code>, <code>uploadDate</code>, <code>status</code>) is written to <code>TpPiaRegistrationData</code>.</li>
+<br/>
+<hr/>
+<br/>
+<h2>10. DATE HANDLING &amp; DUAL-PICKER ARCHITECTURE</h2>
+<br/>
+<p>The application manages two date fields:</p>
+<li><strong>1.</strong> <code>data.basicInfo.dateOfRegistration</code> (Step 1)</li>
+<li><strong>2.</strong> <code>data.authorizedOrg.dob</code> (Step 2)</li>
+<br/>
+<h3>10.1 Dual-Picker Architecture</h3>
+<br/>
+<p>Each date input employs a dual-control strategy:</p>
+<li><strong>Visible Primary Input:</strong> A standard text input with a mask handler (<code>onDateInput</code>) allowing direct typing in <code>DD/MM/YYYY</code> format.</li>
+<li><strong>Hidden Native Date Input:</strong> An HTML5 <code>&lt;input type="date"&gt;</code> element positioned absolutely with <code>opacity-0 pointer-events-none w-0 h-0 -z-10</code> linked via template reference (<code>#regDatePicker</code>, <code>#dobPicker</code>).</li>
+<li><strong>Calendar Icon Button:</strong> Calls <code>openPicker(pickerRef)</code>, which attempts to invoke <code>picker.showPicker()</code> (modern HTML5 API) with fallback to <code>picker.focus(); picker.click()</code>.</li>
+<br/>
+<h3>10.2 Format Conversion Pipeline</h3>
+<li><strong>Internal Storage Format:</strong> The form data stores dates as strings. Depending on user entry, it may be stored as <code>DD/MM/YYYY</code> (from text input) or <code>YYYY-MM-DD</code> (from sample data or native picker).</li>
+<li><strong><code>formatDateDisplay(dateStr)</code>:</strong> Converts ISO <code>YYYY-MM-DD</code> strings to <code>DD/MM/YYYY</code> for template rendering.</li>
+<li><strong><code>getIsoDate(dateStr)</code>:</strong> Converts <code>DD/MM/YYYY</code> strings to ISO <code>YYYY-MM-DD</code> for the hidden native picker's <code>[value]</code> attribute.</li>
+<li><strong><code>onDateInput($event, field)</code>:</strong> Strips non-digits, slices to 8 digits, and dynamically injects slashes: <code>DD/MM/YYYY</code>.</li>
+<br/>
+<h3>10.3 Age Calculation Logic (<code>onDobChange</code>)</h3>
+<p>When the DOB input updates, <code>onDobChange()</code> parses the date (handling both <code>/</code> and <code>-</code> separators), compares it against the current system date, calculates the exact age in years, and updates <code>data.authorizedOrg.age</code>.</p>
+<br/>
+<hr/>
+<br/>
+<h2>11. INPUT SANITIZATION &amp; KEYBOARD EVENT RESTRICTIONS</h2>
+<br/>
+<p>The component employs a two-tier defense: keypress event suppression (preventing illegal characters from being typed) and input sanitization (cleaning pasted content or auto-fill).</p>
+<br/>
+<h3>Complete Sanitizer &amp; Restriction Matrix</h3>
+<br/>
+<div class="table-container"><table>
+<thead><tr><th>Function Name</th><th>Nature</th><th>Allowed Characters / Logic</th><th>Regex Pattern</th><th>Fields Utilizing</th></tr></thead><tbody>
+<tr><td><strong><code>onlyNumbers</code></strong></td><td>Keypress Event</td><td>Allows digits 0-9 and control keys (Backspace, Tab, Arrows, Enter, Delete)</td><td><code>/^\d$/</code></td><td>Contact numbers, Aadhaar, Pincode, Account No, MICR, Age, Year</td></tr>
+<tr><td><strong><code>onlyLetters</code></strong></td><td>Keypress Event</td><td>Allows letters (a-z, A-Z), spaces, and dots</td><td><code>/^[a-zA-Z\s.]$/</code></td><td>TP/PIA Full Name, Authorized Person Name, Guardian Name, Officer Name</td></tr>
+<tr><td><strong><code>onlyLettersSymbols</code></strong></td><td>Keypress Event</td><td>Allows letters, spaces, and <code>/</code>, <code>&amp;</code>, <code>-</code>, <code>.</code> (No digits)</td><td><code>/^[a-zA-Z\s/&amp;.-]$/</code></td><td>TP/PIA Short Name</td></tr>
+<tr><td><strong><code>onlyAlphanumericSymbols</code></strong></td><td>Keypress Event</td><td>Allows letters, digits, spaces, and <code>/</code>, <code>&amp;</code>, <code>-</code>, <code>.</code></td><td><code>/^[a-zA-Z0-9\s/&amp;.-]$/</code></td><td>Registration No, Designation, Branch Name, Voter ID, Bhamashah</td></tr>
+<tr><td><strong><code>onlyAlphanumeric</code></strong></td><td>Keypress Event</td><td>Allows strict letters and digits only</td><td><code>/^[a-zA-Z0-9]$/</code></td><td>PAN No, IFSC Code, Passport No</td></tr>
+<tr><td><strong><code>onlyDecimals</code></strong></td><td>Keypress Event</td><td>Allows digits and at most ONE decimal point <code>.</code></td><td>Digits + <code>'.'</code> check</td><td>Annual Turnover (<code>turnOver</code>)</td></tr>
+<tr><td><strong><code>sanitizeNumbers</code></strong></td><td>Input Sanitizer</td><td>Strips all non-digit characters; enforces maxlength</td><td><code>/\D/g</code></td><td>Mobile No, Aadhaar No, Pincode, Bank Account No, MICR, Age, Year</td></tr>
+<tr><td><strong><code>sanitizeLetters</code></strong></td><td>Input Sanitizer</td><td>Strips non-letters, spaces, and dots; enforces maxlength</td><td><code>/[^a-zA-Z\s.]/g</code></td><td>Full Name, Guardian Name, Officer Name</td></tr>
+<tr><td><strong><code>sanitizeAlphanumericUpper</code></strong></td><td>Input Sanitizer</td><td>Converts to uppercase; strips non-alphanumerics</td><td><code>/[^A-Z0-9]/g</code></td><td>PAN, IFSC, Passport</td></tr>
+<tr><td><strong><code>sanitizeAlphanumericSymbols</code></strong></td><td>Input Sanitizer</td><td>Strips non-alphanumeric and symbols (<code>&amp; / - .</code>)</td><td><code>/[^a-zA-Z0-9\s/&amp;.-]/g</code></td><td>Designation, Branch Name</td></tr>
+<tr><td><strong><code>sanitizeAlphanumericSymbolsUpper</code></strong></td><td>Input Sanitizer</td><td>Uppercases; strips non-alphanumeric and symbols</td><td><code>/[^A-Z0-9\s/&amp;.-]/g</code></td><td>Registration Number, Voter ID, Bhamashah</td></tr>
+<tr><td><strong><code>sanitizeLettersSymbolsUpper</code></strong></td><td>Input Sanitizer</td><td>Uppercases; allows letters, spaces, symbols (no digits)</td><td><code>/[^A-Z\s/&amp;.-]/g</code></td><td>Short Name</td></tr>
+<tr><td><strong><code>sanitizeDecimals</code></strong></td><td>Input Sanitizer</td><td>Strips non-digits and multiple decimal points</td><td>Custom slice logic</td><td>Annual Turnover</td></tr>
+</tbody></table></div>
+<br/>
+<hr/>
+<br/>
+<h2>12. VALIDATION ENGINE &amp; RULES MATRIX</h2>
+<br/>
+<p>The validation subsystem is housed in <code>src/app/features/forms/services/form-validation.service.ts</code> and consumed by <code>TpPiaRegistrationComponent</code>.</p>
+<br/>
+<h3>12.1 Regular Expression Patterns Library (<code>VALIDATION_PATTERNS</code>)</h3>
+<br/>
+<pre><code>
+export const VALIDATION_PATTERNS = {
+  mobile: /^[6-9]\d{9}$/,
+  email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+  pan: /^[A-Z]{5}[0-9]{4}[A-Z]$/,
+  gstin: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/,
+  pincode: /^\d{6}$/,
+  aadhaar: /^\d{12}$/,
+  ifsc: /^[A-Z]{4}0[A-Z0-9]{6}$/,
+  micr: /^\d{9}$/,
+  cin: /^[a-zA-Z0-9]{21}$/,
+  bankAccount: /^\d{9,18}$/,
+  url: /^(https?:\/\/)?([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/i,
+};
+</code></pre>
+<br/>
+<h3>12.2 Validation Methods Matrix</h3>
+<br/>
+<div class="table-container"><table>
+<thead><tr><th>Method Name</th><th>Target Data Entity</th><th>Evaluated Fields &amp; Conditions</th><th>Validation Outcome / Error Message</th></tr></thead><tbody>
+<tr><td><strong><code>validateTab1</code></strong></td><td><code>basicInfo</code>, <code>entityInfo</code>, <code>registeredAddress</code>, <code>postalAddress</code></td><td>- <code>fullName</code>: required, 3-100 chars, letters only&lt;br&gt;- <code>shortName</code>: required, 2-30 chars, letters/symbols&lt;br&gt;- <code>registrationNumber</code>: optional, 3-30 chars, alphanumeric&lt;br&gt;- <code>website</code>: optional, &lt;=100 chars, valid URL&lt;br&gt;- <code>dateOfRegistration</code>: optional, DD/MM/YYYY, not future&lt;br&gt;- <code>contactNo</code>: required, valid 10-digit mobile&lt;br&gt;- <code>emailId</code>: required, valid email pattern&lt;br&gt;- <code>panNo</code>: optional, valid 10-char PAN&lt;br&gt;- <code>registeredAddress.address</code>: required&lt;br&gt;- <code>registeredAddress.state</code>: required&lt;br&gt;- <code>registeredAddress.district</code>: required&lt;br&gt;- <code>registeredAddress.pincode</code>: required, 6 digits&lt;br&gt;- <code>turnOver</code>: required, numeric &gt;= 0, &lt;= 10,000,000&lt;br&gt;- <code>postalAddress.address</code>: required if <code>!sameAsRegistered</code></td><td>Returns <code>TabValidationResult</code> with populated <code>errors</code> dictionary.</td></tr>
+<tr><td><strong><code>validateTab2</code></strong></td><td><code>authorizedOrg</code></td><td>- <code>name</code>: required, &gt;=3 chars, letters only&lt;br&gt;- <code>guardianName</code>: optional, letters only&lt;br&gt;- <code>dob</code>: optional, DD/MM/YYYY, age &gt;= 18 &amp; &lt;= 100&lt;br&gt;- <code>age</code>: optional, 18 &lt;= age &lt;= 100&lt;br&gt;- <code>contactNo</code>: required, valid 10-digit mobile&lt;br&gt;- <code>pan</code>: required, valid 10-char PAN&lt;br&gt;- <code>aadhaarNo</code>: required, exactly 12 digits&lt;br&gt;- <code>emailId</code>: optional, valid email pattern</td><td>Returns <code>TabValidationResult</code> with populated <code>errors</code> dictionary.</td></tr>
+<tr><td><strong><code>validateTab3</code></strong></td><td><code>bankDetails</code></td><td>- <code>bankName</code>: required, non-empty&lt;br&gt;- <code>accountNo</code>: required, 9 to 18 digits&lt;br&gt;- <code>ifscCode</code>: required, valid 11-char IFSC&lt;br&gt;- <code>branchName</code>: required, non-empty&lt;br&gt;- <code>branchAddress</code>: required, non-empty&lt;br&gt;- <code>micrCode</code>: optional, exactly 9 digits</td><td>Returns <code>TabValidationResult</code> with populated <code>errors</code> dictionary.</td></tr>
+<tr><td><strong><code>validateTab4</code></strong></td><td><code>documents</code></td><td>- Checks all documents where <code>required === true</code>&lt;br&gt;- Verifies <code>status === 'uploaded'</code> and <code>fileName</code> present</td><td>Dispatches error if missing required docs count &gt; 0.</td></tr>
+<tr><td><strong><code>validateTab5</code></strong></td><td>Master Data</td><td>Delegates directly to <code>validateTab3(data)</code></td><td>Matches Tab 3 validation.</td></tr>
+<tr><td><strong><code>validateTab6</code></strong></td><td><code>awards</code></td><td>Iterates over <code>data.awards</code> and runs <code>validateAward()</code></td><td>Dispatches error if any award has invalid details.</td></tr>
+<tr><td><strong><code>validateTab7</code></strong></td><td>Master Data</td><td>Delegates directly to <code>validateTab4(data)</code></td><td>Matches Tab 4 validation.</td></tr>
+<tr><td><strong><code>validateOfficer</code></strong></td><td><code>OfficerInCharge</code></td><td>- <code>name</code>: required, letters only&lt;br&gt;- <code>designation</code>: required&lt;br&gt;- <code>mobileNo</code>: required, 10-digit mobile&lt;br&gt;- <code>emailId</code>: required, valid email&lt;br&gt;- <code>pan</code>: optional, valid PAN&lt;br&gt;- <code>aadhaarNo</code>: optional, 12 digits</td><td>Used inside Officer Modal.</td></tr>
+<tr><td><strong><code>validateAward</code></strong></td><td><code>AwardItem</code></td><td>- <code>awardName</code>: required&lt;br&gt;- <code>awardingAgency</code>: required&lt;br&gt;- <code>year</code>: optional, 4-digit year 1950–2100</td><td>Used inside Award Modal.</td></tr>
+<tr><td><strong><code>validateDate</code></strong></td><td>Date string</td><td>Complete date parser and range validator</td><td>Validates format, valid days per month, leap years, min/max limits.</td></tr>
+</tbody></table></div>
+<br/>
+<h3>12.3 The Validation Cache Object Identity Bug</h3>
+<p>In <code>FormValidationService</code> (lines 568–592):</p>
+<pre><code>
+private validationCache = new Map&lt;number, { dataRef: any; result: TabValidationResult }&gt;();
+
+getTabValidation(tabId: number, data: TpPiaRegistrationData): TabValidationResult {
+  const cached = this.validationCache.get(tabId);
+  if (cached &amp;&amp; cached.dataRef === data) {
+    return cached.result;
+  }
+  ...
+}
+</code></pre>
+<p><strong>CRITICAL FLAW:</strong> In <code>TpPiaRegistrationService</code>, <code>updateFormData</code> always creates a new object reference via object spread (<code>curr =&gt; ({ ...curr })</code>). Therefore, on every single keystroke, <code>dataRef === data</code> evaluates to <strong><code>false</code></strong>. The cache <strong>never hits</strong> during active typing, rendering the memoization logic completely ineffectual.</p>
+<br/>
+<hr/>
+<br/>
+<h2>13. DATA MODEL AUDIT &amp; DISCREPANCIES</h2>
+<br/>
+<p>The domain interfaces reside in <code>src/app/features/forms/models/tp-pia-registration.model.ts</code>.</p>
+<br/>
+<h3>13.1 Interface Structure</h3>
+<li><strong><code>BasicOrgInfo</code></strong>: Application metadata, entity name, registration number, contacts, PAN, CIN, GST.</li>
+<li><strong><code>EntityInfo</code></strong>: Turnover, blacklisting status, NSDC partnership, nature of entity, applicant category, state, EOI details.</li>
+<li><strong><code>AddressInfo</code></strong>: Address premises, state, district, pincode.</li>
+<li><strong><code>WorkflowInfo</code></strong>: Internal department workflow routing (action, markTo, markToOfficer, remarks).</li>
+<li><strong><code>OfficerInCharge</code></strong>: Administrative officer details.</li>
+<li><strong><code>AuthorizedPersonOrg</code></strong>: Corporate statutory signatory details.</li>
+<li><strong><code>AuthorizedPersonProject</code></strong>: Project-level authorized person details.</li>
+<li><strong><code>BankDetails</code></strong>: Disbursal bank account, IFSC, branch, cheque metadata.</li>
+<li><strong><code>AwardItem</code></strong>: Entity recognition details.</li>
+<li><strong><code>UploadedDocument</code></strong>: Document metadata, upload date, status.</li>
+<li><strong><code>TpPiaRegistrationData</code></strong>: Aggregate container aggregating all sub-interfaces.</li>
+<br/>
+<h3>13.2 Model Architectural Discrepancies &amp; Stale Code</h3>
+<li><strong>1.</strong> <strong>Mismatched Tab Number Comments:</strong></li>
+<p>   Lines 122–146 of <code>tp-pia-registration.model.ts</code> list:</p>
+<pre><code>
+   // Tab 1: basicInfo, entityInfo, registeredAddress, postalAddress, sameAsRegistered, workflowInfo
+   // Tab 2: officers
+   // Tab 3: authorizedOrg
+   // Tab 4: authorizedProject
+   // Tab 5: bankDetails
+   // Tab 6: awards
+   // Tab 7: documents
+</code></pre>
+<p>   However, the active application has only <strong>5 steps</strong>. Tab 2 in the UI is actually <code>authorizedOrg</code>, Tab 3 is <code>bankDetails</code>, Tab 4 is <code>documents</code>, and Tab 5 is <code>Review &amp; Submit</code>. The model comments reflect an obsolete 7-tab layout.</p>
+<li><strong>2.</strong> <strong>Orphaned <code>AuthorizedPersonProject</code> Interface:</strong></li>
+<p>   The interface <code>AuthorizedPersonProject</code> (lines 76–84) and its corresponding property <code>authorizedProject</code> on <code>TpPiaRegistrationData</code> (line 137) are <strong>completely absent from the HTML template</strong>. No UI exists to view or edit project-level authorized persons.</p>
+<li><strong>3.</strong> <strong>Unused Properties on <code>BasicOrgInfo</code> &amp; <code>EntityInfo</code>:</strong></li>
+<li><code>cinNo</code> (BasicOrgInfo): Defined in model and sample data, but has no input field in the HTML template.</li>
+<li><code>gstNo</code> (BasicOrgInfo): Defined in model and sample data, but has no input field in Step 1 (GST Certificate is only uploaded as a document).</li>
+<li><code>blackListed</code>, <code>nsdcPartner</code>, <code>natureOfEntity</code>, <code>categoryOfApplicant</code>, <code>eoiReferenceNo</code>, <code>dateOfEoiPublished</code> (EntityInfo): Defined in model and populated by demo data, but omitted from Step 1 HTML form.</li>
+<li><code>workflowInfo</code> (TpPiaRegistrationData): Populated in demo data, completely omitted from UI.</li>
+<br/>
+<hr/>
+<br/>
+<h2>14. REGISTRATION SERVICE AUDIT</h2>
+<br/>
+<p>The service <code>TpPiaRegistrationService</code> (<code>src/app/features/forms/services/tp-pia-registration.service.ts</code>) serves as the central data store.</p>
+<br/>
+<h3>14.1 State &amp; Properties</h3>
+<li><strong><code>formData</code></strong>: <code>signal&lt;TpPiaRegistrationData&gt;(this.getInitialState())</code> — Central reactive state for the entire form.</li>
+<li><strong><code>autoSaveStatus</code></strong>: <code>signal&lt;'saved' | 'saving' | 'idle'&gt;('idle')</code> — Tracks auto-save activity.</li>
+<li><strong><code>lastSavedTime</code></strong>: <code>signal&lt;string&gt;('')</code> — Formatted timestamp string of last save.</li>
+<li><strong><code>isSaving</code></strong>: <code>computed(() =&gt; this.autoSaveStatus() === 'saving')</code> — Readonly indicator for saving state.</li>
+<li><strong><code>lastSaveMessage</code></strong>: <code>signal&lt;string&gt;('')</code> — User-facing toast/status message.</li>
+<li><strong><code>autoSaveTimer</code></strong>: Internal timer handle for 400ms auto-save debounce.</li>
+<br/>
+<h3>14.2 Persistence Mechanism</h3>
+<li><strong>Key:</strong> <code>'isms_tp_pia_registration_draft_v1'</code>.</li>
+<li><strong>Target Storage:</strong> Browser <code>localStorage</code>.</li>
+<li><strong>Auto-save Lifecycle:</strong></li>
+<li><code>updateFormData()</code> triggers <code>triggerAutoSave()</code>.</li>
+<li>Debounces for 400ms before invoking <code>saveDraftSync()</code>.</li>
+<li>Window <code>beforeunload</code> listener invokes <code>saveDraftSync()</code> synchronously.</li>
+<li>On service instantiation, constructor calls <code>restoreSavedDraft()</code>. If valid draft JSON exists, restores state into <code>formData</code> signal.</li>
+<br/>
+<h3>14.3 Static Constants Exported</h3>
+<p>Exports <code>INITIAL_DOCUMENTS</code>, <code>INDIAN_STATES</code>, <code>RAJASTHAN_DISTRICTS</code>, <code>NATURE_OF_ENTITIES</code>, <code>SCHEME_NAMES</code>, <code>BUSINESS_ACTIVITIES</code>, <code>APPLICANT_CATEGORIES</code>, <code>WORKFLOW_ACTIONS</code>, <code>MARK_TO_ROLES</code>, <code>ID_PROOF_TYPES</code>, <code>COMMON_BANKS</code>, <code>TRANSFER_MODES</code>, <code>ACCOUNT_TYPES</code>.</p>
+<br/>
+<hr/>
+<br/>
+<h2>15. ROUTING ARCHITECTURE</h2>
+<br/>
+<p>Routing is declared in <code>src/app/features/forms/forms.routes.ts</code>:</p>
+<br/>
+<pre><code>
+import { Routes } from '@angular/router';
+import { TpPiaRegistrationComponent } from './components/tp-pia-registration/tp-pia-registration.component';
+
+export const FORMS_ROUTES: Routes = [
+  {
+    path: '',
+    component: TpPiaRegistrationComponent,
+  },
+  {
+    path: 'tp-pia-registration',
+    component: TpPiaRegistrationComponent,
+  }
+];
+</code></pre>
+<br/>
+<li><strong>Integration:</strong> Lazy-loaded in <code>src/app/app.routes.ts</code> under <code>path: 'forms'</code>:</li>
+<p>  <code>loadChildren: () =&gt; import('./features/forms/forms.routes').then(m =&gt; m.FORMS_ROUTES)</code>.</p>
+<li><strong>Accessible URLs:</strong></li>
+<li><code>http://localhost:4200/forms</code></li>
+<li><code>http://localhost:4200/forms/tp-pia-registration</code></li>
+<li><strong>Route Guards / Resolvers:</strong> None. The route is completely open and public.</li>
+<br/>
+<br/>
+<hr/>
+<br/>
+<h2>16. END-TO-END DATA FLOW ANALYSIS</h2>
+<br/>
+<pre><code>
+[ User Keystroke / Input Event ]
+              │
+              ▼
+[ Keypress Filter: onlyNumbers / onlyLetters ]  ---&gt; (Event cancelled if illegal key)
+              │
+              ▼
+[ Input Sanitizer: sanitizeLetters / sanitizeNumbers ]
+              │
+              ▼
+[ Two-way Model Mutation via [(ngModel)] on this.data.* ]
+              │
+              ▼
+[ Component onDataChange() debounces 60ms ]
+              │
+              ▼
+[ service.updateFormData(curr =&gt; ({ ...curr })) ]
+              │
+              ├───────────────────────────────────┐
+              ▼                                   ▼
+[ formData.set(newCopy) ]              [ triggerAutoSave(400ms) ]
+              │                                   │
+              ▼                                   ▼
+[ computed() signals re-evaluate: ]    [ localStorage.setItem(...) ]
+  - tab1Errors, tab2Errors...
+  - errors
+  - tabStatuses
+              │
+              ▼
+[ Template OnPush Change Detection evaluates: ]
+  - isFieldInvalid(fieldKey)
+  - getFieldError(fieldKey)
+  - Stepper icons &amp; classes
+</code></pre>
+<br/>
+<h3>Detailed Data Flow Stages</h3>
+<li><strong>1.</strong> <strong>User Interaction &amp; Keyboard Suppression:</strong> Keystroke triggers <code>onlyNumbers()</code> or <code>onlyLetters()</code>. If regex check fails, <code>event.preventDefault()</code> halts entry before value reaches the DOM element.</li>
+<li><strong>2.</strong> <strong>Template Model Mutation:</strong> Angular's <code>[(ngModel)]</code> directive directly writes the new primitive value into the nested property of <code>this.data</code> (e.g. <code>data.basicInfo.fullName</code>). Note that because <code>this.data</code> returns the mutable reference from the service's current signal, <strong>the property is mutated in-place before <code>service.updateFormData()</code> is called</strong>.</li>
+<li><strong>3.</strong> <strong>Component Change Debounce (<code>onDataChange</code>):</strong> Clears and sets a 60ms timer. When the timer expires, it calls <code>service.updateFormData(curr =&gt; ({ ...curr }))</code>.</li>
+<li><strong>4.</strong> <strong>Service Signal Notification:</strong> <code>service.updateFormData()</code> runs the callback, creating a shallow clone of the master object, and calls <code>this.formData.set(updated)</code>.</li>
+<li><strong>5.</strong> <strong>Auto-save Dispatch:</strong> <code>service.triggerAutoSave()</code> debounces 400ms before stringifying the state and committing it to browser <code>localStorage</code> under key <code>'isms_tp_pia_registration_draft_v1'</code>.</li>
+<li><strong>6.</strong> <strong>Reactive Recomputation:</strong> The modification of <code>formData</code> notifies downstream <code>computed()</code> signals:</li>
+<li><code>tab1Errors</code>, <code>tab2Errors</code>, <code>tab3Errors</code>, <code>tab4ProjectErrors</code></li>
+<li><code>errors</code> (aggregates the tab errors)</li>
+<li><code>tabStatuses</code> (evaluates whether steps are completed or invalid)</li>
+<li><strong>7.</strong> <strong>Template OnPush Re-render:</strong> Angular re-evaluates bound template expressions (<code>isFieldInvalid()</code>, <code>getFieldError()</code>, <code>tabStatuses()</code>) and updates visual validation classes, error texts, and step badges.</li>
+<br/>
+<hr/>
+<br/>
+<h2>17. PERFORMANCE &amp; CHANGE DETECTION ANALYSIS</h2>
+<br/>
+<h3>17.1 Confirmed Current Performance Bottlenecks &amp; Architectural Bugs</h3>
+<br/>
+<div class="table-container"><table>
+<thead><tr><th>#</th><th>Classification</th><th>Exact Issue</th><th>Technical Cause</th><th>Real-World Performance Impact</th></tr></thead><tbody>
+<tr><td>:-:</td><td>:---</td><td>:---</td><td>:---</td><td>:---</td></tr>
+<tr><td><strong>1</strong></td><td><strong>CONFIRMED</strong></td><td><strong>Validation Cache Ineffectiveness</strong></td><td><code>FormValidationService.getTabValidation</code> uses object identity comparison (<code>cached.dataRef === data</code>). Since <code>updateFormData</code> spreads <code>curr</code> into a new object on every change, the reference is always new.</td><td><strong>Zero cache hits during typing.</strong> Validation algorithms run repeatedly and redundantly across change detection ticks.</td></tr>
+<tr><td><strong>2</strong></td><td><strong>CONFIRMED</strong></td><td><strong>Redundant Intermediate Computed Signals</strong></td><td>Component defines <code>tab1Errors</code>, <code>tab2Errors</code>, <code>tab3Errors</code>, <code>tab4ProjectErrors</code>, and then merges them into <code>errors</code>.</td><td>Each of the 4 computed signals re-evaluates independently on every form data update, creating 5 computed signal recalculations per keystroke instead of 1.</td></tr>
+<tr><td><strong>3</strong></td><td><strong>CONFIRMED</strong></td><td><strong>Date Object Instantiation on Every Render</strong></td><td><code>todayIso</code>, <code>maxDobIso</code>, and <code>minDobIso</code> are implemented as getters creating <code>new Date()</code> instances every time they are evaluated in template attribute bindings.</td><td>Unnecessary garbage collection churn during typing and scrolling in Step 1 &amp; 2.</td></tr>
+<tr><td><strong>4</strong></td><td><strong>CONFIRMED</strong></td><td><strong>Inline Regular Expression Re-compilation</strong></td><td>Input restriction functions (<code>onlyNumbers</code>, <code>onlyLetters</code>, <code>onlyLettersSymbols</code>, <code>onlyAlphanumericSymbols</code>, etc.) construct new <code>RegExp</code> literal instances on every single keypress event.</td><td>Micro-overhead on every keyboard keystroke; should be static module-level constants.</td></tr>
+<tr><td><strong>5</strong></td><td><strong>CONFIRMED</strong></td><td><strong>Monolithic Template DOM Size</strong></td><td>A single 2,565-line HTML template with thousands of DOM nodes is maintained inside a single Angular component.</td><td>When change detection runs, Angular must traverse the entire component DOM tree, inspecting all 5 steps and 4 modals even though 4 steps and all modals are hidden.</td></tr>
+<tr><td><strong>6</strong></td><td><strong>CONFIRMED</strong></td><td><strong>Repeated String Splitting in Template Expressions</strong></td><td><code>isFieldInvalid(key)</code> and <code>getFieldError(key)</code> call <code>getFieldValue(key)</code>, which splits the key string on <code>'.'</code> and loops through properties on every change detection pass for dozens of fields.</td><td>Unnecessary string operations per field evaluated in the template.</td></tr>
+</tbody></table></div>
+<br/>
+<h3>17.2 Possible / Marginal Optimizations</h3>
+<li><strong>Searchable Dropdown Filtering:</strong> The computed signals <code>filteredDistricts</code>, <code>filteredStatesReg</code>, etc. run <code>.filter()</code> on arrays with 14 to 33 items. Because the arrays are tiny, performance overhead is negligible, though extracting them to a shared component would dramatically clean up component code size.</li>
+<li><strong>Component Subtree Splitting:</strong> Splitting each of the 5 tabs into dedicated standalone child components (<code>app-tp-org-details</code>, <code>app-tp-auth-person</code>, <code>app-tp-bank-details</code>, <code>app-tp-documents</code>, <code>app-tp-review</code>) would restrict Angular's <code>OnPush</code> change detection specifically to the active tab's subtree.</li>
+<br/>
+<h3>17.3 Non-Issues / Patterns Functioning As Intended</h3>
+<li><strong><code>OnPush</code> Strategy:</strong> The component correctly uses <code>ChangeDetectionStrategy.OnPush</code>.</li>
+<li><strong>LocalStorage Performance:</strong> Auto-saving is properly debounced to 400ms, preventing main thread I/O thrashing during fast typing.</li>
+<li><strong>Signal Mutability:</strong> Despite the direct mutation of nested properties via <code>[(ngModel)]</code>, the 60ms debounce in <code>onDataChange()</code> ensures that Angular signals do receive new object references, triggering reactivity reliably.</li>
+<br/>
+<hr/>
+<br/>
+<h2>18. CODE QUALITY &amp; ARCHITECTURAL ASSESSMENT</h2>
+<br/>
+<h3>18.1 Single Responsibility Principle (SRP) Violation</h3>
+<p><code>TpPiaRegistrationComponent</code> is a classic <strong>"God Component"</strong> encompassing 1,257 lines of TypeScript and 2,565 lines of HTML. It simultaneously assumes responsibilities for:</p>
+<li><strong>1.</strong> Stepper wizard state and navigation logic</li>
+<li><strong>2.</strong> 5 distinct business domains (Organisation, Signatory, Bank, Documents, Review)</li>
+<li><strong>3.</strong> 5 separate searchable dropdown UI controllers (open, close, filter, clear, outside click, escape)</li>
+<li><strong>4.</strong> Character-level input filtering and regex sanitization</li>
+<li><strong>5.</strong> Dual-input date picker formatting and age calculation</li>
+<li><strong>6.</strong> File upload drag-and-drop and binary size validation</li>
+<li><strong>7.</strong> CRUD modal management for Officers and Awards</li>
+<li><strong>8.</strong> LocalStorage persistence coordination</li>
+<br/>
+<h3>18.2 Dormant &amp; Orphaned Code</h3>
+<li><strong>1.</strong> <strong>Officer In-Charge CRUD Subsystem:</strong> The component contains complete state management, validation, and HTML modal structure for Officers (<code>officers</code>, <code>currentOfficer</code>, <code>openAddOfficerModal</code>, <code>saveOfficer</code>, etc.), yet <strong>no UI elements in the 5 steps allow users to view, add, or edit officers</strong>.</li>
+<li><strong>2.</strong> <strong>Award Record CRUD Subsystem:</strong> Similarly, the Awards modal (<code>awards</code>, <code>currentAward</code>, <code>openAddAwardModal</code>, <code>saveAward</code>, etc.) is fully written into the component and template, but completely inaccessible in the main user journey.</li>
+<li><strong>3.</strong> <strong>Duplicate Wrapper Methods:</strong> <code>openPreviewModal()</code>, <code>openReviewModal()</code>, and <code>confirmSubmit()</code> are redundant passthroughs to <code>switchTab(5)</code> and <code>submitFinalApplication()</code>.</li>
+<li><strong>4.</strong> <strong>Dormant Variables:</strong> <code>isOfficerOpen</code> (line 957) and <code>isAwardOpen</code> (line 1050) are declared as signals but never bound in the template.</li>
+<br/>
+<hr/>
+<br/>
+<h2>19. TEXTUAL DEPENDENCY &amp; COUPLING MAP</h2>
+<br/>
+<pre><code>
+src/app/app.routes.ts
+       │ (loadChildren)
+       ▼
+src/app/features/forms/forms.routes.ts
+       │
+       ▼
+TpPiaRegistrationComponent
+ ├── TpPiaRegistrationService
+ │    ├── signal&lt;TpPiaRegistrationData&gt; (Master State)
+ │    ├── localStorage ('isms_tp_pia_registration_draft_v1')
+ │    └── Static Constants (INDIAN_STATES, COMMON_BANKS, etc.)
+ ├── FormValidationService
+ │    ├── VALIDATION_PATTERNS (Regex library)
+ │    ├── Tab Validators (validateTab1, validateTab2, etc.)
+ │    ├── tabStatuses, submittedTabs, completedTabs
+ │    └── toastMessage signal
+ ├── Data Models (tp-pia-registration.model.ts)
+ │    ├── TpPiaRegistrationData
+ │    ├── BasicOrgInfo, EntityInfo, AddressInfo
+ │    ├── AuthorizedPersonOrg, AuthorizedPersonProject
+ │    ├── BankDetails, AwardItem, UploadedDocument
+ └── Template: tp-pia-registration.component.html (2,565 lines)
+      ├── Header &amp; Stepper
+      ├── Step 1: Organisation Profile &amp; Addresses (3 Dropdowns)
+      ├── Step 2: Authorized Person Org (1 Dropdown, Dynamic IDs)
+      ├── Step 3: Bank Details (1 Dropdown, Cheque Dropzone)
+      ├── Step 4: Statutory Documents (Table &amp; Mobile Cards)
+      ├── Step 5: Review &amp; Declaration
+      └── 4 Dialog Modals (Preview, Officer, Award, Success)
+</code></pre>
+<br/>
+<hr/>
+<br/>
+<h2>20. EXACT CURRENT USER FLOW &amp; RUNTIME BEHAVIOR</h2>
+<br/>
+<h3>Step-by-Step Runtime Walkthrough</h3>
+<br/>
+<li><strong>1.</strong> <strong>Route Activation (<code>/forms</code> or <code>/forms/tp-pia-registration</code>):</strong></li>
+<li><code>forms.routes.ts</code> initializes <code>TpPiaRegistrationComponent</code>.</li>
+<li>In <code>TpPiaRegistrationService</code> constructor, <code>restoreSavedDraft()</code> checks <code>localStorage</code> for <code>'isms_tp_pia_registration_draft_v1'</code>.</li>
+<li>If a saved draft exists, it loads it into <code>formData</code> signal.</li>
+<li>In <code>ngOnInit()</code>, if <code>applicationNo</code> is empty, it assigns a newly generated number (e.g. <code>ISMS-TP-748291</code>).</li>
+<li><strong>2.</strong> <strong>Step 1: Organisation Details:</strong></li>
+<li>Active step circle 1 is highlighted in Navy Blue (<code>bg-[#1a2656]</code>).</li>
+<li>Section 1.1 (Profile) is open by default. User enters Full Name, Short Name, Registration Number, PAN, Turnover, and selects Business Activity and Registered State.</li>
+<li>User clicks Section 1.2 header to expand Contact &amp; Address.</li>
+<li>User fills Contact No, Email, Registered Premises, District (searchable if Rajasthan), State, and Pincode.</li>
+<li>Checking "Same as Registered" instantly copies Registered Address to Postal Address and disables Postal Address.</li>
+<li>User clicks "Next Step".</li>
+<li><code>nextTab()</code> runs <code>valService.validateTab1()</code>. If any required field is invalid, an error toast appears at the top and the window smoothly scrolls to top.</li>
+<li>If valid, Tab 1 is marked completed (<code>✓</code> in green circle), draft is saved to localStorage, and wizard advances to Step 2.</li>
+<li><strong>3.</strong> <strong>Step 2: Authorized Person (Organisation Level):</strong></li>
+<li>Active step circle 2 is highlighted.</li>
+<li>User enters Name (<em>), Mobile (</em>), PAN (<em>), Aadhaar (</em>).</li>
+<li>User enters DOB. The input mask inserts slashes (<code>DD/MM/YYYY</code>). On blur, <code>onDobChange()</code> calculates the age in years.</li>
+<li>User selects Secondary ID type (e.g. Voter ID). The dynamic input field appears below.</li>
+<li>User clicks "Next Step". <code>valService.validateTab2()</code> validates mandatory fields. If valid, advances to Step 3.</li>
+<li><strong>4.</strong> <strong>Step 3: Bank Details:</strong></li>
+<li>Active step circle 3 is highlighted.</li>
+<li>User clicks Bank Name button; searchable dropdown opens downwards. User searches "State Bank", selects SBI.</li>
+<li>User inputs Account Number (<em>), IFSC Code (</em>), Branch Name (<em>), Branch Address (</em>).</li>
+<li>User drags and drops a cancelled cheque PDF into the dropzone (or clicks to browse).</li>
+<li>File handler validates that size &lt;= 5 MB and extension is PDF/JPG/PNG. Card displays file name, formatted size, and "Ready" indicator.</li>
+<li>User clicks "Next Step". Advances to Step 4.</li>
+<li><strong>5.</strong> <strong>Step 4: Statutory Document Upload:</strong></li>
+<li>Active step circle 4 is highlighted. Banner displays: <code>"Uploaded: 0 / 3 Mandatory"</code>.</li>
+<li>User browses and uploads Registration Certificate, PAN Card, and GST Certificate.</li>
+<li>Counter updates to <code>"Uploaded: 3 / 3 Mandatory"</code>.</li>
+<li>User can click "Preview" on any document to inspect details inside the Document Preview modal.</li>
+<li>User clicks "Next Step". Advances to Step 5.</li>
+<li><strong>6.</strong> <strong>Step 5: Review &amp; Final Submission:</strong></li>
+<li>Active step circle 5 is highlighted.</li>
+<li>User reviews collapsible accordion cards summarizing all entered details from Steps 1 to 4.</li>
+<li>User can click "Edit Step X" to immediately jump back to that step.</li>
+<li>User checks the mandatory "Declaration" checkbox.</li>
+<li>"Submit Final Application" button becomes enabled.</li>
+<li>User clicks "Submit Final Application".</li>
+<li><code>submitFinalApplication()</code> verifies that <code>declarationAgreed === true</code> and <code>getFirstInvalidTab() === null</code>.</li>
+<li>Form data status is set to <code>'Submitted'</code>.</li>
+<li><code>showSuccessModal</code> signal is set to <code>true</code>, displaying the submission success dialog.</li>
+<li>User clicks "Print Acknowledgement" to invoke native browser print dialog, or clicks "Close".</li>
+<br/>
+<hr/>
+<br/>
+<h2>21. POTENTIAL OPTIMIZATION &amp; REFACTORING TARGETS</h2>
+<br/>
+<p><em>Note: As per strict task instructions, these are purely analytical recommendations. Zero code has been altered.</em></p>
+<br/>
+<h3>Group A: Safe / Low Risk Optimizations</h3>
+<li><strong>1.</strong> <strong>Dormant Wrapper Method Elimination:</strong></li>
+<li><strong>Current:</strong> <code>openPreviewModal()</code>, <code>openReviewModal()</code>, <code>confirmSubmit()</code> simply wrap other methods.</li>
+<li><strong>Target:</strong> Remove wrappers and bind directly to <code>switchTab(5)</code> and <code>submitFinalApplication()</code>.</li>
+<li><strong>Risk:</strong> Zero.</li>
+<li><strong>2.</strong> <strong>Static Date Getters to Readonly Class Properties:</strong></li>
+<li><strong>Current:</strong> <code>todayIso</code>, <code>maxDobIso</code>, <code>minDobIso</code> are getters that execute <code>new Date()</code> on every template render cycle.</li>
+<li><strong>Target:</strong> Compute once in <code>readonly</code> class properties on component initialization.</li>
+<li><strong>Risk:</strong> Zero.</li>
+<li><strong>3.</strong> <strong>Static Regex Hoisting:</strong></li>
+<li><strong>Current:</strong> Inline regexes like <code>/^\d$/</code>, <code>/^[a-zA-Z\s.]$/</code> recompile on every keystroke.</li>
+<li><strong>Target:</strong> Hoist to module-level <code>const</code> declarations or import from a shared validation pattern file.</li>
+<li><strong>Risk:</strong> Zero.</li>
+<li><strong>4.</strong> <strong>Clean Stale Tab Comments in Data Model:</strong></li>
+<li><strong>Current:</strong> Comments in <code>tp-pia-registration.model.ts</code> refer to 7 tabs.</li>
+<li><strong>Target:</strong> Update comments to match active 5-step architecture.</li>
+<li><strong>Risk:</strong> Zero.</li>
+<br/>
+<h3>Group B: Medium Risk Optimizations</h3>
+<li><strong>5.</strong> <strong>Reusable Searchable Dropdown Component:</strong></li>
+<li><strong>Current:</strong> 5 nearly identical searchable dropdowns are copy-pasted across the template and TS (~350 lines HTML, ~150 lines TS).</li>
+<li><strong>Target:</strong> Create a standalone <code>SearchableDropdownComponent</code> with <code>@Input() items</code>, <code>@Input() value</code>, and <code>@Output() valueChange</code>.</li>
+<li><strong>Benefit:</strong> Eliminates ~450 lines of duplicate markup and logic; unifies outside-click and keyboard navigation.</li>
+<li><strong>Risk:</strong> Low-Medium (requires testing two-way binding on all 5 dropdowns).</li>
+<li><strong>6.</strong> <strong>Fix Validation Cache Identity Check:</strong></li>
+<li><strong>Current:</strong> <code>cached.dataRef === data</code> fails every time because of object spreading in <code>updateFormData</code>.</li>
+<li><strong>Target:</strong> Key cache by a change version counter or deep equality/stable hash.</li>
+<li><strong>Benefit:</strong> Restores intended performance caching behavior.</li>
+<li><strong>Risk:</strong> Low.</li>
+<li><strong>7.</strong> <strong>Consolidate Validation Computed Signals:</strong></li>
+<li><strong>Current:</strong> 4 intermediate tab error computed signals merge into <code>errors</code>.</li>
+<li><strong>Target:</strong> Merge into a single computed signal evaluating the tabs directly.</li>
+<li><strong>Benefit:</strong> Reduces reactive graph complexity from 5 signals to 1.</li>
+<li><strong>Risk:</strong> Low.</li>
+<br/>
+<h3>Group C: Higher Risk / Architectural Refactoring</h3>
+<li><strong>8.</strong> <strong>Split Monolithic Component into 5 Step Sub-components:</strong></li>
+<li><strong>Current:</strong> 1,257-line TS file and 2,565-line HTML file in a single component.</li>
+<li><strong>Target:</strong> Decompose into:</li>
+<li><code>tp-pia-registration-shell.component</code> (Stepper header, footer navigation, state orchestrator)</li>
+<li><code>step-org-details.component</code></li>
+<li><code>step-auth-person.component</code></li>
+<li><code>step-bank-details.component</code></li>
+<li><code>step-document-upload.component</code></li>
+<li><code>step-review-submit.component</code></li>
+<li><strong>Benefit:</strong> Adheres to Single Responsibility Principle, drastically improves readability, decouples change detection to active step subtrees, and simplifies unit testing.</li>
+<li><strong>Risk:</strong> Medium-High (requires careful input/output or shared service state alignment).</li>
+<li><strong>9.</strong> <strong>Eliminate or Integrate Dormant Officer &amp; Award Subsystems:</strong></li>
+<li><strong>Current:</strong> 300+ lines of HTML and 150+ lines of TS represent Officer and Award CRUD modals that cannot be triggered by users.</li>
+<li><strong>Target:</strong> Either wire up dedicated "Add Officer" and "Add Award" cards in Step 1/2, or cleanly prune them to dedicated sub-features.</li>
+<li><strong>Risk:</strong> Medium (requires product owner clarification on whether officers and awards are part of Phase 1 requirements).</li>
+<br/>
+<hr/>
+<br/>
+<h2>22. EXECUTIVE SUMMARY &amp; KEY METRICS</h2>
+<br/>
+<h3>15 Critical Quantitative Metrics</h3>
+<br/>
+<div class="table-container"><table>
+<thead><tr><th>#</th><th>Metric Description</th><th>Exact Value</th></tr></thead><tbody>
+<tr><td>:-:</td><td>:---</td><td>:---:</td></tr>
+<tr><td><strong>1</strong></td><td>Total Files in <code>src/app/features/forms</code></td><td><strong>7 files</strong></td></tr>
+<tr><td><strong>2</strong></td><td>Total Components</td><td><strong>1 component</strong> (<code>TpPiaRegistrationComponent</code>)</td></tr>
+<tr><td><strong>3</strong></td><td>Total Services</td><td><strong>2 services</strong> (<code>TpPiaRegistrationService</code>, <code>FormValidationService</code>)</td></tr>
+<tr><td><strong>4</strong></td><td>Total Domain Model Files</td><td><strong>1 file</strong> (<code>tp-pia-registration.model.ts</code>)</td></tr>
+<tr><td><strong>5</strong></td><td>Total Defined Routes</td><td><strong>2 routes</strong> (<code>''</code> and <code>'tp-pia-registration'</code>)</td></tr>
+<tr><td><strong>6</strong></td><td>Main Component TypeScript Line Count</td><td><strong>1,257 lines</strong> (40,014 bytes)</td></tr>
+<tr><td><strong>7</strong></td><td>Main Component HTML Template Line Count</td><td><strong>2,565 lines</strong> (175,001 bytes)</td></tr>
+<tr><td><strong>8</strong></td><td>Main Component SCSS Line Count</td><td><strong>63 lines</strong> (1,251 bytes)</td></tr>
+<tr><td><strong>9</strong></td><td>Number of Form Wizard Steps</td><td><strong>5 steps</strong></td></tr>
+<tr><td><strong>10</strong></td><td>Approximate Total Field Count (including Modals &amp; Dynamic fields)</td><td><strong>68 distinct inputs / controls</strong></td></tr>
+<tr><td><strong>11</strong></td><td>Number of Custom Searchable Dropdowns</td><td><strong>5 dropdowns</strong> (District, State Reg, State Addr, State Auth, Bank)</td></tr>
+<tr><td><strong>12</strong></td><td>Number of Dialog Modals in Template</td><td><strong>4 modals</strong> (Preview, Officer CRUD, Award CRUD, Success)</td></tr>
+<tr><td><strong>13</strong></td><td>Number of Validation Engine Methods</td><td><strong>10 methods</strong> in <code>FormValidationService</code></td></tr>
+<tr><td><strong>14</strong></td><td>Major Duplicated Logic Areas</td><td><strong>4 areas</strong> (5x Dropdowns, 2x Document Views, 28x Input shells, 4x Modal shells)</td></tr>
+<tr><td><strong>15</strong></td><td>Dormant / Orphaned Features Identified</td><td><strong>2 complete CRUD subsystems</strong> (Officer In-Charge &amp; Awards)</td></tr>
+</tbody></table></div>
+<br/>
+<h3>Top Architectural Observations</h3>
+<li><strong>1.</strong> <strong>High Functional Completeness:</strong> The forms feature contains rich government portal validation, thorough input masking (Aadhaar, PAN, IFSC, Mobile, Turnover, Dates), real-time auto-saving to localStorage, and responsive UI.</li>
+<li><strong>2.</strong> <strong>Extreme Component Density:</strong> The main component violates Single Responsibility Principle by combining 5 complex domains, 5 custom searchable dropdowns, 4 modals, and all sanitizers in a single monolithic controller.</li>
+<li><strong>3.</strong> <strong>Orphaned Subsystems:</strong> The Officer In-Charge and Award Record modals represent complete CRUD features that exist in both the TypeScript controller and HTML template, but lack entry-point trigger buttons in the active wizard steps.</li>
+<li><strong>4.</strong> <strong>Validation Cache Bug:</strong> The memoization cache in <code>FormValidationService</code> fails 100% of cache checks during user typing due to object reference inequality caused by immutable state spreading.</li>
+<br/>
+</body>
+</html>

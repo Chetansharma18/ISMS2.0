@@ -103,12 +103,95 @@ import { AuthService } from '../../../../core/auth/auth.service';
              </ul>
           </div>
           
-          <!-- Courses Placeholder -->
-          <div *ngIf="activeTab === 'courses'">
-            <div class="p-4 border border-slate-200 rounded-lg bg-slate-50">
-               <h4 class="font-bold text-rsldc-navy">Data Entry Operator</h4>
-               <p class="text-sm text-slate-600">IT-ITeS Sector &bull; 400 Hours</p>
-            </div>
+          <!-- Courses Detailed View -->
+          <div *ngIf="activeTab === 'courses'" class="space-y-4">
+             <div class="p-5 border border-slate-200 rounded-lg bg-white shadow-xs">
+                <div class="flex justify-between items-start">
+                   <div>
+                     <span class="px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-bold rounded uppercase tracking-wider">Approved Course</span>
+                     <h4 class="font-bold text-rsldc-navy text-lg mt-1">Data Entry Operator (C-01)</h4>
+                     <p class="text-sm text-slate-600 mt-1">IT-ITeS Sector &bull; 400 Hours Duration</p>
+                   </div>
+                   <div class="text-right">
+                     <p class="text-xs text-slate-500 font-bold uppercase">Target Allocation</p>
+                     <p class="text-2xl font-black text-[#131A4D]">120</p>
+                   </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-slate-100">
+                   <div>
+                     <p class="text-[10px] text-slate-500 font-bold uppercase">NSQF Level</p>
+                     <p class="font-bold text-slate-800">Level 4</p>
+                   </div>
+                   <div>
+                     <p class="text-[10px] text-slate-500 font-bold uppercase">Minimum Education</p>
+                     <p class="font-bold text-slate-800">10th Pass</p>
+                   </div>
+                   <div>
+                     <p class="text-[10px] text-slate-500 font-bold uppercase">Required Labs</p>
+                     <p class="font-bold text-slate-800">Computer Lab (1)</p>
+                   </div>
+                   <div>
+                     <p class="text-[10px] text-slate-500 font-bold uppercase">Trainers Req.</p>
+                     <p class="font-bold text-slate-800">1 per 30 students</p>
+                   </div>
+                </div>
+                
+                <!-- Course Admin Actions -->
+                <div class="mt-4 pt-4 border-t border-slate-100 flex justify-end gap-2" *ngIf="sdc.status === 'PENDING_APPROVAL' && authService.hasRole(['DEPARTMENT_ADMIN', 'APPROVAL_AUTHORITY'])">
+                   <button class="px-3 py-1.5 bg-white border border-red-200 text-red-600 rounded text-xs font-bold hover:bg-red-50 transition">
+                     Reject Course
+                   </button>
+                   <button class="px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 rounded text-xs font-bold hover:bg-blue-100 transition">
+                     Modify Target
+                   </button>
+                   <button class="px-3 py-1.5 bg-approve-700 text-white rounded text-xs font-bold hover:bg-green-800 transition shadow-sm">
+                     Approve Course
+                   </button>
+                </div>
+             </div>
+          </div>
+
+          <!-- Inspection Report Tab -->
+          <div *ngIf="activeTab === 'inspection'" class="space-y-6">
+             <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+                <div class="mt-0.5 text-amber-600">
+                   <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                </div>
+                <div>
+                   <h4 class="font-bold text-amber-800 text-sm">Inspection Pending</h4>
+                   <p class="text-xs text-amber-700 mt-0.5">The auditor has not yet submitted the final physical verification report.</p>
+                </div>
+             </div>
+
+             <!-- Auditor Geo-Match Data (Read Only) -->
+             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-xs space-y-4">
+                <h3 class="font-bold text-rsldc-navy border-b pb-2">Auditor Geo-Match Verification</h3>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <p class="text-xs text-slate-500 font-bold uppercase">TP Submitted Location</p>
+                    <p class="font-mono text-sm">26.912400, 75.787300</p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-500 font-bold uppercase">Auditor Captured Location</p>
+                    <p class="font-mono text-sm text-slate-400 italic">Awaiting Capture</p>
+                  </div>
+                </div>
+             </div>
+
+             <!-- Inspection Checklist (Read Only) -->
+             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-xs space-y-4">
+               <h3 class="font-bold text-rsldc-navy border-b pb-2">Physical Infrastructure Checklist</h3>
+               <div class="space-y-3 opacity-60">
+                 <label class="flex items-center gap-3 p-3 bg-slate-50 rounded border border-slate-200">
+                   <input type="checkbox" disabled class="w-5 h-5 rounded text-blue-600">
+                   <span class="font-bold text-sm text-slate-700">Center exists at the physical address</span>
+                 </label>
+                 <label class="flex items-center gap-3 p-3 bg-slate-50 rounded border border-slate-200">
+                   <input type="checkbox" disabled class="w-5 h-5 rounded text-blue-600">
+                   <span class="font-bold text-sm text-slate-700">Signboard is available and clearly visible</span>
+                 </label>
+               </div>
+             </div>
           </div>
 
         </div>

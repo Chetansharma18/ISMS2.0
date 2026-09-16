@@ -213,6 +213,98 @@ import { Observable } from 'rxjs';
 
           </div>
 
+          <!-- Target Courses & Capacity Mapping -->
+          <div class="mt-8 bg-white border border-slate-300 shadow-sm overflow-hidden">
+            <div class="bg-[#131A4D] text-white px-5 py-3 flex items-center justify-between">
+              <h2 class="text-xs font-bold uppercase tracking-wider">
+                Target Courses & Capacity Allocation for [{{ selectedSchemeCode }}]
+              </h2>
+            </div>
+            <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-8">
+              
+              <!-- Available Courses -->
+              <div>
+                <h3 class="font-bold text-slate-800 text-sm mb-3">Available Master Courses</h3>
+                <div class="space-y-2 max-h-64 overflow-y-auto pr-2">
+                  <div class="p-3 border border-slate-200 rounded-lg flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors">
+                    <div>
+                      <p class="font-bold text-slate-700 text-xs">Data Entry Operator (C-01)</p>
+                      <p class="text-[10px] text-slate-500">IT & ITeS • 400 Hrs</p>
+                    </div>
+                    <button class="px-3 py-1 bg-white border border-[#131A4D] text-[#131A4D] hover:bg-[#131A4D] hover:text-white rounded text-xs font-bold transition-colors">
+                      + Add to Scheme
+                    </button>
+                  </div>
+                  <div class="p-3 border border-slate-200 rounded-lg flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors">
+                    <div>
+                      <p class="font-bold text-slate-700 text-xs">Web Developer (C-02)</p>
+                      <p class="text-[10px] text-slate-500">IT & ITeS • 600 Hrs</p>
+                    </div>
+                    <button class="px-3 py-1 bg-white border border-[#131A4D] text-[#131A4D] hover:bg-[#131A4D] hover:text-white rounded text-xs font-bold transition-colors">
+                      + Add to Scheme
+                    </button>
+                  </div>
+                  <div class="p-3 border border-slate-200 rounded-lg flex items-center justify-between bg-slate-50 hover:bg-slate-100 transition-colors">
+                    <div>
+                      <p class="font-bold text-slate-700 text-xs">Sewing Machine Operator (C-03)</p>
+                      <p class="text-[10px] text-slate-500">Apparel • 250 Hrs</p>
+                    </div>
+                    <button class="px-3 py-1 bg-white border border-[#131A4D] text-[#131A4D] hover:bg-[#131A4D] hover:text-white rounded text-xs font-bold transition-colors">
+                      + Add to Scheme
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mapped Courses -->
+              <div>
+                <h3 class="font-bold text-slate-800 text-sm mb-3">Courses Mapped to Scheme</h3>
+                <div class="space-y-3">
+                  <div class="p-3 border border-green-200 bg-green-50 rounded-lg">
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <p class="font-bold text-green-900 text-xs">Data Entry Operator (C-01)</p>
+                        <p class="text-[10px] text-green-700">Level 4 • 400 Hrs</p>
+                      </div>
+                      <button class="text-red-500 hover:text-red-700 font-bold text-xs">✕ Remove</button>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-green-200 flex items-center gap-4">
+                      <div class="flex-1">
+                        <label class="block text-[10px] font-bold text-green-900 uppercase">Target Capacity (Aspirants)</label>
+                        <input type="number" value="2000" class="w-full px-2 py-1 border border-green-300 rounded text-xs mt-1 bg-white focus:outline-none">
+                      </div>
+                      <div class="flex-1">
+                        <label class="block text-[10px] font-bold text-green-900 uppercase">Per Hour Rate (₹)</label>
+                        <input type="number" value="42.50" class="w-full px-2 py-1 border border-green-300 rounded text-xs mt-1 bg-white focus:outline-none">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="p-3 border border-green-200 bg-green-50 rounded-lg">
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <p class="font-bold text-green-900 text-xs">Web Developer (C-02)</p>
+                        <p class="text-[10px] text-green-700">Level 5 • 600 Hrs</p>
+                      </div>
+                      <button class="text-red-500 hover:text-red-700 font-bold text-xs">✕ Remove</button>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-green-200 flex items-center gap-4">
+                      <div class="flex-1">
+                        <label class="block text-[10px] font-bold text-green-900 uppercase">Target Capacity (Aspirants)</label>
+                        <input type="number" value="500" class="w-full px-2 py-1 border border-green-300 rounded text-xs mt-1 bg-white focus:outline-none">
+                      </div>
+                      <div class="flex-1">
+                        <label class="block text-[10px] font-bold text-green-900 uppercase">Per Hour Rate (₹)</label>
+                        <input type="number" value="49.00" class="w-full px-2 py-1 border border-green-300 rounded text-xs mt-1 bg-white focus:outline-none">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
         </main>
       </div>
 

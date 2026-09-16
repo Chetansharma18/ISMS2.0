@@ -192,6 +192,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/department/sanction-orders/sanction-order-create.component').then(m => m.SanctionOrderCreateComponent),
         data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
       },
+      {
+        path: 'admin/courses',
+        loadComponent: () => import('./features/admin/department/admin-courses.component').then(m => m.AdminCoursesComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
+      },
       
       // ================= AUDITOR MODULE =================
       {
@@ -213,6 +218,13 @@ export const routes: Routes = [
         path: 'auditor/inspection/:id',
         loadComponent: () => import('./features/auditor/inspection.component').then(m => m.InspectionComponent),
         data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'] }
+      },
+
+      // ================= TP MODULE =================
+      {
+        path: 'tp/courses',
+        loadComponent: () => import('./features/tp-pia/courses/tp-courses.component').then(m => m.TpCoursesComponent),
+        data: { roles: ['TP_PIA'] }
       },
 
       // ================= SDC MODULE =================

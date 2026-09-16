@@ -20,7 +20,7 @@ import { Observable } from 'rxjs';
         <app-sidebar class="hidden md:block"></app-sidebar>
 
         <!-- Main Content Area -->
-        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto">
+        <main class="flex-grow px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto">
           
           <!-- Top Breadcrumb & Title Bar -->
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 mb-6">
@@ -91,71 +91,136 @@ import { Observable } from 'rxjs';
                 </div>
               </div>
 
-              <!-- 2. Corporate Entity Master Record -->
+              <!-- STEP 1: Organisation / Company Basic Details -->
               <div class="bg-white border border-slate-300 shadow-sm overflow-hidden">
                 <div class="bg-slate-100 border-b border-slate-200 px-5 py-2.5 flex items-center justify-between">
                   <span class="text-xs font-bold text-[#131A4D] uppercase tracking-wider">
-                    1. Verified Entity & Signatory Profile
-                  </span>
-                  <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold rounded-xs">
-                    ✓ Verified Master Record
+                    Step 1: Organisation / Company Basic Details
                   </span>
                 </div>
-
                 <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-700">
-                  <div>
-                    <span class="text-slate-400 block text-[11px]">Legal Entity Name:</span>
-                    <span class="font-bold text-slate-900">{{ selectedApplicant?.organizationName }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block text-[11px]">Authorized Signatory:</span>
-                    <span class="font-bold text-slate-900">{{ selectedApplicant?.applicantName }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block text-[11px]">PAN Number:</span>
-                    <span class="font-mono font-bold text-slate-900">{{ selectedApplicant?.pan }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block text-[11px]">GSTIN Registration:</span>
-                    <span class="font-mono font-bold text-slate-900">{{ selectedApplicant?.gstin }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block text-[11px]">Official Communication Email:</span>
-                    <span class="font-mono text-slate-800">{{ selectedApplicant?.contactEmail }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block text-[11px]">Registered Contact Mobile:</span>
-                    <span class="font-mono text-slate-800">{{ selectedApplicant?.contactMobile }}</span>
-                  </div>
+                  <div><span class="text-slate-400 block text-[11px]">Application No.</span><span class="font-mono font-bold text-[#131A4D]">{{ selectedApplicant?.applicationId || 'ISMS-TP-892134' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">TP/PIA Full Name</span><span class="font-bold text-slate-900">{{ selectedApplicant?.organizationName || 'N/A' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">TP/PIA Short Name</span><span class="font-bold text-slate-900">APEX-TECH</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Registration Number</span><span class="font-mono text-slate-900">{{ selectedApplicant?.registrationNumber || 'N/A' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Organisation Contact No.</span><span class="font-mono text-slate-800">{{ selectedApplicant?.contactMobile || '+91 98201 44520' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Company Email-ID</span><span class="font-mono text-slate-800">{{ selectedApplicant?.contactEmail || 'contact@example.com' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Organisation PAN No.</span><span class="font-mono font-bold text-slate-900">{{ selectedApplicant?.pan || 'AABCA1294F' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Website</span><span class="text-blue-600 hover:underline cursor-pointer">https://apextechnical.in</span></div>
+                  <div class="sm:col-span-2"><span class="text-slate-400 block text-[11px]">Registered Address</span><span class="text-slate-900">123, RIICO Industrial Area, Phase II</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">State/UT</span><span class="text-slate-900">Rajasthan</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">District</span><span class="text-slate-900">Jaipur</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Pincode</span><span class="font-mono text-slate-900">302022</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Turn Over (₹ in Lakhs)</span><span class="font-mono font-bold text-slate-900">₹ 850.50</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Date of Registration</span><span class="font-mono text-slate-900">12/05/2015</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">State Where Registered</span><span class="text-slate-900">Rajasthan</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Type of business/activity</span><span class="text-slate-900">Skill Training Provider</span></div>
+                  <div class="sm:col-span-2"><span class="text-slate-400 block text-[11px]">Postal Address</span><span class="text-slate-900">123, RIICO Industrial Area, Phase II (Same as Registered)</span></div>
                 </div>
               </div>
 
-              <!-- 3. Statutory Uploaded Documents Verification -->
+              <!-- STEP 2: Authorized Person Details -->
+              <div class="bg-white border border-slate-300 shadow-sm overflow-hidden">
+                <div class="bg-slate-100 border-b border-slate-200 px-5 py-2.5 flex items-center justify-between">
+                  <span class="text-xs font-bold text-[#131A4D] uppercase tracking-wider">
+                    Step 2: Authorized Person Details (Organisation Level)
+                  </span>
+                </div>
+                <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-700">
+                  <div><span class="text-slate-400 block text-[11px]">Name</span><span class="font-bold text-slate-900">{{ selectedApplicant?.applicantName || 'Vikramaditya Sharma' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">S/O, D/O, W/O</span><span class="text-slate-900">Shri R.K. Sharma</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Date of Birth</span><span class="font-mono text-slate-900">14/08/1982</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Age</span><span class="font-mono text-slate-900">44</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Designation</span><span class="text-slate-900">Managing Director</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Mobile No.</span><span class="font-mono text-slate-800">{{ selectedApplicant?.contactMobile || '+91 98201 44520' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Email-Id</span><span class="font-mono text-slate-800">{{ selectedApplicant?.contactEmail || 'v.sharma@apextechnical.in' }}</span></div>
+                  <div class="sm:col-span-2"><span class="text-slate-400 block text-[11px]">Residence Address</span><span class="text-slate-900">45-B, Civil Lines, Jaipur</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">State</span><span class="text-slate-900">Rajasthan</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">PAN</span><span class="font-mono font-bold text-slate-900">BGPPS4512K</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Aadhaar No.</span><span class="font-mono font-bold text-slate-900">XXXX-XXXX-4512</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Type ID Proof</span><span class="text-slate-900">Aadhaar Card</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">ID No.</span><span class="font-mono text-slate-900">XXXX-XXXX-4512</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Bhamashah No.</span><span class="font-mono text-slate-900">Not Provided</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Voter Id No.</span><span class="font-mono text-slate-900">RJP1245789</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Passport No.</span><span class="font-mono text-slate-900">Z8945123</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Service Tax No.</span><span class="font-mono text-slate-900">Not Provided</span></div>
+                </div>
+              </div>
+
+              <!-- STEP 4: Document Upload -->
               <div class="bg-white border border-slate-300 shadow-sm overflow-hidden">
                 <div class="bg-slate-100 border-b border-slate-200 px-5 py-2.5">
                   <span class="text-xs font-bold text-[#131A4D] uppercase tracking-wider">
-                    2. Uploaded Tender Documents
+                    Step 4: Document Upload
                   </span>
                 </div>
-
                 <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div class="p-3 border border-slate-200 bg-slate-50 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                       <span class="text-base">📄</span>
                       <div>
-                        <div class="font-bold text-slate-900">Certificate of Incorporation</div>
+                        <div class="font-bold text-slate-900">Organisation Registration Certificate</div>
                         <div class="text-[10px] text-slate-500 font-mono">1.4 MB PDF</div>
                       </div>
                     </div>
                     <button type="button" class="text-xs text-[#131A4D] font-bold hover:underline">View</button>
                   </div>
-
                   <div class="p-3 border border-slate-200 bg-slate-50 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                       <span class="text-base">📄</span>
                       <div>
-                        <div class="font-bold text-slate-900">Audited FY25 Balance Sheet</div>
+                        <div class="font-bold text-slate-900">Organisation PAN Card</div>
+                        <div class="text-[10px] text-slate-500 font-mono">850 KB PDF</div>
+                      </div>
+                    </div>
+                    <button type="button" class="text-xs text-[#131A4D] font-bold hover:underline">View</button>
+                  </div>
+                  <div class="p-3 border border-slate-200 bg-slate-50 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="text-base">📄</span>
+                      <div>
+                        <div class="font-bold text-slate-900">GST Registration Certificate</div>
+                        <div class="text-[10px] text-slate-500 font-mono">1.1 MB PDF</div>
+                      </div>
+                    </div>
+                    <button type="button" class="text-xs text-[#131A4D] font-bold hover:underline">View</button>
+                  </div>
+                  <div class="p-3 border border-slate-200 bg-slate-50 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="text-base">📄</span>
+                      <div>
+                        <div class="font-bold text-slate-900">Audited Balance Sheet / Turnover Certificate</div>
                         <div class="text-[10px] text-slate-500 font-mono">3.8 MB PDF · CA Certified</div>
+                      </div>
+                    </div>
+                    <button type="button" class="text-xs text-[#131A4D] font-bold hover:underline">View</button>
+                  </div>
+                  <div class="p-3 border border-slate-200 bg-slate-50 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="text-base">📄</span>
+                      <div>
+                        <div class="font-bold text-slate-900">Board Resolution / Power of Attorney</div>
+                        <div class="text-[10px] text-slate-500 font-mono">2.1 MB PDF</div>
+                      </div>
+                    </div>
+                    <button type="button" class="text-xs text-[#131A4D] font-bold hover:underline">View</button>
+                  </div>
+                  <div class="p-3 border border-slate-200 bg-slate-50 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="text-base">📄</span>
+                      <div>
+                        <div class="font-bold text-slate-900">NSDC Partner Certificate</div>
+                        <div class="text-[10px] text-slate-500 font-mono">1.9 MB PDF</div>
+                      </div>
+                    </div>
+                    <button type="button" class="text-xs text-[#131A4D] font-bold hover:underline">View</button>
+                  </div>
+                  <div class="p-3 border border-slate-200 bg-slate-50 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="text-base">📄</span>
+                      <div>
+                        <div class="font-bold text-slate-900">Additional Supporting Document</div>
+                        <div class="text-[10px] text-slate-500 font-mono">4.5 MB PDF</div>
                       </div>
                     </div>
                     <button type="button" class="text-xs text-[#131A4D] font-bold hover:underline">View</button>
@@ -163,18 +228,6 @@ import { Observable } from 'rxjs';
                 </div>
               </div>
 
-              <!-- 4. EMD Fee Verification Box -->
-              <div class="bg-white border border-slate-300 p-4 shadow-sm flex items-center justify-between">
-                <div>
-                  <span class="text-slate-400 block text-[11px]">Earnest Money Deposit (EMD):</span>
-                  <div class="text-base font-mono font-bold text-slate-900">
-                    ₹{{ selectedApplicant?.emdAmount | number:'1.0-0' }} <span class="text-xs font-normal text-emerald-700">· Transaction Verified (TXN-ISMS-884920482)</span>
-                  </div>
-                </div>
-                <span class="px-3 py-1 bg-emerald-100 text-emerald-800 font-mono font-bold text-xs rounded">
-                  ✓ PAID
-                </span>
-              </div>
 
             </div>
 

@@ -49,7 +49,7 @@ import { Observable } from 'rxjs';
               <table class="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr class="bg-[#131A4D] text-white font-bold border-b border-[#1a4f78] uppercase tracking-wider text-[11px]">
-                    <th class="p-3 border-r border-[#1a4f78]">#</th>
+                    <th class="p-3 border-r border-[#1a4f78]">No.</th>
                     <th class="p-3 border-r border-[#1a4f78]">EOI Ref No. & Scheme Name</th>
                     <th class="p-3 border-r border-[#1a4f78]">Category</th>
                     <th class="p-3 border-r border-[#1a4f78]">Published</th>

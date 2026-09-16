@@ -113,7 +113,7 @@ export interface EoiApplication {
   schemeName: string;
   department: string;
   appliedDate: string;
-  status: 'DRAFT' | 'SUBMITTED' | 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED';
+  status: 'DRAFT' | 'SUBMITTED' | 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED' | 'ACCEPTED' | 'PENDING' | 'AOC';
   proposalDetails: {
     targetCapacity: number;
     sectors: string[];
@@ -301,8 +301,8 @@ export class EoiStateService {
       id: 'EOI-MMKVY-2026-01',
       eoiReferenceNo: 'RSLDC/EOI/2026/MMKVY-01',
       name: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
-      schemeCode: 'MMKVY',
-      schemeCategory: 'State Funded',
+      schemeCode: 'MMKVY-RAJKVIK',
+      schemeCategory: 'Category I: RAJKVIK',
       tenderId: '2026_RSLDC_593778_1',
       ePublishedDate: '31-Aug-2026 01:00 PM',
       closingDate: '05-Oct-2026 02:00 PM',
@@ -312,16 +312,16 @@ export class EoiStateService {
       publishDate: '31-Aug-2026 01:00 PM',
       submissionLastDate: '05-Oct-2026 02:00 PM',
       deadline: '05-Oct-2026 02:00 PM',
-      daysRemaining: 23,
+      daysRemaining: 20,
       eoiCategory: 'General Empanelment',
-      eoiDescription: 'Expression of Interest for Empanelment of Training Partners (TPs) to impart skill training under MMKVY across Rajasthan districts with guaranteed minimum 70% wage & self-employment placement support for eligible youth.',
+      eoiDescription: 'Expression of Interest for Empanelment of Training Partners (TPs) to impart skill training under MMKVY (Category I: RAJKVIK - Rojgar Aadharit Jan Kaushal Vikas Karyakram) across Rajasthan districts with guaranteed minimum 70% wage & corporate placement support for eligible youth.',
       emdAmount: 50000,
       processingFee: 2500,
       attachedFile: 'EOI_MMKVY_RSLDC_2026.pdf',
       department: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
       status: 'Closed',
       responseCount: 14,
-      targetBeneficiaries: 'Youth of Rajasthan (Aged 18-35) with priority to rural and underprivileged categories.',
+      targetBeneficiaries: 'Youth of Rajasthan (Aged 18-35) with priority to corporate wage-employment placement.',
       eligibilityPreview: [
         'Registered Company / Society / Trust / Partnership active for minimum 3 years',
         'Average annual turnover of ₹50 Lakhs in the last 3 financial years',
@@ -346,213 +346,212 @@ export class EoiStateService {
           size: '1.8 MB',
           publishedDate: '31-Aug-2026',
           description: 'Guidelines on biometric attendance, course curriculum, assessments, and trainer certification.'
-        },
-        {
-          id: 'doc-mmkvy-3',
-          title: 'Technical Bid Evaluation Criteria & Annexures',
-          filename: 'Annexure_Technical_Evaluation_Criteria.pdf',
-          type: 'PDF',
-          size: '950 KB',
-          publishedDate: '31-Aug-2026',
-          description: 'Format for past experience certificates, faculty credentials, and center layout affidavits.'
-        },
-        {
-          id: 'doc-mmkvy-4',
-          title: 'Financial Norms Schedule & Cost Head Formats',
-          filename: 'Annexure_Financial_Cost_Norms.xlsx',
-          type: 'EXCEL',
-          size: '420 KB',
-          publishedDate: '31-Aug-2026',
-          description: 'Category-wise training cost payouts, milestone disbursement schedule, and incentive grid.'
-        },
-        {
-          id: 'doc-mmkvy-5',
-          title: 'Corrigendum 01 - Pre-Bid Query Submission Extension',
-          filename: 'Corrigendum_01_MMKVY_Extension.pdf',
-          type: 'PDF',
-          size: '310 KB',
-          publishedDate: '04-Sep-2026',
-          description: 'Official notice regarding clarification timeline and online submission portal guidelines.'
         }
       ]
     },
     {
-      id: 'EOI-SAMARTH-2026-02',
-      eoiReferenceNo: 'RSLDC/EOI/2026/SAMARTH-02',
-      name: 'SAMARTH Skill Development Scheme',
-      schemeCode: 'SAMARTH',
-      schemeCategory: 'State Funded',
+      id: 'EOI-MMKVY-2026-02',
+      eoiReferenceNo: 'RSLDC/EOI/2026/MMKVY-02',
+      name: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
+      schemeCode: 'MMKVY-SAKSHM',
+      schemeCategory: 'Category II: SAKSHM',
       tenderId: '2026_RSLDC_587251_9',
-      ePublishedDate: '27-Aug-2026 03:00 PM',
-      closingDate: '15-Sep-2026 11:00 AM',
-      openingDate: '16-Sep-2026 11:00 AM',
-      preBidMeetingDate: '05-Sep-2026 11:00 AM',
+      ePublishedDate: '01-Sep-2026 11:00 AM',
+      closingDate: '15-Oct-2026 03:00 PM',
+      openingDate: '16-Oct-2026 03:30 PM',
+      preBidMeetingDate: '15-Sep-2026 02:00 PM',
       organisationChain: 'RSLDC - MD||CE-COMMERCIAL||SE-TECHNICAL CELL||XEN',
-      publishDate: '27-Aug-2026 03:00 PM',
-      submissionLastDate: '15-Sep-2026 11:00 AM',
-      deadline: '15-Sep-2026 11:00 AM',
-      daysRemaining: 3,
-      eoiCategory: 'Special Projects',
-      eoiDescription: 'Empanelment of specialized technical training institutes for advanced manufacturing, renewable solar PV systems, EV servicing, and automation trade certifications.',
+      publishDate: '01-Sep-2026 11:00 AM',
+      submissionLastDate: '15-Oct-2026 03:00 PM',
+      deadline: '15-Oct-2026 03:00 PM',
+      daysRemaining: 30,
+      eoiCategory: 'Self-Employment Skilling',
+      eoiDescription: 'Expression of Interest for Empanelment of Training Partners under MMKVY (Category II: SAKSHM - Swarojgar Aadharit Kaushal Shiksha Mahabhiyan) targeting entrepreneurial development and self-employment skilling.',
       emdAmount: 35000,
       processingFee: 1800,
-      attachedFile: 'EOI_SAMARTH_Technical_Specs.pdf',
+      attachedFile: 'EOI_MMKVY_SAKSHM_2026.pdf',
       department: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
       status: 'Closed',
       responseCount: 8,
-      targetBeneficiaries: 'Diploma holders, ITI graduates, and engineering dropouts seeking industrial certifications.',
+      targetBeneficiaries: 'Mid-sized training organisations and youth seeking micro-enterprise & self-employment.',
       eligibilityPreview: [
-        'Recognized technical education institute or NSIC/MSME certified tech training center',
-        'Minimum 2 years domain training experience in engineering/renewable energy trades',
-        'Industry tie-ups with minimum 5 manufacturing/solar enterprises for on-the-job internships'
+        'Recognized training institute or MSME registered skill center',
+        'Minimum 2 years domain training experience in entrepreneurship or trades',
+        'Demonstrated linkage with financial institutions / micro-credit schemes for candidate venture setup'
+      ],
+      documents: [
+        {
+          id: 'doc-sakshm-1',
+          title: 'Official RFP for MMKVY SAKSHM Self-Employment Trades',
+          filename: 'EOI_MMKVY_SAKSHM_Specs.pdf',
+          type: 'PDF',
+          size: '2.1 MB',
+          publishedDate: '01-Sep-2026',
+          description: 'Tender requirements, entrepreneurial curriculum, trade list, and evaluation marks.'
+        }
+      ]
+    },
+    {
+      id: 'EOI-MMKVY-2026-03',
+      eoiReferenceNo: 'RSLDC/EOI/2026/MMKVY-03',
+      name: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
+      schemeCode: 'MMKVY-SAMARTH',
+      schemeCategory: 'Category III: SAMARTH',
+      tenderId: '2026_RSLDC_592681_1',
+      ePublishedDate: '03-Sep-2026 02:30 PM',
+      closingDate: '20-Oct-2026 05:00 PM',
+      openingDate: '21-Oct-2026 11:30 AM',
+      preBidMeetingDate: '18-Sep-2026 03:00 PM',
+      organisationChain: 'RSLDC - MD||CE-OPERATIONS||SE-SKILL CELL||XEN',
+      publishDate: '03-Sep-2026 02:30 PM',
+      submissionLastDate: '20-Oct-2026 05:00 PM',
+      deadline: '20-Oct-2026 05:00 PM',
+      daysRemaining: 35,
+      eoiCategory: 'Special Projects',
+      eoiDescription: 'Expression of Interest for Empanelment of Training Partners under MMKVY (Category III: SAMARTH) for specialized technical training and marginalized group livelihood skill development.',
+      emdAmount: 25000,
+      processingFee: 1500,
+      attachedFile: 'EOI_MMKVY_SAMARTH_2026.pdf',
+      department: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
+      status: 'Open',
+      responseCount: 19,
+      targetBeneficiaries: 'Special target groups, marginalized communities, and specialized technical sectors.',
+      eligibilityPreview: [
+        'Registered organization with experience in social welfare or specialized technical training',
+        'Direct tie-ups for practical training and community outreach'
       ],
       documents: [
         {
           id: 'doc-samarth-1',
-          title: 'Official RFP for SAMARTH Specialized Technical Trades',
-          filename: 'EOI_SAMARTH_Technical_Specs.pdf',
+          title: 'Official RFP for MMKVY SAMARTH Program',
+          filename: 'EOI_MMKVY_SAMARTH_Guidelines.pdf',
           type: 'PDF',
-          size: '2.1 MB',
-          publishedDate: '27-Aug-2026',
-          description: 'Tender requirements, technical trade list, equipment specifications, and evaluation marks.'
-        },
-        {
-          id: 'doc-samarth-2',
-          title: 'Curriculum & Laboratory Equipment Norms',
-          filename: 'SAMARTH_Lab_Standards_2026.pdf',
-          type: 'PDF',
-          size: '1.4 MB',
-          publishedDate: '27-Aug-2026',
-          description: 'Mandatory tools, workshop layout, safety protocols, and lab equipment checklists.'
-        },
-        {
-          id: 'doc-samarth-3',
-          title: 'Industry MoA / Placement Undertaking Templates',
-          filename: 'SAMARTH_Industry_MoA_Templates.docx',
-          type: 'DOC',
-          size: '620 KB',
-          publishedDate: '27-Aug-2026',
-          description: 'Standard format for enterprise placement agreements and trainee apprenticeship commitments.'
+          size: '3.2 MB',
+          publishedDate: '03-Sep-2026',
+          description: 'Empanelment terms, target segment criteria, and monitoring mechanisms.'
         }
       ]
     },
     {
-      id: 'EOI-ELSTP-2026-03',
-      eoiReferenceNo: 'RSLDC/EOI/2026/ELSTP-03',
+      id: 'EOI-ELSTP-2026-04',
+      eoiReferenceNo: 'RSLDC/EOI/2026/ELSTP-01',
       name: 'Employment Linked Skill Training Programme (ELSTP)',
       schemeCode: 'ELSTP',
-      schemeCategory: 'Employment Linked',
-      tenderId: '2026_DSEE_592681_1',
-      ePublishedDate: '25-Aug-2026 04:30 PM',
-      closingDate: '15-Sep-2026 11:00 AM',
-      openingDate: '16-Sep-2026 11:00 AM',
-      preBidMeetingDate: '04-Sep-2026 03:00 PM',
-      organisationChain: 'DSEE - SECRETARIAT||DIRECTORATE SKILL DEV||SE-OPERATIONS||XEN',
-      publishDate: '25-Aug-2026 04:30 PM',
-      submissionLastDate: '15-Sep-2026 11:00 AM',
-      deadline: '15-Sep-2026 11:00 AM',
-      daysRemaining: 3,
+      schemeCategory: 'Category I: RAJKVIK',
+      tenderId: '2026_RSLDC_601244_1',
+      ePublishedDate: '05-Sep-2026 10:00 AM',
+      closingDate: '24-Oct-2026 04:00 PM',
+      openingDate: '25-Oct-2026 11:30 AM',
+      preBidMeetingDate: '20-Sep-2026 02:00 PM',
+      organisationChain: 'RSLDC - Placement Division||Directorate of Employment',
+      publishDate: '05-Sep-2026 10:00 AM',
+      submissionLastDate: '24-Oct-2026 04:00 PM',
+      deadline: '24-Oct-2026 04:00 PM',
+      daysRemaining: 39,
       eoiCategory: 'Wage Employment',
-      eoiDescription: 'Selection of corporate training providers for demand-driven wage and self-employment skill certifications with guaranteed 75% formal employment within 90 days of completion.',
+      eoiDescription: 'Empanelment of corporate training partners with captive employer placements across industrial sectors.',
       emdAmount: 75000,
       processingFee: 3000,
-      attachedFile: 'ELSTP_Empanelment_Guidelines.pdf',
-      department: 'Department of Skills, Employment & Entrepreneurship, GoR',
+      attachedFile: 'EOI_ELSTP_Guidelines_2026.pdf',
+      department: 'Department of Skills, Employment & Entrepreneurship (DSEE)',
       status: 'Open',
-      responseCount: 19,
-      targetBeneficiaries: 'Unemployed youth across all 33 districts of Rajasthan registered on Employment Exchange.',
+      responseCount: 16,
+      targetBeneficiaries: 'Registered unemployed youth with direct placement commitments.',
       eligibilityPreview: [
-        'Corporate training firm or National Skill Development Corporation (NSDC) funded partner',
-        'Direct employer placement tie-ups or captive hiring requirements',
-        'Minimum cumulative placement track record of 1,000 candidates over last 3 years'
+        'Recognized corporate training institute or NSDC affiliated partner',
+        'Minimum 3 years active corporate training & placement record'
       ],
       documents: [
         {
           id: 'doc-elstp-1',
-          title: 'ELSTP Empanelment Guidelines & RFP Document',
+          title: 'ELSTP Empanelment Guidelines',
           filename: 'ELSTP_Empanelment_Guidelines.pdf',
           type: 'PDF',
-          size: '3.2 MB',
-          publishedDate: '25-Aug-2026',
-          description: 'Comprehensive tender terms, captive employer guidelines, and wage validation SOP.'
-        },
-        {
-          id: 'doc-elstp-2',
-          title: 'Placement Verification & Post-Placement Tracking Protocol',
-          filename: 'ELSTP_Placement_Tracking_Protocol.pdf',
-          type: 'PDF',
-          size: '880 KB',
-          publishedDate: '25-Aug-2026',
-          description: 'EPFO/ESIC wage proof submission requirements and 12-month candidate tracking guidelines.'
-        },
-        {
-          id: 'doc-elstp-3',
-          title: 'Sector Skill Council (SSC) Affiliation Affidavit Format',
-          filename: 'SSC_Affiliation_Affidavit_Format.docx',
-          type: 'DOC',
-          size: '340 KB',
-          publishedDate: '25-Aug-2026',
-          description: 'Format for declaring active Sector Skill Council trainer and assessor accreditations.'
+          size: '2.6 MB',
+          publishedDate: '05-Sep-2026',
+          description: 'Guidelines on placement validation and employer tie-ups.'
         }
       ]
     },
     {
-      id: 'EOI-DDUGKY-2026-04',
-      eoiReferenceNo: 'RSLDC/EOI/2026/DDUGKY-04',
+      id: 'EOI-RYSY-2026-05',
+      eoiReferenceNo: 'DSEE/EOI/2026/RYSY-02',
+      name: 'Rajasthan Yuva Sambal Yojana (RYSY)',
+      schemeCode: 'RYSY',
+      schemeCategory: 'Category II: SAKSHM',
+      tenderId: '2026_DSEE_619842_2',
+      ePublishedDate: '08-Sep-2026 01:00 PM',
+      closingDate: '28-Oct-2026 03:00 PM',
+      openingDate: '29-Oct-2026 11:00 AM',
+      preBidMeetingDate: '22-Sep-2026 03:00 PM',
+      organisationChain: 'DSEE - Youth Welfare Cell||Directorate of Technical Education',
+      publishDate: '08-Sep-2026 01:00 PM',
+      submissionLastDate: '28-Oct-2026 03:00 PM',
+      deadline: '28-Oct-2026 03:00 PM',
+      daysRemaining: 43,
+      eoiCategory: 'Self-Employment Skilling',
+      eoiDescription: 'Skill training and micro-enterprise incubation under Mukhyamantri Yuva Sambal initiative.',
+      emdAmount: 40000,
+      processingFee: 2000,
+      attachedFile: 'EOI_RYSY_Empanelment_2026.pdf',
+      department: 'Department of Skills, Employment & Entrepreneurship (DSEE)',
+      status: 'Open',
+      responseCount: 11,
+      targetBeneficiaries: 'Educated unemployed youth seeking self-employment and startup training.',
+      eligibilityPreview: [
+        'Accredited educational society or skill incubation center',
+        'Tie-up with state financial corporations for credit linkage'
+      ],
+      documents: [
+        {
+          id: 'doc-rysy-1',
+          title: 'RYSY Operational Framework & Terms',
+          filename: 'EOI_RYSY_Empanelment_2026.pdf',
+          type: 'PDF',
+          size: '1.9 MB',
+          publishedDate: '08-Sep-2026',
+          description: 'Framework for youth self-employment incubation and skill stipends.'
+        }
+      ]
+    },
+    {
+      id: 'EOI-DDUGKY-2026-06',
+      eoiReferenceNo: 'MORD/EOI/2026/DDUGKY-03',
       name: 'Deen Dayal Upadhyaya Grameen Kaushalya Yojana (DDU-GKY)',
       schemeCode: 'DDU-GKY',
-      schemeCategory: 'Centrally Sponsored',
-      tenderId: '2026_MORD_592688_1',
-      ePublishedDate: '25-Aug-2026 04:30 PM',
-      closingDate: '15-Sep-2026 11:00 AM',
-      openingDate: '16-Sep-2026 11:00 AM',
-      preBidMeetingDate: '03-Sep-2026 02:00 PM',
-      organisationChain: 'MORD STATE CELL - HQ||CE-RURAL LIVELIHOODS||SE-PROJECTS||XEN',
-      publishDate: '25-Aug-2026 04:30 PM',
-      submissionLastDate: '15-Sep-2026 11:00 AM',
-      deadline: '15-Sep-2026 11:00 AM',
-      daysRemaining: 3,
-      eoiCategory: 'Rural Focus',
-      eoiDescription: 'Empanelment of Project Implementing Agencies (PIAs) for rural poor youth skill development, residential training facilities, and sustainable livelihood placement under MoRD norms.',
-      emdAmount: 25000,
-      processingFee: 1500,
-      attachedFile: 'DDU_GKY_RSLDC_RFP_2026.pdf',
+      schemeCategory: 'Category III: SAMARTH',
+      tenderId: '2026_MORD_624190_1',
+      ePublishedDate: '10-Sep-2026 11:30 AM',
+      closingDate: '02-Nov-2026 05:00 PM',
+      openingDate: '03-Nov-2026 11:00 AM',
+      preBidMeetingDate: '25-Sep-2026 02:30 PM',
+      organisationChain: 'MoRD - Rural Livelihoods Mission||RSLDC Special Projects',
+      publishDate: '10-Sep-2026 11:30 AM',
+      submissionLastDate: '02-Nov-2026 05:00 PM',
+      deadline: '02-Nov-2026 05:00 PM',
+      daysRemaining: 48,
+      eoiCategory: 'Special Projects',
+      eoiDescription: 'Residential placement-linked skill training for rural youth across Rajasthan districts.',
+      emdAmount: 50000,
+      processingFee: 2500,
+      attachedFile: 'EOI_DDUGKY_Special_Projects_2026.pdf',
       department: 'Ministry of Rural Development / RSLDC',
       status: 'Open',
-      responseCount: 6,
-      targetBeneficiaries: 'Rural BPL/SECC poor youth aged 15-35 years with focus on SC, ST, women and PwD.',
+      responseCount: 14,
+      targetBeneficiaries: 'Rural BPL / SECC youth with mandatory residential amenities.',
       eligibilityPreview: [
-        'Valid PRN (Permanent Registration Number) registered with MoRD portal',
-        'Financial net worth of at least 25% of total proposed project cost',
-        'Capacity to operate fully residential skill centers with boarding and lodging amenities'
+        'Valid Permanent Registration Number (PRN) with MoRD',
+        'Capacity for fully residential training facilities'
       ],
       documents: [
         {
           id: 'doc-ddugky-1',
-          title: 'Official DDU-GKY MoRD RFP & Empanelment Notice',
-          filename: 'DDU_GKY_RSLDC_RFP_2026.pdf',
+          title: 'DDU-GKY Project Implementation Guidelines',
+          filename: 'DDUGKY_Project_Implementation_Guidelines.pdf',
           type: 'PDF',
-          size: '2.8 MB',
-          publishedDate: '25-Aug-2026',
-          description: 'Guidelines on project eligibility, target allocation, and inspection protocols.'
-        },
-        {
-          id: 'doc-ddugky-2',
-          title: 'Residential Training Center Specification & Amenities Checklist',
-          filename: 'DDU_GKY_Residential_Center_Norms.pdf',
-          type: 'PDF',
-          size: '1.1 MB',
-          publishedDate: '25-Aug-2026',
-          description: 'Hostel standards, CCTV surveillance norms, mess facilities, and biometric setup.'
-        },
-        {
-          id: 'doc-ddugky-3',
-          title: 'Financial Proposal & Installment Disbursement Model',
-          filename: 'DDUGKY_Disbursement_Schedule.xlsx',
-          type: 'EXCEL',
-          size: '510 KB',
-          publishedDate: '25-Aug-2026',
-          description: 'Four-installment release conditions, bank guarantee norms, and audit checklists.'
+          size: '3.1 MB',
+          publishedDate: '10-Sep-2026',
+          description: 'Standard operating procedures for residential centers.'
         }
       ]
     }
@@ -609,8 +608,8 @@ export class EoiStateService {
       schemeId: 'EOI-MMKVY-2026-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
       department: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
-      appliedDate: '2026-09-08',
-      status: 'UNDER_SCRUTINY',
+      appliedDate: '08-Sep-2026',
+      status: 'PENDING',
       proposalDetails: {
         targetCapacity: 450,
         sectors: ['Industrial Automation', 'Solar Energy'],
@@ -636,12 +635,45 @@ export class EoiStateService {
       }
     },
     {
+      id: 'ISMS-EOI-2026-8819',
+      schemeId: 'EOI-MMKVY-2026-01',
+      schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (Category I: RAJKVIK)',
+      department: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
+      appliedDate: '24-Aug-2026',
+      status: 'AOC',
+      proposalDetails: {
+        targetCapacity: 600,
+        sectors: ['Renewable Energy', 'Automotive Mechatronics'],
+        proposedDistricts: ['Jaipur Urban', 'Ajmer', 'Bikaner'],
+        proposedCentersCount: 4,
+        keyFacultyCount: 12,
+        priorGovtProjects: 7
+      },
+      emdPayment: {
+        baseEmd: 50000,
+        processingFee: 2500,
+        totalPaid: 52500,
+        paymentMethod: 'NET_BANKING',
+        txnReference: 'TXN-AOC-994182914',
+        paidTimestamp: '2026-08-24 10:40:15 IST',
+        status: 'SUCCESS'
+      },
+      scrutinyDetails: {
+        assignedOfficer: 'Committee Bench 1 (RSLDC Directorate)',
+        submissionDate: '2026-08-24',
+        slaExpectedDays: 10,
+        scrutinyStage: 'Award of Contract (AOC) Issued & Empanelled',
+        decisionDate: '2026-09-04',
+        assignedGrade: 'A+'
+      }
+    },
+    {
       id: 'ISMS-EOI-2026-6412',
       schemeId: 'EOI-SAMARTH-2026-02',
-      schemeName: 'SAMARTH Skill Development Scheme',
+      schemeName: 'SAMARTH Skill Development Scheme (Special Trades)',
       department: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
-      appliedDate: '2026-07-14',
-      status: 'APPROVED',
+      appliedDate: '14-Jul-2026',
+      status: 'ACCEPTED',
       proposalDetails: {
         targetCapacity: 300,
         sectors: ['Industrial Automation', 'CNC Machining'],
@@ -663,7 +695,7 @@ export class EoiStateService {
         assignedOfficer: 'S. Rajagopalan (Directorate)',
         submissionDate: '2026-07-14',
         slaExpectedDays: 10,
-        scrutinyStage: 'Scrutiny Complete & Approved',
+        scrutinyStage: 'Scrutiny Complete & Accepted for Empanelment',
         decisionDate: '2026-07-22',
         assignedGrade: 'A'
       }
@@ -673,7 +705,7 @@ export class EoiStateService {
       schemeId: 'EOI-DDUGKY-2026-04',
       schemeName: 'Deen Dayal Upadhyaya Grameen Kaushalya Yojana (DDU-GKY)',
       department: 'Ministry of Rural Development / RSLDC',
-      appliedDate: '2025-11-20',
+      appliedDate: '20-Nov-2025',
       status: 'REJECTED',
       proposalDetails: {
         targetCapacity: 200,
@@ -705,6 +737,37 @@ export class EoiStateService {
           refundStatus: 'Processed & Credited to Original Bank Account',
           expectedCreditDays: 'Credited on 2025-12-02'
         }
+      }
+    },
+    {
+      id: 'ISMS-EOI-2026-5520',
+      schemeId: 'EOI-RYSY-2026-03',
+      schemeName: 'Rajasthan Yuva Sambal Yojana (RYSY) - Self-Employment Skilling',
+      department: 'Directorate of Skill Development',
+      appliedDate: '12-Sep-2026',
+      status: 'PENDING',
+      proposalDetails: {
+        targetCapacity: 350,
+        sectors: ['Electrical & Solar Installation', 'Apparel & Handicrafts'],
+        proposedDistricts: ['Udaipur', 'Chittorgarh'],
+        proposedCentersCount: 2,
+        keyFacultyCount: 5,
+        priorGovtProjects: 2
+      },
+      emdPayment: {
+        baseEmd: 40000,
+        processingFee: 2000,
+        totalPaid: 42000,
+        paymentMethod: 'NET_BANKING',
+        txnReference: 'TXN-NET-661928410',
+        paidTimestamp: '2026-09-12 15:10:22 IST',
+        status: 'SUCCESS'
+      },
+      scrutinyDetails: {
+        assignedOfficer: 'P. K. Rathore (Senior Verification Officer)',
+        submissionDate: '2026-09-12',
+        slaExpectedDays: 7,
+        scrutinyStage: 'Stage 1: Profile & Document Scrutiny'
       }
     }
   ];
@@ -922,7 +985,7 @@ export class EoiStateService {
     { id: 'f-4', schemeCode: 'MMKVY', label: 'Number of Dedicated Training Centers', fieldType: 'number', required: true, placeholder: 'e.g. 3', order: 4 },
     { id: 'f-5', schemeCode: 'MMKVY', label: 'Center Infrastructure Layout Drawing (PDF)', fieldType: 'file', required: true, helpText: 'Upload certified floor plan blueprint', order: 5 },
     { id: 'f-6', schemeCode: 'MMKVY', label: 'I agree to comply with RSLDC 70% mandatory placement guidelines', fieldType: 'checkbox', required: true, order: 6 },
-    
+
     { id: 'f-7', schemeCode: 'SAMARTH', label: 'Specialized Lab Equipment Machinery List', fieldType: 'file', required: true, helpText: 'Upload equipment invoice and serial audit', order: 1 },
     { id: 'f-8', schemeCode: 'SAMARTH', label: 'Industry MoU / Apprenticeship Partner Name', fieldType: 'text', required: true, placeholder: 'e.g. Hero MotoCorp Ltd', order: 2 }
   ]);
@@ -961,7 +1024,7 @@ export class EoiStateService {
     if (typeof window !== 'undefined' && window.localStorage) {
       try {
         window.localStorage.setItem(key, JSON.stringify(data));
-      } catch (e) {}
+      } catch (e) { }
     }
   }
 
@@ -972,7 +1035,7 @@ export class EoiStateService {
         if (item) {
           return JSON.parse(item) as T;
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     return fallback;
   }
@@ -1160,7 +1223,7 @@ export class EoiStateService {
 
   // Scrutiny Actions by Dept Admin
   updateScrutinyDecision(
-    applicationId: string, 
+    applicationId: string,
     decision: {
       status: 'APPROVED' | 'REJECTED';
       grade?: 'A' | 'B' | 'C';
@@ -1239,7 +1302,13 @@ export class EoiStateService {
 
   // Missing methods for applicant wizard & status tracker
   getSchemeById(id: string): Scheme | undefined {
-    return this.schemesSubject.getValue().find(s => s.id === id || s.schemeCode === id);
+    return this.schemesSubject.getValue().find(s =>
+      s.id === id ||
+      s.schemeCode === id ||
+      (id === 'EOI-SAMARTH-2026-02' && s.id === 'EOI-MMKVY-2026-03') ||
+      (id === 'EOI-ELSTP-2026-03' && s.id === 'EOI-MMKVY-2026-02') ||
+      (id === 'EOI-DDUGKY-2026-04' && s.id === 'EOI-MMKVY-2026-01')
+    );
   }
 
   startApplicationForScheme(scheme: Scheme): void {
@@ -1292,7 +1361,7 @@ export class EoiStateService {
     };
     this.currentDraftSubject.next(finalized);
     this.saveToStorage('isms_current_draft', finalized);
-    
+
     // Add to history
     const history = this.historySubject.getValue();
     const newHistory = [finalized, ...history];

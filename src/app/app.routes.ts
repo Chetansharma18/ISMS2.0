@@ -100,8 +100,13 @@ export const routes: Routes = [
     loadComponent: () => import('./features/eoi/dashboard/dashboard.component').then(m => m.DashboardComponent)
   },
   {
-    path: 'eoi/my-applications',
+    path: 'eoi/tender-status',
     loadComponent: () => import('./features/eoi/my-applications/my-applications.component').then(m => m.MyApplicationsComponent)
+  },
+  {
+    path: 'eoi/my-applications',
+    redirectTo: 'eoi/tender-status',
+    pathMatch: 'full'
   },
 
   // Screen 14: Department User (Admin) — EOI View

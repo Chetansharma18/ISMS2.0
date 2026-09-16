@@ -1,18 +1,31 @@
-import { Component, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { NgIf, NgFor, AsyncPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { NgIf, NgFor, AsyncPipe, DatePipe, DecimalPipe, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EoiStateService, UserProfile, EoiApplication } from '../../core/services/eoi-state.service';
+import { EoiService } from '../eoi/application-wizard/services/eoi.service';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { GradeBadgeComponent } from '../../shared/components/grade-badge/grade-badge.component';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+
+export interface OfficialDocItem {
+  s_no: number;
+  doc_title: string;
+  doc_category: string;
+  file_name: string;
+  file_size: string;
+  upload_date: string;
+  mandatory: boolean;
+  status: 'Verified' | 'Pending';
+}
 
 @Component({
   selector: 'app-profile',
   standalone: true,
   imports: [
+    CommonModule,
     RouterLink,
     NgIf,
     NgFor,
@@ -42,34 +55,10 @@ import { Observable } from 'rxjs';
               <h1 class="text-2xl sm:text-3xl font-bold text-[#002244] tracking-tight">
                 Entity &amp; Applicant Profile
               </h1>
-              <p class="text-xs sm:text-sm text-slate-500 mt-1">
-                Official registered organization, authorized signatory credentials, bank mandate, and statutory documents.
-              </p>
             </div>
 
             <div class="flex items-center gap-2.5">
               <ng-container *ngIf="userProfile$ | async as profile">
-                <!-- If Profile is Complete -->
-                <ng-container *ngIf="profile.isRegistered && profile.userState === 'existing'">
-                  <button 
-                    *ngIf="!isEditing"
-                    (click)="startEditing(profile)"
-                    class="px-4 py-2 border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold rounded-md transition-colors inline-flex items-center gap-1.5 shadow-2xs cursor-pointer">
-                    <svg class="w-3.5 h-3.5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
-                    <span>Edit Profile Details</span>
-                  </button>
-
-                  <button 
-                    *ngIf="isEditing"
-                    (click)="saveProfile()"
-                    class="px-5 py-2 bg-[#002244] text-white text-xs font-bold rounded-md hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
-                    Save Changes
-                  </button>
-                </ng-container>
-
                 <!-- If Profile is Incomplete: Direct CTA to OTR -->
                 <ng-container *ngIf="!profile.isRegistered || profile.userState === 'new'">
                   <a 
@@ -83,596 +72,709 @@ import { Observable } from 'rxjs';
             </div>
           </div>
 
-          <div *ngIf="userProfile$ | async as profile">
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              
-              <!-- Left Column: Official Profile Details (8 Cols) -->
-              <div class="lg:col-span-8 space-y-6">
-
-                <!-- ================= STATE 1: INCOMPLETE PROFILE CALLOUT BANNER ================= -->
-                <div *ngIf="!profile.isRegistered || profile.userState === 'new'" 
-                  class="p-5 bg-gradient-to-r from-amber-50 via-white to-amber-50/80 border-2 border-amber-300 rounded-xl shadow-xs relative overflow-hidden">
-                  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div class="flex items-start gap-3.5">
-                      <div class="w-10 h-10 rounded-xl bg-amber-500 text-[#002244] font-black flex items-center justify-center text-lg shrink-0 shadow-xs">
-                        ⚠️
-                      </div>
-                      <div>
-                        <h3 class="font-extrabold text-sm text-[#002244] tracking-tight">
-                          One-Time Registration (OTR) Incomplete
-                        </h3>
-                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                          Your official corporate entity, bank mandate, and statutory documents are not registered yet. All fields below are currently blank. Complete One-Time Registration (OTR) to unlock tender applications, EMD fee payments, and proposal submissions.
-                        </p>
-                      </div>
-                    </div>
-
-                    <a 
-                      routerLink="/auth/register" 
-                      class="shrink-0 w-full sm:w-auto text-center px-5 py-2.5 bg-[#002244] hover:bg-[#003366] text-white font-bold text-xs rounded-lg transition-colors shadow-xs flex items-center justify-center gap-2">
-                      <span>Start OTR Registration</span>
-                      <span>→</span>
-                    </a>
-                  </div>
-                </div>
-
-                <!-- ================= STATE 2: VERIFIED TP CALLOUT BANNER ================= -->
-                <div *ngIf="profile.isRegistered && profile.userState === 'existing'" 
-                  class="p-5 bg-gradient-to-r from-emerald-50 via-white to-emerald-50/80 border-2 border-emerald-300 rounded-xl shadow-xs">
-                  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div class="flex items-start gap-3.5">
-                      <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white font-black flex items-center justify-center text-xl shrink-0 shadow-xs">
-                        ✓
-                      </div>
-                      <div>
-                        <div class="flex items-center gap-2">
-                          <h3 class="font-extrabold text-sm text-emerald-900 tracking-tight">
-                            One-Time Registration (OTR) Completed &amp; Verified
-                          </h3>
-                          <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full">
-                            Active TP
-                          </span>
-                        </div>
-                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                          Entity credentials, authorized signatory, bank account, and statutory documents are verified by Government of Rajasthan. Eligible to participate in all open tenders and schemes.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div class="shrink-0 text-right">
-                      <div class="text-[10.5px] font-mono text-slate-500 uppercase">Registration ID</div>
-                      <div class="text-xs font-mono font-black text-[#002244] mt-0.5">{{ profile.registrationNumber }}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Master Official Certificate Card Container -->
-                <div class="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-xs space-y-7">
-                  
-                  <!-- Card Header: Identity & Registration Badges -->
-                  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 border-b border-slate-200">
-                    <div class="flex items-center gap-3.5">
-                      <div class="w-12 h-12 rounded-xl bg-[#002244] text-amber-400 border border-[#0a2e5c] flex items-center justify-center font-bold text-2xl shadow-xs shrink-0">
-                        {{ profile.isRegistered ? '🏢' : '👤' }}
-                      </div>
-                      <div>
-                        <div class="text-[10.5px] font-mono uppercase tracking-wider text-slate-500">
-                          {{ profile.isRegistered ? 'Government Registered Training Partner' : 'Rajasthan SSO Citizen Identity' }}
-                        </div>
-                        <div class="text-lg font-bold text-[#002244] tracking-tight">
-                          {{ profile.isRegistered ? profile.organization.name : 'Citizen Applicant (Unregistered Entity)' }}
-                        </div>
-                        <div class="text-xs font-mono text-slate-600 mt-0.5 flex items-center gap-2">
-                          <span>Mapped SSO ID: <strong class="text-[#002244]">{{ profile.ssoId || 'new_citizen_rj' }}</strong></span>
-                          <span class="text-emerald-700 bg-emerald-50 border border-emerald-200 text-[10px] font-bold px-1.5 py-0.2 rounded">🔒 SSO Verified</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Status Pill -->
-                    <div>
-                      <app-grade-badge *ngIf="profile.isApprovedTp && profile.tpGrade" [grade]="profile.tpGrade" [showLabel]="true"></app-grade-badge>
-                      <div *ngIf="!profile.isApprovedTp && profile.isRegistered" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-800 border border-emerald-300 rounded-md text-xs font-bold shadow-2xs">
-                        <span>✓ Verified Entity Profile</span>
-                      </div>
-                      <div *ngIf="!profile.isRegistered" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-900 border border-amber-300 rounded-md text-xs font-extrabold shadow-2xs">
-                        <span>● OTR Registration Pending</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- ================= 1. CORPORATE ENTITY & LEGAL REGISTRATION DETAILS ================= -->
-                  <div>
-                    <div class="flex items-center justify-between pb-2.5 border-b border-slate-200 mb-4">
-                      <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#002244] flex items-center gap-2">
-                        <span>1. Corporate Entity &amp; Registration Details</span>
-                      </h3>
-                      <span *ngIf="!profile.isRegistered" class="text-[11px] font-semibold text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded">
-                        Requires OTR (Currently Blank)
-                      </span>
-                      <span *ngIf="profile.isRegistered" class="text-[11px] font-semibold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded">
-                        ✓ MCA &amp; Tax Portal Verified
-                      </span>
-                    </div>
-
-                    <!-- Non-Editing Display -->
-                    <div *ngIf="!isEditing" class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 text-xs">
-                      <div>
-                        <span class="text-slate-500 font-medium block">Company / Entity Legal Name</span>
-                        <div class="mt-0.5">
-                          <span *ngIf="profile.isRegistered && profile.organization.name" class="font-bold text-sm text-[#002244]">
-                            {{ profile.organization.name }}
-                          </span>
-                          <span *ngIf="!profile.isRegistered || !profile.organization.name" class="text-slate-400 italic text-xs font-mono">
-                            — (Not Registered)
-                          </span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <span class="text-slate-500 font-medium block">Constitution / Entity Type</span>
-                        <div class="mt-0.5">
-                          <span *ngIf="profile.isRegistered && profile.organization.entityType" class="font-semibold text-slate-900">
-                            {{ profile.organization.entityType }}
-                          </span>
-                          <span *ngIf="!profile.isRegistered || !profile.organization.entityType" class="text-slate-400 italic text-xs font-mono">
-                            —
-                          </span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <span class="text-slate-500 font-medium block">Permanent Account Number (PAN)</span>
-                        <div class="mt-0.5">
-                          <span *ngIf="profile.isRegistered && profile.organization.pan" class="font-mono font-bold text-slate-900 text-xs">
-                            {{ profile.organization.pan }}
-                            <span class="ml-1.5 text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-1 py-0.5 rounded font-sans font-bold">✓ NSDL Validated</span>
-                          </span>
-                          <span *ngIf="!profile.isRegistered || !profile.organization.pan" class="text-slate-400 italic text-xs font-mono">
-                            —
-                          </span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <span class="text-slate-500 font-medium block">GSTIN Registration</span>
-                        <div class="mt-0.5">
-                          <span *ngIf="profile.isRegistered && profile.organization.gstin" class="font-mono font-bold text-slate-900 text-xs">
-                            {{ profile.organization.gstin }}
-                            <span class="ml-1.5 text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-1 py-0.5 rounded font-sans font-bold">✓ Active Regular</span>
-                          </span>
-                          <span *ngIf="!profile.isRegistered || !profile.organization.gstin" class="text-slate-400 italic text-xs font-mono">
-                            —
-                          </span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <span class="text-slate-500 font-medium block">Date of Incorporation</span>
-                        <div class="mt-0.5">
-                          <span *ngIf="profile.isRegistered && profile.organization.incorporationDate" class="font-semibold text-slate-900">
-                            {{ profile.organization.incorporationDate }}
-                          </span>
-                          <span *ngIf="!profile.isRegistered || !profile.organization.incorporationDate" class="text-slate-400 italic text-xs font-mono">
-                            —
-                          </span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <span class="text-slate-500 font-medium block">Official Website</span>
-                        <div class="mt-0.5">
-                          <a *ngIf="profile.isRegistered && profile.organization.website" 
-                            [href]="'https://' + profile.organization.website" 
-                            target="_blank" 
-                            class="text-blue-700 hover:underline font-mono text-xs">
-                            {{ profile.organization.website }}
-                          </a>
-                          <span *ngIf="!profile.isRegistered || !profile.organization.website" class="text-slate-400 italic text-xs font-mono">
-                            —
-                          </span>
-                        </div>
-                      </div>
-
-                      <div class="sm:col-span-2">
-                        <span class="text-slate-500 font-medium block">Registered Office Address</span>
-                        <div class="mt-0.5">
-                          <span *ngIf="profile.isRegistered && profile.organization.registeredAddress" class="font-medium text-slate-900 leading-relaxed">
-                            {{ profile.organization.registeredAddress }}, {{ profile.organization.state }} - {{ profile.organization.pincode }}
-                          </span>
-                          <span *ngIf="!profile.isRegistered || !profile.organization.registeredAddress" class="text-slate-400 italic text-xs font-mono">
-                            — (Address will be captured during One-Time Registration)
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Editable Inputs for Complete Profile -->
-                    <div *ngIf="isEditing" class="space-y-3 text-xs bg-slate-50 p-4 rounded-lg border border-slate-200">
-                      <div>
-                        <label class="block text-slate-600 font-bold mb-1">Company Legal Name</label>
-                        <input [(ngModel)]="editData.orgName" class="w-full px-3 py-2 border border-slate-300 rounded bg-white text-slate-900 focus:outline-none focus:border-[#002244]" />
-                      </div>
-                      <div class="grid grid-cols-2 gap-3">
-                        <div>
-                          <label class="block text-slate-600 font-bold mb-1">PAN Number</label>
-                          <input [(ngModel)]="editData.pan" class="w-full px-3 py-2 border border-slate-300 rounded bg-white text-slate-900 uppercase font-mono focus:outline-none focus:border-[#002244]" />
-                        </div>
-                        <div>
-                          <label class="block text-slate-600 font-bold mb-1">GSTIN Number</label>
-                          <input [(ngModel)]="editData.gstin" class="w-full px-3 py-2 border border-slate-300 rounded bg-white text-slate-900 uppercase font-mono focus:outline-none focus:border-[#002244]" />
-                        </div>
-                      </div>
-                      <div>
-                        <label class="block text-slate-600 font-bold mb-1">Registered Address</label>
-                        <textarea [(ngModel)]="editData.address" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded bg-white text-slate-900 focus:outline-none focus:border-[#002244]"></textarea>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- ================= 2. AUTHORIZED SIGNATORY & CONTACT DETAILS ================= -->
-                  <div>
-                    <div class="flex items-center justify-between pb-2.5 border-b border-slate-200 mb-4">
-                      <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#002244]">
-                        2. Authorized Signatory &amp; Key Management
-                      </h3>
-                      <span *ngIf="profile.isRegistered" class="text-[11px] font-semibold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded">
-                        ✓ Aadhaar e-KYC Verified
-                      </span>
-                      <span *ngIf="!profile.isRegistered" class="text-[11px] font-semibold text-blue-800 bg-blue-100 border border-blue-300 px-2 py-0.5 rounded">
-                        SSO Identity Authenticated
-                      </span>
-                    </div>
-
-                    <div *ngIf="!isEditing" class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 text-xs">
-                      <div>
-                        <span class="text-slate-500 font-medium block">Authorized Signatory Full Name</span>
-                        <div class="mt-0.5">
-                          <span class="font-bold text-slate-900 text-sm">
-                            {{ profile.personal.fullName || 'Citizen Applicant' }}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <span class="text-slate-500 font-medium block">Official Designation</span>
-                        <div class="mt-0.5">
-                          <span *ngIf="profile.isRegistered && profile.personal.designation" class="font-semibold text-slate-900">
-                            {{ profile.personal.designation }}
-                          </span>
-                          <span *ngIf="!profile.isRegistered || !profile.personal.designation" class="text-slate-400 italic text-xs font-mono">
-                            — (Designation pending OTR completion)
-                          </span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <span class="text-slate-500 font-medium block">Identity Verification (Aadhaar / UIDAI)</span>
-                        <div class="mt-0.5">
-                          <span *ngIf="profile.isRegistered && profile.personal.identityNumber" class="font-mono text-slate-900 font-semibold">
-                            {{ profile.personal.identityType }} ({{ profile.personal.identityNumber }})
-                            <span class="ml-1 text-emerald-700 font-bold">🔒 e-Sign Active</span>
-                          </span>
-                          <span *ngIf="!profile.isRegistered || !profile.personal.identityNumber" class="text-slate-400 italic text-xs font-mono">
-                            —
-                          </span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <span class="text-slate-500 font-medium block">Official Email Address</span>
-                        <div class="mt-0.5 font-mono text-slate-900 font-medium">
-                          {{ profile.personal.email || 'citizen@rajasthan.in' }}
-                          <span class="ml-1 text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-1 py-0.2 rounded font-sans">✓ Verified</span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <span class="text-slate-500 font-medium block">Registered Mobile Number</span>
-                        <div class="mt-0.5 font-mono text-slate-900 font-medium">
-                          {{ profile.personal.mobile || '+91 98290 12345' }}
-                          <span class="ml-1 text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-1 py-0.2 rounded font-sans">✓ OTP Linked</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Editable Inputs for Signatory -->
-                    <div *ngIf="isEditing" class="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-4 rounded-lg border border-slate-200">
-                      <div>
-                        <label class="block text-slate-600 font-bold mb-1">Signatory Full Name</label>
-                        <input [(ngModel)]="editData.fullName" class="w-full px-3 py-2 border border-slate-300 rounded bg-white text-slate-900 focus:outline-none focus:border-[#002244]" />
-                      </div>
-                      <div>
-                        <label class="block text-slate-600 font-bold mb-1">Designation</label>
-                        <input [(ngModel)]="editData.designation" class="w-full px-3 py-2 border border-slate-300 rounded bg-white text-slate-900 focus:outline-none focus:border-[#002244]" />
-                      </div>
-                      <div>
-                        <label class="block text-slate-600 font-bold mb-1">Official Email ID</label>
-                        <input [(ngModel)]="editData.email" class="w-full px-3 py-2 border border-slate-300 rounded bg-white text-slate-900 focus:outline-none focus:border-[#002244]" />
-                      </div>
-                      <div>
-                        <label class="block text-slate-600 font-bold mb-1">Mobile Number</label>
-                        <input [(ngModel)]="editData.mobile" class="w-full px-3 py-2 border border-slate-300 rounded bg-white text-slate-900 focus:outline-none focus:border-[#002244]" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- ================= 3. BANK ACCOUNT & FINANCIAL MANDATE ================= -->
-                  <div>
-                    <div class="flex items-center justify-between pb-2.5 border-b border-slate-200 mb-4">
-                      <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#002244]">
-                        3. Bank Account &amp; Financial Mandate (OTR Tab 3)
-                      </h3>
-                      <span *ngIf="profile.isRegistered && profile.bankDetails?.accountNumber" class="text-[11px] font-semibold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded">
-                        ✓ PFMS Mandate Verified
-                      </span>
-                      <span *ngIf="!profile.isRegistered || !profile.bankDetails?.accountNumber" class="text-[11px] font-semibold text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded">
-                        Mandate Pending (Blank)
-                      </span>
-                    </div>
-
-                    <!-- When Complete: Display Bank Details -->
-                    <div *ngIf="profile.isRegistered && profile.bankDetails?.accountNumber" class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 text-xs bg-slate-50 p-4 rounded-lg border border-slate-200">
-                      <div>
-                        <span class="text-slate-500 font-medium block">Bank Name</span>
-                        <span class="font-bold text-slate-900 text-sm mt-0.5 block">
-                          {{ profile.bankDetails?.bankName }}
-                        </span>
-                      </div>
-
-                      <div>
-                        <span class="text-slate-500 font-medium block">Branch Location</span>
-                        <span class="font-semibold text-slate-800 mt-0.5 block">
-                          {{ profile.bankDetails?.branchName }}
-                        </span>
-                      </div>
-
-                      <div>
-                        <span class="text-slate-500 font-medium block">Account Number</span>
-                        <span class="font-mono font-bold text-slate-900 mt-0.5 block">
-                          {{ profile.bankDetails?.accountNumber }}
-                        </span>
-                      </div>
-
-                      <div>
-                        <span class="text-slate-500 font-medium block">IFSC Code</span>
-                        <span class="font-mono font-bold text-[#002244] mt-0.5 block">
-                          {{ profile.bankDetails?.ifscCode }}
-                        </span>
-                      </div>
-
-                      <div class="sm:col-span-2 pt-2 border-t border-slate-200 flex items-center justify-between text-[11px]">
-                        <span class="text-slate-600 font-medium">Account Type: <strong>{{ profile.bankDetails?.accountType }}</strong></span>
-                        <span class="text-emerald-700 font-bold flex items-center gap-1">
-                          ✓ PFMS Electronic EMD Refund Mandate Active
-                        </span>
-                      </div>
-                    </div>
-
-                    <!-- When Incomplete: Blank State Message -->
-                    <div *ngIf="!profile.isRegistered || !profile.bankDetails?.accountNumber" 
-                      class="p-4 bg-slate-50 border border-dashed border-slate-300 rounded-lg text-xs text-center space-y-2">
-                      <div class="font-bold text-slate-700">No bank account details linked yet</div>
-                      <p class="text-[11px] text-slate-500 max-w-md mx-auto">
-                        Your bank account number, branch IFSC code, and cancelled passbook cheque must be registered in OTR for automated electronic EMD refunds and grant disbursements.
-                      </p>
-                      <a routerLink="/auth/register" class="inline-block mt-1 text-[#002244] hover:underline font-bold text-xs">
-                        Link Bank Account via One-Time Registration →
-                      </a>
-                    </div>
-                  </div>
-
-                  <!-- ================= 4. STATUTORY DOCUMENTS & UPLOADS ================= -->
-                  <div>
-                    <div class="flex items-center justify-between pb-2.5 border-b border-slate-200 mb-3">
-                      <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#002244]">
-                        4. Uploaded Statutory Documents &amp; Certificates
-                      </h3>
-                      <span class="text-xs text-slate-500 font-mono">
-                        {{ profile.documents.length || 0 }} Files Registered
-                      </span>
-                    </div>
-
-                    <!-- When Complete: Documents Grid -->
-                    <div *ngIf="profile.documents && profile.documents.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                      <div *ngFor="let doc of profile.documents" class="p-3 bg-slate-50 border border-slate-200 rounded-lg hover:border-[#002244] transition-all flex items-center justify-between gap-2 group">
-                        <div class="flex items-center gap-2.5 truncate">
-                          <div class="w-8 h-8 rounded bg-red-100 text-red-700 font-bold text-[11px] flex items-center justify-center shrink-0 border border-red-200">
-                            PDF
-                          </div>
-                          <div class="min-w-0">
-                            <div class="font-bold text-slate-900 truncate" [title]="doc.name">{{ doc.name }}</div>
-                            <div class="text-[10.5px] text-slate-500 font-mono mt-0.5 flex items-center gap-2">
-                              <span>{{ doc.size }}</span>
-                              <span>•</span>
-                              <span class="text-emerald-700 font-bold">✓ Verified</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <button 
-                          type="button"
-                          (click)="downloadDoc(doc.name)"
-                          class="p-1.5 rounded text-slate-500 hover:text-[#002244] hover:bg-slate-200 transition-colors shrink-0"
-                          title="Download document">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-
-                    <!-- When Incomplete: Blank State -->
-                    <div *ngIf="!profile.documents || profile.documents.length === 0" 
-                      class="text-xs text-slate-500 p-6 bg-slate-50 border border-dashed border-slate-300 rounded-lg text-center space-y-2">
-                      <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center mx-auto text-lg">
-                        📄
-                      </div>
-                      <div class="font-bold text-slate-800 text-sm">No statutory documents uploaded yet</div>
-                      <p class="text-[11.5px] text-slate-500 max-w-lg mx-auto leading-relaxed">
-                        Certificate of Incorporation, Entity PAN card, GST registration certificate, and Audited Balance Sheets will be uploaded and cryptographically stamped during One-Time Registration (OTR).
-                      </p>
-                      <a routerLink="/auth/register" class="inline-block mt-2 px-4 py-2 bg-[#002244] hover:bg-[#003366] text-white font-bold text-xs rounded transition-colors shadow-2xs">
-                        Upload Documents via OTR Form →
-                      </a>
-                    </div>
-                  </div>
-
-                </div>
-
-              </div>
-
-              <!-- Right Column: Profile Status, Completion Meter & Quick Action (4 Cols) -->
-              <div class="lg:col-span-4 space-y-5">
-                
-                <!-- Registration Status Summary Card -->
-                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
-                  <h3 class="font-extrabold text-sm text-[#002244] pb-3 border-b border-slate-200 mb-4 flex items-center justify-between">
-                    <span>Profile Status</span>
-                    <span class="w-2 h-2 rounded-full" [class.bg-emerald-500]="profile.isRegistered" [class.bg-amber-500]="!profile.isRegistered"></span>
-                  </h3>
-
-                  <!-- Progress Meter -->
-                  <div class="mb-5">
-                    <div class="flex justify-between text-xs font-semibold mb-1.5">
-                      <span class="text-slate-600">OTR Completion</span>
-                      <span class="font-bold" [class.text-emerald-700]="profile.isRegistered" [class.text-amber-800]="!profile.isRegistered">
-                        {{ profile.isRegistered ? '100% (Verified)' : '25% (Incomplete)' }}
-                      </span>
-                    </div>
-                    <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                      <div 
-                        class="h-full rounded-full transition-all duration-500"
-                        [class.bg-emerald-600]="profile.isRegistered"
-                        [class.bg-amber-500]="!profile.isRegistered"
-                        [style.width]="profile.isRegistered ? '100%' : '25%'">
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="space-y-3 text-xs text-slate-700">
-                    <div class="flex justify-between py-1.5 border-b border-slate-100 items-center">
-                      <span class="text-slate-500 font-medium">Status:</span>
-                      <span class="font-extrabold text-xs px-2 py-0.5 rounded"
-                        [class.text-emerald-800]="profile.isRegistered"
-                        [class.bg-emerald-50]="profile.isRegistered"
-                        [class.border]="profile.isRegistered"
-                        [class.border-emerald-200]="profile.isRegistered"
-                        [class.text-amber-900]="!profile.isRegistered"
-                        [class.bg-amber-50]="!profile.isRegistered"
-                        [class.border-amber-200]="!profile.isRegistered">
-                        {{ profile.isRegistered ? '✓ Verified Profile' : '⚠️ Pending (OTR Required)' }}
-                      </span>
-                    </div>
-
-                    <div class="flex justify-between py-1.5 border-b border-slate-100 items-center">
-                      <span class="text-slate-500 font-medium">Registration No:</span>
-                      <span class="font-mono font-bold text-slate-900">
-                        {{ profile.isRegistered ? profile.registrationNumber : 'Pending Generation' }}
-                      </span>
-                    </div>
-
-                    <div class="flex justify-between py-1.5 border-b border-slate-100 items-center">
-                      <span class="text-slate-500 font-medium">Mapped SSO ID:</span>
-                      <span class="font-mono font-bold text-[#002244]">
-                        {{ profile.ssoId || 'new_citizen_rj' }}
-                      </span>
-                    </div>
-
-                    <div class="flex justify-between py-1.5 border-b border-slate-100 items-center">
-                      <span class="text-slate-500 font-medium">Applications Filed:</span>
-                      <span class="font-bold text-slate-900 tabular-nums font-mono">
-                        {{ (history$ | async)?.length || 0 }} EOIs
-                      </span>
-                    </div>
-
-                    <div class="flex justify-between py-1.5 border-b border-slate-100 items-center">
-                      <span class="text-slate-500 font-medium">Tender Eligibility:</span>
-                      <span class="font-bold text-xs" [class.text-emerald-700]="profile.isRegistered" [class.text-amber-800]="!profile.isRegistered">
-                        {{ profile.isRegistered ? 'Eligible for all Tenders' : 'Locked (OTR Mandatory)' }}
-                      </span>
-                    </div>
-
-                    <!-- Empanelled Training Partner Badge if Approved -->
-                    <div *ngIf="profile.isApprovedTp" class="p-3 bg-emerald-50 rounded-xs border border-emerald-300 mt-2 space-y-1">
-                      <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-bold uppercase text-emerald-900">Partner Empanelment</span>
-                        <span class="px-1.5 py-0.2 rounded-2xs bg-emerald-200 text-emerald-950 font-extrabold text-[10px]">
-                          ★ Grade {{ profile.tpGrade || 'A' }}
-                        </span>
-                      </div>
-                      <div class="text-xs font-mono font-bold text-[#002244]">{{ profile.tpId }}</div>
-                      <div class="pt-1 flex items-center justify-between text-[10.5px]">
-                        <span class="text-emerald-700 font-medium">Committee Order Sealed</span>
-                        <a routerLink="/eoi/tracker/ISMS-EOI-2026-9871" class="font-bold text-[#002244] hover:underline">
-                          View Order →
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Action Button -->
-                  <div class="mt-5 pt-3 border-t border-slate-200">
-                    <ng-container *ngIf="!profile.isRegistered || profile.userState === 'new'">
-                      <a routerLink="/auth/register" class="w-full block text-center py-2.5 bg-[#002244] hover:bg-[#003366] text-white font-bold text-xs rounded-lg transition-colors shadow-2xs">
-                        Complete OTR Registration →
-                      </a>
-                    </ng-container>
-                    <ng-container *ngIf="profile.isRegistered && profile.userState === 'existing'">
-                      <a routerLink="/schemes" class="w-full block text-center py-2.5 bg-[#002244] hover:bg-[#003366] text-white font-bold text-xs rounded-lg transition-colors shadow-2xs">
-                        Apply for Active Scheme →
-                      </a>
-                    </ng-container>
-                  </div>
-                </div>
-
-                <!-- Registration Checklist -->
-                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
-                  <h4 class="font-bold text-xs uppercase tracking-wider text-[#002244] mb-3">
-                    OTR Verification Checklist
-                  </h4>
-                  <ul class="space-y-2.5 text-xs">
-                    <li class="flex items-center gap-2">
-                      <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[10px]">✓</span>
-                      <span class="text-slate-700">Rajasthan SSO Authentication</span>
-                    </li>
-                    <li class="flex items-center gap-2">
-                      <span class="w-4 h-4 rounded-full flex items-center justify-center font-bold text-[10px]"
-                        [class.bg-emerald-100]="profile.isRegistered" [class.text-emerald-800]="profile.isRegistered"
-                        [class.bg-slate-100]="!profile.isRegistered" [class.text-slate-400]="!profile.isRegistered">
-                        {{ profile.isRegistered ? '✓' : '○' }}
-                      </span>
-                      <span [class.text-slate-800]="profile.isRegistered" [class.text-slate-400]="!profile.isRegistered">
-                        Corporate Legal Registration (PAN/GST)
-                      </span>
-                    </li>
-                    <li class="flex items-center gap-2">
-                      <span class="w-4 h-4 rounded-full flex items-center justify-center font-bold text-[10px]"
-                        [class.bg-emerald-100]="profile.isRegistered" [class.text-emerald-800]="profile.isRegistered"
-                        [class.bg-slate-100]="!profile.isRegistered" [class.text-slate-400]="!profile.isRegistered">
-                        {{ profile.isRegistered ? '✓' : '○' }}
-                      </span>
-                      <span [class.text-slate-800]="profile.isRegistered" [class.text-slate-400]="!profile.isRegistered">
-                        Bank Mandate &amp; EMD Refund Account
-                      </span>
-                    </li>
-                    <li class="flex items-center gap-2">
-                      <span class="w-4 h-4 rounded-full flex items-center justify-center font-bold text-[10px]"
-                        [class.bg-emerald-100]="profile.isRegistered" [class.text-emerald-800]="profile.isRegistered"
-                        [class.bg-slate-100]="!profile.isRegistered" [class.text-slate-400]="!profile.isRegistered">
-                        {{ profile.isRegistered ? '✓' : '○' }}
-                      </span>
-                      <span [class.text-slate-800]="profile.isRegistered" [class.text-slate-400]="!profile.isRegistered">
-                        Statutory Document Uploads
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-
-              </div>
-
+          <!-- Toast Notification -->
+          <div *ngIf="toastMessage" class="mb-5 p-3.5 bg-emerald-50 border border-emerald-300 rounded-lg text-emerald-900 text-xs font-bold flex items-center justify-between shadow-xs animate-fadeIn">
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-700 text-base">✓</span>
+              <span>{{ toastMessage }}</span>
             </div>
+            <button (click)="toastMessage = null" class="text-emerald-700 hover:text-emerald-900 text-sm font-bold">✕</button>
+          </div>
+
+          <div *ngIf="userProfile$ | async as profile" class="w-full space-y-6">
+
+            <!-- ================= STATE 1: INCOMPLETE PROFILE CALLOUT BANNER ================= -->
+            <div *ngIf="!profile.isRegistered || profile.userState === 'new'" 
+              class="p-5 bg-gradient-to-r from-amber-50 via-white to-amber-50/80 border-2 border-amber-300 rounded-xl shadow-xs relative overflow-hidden">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-start gap-3.5">
+                  <div class="w-10 h-10 rounded-xl bg-amber-500 text-[#002244] font-black flex items-center justify-center text-lg shrink-0 shadow-xs">
+                    ⚠️
+                  </div>
+                  <div>
+                    <h3 class="font-extrabold text-sm text-[#002244] tracking-tight">
+                      One-Time Registration (OTR) Incomplete
+                    </h3>
+                    <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                      Your official corporate entity, bank mandate, and statutory documents are not registered yet. All fields below are currently blank. Complete One-Time Registration (OTR) to unlock tender applications, EMD fee payments, and proposal submissions.
+                    </p>
+                  </div>
+                </div>
+
+                <a 
+                  routerLink="/auth/register" 
+                  class="shrink-0 w-full sm:w-auto text-center px-5 py-2.5 bg-[#002244] hover:bg-[#003366] text-white font-bold text-xs rounded-lg transition-colors shadow-xs flex items-center justify-center gap-2">
+                  <span>Start OTR Registration</span>
+                  <span>→</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- ================= 1. ORGANISATION / COMPANY BASIC DETAILS (17 FIELDS) ================= -->
+            <div *ngIf="activeSection === 1" class="bg-white border border-slate-200 rounded-xl p-6 sm:p-7 shadow-xs space-y-5">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-200">
+                <div>
+                  <h3 class="text-sm font-bold text-[#002244] flex items-center gap-2">
+                    <span class="w-6 h-6 rounded bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">1</span>
+                    <span>Organisation / Company Basic Details (17 Fields)</span>
+                  </h3>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Corporate entity details, legal incorporation, address, and turnover</p>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <button 
+                    *ngIf="editingSection !== 1"
+                    (click)="startEditingSection(1)"
+                    class="px-3 py-1 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs font-bold rounded transition-colors inline-flex items-center gap-1 cursor-pointer">
+                    <span>✏️</span>
+                    <span>Edit Section</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- VIEW MODE: SECTION 1 (17 Fields) -->
+              <div *ngIf="editingSection !== 1" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-5 text-xs">
+                <div>
+                  <span class="text-slate-500 font-medium block">1. Application No.</span>
+                  <span class="font-mono font-bold text-[#002244] block mt-0.5">{{ orgData.application_no }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">2. TP/PIA Full Name <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-slate-900 block mt-0.5">{{ orgData.tp_full_name }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">3. TP/PIA Short Name <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-semibold text-slate-800 block mt-0.5">{{ orgData.tp_short_name }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">4. Registration Number</span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5">{{ orgData.registration_number }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">5. Organisation Contact No. <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-slate-900 block mt-0.5">{{ orgData.organisation_contact_no }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">6. Company Email-ID <span class="text-red-500">*</span></span>
+                  <span class="font-mono text-slate-900 block mt-0.5">{{ orgData.company_email }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">7. Organisation PAN No.</span>
+                  <span class="font-mono font-bold text-[#002244] block mt-0.5">
+                    {{ orgData.organisation_pan }}
+                    <span class="ml-1 text-[10px] text-emerald-700 font-sans font-bold">✓ Validated</span>
+                  </span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">8. Website</span>
+                  <a *ngIf="orgData.website" [href]="'https://' + orgData.website.replace('https://', '').replace('http://', '')" target="_blank" class="text-blue-700 hover:underline font-mono block mt-0.5 truncate">
+                    {{ orgData.website }}
+                  </a>
+                  <span *ngIf="!orgData.website" class="text-slate-400 italic font-mono block mt-0.5">—</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">10. State / UT <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block mt-0.5">{{ orgData.state_ut }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">11. District <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block mt-0.5">{{ orgData.district }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">12. Pincode <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5">{{ orgData.pincode }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">13. Turn Over (₹ in Lakhs) <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-[#002244] block mt-0.5">₹ {{ orgData.turnover_lakhs }} Lakhs</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">14. Date of Registration</span>
+                  <span class="font-semibold text-slate-900 block mt-0.5">{{ orgData.date_of_registration }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">15. State Where Registered</span>
+                  <span class="font-semibold text-slate-900 block mt-0.5">{{ orgData.state_where_registered }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">16. Type of Business / Activity</span>
+                  <span class="font-medium text-slate-900 block mt-0.5">{{ orgData.type_of_business }}</span>
+                </div>
+
+                <div class="sm:col-span-2 lg:col-span-3">
+                  <span class="text-slate-500 font-medium block">9. Registered Office Address <span class="text-red-500">*</span></span>
+                  <span class="font-medium text-slate-900 block mt-0.5">{{ orgData.registered_address }}</span>
+                </div>
+
+                <div class="sm:col-span-2 lg:col-span-3">
+                  <span class="text-slate-500 font-medium block">17. Postal / Communication Address <span class="text-red-500">*</span></span>
+                  <span class="font-medium text-slate-900 block mt-0.5">{{ orgData.postal_address }}</span>
+                </div>
+              </div>
+
+              <!-- EDIT MODE: SECTION 1 -->
+              <div *ngIf="editingSection === 1" class="space-y-4 bg-slate-50 p-4 sm:p-5 rounded-lg border border-slate-300">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                  <span class="font-bold text-xs text-[#002244] uppercase tracking-wide">Editing: Organisation Details</span>
+                  <span class="text-[11px] text-slate-500">Fields marked with <span class="text-red-500 font-bold">*</span> are mandatory</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                  <div class="sm:col-span-2 lg:col-span-2">
+                    <label class="block font-bold text-slate-700 mb-1">2. TP/PIA Full Name <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="orgEdit.tp_full_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244] font-bold" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">3. TP/PIA Short Name <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="orgEdit.tp_short_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">4. Registration Number</label>
+                    <input [(ngModel)]="orgEdit.registration_number" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244] font-mono" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">5. Contact No. <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="orgEdit.organisation_contact_no" maxlength="12" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">6. Company Email-ID <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="orgEdit.company_email" type="email" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">7. Organisation PAN</label>
+                    <input [(ngModel)]="orgEdit.organisation_pan" maxlength="10" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 uppercase font-mono focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">8. Website</label>
+                    <input [(ngModel)]="orgEdit.website" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">10. State / UT <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="orgEdit.state_ut" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">11. District <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="orgEdit.district" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">12. Pincode <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="orgEdit.pincode" maxlength="6" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 font-mono focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">13. Turn Over (₹ in Lakhs) <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="orgEdit.turnover_lakhs" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 font-bold focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">14. Date of Registration</label>
+                    <input [(ngModel)]="orgEdit.date_of_registration" type="date" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">15. State Where Registered</label>
+                    <input [(ngModel)]="orgEdit.state_where_registered" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">16. Type of Business</label>
+                    <input [(ngModel)]="orgEdit.type_of_business" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div class="sm:col-span-2 lg:col-span-3">
+                    <label class="block font-bold text-slate-700 mb-1">9. Registered Address <span class="text-red-500">*</span></label>
+                    <textarea [(ngModel)]="orgEdit.registered_address" rows="2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]"></textarea>
+                  </div>
+
+                  <div class="sm:col-span-2 lg:col-span-3">
+                    <label class="block font-bold text-slate-700 mb-1">17. Postal / Communication Address <span class="text-red-500">*</span></label>
+                    <textarea [(ngModel)]="orgEdit.postal_address" rows="2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]"></textarea>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
+                  <button 
+                    (click)="cancelEditing()"
+                    class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded hover:bg-slate-100 transition-colors cursor-pointer">
+                    Cancel
+                  </button>
+                  <button 
+                    (click)="saveSection(1)"
+                    class="px-5 py-2 bg-[#002244] text-white font-bold text-xs rounded hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
+                    ✓ Save Section 1 Details
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ================= 2. AUTHORIZED PERSON DETAILS (17 FIELDS) ================= -->
+            <div *ngIf="activeSection === 2" class="bg-white border border-slate-200 rounded-xl p-6 sm:p-7 shadow-xs space-y-5">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-200">
+                <div>
+                  <h3 class="text-sm font-bold text-[#002244] flex items-center gap-2">
+                    <span class="w-6 h-6 rounded bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">2</span>
+                    <span>Authorized Person Details (Organisation Level) (17 Fields)</span>
+                  </h3>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Authorized signatory credentials, Aadhaar e-KYC, identity proofs, and contact</p>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <button 
+                    *ngIf="editingSection !== 2"
+                    (click)="startEditingSection(2)"
+                    class="px-3 py-1 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs font-bold rounded transition-colors inline-flex items-center gap-1 cursor-pointer">
+                    <span>✏️</span>
+                    <span>Edit Section</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- VIEW MODE: SECTION 2 (17 Fields) -->
+              <div *ngIf="editingSection !== 2" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-5 text-xs">
+                <div>
+                  <span class="text-slate-500 font-medium block">1. Name <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-slate-900 block mt-0.5 text-sm">{{ authData.auth_name }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">2. S/O, D/O, W/O</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ authData.auth_guardian_name }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">3. Date of Birth</span>
+                  <span class="font-mono text-slate-800 block mt-0.5">{{ authData.auth_dob }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">4. Age</span>
+                  <span class="font-bold text-slate-800 block mt-0.5">{{ authData.auth_age }} Years</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">5. Designation <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-slate-900 block mt-0.5">{{ authData.auth_designation }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">6. Mobile No. <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5">{{ authData.auth_mobile }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">7. Email-Id <span class="text-red-500">*</span></span>
+                  <span class="font-mono text-slate-900 block mt-0.5">{{ authData.auth_email }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">8. State</span>
+                  <span class="font-semibold text-slate-900 block mt-0.5">{{ authData.auth_state }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">10. PAN <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-[#002244] block mt-0.5">{{ authData.auth_pan }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">11. Aadhaar No.</span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5">
+                    {{ authData.auth_aadhaar }}
+                    <span class="ml-1 text-[10px] text-emerald-700 font-sans font-bold">🔒 e-Sign Active</span>
+                  </span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">12. Type ID Proof</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ authData.auth_id_proof_type }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">13. ID No.</span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5">{{ authData.auth_id_number }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">14. Bhamashah / Jan Aadhaar</span>
+                  <span class="font-mono text-slate-800 block mt-0.5">{{ authData.auth_bhamashah || '—' }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">15. Voter Id No.</span>
+                  <span class="font-mono text-slate-800 block mt-0.5">{{ authData.auth_voter_id || '—' }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">16. Passport No.</span>
+                  <span class="font-mono text-slate-800 block mt-0.5">{{ authData.auth_passport_no || '—' }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">17. Service Tax No.</span>
+                  <span class="font-mono text-slate-800 block mt-0.5">{{ authData.auth_service_tax_no || '—' }}</span>
+                </div>
+
+                <div class="sm:col-span-2 lg:col-span-3">
+                  <span class="text-slate-500 font-medium block">9. Residence Address</span>
+                  <span class="font-medium text-slate-900 block mt-0.5">{{ authData.auth_residence_address }}</span>
+                </div>
+              </div>
+
+              <!-- EDIT MODE: SECTION 2 -->
+              <div *ngIf="editingSection === 2" class="space-y-4 bg-slate-50 p-4 sm:p-5 rounded-lg border border-slate-300">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                  <span class="font-bold text-xs text-[#002244] uppercase tracking-wide">Editing: Authorized Person Details</span>
+                  <span class="text-[11px] text-slate-500">Fields marked with <span class="text-red-500 font-bold">*</span> are mandatory</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">1. Full Name <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="authEdit.auth_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244] font-bold" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">2. S/O, D/O, W/O (Guardian)</label>
+                    <input [(ngModel)]="authEdit.auth_guardian_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">3. Date of Birth</label>
+                    <input [(ngModel)]="authEdit.auth_dob" type="date" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">4. Age</label>
+                    <input [(ngModel)]="authEdit.auth_age" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">5. Designation <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="authEdit.auth_designation" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">6. Mobile No. <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="authEdit.auth_mobile" maxlength="10" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">7. Email-Id <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="authEdit.auth_email" type="email" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">8. State</label>
+                    <input [(ngModel)]="authEdit.auth_state" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">10. PAN <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="authEdit.auth_pan" maxlength="10" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 uppercase font-mono focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">11. Aadhaar No.</label>
+                    <input [(ngModel)]="authEdit.auth_aadhaar" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 font-mono focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">12. ID Proof Type</label>
+                    <input [(ngModel)]="authEdit.auth_id_proof_type" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">13. ID Number</label>
+                    <input [(ngModel)]="authEdit.auth_id_number" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 font-mono focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div class="sm:col-span-2 lg:col-span-3">
+                    <label class="block font-bold text-slate-700 mb-1">9. Residence Address</label>
+                    <textarea [(ngModel)]="authEdit.auth_residence_address" rows="2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]"></textarea>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
+                  <button 
+                    (click)="cancelEditing()"
+                    class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded hover:bg-slate-100 transition-colors cursor-pointer">
+                    Cancel
+                  </button>
+                  <button 
+                    (click)="saveSection(2)"
+                    class="px-5 py-2 bg-[#002244] text-white font-bold text-xs rounded hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
+                    ✓ Save Section 2 Details
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ================= 3. BANK DETAILS (9 FIELDS) ================= -->
+            <div *ngIf="activeSection === 3" class="bg-white border border-slate-200 rounded-xl p-6 sm:p-7 shadow-xs space-y-5">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-200">
+                <div>
+                  <h3 class="text-sm font-bold text-[#002244] flex items-center gap-2">
+                    <span class="w-6 h-6 rounded bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">3</span>
+                    <span>Bank Details (9 Fields)</span>
+                  </h3>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Government PFMS verified bank mandate for electronic EMD refunds and grant transfers</p>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <button 
+                    *ngIf="editingSection !== 3"
+                    (click)="startEditingSection(3)"
+                    class="px-3 py-1 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs font-bold rounded transition-colors inline-flex items-center gap-1 cursor-pointer">
+                    <span>✏️</span>
+                    <span>Edit Section</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- VIEW MODE: SECTION 3 (9 Fields) -->
+              <div *ngIf="editingSection !== 3" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-5 text-xs">
+                <div>
+                  <span class="text-slate-500 font-medium block">1. Name of the Bank <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-[#002244] block mt-0.5 text-sm">{{ bankData.bank_name }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">2. Account No. <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-sm">{{ bankData.bank_account_no }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">3. IFSC Code <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-[#002244] block mt-0.5">{{ bankData.bank_ifsc }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">4. Type of Account <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block mt-0.5">{{ bankData.bank_account_type }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">5. Mode of Electronic Transfer</span>
+                  <span class="font-medium text-slate-800 block mt-0.5">{{ bankData.bank_transfer_mode }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">6. Branch Name <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block mt-0.5">{{ bankData.bank_branch_name }}</span>
+                </div>
+
+                <div>
+                  <span class="text-slate-500 font-medium block">7. MICR Code</span>
+                  <span class="font-mono font-semibold text-slate-800 block mt-0.5">{{ bankData.bank_micr || '—' }}</span>
+                </div>
+
+                <div class="sm:col-span-2 lg:col-span-2">
+                  <span class="text-slate-500 font-medium block">8. Branch Address <span class="text-red-500">*</span></span>
+                  <span class="font-medium text-slate-900 block mt-0.5">{{ bankData.bank_branch_address }}</span>
+                </div>
+
+                <div class="sm:col-span-2 lg:col-span-3 pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div>
+                    <span class="text-slate-500 font-medium block">9. Uploaded Cancelled Cheque / Bank Passbook</span>
+                    <span class="font-mono text-slate-800 font-bold text-xs mt-0.5 flex items-center gap-1.5">
+                      <span>📎</span>
+                      <span>{{ bankData.bank_cancelled_cheque_doc }}</span>
+                      <span class="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded font-sans">✓ Uploaded</span>
+                    </span>
+                  </div>
+                  <button 
+                    (click)="downloadDoc(bankData.bank_cancelled_cheque_doc)"
+                    class="px-3 py-1.5 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] text-xs font-bold rounded border border-slate-300 transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                    <span>📥</span>
+                    <span>Download Cheque Proof</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- EDIT MODE: SECTION 3 -->
+              <div *ngIf="editingSection === 3" class="space-y-4 bg-slate-50 p-4 sm:p-5 rounded-lg border border-slate-300">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                  <span class="font-bold text-xs text-[#002244] uppercase tracking-wide">Editing: Bank Details &amp; Mandate</span>
+                  <span class="text-[11px] text-slate-500">Fields marked with <span class="text-red-500 font-bold">*</span> are mandatory</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">1. Bank Name <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="bankEdit.bank_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244] font-bold" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">2. Account Number <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="bankEdit.bank_account_no" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 font-mono font-bold focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">3. IFSC Code <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="bankEdit.bank_ifsc" maxlength="11" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 uppercase font-mono font-bold focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">4. Account Type <span class="text-red-500">*</span></label>
+                    <select [(ngModel)]="bankEdit.bank_account_type" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]">
+                      <option value="Current Account">Current Account</option>
+                      <option value="Savings Account">Savings Account</option>
+                      <option value="Cash Credit / Overdraft">Cash Credit / Overdraft</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">5. Transfer Mode</label>
+                    <input [(ngModel)]="bankEdit.bank_transfer_mode" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">6. Branch Name <span class="text-red-500">*</span></label>
+                    <input [(ngModel)]="bankEdit.bank_branch_name" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">7. MICR Code</label>
+                    <input [(ngModel)]="bankEdit.bank_micr" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 font-mono focus:outline-none focus:border-[#002244]" />
+                  </div>
+
+                  <div class="sm:col-span-2 lg:col-span-2">
+                    <label class="block font-bold text-slate-700 mb-1">8. Branch Address <span class="text-red-500">*</span></label>
+                    <textarea [(ngModel)]="bankEdit.bank_branch_address" rows="2" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 focus:outline-none focus:border-[#002244]"></textarea>
+                  </div>
+
+                  <div class="sm:col-span-2 lg:col-span-3">
+                    <label class="block font-bold text-slate-700 mb-1">9. Cancelled Cheque / Bank Passbook Document</label>
+                    <input [(ngModel)]="bankEdit.bank_cancelled_cheque_doc" class="w-full px-3 py-2 bg-white border border-slate-300 rounded text-slate-900 font-mono focus:outline-none focus:border-[#002244]" />
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
+                  <button 
+                    (click)="cancelEditing()"
+                    class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded hover:bg-slate-100 transition-colors cursor-pointer">
+                    Cancel
+                  </button>
+                  <button 
+                    (click)="saveSection(3)"
+                    class="px-5 py-2 bg-[#002244] text-white font-bold text-xs rounded hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
+                    ✓ Save Section 3 Details
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ================= 4. OFFICIAL UPLOADED DOCUMENTS CHECKLIST (12 DOCS) ================= -->
+            <div *ngIf="activeSection === 4" class="bg-white border border-slate-200 rounded-xl p-6 sm:p-7 shadow-xs space-y-5">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-200">
+                <div>
+                  <h3 class="text-sm font-bold text-[#002244] flex items-center gap-2">
+                    <span class="w-6 h-6 rounded bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">4</span>
+                    <span>Official Uploaded Documents Checklist (12 Documents per Spec)</span>
+                  </h3>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Statutory certificates, audit balance sheets, pan, GST, and affidavits</p>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <button 
+                    *ngIf="editingSection !== 4"
+                    (click)="startEditingSection(4)"
+                    class="px-3 py-1 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs font-bold rounded transition-colors inline-flex items-center gap-1 cursor-pointer">
+                    <span>✏️</span>
+                    <span>Manage / Replace Docs</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Documents Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full min-w-[720px] text-xs text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[#002244]">
+                      <th class="py-2.5 px-3 font-bold w-12 text-center">S.No.</th>
+                      <th class="py-2.5 px-3 font-bold">Document Title &amp; Category</th>
+                      <th class="py-2.5 px-3 font-bold">Uploaded File</th>
+                      <th class="py-2.5 px-3 font-bold text-center">Size</th>
+                      <th class="py-2.5 px-3 font-bold text-center">Status</th>
+                      <th class="py-2.5 px-3 font-bold text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    <tr *ngFor="let doc of officialDocs" class="hover:bg-slate-50/80 transition-colors">
+                      <td class="py-3 px-3 font-mono font-bold text-slate-500 text-center">{{ doc.s_no }}</td>
+                      <td class="py-3 px-3">
+                        <div class="font-bold text-slate-900">{{ doc.doc_title }}</div>
+                        <div class="text-[10.5px] text-slate-500 mt-0.5 font-mono">{{ doc.doc_category }}</div>
+                      </td>
+                      <td class="py-3 px-3">
+                        <div class="flex items-center gap-2">
+                          <span class="px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-bold text-[10px] border border-red-200">PDF</span>
+                          <span class="font-mono text-slate-800 font-medium truncate max-w-[180px]" [title]="doc.file_name">{{ doc.file_name }}</span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-mono mt-0.5">Uploaded: {{ doc.upload_date }}</div>
+                      </td>
+                      <td class="py-3 px-3 font-mono text-slate-600 text-center">{{ doc.file_size }}</td>
+                      <td class="py-3 px-3 text-center">
+                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                          ✓ Verified
+                        </span>
+                      </td>
+                      <td class="py-3 px-3 text-right">
+                        <div class="flex items-center justify-end gap-1.5">
+                          <button 
+                            (click)="downloadDoc(doc.file_name)"
+                            class="p-1.5 rounded hover:bg-slate-200 text-slate-600 hover:text-[#002244] transition-colors cursor-pointer"
+                            title="Download PDF">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                          </button>
+                          <button 
+                            *ngIf="editingSection === 4"
+                            (click)="replaceDocument(doc)"
+                            class="px-2 py-1 bg-[#002244] text-white font-bold text-[10px] rounded hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
+                            Replace
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div *ngIf="editingSection === 4" class="pt-3 border-t border-slate-200 flex items-center justify-between">
+                <span class="text-xs text-slate-500 font-medium">Click "Replace" on any document row to update with a new PDF (Max 5MB).</span>
+                <button 
+                  (click)="editingSection = null"
+                  class="px-4 py-1.5 bg-[#002244] text-white text-xs font-bold rounded hover:bg-[#003366] transition-colors cursor-pointer">
+                  Done Managing
+                </button>
+              </div>
+            </div>
+
           </div>
 
         </main>
@@ -681,82 +783,330 @@ import { Observable } from 'rxjs';
     </div>
   `
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
   userProfile$!: Observable<UserProfile>;
   history$!: Observable<EoiApplication[]>;
-  isEditing = false;
 
-  editData = {
-    orgName: '',
-    pan: '',
-    gstin: '',
-    address: '',
-    fullName: '',
-    designation: '',
-    email: '',
-    mobile: ''
+  activeSection: number = 1; // 1 = org, 2 = auth, 3 = bank, 4 = docs
+  editingSection: number | null = null;
+  toastMessage: string | null = null;
+
+  private routeSub!: Subscription;
+
+  // SECTION 1: Organisation / Company Basic Details (17 Fields)
+  orgData = {
+    application_no: 'ISMS-EOI-2026-9871',
+    tp_full_name: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
+    tp_short_name: 'Apex Skills',
+    registration_number: 'ISMS-REG-2026-8819',
+    organisation_contact_no: '0141-2789456',
+    company_email: 'info@apextechnical.in',
+    organisation_pan: 'AABCA1294F',
+    website: 'www.apextechnical.in',
+    registered_address: 'Unit 402, Bharat Technology Hub, Sector 18, MIDC Industrial Area',
+    state_ut: 'Rajasthan',
+    district: 'Jaipur',
+    pincode: '302022',
+    turnover_lakhs: '485.50',
+    date_of_registration: '2015-11-04',
+    state_where_registered: 'Rajasthan',
+    type_of_business: 'Skill Training Provider / Private Limited Company',
+    postal_address: 'Plot No. 45, Institutional Area, Jhalana Doongri, Jaipur - 302004'
   };
+  orgEdit = { ...this.orgData };
 
-  constructor(private eoiService: EoiStateService) {}
+  // SECTION 2: Authorized Person Details (17 Fields)
+  authData = {
+    auth_name: 'Vikramaditya Sharma',
+    auth_guardian_name: 'Late Shri Mohan Lal Sharma',
+    auth_dob: '1984-06-15',
+    auth_age: '42',
+    auth_designation: 'Managing Director & Authorized Signatory',
+    auth_mobile: '9820144520',
+    auth_email: 'v.sharma@apextechnical.in',
+    auth_state: 'Rajasthan',
+    auth_residence_address: 'B-12, Malviya Nagar, Jaipur, Rajasthan - 302017',
+    auth_pan: 'ABCPR5678K',
+    auth_aadhaar: '8921-4432-1109',
+    auth_id_proof_type: 'Aadhaar Card',
+    auth_id_number: '8921-4432-1109',
+    auth_bhamashah: 'BHAM-8849-21',
+    auth_voter_id: 'RJ/01/045/882190',
+    auth_passport_no: 'Z8849201',
+    auth_service_tax_no: '08AAACA1234C1ZP'
+  };
+  authEdit = { ...this.authData };
+
+  // SECTION 3: Bank Details (9 Fields)
+  bankData = {
+    bank_name: 'State Bank of India',
+    bank_account_no: '39480124891',
+    bank_ifsc: 'SBIN0004123',
+    bank_account_type: 'Current Account',
+    bank_transfer_mode: 'RTGS / NEFT / ECS / CBS',
+    bank_branch_name: 'Commercial Branch, M.I. Road, Jaipur',
+    bank_micr: '302002014',
+    bank_branch_address: 'Commercial Complex, Sitapura, Jaipur, Rajasthan - 302022',
+    bank_cancelled_cheque_doc: 'cancelled_cheque_sbi_current.pdf'
+  };
+  bankEdit = { ...this.bankData };
+
+  // SECTION 4: Official Uploaded Documents Checklist (12 Documents)
+  officialDocs: OfficialDocItem[] = [
+    { s_no: 1, doc_title: 'Certificate of Incorporation / Society Reg / Trust Deed', doc_category: 'Legal Constitution Proof', file_name: 'Certificate_of_Incorporation_Apex.pdf', file_size: '1.4 MB', upload_date: '12-Jan-2026', mandatory: true, status: 'Verified' },
+    { s_no: 2, doc_title: 'Permanent Account Number (PAN) Card of Entity', doc_category: 'Tax & Identification Proof', file_name: 'PAN_Card_Apex_Technical.pdf', file_size: '420 KB', upload_date: '12-Jan-2026', mandatory: true, status: 'Verified' },
+    { s_no: 3, doc_title: 'GSTIN Registration Certificate', doc_category: 'Tax & Compliance Proof', file_name: 'GST_Registration_Certificate.pdf', file_size: '680 KB', upload_date: '12-Jan-2026', mandatory: true, status: 'Verified' },
+    { s_no: 4, doc_title: 'Audited Balance Sheet & P&L (FY 2024-25)', doc_category: 'Financial Capability Proof', file_name: 'Audited_Balance_Sheet_2024_25.pdf', file_size: '2.8 MB', upload_date: '12-Jan-2026', mandatory: true, status: 'Verified' },
+    { s_no: 5, doc_title: 'Audited Balance Sheet & P&L (FY 2023-24)', doc_category: 'Financial Capability Proof', file_name: 'Audited_Balance_Sheet_2023_24.pdf', file_size: '2.5 MB', upload_date: '12-Jan-2026', mandatory: true, status: 'Verified' },
+    { s_no: 6, doc_title: 'Audited Balance Sheet & P&L (FY 2022-23)', doc_category: 'Financial Capability Proof', file_name: 'Audited_Balance_Sheet_2022_23.pdf', file_size: '2.1 MB', upload_date: '12-Jan-2026', mandatory: true, status: 'Verified' },
+    { s_no: 7, doc_title: 'CA Certified Turnover & Net Worth Certificate (UDIN)', doc_category: 'Financial Certification', file_name: 'CA_Turnover_Certificate_UDIN.pdf', file_size: '890 KB', upload_date: '12-Jan-2026', mandatory: true, status: 'Verified' },
+    { s_no: 8, doc_title: 'Authorized Signatory Aadhaar / Official ID Proof', doc_category: 'Signatory Identity Proof', file_name: 'Auth_Signatory_Aadhaar_eKYC.pdf', file_size: '510 KB', upload_date: '12-Jan-2026', mandatory: true, status: 'Verified' },
+    { s_no: 9, doc_title: 'Board Resolution / Power of Attorney for Signatory', doc_category: 'Authorization Mandate', file_name: 'Board_Resolution_Authorization.pdf', file_size: '760 KB', upload_date: '12-Jan-2026', mandatory: true, status: 'Verified' },
+    { s_no: 10, doc_title: 'Bank Cancelled Cheque / Passbook Mandate', doc_category: 'Bank Account Proof', file_name: 'cancelled_cheque_sbi_current.pdf', file_size: '920 KB', upload_date: '12-Jan-2026', mandatory: true, status: 'Verified' },
+    { s_no: 11, doc_title: 'Prior Skill Training Experience Completion Certificates', doc_category: 'Technical Experience Proof', file_name: 'Previous_Experience_Certificates.pdf', file_size: '3.4 MB', upload_date: '12-Jan-2026', mandatory: true, status: 'Verified' },
+    { s_no: 12, doc_title: 'Non-Debarment Affidavit on ₹500 Non-Judicial Stamp', doc_category: 'Statutory Affidavit', file_name: 'Non_Debarment_Affidavit_Stamp.pdf', file_size: '1.1 MB', upload_date: '12-Jan-2026', mandatory: true, status: 'Verified' }
+  ];
+
+  constructor(
+    private eoiState: EoiStateService,
+    private eoiService: EoiService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    this.userProfile$ = this.eoiService.userProfile$;
-    this.history$ = this.eoiService.history$;
+    this.userProfile$ = this.eoiState.userProfile$;
+    this.history$ = this.eoiState.history$;
 
-    const p = this.eoiService.getProfile();
-    this.populateEditData(p);
-  }
+    // Sync from state / localStorage if available
+    this.loadStateFromStorage();
 
-  switchToCitizen(): void {
-    this.eoiService.resetToNewCitizen('new_citizen_rj');
-    this.isEditing = false;
-  }
-
-  switchToRegistered(): void {
-    this.eoiService.resetToRegisteredApplicant('applicant_rj');
-    this.isEditing = false;
-  }
-
-  startEditing(p: UserProfile): void {
-    this.populateEditData(p);
-    this.isEditing = true;
-  }
-
-  private populateEditData(p: UserProfile): void {
-    this.editData = {
-      orgName: p.organization?.name || '',
-      pan: p.organization?.pan || '',
-      gstin: p.organization?.gstin || '',
-      address: p.organization?.registeredAddress || '',
-      fullName: p.personal?.fullName || '',
-      designation: p.personal?.designation || '',
-      email: p.personal?.email || '',
-      mobile: p.personal?.mobile || ''
-    };
-  }
-
-  saveProfile(): void {
-    const current = this.eoiService.getProfile();
-    this.eoiService.updateProfile({
-      personal: {
-        ...current.personal,
-        fullName: this.editData.fullName,
-        designation: this.editData.designation,
-        email: this.editData.email,
-        mobile: this.editData.mobile
-      },
-      organization: {
-        ...current.organization,
-        name: this.editData.orgName,
-        pan: this.editData.pan,
-        gstin: this.editData.gstin,
-        registeredAddress: this.editData.address
+    // Listen to query parameters to switch active section
+    this.routeSub = this.route.queryParams.subscribe(params => {
+      if (params['section']) {
+        const sec = parseInt(params['section'], 10);
+        if (!isNaN(sec) && sec >= 1 && sec <= 4) {
+          this.activeSection = sec;
+        } else {
+          this.activeSection = 1;
+        }
+      } else {
+        this.activeSection = 1; // Default to section 1
       }
     });
-    this.isEditing = false;
+  }
+
+  ngOnDestroy(): void {
+    if (this.routeSub) {
+      this.routeSub.unsubscribe();
+    }
+  }
+
+  private loadStateFromStorage(): void {
+    const profile = this.eoiState.getProfile();
+    if (profile && profile.organization) {
+      this.orgData.tp_full_name = profile.organization.name || this.orgData.tp_full_name;
+      this.orgData.organisation_pan = profile.organization.pan || this.orgData.organisation_pan;
+      this.orgData.registered_address = profile.organization.registeredAddress || this.orgData.registered_address;
+      this.orgData.state_ut = profile.organization.state || this.orgData.state_ut;
+      this.orgData.pincode = profile.organization.pincode || this.orgData.pincode;
+      this.orgData.website = profile.organization.website || this.orgData.website;
+      this.orgData.registration_number = profile.registrationNumber || this.orgData.registration_number;
+    }
+    if (profile && profile.personal) {
+      this.authData.auth_name = profile.personal.fullName || this.authData.auth_name;
+      this.authData.auth_designation = profile.personal.designation || this.authData.auth_designation;
+      this.authData.auth_email = profile.personal.email || this.authData.auth_email;
+      this.authData.auth_mobile = profile.personal.mobile || this.authData.auth_mobile;
+    }
+    if (profile && profile.bankDetails) {
+      this.bankData.bank_name = profile.bankDetails.bankName || this.bankData.bank_name;
+      this.bankData.bank_account_no = profile.bankDetails.accountNumber || this.bankData.bank_account_no;
+      this.bankData.bank_ifsc = profile.bankDetails.ifscCode || this.bankData.bank_ifsc;
+      this.bankData.bank_account_type = profile.bankDetails.accountType || this.bankData.bank_account_type;
+      this.bankData.bank_branch_name = profile.bankDetails.branchName || this.bankData.bank_branch_name;
+    }
+
+    this.orgEdit = { ...this.orgData };
+    this.authEdit = { ...this.authData };
+    this.bankEdit = { ...this.bankData };
+  }
+
+  selectSection(sec: number): void {
+    this.activeSection = sec;
+    this.editingSection = null;
+    if (sec > 0) {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { section: sec },
+        queryParamsHandling: 'merge'
+      });
+    } else {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { section: null },
+        queryParamsHandling: 'merge'
+      });
+    }
+  }
+
+  startEditingSection(sec: number): void {
+    this.activeSection = sec;
+    this.editingSection = sec;
+    if (sec === 1) this.orgEdit = { ...this.orgData };
+    if (sec === 2) this.authEdit = { ...this.authData };
+    if (sec === 3) this.bankEdit = { ...this.bankData };
+  }
+
+  cancelEditing(): void {
+    this.editingSection = null;
+  }
+
+  saveSection(sec: number): void {
+    const current = this.eoiState.getProfile();
+
+    if (sec === 1) {
+      this.orgData = { ...this.orgEdit };
+      this.eoiState.updateProfile({
+        organization: {
+          ...current.organization,
+          name: this.orgData.tp_full_name,
+          pan: this.orgData.organisation_pan,
+          registeredAddress: this.orgData.registered_address,
+          state: this.orgData.state_ut,
+          pincode: this.orgData.pincode,
+          website: this.orgData.website
+        },
+        registrationNumber: this.orgData.registration_number
+      });
+
+      // Also update EoiService if available
+      try {
+        this.eoiService.updateOrgBasicDetails({
+          tp_full_name: this.orgData.tp_full_name,
+          tp_short_name: this.orgData.tp_short_name,
+          registration_number: this.orgData.registration_number,
+          organisation_contact_no: this.orgData.organisation_contact_no,
+          company_email: this.orgData.company_email,
+          organisation_pan: this.orgData.organisation_pan,
+          website: this.orgData.website,
+          registered_address: this.orgData.registered_address,
+          state_ut: this.orgData.state_ut,
+          district: this.orgData.district,
+          pincode: this.orgData.pincode,
+          turnover_lakhs: this.orgData.turnover_lakhs,
+          date_of_registration: this.orgData.date_of_registration,
+          state_where_registered: this.orgData.state_where_registered,
+          type_of_business: this.orgData.type_of_business,
+          postal_address: this.orgData.postal_address
+        });
+      } catch {}
+
+      this.toastMessage = '✓ Organisation / Company Basic Details updated successfully.';
+    } else if (sec === 2) {
+      this.authData = { ...this.authEdit };
+      this.eoiState.updateProfile({
+        personal: {
+          ...current.personal,
+          fullName: this.authData.auth_name,
+          designation: this.authData.auth_designation,
+          email: this.authData.auth_email,
+          mobile: this.authData.auth_mobile
+        }
+      });
+
+      try {
+        this.eoiService.updateAuthPersonDetails({
+          auth_name: this.authData.auth_name,
+          auth_guardian_name: this.authData.auth_guardian_name,
+          auth_dob: this.authData.auth_dob,
+          auth_age: this.authData.auth_age,
+          auth_designation: this.authData.auth_designation,
+          auth_mobile: this.authData.auth_mobile,
+          auth_email: this.authData.auth_email,
+          auth_state: this.authData.auth_state,
+          auth_residence_address: this.authData.auth_residence_address,
+          auth_pan: this.authData.auth_pan,
+          auth_aadhaar: this.authData.auth_aadhaar,
+          auth_id_proof_type: this.authData.auth_id_proof_type,
+          auth_id_number: this.authData.auth_id_number,
+          auth_bhamashah: this.authData.auth_bhamashah,
+          auth_voter_id: this.authData.auth_voter_id,
+          auth_passport_no: this.authData.auth_passport_no,
+          auth_service_tax_no: this.authData.auth_service_tax_no
+        });
+      } catch {}
+
+      this.toastMessage = '✓ Authorized Person Details updated successfully.';
+    } else if (sec === 3) {
+      this.bankData = { ...this.bankEdit };
+      this.eoiState.updateProfile({
+        bankDetails: {
+          accountHolderName: this.orgData.tp_full_name,
+          bankName: this.bankData.bank_name,
+          branchName: this.bankData.bank_branch_name,
+          accountNumber: this.bankData.bank_account_no,
+          ifscCode: this.bankData.bank_ifsc,
+          accountType: this.bankData.bank_account_type,
+          isPfmsVerified: true
+        }
+      });
+
+      try {
+        this.eoiService.updateBankDetails({
+          bank_name: this.bankData.bank_name,
+          bank_account_no: this.bankData.bank_account_no,
+          bank_ifsc: this.bankData.bank_ifsc,
+          bank_account_type: this.bankData.bank_account_type,
+          bank_transfer_mode: this.bankData.bank_transfer_mode,
+          bank_branch_name: this.bankData.bank_branch_name,
+          bank_micr: this.bankData.bank_micr,
+          bank_branch_address: this.bankData.bank_branch_address,
+          bank_cancelled_cheque_doc: this.bankData.bank_cancelled_cheque_doc
+        });
+      } catch {}
+
+      this.toastMessage = '✓ Bank Mandate & Details updated successfully.';
+    }
+
+    this.editingSection = null;
+    setTimeout(() => {
+      if (this.toastMessage) this.toastMessage = null;
+    }, 4000);
   }
 
   downloadDoc(docName: string): void {
-    alert(`Downloading verified official document: ${docName}`);
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(`GOVERNMENT OF RAJASTHAN\nISMS 2.0 Official Document Repository\nVerified Document: ${docName}\nStamped Date: 12-Jan-2026\nStatus: MCA / Tax Portal / PFMS Stamped Validated`));
+    element.setAttribute('download', docName.endsWith('.pdf') ? docName : `${docName}.pdf`);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  }
+
+  replaceDocument(doc: OfficialDocItem): void {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pdf,application/pdf';
+    input.onchange = (e: any) => {
+      const file = e.target?.files?.[0];
+      if (file) {
+        if (!file.name.toLowerCase().endsWith('.pdf')) {
+          alert('Invalid format: Only PDF documents are accepted.');
+          return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          alert('File exceeds 5MB limit. Please upload a compressed PDF.');
+          return;
+        }
+        doc.file_name = file.name;
+        doc.file_size = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+        doc.upload_date = 'Today (Updated)';
+        this.toastMessage = `✓ ${doc.doc_title} replaced with ${file.name} successfully.`;
+        setTimeout(() => this.toastMessage = null, 4000);
+      }
+    };
+    input.click();
   }
 }

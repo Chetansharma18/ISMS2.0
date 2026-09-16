@@ -75,7 +75,7 @@
       </div>
 
       <!-- Login Button: Properly aligned inline with language switcher -->
-      <a href="https://sso.rajasthan.gov.in" target="_blank" rel="noopener noreferrer"
+      <a routerLink="/auth/login"
         class="px-5 py-2 rounded-lg bg-[#002752] hover:bg-[#003873] active:scale-95 text-white text-[13px] font-semibold tracking-wide shadow-xs transition-all inline-flex items-center gap-2 cursor-pointer"
         [title]="t().navbar.loginTitle">
         <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -111,7 +111,7 @@
       </div>
 
       <!-- Action: Raj SSO Login Button -->
-      <a href="https://sso.rajasthan.gov.in" target="_blank" rel="noopener noreferrer"
+      <a routerLink="/auth/login"
         (click)="closeMobileMenu()"
         class="w-full py-2.5 rounded-lg bg-[#002752] hover:bg-[#003873] text-white text-sm font-semibold tracking-wide shadow-xs transition flex items-center justify-center gap-2"
         [title]="t().navbar.loginTitle">

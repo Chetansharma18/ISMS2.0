@@ -37,7 +37,8 @@ import { RouterModule } from '@angular/router';
       <!-- Navigation Links Container -->
       <nav class="flex-1 overflow-y-auto px-2.5 py-3 space-y-1 text-xs font-medium min-h-0">
         
-        <!-- DASHBOARD -->
+        <!-- DASHBOARD (Commented out per request) -->
+        <!--
         <a 
           routerLink="/admin/dashboard" 
           routerLinkActive="bg-[#002244]/10 text-[#002244] font-bold border-l-[3.5px] border-[#002244]"
@@ -47,6 +48,7 @@ import { RouterModule } from '@angular/router';
           <span class="material-symbols-outlined text-[20px] text-slate-500 group-hover:text-[#002244] transition-colors">dashboard</span>
           <span>DASHBOARD</span>
         </a>
+        -->
 
         <!-- MASTERS (Collapsible Accordion) -->
         <div>
@@ -104,6 +106,7 @@ import { RouterModule } from '@angular/router';
 
           <div *ngIf="eoiOpen()" class="pl-7 pr-1 py-1 space-y-0.5 border-l-2 border-slate-200 ml-5 my-1 text-[11px]">
             <a routerLink="/admin/eoi" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" [routerLinkActiveOptions]="{ exact: true }" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">All EOI</a>
+            <!--
             <a routerLink="/admin/eoi/create" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">+ Create EOI</a>
             <a routerLink="/admin/masters/eoi-categories" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Categories</a>
             <a routerLink="/admin/eoi/EOI-2025-001/form-builder" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Form Builder</a>
@@ -114,6 +117,7 @@ import { RouterModule } from '@angular/router';
             <a routerLink="/admin/eoi/EOI-2025-001/amendments" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Corrigendum &amp; Amendments</a>
             <a routerLink="/admin/eoi/EOI-2025-001/reschedule" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Reschedule EOI</a>
             <a routerLink="/admin/eoi/EOI-2025-001/history" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI History &amp; Versions</a>
+            -->
           </div>
         </div>
 

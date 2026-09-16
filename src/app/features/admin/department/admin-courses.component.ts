@@ -45,7 +45,7 @@ import { map } from 'rxjs/operators';
                   <div class="text-[10px] text-slate-500 uppercase">{{ p.durationHrs }} Hrs</div>
                 </td>
                 <td class="p-4 text-center">
-                  <button class="px-2 py-1 bg-slate-100 border border-slate-300 text-slate-600 rounded text-[10px] font-bold hover:bg-slate-200" [title]="p.infrastructure">
+                  <button (click)="viewInfra(p.infrastructure)" class="px-2 py-1 bg-slate-100 border border-slate-300 text-slate-600 rounded text-[10px] font-bold hover:bg-slate-200">
                     View Requirements
                   </button>
                 </td>
@@ -68,11 +68,33 @@ import { map } from 'rxjs/operators';
           </table>
         </div>
       </div>
+
+      <!-- Infrastructure Modal -->
+      <div *ngIf="selectedInfra !== null" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+          <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+            <h3 class="font-bold text-[#131A4D] text-lg">Infrastructure Requirements</h3>
+            <button (click)="closeInfra()" class="text-slate-400 hover:text-slate-600">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+            </button>
+          </div>
+          <div class="p-6">
+            <p class="text-slate-600 text-sm whitespace-pre-wrap">{{ selectedInfra }}</p>
+          </div>
+          <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+            <button (click)="closeInfra()" class="px-4 py-2 bg-[#131A4D] text-white rounded font-bold text-sm hover:bg-[#002855] transition-colors shadow-sm">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   `
 })
 export class AdminCoursesComponent implements OnInit {
   pendingProposals$!: Observable<CourseProposal[]>;
+  selectedInfra: string | null = null;
 
   constructor(private courseService: CourseProposalService) {}
 
@@ -91,5 +113,13 @@ export class AdminCoursesComponent implements OnInit {
     if (reason !== null) {
       this.courseService.updateStatus(id, 'REJECTED', reason);
     }
+  }
+
+  viewInfra(infra: string) {
+    this.selectedInfra = infra || 'No specific infrastructure requirements provided.';
+  }
+
+  closeInfra() {
+    this.selectedInfra = null;
   }
 }

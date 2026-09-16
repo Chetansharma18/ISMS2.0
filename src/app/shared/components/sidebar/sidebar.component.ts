@@ -267,8 +267,47 @@ import { Observable, filter } from 'rxjs';
           </a>
         </ng-container>
 
-        <!-- ================= ISMS 2.0 WORKFLOW MENUS ================= -->
-        <ng-container *ngIf="authService.hasRole(['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'TP_PIA'])">
+        <!-- ================= DEPARTMENT WORKFLOW MENUS ================= -->
+        <ng-container *ngIf="authService.hasRole(['SUPER_ADMIN', 'DEPARTMENT_ADMIN'])">
+          <div class="pt-2 mt-2 border-t border-slate-200">
+             <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+               Dept Workflow (ISMS 2.0)
+             </div>
+             
+             <!-- Tender Management -->
+             <a 
+               routerLink="/department/tenders" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                   <polyline points="14 2 14 8 20 8"></polyline>
+                   <line x1="16" y1="13" x2="8" y2="13"></line>
+                   <line x1="16" y1="17" x2="8" y2="17"></line>
+                   <polyline points="10 9 9 9 8 9"></polyline>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Tender Management</span>
+             </a>
+
+             <!-- Sanction Orders -->
+             <a 
+               routerLink="/department/sanction-orders" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Sanction Orders</span>
+             </a>
+          </div>
+        </ng-container>
+
+        <!-- ================= TP / EXECUTION MENUS ================= -->
+        <ng-container *ngIf="authService.hasRole(['TP_PIA'])">
           <div class="pt-2 mt-2 border-t border-slate-200">
              <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                Execution (ISMS 2.0)
@@ -305,6 +344,46 @@ import { Observable, filter } from 'rxjs';
              </a>
           </div>
         </ng-container>
+
+        <!-- ================= AUDITOR MENUS ================= -->
+        <ng-container *ngIf="authService.hasRole(['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'])">
+          <div class="pt-2 mt-2 border-t border-slate-200">
+             <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+               Auditor Workflow
+             </div>
+             
+             <!-- Assigned TPs -->
+             <a 
+               routerLink="/auditor/tps" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                   <circle cx="9" cy="7" r="4"></circle>
+                   <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                   <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Assigned TPs</span>
+             </a>
+             
+             <!-- Dashboard / Overviews -->
+             <a 
+               routerLink="/auditor/dashboard" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                   <path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"/>
+                 </svg>
+               </div>
+               <span class="tracking-tight">My Inspections</span>
+             </a>
+          </div>
+        </ng-container>
+
       </nav>
     </aside>
   `

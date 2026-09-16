@@ -96,6 +96,50 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
               <label class="block text-sm font-semibold text-slate-700 mb-1">Full Address <span class="text-red-500">*</span></label>
               <textarea formControlName="address" rows="2" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy"></textarea>
             </div>
+
+            <!-- GEOLOCATION SECTION -->
+            <div class="md:col-span-3 mt-4 pt-4 border-t border-slate-200">
+              <h3 class="font-bold text-rsldc-navy mb-3">Center Geo-Location <span class="text-red-500">*</span></h3>
+              <p class="text-xs text-slate-500 mb-4">Mandatory for Auditor Verification. Drag the map marker or enter coordinates manually.</p>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Inputs -->
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Latitude (-90 to +90)</label>
+                    <input formControlName="latitude" type="number" step="0.000001" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy bg-slate-50" placeholder="e.g. 26.9124">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Longitude (-180 to +180)</label>
+                    <input formControlName="longitude" type="number" step="0.000001" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy bg-slate-50" placeholder="e.g. 75.7873">
+                  </div>
+                  <div class="flex gap-2">
+                    <button type="button" (click)="useCurrentLocation()" class="flex-1 py-2 bg-blue-100 text-blue-800 font-bold text-xs rounded shadow-xs hover:bg-blue-200 transition-colors flex items-center justify-center gap-1">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                      Use My Location
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Map Mock -->
+                <div class="bg-slate-200 rounded-lg overflow-hidden border border-slate-300 relative min-h-[200px] flex items-center justify-center">
+                  <!-- Fake Map Background -->
+                  <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 20px 20px;"></div>
+                  
+                  <div class="relative flex flex-col items-center">
+                    <svg class="w-8 h-8 text-red-600 drop-shadow-md -mt-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+                    <span class="bg-white px-2 py-1 rounded shadow-md text-[10px] font-bold mt-2">
+                      Lat: {{ sdcForm.value.latitude || 'Not set' }}<br>
+                      Lng: {{ sdcForm.value.longitude || 'Not set' }}
+                    </span>
+                  </div>
+                  
+                  <div class="absolute bottom-2 right-2 bg-white/80 px-2 py-1 text-[9px] font-bold text-slate-600 rounded">
+                    Map Preview
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -196,8 +240,17 @@ export class SdcFormComponent {
     district: ['', Validators.required],
     capacity: ['', Validators.required],
     address: ['', Validators.required],
+    latitude: ['', [Validators.required, Validators.min(-90), Validators.max(90)]],
+    longitude: ['', [Validators.required, Validators.min(-180), Validators.max(180)]],
     courseId: ['', Validators.required]
   });
+
+  useCurrentLocation() {
+    this.sdcForm.patchValue({
+      latitude: 26.9124,
+      longitude: 75.7873
+    });
+  }
 
   nextStep() {
     if (this.currentStep < 4) this.currentStep++;

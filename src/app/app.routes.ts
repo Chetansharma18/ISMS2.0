@@ -175,10 +175,51 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
+      
+      // ================= DEPARTMENT MODULE =================
+      {
+        path: 'department/tenders',
+        loadComponent: () => import('./features/department/tender-management/tender-list.component').then(m => m.TenderListComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
+      },
+      {
+        path: 'department/sanction-orders',
+        loadComponent: () => import('./features/department/sanction-orders/sanction-order-list.component').then(m => m.SanctionOrderListComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
+      },
+      {
+        path: 'department/sanction-orders/create',
+        loadComponent: () => import('./features/department/sanction-orders/sanction-order-create.component').then(m => m.SanctionOrderCreateComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
+      },
+      
+      // ================= AUDITOR MODULE =================
+      {
+        path: 'auditor/dashboard',
+        loadComponent: () => import('./features/auditor/auditor-dashboard.component').then(m => m.AuditorDashboardComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'] }
+      },
+      {
+        path: 'auditor/tps',
+        loadComponent: () => import('./features/auditor/auditor-tp-list.component').then(m => m.AuditorTpListComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'] }
+      },
+      {
+        path: 'auditor/tps/:id',
+        loadComponent: () => import('./features/auditor/auditor-tp-detail.component').then(m => m.AuditorTpDetailComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'] }
+      },
+      {
+        path: 'auditor/inspection/:id',
+        loadComponent: () => import('./features/auditor/inspection.component').then(m => m.InspectionComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'] }
+      },
+
+      // ================= SDC MODULE =================
       {
         path: 'sdcs',
         loadComponent: () => import('./features/sdc/pages/sdc-list/sdc-list.component').then(m => m.SdcListComponent),
-        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'TP_PIA'] }
+        data: { roles: ['TP_PIA'] }
       },
       {
         path: 'sdcs/create',
@@ -188,12 +229,12 @@ export const routes: Routes = [
       {
         path: 'sdcs/:id',
         loadComponent: () => import('./features/sdc/pages/sdc-detail/sdc-detail.component').then(m => m.SdcDetailComponent),
-        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'TP_PIA', 'INSPECTOR', 'APPROVAL_AUTHORITY'] }
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'TP_PIA', 'INSPECTOR', 'APPROVAL_AUTHORITY', 'AUDITOR'] }
       },
       {
         path: 'batches',
         loadComponent: () => import('./features/batches/pages/batch-list/batch-list.component').then(m => m.BatchListComponent),
-        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'TP_PIA'] }
+        data: { roles: ['TP_PIA'] }
       },
       {
         path: 'batches/create',

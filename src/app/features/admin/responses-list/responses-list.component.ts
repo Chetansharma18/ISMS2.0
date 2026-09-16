@@ -61,26 +61,20 @@ import { Observable } from 'rxjs';
               <div class="flex items-center gap-1.5 text-xs">
                 <button 
                   (click)="activeFilter = 'ALL'"
-                  [class.bg-white]="activeFilter === 'ALL'"
-                  [class.text-[#131A4D]]="activeFilter === 'ALL'"
-                  [class.font-bold]="activeFilter === 'ALL'"
-                  class="px-2.5 py-1 text-blue-100 hover:bg-white/10 rounded-xs transition-colors">
+                  [ngClass]="activeFilter === 'ALL' ? 'border-white text-white font-bold' : 'border-transparent text-blue-100'"
+                  class="px-3 py-1 border rounded-md hover:bg-white/10 transition-colors">
                   All ({{ responses.length }})
                 </button>
                 <button 
                   (click)="activeFilter = 'UNDER_SCRUTINY'"
-                  [class.bg-white]="activeFilter === 'UNDER_SCRUTINY'"
-                  [class.text-[#131A4D]]="activeFilter === 'UNDER_SCRUTINY'"
-                  [class.font-bold]="activeFilter === 'UNDER_SCRUTINY'"
-                  class="px-2.5 py-1 text-blue-100 hover:bg-white/10 rounded-xs transition-colors">
+                  [ngClass]="activeFilter === 'UNDER_SCRUTINY' ? 'border-white text-white font-bold' : 'border-transparent text-blue-100'"
+                  class="px-3 py-1 border rounded-md hover:bg-white/10 transition-colors">
                   Pending Review (1)
                 </button>
                 <button 
                   (click)="activeFilter = 'APPROVED'"
-                  [class.bg-white]="activeFilter === 'APPROVED'"
-                  [class.text-[#131A4D]]="activeFilter === 'APPROVED'"
-                  [class.font-bold]="activeFilter === 'APPROVED'"
-                  class="px-2.5 py-1 text-blue-100 hover:bg-white/10 rounded-xs transition-colors">
+                  [ngClass]="activeFilter === 'APPROVED' ? 'border-white text-white font-bold' : 'border-transparent text-blue-100'"
+                  class="px-3 py-1 border rounded-md hover:bg-white/10 transition-colors">
                   Approved (2)
                 </button>
               </div>

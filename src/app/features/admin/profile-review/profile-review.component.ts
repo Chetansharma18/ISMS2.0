@@ -41,11 +41,8 @@ import { Observable } from 'rxjs';
 
           </div>
 
-          <!-- Two-Column Layout: Left (8 Cols Applicant Profile Recap) | Right (4 Cols Admin Scrutiny Panel) -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            <!-- Left 8 Cols: Full Read-Only Recap of Applicant's EOI Form + Profile -->
-            <div class="lg:col-span-8 space-y-6">
+          <!-- Step 1: Full Read-Only Recap of Applicant's EOI Form + Profile -->
+          <div *ngIf="!showActionPanel" class="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-300">
               
               <!-- 1. Scheme & EOI Submission Details Box -->
               <div class="bg-white border border-slate-300 shadow-sm overflow-hidden">
@@ -222,10 +219,24 @@ import { Observable } from 'rxjs';
               </div>
 
 
+
+
+            <!-- Bottom Next Button for Step 1 -->
+            <div class="mt-8 flex justify-end">
+              <button (click)="showActionPanel = true" class="px-5 py-2.5 bg-[#131A4D] hover:bg-[#004d73] text-white font-bold text-sm rounded shadow-sm transition-colors flex items-center gap-2">
+                Next <span>→</span>
+              </button>
             </div>
 
-            <!-- Right 4 Cols: Department Admin Scrutiny Action Panel -->
-            <div class="lg:col-span-4 sticky top-20 space-y-6">
+          </div> <!-- End Step 1 -->
+
+          <!-- Step 2: Department Admin Scrutiny Action Panel -->
+          <div *ngIf="showActionPanel" class="max-w-2xl mx-auto animate-in fade-in duration-300">
+            
+            <!-- Back Button -->
+            <button (click)="showActionPanel = false" class="mb-4 text-slate-500 hover:text-[#131A4D] font-bold text-sm flex items-center gap-1.5 transition-colors">
+              <span>←</span> Back to Details
+            </button>
               
               <div class="bg-white border-2 border-[#131A4D] shadow-md">
                 
@@ -329,16 +340,6 @@ import { Observable } from 'rxjs';
               </div>
 
             </div>
-
-          </div>
-
-          <!-- Bottom Next Button -->
-          <div class="mt-6 flex justify-end">
-            <button class="px-5 py-2.5 bg-[#131A4D] hover:bg-[#004d73] text-white font-bold text-sm rounded shadow-sm transition-colors flex items-center gap-2">
-              Next <span>→</span>
-            </button>
-          </div>
-
         </main>
       </div>
 
@@ -418,6 +419,7 @@ export class ProfileReviewComponent implements OnInit {
   pendingAction: 'APPROVED' | 'REJECTED' | null = null;
   decisionTaken = false;
   isDocumentAttached = false;
+  showActionPanel = false;
 
   constructor(
     private fb: FormBuilder,

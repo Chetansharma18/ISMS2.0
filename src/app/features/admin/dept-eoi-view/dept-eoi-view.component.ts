@@ -127,8 +127,6 @@ import { Observable } from 'rxjs';
               </table>
             </div>
 
-
-
           </div>
 
         </main>

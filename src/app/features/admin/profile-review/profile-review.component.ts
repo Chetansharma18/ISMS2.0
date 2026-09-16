@@ -332,6 +332,13 @@ import { Observable } from 'rxjs';
 
           </div>
 
+          <!-- Bottom Next Button -->
+          <div class="mt-6 flex justify-end">
+            <button class="px-5 py-2.5 bg-[#131A4D] hover:bg-[#004d73] text-white font-bold text-sm rounded shadow-sm transition-colors flex items-center gap-2">
+              Next <span>→</span>
+            </button>
+          </div>
+
         </main>
       </div>
 

@@ -238,20 +238,20 @@ import { Observable } from 'rxjs';
               <span>←</span> Back to Details
             </button>
               
-              <div class="bg-white border-2 border-[#131A4D] shadow-md">
+              <div class="mt-2">
                 
                 <!-- Panel Header -->
-                <div class="bg-[#131A4D] text-white px-5 py-3">
-                  <h3 class="text-sm font-bold tracking-wide">
+                <div class="mb-5 pb-3 border-b border-slate-200">
+                  <h3 class="text-lg font-bold text-[#131A4D] tracking-tight">
                     Scrutiny Officer Action Panel
                   </h3>
-                  <div class="text-[10px] text-blue-200 font-mono">
+                  <div class="text-xs text-slate-500 mt-1">
                     Evaluation & Empanelment Decision
                   </div>
                 </div>
 
                 <!-- Action Form -->
-                <form [formGroup]="reviewForm" class="p-5 space-y-4 text-xs">
+                <form [formGroup]="reviewForm" class="space-y-4 text-sm">
                   
                   <div class="grid grid-cols-3 gap-4">
                     <!-- 1. Proposed Proposal PDF -->
@@ -259,12 +259,12 @@ import { Observable } from 'rxjs';
                       <label class="block font-bold text-[#131A4D]">
                         Proposed Proposal PDF
                       </label>
-                      <div class="h-10 px-3 border border-slate-200 bg-slate-50 flex items-center justify-between rounded">
+                      <div class="h-11 px-3 border border-slate-200 bg-slate-50 flex items-center justify-between rounded">
                         <div class="flex items-center gap-2 overflow-hidden">
                           <span class="text-base leading-none">📄</span>
                           <span class="font-bold text-slate-900 truncate">Bidder Proposal.pdf</span>
                         </div>
-                        <button type="button" class="text-xs text-[#131A4D] font-bold hover:underline shrink-0 ml-2">View</button>
+                        <button type="button" class="text-sm text-[#131A4D] font-bold hover:underline shrink-0 ml-2">View</button>
                       </div>
                     </div>
 
@@ -274,7 +274,7 @@ import { Observable } from 'rxjs';
                         Grade (A-E) <span class="text-red-600">*</span>
                       </label>
                       <div class="relative">
-                        <button type="button" (click)="showGradeDropdown = !showGradeDropdown" class="w-full h-10 px-3 border border-slate-300 bg-white focus:outline-none focus:border-[#131A4D] font-bold text-slate-800 rounded flex justify-between items-center text-xs">
+                        <button type="button" (click)="showGradeDropdown = !showGradeDropdown" class="w-full h-11 px-3 border border-slate-300 bg-white focus:outline-none focus:border-[#131A4D] font-bold text-slate-800 rounded flex justify-between items-center text-sm">
                           <span *ngIf="reviewForm.get('grade')?.value">Grade {{ reviewForm.get('grade')?.value }}</span>
                           <span *ngIf="!reviewForm.get('grade')?.value" class="text-slate-400 font-normal">Select Grade</span>
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="m6 9 6 6 6-6"/></svg>
@@ -282,11 +282,11 @@ import { Observable } from 'rxjs';
                         
                         <!-- Custom Dropdown Menu -->
                         <div *ngIf="showGradeDropdown" class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded shadow-lg z-50 py-1">
-                          <button type="button" (click)="selectGrade('A')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-xs">Grade A</button>
-                          <button type="button" (click)="selectGrade('B')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-xs">Grade B</button>
-                          <button type="button" (click)="selectGrade('C')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-xs">Grade C</button>
-                          <button type="button" (click)="selectGrade('D')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-xs">Grade D</button>
-                          <button type="button" (click)="selectGrade('E')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-xs">Grade E</button>
+                          <button type="button" (click)="selectGrade('A')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-sm">Grade A</button>
+                          <button type="button" (click)="selectGrade('B')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-sm">Grade B</button>
+                          <button type="button" (click)="selectGrade('C')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-sm">Grade C</button>
+                          <button type="button" (click)="selectGrade('D')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-sm">Grade D</button>
+                          <button type="button" (click)="selectGrade('E')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-sm">Grade E</button>
                         </div>
                       </div>
                     </div>
@@ -301,7 +301,7 @@ import { Observable } from 'rxjs';
                         formControlName="technicalScore"
                         placeholder="e.g. 85"
                         (input)="enforceNumericInput($event)"
-                        class="w-full h-10 px-3 border border-slate-300 bg-white focus:border-[#131A4D] font-bold text-slate-800 rounded">
+                        class="w-full h-11 px-3 border border-slate-300 bg-white focus:border-[#131A4D] font-bold text-slate-800 rounded">
                     </div>
                   </div>
 
@@ -320,7 +320,7 @@ import { Observable } from 'rxjs';
                           type="button" 
                           [disabled]="!reviewForm.get('grade')?.value || !reviewForm.get('technicalScore')?.value"
                           (click)="pendingAction = 'APPROVED'"
-                          class="w-full py-2.5 rounded-full bg-[#166534] hover:bg-[#14532d] text-white font-bold text-xs tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
+                          class="w-full py-3 rounded-full bg-[#166534] hover:bg-[#14532d] text-white font-bold text-sm tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
                           <span>✓ Accept Bidder</span>
                         </button>
 
@@ -329,7 +329,7 @@ import { Observable } from 'rxjs';
                           type="button" 
                           [disabled]="!reviewForm.get('grade')?.value || !reviewForm.get('technicalScore')?.value"
                           (click)="pendingAction = 'REJECTED'"
-                          class="w-full py-2.5 rounded-full bg-[#991b1b] hover:bg-[#7f1d1d] text-white font-bold text-xs tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
+                          class="w-full py-3 rounded-full bg-[#991b1b] hover:bg-[#7f1d1d] text-white font-bold text-sm tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
                           <span>✕ Reject Bidder</span>
                         </button>
                       </div>

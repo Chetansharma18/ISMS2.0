@@ -14,7 +14,7 @@ export type FontSize = 'sm' | 'md' | 'lg';
   template: `
     <!-- Top Government Authenticated Portal Header (Dual Logos, Bilingual, User Name & Profile) -->
     <header class="w-full bg-[#f0f6fc] border-b border-slate-200/90 shadow-2xs font-['Poppins',sans-serif] sticky top-0 z-40 select-none">
-      <div class="max-w-[1400px] mx-auto px-2.5 sm:px-6 lg:px-8 py-2 sm:py-2.5 lg:py-3 flex items-center justify-between gap-2 sm:gap-4">
+      <div class="w-full px-3 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3 flex items-center justify-between gap-2 sm:gap-4">
         
         <!-- Left Branding: Two Emblems (Ashoka + RSLDC) + Government Titles + ISMS 2.0 -->
         <div class="flex items-center gap-1.5 sm:gap-3.5 lg:gap-4 min-w-0 cursor-pointer" routerLink="/">

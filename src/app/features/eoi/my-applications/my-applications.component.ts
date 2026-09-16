@@ -9,7 +9,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
 import { PdfGeneratorService } from '../application-wizard/services/pdf-generator.service';
 import { Observable } from 'rxjs';
 
-type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
+type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
 
 @Component({
   selector: 'app-my-applications',
@@ -31,11 +31,11 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
     <div class="min-h-screen flex flex-col bg-[#f8fafc] font-sans text-slate-800 antialiased font-['Poppins',sans-serif]">
       <app-header></app-header>
 
-      <div class="flex flex-grow">
+      <div class="flex flex-grow w-full">
         <!-- Persistent Portal Sidebar -->
-        <app-sidebar class="hidden md:block"></app-sidebar>
+        <app-sidebar class="hidden md:block flex-shrink-0"></app-sidebar>
 
-        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto space-y-4">
+        <main class="flex-1 min-w-0 w-full px-3 sm:px-5 py-4 overflow-y-auto space-y-3">
 
           <!-- Page Heading: Tender Status -->
           <div class="bg-white border border-slate-200 shadow-xs p-4 sm:p-5 rounded-xs">
@@ -479,6 +479,7 @@ export class MyApplicationsComponent implements OnInit {
     { key: 'ALL',      label: 'All' },
     { key: 'PENDING',  label: 'Pending' },
     { key: 'ACCEPTED', label: 'Accepted' },
+    { key: 'AOC',      label: 'AOC' },
     { key: 'REJECTED', label: 'Rejected' },
   ];
 
@@ -491,8 +492,11 @@ export class MyApplicationsComponent implements OnInit {
     this.history$ = this.eoiService.history$;
   }
 
-  getMappedStatus(status: string): 'PENDING' | 'ACCEPTED' | 'REJECTED' {
+  getMappedStatus(status: string): 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED' {
     const s = (status || '').toUpperCase().replace(/[\s-]/g, '_');
+    if (s === 'AOC' || s === 'AWARD_OF_CONTRACT') {
+      return 'AOC';
+    }
     if (s === 'UNDER_SCRUTINY' || s === 'UNDER_PROCESS' || s === 'PENDING' || s === 'DRAFT' || s === 'SUBMITTED') {
       return 'PENDING';
     }

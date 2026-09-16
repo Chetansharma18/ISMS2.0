@@ -43,11 +43,11 @@ export interface OfficialDocItem {
       <!-- Portal Post-Login Header with Dual Emblems & User Profile Information -->
       <app-header></app-header>
 
-      <div class="flex flex-grow">
+      <div class="flex flex-grow w-full">
         <!-- Persistent Portal Sidebar -->
-        <app-sidebar class="hidden md:block"></app-sidebar>
+        <app-sidebar class="hidden md:block flex-shrink-0"></app-sidebar>
 
-        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 w-full overflow-y-auto">
+        <main class="flex-1 min-w-0 w-full px-3 sm:px-5 py-4 overflow-y-auto">
           
           <!-- Top Title & Action Bar -->
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 mb-6">

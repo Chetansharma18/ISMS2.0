@@ -314,13 +314,13 @@ import { Observable } from 'rxjs';
                   <div class="pt-3 space-y-2">
                     
                     <ng-container *ngIf="selectedApplicant?.scrutinyStatus === 'UNDER_SCRUTINY'; else decisionBadge">
-                      <div class="grid grid-cols-2 gap-4" *ngIf="!pendingAction">
+                      <div class="flex justify-center gap-4" *ngIf="!pendingAction">
                         <!-- Accept Button -->
                         <button 
                           type="button" 
                           [disabled]="!reviewForm.get('grade')?.value || !reviewForm.get('technicalScore')?.value"
                           (click)="pendingAction = 'APPROVED'"
-                          class="w-full py-3 rounded-full bg-[#166534] hover:bg-[#14532d] text-white font-bold text-sm tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
+                          class="w-64 py-3 rounded-full bg-[#166534] hover:bg-[#14532d] text-white font-bold text-sm tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
                           <span>✓ Accept Bidder</span>
                         </button>
 
@@ -329,7 +329,7 @@ import { Observable } from 'rxjs';
                           type="button" 
                           [disabled]="!reviewForm.get('grade')?.value || !reviewForm.get('technicalScore')?.value"
                           (click)="pendingAction = 'REJECTED'"
-                          class="w-full py-3 rounded-full bg-[#991b1b] hover:bg-[#7f1d1d] text-white font-bold text-sm tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
+                          class="w-64 py-3 rounded-full bg-[#991b1b] hover:bg-[#7f1d1d] text-white font-bold text-sm tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
                           <span>✕ Reject Bidder</span>
                         </button>
                       </div>

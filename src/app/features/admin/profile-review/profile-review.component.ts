@@ -269,20 +269,26 @@ import { Observable } from 'rxjs';
                     </div>
 
                     <!-- 2. Grading Dropdown -->
-                    <div class="space-y-1">
+                    <div class="space-y-1 relative">
                       <label class="block font-bold text-[#131A4D]">
                         Grade (A-E) <span class="text-red-600">*</span>
                       </label>
-                      <select 
-                        formControlName="grade"
-                        class="w-full h-10 px-3 border border-slate-300 bg-white focus:border-[#131A4D] font-bold text-slate-800 rounded">
-                        <option value="" disabled selected>Select Grade</option>
-                        <option value="A">Grade A</option>
-                        <option value="B">Grade B</option>
-                        <option value="C">Grade C</option>
-                        <option value="D">Grade D</option>
-                        <option value="E">Grade E</option>
-                      </select>
+                      <div class="relative">
+                        <button type="button" (click)="showGradeDropdown = !showGradeDropdown" class="w-full h-10 px-3 border border-slate-300 bg-white focus:outline-none focus:border-[#131A4D] font-bold text-slate-800 rounded flex justify-between items-center text-xs">
+                          <span *ngIf="reviewForm.get('grade')?.value">Grade {{ reviewForm.get('grade')?.value }}</span>
+                          <span *ngIf="!reviewForm.get('grade')?.value" class="text-slate-400 font-normal">Select Grade</span>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                        
+                        <!-- Custom Dropdown Menu -->
+                        <div *ngIf="showGradeDropdown" class="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded shadow-lg z-50 py-1">
+                          <button type="button" (click)="selectGrade('A')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-xs">Grade A</button>
+                          <button type="button" (click)="selectGrade('B')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-xs">Grade B</button>
+                          <button type="button" (click)="selectGrade('C')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-xs">Grade C</button>
+                          <button type="button" (click)="selectGrade('D')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-xs">Grade D</button>
+                          <button type="button" (click)="selectGrade('E')" class="w-full text-left px-3 py-2 hover:bg-slate-50 font-bold text-slate-800 text-xs">Grade E</button>
+                        </div>
+                      </div>
                     </div>
 
                     <!-- 3. Technical Score -->
@@ -345,47 +351,48 @@ import { Observable } from 'rxjs';
                           </p>
                         </div>
 
-                        <!-- Upload Document -->
-                        <div class="space-y-1">
-                          <label class="block font-bold text-[#131A4D] text-xs">
-                            {{ pendingAction === 'APPROVED' ? 'Mandatory Approval Document' : 'Mandatory Rejection Document' }} <span class="text-red-600">*</span>
-                          </label>
-                          <input type="file" #fileInput (change)="onFileSelected($event)" accept="application/pdf" class="hidden">
-                          
-                          <div *ngIf="!isDocumentAttached"
-                            (click)="fileInput.click()"
-                            class="border border-slate-300 border-dashed bg-slate-50 hover:bg-slate-100 text-[#131A4D] p-3 text-center transition-colors cursor-pointer rounded">
-                            <span class="text-xs font-semibold">
-                              📎 Attach Document
-                            </span>
+                        <div class="grid grid-cols-2 gap-4">
+                          <!-- Upload Document -->
+                          <div class="space-y-1 h-full flex flex-col">
+                            <label class="block font-bold text-[#131A4D] text-xs">
+                              {{ pendingAction === 'APPROVED' ? 'Mandatory Approval Document' : 'Mandatory Rejection Document' }} <span class="text-red-600">*</span>
+                            </label>
+                            <input type="file" #fileInput (change)="onFileSelected($event)" accept="application/pdf" class="hidden">
+                            
+                            <div *ngIf="!isDocumentAttached"
+                              (click)="fileInput.click()"
+                              class="border border-slate-300 border-dashed bg-slate-50 hover:bg-slate-100 text-[#131A4D] p-3 text-center transition-colors cursor-pointer rounded flex-1 flex flex-col justify-center min-h-[82px]">
+                              <span class="text-xs font-semibold">
+                                📎 Attach Document
+                              </span>
+                            </div>
+
+                            <div *ngIf="isDocumentAttached"
+                              class="flex items-center justify-between border border-emerald-500 bg-emerald-50 text-emerald-700 p-3 rounded flex-1 min-h-[82px]">
+                              <div class="flex items-center gap-2 overflow-hidden">
+                                <span class="text-xs font-semibold truncate">✓ {{ attachedFileName }}</span>
+                              </div>
+                              <div class="flex gap-4 shrink-0">
+                                <button type="button" (click)="viewAttachedDocument()" class="text-xs font-bold hover:underline text-emerald-800 focus:outline-none">
+                                  View
+                                </button>
+                                <button type="button" (click)="removeAttachedDocument()" class="text-xs font-bold hover:underline text-red-600 focus:outline-none">
+                                  Remove
+                                </button>
+                              </div>
+                            </div>
                           </div>
 
-                          <div *ngIf="isDocumentAttached"
-                            class="flex items-center justify-between border border-emerald-500 bg-emerald-50 text-emerald-700 p-3 rounded">
-                            <div class="flex items-center gap-2 overflow-hidden">
-                              <span class="text-xs font-semibold truncate">✓ {{ attachedFileName }}</span>
-                            </div>
-                            <div class="flex gap-4 shrink-0">
-                              <button type="button" (click)="viewAttachedDocument()" class="text-xs font-bold hover:underline text-emerald-800 focus:outline-none">
-                                View
-                              </button>
-                              <button type="button" (click)="removeAttachedDocument()" class="text-xs font-bold hover:underline text-red-600 focus:outline-none">
-                                Remove
-                              </button>
-                            </div>
+                          <!-- Remarks -->
+                          <div class="space-y-1">
+                            <label class="block font-bold text-[#131A4D] text-xs">
+                              Remarks (Max 500 words) <span class="text-red-600">*</span>
+                            </label>
+                            <textarea 
+                              formControlName="remarks"
+                              placeholder="Enter your confirmation remarks here..."
+                              class="w-full h-[82px] px-3 py-2 border border-slate-300 bg-white focus:border-[#131A4D] text-xs text-slate-900 rounded resize-none"></textarea>
                           </div>
-                        </div>
-
-                        <!-- Remarks -->
-                        <div class="space-y-1">
-                          <label class="block font-bold text-[#131A4D] text-xs">
-                            Remarks (Max 500 words) <span class="text-red-600">*</span>
-                          </label>
-                          <textarea 
-                            formControlName="remarks"
-                            rows="4" 
-                            placeholder="Enter your confirmation remarks here..."
-                            class="w-full px-3 py-2 border border-slate-300 bg-white focus:border-[#131A4D] text-xs text-slate-900 rounded"></textarea>
                         </div>
 
                         <div class="flex items-center justify-end gap-3 pt-2">
@@ -440,6 +447,7 @@ export class ProfileReviewComponent implements OnInit {
   attachedFile: File | null = null;
   attachedFileName: string = '';
   showActionPanel = false;
+  showGradeDropdown = false;
 
   constructor(
     private fb: FormBuilder,
@@ -505,6 +513,11 @@ export class ProfileReviewComponent implements OnInit {
     
     input.value = value;
     this.reviewForm.get('technicalScore')?.setValue(value, { emitEvent: false });
+  }
+
+  selectGrade(grade: string): void {
+    this.reviewForm.get('grade')?.setValue(grade);
+    this.showGradeDropdown = false;
   }
 
   viewAttachedDocument(): void {

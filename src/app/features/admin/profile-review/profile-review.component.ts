@@ -35,16 +35,10 @@ import { Observable } from 'rxjs';
               <h1 class="text-2xl font-bold text-[#131A4D] tracking-tight">
                 EOI Detailed Scrutiny & Evaluation Desk
               </h1>
-              <p class="text-xs text-slate-500 mt-0.5">
-                Official Department Scrutiny · Verify statutory corporate records, proposed project capacity & assign TP grade.
-              </p>
+
             </div>
 
-            <div class="flex items-center gap-2">
-              <span class="text-xs px-3 py-1 bg-white border border-slate-200 font-mono font-bold text-slate-700 shadow-2xs">
-                Status: <strong class="text-[#131A4D]">{{ selectedApplicant?.scrutinyStatus }}</strong>
-              </span>
-            </div>
+
           </div>
 
           <!-- Two-Column Layout: Left (8 Cols Applicant Profile Recap) | Right (4 Cols Admin Scrutiny Panel) -->
@@ -56,8 +50,7 @@ import { Observable } from 'rxjs';
               <!-- 1. Scheme & EOI Submission Details Box -->
               <div class="bg-white border border-slate-300 shadow-sm overflow-hidden">
                 <div class="bg-[#131A4D] text-white px-5 py-2.5 flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <span class="text-sm">🏛</span>
+                  <div class="flex items-center">
                     <h2 class="text-xs font-bold uppercase tracking-wider">
                       Applied Tender Specification
                     </h2>
@@ -83,8 +76,8 @@ import { Observable } from 'rxjs';
                   <div class="sm:col-span-2">
                     <span class="text-slate-400 block text-[11px]">Proposed Rajasthan District Centers:</span>
                     <div class="flex flex-wrap gap-1.5 mt-1">
-                      <span *ngFor="let dist of selectedApplicant?.proposedDistricts" class="px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-[11px]">
-                        📍 {{ dist }}
+                      <span *ngFor="let dist of selectedApplicant?.proposedDistricts" class="px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-[11px] rounded-full">
+                        {{ dist }}
                       </span>
                     </div>
                   </div>
@@ -151,7 +144,7 @@ import { Observable } from 'rxjs';
               <div class="bg-white border border-slate-300 shadow-sm overflow-hidden">
                 <div class="bg-slate-100 border-b border-slate-200 px-5 py-2.5">
                   <span class="text-xs font-bold text-[#131A4D] uppercase tracking-wider">
-                    Step 4: Document Upload
+                    Step 3: Document Upload
                   </span>
                 </div>
                 <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -249,44 +242,50 @@ import { Observable } from 'rxjs';
                 <!-- Action Form -->
                 <form [formGroup]="reviewForm" class="p-5 space-y-4 text-xs">
                   
-                  <!-- 1. Grading / Category Dropdown -->
+                  <!-- 1. Proposed Proposal PDF -->
                   <div class="space-y-1">
                     <label class="block font-bold text-[#131A4D]">
-                      Assign Training Partner (TP) Grade <span class="text-red-600">*</span>
+                      Proposed Proposal PDF
+                    </label>
+                    <div class="p-3 border border-slate-200 bg-slate-50 flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span class="text-base">📄</span>
+                        <div>
+                          <div class="font-bold text-slate-900">Bidder Proposal</div>
+                          <div class="text-[10px] text-slate-500 font-mono">3.2 MB PDF</div>
+                        </div>
+                      </div>
+                      <button type="button" class="text-xs text-[#131A4D] font-bold hover:underline">View</button>
+                    </div>
+                  </div>
+
+                  <!-- 2. Grading Dropdown -->
+                  <div class="space-y-1 pt-1">
+                    <label class="block font-bold text-[#131A4D]">
+                      Grade (A-E) <span class="text-red-600">*</span>
                     </label>
                     <select 
                       formControlName="grade"
                       class="w-full px-3 py-2 border border-slate-300 bg-white focus:border-[#131A4D] font-bold text-slate-800">
-                      <option value="A">Grade A (Turnover > 5 Cr · Mega Training Partner)</option>
-                      <option value="B">Grade B (Turnover 1 - 5 Cr · Standard Partner)</option>
-                      <option value="C">Grade C (Startup / District Level Partner)</option>
+                      <option value="A">Grade A</option>
+                      <option value="B">Grade B</option>
+                      <option value="C">Grade C</option>
+                      <option value="D">Grade D</option>
+                      <option value="E">Grade E</option>
                     </select>
-                    <p class="text-[10px] text-slate-500">
-                      Determines batch allocation ceiling and mobilization quota.
-                    </p>
                   </div>
 
-                  <!-- 2. Upload Scrutiny Attachments -->
+                  <!-- 3. Technical Score -->
                   <div class="space-y-1 pt-1">
                     <label class="block font-bold text-[#131A4D]">
-                      Upload Scrutiny Note / Inspection Audit (Optional)
+                      Technical Score (0-100) <span class="text-red-600">*</span>
                     </label>
-                    <div class="border border-dashed border-slate-300 p-3 bg-slate-50 text-center hover:bg-slate-100 transition-colors cursor-pointer">
-                      <span class="text-xs text-[#131A4D] font-semibold">📎 Attach Department Scrutiny PDF</span>
-                      <div class="text-[10px] text-slate-400 mt-0.5">Signed evaluation remarks sheet</div>
-                    </div>
-                  </div>
-
-                  <!-- 3. Official Remarks / Reason -->
-                  <div class="space-y-1 pt-1">
-                    <label class="block font-bold text-[#131A4D]">
-                      Officer Remarks / Scrutiny Reason <span class="text-red-600">*</span>
-                    </label>
-                    <textarea 
-                      formControlName="remarks"
-                      rows="4" 
-                      placeholder="Enter scrutiny evaluation remarks. (Required if rejecting to state rejection clause)..."
-                      class="w-full px-3 py-2 border border-slate-300 bg-white focus:border-[#131A4D] text-xs text-slate-900"></textarea>
+                    <input 
+                      type="number"
+                      min="0"
+                      max="100"
+                      placeholder="e.g. 85"
+                      class="w-full px-3 py-2 border border-slate-300 bg-white focus:border-[#131A4D] font-bold text-slate-800">
                   </div>
 
                   <!-- Success/Decision Alert Notice -->
@@ -297,20 +296,20 @@ import { Observable } from 'rxjs';
                   <!-- 4. Decision Buttons (Accept vs Reject) -->
                   <div class="pt-3 space-y-2">
                     
-                    <!-- Accept Button (--approve-700 #166534) -->
+                    <!-- Accept Button -->
                     <button 
                       type="button" 
                       (click)="confirmDecision('APPROVED')"
-                      class="w-full py-2.5 bg-[#166534] hover:bg-[#14532d] text-white font-bold text-xs tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5">
-                      <span>✓ Accept & Empanel as Technical Partner</span>
+                      class="w-full py-2.5 rounded-full bg-[#166534] hover:bg-[#14532d] text-white font-bold text-xs tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5">
+                      <span>✓ Accept Bidder</span>
                     </button>
 
-                    <!-- Reject Button (--reject-700 #991b1b) -->
+                    <!-- Reject Button -->
                     <button 
                       type="button" 
                       (click)="confirmDecision('REJECTED')"
-                      class="w-full py-2.5 bg-[#991b1b] hover:bg-[#7f1d1d] text-white font-bold text-xs tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5">
-                      <span>✕ Reject Submission & Refund EMD</span>
+                      class="w-full py-2.5 rounded-full bg-[#991b1b] hover:bg-[#7f1d1d] text-white font-bold text-xs tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5">
+                      <span>✕ Reject Bidder</span>
                     </button>
 
                   </div>

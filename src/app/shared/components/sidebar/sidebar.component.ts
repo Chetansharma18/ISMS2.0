@@ -160,7 +160,7 @@ import { Observable } from 'rxjs';
             routerLink="/admin/eoi-view" 
             routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
             class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
-            <span class="tracking-tight">EOI Requests Desk</span>
+            <span class="tracking-tight">EOI RESPONSES</span>
           </a>
 
 

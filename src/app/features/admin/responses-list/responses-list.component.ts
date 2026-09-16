@@ -30,7 +30,7 @@ import { Observable } from 'rxjs';
                 <span>Applicant Responses</span>
               </div>
               <h1 class="text-2xl font-bold text-[#131A4D] tracking-tight">
-                Applicant Scrutiny Submissions
+                APPLICANT SUBMISSION
               </h1>
 
             </div>

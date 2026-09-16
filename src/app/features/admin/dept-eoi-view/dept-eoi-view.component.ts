@@ -25,7 +25,7 @@ import { Observable } from 'rxjs';
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 mb-6">
             <div>
               <h1 class="text-2xl font-bold text-[#131A4D] tracking-tight">
-                EOI View (Department Tenders)
+                EOI RESPONSES
               </h1>
             </div>
           </div>
@@ -104,7 +104,7 @@ import { Observable } from 'rxjs';
                     <!-- No. of Responses (Plain Text) -->
                     <td class="p-3 border-r border-slate-200 text-center">
                       <span class="font-bold text-[#131A4D] text-sm">
-                        {{ scheme.responseCount || 14 }}
+                        {{ scheme.responseCount || 4 }}
                       </span>
                       <span class="text-[10px] font-semibold text-slate-600 ml-1">EOIs</span>
                     </td>

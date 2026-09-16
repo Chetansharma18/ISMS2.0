@@ -105,7 +105,7 @@ import { RouterModule } from '@angular/router';
           </button>
 
           <div *ngIf="eoiOpen()" class="pl-7 pr-1 py-1 space-y-0.5 border-l-2 border-slate-200 ml-5 my-1 text-[11px]">
-            <a routerLink="/admin/eoi" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" [routerLinkActiveOptions]="{ exact: true }" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">All EOI</a>
+            <a routerLink="/admin/eoi" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" [routerLinkActiveOptions]="{ exact: true }" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Configure</a>
             <!--
             <a routerLink="/admin/eoi/create" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">+ Create EOI</a>
             <a routerLink="/admin/masters/eoi-categories" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Categories</a>

@@ -51,10 +51,10 @@ export interface TabItem {
                   राजस्थान सरकार &nbsp;•&nbsp; Government of Rajasthan
                 </p>
                 <h1 class="text-lg sm:text-2xl font-black text-white tracking-wide leading-none mt-0.5">
-                  ISMS 2.0
+                  TP/PIA One Time Register
                 </h1>
                 <p class="text-[10px] sm:text-xs text-white/80 font-normal mt-0.5 truncate">
-                  Integrated Scheme Management System · TP / PIA One-Time Registration
+                  Integrated Scheme Management System (ISMS 2.0)
                 </p>
               </div>
             </div>

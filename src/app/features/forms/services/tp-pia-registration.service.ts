@@ -115,8 +115,7 @@ export const TRANSFER_MODES: string[] = [
 
 export const ACCOUNT_TYPES: string[] = [
   'Current Account',
-  'Savings Account',
-  'Zero Balance Escrow Account'
+  'Savings Account'
 ];
 
 @Injectable({

@@ -6,7 +6,7 @@ const STORAGE_KEY = 'isms_tp_pia_registration_draft_v1';
 export const INITIAL_DOCUMENTS: UploadedDocument[] = [
   { id: 'doc-reg-cert', docType: 'Registration Certificate', label: 'Organisation Registration Certificate', required: true, status: 'pending' },
   { id: 'doc-pan', docType: 'PAN Card', label: 'Organisation PAN Card', required: true, status: 'pending' },
-  { id: 'doc-gst', docType: 'GST Certificate', label: 'GST Registration Certificate', required: false, status: 'pending' },
+  { id: 'doc-gst', docType: 'GST Certificate', label: 'GST Registration Certificate', required: true, status: 'pending' },
   { id: 'doc-turnover', docType: 'Audited Balance Sheet', label: 'Audited Balance Sheet / Turnover Certificate', required: false, status: 'pending' },
   { id: 'doc-bank', docType: 'Bank Proof', label: 'Cancelled Cheque / Bank Passbook', required: false, status: 'pending' },
   { id: 'doc-board-res', docType: 'Board Resolution', label: 'Board Resolution / Power of Attorney for Authorized Signatory', required: false, status: 'pending' },
@@ -142,6 +142,12 @@ export class TpPiaRegistrationService {
   restoreSavedDraft(): boolean {
     const draft = this.loadFromStorage();
     if (draft && draft.basicInfo && draft.basicInfo.applicationNo) {
+      if (draft.documents && Array.isArray(draft.documents)) {
+        draft.documents = draft.documents.map(d => {
+          const initDoc = INITIAL_DOCUMENTS.find(idoc => idoc.id === d.id);
+          return initDoc ? { ...d, required: initDoc.required } : d;
+        });
+      }
       this.formData.set(draft);
       if (draft.lastSaved) {
         this.lastSavedTime.set(draft.lastSaved);

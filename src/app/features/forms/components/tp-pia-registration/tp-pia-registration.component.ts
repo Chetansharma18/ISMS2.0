@@ -2,20 +2,20 @@ import { Component, inject, signal, computed, ChangeDetectionStrategy, HostListe
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { 
-  TpPiaRegistrationService, 
-  INDIAN_STATES, 
-  RAJASTHAN_DISTRICTS, 
+import {
+  TpPiaRegistrationService,
+  INDIAN_STATES,
+  RAJASTHAN_DISTRICTS,
   BUSINESS_ACTIVITIES,
   ID_PROOF_TYPES,
-  COMMON_BANKS, 
-  TRANSFER_MODES, 
-  ACCOUNT_TYPES 
+  COMMON_BANKS,
+  TRANSFER_MODES,
+  ACCOUNT_TYPES
 } from '../../services/tp-pia-registration.service';
 import { FormValidationService } from '../../services/form-validation.service';
-import { 
-  OfficerInCharge, 
-  AwardItem, 
+import {
+  OfficerInCharge,
+  AwardItem,
   UploadedDocument,
   TpPiaRegistrationData
 } from '../../models/tp-pia-registration.model';
@@ -219,9 +219,18 @@ export class TpPiaRegistrationComponent {
     return this.districts.filter(d => d.toLowerCase().includes(q));
   });
 
+  closeAllDropdowns() {
+    this.isDistrictDropdownOpen.set(false);
+    this.isStateRegDropdownOpen.set(false);
+    this.isStateAddrDropdownOpen.set(false);
+    this.isStateAuthDropdownOpen.set(false);
+    this.isBankDropdownOpen.set(false);
+  }
+
   toggleDistrictDropdown(event?: MouseEvent) {
     if (event) event.stopPropagation();
     const nextState = !this.isDistrictDropdownOpen();
+    this.closeAllDropdowns();
     this.isDistrictDropdownOpen.set(nextState);
     if (nextState) {
       this.districtSearchQuery.set('');
@@ -258,6 +267,7 @@ export class TpPiaRegistrationComponent {
   toggleStateRegDropdown(event?: MouseEvent) {
     if (event) event.stopPropagation();
     const nextState = !this.isStateRegDropdownOpen();
+    this.closeAllDropdowns();
     this.isStateRegDropdownOpen.set(nextState);
     if (nextState) {
       this.stateRegSearchQuery.set('');
@@ -294,6 +304,7 @@ export class TpPiaRegistrationComponent {
   toggleStateAddrDropdown(event?: MouseEvent) {
     if (event) event.stopPropagation();
     const nextState = !this.isStateAddrDropdownOpen();
+    this.closeAllDropdowns();
     this.isStateAddrDropdownOpen.set(nextState);
     if (nextState) {
       this.stateAddrSearchQuery.set('');
@@ -330,6 +341,7 @@ export class TpPiaRegistrationComponent {
   toggleStateAuthDropdown(event?: MouseEvent) {
     if (event) event.stopPropagation();
     const nextState = !this.isStateAuthDropdownOpen();
+    this.closeAllDropdowns();
     this.isStateAuthDropdownOpen.set(nextState);
     if (nextState) {
       this.stateAuthSearchQuery.set('');
@@ -366,6 +378,7 @@ export class TpPiaRegistrationComponent {
   toggleBankDropdown(event?: MouseEvent) {
     if (event) event.stopPropagation();
     const nextState = !this.isBankDropdownOpen();
+    this.closeAllDropdowns();
     this.isBankDropdownOpen.set(nextState);
     if (nextState) {
       this.bankSearchQuery.set('');
@@ -1008,6 +1021,7 @@ export class TpPiaRegistrationComponent {
   }
 
   switchTab(tabId: number) {
+    this.closeAllDropdowns();
     const current = this.activeTab();
     if (this.valService.isTabValid(current, this.data)) {
       this.valService.markTabCompleted(current);
@@ -1020,6 +1034,7 @@ export class TpPiaRegistrationComponent {
   }
 
   nextTab() {
+    this.closeAllDropdowns();
     const current = this.activeTab();
     this.valService.markTabSubmitted(current);
 
@@ -1042,6 +1057,7 @@ export class TpPiaRegistrationComponent {
   }
 
   prevTab() {
+    this.closeAllDropdowns();
     if (this.activeTab() > 1) {
       this.service.saveDraftSync();
       const prevId = this.activeTab() - 1;

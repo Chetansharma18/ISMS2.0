@@ -43,7 +43,6 @@ export interface TabItem {
               <div class="flex-shrink-0 flex items-center justify-center">
                 <img src="emblem.png" alt="State Emblem of India" class="h-9 sm:h-[52px] lg:h-[60px] w-auto object-contain select-none" />
               </div>
-
               <!-- Official RSLDC Circular Emblem -->
               <div class="flex-shrink-0 flex items-center justify-center">
                 <img src="rsldc-logo.png" alt="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)" class="h-9 w-9 sm:h-[52px] sm:w-[52px] lg:h-[60px] lg:w-[60px] object-contain select-none drop-shadow-2xs" />

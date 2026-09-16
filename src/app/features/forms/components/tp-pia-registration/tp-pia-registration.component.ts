@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, computed, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -49,6 +49,21 @@ export class TpPiaRegistrationComponent {
   readonly showSuccessModal = signal<boolean>(false);
   readonly fontScale = signal<'standard' | 'large' | 'xlarge'>('standard');
   declarationAgreed: boolean = false;
+
+  // --- ACCORDION / DROPDOWN STATES ---
+  // Step 1 Sections: 1st is open by default, rest closed
+  readonly isOrgProfileOpen = signal<boolean>(true);
+  readonly isContactDetailsOpen = signal<boolean>(false);
+  readonly isAddressRecordsOpen = signal<boolean>(false);
+
+  // Step 5 Review Sections: 1st block & 1st sub-accordion open by default, rest closed
+  readonly isReviewStep1Open = signal<boolean>(true);
+  readonly isReviewOrgProfileOpen = signal<boolean>(true);
+  readonly isReviewContactOpen = signal<boolean>(false);
+  readonly isReviewAddressOpen = signal<boolean>(false);
+  readonly isReviewAuthPersonOpen = signal<boolean>(false);
+  readonly isReviewBankOpen = signal<boolean>(false);
+  readonly isReviewDocsOpen = signal<boolean>(false);
 
   readonly tabs: TabItem[] = [
     { id: 1, label: 'Organisation Details', shortLabel: 'Organisation', icon: '🏢' },
@@ -193,6 +208,216 @@ export class TpPiaRegistrationComponent {
   readonly states = INDIAN_STATES;
   readonly districts = RAJASTHAN_DISTRICTS;
   readonly businessActivities = BUSINESS_ACTIVITIES;
+  readonly commonBanks = COMMON_BANKS;
+
+  // 1. Searchable District Dropdown
+  readonly isDistrictDropdownOpen = signal<boolean>(false);
+  readonly districtSearchQuery = signal<string>('');
+  readonly filteredDistricts = computed(() => {
+    const q = this.districtSearchQuery().toLowerCase().trim();
+    if (!q) return this.districts;
+    return this.districts.filter(d => d.toLowerCase().includes(q));
+  });
+
+  toggleDistrictDropdown(event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    const nextState = !this.isDistrictDropdownOpen();
+    this.isDistrictDropdownOpen.set(nextState);
+    if (nextState) {
+      this.districtSearchQuery.set('');
+      setTimeout(() => {
+        const input = document.getElementById('district-search-input');
+        if (input) input.focus();
+      }, 50);
+    }
+  }
+
+  selectDistrict(dist: string) {
+    this.data.registeredAddress.district = dist;
+    this.isDistrictDropdownOpen.set(false);
+    this.districtSearchQuery.set('');
+    this.onRegisteredAddressChange();
+  }
+
+  clearDistrict(event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    this.data.registeredAddress.district = '';
+    this.districtSearchQuery.set('');
+    this.onRegisteredAddressChange();
+  }
+
+  // 2. Searchable State Where Registered Dropdown
+  readonly isStateRegDropdownOpen = signal<boolean>(false);
+  readonly stateRegSearchQuery = signal<string>('');
+  readonly filteredStatesReg = computed(() => {
+    const q = this.stateRegSearchQuery().toLowerCase().trim();
+    if (!q) return this.states;
+    return this.states.filter(s => s.toLowerCase().includes(q));
+  });
+
+  toggleStateRegDropdown(event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    const nextState = !this.isStateRegDropdownOpen();
+    this.isStateRegDropdownOpen.set(nextState);
+    if (nextState) {
+      this.stateRegSearchQuery.set('');
+      setTimeout(() => {
+        const input = document.getElementById('statereg-search-input');
+        if (input) input.focus();
+      }, 50);
+    }
+  }
+
+  selectStateReg(state: string) {
+    this.data.entityInfo.stateWhereRegistered = state;
+    this.isStateRegDropdownOpen.set(false);
+    this.stateRegSearchQuery.set('');
+    this.onDataChange();
+  }
+
+  clearStateReg(event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    this.data.entityInfo.stateWhereRegistered = '';
+    this.stateRegSearchQuery.set('');
+    this.onDataChange();
+  }
+
+  // 3. Searchable State/UT for Registered Address
+  readonly isStateAddrDropdownOpen = signal<boolean>(false);
+  readonly stateAddrSearchQuery = signal<string>('');
+  readonly filteredStatesAddr = computed(() => {
+    const q = this.stateAddrSearchQuery().toLowerCase().trim();
+    if (!q) return this.states;
+    return this.states.filter(s => s.toLowerCase().includes(q));
+  });
+
+  toggleStateAddrDropdown(event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    const nextState = !this.isStateAddrDropdownOpen();
+    this.isStateAddrDropdownOpen.set(nextState);
+    if (nextState) {
+      this.stateAddrSearchQuery.set('');
+      setTimeout(() => {
+        const input = document.getElementById('stateaddr-search-input');
+        if (input) input.focus();
+      }, 50);
+    }
+  }
+
+  selectStateAddr(state: string) {
+    this.data.registeredAddress.state = state;
+    this.isStateAddrDropdownOpen.set(false);
+    this.stateAddrSearchQuery.set('');
+    this.onRegisteredAddressChange();
+  }
+
+  clearStateAddr(event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    this.data.registeredAddress.state = '';
+    this.stateAddrSearchQuery.set('');
+    this.onRegisteredAddressChange();
+  }
+
+  // 4. Searchable State for Authorized Person
+  readonly isStateAuthDropdownOpen = signal<boolean>(false);
+  readonly stateAuthSearchQuery = signal<string>('');
+  readonly filteredStatesAuth = computed(() => {
+    const q = this.stateAuthSearchQuery().toLowerCase().trim();
+    if (!q) return this.states;
+    return this.states.filter(s => s.toLowerCase().includes(q));
+  });
+
+  toggleStateAuthDropdown(event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    const nextState = !this.isStateAuthDropdownOpen();
+    this.isStateAuthDropdownOpen.set(nextState);
+    if (nextState) {
+      this.stateAuthSearchQuery.set('');
+      setTimeout(() => {
+        const input = document.getElementById('stateauth-search-input');
+        if (input) input.focus();
+      }, 50);
+    }
+  }
+
+  selectStateAuth(state: string) {
+    this.data.authorizedOrg.state = state;
+    this.isStateAuthDropdownOpen.set(false);
+    this.stateAuthSearchQuery.set('');
+    this.onDataChange();
+  }
+
+  clearStateAuth(event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    this.data.authorizedOrg.state = '';
+    this.stateAuthSearchQuery.set('');
+    this.onDataChange();
+  }
+
+  // 5. Searchable Bank Name for Step 3
+  readonly isBankDropdownOpen = signal<boolean>(false);
+  readonly bankSearchQuery = signal<string>('');
+  readonly filteredBanks = computed(() => {
+    const q = this.bankSearchQuery().toLowerCase().trim();
+    if (!q) return this.commonBanks;
+    return this.commonBanks.filter(b => b.toLowerCase().includes(q));
+  });
+
+  toggleBankDropdown(event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    const nextState = !this.isBankDropdownOpen();
+    this.isBankDropdownOpen.set(nextState);
+    if (nextState) {
+      this.bankSearchQuery.set('');
+      setTimeout(() => {
+        const input = document.getElementById('bank-search-input');
+        if (input) input.focus();
+      }, 50);
+    }
+  }
+
+  selectBank(bank: string) {
+    this.data.bankDetails.bankName = bank;
+    this.isBankDropdownOpen.set(false);
+    this.bankSearchQuery.set('');
+    this.onDataChange();
+  }
+
+  clearBank(event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    this.data.bankDetails.bankName = '';
+    this.bankSearchQuery.set('');
+    this.onDataChange();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.district-dropdown-container')) {
+      this.isDistrictDropdownOpen.set(false);
+    }
+    if (!target.closest('.statereg-dropdown-container')) {
+      this.isStateRegDropdownOpen.set(false);
+    }
+    if (!target.closest('.stateaddr-dropdown-container')) {
+      this.isStateAddrDropdownOpen.set(false);
+    }
+    if (!target.closest('.stateauth-dropdown-container')) {
+      this.isStateAuthDropdownOpen.set(false);
+    }
+    if (!target.closest('.bank-dropdown-container')) {
+      this.isBankDropdownOpen.set(false);
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapePress() {
+    this.isDistrictDropdownOpen.set(false);
+    this.isStateRegDropdownOpen.set(false);
+    this.isStateAddrDropdownOpen.set(false);
+    this.isStateAuthDropdownOpen.set(false);
+    this.isBankDropdownOpen.set(false);
+  }
 
   toggleSameAddress() {
     if (this.data.sameAsRegistered) {
@@ -222,17 +447,147 @@ export class TpPiaRegistrationComponent {
     }
   }
 
-  onDobChange() {
-    if (this.data.authorizedOrg.dob) {
-      const birthDate = new Date(this.data.authorizedOrg.dob);
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
+  // --- DATE DD/MM/YYYY FORMATTING & PICKER HELPERS ---
+  get todayIso(): string {
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  get maxDobIso(): string {
+    const today = new Date();
+    const y = today.getFullYear() - 18;
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  get minDobIso(): string {
+    const today = new Date();
+    const y = today.getFullYear() - 100;
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  formatDateDisplay(dateStr?: string): string {
+    if (!dateStr) return '';
+    const trimmed = dateStr.trim();
+    if (trimmed.includes('-')) {
+      const parts = trimmed.split('-');
+      if (parts.length === 3 && parts[0].length === 4) {
+        return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
       }
-      if (age >= 0 && age <= 120) {
-        this.data.authorizedOrg.age = age;
+    }
+    return trimmed;
+  }
+
+  getIsoDate(dateStr?: string): string {
+    if (!dateStr) return '';
+    const trimmed = dateStr.trim();
+    if (trimmed.includes('/')) {
+      const parts = trimmed.split('/');
+      if (parts.length === 3 && parts[2].length === 4) {
+        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+    }
+    if (trimmed.includes('-')) {
+      const parts = trimmed.split('-');
+      if (parts.length === 3 && parts[0].length === 4) {
+        return trimmed;
+      }
+    }
+    return '';
+  }
+
+  onDateInput(event: Event, field: 'registration' | 'dob') {
+    const input = event.target as HTMLInputElement;
+    const val = input.value || '';
+    const rawDigits = val.replace(/\D/g, '').slice(0, 8);
+    let formatted = '';
+    if (rawDigits.length > 4) {
+      formatted = `${rawDigits.slice(0, 2)}/${rawDigits.slice(2, 4)}/${rawDigits.slice(4)}`;
+    } else if (rawDigits.length > 2) {
+      formatted = `${rawDigits.slice(0, 2)}/${rawDigits.slice(2)}`;
+    } else {
+      formatted = rawDigits;
+    }
+    input.value = formatted;
+
+    if (field === 'registration') {
+      this.data.basicInfo.dateOfRegistration = formatted;
+      this.onDataChange();
+    } else if (field === 'dob') {
+      this.data.authorizedOrg.dob = formatted;
+      this.onDobChange();
+    }
+  }
+
+  onDatePick(event: Event, field: 'registration' | 'dob') {
+    const input = event.target as HTMLInputElement;
+    const isoVal = input.value;
+    if (!isoVal) return;
+    const parts = isoVal.split('-');
+    if (parts.length === 3) {
+      const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      if (field === 'registration') {
+        this.data.basicInfo.dateOfRegistration = formatted;
+        this.onDataChange();
+      } else if (field === 'dob') {
+        this.data.authorizedOrg.dob = formatted;
+        this.onDobChange();
+      }
+    }
+  }
+
+  openPicker(picker: HTMLInputElement) {
+    if (picker) {
+      if (typeof picker.showPicker === 'function') {
+        try {
+          picker.showPicker();
+          return;
+        } catch {
+          // fallback
+        }
+      }
+      picker.focus();
+      picker.click();
+    }
+  }
+
+  onDobChange() {
+    const val = (this.data.authorizedOrg.dob || '').trim();
+    if (val) {
+      let birthDate: Date | null = null;
+      if (val.includes('/')) {
+        const parts = val.split('/');
+        if (parts.length === 3 && parts[2].length === 4) {
+          const d = parseInt(parts[0], 10);
+          const m = parseInt(parts[1], 10) - 1;
+          const y = parseInt(parts[2], 10);
+          birthDate = new Date(y, m, d);
+        }
+      } else if (val.includes('-')) {
+        const parts = val.split('-');
+        if (parts.length === 3 && parts[0].length === 4) {
+          const y = parseInt(parts[0], 10);
+          const m = parseInt(parts[1], 10) - 1;
+          const d = parseInt(parts[2], 10);
+          birthDate = new Date(y, m, d);
+        }
+      }
+      if (birthDate && !isNaN(birthDate.getTime())) {
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        if (age >= 0 && age <= 120) {
+          this.data.authorizedOrg.age = age;
+        }
       }
     }
     this.onDataChange();
@@ -289,7 +644,6 @@ export class TpPiaRegistrationComponent {
   }
 
   // --- STEP 3: BANK DETAILS SPECIFICS ---
-  readonly commonBanks = COMMON_BANKS;
   readonly transferModes = TRANSFER_MODES;
   readonly accountTypes = ACCOUNT_TYPES;
 

@@ -5,8 +5,7 @@ import { LanguageService } from '../../../core/services/language.service';
   selector: 'app-mobile-app',
   standalone: true,
   imports: [],
-  templateUrl: './mobile-app.component.html',
-  styleUrls: ['./mobile-app.component.css']
+  templateUrl: './mobile-app.component.html'
 })
 export class MobileAppComponent {
   protected readonly languageService = inject(LanguageService);

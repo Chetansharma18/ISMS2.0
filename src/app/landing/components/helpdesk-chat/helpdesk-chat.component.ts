@@ -16,8 +16,7 @@ interface ChatMessage {
   selector: 'app-helpdesk-chat',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './helpdesk-chat.component.html',
-  styleUrls: ['./helpdesk-chat.component.css']
+  templateUrl: './helpdesk-chat.component.html'
 })
 export class HelpdeskChatComponent {
   protected readonly languageService = inject(LanguageService);

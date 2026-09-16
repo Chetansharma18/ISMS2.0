@@ -23,8 +23,7 @@ export interface PartnerLink {
   selector: 'app-important-links',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './important-links.component.html',
-  styleUrls: ['./important-links.component.css']
+  templateUrl: './important-links.component.html'
 })
 export class ImportantLinksComponent implements OnInit, OnDestroy {
   protected readonly languageService = inject(LanguageService);

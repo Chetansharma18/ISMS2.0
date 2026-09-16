@@ -14,8 +14,7 @@ export interface TenderItem {
   selector: 'app-hero',
   standalone: true,
   imports: [],
-  templateUrl: './hero.component.html',
-  styleUrl: './hero.component.css'
+  templateUrl: './hero.component.html'
 })
 export class HeroComponent {
   protected readonly languageService = inject(LanguageService);

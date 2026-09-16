@@ -1,11 +1,17 @@
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Output, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { SdcService, Sdc } from '../../../../core/services/sdc.service';
+import { CourseProposalService, CourseProposal } from '../../../../core/services/course-proposal.service';
+import { Observable, of } from 'rxjs';
+import { startWith, switchMap, map } from 'rxjs/operators';
+import { UiInputComponent } from '../../../../shared/components/ui/ui-input/ui-input.component';
+import { UiSelectComponent, SelectOption } from '../../../../shared/components/ui/ui-select/ui-select.component';
 
 @Component({
   selector: 'app-batch-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, UiInputComponent, UiSelectComponent],
   template: `
     <div class="bg-white rounded-xl shadow-2xs border border-slate-200 p-6 font-sans">
       
@@ -50,20 +56,26 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
         <div *ngIf="currentStep === 1" class="animate-in fade-in slide-in-from-right-4 duration-300">
           <h2 class="text-lg font-bold text-rsldc-navy border-b pb-2 mb-4">Section A: Basic Details</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <app-ui-select
+              formControlName="sdcId"
+              label="Select Skill Development Center (SDC)"
+              [required]="true"
+              [options]="(sdcOptions$ | async) || []">
+            </app-ui-select>
+
             <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Select SDC <span class="text-red-500">*</span></label>
-              <select formControlName="sdcId" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy bg-slate-50">
-                <option value="">Select Approved SDC</option>
-                <option value="SDC-0001">Jaipur Excellence Center (SDC-0001)</option>
-              </select>
+              <app-ui-select
+                formControlName="courseId"
+                label="Course"
+                [required]="true"
+                [options]="(courseOptions$ | async) || []">
+              </app-ui-select>
+              <p *ngIf="batchForm.get('sdcId')?.value && (courseOptions$ | async)?.length === 0" class="text-xs text-amber-600 mt-1">
+                No approved courses available for this SDC.
+              </p>
             </div>
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Course <span class="text-red-500">*</span></label>
-              <select formControlName="courseId" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy bg-slate-50">
-                <option value="">Select Course</option>
-                <option value="C-01">Data Entry Operator</option>
-              </select>
-            </div>
+
             <div class="md:col-span-2">
               <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" formControlName="isResidential" class="w-4 h-4 text-rsldc-navy rounded border-slate-300 focus:ring-rsldc-navy">
@@ -77,18 +89,27 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
         <div *ngIf="currentStep === 2" class="animate-in fade-in slide-in-from-right-4 duration-300">
           <h2 class="text-lg font-bold text-rsldc-navy border-b pb-2 mb-4">Section B & C: Dates & Batch Strength</h2>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Batch Start Date <span class="text-red-500">*</span></label>
-              <input formControlName="startDate" type="date" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy">
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Batch End Date <span class="text-red-500">*</span></label>
-              <input formControlName="endDate" type="date" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy">
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">Target Strength <span class="text-red-500">*</span></label>
-              <input formControlName="strength" type="number" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rsldc-navy" placeholder="Max 30 per batch">
-            </div>
+            <app-ui-input
+              formControlName="startDate"
+              type="date"
+              label="Batch Start Date"
+              [required]="true">
+            </app-ui-input>
+            
+            <app-ui-input
+              formControlName="endDate"
+              type="date"
+              label="Batch End Date"
+              [required]="true">
+            </app-ui-input>
+            
+            <app-ui-input
+              formControlName="strength"
+              type="number"
+              label="Target Strength"
+              [required]="true"
+              placeholder="Max 30">
+            </app-ui-input>
           </div>
         </div>
 
@@ -96,19 +117,21 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
         <div *ngIf="currentStep === 3" class="animate-in fade-in slide-in-from-right-4 duration-300">
           <h2 class="text-lg font-bold text-rsldc-navy border-b pb-2 mb-4">Section D: Faculty Details</h2>
           
-          <div class="border border-slate-200 rounded-lg p-4 bg-slate-50 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-xs font-semibold text-slate-700 mb-1">Faculty Name</label>
-                <input type="text" class="w-full px-3 py-2 border border-slate-300 rounded text-sm focus:ring-1 focus:ring-rsldc-navy" placeholder="Enter name">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-slate-700 mb-1">Qualification</label>
-                <input type="text" class="w-full px-3 py-2 border border-slate-300 rounded text-sm focus:ring-1 focus:ring-rsldc-navy" placeholder="e.g. BCA, MCA">
-              </div>
-              <div class="flex items-end">
-                <button class="px-4 py-2 bg-rsldc-navy text-white text-sm font-bold rounded-lg w-full hover:bg-rsldc-navyLight transition">Add Faculty</button>
-              </div>
+          <div class="border border-slate-200 rounded-lg p-6 bg-slate-50 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <app-ui-input
+                formControlName="facultyName"
+                label="Primary Faculty Name"
+                [required]="true"
+                placeholder="e.g. Rahul Sharma">
+              </app-ui-input>
+              
+              <app-ui-input
+                formControlName="qualification"
+                label="Qualification"
+                [required]="true"
+                placeholder="e.g. BCA, MCA">
+              </app-ui-input>
             </div>
           </div>
 
@@ -160,7 +183,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
         <button 
           *ngIf="currentStep < 4" 
           (click)="nextStep()"
-          class="px-6 py-2 bg-rsldc-navy text-white rounded-lg font-bold text-sm hover:bg-rsldc-navyLight transition shadow-md">
+          [disabled]="isCurrentStepInvalid()"
+          class="px-6 py-2 bg-rsldc-navy text-white rounded-lg font-bold text-sm hover:bg-rsldc-navyLight transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
           Continue
         </button>
         
@@ -176,8 +200,10 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
     </div>
   `
 })
-export class BatchFormComponent {
+export class BatchFormComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private sdcService = inject(SdcService);
+  private courseService = inject(CourseProposalService);
   @Output() formSubmit = new EventEmitter<any>();
 
   currentStep = 1;
@@ -188,11 +214,58 @@ export class BatchFormComponent {
     isResidential: [false],
     startDate: ['', Validators.required],
     endDate: ['', Validators.required],
-    strength: ['', [Validators.required, Validators.min(1), Validators.max(30)]]
+    strength: ['', [Validators.required, Validators.min(1), Validators.max(30)]],
+    facultyName: ['', Validators.required],
+    qualification: ['', Validators.required]
   });
 
+  sdcOptions$!: Observable<SelectOption[]>;
+  courseOptions$!: Observable<SelectOption[]>;
+
+  ngOnInit() {
+    this.sdcOptions$ = this.sdcService.sdcs$.pipe(
+      map(sdcs => (sdcs || [])
+        .filter(sdc => sdc.status === 'APPROVED')
+        .map(sdc => ({ label: `${sdc.name} (${sdc.sdcCode})`, value: sdc.id }))
+      )
+    );
+
+    this.courseOptions$ = this.batchForm.get('sdcId')!.valueChanges.pipe(
+      startWith(this.batchForm.get('sdcId')!.value),
+      switchMap(sdcId => {
+        if (!sdcId) return of([]);
+        return this.courseService.getProposalsBySdc(sdcId).pipe(
+          map(courses => courses
+            .filter(c => c.status === 'APPROVED')
+            .map(c => ({ label: `${c.courseName} (${c.courseCode})`, value: c.id }))
+          )
+        );
+      })
+    );
+    
+    // Reset course when SDC changes
+    this.batchForm.get('sdcId')!.valueChanges.subscribe(() => {
+      this.batchForm.get('courseId')!.setValue('');
+    });
+  }
+
+  isCurrentStepInvalid(): boolean {
+    switch (this.currentStep) {
+      case 1:
+        return this.batchForm.get('sdcId')!.invalid || this.batchForm.get('courseId')!.invalid;
+      case 2:
+        return this.batchForm.get('startDate')!.invalid || this.batchForm.get('endDate')!.invalid || this.batchForm.get('strength')!.invalid;
+      case 3:
+        return this.batchForm.get('facultyName')!.invalid || this.batchForm.get('qualification')!.invalid;
+      default:
+        return false;
+    }
+  }
+
   nextStep() {
-    if (this.currentStep < 4) this.currentStep++;
+    if (this.currentStep < 4 && !this.isCurrentStepInvalid()) {
+      this.currentStep++;
+    }
   }
 
   prevStep() {

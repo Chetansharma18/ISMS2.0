@@ -1,13 +1,15 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { SdcService, Sdc } from '../../../../core/services/sdc.service';
+import { UiTableComponent, TableColumn } from '../../../../shared/components/ui/ui-table/ui-table.component';
 
 @Component({
   selector: 'app-sdc-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, UiTableComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="space-y-6 animate-in fade-in zoom-in-95 duration-300">
       <!-- Page Header -->
@@ -50,89 +52,67 @@ import { AuthService } from '../../../../core/auth/auth.service';
       </div>
 
       <!-- SDC Data Table -->
-      <div class="bg-white rounded-xl shadow-2xs border border-slate-200 overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm whitespace-nowrap">
-            <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-xs tracking-wider">
-              <tr>
-                <th class="px-6 py-4">SDC Code</th>
-                <th class="px-6 py-4">Center Name</th>
-                <th class="px-6 py-4">TP / PIA</th>
-                <th class="px-6 py-4">Scheme</th>
-                <th class="px-6 py-4">Status</th>
-                <th class="px-6 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-200">
-              <tr *ngFor="let sdc of sdcs" class="hover:bg-slate-50/50 transition">
-                <td class="px-6 py-4 font-mono font-semibold text-rsldc-navy">{{ sdc.sdcCode }}</td>
-                <td class="px-6 py-4 font-semibold text-slate-800">{{ sdc.name }}</td>
-                <td class="px-6 py-4 text-slate-600">{{ sdc.tpName }}</td>
-                <td class="px-6 py-4 text-slate-600">
-                  <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded text-xs font-bold">{{ sdc.scheme }}</span>
-                </td>
-                <td class="px-6 py-4">
-                  <span class="px-2.5 py-1 rounded-full text-xs font-bold border"
-                    [ngClass]="{
-                      'bg-approve-100 text-approve-700 border-approve-700/20': sdc.status === 'APPROVED',
-                      'bg-pending-100 text-pending-700 border-pending-700/20': sdc.status === 'PENDING_INSPECTION' || sdc.status === 'SUBMITTED',
-                      'bg-slate-100 text-slate-700 border-slate-300': sdc.status === 'DRAFT',
-                      'bg-reject-100 text-reject-700 border-reject-700/20': sdc.status === 'REJECTED'
-                    }">
-                    {{ sdc.status.replace('_', ' ') }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 text-right">
-                  <a [routerLink]="['/sdcs', sdc.id]" class="text-rsldc-blueAccent hover:text-rsldc-navy font-semibold text-xs bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded transition">
-                    View Details
-                  </a>
-                </td>
-              </tr>
-              
-              <!-- Empty State -->
-              <tr *ngIf="sdcs.length === 0">
-                <td colspan="6" class="px-6 py-12 text-center text-slate-500">
-                  <div class="flex flex-col items-center justify-center">
-                    <svg class="w-12 h-12 text-slate-300 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                    <p class="text-base font-semibold text-slate-700">No SDCs found</p>
-                    <p class="text-sm mt-1">There are no training centers matching your criteria.</p>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <app-ui-table
+        [columns]="columns"
+        [data]="(sdcs$ | async) || []"
+        emptyMessage="No SDCs found. There are no training centers matching your criteria.">
         
-        <!-- Pagination -->
-        <div class="bg-slate-50 border-t border-slate-200 px-6 py-3 flex items-center justify-between text-xs text-slate-500">
-          <span>Showing 1 to {{ sdcs.length }} of {{ sdcs.length }} entries</span>
-          <div class="flex gap-1">
-            <button class="px-3 py-1.5 border border-slate-300 rounded hover:bg-white disabled:opacity-50" disabled>Previous</button>
-            <button class="px-3 py-1.5 border border-slate-300 rounded bg-rsldc-navy text-white">1</button>
-            <button class="px-3 py-1.5 border border-slate-300 rounded hover:bg-white disabled:opacity-50" disabled>Next</button>
-          </div>
-        </div>
-      </div>
+        <ng-template #rowTemplate let-sdc let-col="column">
+          
+          <ng-container *ngIf="col.key === 'sdcCode'">
+            <div class="font-mono font-semibold text-rsldc-navy">{{ sdc.sdcCode }}</div>
+          </ng-container>
+
+          <ng-container *ngIf="col.key === 'name'">
+            <div class="font-semibold text-slate-800">{{ sdc.name }}</div>
+          </ng-container>
+
+          <ng-container *ngIf="col.key === 'tpName'">
+            <div class="text-slate-600">{{ sdc.tpName }}</div>
+          </ng-container>
+
+          <ng-container *ngIf="col.key === 'scheme'">
+            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded text-xs font-bold">{{ sdc.scheme }}</span>
+          </ng-container>
+
+          <ng-container *ngIf="col.key === 'status'">
+            <span class="px-2.5 py-1 rounded-full text-xs font-bold border"
+              [ngClass]="{
+                'bg-approve-100 text-approve-700 border-approve-700/20': sdc.status === 'APPROVED',
+                'bg-pending-100 text-pending-700 border-pending-700/20': sdc.status === 'PENDING_INSPECTION' || sdc.status === 'SUBMITTED',
+                'bg-slate-100 text-slate-700 border-slate-300': sdc.status === 'DRAFT',
+                'bg-reject-100 text-reject-700 border-reject-700/20': sdc.status === 'REJECTED'
+              }">
+              {{ sdc.status.replace('_', ' ') }}
+            </span>
+          </ng-container>
+
+          <ng-container *ngIf="col.key === 'action'">
+            <div class="flex justify-end">
+              <a [routerLink]="['/sdcs', sdc.id]" class="text-rsldc-blueAccent hover:text-rsldc-navy font-semibold text-xs bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded transition">
+                View Details
+              </a>
+            </div>
+          </ng-container>
+
+        </ng-template>
+      </app-ui-table>
     </div>
   `
 })
 export class SdcListComponent {
   authService = inject(AuthService);
-  private http = inject(HttpClient);
+  private sdcService = inject(SdcService);
   
-  sdcs: any[] = [];
+  sdcs$ = this.sdcService.sdcs$;
 
-  constructor() {
-    this.loadSdcs();
-  }
-
-  loadSdcs() {
-    this.http.get<any>('/api/v1/sdcs').subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.sdcs = res.data.items;
-        }
-      }
-    });
-  }
+  columns: TableColumn[] = [
+    { key: 'sdcCode', label: 'SDC Code' },
+    { key: 'name', label: 'Center Name' },
+    { key: 'tpName', label: 'TP / PIA' },
+    { key: 'scheme', label: 'Scheme' },
+    { key: 'status', label: 'Status' },
+    { key: 'action', label: 'Actions', align: 'right' }
+  ];
 }
+

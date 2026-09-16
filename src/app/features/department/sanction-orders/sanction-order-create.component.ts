@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -10,6 +10,7 @@ import { SanctionOrderService } from '../../../core/services/sanction-order.serv
   selector: 'app-sanction-order-create',
   standalone: true,
   imports: [CommonModule, RouterLink, ReactiveFormsModule, UiInputComponent, UiSelectComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="max-w-4xl mx-auto space-y-6 pb-12">
       

@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CourseProposalService, CourseProposal } from '../../../core/services/course-proposal.service';
+import { SdcService } from '../../../core/services/sdc.service';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { UiInputComponent } from '../../../shared/components/ui/ui-input/ui-input.component';
 import { UiSelectComponent, SelectOption } from '../../../shared/components/ui/ui-select/ui-select.component';
 import { UiModalComponent } from '../../../shared/components/ui/ui-modal/ui-modal.component';
@@ -84,6 +86,13 @@ import { UiTableComponent, TableColumn } from '../../../shared/components/ui/ui-
         (closed)="showCreateModal = false">
         
         <form [formGroup]="courseForm" (ngSubmit)="submitCourse()" class="space-y-4">
+          <app-ui-select
+            formControlName="sdcId"
+            label="Select Skill Development Center (SDC)"
+            [required]="true"
+            [options]="(sdcOptions$ | async) || []">
+          </app-ui-select>
+
           <app-ui-input
             formControlName="courseName"
             label="Course Name"
@@ -142,6 +151,7 @@ import { UiTableComponent, TableColumn } from '../../../shared/components/ui/ui-
 export class TpCoursesComponent implements OnInit {
   showCreateModal = false;
   courses$!: Observable<CourseProposal[]>;
+  sdcOptions$!: Observable<SelectOption[]>;
   courseForm!: FormGroup;
 
   columns: TableColumn[] = [
@@ -165,12 +175,22 @@ export class TpCoursesComponent implements OnInit {
 
   constructor(
     private courseService: CourseProposalService,
+    private sdcService: SdcService,
     private fb: FormBuilder
   ) {}
 
   ngOnInit() {
     this.courses$ = this.courseService.getProposalsByTp('TP042');
+    
+    this.sdcOptions$ = this.sdcService.sdcs$.pipe(
+      map(sdcs => (sdcs || []).filter(sdc => sdc.status === 'APPROVED').map(sdc => ({
+        label: `${sdc.name} (${sdc.sdcCode})`,
+        value: sdc.id
+      })))
+    );
+
     this.courseForm = this.fb.group({
+      sdcId: ['', Validators.required],
       courseName: ['', Validators.required],
       sector: ['IT & ITeS', Validators.required],
       nsqfLevel: ['Level 4', Validators.required],
@@ -186,6 +206,8 @@ export class TpCoursesComponent implements OnInit {
       this.courseService.addProposal({
         ...formVal,
         tpId: 'TP042',
+        tpName: 'SkillMasters Rajasthan',
+        sdcName: 'Skill Center Jaipur', // In reality, fetch from SdcService
         courseCode: 'CRS-' + Math.floor(1000 + Math.random() * 9000)
       });
       this.showCreateModal = false;

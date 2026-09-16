@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface CourseProposal {
   id: string;
   tpId: string;
   tpName: string;
+  sdcId: string;
+  sdcName: string;
   courseCode: string;
   courseName: string;
   sector: string;
@@ -25,6 +28,8 @@ export class CourseProposalService {
       id: 'prop-1',
       tpId: 'TP042',
       tpName: 'SkillMasters Rajasthan',
+      sdcId: '1',
+      sdcName: 'Skill Center Jaipur',
       courseCode: 'C-01',
       courseName: 'Data Entry Operator',
       sector: 'IT & ITeS',
@@ -38,6 +43,8 @@ export class CourseProposalService {
       id: 'prop-2',
       tpId: 'TP042',
       tpName: 'SkillMasters Rajasthan',
+      sdcId: '2',
+      sdcName: 'Tech Training Jodhpur',
       courseCode: 'C-09',
       courseName: 'Cloud Architect',
       sector: 'IT & ITeS',
@@ -51,6 +58,8 @@ export class CourseProposalService {
       id: 'prop-3',
       tpId: 'TP042',
       tpName: 'SkillMasters Rajasthan',
+      sdcId: '1',
+      sdcName: 'Skill Center Jaipur',
       courseCode: 'C-04',
       courseName: 'Basic Typing',
       sector: 'IT & ITeS',
@@ -69,7 +78,15 @@ export class CourseProposalService {
   constructor() {}
 
   getProposalsByTp(tpId: string): Observable<CourseProposal[]> {
-    return new BehaviorSubject(this.proposals.filter(p => p.tpId === tpId)).asObservable();
+    return this.proposals$.pipe(
+      map(proposals => proposals.filter(p => p.tpId === tpId))
+    );
+  }
+
+  getProposalsBySdc(sdcId: string): Observable<CourseProposal[]> {
+    return this.proposals$.pipe(
+      map(proposals => proposals.filter(p => p.sdcId === sdcId))
+    );
   }
 
   addProposal(proposal: Omit<CourseProposal, 'id' | 'status'>): void {
@@ -90,3 +107,4 @@ export class CourseProposalService {
     this.proposalsSubject.next(this.proposals);
   }
 }
+

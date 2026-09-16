@@ -98,9 +98,7 @@ export type FontSize = 'sm' | 'md' | 'lg';
                     </svg>
                     <span class="truncate max-w-[120px]">{{ profile.personal.designation || 'Signatory Authority' }}</span>
                   </span>
-                  <span *ngIf="!profile.isRegistered" class="text-amber-700 font-bold">
-                    ⚠️ OTR Pending
-                  </span>
+
                 </div>
               </div>
 
@@ -165,7 +163,7 @@ export type FontSize = 'sm' | 'md' | 'lg';
           </div>
           <div class="text-[10.5px] text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
             <span *ngIf="profile.isRegistered" class="text-emerald-700 font-semibold">✓ Verified Partner</span>
-            <span *ngIf="!profile.isRegistered" class="text-amber-700 font-semibold">⚠️ OTR Pending</span>
+
             <span>•</span>
             <span class="font-mono">SSO: {{ profile.ssoId }}</span>
           </div>

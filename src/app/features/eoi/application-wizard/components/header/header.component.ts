@@ -121,9 +121,7 @@ import { Observable } from 'rxjs';
                     </svg>
                     <span>{{ profile.personal.designation || 'Managing Director & Authorized Signatory' }}</span>
                   </span>
-                  <span *ngIf="!profile.isRegistered" class="text-amber-700 font-bold">
-                    ⚠️ OTR Pending
-                  </span>
+
                 </div>
               </div>
 

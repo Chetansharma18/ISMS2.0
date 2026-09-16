@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { UiTableComponent, TableColumn } from '../../../shared/components/ui/ui-table/ui-table.component';
@@ -8,6 +8,7 @@ import { SanctionOrderService, SanctionOrder } from '../../../core/services/sanc
   selector: 'app-sanction-order-list',
   standalone: true,
   imports: [CommonModule, RouterLink, UiTableComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="space-y-6">
       <div class="flex justify-between items-end">

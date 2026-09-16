@@ -26,9 +26,9 @@ import { UiModalComponent } from '../../../shared/components/ui/ui-modal/ui-moda
         
         <ng-template #rowTemplate let-p let-col="column">
           
-          <ng-container *ngIf="col.key === 'tp'">
+          <ng-container *ngIf="col.key === 'tpSdc'">
             <div class="font-bold text-[#131A4D]">{{ p.tpName }}</div>
-            <div class="text-[10px] text-slate-500 uppercase">{{ p.tpId }}</div>
+            <div class="text-[10px] text-slate-500 uppercase">{{ p.tpId }} • {{ p.sdcName }}</div>
           </ng-container>
 
           <ng-container *ngIf="col.key === 'course'">
@@ -86,7 +86,7 @@ export class AdminCoursesComponent implements OnInit {
   selectedInfra: string | null = null;
 
   columns: TableColumn[] = [
-    { key: 'tp', label: 'TP Details' },
+    { key: 'tpSdc', label: 'TP & SDC Details' },
     { key: 'course', label: 'Proposed Course' },
     { key: 'capacity', label: 'Capacity & Duration' },
     { key: 'infra', label: 'Infrastructure', align: 'center' },

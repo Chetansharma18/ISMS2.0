@@ -188,7 +188,7 @@ import { FormFieldComponent } from '../shared/form-field.component';
         </div>
         <div class="gov-card-body">
           <div class="preview-fields-grid">
-            <app-preview-field label="Processing Fee (Non-refundable)" [value]="'₹' + ((eoiService.paymentData().processingFee || 2500) | number:'1.0-0') + '.00 (PF-RJ-2026-11029)'" [isBold]="true"></app-preview-field>
+            <app-preview-field label="Processing Fee (Non-refundable)" [value]="'₹' + ((eoiService.paymentData().processingFee || 2000) | number:'1.0-0') + '.00 (PF-RJ-2026-11029)'" [isBold]="true"></app-preview-field>
             <app-preview-field label="Earnest Money Deposit (EMD)" [value]="'₹' + ((eoiService.paymentData().emdFee || 50000) | number:'1.0-0') + '.00 (EMD-RJ-2026-88492)'" [isBold]="true"></app-preview-field>
             <app-preview-field label="Total Amount Paid" [value]="'₹' + eoiService.computedTotalFee().toLocaleString('en-IN') + '.00'" [isNavy]="true" [isBold]="true" [isMono]="true"></app-preview-field>
             <app-preview-field label="Transaction Reference ID" [value]="eoiService.paymentData().transactionId || 'TXN-ISMS-2026-884921'" [isMono]="true" [isBold]="true"></app-preview-field>

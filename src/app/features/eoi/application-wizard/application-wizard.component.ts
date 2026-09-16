@@ -169,7 +169,7 @@ export class ApplicationWizardComponent implements OnInit {
     const pay = this.eoiService.paymentData();
     const errors: Record<string, string> = {};
 
-    const procFee = pay.processingFee || 2500;
+    const procFee = pay.processingFee || 2000;
     const emdFee = pay.emdFee || 50000;
     const procFeeStr = '₹' + procFee.toLocaleString('en-IN');
     const emdFeeStr = '₹' + emdFee.toLocaleString('en-IN');
@@ -324,9 +324,9 @@ export class ApplicationWizardComponent implements OnInit {
       tpMobile: org.organisation_contact_no || '9829012345',
       authPerson: auth.auth_name || 'Rajesh Kumar Sharma',
       authDesignation: auth.auth_designation || 'Managing Director & CEO',
-      processingFee: pay.processingFee || pay.processingFeeAmount || 2500,
+      processingFee: pay.processingFee || pay.processingFeeAmount || 2000,
       emdFee: pay.emdFee || pay.emdFeeAmount || 50000,
-      totalFee: pay.totalAmount || this.eoiService.computedTotalFee() || ((pay.processingFee || 2500) + (pay.emdFee || 50000)),
+      totalFee: pay.totalAmount || this.eoiService.computedTotalFee() || ((pay.processingFee || 2000) + (pay.emdFee || 50000)),
       transactionId: pay.transactionId || 'TXN-ISMS-2026-884921',
       paymentMethod: pay.paymentMethod || 'UPI / Online Gateway',
       paymentDate: pay.paymentDate || '08-Sep-2026',

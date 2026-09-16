@@ -171,7 +171,7 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
                         ₹{{ (app.emdPayment.baseEmd || app.emdPayment.totalPaid) | number:'1.0-0' }}
                       </div>
                       <div class="text-[11px] text-slate-500 font-medium mt-0.5">
-                        Fee: ₹{{ (app.emdPayment.processingFee || 2500) | number:'1.0-0' }}
+                        Fee: ₹{{ (app.emdPayment.processingFee || 2000) | number:'1.0-0' }}
                       </div>
                       <div class="text-[10.5px] text-emerald-700 font-mono font-semibold truncate max-w-[140px]" [title]="app.emdPayment.txnReference">
                         {{ app.emdPayment.txnReference }}
@@ -381,7 +381,7 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
                             <span class="bg-[#DCFCE7] text-[#15803D] text-[10.5px] font-bold px-2 py-0.5 rounded-xs">✓ SUCCESSFUL</span>
                           </td>
                           <td class="p-2.5 text-right font-mono font-semibold">
-                            ₹{{ (selectedReceiptApp.emdPayment.processingFee || 2500) | number:'1.0-0' }}
+                            ₹{{ (selectedReceiptApp.emdPayment.processingFee || 2000) | number:'1.0-0' }}
                           </td>
                         </tr>
                         <tr>
@@ -398,7 +398,7 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
                         <tr class="bg-slate-50/80 font-bold text-slate-900">
                           <td colspan="4" class="p-2.5 text-right">TOTAL AMOUNT PAID:</td>
                           <td class="p-2.5 text-right font-mono text-sm sm:text-base font-extrabold text-[#1E4D8F]">
-                            ₹{{ ((selectedReceiptApp.emdPayment.baseEmd || 50000) + (selectedReceiptApp.emdPayment.processingFee || 2500)) | number:'1.0-0' }}
+                            ₹{{ ((selectedReceiptApp.emdPayment.baseEmd || 50000) + (selectedReceiptApp.emdPayment.processingFee || 2000)) | number:'1.0-0' }}
                           </td>
                         </tr>
                       </tbody>
@@ -572,7 +572,7 @@ export class MyApplicationsComponent implements OnInit {
 
   downloadReceiptPdf(app: EoiApplication): void {
     const baseEmd = app.emdPayment.baseEmd || 50000;
-    const procFee = app.emdPayment.processingFee || 2500;
+    const procFee = app.emdPayment.processingFee || 2000;
     const total = (app.emdPayment.totalPaid || (baseEmd + procFee));
     const cleanDigits = app.id.replace(/\D/g, '');
     const ackSuffix = cleanDigits ? cleanDigits.slice(-4) : '9921';

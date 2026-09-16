@@ -45,7 +45,7 @@ import { Scheme } from '../../../../../core/services/eoi-state.service';
             
             <div class="gov-card-body">
               <p class="fee-section-note">
-                Both Processing Fee (₹{{ (eoiService.paymentData().processingFee || 2500) | number:'1.0-0' }}) and Earnest Money Deposit (₹{{ (eoiService.paymentData().emdFee || 50000) | number:'1.0-0' }}) are compulsory for EOI proposal submission under <strong>{{ scheme?.schemeCode || 'this Scheme' }}</strong>.
+                Both Processing Fee (₹{{ (eoiService.paymentData().processingFee || 2000) | number:'1.0-0' }}) and Earnest Money Deposit (₹{{ (eoiService.paymentData().emdFee || 50000) | number:'1.0-0' }}) are compulsory for EOI proposal submission under <strong>{{ scheme?.schemeCode || 'this Scheme' }}</strong>.
               </p>
 
               <div class="fee-items-list">
@@ -66,7 +66,7 @@ import { Scheme } from '../../../../../core/services/eoi-state.service';
                   <div class="fee-details-wrap">
                     <div class="fee-name-row">
                       <span class="fee-title">1. Processing Fee <span class="req-star">*</span></span>
-                      <span class="fee-amount-tag">₹{{ (eoiService.paymentData().processingFee || 2500) | number:'1.0-0' }}</span>
+                      <span class="fee-amount-tag">₹{{ (eoiService.paymentData().processingFee || 2000) | number:'1.0-0' }}</span>
                     </div>
                     <span class="fee-sub-desc">Non-refundable administrative scrutiny fee under {{ scheme?.schemeCode || 'ISMS 2.0' }} guidelines</span>
                   </div>
@@ -199,7 +199,7 @@ import { Scheme } from '../../../../../core/services/eoi-state.service';
               <div class="summary-fee-line">
                 <span class="fee-item-name">Processing Fee</span>
                 <span class="fee-item-val" [class.is-zero]="!eoiService.paymentData().processingFeeSelected">
-                  {{ eoiService.paymentData().processingFeeSelected ? ('₹' + ((eoiService.paymentData().processingFee || 2500) | number:'1.0-0')) : '₹0' }}
+                  {{ eoiService.paymentData().processingFeeSelected ? ('₹' + ((eoiService.paymentData().processingFee || 2000) | number:'1.0-0')) : '₹0' }}
                 </span>
               </div>
               <div class="summary-fee-line">

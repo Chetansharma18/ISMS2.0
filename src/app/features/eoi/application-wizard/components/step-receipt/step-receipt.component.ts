@@ -177,7 +177,7 @@ import { Scheme } from '../../../../../core/services/eoi-state.service';
                     <td class="font-mono">{{ eoiService.formData().section8.process_fee_payment_id }}</td>
                     <td>{{ eoiService.paymentData().paymentMethod || 'Online UPI' }}</td>
                     <td><span class="r-tag-paid">✓ SUCCESSFUL</span></td>
-                    <td style="text-align: right;" class="font-mono">₹{{ (eoiService.paymentData().processingFeeSelected ? (eoiService.paymentData().processingFeeAmount || 500) : 0).toLocaleString('en-IN') }}</td>
+                    <td style="text-align: right;" class="font-mono">₹{{ (eoiService.paymentData().processingFeeSelected ? (eoiService.paymentData().processingFeeAmount || 2000) : 0).toLocaleString('en-IN') }}</td>
                   </tr>
                   <tr>
                     <td>Earnest Money Deposit (EMD)</td>

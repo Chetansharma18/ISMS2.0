@@ -1,3 +1,60 @@
 :host {
   display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
+
+/* Explicit dimensional enforcement for footer logos across all screens */
+.footer-emblem {
+  height: 44px !important;
+  max-height: 44px !important;
+  width: auto !important;
+  max-width: 44px !important;
+  display: block !important;
+  object-fit: contain !important;
+}
+
+@media (min-width: 640px) {
+  .footer-emblem {
+    height: 56px !important;
+    max-height: 56px !important;
+    max-width: 56px !important;
+  }
+}
+
+.footer-rsldc-circle {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  max-width: 44px !important;
+  max-height: 44px !important;
+  flex-shrink: 0 !important;
+  overflow: hidden !important;
+  border-radius: 9999px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+@media (min-width: 640px) {
+  .footer-rsldc-circle {
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
+    max-width: 56px !important;
+    max-height: 56px !important;
+  }
+}
+
+.footer-rsldc-img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+

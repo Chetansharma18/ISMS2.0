@@ -16,7 +16,7 @@ export interface PartnerLink {
   hindiName?: string;
   tagline?: string;
   url: string;
-  type: string;
+  logo: string;
 }
 
 @Component({
@@ -29,84 +29,61 @@ export interface PartnerLink {
 export class ImportantLinksComponent implements OnInit, OnDestroy {
   protected readonly languageService = inject(LanguageService);
   readonly t = this.languageService.t;
+
   links: PartnerLink[] = [
-    {
-      id: 'acb',
-      name: 'Anti Corruption Bureau',
-      hindiName: 'मांगे कोई रिश्वत तो कॉल करें',
-      tagline: 'Toll Free: 1064 | WhatsApp: 9413502834',
-      url: 'http://acbrajasthan.gov.in',
-      type: 'acb'
-    },
-    {
-      id: 'organ-donation',
-      name: 'Organ Donation Pledge',
-      hindiName: 'Save lives today',
-      tagline: 'One Donor Can Save 8 Lives - Register for Pledge',
-      url: 'https://notto.mohfw.gov.in',
-      type: 'pledge'
-    },
-    {
-      id: 'jan-soochna',
-      name: 'Jan Soochna Portal 2019',
-      hindiName: 'जन सूचना पोर्टल-2019',
-      tagline: 'Government of Rajasthan',
-      url: 'https://jansoochna.rajasthan.gov.in',
-      type: 'jansoochna'
-    },
     {
       id: 'bis',
       name: 'Bureau of Indian Standards',
       hindiName: 'मानक: पथप्रदर्शक:',
       tagline: 'The National Standards Body of India',
-      url: 'https://www.bis.gov.in',
-      type: 'bis'
+      url: 'https://www.bis.gov.in/',
+      logo: '/assets/links/bis.png'
     },
     {
-      id: 'skill-india',
-      name: 'Skill India',
-      hindiName: 'कौशल भारत - कुशल भारत',
-      tagline: 'Ministry of Skill Development & Entrepreneurship',
-      url: 'https://www.skillindia.gov.in',
-      type: 'skillindia'
+      id: 'bis-care',
+      name: 'BIS Care App',
+      hindiName: 'बीआईएस केयर ऐप',
+      tagline: 'Bureau of Indian Standards Mobile App',
+      url: 'https://www.bis.gov.in/bis-apps/',
+      logo: '/assets/links/bis-care.png'
     },
     {
-      id: 'digital-india',
-      name: 'Digital India',
-      hindiName: 'डिजिटल भारत',
-      tagline: 'Power To Empower',
-      url: 'https://www.digitalindia.gov.in',
-      type: 'digitalindia'
+      id: 'acb',
+      name: 'Anti Corruption Bureau',
+      hindiName: 'मांगे कोई रिश्वत तो कॉल करें',
+      tagline: 'Toll Free: 1064 | WhatsApp: 9413502834',
+      url: 'https://home.rajasthan.gov.in/content/homeportal/en/acbdepartment.html',
+      logo: '/assets/links/acb.png'
     },
     {
-      id: 'rajsso',
-      name: 'Rajasthan Single Sign On',
-      hindiName: 'राजएसएसओ (RajSSO)',
-      tagline: 'One Digital Identity for All Applications',
-      url: 'https://sso.rajasthan.gov.in',
-      type: 'rajsso'
+      id: 'pledge',
+      name: 'Organ Donation Pledge',
+      hindiName: 'Save lives today',
+      tagline: 'One Donor Can Save 8 Lives - Register for Pledge',
+      url: 'https://notto.abdm.gov.in/register/',
+      logo: '/assets/links/pledge.jpeg'
     },
     {
-      id: 'raj-sampark',
-      name: 'Rajasthan Sampark',
-      hindiName: 'राजस्थान संपर्क - 181',
-      tagline: 'Toll-Free 181 | जन समस्या निवारण प्रणाली',
-      url: 'https://sampark.rajasthan.gov.in',
-      type: 'sampark'
+      id: 'jansoochna',
+      name: 'Jan Soochna Portal 2019',
+      hindiName: 'जन सूचना पोर्टल-2019',
+      tagline: 'Government of Rajasthan',
+      url: 'https://jansoochna.rajasthan.gov.in/',
+      logo: '/assets/links/jansoochna.png'
     }
   ];
 
-  currentPage = signal(0);
+  currentIndex = signal(0);
   itemsPerPage = signal(4);
   private autoSlideInterval: any = null;
   isPaused = signal(false);
 
-  totalPages = computed(() => {
-    return Math.ceil(this.links.length / this.itemsPerPage());
+  maxIndex = computed(() => {
+    return Math.max(0, this.links.length - this.itemsPerPage());
   });
 
-  pagesArray = computed(() => {
-    return Array.from({ length: this.totalPages() }, (_, i) => i);
+  dotsArray = computed(() => {
+    return Array.from({ length: this.maxIndex() + 1 }, (_, i) => i);
   });
 
   ngOnInit() {
@@ -134,23 +111,30 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
       this.itemsPerPage.set(1);
     }
 
-    // Ensure currentPage is within bounds
-    if (this.currentPage() >= this.totalPages()) {
-      this.currentPage.set(0);
+    if (this.currentIndex() > this.maxIndex()) {
+      this.currentIndex.set(this.maxIndex());
     }
   }
 
   next() {
-    this.currentPage.update(p => (p + 1) % this.totalPages());
+    if (this.currentIndex() >= this.maxIndex()) {
+      this.currentIndex.set(0);
+    } else {
+      this.currentIndex.update(i => i + 1);
+    }
   }
 
   prev() {
-    this.currentPage.update(p => (p - 1 + this.totalPages()) % this.totalPages());
+    if (this.currentIndex() <= 0) {
+      this.currentIndex.set(this.maxIndex());
+    } else {
+      this.currentIndex.update(i => i - 1);
+    }
   }
 
-  goToPage(page: number) {
-    if (page >= 0 && page < this.totalPages()) {
-      this.currentPage.set(page);
+  goToSlide(index: number) {
+    if (index >= 0 && index <= this.maxIndex()) {
+      this.currentIndex.set(index);
     }
   }
 
@@ -160,7 +144,7 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
       if (!this.isPaused()) {
         this.next();
       }
-    }, 4500);
+    }, 4000);
   }
 
   stopAutoSlide() {
@@ -178,8 +162,10 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
     this.isPaused.set(false);
   }
 
-  getPageLinks(pageIndex: number): PartnerLink[] {
-    const start = pageIndex * this.itemsPerPage();
-    return this.links.slice(start, start + this.itemsPerPage());
+  onImageError(event: Event, fallbackName: string) {
+    const target = event.target as HTMLImageElement;
+    if (target && fallbackName && !target.src.endsWith('/' + fallbackName)) {
+      target.src = '/' + fallbackName;
+    }
   }
 }

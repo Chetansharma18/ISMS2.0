@@ -42,14 +42,14 @@ import { Observable } from 'rxjs';
           </div>
 
           <!-- Step 1: Full Read-Only Recap of Applicant's EOI Form + Profile -->
-          <div *ngIf="!showActionPanel" class="max-w-5xl mx-auto space-y-6 animate-in fade-in duration-300">
+          <div *ngIf="!showActionPanel" class="w-full space-y-6 animate-in fade-in duration-300">
               
               <!-- 1. Scheme & EOI Submission Details Box -->
               <div class="bg-white border border-slate-300 shadow-sm overflow-hidden">
                 <div class="bg-[#131A4D] text-white px-5 py-2.5 flex items-center justify-between">
                   <div class="flex items-center">
                     <h2 class="text-xs font-bold uppercase tracking-wider">
-                      Applied Tender Specification
+                      Tender Details
                     </h2>
                   </div>
                   <span class="text-[10px] font-mono text-blue-200">
@@ -58,7 +58,7 @@ import { Observable } from 'rxjs';
                 </div>
 
                 <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-700">
-                  <div class="sm:col-span-2">
+                  <div>
                     <span class="text-slate-400 block text-[11px]">Scheme Name:</span>
                     <span class="font-bold text-slate-900 text-sm">{{ selectedApplicant?.schemeName }}</span>
                   </div>
@@ -70,7 +70,7 @@ import { Observable } from 'rxjs';
                     <span class="text-slate-400 block text-[11px]">Target Training Capacity:</span>
                     <span class="font-mono font-bold text-slate-900">{{ selectedApplicant?.proposalCapacity }} Candidates / Year</span>
                   </div>
-                  <div class="sm:col-span-2">
+                  <div>
                     <span class="text-slate-400 block text-[11px]">Proposed Rajasthan District Centers:</span>
                     <div class="flex flex-wrap gap-1.5 mt-1">
                       <span *ngFor="let dist of selectedApplicant?.proposedDistricts" class="px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-[11px] rounded-full">
@@ -88,7 +88,7 @@ import { Observable } from 'rxjs';
                     Step 1: Organisation / Company Basic Details
                   </span>
                 </div>
-                <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-700">
+                <div class="p-5 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-700">
                   <div><span class="text-slate-400 block text-[11px]">Application No.</span><span class="font-mono font-bold text-[#131A4D]">{{ selectedApplicant?.applicationId || 'ISMS-TP-892134' }}</span></div>
                   <div><span class="text-slate-400 block text-[11px]">TP/PIA Full Name</span><span class="font-bold text-slate-900">{{ selectedApplicant?.organizationName || 'N/A' }}</span></div>
                   <div><span class="text-slate-400 block text-[11px]">TP/PIA Short Name</span><span class="font-bold text-slate-900">APEX-TECH</span></div>
@@ -97,7 +97,7 @@ import { Observable } from 'rxjs';
                   <div><span class="text-slate-400 block text-[11px]">Company Email-ID</span><span class="font-mono text-slate-800">{{ selectedApplicant?.contactEmail || 'contact@example.com' }}</span></div>
                   <div><span class="text-slate-400 block text-[11px]">Organisation PAN No.</span><span class="font-mono font-bold text-slate-900">{{ selectedApplicant?.pan || 'AABCA1294F' }}</span></div>
                   <div><span class="text-slate-400 block text-[11px]">Website</span><span class="text-blue-600 hover:underline cursor-pointer">https://apextechnical.in</span></div>
-                  <div class="sm:col-span-2"><span class="text-slate-400 block text-[11px]">Registered Address</span><span class="text-slate-900">123, RIICO Industrial Area, Phase II</span></div>
+                  <div class="md:col-span-3"><span class="text-slate-400 block text-[11px]">Registered Address</span><span class="text-slate-900">123, RIICO Industrial Area, Phase II</span></div>
                   <div><span class="text-slate-400 block text-[11px]">State/UT</span><span class="text-slate-900">Rajasthan</span></div>
                   <div><span class="text-slate-400 block text-[11px]">District</span><span class="text-slate-900">Jaipur</span></div>
                   <div><span class="text-slate-400 block text-[11px]">Pincode</span><span class="font-mono text-slate-900">302022</span></div>
@@ -105,7 +105,7 @@ import { Observable } from 'rxjs';
                   <div><span class="text-slate-400 block text-[11px]">Date of Registration</span><span class="font-mono text-slate-900">12/05/2015</span></div>
                   <div><span class="text-slate-400 block text-[11px]">State Where Registered</span><span class="text-slate-900">Rajasthan</span></div>
                   <div><span class="text-slate-400 block text-[11px]">Type of business/activity</span><span class="text-slate-900">Skill Training Provider</span></div>
-                  <div class="sm:col-span-2"><span class="text-slate-400 block text-[11px]">Postal Address</span><span class="text-slate-900">123, RIICO Industrial Area, Phase II (Same as Registered)</span></div>
+                  <div class="md:col-span-3"><span class="text-slate-400 block text-[11px]">Postal Address</span><span class="text-slate-900">123, RIICO Industrial Area, Phase II (Same as Registered)</span></div>
                 </div>
               </div>
 
@@ -116,7 +116,7 @@ import { Observable } from 'rxjs';
                     Step 2: Authorized Person Details (Organisation Level)
                   </span>
                 </div>
-                <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-700">
+                <div class="p-5 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-700">
                   <div><span class="text-slate-400 block text-[11px]">Name</span><span class="font-bold text-slate-900">{{ selectedApplicant?.applicantName || 'Vikramaditya Sharma' }}</span></div>
                   <div><span class="text-slate-400 block text-[11px]">S/O, D/O, W/O</span><span class="text-slate-900">Shri R.K. Sharma</span></div>
                   <div><span class="text-slate-400 block text-[11px]">Date of Birth</span><span class="font-mono text-slate-900">14/08/1982</span></div>
@@ -124,7 +124,7 @@ import { Observable } from 'rxjs';
                   <div><span class="text-slate-400 block text-[11px]">Designation</span><span class="text-slate-900">Managing Director</span></div>
                   <div><span class="text-slate-400 block text-[11px]">Mobile No.</span><span class="font-mono text-slate-800">{{ selectedApplicant?.contactMobile || '+91 98201 44520' }}</span></div>
                   <div><span class="text-slate-400 block text-[11px]">Email-Id</span><span class="font-mono text-slate-800">{{ selectedApplicant?.contactEmail || 'v.sharma@apextechnical.in' }}</span></div>
-                  <div class="sm:col-span-2"><span class="text-slate-400 block text-[11px]">Residence Address</span><span class="text-slate-900">45-B, Civil Lines, Jaipur</span></div>
+                  <div class="md:col-span-3"><span class="text-slate-400 block text-[11px]">Residence Address</span><span class="text-slate-900">45-B, Civil Lines, Jaipur</span></div>
                   <div><span class="text-slate-400 block text-[11px]">State</span><span class="text-slate-900">Rajasthan</span></div>
                   <div><span class="text-slate-400 block text-[11px]">PAN</span><span class="font-mono font-bold text-slate-900">BGPPS4512K</span></div>
                   <div><span class="text-slate-400 block text-[11px]">Aadhaar No.</span><span class="font-mono font-bold text-slate-900">XXXX-XXXX-4512</span></div>
@@ -144,7 +144,7 @@ import { Observable } from 'rxjs';
                     Step 3: Document Upload
                   </span>
                 </div>
-                <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div class="p-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                   <div class="p-3 border border-slate-200 bg-slate-50 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                       <span class="text-base">📄</span>

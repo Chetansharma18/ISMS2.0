@@ -3,10 +3,10 @@
   <div class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8 sm:pt-10 sm:pb-12 lg:pt-10 lg:pb-12">
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-12 gap-x-4 sm:gap-x-6 lg:gap-x-10 gap-y-7 sm:gap-y-8 lg:gap-y-10">
 
-      <!-- Col 1: Emblems + Divider + ISMS 2.0 (matching Header layout) -->
+      <!-- Col 1: Two Logos on Top, ISMS 2.0 & Subtitle Underneath -->
       <div class="col-span-2 md:col-span-1 lg:col-span-5 flex flex-col justify-start">
-        <div class="flex items-center gap-2.5 sm:gap-3.5 lg:gap-4 select-none min-w-0">
-
+        <!-- Logos Row (Emblem + RSLDC Logo side-by-side) -->
+        <div class="flex items-center gap-3 sm:gap-4 select-none mb-3 sm:mb-3.5">
           <!-- State Emblem of India (White version for dark footer) -->
           <div class="flex-shrink-0 flex items-center justify-center">
             <img src="footer-images/emblem-white.png" alt="State Emblem of India" width="44" height="44"
@@ -18,21 +18,17 @@
             <img src="footer-images/rsldc-logo.png" alt="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)" width="44" height="44"
               class="footer-rsldc-img object-contain shrink-0 drop-shadow-sm" />
           </div>
+        </div>
 
-          <!-- Thin Vertical Divider Line -->
-          <div class="h-8 sm:h-10 lg:h-12 w-[1.5px] bg-white/20 mx-0.5 xs:mx-1 sm:mx-1.5 lg:mx-2 shrink-0"></div>
-
-          <!-- System Branding: ISMS in White, 2.0 in Orange/Amber -->
-          <div class="flex text-left flex-col justify-center shrink-0">
-            <div class="flex items-baseline leading-none">
-              <span class="text-xl sm:text-2xl lg:text-[27px] font-extrabold text-white tracking-tight">ISMS</span>
-              <span class="text-xl sm:text-2xl lg:text-[27px] font-extrabold text-[#f59e0b] ml-1">2.0</span>
-            </div>
-            <div class="text-[10px] xs:text-[11px] sm:text-[11.5px] lg:text-[12px] text-slate-300/90 font-medium tracking-tight mt-0.5 sm:mt-1 max-w-xs sm:max-w-sm">
-              {{ t().footer.ismsSubtitle }}
-            </div>
+        <!-- System Branding: ISMS 2.0 and Subtitle Underneath the Logos -->
+        <div class="flex flex-col text-left">
+          <div class="flex items-baseline leading-none mb-1">
+            <span class="text-xl sm:text-2xl lg:text-[26px] font-extrabold text-white tracking-tight">ISMS</span>
+            <span class="text-xl sm:text-2xl lg:text-[26px] font-extrabold text-[#f59e0b] ml-1">2.0</span>
           </div>
-
+          <p class="text-xs sm:text-[12.5px] text-slate-300/90 tracking-normal max-w-sm leading-relaxed">
+            {{ t().footer.ismsSubtitle }}
+          </p>
         </div>
       </div>
 

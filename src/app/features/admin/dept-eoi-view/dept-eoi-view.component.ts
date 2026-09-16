@@ -22,25 +22,11 @@ import { Observable } from 'rxjs';
         <main class="flex-grow px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto">
           
           <!-- Top Breadcrumb & Department Header -->
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 mb-6" *ngIf="userProfile$ | async as profile">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 mb-6">
             <div>
-              <div class="text-[11px] text-cyan-800 uppercase tracking-wider font-semibold">
-                Department Scrutiny Cell · {{ profile.department || 'RSLDC' }}
-              </div>
               <h1 class="text-2xl font-bold text-[#131A4D] tracking-tight">
                 EOI View (Department Tenders)
               </h1>
-              <p class="text-xs text-slate-500 mt-0.5">
-                Active schemes and tenders published by your department with incoming Expression of Interest (EOI) applicant response counts.
-              </p>
-            </div>
-
-            <!-- Department Quick Stats Badge -->
-            <div class="flex items-center gap-3 bg-white border border-slate-200 px-4 py-2 shadow-2xs">
-              <div class="text-right">
-                <div class="text-[10px] text-slate-400 uppercase">Total Responses</div>
-                <div class="text-lg font-bold text-[#131A4D]">47 Submissions</div>
-              </div>
             </div>
           </div>
 
@@ -55,9 +41,7 @@ import { Observable } from 'rxjs';
                 </h2>
               </div>
 
-              <div class="text-xs text-blue-200">
-                Showing {{ (schemes$ | async)?.length || 0 }} Tenders
-              </div>
+
             </div>
 
             <!-- Dense Working Table -->

@@ -19,7 +19,7 @@ import { Observable } from 'rxjs';
         <app-sidebar class="hidden md:block"></app-sidebar>
 
         <!-- Main Content Area -->
-        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto">
+        <main class="flex-grow px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto">
           
           <!-- Top Title & Navigation Bar -->
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 mb-6">
@@ -32,9 +32,7 @@ import { Observable } from 'rxjs';
               <h1 class="text-2xl font-bold text-[#131A4D] tracking-tight">
                 Applicant Scrutiny Submissions
               </h1>
-              <p class="text-xs text-slate-500 mt-0.5">
-                Working evaluation desk for submitted tenders, technical partner eligibility & EMD verification.
-              </p>
+
             </div>
 
             <!-- Total Submissions Count Badge -->
@@ -51,33 +49,13 @@ import { Observable } from 'rxjs';
             <!-- Window Title Bar (#131A4D) -->
             <div class="bg-[#131A4D] text-white px-5 py-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
               <div class="flex items-center gap-2">
-                <span class="text-base">📑</span>
+
                 <h2 class="text-sm font-bold tracking-wide">
                   Incoming Expressions of Interest (EOI Working Desk)
                 </h2>
               </div>
 
-              <!-- Quick Status Filter Pills -->
-              <div class="flex items-center gap-1.5 text-xs">
-                <button 
-                  (click)="activeFilter = 'ALL'"
-                  [ngClass]="activeFilter === 'ALL' ? 'border-white text-white font-bold' : 'border-transparent text-blue-100'"
-                  class="px-3 py-1 border rounded-md hover:bg-white/10 transition-colors">
-                  All ({{ responses.length }})
-                </button>
-                <button 
-                  (click)="activeFilter = 'UNDER_SCRUTINY'"
-                  [ngClass]="activeFilter === 'UNDER_SCRUTINY' ? 'border-white text-white font-bold' : 'border-transparent text-blue-100'"
-                  class="px-3 py-1 border rounded-md hover:bg-white/10 transition-colors">
-                  Pending Review (1)
-                </button>
-                <button 
-                  (click)="activeFilter = 'APPROVED'"
-                  [ngClass]="activeFilter === 'APPROVED' ? 'border-white text-white font-bold' : 'border-transparent text-blue-100'"
-                  class="px-3 py-1 border rounded-md hover:bg-white/10 transition-colors">
-                  Approved (2)
-                </button>
-              </div>
+
             </div>
 
             <!-- Dense Working Table -->

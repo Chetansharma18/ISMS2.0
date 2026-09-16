@@ -255,20 +255,6 @@ import { Observable } from 'rxjs';
             </div>
             <span class="tracking-tight whitespace-nowrap">EOI Requests Desk</span>
           </a>
-
-          <!-- 2. Scrutiny Desk -->
-          <a 
-            routerLink="/admin/responses" 
-            [ngClass]="isDeptResponsesActive() ? 'nav-item-active' : 'nav-item-inactive'"
-            class="flex items-center gap-3 px-3 py-2.5 transition-all text-xs rounded-xs group cursor-pointer">
-            <div class="w-5 h-5 rounded flex items-center justify-center shrink-0 transition-colors" [ngClass]="isDeptResponsesActive() ? 'text-[#002244]' : 'text-slate-500 group-hover:text-[#002244]'">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-              </svg>
-            </div>
-            <span class="tracking-tight whitespace-nowrap">Application Scrutiny Desk</span>
-          </a>
         </ng-container>
 
         <!-- ================= SUPER ADMIN ================= -->
@@ -378,11 +364,7 @@ export class SidebarComponent implements OnInit {
   }
 
   isDeptEoiActive(): boolean {
-    return this.router.url.includes('/admin/eoi-view');
-  }
-
-  isDeptResponsesActive(): boolean {
-    return this.router.url.includes('/admin/responses');
+    return this.router.url.includes('/admin/eoi-view') || this.router.url.includes('/admin/responses') || this.router.url.includes('/admin/review');
   }
 
   isSuperMastersActive(): boolean {

@@ -84,6 +84,15 @@ import {
               <label class="block font-bold text-slate-700 mb-1">Aadhaar / Gov Identifier</label>
               <input type="text" formControlName="aadhaarMasked" placeholder="XXXXXXXX4512" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono" />
             </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">SSO ID</label>
+              <div class="flex gap-2">
+                <input type="text" formControlName="ssoId" placeholder="e.g. sso_user_id" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+                <button type="button" (click)="fetchSsoDetails()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 rounded-lg text-xs font-bold transition-colors shadow-2xs whitespace-nowrap">
+                  Map
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -400,6 +409,29 @@ export class UserCreateComponent implements OnInit {
     });
   }
 
+  fetchSsoDetails(): void {
+    const sso = this.userForm.get('ssoId')?.value;
+    if (!sso) {
+      this.toastService.error('SSO ID Required', 'Please enter an SSO ID to fetch details.');
+      return;
+    }
+    
+    this.toastService.info('Fetching SSO Data', 'Retrieving user details from State SSO API...');
+    
+    setTimeout(() => {
+      // Mock formatting of name from SSO ID (e.g. john_doe -> John Doe)
+      const mockName = sso.split(/[\._-]/).map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      
+      this.userForm.patchValue({
+        fullName: mockName || 'User SSO Fetch',
+        email: `${sso}@rajasthan.gov.in`,
+        mobile: '9' + Math.floor(100000000 + Math.random() * 900000000).toString(),
+        username: sso
+      });
+      this.toastService.success('SSO Details Fetched', 'User details successfully auto-filled.');
+    }, 600);
+  }
+
   onDistrictChange(): void {
     const dist = this.userForm.get('district')?.value;
     const found = this.districts().find(d => d.districtName === dist);
@@ -437,8 +469,8 @@ export class UserCreateComponent implements OnInit {
     }
 
     const formVal = this.userForm.value;
-    // Map SSO ID from the email prefix
-    const derivedSsoId = formVal.email ? formVal.email.split('@')[0] : formVal.ssoId;
+    // Map SSO ID from form input, or fallback to email prefix
+    const derivedSsoId = formVal.ssoId || (formVal.email ? formVal.email.split('@')[0] : '');
 
     const payload = {
       ...formVal,

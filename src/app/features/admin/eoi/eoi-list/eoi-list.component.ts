@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -7,18 +7,20 @@ import { ToastService } from '../../core/services/toast.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
+import { UiTableComponent, TableColumn } from '../../../../shared/components/ui/ui-table/ui-table.component';
 import { EoiItem, EoiStatus } from '../../core/models/admin.models';
 
 @Component({
   selector: 'admin-eoi-list',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule, 
     RouterModule, 
     FormsModule, 
     PageHeaderComponent, 
     StatusBadgeComponent, 
-    ModalComponent
+    UiTableComponent
   ],
   template: `
     <div>
@@ -44,7 +46,8 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
             <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
             <input 
               type="text" 
-              [(ngModel)]="searchQuery" 
+              [ngModel]="searchQuery()" 
+              (ngModelChange)="searchQuery.set($event)"
               placeholder="Search EOI Reference, Title, or Scheme..."
               class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-xs placeholder:text-slate-400 focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
           </div>
@@ -52,7 +55,8 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
           <!-- Scheme Filter -->
           <div>
             <select 
-              [(ngModel)]="schemeFilter" 
+              [ngModel]="schemeFilter()"
+              (ngModelChange)="schemeFilter.set($event)"
               class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 focus:ring-2 focus:ring-blue-600 focus:outline-hidden">
               <option value="ALL">All Schemes</option>
               <option value="Mukhya Mantri Kaushal Vikas Yojana">MMKVY</option>
@@ -66,7 +70,8 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
           <!-- Category Filter -->
           <div>
             <select 
-              [(ngModel)]="categoryFilter" 
+              [ngModel]="categoryFilter()"
+              (ngModelChange)="categoryFilter.set($event)"
               class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 focus:ring-2 focus:ring-blue-600 focus:outline-hidden">
               <option value="ALL">All Categories</option>
               <option value="General">General</option>
@@ -78,7 +83,8 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
           <!-- Status Filter -->
           <div>
             <select 
-              [(ngModel)]="statusFilter" 
+              [ngModel]="statusFilter()"
+              (ngModelChange)="statusFilter.set($event)"
               class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 focus:ring-2 focus:ring-blue-600 focus:outline-hidden">
               <option value="ALL">All Statuses</option>
               <option value="OPEN">OPEN (Accepting)</option>
@@ -95,7 +101,7 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
             Showing {{ filteredEois().length }} of {{ eois().length }} Total EOIs
           </span>
           <button 
-            *ngIf="searchQuery || schemeFilter !== 'ALL' || categoryFilter !== 'ALL' || statusFilter !== 'ALL'"
+            *ngIf="searchQuery() || schemeFilter() !== 'ALL' || categoryFilter() !== 'ALL' || statusFilter() !== 'ALL'"
             (click)="resetFilters()"
             class="text-blue-700 hover:text-blue-900 font-semibold cursor-pointer">
             Clear All Filters
@@ -103,179 +109,73 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
         </div>
       </div>
 
-      <!-- EOI Master Table -->
-      <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-slate-600 border-collapse">
-            <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[10px]">
-              <tr>
-                <th class="px-4 py-3.5">EOI Ref No.</th>
-                <th class="px-4 py-3.5">EOI Title</th>
-                <th class="px-4 py-3.5">Scheme & Category</th>
-                <th class="px-4 py-3.5">Published Date</th>
-                <th class="px-4 py-3.5">Closing Date</th>
-                <!-- <th class="px-4 py-3.5 text-center">Applications</th> -->
-                <th class="px-4 py-3.5">Committee</th>
-                <!-- <th class="px-4 py-3.5">Version</th> -->
-                <th class="px-4 py-3.5">Status</th>
-                <th class="px-4 py-3.5 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-              <tr *ngFor="let e of filteredEois()" class="hover:bg-slate-50/80 transition-colors group">
-                <!-- Ref No -->
-                <td class="px-4 py-3 font-mono font-bold text-blue-900 whitespace-nowrap">
-                  <a [routerLink]="['/admin/eoi', e.id, 'details']" class="hover:underline">
-                    {{ e.referenceNo }}
-                  </a>
-                </td>
+      <!-- EOI Master Table using UiTableComponent -->
+      <app-ui-table 
+        [columns]="tableColumns" 
+        [data]="filteredEois()" 
+        emptyMessage="No Expressions of Interest matching criteria."
+        [showSearch]="false"
+        [showPagination]="false">
+        <ng-template #rowTemplate let-row let-column="column">
+          <ng-container [ngSwitch]="column.key">
+            <!-- Ref No -->
+            <div *ngSwitchCase="'referenceNo'" class="font-mono font-bold text-blue-900 whitespace-nowrap">
+              <a [routerLink]="['/admin/eoi', row.id, 'details']" class="hover:underline">
+                {{ row.referenceNo }}
+              </a>
+            </div>
 
-                <!-- Title -->
-                <td class="px-4 py-3 max-w-xs">
-                  <div class="font-bold text-slate-900 line-clamp-1" [title]="e.title">{{ e.title }}</div>
-                  <div class="text-[11px] text-slate-500 truncate mt-0.5">{{ e.department }}</div>
-                </td>
+            <!-- Title -->
+            <div *ngSwitchCase="'title'" class="max-w-xs">
+              <div class="font-bold text-slate-900 line-clamp-1" [title]="row.title">{{ row.title }}</div>
+              <div class="text-[11px] text-slate-500 truncate mt-0.5">{{ row.department }}</div>
+            </div>
 
-                <!-- Scheme & Category -->
-                <td class="px-4 py-3 whitespace-nowrap">
-                  <div class="font-semibold text-slate-800">{{ e.schemeName }}</div>
-                  <div class="text-[11px] text-slate-500">{{ e.eoiCategory }}</div>
-                </td>
+            <!-- Scheme & Category -->
+            <div *ngSwitchCase="'scheme'" class="whitespace-nowrap">
+              <div class="font-semibold text-slate-800">{{ row.schemeName }}</div>
+              <div class="text-[11px] text-slate-500">{{ row.eoiCategory }}</div>
+            </div>
 
-                <!-- Published Date -->
-                <td class="px-4 py-3 whitespace-nowrap text-slate-600">
-                  {{ e.publishedDate }}
-                </td>
+            <!-- Published Date -->
+            <div *ngSwitchCase="'publishedDate'" class="whitespace-nowrap text-slate-600">
+              {{ row.publishedDate }}
+            </div>
 
-                <!-- Closing Date -->
-                <td class="px-4 py-3 font-semibold whitespace-nowrap" [ngClass]="e.status === 'OPEN' ? 'text-amber-700 font-bold' : 'text-slate-700'">
-                  {{ e.closingDate }}
-                </td>
+            <!-- Closing Date -->
+            <div *ngSwitchCase="'closingDate'" class="font-semibold whitespace-nowrap" [ngClass]="row.status === 'OPEN' ? 'text-amber-700 font-bold' : 'text-slate-700'">
+              {{ row.closingDate }}
+            </div>
 
-                <!-- Applications Count -->
-                <!--
-                <td class="px-4 py-3 text-center whitespace-nowrap">
-                  <a 
-                    [routerLink]="['/admin/eoi', e.id, 'responses']"
-                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-[#131A4D] border border-blue-200 hover:bg-blue-100 transition-colors"
-                    title="View Submissions">
-                    {{ e.applicationCount }} Apps
-                  </a>
-                </td>
-                -->
+            <!-- Committee -->
+            <div *ngSwitchCase="'committee'" class="max-w-[130px] truncate text-slate-600" [title]="row.committeeName || 'Not Assigned'">
+              <a [routerLink]="['/admin/eoi', row.id, 'committee']" class="hover:text-blue-700 hover:underline">
+                {{ row.committeeName || 'Assign Committee' }}
+              </a>
+            </div>
 
-                <!-- Committee -->
-                <td class="px-4 py-3 max-w-[130px] truncate text-slate-600" [title]="e.committeeName || 'Not Assigned'">
-                  <a [routerLink]="['/admin/eoi', e.id, 'committee']" class="hover:text-blue-700 hover:underline">
-                    {{ e.committeeName || 'Assign Committee' }}
-                  </a>
-                </td>
+            <!-- Status -->
+            <div *ngSwitchCase="'status'" class="whitespace-nowrap">
+              <admin-status-badge [status]="row.status"></admin-status-badge>
+            </div>
 
-                <!-- Version (Commented Out) -->
-                <!--
-                <td class="px-4 py-3 font-mono text-slate-600 whitespace-nowrap">
-                  <a [routerLink]="['/admin/eoi', e.id, 'history']" class="hover:text-blue-700 hover:underline">
-                    v{{ e.version }}
-                  </a>
-                </td>
-                -->
+            <!-- Actions -->
+            <div *ngSwitchCase="'actions'" class="flex items-center justify-end gap-1">
+              <a 
+                [routerLink]="['/admin/eoi/edit', row.id]" 
+                class="p-1 text-slate-500 hover:text-amber-700 hover:bg-slate-100 rounded" 
+                title="Edit EOI">
+                <span class="material-symbols-outlined text-[18px]">edit</span>
+              </a>
+            </div>
 
-                <!-- Status -->
-                <td class="px-4 py-3 whitespace-nowrap">
-                  <admin-status-badge [status]="e.status"></admin-status-badge>
-                </td>
+            <div *ngSwitchDefault class="text-slate-700 text-sm font-medium">
+              {{ row[column.key] }}
+            </div>
+          </ng-container>
+        </ng-template>
+      </app-ui-table>
 
-                <!-- Comprehensive Actions Dropdown/Row (Rule 20 & 38) -->
-                <td class="px-4 py-3 text-right whitespace-nowrap">
-                  <div class="flex items-center justify-end gap-1">
-                    <!-- View / Details (Commented Out) -->
-                    <!--
-                    <a 
-                      [routerLink]="['/admin/eoi', e.id, 'details']" 
-                      class="p-1 text-slate-500 hover:text-blue-700 hover:bg-slate-100 rounded" 
-                      title="View Details">
-                      <span class="material-symbols-outlined text-[18px]">visibility</span>
-                    </a>
-                    -->
-
-                    <!-- Edit / Configure -->
-                    <a 
-                      [routerLink]="['/admin/eoi/edit', e.id]" 
-                      class="p-1 text-slate-500 hover:text-amber-700 hover:bg-slate-100 rounded" 
-                      title="Edit EOI">
-                      <span class="material-symbols-outlined text-[18px]">edit</span>
-                    </a>
-
-                    <!-- Other Actions (Commented Out) -->
-                    <!--
-                    <a 
-                      [routerLink]="['/admin/eoi', e.id, 'form-builder']" 
-                      class="p-1 text-slate-500 hover:text-indigo-700 hover:bg-slate-100 rounded" 
-                      title="Dynamic Form Builder">
-                      <span class="material-symbols-outlined text-[18px]">format_shapes</span>
-                    </a>
-
-                    <a 
-                      [routerLink]="['/admin/eoi', e.id, 'preview']" 
-                      class="p-1 text-slate-500 hover:text-emerald-700 hover:bg-slate-100 rounded" 
-                      title="Preview as Applicant">
-                      <span class="material-symbols-outlined text-[18px]">preview</span>
-                    </a>
-
-                    <a 
-                      [routerLink]="['/admin/eoi', e.id, 'reschedule']" 
-                      class="p-1 text-slate-500 hover:text-amber-600 hover:bg-slate-100 rounded" 
-                      title="Reschedule Dates (Corrigendum)">
-                      <span class="material-symbols-outlined text-[18px]">update</span>
-                    </a>
-
-                    <a 
-                      [routerLink]="['/admin/eoi', e.id, 'committee']" 
-                      class="p-1 rounded transition-colors"
-                      [class]="e.committeeName 
-                        ? 'text-teal-600 hover:text-teal-800 hover:bg-teal-50' 
-                        : 'text-orange-500 hover:text-orange-700 hover:bg-orange-50'"
-                      [title]="e.committeeName ? ('Change Committee · ' + e.committeeName) : 'Assign Committee (Not Assigned)'">
-                      <span class="material-symbols-outlined text-[18px]">group_add</span>
-                    </a>
-
-                    <button 
-                      *ngIf="e.status === 'DRAFT' || e.status === 'PUBLISHED'"
-                      (click)="publishEoi(e)"
-                      class="p-1 text-emerald-600 hover:bg-emerald-50 rounded cursor-pointer" 
-                      title="Publish & Open Submissions">
-                      <span class="material-symbols-outlined text-[18px]">rocket_launch</span>
-                    </button>
-
-                    <button 
-                      *ngIf="e.status === 'OPEN'"
-                      (click)="closeEoi(e)"
-                      class="p-1 text-zinc-600 hover:bg-zinc-100 rounded cursor-pointer" 
-                      title="Close EOI Submissions">
-                      <span class="material-symbols-outlined text-[18px]">lock</span>
-                    </button>
-
-                    <button 
-                      (click)="duplicateEoi(e)"
-                      class="p-1 text-slate-500 hover:text-blue-700 hover:bg-slate-100 rounded cursor-pointer" 
-                      title="Duplicate EOI">
-                      <span class="material-symbols-outlined text-[18px]">content_copy</span>
-                    </button>
-                    -->
-                  </div>
-                </td>
-              </tr>
-
-              <tr *ngIf="filteredEois().length === 0">
-                <td colspan="10" class="py-12 text-center text-slate-400">
-                  <span class="material-symbols-outlined text-[36px] text-slate-300 block mb-1">search_off</span>
-                  No Expressions of Interest matching criteria.
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   `
 })
@@ -285,10 +185,41 @@ export class EoiListComponent implements OnInit {
   private router = inject(Router);
 
   eois = signal<EoiItem[]>([]);
-  searchQuery = '';
-  schemeFilter = 'ALL';
-  categoryFilter = 'ALL';
-  statusFilter = 'ALL';
+  searchQuery = signal('');
+  schemeFilter = signal('ALL');
+  categoryFilter = signal('ALL');
+  statusFilter = signal('ALL');
+
+  tableColumns: TableColumn[] = [
+    { key: 'referenceNo', label: 'EOI Ref No.', width: '160px' },
+    { key: 'title', label: 'EOI Title', width: 'auto' },
+    { key: 'scheme', label: 'Scheme & Category', width: 'auto' },
+    { key: 'publishedDate', label: 'Published', width: '100px' },
+    { key: 'closingDate', label: 'Closing', width: '100px' },
+    { key: 'committee', label: 'Committee', width: '140px' },
+    { key: 'status', label: 'Status', width: '100px' },
+    { key: 'actions', label: 'Actions', align: 'right', width: '80px' }
+  ];
+
+  filteredEois = computed(() => {
+    const search = this.searchQuery().toLowerCase();
+    const scheme = this.schemeFilter();
+    const category = this.categoryFilter();
+    const status = this.statusFilter();
+
+    return this.eois().filter(e => {
+      const matchSearch = !search || 
+        e.referenceNo.toLowerCase().includes(search) ||
+        e.title.toLowerCase().includes(search) ||
+        e.schemeName.toLowerCase().includes(search);
+
+      const matchScheme = scheme === 'ALL' || e.schemeName.toLowerCase().includes(scheme.toLowerCase());
+      const matchCategory = category === 'ALL' || e.eoiCategory === category;
+      const matchStatus = status === 'ALL' || e.status === status;
+
+      return matchSearch && matchScheme && matchCategory && matchStatus;
+    });
+  });
 
   ngOnInit(): void {
     this.loadEois();
@@ -298,26 +229,11 @@ export class EoiListComponent implements OnInit {
     this.eoiService.getEois().subscribe(data => this.eois.set(data));
   }
 
-  filteredEois(): EoiItem[] {
-    return this.eois().filter(e => {
-      const matchSearch = !this.searchQuery || 
-        e.referenceNo.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        e.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        e.schemeName.toLowerCase().includes(this.searchQuery.toLowerCase());
-
-      const matchScheme = this.schemeFilter === 'ALL' || e.schemeName.toLowerCase().includes(this.schemeFilter.toLowerCase());
-      const matchCategory = this.categoryFilter === 'ALL' || e.eoiCategory === this.categoryFilter;
-      const matchStatus = this.statusFilter === 'ALL' || e.status === this.statusFilter;
-
-      return matchSearch && matchScheme && matchCategory && matchStatus;
-    });
-  }
-
   resetFilters(): void {
-    this.searchQuery = '';
-    this.schemeFilter = 'ALL';
-    this.categoryFilter = 'ALL';
-    this.statusFilter = 'ALL';
+    this.searchQuery.set('');
+    this.schemeFilter.set('ALL');
+    this.categoryFilter.set('ALL');
+    this.statusFilter.set('ALL');
   }
 
   publishEoi(e: EoiItem): void {
@@ -354,3 +270,4 @@ export class EoiListComponent implements OnInit {
     });
   }
 }
+

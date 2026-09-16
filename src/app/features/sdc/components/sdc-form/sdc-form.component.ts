@@ -88,7 +88,7 @@ import { UiSelectComponent, SelectOption } from '../../../../shared/components/u
               [required]="true"
               [options]="[{label: 'Rajasthan', value: 'Rajasthan'}]"
               placeholder="Rajasthan"
-              [disabled]="true"
+              [isDisabled]="true"
               class="w-full">
             </app-ui-select>
 

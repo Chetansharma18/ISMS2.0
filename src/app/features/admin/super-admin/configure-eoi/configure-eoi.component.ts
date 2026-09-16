@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 @Component({
   selector: 'app-configure-eoi',
   standalone: true,
-  imports: [ReactiveFormsModule, FormsModule, NgIf, NgFor, AsyncPipe, HeaderComponent, SidebarComponent],
+  imports: [ReactiveFormsModule, FormsModule, NgIf, NgFor, HeaderComponent, SidebarComponent],
   template: `
     <div class="min-h-screen flex flex-col bg-[#F4F7F9] font-sans text-slate-800 antialiased">
       <app-header></app-header>

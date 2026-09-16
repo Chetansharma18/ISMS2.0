@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NgIf, NgFor, NgClass, AsyncPipe, DecimalPipe } from '@angular/common';
@@ -10,7 +10,8 @@ import { Observable } from 'rxjs';
 @Component({
   selector: 'app-profile-review',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, NgIf, NgFor, NgClass, AsyncPipe, DecimalPipe, HeaderComponent, SidebarComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ReactiveFormsModule, RouterLink, NgIf, NgFor, NgClass, HeaderComponent, SidebarComponent],
   template: `
     <div class="min-h-screen flex flex-col bg-[#F4F7F9] font-sans text-slate-800 antialiased">
       <app-header></app-header>
@@ -30,7 +31,7 @@ import { Observable } from 'rxjs';
                 <span>/</span>
                 <a routerLink="/admin/responses" class="text-[#131A4D] hover:underline">Applicant Responses</a>
                 <span>/</span>
-                <span class="font-bold text-slate-700">{{ selectedApplicant?.applicationId }}</span>
+                <span class="font-bold text-slate-700">{{ selectedApplicant()?.applicationId }}</span>
               </div>
               <h1 class="text-2xl font-bold text-[#131A4D] tracking-tight">
                 EOI Detailed Scrutiny & Evaluation Desk
@@ -53,27 +54,27 @@ import { Observable } from 'rxjs';
                     </h2>
                   </div>
                   <span class="text-[10px] font-mono text-blue-200">
-                    Submission Date: {{ selectedApplicant?.submissionDate }}
+                    Submission Date: {{ selectedApplicant()?.submissionDate }}
                   </span>
                 </div>
 
                 <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-700">
                   <div>
                     <span class="text-slate-400 block text-[11px]">Scheme Name:</span>
-                    <span class="font-bold text-slate-900 text-sm">{{ selectedApplicant?.schemeName }}</span>
+                    <span class="font-bold text-slate-900 text-sm">{{ selectedApplicant()?.schemeName }}</span>
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[11px]">Application Reference ID:</span>
-                    <span class="font-mono font-bold text-[#131A4D]">{{ selectedApplicant?.applicationId }}</span>
+                    <span class="font-mono font-bold text-[#131A4D]">{{ selectedApplicant()?.applicationId }}</span>
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[11px]">Target Training Capacity:</span>
-                    <span class="font-mono font-bold text-slate-900">{{ selectedApplicant?.proposalCapacity }} Candidates / Year</span>
+                    <span class="font-mono font-bold text-slate-900">{{ selectedApplicant()?.proposalCapacity }} Candidates / Year</span>
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[11px]">Proposed Rajasthan District Centers:</span>
                     <div class="flex flex-wrap gap-1.5 mt-1">
-                      <span *ngFor="let dist of selectedApplicant?.proposedDistricts" class="px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-[11px] rounded-full">
+                      <span *ngFor="let dist of selectedApplicant()?.proposedDistricts" class="px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-[11px] rounded-full">
                         {{ dist }}
                       </span>
                     </div>
@@ -89,13 +90,13 @@ import { Observable } from 'rxjs';
                   </span>
                 </div>
                 <div class="p-5 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-700">
-                  <div><span class="text-slate-400 block text-[11px]">Application No.</span><span class="font-mono font-bold text-[#131A4D]">{{ selectedApplicant?.applicationId || 'ISMS-TP-892134' }}</span></div>
-                  <div><span class="text-slate-400 block text-[11px]">TP/PIA Full Name</span><span class="font-bold text-slate-900">{{ selectedApplicant?.organizationName || 'N/A' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Application No.</span><span class="font-mono font-bold text-[#131A4D]">{{ selectedApplicant()?.applicationId || 'ISMS-TP-892134' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">TP/PIA Full Name</span><span class="font-bold text-slate-900">{{ selectedApplicant()?.organizationName || 'N/A' }}</span></div>
                   <div><span class="text-slate-400 block text-[11px]">TP/PIA Short Name</span><span class="font-bold text-slate-900">APEX-TECH</span></div>
-                  <div><span class="text-slate-400 block text-[11px]">Registration Number</span><span class="font-mono text-slate-900">{{ selectedApplicant?.registrationNumber || 'N/A' }}</span></div>
-                  <div><span class="text-slate-400 block text-[11px]">Organisation Contact No.</span><span class="font-mono text-slate-800">{{ selectedApplicant?.contactMobile || '+91 98201 44520' }}</span></div>
-                  <div><span class="text-slate-400 block text-[11px]">Company Email-ID</span><span class="font-mono text-slate-800">{{ selectedApplicant?.contactEmail || 'contact@example.com' }}</span></div>
-                  <div><span class="text-slate-400 block text-[11px]">Organisation PAN No.</span><span class="font-mono font-bold text-slate-900">{{ selectedApplicant?.pan || 'AABCA1294F' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Registration Number</span><span class="font-mono text-slate-900">{{ selectedApplicant()?.registrationNumber || 'N/A' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Organisation Contact No.</span><span class="font-mono text-slate-800">{{ selectedApplicant()?.contactMobile || '+91 98201 44520' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Company Email-ID</span><span class="font-mono text-slate-800">{{ selectedApplicant()?.contactEmail || 'contact@example.com' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Organisation PAN No.</span><span class="font-mono font-bold text-slate-900">{{ selectedApplicant()?.pan || 'AABCA1294F' }}</span></div>
                   <div><span class="text-slate-400 block text-[11px]">Website</span><span class="text-blue-600 hover:underline cursor-pointer">https://apextechnical.in</span></div>
                   <div class="md:col-span-3"><span class="text-slate-400 block text-[11px]">Registered Address</span><span class="text-slate-900">123, RIICO Industrial Area, Phase II</span></div>
                   <div><span class="text-slate-400 block text-[11px]">State/UT</span><span class="text-slate-900">Rajasthan</span></div>
@@ -117,13 +118,13 @@ import { Observable } from 'rxjs';
                   </span>
                 </div>
                 <div class="p-5 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-700">
-                  <div><span class="text-slate-400 block text-[11px]">Name</span><span class="font-bold text-slate-900">{{ selectedApplicant?.applicantName || 'Vikramaditya Sharma' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Name</span><span class="font-bold text-slate-900">{{ selectedApplicant()?.applicantName || 'Vikramaditya Sharma' }}</span></div>
                   <div><span class="text-slate-400 block text-[11px]">S/O, D/O, W/O</span><span class="text-slate-900">Shri R.K. Sharma</span></div>
                   <div><span class="text-slate-400 block text-[11px]">Date of Birth</span><span class="font-mono text-slate-900">14/08/1982</span></div>
                   <div><span class="text-slate-400 block text-[11px]">Age</span><span class="font-mono text-slate-900">44</span></div>
                   <div><span class="text-slate-400 block text-[11px]">Designation</span><span class="text-slate-900">Managing Director</span></div>
-                  <div><span class="text-slate-400 block text-[11px]">Mobile No.</span><span class="font-mono text-slate-800">{{ selectedApplicant?.contactMobile || '+91 98201 44520' }}</span></div>
-                  <div><span class="text-slate-400 block text-[11px]">Email-Id</span><span class="font-mono text-slate-800">{{ selectedApplicant?.contactEmail || 'v.sharma@apextechnical.in' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Mobile No.</span><span class="font-mono text-slate-800">{{ selectedApplicant()?.contactMobile || '+91 98201 44520' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Email-Id</span><span class="font-mono text-slate-800">{{ selectedApplicant()?.contactEmail || 'v.sharma@apextechnical.in' }}</span></div>
                   <div class="md:col-span-3"><span class="text-slate-400 block text-[11px]">Residence Address</span><span class="text-slate-900">45-B, Civil Lines, Jaipur</span></div>
                   <div><span class="text-slate-400 block text-[11px]">State</span><span class="text-slate-900">Rajasthan</span></div>
                   <div><span class="text-slate-400 block text-[11px]">PAN</span><span class="font-mono font-bold text-slate-900">BGPPS4512K</span></div>
@@ -313,7 +314,7 @@ import { Observable } from 'rxjs';
                   <!-- 4. Decision Action / Final Status -->
                   <div class="pt-3 space-y-2">
                     
-                    <ng-container *ngIf="selectedApplicant?.scrutinyStatus === 'UNDER_SCRUTINY'; else decisionBadge">
+                    <ng-container *ngIf="selectedApplicant()?.scrutinyStatus === 'UNDER_SCRUTINY'; else decisionBadge">
                       <div class="flex justify-center gap-4" *ngIf="!pendingAction">
                         <!-- Accept Button -->
                         <button 
@@ -344,7 +345,7 @@ import { Observable } from 'rxjs';
 
                         <div class="text-xs text-slate-700 leading-relaxed border-b border-slate-200 pb-3">
                           <p *ngIf="pendingAction === 'APPROVED'">
-                            You are officially approving <strong>{{ selectedApplicant?.organizationName }}</strong> for the <strong>{{ selectedApplicant?.schemeName }}</strong> tender.
+                            You are officially approving <strong>{{ selectedApplicant()?.organizationName }}</strong> for the <strong>{{ selectedApplicant()?.schemeName }}</strong> tender.
                           </p>
                           <p *ngIf="pendingAction === 'REJECTED'">
                             You are rejecting this application. This will notify the applicant and trigger an EMD refund.
@@ -417,8 +418,8 @@ import { Observable } from 'rxjs';
                     <ng-template #decisionBadge>
                       <div 
                         class="w-full py-2.5 rounded-full font-bold text-xs tracking-wide flex items-center justify-center text-white"
-                        [ngClass]="selectedApplicant?.scrutinyStatus === 'APPROVED' ? 'bg-[#166534]' : 'bg-[#991b1b]'">
-                        {{ selectedApplicant?.scrutinyStatus === 'APPROVED' ? '✓ Accepted' : '✕ Rejected' }}
+                        [ngClass]="selectedApplicant()?.scrutinyStatus === 'APPROVED' ? 'bg-[#166534]' : 'bg-[#991b1b]'">
+                        {{ selectedApplicant()?.scrutinyStatus === 'APPROVED' ? '✓ Accepted' : '✕ Rejected' }}
                       </div>
                     </ng-template>
 
@@ -438,7 +439,7 @@ import { Observable } from 'rxjs';
   `
 })
 export class ProfileReviewComponent implements OnInit {
-  selectedApplicant: ApplicantResponse | null = null;
+  selectedApplicant = signal<ApplicantResponse | null>(null);
   reviewForm!: FormGroup;
   showConfirmModal = false;
   pendingAction: 'APPROVED' | 'REJECTED' | null = null;
@@ -467,7 +468,7 @@ export class ProfileReviewComponent implements OnInit {
       const id = params.get('applicationId');
       if (id) {
         const responses = this.eoiService.getApplicantResponses();
-        this.selectedApplicant = responses.find(r => r.applicationId === id) || null;
+        this.selectedApplicant.set(responses.find(r => r.applicationId === id) || null);
       }
     });
   }
@@ -534,20 +535,21 @@ export class ProfileReviewComponent implements OnInit {
   }
 
   executeDecision(): void {
-    if (!this.selectedApplicant || !this.pendingAction) return;
+    const applicant = this.selectedApplicant();
+    if (!applicant || !this.pendingAction) return;
 
-    this.eoiService.updateScrutinyDecision(this.selectedApplicant.applicationId, {
+    this.eoiService.updateScrutinyDecision(applicant.applicationId, {
       status: this.pendingAction,
       grade: this.pendingAction === 'APPROVED' ? this.reviewForm.value.grade : undefined,
       remarks: this.reviewForm.value.remarks
     });
 
-    this.selectedApplicant = {
-      ...this.selectedApplicant,
+    this.selectedApplicant.set({
+      ...applicant,
       scrutinyStatus: this.pendingAction,
       currentGrade: this.pendingAction === 'APPROVED' ? this.reviewForm.value.grade : null,
       emdStatus: this.pendingAction === 'REJECTED' ? 'REFUNDED' : 'PAID'
-    };
+    });
 
     this.showConfirmModal = false;
     this.decisionTaken = true;

@@ -69,9 +69,12 @@ import { RouterModule } from '@angular/router';
           <!-- 16 Master Sub-items -->
           <div *ngIf="mastersOpen()" class="pl-7 pr-1 py-1 space-y-0.5 border-l-2 border-slate-200 ml-5 my-1 text-[11px]">
             <a routerLink="/admin/masters/schemes" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Scheme Master</a>
+            <!--
             <a routerLink="/admin/masters/scheme-categories" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Scheme Category Master</a>
+            -->
             <a routerLink="/admin/masters/eoi-categories" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Category Master</a>
             <a routerLink="/admin/masters/departments" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Department Master</a>
+            <!--
             <a routerLink="/admin/masters/organization-types" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Organization Type Master</a>
             <a routerLink="/admin/masters/user-types" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">User Type Master</a>
             <a routerLink="/admin/masters/designations" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Designation Master</a>
@@ -85,6 +88,7 @@ import { RouterModule } from '@angular/router';
             <a routerLink="/admin/masters/access-levels" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Access Level Master</a>
             <a routerLink="/admin/masters/application-status" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Application Status Master</a>
             <a routerLink="/admin/masters/committee-roles" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Committee Role Master</a>
+            -->
           </div>
         </div>
 
@@ -163,9 +167,11 @@ import { RouterModule } from '@angular/router';
           <div *ngIf="usersOpen()" class="pl-7 pr-1 py-1 space-y-0.5 border-l-2 border-slate-200 ml-5 my-1 text-[11px]">
             <a routerLink="/admin/users" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" [routerLinkActiveOptions]="{ exact: true }" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">User List</a>
             <a routerLink="/admin/users/create" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">+ Create User</a>
+            <!--
             <a routerLink="/admin/masters/roles" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Roles</a>
             <a routerLink="/admin/masters/access-levels" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Access Levels</a>
             <a routerLink="/admin/users" [queryParams]="{ filter: 'sso' }" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">SSO Mapping</a>
+            -->
           </div>
         </div>
 

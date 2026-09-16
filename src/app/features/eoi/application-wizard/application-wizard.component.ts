@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, effect, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, inject, signal, computed, effect, HostListener, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +17,7 @@ import { RAJASTHAN_DISTRICTS, EOI_SECTIONS } from './models/eoi.model';
 @Component({
   selector: 'app-application-wizard',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     FormsModule,

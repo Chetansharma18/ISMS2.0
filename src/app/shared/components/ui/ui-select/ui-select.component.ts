@@ -27,7 +27,7 @@ export interface SelectOption {
       <div class="relative">
         <select
           [id]="id"
-          [disabled]="disabled"
+          [disabled]="isDisabled"
           [value]="value"
           (change)="onChangeEvent($event)"
           (blur)="onTouched()"
@@ -35,7 +35,7 @@ export interface SelectOption {
           [ngClass]="{
             'border-red-400 focus:border-red-500': showError,
             'border-slate-300 focus:border-[#131A4D]': !showError,
-            'bg-slate-100 cursor-not-allowed': disabled,
+            'bg-slate-100 cursor-not-allowed': isDisabled,
             'text-slate-400 font-normal': value === ''
           }"
         >
@@ -69,7 +69,7 @@ export class UiSelectComponent implements ControlValueAccessor {
   @Input() showError = false;
   @Input() errorMessage = '';
   @Input() hint = '';
-  @Input() disabled = false;
+  @Input() isDisabled = false;
 
   value: any = '';
 
@@ -95,6 +95,6 @@ export class UiSelectComponent implements ControlValueAccessor {
   }
 
   setDisabledState?(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    this.isDisabled = isDisabled;
   }
 }

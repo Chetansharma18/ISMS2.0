@@ -8,7 +8,7 @@ import { AuthService } from '../../../core/auth/auth.service';
 @Component({
   selector: 'app-sso-login',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, NgFor, NgClass, RouterLink],
+  imports: [ReactiveFormsModule, NgIf, NgFor, RouterLink],
   template: `
     <div class="min-h-screen flex flex-col bg-white font-sans text-slate-800 antialiased selection:bg-[#131A4D] selection:text-white">
       

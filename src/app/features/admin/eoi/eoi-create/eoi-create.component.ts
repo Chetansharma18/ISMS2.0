@@ -42,26 +42,10 @@ import { SchemeMaster, DepartmentMaster, EoiCategoryMaster, Committee, EoiItem }
         </div>
       </admin-page-header>
 
-      <!-- Tabs Navigation Bar (10 Steps) -->
-      <div class="bg-white rounded-xl shadow-xs border border-slate-200 mb-6 p-1.5 flex items-center gap-1 overflow-x-auto select-none">
-        <button 
-          *ngFor="let tab of tabs; let idx = index"
-          type="button"
-          (click)="activeTab.set(tab.id)"
-          class="flex items-center gap-2 px-3.5 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer"
-          [ngClass]="activeTab() === tab.id ? 'bg-blue-700 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'">
-          <span class="w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-bold"
-            [ngClass]="activeTab() === tab.id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'">
-            {{ idx + 1 }}
-          </span>
-          <span>{{ tab.label }}</span>
-        </button>
-      </div>
+      <form [formGroup]="eoiForm" (ngSubmit)="onSubmitPublish()" class="space-y-8">
 
-      <form [formGroup]="eoiForm" (ngSubmit)="onSubmitPublish()" class="space-y-6">
-
-        <!-- TAB 1: BASIC DETAILS -->
-        <div *ngIf="activeTab() === 'basic'" class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
+        <!-- SECTION 1: BASIC DETAILS -->
+        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
           <div class="border-b border-slate-100 pb-3">
             <h3 class="text-sm font-bold text-slate-900">Section 1: EOI Basic Details</h3>
             <p class="text-xs text-slate-500">Specify official tender reference number, associated scheme, and nodal department</p>
@@ -158,8 +142,8 @@ import { SchemeMaster, DepartmentMaster, EoiCategoryMaster, Committee, EoiItem }
           </div>
         </div>
 
-        <!-- TAB 2: IMPORTANT DATES -->
-        <div *ngIf="activeTab() === 'dates'" class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
+        <!-- SECTION 2: IMPORTANT DATES -->
+        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
           <div class="border-b border-slate-100 pb-3">
             <h3 class="text-sm font-bold text-slate-900">Section 2: Important Tender Milestone Dates</h3>
             <p class="text-xs text-slate-500">All dates are strictly validated. Submission deadline enforces applicant form closing.</p>
@@ -189,8 +173,8 @@ import { SchemeMaster, DepartmentMaster, EoiCategoryMaster, Committee, EoiItem }
           </div>
         </div>
 
-        <!-- TAB 3: FEES -->
-        <div *ngIf="activeTab() === 'fees'" class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
+        <!-- SECTION 3: FEES -->
+        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
           <div class="border-b border-slate-100 pb-3">
             <h3 class="text-sm font-bold text-slate-900">Section 3: Statutory Fees & Earnest Money Deposit (EMD)</h3>
             <p class="text-xs text-slate-500">Values calculate automatic totals and GST billing requirements</p>
@@ -235,8 +219,8 @@ import { SchemeMaster, DepartmentMaster, EoiCategoryMaster, Committee, EoiItem }
           </div>
         </div>
 
-        <!-- TAB 4: ATTACHMENT & DOCUMENTS -->
-        <div *ngIf="activeTab() === 'documents'" class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-6">
+        <!-- SECTION 4: ATTACHMENT & DOCUMENTS -->
+        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-6">
           <!-- Official EOI File -->
           <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
             <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2 flex items-center gap-1.5">
@@ -297,8 +281,8 @@ import { SchemeMaster, DepartmentMaster, EoiCategoryMaster, Committee, EoiItem }
           </div>
         </div>
 
-        <!-- TAB 5: TRANSACTIONS -->
-        <div *ngIf="activeTab() === 'transactions'" class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
+        <!-- SECTION 5: TRANSACTIONS -->
+        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <h3 class="text-sm font-bold text-slate-900">Section 5: Transaction Configuration</h3>
@@ -340,8 +324,8 @@ import { SchemeMaster, DepartmentMaster, EoiCategoryMaster, Committee, EoiItem }
           </table>
         </div>
 
-        <!-- TAB 6: ELIGIBILITY CRITERIA -->
-        <div *ngIf="activeTab() === 'eligibility'" class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
+        <!-- SECTION 6: ELIGIBILITY CRITERIA -->
+        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
           <div class="border-b border-slate-100 pb-3">
             <h3 class="text-sm font-bold text-slate-900">Section 6: Minimum Eligibility Configuration</h3>
             <p class="text-xs text-slate-500">Applicant responses must satisfy these quantitative and qualification filters</p>
@@ -363,8 +347,8 @@ import { SchemeMaster, DepartmentMaster, EoiCategoryMaster, Committee, EoiItem }
           </div>
         </div>
 
-        <!-- TAB 7: COMMITTEE ASSIGNMENT (Rule 7 & 30) -->
-        <div *ngIf="activeTab() === 'committee'" class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
+        <!-- SECTION 7: COMMITTEE ASSIGNMENT (Rule 7 & 30) -->
+        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
           <div class="border-b border-slate-100 pb-3">
             <h3 class="text-sm font-bold text-slate-900">Section 7: Approval Committee Assignment</h3>
             <p class="text-xs text-slate-500">Assign a designated Technical Evaluation Committee to score proposals post-closure</p>
@@ -391,8 +375,8 @@ import { SchemeMaster, DepartmentMaster, EoiCategoryMaster, Committee, EoiItem }
           </div>
         </div>
 
-        <!-- TAB 8: PREVIEW & PUBLISH -->
-        <div *ngIf="activeTab() === 'preview'" class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-6">
+        <!-- SECTION 8: PREVIEW & PUBLISH -->
+        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-6">
           <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
             <div>
               <h3 class="text-sm font-bold text-slate-900">Section 8: Review Tender Summary & Final Publish</h3>
@@ -421,33 +405,20 @@ import { SchemeMaster, DepartmentMaster, EoiCategoryMaster, Committee, EoiItem }
           </div>
         </div>
 
-        <!-- WIZARD STEP CONTROLS (Next / Prev / Submit) -->
-        <div class="flex items-center justify-between pt-4 border-t border-slate-200">
+        <!-- FORM SUBMIT CONTROLS -->
+        <div class="flex items-center justify-end pt-4 border-t border-slate-200 gap-3">
           <button 
             type="button" 
-            [disabled]="isFirstTab()"
-            (click)="prevTab()"
-            class="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
-            ← Previous Step
+            (click)="saveAsDraft()" 
+            class="px-5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-lg shadow-2xs transition-colors cursor-pointer">
+            Save as Draft
           </button>
-
-          <div class="flex items-center gap-3">
-            <button 
-              *ngIf="!isLastTab()"
-              type="button" 
-              (click)="nextTab()"
-              class="px-5 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-xs font-bold shadow-xs cursor-pointer">
-              Next Step →
-            </button>
-
-            <button 
-              *ngIf="isLastTab()"
-              type="submit" 
-              class="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-extrabold shadow-md flex items-center gap-2 cursor-pointer">
-              <span class="material-symbols-outlined text-[18px]">rocket_launch</span>
-              Publish EOI Live
-            </button>
-          </div>
+          <button 
+            type="submit" 
+            class="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-extrabold shadow-md flex items-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">rocket_launch</span>
+            Publish EOI Live
+          </button>
         </div>
 
       </form>
@@ -467,17 +438,7 @@ export class EoiCreateComponent implements OnInit {
   eoiId = '';
   referenceNo = '';
 
-  activeTab = signal<string>('basic');
-  tabs = [
-    { id: 'basic', label: '1. Basic Details' },
-    { id: 'dates', label: '2. Milestone Dates' },
-    { id: 'fees', label: '3. Fees & EMD' },
-    { id: 'documents', label: '4. Documents' },
-    { id: 'transactions', label: '5. Transactions' },
-    { id: 'eligibility', label: '6. Eligibility' },
-    { id: 'committee', label: '7. Committee' },
-    { id: 'preview', label: '8. Preview & Publish' }
-  ];
+  // Form is now a single-step layout
 
   activeSchemes = signal<SchemeMaster[]>([]);
   departments = signal<DepartmentMaster[]>([]);
@@ -659,27 +620,7 @@ export class EoiCreateComponent implements OnInit {
     this.transactionList.update(list => list.filter((_, i) => i !== index));
   }
 
-  isFirstTab(): boolean {
-    return this.tabs.findIndex(t => t.id === this.activeTab()) === 0;
-  }
-
-  isLastTab(): boolean {
-    return this.tabs.findIndex(t => t.id === this.activeTab()) === this.tabs.length - 1;
-  }
-
-  nextTab(): void {
-    const idx = this.tabs.findIndex(t => t.id === this.activeTab());
-    if (idx < this.tabs.length - 1) {
-      this.activeTab.set(this.tabs[idx + 1].id);
-    }
-  }
-
-  prevTab(): void {
-    const idx = this.tabs.findIndex(t => t.id === this.activeTab());
-    if (idx > 0) {
-      this.activeTab.set(this.tabs[idx - 1].id);
-    }
-  }
+  // Removed tab navigation methods
 
   saveAsDraft(): void {
     const payload = {

@@ -74,8 +74,7 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
       hindiName: 'जन सूचना पोर्टल-2019',
       tagline: 'Government of Rajasthan',
       url: 'https://jansoochna.rajasthan.gov.in/',
-<<<<<<< HEAD
-      logo: '/assets/links/jansoochna.png'
+      logo: 'footer-images/jansoochna.png'
     },
     {
       id: 'rajsso',
@@ -112,9 +111,6 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
       tagline: 'Transforming India Digitally',
       url: 'https://www.digitalindia.gov.in/',
       logo: '/assets/links/digitalindia.png'
-=======
-      logo: 'footer-images/jansoochna.png'
->>>>>>> origin/Shringi
     }
   ];
 

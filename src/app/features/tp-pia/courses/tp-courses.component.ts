@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -10,13 +10,14 @@ import { UiInputComponent } from '../../../shared/components/ui/ui-input/ui-inpu
 import { UiSelectComponent, SelectOption } from '../../../shared/components/ui/ui-select/ui-select.component';
 import { UiModalComponent } from '../../../shared/components/ui/ui-modal/ui-modal.component';
 import { UiTableComponent, TableColumn } from '../../../shared/components/ui/ui-table/ui-table.component';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-tp-courses',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule, 
-    RouterLink, 
     ReactiveFormsModule, 
     UiInputComponent, 
     UiSelectComponent, 
@@ -30,14 +31,14 @@ import { UiTableComponent, TableColumn } from '../../../shared/components/ui/ui-
           <h1 class="text-3xl font-extrabold text-[#131A4D] tracking-tight">Proposed Courses</h1>
           <p class="text-slate-500 mt-1">Manage and track your course proposals for SDC integration.</p>
         </div>
-        <button (click)="showCreateModal = true" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors">
+        <button (click)="showCreateModal.set(true)" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors">
           + Propose New Course
         </button>
       </div>
 
       <app-ui-table
         [columns]="columns"
-        [data]="(courses$ | async) || []"
+        [data]="courses() || []"
         emptyMessage="No courses proposed yet. Click '+ Propose New Course' to get started.">
         
         <ng-template #rowTemplate let-course let-col="column">
@@ -80,17 +81,17 @@ import { UiTableComponent, TableColumn } from '../../../shared/components/ui/ui-
 
       <!-- Add Course Modal -->
       <app-ui-modal 
-        [isOpen]="showCreateModal" 
+        [isOpen]="showCreateModal()" 
         title="Propose New Course" 
         maxWidth="lg" 
-        (closed)="showCreateModal = false">
+        (closed)="showCreateModal.set(false)">
         
         <form [formGroup]="courseForm" (ngSubmit)="submitCourse()" class="space-y-4">
           <app-ui-select
             formControlName="sdcId"
             label="Select Skill Development Center (SDC)"
             [required]="true"
-            [options]="(sdcOptions$ | async) || []">
+            [options]="sdcOptions() || []">
           </app-ui-select>
 
           <app-ui-input
@@ -138,7 +139,7 @@ import { UiTableComponent, TableColumn } from '../../../shared/components/ui/ui-
           </div>
 
           <div class="flex justify-end gap-3 pt-4 border-t border-slate-200 mt-6">
-            <button type="button" (click)="showCreateModal = false" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-lg hover:bg-slate-200 transition">Cancel</button>
+            <button type="button" (click)="showCreateModal.set(false)" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-lg hover:bg-slate-200 transition">Cancel</button>
             <button type="submit" [disabled]="courseForm.invalid" class="px-6 py-2 bg-[#131A4D] text-white font-bold rounded-lg hover:bg-blue-900 transition disabled:opacity-50">Submit Proposal</button>
           </div>
         </form>
@@ -149,9 +150,25 @@ import { UiTableComponent, TableColumn } from '../../../shared/components/ui/ui-
   `
 })
 export class TpCoursesComponent implements OnInit {
-  showCreateModal = false;
-  courses$!: Observable<CourseProposal[]>;
-  sdcOptions$!: Observable<SelectOption[]>;
+  private courseService = inject(CourseProposalService);
+  private sdcService = inject(SdcService);
+  private fb = inject(FormBuilder);
+
+  showCreateModal = signal(false);
+  
+  // Use toSignal to convert observables to signals for the template
+  courses = toSignal(this.courseService.getProposalsByTp('TP042'), { initialValue: [] });
+  
+  sdcOptions = toSignal(
+    this.sdcService.sdcs$.pipe(
+      map(sdcs => (sdcs || []).filter(sdc => sdc.status === 'APPROVED').map(sdc => ({
+        label: `${sdc.name} (${sdc.sdcCode})`,
+        value: sdc.id
+      })))
+    ),
+    { initialValue: [] }
+  );
+
   courseForm!: FormGroup;
 
   columns: TableColumn[] = [
@@ -173,22 +190,7 @@ export class TpCoursesComponent implements OnInit {
     value: `Level ${i + 1}`
   }));
 
-  constructor(
-    private courseService: CourseProposalService,
-    private sdcService: SdcService,
-    private fb: FormBuilder
-  ) {}
-
   ngOnInit() {
-    this.courses$ = this.courseService.getProposalsByTp('TP042');
-    
-    this.sdcOptions$ = this.sdcService.sdcs$.pipe(
-      map(sdcs => (sdcs || []).filter(sdc => sdc.status === 'APPROVED').map(sdc => ({
-        label: `${sdc.name} (${sdc.sdcCode})`,
-        value: sdc.id
-      })))
-    );
-
     this.courseForm = this.fb.group({
       sdcId: ['', Validators.required],
       courseName: ['', Validators.required],
@@ -210,7 +212,7 @@ export class TpCoursesComponent implements OnInit {
         sdcName: 'Skill Center Jaipur', // In reality, fetch from SdcService
         courseCode: 'CRS-' + Math.floor(1000 + Math.random() * 9000)
       });
-      this.showCreateModal = false;
+      this.showCreateModal.set(false);
       this.courseForm.reset({
         sector: 'IT & ITeS',
         nsqfLevel: 'Level 4'

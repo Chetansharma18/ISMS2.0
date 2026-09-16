@@ -66,18 +66,26 @@ export class EoiService {
 
   // Modification Deadline: 30 September 2026 23:59:59 IST
   readonly modificationDeadlineIso = '2026-09-30T23:59:59';
-  
+
   // Flag to simulate deadline expiry for testing
   readonly simulateExpiredDeadline = signal<boolean>(false);
 
   // Toast / System messages
   readonly toastMessage = signal<string | null>(null);
 
+  // Active Scheme tracking for resume / return
+  readonly activeSchemeId = signal<string>('EOI-MMKVY-2026-01');
+
   // Main Form Data State for all sections (Pre-populated with realistic dummy data)
   readonly formData = signal<EoiFormData>(this.getInitialFormData());
 
-  // Dynamically set scheme fees matching selected scheme from /schemes
-  setSchemeFees(processingFee: number, emdFee: number, schemeName?: string, eoiRef?: string): void {
+  // Dynamically set scheme fees matching selected scheme from /schemes and restore scheme step
+  setSchemeFees(processingFee: number, emdFee: number, schemeName?: string, eoiRef?: string, schemeId?: string): void {
+    if (schemeId) {
+      this.activeSchemeId.set(schemeId);
+      this.restoreSchemeStep(schemeId);
+    }
+
     this.paymentData.update(curr => ({
       ...curr,
       processingFee: processingFee,
@@ -105,6 +113,31 @@ export class EoiService {
         eoiRefNumber: eoiRef || curr.eoiRefNumber
       }));
     }
+  }
+
+  // Restore the exact step where user left off on this specific scheme
+  private restoreSchemeStep(schemeId: string): void {
+    if (typeof localStorage === 'undefined' || !schemeId) return;
+    try {
+      const savedStage = localStorage.getItem(`isms_eoi_stage_${schemeId}`) as ApplicationFlowStage | null;
+      const savedSec = localStorage.getItem(`isms_eoi_sec_${schemeId}`);
+      const isPaid = this.isStep2Paid();
+
+      if (savedStage && ['documents', 'fees', 'preview', 'edit_section', 'receipt'].includes(savedStage)) {
+        if ((savedStage === 'preview' || savedStage === 'edit_section' || savedStage === 'receipt') && !isPaid) {
+          this.flowStage.set('fees');
+          this.currentSection.set(2);
+        } else {
+          this.flowStage.set(savedStage);
+          if (savedSec) {
+            const num = parseInt(savedSec, 10);
+            if (!isNaN(num) && num >= 1 && num <= 4) {
+              this.currentSection.set(num);
+            }
+          }
+        }
+      }
+    } catch { }
   }
 
   // Computed Properties
@@ -828,7 +861,7 @@ export class EoiService {
       current.emdFeeSelected = checked;
     }
     current.totalAmount = (current.includeProcessingFee || current.processingFeeSelected ? (current.processingFee || 500) : 0) +
-                          (current.includeEmdFee || current.emdFeeSelected ? (current.emdFee || 100000) : 0);
+      (current.includeEmdFee || current.emdFeeSelected ? (current.emdFee || 100000) : 0);
     this.paymentData.set(current);
     this.persistToStorage();
   }
@@ -850,7 +883,7 @@ export class EoiService {
         totalAmount: this.computedTotalFee()
       };
       this.paymentData.set(updated);
-      
+
       // Update section 7 and 8 payment records in form data
       const curForm = { ...this.formData() };
       curForm.section7 = {
@@ -961,6 +994,12 @@ export class EoiService {
       localStorage.setItem(STORAGE_KEY_FORM, JSON.stringify(this.formData()));
       localStorage.setItem(STORAGE_KEY_STAGE, this.flowStage());
       localStorage.setItem(STORAGE_KEY_SECTION, this.currentSection().toString());
+
+      if (this.activeSchemeId()) {
+        localStorage.setItem(`isms_eoi_stage_${this.activeSchemeId()}`, this.flowStage());
+        localStorage.setItem(`isms_eoi_sec_${this.activeSchemeId()}`, this.currentSection().toString());
+      }
+
       localStorage.setItem(STORAGE_KEY_PAYMENT, JSON.stringify(this.paymentData()));
       localStorage.setItem(STORAGE_KEY_SUBMISSION, JSON.stringify(this.submissionData()));
       localStorage.setItem(STORAGE_KEY_MOD_COUNT, this.modificationCount().toString());

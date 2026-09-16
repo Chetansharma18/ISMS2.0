@@ -6,7 +6,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 10;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   box-sizing: border-box;
@@ -131,6 +131,14 @@
   background-color: #10B981;
   border-color: #10B981;
   color: #FFFFFF;
+}
+
+.stepper-step.completed.active .stepper-badge {
+  background-color: #10B981;
+  border-color: #10B981;
+  color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+  transform: scale(1.04);
 }
 
 .stepper-step.completed .step-title {

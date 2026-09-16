@@ -1,93 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule, NgIf, AsyncPipe } from '@angular/common';
 import { EoiStateService, UserProfile } from '../../../core/services/eoi-state.service';
-import { Observable } from 'rxjs';
+import { Observable, filter } from 'rxjs';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive, NgIf, AsyncPipe],
   template: `
-    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col h-full font-sans text-xs flex-shrink-0 select-none shadow-2xs">
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col h-full font-['Poppins',sans-serif] text-xs flex-shrink-0 select-none shadow-2xs">
       
-      <!-- Top Section: Company / Organization Name (Directly displayed without uppercase category tag) -->
-      <div class="p-4 border-b border-slate-200 bg-slate-50/70" *ngIf="userProfile$ | async as profile">
-        
-        <!-- Applicant Header: Focused directly on Company Name -->
-        <ng-container *ngIf="profile.role === 'applicant'">
-          
-          <!-- Incomplete / Unregistered Profile State -->
-          <ng-container *ngIf="profile.userState === 'new' || !profile.isRegistered">
-            <div class="font-extrabold text-[13px] text-[#002244] leading-snug line-clamp-2 tracking-tight" [title]="profile.organization.name || 'Company Name Pending'">
-              {{ profile.organization.name || 'Company Name Pending' }}
-            </div>
-
-            <div class="mt-1.5 flex items-center gap-1.5">
-              <span class="inline-flex items-center gap-1 text-[10px] font-extrabold text-amber-800 bg-amber-100/90 border border-amber-300 px-2 py-0.5 rounded-xs">
-                <span>⚠️ OTR Incomplete</span>
-              </span>
-            </div>
-
-            <div class="text-[11px] text-slate-500 mt-2 font-mono font-medium flex items-center justify-between border-t border-slate-200 pt-1.5">
-              <span>SSO: <strong class="text-[#002244] font-bold">{{ profile.ssoId || 'new_citizen_rj' }}</strong></span>
-              <a routerLink="/auth/register" class="text-[11px] font-bold text-[#002244] hover:underline">Complete →</a>
-            </div>
-          </ng-container>
-
-          <!-- Registered & Verified Organization State -->
-          <ng-container *ngIf="profile.userState === 'existing' && profile.isRegistered">
-            <div class="font-black text-[13px] text-[#002244] leading-snug line-clamp-2 tracking-tight" [title]="profile.organization.name">
-              {{ profile.organization.name }}
-            </div>
-
-            <div class="mt-1.5 flex items-center gap-1.5">
-              <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100/90 border border-emerald-300 px-2 py-0.5 rounded-xs">
-                <span>✓ Verified Training Partner</span>
-              </span>
-            </div>
-
-            <div class="text-[11px] text-slate-500 mt-2 font-mono font-medium flex items-center justify-between border-t border-slate-200 pt-1.5">
-              <span>REG ID: <strong class="text-slate-800 font-bold">{{ profile.registrationNumber }}</strong></span>
-            </div>
-          </ng-container>
-
-        </ng-container>
-
-        <!-- Department Admin Header -->
-        <ng-container *ngIf="profile.role === 'dept_admin'">
-          <div class="font-extrabold text-[13px] text-[#002244] leading-snug">
-            {{ profile.department || 'RSLDC Scrutiny Cell' }}
-          </div>
-          <div class="mt-1 flex items-center gap-1.5">
-            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-cyan-800 bg-cyan-100 border border-cyan-300 px-2 py-0.5 rounded-xs">
-              🏛 Scrutiny Authority
-            </span>
-          </div>
-          <div class="text-[11px] text-slate-500 mt-2 border-t border-slate-200 pt-1.5">
-            Officer: <strong class="text-[#002244]">{{ profile.personal.fullName }}</strong>
-          </div>
-        </ng-container>
-
-        <!-- Super Admin Header -->
-        <ng-container *ngIf="profile.role === 'super_admin'">
-          <div class="font-extrabold text-[13px] text-[#002244] leading-snug">
-            ISMS 2.0 Central Governance
-          </div>
-          <div class="mt-1 flex items-center gap-1.5">
-            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-purple-800 bg-purple-100 border border-purple-300 px-2 py-0.5 rounded-xs">
-              ⚙ State Super Admin
-            </span>
-          </div>
-          <div class="text-[11px] text-slate-500 mt-2 border-t border-slate-200 pt-1.5">
-            Admin: <strong class="text-[#002244]">{{ profile.personal.fullName }}</strong>
-          </div>
-        </ng-container>
-
-      </div>
-
       <!-- Main Navigation Menu (Stylish, Bold Typography & Modern Hover/Active Accents) -->
-      <nav class="flex-grow py-3 px-2.5 space-y-1.5 overflow-y-auto" *ngIf="userProfile$ | async as profile">
+      <nav class="flex-grow py-4 px-2.5 space-y-1.5 overflow-y-auto" *ngIf="userProfile$ | async as profile">
         
         <!-- ================= APPLICANT (NEW USER) ================= -->
         <ng-container *ngIf="profile.role === 'applicant' && (profile.userState === 'new' || !profile.isRegistered)">
@@ -106,19 +31,67 @@ import { Observable } from 'rxjs';
             <span class="tracking-tight">Active Schemes &amp; Tenders</span>
           </a>
 
-          <!-- 2. Profile -->
-          <a 
-            routerLink="/profile" 
-            routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
-            class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
-            <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
+          <!-- 2. Profile with Sub-points -->
+          <div class="space-y-1">
+            <div 
+              (click)="toggleProfile()"
+              [ngClass]="isProfileActive() ? 'bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]' : 'text-slate-700 hover:bg-slate-100 hover:text-[#002244] border-l-[3.5px] border-transparent'"
+              class="flex items-center justify-between px-3 py-2.5 transition-all font-bold text-xs rounded-xs group cursor-pointer select-none">
+              <div class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]" [ngClass]="{'text-[#002244]': isProfileActive()}">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <span class="tracking-tight">Profile</span>
+              </div>
+              <div class="p-0.5 rounded text-slate-400 group-hover:text-[#002244]">
+                <svg class="w-3.5 h-3.5 transition-transform duration-200" [ngClass]="{'rotate-180 text-[#002244]': isProfileOpen}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
             </div>
-            <span class="tracking-tight">Profile</span>
-          </a>
+
+            <!-- Sub-points (4 sections) -->
+            <div *ngIf="isProfileOpen" class="pl-4 pr-1 py-1 space-y-1 border-l-2 border-slate-200 ml-4.5">
+              <a 
+                routerLink="/profile" 
+                [queryParams]="{ section: 1 }"
+                [ngClass]="isSectionActive(1) ? 'bg-[#002244]/10 text-[#002244] font-black border-l-[2.5px] border-[#002244]' : 'text-slate-600 hover:text-[#002244] hover:bg-slate-50 border-l-[2.5px] border-transparent'"
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-xs transition-all text-[11px] leading-tight">
+                <span class="w-1.5 h-1.5 rounded-full shrink-0" [ngClass]="isSectionActive(1) ? 'bg-[#002244]' : 'bg-slate-300'"></span>
+                <span class="truncate">1. Organisation Details</span>
+              </a>
+
+              <a 
+                routerLink="/profile" 
+                [queryParams]="{ section: 2 }"
+                [ngClass]="isSectionActive(2) ? 'bg-[#002244]/10 text-[#002244] font-black border-l-[2.5px] border-[#002244]' : 'text-slate-600 hover:text-[#002244] hover:bg-slate-50 border-l-[2.5px] border-transparent'"
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-xs transition-all text-[11px] leading-tight">
+                <span class="w-1.5 h-1.5 rounded-full shrink-0" [ngClass]="isSectionActive(2) ? 'bg-[#002244]' : 'bg-slate-300'"></span>
+                <span class="truncate">2. Authorized Person Details</span>
+              </a>
+
+              <a 
+                routerLink="/profile" 
+                [queryParams]="{ section: 3 }"
+                [ngClass]="isSectionActive(3) ? 'bg-[#002244]/10 text-[#002244] font-black border-l-[2.5px] border-[#002244]' : 'text-slate-600 hover:text-[#002244] hover:bg-slate-50 border-l-[2.5px] border-transparent'"
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-xs transition-all text-[11px] leading-tight">
+                <span class="w-1.5 h-1.5 rounded-full shrink-0" [ngClass]="isSectionActive(3) ? 'bg-[#002244]' : 'bg-slate-300'"></span>
+                <span class="truncate">3. Bank Details</span>
+              </a>
+
+              <a 
+                routerLink="/profile" 
+                [queryParams]="{ section: 4 }"
+                [ngClass]="isSectionActive(4) ? 'bg-[#002244]/10 text-[#002244] font-black border-l-[2.5px] border-[#002244]' : 'text-slate-600 hover:text-[#002244] hover:bg-slate-50 border-l-[2.5px] border-transparent'"
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-xs transition-all text-[11px] leading-tight">
+                <span class="w-1.5 h-1.5 rounded-full shrink-0" [ngClass]="isSectionActive(4) ? 'bg-[#002244]' : 'bg-slate-300'"></span>
+                <span class="truncate">4. Uploaded Documents</span>
+              </a>
+            </div>
+          </div>
         </ng-container>
 
         <!-- ================= APPLICANT (EXISTING USER) ================= -->
@@ -138,29 +111,12 @@ import { Observable } from 'rxjs';
             <span class="tracking-tight">Active Schemes &amp; Tenders</span>
           </a>
 
-          <!-- 2. My EOI Applications -->
+          <!-- 2. Tender Status -->
           <a 
-            routerLink="/eoi/my-applications" 
-            routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
-            class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
-            <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
-            </div>
-            <span class="tracking-tight">My EOI Applications</span>
-          </a>
-
-          <!-- 3. Tender Status -->
-          <a 
-            routerLink="/eoi/tracker/ISMS-EOI-2026-9871" 
-            [ngClass]="isTrackerActive() ? 'bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]' : 'text-slate-700 hover:bg-slate-100 hover:text-[#002244] border-l-[3.5px] border-transparent'"
+            routerLink="/eoi/tender-status" 
+            [ngClass]="isTenderStatusActive() ? 'bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]' : 'text-slate-700 hover:bg-slate-100 hover:text-[#002244] border-l-[3.5px] border-transparent'"
             class="flex items-center gap-3 px-3 py-2.5 transition-all font-bold text-xs rounded-xs group">
-            <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]" [ngClass]="{'text-[#002244]': isTrackerActive()}">
+            <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]" [ngClass]="{'text-[#002244]': isTenderStatusActive()}">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
@@ -169,19 +125,67 @@ import { Observable } from 'rxjs';
             <span class="tracking-tight">Tender Status</span>
           </a>
 
-          <!-- 4. Profile -->
-          <a 
-            routerLink="/profile" 
-            routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
-            class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
-            <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
-              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
+          <!-- 3. Profile with Sub-points (4 Sub-points from Step 3) -->
+          <div class="space-y-1">
+            <div 
+              (click)="toggleProfile()"
+              [ngClass]="isProfileActive() ? 'bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]' : 'text-slate-700 hover:bg-slate-100 hover:text-[#002244] border-l-[3.5px] border-transparent'"
+              class="flex items-center justify-between px-3 py-2.5 transition-all font-bold text-xs rounded-xs group cursor-pointer select-none">
+              <div class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]" [ngClass]="{'text-[#002244]': isProfileActive()}">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <span class="tracking-tight">Profile</span>
+              </div>
+              <div class="p-0.5 rounded text-slate-400 group-hover:text-[#002244]">
+                <svg class="w-3.5 h-3.5 transition-transform duration-200" [ngClass]="{'rotate-180 text-[#002244]': isProfileOpen}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
             </div>
-            <span class="tracking-tight">Profile</span>
-          </a>
+
+            <!-- Sub-points (4 sections) -->
+            <div *ngIf="isProfileOpen" class="pl-4 pr-1 py-1 space-y-1 border-l-2 border-slate-200 ml-4.5">
+              <a 
+                routerLink="/profile" 
+                [queryParams]="{ section: 1 }"
+                [ngClass]="isSectionActive(1) ? 'bg-[#002244]/10 text-[#002244] font-black border-l-[2.5px] border-[#002244]' : 'text-slate-600 hover:text-[#002244] hover:bg-slate-50 border-l-[2.5px] border-transparent'"
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-xs transition-all text-[11px] leading-tight group/sub">
+                <span class="w-1.5 h-1.5 rounded-full shrink-0 transition-colors" [ngClass]="isSectionActive(1) ? 'bg-[#002244]' : 'bg-slate-300 group-hover/sub:bg-slate-500'"></span>
+                <span class="truncate">1. Organisation Details</span>
+              </a>
+
+              <a 
+                routerLink="/profile" 
+                [queryParams]="{ section: 2 }"
+                [ngClass]="isSectionActive(2) ? 'bg-[#002244]/10 text-[#002244] font-black border-l-[2.5px] border-[#002244]' : 'text-slate-600 hover:text-[#002244] hover:bg-slate-50 border-l-[2.5px] border-transparent'"
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-xs transition-all text-[11px] leading-tight group/sub">
+                <span class="w-1.5 h-1.5 rounded-full shrink-0 transition-colors" [ngClass]="isSectionActive(2) ? 'bg-[#002244]' : 'bg-slate-300 group-hover/sub:bg-slate-500'"></span>
+                <span class="truncate">2. Authorized Person Details</span>
+              </a>
+
+              <a 
+                routerLink="/profile" 
+                [queryParams]="{ section: 3 }"
+                [ngClass]="isSectionActive(3) ? 'bg-[#002244]/10 text-[#002244] font-black border-l-[2.5px] border-[#002244]' : 'text-slate-600 hover:text-[#002244] hover:bg-slate-50 border-l-[2.5px] border-transparent'"
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-xs transition-all text-[11px] leading-tight group/sub">
+                <span class="w-1.5 h-1.5 rounded-full shrink-0 transition-colors" [ngClass]="isSectionActive(3) ? 'bg-[#002244]' : 'bg-slate-300 group-hover/sub:bg-slate-500'"></span>
+                <span class="truncate">3. Bank Details</span>
+              </a>
+
+              <a 
+                routerLink="/profile" 
+                [queryParams]="{ section: 4 }"
+                [ngClass]="isSectionActive(4) ? 'bg-[#002244]/10 text-[#002244] font-black border-l-[2.5px] border-[#002244]' : 'text-slate-600 hover:text-[#002244] hover:bg-slate-50 border-l-[2.5px] border-transparent'"
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-xs transition-all text-[11px] leading-tight group/sub">
+                <span class="w-1.5 h-1.5 rounded-full shrink-0 transition-colors" [ngClass]="isSectionActive(4) ? 'bg-[#002244]' : 'bg-slate-300 group-hover/sub:bg-slate-500'"></span>
+                <span class="truncate">4. Uploaded Documents</span>
+              </a>
+            </div>
+          </div>
         </ng-container>
 
         <!-- ================= DEPARTMENT ADMIN ================= -->
@@ -264,27 +268,12 @@ import { Observable } from 'rxjs';
 
       </nav>
 
-      <!-- Bottom Persona Switcher & Help Desk -->
-      <div class="p-3 border-t border-slate-200 bg-slate-50/50 space-y-2">
-        <a 
-          routerLink="/profile" 
-          class="flex items-center justify-between px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200/60 rounded-xs transition-colors">
-          <span class="flex items-center gap-2">
-            <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            </svg>
-            <span>Portal Settings</span>
-          </span>
-          <span class="text-slate-400">→</span>
-        </a>
-      </div>
-
     </aside>
   `
 })
 export class SidebarComponent implements OnInit {
   userProfile$!: Observable<UserProfile>;
+  isProfileOpen = true;
 
   constructor(private eoiService: EoiStateService, private router: Router) {}
 
@@ -292,7 +281,28 @@ export class SidebarComponent implements OnInit {
     this.userProfile$ = this.eoiService.userProfile$;
   }
 
+  toggleProfile(): void {
+    this.isProfileOpen = !this.isProfileOpen;
+  }
+
+  isProfileActive(): boolean {
+    return this.router.url.startsWith('/profile');
+  }
+
+  isSectionActive(sectionId: number): boolean {
+    if (!this.isProfileActive()) return false;
+    const url = this.router.url;
+    if (url.includes(`section=${sectionId}`)) return true;
+    // Default to section 1 when just on /profile without queryParams
+    if (sectionId === 1 && !url.includes('section=')) return true;
+    return false;
+  }
+
+  isTenderStatusActive(): boolean {
+    return this.router.url.includes('/eoi/tender-status') || this.router.url.includes('/eoi/my-applications') || this.router.url.includes('/eoi/tracker') || this.router.url.includes('/eoi/status');
+  }
+
   isTrackerActive(): boolean {
-    return this.router.url.includes('/eoi/tracker') || this.router.url.includes('/eoi/status') || this.router.url.includes('/tender-status');
+    return this.isTenderStatusActive();
   }
 }

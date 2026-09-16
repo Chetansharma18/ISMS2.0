@@ -208,8 +208,8 @@ export const LANDING_TRANSLATIONS: Record<'en' | 'hi', LandingTranslations> = {
     },
     about: {
       heading: 'About ISMS 2.0',
-      p1: "ISMS 2.0 is envisioned as a comprehensive information hub that integrates various data sources, providing both the department and the empaneled agencies with a seamless 'one-stop-solution' for all skill-related activities.",
-      p2: 'The Integrated Scheme Management System (ISMS 2.0) is an e-Governance system for automation of RSLDC processes and MIS for decision making by the top management.',
+      p1: 'Integrated Scheme Management System (ISMS 2.0) is a comprehensive e-Governance and Management Information System (MIS) designed to digitally transform and streamline RSLDC processes. It provides a centralized, secure, and integrated platform connecting youth, training providers, government departments, empaneled agencies, and assessment & certification agencies.',
+      p2: 'ISMS 2.0 enables end-to-end scheme management, workflow-based approvals, real-time monitoring, MIS and reporting, and data-driven decision-making, providing a unified platform for efficient, transparent, and accountable delivery of skill development initiatives.',
       knowMore: 'Know More',
       quote: 'ISMS 2.0 is an integrated MIS system of RSLDC to provide a single platform to Youths, Training providers, Govt. Departments, Convergence Departments, and Certification agencies for Skill Development Schemes.',
       stat1Label: 'Official RFP Modules',
@@ -360,8 +360,8 @@ export const LANDING_TRANSLATIONS: Record<'en' | 'hi', LandingTranslations> = {
     },
     about: {
       heading: 'ISMS 2.0 के बारे में',
-      p1: "ISMS 2.0 की परिकल्पना एक व्यापक सूचना केंद्र के रूप में की गई है जो विभिन्न डेटा स्रोतों को एकीकृत करता है, तथा विभाग और पैनलबद्ध एजेंसियों दोनों को सभी कौशल-संबंधित गतिविधियों के लिए एक निर्बाध 'वन-स्टॉप समाधान' प्रदान करता है।",
-      p2: 'Integrated Scheme Management System (ISMS 2.0) RSLDC प्रक्रियाओं के स्वचालन और शीर्ष प्रबंधन द्वारा नीतिगत निर्णय लेने हेतु MIS के लिए एक उन्नत ई-गवर्नेंस प्रणाली है।',
+      p1: 'Integrated Scheme Management System (ISMS 2.0) RSLDC प्रक्रियाओं को डिजिटल रूप से रूपांतरित एवं सुव्यवस्थित करने के लिए अभिकल्पित एक व्यापक ई-गवर्नेंस एवं प्रबंधन सूचना प्रणाली (MIS) है। यह युवाओं, प्रशिक्षण प्रदाताओं, सरकारी विभागों, पैनलबद्ध एजेंसियों तथा मूल्यांकन एवं प्रमाणन एजेंसियों को जोड़ने वाला एक केंद्रीकृत, सुरक्षित और एकीकृत मंच प्रदान करता है।',
+      p2: 'ISMS 2.0 एंड-टू-एंड योजना प्रबंधन, वर्कफ़्लो-आधारित अनुमोदन, रीयल-टाइम निगरानी, MIS एवं रिपोर्टिंग तथा डेटा-संचालित निर्णय लेने में सक्षम बनाता है, जो कौशल विकास पहलों के कुशल, पारदर्शी और जवाबदेह निष्पादन हेतु एक एकीकृत मंच प्रदान करता है।',
       knowMore: 'अधिक जानें',
       quote: 'ISMS 2.0 RSLDC की एक एकीकृत MIS प्रणाली है जो कौशल विकास योजनाओं हेतु युवाओं, प्रशिक्षण प्रदाताओं, सरकारी विभागों, कन्वर्जेंस विभागों और प्रमाणन एजेंसियों को एक साझा मंच प्रदान करती है।',
       stat1Label: 'आधिकारिक RFP मॉड्यूल',

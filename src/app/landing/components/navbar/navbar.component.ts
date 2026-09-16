@@ -1,8 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterModule } from '@angular/router';
 import { LanguageService, Language } from '../../../core/services/language.service';
-import { EoiStateService } from '../../../core/services/eoi-state.service';
 
 export type { Language };
 export type FontSize = 'sm' | 'md' | 'lg';
@@ -17,27 +15,39 @@ export interface PressRelease {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterModule],
+  imports: [CommonModule],
   templateUrl: './navbar.component.html'
 })
 export class NavbarComponent implements OnInit {
   protected readonly languageService = inject(LanguageService);
-  private readonly eoiStateService = inject(EoiStateService);
-  private readonly router = inject(Router);
-
   readonly currentLanguage = this.languageService.currentLanguage;
   readonly t = this.languageService.t;
   readonly fontSize = signal<FontSize>('md');
   readonly searchQuery = signal<string>('');
   readonly isNewsModalOpen = signal<boolean>(false);
   readonly isMobileMenuOpen = signal<boolean>(false);
+  readonly isMobileSearchOpen = signal<boolean>(false);
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen.update(v => !v);
+    if (this.isMobileMenuOpen()) {
+      this.isMobileSearchOpen.set(false);
+    }
   }
 
   closeMobileMenu(): void {
     this.isMobileMenuOpen.set(false);
+  }
+
+  toggleMobileSearch(): void {
+    this.isMobileSearchOpen.update(v => !v);
+    if (this.isMobileSearchOpen()) {
+      this.isMobileMenuOpen.set(false);
+    }
+  }
+
+  closeMobileSearch(): void {
+    this.isMobileSearchOpen.set(false);
   }
 
   pressReleases: PressRelease[] = [

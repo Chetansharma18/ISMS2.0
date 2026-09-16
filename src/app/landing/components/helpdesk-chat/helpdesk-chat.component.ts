@@ -1,11 +1,10 @@
-import { Component, signal, inject, computed, effect } from '@angular/core';
+import { Component, signal, inject, computed, effect, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LanguageService } from '../../../core/services/language.service';
 
 interface ChatMessage {
   id: string;
-
   sender: 'bot' | 'user';
   text: string;
   time: string;
@@ -19,11 +18,14 @@ interface ChatMessage {
   templateUrl: './helpdesk-chat.component.html'
 })
 export class HelpdeskChatComponent {
+  @ViewChild('messagesContainer') private messagesContainer?: ElementRef<HTMLDivElement>;
+
   protected readonly languageService = inject(LanguageService);
   readonly t = this.languageService.t;
 
   isOpen = signal(false);
   userInput = signal('');
+  isTyping = signal(false);
 
   messages = signal<ChatMessage[]>([
     {
@@ -75,6 +77,9 @@ export class HelpdeskChatComponent {
 
   toggleChat() {
     this.isOpen.update(v => !v);
+    if (this.isOpen()) {
+      this.scrollToBottom();
+    }
   }
 
   closeChat() {
@@ -116,7 +121,7 @@ export class HelpdeskChatComponent {
         default:
           userText = action;
           botReply =
-            'संपर्क करने के लिए धन्यवाद। ISMS 2.0 सहायता टीम से support@isms.rajasthan.gov.in या 0141-xxxxxxx पर भी संपर्क किया जा सकता है।';
+            'संपर्क करने के लिए धन्यवाद। ISMS 2.0 सहायता टीम से support@isms.rajasthan.gov.in पर भी संपर्क किया जा सकता है।';
       }
     } else {
       switch (action) {
@@ -148,14 +153,19 @@ export class HelpdeskChatComponent {
         default:
           userText = action;
           botReply =
-            'Thank you for reaching out. An ISMS 2.0 support executive can also be reached at support@isms.rajasthan.gov.in or 0141-xxxxxxx.';
+            'Thank you for reaching out. An ISMS 2.0 support executive can also be reached at support@isms.rajasthan.gov.in.';
       }
     }
 
     this.appendMessage('user', userText);
+    this.isTyping.set(true);
+    this.scrollToBottom();
+
     setTimeout(() => {
+      this.isTyping.set(false);
       this.appendMessage('bot', botReply);
-    }, 400);
+      this.scrollToBottom();
+    }, 450);
   }
 
   sendMessage() {
@@ -164,13 +174,17 @@ export class HelpdeskChatComponent {
 
     this.appendMessage('user', text);
     this.userInput.set('');
+    this.isTyping.set(true);
+    this.scrollToBottom();
 
     const isHi = this.languageService.isHindi();
     setTimeout(() => {
       const reply = isHi
         ? 'आपके संदेश के लिए धन्यवाद। ISMS 2.0 सेवाओं की तत्काल सहायता के लिए कृपया टोल-फ्री 181 (राजस्थान संपर्क) डायल करें अथवा support@isms.rajasthan.gov.in पर ईमेल करें।'
         : 'Thank you for your message. For immediate assistance with ISMS 2.0 services, please dial Toll-Free 181 (Rajasthan Sampark) or email support@isms.rajasthan.gov.in.';
+      this.isTyping.set(false);
       this.appendMessage('bot', reply);
+      this.scrollToBottom();
     }, 500);
   }
 
@@ -180,12 +194,25 @@ export class HelpdeskChatComponent {
     this.messages.update(msgs => [
       ...msgs,
       {
-        id: String(Date.now()),
+        id: String(Date.now() + Math.random()),
         sender,
         text,
         time
       }
     ]);
+    this.scrollToBottom();
+  }
+
+  private scrollToBottom(): void {
+    setTimeout(() => {
+      if (this.messagesContainer?.nativeElement) {
+        this.messagesContainer.nativeElement.scrollTo({
+          top: this.messagesContainer.nativeElement.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
+    }, 60);
   }
 }
+
 

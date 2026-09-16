@@ -139,15 +139,18 @@
                     <label class="block text-xs font-semibold text-slate-700 mb-1">
                       Application No.
                     </label>
-                    <input type="text" placeholder="Application Number" maxlength="50"
-                      [(ngModel)]="data.basicInfo.applicationNo" (ngModelChange)="onDataChange()"
-                      class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 bg-slate-50 font-mono focus:bg-white hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
+                    <input type="text" [value]="data.basicInfo.applicationNo" readonly tabindex="-1"
+                      placeholder="Application Number"
+                      class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-700 bg-slate-100 font-mono font-bold cursor-not-allowed select-all focus:outline-none" />
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">
-                      Date of Registration
-                    </label>
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="block text-xs font-semibold text-slate-700">
+                        Date of Registration
+                      </label>
+                      <span class="text-[10px] text-slate-400 font-mono">{{ data.basicInfo.dateOfRegistration.length || 0 }}/10</span>
+                    </div>
                     <div class="relative">
                       <input type="text" placeholder="DD/MM/YYYY" maxlength="10"
                         [value]="formatDateDisplay(data.basicInfo.dateOfRegistration)"
@@ -175,11 +178,16 @@
 
                   <!-- Row 2: TP/PIA Full Name * & TP/PIA Short Name * -->
                   <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">
-                      TP/PIA Full Name <span class="text-rose-500 font-bold">*</span>
-                    </label>
-                    <input type="text" placeholder="Enter TP/PIA Full Name" maxlength="150"
-                      [(ngModel)]="data.basicInfo.fullName" (ngModelChange)="onDataChange()"
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="block text-xs font-semibold text-slate-700">
+                        TP/PIA Full Name <span class="text-rose-500 font-bold">*</span>
+                      </label>
+                      <span class="text-[10px] text-slate-400 font-mono">{{ data.basicInfo.fullName.length || 0 }}/100</span>
+                    </div>
+                    <input type="text" placeholder="Enter TP/PIA Full Name (Letters only)" maxlength="100"
+                      [(ngModel)]="data.basicInfo.fullName"
+                      (keypress)="onlyLetters($event)"
+                      (input)="data.basicInfo.fullName = sanitizeLetters(data.basicInfo.fullName, 100); onDataChange()"
                       [ngClass]="isFieldInvalid('basicInfo.fullName') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                       class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none"
                       required />
@@ -189,13 +197,18 @@
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">
-                      TP/PIA Short Name <span class="text-rose-500 font-bold">*</span>
-                    </label>
-                    <input type="text" placeholder="e.g. KUSHAL / SKILL-ORG" maxlength="50"
-                      [(ngModel)]="data.basicInfo.shortName" (ngModelChange)="onDataChange()"
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="block text-xs font-semibold text-slate-700">
+                        TP/PIA Short Name <span class="text-rose-500 font-bold">*</span>
+                      </label>
+                      <span class="text-[10px] text-slate-400 font-mono">{{ data.basicInfo.shortName.length || 0 }}/30</span>
+                    </div>
+                    <input type="text" placeholder="e.g. KUSHAL / SKILL-ORG" maxlength="30"
+                      [(ngModel)]="data.basicInfo.shortName"
+                      (keypress)="onlyLettersSymbols($event)"
+                      (input)="data.basicInfo.shortName = sanitizeLettersSymbolsUpper(data.basicInfo.shortName, 30); onDataChange()"
                       [ngClass]="isFieldInvalid('basicInfo.shortName') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
-                      class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none"
+                      class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none uppercase font-mono"
                       required />
                     @if (isFieldInvalid('basicInfo.shortName')) {
                     <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('basicInfo.shortName') }}</p>
@@ -204,21 +217,34 @@
 
                   <!-- Row 3: Registration Number & Organisation PAN No. -->
                   <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">
-                      Entity Registration Number
-                    </label>
-                    <input type="text" placeholder="Enter Entity Registration Number" maxlength="50"
-                      [(ngModel)]="data.basicInfo.registrationNumber" (ngModelChange)="onDataChange()"
-                      class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono" />
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="block text-xs font-semibold text-slate-700">
+                        Entity Registration Number
+                      </label>
+                      <span class="text-[10px] text-slate-400 font-mono">{{ data.basicInfo.registrationNumber.length || 0 }}/30</span>
+                    </div>
+                    <input type="text" placeholder="Enter Entity Registration Number" maxlength="30"
+                      [(ngModel)]="data.basicInfo.registrationNumber"
+                      (keypress)="onlyAlphanumericSymbols($event)"
+                      (input)="data.basicInfo.registrationNumber = sanitizeAlphanumericSymbolsUpper(data.basicInfo.registrationNumber, 30); onDataChange()"
+                      [ngClass]="isFieldInvalid('basicInfo.registrationNumber') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                      class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none uppercase font-mono" />
+                    @if (isFieldInvalid('basicInfo.registrationNumber')) {
+                    <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('basicInfo.registrationNumber') }}</p>
+                    }
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">
-                      Organisation PAN No.
-                    </label>
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="block text-xs font-semibold text-slate-700">
+                        Organisation PAN No.
+                      </label>
+                      <span class="text-[10px] text-slate-400 font-mono">{{ data.basicInfo.panNo.length || 0 }}/10</span>
+                    </div>
                     <input type="text" placeholder="10-character PAN (e.g. ABCDE1234F)" maxlength="10"
                       [(ngModel)]="data.basicInfo.panNo"
-                      (ngModelChange)="data.basicInfo.panNo = (data.basicInfo.panNo || '').toUpperCase(); onDataChange()"
+                      (keypress)="onlyAlphanumeric($event)"
+                      (input)="data.basicInfo.panNo = sanitizeAlphanumericUpper(data.basicInfo.panNo, 10); onDataChange()"
                       [ngClass]="isFieldInvalid('basicInfo.panNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                       class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none uppercase font-mono" />
                     @if (isFieldInvalid('basicInfo.panNo')) {
@@ -318,16 +344,21 @@
 
                   <!-- Row 5: Turn Over * & Website (No spinner arrows on turnover) -->
                   <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">
-                      Annual Turnover (₹ in Lakhs) <span class="text-rose-500 font-bold">*</span>
-                    </label>
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="block text-xs font-semibold text-slate-700">
+                        Annual Turnover (₹ in Lakhs) <span class="text-rose-500 font-bold">*</span>
+                      </label>
+                      <span class="text-[10px] text-slate-400 font-mono">{{ data.entityInfo.turnOver.length || 0 }}/10</span>
+                    </div>
                     <div class="relative">
                       <span
                         class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium select-none">₹</span>
-                      <input type="number" step="0.01" placeholder="Turnover (e.g. 150.00)"
-                        [(ngModel)]="data.entityInfo.turnOver" (ngModelChange)="onDataChange()"
+                      <input type="text" inputmode="decimal" placeholder="Turnover (e.g. 150.00)" maxlength="10"
+                        [(ngModel)]="data.entityInfo.turnOver"
+                        (keypress)="onlyDecimals($event, data.entityInfo.turnOver)"
+                        (input)="data.entityInfo.turnOver = sanitizeDecimals(data.entityInfo.turnOver, 10); onDataChange()"
                         [ngClass]="isFieldInvalid('entityInfo.turnOver') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
-                        class="w-full h-9 pl-7 pr-12 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none font-mono no-spinners [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        class="w-full h-9 pl-7 pr-12 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none font-mono"
                         required />
                       <span
                         class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium select-none">Lakhs</span>
@@ -338,12 +369,19 @@
                   </div>
 
                   <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">
-                      Official Website
-                    </label>
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="block text-xs font-semibold text-slate-700">
+                        Official Website
+                      </label>
+                      <span class="text-[10px] text-slate-400 font-mono">{{ data.basicInfo.website.length || 0 }}/100</span>
+                    </div>
                     <input type="url" placeholder="https://www.organisation.org" maxlength="100"
-                      [(ngModel)]="data.basicInfo.website" (ngModelChange)="onDataChange()"
-                      class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
+                      [(ngModel)]="data.basicInfo.website" (input)="onDataChange()"
+                      [ngClass]="isFieldInvalid('basicInfo.website') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                      class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" />
+                    @if (isFieldInvalid('basicInfo.website')) {
+                    <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('basicInfo.website') }}</p>
+                    }
                   </div>
                 </div>
               </div>
@@ -379,14 +417,19 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                   <!-- Organisation Contact No. * -->
                   <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">
-                      Organisation Contact No. <span class="text-rose-500 font-bold">*</span>
-                    </label>
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="block text-xs font-semibold text-slate-700">
+                        Organisation Contact No. <span class="text-rose-500 font-bold">*</span>
+                      </label>
+                      <span class="text-[10px] text-slate-400 font-mono">{{ data.basicInfo.contactNo.length || 0 }}/10</span>
+                    </div>
                     <div class="relative">
                       <span
                         class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-mono select-none">+91</span>
                       <input type="tel" placeholder="10-digit mobile number" maxlength="10"
-                        [(ngModel)]="data.basicInfo.contactNo" (ngModelChange)="onDataChange()"
+                        [(ngModel)]="data.basicInfo.contactNo"
+                        (keypress)="onlyNumbers($event)"
+                        (input)="data.basicInfo.contactNo = sanitizeNumbers(data.basicInfo.contactNo, 10); onDataChange()"
                         [ngClass]="isFieldInvalid('basicInfo.contactNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                         class="w-full h-9 pl-11 pr-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none font-mono"
                         required />
@@ -398,11 +441,14 @@
 
                   <!-- Company Email-ID * -->
                   <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">
-                      Company Official Email-ID <span class="text-rose-500 font-bold">*</span>
-                    </label>
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="block text-xs font-semibold text-slate-700">
+                        Company Official Email-ID <span class="text-rose-500 font-bold">*</span>
+                      </label>
+                      <span class="text-[10px] text-slate-400 font-mono">{{ data.basicInfo.emailId.length || 0 }}/80</span>
+                    </div>
                     <input type="email" placeholder="info@organisation.org" maxlength="80"
-                      [(ngModel)]="data.basicInfo.emailId" (ngModelChange)="onDataChange()"
+                      [(ngModel)]="data.basicInfo.emailId" (input)="onDataChange()"
                       [ngClass]="isFieldInvalid('basicInfo.emailId') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                       class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none"
                       required />
@@ -554,9 +600,14 @@
                         </div>
 
                         <div class="relative district-dropdown-container" [class.z-40]="isDistrictDropdownOpen()">
-                          <label class="block text-xs font-semibold text-slate-700 mb-1">
-                            District <span class="text-rose-500 font-bold">*</span>
-                          </label>
+                          <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-semibold text-slate-700">
+                              District <span class="text-rose-500 font-bold">*</span>
+                            </label>
+                            @if (data.registeredAddress.state !== 'Rajasthan') {
+                            <span class="text-[10px] text-slate-400 font-mono">{{ data.registeredAddress.district.length || 0 }}/80</span>
+                            }
+                          </div>
                           @if (data.registeredAddress.state === 'Rajasthan') {
                           <!-- Searchable Dropdown Trigger Button -->
                           <button type="button" (click)="toggleDistrictDropdown($event)"
@@ -634,8 +685,9 @@
                           </div>
                           }
                           } @else {
-                          <input type="text" placeholder="District" [(ngModel)]="data.registeredAddress.district"
-                            (ngModelChange)="onRegisteredAddressChange()"
+                          <input type="text" placeholder="District" maxlength="80" [(ngModel)]="data.registeredAddress.district"
+                            (keypress)="onlyLetters($event)"
+                            (input)="data.registeredAddress.district = sanitizeLetters(data.registeredAddress.district, 80); onRegisteredAddressChange()"
                             class="w-full h-9 px-2.5 bg-white border border-slate-300 rounded-md text-sm text-slate-800 transition outline-none" />
                           }
                           @if (isFieldInvalid('registeredAddress.district')) {
@@ -644,11 +696,16 @@
                         </div>
 
                         <div>
-                          <label class="block text-xs font-semibold text-slate-700 mb-1">
-                            Pincode <span class="text-rose-500 font-bold">*</span>
-                          </label>
+                          <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-semibold text-slate-700">
+                              Pincode <span class="text-rose-500 font-bold">*</span>
+                            </label>
+                            <span class="text-[10px] text-slate-400 font-mono">{{ data.registeredAddress.pincode.length || 0 }}/6</span>
+                          </div>
                           <input type="text" placeholder="6 digits" maxlength="6"
-                            [(ngModel)]="data.registeredAddress.pincode" (ngModelChange)="onRegisteredAddressChange()"
+                            [(ngModel)]="data.registeredAddress.pincode"
+                            (keypress)="onlyNumbers($event)"
+                            (input)="data.registeredAddress.pincode = sanitizeNumbers(data.registeredAddress.pincode, 6); onRegisteredAddressChange()"
                             [ngClass]="isFieldInvalid('registeredAddress.pincode') ? 'border-rose-400' : 'border-slate-300'"
                             class="w-full h-9 px-2.5 bg-white border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono"
                             required />
@@ -734,21 +791,26 @@
               <div class="p-4 sm:p-6 lg:p-8">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
 
-                  <!-- ================= LEFT SIDE: Personal & Contact Details ================= -->
+                  <!-- ================= LEFT SIDE: Personal & Residential Details ================= -->
                   <div class="space-y-3.5">
                     <div class="pb-1 border-b border-slate-100 flex items-center justify-between">
                       <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">
-                        Personal & Communication Profile
+                        Personal Profile
                       </h3>
                     </div>
 
                     <!-- 1. Name * -->
                     <div>
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        Name <span class="text-rose-500 font-bold">*</span>
-                      </label>
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          Name <span class="text-rose-500 font-bold">*</span>
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.name.length || 0 }}/100</span>
+                      </div>
                       <input type="text" placeholder="Enter Authorized Person Full Name" maxlength="100"
-                        [(ngModel)]="data.authorizedOrg.name" (ngModelChange)="onDataChange()"
+                        [(ngModel)]="data.authorizedOrg.name"
+                        (keypress)="onlyLetters($event)"
+                        (input)="data.authorizedOrg.name = sanitizeLetters(data.authorizedOrg.name, 100); onDataChange()"
                         [ngClass]="isFieldInvalid('authorizedOrg.name') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                         class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none"
                         required />
@@ -759,11 +821,16 @@
 
                     <!-- 2. S/O, D/O, W/O -->
                     <div>
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        S/O, D/O, W/O
-                      </label>
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          S/O, D/O, W/O
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.guardianName?.length || 0 }}/100</span>
+                      </div>
                       <input type="text" placeholder="Father's / Husband's / Guardian's Name" maxlength="100"
-                        [(ngModel)]="data.authorizedOrg.guardianName" (ngModelChange)="onDataChange()"
+                        [(ngModel)]="data.authorizedOrg.guardianName"
+                        (keypress)="onlyLetters($event)"
+                        (input)="data.authorizedOrg.guardianName = sanitizeLetters(data.authorizedOrg.guardianName, 100); onDataChange()"
                         class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
                     </div>
 
@@ -771,9 +838,12 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
                       <!-- 3. Date of Birth -->
                       <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">
-                          Date of Birth (Min 18 Years)
-                        </label>
+                        <div class="flex items-center justify-between mb-1">
+                          <label class="block text-xs font-semibold text-slate-700">
+                            Date of Birth (Min 18 Years)
+                          </label>
+                          <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.dob?.length || 0 }}/10</span>
+                        </div>
                         <div class="relative">
                           <input type="text" placeholder="DD/MM/YYYY" maxlength="10"
                             [value]="formatDateDisplay(data.authorizedOrg.dob)" (input)="onDateInput($event, 'dob')"
@@ -798,13 +868,18 @@
 
                       <!-- 4. Age -->
                       <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">
-                          Age (Years: 18 - 100)
-                        </label>
-                        <input type="number" min="18" max="100" placeholder="Age (Years)"
-                          [(ngModel)]="data.authorizedOrg.age" (ngModelChange)="onDataChange()"
+                        <div class="flex items-center justify-between mb-1">
+                          <label class="block text-xs font-semibold text-slate-700">
+                            Age (Years: 18 - 100)
+                          </label>
+                          <span class="text-[10px] text-slate-400 font-mono">{{ (data.authorizedOrg.age?.toString()?.length || 0) }}/3</span>
+                        </div>
+                        <input type="text" inputmode="numeric" maxlength="3" placeholder="Age (Years)"
+                          [(ngModel)]="data.authorizedOrg.age"
+                          (keypress)="onlyNumbers($event)"
+                          (input)="data.authorizedOrg.age = sanitizeNumbers(data.authorizedOrg.age, 3); onDataChange()"
                           [ngClass]="isFieldInvalid('authorizedOrg.age') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
-                          class="w-full h-9 px-2.5 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none font-mono no-spinners [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                          class="w-full h-9 px-2.5 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none font-mono" />
                         @if (isFieldInvalid('authorizedOrg.age')) {
                         <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('authorizedOrg.age') }}</p>
                         }
@@ -813,24 +888,58 @@
 
                     <!-- 5. Designation -->
                     <div>
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        Designation
-                      </label>
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          Designation
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.designation.length || 0 }}/80</span>
+                      </div>
                       <input type="text" placeholder="e.g. Director / Managing Partner / Trustee" maxlength="80"
-                        [(ngModel)]="data.authorizedOrg.designation" (ngModelChange)="onDataChange()"
+                        [(ngModel)]="data.authorizedOrg.designation"
+                        (keypress)="onlyAlphanumericSymbols($event)"
+                        (input)="data.authorizedOrg.designation = sanitizeAlphanumericSymbols(data.authorizedOrg.designation, 80); onDataChange()"
                         class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
                     </div>
 
-                    <!-- 6. Mobile No. * -->
+                    <!-- 6. Residence Address -->
                     <div>
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        Mobile No. <span class="text-rose-500 font-bold">*</span>
-                      </label>
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          Residence Address
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.residenceAddress.length
+                          || 0 }}/250</span>
+                      </div>
+                      <textarea rows="4" placeholder="House / Flat No., Premises, Street, Area" maxlength="250"
+                        [(ngModel)]="data.authorizedOrg.residenceAddress" (ngModelChange)="onDataChange()"
+                        class="w-full p-2.5 min-h-[105px] border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none resize-none"></textarea>
+                    </div>
+                  </div>
+
+
+                  <!-- ================= RIGHT SIDE: Contact Details & Statutory Proofs ================= -->
+                  <div class="space-y-3.5">
+                    <div class="pb-1 border-b border-slate-100 flex items-center justify-between">
+                      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Contact & Statutory Proofs
+                      </h3>
+                    </div>
+
+                    <!-- 1. Mobile No. * -->
+                    <div>
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          Mobile No. <span class="text-rose-500 font-bold">*</span>
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.contactNo.length || 0 }}/10</span>
+                      </div>
                       <div class="relative w-full">
                         <span
                           class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-mono select-none">+91</span>
                         <input type="tel" placeholder="10-digit mobile number" maxlength="10"
-                          [(ngModel)]="data.authorizedOrg.contactNo" (ngModelChange)="onDataChange()"
+                          [(ngModel)]="data.authorizedOrg.contactNo"
+                          (keypress)="onlyNumbers($event)"
+                          (input)="data.authorizedOrg.contactNo = sanitizeNumbers(data.authorizedOrg.contactNo, 10); onDataChange()"
                           [ngClass]="isFieldInvalid('authorizedOrg.contactNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                           class="w-full h-9 pl-11 pr-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none font-mono"
                           required />
@@ -841,13 +950,16 @@
                       }
                     </div>
 
-                    <!-- 7. Email-Id -->
+                    <!-- 2. Email-Id -->
                     <div>
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        Email-Id
-                      </label>
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          Email-Id
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.emailId.length || 0 }}/80</span>
+                      </div>
                       <input type="email" placeholder="e.g. signatory@organisation.org" maxlength="80"
-                        [(ngModel)]="data.authorizedOrg.emailId" (ngModelChange)="onDataChange()"
+                        [(ngModel)]="data.authorizedOrg.emailId" (input)="onDataChange()"
                         [ngClass]="isFieldInvalid('authorizedOrg.emailId') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                         class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" />
                       @if (isFieldInvalid('authorizedOrg.emailId')) {
@@ -855,21 +967,48 @@
                       }
                     </div>
 
-                    <!-- 8. Residence Address -->
+                    <!-- 3. PAN Card No. * -->
                     <div>
                       <div class="flex items-center justify-between mb-1">
                         <label class="block text-xs font-semibold text-slate-700">
-                          Residence Address
+                          PAN Card No. <span class="text-rose-500 font-bold">*</span>
                         </label>
-                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.residenceAddress.length
-                          || 0 }}/250</span>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.pan?.length || 0 }}/10</span>
                       </div>
-                      <textarea rows="2" placeholder="House / Flat No., Premises, Street, Area" maxlength="250"
-                        [(ngModel)]="data.authorizedOrg.residenceAddress" (ngModelChange)="onDataChange()"
-                        class="w-full p-2.5 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none resize-none"></textarea>
+                      <input type="text" placeholder="10-character PAN (e.g. ABCDE1234F)" maxlength="10"
+                        [(ngModel)]="data.authorizedOrg.pan"
+                        (keypress)="onlyAlphanumeric($event)"
+                        (input)="data.authorizedOrg.pan = sanitizeAlphanumericUpper(data.authorizedOrg.pan, 10); onDataChange()"
+                        [ngClass]="isFieldInvalid('authorizedOrg.pan') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                        class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none uppercase font-mono"
+                        required />
+                      @if (isFieldInvalid('authorizedOrg.pan')) {
+                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('authorizedOrg.pan') }}</p>
+                      }
                     </div>
 
-                    <!-- 9. Searchable State Dropdown (Opens Downwards) -->
+                    <!-- 2. Aadhaar No. * -->
+                    <div>
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          Aadhaar No. <span class="text-rose-500 font-bold">*</span>
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.aadhaarNo?.length || 0 }}/12</span>
+                      </div>
+                      <input type="text" placeholder="12-digit Aadhaar Number" maxlength="12"
+                        [(ngModel)]="data.authorizedOrg.aadhaarNo"
+                        (keypress)="onlyNumbers($event)"
+                        (input)="data.authorizedOrg.aadhaarNo = sanitizeNumbers(data.authorizedOrg.aadhaarNo, 12); onAadhaarChange()"
+                        [ngClass]="isFieldInvalid('authorizedOrg.aadhaarNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                        class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none font-mono"
+                        required />
+                      @if (isFieldInvalid('authorizedOrg.aadhaarNo')) {
+                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('authorizedOrg.aadhaarNo') }}
+                      </p>
+                      }
+                    </div>
+
+                    <!-- 5. Searchable State Dropdown (Opens Downwards) -->
                     <div class="relative stateauth-dropdown-container" [class.z-40]="isStateAuthDropdownOpen()">
                       <label class="block text-xs font-semibold text-slate-700 mb-1">
                         State
@@ -944,48 +1083,6 @@
                       </div>
                       }
                     </div>
-                  </div>
-
-
-                  <!-- ================= RIGHT SIDE: Statutory Identification & Proofs ================= -->
-                  <div class="space-y-3.5">
-                    <div class="pb-1 border-b border-slate-100 flex items-center justify-between">
-                      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">
-                        Statutory Identification & Proofs
-                      </h3>
-                    </div>
-
-                    <!-- 1. PAN Card No. * -->
-                    <div>
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        PAN Card No. <span class="text-rose-500 font-bold">*</span>
-                      </label>
-                      <input type="text" placeholder="10-character PAN (e.g. ABCDE1234F)" maxlength="10"
-                        [(ngModel)]="data.authorizedOrg.pan"
-                        (ngModelChange)="data.authorizedOrg.pan = (data.authorizedOrg.pan || '').toUpperCase(); onDataChange()"
-                        [ngClass]="isFieldInvalid('authorizedOrg.pan') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
-                        class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none uppercase font-mono"
-                        required />
-                      @if (isFieldInvalid('authorizedOrg.pan')) {
-                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('authorizedOrg.pan') }}</p>
-                      }
-                    </div>
-
-                    <!-- 2. Aadhaar No. * -->
-                    <div>
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        Aadhaar No. <span class="text-rose-500 font-bold">*</span>
-                      </label>
-                      <input type="text" placeholder="12-digit Aadhaar Number" maxlength="12"
-                        [(ngModel)]="data.authorizedOrg.aadhaarNo" (ngModelChange)="onAadhaarChange()"
-                        [ngClass]="isFieldInvalid('authorizedOrg.aadhaarNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
-                        class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none font-mono"
-                        required />
-                      @if (isFieldInvalid('authorizedOrg.aadhaarNo')) {
-                      <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('authorizedOrg.aadhaarNo') }}
-                      </p>
-                      }
-                    </div>
 
                     <!-- 3. Type ID Proof (Other IDs) -->
                     <div>
@@ -1004,48 +1101,73 @@
                     <!-- 4. Dynamic ID Proof Field (Shows other ID selected in Type ID Proof) -->
                     @if (data.authorizedOrg.typeIdProof === 'Voter ID Card') {
                     <div class="step-content-smooth">
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        Voter Id No.
-                      </label>
-                      <input type="text" placeholder="e.g. RJ/04/123/98765" maxlength="50"
-                        [(ngModel)]="data.authorizedOrg.voterIdNo" (ngModelChange)="onVoterIdChange()"
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          Voter Id No.
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.voterIdNo?.length || 0 }}/20</span>
+                      </div>
+                      <input type="text" placeholder="e.g. RJ/04/123/98765" maxlength="20"
+                        [(ngModel)]="data.authorizedOrg.voterIdNo"
+                        (keypress)="onlyAlphanumericSymbols($event)"
+                        (input)="data.authorizedOrg.voterIdNo = sanitizeAlphanumericSymbolsUpper(data.authorizedOrg.voterIdNo, 20); onVoterIdChange()"
                         class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono uppercase" />
                     </div>
                     } @else if (data.authorizedOrg.typeIdProof === 'Passport') {
                     <div class="step-content-smooth">
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        Passport No.
-                      </label>
-                      <input type="text" placeholder="e.g. Z1234567" maxlength="50"
-                        [(ngModel)]="data.authorizedOrg.passportNo" (ngModelChange)="onPassportChange()"
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          Passport No.
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.passportNo?.length || 0 }}/12</span>
+                      </div>
+                      <input type="text" placeholder="e.g. Z1234567" maxlength="12"
+                        [(ngModel)]="data.authorizedOrg.passportNo"
+                        (keypress)="onlyAlphanumeric($event)"
+                        (input)="data.authorizedOrg.passportNo = sanitizeAlphanumericUpper(data.authorizedOrg.passportNo, 12); onPassportChange()"
                         class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono uppercase" />
                     </div>
                     } @else if (data.authorizedOrg.typeIdProof === 'Driving License') {
                     <div class="step-content-smooth">
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        Driving License No.
-                      </label>
-                      <input type="text" placeholder="e.g. RJ14 20200012345" maxlength="50"
-                        [(ngModel)]="data.authorizedOrg.idNo" (ngModelChange)="onDataChange()"
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          Driving License No.
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.idNo.length || 0 }}/20</span>
+                      </div>
+                      <input type="text" placeholder="e.g. RJ14 20200012345" maxlength="20"
+                        [(ngModel)]="data.authorizedOrg.idNo"
+                        (keypress)="onlyAlphanumericSymbols($event)"
+                        (input)="data.authorizedOrg.idNo = sanitizeAlphanumericSymbolsUpper(data.authorizedOrg.idNo, 20); onDataChange()"
                         class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono uppercase" />
                     </div>
                     } @else if (data.authorizedOrg.typeIdProof === 'Bhamashah Card') {
                     <div class="step-content-smooth">
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        Bhamashah No.
-                      </label>
-                      <input type="text" placeholder="e.g. BHAM-12345678" maxlength="50"
-                        [(ngModel)]="data.authorizedOrg.bhamashahNo" (ngModelChange)="onBhamashahChange()"
-                        class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono" />
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          Bhamashah No.
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.bhamashahNo?.length || 0 }}/20</span>
+                      </div>
+                      <input type="text" placeholder="e.g. BHAM-12345678" maxlength="20"
+                        [(ngModel)]="data.authorizedOrg.bhamashahNo"
+                        (keypress)="onlyAlphanumericSymbols($event)"
+                        (input)="data.authorizedOrg.bhamashahNo = sanitizeAlphanumericSymbolsUpper(data.authorizedOrg.bhamashahNo, 20); onBhamashahChange()"
+                        class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono uppercase" />
                     </div>
                     } @else if (data.authorizedOrg.typeIdProof && data.authorizedOrg.typeIdProof !== 'PAN Card' &&
                     data.authorizedOrg.typeIdProof !== 'Aadhaar Card') {
                     <div class="step-content-smooth">
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        {{ data.authorizedOrg.typeIdProof }} No.
-                      </label>
-                      <input type="text" placeholder="Enter {{ data.authorizedOrg.typeIdProof }} Number" maxlength="50"
-                        [(ngModel)]="data.authorizedOrg.idNo" (ngModelChange)="onDataChange()"
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          {{ data.authorizedOrg.typeIdProof }} No.
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.authorizedOrg.idNo.length || 0 }}/30</span>
+                      </div>
+                      <input type="text" placeholder="Enter {{ data.authorizedOrg.typeIdProof }} Number" maxlength="30"
+                        [(ngModel)]="data.authorizedOrg.idNo"
+                        (keypress)="onlyAlphanumericSymbols($event)"
+                        (input)="data.authorizedOrg.idNo = sanitizeAlphanumericSymbols(data.authorizedOrg.idNo, 30); onDataChange()"
                         class="w-full h-9 px-3 border border-slate-300 rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none font-mono" />
                     </div>
                     }
@@ -1157,11 +1279,16 @@
 
                     <!-- 2. Account No. * -->
                     <div>
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        Account No. <span class="text-rose-500 font-bold">*</span>
-                      </label>
-                      <input type="text" placeholder="Enter Bank Account Number (9 to 18 digits)" maxlength="20"
-                        [(ngModel)]="data.bankDetails.accountNo" (ngModelChange)="onDataChange()"
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          Account No. <span class="text-rose-500 font-bold">*</span>
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.bankDetails.accountNo.length || 0 }}/18</span>
+                      </div>
+                      <input type="text" placeholder="Enter Bank Account Number (9 to 18 digits)" maxlength="18"
+                        [(ngModel)]="data.bankDetails.accountNo"
+                        (keypress)="onlyNumbers($event)"
+                        (input)="data.bankDetails.accountNo = sanitizeNumbers(data.bankDetails.accountNo, 18); onDataChange()"
                         [ngClass]="isFieldInvalid('bankDetails.accountNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                         class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 font-mono tracking-wider placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none"
                         required />
@@ -1172,12 +1299,16 @@
 
                     <!-- 3. IFSC Code * -->
                     <div>
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        IFSC Code <span class="text-rose-500 font-bold">*</span>
-                      </label>
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          IFSC Code <span class="text-rose-500 font-bold">*</span>
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.bankDetails.ifscCode.length || 0 }}/11</span>
+                      </div>
                       <input type="text" maxlength="11" placeholder="e.g. SBIN0004129"
                         [(ngModel)]="data.bankDetails.ifscCode"
-                        (ngModelChange)="data.bankDetails.ifscCode = (data.bankDetails.ifscCode || '').toUpperCase(); onDataChange()"
+                        (keypress)="onlyAlphanumeric($event)"
+                        (input)="data.bankDetails.ifscCode = sanitizeAlphanumericUpper(data.bankDetails.ifscCode, 11); onDataChange()"
                         [ngClass]="isFieldInvalid('bankDetails.ifscCode') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                         class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 uppercase font-mono tracking-widest placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none"
                         required />
@@ -1226,11 +1357,16 @@
 
                     <!-- 6. Branch Name * -->
                     <div>
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        Branch Name <span class="text-rose-500 font-bold">*</span>
-                      </label>
-                      <input type="text" placeholder="e.g. Malviya Nagar Branch, Jaipur" maxlength="100"
-                        [(ngModel)]="data.bankDetails.branchName" (ngModelChange)="onDataChange()"
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          Branch Name <span class="text-rose-500 font-bold">*</span>
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.bankDetails.branchName.length || 0 }}/80</span>
+                      </div>
+                      <input type="text" placeholder="e.g. Malviya Nagar Branch, Jaipur" maxlength="80"
+                        [(ngModel)]="data.bankDetails.branchName"
+                        (keypress)="onlyAlphanumericSymbols($event)"
+                        (input)="data.bankDetails.branchName = sanitizeAlphanumericSymbols(data.bankDetails.branchName, 80); onDataChange()"
                         [ngClass]="isFieldInvalid('bankDetails.branchName') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                         class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none"
                         required />
@@ -1242,11 +1378,16 @@
 
                     <!-- 7. MICR Code -->
                     <div>
-                      <label class="block text-xs font-semibold text-slate-700 mb-1">
-                        MICR Code
-                      </label>
+                      <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-700">
+                          MICR Code
+                        </label>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ data.bankDetails.micrCode.length || 0 }}/9</span>
+                      </div>
                       <input type="text" maxlength="9" placeholder="9-digit MICR code (e.g. 302002018)"
-                        [(ngModel)]="data.bankDetails.micrCode" (ngModelChange)="onDataChange()"
+                        [(ngModel)]="data.bankDetails.micrCode"
+                        (keypress)="onlyNumbers($event)"
+                        (input)="data.bankDetails.micrCode = sanitizeNumbers(data.bankDetails.micrCode, 9); onDataChange()"
                         [ngClass]="isFieldInvalid('bankDetails.micrCode') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                         class="w-full h-9 px-3 border rounded-md text-sm text-slate-800 font-mono tracking-widest placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none" />
                       @if (isFieldInvalid('bankDetails.micrCode')) {
@@ -2112,10 +2253,15 @@
         <div class="p-4 sm:p-6 space-y-3.5 sm:space-y-4 max-h-[75vh] overflow-y-auto">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-                Name <span class="text-rose-500 font-bold">*</span>
-              </label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700">
+                  Name <span class="text-rose-500 font-bold">*</span>
+                </label>
+                <span class="text-[10px] text-slate-400 font-mono">{{ currentOfficer.name.length || 0 }}/100</span>
+              </div>
               <input type="text" maxlength="100" [(ngModel)]="currentOfficer.name" placeholder="Full legal name"
+                (keypress)="onlyLetters($event)"
+                (input)="currentOfficer.name = sanitizeLetters(currentOfficer.name, 100)"
                 [ngClass]="isOfficerModalFieldInvalid('name') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                 class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none"
                 required />
@@ -2125,11 +2271,16 @@
             </div>
 
             <div>
-              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-                Designation <span class="text-rose-500 font-bold">*</span>
-              </label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700">
+                  Designation <span class="text-rose-500 font-bold">*</span>
+                </label>
+                <span class="text-[10px] text-slate-400 font-mono">{{ currentOfficer.designation.length || 0 }}/80</span>
+              </div>
               <input type="text" maxlength="80" [(ngModel)]="currentOfficer.designation"
                 placeholder="e.g. Officer In-Charge"
+                (keypress)="onlyAlphanumericSymbols($event)"
+                (input)="currentOfficer.designation = sanitizeAlphanumericSymbols(currentOfficer.designation, 80)"
                 [ngClass]="isOfficerModalFieldInvalid('designation') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                 class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none"
                 required />
@@ -2139,10 +2290,15 @@
             </div>
 
             <div>
-              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-                Mobile No. <span class="text-rose-500 font-bold">*</span>
-              </label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700">
+                  Mobile No. <span class="text-rose-500 font-bold">*</span>
+                </label>
+                <span class="text-[10px] text-slate-400 font-mono">{{ currentOfficer.mobileNo.length || 0 }}/10</span>
+              </div>
               <input type="tel" maxlength="10" [(ngModel)]="currentOfficer.mobileNo" placeholder="10 digit mobile"
+                (keypress)="onlyNumbers($event)"
+                (input)="currentOfficer.mobileNo = sanitizeNumbers(currentOfficer.mobileNo, 10)"
                 [ngClass]="isOfficerModalFieldInvalid('mobileNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                 class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 font-mono placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none"
                 required />
@@ -2152,9 +2308,12 @@
             </div>
 
             <div>
-              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-                Email ID <span class="text-rose-500 font-bold">*</span>
-              </label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700">
+                  Email ID <span class="text-rose-500 font-bold">*</span>
+                </label>
+                <span class="text-[10px] text-slate-400 font-mono">{{ currentOfficer.emailId.length || 0 }}/80</span>
+              </div>
               <input type="email" maxlength="80" [(ngModel)]="currentOfficer.emailId" placeholder="officer@domain.org"
                 [ngClass]="isOfficerModalFieldInvalid('emailId') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                 class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none"
@@ -2165,11 +2324,15 @@
             </div>
 
             <div>
-              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-                PAN
-              </label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700">
+                  PAN
+                </label>
+                <span class="text-[10px] text-slate-400 font-mono">{{ currentOfficer.pan.length || 0 }}/10</span>
+              </div>
               <input type="text" maxlength="10" [(ngModel)]="currentOfficer.pan"
-                (ngModelChange)="currentOfficer.pan = (currentOfficer.pan || '').toUpperCase()" placeholder="ABCDE1234F"
+                (keypress)="onlyAlphanumeric($event)"
+                (input)="currentOfficer.pan = sanitizeAlphanumericUpper(currentOfficer.pan, 10)" placeholder="ABCDE1234F"
                 [ngClass]="isOfficerModalFieldInvalid('pan') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                 class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 uppercase font-mono placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none" />
               @if (isOfficerModalFieldInvalid('pan')) {
@@ -2178,10 +2341,15 @@
             </div>
 
             <div>
-              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-                Aadhaar No.
-              </label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700">
+                  Aadhaar No.
+                </label>
+                <span class="text-[10px] text-slate-400 font-mono">{{ currentOfficer.aadhaarNo.length || 0 }}/12</span>
+              </div>
               <input type="text" maxlength="12" [(ngModel)]="currentOfficer.aadhaarNo" placeholder="12 digit Aadhaar"
+                (keypress)="onlyNumbers($event)"
+                (input)="currentOfficer.aadhaarNo = sanitizeNumbers(currentOfficer.aadhaarNo, 12)"
                 [ngClass]="isOfficerModalFieldInvalid('aadhaarNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                 class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 font-mono placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none" />
               @if (isOfficerModalFieldInvalid('aadhaarNo')) {
@@ -2190,26 +2358,41 @@
             </div>
 
             <div>
-              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-                Bhamashah No.
-              </label>
-              <input type="text" maxlength="50" [(ngModel)]="currentOfficer.bhamashahNo" placeholder="Bhamashah ID"
-                class="w-full h-10 px-3.5 border border-slate-300 rounded-lg text-sm text-slate-800 font-mono placeholder-slate-400 hover:border-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700">
+                  Bhamashah No.
+                </label>
+                <span class="text-[10px] text-slate-400 font-mono">{{ currentOfficer.bhamashahNo.length || 0 }}/20</span>
+              </div>
+              <input type="text" maxlength="20" [(ngModel)]="currentOfficer.bhamashahNo" placeholder="Bhamashah ID"
+                (keypress)="onlyAlphanumericSymbols($event)"
+                (input)="currentOfficer.bhamashahNo = sanitizeAlphanumericSymbolsUpper(currentOfficer.bhamashahNo, 20)"
+                class="w-full h-10 px-3.5 border border-slate-300 rounded-lg text-sm text-slate-800 font-mono uppercase placeholder-slate-400 hover:border-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
             </div>
 
             <div>
-              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-                Voter ID No.
-              </label>
-              <input type="text" maxlength="50" [(ngModel)]="currentOfficer.voterIdNo" placeholder="EPIC / Voter ID"
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700">
+                  Voter ID No.
+                </label>
+                <span class="text-[10px] text-slate-400 font-mono">{{ currentOfficer.voterIdNo.length || 0 }}/20</span>
+              </div>
+              <input type="text" maxlength="20" [(ngModel)]="currentOfficer.voterIdNo" placeholder="EPIC / Voter ID"
+                (keypress)="onlyAlphanumericSymbols($event)"
+                (input)="currentOfficer.voterIdNo = sanitizeAlphanumericSymbolsUpper(currentOfficer.voterIdNo, 20)"
                 class="w-full h-10 px-3.5 border border-slate-300 rounded-lg text-sm text-slate-800 uppercase font-mono placeholder-slate-400 hover:border-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
             </div>
 
             <div class="sm:col-span-2">
-              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-                Passport No.
-              </label>
-              <input type="text" maxlength="50" [(ngModel)]="currentOfficer.passportNo" placeholder="Passport number"
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700">
+                  Passport No.
+                </label>
+                <span class="text-[10px] text-slate-400 font-mono">{{ currentOfficer.passportNo.length || 0 }}/12</span>
+              </div>
+              <input type="text" maxlength="12" [(ngModel)]="currentOfficer.passportNo" placeholder="Passport number"
+                (keypress)="onlyAlphanumeric($event)"
+                (input)="currentOfficer.passportNo = sanitizeAlphanumericUpper(currentOfficer.passportNo, 12)"
                 class="w-full h-10 px-3.5 border border-slate-300 rounded-lg text-sm text-slate-800 uppercase font-mono placeholder-slate-400 hover:border-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
             </div>
           </div>
@@ -2246,10 +2429,13 @@
 
         <div class="p-4 sm:p-6 space-y-3.5 sm:space-y-4 max-h-[75vh] overflow-y-auto">
           <div>
-            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-              Award / Recognition Name <span class="text-rose-500 font-bold">*</span>
-            </label>
-            <input type="text" [(ngModel)]="currentAward.awardName" placeholder="e.g. Best Skill Development Partner"
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700">
+                Award / Recognition Name <span class="text-rose-500 font-bold">*</span>
+              </label>
+              <span class="text-[10px] text-slate-400 font-mono">{{ currentAward.awardName.length || 0 }}/100</span>
+            </div>
+            <input type="text" maxlength="100" [(ngModel)]="currentAward.awardName" placeholder="e.g. Best Skill Development Partner"
               [ngClass]="isAwardModalFieldInvalid('awardName') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
               class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none"
               required />
@@ -2259,10 +2445,13 @@
           </div>
 
           <div>
-            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-              Awarding Agency / Body <span class="text-rose-500 font-bold">*</span>
-            </label>
-            <input type="text" [(ngModel)]="currentAward.awardingAgency"
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700">
+                Awarding Agency / Body <span class="text-rose-500 font-bold">*</span>
+              </label>
+              <span class="text-[10px] text-slate-400 font-mono">{{ currentAward.awardingAgency.length || 0 }}/100</span>
+            </div>
+            <input type="text" maxlength="100" [(ngModel)]="currentAward.awardingAgency"
               placeholder="e.g. NSDC / Ministry of Skill Development"
               [ngClass]="isAwardModalFieldInvalid('awardingAgency') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
               class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none"
@@ -2274,10 +2463,15 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-                Year of Award
-              </label>
-              <input type="number" [(ngModel)]="currentAward.year" placeholder="2025"
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700">
+                  Year of Award
+                </label>
+                <span class="text-[10px] text-slate-400 font-mono">{{ currentAward.year.length || 0 }}/4</span>
+              </div>
+              <input type="text" inputmode="numeric" maxlength="4" [(ngModel)]="currentAward.year" placeholder="2025"
+                (keypress)="onlyNumbers($event)"
+                (input)="currentAward.year = sanitizeNumbers(currentAward.year, 4)"
                 [ngClass]="isAwardModalFieldInvalid('year') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                 class="w-full h-10 px-3.5 border rounded-lg text-sm text-slate-800 font-mono placeholder-slate-400 hover:border-slate-400 focus:ring-2 transition outline-none" />
               @if (isAwardModalFieldInvalid('year')) {
@@ -2300,10 +2494,13 @@
           </div>
 
           <div>
-            <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-              Description / Remarks
-            </label>
-            <input type="text" [(ngModel)]="currentAward.description"
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs sm:text-sm font-semibold text-slate-700">
+                Description / Remarks
+              </label>
+              <span class="text-[10px] text-slate-400 font-mono">{{ currentAward.description.length || 0 }}/200</span>
+            </div>
+            <input type="text" maxlength="200" [(ngModel)]="currentAward.description"
               placeholder="Brief details about the recognition..."
               class="w-full h-10 px-3.5 border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" />
           </div>

@@ -19,6 +19,7 @@ export const VALIDATION_PATTERNS = {
   micr: /^\d{9}$/,
   cin: /^[a-zA-Z0-9]{21}$/,
   bankAccount: /^\d{9,18}$/,
+  url: /^(https?:\/\/)?([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/i,
 };
 
 export interface TabValidationResult {
@@ -123,6 +124,16 @@ export class FormValidationService {
     return VALIDATION_PATTERNS.bankAccount.test((val || '').trim());
   }
 
+  isValidLettersOnly(val: string): boolean {
+    return /^[a-zA-Z\s.]+$/.test((val || '').trim());
+  }
+
+  isValidUrl(val: string): boolean {
+    const trimmed = (val || '').trim();
+    if (!trimmed) return false;
+    return VALIDATION_PATTERNS.url.test(trimmed);
+  }
+
   // --- DATE & LIMIT VALIDATION HELPER ---
   validateDate(
     val: string, 
@@ -202,8 +213,10 @@ export class FormValidationService {
       errors['basicInfo.fullName'] = 'TP/PIA Full Name is required';
     } else if (fullName.length < 3) {
       errors['basicInfo.fullName'] = 'Full Name must be at least 3 characters';
-    } else if (fullName.length > 150) {
-      errors['basicInfo.fullName'] = 'Full Name cannot exceed 150 characters';
+    } else if (fullName.length > 100) {
+      errors['basicInfo.fullName'] = 'Full Name cannot exceed 100 characters';
+    } else if (!this.isValidLettersOnly(fullName)) {
+      errors['basicInfo.fullName'] = 'Full Name must contain letters and spaces only';
     }
 
     const shortName = (data.basicInfo.shortName || '').trim();
@@ -211,8 +224,32 @@ export class FormValidationService {
       errors['basicInfo.shortName'] = 'TP/PIA Short Name is required';
     } else if (shortName.length < 2) {
       errors['basicInfo.shortName'] = 'Short Name must be at least 2 characters';
-    } else if (shortName.length > 50) {
-      errors['basicInfo.shortName'] = 'Short Name cannot exceed 50 characters';
+    } else if (shortName.length > 30) {
+      errors['basicInfo.shortName'] = 'Short Name cannot exceed 30 characters';
+    } else if (!/^[a-zA-Z\s/&.-]+$/.test(shortName)) {
+      errors['basicInfo.shortName'] = 'Short Name must contain letters, spaces and hyphens only';
+    }
+
+    // Entity Registration Number (Optional / Alphanumeric)
+    const regNo = (data.basicInfo.registrationNumber || '').trim();
+    if (regNo) {
+      if (regNo.length < 3) {
+        errors['basicInfo.registrationNumber'] = 'Registration Number must be at least 3 characters';
+      } else if (regNo.length > 30) {
+        errors['basicInfo.registrationNumber'] = 'Registration Number cannot exceed 30 characters';
+      } else if (!/^[a-zA-Z0-9\s/&.-]+$/.test(regNo)) {
+        errors['basicInfo.registrationNumber'] = 'Registration Number must be alphanumeric';
+      }
+    }
+
+    // Official Website (Optional / URL format)
+    const website = (data.basicInfo.website || '').trim();
+    if (website) {
+      if (website.length > 100) {
+        errors['basicInfo.website'] = 'Official Website cannot exceed 100 characters';
+      } else if (!this.isValidUrl(website)) {
+        errors['basicInfo.website'] = 'Enter a valid website URL (e.g. https://www.organisation.org)';
+      }
     }
 
     // Date of Registration (Optional, but if entered must be valid DD/MM/YYYY and cannot be in future)
@@ -304,6 +341,13 @@ export class FormValidationService {
       errors['authorizedOrg.name'] = 'Authorized Person Name is required';
     } else if (org.name.trim().length < 3) {
       errors['authorizedOrg.name'] = 'Name must be at least 3 characters';
+    } else if (!this.isValidLettersOnly(org.name)) {
+      errors['authorizedOrg.name'] = 'Name must contain letters and spaces only';
+    }
+
+    // S/O, D/O, W/O
+    if (org.guardianName && !this.isValidLettersOnly(org.guardianName)) {
+      errors['authorizedOrg.guardianName'] = 'Guardian name must contain letters and spaces only';
     }
 
     // 2. Date of Birth (Must be >= 18 years and <= 100 years old)
@@ -373,6 +417,8 @@ export class FormValidationService {
 
     if (!(officer.name || '').trim()) {
       errors['name'] = 'Officer name is required';
+    } else if (!this.isValidLettersOnly(officer.name)) {
+      errors['name'] = 'Officer name must contain letters and spaces only';
     }
     if (!(officer.designation || '').trim()) {
       errors['designation'] = 'Designation is required';

@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, ChangeDetectionStrategy, HostListener } from '@angular/core';
+import { Component, inject, signal, computed, ChangeDetectionStrategy, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -39,10 +39,22 @@ export interface TabItem {
   templateUrl: './tp-pia-registration.component.html',
   styleUrl: './tp-pia-registration.component.scss'
 })
-export class TpPiaRegistrationComponent {
+export class TpPiaRegistrationComponent implements OnInit {
   readonly service = inject(TpPiaRegistrationService);
   readonly valService = inject(FormValidationService);
   readonly Math = Math;
+
+  ngOnInit() {
+    if (!this.data.basicInfo.applicationNo) {
+      this.service.updateFormData(curr => ({
+        ...curr,
+        basicInfo: {
+          ...curr.basicInfo,
+          applicationNo: this.service.generateApplicationNo()
+        }
+      }));
+    }
+  }
 
   // --- STEPPER & TAB STATE ---
   readonly activeTab = signal<number>(1);
@@ -483,6 +495,121 @@ export class TpPiaRegistrationComponent {
     const m = String(today.getMonth() + 1).padStart(2, '0');
     const d = String(today.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
+  }
+
+  // --- REAL-TIME INPUT RESTRICTIONS (CHARACTERS, NUMBERS, ALPHANUMERIC) ---
+
+  /** Allows only numeric keys 0-9 */
+  onlyNumbers(event: KeyboardEvent): boolean {
+    if (event.key.length > 1) return true; // allow Backspace, Tab, Arrows, Enter, Delete
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  /** Allows only alphabetic letters, spaces and dots */
+  onlyLetters(event: KeyboardEvent): boolean {
+    if (event.key.length > 1) return true;
+    if (!/^[a-zA-Z\s.]$/.test(event.key)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  /** Allows letters, spaces, and standard name symbols: & / - . (No numbers) */
+  onlyLettersSymbols(event: KeyboardEvent): boolean {
+    if (event.key.length > 1) return true;
+    if (!/^[a-zA-Z\s/&.-]$/.test(event.key)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  /** Allows letters, numbers, spaces, and common symbols: & / - . */
+  onlyAlphanumericSymbols(event: KeyboardEvent): boolean {
+    if (event.key.length > 1) return true;
+    if (!/^[a-zA-Z0-9\s/&.-]$/.test(event.key)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  /** Allows only strict alphanumeric (letters & numbers) */
+  onlyAlphanumeric(event: KeyboardEvent): boolean {
+    if (event.key.length > 1) return true;
+    if (!/^[a-zA-Z0-9]$/.test(event.key)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  /** Allows only numbers and at most 1 decimal point for currency/turnover */
+  onlyDecimals(event: KeyboardEvent, currentVal: any): boolean {
+    if (event.key.length > 1) return true;
+    if (event.key === '.') {
+      if (String(currentVal || '').includes('.')) {
+        event.preventDefault();
+        return false;
+      }
+      return true;
+    }
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  /** Sanitizes input to digits only */
+  sanitizeNumbers(val: any, maxLen?: number): string {
+    const digits = String(val ?? '').replace(/\D/g, '');
+    return maxLen ? digits.slice(0, maxLen) : digits;
+  }
+
+  /** Sanitizes input to letters, spaces and dots only */
+  sanitizeLetters(val?: string | null, maxLen?: number): string {
+    const letters = String(val ?? '').replace(/[^a-zA-Z\s.]/g, '');
+    return maxLen ? letters.slice(0, maxLen) : letters;
+  }
+
+  /** Sanitizes input to uppercase alphanumeric */
+  sanitizeAlphanumericUpper(val?: string | null, maxLen?: number): string {
+    const clean = String(val ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    return maxLen ? clean.slice(0, maxLen) : clean;
+  }
+
+  /** Sanitizes input to alphanumeric with common symbols: & / - . */
+  sanitizeAlphanumericSymbols(val?: string | null, maxLen?: number): string {
+    const clean = String(val ?? '').replace(/[^a-zA-Z0-9\s/&.-]/g, '');
+    return maxLen ? clean.slice(0, maxLen) : clean;
+  }
+
+  /** Sanitizes input to uppercase alphanumeric with common symbols: & / - . */
+  sanitizeAlphanumericSymbolsUpper(val?: string | null, maxLen?: number): string {
+    const clean = String(val ?? '').toUpperCase().replace(/[^A-Z0-9\s/&.-]/g, '');
+    return maxLen ? clean.slice(0, maxLen) : clean;
+  }
+
+  /** Sanitizes input to uppercase letters, spaces, and symbols: & / - . (No numbers) */
+  sanitizeLettersSymbolsUpper(val?: string | null, maxLen?: number): string {
+    const clean = String(val ?? '').toUpperCase().replace(/[^A-Z\s/&.-]/g, '');
+    return maxLen ? clean.slice(0, maxLen) : clean;
+  }
+
+  /** Sanitizes decimal numbers (e.g. 150.00) */
+  sanitizeDecimals(val: any, maxLen?: number): string {
+    let str = String(val ?? '').replace(/[^0-9.]/g, '');
+    const firstDot = str.indexOf('.');
+    if (firstDot !== -1) {
+      str = str.slice(0, firstDot + 1) + str.slice(firstDot + 1).replace(/\./g, '');
+    }
+    return maxLen ? str.slice(0, maxLen) : str;
   }
 
   formatDateDisplay(dateStr?: string): string {

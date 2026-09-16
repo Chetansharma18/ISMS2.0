@@ -139,9 +139,16 @@ export class TpPiaRegistrationService {
     }
   }
 
+  generateApplicationNo(): string {
+    return 'ISMS-TP-' + Math.floor(100000 + Math.random() * 900000);
+  }
+
   restoreSavedDraft(): boolean {
     const draft = this.loadFromStorage();
-    if (draft && draft.basicInfo && draft.basicInfo.applicationNo) {
+    if (draft && draft.basicInfo) {
+      if (!draft.basicInfo.applicationNo) {
+        draft.basicInfo.applicationNo = this.generateApplicationNo();
+      }
       if (draft.documents && Array.isArray(draft.documents)) {
         draft.documents = draft.documents.map(d => {
           const initDoc = INITIAL_DOCUMENTS.find(idoc => idoc.id === d.id);
@@ -160,10 +167,9 @@ export class TpPiaRegistrationService {
   }
 
   getInitialState(): TpPiaRegistrationData {
-    const randomAppNo = 'ISMS-TP-' + Math.floor(100000 + Math.random() * 900000);
     return {
       basicInfo: {
-        applicationNo: randomAppNo,
+        applicationNo: this.generateApplicationNo(),
         schemeName: '',
         shortName: '',
         fullName: '',

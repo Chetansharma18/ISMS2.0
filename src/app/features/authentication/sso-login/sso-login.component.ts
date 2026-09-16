@@ -261,17 +261,6 @@ import { AuthService } from '../../../core/auth/auth.service';
                     <div class="font-bold text-purple-900">4. super_admin_rj</div>
                     <div class="text-[9px] text-purple-700 mt-0.5">Master Control</div>
                   </button>
-
-                  <button 
-                    type="button"
-                    (click)="fillAndSubmitPersona('auditor')"
-                    class="p-2 bg-slate-50 hover:bg-amber-50 hover:border-amber-300 border border-slate-200 text-slate-700 text-left transition-colors col-span-2">
-                    <div class="font-bold text-amber-900 flex items-center justify-between">
-                       <span>5. auditor</span>
-                       <span class="bg-amber-500 text-white px-2 py-0.5 rounded-full text-[10px]">NEW</span>
-                    </div>
-                    <div class="text-[9px] text-amber-700 mt-0.5">Independent SDC Inspector</div>
-                  </button>
                 </div>
               </div>
 
@@ -347,15 +336,13 @@ export class SsoLoginComponent implements OnInit {
     }
   }
 
-  fillAndSubmitPersona(type: 'citizen' | 'applicant' | 'dept' | 'super' | 'auditor'): void {
+  fillAndSubmitPersona(type: 'citizen' | 'applicant' | 'dept' | 'super'): void {
     if (type === 'citizen') {
       this.loginForm.patchValue({ ssoId: 'new_citizen_rj', password: 'Password@123', captchaInput: this.captchaCode });
     } else if (type === 'applicant') {
       this.loginForm.patchValue({ ssoId: 'applicant_rj', password: 'Password@123', captchaInput: this.captchaCode });
     } else if (type === 'dept') {
       this.loginForm.patchValue({ ssoId: 'dept_admin_rj', password: 'Password@123', captchaInput: this.captchaCode });
-    } else if (type === 'auditor') {
-      this.loginForm.patchValue({ ssoId: 'auditor', password: 'Password@123', captchaInput: this.captchaCode });
     } else {
       this.loginForm.patchValue({ ssoId: 'super_admin_rj', password: 'Password@123', captchaInput: this.captchaCode });
     }
@@ -397,20 +384,15 @@ export class SsoLoginComponent implements OnInit {
         return;
       }
 
-      if (ssoLower === 'auditor') {
-        this.authService.login(ssoLower).subscribe(() => {
-          this.router.navigate(['/auditor/dashboard']);
-        });
-        return;
-      }
-
       // Legacy Branching by Role & User State
       if (ssoLower.includes('super') || ssoLower.includes('root') || ssoLower.includes('sysadmin')) {
         // Super Admin -> Dashboard
+        this.authService.login('superadmin').subscribe();
         this.eoiService.resetToSuperAdmin(rawSsoId);
         this.router.navigate(['/admin/dashboard']);
       } else if (ssoLower.includes('dept') || ssoLower.includes('officer') || ssoLower.includes('scrutiny')) {
         // Department Admin -> EOI View
+        this.authService.login('deptadmin').subscribe();
         this.eoiService.resetToDeptAdmin(rawSsoId);
         this.router.navigate(['/admin/eoi-view']);
       } else if (ssoLower.includes('new') || ssoLower.includes('citizen') || ssoLower.includes('reg') || ssoLower.includes('fresh')) {

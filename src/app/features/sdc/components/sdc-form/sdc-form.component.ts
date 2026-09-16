@@ -1,6 +1,9 @@
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Output, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CourseProposalService, CourseProposal } from '../../../../core/services/course-proposal.service';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sdc-form',
@@ -148,13 +151,23 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
           <h2 class="text-lg font-bold text-rsldc-navy border-b pb-2 mb-4">Section D: Courses & Documents</h2>
           
           <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h3 class="font-bold text-rsldc-navy text-sm mb-2">Selected Course</h3>
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold text-rsldc-navy text-sm">Select Target Course</h3>
+              <span class="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded uppercase">From Approved Proposals</span>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">You can only select courses that have been explicitly approved for your TP by the Department.</p>
             <div class="flex gap-4">
-              <select formControlName="courseId" class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm">
-                <option value="">Select Course...</option>
-                <option value="C-01">Data Entry Operator (IT-ITeS)</option>
-                <option value="C-02">Web Developer (IT-ITeS)</option>
+              <select formControlName="courseId" class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700">
+                <option value="">Select an Approved Course...</option>
+                <ng-container *ngFor="let course of allCourses$ | async">
+                  <option [value]="course.courseCode" [disabled]="course.status !== 'APPROVED'">
+                    {{ course.courseName }} ({{ course.courseCode }}) - {{ course.status === 'APPROVED' ? course.nsqfLevel : course.status.replace('_', ' ') }}
+                  </option>
+                </ng-container>
               </select>
+            </div>
+            <div class="mt-3 text-right">
+               <a routerLink="/tp/courses" class="text-xs font-bold text-blue-600 hover:underline">Manage My Proposed Courses &rarr;</a>
             </div>
           </div>
 
@@ -227,11 +240,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
     </div>
   `
 })
-export class SdcFormComponent {
+export class SdcFormComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private courseService = inject(CourseProposalService);
   @Output() formSubmit = new EventEmitter<any>();
 
   currentStep = 1;
+  allCourses$!: Observable<CourseProposal[]>;
 
   sdcForm: FormGroup = this.fb.group({
     schemeId: ['', Validators.required],
@@ -244,6 +259,10 @@ export class SdcFormComponent {
     longitude: ['', [Validators.required, Validators.min(-180), Validators.max(180)]],
     courseId: ['', Validators.required]
   });
+
+  ngOnInit() {
+    this.allCourses$ = this.courseService.getProposalsByTp('TP042');
+  }
 
   useCurrentLocation() {
     this.sdcForm.patchValue({

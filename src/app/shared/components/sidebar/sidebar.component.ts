@@ -273,6 +273,20 @@ import { Observable, filter } from 'rxjs';
              <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                Dept Workflow (ISMS 2.0)
              </div>
+
+             <!-- Course Scrutiny Queue -->
+             <a 
+               routerLink="/admin/courses" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                   <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Course Scrutiny Queue</span>
+             </a>
              
              <!-- Tender Management -->
              <a 
@@ -307,11 +321,25 @@ import { Observable, filter } from 'rxjs';
         </ng-container>
 
         <!-- ================= TP / EXECUTION MENUS ================= -->
-        <ng-container *ngIf="authService.hasRole(['TP_PIA'])">
+        <ng-container *ngIf="authService.currentUser()?.role === 'TP_PIA'">
           <div class="pt-2 mt-2 border-t border-slate-200">
              <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                Execution (ISMS 2.0)
              </div>
+
+             <!-- Propose Courses -->
+             <a 
+               routerLink="/tp/courses" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M12 20h9"></path>
+                   <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Propose Courses</span>
+             </a>
              
              <!-- SDC Management -->
              <a 

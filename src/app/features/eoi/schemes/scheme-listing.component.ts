@@ -73,13 +73,13 @@ import { Observable } from 'rxjs';
             <!-- Crisp Government Schemes Table -->
             <div class="bg-white border border-slate-200 shadow-sm rounded-xs overflow-hidden">
               <div class="w-full overflow-x-auto">
-                <table class="w-full table-fixed text-left text-xs border-collapse">
+                <table class="w-full min-w-[860px] table-fixed text-left text-xs border-collapse">
                   <thead>
                     <tr class="bg-[#002244] text-white text-[11px] font-bold tracking-wide uppercase border-b-2 border-amber-500">
-                      <th class="p-2 w-[4%] text-center border-r border-[#0e3b6e] whitespace-nowrap">S.No</th>
+                      <th class="p-2 w-[5%] text-center border-r border-[#0e3b6e] whitespace-nowrap">S.No</th>
                       <th class="p-2 w-[18%] border-r border-[#0e3b6e] whitespace-nowrap">EOI Reference No.</th>
                       <th class="p-2 w-[27%] border-r border-[#0e3b6e]">Scheme &amp; Department Chain</th>
-                      <th class="p-2 w-[14%] border-r border-[#0e3b6e] text-center whitespace-nowrap">Category</th>
+                      <th class="p-2 w-[13%] border-r border-[#0e3b6e] text-center whitespace-nowrap">Category</th>
                       <th class="p-2 w-[15%] border-r border-[#0e3b6e] whitespace-nowrap">Date Published</th>
                       <th class="p-2 w-[15%] border-r border-[#0e3b6e] whitespace-nowrap">Closing Date</th>
                       <th class="p-2 w-[7%] text-center whitespace-nowrap">Actions</th>

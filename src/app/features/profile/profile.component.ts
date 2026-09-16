@@ -711,7 +711,7 @@ export interface OfficialDocItem {
 
               <!-- Documents Table -->
               <div class="overflow-x-auto">
-                <table class="w-full text-xs text-left border-collapse">
+                <table class="w-full min-w-[720px] text-xs text-left border-collapse">
                   <thead>
                     <tr class="bg-slate-50 border-b border-slate-200 text-[#002244]">
                       <th class="py-2.5 px-3 font-bold w-12 text-center">S.No.</th>

@@ -96,7 +96,7 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
 
             <!-- TENDER STATUS TABLE (Exactly 5 Columns) -->
             <div class="w-full overflow-x-auto" *ngIf="(history$ | async) as allApps">
-              <table class="w-full table-fixed text-left text-xs border-collapse">
+              <table class="w-full min-w-[800px] table-fixed text-left text-xs border-collapse">
                 
                 <thead>
                   <tr class="bg-[#002244] text-white text-[11px] font-bold tracking-wide uppercase border-b-2 border-amber-500">
@@ -368,8 +368,8 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'REJECTED';
                 <!-- Payment Section in Receipt -->
                 <div class="space-y-2.5">
                   <h4 class="text-xs font-bold text-[#002244] uppercase tracking-wider">PAYMENT DETAILS &amp; TRANSACTION RECEIPT</h4>
-                  <div class="border border-slate-200 rounded-xs overflow-hidden">
-                    <table class="w-full text-left text-xs border-collapse">
+                  <div class="border border-slate-200 rounded-xs overflow-x-auto">
+                    <table class="w-full min-w-[550px] text-left text-xs border-collapse">
                       <thead>
                         <tr class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200 text-[11.5px]">
                           <th class="p-2.5">Fee Description</th>

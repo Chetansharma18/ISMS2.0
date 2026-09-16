@@ -13,28 +13,28 @@ import { EoiStateService } from '../../../core/services/eoi-state.service';
       
       <!-- Top Brand Header Bar matching Landing Page Navbar -->
       <header class="w-full bg-[#f0f6fc] border-b border-slate-200/80 font-['Poppins',sans-serif] shadow-2xs select-none">
-        <div class="max-w-[1400px] mx-auto py-2 sm:py-2.5 lg:py-3 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+        <div class="max-w-[1400px] mx-auto py-2 sm:py-2.5 lg:py-3 px-2.5 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
           
           <!-- Left Branding Group: Emblems + Divider + ISMS (Far Left) -->
-          <div class="flex items-center gap-2.5 sm:gap-3.5 lg:gap-4 min-w-0 cursor-pointer" routerLink="/">
+          <div class="flex items-center gap-1.5 sm:gap-3.5 lg:gap-4 min-w-0 cursor-pointer" routerLink="/">
             <!-- Official Ashoka Lion Capital (State Emblem of India) -->
             <div class="flex-shrink-0 flex items-center justify-center">
-              <img src="emblem.png" alt="State Emblem of India" class="h-11 sm:h-[52px] lg:h-[68px] w-auto object-contain select-none" />
+              <img src="emblem.png" alt="State Emblem of India" class="h-9 sm:h-[52px] lg:h-[68px] w-auto object-contain select-none" />
             </div>
 
             <!-- Official RSLDC Circular Emblem -->
             <div class="flex-shrink-0 flex items-center justify-center">
-              <img src="rsldc-logo.png" alt="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)" class="h-11 w-11 sm:h-[52px] sm:w-[52px] lg:h-[68px] lg:w-[68px] object-contain select-none drop-shadow-2xs" />
+              <img src="rsldc-logo.png" alt="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)" class="h-9 w-9 sm:h-[52px] sm:w-[52px] lg:h-[68px] lg:w-[68px] object-contain select-none drop-shadow-2xs" />
             </div>
 
             <!-- Thin Vertical Divider Line -->
-            <div class="h-8 sm:h-10 lg:h-12 w-[1.5px] bg-slate-300 mx-1 sm:mx-2 lg:mx-2.5 shrink-0"></div>
+            <div class="h-7 sm:h-10 lg:h-12 w-[1.5px] bg-slate-300 mx-0.5 sm:mx-2 lg:mx-2.5 shrink-0"></div>
 
             <!-- System Branding: ISMS in Navy, 2.0 in Orange/Amber -->
             <div class="flex text-left flex-col justify-center shrink-0">
               <div class="flex items-baseline leading-none">
-                <span class="text-xl sm:text-2xl lg:text-[27px] font-extrabold text-[#092244] tracking-tight">ISMS</span>
-                <span class="text-xl sm:text-2xl lg:text-[27px] font-extrabold text-[#f59e0b] ml-1">2.0</span>
+                <span class="text-lg sm:text-2xl lg:text-[27px] font-extrabold text-[#092244] tracking-tight">ISMS</span>
+                <span class="text-lg sm:text-2xl lg:text-[27px] font-extrabold text-[#f59e0b] ml-1">2.0</span>
               </div>
               <div class="hidden sm:block text-[10.5px] sm:text-[11.5px] lg:text-[12px] text-slate-600 font-medium tracking-tight mt-0.5 sm:mt-1">
                 Integrated Scheme Management System
@@ -44,7 +44,7 @@ import { EoiStateService } from '../../../core/services/eoi-state.service';
 
           <!-- Right Header: SSO Email Linking in blue box -->
           <div class="flex items-center shrink-0">
-            <div class="px-3.5 py-1.5 sm:px-4 sm:py-2 bg-[#002244] text-white text-xs sm:text-sm font-bold rounded-lg shadow-xs tracking-tight border border-[#001730] flex items-center gap-1.5">
+            <div class="px-2.5 py-1 sm:px-4 sm:py-2 bg-[#002244] text-white text-[11px] sm:text-sm font-bold rounded-lg shadow-xs tracking-tight border border-[#001730] flex items-center gap-1.5 whitespace-nowrap">
               <span>SSO Email Linking</span>
             </div>
           </div>

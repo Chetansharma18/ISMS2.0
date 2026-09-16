@@ -179,42 +179,34 @@ import { Observable } from 'rxjs';
           <!-- ================================================================= -->
           <div *ngIf="viewMode === 'details' && selectedScheme" class="space-y-4 animate-in fade-in duration-150">
             
-            <!-- Window Navigation & Hero Banner -->
-            <div class="bg-[#002244] text-white rounded-xs shadow-md overflow-hidden border-b-4 border-amber-500">
+            <!-- Window Navigation & Scheme Title Box -->
+            <div class="space-y-3">
               
               <!-- Top Row: Breadcrumbs -->
-              <div class="px-5 py-3 border-b border-white/15 flex items-center justify-between">
-                <div class="flex items-center gap-2 text-xs">
-                  <button 
-                    type="button"
-                    (click)="showTable()" 
-                    class="text-amber-300 hover:text-white font-semibold flex items-center gap-1 cursor-pointer">
-                    <span>←</span>
-                    <span>All Tenders List</span>
-                  </button>
-                  <span class="text-white/40">/</span>
-                  <span class="text-slate-300">EOI Schemes</span>
-                  <span class="text-white/40">/</span>
-                  <span class="text-white font-semibold">{{ selectedScheme.schemeCode }}</span>
-                </div>
+              <div class="flex items-center gap-2 text-xs font-['Poppins',sans-serif]">
+                <button 
+                  type="button"
+                  (click)="showTable()" 
+                  class="text-blue-700 hover:text-blue-900 font-semibold flex items-center gap-1 cursor-pointer">
+                  <span>←</span>
+                  <span>All Tenders List</span>
+                </button>
+                <span class="text-slate-400">/</span>
+                <span class="text-slate-500">EOI Schemes</span>
+                <span class="text-slate-400">/</span>
+                <span class="text-slate-800 font-semibold">{{ selectedScheme.schemeCode }}</span>
               </div>
 
-              <!-- Main Hero Content: Ref & Scheme Name (Tender ID removed) -->
-              <div class="p-5 sm:p-6 space-y-3">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span class="px-3 py-1 bg-white/15 text-white text-xs font-semibold rounded-2xs border border-white/20 font-['Poppins',sans-serif]">
-                    Ref: {{ selectedScheme.eoiReferenceNo }}
-                  </span>
-                </div>
-
-                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white leading-tight font-['Poppins',sans-serif]">
+              <!-- Page Heading Bar (Box like Active Schemes & Tenders) -->
+              <div class="bg-white border border-slate-200 shadow-xs p-3.5 sm:p-4 rounded-xs">
+                <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-[#002244]">
                   {{ selectedScheme.name }}
                 </h1>
               </div>
 
             </div>
 
-            <!-- Full-Width Content: Official Documents & Milestones Table & Application Section -->
+            <!-- Full-Width Content: Official Documents & Milestones Table -->
             <div class="space-y-6">
               
               <!-- SECTION 1: Scheme Related Official Documents & RFP Downloads -->
@@ -368,77 +360,68 @@ import { Observable } from 'rxjs';
                           Online scrutiny &amp; empanelment desk opening
                         </td>
                       </tr>
-
                     </tbody>
                   </table>
                 </div>
-
               </div>
 
-              <!-- SECTION 3: Submission Deadline, Fees & Apply Action Card (Placed below Milestones) -->
-              <div class="bg-white border border-slate-200 rounded-xs shadow-xs p-5 sm:p-6">
-                
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
-                  
-                  <!-- Left Box: Submission Deadline & Status -->
-                  <div class="lg:col-span-5 bg-amber-50/70 border border-amber-300 p-4 rounded-xs">
-                    <div class="text-[11px] uppercase tracking-wider font-bold text-amber-900 flex items-center gap-1.5 font-['Poppins',sans-serif]">
-                      <svg class="w-3.5 h-3.5 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                      </svg>
-                      <span>SUBMISSION DEADLINE (CLOSING DATE)</span>
-                    </div>
-                    <div class="text-lg sm:text-xl font-bold text-[#002244] mt-1 font-['Poppins',sans-serif]">
-                      {{ selectedScheme.closingDate }}
-                    </div>
-                    <div class="text-xs text-amber-800 font-medium mt-1 flex items-center gap-1.5 font-['Poppins',sans-serif]">
-                      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                      <span>Status: Open for Proposal Submission ({{ selectedScheme.daysRemaining || 20 }} Days Left)</span>
-                    </div>
-                  </div>
-
-                  <!-- Middle: Financial Parameters (EMD Fee & Process Fee) -->
-                  <div class="lg:col-span-4 grid grid-cols-2 gap-3">
-                    <!-- EMD Fee -->
-                    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xs text-center">
-                      <div class="text-[10.5px] uppercase font-bold text-slate-500 tracking-wider font-['Poppins',sans-serif]">EMD Fee</div>
-                      <div class="text-base sm:text-lg font-bold text-[#002244] mt-0.5 font-['Poppins',sans-serif]">
-                        ₹{{ selectedScheme.emdAmount | number:'1.0-0' }}
-                      </div>
-                      <div class="text-[10px] text-emerald-700 font-semibold mt-0.5 flex items-center justify-center gap-1 font-['Poppins',sans-serif]">
-                        <svg class="w-3 h-3 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        <span>100% Refundable</span>
-                      </div>
-                    </div>
-
-                    <!-- Process Fee -->
-                    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xs text-center">
-                      <div class="text-[10.5px] uppercase font-bold text-slate-500 tracking-wider font-['Poppins',sans-serif]">Process Fee</div>
-                      <div class="text-base sm:text-lg font-bold text-[#002244] mt-0.5 font-['Poppins',sans-serif]">
-                        ₹{{ selectedScheme.processingFee | number:'1.0-0' }}
-                      </div>
-                      <div class="text-[10px] text-slate-500 font-medium mt-0.5 font-['Poppins',sans-serif]">
-                        Non-Refundable
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Right: Apply Action Button (Return to Tenders Table button removed) -->
-                  <div class="lg:col-span-3 flex flex-col justify-center">
-                    <button 
-                      type="button"
-                      (click)="onApplyClicked(selectedScheme)"
-                      class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-[#002244] font-bold text-xs uppercase tracking-wider rounded-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 font-['Poppins',sans-serif]">
-                      <span>Apply for this Scheme Now</span>
-                      <span>→</span>
-                    </button>
-                  </div>
-
+              <!-- SECTION 3: Submission Deadline & Financial Parameters (Clean Gov Style) -->
+              <div class="bg-white border border-slate-200 rounded-xs shadow-xs p-5 sm:p-6 space-y-4">
+                <div class="pb-3 border-b border-slate-200">
+                  <h2 class="text-base font-bold text-[#002244] flex items-center gap-2 font-['Poppins',sans-serif]">
+                    <svg class="w-5 h-5 text-[#002244]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="4" width="20" height="16" rx="1"></rect>
+                      <line x1="6" y1="8" x2="6" y2="8"></line>
+                      <line x1="10" y1="8" x2="18" y2="8"></line>
+                      <line x1="6" y1="12" x2="6" y2="12"></line>
+                      <line x1="10" y1="12" x2="18" y2="12"></line>
+                      <line x1="6" y1="16" x2="6" y2="16"></line>
+                      <line x1="10" y1="16" x2="18" y2="16"></line>
+                    </svg>
+                    <span>Submission &amp; Financial Parameters</span>
+                  </h2>
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <!-- 1. Submission Deadline -->
+                  <div class="border border-slate-200 p-4 rounded-xs bg-slate-50/60">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      Submission Deadline (Closing Date)
+                    </div>
+                    <div class="text-sm sm:text-base font-bold text-[#002244] mt-1.5 font-['Poppins',sans-serif]">
+                      {{ selectedScheme.closingDate }}
+                    </div>
+                    <div class="text-xs text-slate-600 font-medium mt-1">
+                      Status: Open for Proposal Submission ({{ selectedScheme.daysRemaining || 20 }} Days Left)
+                    </div>
+                  </div>
+
+                  <!-- 2. EMD Fee -->
+                  <div class="border border-slate-200 p-4 rounded-xs bg-slate-50/60">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      EMD Fee
+                    </div>
+                    <div class="text-sm sm:text-base font-bold text-[#002244] mt-1.5 font-['Poppins',sans-serif]">
+                      ₹{{ selectedScheme.emdAmount | number:'1.0-0' }}
+                    </div>
+                    <div class="text-xs text-emerald-700 font-medium mt-1">
+                      ✓ 100% Refundable
+                    </div>
+                  </div>
+
+                  <!-- 3. Process Fee -->
+                  <div class="border border-slate-200 p-4 rounded-xs bg-slate-50/60">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      Process Fee
+                    </div>
+                    <div class="text-sm sm:text-base font-bold text-[#002244] mt-1.5 font-['Poppins',sans-serif]">
+                      ₹{{ selectedScheme.processingFee | number:'1.0-0' }}
+                    </div>
+                    <div class="text-xs text-slate-500 font-medium mt-1">
+                      Non-Refundable
+                    </div>
+                  </div>
+                </div>
               </div>
 
             </div>

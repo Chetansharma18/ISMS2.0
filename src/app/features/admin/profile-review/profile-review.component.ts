@@ -231,7 +231,7 @@ import { Observable } from 'rxjs';
           </div> <!-- End Step 1 -->
 
           <!-- Step 2: Department Admin Scrutiny Action Panel -->
-          <div *ngIf="showActionPanel" class="max-w-2xl mx-auto animate-in fade-in duration-300">
+          <div *ngIf="showActionPanel" class="w-full animate-in fade-in duration-300">
             
             <!-- Back Button -->
             <button (click)="showActionPanel = false" class="mb-4 text-slate-500 hover:text-[#131A4D] font-bold text-sm flex items-center gap-1.5 transition-colors">
@@ -253,50 +253,50 @@ import { Observable } from 'rxjs';
                 <!-- Action Form -->
                 <form [formGroup]="reviewForm" class="p-5 space-y-4 text-xs">
                   
-                  <!-- 1. Proposed Proposal PDF -->
-                  <div class="space-y-1">
-                    <label class="block font-bold text-[#131A4D]">
-                      Proposed Proposal PDF
-                    </label>
-                    <div class="p-3 border border-slate-200 bg-slate-50 flex items-center justify-between">
-                      <div class="flex items-center gap-2">
-                        <span class="text-base">📄</span>
-                        <div>
-                          <div class="font-bold text-slate-900">Bidder Proposal</div>
-                          <div class="text-[10px] text-slate-500 font-mono">3.2 MB PDF</div>
+                  <div class="grid grid-cols-3 gap-4">
+                    <!-- 1. Proposed Proposal PDF -->
+                    <div class="space-y-1">
+                      <label class="block font-bold text-[#131A4D]">
+                        Proposed Proposal PDF
+                      </label>
+                      <div class="h-10 px-3 border border-slate-200 bg-slate-50 flex items-center justify-between rounded">
+                        <div class="flex items-center gap-2 overflow-hidden">
+                          <span class="text-base leading-none">📄</span>
+                          <span class="font-bold text-slate-900 truncate">Bidder Proposal.pdf</span>
                         </div>
+                        <button type="button" class="text-xs text-[#131A4D] font-bold hover:underline shrink-0 ml-2">View</button>
                       </div>
-                      <button type="button" class="text-xs text-[#131A4D] font-bold hover:underline">View</button>
                     </div>
-                  </div>
 
-                  <!-- 2. Grading Dropdown -->
-                  <div class="space-y-1 pt-1">
-                    <label class="block font-bold text-[#131A4D]">
-                      Grade (A-E) <span class="text-red-600">*</span>
-                    </label>
-                    <select 
-                      formControlName="grade"
-                      class="w-full px-3 py-2 border border-slate-300 bg-white focus:border-[#131A4D] font-bold text-slate-800">
-                      <option value="A">Grade A</option>
-                      <option value="B">Grade B</option>
-                      <option value="C">Grade C</option>
-                      <option value="D">Grade D</option>
-                      <option value="E">Grade E</option>
-                    </select>
-                  </div>
+                    <!-- 2. Grading Dropdown -->
+                    <div class="space-y-1">
+                      <label class="block font-bold text-[#131A4D]">
+                        Grade (A-E) <span class="text-red-600">*</span>
+                      </label>
+                      <select 
+                        formControlName="grade"
+                        class="w-full h-10 px-3 border border-slate-300 bg-white focus:border-[#131A4D] font-bold text-slate-800 rounded">
+                        <option value="" disabled selected>Select Grade</option>
+                        <option value="A">Grade A</option>
+                        <option value="B">Grade B</option>
+                        <option value="C">Grade C</option>
+                        <option value="D">Grade D</option>
+                        <option value="E">Grade E</option>
+                      </select>
+                    </div>
 
-                  <!-- 3. Technical Score -->
-                  <div class="space-y-1 pt-1">
-                    <label class="block font-bold text-[#131A4D]">
-                      Technical Score (0-100) <span class="text-red-600">*</span>
-                    </label>
-                    <input 
-                      type="number"
-                      min="0"
-                      max="100"
-                      placeholder="e.g. 85"
-                      class="w-full px-3 py-2 border border-slate-300 bg-white focus:border-[#131A4D] font-bold text-slate-800">
+                    <!-- 3. Technical Score -->
+                    <div class="space-y-1">
+                      <label class="block font-bold text-[#131A4D]">
+                        Technical Score (0-100) <span class="text-red-600">*</span>
+                      </label>
+                      <input 
+                        type="text"
+                        formControlName="technicalScore"
+                        placeholder="e.g. 85"
+                        (input)="enforceNumericInput($event)"
+                        class="w-full h-10 px-3 border border-slate-300 bg-white focus:border-[#131A4D] font-bold text-slate-800 rounded">
+                    </div>
                   </div>
 
                   <!-- Success/Decision Alert Notice -->
@@ -308,21 +308,103 @@ import { Observable } from 'rxjs';
                   <div class="pt-3 space-y-2">
                     
                     <ng-container *ngIf="selectedApplicant?.scrutinyStatus === 'UNDER_SCRUTINY'; else decisionBadge">
-                      <!-- Accept Button -->
-                      <button 
-                        type="button" 
-                        (click)="confirmDecision('APPROVED')"
-                        class="w-full py-2.5 rounded-full bg-[#166534] hover:bg-[#14532d] text-white font-bold text-xs tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5">
-                        <span>✓ Accept Bidder</span>
-                      </button>
+                      <div class="grid grid-cols-2 gap-4" *ngIf="!pendingAction">
+                        <!-- Accept Button -->
+                        <button 
+                          type="button" 
+                          [disabled]="!reviewForm.get('grade')?.value || !reviewForm.get('technicalScore')?.value"
+                          (click)="pendingAction = 'APPROVED'"
+                          class="w-full py-2.5 rounded-full bg-[#166534] hover:bg-[#14532d] text-white font-bold text-xs tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
+                          <span>✓ Accept Bidder</span>
+                        </button>
 
-                      <!-- Reject Button -->
-                      <button 
-                        type="button" 
-                        (click)="confirmDecision('REJECTED')"
-                        class="w-full py-2.5 rounded-full bg-[#991b1b] hover:bg-[#7f1d1d] text-white font-bold text-xs tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5">
-                        <span>✕ Reject Bidder</span>
-                      </button>
+                        <!-- Reject Button -->
+                        <button 
+                          type="button" 
+                          [disabled]="!reviewForm.get('grade')?.value || !reviewForm.get('technicalScore')?.value"
+                          (click)="pendingAction = 'REJECTED'"
+                          class="w-full py-2.5 rounded-full bg-[#991b1b] hover:bg-[#7f1d1d] text-white font-bold text-xs tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
+                          <span>✕ Reject Bidder</span>
+                        </button>
+                      </div>
+
+                      <!-- Inline Confirmation Form -->
+                      <div *ngIf="pendingAction" class="space-y-4 border-t border-slate-200 pt-4 mt-4 animate-in slide-in-from-top-2 duration-300">
+                        <div class="flex items-center">
+                          <h4 class="text-base font-bold text-[#131A4D]">
+                            {{ pendingAction === 'APPROVED' ? 'Confirm Acceptance' : 'Confirm Rejection' }}
+                          </h4>
+                        </div>
+
+                        <div class="text-xs text-slate-700 leading-relaxed border-b border-slate-200 pb-3">
+                          <p *ngIf="pendingAction === 'APPROVED'">
+                            You are officially approving <strong>{{ selectedApplicant?.organizationName }}</strong> for the <strong>{{ selectedApplicant?.schemeName }}</strong> tender.
+                          </p>
+                          <p *ngIf="pendingAction === 'REJECTED'">
+                            You are rejecting this application. This will notify the applicant and trigger an EMD refund.
+                          </p>
+                        </div>
+
+                        <!-- Upload Document -->
+                        <div class="space-y-1">
+                          <label class="block font-bold text-[#131A4D] text-xs">
+                            {{ pendingAction === 'APPROVED' ? 'Mandatory Approval Document' : 'Mandatory Rejection Document' }} <span class="text-red-600">*</span>
+                          </label>
+                          <input type="file" #fileInput (change)="onFileSelected($event)" accept="application/pdf" class="hidden">
+                          
+                          <div *ngIf="!isDocumentAttached"
+                            (click)="fileInput.click()"
+                            class="border border-slate-300 border-dashed bg-slate-50 hover:bg-slate-100 text-[#131A4D] p-3 text-center transition-colors cursor-pointer rounded">
+                            <span class="text-xs font-semibold">
+                              📎 Attach Document
+                            </span>
+                          </div>
+
+                          <div *ngIf="isDocumentAttached"
+                            class="flex items-center justify-between border border-emerald-500 bg-emerald-50 text-emerald-700 p-3 rounded">
+                            <div class="flex items-center gap-2 overflow-hidden">
+                              <span class="text-xs font-semibold truncate">✓ {{ attachedFileName }}</span>
+                            </div>
+                            <div class="flex gap-4 shrink-0">
+                              <button type="button" (click)="viewAttachedDocument()" class="text-xs font-bold hover:underline text-emerald-800 focus:outline-none">
+                                View
+                              </button>
+                              <button type="button" (click)="removeAttachedDocument()" class="text-xs font-bold hover:underline text-red-600 focus:outline-none">
+                                Remove
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Remarks -->
+                        <div class="space-y-1">
+                          <label class="block font-bold text-[#131A4D] text-xs">
+                            Remarks (Max 500 words) <span class="text-red-600">*</span>
+                          </label>
+                          <textarea 
+                            formControlName="remarks"
+                            rows="4" 
+                            placeholder="Enter your confirmation remarks here..."
+                            class="w-full px-3 py-2 border border-slate-300 bg-white focus:border-[#131A4D] text-xs text-slate-900 rounded"></textarea>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-3 pt-2">
+                          <button 
+                            type="button" 
+                            (click)="pendingAction = null; removeAttachedDocument(); reviewForm.reset()"
+                            class="px-5 py-2.5 border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-full transition-colors">
+                            Cancel
+                          </button>
+                          <button 
+                            type="button" 
+                            (click)="executeDecision()"
+                            [disabled]="reviewForm.get('remarks')?.invalid || !isDocumentAttached"
+                            [ngClass]="pendingAction === 'APPROVED' ? 'bg-[#166534] hover:bg-[#14532d]' : 'bg-[#991b1b] hover:bg-[#7f1d1d]'"
+                            class="px-5 py-2.5 text-white text-xs font-bold transition-colors rounded-full disabled:opacity-50 disabled:cursor-not-allowed flex gap-1.5 items-center">
+                            {{ pendingAction === 'APPROVED' ? '✓ Submit Approval' : '✕ Submit Rejection' }}
+                          </button>
+                        </div>
+                      </div>
                     </ng-container>
 
                     <ng-template #decisionBadge>
@@ -343,71 +425,7 @@ import { Observable } from 'rxjs';
         </main>
       </div>
 
-      <!-- Confirmation Modal Dialog -->
-      <div *ngIf="showConfirmModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-        <div class="bg-white border-2 border-slate-400 max-w-md w-full shadow-2xl p-6 space-y-4">
-          
-          <div class="flex items-center">
-            <h4 class="text-base font-bold text-slate-900">
-              {{ pendingAction === 'APPROVED' ? 'Confirm Acceptance' : 'Confirm Rejection' }}
-            </h4>
-          </div>
 
-          <div class="text-xs text-slate-700 leading-relaxed border-t border-slate-200 pt-3">
-            <p *ngIf="pendingAction === 'APPROVED'">
-              You are officially approving <strong>{{ selectedApplicant?.organizationName }}</strong> for the <strong>{{ selectedApplicant?.schemeName }}</strong> tender.
-            </p>
-            <p *ngIf="pendingAction === 'REJECTED'">
-              You are rejecting this application. This will notify the applicant and trigger an EMD refund.
-            </p>
-          </div>
-
-          <!-- Upload Document -->
-          <div class="space-y-1">
-            <label class="block font-bold text-[#131A4D] text-xs">
-              {{ pendingAction === 'APPROVED' ? 'Mandatory Approval Document' : 'Mandatory Rejection Document' }} <span class="text-red-600">*</span>
-            </label>
-            <div 
-              (click)="isDocumentAttached = true"
-              [ngClass]="isDocumentAttached ? 'border-emerald-500 bg-emerald-50 text-emerald-700 border-solid' : 'border-slate-300 border-dashed bg-slate-50 hover:bg-slate-100 text-[#131A4D]'"
-              class="border p-3 text-center transition-colors cursor-pointer rounded">
-              <span class="text-xs font-semibold">
-                {{ isDocumentAttached ? '✓ Document Attached' : '📎 Attach Document' }}
-              </span>
-            </div>
-          </div>
-
-          <!-- Remarks -->
-          <form [formGroup]="reviewForm" class="space-y-1">
-            <label class="block font-bold text-[#131A4D] text-xs">
-              Remarks (Max 500 words) <span class="text-red-600">*</span>
-            </label>
-            <textarea 
-              formControlName="remarks"
-              rows="4" 
-              placeholder="Enter your confirmation remarks here..."
-              class="w-full px-3 py-2 border border-slate-300 bg-white focus:border-[#131A4D] text-xs text-slate-900"></textarea>
-          </form>
-
-          <div class="flex items-center justify-end gap-3 pt-2">
-            <button 
-              type="button" 
-              (click)="showConfirmModal = false"
-              class="px-4 py-2 border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-full">
-              Cancel
-            </button>
-            <button 
-              type="button" 
-              (click)="executeDecision()"
-              [disabled]="reviewForm.get('remarks')?.invalid || !isDocumentAttached"
-              [ngClass]="pendingAction === 'APPROVED' ? 'bg-[#166534] hover:bg-[#14532d]' : 'bg-[#991b1b] hover:bg-[#7f1d1d]'"
-              class="px-5 py-2 text-white text-xs font-bold transition-colors rounded-full disabled:opacity-50 disabled:cursor-not-allowed">
-              Confirm Decision
-            </button>
-          </div>
-
-        </div>
-      </div>
 
     </div>
   `
@@ -419,6 +437,8 @@ export class ProfileReviewComponent implements OnInit {
   pendingAction: 'APPROVED' | 'REJECTED' | null = null;
   decisionTaken = false;
   isDocumentAttached = false;
+  attachedFile: File | null = null;
+  attachedFileName: string = '';
   showActionPanel = false;
 
   constructor(
@@ -430,7 +450,8 @@ export class ProfileReviewComponent implements OnInit {
 
   ngOnInit(): void {
     this.reviewForm = this.fb.group({
-      grade: ['A', Validators.required],
+      grade: ['', Validators.required],
+      technicalScore: ['', Validators.required],
       remarks: ['Verified compliance with all technical eligibility criteria and statutory incorporation credentials.', Validators.required]
     });
 
@@ -451,6 +472,52 @@ export class ProfileReviewComponent implements OnInit {
     this.pendingAction = action;
     this.isDocumentAttached = false; // Reset on modal open
     this.showConfirmModal = true;
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.type !== 'application/pdf') {
+        alert('Please upload a valid PDF document.');
+        event.target.value = '';
+        this.removeAttachedDocument();
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File size exceeds the 10 MB limit.');
+        event.target.value = '';
+        this.removeAttachedDocument();
+        return;
+      }
+      this.attachedFile = file;
+      this.attachedFileName = file.name;
+      this.isDocumentAttached = true;
+    }
+  }
+
+  enforceNumericInput(event: any): void {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/[^0-9]/g, '');
+    
+    if (value !== '' && parseInt(value, 10) > 100) {
+      value = '100';
+    }
+    
+    input.value = value;
+    this.reviewForm.get('technicalScore')?.setValue(value, { emitEvent: false });
+  }
+
+  viewAttachedDocument(): void {
+    if (this.attachedFile) {
+      const fileUrl = URL.createObjectURL(this.attachedFile);
+      window.open(fileUrl, '_blank');
+    }
+  }
+
+  removeAttachedDocument(): void {
+    this.attachedFile = null;
+    this.attachedFileName = '';
+    this.isDocumentAttached = false;
   }
 
   executeDecision(): void {

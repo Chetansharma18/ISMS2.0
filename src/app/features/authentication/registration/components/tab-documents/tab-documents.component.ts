@@ -16,9 +16,6 @@ import { UploadedDocument } from '../../models/tp-pia-registration.model';
           class="px-4 sm:px-6 py-3.5 bg-white border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
         >
           <div class="flex items-center gap-2.5 min-w-0">
-            <span class="px-2.5 py-1 rounded bg-[#131A4D] text-white text-xs font-bold tracking-wide select-none shrink-0">
-              STEP 4
-            </span>
             <h2 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
               Document Upload
             </h2>

@@ -16,9 +16,6 @@ import { FormValidationService } from '../../services/form-validation.service';
         <!-- Card Header -->
         <div class="px-4 sm:px-6 py-3.5 bg-white border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div class="flex items-center gap-2.5 min-w-0">
-            <span class="px-2.5 py-1 rounded bg-[#131A4D] text-white text-xs font-bold tracking-wide select-none shrink-0">
-              STEP 2
-            </span>
             <h2 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
               Authorized Person Details (Organisation Level)
             </h2>
@@ -200,10 +197,10 @@ import { FormValidationService } from '../../services/form-validation.service';
                 </h3>
               </div>
 
-              <!-- 1. PAN * -->
+              <!-- 1. PAN Card No. * -->
               <div>
                 <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-                  PAN <span class="text-rose-500 font-bold">*</span>
+                  PAN Card No. <span class="text-rose-500 font-bold">*</span>
                 </label>
                 <input 
                   type="text" 
@@ -220,19 +217,20 @@ import { FormValidationService } from '../../services/form-validation.service';
                 }
               </div>
 
-              <!-- 2. Aadhaar No. -->
+              <!-- 2. Aadhaar No. * -->
               <div>
                 <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
-                  Aadhaar No.
+                  Aadhaar No. <span class="text-rose-500 font-bold">*</span>
                 </label>
                 <input 
                   type="text" 
                   placeholder="12-digit Aadhaar Number" 
-                  maxlength="12"
+                  maxlength="12" 
                   [(ngModel)]="data.authorizedOrg.aadhaarNo" 
-                  (ngModelChange)="onDataChange()"
+                  (ngModelChange)="onAadhaarChange()"
                   [ngClass]="isFieldInvalid('authorizedOrg.aadhaarNo') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
                   class="w-full h-10 px-3.5 border rounded-md text-sm text-slate-800 placeholder-slate-400 hover:border-slate-400 focus:ring-1 transition outline-none font-mono" 
+                  required
                 />
                 @if (isFieldInvalid('authorizedOrg.aadhaarNo')) {
                   <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('authorizedOrg.aadhaarNo') }}</p>
@@ -335,7 +333,7 @@ import { FormValidationService } from '../../services/form-validation.service';
 export class TabAuthorizedOrgComponent {
   readonly service = inject(TpPiaRegistrationService);
   readonly valService = inject(FormValidationService);
-  readonly idTypes = ID_PROOF_TYPES;
+  readonly idTypes = ID_PROOF_TYPES.filter(t => t !== 'Aadhaar Card' && t !== 'PAN Card');
   readonly states = INDIAN_STATES;
 
   readonly errors = computed(() => this.valService.validateTab2(this.service.formData()).errors);
@@ -377,6 +375,13 @@ export class TabAuthorizedOrgComponent {
     this.changeTimer = setTimeout(() => {
       this.service.updateFormData(curr => ({ ...curr }));
     }, 60);
+  }
+
+  onAadhaarChange() {
+    if (this.data.authorizedOrg.aadhaarNo) {
+      this.data.authorizedOrg.aadhaarNo = this.data.authorizedOrg.aadhaarNo.replace(/\D/g, '').slice(0, 12);
+    }
+    this.onDataChange();
   }
 
   onDobChange() {

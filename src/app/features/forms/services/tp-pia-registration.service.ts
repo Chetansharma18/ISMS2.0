@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { TpPiaRegistrationData, UploadedDocument } from '../models/tp-pia-registration.model';
 
 const STORAGE_KEY = 'isms_tp_pia_registration_draft_v1';
@@ -85,7 +85,8 @@ export const MARK_TO_ROLES: string[] = [
 export const ID_PROOF_TYPES: string[] = [
   'Voter ID Card',
   'Passport',
-  'Driving License'
+  'Driving License',
+  'Bhamashah Card'
 ];
 
 export const COMMON_BANKS: string[] = [
@@ -114,8 +115,7 @@ export const TRANSFER_MODES: string[] = [
 
 export const ACCOUNT_TYPES: string[] = [
   'Current Account',
-  'Savings Account',
-  'Zero Balance Escrow Account'
+  'Savings Account'
 ];
 
 @Injectable({
@@ -123,15 +123,34 @@ export const ACCOUNT_TYPES: string[] = [
 })
 export class TpPiaRegistrationService {
   readonly formData = signal<TpPiaRegistrationData>(this.getInitialState());
-  readonly isSaving = signal<boolean>(false);
+  readonly autoSaveStatus = signal<'saved' | 'saving' | 'idle'>('idle');
+  readonly lastSavedTime = signal<string>('');
+  readonly isSaving = computed(() => this.autoSaveStatus() === 'saving');
   readonly lastSaveMessage = signal<string>('');
 
+  private autoSaveTimer: any = null;
+
   constructor() {
-    // Clear any previous cached draft on startup so fields start completely blank.
-    // Data only populates when user explicitly clicks "Fill Sample".
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch {}
+    this.restoreSavedDraft();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', () => {
+        this.saveDraftSync();
+      });
+    }
+  }
+
+  restoreSavedDraft(): boolean {
+    const draft = this.loadFromStorage();
+    if (draft && draft.basicInfo && draft.basicInfo.applicationNo) {
+      this.formData.set(draft);
+      if (draft.lastSaved) {
+        this.lastSavedTime.set(draft.lastSaved);
+        this.autoSaveStatus.set('saved');
+        this.lastSaveMessage.set(`Draft automatically loaded (${draft.lastSaved})`);
+      }
+      return true;
+    }
+    return false;
   }
 
   getInitialState(): TpPiaRegistrationData {
@@ -193,7 +212,7 @@ export class TpPiaRegistrationService {
         emailId: '',
         pan: '',
         aadhaarNo: '',
-        typeIdProof: 'Aadhaar Card',
+        typeIdProof: '',
         idNo: '',
         bhamashahNo: '',
         voterIdNo: '',
@@ -232,27 +251,56 @@ export class TpPiaRegistrationService {
 
   updateFormData(updater: (prev: TpPiaRegistrationData) => TpPiaRegistrationData) {
     this.formData.update(updater);
+    this.triggerAutoSave();
   }
 
-  saveDraft(): boolean {
-    try {
-      this.isSaving.set(true);
-      const data = { ...this.formData(), lastSaved: new Date().toLocaleTimeString() };
-      this.formData.set(data);
-      this.saveToStorage(data);
-      this.lastSaveMessage.set(`Draft saved at ${data.lastSaved}`);
-      setTimeout(() => this.isSaving.set(false), 400);
-      return true;
-    } catch {
-      this.isSaving.set(false);
-      return false;
+  triggerAutoSave(immediate = false) {
+    this.autoSaveStatus.set('saving');
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+    }
+    if (immediate) {
+      this.saveDraftSync();
+    } else {
+      this.autoSaveTimer = setTimeout(() => {
+        this.saveDraftSync();
+      }, 400);
     }
   }
 
+  saveDraftSync() {
+    try {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const current = this.formData();
+      const updated = { ...current, lastSaved: timeStr };
+      this.formData.set(updated);
+      this.saveToStorage(updated);
+      this.lastSavedTime.set(timeStr);
+      this.autoSaveStatus.set('saved');
+      this.lastSaveMessage.set(`Draft saved at ${timeStr}`);
+    } catch (e) {
+      console.warn('Auto-save error', e);
+      this.autoSaveStatus.set('idle');
+    }
+  }
+
+  saveDraft(): boolean {
+    this.triggerAutoSave(true);
+    return true;
+  }
+
   resetForm() {
-    localStorage.removeItem(STORAGE_KEY);
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+    }
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {}
     const fresh = this.getInitialState();
     this.formData.set(fresh);
+    this.lastSavedTime.set('');
+    this.autoSaveStatus.set('idle');
     this.lastSaveMessage.set('Form has been reset to defaults');
   }
 
@@ -327,8 +375,8 @@ export class TpPiaRegistrationService {
         emailId: 'm.sharma@kushalfoundation.org',
         pan: 'ABCPS1234E',
         aadhaarNo: '887654321908',
-        typeIdProof: 'Aadhaar Card',
-        idNo: '887654321908',
+        typeIdProof: 'Voter ID Card',
+        idNo: 'RJ/04/123/98765',
         bhamashahNo: 'BHAM-8971201',
         voterIdNo: 'RJ/04/123/98765',
         passportNo: 'Z9876543',
@@ -382,6 +430,8 @@ export class TpPiaRegistrationService {
 
     this.formData.set(sample);
     this.saveToStorage(sample);
+    this.lastSavedTime.set(sample.lastSaved || '');
+    this.autoSaveStatus.set('saved');
     this.lastSaveMessage.set('Sample government demo data loaded');
   }
 

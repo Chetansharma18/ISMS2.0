@@ -120,7 +120,7 @@ import { EoiStateService } from '../../../core/services/eoi-state.service';
                     type="text" 
                     formControlName="ssoId"
                     placeholder="Digital Identity (SSOID / Username / Mobile)"
-                    class="w-full py-2.5 px-1 text-sm bg-transparent border-b border-slate-300 focus:border-[#131A4D] focus:outline-none placeholder-slate-400 text-slate-800 transition-colors font-mono"
+                    class="w-full py-2.5 px-1 text-sm bg-transparent border-b border-slate-300 focus:border-[#131A4D] focus:outline-none placeholder-slate-400 text-slate-800 transition-colors font-['Poppins',sans-serif] font-medium"
                   />
                   <div *ngIf="loginForm.get('ssoId')?.touched && loginForm.get('ssoId')?.invalid" class="text-[11px] text-red-600 pt-0.5">
                     Please enter your SSOID / Username

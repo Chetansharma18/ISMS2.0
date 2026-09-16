@@ -1,7 +1,8 @@
-<footer class="relative w-full max-w-full bg-[#001f3f] text-white select-none overflow-x-hidden flex flex-col justify-between">
+<footer
+  class="relative w-full bg-[#001f3f] text-white select-none overflow-visible flex-1 flex flex-col justify-between">
   <!-- Main Footer Content -->
-  <div class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8 sm:pt-10 sm:pb-12 lg:pt-10 lg:pb-12">
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-12 gap-7 sm:gap-8 lg:gap-10">
+  <div class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 my-auto pt-6 pb-6 sm:pt-8 sm:pb-8 lg:pt-6 lg:pb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
 
       <!-- Col 1: ISMS 2.0 & Logos (5 cols on lg, 1 col on md, 1 col on mobile) -->
       <div class="md:col-span-1 lg:col-span-5 flex flex-col justify-start">
@@ -15,12 +16,14 @@
 
         <div class="flex items-center gap-3 sm:gap-4 select-none">
           <!-- State Emblem of India (White) -->
-          <img src="emblem-white.png" alt="State Emblem of India" width="44" height="44" class="footer-emblem object-contain shrink-0" />
+          <img src="emblem-white.png" alt="State Emblem of India" width="44" height="44"
+            class="footer-emblem object-contain shrink-0" />
 
           <!-- Official Circular RSLDC Logo -->
-          <div class="footer-rsldc-circle rounded-full bg-white/10 p-0.5 flex items-center justify-center shrink-0 border border-white/20 shadow-sm overflow-hidden">
-            <img src="rsldc-logo.png" alt="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)" width="44" height="44"
-              class="footer-rsldc-img drop-shadow-sm" />
+          <div
+            class="footer-rsldc-circle rounded-full bg-white/10 p-0.5 flex items-center justify-center shrink-0 border border-white/20 shadow-sm overflow-hidden">
+            <img src="rsldc-logo.png" alt="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)" width="44"
+              height="44" class="footer-rsldc-img drop-shadow-sm" />
           </div>
         </div>
       </div>
@@ -44,12 +47,14 @@
             </a>
           </li>
           <li>
-            <a href="#privacy" class="text-slate-300 hover:text-amber-400 transition-colors duration-150 inline-block py-0.5">
+            <a href="#privacy"
+              class="text-slate-300 hover:text-amber-400 transition-colors duration-150 inline-block py-0.5">
               {{ t().footer.privacy }}
             </a>
           </li>
           <li>
-            <a href="#terms" class="text-slate-300 hover:text-amber-400 transition-colors duration-150 inline-block py-0.5">
+            <a href="#terms"
+              class="text-slate-300 hover:text-amber-400 transition-colors duration-150 inline-block py-0.5">
               {{ t().footer.terms }}
             </a>
           </li>
@@ -125,7 +130,8 @@
               <path
                 d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
             </svg>
-            <a href="mailto:support@isms.rajasthan.gov.in" class="hover:text-white transition-colors break-all sm:break-normal">support&#64;isms.rajasthan.gov.in</a>
+            <a href="mailto:support@isms.rajasthan.gov.in"
+              class="hover:text-white transition-colors break-all sm:break-normal">support&#64;isms.rajasthan.gov.in</a>
           </div>
         </div>
       </div>
@@ -135,22 +141,22 @@
 
   <!-- Bottom Divider & Tagline Bar with Floating Scroll-to-Top Button -->
   <div class="border-t border-white/10 relative">
-    <!-- Scroll to Top Button (Centered on divider line - immune to helpdesk collision and 100% responsive across mobile, tablet, and desktop) -->
-    <button
-      type="button"
-      (click)="scrollToTop()"
-      class="absolute left-1/2 -translate-x-1/2 -top-5 sm:-top-5.5 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white hover:bg-amber-400 text-[#001f3f] hover:text-slate-950 shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-95 border border-white/20 z-20 group"
-      [attr.aria-label]="t().footer.scrollToTopAria"
-      title="Scroll to top">
-      <svg class="w-5 h-5 transition-transform group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-      </svg>
-    </button>
-
-    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-7 pb-16 sm:pt-6 sm:pb-5 text-center text-xs sm:text-[13px] text-slate-300/85">
-      <p class="leading-relaxed font-normal max-w-2xl mx-auto">
+    <div
+      class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 relative flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] sm:text-xs text-slate-300/80 text-center sm:text-left">
+      <div>
+        &copy; {{ currentYear }} {{ t().footer.copyright }}
+      </div>
+      <div class="sm:mr-20">
         {{ t().footer.tagline }}
-      </p>
+      </div>
+
+      <button type="button" (click)="scrollToTop()"
+        class="absolute right-4 sm:right-6 lg:right-8 -top-5 sm:-top-5.5 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white text-[#1d4ed8] shadow-lg flex items-center justify-center hover:bg-slate-100 hover:scale-105 active:scale-95 transition-all duration-150 focus:outline-none z-20 cursor-pointer"
+        [attr.aria-label]="t().footer.scrollToTopAria">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+      </button>
     </div>
   </div>
 </footer>

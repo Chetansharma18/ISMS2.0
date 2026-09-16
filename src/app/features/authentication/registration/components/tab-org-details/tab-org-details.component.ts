@@ -21,9 +21,6 @@ import { FormValidationService } from '../../services/form-validation.service';
         <!-- Card Header -->
         <div class="px-4 sm:px-6 py-3.5 bg-white border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div class="flex items-center gap-2.5 min-w-0">
-            <span class="px-2.5 py-1 rounded bg-[#131A4D] text-white text-xs font-bold tracking-wide select-none shrink-0">
-              STEP 1
-            </span>
             <h2 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
               Organisation / Company Basic Details
             </h2>
@@ -50,18 +47,13 @@ import { FormValidationService } from '../../services/form-validation.service';
                 <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
                   Application No.
                 </label>
-                <div class="relative">
-                  <input 
-                    type="text" 
-                    placeholder="Application Number" 
-                    [(ngModel)]="data.basicInfo.applicationNo" 
-                    (ngModelChange)="onDataChange()"
-                    class="w-full h-10 px-3.5 border border-slate-300 rounded-md text-sm text-slate-800 bg-slate-50 font-mono focus:bg-white hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" 
-                  />
-                  <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-sky-800 bg-sky-100/90 border border-sky-200 px-2 py-0.5 rounded select-none">
-                    Auto / Assigned
-                  </span>
-                </div>
+                <input 
+                  type="text" 
+                  placeholder="Application Number" 
+                  [(ngModel)]="data.basicInfo.applicationNo" 
+                  (ngModelChange)="onDataChange()"
+                  class="w-full h-10 px-3.5 border border-slate-300 rounded-md text-sm text-slate-800 bg-slate-50 font-mono focus:bg-white hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" 
+                />
               </div>
 
               <!-- 2. TP/PIA Full Name * -->
@@ -319,12 +311,40 @@ import { FormValidationService } from '../../services/form-validation.service';
                 <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
                   Date of Registration
                 </label>
-                <input 
-                  type="date" 
-                  [(ngModel)]="data.basicInfo.dateOfRegistration" 
-                  (ngModelChange)="onDataChange()"
-                  class="w-full h-10 px-3.5 border border-slate-300 rounded-md text-sm text-slate-800 hover:border-slate-400 focus:ring-1 focus:ring-blue-900/20 focus:border-blue-900 transition outline-none" 
-                />
+                <div class="relative">
+                  <input 
+                    type="text" 
+                    placeholder="DD/MM/YYYY" 
+                    maxlength="10"
+                    [value]="formatDateDisplay(data.basicInfo.dateOfRegistration)" 
+                    (input)="onDateInput($event)"
+                    [ngClass]="isFieldInvalid('basicInfo.dateOfRegistration') ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20' : 'border-slate-300 focus:border-blue-900 focus:ring-blue-900/20'"
+                    class="w-full h-10 px-3.5 pr-10 border rounded-md text-sm text-slate-800 hover:border-slate-400 focus:ring-1 transition outline-none" 
+                  />
+                  <input 
+                    #regDatePicker
+                    type="date" 
+                    tabindex="-1"
+                    [max]="todayIso"
+                    min="1900-01-01"
+                    [value]="getIsoDate(data.basicInfo.dateOfRegistration)"
+                    (change)="onDatePick($event)"
+                    class="absolute opacity-0 pointer-events-none w-0 h-0 -z-10"
+                  />
+                  <button 
+                    type="button" 
+                    (click)="openPicker(regDatePicker)"
+                    title="Select Date of Registration (Max: Today)"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-700 p-1 focus:outline-none transition cursor-pointer"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                </div>
+                @if (isFieldInvalid('basicInfo.dateOfRegistration')) {
+                  <p class="text-xs text-rose-600 mt-1 font-medium">{{ getFieldError('basicInfo.dateOfRegistration') }}</p>
+                }
               </div>
 
               <!-- 3. State Where Registered -->
@@ -465,5 +485,88 @@ export class TabOrgDetailsComponent {
       this.toggleSameAddress();
     }
     this.onDataChange();
+  }
+
+  // --- DATE DD/MM/YYYY FORMATTING & PICKER HELPERS ---
+  get todayIso(): string {
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  formatDateDisplay(dateStr?: string): string {
+    if (!dateStr) return '';
+    const trimmed = dateStr.trim();
+    if (trimmed.includes('-')) {
+      const parts = trimmed.split('-');
+      if (parts.length === 3 && parts[0].length === 4) {
+        return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+      }
+    }
+    return trimmed;
+  }
+
+  getIsoDate(dateStr?: string): string {
+    if (!dateStr) return '';
+    const trimmed = dateStr.trim();
+    if (trimmed.includes('/')) {
+      const parts = trimmed.split('/');
+      if (parts.length === 3 && parts[2].length === 4) {
+        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+    }
+    if (trimmed.includes('-')) {
+      const parts = trimmed.split('-');
+      if (parts.length === 3 && parts[0].length === 4) {
+        return trimmed;
+      }
+    }
+    return '';
+  }
+
+  onDateInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const val = input.value || '';
+    const rawDigits = val.replace(/\D/g, '').slice(0, 8);
+    let formatted = '';
+    if (rawDigits.length > 4) {
+      formatted = `${rawDigits.slice(0, 2)}/${rawDigits.slice(2, 4)}/${rawDigits.slice(4)}`;
+    } else if (rawDigits.length > 2) {
+      formatted = `${rawDigits.slice(0, 2)}/${rawDigits.slice(2)}`;
+    } else {
+      formatted = rawDigits;
+    }
+    input.value = formatted;
+    this.data.basicInfo.dateOfRegistration = formatted;
+    this.onDataChange();
+  }
+
+  onDatePick(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const isoVal = input.value;
+    if (!isoVal) return;
+    const parts = isoVal.split('-');
+    if (parts.length === 3) {
+      const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      this.data.basicInfo.dateOfRegistration = formatted;
+      this.onDataChange();
+    }
+  }
+
+  openPicker(picker: HTMLInputElement) {
+    if (picker) {
+      if (typeof picker.showPicker === 'function') {
+        try {
+          picker.showPicker();
+          return;
+        } catch {
+          // fallback
+        }
+      }
+      picker.focus();
+      picker.click();
+    }
   }
 }

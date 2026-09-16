@@ -22,254 +22,135 @@ import { Observable } from 'rxjs';
     SidebarComponent
   ],
   template: `
-    <div class="min-h-screen flex flex-col bg-[#f0f4f8] font-sans text-slate-800 antialiased">
+    <div class="min-h-screen flex flex-col bg-[#f0f4f8] font-['Poppins',sans-serif] text-slate-800 antialiased">
       
       <!-- TOP POST-LOGIN HEADER: Dual Logos, User Profile Name, Language/Font Tools (No News Bar) -->
       <app-header></app-header>
-
-      <!-- PENDING PROFILE (OTR) NOTIFICATION BANNER -->
-      <div 
-        *ngIf="(userProfile$ | async) as profile" 
-        class="w-full bg-[#fffbeb] border-b border-amber-200 text-amber-900 px-4 sm:px-6 lg:px-8 py-2.5 shadow-2xs">
-        <div 
-          *ngIf="profile.role === 'applicant' && (profile.userState === 'new' || !profile.isRegistered)" 
-          class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs">
-          <div class="flex items-center gap-2.5">
-            <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white font-extrabold text-xs shadow-xs">!</span>
-            <span class="text-amber-950 font-medium">
-              <strong class="font-bold text-amber-900">One-Time Registration (OTR) Pending:</strong>
-              Complete your Organization Master Profile to unlock scheme applications, EMD fee payments, and proposal submissions.
-            </span>
-          </div>
-          <button 
-            type="button"
-            (click)="goToRegistration()" 
-            class="shrink-0 px-3.5 py-1.5 bg-[#002244] hover:bg-[#003366] text-white font-bold text-[11px] rounded-sm shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
-            <span>Complete Profile Now</span>
-            <span>→</span>
-          </button>
-        </div>
-      </div>
 
       <div class="flex flex-grow w-full">
         <!-- PERSISTENT PORTAL SIDEBAR -->
         <app-sidebar class="hidden md:block flex-shrink-0"></app-sidebar>
 
         <!-- MAIN CONTENT AREA -->
-        <main class="flex-grow max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto">
+        <main class="flex-1 min-w-0 w-full px-3 sm:px-4 py-4 overflow-y-auto">
 
           <!-- ================================================================= -->
           <!-- VIEW 1: ACTIVE SCHEMES & TENDERS TABLE VIEW                      -->
           <!-- ================================================================= -->
-          <div *ngIf="viewMode === 'table'" class="space-y-4">
+          <div *ngIf="viewMode === 'table'" class="space-y-3">
             
-            <!-- Page Heading & Controls Bar -->
-            <div class="bg-white border border-slate-200 shadow-xs p-4 sm:p-6 rounded-xs">
-              <div>
-                <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-[#002244]">
-                  Active Schemes &amp; Tenders
-                </h1>
-                <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                  Official Expression of Interest (EOI) schemes, technical tenders, and empanelment opportunities published by Government of Rajasthan departments.
-                </p>
-              </div>
-
-              <!-- Search & Filter Bar -->
-              <div class="mt-4 pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-12 gap-3">
-                
-                <!-- Search Input -->
-                <div class="sm:col-span-6 lg:col-span-5 relative">
-                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <circle cx="11" cy="11" r="8"></circle>
-                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                  </span>
-                  <input 
-                    type="text" 
-                    [(ngModel)]="searchKeyword" 
-                    (input)="filterSchemes()"
-                    placeholder="Search by Scheme name, EOI Ref No, or Tender ID..." 
-                    class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xs bg-slate-50 focus:bg-white focus:border-[#002244] focus:outline-none text-slate-800 transition-colors"
-                  />
-                </div>
-
-                <!-- Category Filter -->
-                <div class="sm:col-span-4 lg:col-span-4">
-                  <select 
-                    [(ngModel)]="selectedCategory" 
-                    (change)="filterSchemes()"
-                    class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xs bg-slate-50 focus:bg-white focus:border-[#002244] focus:outline-none text-slate-800 transition-colors font-medium">
-                    <option value="ALL">All Scheme Categories</option>
-                    <option value="State Funded">State Funded Schemes</option>
-                    <option value="Centrally Sponsored">Centrally Sponsored Schemes</option>
-                    <option value="Employment Linked">Employment Linked Schemes</option>
-                  </select>
-                </div>
-
-                <!-- Result Counter Pill -->
-                <div class="sm:col-span-2 lg:col-span-3 flex items-center justify-start sm:justify-end text-xs text-slate-500">
-                  <span>Showing <strong class="text-[#002244] font-bold">{{ filteredSchemes.length }}</strong> of {{ schemes.length }} tenders</span>
-                </div>
-
-              </div>
+            <!-- Page Heading Bar -->
+            <div class="bg-white border border-slate-200 shadow-xs p-3.5 sm:p-4 rounded-xs">
+              <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-[#002244]">
+                Active Schemes &amp; Tenders
+              </h1>
             </div>
 
             <!-- Crisp Government Schemes Table -->
             <div class="bg-white border border-slate-200 shadow-sm rounded-xs overflow-hidden">
-              <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs border-collapse">
+              <div class="w-full overflow-x-auto">
+                <table class="w-full min-w-[860px] table-fixed text-left text-xs border-collapse">
                   <thead>
-                    <tr class="bg-[#002244] text-white font-bold border-b-2 border-amber-500 text-[11.5px] tracking-wide">
-                      <th class="p-3 text-center w-12 border-r border-[#0e3b6e]">S.No</th>
-                      <th class="p-3 min-w-[170px] border-r border-[#0e3b6e]">EOI Reference No.</th>
-                      <th class="p-3 min-w-[280px] border-r border-[#0e3b6e]">Scheme &amp; Department Chain</th>
-                      <th class="p-3 min-w-[130px] border-r border-[#0e3b6e]">Category</th>
-                      <th class="p-3 min-w-[145px] border-r border-[#0e3b6e]">Date Published</th>
-                      <th class="p-3 min-w-[195px] border-r border-[#0e3b6e] bg-[#001730]">
-                        <div class="flex items-center gap-1.5 text-amber-300 font-extrabold">
-                          <span>Closing Date</span>
-                          <span class="text-[10px] px-1.5 py-0.2 bg-amber-400/20 rounded text-amber-200">HIGHLIGHT</span>
-                        </div>
-                      </th>
-                      <th class="p-3 min-w-[140px] border-r border-[#0e3b6e]">EMD &amp; Fee</th>
-                      <th class="p-3 min-w-[170px] text-center">Actions</th>
+                    <tr class="bg-[#002244] text-white text-[11px] font-bold tracking-wide uppercase border-b-2 border-amber-500">
+                      <th class="p-2 w-[5%] text-center border-r border-[#0e3b6e] whitespace-nowrap">S.No</th>
+                      <th class="p-2 w-[18%] border-r border-[#0e3b6e] whitespace-nowrap">EOI Reference No.</th>
+                      <th class="p-2 w-[27%] border-r border-[#0e3b6e]">Scheme &amp; Department Chain</th>
+                      <th class="p-2 w-[13%] border-r border-[#0e3b6e] text-center whitespace-nowrap">Category</th>
+                      <th class="p-2 w-[15%] border-r border-[#0e3b6e] whitespace-nowrap">Date Published</th>
+                      <th class="p-2 w-[15%] border-r border-[#0e3b6e] whitespace-nowrap">Closing Date</th>
+                      <th class="p-2 w-[7%] text-center whitespace-nowrap">Actions</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-200 text-slate-800 font-sans">
+                  <tbody class="divide-y divide-slate-200 text-slate-800 font-['Poppins',sans-serif]">
                     
                     <tr 
                       *ngFor="let scheme of filteredSchemes; let idx = index" 
                       class="hover:bg-blue-50/60 transition-colors group">
                       
                       <!-- 1. S.No -->
-                      <td class="p-3.5 text-center font-bold text-slate-600 border-r border-slate-200 align-top bg-slate-50/40">
+                      <td class="p-2 text-center font-bold text-slate-600 border-r border-slate-200 align-middle bg-slate-50/40">
                         {{ idx + 1 }}
                       </td>
 
-                      <!-- 2. EOI Reference No & Tender ID -->
-                      <td class="p-3.5 border-r border-slate-200 align-top">
-                        <div class="font-mono font-bold text-[#002244] text-xs leading-snug">
+                      <!-- 2. EOI Reference No -->
+                      <td class="p-2 border-r border-slate-200 align-middle whitespace-nowrap">
+                        <div class="font-semibold text-[#002244] text-[11px] leading-snug">
                           {{ scheme.eoiReferenceNo }}
                         </div>
-                        <div class="mt-1 text-[11px] font-mono text-slate-500 flex items-center gap-1">
-                          <span class="text-[10px] text-slate-400">ID:</span>
-                          <span>{{ scheme.tenderId }}</span>
-                        </div>
-                        <div class="mt-1.5">
-                          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-700 border border-slate-200">
-                            Code: {{ scheme.schemeCode }}
-                          </span>
-                        </div>
                       </td>
 
-                      <!-- 3. Scheme & Department Chain -->
-                      <td class="p-3.5 border-r border-slate-200 align-top">
+                      <!-- 3. Scheme & Department Chain (Only Scheme Name) -->
+                      <td class="p-2 border-r border-slate-200 align-middle">
                         <div 
                           (click)="selectScheme(scheme)"
-                          class="font-bold text-[#002244] hover:text-blue-800 text-xs leading-snug cursor-pointer group-hover:underline">
+                          class="font-semibold text-[#002244] hover:text-blue-800 text-[11px] leading-snug cursor-pointer group-hover:underline line-clamp-2"
+                          [title]="scheme.name">
                           {{ scheme.name }}
-                        </div>
-                        <div class="mt-1.5 text-[11px] text-slate-600 leading-relaxed">
-                          <span class="font-semibold text-slate-700">Dept Chain:</span>
-                          <span class="text-slate-600">{{ scheme.organisationChain }}</span>
-                        </div>
-                        <div class="mt-1 text-[11px] text-slate-500">
-                          <span>Beneficiaries: </span>
-                          <span class="italic text-slate-600">{{ scheme.targetBeneficiaries || 'Eligible Citizens of Rajasthan' }}</span>
                         </div>
                       </td>
 
-                      <!-- 4. Scheme Category -->
-                      <td class="p-3.5 border-r border-slate-200 align-top">
+                      <!-- 4. Category (Only Category Name) -->
+                      <td class="p-2 border-r border-slate-200 align-middle text-center whitespace-nowrap">
                         <span 
                           [ngClass]="{
-                            'bg-blue-50 text-blue-800 border-blue-200': scheme.schemeCategory === 'State Funded',
-                            'bg-purple-50 text-purple-800 border-purple-200': scheme.schemeCategory === 'Centrally Sponsored',
-                            'bg-emerald-50 text-emerald-800 border-emerald-200': scheme.schemeCategory === 'Employment Linked',
-                            'bg-slate-50 text-slate-800 border-slate-200': scheme.schemeCategory !== 'State Funded' && scheme.schemeCategory !== 'Centrally Sponsored' && scheme.schemeCategory !== 'Employment Linked'
+                            'bg-blue-50 text-blue-800 border-blue-200': scheme.schemeCategory.includes('RAJKVIK'),
+                            'bg-amber-50 text-amber-800 border-amber-200': scheme.schemeCategory.includes('SAKSHM'),
+                            'bg-purple-50 text-purple-800 border-purple-200': scheme.schemeCategory.includes('SAMARTH'),
+                            'bg-slate-50 text-slate-800 border-slate-200': !scheme.schemeCategory.includes('RAJKVIK') && !scheme.schemeCategory.includes('SAKSHM') && !scheme.schemeCategory.includes('SAMARTH')
                           }"
-                          class="inline-block px-2 py-0.5 text-[11px] font-semibold rounded-xs border">
+                          class="inline-block px-1.5 py-0.5 text-[10px] font-semibold rounded-xs border">
                           {{ scheme.schemeCategory }}
                         </span>
-                        <div class="mt-1 text-[10.5px] text-slate-500 font-medium">
-                          {{ scheme.eoiCategory }}
-                        </div>
                       </td>
 
                       <!-- 5. Date of EOI Published -->
-                      <td class="p-3.5 border-r border-slate-200 align-top whitespace-nowrap">
-                        <div class="font-mono text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                      <td class="p-2 border-r border-slate-200 align-middle whitespace-nowrap">
+                        <div class="text-[11px] font-semibold text-slate-800 flex items-center gap-1">
                           <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                             <line x1="16" y1="2" x2="16" y2="6"></line>
                             <line x1="8" y1="2" x2="8" y2="6"></line>
                             <line x1="3" y1="10" x2="21" y2="10"></line>
                           </svg>
-                          <span>{{ scheme.ePublishedDate }}</span>
-                        </div>
-                        <div class="text-[10.5px] text-slate-500 mt-1 font-mono">
-                          Opening: {{ scheme.openingDate }}
+                          <span>{{ getSplitDate(scheme.ePublishedDate).date }}</span>
+                          <span class="text-[10px] text-slate-500 font-normal">{{ getSplitDate(scheme.ePublishedDate).time }}</span>
                         </div>
                       </td>
 
-                      <!-- 6. Closing Date of EOI (HIGHLIGHTED!) -->
-                      <td class="p-3.5 border-r border-slate-200 align-top whitespace-nowrap bg-amber-50/40">
-                        <div class="p-2 rounded-xs border border-amber-300 bg-amber-100/70">
-                          <div class="font-mono font-black text-[#92400e] text-xs flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5 text-amber-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
-                            <span>{{ scheme.closingDate }}</span>
-                          </div>
-
-                          <div class="mt-1.5 flex items-center gap-1.5">
-                            <span 
-                              *ngIf="(scheme.daysRemaining || 20) <= 5"
-                              class="inline-flex items-center gap-1 text-[10px] font-extrabold text-red-800 bg-red-100 border border-red-300 px-1.5 py-0.5 rounded-2xs animate-pulse">
-                              <span>⚠️ Closes Soon ({{ scheme.daysRemaining }} Days)</span>
-                            </span>
-                            <span 
-                              *ngIf="(scheme.daysRemaining || 20) > 5"
-                              class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.5 rounded-2xs">
-                              <span>● Open ({{ scheme.daysRemaining }} Days Left)</span>
-                            </span>
-                          </div>
+                      <!-- 6. Closing Date of EOI & Bid Opening -->
+                      <td class="p-2 border-r border-slate-200 align-middle whitespace-nowrap">
+                        <div class="text-[11px] font-semibold text-slate-800 flex items-center gap-1">
+                          <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 16 14"></polyline>
+                          </svg>
+                          <span>{{ getSplitDate(scheme.closingDate).date }}</span>
+                          <span class="text-[10px] text-slate-500 font-normal">{{ getSplitDate(scheme.closingDate).time }}</span>
+                        </div>
+                        <div class="text-[9.5px] text-slate-500 mt-0.5 font-medium flex items-center gap-1">
+                          <span class="text-slate-400">Opening:</span>
+                          <span>{{ scheme.openingDate }}</span>
                         </div>
                       </td>
 
-                      <!-- 7. EMD Fee & Process Fee -->
-                      <td class="p-3.5 border-r border-slate-200 align-top">
-                        <div class="font-bold text-[#002244] text-xs font-mono">
-                          ₹{{ scheme.emdAmount | number:'1.0-0' }}
-                        </div>
-                        <div class="text-[10px] text-emerald-700 font-semibold mt-0.5">
-                          ✓ Refundable EMD
-                        </div>
-                        <div class="mt-1 text-[10.5px] font-mono text-slate-500 border-t border-slate-100 pt-1">
-                          Fee: ₹{{ scheme.processingFee | number:'1.0-0' }}
-                        </div>
-                      </td>
-
-                      <!-- 8. Actions: View Details & Apply -->
-                      <td class="p-3.5 align-top text-center">
-                        <div class="flex flex-col gap-1.5">
+                      <!-- 7. Actions: View Details & Apply -->
+                      <td class="p-2 align-middle text-center whitespace-nowrap">
+                        <div class="flex flex-col gap-1 w-full max-w-[70px] mx-auto">
                           <button 
                             type="button"
                             (click)="selectScheme(scheme)"
-                            class="w-full px-3 py-1.5 bg-white hover:bg-slate-100 text-[#002244] border border-[#002244]/40 text-xs font-bold rounded-xs shadow-2xs transition-colors flex items-center justify-center gap-1 cursor-pointer">
-                            <svg class="w-3.5 h-3.5 text-[#002244]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            class="w-full px-1.5 py-0.5 bg-white hover:bg-slate-100 text-[#002244] border border-[#002244]/40 text-[10.5px] font-semibold rounded-xs shadow-2xs transition-colors flex items-center justify-center gap-1 cursor-pointer">
+                            <svg class="w-3 h-3 text-[#002244]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                               <circle cx="12" cy="12" r="3"></circle>
                             </svg>
-                            <span>View Details</span>
+                            <span>View</span>
                           </button>
 
                           <button 
                             type="button"
                             (click)="onApplyClicked(scheme)"
-                            class="w-full px-3 py-1.5 bg-[#002244] hover:bg-[#003366] text-white text-xs font-bold rounded-xs shadow-xs transition-colors flex items-center justify-center gap-1 cursor-pointer">
+                            class="w-full px-1.5 py-0.5 bg-[#002244] hover:bg-[#003366] text-white text-[10.5px] font-semibold rounded-xs shadow-xs transition-colors flex items-center justify-center gap-0.5 cursor-pointer">
                             <span>Apply</span>
                             <span>→</span>
                           </button>
@@ -280,7 +161,7 @@ import { Observable } from 'rxjs';
 
                     <!-- Empty State if no schemes match filter -->
                     <tr *ngIf="filteredSchemes.length === 0">
-                      <td colspan="8" class="p-8 text-center text-slate-500">
+                      <td colspan="7" class="p-8 text-center text-slate-500">
                         <div class="text-sm font-bold text-slate-700">No tenders matched your search criteria</div>
                         <div class="text-xs text-slate-500 mt-1">Try resetting search filters or keywords</div>
                         <button 
@@ -307,8 +188,8 @@ import { Observable } from 'rxjs';
             <!-- Window Navigation & Hero Banner -->
             <div class="bg-[#002244] text-white rounded-xs shadow-md overflow-hidden border-b-4 border-amber-500">
               
-              <!-- Top Row: Breadcrumbs & Back Button -->
-              <div class="px-5 py-3 border-b border-white/15 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+              <!-- Top Row: Breadcrumbs -->
+              <div class="px-5 py-3 border-b border-white/15 flex items-center justify-between">
                 <div class="flex items-center gap-2 text-xs">
                   <button 
                     type="button"
@@ -320,404 +201,402 @@ import { Observable } from 'rxjs';
                   <span class="text-white/40">/</span>
                   <span class="text-slate-300">EOI Schemes</span>
                   <span class="text-white/40">/</span>
-                  <span class="text-white font-mono font-bold">{{ selectedScheme.schemeCode }}</span>
-                </div>
-
-                <div class="flex items-center gap-2">
-                  <button 
-                    type="button"
-                    (click)="showTable()" 
-                    class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white border border-white/25 text-xs font-semibold rounded-xs transition-colors cursor-pointer flex items-center gap-1.5">
-                    <span>←</span>
-                    <span>Back to Tenders Table</span>
-                  </button>
+                  <span class="text-white font-semibold">{{ selectedScheme.schemeCode }}</span>
                 </div>
               </div>
 
-              <!-- Main Hero Content -->
-              <div class="p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                
-                <!-- Left Title & Meta -->
-                <div class="lg:col-span-8 space-y-2">
-                  <div class="flex flex-wrap items-center gap-2">
-                    <span class="px-2.5 py-0.5 bg-amber-500 text-[#002244] text-xs font-extrabold rounded-2xs tracking-wide">
-                      {{ selectedScheme.schemeCategory }}
-                    </span>
-                    <span class="px-2.5 py-0.5 bg-white/15 text-white text-xs font-mono font-bold rounded-2xs border border-white/20">
-                      Ref: {{ selectedScheme.eoiReferenceNo }}
-                    </span>
-                    <span class="px-2.5 py-0.5 bg-white/15 text-white text-xs font-mono rounded-2xs border border-white/20">
-                      Tender ID: {{ selectedScheme.tenderId }}
-                    </span>
-                  </div>
-
-                  <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white leading-tight">
-                    {{ selectedScheme.name }}
-                  </h1>
-
-                  <p class="text-xs sm:text-sm text-slate-200 leading-relaxed max-w-3xl">
-                    {{ selectedScheme.eoiDescription }}
-                  </p>
-
-                  <div class="pt-2 text-xs text-amber-200/90 font-medium">
-                    🏛 Nodal Dept: <span class="text-white font-semibold">{{ selectedScheme.department }}</span>
-                  </div>
+              <!-- Main Hero Content: Ref & Scheme Name (Tender ID removed) -->
+              <div class="p-5 sm:p-6 space-y-3">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-3 py-1 bg-white/15 text-white text-xs font-semibold rounded-2xs border border-white/20 font-['Poppins',sans-serif]">
+                    Ref: {{ selectedScheme.eoiReferenceNo }}
+                  </span>
                 </div>
 
-                <!-- Right High-Visibility Closing Date & Apply Card -->
-                <div class="lg:col-span-4 bg-white/10 border border-white/20 p-4 rounded-xs text-white space-y-3 shadow-inner">
-                  
-                  <!-- Highlighted Closing Date Box -->
-                  <div class="bg-amber-500/20 border border-amber-400/50 p-3 rounded-xs">
-                    <div class="text-[11px] uppercase tracking-wider font-extrabold text-amber-300 flex items-center gap-1">
-                      <span>⏰ SUBMISSION DEADLINE (CLOSING DATE)</span>
-                    </div>
-                    <div class="text-base sm:text-lg font-mono font-black text-white mt-0.5">
-                      {{ selectedScheme.closingDate }}
-                    </div>
-                    <div class="text-[11px] text-amber-200 font-bold mt-1">
-                      ● Status: Open for Proposal Submission ({{ selectedScheme.daysRemaining || 20 }} Days Left)
-                    </div>
-                  </div>
-
-                  <!-- Quick Fees Row -->
-                  <div class="grid grid-cols-2 gap-2 text-center text-xs">
-                    <div class="bg-white/5 border border-white/15 p-2 rounded-xs">
-                      <div class="text-[10px] text-slate-300 uppercase">EMD Fee</div>
-                      <div class="font-mono font-bold text-white text-sm mt-0.5">
-                        ₹{{ selectedScheme.emdAmount | number:'1.0-0' }}
-                      </div>
-                      <div class="text-[9.5px] text-emerald-300 font-semibold mt-0.5">100% Refundable</div>
-                    </div>
-                    <div class="bg-white/5 border border-white/15 p-2 rounded-xs">
-                      <div class="text-[10px] text-slate-300 uppercase">Process Fee</div>
-                      <div class="font-mono font-bold text-white text-sm mt-0.5">
-                        ₹{{ selectedScheme.processingFee | number:'1.0-0' }}
-                      </div>
-                      <div class="text-[9.5px] text-slate-300 mt-0.5">Non-Refundable</div>
-                    </div>
-                  </div>
-
-                  <!-- Primary Apply CTA -->
-                  <button 
-                    type="button"
-                    (click)="onApplyClicked(selectedScheme)"
-                    class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-[#002244] font-black text-xs uppercase tracking-wider rounded-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
-                    <span>Apply for this Scheme Now</span>
-                    <span>→</span>
-                  </button>
-
-                </div>
-
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white leading-tight font-['Poppins',sans-serif]">
+                  {{ selectedScheme.name }}
+                </h1>
               </div>
 
             </div>
 
-            <!-- Two-Column Structured Scheme Details & Documents Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Full-Width Content: Official Documents & Milestones Table & Application Section -->
+            <div class="space-y-6">
               
-              <!-- LEFT COLUMN: Scheme Overview, All Documents, Scope & Eligibility (8 Cols) -->
-              <div class="lg:col-span-8 space-y-6">
+              <!-- SECTION 1: Scheme Related Official Documents & RFP Downloads -->
+              <div class="bg-white border border-slate-200 rounded-xs shadow-xs p-5 sm:p-6">
                 
-                <!-- SECTION: Scheme Related All Documents & RFP Downloads -->
-                <div class="bg-white border border-slate-200 rounded-xs shadow-xs p-5 sm:p-6">
-                  
-                  <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-                    <div>
-                      <h2 class="text-base font-bold text-[#002244] flex items-center gap-2">
-                        <svg class="w-5 h-5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                          <polyline points="14 2 14 8 20 8"></polyline>
-                          <line x1="16" y1="13" x2="8" y2="13"></line>
-                          <line x1="16" y1="17" x2="8" y2="17"></line>
-                          <polyline points="10 9 9 9 8 9"></polyline>
-                        </svg>
-                        <span>Scheme Related Official Documents &amp; RFP</span>
-                      </h2>
-                      <p class="text-xs text-slate-500 mt-0.5">
-                        Download standard tender terms, technical specifications, and financial bid schedules for {{ selectedScheme.schemeCode }}.
-                      </p>
-                    </div>
-
-                    <span class="px-2.5 py-1 bg-blue-50 text-[#002244] text-xs font-bold rounded-xs border border-blue-200">
-                      {{ (selectedScheme.documents || []).length }} Documents
-                    </span>
-                  </div>
-
-                  <!-- Documents List Container -->
-                  <div class="mt-4 space-y-3">
-                    <div 
-                      *ngFor="let doc of selectedScheme.documents"
-                      class="border border-slate-200 hover:border-[#002244] p-3.5 rounded-xs bg-slate-50/50 hover:bg-white transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group">
-                      
-                      <!-- Doc Meta & Title -->
-                      <div class="flex items-start gap-3 min-w-0">
-                        <!-- File Type Badge -->
-                        <div 
-                          [ngClass]="{
-                            'bg-red-100 text-red-800 border-red-300': doc.type === 'PDF',
-                            'bg-emerald-100 text-emerald-800 border-emerald-300': doc.type === 'EXCEL',
-                            'bg-blue-100 text-blue-800 border-blue-300': doc.type === 'DOC'
-                          }"
-                          class="w-11 h-11 flex-shrink-0 rounded-xs border flex flex-col items-center justify-center font-bold font-mono">
-                          <span class="text-xs leading-none">{{ doc.type }}</span>
-                          <span class="text-[9px] opacity-75 mt-0.5">DOC</span>
-                        </div>
-
-                        <div class="min-w-0">
-                          <div class="font-bold text-xs text-[#002244] group-hover:text-blue-800 transition-colors leading-snug">
-                            {{ doc.title }}
-                          </div>
-                          <div class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-                            {{ doc.description }}
-                          </div>
-                          <div class="flex items-center gap-3 mt-1 text-[10.5px] font-mono text-slate-400">
-                            <span>File: <strong class="text-slate-600">{{ doc.filename }}</strong></span>
-                            <span>•</span>
-                            <span>Size: <strong class="text-slate-600">{{ doc.size }}</strong></span>
-                            <span>•</span>
-                            <span>Published: {{ doc.publishedDate }}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Actions: Download & Preview -->
-                      <div class="flex items-center gap-2 self-start sm:self-center shrink-0">
-                        <button 
-                          type="button"
-                          (click)="previewDocument(doc)"
-                          class="px-2.5 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-semibold rounded-xs transition-colors flex items-center gap-1 cursor-pointer">
-                          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                          </svg>
-                          <span>Preview</span>
-                        </button>
-
-                        <button 
-                          type="button"
-                          (click)="downloadDocument(doc)"
-                          class="px-3 py-1.5 bg-[#002244] hover:bg-[#003366] text-white text-xs font-bold rounded-xs shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer">
-                          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                          </svg>
-                          <span>Download</span>
-                        </button>
-                      </div>
-
-                    </div>
-                  </div>
-
+                <div class="pb-3 border-b border-slate-200">
+                  <h2 class="text-base font-bold text-[#002244] flex items-center gap-2 font-['Poppins',sans-serif]">
+                    <svg class="w-5 h-5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span>Scheme Related Official Documents &amp; RFP</span>
+                  </h2>
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    Download standard tender terms, technical specifications, and financial bid schedules for {{ selectedScheme.schemeCode }}.
+                  </p>
                 </div>
 
-                <!-- SECTION: Key Timeline & Critical Dates Matrix -->
-                <div class="bg-white border border-slate-200 rounded-xs shadow-xs p-5 sm:p-6">
-                  <h2 class="text-base font-bold text-[#002244] pb-3 border-b border-slate-200 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <!-- Documents List Container: Name, Size, Date of Publish with Open PDF & Download -->
+                <div class="mt-4 space-y-3">
+                  <div 
+                    *ngFor="let doc of selectedScheme.documents"
+                    class="border border-slate-200 hover:border-[#002244] p-3.5 rounded-xs bg-slate-50/50 hover:bg-white transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group">
+                    
+                    <!-- Doc Meta: Name, Size, Date of Publish -->
+                    <div class="flex items-center gap-3 min-w-0">
+                      <!-- File Type Badge -->
+                      <div 
+                        [ngClass]="{
+                          'bg-red-100 text-red-800 border-red-300': doc.type === 'PDF',
+                          'bg-emerald-100 text-emerald-800 border-emerald-300': doc.type === 'EXCEL',
+                          'bg-blue-100 text-blue-800 border-blue-300': doc.type === 'DOC'
+                        }"
+                        class="w-10 h-10 flex-shrink-0 rounded-xs border flex flex-col items-center justify-center font-bold">
+                        <span class="text-xs leading-none font-['Poppins',sans-serif]">{{ doc.type }}</span>
+                      </div>
+
+                      <div class="min-w-0">
+                        <div class="font-bold text-xs sm:text-sm text-[#002244] group-hover:text-blue-800 transition-colors leading-snug font-['Poppins',sans-serif]">
+                          {{ doc.title }}
+                        </div>
+                        <div class="flex items-center gap-3 mt-1 text-[11px] text-slate-500 font-['Poppins',sans-serif]">
+                          <span>Size: <strong class="text-slate-700">{{ doc.size }}</strong></span>
+                          <span>•</span>
+                          <span>Published: <strong class="text-slate-700">{{ doc.publishedDate }}</strong></span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Actions: Direct PDF Download -->
+                    <div class="flex items-center gap-2 self-start sm:self-center shrink-0">
+                      <button 
+                        type="button"
+                        (click)="downloadDocument(doc)"
+                        class="px-3.5 py-1.5 bg-[#002244] hover:bg-[#003366] text-white text-xs font-bold rounded-xs shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer font-['Poppins',sans-serif]">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="7 10 12 15 17 10"></polyline>
+                          <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Download</span>
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- SECTION 2: Critical EOI Milestones & Schedule Matrix in Proper Table Form (No Emojis) -->
+              <div class="bg-white border border-slate-200 rounded-xs shadow-xs p-5 sm:p-6 space-y-4">
+                
+                <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+                  <h2 class="text-base font-bold text-[#002244] flex items-center gap-2 font-['Poppins',sans-serif]">
+                    <svg class="w-5 h-5 text-[#002244]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <circle cx="12" cy="12" r="10"></circle>
                       <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
                     <span>Critical EOI Milestones &amp; Schedule Matrix</span>
                   </h2>
-
-                  <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                    
-                    <!-- Date 1: Published -->
-                    <div class="border border-slate-200 p-3.5 rounded-xs bg-slate-50/50">
-                      <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Date of EOI Published</div>
-                      <div class="font-mono font-bold text-[#002244] text-sm mt-1">
-                        {{ selectedScheme.ePublishedDate }}
-                      </div>
-                      <div class="text-[10.5px] text-slate-500 mt-0.5">Published on official state tender bulletin</div>
-                    </div>
-
-                    <!-- Date 2: Pre-Bid Meeting -->
-                    <div class="border border-slate-200 p-3.5 rounded-xs bg-slate-50/50">
-                      <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Pre-Bid Meeting</div>
-                      <div class="font-mono font-bold text-[#002244] text-sm mt-1">
-                        {{ selectedScheme.preBidMeetingDate || '15-Sep-2026 11:30 AM' }}
-                      </div>
-                      <div class="text-[10.5px] text-slate-500 mt-0.5">Held at RSLDC Head Office, Jhalana Doongri, Jaipur</div>
-                    </div>
-
-                    <!-- Date 3: Closing Date (HIGHLIGHTED) -->
-                    <div class="border-2 border-amber-400 p-3.5 rounded-xs bg-amber-50">
-                      <div class="text-[11px] font-extrabold text-amber-900 uppercase tracking-wider flex items-center gap-1">
-                        <span>⭐ Closing Date of EOI Submission</span>
-                      </div>
-                      <div class="font-mono font-black text-[#92400e] text-base mt-1">
-                        {{ selectedScheme.closingDate }}
-                      </div>
-                      <div class="text-[11px] text-amber-800 font-bold mt-0.5">
-                        Strict deadline: No proposals accepted after portal closing time.
-                      </div>
-                    </div>
-
-                    <!-- Date 4: Opening Date -->
-                    <div class="border border-slate-200 p-3.5 rounded-xs bg-slate-50/50">
-                      <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Technical Bid Opening Date</div>
-                      <div class="font-mono font-bold text-[#002244] text-sm mt-1">
-                        {{ selectedScheme.openingDate }}
-                      </div>
-                      <div class="text-[10.5px] text-slate-500 mt-0.5">Online scrutiny &amp; empanelment desk opening</div>
-                    </div>
-
-                  </div>
                 </div>
 
-                <!-- SECTION: Scheme Scope, Objectives & Eligibility Requirements -->
-                <div class="bg-white border border-slate-200 rounded-xs shadow-xs p-5 sm:p-6 space-y-4">
-                  <h2 class="text-base font-bold text-[#002244] pb-3 border-b border-slate-200 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-emerald-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
-                    <span>Eligibility Requirements &amp; Scope of Work</span>
-                  </h2>
+                <!-- Structured Milestones Table -->
+                <div class="overflow-x-auto border border-slate-200 rounded-xs shadow-2xs">
+                  <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr class="bg-[#002244] text-white font-bold border-b-2 border-amber-500 text-[11.5px] tracking-wide font-['Poppins',sans-serif]">
+                        <th class="p-3 text-center w-14 border-r border-[#0e3b6e]">S.No</th>
+                        <th class="p-3 min-w-[220px] border-r border-[#0e3b6e]">Milestone / Event Stage</th>
+                        <th class="p-3 min-w-[200px] border-r border-[#0e3b6e]">Date &amp; Time</th>
+                        <th class="p-3 min-w-[280px]">Details &amp; Remarks</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-slate-800 font-['Poppins',sans-serif]">
+                      
+                      <!-- Milestone 1 -->
+                      <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-3 text-center font-bold text-slate-600 border-r border-slate-200 bg-slate-50/50">1</td>
+                        <td class="p-3 font-semibold text-[#002244] border-r border-slate-200">
+                          Date of EOI Published
+                        </td>
+                        <td class="p-3 font-semibold text-slate-800 border-r border-slate-200 whitespace-nowrap">
+                          {{ selectedScheme.ePublishedDate }}
+                        </td>
+                        <td class="p-3 text-slate-600">
+                          Published on official state tender bulletin
+                        </td>
+                      </tr>
 
-                  <div>
-                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
-                      1. Target Beneficiary Coverage
-                    </h3>
-                    <p class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xs border border-slate-100">
-                      {{ selectedScheme.targetBeneficiaries || 'Youth of Rajasthan state across designated priority districts.' }}
-                    </p>
-                  </div>
+                      <!-- Milestone 2 -->
+                      <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-3 text-center font-bold text-slate-600 border-r border-slate-200 bg-slate-50/50">2</td>
+                        <td class="p-3 font-semibold text-[#002244] border-r border-slate-200">
+                          Pre-Bid Meeting
+                        </td>
+                        <td class="p-3 font-semibold text-slate-800 border-r border-slate-200 whitespace-nowrap">
+                          {{ selectedScheme.preBidMeetingDate || '15-Sep-2026 11:30 AM' }}
+                        </td>
+                        <td class="p-3 text-slate-600">
+                          Held at RSLDC Head Office, Jhalana Doongri, Jaipur
+                        </td>
+                      </tr>
 
-                  <div>
-                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
-                      2. Mandatory Empanelment Qualification Criteria
-                    </h3>
-                    <ul class="space-y-2 text-xs text-slate-700">
-                      <li *ngFor="let crit of selectedScheme.eligibilityPreview" class="flex items-start gap-2">
-                        <span class="text-emerald-600 font-bold shrink-0">✓</span>
-                        <span>{{ crit }}</span>
-                      </li>
-                    </ul>
-                  </div>
+                      <!-- Milestone 3 -->
+                      <tr class="hover:bg-slate-50 transition-colors bg-amber-50/20">
+                        <td class="p-3 text-center font-bold text-slate-600 border-r border-slate-200 bg-slate-50/50">3</td>
+                        <td class="p-3 font-bold text-[#002244] border-r border-slate-200">
+                          Closing Date of EOI Submission
+                        </td>
+                        <td class="p-3 font-bold text-[#92400e] border-r border-slate-200 whitespace-nowrap">
+                          {{ selectedScheme.closingDate }}
+                        </td>
+                        <td class="p-3 font-medium text-amber-900">
+                          Strict deadline: No proposals accepted after portal closing time.
+                        </td>
+                      </tr>
 
+                      <!-- Milestone 4 -->
+                      <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-3 text-center font-bold text-slate-600 border-r border-slate-200 bg-slate-50/50">4</td>
+                        <td class="p-3 font-semibold text-[#002244] border-r border-slate-200">
+                          Technical Bid Opening Date
+                        </td>
+                        <td class="p-3 font-semibold text-slate-800 border-r border-slate-200 whitespace-nowrap">
+                          {{ selectedScheme.openingDate }}
+                        </td>
+                        <td class="p-3 text-slate-600">
+                          Online scrutiny &amp; empanelment desk opening
+                        </td>
+                      </tr>
+
+                    </tbody>
+                  </table>
                 </div>
 
               </div>
 
-              <!-- RIGHT COLUMN: Fees, Organization Chain, Helpdesk & Apply Action (4 Cols) -->
-              <div class="lg:col-span-4 space-y-6">
+              <!-- SECTION 3: Submission Deadline, Fees & Apply Action Card (Placed below Milestones) -->
+              <div class="bg-white border border-slate-200 rounded-xs shadow-xs p-5 sm:p-6">
                 
-                <!-- Quick Apply Action Card -->
-                <div class="bg-white border-2 border-[#002244] rounded-xs shadow-md p-5 space-y-4">
-                  <div>
-                    <span class="text-[10px] font-mono text-[#002244] uppercase tracking-wider font-bold">
-                      Submission Desk
-                    </span>
-                    <h3 class="text-base font-bold text-[#002244] mt-0.5">
-                      Ready to Apply?
-                    </h3>
-                    <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                      Submit technical qualifications, center capacity proposals, and complete EMD payments online.
-                    </p>
-                  </div>
-
-                  <div class="p-3 bg-blue-50 border border-blue-200 rounded-xs text-xs text-[#002244] space-y-1">
-                    <div class="font-bold">⚠️ Profile Requirement Check:</div>
-                    <div class="text-[11.5px] leading-relaxed">
-                      Applicants must possess an active verified One-Time Registration (OTR) profile before proceeding.
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+                  
+                  <!-- Left Box: Submission Deadline & Status -->
+                  <div class="lg:col-span-5 bg-amber-50/70 border border-amber-300 p-4 rounded-xs">
+                    <div class="text-[11px] uppercase tracking-wider font-bold text-amber-900 flex items-center gap-1.5 font-['Poppins',sans-serif]">
+                      <svg class="w-3.5 h-3.5 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                      <span>SUBMISSION DEADLINE (CLOSING DATE)</span>
+                    </div>
+                    <div class="text-lg sm:text-xl font-bold text-[#002244] mt-1 font-['Poppins',sans-serif]">
+                      {{ selectedScheme.closingDate }}
+                    </div>
+                    <div class="text-xs text-amber-800 font-medium mt-1 flex items-center gap-1.5 font-['Poppins',sans-serif]">
+                      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      <span>Status: Open for Proposal Submission ({{ selectedScheme.daysRemaining || 20 }} Days Left)</span>
                     </div>
                   </div>
 
-                  <button 
-                    type="button"
-                    (click)="onApplyClicked(selectedScheme)"
-                    class="w-full py-3 bg-[#002244] hover:bg-[#003366] text-white font-bold text-xs uppercase tracking-wider rounded-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
-                    <span>Submit EOI Proposal</span>
-                    <span>→</span>
-                  </button>
-
-                  <button 
-                    type="button"
-                    (click)="showTable()"
-                    class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xs transition-colors cursor-pointer">
-                    ← Back to All Tenders
-                  </button>
-                </div>
-
-                <!-- Financial Fee Parameters Card -->
-                <div class="bg-white border border-slate-200 rounded-xs shadow-xs p-5 space-y-3 text-xs">
-                  <h3 class="font-bold text-[#002244] pb-2 border-b border-slate-200 uppercase tracking-wider text-[11px]">
-                    Financial Parameters &amp; Payment Norms
-                  </h3>
-
-                  <div class="space-y-2.5">
-                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-                      <span class="text-slate-500">Earnest Money Deposit (EMD):</span>
-                      <span class="font-mono font-bold text-[#002244] text-sm">₹{{ selectedScheme.emdAmount | number:'1.0-0' }}</span>
+                  <!-- Middle: Financial Parameters (EMD Fee & Process Fee) -->
+                  <div class="lg:col-span-4 grid grid-cols-2 gap-3">
+                    <!-- EMD Fee -->
+                    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xs text-center">
+                      <div class="text-[10.5px] uppercase font-bold text-slate-500 tracking-wider font-['Poppins',sans-serif]">EMD Fee</div>
+                      <div class="text-base sm:text-lg font-bold text-[#002244] mt-0.5 font-['Poppins',sans-serif]">
+                        ₹{{ selectedScheme.emdAmount | number:'1.0-0' }}
+                      </div>
+                      <div class="text-[10px] text-emerald-700 font-semibold mt-0.5 flex items-center justify-center gap-1 font-['Poppins',sans-serif]">
+                        <svg class="w-3 h-3 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>100% Refundable</span>
+                      </div>
                     </div>
 
-                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-                      <span class="text-slate-500">Tender Processing Fee:</span>
-                      <span class="font-mono font-bold text-slate-800">₹{{ selectedScheme.processingFee | number:'1.0-0' }}</span>
-                    </div>
-
-                    <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-                      <span class="text-slate-500">EMD Refund Nature:</span>
-                      <span class="font-semibold text-emerald-700">100% Refundable to non-selected</span>
-                    </div>
-
-                    <div class="flex justify-between items-center">
-                      <span class="text-slate-500">Payment Gateways:</span>
-                      <span class="font-medium text-slate-700">Net Banking / UPI / NEFT / RTGS</span>
+                    <!-- Process Fee -->
+                    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xs text-center">
+                      <div class="text-[10.5px] uppercase font-bold text-slate-500 tracking-wider font-['Poppins',sans-serif]">Process Fee</div>
+                      <div class="text-base sm:text-lg font-bold text-[#002244] mt-0.5 font-['Poppins',sans-serif]">
+                        ₹{{ selectedScheme.processingFee | number:'1.0-0' }}
+                      </div>
+                      <div class="text-[10px] text-slate-500 font-medium mt-0.5 font-['Poppins',sans-serif]">
+                        Non-Refundable
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <!-- Nodal Department Contact Desk -->
-                <div class="bg-white border border-slate-200 rounded-xs shadow-xs p-5 space-y-3 text-xs">
-                  <h3 class="font-bold text-[#002244] pb-2 border-b border-slate-200 uppercase tracking-wider text-[11px]">
-                    Nodal Authority Contact
-                  </h3>
-
-                  <div class="space-y-2 text-slate-600 leading-relaxed">
-                    <div>
-                      <strong class="text-slate-800">Department:</strong>
-                      <div>{{ selectedScheme.department }}</div>
-                    </div>
-                    <div>
-                      <strong class="text-slate-800">Tender Cell:</strong>
-                      <div>EOI Scrutiny &amp; Empanelment Committee</div>
-                    </div>
-                    <div>
-                      <strong class="text-slate-800">Office Location:</strong>
-                      <div>EMI Campus, J-8-B, Jhalana Institutional Area, Jaipur - 302004</div>
-                    </div>
-                    <div>
-                      <strong class="text-slate-800">Helpdesk Email:</strong>
-                      <div class="font-mono text-blue-700">support-isms&#64;rajasthan.gov.in</div>
-                    </div>
+                  <!-- Right: Apply Action Button (Return to Tenders Table button removed) -->
+                  <div class="lg:col-span-3 flex flex-col justify-center">
+                    <button 
+                      type="button"
+                      (click)="onApplyClicked(selectedScheme)"
+                      class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-[#002244] font-bold text-xs uppercase tracking-wider rounded-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 font-['Poppins',sans-serif]">
+                      <span>Apply for this Scheme Now</span>
+                      <span>→</span>
+                    </button>
                   </div>
+
                 </div>
 
               </div>
 
             </div>
 
-            <!-- Bottom Floating Action Bar -->
-            <div class="mt-8 p-4 bg-white border border-slate-200 rounded-xs shadow-sm flex flex-col sm:flex-row justify-between items-center gap-3">
-              <button 
-                type="button"
-                (click)="showTable()" 
-                class="px-4 py-2 border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 text-xs font-bold transition-colors flex items-center gap-1.5 rounded-xs cursor-pointer">
-                <span>←</span>
-                <span>Return to Tenders Table</span>
-              </button>
+          </div>
 
-              <button 
-                type="button"
-                (click)="onApplyClicked(selectedScheme)"
-                class="px-6 py-2.5 bg-[#002244] hover:bg-[#003366] text-white font-bold text-xs tracking-wide transition-colors flex items-center gap-2 shadow-xs cursor-pointer rounded-xs">
-                <span>Apply for this Scheme (Submit Proposal)</span>
-                <span>→</span>
-              </button>
+          <!-- ================================================================= -->
+          <!-- VIEW 3: IN-PORTAL PDF DOCUMENT VIEWER                            -->
+          <!-- ================================================================= -->
+          <div *ngIf="viewMode === 'pdf' && activePdfDoc && selectedScheme" class="space-y-4 animate-in fade-in duration-150">
+            
+            <!-- Sticky Navigation Bar with Back Option & Download Button -->
+            <div class="bg-[#002244] text-white p-4 rounded-xs shadow-md border-b-4 border-amber-500 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div class="flex items-center gap-3">
+                <button 
+                  type="button"
+                  (click)="viewMode = 'details'" 
+                  class="px-3.5 py-1.5 bg-white text-[#002244] hover:bg-slate-100 text-xs font-bold rounded-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs font-['Poppins',sans-serif]">
+                  <span>←</span>
+                  <span>Back to Scheme Details</span>
+                </button>
+                <div class="text-xs text-white/80 hidden sm:block">
+                  Viewing: <strong class="text-white">{{ activePdfDoc.title }}</strong>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 self-stretch sm:self-auto justify-end">
+                <button 
+                  type="button"
+                  (click)="downloadDocument(activePdfDoc)" 
+                  class="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-[#002244] text-xs font-bold rounded-xs shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer font-['Poppins',sans-serif]">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>Download PDF</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Official PDF Document Paper Sheet -->
+            <div class="bg-slate-100 p-3 sm:p-8 rounded-xs border border-slate-300 shadow-inner flex justify-center">
+              <div class="bg-white border border-slate-300 shadow-lg max-w-3xl w-full p-6 sm:p-12 text-slate-800 font-['Poppins',sans-serif] space-y-6">
+                
+                <!-- Document Header (Emblem & Dept Details) -->
+                <div class="text-center pb-6 border-b-2 border-[#002244] space-y-1.5">
+                  <div class="text-xs font-bold tracking-widest text-slate-500 uppercase">
+                    Government of Rajasthan
+                  </div>
+                  <div class="text-base sm:text-lg font-bold text-[#002244]">
+                    Rajasthan Skill and Livelihoods Development Corporation (RSLDC)
+                  </div>
+                  <div class="text-[11px] text-slate-500">
+                    EMI Campus, J-8-B, Jhalana Institutional Area, Jaipur - 302004
+                  </div>
+                  <div class="inline-block mt-2 px-3 py-1 bg-[#002244] text-white text-xs font-bold rounded-2xs uppercase tracking-wider">
+                    Official {{ activePdfDoc.type }} Document
+                  </div>
+                </div>
+
+                <!-- Document Meta Bar -->
+                <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xs grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                  <div>
+                    <span class="text-slate-500 block text-[10.5px]">Document Title:</span>
+                    <strong class="text-slate-800 text-[11.5px]">{{ activePdfDoc.title }}</strong>
+                  </div>
+                  <div>
+                    <span class="text-slate-500 block text-[10.5px]">Scheme Code &amp; Ref:</span>
+                    <strong class="text-slate-800 text-[11.5px]">{{ selectedScheme.schemeCode }} ({{ selectedScheme.eoiReferenceNo }})</strong>
+                  </div>
+                  <div>
+                    <span class="text-slate-500 block text-[10.5px]">Publication Date &amp; Size:</span>
+                    <strong class="text-slate-800 text-[11.5px]">{{ activePdfDoc.publishedDate }} · {{ activePdfDoc.size }}</strong>
+                  </div>
+                </div>
+
+                <!-- Document Content Body -->
+                <div class="space-y-4 text-xs leading-relaxed text-slate-700">
+                  <h3 class="text-sm font-bold text-[#002244] uppercase tracking-wide border-b border-slate-200 pb-1">
+                    1. Scope of Expression of Interest (EOI)
+                  </h3>
+                  <p>
+                    The Rajasthan Skill and Livelihoods Development Corporation (RSLDC) hereby invites online proposals through ISMS 2.0 portal for Empanelment of Training Partners (TPs) under <strong>{{ selectedScheme.name }}</strong>.
+                  </p>
+                  <p>
+                    The primary objective of this scheme is to impart high-quality market-relevant domain skill training across all districts of Rajasthan with guaranteed wage employment and corporate placement support for eligible youth.
+                  </p>
+
+                  <h3 class="text-sm font-bold text-[#002244] uppercase tracking-wide border-b border-slate-200 pb-1 pt-2">
+                    2. Mandatory Financial Parameters
+                  </h3>
+                  <div class="border border-slate-200 rounded-xs overflow-hidden">
+                    <table class="w-full text-left text-xs border-collapse">
+                      <tbody>
+                        <tr class="border-b border-slate-200 bg-slate-50">
+                          <td class="p-2.5 font-bold text-slate-700 w-1/2">Earnest Money Deposit (EMD)</td>
+                          <td class="p-2.5 font-bold text-[#002244]">₹{{ selectedScheme.emdAmount | number:'1.0-0' }} (100% Refundable)</td>
+                        </tr>
+                        <tr class="border-b border-slate-200">
+                          <td class="p-2.5 font-bold text-slate-700">Tender Processing Fee</td>
+                          <td class="p-2.5 font-semibold text-slate-800">₹{{ selectedScheme.processingFee | number:'1.0-0' }} (Non-Refundable)</td>
+                        </tr>
+                        <tr>
+                          <td class="p-2.5 font-bold text-slate-700">Submission Closing Date</td>
+                          <td class="p-2.5 font-bold text-amber-800">{{ selectedScheme.closingDate }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <h3 class="text-sm font-bold text-[#002244] uppercase tracking-wide border-b border-slate-200 pb-1 pt-2">
+                    3. Submission &amp; Compliance Instructions
+                  </h3>
+                  <p>
+                    All prospective applicants must possess a verified <strong>One-Time Registration (OTR)</strong> profile on the ISMS portal. Physical submissions will not be entertained. Ensure all required center infrastructure, audited turnover statements, and trainer credentials are submitted online before the closing date.
+                  </p>
+                </div>
+
+                <!-- Signatory Box -->
+                <div class="pt-8 border-t border-slate-200 flex justify-between items-end text-xs">
+                  <div class="text-slate-500 text-[11px]">
+                    Official E-Signed Document<br>
+                    ISMS Digital Procurement Cell
+                  </div>
+                  <div class="text-right space-y-0.5">
+                    <div class="font-bold text-[#002244]">Authorized Signatory</div>
+                    <div class="text-slate-600">RSLDC, Government of Rajasthan</div>
+                    <div class="text-[10px] text-slate-400">Jaipur, Rajasthan</div>
+                  </div>
+                </div>
+
+                <!-- Action Footer Inside Viewer -->
+                <div class="pt-6 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3">
+                  <button 
+                    type="button"
+                    (click)="viewMode = 'details'" 
+                    class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xs cursor-pointer flex items-center gap-1.5 transition-colors font-['Poppins',sans-serif]">
+                    <span>←</span>
+                    <span>Back to Scheme Details</span>
+                  </button>
+
+                  <button 
+                    type="button"
+                    (click)="downloadDocument(activePdfDoc)" 
+                    class="px-5 py-2 bg-[#002244] hover:bg-[#003366] text-white text-xs font-bold rounded-xs shadow-xs cursor-pointer flex items-center gap-1.5 transition-colors font-['Poppins',sans-serif]">
+                    <span>Download Official PDF</span>
+                    <span>⬇</span>
+                  </button>
+                </div>
+
+              </div>
             </div>
 
           </div>
@@ -761,33 +640,24 @@ import { Observable } from 'rxjs';
           </div>
 
           <!-- Modal Body -->
-          <div class="p-6 space-y-4 text-xs">
-            
-            <div class="bg-amber-50 border border-amber-200 p-4 rounded-xs text-slate-800 space-y-2">
-              <p class="leading-relaxed font-medium">
-                Under Government of Rajasthan procurement and empanelment regulations, applicants cannot submit proposals or pay EMD fees without completing the <strong>One-Time Registration (OTR)</strong> profile.
-              </p>
-              <p class="text-slate-600 text-[11.5px] leading-relaxed">
-                Your organization profile is currently incomplete. Please complete registration to link your PAN, GSTIN, and Authorized Signatory credentials.
-              </p>
-            </div>
+          <div class="p-6 space-y-4 text-xs leading-relaxed text-slate-600">
+            <p>
+              To apply for <strong class="text-[#002244]">{{ selectedScheme?.name }}</strong>, your organization must have a 100% verified <strong>One-Time Registration (OTR)</strong> profile with active verified documents.
+            </p>
 
-            <!-- Missing Items Checklist -->
-            <div class="border border-slate-200 rounded-xs p-3.5 space-y-2 bg-slate-50">
-              <div class="font-bold text-[#002244] uppercase tracking-wider text-[10.5px]">
-                Registration Steps Required Before Applying:
-              </div>
-              <div class="space-y-1.5 text-slate-700">
+            <div class="bg-amber-50 border border-amber-200 p-3.5 rounded-xs space-y-2">
+              <div class="font-bold text-amber-900 text-xs">Missing or Pending Profile Data:</div>
+              <div class="space-y-1.5 text-[11.5px] text-amber-800">
                 <div class="flex items-center gap-2">
-                  <span class="text-amber-600 font-bold">●</span>
-                  <span>Organization Name, Entity Type &amp; Incorporation Details</span>
+                  <span class="text-amber-600 font-bold">•</span>
+                  <span>Registered Business Entity &amp; GSTIN Verification</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="text-amber-600 font-bold">●</span>
-                  <span>Rajasthan GSTIN &amp; Corporate PAN Verification</span>
+                  <span class="text-amber-600 font-bold">•</span>
+                  <span>Audited Financial Statements (Last 3 Financial Years)</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="text-amber-600 font-bold">●</span>
+                  <span class="text-amber-600 font-bold">•</span>
                   <span>Authorized Signatory Identity Verification (Aadhaar / SSO)</span>
                 </div>
               </div>
@@ -816,81 +686,6 @@ import { Observable } from 'rxjs';
         </div>
       </div>
 
-      <!-- ================================================================= -->
-      <!-- MODAL: DOCUMENT PREVIEW MODAL                                    -->
-      <!-- ================================================================= -->
-      <div 
-        *ngIf="previewingDocument" 
-        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-200 select-none"
-        (click)="previewingDocument = null">
-        
-        <div 
-          class="bg-white border border-slate-200 shadow-2xl max-w-2xl w-full rounded-xs overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-150"
-          (click)="$event.stopPropagation()">
-          
-          <!-- Header -->
-          <div class="bg-[#002244] text-white px-5 py-3.5 flex items-center justify-between border-b-2 border-amber-500">
-            <div class="flex items-center gap-2.5">
-              <span class="px-2 py-0.5 bg-amber-500 text-[#002244] text-xs font-mono font-bold rounded-2xs">
-                {{ previewingDocument.type }}
-              </span>
-              <h3 class="text-sm font-bold text-white line-clamp-1">
-                {{ previewingDocument.title }}
-              </h3>
-            </div>
-            <button 
-              type="button" 
-              (click)="previewingDocument = null"
-              class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer">
-              ✕
-            </button>
-          </div>
-
-          <!-- Body -->
-          <div class="p-6 space-y-4 text-xs overflow-y-auto">
-            <div class="p-4 bg-slate-50 border border-slate-200 rounded-xs space-y-2">
-              <div class="text-slate-500 font-mono text-[11px]">Filename: <strong class="text-slate-800">{{ previewingDocument.filename }}</strong></div>
-              <div class="text-slate-500 font-mono text-[11px]">File Size: <strong class="text-slate-800">{{ previewingDocument.size }}</strong></div>
-              <div class="text-slate-500 font-mono text-[11px]">Publish Date: <strong class="text-slate-800">{{ previewingDocument.publishedDate }}</strong></div>
-            </div>
-
-            <div>
-              <h4 class="font-bold text-[#002244] uppercase tracking-wider text-[11px] mb-1">
-                Document Abstract &amp; Scope:
-              </h4>
-              <p class="text-slate-700 leading-relaxed bg-white border border-slate-200 p-3 rounded-xs">
-                {{ previewingDocument.description }}
-              </p>
-            </div>
-
-            <div class="p-3 bg-blue-50 border border-blue-200 text-[#002244] rounded-xs text-[11.5px] leading-relaxed">
-              This official document contains regulatory tender guidelines, evaluation scorecards, and submission templates authorized by Rajasthan Skill and Livelihoods Development Corporation (RSLDC).
-            </div>
-          </div>
-
-          <!-- Footer -->
-          <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
-            <span class="text-[11px] text-slate-500 font-mono">Official PDF Document</span>
-            <div class="flex items-center gap-2">
-              <button 
-                type="button" 
-                (click)="previewingDocument = null"
-                class="px-3.5 py-1.5 border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-semibold rounded-xs">
-                Close
-              </button>
-              <button 
-                type="button" 
-                (click)="downloadDocument(previewingDocument)"
-                class="px-4 py-1.5 bg-[#002244] hover:bg-[#003366] text-white text-xs font-bold rounded-xs flex items-center gap-1.5">
-                <span>Download Document</span>
-                <span>⬇</span>
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
     </div>
   `
 })
@@ -898,10 +693,10 @@ export class SchemeListingComponent implements OnInit {
   schemes: Scheme[] = [];
   filteredSchemes: Scheme[] = [];
   selectedScheme: Scheme | null = null;
-  viewMode: 'table' | 'details' = 'table';
+  activePdfDoc: SchemeDocument | null = null;
+  viewMode: 'table' | 'details' | 'pdf' = 'table';
   userProfile$!: Observable<UserProfile>;
   showProfileRequiredModal = false;
-  previewingDocument: SchemeDocument | null = null;
 
   searchKeyword: string = '';
   selectedCategory: string = 'ALL';
@@ -971,16 +766,18 @@ export class SchemeListingComponent implements OnInit {
     }
   }
 
-  onApplyClicked(scheme: Scheme | null): void {
-    if (!scheme) return;
-    const currentProfile = this.eoiService.getProfile();
+  onApplyClicked(scheme: Scheme): void {
+    this.selectedScheme = scheme;
     
-    // Gating check: if profile is pending (userState === 'new' or !isRegistered), show popup
-    if (currentProfile.role === 'applicant' && (currentProfile.userState === 'new' || !currentProfile.isRegistered)) {
-      this.showProfileRequiredModal = true;
-    } else {
-      this.router.navigate(['/eoi/apply', scheme.id]);
-    }
+    // Check if user has an active, verified profile
+    this.eoiService.userProfile$.subscribe(profile => {
+      if (!profile || !profile.isRegistered) {
+        this.showProfileRequiredModal = true;
+      } else {
+        // Navigate directly into multi-step proposal submission workflow
+        this.router.navigate(['/eoi/apply', scheme.id]);
+      }
+    }).unsubscribe();
   }
 
   goToRegistration(): void {
@@ -996,19 +793,89 @@ export class SchemeListingComponent implements OnInit {
   }
 
   goBack(): void {
-    if (this.viewMode === 'details') {
+    if (this.viewMode === 'pdf') {
+      this.viewMode = 'details';
+    } else if (this.viewMode === 'details') {
       this.showTable();
     } else {
       this.router.navigate(['/']);
     }
   }
 
-  previewDocument(doc: SchemeDocument): void {
-    this.previewingDocument = doc;
+  getSplitDate(dateStr: string): { date: string; time: string } {
+    if (!dateStr) return { date: '', time: '' };
+    const parts = dateStr.trim().split(' ');
+    if (parts.length >= 3) {
+      return { date: parts[0], time: `${parts[1]} ${parts[2]}` };
+    }
+    return { date: dateStr, time: '' };
+  }
+
+  openPdf(doc: SchemeDocument): void {
+    this.activePdfDoc = doc;
+    this.viewMode = 'pdf';
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   downloadDocument(doc: SchemeDocument): void {
-    // Generate simulated download trigger
-    alert(`Downloading ${doc.filename} (${doc.size})... Official document download initiated.`);
+    if (typeof window === 'undefined') return;
+
+    // Generate real PDF file content and trigger browser download
+    const pdfContent = `%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Title (${doc.title}) /Author (Government of Rajasthan - RSLDC) /Subject (EOI Tender Document) >>
+endobj
+2 0 obj
+<< /Type /Catalog /Pages 3 0 R >>
+endobj
+3 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 3 0 R /MediaBox [0 0 612 792] /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 250 >>
+stream
+BT
+/F1 16 Tf
+50 720 Td
+(GOVERNMENT OF RAJASTHAN - RSLDC) Tj
+/F1 12 Tf
+50 690 Td
+(${doc.title}) Tj
+50 670 Td
+(File: ${doc.filename} | Published: ${doc.publishedDate} | Size: ${doc.size}) Tj
+50 640 Td
+(Official EOI Tender RFP Document authorized under ISMS Rajasthan Portal.) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000120 00000 n 
+0000000170 00000 n 
+0000000230 00000 n 
+0000000325 00000 n 
+trailer
+<< /Size 6 /Root 2 0 R /Info 1 0 R >>
+startxref
+620
+%%EOF`;
+
+    const blob = new Blob([pdfContent], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = doc.filename.endsWith('.pdf') ? doc.filename : `${doc.filename}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   }
 }

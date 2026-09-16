@@ -961,6 +961,13 @@
             <h3 class="card-title">1. Organisation / Company Basic Details (17 Fields)</h3>
           </div>
           <div class="gov-card-body">
+            <div *ngIf="hasEditValidationErrors()" class="gov-edit-error-banner">
+              <div class="banner-icon">⚠️</div>
+              <div class="banner-text">
+                <strong>Mandatory Fields Incomplete:</strong> Please fill in all compulsory fields marked with <span class="req-star">*</span> before saving.
+              </div>
+            </div>
+
             <div class="gov-form-layout">
               <div class="gov-form-row">
                 <label class="gov-label">TP/PIA Full Name <span class="req-star">*</span></label>
@@ -968,11 +975,15 @@
                   <input
                     type="text"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['tp_full_name']"
                     maxlength="150"
                     [ngModel]="eoiService.formData().orgBasicDetails.tp_full_name"
-                    (ngModelChange)="eoiService.updateOrgBasicDetails({ tp_full_name: $event })"
+                    (ngModelChange)="eoiService.updateOrgBasicDetails({ tp_full_name: $event }); clearFieldError('tp_full_name')"
                   />
-                  <span class="field-hint">Max 150 characters</span>
+                  <span *ngIf="!validationErrors()['tp_full_name']" class="field-hint">Max 150 characters</span>
+                  <div *ngIf="validationErrors()['tp_full_name']" class="gov-input-error-msg">
+                    {{ validationErrors()['tp_full_name'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -981,10 +992,14 @@
                   <input
                     type="text"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['tp_short_name']"
                     maxlength="50"
                     [ngModel]="eoiService.formData().orgBasicDetails.tp_short_name"
-                    (ngModelChange)="eoiService.updateOrgBasicDetails({ tp_short_name: $event })"
+                    (ngModelChange)="eoiService.updateOrgBasicDetails({ tp_short_name: $event }); clearFieldError('tp_short_name')"
                   />
+                  <div *ngIf="validationErrors()['tp_short_name']" class="gov-input-error-msg">
+                    {{ validationErrors()['tp_short_name'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1005,10 +1020,14 @@
                   <input
                     type="tel"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['organisation_contact_no']"
                     maxlength="10"
                     [ngModel]="eoiService.formData().orgBasicDetails.organisation_contact_no"
-                    (ngModelChange)="eoiService.updateOrgBasicDetails({ organisation_contact_no: $event })"
+                    (ngModelChange)="eoiService.updateOrgBasicDetails({ organisation_contact_no: $event }); clearFieldError('organisation_contact_no')"
                   />
+                  <div *ngIf="validationErrors()['organisation_contact_no']" class="gov-input-error-msg">
+                    {{ validationErrors()['organisation_contact_no'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1017,9 +1036,13 @@
                   <input
                     type="email"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['company_email']"
                     [ngModel]="eoiService.formData().orgBasicDetails.company_email"
-                    (ngModelChange)="eoiService.updateOrgBasicDetails({ company_email: $event })"
+                    (ngModelChange)="eoiService.updateOrgBasicDetails({ company_email: $event }); clearFieldError('company_email')"
                   />
+                  <div *ngIf="validationErrors()['company_email']" class="gov-input-error-msg">
+                    {{ validationErrors()['company_email'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1051,11 +1074,15 @@
                 <div class="gov-control-wrapper">
                   <textarea
                     class="gov-input gov-textarea"
+                    [class.has-error]="validationErrors()['registered_address']"
                     rows="2"
                     maxlength="250"
                     [ngModel]="eoiService.formData().orgBasicDetails.registered_address"
-                    (ngModelChange)="eoiService.updateOrgBasicDetails({ registered_address: $event })"
+                    (ngModelChange)="eoiService.updateOrgBasicDetails({ registered_address: $event }); clearFieldError('registered_address')"
                   ></textarea>
+                  <div *ngIf="validationErrors()['registered_address']" class="gov-input-error-msg">
+                    {{ validationErrors()['registered_address'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1064,9 +1091,13 @@
                   <input
                     type="text"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['state_ut']"
                     [ngModel]="eoiService.formData().orgBasicDetails.state_ut"
-                    (ngModelChange)="eoiService.updateOrgBasicDetails({ state_ut: $event })"
+                    (ngModelChange)="eoiService.updateOrgBasicDetails({ state_ut: $event }); clearFieldError('state_ut')"
                   />
+                  <div *ngIf="validationErrors()['state_ut']" class="gov-input-error-msg">
+                    {{ validationErrors()['state_ut'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1074,11 +1105,15 @@
                 <div class="gov-control-wrapper">
                   <select
                     class="gov-input gov-select"
+                    [class.has-error]="validationErrors()['district']"
                     [ngModel]="eoiService.formData().orgBasicDetails.district"
-                    (ngModelChange)="eoiService.updateOrgBasicDetails({ district: $event })"
+                    (ngModelChange)="eoiService.updateOrgBasicDetails({ district: $event }); clearFieldError('district')"
                   >
                     <option *ngFor="let dist of districts; trackBy: trackByIndex" [value]="dist">{{ dist }}</option>
                   </select>
+                  <div *ngIf="validationErrors()['district']" class="gov-input-error-msg">
+                    {{ validationErrors()['district'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1087,10 +1122,14 @@
                   <input
                     type="text"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['pincode']"
                     maxlength="6"
                     [ngModel]="eoiService.formData().orgBasicDetails.pincode"
-                    (ngModelChange)="eoiService.updateOrgBasicDetails({ pincode: $event })"
+                    (ngModelChange)="eoiService.updateOrgBasicDetails({ pincode: $event }); clearFieldError('pincode')"
                   />
+                  <div *ngIf="validationErrors()['pincode']" class="gov-input-error-msg">
+                    {{ validationErrors()['pincode'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1099,9 +1138,13 @@
                   <input
                     type="text"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['turnover_lakhs']"
                     [ngModel]="eoiService.formData().orgBasicDetails.turnover_lakhs"
-                    (ngModelChange)="eoiService.updateOrgBasicDetails({ turnover_lakhs: $event })"
+                    (ngModelChange)="eoiService.updateOrgBasicDetails({ turnover_lakhs: $event }); clearFieldError('turnover_lakhs')"
                   />
+                  <div *ngIf="validationErrors()['turnover_lakhs']" class="gov-input-error-msg">
+                    {{ validationErrors()['turnover_lakhs'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1142,11 +1185,15 @@
                 <div class="gov-control-wrapper">
                   <textarea
                     class="gov-input gov-textarea"
+                    [class.has-error]="validationErrors()['postal_address']"
                     rows="2"
                     maxlength="250"
                     [ngModel]="eoiService.formData().orgBasicDetails.postal_address"
-                    (ngModelChange)="eoiService.updateOrgBasicDetails({ postal_address: $event })"
+                    (ngModelChange)="eoiService.updateOrgBasicDetails({ postal_address: $event }); clearFieldError('postal_address')"
                   ></textarea>
+                  <div *ngIf="validationErrors()['postal_address']" class="gov-input-error-msg">
+                    {{ validationErrors()['postal_address'] }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1161,6 +1208,13 @@
             <h3 class="card-title">2. Authorized Person Details (Organisation Level) (17 Fields)</h3>
           </div>
           <div class="gov-card-body">
+            <div *ngIf="hasEditValidationErrors()" class="gov-edit-error-banner">
+              <div class="banner-icon">⚠️</div>
+              <div class="banner-text">
+                <strong>Mandatory Fields Incomplete:</strong> Please fill in all compulsory fields marked with <span class="req-star">*</span> before saving.
+              </div>
+            </div>
+
             <div class="gov-form-layout">
               <div class="gov-form-row">
                 <label class="gov-label">Name <span class="req-star">*</span></label>
@@ -1168,10 +1222,14 @@
                   <input
                     type="text"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['auth_name']"
                     maxlength="100"
                     [ngModel]="eoiService.formData().authPersonDetails.auth_name"
-                    (ngModelChange)="eoiService.updateAuthPersonDetails({ auth_name: $event })"
+                    (ngModelChange)="eoiService.updateAuthPersonDetails({ auth_name: $event }); clearFieldError('auth_name')"
                   />
+                  <div *ngIf="validationErrors()['auth_name']" class="gov-input-error-msg">
+                    {{ validationErrors()['auth_name'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1224,10 +1282,14 @@
                   <input
                     type="tel"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['auth_mobile']"
                     maxlength="10"
                     [ngModel]="eoiService.formData().authPersonDetails.auth_mobile"
-                    (ngModelChange)="eoiService.updateAuthPersonDetails({ auth_mobile: $event })"
+                    (ngModelChange)="eoiService.updateAuthPersonDetails({ auth_mobile: $event }); clearFieldError('auth_mobile')"
                   />
+                  <div *ngIf="validationErrors()['auth_mobile']" class="gov-input-error-msg">
+                    {{ validationErrors()['auth_mobile'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1269,11 +1331,15 @@
                   <input
                     type="text"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['auth_pan']"
                     maxlength="10"
                     style="text-transform: uppercase;"
                     [ngModel]="eoiService.formData().authPersonDetails.auth_pan"
-                    (ngModelChange)="eoiService.updateAuthPersonDetails({ auth_pan: $event.toUpperCase() })"
+                    (ngModelChange)="eoiService.updateAuthPersonDetails({ auth_pan: $event.toUpperCase() }); clearFieldError('auth_pan')"
                   />
+                  <div *ngIf="validationErrors()['auth_pan']" class="gov-input-error-msg">
+                    {{ validationErrors()['auth_pan'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1370,6 +1436,13 @@
             <h3 class="card-title">3. Bank Details (9 Fields)</h3>
           </div>
           <div class="gov-card-body">
+            <div *ngIf="hasEditValidationErrors()" class="gov-edit-error-banner">
+              <div class="banner-icon">⚠️</div>
+              <div class="banner-text">
+                <strong>Mandatory Fields Incomplete:</strong> Please fill in all compulsory fields marked with <span class="req-star">*</span> before saving.
+              </div>
+            </div>
+
             <div class="gov-form-layout">
               <div class="gov-form-row">
                 <label class="gov-label">Name of the Bank <span class="req-star">*</span></label>
@@ -1377,9 +1450,13 @@
                   <input
                     type="text"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['bank_name']"
                     [ngModel]="eoiService.formData().bankDetails.bank_name"
-                    (ngModelChange)="eoiService.updateBankDetails({ bank_name: $event })"
+                    (ngModelChange)="eoiService.updateBankDetails({ bank_name: $event }); clearFieldError('bank_name')"
                   />
+                  <div *ngIf="validationErrors()['bank_name']" class="gov-input-error-msg">
+                    {{ validationErrors()['bank_name'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1388,10 +1465,14 @@
                   <input
                     type="text"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['bank_account_no']"
                     maxlength="18"
                     [ngModel]="eoiService.formData().bankDetails.bank_account_no"
-                    (ngModelChange)="eoiService.updateBankDetails({ bank_account_no: $event })"
+                    (ngModelChange)="eoiService.updateBankDetails({ bank_account_no: $event }); clearFieldError('bank_account_no')"
                   />
+                  <div *ngIf="validationErrors()['bank_account_no']" class="gov-input-error-msg">
+                    {{ validationErrors()['bank_account_no'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1400,11 +1481,15 @@
                   <input
                     type="text"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['bank_ifsc']"
                     maxlength="11"
                     style="text-transform: uppercase;"
                     [ngModel]="eoiService.formData().bankDetails.bank_ifsc"
-                    (ngModelChange)="eoiService.updateBankDetails({ bank_ifsc: $event.toUpperCase() })"
+                    (ngModelChange)="eoiService.updateBankDetails({ bank_ifsc: $event.toUpperCase() }); clearFieldError('bank_ifsc')"
                   />
+                  <div *ngIf="validationErrors()['bank_ifsc']" class="gov-input-error-msg">
+                    {{ validationErrors()['bank_ifsc'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1442,9 +1527,13 @@
                   <input
                     type="text"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['bank_branch_name']"
                     [ngModel]="eoiService.formData().bankDetails.bank_branch_name"
-                    (ngModelChange)="eoiService.updateBankDetails({ bank_branch_name: $event })"
+                    (ngModelChange)="eoiService.updateBankDetails({ bank_branch_name: $event }); clearFieldError('bank_branch_name')"
                   />
+                  <div *ngIf="validationErrors()['bank_branch_name']" class="gov-input-error-msg">
+                    {{ validationErrors()['bank_branch_name'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1464,10 +1553,14 @@
                 <div class="gov-control-wrapper">
                   <textarea
                     class="gov-input gov-textarea"
+                    [class.has-error]="validationErrors()['bank_branch_address']"
                     rows="2"
                     [ngModel]="eoiService.formData().bankDetails.bank_branch_address"
-                    (ngModelChange)="eoiService.updateBankDetails({ bank_branch_address: $event })"
+                    (ngModelChange)="eoiService.updateBankDetails({ bank_branch_address: $event }); clearFieldError('bank_branch_address')"
                   ></textarea>
+                  <div *ngIf="validationErrors()['bank_branch_address']" class="gov-input-error-msg">
+                    {{ validationErrors()['bank_branch_address'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1493,17 +1586,28 @@
             <h3 class="card-title">5. Training Centre & Infrastructure Details</h3>
           </div>
           <div class="gov-card-body">
+            <div *ngIf="hasEditValidationErrors()" class="gov-edit-error-banner">
+              <div class="banner-icon">⚠️</div>
+              <div class="banner-text">
+                <strong>Mandatory Fields Incomplete:</strong> Please fill in all compulsory fields marked with <span class="req-star">*</span> before saving.
+              </div>
+            </div>
+
             <div class="gov-form-layout">
               <div class="gov-form-row">
                 <label class="gov-label">District / City <span class="req-star">*</span></label>
                 <div class="gov-control-wrapper">
                   <select
                     class="gov-input gov-select"
+                    [class.has-error]="validationErrors()['district_city']"
                     [ngModel]="eoiService.formData().section6.district_city"
-                    (ngModelChange)="eoiService.updateSection6({ district_city: $event })"
+                    (ngModelChange)="eoiService.updateSection6({ district_city: $event }); clearFieldError('district_city')"
                   >
                     <option *ngFor="let dist of districts; trackBy: trackByIndex" [value]="dist">{{ dist }}</option>
                   </select>
+                  <div *ngIf="validationErrors()['district_city']" class="gov-input-error-msg">
+                    {{ validationErrors()['district_city'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1512,11 +1616,15 @@
                   <input
                     type="text"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['training_center_name']"
                     maxlength="100"
                     [ngModel]="eoiService.formData().section6.training_center_name"
-                    (ngModelChange)="eoiService.updateSection6({ training_center_name: $event })"
+                    (ngModelChange)="eoiService.updateSection6({ training_center_name: $event }); clearFieldError('training_center_name')"
                   />
-                  <span class="field-hint">Max 100 characters</span>
+                  <span *ngIf="!validationErrors()['training_center_name']" class="field-hint">Max 100 characters</span>
+                  <div *ngIf="validationErrors()['training_center_name']" class="gov-input-error-msg">
+                    {{ validationErrors()['training_center_name'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1525,11 +1633,15 @@
                   <input
                     type="tel"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['telephone_number']"
                     maxlength="11"
                     (keydown)="onlyNumeric($event, 'telephone_number', 'Telephone Number', 11)"
                     [ngModel]="eoiService.formData().section6.telephone_number"
-                    (ngModelChange)="eoiService.updateSection6({ telephone_number: $event })"
+                    (ngModelChange)="eoiService.updateSection6({ telephone_number: $event }); clearFieldError('telephone_number')"
                   />
+                  <div *ngIf="validationErrors()['telephone_number']" class="gov-input-error-msg">
+                    {{ validationErrors()['telephone_number'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1538,13 +1650,17 @@
                   <input
                     type="number"
                     class="gov-input"
+                    [class.has-error]="validationErrors()['number_of_classrooms']"
                     min="1"
                     max="500"
                     (keydown)="onlyNumeric($event, 'number_of_classrooms', 'Number of Classrooms', 3, 500)"
                     [ngModel]="eoiService.formData().section6.number_of_classrooms"
-                    (ngModelChange)="eoiService.updateSection6({ number_of_classrooms: $event })"
+                    (ngModelChange)="eoiService.updateSection6({ number_of_classrooms: $event }); clearFieldError('number_of_classrooms')"
                   />
-                  <span class="field-hint">Min 1 | Max 500</span>
+                  <span *ngIf="!validationErrors()['number_of_classrooms']" class="field-hint">Min 1 | Max 500</span>
+                  <div *ngIf="validationErrors()['number_of_classrooms']" class="gov-input-error-msg">
+                    {{ validationErrors()['number_of_classrooms'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1552,12 +1668,16 @@
                 <div class="gov-control-wrapper">
                   <textarea
                     class="gov-input gov-textarea"
+                    [class.has-error]="validationErrors()['full_address']"
                     rows="3"
                     maxlength="250"
                     [ngModel]="eoiService.formData().section6.full_address"
-                    (ngModelChange)="eoiService.updateSection6({ full_address: $event })"
+                    (ngModelChange)="eoiService.updateSection6({ full_address: $event }); clearFieldError('full_address')"
                   ></textarea>
-                  <span class="field-hint">Max 250 characters</span>
+                  <span *ngIf="!validationErrors()['full_address']" class="field-hint">Max 250 characters</span>
+                  <div *ngIf="validationErrors()['full_address']" class="gov-input-error-msg">
+                    {{ validationErrors()['full_address'] }}
+                  </div>
                 </div>
               </div>
               <div class="gov-form-row">
@@ -1612,23 +1732,53 @@
             <button type="button" class="gov-btn gov-btn-add" (click)="eoiService.addFinancialRow()">+ Add Row</button>
           </div>
           <div class="gov-card-body" style="padding: 0;">
+            <div *ngIf="hasEditValidationErrors()" class="gov-edit-error-banner" style="margin: 16px;">
+              <div class="banner-icon">⚠️</div>
+              <div class="banner-text">
+                <strong>Mandatory Fields Incomplete:</strong> Please fill in all financial year and turnover values before saving.
+              </div>
+            </div>
             <div class="table-responsive">
               <table class="gov-data-table">
                 <thead>
                   <tr>
                     <th style="width: 60px;">S.No</th>
-                    <th>Financial Year</th>
-                    <th>Total Turnover (INR)</th>
-                    <th>Turnover From Skill (INR)</th>
+                    <th>Financial Year <span class="req-star">*</span></th>
+                    <th>Total Turnover (INR) <span class="req-star">*</span></th>
+                    <th>Turnover From Skill (INR) <span class="req-star">*</span></th>
                     <th style="width: 80px;">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let row of eoiService.formData().section10; let i = index; trackBy: trackByRowId">
                     <td class="td-sno">{{ i + 1 }}</td>
-                    <td><input type="text" class="table-input" [(ngModel)]="row.financial_year" /></td>
-                    <td><input type="number" class="table-input" [(ngModel)]="row.total_turnover_inr" /></td>
-                    <td><input type="number" class="table-input" [(ngModel)]="row.total_turnover_from_skill_development" /></td>
+                    <td>
+                      <input 
+                        type="text" 
+                        class="table-input" 
+                        [class.has-error]="validationErrors()['sec10_fy_' + i]"
+                        [(ngModel)]="row.financial_year" 
+                        (ngModelChange)="clearFieldError('sec10_fy_' + i)"
+                      />
+                    </td>
+                    <td>
+                      <input 
+                        type="number" 
+                        class="table-input" 
+                        [class.has-error]="validationErrors()['sec10_turnover_' + i]"
+                        [(ngModel)]="row.total_turnover_inr" 
+                        (ngModelChange)="clearFieldError('sec10_turnover_' + i)"
+                      />
+                    </td>
+                    <td>
+                      <input 
+                        type="number" 
+                        class="table-input" 
+                        [class.has-error]="validationErrors()['sec10_skill_' + i]"
+                        [(ngModel)]="row.total_turnover_from_skill_development" 
+                        (ngModelChange)="clearFieldError('sec10_skill_' + i)"
+                      />
+                    </td>
                     <td class="td-action">
                       <button type="button" class="action-btn action-btn-delete" (click)="eoiService.removeFinancialRow(i)" title="Delete Row">✕</button>
                     </td>
@@ -1648,15 +1798,21 @@
             <button type="button" class="gov-btn gov-btn-add" (click)="eoiService.addTrainingPlacementRow()">+ Add Row</button>
           </div>
           <div class="gov-card-body" style="padding: 0;">
+            <div *ngIf="hasEditValidationErrors()" class="gov-edit-error-banner" style="margin: 16px;">
+              <div class="banner-icon">⚠️</div>
+              <div class="banner-text">
+                <strong>Mandatory Fields Incomplete:</strong> Please fill in all training and placement fields before saving.
+              </div>
+            </div>
             <div class="table-responsive">
               <table class="gov-data-table">
                 <thead>
                   <tr>
                     <th style="width: 60px;">S.No</th>
-                    <th>Sector</th>
-                    <th>Year</th>
-                    <th>Trained</th>
-                    <th>Placed</th>
+                    <th>Sector <span class="req-star">*</span></th>
+                    <th>Year <span class="req-star">*</span></th>
+                    <th>Trained <span class="req-star">*</span></th>
+                    <th>Placed <span class="req-star">*</span></th>
                     <th>Proofs</th>
                     <th style="width: 80px;">Action</th>
                   </tr>
@@ -1664,11 +1820,45 @@
                 <tbody>
                   <tr *ngFor="let row of eoiService.formData().section11; let i = index; trackBy: trackByRowId">
                     <td class="td-sno">{{ i + 1 }}</td>
-                    <td><input type="text" class="table-input" [(ngModel)]="row.name_of_sector" /></td>
-                    <td><input type="text" class="table-input" [(ngModel)]="row.financial_year" /></td>
-                    <td><input type="number" class="table-input" [(ngModel)]="row.total_candidates_trained" /></td>
-                    <td><input type="number" class="table-input" [(ngModel)]="row.placement_provided_to_number" /></td>
-                    <td><input type="number" class="table-input" [(ngModel)]="row.details_of_supporting_proof_provided" /></td>
+                    <td>
+                      <input 
+                        type="text" 
+                        class="table-input" 
+                        [class.has-error]="validationErrors()['sec11_sector_' + i]"
+                        [(ngModel)]="row.name_of_sector" 
+                        (ngModelChange)="clearFieldError('sec11_sector_' + i)"
+                      />
+                    </td>
+                    <td>
+                      <input 
+                        type="text" 
+                        class="table-input" 
+                        [class.has-error]="validationErrors()['sec11_fy_' + i]"
+                        [(ngModel)]="row.financial_year" 
+                        (ngModelChange)="clearFieldError('sec11_fy_' + i)"
+                      />
+                    </td>
+                    <td>
+                      <input 
+                        type="number" 
+                        class="table-input" 
+                        [class.has-error]="validationErrors()['sec11_trained_' + i]"
+                        [(ngModel)]="row.total_candidates_trained" 
+                        (ngModelChange)="clearFieldError('sec11_trained_' + i)"
+                      />
+                    </td>
+                    <td>
+                      <input 
+                        type="number" 
+                        class="table-input" 
+                        [class.has-error]="validationErrors()['sec11_placed_' + i]"
+                        [(ngModel)]="row.placement_provided_to_number" 
+                        (ngModelChange)="clearFieldError('sec11_placed_' + i)"
+                      />
+                    </td>
+                    <td>
+                      <input type="number" class="table-input" [(ngModel)]="row.details_of_supporting_proof_provided" />
+                    </td>
                     <td class="td-action">
                       <button type="button" class="action-btn action-btn-delete" (click)="eoiService.removeTrainingPlacementRow(i)" title="Delete Row">✕</button>
                     </td>
@@ -1688,36 +1878,90 @@
             <button type="button" class="gov-btn gov-btn-add" (click)="eoiService.addActionPlanRow()">+ Add Row</button>
           </div>
           <div class="gov-card-body" style="padding: 0;">
+            <div *ngIf="hasEditValidationErrors()" class="gov-edit-error-banner" style="margin: 16px;">
+              <div class="banner-icon">⚠️</div>
+              <div class="banner-text">
+                <strong>Mandatory Fields Incomplete:</strong> Please fill in all proposed action plan parameters before saving.
+              </div>
+            </div>
             <div class="table-responsive">
               <table class="gov-data-table">
                 <thead>
                   <tr>
                     <th style="width: 60px;">S.No</th>
-                    <th>District</th>
-                    <th>SDCs</th>
-                    <th>SDC Location</th>
-                    <th>Proposed Sectors</th>
-                    <th>Course / Scheme</th>
+                    <th>District <span class="req-star">*</span></th>
+                    <th>SDCs <span class="req-star">*</span></th>
+                    <th>SDC Location <span class="req-star">*</span></th>
+                    <th>Proposed Sectors <span class="req-star">*</span></th>
+                    <th>Course / Scheme <span class="req-star">*</span></th>
                     <th>Mode</th>
-                    <th>Batches</th>
+                    <th>Batches <span class="req-star">*</span></th>
                     <th style="width: 80px;">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let row of eoiService.formData().section12; let i = index; trackBy: trackByRowId">
                     <td class="td-sno">{{ i + 1 }}</td>
-                    <td><input type="text" class="table-input" [(ngModel)]="row.proposed_district" /></td>
-                    <td><input type="number" class="table-input" [(ngModel)]="row.proposed_number_of_sdc" /></td>
-                    <td><input type="text" class="table-input" [(ngModel)]="row.sdc_location" /></td>
-                    <td><input type="text" class="table-input" [(ngModel)]="row.proposed_sectors" /></td>
-                    <td><input type="text" class="table-input" [(ngModel)]="row.sdc_wise_course" /></td>
+                    <td>
+                      <input 
+                        type="text" 
+                        class="table-input" 
+                        [class.has-error]="validationErrors()['sec12_dist_' + i]"
+                        [(ngModel)]="row.proposed_district" 
+                        (ngModelChange)="clearFieldError('sec12_dist_' + i)"
+                      />
+                    </td>
+                    <td>
+                      <input 
+                        type="number" 
+                        class="table-input" 
+                        [class.has-error]="validationErrors()['sec12_sdc_' + i]"
+                        [(ngModel)]="row.proposed_number_of_sdc" 
+                        (ngModelChange)="clearFieldError('sec12_sdc_' + i)"
+                      />
+                    </td>
+                    <td>
+                      <input 
+                        type="text" 
+                        class="table-input" 
+                        [class.has-error]="validationErrors()['sec12_loc_' + i]"
+                        [(ngModel)]="row.sdc_location" 
+                        (ngModelChange)="clearFieldError('sec12_loc_' + i)"
+                      />
+                    </td>
+                    <td>
+                      <input 
+                        type="text" 
+                        class="table-input" 
+                        [class.has-error]="validationErrors()['sec12_sec_' + i]"
+                        [(ngModel)]="row.proposed_sectors" 
+                        (ngModelChange)="clearFieldError('sec12_sec_' + i)"
+                      />
+                    </td>
+                    <td>
+                      <input 
+                        type="text" 
+                        class="table-input" 
+                        [class.has-error]="validationErrors()['sec12_course_' + i]"
+                        [(ngModel)]="row.sdc_wise_course" 
+                        (ngModelChange)="clearFieldError('sec12_course_' + i)"
+                      />
+                    </td>
                     <td>
                       <select class="table-input" [(ngModel)]="row.residential_non_residential">
                         <option value="Residential">Residential</option>
                         <option value="Non-Residential">Non-Residential</option>
                       </select>
                     </td>
-                    <td><input type="number" class="table-input" [(ngModel)]="row.no_of_batches" /></td>
+                    <td>
+                      <input 
+                        type="number" 
+                        class="table-input" 
+                        [class.has-error]="validationErrors()['sec12_batches_' + i]"
+                        [(ngModel)]="row.no_of_batches" 
+                        (ngModelChange)="clearFieldError('sec12_batches_' + i)"
+                      />
+                    </td>
                     <td class="td-action">
                       <button type="button" class="action-btn action-btn-delete" (click)="eoiService.removeActionPlanRow(i)" title="Delete Row">✕</button>
                     </td>
@@ -1753,16 +1997,7 @@
             <h1 id="step4-heading" class="section-title">Submission Receipt & Acknowledgement</h1>
             <p class="section-subtitle">Official Government of Rajasthan EOI Registration Proof • Tender Empanelment</p>
           </div>
-          <div class="title-meta-right" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <button
-              type="button"
-              class="gov-btn"
-              style="height: 36px; min-height: 36px; padding: 0 14px; font-size: 12.5px; background: #002244; color: #ffffff; border: 1px solid #f59e0b; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,34,68,0.15);"
-              (click)="goToAllSchemes()"
-              title="Return to Schemes listing page"
-            >
-              🏛️ View All Schemes
-            </button>
+          <div class="title-meta-right">
             <span class="gov-step-pill">STEP 04 OF 04</span>
           </div>
         </div>
@@ -1961,18 +2196,6 @@
       <!-- Bottom Receipt Action Bar -->
       <div class="gov-form-footer receipt-actions-bar">
         <div class="footer-left">
-          <!-- Back to Schemes Listing Button -->
-          <button
-            type="button"
-            id="btn-return-schemes"
-            class="gov-btn gov-btn-primary"
-            style="background: linear-gradient(135deg, #002244 0%, #003366 100%); color: #ffffff; border: 1px solid #f59e0b; box-shadow: 0 4px 12px rgba(0,34,68,0.25);"
-            (click)="goToAllSchemes()"
-            title="Return to Government Scheme listing page"
-          >
-            <span>🏛️ View All Schemes</span>
-          </button>
-
           <button
             type="button"
             class="gov-btn gov-btn-secondary"
@@ -2165,18 +2388,4 @@
     <span class="toast-icon">ℹ️</span>
     <span class="toast-text">{{ eoiService.toastMessage() }}</span>
   </div>
-
-  <!-- Government Portal Footer -->
-  <footer class="gov-site-footer">
-    <div class="gov-footer-inner">
-      <div class="footer-legal">
-        <span>© 2026 Government of Rajasthan. Integrated Skill Management System (ISMS 2.0).</span>
-      </div>
-      <div class="footer-meta-links">
-        <span>RSLDC Directorate of Skill Development</span>
-        <span>•</span>
-        <span>Empanelment Portal</span>
-      </div>
-    </div>
-  </footer>
 </div>

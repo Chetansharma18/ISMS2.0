@@ -13,6 +13,7 @@ import { LanguageService } from '../../../core/services/language.service';
 export interface PartnerLink {
   id: string;
   name: string;
+  type?: string;
   hindiName?: string;
   tagline?: string;
   url: string;
@@ -33,6 +34,7 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
     {
       id: 'bis',
       name: 'Bureau of Indian Standards',
+      type: 'bis',
       hindiName: 'मानक: पथप्रदर्शक:',
       tagline: 'The National Standards Body of India',
       url: 'https://www.bis.gov.in/',
@@ -41,6 +43,7 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
     {
       id: 'bis-care',
       name: 'BIS Care App',
+      type: 'bis',
       hindiName: 'बीआईएस केयर ऐप',
       tagline: 'Bureau of Indian Standards Mobile App',
       url: 'https://www.bis.gov.in/bis-apps/',
@@ -49,6 +52,7 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
     {
       id: 'acb',
       name: 'Anti Corruption Bureau',
+      type: 'acb',
       hindiName: 'मांगे कोई रिश्वत तो कॉल करें',
       tagline: 'Toll Free: 1064 | WhatsApp: 9413502834',
       url: 'https://home.rajasthan.gov.in/content/homeportal/en/acbdepartment.html',
@@ -57,6 +61,7 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
     {
       id: 'pledge',
       name: 'Organ Donation Pledge',
+      type: 'pledge',
       hindiName: 'Save lives today',
       tagline: 'One Donor Can Save 8 Lives - Register for Pledge',
       url: 'https://notto.abdm.gov.in/register/',
@@ -65,10 +70,47 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
     {
       id: 'jansoochna',
       name: 'Jan Soochna Portal 2019',
+      type: 'jansoochna',
       hindiName: 'जन सूचना पोर्टल-2019',
       tagline: 'Government of Rajasthan',
       url: 'https://jansoochna.rajasthan.gov.in/',
       logo: '/assets/links/jansoochna.png'
+    },
+    {
+      id: 'rajsso',
+      name: 'Rajasthan Single Sign On',
+      type: 'rajsso',
+      hindiName: 'राजस्थान एकल लॉग-इन',
+      tagline: 'One Digital Identity for all Applications',
+      url: 'https://sso.rajasthan.gov.in/',
+      logo: '/assets/links/rajsso.png'
+    },
+    {
+      id: 'sampark',
+      name: 'Rajasthan Sampark 181',
+      type: 'sampark',
+      hindiName: 'राजस्थान संपर्क',
+      tagline: 'Chief Minister Helpline 181',
+      url: 'https://sampark.rajasthan.gov.in/',
+      logo: '/assets/links/sampark.png'
+    },
+    {
+      id: 'skillindia',
+      name: 'Skill India',
+      type: 'skillindia',
+      hindiName: 'कौशल भारत',
+      tagline: 'Ministry of Skill Development & Entrepreneurship',
+      url: 'https://www.skillindia.gov.in/',
+      logo: '/assets/links/skillindia.png'
+    },
+    {
+      id: 'digitalindia',
+      name: 'Digital India',
+      type: 'digitalindia',
+      hindiName: 'डिजिटल इंडिया',
+      tagline: 'Transforming India Digitally',
+      url: 'https://www.digitalindia.gov.in/',
+      logo: '/assets/links/digitalindia.png'
     }
   ];
 

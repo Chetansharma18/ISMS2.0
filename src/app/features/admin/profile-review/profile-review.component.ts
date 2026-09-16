@@ -23,7 +23,7 @@ import { Observable } from 'rxjs';
         <main class="flex-grow px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto">
           
           <!-- Top Breadcrumb & Title Bar -->
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 mb-6">
+          <div *ngIf="!showActionPanel" class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 mb-6 animate-in fade-in duration-300">
             <div>
               <div class="flex items-center gap-2 text-xs text-slate-500 font-mono mb-1">
                 <a routerLink="/admin/eoi" class="text-[#131A4D] hover:underline">← Back to EOI View</a>

@@ -31,7 +31,7 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
             routerLink="/admin/eoi/create" 
             class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold text-xs rounded-lg shadow-xs transition-all cursor-pointer">
             <span class="material-symbols-outlined text-[18px]">add_circle</span>
-            + Create New EOI
+            Create New EOI
           </a>
         </div>
       </admin-page-header>

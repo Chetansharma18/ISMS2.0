@@ -1,7 +1,7 @@
-<section id="mobile-app" class="relative w-full overflow-hidden select-none border-t border-slate-200/80">
-  <!-- Top Tier: Mobile Application (Light Sky Blue Background) -->
-  <div class="bg-[#edf5fc] pt-10 pb-10 sm:pt-12 sm:pb-12 lg:pt-14 lg:pb-12">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<section id="mobile-app" class="relative w-full bg-[#edf5fc] overflow-hidden select-none border-t border-slate-200/80">
+  <!-- Top Tier: Mobile Application Information -->
+  <div class="pt-10 pb-8 sm:pt-12 sm:pb-10 lg:pt-12 lg:pb-10">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
         <!-- Left: Mobile Application Information -->
         <div class="lg:col-span-5 flex flex-col justify-center text-left">
@@ -11,16 +11,9 @@
           <h2 class="text-2xl sm:text-3xl font-extrabold text-[#002244] tracking-tight mb-3">
             {{ t().mobileApp.heading }}
           </h2>
-          <p class="text-sm text-slate-600 leading-relaxed max-w-sm mb-6">
+          <p class="text-sm text-slate-600 leading-relaxed max-w-md">
             {{ t().mobileApp.description }}
           </p>
-          <div>
-            <a href="#mobile-app-download"
-              class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#002244] hover:bg-[#001730] text-white text-sm font-medium rounded-lg shadow-sm transition-all duration-150 group">
-              <span>{{ t().mobileApp.knowMore }}</span>
-              <span class="transition-transform duration-150 group-hover:translate-x-0.5 font-sans font-bold">→</span>
-            </a>
-          </div>
         </div>
 
         <!-- Center Phone Placeholder Spacer (Visible on Mobile/Tablet, hidden on lg) -->
@@ -96,9 +89,12 @@
     </div>
   </div>
 
-  <!-- Bottom Tier: Need Assistance? & Helpdesk Support (Pure White Background) -->
-  <div class="bg-white pt-8 pb-10 sm:pt-9 sm:pb-12 border-t border-slate-100/80">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- Divider between Tiers -->
+  <div class="border-t border-blue-200/50 max-w-[1400px] mx-auto"></div>
+
+  <!-- Bottom Tier: Need Assistance? & Helpdesk Support (Same unified background) -->
+  <div class="pt-8 pb-10 sm:pt-10 sm:pb-12">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
         <!-- Left: Need Assistance? -->
         <div class="lg:col-span-5 flex flex-col justify-center text-left">
@@ -108,20 +104,9 @@
           <h2 class="text-2xl sm:text-3xl font-extrabold text-[#002244] tracking-tight mb-2">
             {{ t().mobileApp.helpHeading }}
           </h2>
-          <p class="text-sm text-slate-600 leading-relaxed max-w-md mb-5">
+          <p class="text-sm text-slate-600 leading-relaxed max-w-md">
             {{ t().mobileApp.helpDescription }}
           </p>
-          <div class="flex flex-wrap items-center gap-3">
-            <a href="#helpdesk"
-              class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#f97316] hover:bg-[#ea580c] text-white text-sm font-semibold rounded-lg shadow-sm transition-all duration-150 group">
-              <span>{{ t().mobileApp.visitHelpdesk }}</span>
-              <span class="transition-transform duration-150 group-hover:translate-x-0.5 font-sans font-bold">→</span>
-            </a>
-            <a href="#faqs"
-              class="inline-flex items-center px-5 py-2.5 bg-white hover:bg-blue-50/60 text-[#2563eb] border border-[#2563eb]/70 text-sm font-semibold rounded-lg shadow-sm transition-all duration-150">
-              <span>{{ t().mobileApp.viewFaqs }}</span>
-            </a>
-          </div>
         </div>
 
         <!-- Center Spacer for Desktop Phone Anchoring -->
@@ -130,7 +115,7 @@
         </div>
 
         <!-- Right: Helpdesk Support Card -->
-        <div class="lg:col-span-5 flex items-center gap-4">
+        <div class="lg:col-span-5 flex items-center gap-4 bg-white/90 p-4 sm:p-5 rounded-2xl shadow-xs border border-blue-200/60">
           <div class="shrink-0">
             <svg class="w-12 h-12 text-[#002244]" viewBox="0 0 32 32" fill="none">
               <!-- Headband -->
@@ -164,6 +149,6 @@
   <div
     class="hidden lg:flex absolute inset-y-0 left-1/2 -translate-x-1/2 items-center justify-center pointer-events-none z-10">
     <img src="mobile-app-phone.png" alt="ISMS 2.0 Mobile App"
-      class="w-48 xl:w-52 h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,34,68,0.22)] -mt-1" />
+      class="w-44 xl:w-48 h-auto object-contain drop-shadow-[0_20px_40px_rgba(0,34,68,0.22)] -mt-1" />
   </div>
 </section>

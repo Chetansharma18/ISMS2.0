@@ -17,7 +17,8 @@ export interface PressRelease {
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './navbar.component.html'
+  templateUrl: './navbar.component.html',
+  styleUrl: './navbar.component.css'
 })
 export class NavbarComponent implements OnInit {
   protected readonly languageService = inject(LanguageService);
@@ -117,13 +118,9 @@ export class NavbarComponent implements OnInit {
       document.body.classList.remove('font-scale-sm', 'font-scale-md', 'font-scale-lg');
       document.body.classList.add(`font-scale-${size}`);
 
-      if (size === 'sm') {
-        (document.body.style as any).zoom = '0.9';
-      } else if (size === 'lg') {
-        (document.body.style as any).zoom = '1.12';
-      } else {
-        (document.body.style as any).zoom = '1';
-      }
+      const zoomValue = size === 'sm' ? '0.9' : size === 'lg' ? '1.12' : '1';
+      document.body.style.setProperty('zoom', zoomValue);
+      (document.body.style as any).zoom = zoomValue;
 
       try {
         localStorage.setItem('isms_font_size', size);

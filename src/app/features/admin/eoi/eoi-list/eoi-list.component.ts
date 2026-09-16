@@ -25,14 +25,13 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
       <admin-page-header 
         title="Expression of Interest (EOI) Management"
         subtitle="Manage end-to-end EOI lifecycle from configuration and committee assignment to publishing, rescheduling, and response scrutiny"
-        icon="assignment"
         [breadcrumbs]="[{ label: 'EOI Management', url: '/admin/eoi' }, { label: 'All EOIs' }]">
         <div header-actions class="flex items-center gap-2">
           <a 
             routerLink="/admin/eoi/create" 
             class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold text-xs rounded-lg shadow-xs transition-all cursor-pointer">
             <span class="material-symbols-outlined text-[18px]">add_circle</span>
-            + Create New EOI
+            Create New EOI
           </a>
         </div>
       </admin-page-header>
@@ -115,9 +114,9 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
                 <th class="px-4 py-3.5">Scheme & Category</th>
                 <th class="px-4 py-3.5">Published Date</th>
                 <th class="px-4 py-3.5">Closing Date</th>
-                <th class="px-4 py-3.5 text-center">Applications</th>
+                <!-- <th class="px-4 py-3.5 text-center">Applications</th> -->
                 <th class="px-4 py-3.5">Committee</th>
-                <th class="px-4 py-3.5">Version</th>
+                <!-- <th class="px-4 py-3.5">Version</th> -->
                 <th class="px-4 py-3.5">Status</th>
                 <th class="px-4 py-3.5 text-right">Actions</th>
               </tr>
@@ -154,6 +153,7 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
                 </td>
 
                 <!-- Applications Count -->
+                <!--
                 <td class="px-4 py-3 text-center whitespace-nowrap">
                   <a 
                     [routerLink]="['/admin/eoi', e.id, 'responses']"
@@ -162,6 +162,7 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
                     {{ e.applicationCount }} Apps
                   </a>
                 </td>
+                -->
 
                 <!-- Committee -->
                 <td class="px-4 py-3 max-w-[130px] truncate text-slate-600" [title]="e.committeeName || 'Not Assigned'">
@@ -170,12 +171,14 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
                   </a>
                 </td>
 
-                <!-- Version -->
+                <!-- Version (Commented Out) -->
+                <!--
                 <td class="px-4 py-3 font-mono text-slate-600 whitespace-nowrap">
                   <a [routerLink]="['/admin/eoi', e.id, 'history']" class="hover:text-blue-700 hover:underline">
                     v{{ e.version }}
                   </a>
                 </td>
+                -->
 
                 <!-- Status -->
                 <td class="px-4 py-3 whitespace-nowrap">
@@ -185,13 +188,15 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
                 <!-- Comprehensive Actions Dropdown/Row (Rule 20 & 38) -->
                 <td class="px-4 py-3 text-right whitespace-nowrap">
                   <div class="flex items-center justify-end gap-1">
-                    <!-- View / Details -->
+                    <!-- View / Details (Commented Out) -->
+                    <!--
                     <a 
                       [routerLink]="['/admin/eoi', e.id, 'details']" 
                       class="p-1 text-slate-500 hover:text-blue-700 hover:bg-slate-100 rounded" 
                       title="View Details">
                       <span class="material-symbols-outlined text-[18px]">visibility</span>
                     </a>
+                    -->
 
                     <!-- Edit / Configure -->
                     <a 
@@ -201,7 +206,8 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
                       <span class="material-symbols-outlined text-[18px]">edit</span>
                     </a>
 
-                    <!-- Form Builder -->
+                    <!-- Other Actions (Commented Out) -->
+                    <!--
                     <a 
                       [routerLink]="['/admin/eoi', e.id, 'form-builder']" 
                       class="p-1 text-slate-500 hover:text-indigo-700 hover:bg-slate-100 rounded" 
@@ -209,7 +215,6 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
                       <span class="material-symbols-outlined text-[18px]">format_shapes</span>
                     </a>
 
-                    <!-- Preview as Applicant -->
                     <a 
                       [routerLink]="['/admin/eoi', e.id, 'preview']" 
                       class="p-1 text-slate-500 hover:text-emerald-700 hover:bg-slate-100 rounded" 
@@ -217,7 +222,6 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
                       <span class="material-symbols-outlined text-[18px]">preview</span>
                     </a>
 
-                    <!-- Reschedule (Mandatory Corrigendum) -->
                     <a 
                       [routerLink]="['/admin/eoi', e.id, 'reschedule']" 
                       class="p-1 text-slate-500 hover:text-amber-600 hover:bg-slate-100 rounded" 
@@ -225,7 +229,6 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
                       <span class="material-symbols-outlined text-[18px]">update</span>
                     </a>
 
-                    <!-- Assign / Change Committee -->
                     <a 
                       [routerLink]="['/admin/eoi', e.id, 'committee']" 
                       class="p-1 rounded transition-colors"
@@ -236,7 +239,6 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
                       <span class="material-symbols-outlined text-[18px]">group_add</span>
                     </a>
 
-                    <!-- Publish Button if DRAFT/PUBLISHED -->
                     <button 
                       *ngIf="e.status === 'DRAFT' || e.status === 'PUBLISHED'"
                       (click)="publishEoi(e)"
@@ -245,7 +247,6 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
                       <span class="material-symbols-outlined text-[18px]">rocket_launch</span>
                     </button>
 
-                    <!-- Close EOI if OPEN -->
                     <button 
                       *ngIf="e.status === 'OPEN'"
                       (click)="closeEoi(e)"
@@ -254,13 +255,13 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
                       <span class="material-symbols-outlined text-[18px]">lock</span>
                     </button>
 
-                    <!-- Duplicate EOI -->
                     <button 
                       (click)="duplicateEoi(e)"
                       class="p-1 text-slate-500 hover:text-blue-700 hover:bg-slate-100 rounded cursor-pointer" 
                       title="Duplicate EOI">
                       <span class="material-symbols-outlined text-[18px]">content_copy</span>
                     </button>
+                    -->
                   </div>
                 </td>
               </tr>

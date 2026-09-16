@@ -18,8 +18,8 @@ import { HelpdeskChatComponent } from './components/helpdesk-chat/helpdesk-chat.
     // ServicesComponent,
     MobileAppComponent,
     ImportantLinksComponent,
-    FooterComponent,
-    HelpdeskChatComponent
+    FooterComponent
+    // HelpdeskChatComponent // Commented out for now
   ],
   template: `
     <div class="min-h-screen bg-[#f0f6fc] flex flex-col selection:bg-amber-400 selection:text-slate-900 overflow-x-hidden w-full max-w-full scroll-smooth">
@@ -34,7 +34,9 @@ import { HelpdeskChatComponent } from './components/helpdesk-chat/helpdesk-chat.
         <app-important-links />
         <app-footer />
       </div>
+      <!-- Helpdesk button commented out for now:
       <app-helpdesk-chat />
+      -->
     </div>
   `
 })

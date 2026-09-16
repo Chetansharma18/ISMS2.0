@@ -23,7 +23,6 @@ import { SchemeMaster, DepartmentMaster, EoiCategoryMaster, Committee, EoiItem }
       <admin-page-header 
         [title]="isEditMode ? 'Configure EOI: ' + referenceNo : 'Create Expression of Interest (EOI)'"
         subtitle="Multi-step statutory configuration covering tender classification, milestone dates, fee heads, documents checklist, transactions, and eligibility"
-        icon="post_add"
         [breadcrumbs]="[
           { label: 'EOI Management', url: '/admin/eoi' },
           { label: isEditMode ? 'Edit EOI' : 'Create EOI' }

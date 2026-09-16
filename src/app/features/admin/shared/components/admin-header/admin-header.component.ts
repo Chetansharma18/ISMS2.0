@@ -17,7 +17,8 @@ export type FontSize = 'sm' | 'md' | 'lg';
         
         <!-- Left: Sidebar Toggle, Dual Government Emblems & Portal Title -->
         <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
-          <!-- Sidebar Mobile & Desktop Toggle Button -->
+          <!-- Sidebar Mobile & Desktop Toggle Button (Commented Out) -->
+          <!--
           <button 
             type="button"
             (click)="toggleSidebar.emit()"
@@ -25,13 +26,14 @@ export type FontSize = 'sm' | 'md' | 'lg';
             title="Toggle Navigation Menu">
             <span class="material-symbols-outlined text-[22px]">menu</span>
           </button>
+          -->
 
           <!-- Dual Emblems & Branding -->
           <div class="flex items-center gap-2 sm:gap-3 min-w-0 cursor-pointer" routerLink="/admin/dashboard">
             <!-- Official Ashoka Lion Capital Emblem of India -->
             <div class="shrink-0 w-8 h-10 sm:w-10 sm:h-12 flex items-center justify-center">
               <img 
-                src="emblem.png" 
+                src="emblem-new.png" 
                 alt="Government of Rajasthan - State Emblem of India"
                 class="h-full w-auto object-contain select-none" 
               />

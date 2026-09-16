@@ -293,24 +293,34 @@ import { Observable } from 'rxjs';
                     ✓ Scrutiny decision recorded successfully! Status updated on applicant portal.
                   </div>
 
-                  <!-- 4. Decision Buttons (Accept vs Reject) -->
+                  <!-- 4. Decision Action / Final Status -->
                   <div class="pt-3 space-y-2">
                     
-                    <!-- Accept Button -->
-                    <button 
-                      type="button" 
-                      (click)="confirmDecision('APPROVED')"
-                      class="w-full py-2.5 rounded-full bg-[#166534] hover:bg-[#14532d] text-white font-bold text-xs tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5">
-                      <span>✓ Accept Bidder</span>
-                    </button>
+                    <ng-container *ngIf="selectedApplicant?.scrutinyStatus === 'UNDER_SCRUTINY'; else decisionBadge">
+                      <!-- Accept Button -->
+                      <button 
+                        type="button" 
+                        (click)="confirmDecision('APPROVED')"
+                        class="w-full py-2.5 rounded-full bg-[#166534] hover:bg-[#14532d] text-white font-bold text-xs tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5">
+                        <span>✓ Accept Bidder</span>
+                      </button>
 
-                    <!-- Reject Button -->
-                    <button 
-                      type="button" 
-                      (click)="confirmDecision('REJECTED')"
-                      class="w-full py-2.5 rounded-full bg-[#991b1b] hover:bg-[#7f1d1d] text-white font-bold text-xs tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5">
-                      <span>✕ Reject Bidder</span>
-                    </button>
+                      <!-- Reject Button -->
+                      <button 
+                        type="button" 
+                        (click)="confirmDecision('REJECTED')"
+                        class="w-full py-2.5 rounded-full bg-[#991b1b] hover:bg-[#7f1d1d] text-white font-bold text-xs tracking-wide transition-colors shadow-xs flex items-center justify-center gap-1.5">
+                        <span>✕ Reject Bidder</span>
+                      </button>
+                    </ng-container>
+
+                    <ng-template #decisionBadge>
+                      <div 
+                        class="w-full py-2.5 rounded-full font-bold text-xs tracking-wide flex items-center justify-center text-white"
+                        [ngClass]="selectedApplicant?.scrutinyStatus === 'APPROVED' ? 'bg-[#166534]' : 'bg-[#991b1b]'">
+                        {{ selectedApplicant?.scrutinyStatus === 'APPROVED' ? '✓ Accepted' : '✕ Rejected' }}
+                      </div>
+                    </ng-template>
 
                   </div>
 
@@ -329,35 +339,62 @@ import { Observable } from 'rxjs';
       <div *ngIf="showConfirmModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
         <div class="bg-white border-2 border-slate-400 max-w-md w-full shadow-2xl p-6 space-y-4">
           
-          <div class="flex items-center gap-3">
-            <span class="text-2xl">{{ pendingAction === 'APPROVED' ? '🏛' : '⚠️' }}</span>
+          <div class="flex items-center">
             <h4 class="text-base font-bold text-slate-900">
-              {{ pendingAction === 'APPROVED' ? 'Confirm Technical Partner Empanelment' : 'Confirm Application Rejection & EMD Refund' }}
+              {{ pendingAction === 'APPROVED' ? 'Confirm Acceptance' : 'Confirm Rejection' }}
             </h4>
           </div>
 
-          <div class="text-xs text-slate-700 leading-relaxed border-y border-slate-200 py-3">
+          <div class="text-xs text-slate-700 leading-relaxed border-t border-slate-200 pt-3">
             <p *ngIf="pendingAction === 'APPROVED'">
-              You are officially approving <strong>{{ selectedApplicant?.organizationName }}</strong> for the <strong>{{ selectedApplicant?.schemeName }}</strong> tender under <strong>Grade {{ reviewForm.value.grade }}</strong>. This will issue their official Technical Partner certificate.
+              You are officially approving <strong>{{ selectedApplicant?.organizationName }}</strong> for the <strong>{{ selectedApplicant?.schemeName }}</strong> tender.
             </p>
             <p *ngIf="pendingAction === 'REJECTED'">
-              You are rejecting this application. This will notify the applicant with your recorded remarks and immediately trigger an <strong>automatic EMD refund of ₹{{ selectedApplicant?.emdAmount | number:'1.0-0' }}</strong> to the original payment source.
+              You are rejecting this application. This will notify the applicant and trigger an EMD refund.
             </p>
           </div>
+
+          <!-- Upload Document -->
+          <div class="space-y-1">
+            <label class="block font-bold text-[#131A4D] text-xs">
+              {{ pendingAction === 'APPROVED' ? 'Mandatory Approval Document' : 'Mandatory Rejection Document' }} <span class="text-red-600">*</span>
+            </label>
+            <div 
+              (click)="isDocumentAttached = true"
+              [ngClass]="isDocumentAttached ? 'border-emerald-500 bg-emerald-50 text-emerald-700 border-solid' : 'border-slate-300 border-dashed bg-slate-50 hover:bg-slate-100 text-[#131A4D]'"
+              class="border p-3 text-center transition-colors cursor-pointer rounded">
+              <span class="text-xs font-semibold">
+                {{ isDocumentAttached ? '✓ Document Attached' : '📎 Attach Document' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Remarks -->
+          <form [formGroup]="reviewForm" class="space-y-1">
+            <label class="block font-bold text-[#131A4D] text-xs">
+              Remarks (Max 500 words) <span class="text-red-600">*</span>
+            </label>
+            <textarea 
+              formControlName="remarks"
+              rows="4" 
+              placeholder="Enter your confirmation remarks here..."
+              class="w-full px-3 py-2 border border-slate-300 bg-white focus:border-[#131A4D] text-xs text-slate-900"></textarea>
+          </form>
 
           <div class="flex items-center justify-end gap-3 pt-2">
             <button 
               type="button" 
               (click)="showConfirmModal = false"
-              class="px-4 py-2 border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">
+              class="px-4 py-2 border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-full">
               Cancel
             </button>
             <button 
               type="button" 
               (click)="executeDecision()"
+              [disabled]="reviewForm.get('remarks')?.invalid || !isDocumentAttached"
               [ngClass]="pendingAction === 'APPROVED' ? 'bg-[#166534] hover:bg-[#14532d]' : 'bg-[#991b1b] hover:bg-[#7f1d1d]'"
-              class="px-5 py-2 text-white text-xs font-bold transition-colors">
-              Confirm & Finalize Decision
+              class="px-5 py-2 text-white text-xs font-bold transition-colors rounded-full disabled:opacity-50 disabled:cursor-not-allowed">
+              Confirm Decision
             </button>
           </div>
 
@@ -373,6 +410,7 @@ export class ProfileReviewComponent implements OnInit {
   showConfirmModal = false;
   pendingAction: 'APPROVED' | 'REJECTED' | null = null;
   decisionTaken = false;
+  isDocumentAttached = false;
 
   constructor(
     private fb: FormBuilder,
@@ -387,8 +425,13 @@ export class ProfileReviewComponent implements OnInit {
       remarks: ['Verified compliance with all technical eligibility criteria and statutory incorporation credentials.', Validators.required]
     });
 
-    const responses = this.eoiService.getApplicantResponses();
-    this.selectedApplicant = responses[0] || null;
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('applicationId');
+      if (id) {
+        const responses = this.eoiService.getApplicantResponses();
+        this.selectedApplicant = responses.find(r => r.applicationId === id) || null;
+      }
+    });
   }
 
   confirmDecision(action: 'APPROVED' | 'REJECTED'): void {
@@ -397,6 +440,7 @@ export class ProfileReviewComponent implements OnInit {
       return;
     }
     this.pendingAction = action;
+    this.isDocumentAttached = false; // Reset on modal open
     this.showConfirmModal = true;
   }
 

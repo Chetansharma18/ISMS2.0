@@ -108,10 +108,8 @@ import { Observable } from 'rxjs';
                       <div class="font-bold text-slate-900 text-xs">
                         {{ item.organizationName }}
                       </div>
-                      <div class="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5">
-                        <span>Signatory: <strong>{{ item.applicantName }}</strong></span>
-                        <span>•</span>
-                        <span class="font-mono text-[10px]">{{ item.registrationNumber }}</span>
+                      <div class="text-[10px] text-slate-500 mt-0.5">
+                        {{ item.registrationNumber }}
                       </div>
                     </td>
 

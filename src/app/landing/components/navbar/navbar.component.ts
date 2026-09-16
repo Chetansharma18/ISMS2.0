@@ -1,5 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { LanguageService, Language } from '../../../core/services/language.service';
 
 export type { Language };
@@ -15,7 +16,7 @@ export interface PressRelease {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './navbar.component.html'
 })
 export class NavbarComponent implements OnInit {

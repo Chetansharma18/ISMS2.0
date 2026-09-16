@@ -109,72 +109,88 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
         </div>
       </div>
 
-      <!-- EOI Master Table using UiTableComponent -->
-      <app-ui-table 
-        [columns]="tableColumns" 
-        [data]="filteredEois()" 
-        emptyMessage="No Expressions of Interest matching criteria."
-        [showSearch]="false"
-        [showPagination]="false">
-        <ng-template #rowTemplate let-row let-column="column">
-          <ng-container [ngSwitch]="column.key">
-            <!-- Ref No -->
-            <div *ngSwitchCase="'referenceNo'" class="font-mono font-bold text-blue-900 whitespace-nowrap">
-              <a [routerLink]="['/admin/eoi', row.id, 'details']" class="hover:underline">
-                {{ row.referenceNo }}
-              </a>
-            </div>
+      <!-- EOI Master Table -->
+      <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-600 border-collapse">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[10px]">
+              <tr>
+                <th class="px-4 py-3.5">EOI Ref No.</th>
+                <th class="px-4 py-3.5">EOI Title</th>
+                <th class="px-4 py-3.5">Scheme & Category</th>
+                <th class="px-4 py-3.5">Published</th>
+                <th class="px-4 py-3.5">Closing</th>
+                <th class="px-4 py-3.5">Committee</th>
+                <th class="px-4 py-3.5">Status</th>
+                <th class="px-4 py-3.5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr *ngIf="filteredEois().length === 0">
+                <td colspan="8" class="p-8 text-center text-slate-500">
+                  No Expressions of Interest matching criteria.
+                </td>
+              </tr>
+              <tr *ngFor="let row of filteredEois()" class="hover:bg-slate-50/80 transition-colors">
+                
+                <!-- Ref No -->
+                <td class="px-4 py-3 font-mono font-bold text-blue-900 whitespace-nowrap">
+                  <a [routerLink]="['/admin/eoi', row.id, 'details']" class="hover:underline">
+                    {{ row.referenceNo }}
+                  </a>
+                </td>
 
-            <!-- Title -->
-            <div *ngSwitchCase="'title'" class="max-w-xs">
-              <div class="font-bold text-slate-900 line-clamp-1" [title]="row.title">{{ row.title }}</div>
-              <div class="text-[11px] text-slate-500 truncate mt-0.5">{{ row.department }}</div>
-            </div>
+                <!-- Title -->
+                <td class="px-4 py-3 max-w-xs">
+                  <div class="font-bold text-slate-900 line-clamp-1" [title]="row.title">{{ row.title }}</div>
+                  <div class="text-[11px] text-slate-500 truncate mt-0.5">{{ row.department }}</div>
+                </td>
 
-            <!-- Scheme & Category -->
-            <div *ngSwitchCase="'scheme'" class="whitespace-nowrap">
-              <div class="font-semibold text-slate-800">{{ row.schemeName }}</div>
-              <div class="text-[11px] text-slate-500">{{ row.eoiCategory }}</div>
-            </div>
+                <!-- Scheme & Category -->
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <div class="font-semibold text-slate-800">{{ row.schemeName }}</div>
+                  <div class="text-[11px] text-slate-500">{{ row.eoiCategory }}</div>
+                </td>
 
-            <!-- Published Date -->
-            <div *ngSwitchCase="'publishedDate'" class="whitespace-nowrap text-slate-600">
-              {{ row.publishedDate }}
-            </div>
+                <!-- Published Date -->
+                <td class="px-4 py-3 whitespace-nowrap text-slate-600">
+                  {{ row.publishedDate }}
+                </td>
 
-            <!-- Closing Date -->
-            <div *ngSwitchCase="'closingDate'" class="font-semibold whitespace-nowrap" [ngClass]="row.status === 'OPEN' ? 'text-amber-700 font-bold' : 'text-slate-700'">
-              {{ row.closingDate }}
-            </div>
+                <!-- Closing Date -->
+                <td class="px-4 py-3 font-semibold whitespace-nowrap" [ngClass]="row.status === 'OPEN' ? 'text-amber-700 font-bold' : 'text-slate-700'">
+                  {{ row.closingDate }}
+                </td>
 
-            <!-- Committee -->
-            <div *ngSwitchCase="'committee'" class="max-w-[130px] truncate text-slate-600" [title]="row.committeeName || 'Not Assigned'">
-              <a [routerLink]="['/admin/eoi', row.id, 'committee']" class="hover:text-blue-700 hover:underline">
-                {{ row.committeeName || 'Assign Committee' }}
-              </a>
-            </div>
+                <!-- Committee -->
+                <td class="px-4 py-3 max-w-[130px] truncate text-slate-600" [title]="row.committeeName || 'Not Assigned'">
+                  <a [routerLink]="['/admin/eoi', row.id, 'committee']" class="hover:text-blue-700 hover:underline">
+                    {{ row.committeeName || 'Assign Committee' }}
+                  </a>
+                </td>
 
-            <!-- Status -->
-            <div *ngSwitchCase="'status'" class="whitespace-nowrap">
-              <admin-status-badge [status]="row.status"></admin-status-badge>
-            </div>
+                <!-- Status -->
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <admin-status-badge [status]="row.status"></admin-status-badge>
+                </td>
 
-            <!-- Actions -->
-            <div *ngSwitchCase="'actions'" class="flex items-center justify-end gap-1">
-              <a 
-                [routerLink]="['/admin/eoi/edit', row.id]" 
-                class="p-1 text-slate-500 hover:text-amber-700 hover:bg-slate-100 rounded" 
-                title="Edit EOI">
-                <span class="material-symbols-outlined text-[18px]">edit</span>
-              </a>
-            </div>
+                <!-- Actions -->
+                <td class="px-4 py-3 text-right whitespace-nowrap">
+                  <div class="flex items-center justify-end gap-1">
+                    <a 
+                      [routerLink]="['/admin/eoi/edit', row.id]" 
+                      class="p-1.5 text-slate-500 hover:text-amber-700 hover:bg-slate-100 rounded-md transition-colors" 
+                      title="Edit EOI">
+                      <span class="material-symbols-outlined text-[18px]">edit</span>
+                    </a>
+                  </div>
+                </td>
 
-            <div *ngSwitchDefault class="text-slate-700 text-sm font-medium">
-              {{ row[column.key] }}
-            </div>
-          </ng-container>
-        </ng-template>
-      </app-ui-table>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
     </div>
   `

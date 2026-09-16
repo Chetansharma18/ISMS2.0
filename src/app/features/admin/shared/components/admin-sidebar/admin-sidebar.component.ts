@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { EoiService } from '../../../core/services/eoi.service';
 
 @Component({
   selector: 'admin-sidebar',
@@ -110,7 +111,6 @@ import { RouterModule } from '@angular/router';
 
           <div *ngIf="eoiOpen()" class="pl-7 pr-1 py-1 space-y-0.5 border-l-2 border-slate-200 ml-5 my-1 text-[11px]">
             <a routerLink="/admin/eoi" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" [routerLinkActiveOptions]="{ exact: true }" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Configure</a>
-            <!--
             <a routerLink="/admin/eoi/create" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">+ Create EOI</a>
             <a routerLink="/admin/masters/eoi-categories" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Categories</a>
             <a routerLink="/admin/eoi/EOI-2025-001/form-builder" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Form Builder</a>
@@ -121,7 +121,6 @@ import { RouterModule } from '@angular/router';
             <a routerLink="/admin/eoi/EOI-2025-001/amendments" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Corrigendum &amp; Amendments</a>
             <a routerLink="/admin/eoi/EOI-2025-001/reschedule" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Reschedule EOI</a>
             <a routerLink="/admin/eoi/EOI-2025-001/history" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI History &amp; Versions</a>
-            -->
           </div>
         </div>
 
@@ -185,7 +184,7 @@ import { RouterModule } from '@angular/router';
             <span class="material-symbols-outlined text-[20px] text-slate-500 group-hover:text-[#002244] transition-colors">inventory</span>
             <span>APPLICATIONS</span>
           </div>
-          <span class="bg-[#002244] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">42</span>
+          <span class="bg-[#002244] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{{ appCount() }}</span>
         </a>
 
         <!-- REPORTS -->
@@ -235,7 +234,7 @@ import { RouterModule } from '@angular/router';
     </aside>
   `
 })
-export class AdminSidebarComponent {
+export class AdminSidebarComponent implements OnInit {
   @Input() isOpen: boolean = true;
   @Output() closeSidebar = new EventEmitter<void>();
 
@@ -243,6 +242,13 @@ export class AdminSidebarComponent {
   eoiOpen = signal<boolean>(true);
   committeeOpen = signal<boolean>(false);
   usersOpen = signal<boolean>(false);
+  appCount = signal<number>(0);
+
+  private eoiService = inject(EoiService);
+
+  ngOnInit(): void {
+    this.eoiService.getAllApplications().subscribe(apps => this.appCount.set(apps.length));
+  }
 
   toggleSection(section: 'masters' | 'eoi' | 'committee' | 'users'): void {
     if (section === 'masters') this.mastersOpen.update(v => !v);

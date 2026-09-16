@@ -52,7 +52,7 @@ import { EoiFormField, FormFieldType, FormOption, EoiItem } from '../../core/mod
       <div class="grid grid-cols-1" [ngClass]="{'lg:grid-cols-12 gap-6': showPreview()}">
         
         <!-- Left: Fields Schema Table -->
-        <div [ngClass]="showPreview() ? 'lg:col-span-7' : 'col-span-12'">
+        <div class="min-w-0" [ngClass]="showPreview() ? 'lg:col-span-7' : 'col-span-12'">
           
           <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden mb-6">
             <div class="p-4 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
@@ -184,7 +184,7 @@ import { EoiFormField, FormFieldType, FormOption, EoiItem } from '../../core/mod
         </div>
 
         <!-- Right: Interactive Live Preview Pane -->
-        <div *ngIf="showPreview()" class="lg:col-span-5 space-y-4">
+        <div *ngIf="showPreview()" class="min-w-0 lg:col-span-5 space-y-4">
           <div class="bg-white rounded-xl shadow-xs border-2 border-blue-200 p-5 sticky top-20">
             <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-4 bg-blue-50/50 -mx-5 -mt-5 p-4 rounded-t-xl">
               <div class="flex items-center gap-2 text-blue-900">

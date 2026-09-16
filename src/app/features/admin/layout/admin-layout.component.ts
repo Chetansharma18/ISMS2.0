@@ -30,7 +30,7 @@ import { ToastContainerComponent } from '../shared/components/toast/toast.compon
         </admin-sidebar>
 
         <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
+        <main class="flex-1 overflow-y-auto min-w-0 p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
           <div class="max-w-7xl w-full mx-auto">
             <router-outlet></router-outlet>
           </div>

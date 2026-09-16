@@ -389,7 +389,7 @@ export class SsoLoginComponent implements OnInit {
         // Super Admin -> Dashboard
         this.authService.login('superadmin').subscribe();
         this.eoiService.resetToSuperAdmin(rawSsoId);
-        this.router.navigate(['/admin/dashboard']);
+        this.router.navigate(['/admin']);
       } else if (ssoLower.includes('dept') || ssoLower.includes('officer') || ssoLower.includes('scrutiny')) {
         // Department Admin -> EOI View
         this.authService.login('deptadmin').subscribe();

@@ -22,7 +22,7 @@ export type FontSize = 'sm' | 'md' | 'lg';
           <!-- Official Ashoka Lion Capital Emblem of India -->
           <div class="flex-shrink-0 flex items-center justify-center">
             <img 
-              src="emblem.png" 
+              src="emblem-new.png" 
               alt="Government of Rajasthan - State Emblem of India"
               class="h-9 sm:h-[52px] lg:h-[60px] w-auto object-contain select-none" 
             />
@@ -114,15 +114,26 @@ export type FontSize = 'sm' | 'md' | 'lg';
             <!-- Backdrop to close dropdown on outside click -->
             <div *ngIf="userMenuOpen()" (click)="closeUserMenu()" class="fixed inset-0 z-40"></div>
 
-            <!-- Profile Dropdown Menu with Logout Option -->
+            <!-- Profile Dropdown Menu with Profile Link & Logout -->
             <div 
               *ngIf="userMenuOpen()" 
-              class="absolute right-0 mt-1.5 w-44 bg-white border border-slate-200 rounded-lg shadow-xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-100 font-['Poppins',sans-serif]">
+              class="absolute right-0 mt-1.5 w-48 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 font-['Poppins',sans-serif] overflow-hidden">
               
+              <a 
+                routerLink="/profile" 
+                (click)="closeUserMenu()" 
+                class="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-colors text-left border-b border-slate-100">
+                <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Profile</span>
+              </a>
+
               <button 
                 type="button"
                 (click)="logout()"
-                class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 hover:text-red-700 rounded-md transition text-left cursor-pointer">
+                class="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-bold text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors text-left cursor-pointer">
                 <svg class="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                   <polyline points="16 17 21 12 16 7"></polyline>
@@ -132,7 +143,6 @@ export type FontSize = 'sm' | 'md' | 'lg';
               </button>
 
             </div>
-
           </div>
 
           <!-- Mobile Menu Toggle Button (Visible only on screens < md) -->
@@ -309,7 +319,7 @@ export class HeaderComponent implements OnInit {
         if (saved && (saved === 'sm' || saved === 'md' || saved === 'lg')) {
           initialSize = saved;
         }
-      } catch (e) {}
+      } catch (e) { }
       this.setFontSize(initialSize);
     }
   }
@@ -336,7 +346,7 @@ export class HeaderComponent implements OnInit {
 
       try {
         localStorage.setItem('isms_font_size', size);
-      } catch (e) {}
+      } catch (e) { }
     }
   }
 }

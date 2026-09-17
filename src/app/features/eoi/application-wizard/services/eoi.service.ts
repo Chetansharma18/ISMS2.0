@@ -144,7 +144,7 @@ export class EoiService {
   readonly computedTotalFee = computed(() => {
     const pay = this.paymentData();
     let total = 0;
-    if (pay.includeProcessingFee || pay.processingFeeSelected) total += (pay.processingFee ?? pay.processingFeeAmount ?? 2500);
+    if (pay.includeProcessingFee || pay.processingFeeSelected) total += (pay.processingFee ?? pay.processingFeeAmount ?? 2000);
     if (pay.includeEmdFee || pay.emdFeeSelected) total += (pay.emdFee ?? pay.emdFeeAmount ?? 50000);
     return total;
   });
@@ -240,9 +240,9 @@ export class EoiService {
 
   private getInitialPaymentData(): PaymentData {
     return {
-      processingFee: 2500,
+      processingFee: 2000,
       emdFee: 50000,
-      processingFeeAmount: 2500,
+      processingFeeAmount: 2000,
       emdFeeAmount: 50000,
       includeProcessingFee: false,
       includeEmdFee: false,
@@ -860,7 +860,7 @@ export class EoiService {
       current.includeEmdFee = checked;
       current.emdFeeSelected = checked;
     }
-    current.totalAmount = (current.includeProcessingFee || current.processingFeeSelected ? (current.processingFee || 500) : 0) +
+    current.totalAmount = (current.includeProcessingFee || current.processingFeeSelected ? (current.processingFee || 2000) : 0) +
       (current.includeEmdFee || current.emdFeeSelected ? (current.emdFee || 100000) : 0);
     this.paymentData.set(current);
     this.persistToStorage();
@@ -893,7 +893,7 @@ export class EoiService {
       };
       curForm.section8 = {
         process_fee_payment_id: `PF-TXN-${randHex}`,
-        process_fee_amount: updated.includeProcessingFee || updated.processingFeeSelected ? (updated.processingFee || 500) : 0,
+        process_fee_amount: updated.includeProcessingFee || updated.processingFeeSelected ? (updated.processingFee || 2000) : 0,
         process_fee_payment_date: new Date().toISOString().split('T')[0]
       };
       this.formData.set(curForm);

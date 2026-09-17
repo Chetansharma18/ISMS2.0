@@ -51,9 +51,9 @@ export class PdfGeneratorService {
     const txnId = sanitize(data.transactionId || 'TXN-ISMS-2026-884921');
     const payMethod = sanitize(data.paymentMethod || 'UPI / Internet Banking');
     const payDate = sanitize(data.paymentDate || '08-Sep-2026');
-    const procFee = data.processingFee || 500;
-    const emdFee = data.emdFee || 100000;
-    const totalFee = data.totalFee || 100500;
+    const procFee = data.processingFee || 2000;
+    const emdFee = data.emdFee || 50000;
+    const totalFee = data.totalFee || (procFee + emdFee);
 
     const streamCommands = [
       // Outer Page Border

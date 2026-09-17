@@ -192,7 +192,7 @@ export type FontSize = 'sm' | 'md' | 'lg';
               routerLinkActive="bg-[#002244]/10 text-[#002244] font-bold border-l-2 border-[#002244]"
               class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-md transition">
               <span>📋</span>
-              <span>Tenders</span>
+              <span>Active Tenders</span>
             </a>
             <a 
               routerLink="/profile" 

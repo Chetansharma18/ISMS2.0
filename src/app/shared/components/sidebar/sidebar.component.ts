@@ -28,7 +28,7 @@ import { Observable, filter } from 'rxjs';
                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
               </svg>
             </div>
-            <span class="tracking-tight whitespace-nowrap">Tenders</span>
+            <span class="tracking-tight whitespace-nowrap">Active Tenders</span>
           </a>
 
           <!-- 2. Profile -->
@@ -231,7 +231,7 @@ import { Observable, filter } from 'rxjs';
         </ng-container>
 
         <!-- ================= DEPARTMENT WORKFLOW MENUS ================= -->
-        <ng-container *ngIf="authService.hasRole(['SUPER_ADMIN', 'DEPARTMENT_ADMIN'])">
+        <ng-container *ngIf="profile.role !== 'applicant' && authService.hasRole(['SUPER_ADMIN', 'DEPARTMENT_ADMIN'])">
           <div class="pt-2 mt-2 border-t border-slate-200">
              <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                Dept Workflow (ISMS 2.0)
@@ -284,7 +284,7 @@ import { Observable, filter } from 'rxjs';
         </ng-container>
 
         <!-- ================= TP / EXECUTION MENUS ================= -->
-        <ng-container *ngIf="authService.currentUser()?.role === 'TP_PIA'">
+        <ng-container *ngIf="profile.role !== 'applicant' && authService.currentUser()?.role === 'TP_PIA'">
           <div class="pt-2 mt-2 border-t border-slate-200">
              <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                Execution (ISMS 2.0)
@@ -337,7 +337,7 @@ import { Observable, filter } from 'rxjs';
         </ng-container>
 
         <!-- ================= AUDITOR MENUS ================= -->
-        <ng-container *ngIf="authService.hasRole(['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'])">
+        <ng-container *ngIf="profile.role !== 'applicant' && authService.hasRole(['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'])">
           <div class="pt-2 mt-2 border-t border-slate-200">
              <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                Auditor Workflow

@@ -46,31 +46,6 @@ import { Observable } from 'rxjs';
               </h1>
             </div>
 
-            <!-- Profile Incomplete Alert Banner for New Applicant -->
-            <div *ngIf="userProfile$ | async as profile">
-              <div *ngIf="profile.role === 'applicant' && (!profile.isRegistered || profile.userState === 'new')" 
-                class="bg-amber-50 border border-amber-300 border-l-4 border-l-amber-500 p-4 rounded-xs shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div class="flex items-start gap-3">
-                  <div class="w-8 h-8 rounded-full bg-amber-500 text-[#002244] flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
-                    ⚠️
-                  </div>
-                  <div>
-                    <div class="font-bold text-[#002244] text-xs sm:text-sm">Please complete your profile first</div>
-                    <div class="text-[11.5px] text-amber-900 mt-0.5">
-                      Your entity profile is currently incomplete. Please complete your profile to view full tender specifications and submit EOI proposals.
-                    </div>
-                  </div>
-                </div>
-                <button 
-                  type="button" 
-                  (click)="goToRegistration()"
-                  class="shrink-0 px-4 py-2 bg-[#002244] hover:bg-[#003366] text-white text-xs font-bold rounded-xs transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer">
-                  <span>Complete Profile Now</span>
-                  <span>→</span>
-                </button>
-              </div>
-            </div>
-
             <!-- Crisp Government Schemes Table -->
             <div class="bg-white border border-slate-200 shadow-sm rounded-xs overflow-hidden">
               <div class="w-full overflow-x-auto">
@@ -621,14 +596,14 @@ import { Observable } from 'rxjs';
           <div class="bg-[#002244] text-white px-5 py-4 flex items-center justify-between border-b-3 border-amber-500">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 rounded-full bg-amber-500 text-[#002244] flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
-                ⚠️
+                !
               </div>
               <div>
                 <h3 class="text-sm font-bold text-white leading-tight">
-                  Please Complete Your Profile First
+                  One-Time Registration (OTR) Profile Required
                 </h3>
                 <p class="text-[11px] text-amber-300 font-medium">
-                  Profile Incomplete · One-Time Registration (OTR) Required
+                  Official Profile Incomplete · Rajasthan Procurement Rules
                 </p>
               </div>
             </div>
@@ -644,27 +619,23 @@ import { Observable } from 'rxjs';
           <!-- Modal Body -->
           <div class="p-6 space-y-4 text-xs leading-relaxed text-slate-600">
             <p>
-              To view complete tender details and submit an EOI proposal for <strong class="text-[#002244]">{{ selectedScheme?.name }}</strong>, please complete your entity profile verification first.
+              To apply for <strong class="text-[#002244]">{{ selectedScheme?.name }}</strong>, your organization must have a 100% verified <strong>One-Time Registration (OTR)</strong> profile with active verified documents.
             </p>
 
             <div class="bg-amber-50 border border-amber-200 p-3.5 rounded-xs space-y-2">
-              <div class="font-bold text-amber-900 text-xs">Required Profile Sections to Complete:</div>
+              <div class="font-bold text-amber-900 text-xs">Missing or Pending Profile Data:</div>
               <div class="space-y-1.5 text-[11.5px] text-amber-800">
                 <div class="flex items-center gap-2">
                   <span class="text-amber-600 font-bold">•</span>
-                  <span>1. Organisation / Company Basic Details</span>
+                  <span>Registered Business Entity &amp; GSTIN Verification</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <span class="text-amber-600 font-bold">•</span>
-                  <span>2. Authorized Person Details</span>
+                  <span>Audited Financial Statements (Last 3 Financial Years)</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <span class="text-amber-600 font-bold">•</span>
-                  <span>3. Bank Mandate Details (PFMS Verified)</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="text-amber-600 font-bold">•</span>
-                  <span>4. Statutory Document Uploads</span>
+                  <span>Authorized Signatory Identity Verification (Aadhaar / SSO)</span>
                 </div>
               </div>
             </div>
@@ -766,18 +737,10 @@ export class SchemeListingComponent implements OnInit {
 
   selectScheme(scheme: Scheme): void {
     this.selectedScheme = scheme;
-
-    // Check if user is a new applicant with incomplete profile
-    this.eoiService.userProfile$.subscribe(profile => {
-      if (profile && profile.role === 'applicant' && (!profile.isRegistered || profile.userState === 'new')) {
-        this.showProfileRequiredModal = true;
-      } else {
-        this.viewMode = 'details';
-        if (typeof window !== 'undefined') {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-      }
-    }).unsubscribe();
+    this.viewMode = 'details';
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   onApplyClicked(scheme: Scheme): void {
@@ -785,7 +748,7 @@ export class SchemeListingComponent implements OnInit {
 
     // Check if user has an active, verified profile
     this.eoiService.userProfile$.subscribe(profile => {
-      if (!profile || !profile.isRegistered || profile.userState === 'new') {
+      if (!profile || !profile.isRegistered) {
         this.showProfileRequiredModal = true;
       } else {
         // Navigate directly into multi-step proposal submission workflow
@@ -796,7 +759,7 @@ export class SchemeListingComponent implements OnInit {
 
   goToRegistration(): void {
     this.showProfileRequiredModal = false;
-    this.router.navigate(['/profile']);
+    this.router.navigate(['/auth/register']);
   }
 
   showTable(): void {

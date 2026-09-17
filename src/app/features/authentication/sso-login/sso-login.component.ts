@@ -3,11 +3,12 @@ import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NgIf, NgFor, NgClass } from '@angular/common';
 import { EoiStateService } from '../../../core/services/eoi-state.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-sso-login',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, NgFor, NgClass, RouterLink],
+  imports: [ReactiveFormsModule, NgIf, NgFor, RouterLink],
   template: `
     <div class="min-h-screen flex flex-col bg-white font-sans text-slate-800 antialiased selection:bg-[#131A4D] selection:text-white">
       
@@ -241,7 +242,7 @@ import { EoiStateService } from '../../../core/services/eoi-state.service';
                     (click)="fillAndSubmitPersona('applicant')"
                     class="p-2 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 border border-slate-200 text-slate-700 text-left transition-colors">
                     <div class="font-bold text-slate-900">2. applicant_rj</div>
-                    <div class="text-[9px] text-blue-700 mt-0.5">Existing TP (Full Nav)</div>
+                    <div class="text-[9px] text-blue-700 mt-0.5">Approved TP (SDC Flow)</div>
                   </button>
 
                   <button 
@@ -252,12 +253,13 @@ import { EoiStateService } from '../../../core/services/eoi-state.service';
                     <div class="text-[9px] text-cyan-700 mt-0.5">Dept. Scrutiny Admin</div>
                   </button>
 
+
                   <button 
                     type="button"
                     (click)="fillAndSubmitPersona('super')"
                     class="p-2 bg-slate-50 hover:bg-purple-50 hover:border-purple-300 border border-slate-200 text-slate-700 text-left transition-colors">
                     <div class="font-bold text-purple-900">4. super_admin_rj</div>
-                    <div class="text-[9px] text-purple-700 mt-0.5">State Super Admin</div>
+                    <div class="text-[9px] text-purple-700 mt-0.5">Master Control</div>
                   </button>
                 </div>
               </div>
@@ -282,6 +284,7 @@ export class SsoLoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private eoiService: EoiStateService,
+    private authService: AuthService,
     private router: Router
   ) {}
 
@@ -373,13 +376,23 @@ export class SsoLoginComponent implements OnInit {
       const rawSsoId = (val.ssoId || 'applicant_rj').trim();
       const ssoLower = rawSsoId.toLowerCase();
 
-      // Branching by Role & User State
+      // New ISMS 2.0 Auth Flow (Bypass EOI legacy if using ISMS roles)
+      if (ssoLower === 'tppia' || ssoLower === 'applicant_rj') {
+        this.authService.login(ssoLower).subscribe(() => {
+          this.router.navigate(['/dashboard']);
+        });
+        return;
+      }
+
+      // Legacy Branching by Role & User State
       if (ssoLower.includes('super') || ssoLower.includes('root') || ssoLower.includes('sysadmin')) {
         // Super Admin -> Dashboard
+        this.authService.login('superadmin').subscribe();
         this.eoiService.resetToSuperAdmin(rawSsoId);
         this.router.navigate(['/admin/dashboard']);
       } else if (ssoLower.includes('dept') || ssoLower.includes('officer') || ssoLower.includes('scrutiny')) {
         // Department Admin -> EOI View
+        this.authService.login('deptadmin').subscribe();
         this.eoiService.resetToDeptAdmin(rawSsoId);
         this.router.navigate(['/admin/eoi-view']);
       } else if (ssoLower.includes('new') || ssoLower.includes('citizen') || ssoLower.includes('reg') || ssoLower.includes('fresh')) {
@@ -387,7 +400,7 @@ export class SsoLoginComponent implements OnInit {
         this.eoiService.resetToNewCitizen(rawSsoId);
         this.router.navigate(['/schemes']);
       } else {
-        // Existing Registered Training Partner / Applicant -> Full Schemes Dashboard
+        // Fallback for any other legacy roles
         this.eoiService.resetToRegisteredApplicant(rawSsoId);
         this.router.navigate(['/schemes']);
       }

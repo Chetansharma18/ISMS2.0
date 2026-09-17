@@ -37,7 +37,8 @@ import { RouterModule } from '@angular/router';
       <!-- Navigation Links Container -->
       <nav class="flex-1 overflow-y-auto px-2.5 py-3 space-y-1 text-xs font-medium min-h-0">
         
-        <!-- DASHBOARD -->
+        <!-- DASHBOARD (Commented out per request) -->
+        <!--
         <a 
           routerLink="/admin/dashboard" 
           routerLinkActive="bg-[#EEF3F7] text-[#0B3558] font-semibold border-l-[3px] border-[#0B3558]"
@@ -47,6 +48,7 @@ import { RouterModule } from '@angular/router';
           <span class="material-symbols-outlined text-[20px] text-[#61778B] group-hover:text-[#0B3558] transition-colors">dashboard</span>
           <span>DASHBOARD</span>
         </a>
+        -->
 
         <!-- MASTERS (Collapsible Accordion) -->
         <div>

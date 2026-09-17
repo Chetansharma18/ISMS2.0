@@ -1,0 +1,27 @@
+{
+  "schemes": [
+    { "id": "SCH-001", "name": "SAMARTH", "category": "State Fund", "status": "ACTIVE" },
+    { "id": "SCH-002", "name": "PMKVY", "category": "Central Fund", "status": "ACTIVE" },
+    { "id": "SCH-003", "name": "SAKSHAM", "category": "State Fund", "status": "DRAFT" }
+  ],
+  "states": [
+    { "id": "ST-01", "name": "Rajasthan" }
+  ],
+  "districts": [
+    { "id": "D-01", "stateId": "ST-01", "name": "Jaipur" },
+    { "id": "D-02", "stateId": "ST-01", "name": "Ajmer" },
+    { "id": "D-03", "stateId": "ST-01", "name": "Jodhpur" },
+    { "id": "D-04", "stateId": "ST-01", "name": "Udaipur" }
+  ],
+  "sectors": [
+    { "id": "SEC-01", "name": "IT-ITeS" },
+    { "id": "SEC-02", "name": "Apparel" },
+    { "id": "SEC-03", "name": "Healthcare" },
+    { "id": "SEC-04", "name": "Construction" }
+  ],
+  "courses": [
+    { "id": "C-01", "sectorId": "SEC-01", "name": "Data Entry Operator", "durationHours": 400 },
+    { "id": "C-02", "sectorId": "SEC-01", "name": "Web Developer", "durationHours": 500 },
+    { "id": "C-03", "sectorId": "SEC-02", "name": "Sewing Machine Operator", "durationHours": 300 }
+  ]
+}

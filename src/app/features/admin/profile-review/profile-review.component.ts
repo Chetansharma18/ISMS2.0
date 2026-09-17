@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NgIf, NgFor, NgClass, AsyncPipe, DecimalPipe } from '@angular/common';
@@ -10,7 +10,8 @@ import { Observable } from 'rxjs';
 @Component({
   selector: 'app-profile-review',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, NgIf, NgFor, NgClass, AsyncPipe, DecimalPipe, HeaderComponent, SidebarComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ReactiveFormsModule, RouterLink, NgIf, NgFor, NgClass, HeaderComponent, SidebarComponent],
   template: `
     <div class="h-screen flex flex-col bg-[#F4F7F9] font-sans text-slate-800 antialiased overflow-hidden">
       <app-header class="shrink-0"></app-header>
@@ -30,7 +31,7 @@ import { Observable } from 'rxjs';
                 <span>/</span>
                 <a routerLink="/admin/responses" class="text-[#0B3558] font-medium hover:underline">Applicant Responses</a>
                 <span>/</span>
-                <span class="font-semibold text-[#172B3A]">{{ selectedApplicant?.applicationId }}</span>
+                <span class="font-bold text-slate-700">{{ selectedApplicant()?.applicationId }}</span>
               </div>
               <h1 class="text-[28px] font-bold text-[#0B3558] tracking-tight leading-[36px]">
                 EOI Detailed Scrutiny & Evaluation Desk
@@ -49,28 +50,28 @@ import { Observable } from 'rxjs';
                       Tender Details
                     </h2>
                   </div>
-                  <span class="text-[11px] text-[#EEF3F7]">
-                    Submission Date: {{ selectedApplicant?.submissionDate }}
+                  <span class="text-[10px] font-mono text-blue-200">
+                    Submission Date: {{ selectedApplicant()?.submissionDate }}
                   </span>
                 </div>
 
                 <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-700">
                   <div>
                     <span class="text-slate-400 block text-[11px]">Scheme Name:</span>
-                    <span class="font-semibold text-[#172B3A] text-sm">{{ selectedApplicant?.schemeName }}</span>
+                    <span class="font-bold text-slate-900 text-sm">{{ selectedApplicant()?.schemeName }}</span>
                   </div>
                   <div>
-                    <span class="text-[#5F6F7E] block text-[11px]">Application Reference ID:</span>
-                    <span class="font-mono font-semibold text-[#0B3558]">{{ selectedApplicant?.applicationId }}</span>
+                    <span class="text-slate-400 block text-[11px]">Application Reference ID:</span>
+                    <span class="font-mono font-bold text-[#131A4D]">{{ selectedApplicant()?.applicationId }}</span>
                   </div>
                   <div>
-                    <span class="text-[#5F6F7E] block text-[11px]">Target Training Capacity:</span>
-                    <span class="font-mono font-semibold text-[#172B3A]">{{ selectedApplicant?.proposalCapacity }} Candidates / Year</span>
+                    <span class="text-slate-400 block text-[11px]">Target Training Capacity:</span>
+                    <span class="font-mono font-bold text-slate-900">{{ selectedApplicant()?.proposalCapacity }} Candidates / Year</span>
                   </div>
                   <div>
                     <span class="text-[#5F6F7E] block text-[11px]">Proposed Rajasthan District Centers:</span>
                     <div class="flex flex-wrap gap-1.5 mt-1">
-                      <span *ngFor="let dist of selectedApplicant?.proposedDistricts" class="px-2 py-0.5 bg-[#F6F8FA] border border-[#D9E1E8] text-[#172B3A] font-medium text-[11px] rounded-[4px]">
+                      <span *ngFor="let dist of selectedApplicant()?.proposedDistricts" class="px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-[11px] rounded-full">
                         {{ dist }}
                       </span>
                     </div>
@@ -85,24 +86,24 @@ import { Observable } from 'rxjs';
                     Step 1: Organisation / Company Basic Details
                   </span>
                 </div>
-                <div class="p-5 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-[#172B3A]">
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Application No.</span><span class="font-mono font-semibold text-[#0B3558]">{{ selectedApplicant?.applicationId || 'ISMS-TP-892134' }}</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">TP/PIA Full Name</span><span class="font-semibold text-[#172B3A]">{{ selectedApplicant?.organizationName || 'N/A' }}</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">TP/PIA Short Name</span><span class="font-semibold text-[#172B3A]">APEX-TECH</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Registration Number</span><span class="font-mono text-[#172B3A]">{{ selectedApplicant?.registrationNumber || 'N/A' }}</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Organisation Contact No.</span><span class="font-mono text-[#172B3A]">{{ selectedApplicant?.contactMobile || '+91 98201 44520' }}</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Company Email-ID</span><span class="font-mono text-[#172B3A]">{{ selectedApplicant?.contactEmail || 'contact@example.com' }}</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Organisation PAN No.</span><span class="font-mono font-semibold text-[#172B3A]">{{ selectedApplicant?.pan || 'AABCA1294F' }}</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Website</span><span class="text-[#0B3558] hover:underline cursor-pointer">https://apextechnical.in</span></div>
-                  <div class="md:col-span-3"><span class="text-[#5F6F7E] block text-[11px]">Registered Address</span><span class="text-[#172B3A]">123, RIICO Industrial Area, Phase II</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">State/UT</span><span class="text-[#172B3A]">Rajasthan</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">District</span><span class="text-[#172B3A]">Jaipur</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Pincode</span><span class="font-mono text-[#172B3A]">302022</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Turn Over (₹ in Lakhs)</span><span class="font-mono font-semibold text-[#172B3A]">₹ 850.50</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Date of Registration</span><span class="font-mono text-[#172B3A]">12/05/2015</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">State Where Registered</span><span class="text-[#172B3A]">Rajasthan</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Type of business/activity</span><span class="text-[#172B3A]">Skill Training Provider</span></div>
-                  <div class="md:col-span-3"><span class="text-[#5F6F7E] block text-[11px]">Postal Address</span><span class="text-[#172B3A]">123, RIICO Industrial Area, Phase II (Same as Registered)</span></div>
+                <div class="p-5 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-700">
+                  <div><span class="text-slate-400 block text-[11px]">Application No.</span><span class="font-mono font-bold text-[#131A4D]">{{ selectedApplicant()?.applicationId || 'ISMS-TP-892134' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">TP/PIA Full Name</span><span class="font-bold text-slate-900">{{ selectedApplicant()?.organizationName || 'N/A' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">TP/PIA Short Name</span><span class="font-bold text-slate-900">APEX-TECH</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Registration Number</span><span class="font-mono text-slate-900">{{ selectedApplicant()?.registrationNumber || 'N/A' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Organisation Contact No.</span><span class="font-mono text-slate-800">{{ selectedApplicant()?.contactMobile || '+91 98201 44520' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Company Email-ID</span><span class="font-mono text-slate-800">{{ selectedApplicant()?.contactEmail || 'contact@example.com' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Organisation PAN No.</span><span class="font-mono font-bold text-slate-900">{{ selectedApplicant()?.pan || 'AABCA1294F' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Website</span><span class="text-blue-600 hover:underline cursor-pointer">https://apextechnical.in</span></div>
+                  <div class="md:col-span-3"><span class="text-slate-400 block text-[11px]">Registered Address</span><span class="text-slate-900">123, RIICO Industrial Area, Phase II</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">State/UT</span><span class="text-slate-900">Rajasthan</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">District</span><span class="text-slate-900">Jaipur</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Pincode</span><span class="font-mono text-slate-900">302022</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Turn Over (₹ in Lakhs)</span><span class="font-mono font-bold text-slate-900">₹ 850.50</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Date of Registration</span><span class="font-mono text-slate-900">12/05/2015</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">State Where Registered</span><span class="text-slate-900">Rajasthan</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Type of business/activity</span><span class="text-slate-900">Skill Training Provider</span></div>
+                  <div class="md:col-span-3"><span class="text-slate-400 block text-[11px]">Postal Address</span><span class="text-slate-900">123, RIICO Industrial Area, Phase II (Same as Registered)</span></div>
                 </div>
               </div>
 
@@ -113,24 +114,24 @@ import { Observable } from 'rxjs';
                     Step 2: Authorized Person Details (Organisation Level)
                   </span>
                 </div>
-                <div class="p-5 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-[#172B3A]">
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Name</span><span class="font-semibold text-[#172B3A]">{{ selectedApplicant?.applicantName || 'Vikramaditya Sharma' }}</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">S/O, D/O, W/O</span><span class="text-[#172B3A]">Shri R.K. Sharma</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Date of Birth</span><span class="font-mono text-[#172B3A]">14/08/1982</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Age</span><span class="font-mono text-[#172B3A]">44</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Designation</span><span class="text-[#172B3A]">Managing Director</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Mobile No.</span><span class="font-mono text-[#172B3A]">{{ selectedApplicant?.contactMobile || '+91 98201 44520' }}</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Email-Id</span><span class="font-mono text-[#172B3A]">{{ selectedApplicant?.contactEmail || 'v.sharma@apextechnical.in' }}</span></div>
-                  <div class="md:col-span-3"><span class="text-[#5F6F7E] block text-[11px]">Residence Address</span><span class="text-[#172B3A]">45-B, Civil Lines, Jaipur</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">State</span><span class="text-[#172B3A]">Rajasthan</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">PAN</span><span class="font-mono font-semibold text-[#172B3A]">BGPPS4512K</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Aadhaar No.</span><span class="font-mono font-semibold text-[#172B3A]">XXXX-XXXX-4512</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Type ID Proof</span><span class="text-[#172B3A]">Aadhaar Card</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">ID No.</span><span class="font-mono text-[#172B3A]">XXXX-XXXX-4512</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Bhamashah No.</span><span class="font-mono text-[#172B3A]">Not Provided</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Voter Id No.</span><span class="font-mono text-[#172B3A]">RJP1245789</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Passport No.</span><span class="font-mono text-[#172B3A]">Z8945123</span></div>
-                  <div><span class="text-[#5F6F7E] block text-[11px]">Service Tax No.</span><span class="font-mono text-[#172B3A]">Not Provided</span></div>
+                <div class="p-5 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-700">
+                  <div><span class="text-slate-400 block text-[11px]">Name</span><span class="font-bold text-slate-900">{{ selectedApplicant()?.applicantName || 'Vikramaditya Sharma' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">S/O, D/O, W/O</span><span class="text-slate-900">Shri R.K. Sharma</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Date of Birth</span><span class="font-mono text-slate-900">14/08/1982</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Age</span><span class="font-mono text-slate-900">44</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Designation</span><span class="text-slate-900">Managing Director</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Mobile No.</span><span class="font-mono text-slate-800">{{ selectedApplicant()?.contactMobile || '+91 98201 44520' }}</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Email-Id</span><span class="font-mono text-slate-800">{{ selectedApplicant()?.contactEmail || 'v.sharma@apextechnical.in' }}</span></div>
+                  <div class="md:col-span-3"><span class="text-slate-400 block text-[11px]">Residence Address</span><span class="text-slate-900">45-B, Civil Lines, Jaipur</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">State</span><span class="text-slate-900">Rajasthan</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">PAN</span><span class="font-mono font-bold text-slate-900">BGPPS4512K</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Aadhaar No.</span><span class="font-mono font-bold text-slate-900">XXXX-XXXX-4512</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Type ID Proof</span><span class="text-slate-900">Aadhaar Card</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">ID No.</span><span class="font-mono text-slate-900">XXXX-XXXX-4512</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Bhamashah No.</span><span class="font-mono text-slate-900">Not Provided</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Voter Id No.</span><span class="font-mono text-slate-900">RJP1245789</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Passport No.</span><span class="font-mono text-slate-900">Z8945123</span></div>
+                  <div><span class="text-slate-400 block text-[11px]">Service Tax No.</span><span class="font-mono text-slate-900">Not Provided</span></div>
                 </div>
               </div>
 
@@ -310,7 +311,7 @@ import { Observable } from 'rxjs';
                   <!-- 4. Decision Action / Final Status -->
                   <div class="pt-3 space-y-2">
                     
-                    <ng-container *ngIf="selectedApplicant?.scrutinyStatus === 'UNDER_SCRUTINY'; else decisionBadge">
+                    <ng-container *ngIf="selectedApplicant()?.scrutinyStatus === 'UNDER_SCRUTINY'; else decisionBadge">
                       <div class="flex justify-center gap-4" *ngIf="!pendingAction">
                         <!-- Accept Button -->
                         <button 
@@ -341,7 +342,7 @@ import { Observable } from 'rxjs';
 
                         <div class="text-xs text-[#172B3A] leading-relaxed border-b border-[#D9E1E8] pb-3">
                           <p *ngIf="pendingAction === 'APPROVED'">
-                            You are officially approving <strong>{{ selectedApplicant?.organizationName }}</strong> for the <strong>{{ selectedApplicant?.schemeName }}</strong> tender.
+                            You are officially approving <strong>{{ selectedApplicant()?.organizationName }}</strong> for the <strong>{{ selectedApplicant()?.schemeName }}</strong> tender.
                           </p>
                           <p *ngIf="pendingAction === 'REJECTED'">
                             You are rejecting this application. This will notify the applicant and trigger an EMD refund.
@@ -413,9 +414,9 @@ import { Observable } from 'rxjs';
 
                     <ng-template #decisionBadge>
                       <div 
-                        class="w-full py-2.5 rounded-[6px] font-semibold text-xs tracking-wide flex items-center justify-center text-white"
-                        [ngClass]="selectedApplicant?.scrutinyStatus === 'APPROVED' ? 'bg-[#16834B]' : 'bg-[#C62828]'">
-                        {{ selectedApplicant?.scrutinyStatus === 'APPROVED' ? '✓ Accepted' : '✕ Rejected' }}
+                        class="w-full py-2.5 rounded-full font-bold text-xs tracking-wide flex items-center justify-center text-white"
+                        [ngClass]="selectedApplicant()?.scrutinyStatus === 'APPROVED' ? 'bg-[#166534]' : 'bg-[#991b1b]'">
+                        {{ selectedApplicant()?.scrutinyStatus === 'APPROVED' ? '✓ Accepted' : '✕ Rejected' }}
                       </div>
                     </ng-template>
 
@@ -435,7 +436,7 @@ import { Observable } from 'rxjs';
   `
 })
 export class ProfileReviewComponent implements OnInit {
-  selectedApplicant: ApplicantResponse | null = null;
+  selectedApplicant = signal<ApplicantResponse | null>(null);
   reviewForm!: FormGroup;
   showConfirmModal = false;
   pendingAction: 'APPROVED' | 'REJECTED' | null = null;
@@ -464,7 +465,7 @@ export class ProfileReviewComponent implements OnInit {
       const id = params.get('applicationId');
       if (id) {
         const responses = this.eoiService.getApplicantResponses();
-        this.selectedApplicant = responses.find(r => r.applicationId === id) || null;
+        this.selectedApplicant.set(responses.find(r => r.applicationId === id) || null);
       }
     });
   }
@@ -531,20 +532,21 @@ export class ProfileReviewComponent implements OnInit {
   }
 
   executeDecision(): void {
-    if (!this.selectedApplicant || !this.pendingAction) return;
+    const applicant = this.selectedApplicant();
+    if (!applicant || !this.pendingAction) return;
 
-    this.eoiService.updateScrutinyDecision(this.selectedApplicant.applicationId, {
+    this.eoiService.updateScrutinyDecision(applicant.applicationId, {
       status: this.pendingAction,
       grade: this.pendingAction === 'APPROVED' ? this.reviewForm.value.grade : undefined,
       remarks: this.reviewForm.value.remarks
     });
 
-    this.selectedApplicant = {
-      ...this.selectedApplicant,
+    this.selectedApplicant.set({
+      ...applicant,
       scrutinyStatus: this.pendingAction,
       currentGrade: this.pendingAction === 'APPROVED' ? this.reviewForm.value.grade : null,
       emdStatus: this.pendingAction === 'REJECTED' ? 'REFUNDED' : 'PAID'
-    };
+    });
 
     this.showConfirmModal = false;
     this.decisionTaken = true;

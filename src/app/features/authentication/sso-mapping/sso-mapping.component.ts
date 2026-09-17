@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { EoiStateService } from '../../../core/services/eoi-state.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-sso-mapping',
@@ -119,6 +120,7 @@ export class SsoMappingComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private eoiService: EoiStateService,
+    private authService: AuthService,
     private router: Router
   ) { }
 
@@ -174,7 +176,11 @@ export class SsoMappingComponent implements OnInit {
         this.eoiService.updateProfile({
           personal: { ...updated.personal, email: email }
         });
-        this.router.navigate(['/schemes']);
+        
+        // Log into ISMS 2.0 and route to the new dashboard
+        this.authService.login('applicant_rj').subscribe(() => {
+          this.router.navigate(['/dashboard']);
+        });
       }
     }, 400);
   }

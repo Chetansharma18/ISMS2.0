@@ -61,6 +61,14 @@ import { Observable } from 'rxjs';
                 class="px-3.5 py-1.5 transition-colors rounded-xs">
                 Fee Structures ({{ (feeStructures$ | async)?.length }})
               </button>
+              <button 
+                (click)="activeTab = 'COURSES'"
+                [class.bg-[#131A4D]]="activeTab === 'COURSES'"
+                [class.text-white]="activeTab === 'COURSES'"
+                [class.text-slate-700]="activeTab !== 'COURSES'"
+                class="px-3.5 py-1.5 transition-colors rounded-xs border-l border-slate-200">
+                Sectors & Courses
+              </button>
             </div>
           </div>
 
@@ -196,6 +204,109 @@ import { Observable } from 'rxjs';
             </div>
           </div>
 
+          <!-- TAB 4: SECTORS & COURSES MASTER -->
+          <div *ngIf="activeTab === 'COURSES'" class="bg-white border border-slate-200 shadow-sm overflow-hidden rounded-xs">
+            <div class="bg-[#131A4D] text-white px-5 py-3 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span>📚</span>
+                <h2 class="text-xs font-bold uppercase tracking-wider">Sector & Course Catalog</h2>
+              </div>
+              <div class="flex gap-2">
+                <button class="px-3 py-1 bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold rounded-xs shadow-2xs transition-colors">
+                  + Add Sector
+                </button>
+                <button class="px-3 py-1 bg-white text-[#131A4D] hover:bg-slate-100 text-xs font-bold rounded-xs shadow-2xs transition-colors">
+                  + Add Course
+                </button>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div class="grid grid-cols-1 gap-6">
+                
+                <!-- Sector Block -->
+                <div class="border border-slate-200 rounded-lg overflow-hidden">
+                  <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
+                    <div>
+                      <h3 class="font-bold text-[#131A4D] text-sm">IT & ITeS</h3>
+                      <p class="text-xs text-slate-500">Sector Code: SEC-IT-01 • 2 Active Courses</p>
+                    </div>
+                    <button class="text-xs font-bold text-blue-600 hover:underline">Edit Sector</button>
+                  </div>
+                  <div class="p-4">
+                    <table class="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr class="text-slate-500 border-b border-slate-200 uppercase tracking-wider text-[10px]">
+                          <th class="pb-2 font-bold w-32">Course Code</th>
+                          <th class="pb-2 font-bold">Course Name</th>
+                          <th class="pb-2 font-bold">Duration (Hrs)</th>
+                          <th class="pb-2 font-bold">NSQF Level</th>
+                          <th class="pb-2 font-bold text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100">
+                        <tr class="hover:bg-slate-50 transition-colors">
+                          <td class="py-2 font-mono font-bold text-[#131A4D]">C-01</td>
+                          <td class="py-2 font-bold text-slate-700">Data Entry Operator</td>
+                          <td class="py-2">400</td>
+                          <td class="py-2 font-bold">Level 4</td>
+                          <td class="py-2 text-right">
+                            <button class="text-blue-600 hover:underline font-bold text-[10px]">Edit</button>
+                          </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                          <td class="py-2 font-mono font-bold text-[#131A4D]">C-02</td>
+                          <td class="py-2 font-bold text-slate-700">Web Developer</td>
+                          <td class="py-2">600</td>
+                          <td class="py-2 font-bold">Level 5</td>
+                          <td class="py-2 text-right">
+                            <button class="text-blue-600 hover:underline font-bold text-[10px]">Edit</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Sector Block -->
+                <div class="border border-slate-200 rounded-lg overflow-hidden">
+                  <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
+                    <div>
+                      <h3 class="font-bold text-[#131A4D] text-sm">Apparel & Textiles</h3>
+                      <p class="text-xs text-slate-500">Sector Code: SEC-APP-02 • 1 Active Course</p>
+                    </div>
+                    <button class="text-xs font-bold text-blue-600 hover:underline">Edit Sector</button>
+                  </div>
+                  <div class="p-4">
+                    <table class="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr class="text-slate-500 border-b border-slate-200 uppercase tracking-wider text-[10px]">
+                          <th class="pb-2 font-bold w-32">Course Code</th>
+                          <th class="pb-2 font-bold">Course Name</th>
+                          <th class="pb-2 font-bold">Duration (Hrs)</th>
+                          <th class="pb-2 font-bold">NSQF Level</th>
+                          <th class="pb-2 font-bold text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100">
+                        <tr class="hover:bg-slate-50 transition-colors">
+                          <td class="py-2 font-mono font-bold text-[#131A4D]">C-03</td>
+                          <td class="py-2 font-bold text-slate-700">Sewing Machine Operator</td>
+                          <td class="py-2">250</td>
+                          <td class="py-2 font-bold">Level 3</td>
+                          <td class="py-2 text-right">
+                            <button class="text-blue-600 hover:underline font-bold text-[10px]">Edit</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
           <!-- Add Department Simple Modal -->
           <div *ngIf="showAddDeptModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
             <div class="bg-white border border-slate-300 max-w-md w-full overflow-hidden shadow-2xl rounded-xs">
@@ -234,7 +345,7 @@ import { Observable } from 'rxjs';
   `
 })
 export class MastersComponent implements OnInit {
-  activeTab: 'DEPT' | 'SCHEMES' | 'FEES' = 'DEPT';
+  activeTab: 'DEPT' | 'SCHEMES' | 'FEES' | 'COURSES' = 'DEPT';
   departments$!: Observable<DepartmentMaster[]>;
   schemeMasters$!: Observable<SchemeMaster[]>;
   feeStructures$!: Observable<FeeStructureMaster[]>;

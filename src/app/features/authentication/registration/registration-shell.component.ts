@@ -2,7 +2,9 @@ import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } 
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { EoiStateService } from '../../../core/services/eoi-state.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { TpPiaRegistrationService } from './services/tp-pia-registration.service';
 import { FormValidationService } from './services/form-validation.service';
 import { TabOrgDetailsComponent } from './components/tab-org-details/tab-org-details.component';
@@ -405,6 +407,7 @@ export class RegistrationShellComponent implements OnInit {
   readonly valService = inject(FormValidationService);
   readonly eoiService = inject(EoiStateService);
   readonly router = inject(Router);
+  readonly authService = inject(AuthService);
 
   readonly activeTab = signal<number>(1);
   readonly showReviewModal = signal<boolean>(false);
@@ -568,11 +571,15 @@ export class RegistrationShellComponent implements OnInit {
 
   goToPortal() {
     this.showSuccessModal.set(false);
-    this.router.navigate(['/schemes']);
+    this.authService.login('applicant_rj').subscribe(() => {
+      this.router.navigate(['/dashboard']);
+    });
   }
 
   skipToPortal() {
     this.eoiService.resetToRegisteredApplicant(this.currentSsoId || 'applicant_rj');
-    this.router.navigate(['/schemes']);
+    this.authService.login('applicant_rj').subscribe(() => {
+      this.router.navigate(['/dashboard']);
+    });
   }
 }

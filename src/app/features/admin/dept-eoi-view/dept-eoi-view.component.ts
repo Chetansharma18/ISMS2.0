@@ -1,15 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { NgIf, NgFor, AsyncPipe, DatePipe, DecimalPipe, NgClass } from '@angular/common';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule, NgClass } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { EoiStateService, Scheme, UserProfile } from '../../../core/services/eoi-state.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
-import { Observable } from 'rxjs';
+import { UiTableComponent, TableColumn } from '../../../shared/components/ui/ui-table/ui-table.component';
 
 @Component({
   selector: 'app-dept-eoi-view',
   standalone: true,
-  imports: [RouterLink, NgIf, NgFor, AsyncPipe, DatePipe, DecimalPipe, NgClass, HeaderComponent, SidebarComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, NgClass, FormsModule, RouterLink, HeaderComponent, SidebarComponent, UiTableComponent],
   template: `
     <div class="h-screen flex flex-col bg-[#F6F8FA] font-sans text-[#172B3A] antialiased overflow-hidden">
       <app-header class="shrink-0"></app-header>
@@ -42,107 +44,101 @@ import { Observable } from 'rxjs';
               </div>
             </div>
 
-            <!-- Working Table -->
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-[13px] border-collapse">
-                <thead>
-                  <tr class="bg-[#EEF3F7] text-[#173B59] font-semibold border-b border-[#D9E1E8] text-[13px]">
-                    <th class="p-3 border-r border-[#D9E1E8]">No.</th>
-                    <th class="p-3 border-r border-[#D9E1E8]">EOI Ref No. & Scheme Name</th>
-                    <th class="p-3 border-r border-[#D9E1E8]">Category</th>
-                    <th class="p-3 border-r border-[#D9E1E8]">Published</th>
-                    <th class="p-3 border-r border-[#D9E1E8]">Deadline</th>
-                    <th class="p-3 border-r border-[#D9E1E8] text-center">Status</th>
-                    <th class="p-3 border-r border-[#D9E1E8] text-center">No. of Responses</th>
-                    <th class="p-3 text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-[#E8EDF2]">
-                  <tr *ngFor="let scheme of schemes$ | async; let i = index" class="hover:bg-[#F7FAFC] transition-colors">
-                    
-                    <!-- Index -->
-                    <td class="p-3 font-semibold text-[#5F6F7E] border-r border-[#D9E1E8]">
-                      {{ i + 1 }}
-                    </td>
+            <!-- Dense Working Table using UiTableComponent -->
+            <app-ui-table 
+              [columns]="tableColumns" 
+              [data]="schemes()" 
+              emptyMessage="No schemes found."
+              [showSearch]="false"
+              [showPagination]="false">
+              <ng-template #rowTemplate let-row let-column="column" let-i="index">
+                <ng-container [ngSwitch]="column.key">
+                  <!-- Index -->
+                  <div *ngSwitchCase="'index'" class="font-bold text-slate-500">
+                    {{ i + 1 }}
+                  </div>
 
-                    <!-- Scheme Name & Reference No -->
-                    <td class="p-3 border-r border-[#D9E1E8] max-w-sm">
-                      <div class="font-semibold text-[#172B3A] text-[13px]">
-                        {{ scheme.name }}
-                      </div>
-                      <div class="text-[11px] text-[#5F6F7E] mt-0.5">
-                        Ref: {{ scheme.eoiReferenceNo }}
-                      </div>
-                    </td>
+                  <!-- Scheme Name & Reference No -->
+                  <div *ngSwitchCase="'scheme'" class="max-w-sm">
+                    <div class="font-bold text-slate-900 text-xs">
+                      {{ row.name }}
+                    </div>
+                    <div class="text-[10px] text-slate-500 mt-0.5">
+                      Ref: {{ row.eoiReferenceNo }}
+                    </div>
+                  </div>
 
-                    <!-- Category -->
-                    <td class="p-3 border-r border-[#D9E1E8] text-[#172B3A] font-normal">
-                      {{ scheme.schemeCategory }}
-                    </td>
+                  <!-- Category -->
+                  <div *ngSwitchCase="'category'" class="text-slate-600 font-medium">
+                    {{ row.schemeCategory }}
+                  </div>
 
-                    <!-- Published Date -->
-                    <td class="p-3 border-r border-[#D9E1E8] text-[#172B3A]">
-                      {{ scheme.publishDate }}
-                    </td>
+                  <!-- Published Date -->
+                  <div *ngSwitchCase="'published'" class="text-slate-600">
+                    {{ row.publishDate }}
+                  </div>
 
-                    <!-- Submission Deadline -->
-                    <td class="p-3 border-r border-[#D9E1E8] font-semibold"
-                        [ngClass]="scheme.status === 'Closed' ? 'text-[#7A8793]' : 'text-[#C62828]'">
-                      {{ scheme.submissionLastDate }}
-                    </td>
+                  <!-- Submission Deadline -->
+                  <div *ngSwitchCase="'deadline'" class="font-bold" [ngClass]="row.status === 'Closed' ? 'text-slate-400' : 'text-red-700'">
+                    {{ row.submissionLastDate }}
+                  </div>
 
-                    <!-- Status Badge -->
-                    <td class="p-3 border-r border-[#D9E1E8] text-center">
-                      <span class="inline-flex items-center px-2 py-0.5 rounded-[4px] text-xs font-semibold"
-                            [ngClass]="scheme.status === 'Open' ? 'bg-[#E8F5E9] text-[#16834B]' : 'bg-[#F1F5F9] text-[#5F6F7E]'">
-                        {{ scheme.status }}
-                      </span>
-                    </td>
+                  <!-- Status Badge -->
+                  <div *ngSwitchCase="'status'">
+                    <span class="text-[11px] font-bold tracking-wide" [ngClass]="row.status === 'Open' ? 'text-emerald-700' : 'text-blue-700'">
+                      {{ row.status }}
+                    </span>
+                  </div>
 
-                    <!-- No. of Responses (Plain Text) -->
-                    <td class="p-3 border-r border-[#D9E1E8] text-center">
-                      <span class="font-bold text-[#0B3558] text-sm">
-                        {{ scheme.responseCount || 4 }}
-                      </span>
-                      <span class="text-[11px] font-medium text-[#5F6F7E] ml-1">EOIs</span>
-                    </td>
+                  <!-- No. of Responses -->
+                  <div *ngSwitchCase="'responses'">
+                    <span class="font-bold text-[#131A4D] text-sm">
+                      {{ row.responseCount || 4 }}
+                    </span>
+                    <span class="text-[10px] font-semibold text-slate-600 ml-1">EOIs</span>
+                  </div>
 
-                    <!-- Action -->
-                    <td class="p-3 text-center">
-                      <a 
-                        [routerLink]="['/admin/responses', scheme.id]" 
-                        class="px-2.5 py-1 text-[13px] text-[#0B3558] font-semibold hover:underline cursor-pointer transition-colors inline-block">
-                        View List
-                      </a>
-                      <span 
-                        *ngIf="scheme.status !== 'Closed'"
-                        class="px-2.5 py-1 text-[13px] text-[#7A8793] font-medium cursor-not-allowed inline-block select-none opacity-50"
-                        title="Tender is currently Open. Submissions can only be viewed after tender is Closed.">
-                        View List
-                      </span>
-                    </td>
-
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+                  <!-- Action -->
+                  <div *ngSwitchCase="'action'">
+                    <a 
+                      [routerLink]="['/admin/responses', row.id]" 
+                      class="px-2.5 py-1 text-xs text-[#131A4D] font-bold hover:underline cursor-pointer transition-colors inline-block">
+                      View List
+                    </a>
+                  </div>
+                  
+                  <div *ngSwitchDefault class="text-slate-700 text-sm font-medium">
+                    {{ row[column.key] }}
+                  </div>
+                </ng-container>
+              </ng-template>
+            </app-ui-table>
 
           </div>
-
         </main>
       </div>
-
     </div>
   `
 })
 export class DeptEoiViewComponent implements OnInit {
-  schemes$!: Observable<Scheme[]>;
-  userProfile$!: Observable<UserProfile>;
+  private eoiService = inject(EoiStateService);
 
-  constructor(private eoiService: EoiStateService) { }
+  schemes = signal<Scheme[]>([]);
+  userProfile = signal<UserProfile | null>(null);
+
+  tableColumns: TableColumn[] = [
+    { key: 'index', label: 'No.', width: '60px' },
+    { key: 'scheme', label: 'EOI Ref No. & Scheme Name' },
+    { key: 'category', label: 'Category' },
+    { key: 'published', label: 'Published' },
+    { key: 'deadline', label: 'Deadline' },
+    { key: 'status', label: 'Status', align: 'center' },
+    { key: 'responses', label: 'No. of Responses', align: 'center' },
+    { key: 'action', label: 'Action', align: 'center' }
+  ];
 
   ngOnInit(): void {
-    this.schemes$ = this.eoiService.schemes$;
-    this.userProfile$ = this.eoiService.userProfile$;
+    this.eoiService.schemes$.subscribe(data => this.schemes.set(data));
+    this.eoiService.userProfile$.subscribe(data => this.userProfile.set(data));
   }
 }

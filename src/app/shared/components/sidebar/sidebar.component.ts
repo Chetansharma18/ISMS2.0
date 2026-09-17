@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule, NgIf, AsyncPipe } from '@angular/common';
 import { EoiStateService, UserProfile } from '../../../core/services/eoi-state.service';
-import { Observable } from 'rxjs';
+import { AuthService } from '../../../core/auth/auth.service';
+import { Observable, filter } from 'rxjs';
 
 @Component({
   selector: 'app-sidebar',
@@ -229,8 +230,152 @@ import { Observable } from 'rxjs';
           </a>
         </ng-container>
 
-      </nav>
+        <!-- ================= DEPARTMENT WORKFLOW MENUS ================= -->
+        <ng-container *ngIf="authService.hasRole(['SUPER_ADMIN', 'DEPARTMENT_ADMIN'])">
+          <div class="pt-2 mt-2 border-t border-slate-200">
+             <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+               Dept Workflow (ISMS 2.0)
+             </div>
 
+             <!-- Course Scrutiny Queue -->
+             <a 
+               routerLink="/admin/courses" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                   <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Course Scrutiny Queue</span>
+             </a>
+             
+             <!-- Tender Management -->
+             <a 
+               routerLink="/department/tenders" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                   <polyline points="14 2 14 8 20 8"></polyline>
+                   <line x1="16" y1="13" x2="8" y2="13"></line>
+                   <line x1="16" y1="17" x2="8" y2="17"></line>
+                   <polyline points="10 9 9 9 8 9"></polyline>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Tender Management</span>
+             </a>
+
+             <!-- Sanction Orders -->
+             <a 
+               routerLink="/department/sanction-orders" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Sanction Orders</span>
+             </a>
+          </div>
+        </ng-container>
+
+        <!-- ================= TP / EXECUTION MENUS ================= -->
+        <ng-container *ngIf="authService.currentUser()?.role === 'TP_PIA'">
+          <div class="pt-2 mt-2 border-t border-slate-200">
+             <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+               Execution (ISMS 2.0)
+             </div>
+
+             <!-- Propose Courses -->
+             <a 
+               routerLink="/tp/courses" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M12 20h9"></path>
+                   <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Propose Courses</span>
+             </a>
+             
+             <!-- SDC Management -->
+             <a 
+               routerLink="/sdcs" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                   <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                 </svg>
+               </div>
+               <span class="tracking-tight">SDC Management</span>
+             </a>
+
+             <!-- Batch Management -->
+             <a 
+               routerLink="/batches" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                   <circle cx="9" cy="7" r="4"></circle>
+                   <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                   <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Batch Management</span>
+             </a>
+          </div>
+        </ng-container>
+
+        <!-- ================= AUDITOR MENUS ================= -->
+        <ng-container *ngIf="authService.hasRole(['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'])">
+          <div class="pt-2 mt-2 border-t border-slate-200">
+             <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+               Auditor Workflow
+             </div>
+             
+             <!-- Assigned TPs -->
+             <a 
+               routerLink="/auditor/tps" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                   <circle cx="9" cy="7" r="4"></circle>
+                   <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                   <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Assigned TPs</span>
+             </a>
+             
+             <!-- Dashboard / Overviews -->
+             <a 
+               routerLink="/auditor/dashboard" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                   <path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"/>
+                 </svg>
+               </div>
+               <span class="tracking-tight">My Inspections</span>
+             </a>
+          </div>
+        </ng-container>
+
+      </nav>
     </aside>
   `,
   styles: [`
@@ -271,6 +416,7 @@ import { Observable } from 'rxjs';
 export class SidebarComponent implements OnInit {
   userProfile$!: Observable<UserProfile>;
   isProfileOpen = true;
+  authService = inject(AuthService);
 
   constructor(private eoiService: EoiStateService, private router: Router) { }
 

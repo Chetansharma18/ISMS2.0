@@ -8,13 +8,15 @@ export const ADMIN_ROUTES: Routes = [
     component: AdminLayoutComponent,
     canActivate: [adminAuthGuard],
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: '', redirectTo: 'masters/schemes', pathMatch: 'full' },
       
-      // 1. Dashboard
+      // 1. Dashboard (Commented as per request)
+      /*
       {
         path: 'dashboard',
         loadComponent: () => import('./dashboard/dashboard.component').then(m => m.AdminDashboardComponent)
       },
+      */
 
       // 2. Masters - Schemes
       {

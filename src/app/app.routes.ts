@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { AuthenticatedLayoutComponent } from './layout/authenticated-layout/authenticated-layout.component';
+import { roleGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
   // Screen 1: Portal Landing (Krtika's Component)
@@ -159,6 +161,99 @@ export const routes: Routes = [
   {
     path: 'admin',
     loadChildren: () => import('./features/admin/admin.routes').then(m => m.ADMIN_ROUTES)
+  },
+
+  // ==========================================
+  // ISMS 2.0 NEW WORKFLOW ROUTES
+  // ==========================================
+  {
+    path: '',
+    component: AuthenticatedLayoutComponent,
+    canActivate: [roleGuard],
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
+      },
+      
+      // ================= DEPARTMENT MODULE =================
+      {
+        path: 'department/tenders',
+        loadComponent: () => import('./features/department/tender-management/tender-list.component').then(m => m.TenderListComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
+      },
+      {
+        path: 'department/sanction-orders',
+        loadComponent: () => import('./features/department/sanction-orders/sanction-order-list.component').then(m => m.SanctionOrderListComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
+      },
+      {
+        path: 'department/sanction-orders/create',
+        loadComponent: () => import('./features/department/sanction-orders/sanction-order-create.component').then(m => m.SanctionOrderCreateComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
+      },
+      {
+        path: 'admin/courses',
+        loadComponent: () => import('./features/admin/department/admin-courses.component').then(m => m.AdminCoursesComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
+      },
+      
+      // ================= AUDITOR MODULE =================
+      {
+        path: 'auditor/dashboard',
+        loadComponent: () => import('./features/auditor/auditor-dashboard.component').then(m => m.AuditorDashboardComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'] }
+      },
+      {
+        path: 'auditor/tps',
+        loadComponent: () => import('./features/auditor/auditor-tp-list.component').then(m => m.AuditorTpListComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'] }
+      },
+      {
+        path: 'auditor/tps/:id',
+        loadComponent: () => import('./features/auditor/auditor-tp-detail.component').then(m => m.AuditorTpDetailComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'] }
+      },
+      {
+        path: 'auditor/inspection/:id',
+        loadComponent: () => import('./features/auditor/inspection.component').then(m => m.InspectionComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'] }
+      },
+
+      // ================= TP MODULE =================
+      {
+        path: 'tp/courses',
+        loadComponent: () => import('./features/tp-pia/courses/tp-courses.component').then(m => m.TpCoursesComponent),
+        data: { roles: ['TP_PIA'] }
+      },
+
+      // ================= SDC MODULE =================
+      {
+        path: 'sdcs',
+        loadComponent: () => import('./features/sdc/pages/sdc-list/sdc-list.component').then(m => m.SdcListComponent),
+        data: { roles: ['TP_PIA'] }
+      },
+      {
+        path: 'sdcs/create',
+        loadComponent: () => import('./features/sdc/pages/sdc-create/sdc-create.component').then(m => m.SdcCreateComponent),
+        data: { roles: ['TP_PIA'] }
+      },
+      {
+        path: 'sdcs/:id',
+        loadComponent: () => import('./features/sdc/pages/sdc-detail/sdc-detail.component').then(m => m.SdcDetailComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'TP_PIA', 'INSPECTOR', 'APPROVAL_AUTHORITY', 'AUDITOR'] }
+      },
+      {
+        path: 'batches',
+        loadComponent: () => import('./features/batches/pages/batch-list/batch-list.component').then(m => m.BatchListComponent),
+        data: { roles: ['TP_PIA'] }
+      },
+      {
+        path: 'batches/create',
+        loadComponent: () => import('./features/batches/pages/batch-create/batch-create.component').then(m => m.BatchCreateComponent),
+        data: { roles: ['TP_PIA'] }
+      }
+    ]
   },
 
   // Fallback

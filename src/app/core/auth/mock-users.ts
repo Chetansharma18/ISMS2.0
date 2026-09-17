@@ -25,5 +25,13 @@ export const MOCK_USERS: User[] = [
     role: 'TP_PIA',
     permissions: ['create_sdc', 'create_batch', 'view_sdc', 'view_batch'],
     sdcId: null
+  },
+  {
+    id: '11',
+    username: 'new_citizen_rj',
+    name: 'New Citizen',
+    role: 'citizen',
+    permissions: [],
+    sdcId: null
   }
 ];

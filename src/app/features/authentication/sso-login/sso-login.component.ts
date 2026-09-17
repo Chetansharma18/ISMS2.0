@@ -397,9 +397,11 @@ export class SsoLoginComponent implements OnInit {
         this.eoiService.resetToDeptAdmin(rawSsoId);
         this.router.navigate(['/admin/eoi-view']);
       } else if (ssoLower.includes('new') || ssoLower.includes('citizen') || ssoLower.includes('reg') || ssoLower.includes('fresh')) {
-        // New User -> One-Time SSO ID to Email Mapping (/auth/sso-mapping)
+        // New User -> Directly to Active Schemes
         this.eoiService.resetToNewCitizen(rawSsoId);
-        this.router.navigate(['/auth/sso-mapping']);
+        this.authService.login('new_citizen_rj').subscribe(() => {
+          this.router.navigate(['/schemes']);
+        });
       } else {
         // Fallback for any other legacy roles
         this.eoiService.resetToRegisteredApplicant(rawSsoId);

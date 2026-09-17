@@ -13,8 +13,8 @@ export type FontSize = 'sm' | 'md' | 'lg';
   imports: [CommonModule, RouterLink, RouterModule, NgIf, AsyncPipe],
   template: `
     <!-- Top Government Authenticated Portal Header (Dual Logos, Bilingual, User Name & Profile) -->
-    <header class="w-full bg-[#f0f6fc] border-b border-slate-200/90 shadow-2xs font-['Poppins',sans-serif] sticky top-0 z-40 select-none">
-      <div class="w-full px-3 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3 flex items-center justify-between gap-2 sm:gap-4">
+    <header class="w-full bg-[#FFFFFF] border-b border-[#D9E1E8] font-sans sticky top-0 z-40 select-none h-[72px] min-h-[72px] flex items-center">
+      <div class="w-full px-3 sm:px-5 lg:px-6 py-2 flex items-center justify-between gap-2 sm:gap-4">
         
         <!-- Left Branding: Two Emblems (Ashoka + RSLDC) + Government Titles + ISMS 2.0 -->
         <div class="flex items-center gap-1.5 sm:gap-3.5 lg:gap-4 min-w-0 cursor-pointer" routerLink="/">
@@ -24,7 +24,7 @@ export type FontSize = 'sm' | 'md' | 'lg';
             <img 
               src="emblem-new.png" 
               alt="Government of Rajasthan - State Emblem of India"
-              class="h-9 sm:h-[52px] lg:h-[60px] w-auto object-contain select-none" 
+              class="h-9 sm:h-[48px] lg:h-[54px] w-auto object-contain select-none" 
             />
           </div>
 
@@ -33,20 +33,20 @@ export type FontSize = 'sm' | 'md' | 'lg';
             <img 
               src="rsldc-logo.png" 
               alt="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)"
-              class="h-9 w-9 sm:h-[52px] sm:w-[52px] lg:h-[60px] lg:w-[60px] object-contain select-none drop-shadow-2xs" 
+              class="h-9 w-9 sm:h-[48px] sm:w-[48px] lg:h-[54px] lg:w-[54px] object-contain select-none" 
             />
           </div>
 
           <!-- Thin Vertical Divider Line -->
-          <div class="h-7 sm:h-10 lg:h-11 w-[1.5px] bg-slate-300 mx-0.5 sm:mx-2 lg:mx-2.5 shrink-0"></div>
+          <div class="h-7 sm:h-9 lg:h-10 w-[1.5px] bg-[#D9E1E8] mx-0.5 sm:mx-2 lg:mx-2.5 shrink-0"></div>
 
-          <!-- System Branding: ISMS in Navy, 2.0 in Orange/Amber -->
+          <!-- System Branding: ISMS in Navy, 2.0 in Saffron Accent -->
           <div class="flex text-left flex-col justify-center shrink-0">
             <div class="flex items-baseline leading-none">
-              <span class="text-lg sm:text-2xl lg:text-[27px] font-extrabold text-[#092244] tracking-tight">ISMS</span>
-              <span class="text-lg sm:text-2xl lg:text-[27px] font-extrabold text-[#f59e0b] ml-1">2.0</span>
+              <span class="text-lg sm:text-2xl lg:text-[26px] font-extrabold text-[#0B3558] tracking-tight">ISMS</span>
+              <span class="text-lg sm:text-2xl lg:text-[26px] font-extrabold text-[#F4A300] ml-1">2.0</span>
             </div>
-            <div class="hidden sm:block text-[10.5px] sm:text-[11.5px] lg:text-[12px] text-slate-600 font-medium tracking-tight mt-0.5 sm:mt-1">
+            <div class="hidden sm:block text-[10.5px] sm:text-[11.5px] lg:text-[12px] text-[#5F6F7E] font-medium tracking-tight mt-0.5 sm:mt-1">
               {{ t().navbar.ismsSubtitle }}
             </div>
           </div>
@@ -57,19 +57,19 @@ export type FontSize = 'sm' | 'md' | 'lg';
         <div class="flex items-center justify-end gap-1.5 sm:gap-4 shrink-0">
           
           <!-- English | हिंदी (Matches Landing Page) -->
-          <div class="flex items-center space-x-1 sm:space-x-1.5 text-[11px] sm:text-[12.5px] font-medium text-slate-700 bg-white/80 border border-slate-200/90 rounded-lg px-2 sm:px-2.5 py-1 sm:py-1.5 shadow-2xs">
-            <button (click)="setLanguage('en')" [class.text-[#002244]]="currentLanguage() === 'en'"
-              [class.font-bold]="currentLanguage() === 'en'" class="hover:text-blue-700 transition cursor-pointer">
+          <div class="flex items-center space-x-1 sm:space-x-1.5 text-[11px] sm:text-[12.5px] font-medium text-[#172B3A] bg-white border border-[#D9E1E8] rounded-[6px] px-2.5 py-1 sm:py-1.5">
+            <button (click)="setLanguage('en')" [class.text-[#0B3558]]="currentLanguage() === 'en'"
+              [class.font-bold]="currentLanguage() === 'en'" class="hover:text-[#0B3558] transition cursor-pointer">
               English
             </button>
-            <span class="text-slate-300">|</span>
-            <button (click)="setLanguage('hi')" [class.text-[#002244]]="currentLanguage() === 'hi'"
-              [class.font-bold]="currentLanguage() === 'hi'" class="hover:text-blue-700 transition cursor-pointer">
+            <span class="text-[#D9E1E8]">|</span>
+            <button (click)="setLanguage('hi')" [class.text-[#0B3558]]="currentLanguage() === 'hi'"
+              [class.font-bold]="currentLanguage() === 'hi'" class="hover:text-[#0B3558] transition cursor-pointer">
               हिंदी
             </button>
           </div>
 
-          <span class="text-slate-300 hidden sm:inline">|</span>
+          <span class="text-[#D9E1E8] hidden sm:inline">|</span>
 
           <!-- User's Personal Name & Profile Dropdown Trigger -->
           <div *ngIf="userProfile$ | async as profile" class="relative">
@@ -78,34 +78,34 @@ export type FontSize = 'sm' | 'md' | 'lg';
             <button 
               type="button"
               (click)="toggleUserMenu($event)"
-              class="flex items-center gap-1.5 sm:gap-2.5 pl-0.5 sm:pl-1 text-left cursor-pointer hover:opacity-90 transition rounded-lg p-0.5 sm:p-1"
+              class="flex items-center gap-1.5 sm:gap-2.5 pl-0.5 sm:pl-1 text-left cursor-pointer hover:bg-[#F4F7F9] transition rounded-[6px] p-1.5"
               title="User Account Menu">
               
               <!-- Avatar Circle with Initial -->
-              <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-[#002244] text-amber-300 border border-[#002244]/20 flex items-center justify-center font-bold text-[11px] sm:text-xs shadow-xs shrink-0">
+              <div class="w-8 h-8 rounded-full bg-[#0B3558] text-[#F4A300] flex items-center justify-center font-bold text-xs shrink-0">
                 {{ (profile.personal.fullName || 'U').charAt(0).toUpperCase() }}
               </div>
 
               <!-- User Name & Designation Block -->
               <div class="text-left hidden sm:flex sm:flex-col justify-center leading-tight py-0.5">
-                <div class="text-xs sm:text-[13px] font-extrabold text-[#002244] truncate max-w-[150px] md:max-w-[200px]" [title]="profile.personal.fullName">
+                <div class="text-xs sm:text-[13px] font-semibold text-[#0B3558] truncate max-w-[150px] md:max-w-[200px]" [title]="profile.personal.fullName">
                   {{ profile.personal.fullName || 'Authorized Signatory' }}
                 </div>
                 <div class="mt-0.5 flex items-center justify-start gap-1 text-[11px] leading-normal">
-                  <span *ngIf="profile.isRegistered" class="text-emerald-700 font-semibold truncate flex items-center gap-1">
-                    <svg class="w-3 h-3 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <span *ngIf="profile.isRegistered" class="text-[#16834B] font-medium truncate flex items-center gap-1">
+                    <svg class="w-3 h-3 text-[#16834B] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     <span class="truncate max-w-[120px]">{{ profile.personal.designation || 'Signatory Authority' }}</span>
                   </span>
-                  <span *ngIf="!profile.isRegistered" class="text-amber-700 font-bold">
+                  <span *ngIf="!profile.isRegistered" class="text-[#B7791F] font-semibold">
                     ⚠️ OTR Pending
                   </span>
                 </div>
               </div>
 
               <!-- Dropdown Caret Icon -->
-              <svg class="w-3.5 h-3.5 text-slate-500 ml-0.5 transition-transform" [class.rotate-180]="userMenuOpen()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg class="w-3.5 h-3.5 text-[#5F6F7E] ml-0.5 transition-transform" [class.rotate-180]="userMenuOpen()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
 
@@ -117,7 +117,7 @@ export type FontSize = 'sm' | 'md' | 'lg';
             <!-- Profile Dropdown Menu with Profile Link & Logout -->
             <div 
               *ngIf="userMenuOpen()" 
-              class="absolute right-0 mt-1.5 w-48 bg-white border border-slate-200 rounded-lg shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 font-['Poppins',sans-serif] overflow-hidden">
+              class="absolute right-0 mt-1.5 w-48 bg-white border border-[#D9E1E8] rounded-[6px] shadow-md py-1 z-50 animate-in fade-in zoom-in-95 duration-100 font-sans overflow-hidden">
               
               <a 
                 routerLink="/profile" 

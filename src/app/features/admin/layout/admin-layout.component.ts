@@ -16,7 +16,7 @@ import { ToastContainerComponent } from '../shared/components/toast/toast.compon
     ToastContainerComponent
   ],
   template: `
-    <div class="h-screen flex flex-col bg-[#f8fafc] font-sans text-slate-800 antialiased overflow-hidden">
+    <div class="h-screen flex flex-col bg-[#F6F8FA] font-sans text-[#172B3A] antialiased overflow-hidden">
       <!-- Admin Top Header -->
       <admin-header class="shrink-0" (toggleSidebar)="toggleSidebar()"></admin-header>
 
@@ -37,20 +37,20 @@ import { ToastContainerComponent } from '../shared/components/toast/toast.compon
           </div>
 
           <!-- Enterprise Administration Footer -->
-          <footer class="mt-12 pt-6 border-t border-slate-200 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3 max-w-7xl w-full mx-auto pb-4">
+          <footer class="mt-12 pt-6 border-t border-[#D9E1E8] text-xs text-[#5F6F7E] flex flex-col sm:flex-row items-center justify-between gap-3 max-w-7xl w-full mx-auto pb-4">
             <div class="flex items-center gap-2">
-              <span class="font-bold text-[#002244]">Government of Rajasthan</span>
+              <span class="font-semibold text-[#0B3558]">Government of Rajasthan</span>
               <span>•</span>
-              <span class="font-medium text-slate-600">Skill, Employment &amp; Entrepreneurship Department</span>
+              <span class="font-normal text-[#5F6F7E]">Skill, Employment &amp; Entrepreneurship Department</span>
               <span>•</span>
-              <span class="font-bold text-[#002244]">RSLDC</span>
+              <span class="font-semibold text-[#0B3558]">RSLDC</span>
             </div>
-            <div class="flex items-center gap-4 text-slate-400">
-              <span class="hover:text-slate-600 transition-colors">RTPP Act 2012 Compliant</span>
+            <div class="flex items-center gap-4 text-[#7A8793]">
+              <span class="hover:text-[#172B3A] transition-colors">RTPP Act 2012 Compliant</span>
               <span>•</span>
-              <span class="hover:text-slate-600 transition-colors">Jaipur-DC-02 (State Data Centre)</span>
+              <span class="hover:text-[#172B3A] transition-colors">Jaipur-DC-02 (State Data Centre)</span>
               <span>•</span>
-              <span class="font-semibold text-[#002244]">ISMS v2.0 Enterprise</span>
+              <span class="font-semibold text-[#0B3558]">ISMS v2.0 Enterprise</span>
             </div>
           </footer>
         </main>

@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive, NgIf, AsyncPipe],
   template: `
-    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col h-full font-['Poppins',sans-serif] text-xs shrink-0 select-none shadow-2xs">
+    <aside class="w-64 bg-white border-r border-[#D9E1E8] flex flex-col h-full font-sans text-xs shrink-0 select-none">
       
       <!-- Main Navigation Menu (Clean, Consistent Font Sizes & Active Accents) -->
       <nav class="flex-grow py-4 px-3 space-y-1.5 overflow-y-auto" *ngIf="userProfile$ | async as profile">
@@ -240,21 +240,31 @@ import { Observable } from 'rxjs';
       height: 100%;
     }
     .nav-item-active {
-      background-color: rgba(0, 34, 68, 0.08) !important;
-      color: #002244 !important;
-      font-weight: 700 !important;
-      font-size: 13px !important;
-      border-left: 4px solid #002244 !important;
-    }
-    .nav-item-inactive {
-      color: #334155 !important;
+      background-color: #EEF3F7 !important;
+      color: #0B3558 !important;
       font-weight: 600 !important;
       font-size: 13px !important;
-      border-left: 4px solid transparent !important;
+      border-left: 3px solid #0B3558 !important;
+    }
+    .nav-item-active svg {
+      color: #0B3558 !important;
+    }
+    .nav-item-inactive {
+      background-color: transparent !important;
+      color: #29445A !important;
+      font-weight: 500 !important;
+      font-size: 13px !important;
+      border-left: 3px solid transparent !important;
+    }
+    .nav-item-inactive svg {
+      color: #61778B !important;
     }
     .nav-item-inactive:hover {
-      background-color: #f1f5f9 !important;
-      color: #002244 !important;
+      background-color: #F4F7F9 !important;
+      color: #0B3558 !important;
+    }
+    .nav-item-inactive:hover svg {
+      color: #0B3558 !important;
     }
   `]
 })

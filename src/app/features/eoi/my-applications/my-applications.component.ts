@@ -28,30 +28,32 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
     StatusBadgeComponent
   ],
   template: `
-    <div class="h-screen flex flex-col bg-[#f8fafc] font-sans text-slate-800 antialiased font-['Poppins',sans-serif] overflow-hidden">
+    <div class="h-screen flex flex-col bg-[#F6F8FA] font-sans text-[#172B3A] antialiased overflow-hidden">
       <app-header class="shrink-0"></app-header>
 
       <div class="flex flex-1 min-h-0 w-full overflow-hidden">
         <!-- Persistent Portal Sidebar -->
         <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>
 
-        <main class="flex-1 min-h-0 min-w-0 w-full px-3 sm:px-5 py-4 overflow-y-auto overflow-x-hidden space-y-3">
+        <main class="flex-1 min-h-0 min-w-0 w-full p-6 overflow-y-auto overflow-x-hidden space-y-4 bg-[#F6F8FA]">
 
           <!-- Page Heading: Tender Status -->
-          <div class="bg-white border border-slate-200 shadow-xs p-4 sm:p-5 rounded-xs">
-            <h1 class="text-xl sm:text-2xl font-bold text-[#002244] tracking-tight">
-              Tender Status
-            </h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Real-time technical scrutiny progress, EMD payment verification, and empanelment outcomes for your submitted EOI tenders.
-            </p>
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-[#D9E1E8] mb-6">
+            <div>
+              <h1 class="text-[28px] font-bold text-[#0B3558] tracking-tight leading-[36px]">
+                Tender Status
+              </h1>
+              <p class="text-[12px] text-[#5F6F7E] mt-1">
+                Real-time technical scrutiny progress, EMD payment verification, and empanelment outcomes for your submitted EOI tenders.
+              </p>
+            </div>
           </div>
 
           <!-- Main Table Card -->
-          <div class="bg-white border border-slate-200 shadow-sm rounded-xs overflow-hidden">
+          <div class="bg-white border border-[#D9E1E8] rounded-[6px] overflow-hidden shadow-none">
             
             <!-- Filters Toolbar -->
-            <div class="p-3.5 sm:p-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-50/70">
+            <div class="p-3.5 sm:p-4 border-b border-[#D9E1E8] flex flex-col md:flex-row md:items-center justify-between gap-3 bg-[#EEF3F7]/50">
               
               <!-- Filter Tabs: All, Pending, Accepted, Rejected -->
               <nav class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0" aria-label="Tender Status Tabs">

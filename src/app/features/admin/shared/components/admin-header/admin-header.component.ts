@@ -12,8 +12,8 @@ export type FontSize = 'sm' | 'md' | 'lg';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <header class="w-full bg-white border-b border-slate-200/90 shadow-2xs font-sans sticky top-0 z-40 select-none">
-      <div class="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-2.5 flex items-center justify-between gap-4 min-h-[68px]">
+    <header class="w-full bg-white border-b border-[#D9E1E8] shadow-none font-sans sticky top-0 z-40 select-none">
+      <div class="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-2.5 flex items-center justify-between gap-4 min-h-[72px]">
         
         <!-- Left: Sidebar Toggle, Dual Government Emblems & Portal Title -->
         <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
@@ -21,7 +21,7 @@ export type FontSize = 'sm' | 'md' | 'lg';
           <button 
             type="button"
             (click)="toggleSidebar.emit()"
-            class="p-2 rounded-xs text-[#002244] hover:bg-slate-100 transition-colors border border-slate-200 cursor-pointer shrink-0"
+            class="p-2 rounded-[6px] text-[#0B3558] hover:bg-slate-100 transition-colors border border-[#D9E1E8] cursor-pointer shrink-0"
             title="Toggle Navigation Menu">
             <span class="material-symbols-outlined text-[22px]">menu</span>
           </button>
@@ -49,31 +49,31 @@ export type FontSize = 'sm' | 'md' | 'lg';
             <!-- Department Text Block -->
             <div class="text-left flex flex-col justify-center min-w-0">
               <div class="flex items-center gap-2">
-                <span class="text-[10px] sm:text-[12px] font-bold text-[#002244] leading-[1.2] whitespace-nowrap">
+                <span class="text-[10px] sm:text-[12px] font-bold text-[#0B3558] leading-[1.2] whitespace-nowrap">
                   Government of Rajasthan
                 </span>
-                <span class="hidden sm:inline-flex items-center px-2 py-0.2 rounded-xs text-[9.5px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
+                <span class="hidden sm:inline-flex items-center px-2 py-0.2 rounded-[4px] text-[9.5px] font-bold bg-[#EEF3F7] text-[#0B3558] border border-[#D9E1E8]">
                   SUPER ADMIN
                 </span>
               </div>
-              <div class="text-[9.5px] sm:text-[11.5px] font-bold text-[#002244] leading-[1.2] whitespace-nowrap">
+              <div class="text-[9.5px] sm:text-[11.5px] font-bold text-[#0B3558] leading-[1.2] whitespace-nowrap">
                 Skill, Employment &amp; Entrepreneurship Department
               </div>
-              <div class="text-[9px] sm:text-[11px] text-slate-500 font-medium whitespace-nowrap hidden xs:block">
+              <div class="text-[9px] sm:text-[11px] text-[#5F6F7E] font-medium whitespace-nowrap hidden xs:block">
                 Rajasthan Skill and Livelihoods Development Corporation (RSLDC)
               </div>
             </div>
 
             <!-- Thin Vertical Divider Line -->
-            <div class="hidden md:block h-9 w-[1.5px] bg-slate-300 mx-1 shrink-0"></div>
+            <div class="hidden md:block h-9 w-[1.5px] bg-[#D9E1E8] mx-1 shrink-0"></div>
 
             <!-- System Branding: ISMS 2.0 Administration Portal -->
             <div class="hidden md:flex text-left flex-col justify-center shrink-0">
               <div class="flex items-baseline leading-none">
-                <span class="text-xl sm:text-2xl font-black text-[#002244] tracking-tight">ISMS</span>
-                <span class="text-xl sm:text-2xl font-black text-[#f59e0b] ml-1">2.0</span>
+                <span class="text-xl sm:text-2xl font-bold text-[#0B3558] tracking-tight">ISMS</span>
+                <span class="text-xl sm:text-2xl font-bold text-[#F4A300] ml-1">2.0</span>
               </div>
-              <div class="text-[10.5px] text-slate-500 font-semibold tracking-tight mt-0.5">
+              <div class="text-[10.5px] text-[#5F6F7E] font-medium tracking-tight mt-0.5">
                 Central Administration Portal
               </div>
             </div>
@@ -274,7 +274,7 @@ export type FontSize = 'sm' | 'md' | 'lg';
       </div>
 
       <!-- Saffron / Gold Accent Line at bottom -->
-      <div class="h-[2.5px] w-full bg-gradient-to-r from-[#002244] via-[#f59e0b] to-[#002244]"></div>
+      <div class="h-[2.5px] w-full bg-gradient-to-r from-[#0B3558] via-[#F4A300] to-[#0B3558]"></div>
     </header>
 
     <!-- Help Modal -->

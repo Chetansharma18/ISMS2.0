@@ -58,9 +58,28 @@ module.exports = {
         muted: {
           500: '#64748B'
         },
-        primary: '#0B1B3D',
-        primaryLight: '#162E5B',
-        primaryDark: '#07122A'
+        isms: {
+          navy: '#0B3558',
+          navyHover: '#082A46',
+          navySecondary: '#164B73',
+          saffron: '#F4A300',
+          green: '#16834B',
+          red: '#C62828',
+          amber: '#B7791F',
+          bg: '#F6F8FA',
+          surface: '#FFFFFF',
+          text: '#172B3A',
+          textSecondary: '#5F6F7E',
+          textMuted: '#7A8793',
+          border: '#D9E1E8',
+          divider: '#E8EDF2',
+          tableHead: '#EEF3F7',
+          tableHeadText: '#173B59',
+          rowHover: '#F7FAFC'
+        },
+        primary: '#0B3558',
+        primaryLight: '#164B73',
+        primaryDark: '#082A46'
       },
       spacing: {
         'token-xs.5': '0.375rem',
@@ -72,6 +91,13 @@ module.exports = {
         'token-xl': '2rem',
       },
       fontSize: {
+        'page-title': ['1.75rem', { lineHeight: '2.25rem', fontWeight: '700' }], // 28px
+        'section-heading': ['1.25rem', { lineHeight: '1.75rem', fontWeight: '600' }], // 20px
+        'subsection-heading': ['1rem', { lineHeight: '1.5rem', fontWeight: '600' }], // 16px
+        'body-base': ['0.875rem', { lineHeight: '1.3125rem', fontWeight: '400' }], // 14px
+        'form-label': ['0.8125rem', { lineHeight: '1.125rem', fontWeight: '500' }], // 13px
+        'helper': ['0.75rem', { lineHeight: '1rem', fontWeight: '400' }], // 12px
+        'table-font': ['0.8125rem', { lineHeight: '1.125rem' }], // 13px
         'token-xs': ['0.75rem', { lineHeight: '1rem' }],
         'token-sm': ['0.875rem', { lineHeight: '1.25rem' }],
         'token-base': ['1rem', { lineHeight: '1.5rem' }],
@@ -82,9 +108,9 @@ module.exports = {
         'token-3xl': ['2.25rem', { lineHeight: '2.5rem' }],
       },
       fontFamily: {
-        sans: ['"Poppins"', '"Inter"', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
-        serif: ['"Poppins"', 'sans-serif'],
-        heading: ['"Poppins"', 'sans-serif'],
+        sans: ['"Inter"', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        serif: ['"Inter"', 'sans-serif'],
+        heading: ['"Inter"', 'system-ui', 'sans-serif'],
         mono: ['"SF Mono"', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace']
       }
     }

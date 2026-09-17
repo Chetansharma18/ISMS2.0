@@ -22,7 +22,7 @@ import { Observable } from 'rxjs';
     SidebarComponent
   ],
   template: `
-    <div class="h-screen flex flex-col bg-[#f0f4f8] font-['Poppins',sans-serif] text-slate-800 antialiased overflow-hidden">
+    <div class="h-screen flex flex-col bg-[#F6F8FA] font-sans text-[#172B3A] antialiased overflow-hidden">
       
       <!-- TOP POST-LOGIN HEADER: Dual Logos, User Profile Name, Language/Font Tools (No News Bar) -->
       <app-header class="shrink-0"></app-header>
@@ -32,16 +32,16 @@ import { Observable } from 'rxjs';
         <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>
 
         <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 min-h-0 min-w-0 w-full px-3 sm:px-4 py-4 overflow-y-auto overflow-x-hidden">
+        <main class="flex-1 min-h-0 min-w-0 w-full p-6 overflow-y-auto overflow-x-hidden bg-[#F6F8FA]">
 
           <!-- ================================================================= -->
           <!-- VIEW 1: ACTIVE SCHEMES & TENDERS TABLE VIEW                      -->
           <!-- ================================================================= -->
-          <div *ngIf="viewMode === 'table'" class="space-y-3">
+          <div *ngIf="viewMode === 'table'" class="space-y-4">
             
             <!-- Page Heading Bar -->
-            <div class="bg-white border border-slate-200 shadow-xs p-3.5 sm:p-4 rounded-xs">
-              <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-[#002244]">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-[#D9E1E8] mb-6">
+              <h1 class="text-[28px] font-bold tracking-tight text-[#0B3558] leading-[36px]">
                 Active Schemes &amp; Tenders
               </h1>
             </div>

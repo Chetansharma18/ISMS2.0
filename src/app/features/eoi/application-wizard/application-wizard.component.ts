@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from './components/header/header.component';
 import { StepNavComponent } from './components/step-nav/step-nav.component';
-import { SchemeBannerComponent } from './components/scheme-banner/scheme-banner.component';
 import { StepDocumentsComponent } from './components/step-documents/step-documents.component';
 import { StepPaymentComponent } from './components/step-payment/step-payment.component';
 import { StepPreviewComponent } from './components/step-preview/step-preview.component';
@@ -23,7 +22,6 @@ import { RAJASTHAN_DISTRICTS, EOI_SECTIONS } from './models/eoi.model';
     FormsModule,
     HeaderComponent,
     StepNavComponent,
-    SchemeBannerComponent,
     StepDocumentsComponent,
     StepPaymentComponent,
     StepPreviewComponent,

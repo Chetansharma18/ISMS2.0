@@ -7,7 +7,7 @@ import { ToastService } from '../../core/services/toast.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
-import { UiTableComponent, TableColumn } from '../../../../shared/components/ui/ui-table/ui-table.component';
+import { TableColumn } from '../../../../shared/components/ui/ui-table/ui-table.component';
 import { EoiItem, EoiStatus } from '../../core/models/admin.models';
 
 @Component({
@@ -19,8 +19,7 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
     RouterModule, 
     FormsModule, 
     PageHeaderComponent, 
-    StatusBadgeComponent, 
-    UiTableComponent
+    StatusBadgeComponent
   ],
   template: `
     <div>

@@ -359,7 +359,7 @@ import { Observable, filter } from 'rxjs';
         </ng-container>
 
         <!-- ================= TP / EXECUTION MENUS ================= -->
-        <ng-container *ngIf="authService.currentUser()?.role === 'TP_PIA'">
+        <ng-container *ngIf="authService.currentUser()?.role === 'TP_PIA' && profile.isApprovedTp">
           <div class="pt-2 mt-2 border-t border-slate-200">
              <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                Execution (ISMS 2.0)

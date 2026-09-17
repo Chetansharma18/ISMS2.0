@@ -48,36 +48,48 @@ export const routes: Routes = [
   // Screen 3: Saved Master Profile
   {
     path: 'profile',
-    loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent)
+    loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['TP_PIA', 'citizen'] }
   },
   // Screen 4: Scheme Details / Application Form
   {
     path: 'eoi/apply/:id',
-    loadComponent: () => import('./features/eoi/application-wizard/application-wizard.component').then(m => m.ApplicationWizardComponent)
+    loadComponent: () => import('./features/eoi/application-wizard/application-wizard.component').then(m => m.ApplicationWizardComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['TP_PIA', 'citizen'] }
   },
 
   // Screen 5: EMD Fee Payment
   {
     path: 'eoi/payment/:id',
-    loadComponent: () => import('./features/eoi/emd-payment/emd-payment.component').then(m => m.EmdPaymentComponent)
+    loadComponent: () => import('./features/eoi/emd-payment/emd-payment.component').then(m => m.EmdPaymentComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['TP_PIA', 'citizen'] }
   },
 
   // Screen 6: Preview & Submit
   {
     path: 'eoi/preview/:id',
-    loadComponent: () => import('./features/eoi/preview-submit/preview-submit.component').then(m => m.PreviewSubmitComponent)
+    loadComponent: () => import('./features/eoi/preview-submit/preview-submit.component').then(m => m.PreviewSubmitComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['TP_PIA', 'citizen'] }
   },
 
   // Screen 7: Acknowledgement Receipt
   {
     path: 'eoi/acknowledgement/:id',
-    loadComponent: () => import('./features/eoi/receipts/acknowledgement-receipt.component').then(m => m.AcknowledgementReceiptComponent)
+    loadComponent: () => import('./features/eoi/receipts/acknowledgement-receipt.component').then(m => m.AcknowledgementReceiptComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['TP_PIA', 'citizen'] }
   },
 
   // Screen 8: Application Status Tracker (Admin Scrutiny)
   {
     path: 'eoi/tracker/:id',
-    loadComponent: () => import('./features/eoi/status-tracker/status-tracker.component').then(m => m.StatusTrackerComponent)
+    loadComponent: () => import('./features/eoi/status-tracker/status-tracker.component').then(m => m.StatusTrackerComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['TP_PIA', 'citizen'] }
   },
   {
     path: 'eoi/tracker',
@@ -93,23 +105,31 @@ export const routes: Routes = [
   // Screen 9a: Outcome — Approved (TP Certificate & Grade)
   {
     path: 'eoi/outcome-approved/:id',
-    loadComponent: () => import('./features/eoi/outcome/outcome-approved.component').then(m => m.OutcomeApprovedComponent)
+    loadComponent: () => import('./features/eoi/outcome/outcome-approved.component').then(m => m.OutcomeApprovedComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['TP_PIA', 'citizen'] }
   },
 
   // Screen 9b: Outcome — Rejected (EMD Refund Status)
   {
     path: 'eoi/outcome-rejected/:id',
-    loadComponent: () => import('./features/eoi/outcome/outcome-rejected.component').then(m => m.OutcomeRejectedComponent)
+    loadComponent: () => import('./features/eoi/outcome/outcome-rejected.component').then(m => m.OutcomeRejectedComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['TP_PIA', 'citizen'] }
   },
 
   // Screen 10: TP Dashboard (Post-Approval)
   {
     path: 'eoi/dashboard',
-    loadComponent: () => import('./features/eoi/dashboard/dashboard.component').then(m => m.DashboardComponent)
+    loadComponent: () => import('./features/eoi/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['TP_PIA', 'citizen'] }
   },
   {
     path: 'eoi/tender-status',
-    loadComponent: () => import('./features/eoi/my-applications/my-applications.component').then(m => m.MyApplicationsComponent)
+    loadComponent: () => import('./features/eoi/my-applications/my-applications.component').then(m => m.MyApplicationsComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['TP_PIA', 'citizen'] }
   },
   {
     path: 'eoi/my-applications',
@@ -120,47 +140,63 @@ export const routes: Routes = [
   // Screen 14: Department User (Admin) — EOI View
   {
     path: 'admin/eoi-view',
-    loadComponent: () => import('./features/admin/dept-eoi-view/dept-eoi-view.component').then(m => m.DeptEoiViewComponent)
+    loadComponent: () => import('./features/admin/dept-eoi-view/dept-eoi-view.component').then(m => m.DeptEoiViewComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['DEPARTMENT_ADMIN', 'SUPER_ADMIN'] }
   },
 
   // Screen 15: Department User (Admin) — Responses List
   {
     path: 'admin/responses/:schemeId',
-    loadComponent: () => import('./features/admin/responses-list/responses-list.component').then(m => m.ResponsesListComponent)
+    loadComponent: () => import('./features/admin/responses-list/responses-list.component').then(m => m.ResponsesListComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['DEPARTMENT_ADMIN', 'SUPER_ADMIN'] }
   },
   {
     path: 'admin/responses',
-    loadComponent: () => import('./features/admin/responses-list/responses-list.component').then(m => m.ResponsesListComponent)
+    loadComponent: () => import('./features/admin/responses-list/responses-list.component').then(m => m.ResponsesListComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['DEPARTMENT_ADMIN', 'SUPER_ADMIN'] }
   },
 
   // Screen 16: Department User (Admin) — Detailed Profile Review Desk
   {
     path: 'admin/review/:applicationId',
-    loadComponent: () => import('./features/admin/profile-review/profile-review.component').then(m => m.ProfileReviewComponent)
+    loadComponent: () => import('./features/admin/profile-review/profile-review.component').then(m => m.ProfileReviewComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['DEPARTMENT_ADMIN', 'SUPER_ADMIN'] }
   },
 
   // Screen 17: Super Admin — Masters (CRUD)
   {
     path: 'admin/masters',
-    loadComponent: () => import('./features/admin/super-admin/masters/masters.component').then(m => m.MastersComponent)
+    loadComponent: () => import('./features/admin/super-admin/masters/masters.component').then(m => m.MastersComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['SUPER_ADMIN'] }
   },
 
   // Screen 18: Super Admin — Configure EOI (Dynamic Form Builder)
   {
     path: 'admin/configure-eoi',
-    loadComponent: () => import('./features/admin/super-admin/configure-eoi/configure-eoi.component').then(m => m.ConfigureEoiComponent)
+    loadComponent: () => import('./features/admin/super-admin/configure-eoi/configure-eoi.component').then(m => m.ConfigureEoiComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['SUPER_ADMIN'] }
   },
 
   // Screen 19: Super Admin — Manage Users
   {
     path: 'admin/manage-users',
-    loadComponent: () => import('./features/admin/super-admin/manage-users/manage-users.component').then(m => m.ManageUsersComponent)
+    loadComponent: () => import('./features/admin/super-admin/manage-users/manage-users.component').then(m => m.ManageUsersComponent),
+    canActivate: [roleGuard],
+    data: { roles: ['SUPER_ADMIN'] }
   },
 
   // Current Working Feature: Super Admin Panel
   {
     path: 'admin',
-    loadChildren: () => import('./features/admin/admin.routes').then(m => m.ADMIN_ROUTES)
+    loadChildren: () => import('./features/admin/admin.routes').then(m => m.ADMIN_ROUTES),
+    canActivate: [roleGuard],
+    data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
   },
 
   // ==========================================

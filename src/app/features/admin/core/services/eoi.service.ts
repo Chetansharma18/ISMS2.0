@@ -14,7 +14,14 @@ export class EoiService {
   private auditService = inject(AuditService);
   private eoiStateService = inject(EoiStateService, { optional: true });
 
-  private eoiList: EoiItem[] = [
+  private loadEois(): EoiItem[] {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const saved = window.localStorage.getItem('isms_eoi_list');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return [
     {
       id: 'EOI-2025-001',
       referenceNo: 'RSLDC/EOI/2025-26/001',
@@ -272,6 +279,18 @@ export class EoiService {
       updatedAt: '2025-02-25T14:00:00.000Z'
     }
   ];
+}
+
+  private eoiList: EoiItem[] = this.loadEois();
+
+  private saveEoisToStorage(): void {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem('isms_eoi_list', JSON.stringify(this.eoiList));
+      if (this.eoiStateService) {
+        this.eoiStateService.refreshSchemesFromStorage();
+      }
+    }
+  }
 
   // Corrigendums & Amendments
   private corrigendums: CorrigendumAmendment[] = [
@@ -577,6 +596,7 @@ export class EoiService {
           newValue: `Updated: ${eoi.title || this.eoiList[idx].title}`,
           reason: 'Administrative configuration update'
         });
+        this.saveEoisToStorage();
         return of({ ...this.eoiList[idx] });
       }
     }
@@ -637,6 +657,7 @@ export class EoiService {
       newValue: `Created: ${newEoi.referenceNo} - ${newEoi.title}`,
       reason: 'New EOI initialized in system'
     });
+    this.saveEoisToStorage();
     return of({ ...newEoi });
   }
 
@@ -667,6 +688,7 @@ export class EoiService {
         newValue: 'Status: OPEN',
         reason: 'Public tender notification open'
       });
+      this.saveEoisToStorage();
       return of({ ...e });
     }
     return of(undefined);
@@ -699,6 +721,7 @@ export class EoiService {
         newValue: 'Status: CLOSED',
         reason: 'Submission window closed. Responses unlocked for technical scrutiny.'
       });
+      this.saveEoisToStorage();
       return of({ ...e });
     }
     return of(undefined);
@@ -790,6 +813,7 @@ export class EoiService {
       newValue: `New Closing Date: ${newClosingDate} (${documentData.type}: ${documentData.documentNumber})`,
       reason: reason
     });
+    this.saveEoisToStorage();
 
     return of({ success: true, eoi: { ...e }, message: 'EOI successfully rescheduled and Corrigendum published.' });
   }

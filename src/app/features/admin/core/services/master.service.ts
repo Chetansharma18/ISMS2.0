@@ -16,7 +16,14 @@ export class MasterService {
   private auditService = inject(AuditService);
 
   // 1. Schemes Master (Rule 1: Scheme must exist before creating an EOI. Mock values: MMKVY, MMYSY, MNSKSY, PMKVY, RAJKVIK, RAJKVIK RPL, RAJKVIKRTD, RRLP, RSTP, SAMARTH, SAKSHM)
-  private schemes: SchemeMaster[] = [
+  private loadSchemes(): SchemeMaster[] {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const saved = window.localStorage.getItem('isms_master_schemes');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return [
     {
       id: 'SCH-001',
       schemeCode: 'MMKVY',
@@ -151,6 +158,15 @@ export class MasterService {
       updatedAt: '2025-01-14T15:30:00.000Z'
     }
   ];
+}
+
+  private schemes: SchemeMaster[] = this.loadSchemes();
+
+  private saveSchemesToStorage(): void {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem('isms_master_schemes', JSON.stringify(this.schemes));
+    }
+  }
 
   // 2. Scheme Categories
   private schemeCategories: SchemeCategoryMaster[] = [
@@ -423,6 +439,7 @@ export class MasterService {
           newValue: `Updated to: ${this.schemes[index].schemeName} (${this.schemes[index].schemeCode})`,
           reason: 'Administrative update'
         });
+        this.saveSchemesToStorage();
         return of({ ...this.schemes[index] });
       }
     }
@@ -454,6 +471,7 @@ export class MasterService {
       newValue: `Created: ${newScheme.schemeName} (${newScheme.schemeCode})`,
       reason: 'New Scheme created in Scheme Master'
     });
+    this.saveSchemesToStorage();
     return of({ ...newScheme });
   }
 
@@ -472,6 +490,7 @@ export class MasterService {
         newValue: `Status: ${s.status}`,
         reason: 'Super Admin status toggle'
       });
+      this.saveSchemesToStorage();
       return of({ ...s });
     }
     return of(undefined);
@@ -491,6 +510,7 @@ export class MasterService {
         newValue: 'Status: Inactive / Soft Deleted',
         reason: 'Protected historical references - Soft deleted'
       });
+      this.saveSchemesToStorage();
       return of(true);
     }
     return of(false);

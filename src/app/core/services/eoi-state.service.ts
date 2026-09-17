@@ -296,7 +296,54 @@ export class EoiStateService {
   }
 
   // Active Schemes Catalog matching RSLDC EOI Details & Tender Table format
-  private schemesSubject = new BehaviorSubject<Scheme[]>([
+  private loadSchemesFromStorage(): Scheme[] {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const saved = window.localStorage.getItem('isms_eoi_list');
+        if (saved) {
+          const eoiList = JSON.parse(saved);
+          if (Array.isArray(eoiList) && eoiList.length > 0) {
+            return eoiList.filter(eoi => eoi.status === 'OPEN' || eoi.status === 'CLOSED').map((eoi: any) => ({
+              id: eoi.id,
+              eoiReferenceNo: eoi.referenceNo,
+              name: eoi.title,
+              schemeCode: eoi.schemeName,
+              schemeCategory: eoi.schemeCategory,
+              tenderId: eoi.id,
+              ePublishedDate: eoi.publishedDate + ' 10:00 AM',
+              closingDate: eoi.closingDate + ' 05:00 PM',
+              openingDate: eoi.openingDate + ' 10:00 AM',
+              preBidMeetingDate: eoi.publishedDate + ' 12:00 PM',
+              organisationChain: eoi.department,
+              publishDate: eoi.publishedDate + ' 10:00 AM',
+              submissionLastDate: eoi.closingDate + ' 05:00 PM',
+              deadline: eoi.closingDate + ' 05:00 PM',
+              daysRemaining: Math.max(0, Math.floor((new Date(eoi.closingDate).getTime() - new Date().getTime()) / (1000 * 3600 * 24))),
+              eoiCategory: eoi.eoiCategory,
+              eoiDescription: eoi.description,
+              emdAmount: eoi.fees?.emdFee || 0,
+              processingFee: eoi.fees?.processingFee || 0,
+              attachedFile: eoi.attachedFileName || 'EOI_Document.pdf',
+              department: eoi.department,
+              status: eoi.status === 'OPEN' ? 'Open' : 'Closed',
+              responseCount: eoi.applicationCount || 0,
+              targetBeneficiaries: eoi.schemeCategory,
+              eligibilityPreview: eoi.eligibility?.customCriteria || [],
+              documents: (eoi.documents || []).map((d: any, i: number) => ({
+                id: d.id || `doc-${i}`,
+                title: d.documentName || 'Document',
+                filename: 'Document_' + i + '.pdf',
+                type: 'PDF',
+                size: '2 MB',
+                publishedDate: eoi.publishedDate,
+                description: d.documentName || ''
+              }))
+            }));
+          }
+        }
+      } catch (e) {}
+    }
+    return [
     {
       id: 'EOI-MMKVY-2026-01',
       eoiReferenceNo: 'RSLDC/EOI/2026/MMKVY-01',
@@ -555,7 +602,14 @@ export class EoiStateService {
         }
       ]
     }
-  ]);
+  ];
+}
+
+  private schemesSubject = new BehaviorSubject<Scheme[]>(this.loadSchemesFromStorage());
+
+  public refreshSchemesFromStorage(): void {
+    this.schemesSubject.next(this.loadSchemesFromStorage());
+  }
 
   public schemes$: Observable<Scheme[]> = this.schemesSubject.asObservable();
 
@@ -1367,6 +1421,41 @@ export class EoiStateService {
     const newHistory = [finalized, ...history];
     this.historySubject.next(newHistory);
     this.saveToStorage('isms_app_history', newHistory);
+
+    // Sync to Admin's View (isms_admin_applications)
+    try {
+      const adminAppsJson = window.localStorage.getItem('isms_admin_applications');
+      let adminApps = adminAppsJson ? JSON.parse(adminAppsJson) : [];
+      const profile = this.getProfile();
+      
+      const newAdminApp = {
+        id: finalized.id || `APP-${Date.now()}`,
+        applicationNumber: finalized.id,
+        registrationNumber: profile.registrationNumber,
+        eoiId: finalized.schemeId, // Using schemeId as EOI ID since they match in prototype
+        eoiReferenceNo: 'RSLDC/EOI/2026',
+        eoiTitle: finalized.schemeName,
+        schemeId: 'SCH-001',
+        schemeName: finalized.schemeName,
+        category: 'General',
+        applicantName: profile.personal.fullName,
+        applicantEmail: profile.personal.email,
+        applicantPhone: profile.personal.mobile,
+        organizationName: profile.organization.name,
+        organizationType: profile.organization.entityType,
+        submissionDate: new Date().toISOString(),
+        amount: finalized.emdPayment?.totalPaid || 0,
+        paymentStatus: 'Paid',
+        transactionId: finalized.emdPayment?.txnReference,
+        status: 'Submitted',
+        formResponses: finalized.proposalDetails || {},
+        uploadedDocuments: profile.documents.map(d => ({ documentName: d.name, fileName: d.name, fileSize: d.size, verified: false }))
+      };
+      
+      adminApps.unshift(newAdminApp);
+      this.saveToStorage('isms_admin_applications', adminApps);
+    } catch (e) {}
+
     return finalized;
   }
 

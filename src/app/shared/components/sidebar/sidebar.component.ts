@@ -16,7 +16,7 @@ import { Observable, filter } from 'rxjs';
       <nav class="flex-grow py-4 px-3 space-y-1.5 overflow-y-auto" *ngIf="userProfile$ | async as profile">
         
         <!-- ================= APPLICANT (NEW USER) ================= -->
-        <ng-container *ngIf="profile.role === 'applicant' && (profile.userState === 'new' || !profile.isRegistered)">
+        <ng-container *ngIf="authService.currentUser()?.role === 'citizen'">
           <!-- 1. Active Schemes -->
           <a 
             routerLink="/schemes" 
@@ -122,7 +122,7 @@ import { Observable, filter } from 'rxjs';
         </ng-container>
 
         <!-- ================= APPLICANT (EXISTING USER) ================= -->
-        <ng-container *ngIf="profile.role === 'applicant' && profile.userState === 'existing' && profile.isRegistered">
+        <ng-container *ngIf="authService.currentUser()?.role === 'TP_PIA'">
           <!-- 1. Active Schemes & Tenders -->
           <a 
             routerLink="/schemes" 
@@ -242,7 +242,7 @@ import { Observable, filter } from 'rxjs';
         </ng-container>
 
         <!-- ================= DEPARTMENT ADMIN ================= -->
-        <ng-container *ngIf="profile.role === 'dept_admin'">
+        <ng-container *ngIf="authService.currentUser()?.role === 'DEPARTMENT_ADMIN'">
           <!-- 1. EOI Requests -->
           <a 
             routerLink="/admin/eoi-view" 
@@ -259,7 +259,7 @@ import { Observable, filter } from 'rxjs';
         </ng-container>
 
         <!-- ================= SUPER ADMIN ================= -->
-        <ng-container *ngIf="profile.role === 'super_admin'">
+        <ng-container *ngIf="authService.currentUser()?.role === 'SUPER_ADMIN'">
           <!-- 1. Master Configurations -->
           <a 
             routerLink="/admin/masters" 
@@ -359,7 +359,7 @@ import { Observable, filter } from 'rxjs';
         </ng-container>
 
         <!-- ================= TP / EXECUTION MENUS ================= -->
-        <ng-container *ngIf="authService.currentUser()?.role === 'TP_PIA' && profile.isApprovedTp">
+        <ng-container *ngIf="authService.currentUser()?.role === 'TP_PIA'">
           <div class="pt-2 mt-2 border-t border-slate-200">
              <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                Execution (ISMS 2.0)

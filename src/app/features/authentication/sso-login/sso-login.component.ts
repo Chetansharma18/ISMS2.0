@@ -379,6 +379,7 @@ export class SsoLoginComponent implements OnInit {
       // New ISMS 2.0 Auth Flow (Bypass EOI legacy if using ISMS roles)
       if (ssoLower === 'tppia' || ssoLower === 'applicant_rj') {
         this.authService.login(ssoLower).subscribe(() => {
+          this.eoiService.resetToApprovedTp('A', rawSsoId);
           this.router.navigate(['/dashboard']);
         });
         return;

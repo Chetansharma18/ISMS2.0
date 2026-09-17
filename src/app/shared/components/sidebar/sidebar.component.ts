@@ -9,10 +9,10 @@ import { Observable } from 'rxjs';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive, NgIf, AsyncPipe],
   template: `
-    <aside class="w-64 bg-white border-r border-[#D9E1E8] flex flex-col h-full font-sans text-xs shrink-0 select-none">
+    <aside class="w-72 bg-white border-r border-[#D9E1E8] flex flex-col h-full font-sans text-xs shrink-0 select-none overflow-x-hidden">
       
       <!-- Main Navigation Menu (Clean, Consistent Font Sizes & Active Accents) -->
-      <nav class="flex-grow py-4 px-3 space-y-1.5 overflow-y-auto" *ngIf="userProfile$ | async as profile">
+      <nav class="flex-grow py-4 px-3 space-y-1.5 overflow-y-auto overflow-x-hidden" *ngIf="userProfile$ | async as profile">
         
         <!-- ================= APPLICANT (NEW USER) ================= -->
         <ng-container *ngIf="profile.role === 'applicant' && (profile.userState === 'new' || !profile.isRegistered)">
@@ -27,7 +27,7 @@ import { Observable } from 'rxjs';
                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
               </svg>
             </div>
-            <span class="tracking-tight whitespace-nowrap">Tenders</span>
+            <span class="tracking-tight truncate">Tenders</span>
           </a>
 
           <!-- 2. Profile -->
@@ -41,7 +41,7 @@ import { Observable } from 'rxjs';
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
             </div>
-            <span class="tracking-tight whitespace-nowrap">Profile</span>
+            <span class="tracking-tight truncate">Profile</span>
           </a>
         </ng-container>
 
@@ -58,7 +58,7 @@ import { Observable } from 'rxjs';
                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
               </svg>
             </div>
-            <span class="tracking-tight whitespace-nowrap">Active Schemes &amp; Tenders</span>
+            <span class="tracking-tight truncate">Active Schemes &amp; Tenders</span>
           </a>
 
           <!-- 2. Tender Status -->
@@ -72,7 +72,7 @@ import { Observable } from 'rxjs';
                 <polyline points="12 6 12 12 16 14"></polyline>
               </svg>
             </div>
-            <span class="tracking-tight whitespace-nowrap">Tender Status</span>
+            <span class="tracking-tight truncate">Tender Status</span>
           </a>
 
           <!-- 3. Profile with Sub-points (4 Sub-points from Step 3) -->
@@ -98,25 +98,27 @@ import { Observable } from 'rxjs';
             </div>
 
             <!-- Sub-points (4 sections) -->
-            <div *ngIf="isProfileOpen" class="pl-2 space-y-1 mt-1">
+            <div *ngIf="isProfileOpen" class="pl-1.5 space-y-1 mt-1">
               <a 
                 routerLink="/profile" 
                 [queryParams]="{ section: 1 }"
                 [ngClass]="isSectionActive(1) ? 'nav-item-active' : 'nav-item-inactive'"
-                class="flex items-center gap-3 px-3 py-2.5 transition-all text-xs rounded-xs group cursor-pointer">
+                class="flex items-center gap-2.5 px-2.5 py-2 transition-all text-xs rounded-xs group cursor-pointer"
+                title="1. Organisation Details">
                 <div class="w-5 h-5 rounded flex items-center justify-center shrink-0 transition-colors" [ngClass]="isSectionActive(1) ? 'text-[#002244]' : 'text-slate-500 group-hover:text-[#002244]'">
                   <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <path d="M3 21h18M3 7v14M21 7v14M6 11h2M6 15h2M11 11h2M11 15h2M16 11h2M16 15h2M9 21V3h6v18"></path>
                   </svg>
                 </div>
-                <span class="tracking-tight whitespace-nowrap">1. Organisation Details</span>
+                <span class="tracking-tight truncate">1. Organisation Details</span>
               </a>
 
               <a 
                 routerLink="/profile" 
                 [queryParams]="{ section: 2 }"
                 [ngClass]="isSectionActive(2) ? 'nav-item-active' : 'nav-item-inactive'"
-                class="flex items-center gap-3 px-3 py-2.5 transition-all text-xs rounded-xs group cursor-pointer">
+                class="flex items-center gap-2.5 px-2.5 py-2 transition-all text-xs rounded-xs group cursor-pointer"
+                title="2. Authorized Person Details">
                 <div class="w-5 h-5 rounded flex items-center justify-center shrink-0 transition-colors" [ngClass]="isSectionActive(2) ? 'text-[#002244]' : 'text-slate-500 group-hover:text-[#002244]'">
                   <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
@@ -124,14 +126,15 @@ import { Observable } from 'rxjs';
                     <polyline points="16 11 18 13 22 9"></polyline>
                   </svg>
                 </div>
-                <span class="tracking-tight whitespace-nowrap">2. Authorized Person Details</span>
+                <span class="tracking-tight truncate">2. Authorized Person Details</span>
               </a>
 
               <a 
                 routerLink="/profile" 
                 [queryParams]="{ section: 3 }"
                 [ngClass]="isSectionActive(3) ? 'nav-item-active' : 'nav-item-inactive'"
-                class="flex items-center gap-3 px-3 py-2.5 transition-all text-xs rounded-xs group cursor-pointer">
+                class="flex items-center gap-2.5 px-2.5 py-2 transition-all text-xs rounded-xs group cursor-pointer"
+                title="3. Bank Details">
                 <div class="w-5 h-5 rounded flex items-center justify-center shrink-0 transition-colors" [ngClass]="isSectionActive(3) ? 'text-[#002244]' : 'text-slate-500 group-hover:text-[#002244]'">
                   <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <line x1="3" y1="21" x2="21" y2="21"></line>
@@ -143,14 +146,15 @@ import { Observable } from 'rxjs';
                     <line x1="18" y1="10" x2="18" y2="21"></line>
                   </svg>
                 </div>
-                <span class="tracking-tight whitespace-nowrap">3. Bank Details</span>
+                <span class="tracking-tight truncate">3. Bank Details</span>
               </a>
 
               <a 
                 routerLink="/profile" 
                 [queryParams]="{ section: 4 }"
                 [ngClass]="isSectionActive(4) ? 'nav-item-active' : 'nav-item-inactive'"
-                class="flex items-center gap-3 px-3 py-2.5 transition-all text-xs rounded-xs group cursor-pointer">
+                class="flex items-center gap-2.5 px-2.5 py-2 transition-all text-xs rounded-xs group cursor-pointer"
+                title="4. Uploaded Documents">
                 <div class="w-5 h-5 rounded flex items-center justify-center shrink-0 transition-colors" [ngClass]="isSectionActive(4) ? 'text-[#002244]' : 'text-slate-500 group-hover:text-[#002244]'">
                   <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -159,7 +163,7 @@ import { Observable } from 'rxjs';
                     <line x1="16" y1="17" x2="8" y2="17"></line>
                   </svg>
                 </div>
-                <span class="tracking-tight whitespace-nowrap">4. Uploaded Documents</span>
+                <span class="tracking-tight truncate">4. Uploaded Documents</span>
               </a>
             </div>
           </div>

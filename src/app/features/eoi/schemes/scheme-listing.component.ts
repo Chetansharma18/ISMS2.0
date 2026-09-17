@@ -51,9 +51,7 @@ import { Observable } from 'rxjs';
               <div *ngIf="profile.role === 'applicant' && (!profile.isRegistered || profile.userState === 'new')" 
                 class="bg-amber-50 border border-amber-300 border-l-4 border-l-amber-500 p-4 rounded-xs shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div class="flex items-start gap-3">
-                  <div class="w-8 h-8 rounded-full bg-amber-500 text-[#002244] flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
-                    ⚠️
-                  </div>
+                
                   <div>
                     <div class="font-bold text-[#002244] text-xs sm:text-sm">Please complete your profile first</div>
                     <div class="text-[11.5px] text-amber-900 mt-0.5">
@@ -150,28 +148,19 @@ import { Observable } from 'rxjs';
                         </div>
                       </td>
 
-                      <!-- 7. Actions: View & Apply (Clean Text Links Without Boxes) -->
+                      <!-- 7. Actions: View Tender Details Only -->
                       <td class="p-2.5 align-middle text-center whitespace-nowrap">
-                        <div class="flex flex-col gap-1 items-center justify-center">
+                        <div class="flex items-center justify-center">
                           <button 
                             type="button"
                             (click)="selectScheme(scheme)"
-                            class="text-[#002244] hover:text-blue-700 hover:underline text-xs font-semibold inline-flex items-center gap-1 cursor-pointer transition-colors bg-transparent border-0 p-0"
+                            class="text-[#002244] hover:text-blue-700 hover:underline text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors bg-transparent border-0 py-1 px-3 rounded hover:bg-slate-100"
                             title="View Tender Details">
                             <svg class="w-3.5 h-3.5 text-[#002244]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                               <circle cx="12" cy="12" r="3"></circle>
                             </svg>
                             <span>View</span>
-                          </button>
-
-                          <button 
-                            type="button"
-                            (click)="onApplyClicked(scheme)"
-                            class="text-[#002244] hover:text-blue-700 hover:underline text-xs font-bold inline-flex items-center gap-0.5 cursor-pointer transition-colors bg-transparent border-0 p-0"
-                            title="Apply for this Scheme">
-                            <span>Apply</span>
-                            <span>→</span>
                           </button>
                         </div>
                       </td>
@@ -222,11 +211,18 @@ import { Observable } from 'rxjs';
                 <span class="text-slate-800 font-semibold">{{ selectedScheme.schemeCode }}</span>
               </div>
 
-              <!-- Page Heading Bar (Box like Active Schemes & Tenders) -->
-              <div class="bg-white border border-slate-200 shadow-xs p-3.5 sm:p-4 rounded-xs">
+              <!-- Page Heading Bar with Apply Button in Header -->
+              <div class="bg-white border border-slate-200 shadow-xs p-3.5 sm:p-4 rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-[#002244]">
                   {{ selectedScheme.name }}
                 </h1>
+                <button
+                  type="button"
+                  (click)="onApplyClicked(selectedScheme)"
+                  class="shrink-0 px-6 py-2.5 bg-[#0B3558] hover:bg-[#082A46] active:scale-98 text-white font-bold text-sm rounded-xs shadow-sm transition-all flex items-center gap-2 cursor-pointer tracking-wide">
+                  <span>Apply for this Scheme</span>
+                  <span class="text-amber-400 font-extrabold text-base">→</span>
+                </button>
               </div>
 
             </div>
@@ -448,6 +444,8 @@ import { Observable } from 'rxjs';
                   </div>
                 </div>
               </div>
+
+
 
             </div>
 
@@ -766,18 +764,10 @@ export class SchemeListingComponent implements OnInit {
 
   selectScheme(scheme: Scheme): void {
     this.selectedScheme = scheme;
-
-    // Check if user is a new applicant with incomplete profile
-    this.eoiService.userProfile$.subscribe(profile => {
-      if (profile && profile.role === 'applicant' && (!profile.isRegistered || profile.userState === 'new')) {
-        this.showProfileRequiredModal = true;
-      } else {
-        this.viewMode = 'details';
-        if (typeof window !== 'undefined') {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-      }
-    }).unsubscribe();
+    this.viewMode = 'details';
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   onApplyClicked(scheme: Scheme): void {
@@ -826,11 +816,17 @@ export class SchemeListingComponent implements OnInit {
   }
 
   getCategoryName(category: string): string {
-    if (!category) return '';
-    if (category.includes(':')) {
-      return category.split(':')[1].trim();
+    if (!category) return 'NA';
+    const trimmed = category.trim();
+    if (trimmed.toUpperCase() === 'ALL' || trimmed.toUpperCase() === 'NA') {
+      return 'NA';
     }
-    return category.replace(/Category\s+[IVX0-9]+:?\s*/i, '').trim();
+    if (trimmed.includes(':')) {
+      const part = trimmed.split(':')[1].trim();
+      return (part.toUpperCase() === 'ALL' || part.toUpperCase() === 'NA') ? 'NA' : part;
+    }
+    const cleaned = trimmed.replace(/Category\s+[IVX0-9]+:?\s*/i, '').trim();
+    return (cleaned.toUpperCase() === 'ALL' || !cleaned) ? 'NA' : cleaned;
   }
 
   openPdf(doc: SchemeDocument): void {

@@ -18,40 +18,22 @@ import { EoiStateService } from '../../../core/services/eoi-state.service';
           <!-- State Logo & Branding -->
           <div class="flex items-center gap-3.5 cursor-pointer" routerLink="/">
             <div class="flex items-center justify-center flex-shrink-0">
-              <img src="ashok.png" alt="Emblem of India" class="h-11 w-auto max-w-[44px] object-contain brightness-0 invert drop-shadow-xs" />
+              <img src="Rajasthan-Sarkar.png" alt="Government of Rajasthan" class="h-11 sm:h-12 w-auto max-w-[48px] object-contain brightness-0 invert drop-shadow-xs" />
             </div>
 
             <div class="w-px h-9 bg-white/20 hidden sm:block"></div>
 
             <div>
-              <div class="flex items-center gap-2">
-                <span class="text-[11px] font-semibold text-[#F8B471]">राजस्थान सरकार</span>
-                <span class="text-[11px] text-white/80">Government of Rajasthan</span>
-              </div>
+          
               <div class="flex items-center gap-2">
                 <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white leading-none">
                   Rajasthan Single Sign On
                 </h1>
-                <span class="text-[10px] bg-white/10 text-slate-200 border border-white/20 px-1.5 py-0.5 rounded font-mono">
-                  v46.5
-                </span>
+              
               </div>
               <div class="text-xs text-slate-300 font-light mt-0.5">
                 One Digital Identity for all Applications · Integrated Scheme Management System (ISMS 2.0)
               </div>
-            </div>
-          </div>
-
-          <!-- Right: Language Switcher & Public Portal Link -->
-          <div class="flex items-center gap-4 text-xs">
-            <a routerLink="/" class="text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-1 rounded border border-white/20 transition-colors">
-              ← Public Portal
-            </a>
-            <span class="text-white/30">|</span>
-            <div class="flex items-center gap-1.5 font-medium">
-              <span class="text-[#F8B471] font-bold cursor-pointer">English</span>
-              <span class="text-white/40">|</span>
-              <span class="text-slate-300 hover:text-white cursor-pointer">हिन्दी</span>
             </div>
           </div>
 
@@ -105,9 +87,7 @@ import { EoiStateService } from '../../../core/services/eoi-state.service';
               <h2 class="text-sm font-bold text-[#131A4D] uppercase tracking-wide">
                 Rajasthan SSO Login · Sign In
               </h2>
-              <span class="text-[11px] font-mono text-slate-500 bg-white border border-slate-200 px-2 py-0.5 rounded">
-                v46.5
-              </span>
+            
             </div>
 
             <div class="p-6 sm:p-8 space-y-6">
@@ -207,18 +187,7 @@ import { EoiStateService } from '../../../core/services/eoi-state.service';
                 </span>
               </div>
 
-              <!-- Login with Meri Pehchaan -->
-              <div class="text-center">
-                <button 
-                  type="button"
-                  (click)="loginWithMeriPehchaan()"
-                  class="inline-flex items-center border border-[#004b87] bg-[#004b87] text-white text-xs font-semibold px-4 py-1.5 rounded hover:bg-[#003660] transition-colors shadow-xs">
-                  <span class="font-bold text-[11px] mr-1.5 uppercase">Login With</span>
-                  <span class="bg-[#d9222a] text-white px-1 py-0.5 text-[10px] font-bold rounded-xs mr-1">Meri</span>
-                  <span class="font-bold text-white mr-1.5">Pehchaan</span>
-                  <span class="text-[9px] opacity-80 border-l border-white/40 pl-1.5">e-Pramaan</span>
-                </button>
-              </div>
+ 
 
               <!-- Quick Test Personas Picker -->
               <div class="pt-4 border-t border-dashed border-slate-200">
@@ -233,7 +202,7 @@ import { EoiStateService } from '../../../core/services/eoi-state.service';
                     (click)="fillAndSubmitPersona('citizen')"
                     class="p-2 bg-slate-50 hover:bg-amber-50 hover:border-amber-300 border border-slate-200 text-slate-700 text-left transition-colors">
                     <div class="font-bold text-slate-900">1. new_citizen_rj</div>
-                    <div class="text-[9px] text-amber-700 mt-0.5">New User (OTR Skippable)</div>
+                    <div class="text-[9px] text-amber-700 mt-0.5">New Applicant (OTR Form)</div>
                   </button>
 
                   <button 
@@ -283,7 +252,7 @@ export class SsoLoginComponent implements OnInit {
     private fb: FormBuilder,
     private eoiService: EoiStateService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.refreshCaptcha();
@@ -302,7 +271,7 @@ export class SsoLoginComponent implements OnInit {
     this.captchaDigits = digits;
     this.captchaCode = digits.join('');
     this.captchaError = '';
-    
+
     if (this.loginForm) {
       this.loginForm.patchValue({ captchaInput: this.captchaCode });
     }
@@ -383,9 +352,9 @@ export class SsoLoginComponent implements OnInit {
         this.eoiService.resetToDeptAdmin(rawSsoId);
         this.router.navigate(['/admin/eoi-view']);
       } else if (ssoLower.includes('new') || ssoLower.includes('citizen') || ssoLower.includes('reg') || ssoLower.includes('fresh')) {
-        // New User -> Portal with New Applicant Sidebar (Tenders & Profile)
+        // New Applicant -> One-Time SSO Digital Identity & Email Mapping Popup First
         this.eoiService.resetToNewCitizen(rawSsoId);
-        this.router.navigate(['/schemes']);
+        this.router.navigate(['/auth/sso-mapping']);
       } else {
         // Existing Registered Training Partner / Applicant -> Full Schemes Dashboard
         this.eoiService.resetToRegisteredApplicant(rawSsoId);

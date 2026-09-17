@@ -21,8 +21,8 @@ import { Observable } from 'rxjs';
           <!-- Official Ashoka Lion Capital Emblem of India -->
           <div class="flex-shrink-0 flex items-center justify-center">
             <img 
-              src="emblem-new.png" 
-              alt="Government of Rajasthan - State Emblem of India"
+              src="Rajasthan-Sarkar.png" 
+              alt="Government of Rajasthan"
               class="h-11 sm:h-[52px] lg:h-[58px] w-auto object-contain select-none" 
             />
           </div>

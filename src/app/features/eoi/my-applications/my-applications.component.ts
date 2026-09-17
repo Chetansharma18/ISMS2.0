@@ -289,7 +289,7 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
               <div class="bg-gradient-to-r from-[#131A4D] to-[#1D246B] text-white p-5 sm:p-6 flex items-center justify-between gap-4 border-b-[3px] border-[#E67E22] flex-wrap sm:flex-nowrap">
                 <div class="flex items-center gap-3.5 sm:gap-4">
                   <div class="shrink-0">
-                    <img src="ashok.png" alt="Emblem" class="h-12 sm:h-15 w-auto brightness-0 invert object-contain" />
+                    <img src="Rajasthan-Sarkar.png" alt="Government of Rajasthan" class="h-12 sm:h-15 w-auto brightness-0 invert object-contain" />
                   </div>
                   <div class="space-y-0.5">
                     <span class="text-[10.5px] sm:text-[11px] font-bold tracking-wider text-[#F8B471] uppercase block">GOVERNMENT OF RAJASTHAN</span>

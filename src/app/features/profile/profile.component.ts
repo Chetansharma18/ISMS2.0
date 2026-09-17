@@ -59,7 +59,7 @@ export interface OfficialDocItem {
                 <span *ngIf="!profile.isRegistered || profile.userState === 'new'" 
                   class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[4px] text-[12px] font-semibold bg-[#FEF3C7] text-[#B7791F] border border-[#FDE68A]">
                   <span class="w-1.5 h-1.5 rounded-full bg-[#B7791F] animate-pulse"></span>
-                  <span>Incomplete</span>
+                  <span>Profile Creation Pending</span>
                 </span>
                 <span *ngIf="profile.isRegistered && profile.userState !== 'new'" 
                   class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] text-[12px] font-semibold bg-[#E8F5E9] text-[#16834B] border border-[#C8E6C9]">
@@ -83,19 +83,17 @@ export interface OfficialDocItem {
 
           <div *ngIf="userProfile$ | async as profile" class="w-full space-y-6">
 
-            <!-- ================= STATE 1: INCOMPLETE PROFILE (SIMPLE CLEAN MESSAGE) ================= -->
+            <!-- ================= STATE 1: INCOMPLETE PROFILE (PROFILE CREATION PENDING) ================= -->
             <div *ngIf="!profile.isRegistered || profile.userState === 'new'" class="bg-white border border-[#D9E1E8] rounded-[6px] p-6 sm:p-8 shadow-none">
               <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                 <div class="flex items-start gap-4">
-                  <div class="w-12 h-12 rounded-[6px] bg-[#FEF3C7] border border-[#FDE68A] flex items-center justify-center shrink-0 text-2xl">
-                    ⚠️
-                  </div>
+                
                   <div class="space-y-1">
                     <h2 class="text-[20px] font-semibold text-[#0B3558] tracking-tight leading-[28px]">
-                      Please Complete Your Profile First
+                      Profile Creation is Pending
                     </h2>
                     <p class="text-[14px] text-[#5F6F7E] leading-relaxed max-w-2xl">
-                      Your profile is currently incomplete. Please complete your profile first to apply for tenders and access all portal services.
+                      Your One-Time Registration (OTR) profile is currently pending. Please complete your profile first to view full entity details, apply for tenders, and access all portal services.
                     </p>
                   </div>
                 </div>
@@ -136,96 +134,96 @@ export interface OfficialDocItem {
               </div>
 
               <!-- VIEW MODE: SECTION 1 (17 Fields) -->
-              <div *ngIf="editingSection !== 1" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-5 text-xs sm:text-[13px]">
+              <div *ngIf="editingSection !== 1" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-5 gap-x-6 text-sm">
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">1. Application No.</span>
-                  <span class="font-mono font-bold text-[#002244] block mt-0.5 text-xs sm:text-[13px]">{{ orgData.application_no }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">1. Application No.</span>
+                  <span class="font-mono font-bold text-[#002244] block text-sm sm:text-[14.5px]">{{ orgData.application_no }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">2. TP/PIA Full Name <span class="text-red-500">*</span></span>
-                  <span class="font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.tp_full_name }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">2. TP/PIA Full Name <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-slate-900 block text-sm sm:text-[14.5px]">{{ orgData.tp_full_name }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">3. TP/PIA Short Name <span class="text-red-500">*</span></span>
-                  <span class="font-mono font-semibold text-slate-800 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.tp_short_name }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">3. TP/PIA Short Name <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-slate-800 block text-sm sm:text-[14.5px]">{{ orgData.tp_short_name }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">4. Registration Number</span>
-                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.registration_number }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">4. Registration Number</span>
+                  <span class="font-mono font-bold text-slate-900 block text-sm sm:text-[14.5px]">{{ orgData.registration_number }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">5. Organisation Contact No. <span class="text-red-500">*</span></span>
-                  <span class="font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.organisation_contact_no }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">5. Organisation Contact No. <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-slate-900 block text-sm sm:text-[14.5px]">{{ orgData.organisation_contact_no }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">6. Company Email-ID <span class="text-red-500">*</span></span>
-                  <span class="font-mono text-slate-900 font-semibold block mt-0.5 text-xs sm:text-[13px]">{{ orgData.company_email }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">6. Company Email-ID <span class="text-red-500">*</span></span>
+                  <span class="font-mono text-slate-900 font-semibold block text-sm sm:text-[14.5px]">{{ orgData.company_email }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">7. Organisation PAN No.</span>
-                  <span class="font-mono font-bold text-[#002244] block mt-0.5 text-xs sm:text-[13px]">
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">7. Organisation PAN No.</span>
+                  <span class="font-mono font-bold text-[#002244] block text-sm sm:text-[14.5px]">
                     {{ orgData.organisation_pan }}
-                    <span class="ml-1 text-[11px] text-emerald-700 font-sans font-bold">✓ Validated</span>
+                    <span class="ml-1 text-xs text-emerald-700 font-sans font-bold">✓ Validated</span>
                   </span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">8. Website</span>
-                  <a *ngIf="orgData.website" [href]="'https://' + orgData.website.replace('https://', '').replace('http://', '')" target="_blank" class="text-blue-700 hover:underline font-mono font-semibold block mt-0.5 truncate text-xs sm:text-[13px]">
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">8. Website</span>
+                  <a *ngIf="orgData.website" [href]="'https://' + orgData.website.replace('https://', '').replace('http://', '')" target="_blank" class="text-blue-700 hover:underline font-semibold block truncate text-sm sm:text-[14.5px]">
                     {{ orgData.website }}
                   </a>
-                  <span *ngIf="!orgData.website" class="text-slate-400 italic font-mono block mt-0.5 text-xs sm:text-[13px]">—</span>
+                  <span *ngIf="!orgData.website" class="text-slate-400 italic block text-sm sm:text-[14.5px]">—</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">10. State / UT <span class="text-red-500">*</span></span>
-                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.state_ut }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">10. State / UT <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block text-sm sm:text-[14.5px]">{{ orgData.state_ut }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">11. District <span class="text-red-500">*</span></span>
-                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.district }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">11. District <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block text-sm sm:text-[14.5px]">{{ orgData.district }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">12. Pincode <span class="text-red-500">*</span></span>
-                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.pincode }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">12. Pincode <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-slate-900 block text-sm sm:text-[14.5px]">{{ orgData.pincode }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">13. Turn Over (₹ in Lakhs) <span class="text-red-500">*</span></span>
-                  <span class="font-bold text-[#002244] block mt-0.5 text-xs sm:text-[13px]">₹ {{ orgData.turnover_lakhs }} Lakhs</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">13. Turn Over (₹ in Lakhs) <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-[#002244] block text-sm sm:text-[14.5px]">₹ {{ orgData.turnover_lakhs }} Lakhs</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">14. Date of Registration</span>
-                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.date_of_registration }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">14. Date of Registration</span>
+                  <span class="font-mono font-semibold text-slate-900 block text-sm sm:text-[14.5px]">{{ orgData.date_of_registration }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">15. State Where Registered</span>
-                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.state_where_registered }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">15. State Where Registered</span>
+                  <span class="font-semibold text-slate-900 block text-sm sm:text-[14.5px]">{{ orgData.state_where_registered }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">16. Type of Business / Activity</span>
-                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.type_of_business }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">16. Type of Business / Activity</span>
+                  <span class="font-semibold text-slate-900 block text-sm sm:text-[14.5px]">{{ orgData.type_of_business }}</span>
                 </div>
 
                 <div class="sm:col-span-2 lg:col-span-3">
-                  <span class="text-slate-500 font-medium block text-xs">9. Registered Office Address <span class="text-red-500">*</span></span>
-                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.registered_address }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">9. Registered Office Address <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block text-sm sm:text-[14.5px]">{{ orgData.registered_address }}</span>
                 </div>
 
                 <div class="sm:col-span-2 lg:col-span-3">
-                  <span class="text-slate-500 font-medium block text-xs">17. Postal / Communication Address <span class="text-red-500">*</span></span>
-                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ orgData.postal_address }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px] mb-0.5">17. Postal / Communication Address <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block text-sm sm:text-[14.5px]">{{ orgData.postal_address }}</span>
                 </div>
               </div>
 
@@ -355,93 +353,93 @@ export interface OfficialDocItem {
               </div>
 
               <!-- VIEW MODE: SECTION 2 (17 Fields) -->
-              <div *ngIf="editingSection !== 2" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-5 text-xs sm:text-[13px]">
+              <div *ngIf="editingSection !== 2" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-5 text-sm sm:text-[14px]">
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">1. Name <span class="text-red-500">*</span></span>
-                  <span class="font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_name }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">1. Name <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-slate-900 block mt-0.5 text-sm sm:text-[14.5px]">{{ authData.auth_name }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">2. S/O, D/O, W/O</span>
-                  <span class="font-semibold text-slate-800 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_guardian_name }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">2. S/O, D/O, W/O</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5 text-sm sm:text-[14px]">{{ authData.auth_guardian_name }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">3. Date of Birth</span>
-                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_dob }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">3. Date of Birth</span>
+                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-sm sm:text-[14px]">{{ authData.auth_dob }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">4. Age</span>
-                  <span class="font-bold text-slate-800 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_age }} Years</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">4. Age</span>
+                  <span class="font-bold text-slate-800 block mt-0.5 text-sm sm:text-[14px]">{{ authData.auth_age }} Years</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">5. Designation <span class="text-red-500">*</span></span>
-                  <span class="font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_designation }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">5. Designation <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-[#002244] block mt-0.5 text-sm sm:text-[14.5px]">{{ authData.auth_designation }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">6. Mobile No. <span class="text-red-500">*</span></span>
-                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_mobile }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">6. Mobile No. <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-sm sm:text-[14.5px]">{{ authData.auth_mobile }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">7. Email-Id <span class="text-red-500">*</span></span>
-                  <span class="font-mono text-slate-900 font-semibold block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_email }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">7. Email-Id <span class="text-red-500">*</span></span>
+                  <span class="font-mono text-slate-900 font-bold block mt-0.5 text-sm sm:text-[14px]">{{ authData.auth_email }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">8. State</span>
-                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_state }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">8. State</span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-sm sm:text-[14px]">{{ authData.auth_state }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">10. PAN <span class="text-red-500">*</span></span>
-                  <span class="font-mono font-bold text-[#002244] block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_pan }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">10. PAN <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-[#002244] block mt-0.5 text-sm sm:text-[14.5px]">{{ authData.auth_pan }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">11. Aadhaar No.</span>
-                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">11. Aadhaar No.</span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-sm sm:text-[14.5px]">
                     {{ authData.auth_aadhaar }}
-                    <span class="ml-1 text-[11px] text-emerald-700 font-sans font-bold">🔒 e-Sign Active</span>
+                    <span class="ml-1.5 text-xs text-emerald-700 font-sans font-bold">🔒 e-Sign Active</span>
                   </span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">12. Type ID Proof</span>
-                  <span class="font-semibold text-slate-800 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_id_proof_type }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">12. Type ID Proof</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5 text-sm sm:text-[14px]">{{ authData.auth_id_proof_type }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">13. ID No.</span>
-                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_id_number }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">13. ID No.</span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-sm sm:text-[14.5px]">{{ authData.auth_id_number }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">14. Bhamashah / Jan Aadhaar</span>
-                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_bhamashah || '—' }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">14. Bhamashah / Jan Aadhaar</span>
+                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-sm sm:text-[14px]">{{ authData.auth_bhamashah || '—' }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">15. Voter Id No.</span>
-                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_voter_id || '—' }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">15. Voter Id No.</span>
+                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-sm sm:text-[14px]">{{ authData.auth_voter_id || '—' }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">16. Passport No.</span>
-                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_passport_no || '—' }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">16. Passport No.</span>
+                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-sm sm:text-[14px]">{{ authData.auth_passport_no || '—' }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">17. Service Tax No.</span>
-                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_service_tax_no || '—' }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">17. Service Tax No.</span>
+                  <span class="font-mono text-slate-800 font-semibold block mt-0.5 text-sm sm:text-[14px]">{{ authData.auth_service_tax_no || '—' }}</span>
                 </div>
 
                 <div class="sm:col-span-2 lg:col-span-3">
-                  <span class="text-slate-500 font-medium block text-xs">9. Residence Address</span>
-                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ authData.auth_residence_address }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">9. Residence Address</span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-sm sm:text-[14px]">{{ authData.auth_residence_address }}</span>
                 </div>
               </div>
 
@@ -556,51 +554,51 @@ export interface OfficialDocItem {
               </div>
 
               <!-- VIEW MODE: SECTION 3 (9 Fields) -->
-              <div *ngIf="editingSection !== 3" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-5 text-xs sm:text-[13px]">
+              <div *ngIf="editingSection !== 3" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-5 text-sm sm:text-[14px]">
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">1. Name of the Bank <span class="text-red-500">*</span></span>
-                  <span class="font-bold text-[#002244] block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_name }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">1. Name of the Bank <span class="text-red-500">*</span></span>
+                  <span class="font-bold text-[#002244] block mt-0.5 text-sm sm:text-[14.5px]">{{ bankData.bank_name }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">2. Account No. <span class="text-red-500">*</span></span>
-                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_account_no }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">2. Account No. <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-slate-900 block mt-0.5 text-sm sm:text-[14.5px]">{{ bankData.bank_account_no }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">3. IFSC Code <span class="text-red-500">*</span></span>
-                  <span class="font-mono font-bold text-[#002244] block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_ifsc }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">3. IFSC Code <span class="text-red-500">*</span></span>
+                  <span class="font-mono font-bold text-[#002244] block mt-0.5 text-sm sm:text-[14.5px]">{{ bankData.bank_ifsc }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">4. Type of Account <span class="text-red-500">*</span></span>
-                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_account_type }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">4. Type of Account <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-sm sm:text-[14px]">{{ bankData.bank_account_type }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">5. Mode of Electronic Transfer</span>
-                  <span class="font-medium text-slate-800 block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_transfer_mode }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">5. Mode of Electronic Transfer</span>
+                  <span class="font-medium text-slate-800 block mt-0.5 text-sm sm:text-[14px]">{{ bankData.bank_transfer_mode }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">6. Branch Name <span class="text-red-500">*</span></span>
-                  <span class="font-semibold text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_branch_name }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">6. Branch Name <span class="text-red-500">*</span></span>
+                  <span class="font-semibold text-slate-900 block mt-0.5 text-sm sm:text-[14px]">{{ bankData.bank_branch_name }}</span>
                 </div>
 
                 <div>
-                  <span class="text-slate-500 font-medium block text-xs">7. MICR Code</span>
-                  <span class="font-mono font-semibold text-slate-800 block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_micr || '—' }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">7. MICR Code</span>
+                  <span class="font-mono font-semibold text-slate-800 block mt-0.5 text-sm sm:text-[14px]">{{ bankData.bank_micr || '—' }}</span>
                 </div>
 
                 <div class="sm:col-span-2 lg:col-span-2">
-                  <span class="text-slate-500 font-medium block text-xs">8. Branch Address <span class="text-red-500">*</span></span>
-                  <span class="font-medium text-slate-900 block mt-0.5 text-xs sm:text-[13px]">{{ bankData.bank_branch_address }}</span>
+                  <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">8. Branch Address <span class="text-red-500">*</span></span>
+                  <span class="font-medium text-slate-900 block mt-0.5 text-sm sm:text-[14px]">{{ bankData.bank_branch_address }}</span>
                 </div>
 
                 <div class="sm:col-span-2 lg:col-span-3 pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
-                    <span class="text-slate-500 font-medium block text-xs">9. Uploaded Cancelled Cheque / Bank Passbook</span>
-                    <span class="font-mono text-slate-800 font-bold text-xs sm:text-[13px] mt-0.5 flex items-center gap-1.5">
+                    <span class="text-slate-500 font-medium block text-xs sm:text-[12.5px]">9. Uploaded Cancelled Cheque / Bank Passbook</span>
+                    <span class="font-mono text-slate-800 font-bold text-sm sm:text-[14px] mt-0.5 flex items-center gap-1.5">
                       <span>📎</span>
                       <span>{{ bankData.bank_cancelled_cheque_doc }}</span>
                       <span class="text-xs text-emerald-700 font-sans font-bold">✓ Uploaded</span>
@@ -874,7 +872,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private eoiService: EoiService,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.userProfile$ = this.eoiState.userProfile$;
@@ -1002,7 +1000,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
           type_of_business: this.orgData.type_of_business,
           postal_address: this.orgData.postal_address
         });
-      } catch {}
+      } catch { }
 
       this.toastMessage = '✓ Organisation / Company Basic Details updated successfully.';
     } else if (sec === 2) {
@@ -1037,7 +1035,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
           auth_passport_no: this.authData.auth_passport_no,
           auth_service_tax_no: this.authData.auth_service_tax_no
         });
-      } catch {}
+      } catch { }
 
       this.toastMessage = '✓ Authorized Person Details updated successfully.';
     } else if (sec === 3) {
@@ -1066,7 +1064,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
           bank_branch_address: this.bankData.bank_branch_address,
           bank_cancelled_cheque_doc: this.bankData.bank_cancelled_cheque_doc
         });
-      } catch {}
+      } catch { }
 
       this.toastMessage = '✓ Bank Mandate & Details updated successfully.';
     }

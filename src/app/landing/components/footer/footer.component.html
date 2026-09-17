@@ -5,8 +5,8 @@
     <div
       class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-12 gap-x-4 sm:gap-x-6 lg:gap-x-10 gap-y-7 sm:gap-y-8 lg:gap-y-10">
 
-      <!-- Col 1: Two Logos on Top, ISMS 2.0 & Subtitle Underneath -->
-      <div class="col-span-2 md:col-span-1 lg:col-span-5 flex flex-col justify-start">
+      <!-- Col 1: Two Logos on Top, ISMS 2.0 & Subtitle Underneath (Shifted right away from left corner) -->
+      <div class="col-span-2 md:col-span-1 lg:col-span-4 lg:col-start-2 flex flex-col justify-start">
         <!-- Logos Row (Emblem + RSLDC Logo side-by-side) -->
         <div class="flex items-center gap-3 sm:gap-4 select-none mb-3 sm:mb-3.5">
           <!-- State Emblem of India (White version for dark footer) -->
@@ -35,8 +35,8 @@
         </div>
       </div>
 
-      <!-- Col 2: Important Links (left column on mobile: col-span-1, 1 col on md, 3 cols on lg) -->
-      <div class="col-span-1 md:col-span-1 lg:col-span-3 md:pl-2 lg:pl-4">
+      <!-- Col 2: Important Links (lg:col-span-3, lg:col-start-6) -->
+      <div class="col-span-1 md:col-span-1 lg:col-span-3 lg:col-start-6 md:pl-2">
         <h4 class="text-sm font-bold text-white mb-3.5 tracking-wide">
           {{ t().footer.importantLinks }}
         </h4>

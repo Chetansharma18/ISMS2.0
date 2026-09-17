@@ -9,7 +9,7 @@ import { EoiStateService } from '../../../core/services/eoi-state.service';
   standalone: true,
   imports: [ReactiveFormsModule, NgIf, RouterLink],
   template: `
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 via-[#eef5fc] to-slate-200 font-['Poppins',sans-serif] text-slate-800 antialiased p-4 sm:p-8 select-none">
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 via-[#eef5fc] to-slate-200 font-sans text-slate-800 antialiased p-4 sm:p-8 select-none">
       
       <!-- Wrapper aligned with Pop-up width -->
       <div class="w-full max-w-2xl mx-auto flex flex-col items-start gap-2.5">
@@ -30,7 +30,7 @@ import { EoiStateService } from '../../../core/services/eoi-state.service';
             <div class="flex items-center gap-3.5">
               <!-- Emblem & Title -->
               <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center p-1 shrink-0">
-                <img src="emblem-new.png" alt="State Emblem of India" class="h-7 sm:h-8 w-auto object-contain brightness-0 invert" />
+                <img src="Rajasthan-Sarkar.png" alt="Government of Rajasthan" class="h-7 sm:h-8 w-auto object-contain brightness-0 invert" />
               </div>
               <div>
                 <h2 class="text-sm sm:text-lg font-bold tracking-tight text-white leading-tight">

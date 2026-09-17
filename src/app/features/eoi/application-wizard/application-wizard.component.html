@@ -11,67 +11,46 @@
     <!-- ========================================================================= -->
     <!-- STEP 1: DOCUMENT UPLOADS                                                  -->
     <!-- ========================================================================= -->
-    <app-step-documents
-      *ngIf="eoiService.flowStage() === 'documents'"
-      [scheme]="selectedScheme()"
-      [validationErrors]="validationErrors()"
-      (onChangeScheme)="goToAllSchemes()"
-      (onNext)="handleDocumentsNext()"
-      (onViewDoc)="onViewDocument($event)"
-      (onClearError)="clearFieldError($event)"
-    ></app-step-documents>
+    <app-step-documents *ngIf="eoiService.flowStage() === 'documents'" [scheme]="selectedScheme()"
+      [validationErrors]="validationErrors()" (onChangeScheme)="goToAllSchemes()" (onNext)="handleDocumentsNext()"
+      (onViewDoc)="onViewDocument($event)" (onClearError)="clearFieldError($event)"></app-step-documents>
 
     <!-- ========================================================================= -->
     <!-- STEP 2: FEE PAYMENT                                                       -->
     <!-- ========================================================================= -->
-    <app-step-payment
-      *ngIf="eoiService.flowStage() === 'fees'"
-      [scheme]="selectedScheme()"
-      [validationErrors]="validationErrors()"
-      (onProceedPayment)="handleProceedToPayment()"
-      (onBack)="eoiService.setFlowStage('documents')"
-      (onClearError)="clearFieldError($event)"
-    ></app-step-payment>
+    <app-step-payment *ngIf="eoiService.flowStage() === 'fees'" [scheme]="selectedScheme()"
+      [validationErrors]="validationErrors()" (onProceedPayment)="handleProceedToPayment()"
+      (onBack)="eoiService.setFlowStage('documents')" (onClearError)="clearFieldError($event)"></app-step-payment>
 
     <!-- ========================================================================= -->
     <!-- STEP 3: APPLICATION PREVIEW & SECTION EDIT                                -->
     <!-- ========================================================================= -->
-    <app-step-preview
-      *ngIf="eoiService.flowStage() === 'preview' || eoiService.flowStage() === 'edit_section'"
-      [scheme]="selectedScheme()"
-      [validationErrors]="validationErrors()"
-      (onOpenSubmitConfirm)="openSubmitConfirmation()"
-      (onViewDoc)="onViewDocument($event)"
-      (onClearFieldError)="clearFieldError($event)"
-      (onSaveSection)="saveSectionAndReturn()"
-      (onCancelSection)="cancelSectionAndReturn()"
-      (onEditSection)="editSection($event)"
-    ></app-step-preview>
+    <app-step-preview *ngIf="eoiService.flowStage() === 'preview' || eoiService.flowStage() === 'edit_section'"
+      [scheme]="selectedScheme()" [validationErrors]="validationErrors()"
+      (onOpenSubmitConfirm)="openSubmitConfirmation()" (onViewDoc)="onViewDocument($event)"
+      (onClearFieldError)="clearFieldError($event)" (onSaveSection)="saveSectionAndReturn()"
+      (onCancelSection)="cancelSectionAndReturn()" (onEditSection)="editSection($event)"></app-step-preview>
 
     <!-- ========================================================================= -->
     <!-- STEP 4: SUBMISSION RECEIPT & ACKNOWLEDGEMENT                              -->
     <!-- ========================================================================= -->
-    <app-step-receipt
-      *ngIf="eoiService.flowStage() === 'receipt'"
-      [scheme]="selectedScheme()"
-      [copiedRef]="copiedRef()"
-      (onCopyRef)="copyApplicationNumber()"
-      (onPrint)="printReceipt()"
-      (onDownload)="downloadReceipt()"
+    <app-step-receipt *ngIf="eoiService.flowStage() === 'receipt'" [scheme]="selectedScheme()" [copiedRef]="copiedRef()"
+      (onCopyRef)="copyApplicationNumber()" (onPrint)="printReceipt()" (onDownload)="downloadReceipt()"
       (onReopenModification)="reopenForModification()"
-      (onToggleDeadline)="toggleDeadlineSimulation()"
-    ></app-step-receipt>
+      (onToggleDeadline)="toggleDeadlineSimulation()"></app-step-receipt>
 
   </main>
 
   <!-- ========================================================================= -->
   <!-- MODAL 1: DOCUMENT SAVE & NEXT CONFIRMATION POPUP                          -->
   <!-- ========================================================================= -->
-  <div *ngIf="showDocConfirmModal()" class="gov-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="doc-confirm-title">
+  <div *ngIf="showDocConfirmModal()" class="gov-modal-backdrop" role="dialog" aria-modal="true"
+    aria-labelledby="doc-confirm-title">
     <div class="gov-modal-box confirm-dialog-box">
       <div class="gov-modal-header">
         <h3 id="doc-confirm-title" class="gov-modal-title">Verification Confirmation</h3>
-        <button type="button" class="modal-close-btn" (click)="closeDocConfirmModal()" aria-label="Close dialog">✕</button>
+        <button type="button" class="modal-close-btn" (click)="closeDocConfirmModal()"
+          aria-label="Close dialog">✕</button>
       </div>
       <div class="gov-modal-body confirm-dialog-body">
         <div class="confirm-icon-wrap">
@@ -98,12 +77,14 @@
   <!-- ========================================================================= -->
   <!-- MODAL 2: MOCK PAYMENT SUCCESS STATE                                       -->
   <!-- ========================================================================= -->
-  <div *ngIf="showPaymentSuccessModal()" class="gov-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pay-success-title">
+  <div *ngIf="showPaymentSuccessModal()" class="gov-modal-backdrop" role="dialog" aria-modal="true"
+    aria-labelledby="pay-success-title">
     <div class="gov-modal-box payment-success-modal-box">
       <div class="payment-success-header">
         <div class="success-animated-tick">✓</div>
         <h3 id="pay-success-title" class="payment-success-title">Payment Successful</h3>
-        <span class="payment-success-sub">Payment has been completed successfully via {{ eoiService.paymentData().paymentMethod }}</span>
+        <span class="payment-success-sub">Payment has been completed successfully via {{
+          eoiService.paymentData().paymentMethod }}</span>
       </div>
       <div class="gov-modal-body payment-success-body">
         <div class="payment-success-detail-card">
@@ -113,7 +94,8 @@
           </div>
           <div class="pay-detail-row">
             <span class="d-label">Amount Paid:</span>
-            <span class="d-val font-bold text-success" style="font-size: 16px;">₹{{ eoiService.paymentData().totalAmount.toLocaleString('en-IN') }}</span>
+            <span class="d-val font-bold text-success" style="font-size: 16px;">₹{{
+              eoiService.paymentData().totalAmount.toLocaleString('en-IN') }}</span>
           </div>
           <div class="pay-detail-row">
             <span class="d-label">Payment Date &amp; Time:</span>
@@ -129,12 +111,8 @@
         </p>
       </div>
       <div class="gov-modal-footer payment-success-footer">
-        <button
-          type="button"
-          id="btn-payment-continue"
-          class="gov-btn gov-btn-primary gov-btn-full"
-          (click)="continueToPreview()"
-        >
+        <button type="button" id="btn-payment-continue" class="gov-btn gov-btn-primary gov-btn-full"
+          (click)="continueToPreview()">
           <span>Continue to Application Preview</span>
           <span class="arrow-icon">→</span>
         </button>
@@ -145,11 +123,13 @@
   <!-- ========================================================================= -->
   <!-- MODAL 3: FINAL SUBMISSION CONFIRMATION                                    -->
   <!-- ========================================================================= -->
-  <div *ngIf="showSubmitConfirmModal()" class="gov-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="submit-confirm-title">
+  <div *ngIf="showSubmitConfirmModal()" class="gov-modal-backdrop" role="dialog" aria-modal="true"
+    aria-labelledby="submit-confirm-title">
     <div class="gov-modal-box confirm-dialog-box">
       <div class="gov-modal-header">
         <h3 id="submit-confirm-title" class="gov-modal-title">Confirm Application Submission</h3>
-        <button type="button" class="modal-close-btn" (click)="closeSubmitConfirmModal()" aria-label="Close dialog">✕</button>
+        <button type="button" class="modal-close-btn" (click)="closeSubmitConfirmModal()"
+          aria-label="Close dialog">✕</button>
       </div>
       <div class="gov-modal-body confirm-dialog-body">
         <div class="confirm-icon-wrap icon-submit-wrap">
@@ -158,7 +138,8 @@
         <div class="confirm-text-wrap">
           <h4 class="confirm-main-prompt">Submit EOI Application?</h4>
           <p class="confirm-sub-prompt">
-            Please confirm that all information and documents provided in the application are correct. After submission, the application will be submitted for official scrutiny.
+            Please confirm that all information and documents provided in the application are correct. After submission,
+            the application will be submitted for official scrutiny.
           </p>
         </div>
       </div>
@@ -176,14 +157,16 @@
   <!-- ========================================================================= -->
   <!-- MODAL 4: MOCK PDF DOCUMENT VIEWER                                         -->
   <!-- ========================================================================= -->
-  <div *ngIf="showPdfViewerModal()" class="gov-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pdf-viewer-title">
+  <div *ngIf="showPdfViewerModal()" class="gov-modal-backdrop" role="dialog" aria-modal="true"
+    aria-labelledby="pdf-viewer-title">
     <div class="gov-modal-box pdf-viewer-modal-box">
       <div class="gov-modal-header pdf-viewer-header">
         <div class="pdf-header-titles">
           <span class="pdf-tag">PDF PREVIEW • MAX 5 MB VERIFIED</span>
           <h3 id="pdf-viewer-title" class="gov-modal-title">{{ currentViewingDoc()?.title }}</h3>
         </div>
-        <button type="button" class="modal-close-btn" (click)="closePdfViewer()" aria-label="Close document preview">✕</button>
+        <button type="button" class="modal-close-btn" (click)="closePdfViewer()"
+          aria-label="Close document preview">✕</button>
       </div>
       <div class="gov-modal-body pdf-viewer-body">
         <div class="mock-pdf-page">
@@ -193,7 +176,7 @@
           </div>
           <div class="mock-pdf-content">
             <div class="mock-pdf-emblem-wrap">
-              <img src="ashok.png" alt="Emblem" style="height: 48px; filter: grayscale(1);" />
+              <img src="Rajasthan-Sarkar.png" alt="Rajasthan Government Logo" style="height: 48px;" />
               <h4>GOVERNMENT OF RAJASTHAN • ISMS 2.0</h4>
               <p>Official Upload Verification for {{ currentViewingDoc()?.title }}</p>
             </div>

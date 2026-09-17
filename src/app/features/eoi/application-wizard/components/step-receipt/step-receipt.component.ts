@@ -91,7 +91,7 @@ import { Scheme } from '../../../../../core/services/eoi-state.service';
         <!-- Receipt Top Header -->
         <div class="receipt-header-banner">
           <div class="receipt-emblem-wrap">
-            <img src="ashok.png" alt="Emblem" class="receipt-emblem" />
+            <img src="Rajasthan-Sarkar.png" alt="Government of Rajasthan" class="receipt-emblem" />
           </div>
           <div class="receipt-titles-wrap">
             <span class="receipt-govt-tag">GOVERNMENT OF RAJASTHAN</span>

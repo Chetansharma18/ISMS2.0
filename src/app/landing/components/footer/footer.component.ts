@@ -5,8 +5,7 @@ import { LanguageService } from '../../../core/services/language.service';
   selector: 'app-footer',
   standalone: true,
   imports: [],
-  templateUrl: './footer.component.html',
-  styleUrls: ['./footer.component.css']
+  templateUrl: './footer.component.html'
 })
 export class FooterComponent {
   protected readonly languageService = inject(LanguageService);

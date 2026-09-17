@@ -1,15 +1,15 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { NgClass, NgIf } from '@angular/common';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'link';
+export type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'link';
 
 @Component({
   selector: 'app-button',
   template: `
     <button
       [ngClass]="buttonClasses"
-      class="px-4 py-2 rounded-md font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 w-full h-full flex items-center justify-center transition-opacity"
-      [class.opacity-75]="disabled || isLoading"
+      class="px-4 py-2 font-sans text-[14px] font-semibold rounded-[6px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 w-full h-full flex items-center justify-center transition-all cursor-pointer"
+      [class.opacity-60]="disabled || isLoading"
       [class.cursor-not-allowed]="disabled || isLoading"
       [disabled]="disabled || isLoading"
       [attr.type]="type"
@@ -28,19 +28,22 @@ export class ButtonComponent {
   @Input() isLoading = false;
 
   get buttonClasses(): string[] {
-    const base = ['text-white'];
+    const base: string[] = [];
     switch (this.variant) {
       case 'primary':
-        base.push('bg-primary', 'hover:bg-primaryDark');
+        base.push('bg-[#0B3558]', 'hover:bg-[#082A46]', 'text-white', 'border', 'border-transparent');
         break;
       case 'secondary':
-        base.push('bg-gray-600', 'hover:bg-gray-700');
+        base.push('bg-white', 'border', 'border-[#0B3558]', 'text-[#0B3558]', 'hover:bg-[#F4F7F9]');
+        break;
+      case 'success':
+        base.push('bg-[#16834B]', 'hover:bg-[#11683B]', 'text-white', 'border', 'border-transparent');
         break;
       case 'danger':
-        base.push('bg-error', 'hover:bg-errorDark');
+        base.push('bg-[#C62828]', 'hover:bg-[#A31F1F]', 'text-white', 'border', 'border-transparent');
         break;
       case 'link':
-        base.push('bg-transparent', 'text-primary', 'underline');
+        base.push('bg-transparent', 'text-[#0B3558]', 'underline', 'p-0', 'h-auto');
         break;
     }
     return base;

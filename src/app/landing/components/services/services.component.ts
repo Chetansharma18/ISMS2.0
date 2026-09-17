@@ -13,8 +13,7 @@ export interface Option13Service {
   selector: 'app-services',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './services.component.html',
-  styleUrls: ['./services.component.css']
+  templateUrl: './services.component.html'
 })
 export class ServicesComponent {
   services: Option13Service[] = [

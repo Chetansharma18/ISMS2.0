@@ -17,8 +17,7 @@ export interface PressRelease {
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css'
+  templateUrl: './navbar.component.html'
 })
 export class NavbarComponent implements OnInit {
   protected readonly languageService = inject(LanguageService);

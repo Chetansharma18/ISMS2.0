@@ -23,14 +23,14 @@ import { Observable, of, switchMap, map } from 'rxjs';
     StatusBadgeComponent
   ],
   template: `
-    <div class="min-h-screen flex flex-col bg-[#f8fafc] font-sans text-slate-800 antialiased">
-      <app-header></app-header>
+    <div class="h-screen flex flex-col bg-[#f8fafc] font-sans text-slate-800 antialiased overflow-hidden">
+      <app-header class="shrink-0"></app-header>
 
-      <div class="flex flex-grow">
+      <div class="flex flex-1 min-h-0 overflow-hidden w-full">
         <!-- Persistent Portal Sidebar -->
-        <app-sidebar class="hidden md:block"></app-sidebar>
+        <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>
 
-        <main class="flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto space-y-6">
+        <main class="flex-1 min-w-0 min-h-0 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto overflow-x-hidden space-y-6">
 
           <!-- Page Heading -->
           <div class="border-b border-slate-200 pb-4">
@@ -489,7 +489,6 @@ import { Observable, of, switchMap, map } from 'rxjs';
                 View All My Applications →
               </a>
             </div>
-
           </div>
 
         </main>

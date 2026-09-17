@@ -39,93 +39,97 @@ export interface OfficialDocItem {
     GradeBadgeComponent
   ],
   template: `
-    <div class="min-h-screen flex flex-col bg-[#f8fafc] font-sans text-slate-800 antialiased selection:bg-[#002244] selection:text-white">
+    <div class="h-screen flex flex-col bg-[#F6F8FA] font-sans text-[#172B3A] antialiased selection:bg-[#0B3558] selection:text-white overflow-hidden">
       <!-- Portal Post-Login Header with Dual Emblems & User Profile Information -->
-      <app-header></app-header>
+      <app-header class="shrink-0"></app-header>
 
-      <div class="flex flex-grow w-full">
+      <div class="flex flex-1 min-h-0 w-full overflow-hidden">
         <!-- Persistent Portal Sidebar -->
-        <app-sidebar class="hidden md:block flex-shrink-0"></app-sidebar>
+        <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>
 
-        <main class="flex-1 min-w-0 w-full px-3 sm:px-5 py-4 overflow-y-auto">
+        <main class="flex-1 min-w-0 min-h-0 w-full p-6 overflow-y-auto overflow-x-hidden bg-[#F6F8FA]">
           
           <!-- Top Title & Action Bar -->
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 mb-6">
-            <div>
-              <h1 class="text-2xl sm:text-3xl font-bold text-[#002244] tracking-tight">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-[#D9E1E8] mb-6">
+            <div class="flex items-center gap-3">
+              <h1 class="text-[28px] font-bold text-[#0B3558] tracking-tight leading-[36px]">
                 Entity &amp; Applicant Profile
               </h1>
+              <ng-container *ngIf="userProfile$ | async as profile">
+                <span *ngIf="!profile.isRegistered || profile.userState === 'new'" 
+                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[4px] text-[12px] font-semibold bg-[#FEF3C7] text-[#B7791F] border border-[#FDE68A]">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#B7791F] animate-pulse"></span>
+                  <span>Incomplete</span>
+                </span>
+                <span *ngIf="profile.isRegistered && profile.userState !== 'new'" 
+                  class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] text-[12px] font-semibold bg-[#E8F5E9] text-[#16834B] border border-[#C8E6C9]">
+                  <span>✓ Verified TP</span>
+                </span>
+              </ng-container>
             </div>
 
             <div class="flex items-center gap-2.5">
-              <ng-container *ngIf="userProfile$ | async as profile">
-                <!-- If Profile is Incomplete: Direct CTA to OTR -->
-                <ng-container *ngIf="!profile.isRegistered || profile.userState === 'new'">
-                  <a 
-                    routerLink="/auth/register" 
-                    class="px-4 py-2 bg-[#002244] hover:bg-[#003366] text-white text-xs font-bold rounded-md transition-all shadow-xs inline-flex items-center gap-1.5">
-                    <span>Complete OTR Registration</span>
-                    <span>→</span>
-                  </a>
-                </ng-container>
-              </ng-container>
             </div>
           </div>
 
           <!-- Toast Notification -->
-          <div *ngIf="toastMessage" class="mb-5 p-3.5 bg-emerald-50 border border-emerald-300 rounded-lg text-emerald-900 text-xs font-bold flex items-center justify-between shadow-xs animate-fadeIn">
+          <div *ngIf="toastMessage" class="mb-5 p-3.5 bg-[#E8F5E9] border border-[#C8E6C9] rounded-[6px] text-[#16834B] text-xs font-semibold flex items-center justify-between shadow-none animate-fadeIn">
             <div class="flex items-center gap-2">
-              <span class="text-emerald-700 text-base">✓</span>
+              <span class="text-[#16834B] text-base font-bold">✓</span>
               <span>{{ toastMessage }}</span>
             </div>
-            <button (click)="toastMessage = null" class="text-emerald-700 hover:text-emerald-900 text-sm font-bold">✕</button>
+            <button (click)="toastMessage = null" class="text-[#16834B] hover:opacity-75 text-sm font-bold cursor-pointer">✕</button>
           </div>
 
           <div *ngIf="userProfile$ | async as profile" class="w-full space-y-6">
 
-            <!-- ================= STATE 1: INCOMPLETE PROFILE CALLOUT BANNER ================= -->
-            <div *ngIf="!profile.isRegistered || profile.userState === 'new'" 
-              class="p-5 bg-gradient-to-r from-amber-50 via-white to-amber-50/80 border-2 border-amber-300 rounded-xs shadow-xs relative overflow-hidden">
-              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="flex items-start gap-3.5">
-                  <div class="w-10 h-10 rounded-xs bg-amber-500 text-[#002244] font-black flex items-center justify-center text-lg shrink-0 shadow-xs">
+            <!-- ================= STATE 1: INCOMPLETE PROFILE (SIMPLE CLEAN MESSAGE) ================= -->
+            <div *ngIf="!profile.isRegistered || profile.userState === 'new'" class="bg-white border border-[#D9E1E8] rounded-[6px] p-6 sm:p-8 shadow-none">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                <div class="flex items-start gap-4">
+                  <div class="w-12 h-12 rounded-[6px] bg-[#FEF3C7] border border-[#FDE68A] flex items-center justify-center shrink-0 text-2xl">
                     ⚠️
                   </div>
-                  <div>
-                    <h3 class="font-extrabold text-sm text-[#002244] tracking-tight">
-                      One-Time Registration (OTR) Incomplete
-                    </h3>
-                    <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                      Your official corporate entity, bank mandate, and statutory documents are not registered yet. All fields below are currently blank. Complete One-Time Registration (OTR) to unlock tender applications, EMD fee payments, and proposal submissions.
+                  <div class="space-y-1">
+                    <h2 class="text-[20px] font-semibold text-[#0B3558] tracking-tight leading-[28px]">
+                      Please Complete Your Profile First
+                    </h2>
+                    <p class="text-[14px] text-[#5F6F7E] leading-relaxed max-w-2xl">
+                      Your profile is currently incomplete. Please complete your profile first to apply for tenders and access all portal services.
                     </p>
                   </div>
                 </div>
 
-                <a 
-                  routerLink="/auth/register" 
-                  class="shrink-0 w-full sm:w-auto text-center px-5 py-2.5 bg-[#002244] hover:bg-[#003366] text-white font-bold text-xs rounded-xs transition-colors shadow-xs flex items-center justify-center gap-2">
-                  <span>Start OTR Registration</span>
-                  <span>→</span>
-                </a>
+                <div class="shrink-0 w-full sm:w-auto">
+                  <a 
+                    routerLink="/auth/register" 
+                    class="w-full sm:w-auto px-5 py-2.5 bg-[#0B3558] hover:bg-[#082A46] text-white font-semibold text-[14px] rounded-[6px] transition-all inline-flex items-center justify-center gap-1.5 cursor-pointer">
+                    <span>Complete Profile</span>
+                    <span>→</span>
+                  </a>
+                </div>
               </div>
             </div>
 
+            <!-- ================= STATE 2: REGISTERED USER PROFILE SECTIONS (ALL 4 SECTIONS) ================= -->
+            <ng-container *ngIf="profile.isRegistered && profile.userState !== 'new'">
+
             <!-- ================= 1. ORGANISATION / COMPANY BASIC DETAILS (17 FIELDS) ================= -->
-            <div *ngIf="activeSection === 1" class="bg-white border border-slate-200 rounded-xs p-6 sm:p-7 shadow-sm space-y-5">
-              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-200">
+            <div *ngIf="activeSection === 1" class="bg-white border border-[#D9E1E8] rounded-[6px] p-6 space-y-5 shadow-none">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-[#D9E1E8]">
                 <div>
-                  <h3 class="text-base sm:text-lg font-bold text-[#002244] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-xs bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">1</span>
+                  <h3 class="text-[20px] font-semibold text-[#0B3558] flex items-center gap-2 leading-[28px]">
+                    <span class="w-6 h-6 rounded-[4px] bg-[#EEF3F7] text-[#0B3558] flex items-center justify-center font-semibold text-xs">1</span>
                     <span>Organisation / Company Basic Details (17 Fields)</span>
                   </h3>
-                  <p class="text-xs text-slate-500 mt-0.5">Corporate entity details, legal incorporation, address, and turnover</p>
+                  <p class="text-[12px] text-[#5F6F7E] mt-0.5">Corporate entity details, legal incorporation, address, and turnover</p>
                 </div>
                 
                 <div class="flex items-center gap-2">
                   <button 
                     *ngIf="editingSection !== 1"
                     (click)="startEditingSection(1)"
-                    class="px-3.5 py-1.5 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs sm:text-[13px] font-bold rounded-xs transition-colors inline-flex items-center gap-1 cursor-pointer">
+                    class="px-3.5 py-1.5 bg-white border border-[#0B3558] text-[#0B3558] hover:bg-[#F4F7F9] text-[13px] font-semibold rounded-[6px] transition-colors inline-flex items-center gap-1 cursor-pointer">
                     <span>Edit Section</span>
                   </button>
                 </div>
@@ -314,15 +318,15 @@ export interface OfficialDocItem {
                   </div>
                 </div>
 
-                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-[#D9E1E8]">
                   <button 
                     (click)="cancelEditing()"
-                    class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs sm:text-[13px] rounded-xs hover:bg-slate-100 transition-colors cursor-pointer">
+                    class="px-4 py-2 bg-white border border-[#CBD5DF] text-[#172B3A] font-semibold text-[13px] rounded-[6px] hover:bg-[#F4F7F9] transition-colors cursor-pointer">
                     Cancel
                   </button>
                   <button 
                     (click)="saveSection(1)"
-                    class="px-5 py-2 bg-[#002244] text-white font-bold text-xs sm:text-[13px] rounded-xs hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
+                    class="px-5 py-2 bg-[#0B3558] hover:bg-[#082A46] text-white font-semibold text-[13px] rounded-[6px] transition-colors cursor-pointer">
                     ✓ Save Section 1 Details
                   </button>
                 </div>
@@ -330,21 +334,21 @@ export interface OfficialDocItem {
             </div>
 
             <!-- ================= 2. AUTHORIZED PERSON DETAILS (17 FIELDS) ================= -->
-            <div *ngIf="activeSection === 2" class="bg-white border border-slate-200 rounded-xs p-6 sm:p-7 shadow-sm space-y-5">
-              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-200">
+            <div *ngIf="activeSection === 2" class="bg-white border border-[#D9E1E8] rounded-[6px] p-6 space-y-5 shadow-none">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-[#D9E1E8]">
                 <div>
-                  <h3 class="text-base sm:text-lg font-bold text-[#002244] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-xs bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">2</span>
+                  <h3 class="text-[20px] font-semibold text-[#0B3558] flex items-center gap-2 leading-[28px]">
+                    <span class="w-6 h-6 rounded-[4px] bg-[#EEF3F7] text-[#0B3558] flex items-center justify-center font-semibold text-xs">2</span>
                     <span>Authorized Person Details (Organisation Level) (17 Fields)</span>
                   </h3>
-                  <p class="text-xs text-slate-500 mt-0.5">Authorized signatory credentials, Aadhaar e-KYC, identity proofs, and contact</p>
+                  <p class="text-[12px] text-[#5F6F7E] mt-0.5">Authorized signatory credentials, Aadhaar e-KYC, identity proofs, and contact</p>
                 </div>
                 
                 <div class="flex items-center gap-2">
                   <button 
                     *ngIf="editingSection !== 2"
                     (click)="startEditingSection(2)"
-                    class="px-3.5 py-1.5 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs sm:text-[13px] font-bold rounded-xs transition-colors inline-flex items-center gap-1 cursor-pointer">
+                    class="px-3.5 py-1.5 bg-white border border-[#0B3558] text-[#0B3558] hover:bg-[#F4F7F9] text-[13px] font-semibold rounded-[6px] transition-colors inline-flex items-center gap-1 cursor-pointer">
                     <span>Edit Section</span>
                   </button>
                 </div>
@@ -515,15 +519,15 @@ export interface OfficialDocItem {
                   </div>
                 </div>
 
-                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-[#D9E1E8]">
                   <button 
                     (click)="cancelEditing()"
-                    class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs sm:text-[13px] rounded-xs hover:bg-slate-100 transition-colors cursor-pointer">
+                    class="px-4 py-2 bg-white border border-[#CBD5DF] text-[#172B3A] font-semibold text-[13px] rounded-[6px] hover:bg-[#F4F7F9] transition-colors cursor-pointer">
                     Cancel
                   </button>
                   <button 
                     (click)="saveSection(2)"
-                    class="px-5 py-2 bg-[#002244] text-white font-bold text-xs sm:text-[13px] rounded-xs hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
+                    class="px-5 py-2 bg-[#0B3558] hover:bg-[#082A46] text-white font-semibold text-[13px] rounded-[6px] transition-colors cursor-pointer">
                     ✓ Save Section 2 Details
                   </button>
                 </div>
@@ -531,21 +535,21 @@ export interface OfficialDocItem {
             </div>
 
             <!-- ================= 3. BANK DETAILS (9 FIELDS) ================= -->
-            <div *ngIf="activeSection === 3" class="bg-white border border-slate-200 rounded-xs p-6 sm:p-7 shadow-sm space-y-5">
-              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-200">
+            <div *ngIf="activeSection === 3" class="bg-white border border-[#D9E1E8] rounded-[6px] p-6 space-y-5 shadow-none">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-[#D9E1E8]">
                 <div>
-                  <h3 class="text-base sm:text-lg font-bold text-[#002244] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-xs bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">3</span>
+                  <h3 class="text-[20px] font-semibold text-[#0B3558] flex items-center gap-2 leading-[28px]">
+                    <span class="w-6 h-6 rounded-[4px] bg-[#EEF3F7] text-[#0B3558] flex items-center justify-center font-semibold text-xs">3</span>
                     <span>Bank Details (9 Fields)</span>
                   </h3>
-                  <p class="text-xs text-slate-500 mt-0.5">Government PFMS verified bank mandate for electronic EMD refunds and grant transfers</p>
+                  <p class="text-[12px] text-[#5F6F7E] mt-0.5">Government PFMS verified bank mandate for electronic EMD refunds and grant transfers</p>
                 </div>
                 
                 <div class="flex items-center gap-2">
                   <button 
                     *ngIf="editingSection !== 3"
                     (click)="startEditingSection(3)"
-                    class="px-3.5 py-1.5 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs sm:text-[13px] font-bold rounded-xs transition-colors inline-flex items-center gap-1 cursor-pointer">
+                    class="px-3.5 py-1.5 bg-white border border-[#0B3558] text-[#0B3558] hover:bg-[#F4F7F9] text-[13px] font-semibold rounded-[6px] transition-colors inline-flex items-center gap-1 cursor-pointer">
                     <span>Edit Section</span>
                   </button>
                 </div>
@@ -669,15 +673,15 @@ export interface OfficialDocItem {
                   </div>
                 </div>
 
-                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
+                <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-[#D9E1E8]">
                   <button 
                     (click)="cancelEditing()"
-                    class="px-4 py-2 bg-white border border-slate-300 text-slate-700 font-bold text-xs sm:text-[13px] rounded-xs hover:bg-slate-100 transition-colors cursor-pointer">
+                    class="px-4 py-2 bg-white border border-[#CBD5DF] text-[#172B3A] font-semibold text-[13px] rounded-[6px] hover:bg-[#F4F7F9] transition-colors cursor-pointer">
                     Cancel
                   </button>
                   <button 
                     (click)="saveSection(3)"
-                    class="px-5 py-2 bg-[#002244] text-white font-bold text-xs sm:text-[13px] rounded-xs hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
+                    class="px-5 py-2 bg-[#0B3558] hover:bg-[#082A46] text-white font-semibold text-[13px] rounded-[6px] transition-colors cursor-pointer">
                     ✓ Save Section 3 Details
                   </button>
                 </div>
@@ -685,56 +689,56 @@ export interface OfficialDocItem {
             </div>
 
             <!-- ================= 4. OFFICIAL UPLOADED DOCUMENTS CHECKLIST (12 DOCS) ================= -->
-            <div *ngIf="activeSection === 4" class="bg-white border border-slate-200 rounded-xs p-6 sm:p-7 shadow-sm space-y-5">
-              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-200">
+            <div *ngIf="activeSection === 4" class="bg-white border border-[#D9E1E8] rounded-[6px] p-6 space-y-5 shadow-none">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-[#D9E1E8]">
                 <div>
-                  <h3 class="text-base sm:text-lg font-bold text-[#002244] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-xs bg-[#002244]/10 text-[#002244] flex items-center justify-center font-bold text-xs">4</span>
+                  <h3 class="text-[20px] font-semibold text-[#0B3558] flex items-center gap-2 leading-[28px]">
+                    <span class="w-6 h-6 rounded-[4px] bg-[#EEF3F7] text-[#0B3558] flex items-center justify-center font-semibold text-xs">4</span>
                     <span>Official Uploaded Documents Checklist (12 Documents per Spec)</span>
                   </h3>
-                  <p class="text-xs text-slate-500 mt-0.5">Statutory certificates, audit balance sheets, pan, GST, and affidavits</p>
+                  <p class="text-[12px] text-[#5F6F7E] mt-0.5">Statutory certificates, audit balance sheets, pan, GST, and affidavits</p>
                 </div>
                 
                 <div class="flex items-center gap-2">
                   <button 
                     *ngIf="editingSection !== 4"
                     (click)="startEditingSection(4)"
-                    class="px-3.5 py-1.5 bg-slate-100 hover:bg-[#002244] hover:text-white text-[#002244] border border-slate-300 text-xs sm:text-[13px] font-bold rounded-xs transition-colors inline-flex items-center gap-1 cursor-pointer">
+                    class="px-3.5 py-1.5 bg-white border border-[#0B3558] text-[#0B3558] hover:bg-[#F4F7F9] text-[13px] font-semibold rounded-[6px] transition-colors inline-flex items-center gap-1 cursor-pointer">
                     <span>Manage / Replace Docs</span>
                   </button>
                 </div>
               </div>
 
               <!-- Documents Table -->
-              <div class="overflow-x-auto border border-slate-200 rounded-xs shadow-sm">
-                <table class="w-full min-w-[720px] text-xs sm:text-[13px] text-left border-collapse">
+              <div class="overflow-x-auto border border-[#D9E1E8] rounded-[6px]">
+                <table class="w-full min-w-[720px] text-[13px] text-left border-collapse font-sans">
                   <thead>
-                    <tr class="bg-[#002244] text-white border-b-2 border-amber-500">
-                      <th class="py-3 px-3 font-bold w-12 text-center text-xs tracking-wider uppercase border-r border-[#0e3b6e]">S.No.</th>
-                      <th class="py-3 px-3 font-bold text-xs tracking-wider uppercase border-r border-[#0e3b6e]">Document Title &amp; Category</th>
-                      <th class="py-3 px-3 font-bold text-xs tracking-wider uppercase border-r border-[#0e3b6e]">Uploaded File</th>
-                      <th class="py-3 px-3 font-bold text-center text-xs tracking-wider uppercase border-r border-[#0e3b6e]">Size</th>
-                      <th class="py-3 px-3 font-bold text-center text-xs tracking-wider uppercase border-r border-[#0e3b6e]">Status</th>
-                      <th class="py-3 px-3 font-bold text-right text-xs tracking-wider uppercase">Actions</th>
+                    <tr class="bg-[#EEF3F7] text-[#173B59] border-b border-[#D9E1E8]">
+                      <th class="py-2.5 px-3 font-semibold w-12 text-center text-[13px]">S.No.</th>
+                      <th class="py-2.5 px-3 font-semibold text-[13px]">Document Title &amp; Category</th>
+                      <th class="py-2.5 px-3 font-semibold text-[13px]">Uploaded File</th>
+                      <th class="py-2.5 px-3 font-semibold text-center text-[13px]">Size</th>
+                      <th class="py-2.5 px-3 font-semibold text-center text-[13px]">Status</th>
+                      <th class="py-2.5 px-3 font-semibold text-right text-[13px]">Actions</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-100">
-                    <tr *ngFor="let doc of officialDocs" class="hover:bg-slate-50/80 transition-colors">
-                      <td class="py-3 px-3 font-mono font-bold text-slate-500 text-center border-r border-slate-200">{{ doc.s_no }}</td>
-                      <td class="py-3 px-3 border-r border-slate-200">
-                        <div class="font-bold text-slate-900">{{ doc.doc_title }}</div>
-                        <div class="text-xs text-slate-500 mt-0.5">{{ doc.doc_category }}</div>
+                  <tbody class="divide-y divide-[#E8EDF2]">
+                    <tr *ngFor="let doc of officialDocs" class="hover:bg-[#F7FAFC] transition-colors">
+                      <td class="py-3 px-3 font-mono font-semibold text-[#5F6F7E] text-center">{{ doc.s_no }}</td>
+                      <td class="py-3 px-3">
+                        <div class="font-medium text-[#172B3A]">{{ doc.doc_title }}</div>
+                        <div class="text-[12px] text-[#5F6F7E] mt-0.5">{{ doc.doc_category }}</div>
                       </td>
-                      <td class="py-3 px-3 border-r border-slate-200">
+                      <td class="py-3 px-3">
                         <div class="flex items-center gap-2">
-                          <span class="px-1.5 py-0.5 bg-red-100 text-red-700 font-bold text-xs border border-red-200 rounded-xs">PDF</span>
-                          <span class="font-mono text-slate-800 font-medium truncate max-w-[200px]" [title]="doc.file_name">{{ doc.file_name }}</span>
+                          <span class="px-1.5 py-0.5 bg-[#FFEBEE] text-[#C62828] font-bold text-xs border border-[#FFCDD2] rounded-[4px]">PDF</span>
+                          <span class="font-mono text-[#172B3A] font-medium truncate max-w-[200px]" [title]="doc.file_name">{{ doc.file_name }}</span>
                         </div>
-                        <div class="text-xs text-slate-400 font-mono mt-0.5">Uploaded: {{ doc.upload_date }}</div>
+                        <div class="text-[11px] text-[#7A8793] font-mono mt-0.5">Uploaded: {{ doc.upload_date }}</div>
                       </td>
-                      <td class="py-3 px-3 font-mono text-slate-600 text-center border-r border-slate-200">{{ doc.file_size }}</td>
-                      <td class="py-3 px-3 text-center border-r border-slate-200">
-                        <span class="font-bold text-emerald-700 text-xs">
+                      <td class="py-3 px-3 font-mono text-[#5F6F7E] text-center">{{ doc.file_size }}</td>
+                      <td class="py-3 px-3 text-center">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] text-[12px] font-semibold bg-[#E8F5E9] text-[#16834B] border border-[#C8E6C9]">
                           ✓ Verified
                         </span>
                       </td>
@@ -742,7 +746,7 @@ export interface OfficialDocItem {
                         <div class="flex items-center justify-end gap-1.5">
                           <button 
                             (click)="downloadDoc(doc.file_name)"
-                            class="p-1.5 hover:bg-slate-200 text-slate-600 hover:text-[#002244] transition-colors cursor-pointer rounded-xs"
+                            class="p-1.5 hover:bg-[#F4F7F9] text-[#5F6F7E] hover:text-[#0B3558] transition-colors cursor-pointer rounded-[4px]"
                             title="Download PDF">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -751,7 +755,7 @@ export interface OfficialDocItem {
                           <button 
                             *ngIf="editingSection === 4"
                             (click)="replaceDocument(doc)"
-                            class="px-2.5 py-1 bg-[#002244] text-white font-bold text-xs rounded-xs hover:bg-[#003366] transition-colors shadow-2xs cursor-pointer">
+                            class="px-2.5 py-1 bg-[#0B3558] text-white font-semibold text-xs rounded-[4px] hover:bg-[#082A46] transition-colors cursor-pointer">
                             Replace
                           </button>
                         </div>
@@ -761,15 +765,17 @@ export interface OfficialDocItem {
                 </table>
               </div>
 
-              <div *ngIf="editingSection === 4" class="pt-3 border-t border-slate-200 flex items-center justify-between">
-                <span class="text-xs text-slate-500 font-medium">Click "Replace" on any document row to update with a new PDF (Max 5MB).</span>
+              <div *ngIf="editingSection === 4" class="pt-3 border-t border-[#D9E1E8] flex items-center justify-between">
+                <span class="text-[12px] text-[#5F6F7E] font-medium">Click "Replace" on any document row to update with a new PDF (Max 5MB).</span>
                 <button 
                   (click)="editingSection = null"
-                  class="px-4 py-1.5 bg-[#002244] text-white text-xs sm:text-[13px] font-bold rounded-xs hover:bg-[#003366] transition-colors cursor-pointer">
+                  class="px-4 py-1.5 bg-[#0B3558] hover:bg-[#082A46] text-white text-[13px] font-semibold rounded-[6px] transition-colors cursor-pointer">
                   Done Managing
                 </button>
               </div>
             </div>
+
+            </ng-container>
 
           </div>
 

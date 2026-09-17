@@ -12,8 +12,7 @@ export interface PressRelease {
   selector: 'app-news-ticker',
   standalone: true,
   imports: [],
-  templateUrl: './news-ticker.component.html',
-  styleUrls: ['./news-ticker.component.css']
+  templateUrl: './news-ticker.component.html'
 })
 export class NewsTickerComponent {
   protected readonly languageService = inject(LanguageService);

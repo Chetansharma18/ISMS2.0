@@ -37,8 +37,7 @@
             <a [href]="item.url" target="_blank" rel="noopener noreferrer"
               [title]="item.name + (item.tagline ? ' - ' + item.tagline : '')"
               class="bg-white rounded-xl sm:rounded-2xl shadow-md hover:shadow-xl border border-slate-100 hover:border-amber-400 p-2 sm:p-3 flex items-center justify-center h-28 sm:h-36 lg:h-44 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] cursor-pointer group">
-              <img [src]="item.logo" [alt]="item.name"
-                (error)="onImageError($event, item.logo.split('/').pop() || '')"
+              <img [src]="item.logo" [alt]="item.name" (error)="onImageError($event, item.logo.split('/').pop() || '')"
                 class="max-h-[88%] sm:max-h-[92%] w-auto max-w-[95%] object-contain select-none transition-transform duration-300 group-hover:scale-105 filter drop-shadow-sm" />
             </a>
           </div>

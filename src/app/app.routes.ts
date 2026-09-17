@@ -11,10 +11,16 @@ export const routes: Routes = [
     loadComponent: () => import('./features/eoi/schemes/scheme-listing.component').then(m => m.SchemeListingComponent)
   },
   
-  // Forms Module (Nikhil's TP-PIA Registration)
+  // Forms Module (Redirect to Unified TP-PIA Registration)
   {
     path: 'forms',
-    loadChildren: () => import('./features/forms/forms.routes').then(m => m.FORMS_ROUTES)
+    redirectTo: 'auth/register',
+    pathMatch: 'full'
+  },
+  {
+    path: 'forms/tp-pia-registration',
+    redirectTo: 'auth/register',
+    pathMatch: 'full'
   },
 
   // Screen 0: SSO Login Portal

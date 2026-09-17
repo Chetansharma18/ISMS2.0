@@ -221,7 +221,7 @@ import { Scheme } from '../../../../../core/services/eoi-state.service';
           <button
             type="button"
             class="gov-btn gov-btn-secondary"
-            (click)="eoiService.setFlowStage('preview')"
+            (click)="eoiService.setFlowStage('documents')"
           >
             👁️ View Complete Application
           </button>

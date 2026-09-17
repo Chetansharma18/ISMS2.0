@@ -2,55 +2,67 @@
   <!-- Top Government of Rajasthan Header -->
   <app-arpit-header></app-arpit-header>
 
-  <!-- Step Progress Navigation Bar (Visible in application flow) -->
-  <app-step-nav *ngIf="eoiService.flowStage() !== 'listing'"></app-step-nav>
-
   <!-- Main Container -->
   <main class="gov-main-container" id="main-content">
+    
+    <!-- HEADER -->
+    <div class="page-title-section" *ngIf="eoiService.flowStage() !== 'receipt'">
+      <div class="title-header-row">
+        <div class="title-meta-left">
+          <h1 id="step3-heading" class="section-title">Application Form</h1>
+          <p class="section-subtitle">{{ selectedScheme()?.name }} ({{ selectedScheme()?.schemeCode }})</p>
+        </div>
+      </div>
+    </div>
 
-    <!-- ========================================================================= -->
-    <!-- STEP 1: DOCUMENT UPLOADS                                                  -->
-    <!-- ========================================================================= -->
-    <app-step-documents
-      *ngIf="eoiService.flowStage() === 'documents'"
-      [scheme]="selectedScheme()"
-      [validationErrors]="validationErrors()"
-      (onChangeScheme)="goToAllSchemes()"
-      (onNext)="handleDocumentsNext()"
-      (onViewDoc)="onViewDocument($event)"
-      (onClearError)="clearFieldError($event)"
-    ></app-step-documents>
+    <!-- DYNAMIC FORM -->
+    <div class="gov-step-content" *ngIf="eoiService.flowStage() !== 'receipt'">
+      <div class="gov-card-section">
+        <div class="gov-card-header">
+          <h3 class="card-title">Applicant Details</h3>
+          <p class="text-xs text-slate-500 mt-1">Please fill in all mandatory fields correctly before proceeding to payment.</p>
+        </div>
+        
+        <div class="gov-card-body">
+          <div *ngIf="validationErrors() && (validationErrors() | keyvalue).length > 0" class="gov-edit-error-banner mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+            <div class="text-red-500 text-lg">⚠️</div>
+            <div class="text-sm text-red-800">
+              <strong class="block mb-1">Mandatory Fields Missing:</strong>
+              <ul class="list-disc pl-4 space-y-1">
+                <li *ngFor="let err of validationErrors() | keyvalue">{{ err.value }}</li>
+              </ul>
+            </div>
+          </div>
 
-    <!-- ========================================================================= -->
-    <!-- STEP 2: FEE PAYMENT                                                       -->
-    <!-- ========================================================================= -->
-    <app-step-payment
-      *ngIf="eoiService.flowStage() === 'fees'"
-      [scheme]="selectedScheme()"
-      [validationErrors]="validationErrors()"
-      (onProceedPayment)="handleProceedToPayment()"
-      (onBack)="eoiService.setFlowStage('documents')"
-      (onClearError)="clearFieldError($event)"
-    ></app-step-payment>
+          <div class="gov-form-layout grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div *ngFor="let field of dynamicFields()">
+              <app-form-field 
+                [label]="field.fieldLabel" 
+                [required]="field.required" 
+                [type]="field.fieldType === 'Number' || field.fieldType === 'Decimal' || field.fieldType === 'Currency' || field.fieldType === 'Percentage' ? 'number' : field.fieldType === 'Date' ? 'date' : field.fieldType === 'File Upload' ? 'file' : field.fieldType === 'Dropdown' || field.fieldType === 'Multi Select' ? 'select' : 'text'"
+                [options]="field.options || []"
+                [hint]="field.helpText"
+                [value]="dynamicResponses[field.id]" 
+                (valueChange)="dynamicResponses[field.id] = $event; clearFieldError(field.id)"
+                [errorMessage]="validationErrors()[field.id]">
+              </app-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <!-- ========================================================================= -->
-    <!-- STEP 3: APPLICATION PREVIEW & SECTION EDIT                                -->
-    <!-- ========================================================================= -->
-    <app-step-preview
-      *ngIf="eoiService.flowStage() === 'preview' || eoiService.flowStage() === 'edit_section'"
-      [scheme]="selectedScheme()"
-      [validationErrors]="validationErrors()"
-      (onOpenSubmitConfirm)="openSubmitConfirmation()"
-      (onViewDoc)="onViewDocument($event)"
-      (onClearFieldError)="clearFieldError($event)"
-      (onSaveSection)="saveSectionAndReturn()"
-      (onCancelSection)="cancelSectionAndReturn()"
-      (onEditSection)="editSection($event)"
-    ></app-step-preview>
+      <!-- BOTTOM ACTIONS -->
+      <div class="gov-form-footer flex justify-between items-center mt-8 p-6 bg-white border border-slate-200 rounded-xl shadow-sm">
+        <button type="button" class="gov-btn gov-btn-secondary" (click)="goToAllSchemes()">
+          ← Cancel
+        </button>
+        <button type="button" class="gov-btn gov-btn-primary" (click)="initiateSubmitAndPay()">
+          Pay & Submit Application
+        </button>
+      </div>
+    </div>
 
-    <!-- ========================================================================= -->
-    <!-- STEP 4: SUBMISSION RECEIPT & ACKNOWLEDGEMENT                              -->
-    <!-- ========================================================================= -->
+    <!-- RECEIPT STEP -->
     <app-step-receipt
       *ngIf="eoiService.flowStage() === 'receipt'"
       [scheme]="selectedScheme()"
@@ -64,163 +76,69 @@
 
   </main>
 
-  <!-- ========================================================================= -->
-  <!-- MODAL 1: DOCUMENT SAVE & NEXT CONFIRMATION POPUP                          -->
-  <!-- ========================================================================= -->
-  <div *ngIf="showDocConfirmModal()" class="gov-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="doc-confirm-title">
-    <div class="gov-modal-box confirm-dialog-box">
-      <div class="gov-modal-header">
-        <h3 id="doc-confirm-title" class="gov-modal-title">Verification Confirmation</h3>
-        <button type="button" class="modal-close-btn" (click)="closeDocConfirmModal()" aria-label="Close dialog">✕</button>
+  <!-- MOCK PAYMENT MODAL -->
+  <div *ngIf="showPaymentModal()" class="gov-modal-backdrop flex items-center justify-center fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="payment-title">
+    <div class="gov-modal-box bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+      <div class="gov-modal-header bg-slate-50 border-b border-slate-100 px-6 py-4 flex justify-between items-center">
+        <h3 id="payment-title" class="font-bold text-lg text-slate-800">Fee Payment Gateway</h3>
+        <button type="button" class="text-slate-400 hover:text-slate-600 transition-colors" (click)="closePaymentModal()" aria-label="Close dialog">✕</button>
       </div>
-      <div class="gov-modal-body confirm-dialog-body">
-        <div class="confirm-icon-wrap">
-          <span class="confirm-question-icon">❓</span>
+      
+      <div class="gov-modal-body p-6">
+        <div class="mb-6 pb-6 border-b border-slate-100">
+          <div class="flex justify-between items-center mb-3">
+            <span class="text-sm text-slate-600">Processing Fee:</span>
+            <span class="font-medium text-slate-800">₹{{ eoiService.paymentData().processingFeeAmount | number }}</span>
+          </div>
+          <div class="flex justify-between items-center mb-3">
+            <span class="text-sm text-slate-600">EMD Fee:</span>
+            <span class="font-medium text-slate-800">₹{{ eoiService.paymentData().emdFeeAmount | number }}</span>
+          </div>
+          <div class="flex justify-between items-center pt-3 border-t border-slate-200 mt-3">
+            <span class="font-semibold text-slate-800">Total Payable:</span>
+            <span class="font-bold text-lg text-blue-600">₹{{ eoiService.paymentData().processingFeeAmount + eoiService.paymentData().emdFeeAmount | number }}</span>
+          </div>
         </div>
-        <div class="confirm-text-wrap">
-          <h4 class="confirm-main-prompt">Are you sure you want to proceed?</h4>
-          <p class="confirm-sub-prompt">
-            Please verify that the uploaded documents are correct before proceeding to the payment section.
-          </p>
-        </div>
-      </div>
-      <div class="gov-modal-footer confirm-dialog-footer">
-        <button type="button" class="gov-btn gov-btn-secondary" (click)="closeDocConfirmModal()">
-          No
-        </button>
-        <button type="button" id="btn-confirm-yes" class="gov-btn gov-btn-primary" (click)="confirmProceedToFees()">
-          Yes
-        </button>
-      </div>
-    </div>
-  </div>
 
-  <!-- ========================================================================= -->
-  <!-- MODAL 2: MOCK PAYMENT SUCCESS STATE                                       -->
-  <!-- ========================================================================= -->
-  <div *ngIf="showPaymentSuccessModal()" class="gov-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pay-success-title">
-    <div class="gov-modal-box payment-success-modal-box">
-      <div class="payment-success-header">
-        <div class="success-animated-tick">✓</div>
-        <h3 id="pay-success-title" class="payment-success-title">Payment Successful</h3>
-        <span class="payment-success-sub">Payment has been completed successfully via {{ eoiService.paymentData().paymentMethod }}</span>
-      </div>
-      <div class="gov-modal-body payment-success-body">
-        <div class="payment-success-detail-card">
-          <div class="pay-detail-row">
-            <span class="d-label">Transaction ID:</span>
-            <span class="d-val font-mono font-bold">{{ eoiService.paymentData().transactionId }}</span>
-          </div>
-          <div class="pay-detail-row">
-            <span class="d-label">Amount Paid:</span>
-            <span class="d-val font-bold text-success" style="font-size: 16px;">₹{{ eoiService.paymentData().totalAmount.toLocaleString('en-IN') }}</span>
-          </div>
-          <div class="pay-detail-row">
-            <span class="d-label">Payment Date &amp; Time:</span>
-            <span class="d-val">{{ eoiService.paymentData().paymentDate }}</span>
-          </div>
-          <div class="pay-detail-row">
-            <span class="d-label">Payment Method:</span>
-            <span class="d-val">{{ eoiService.paymentData().paymentMethod }}</span>
+        <div class="space-y-4">
+          <label class="block font-medium text-sm text-slate-700">Select Payment Method <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors" [class.ring-2]="paymentMethod() === 'UPI'" [class.ring-blue-500]="paymentMethod() === 'UPI'">
+              <input type="radio" name="payment" value="UPI" (change)="paymentMethod.set('UPI')" class="text-blue-600" />
+              <span class="text-sm font-medium text-slate-700">UPI / QR</span>
+            </label>
+            <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors" [class.ring-2]="paymentMethod() === 'NET_BANKING'" [class.ring-blue-500]="paymentMethod() === 'NET_BANKING'">
+              <input type="radio" name="payment" value="NET_BANKING" (change)="paymentMethod.set('NET_BANKING')" class="text-blue-600" />
+              <span class="text-sm font-medium text-slate-700">Net Banking</span>
+            </label>
           </div>
         </div>
-        <p class="pay-continue-note">
-          Your transaction receipt has been recorded. Click Continue to preview the complete EOI application details.
-        </p>
       </div>
-      <div class="gov-modal-footer payment-success-footer">
-        <button
-          type="button"
-          id="btn-payment-continue"
-          class="gov-btn gov-btn-primary gov-btn-full"
-          (click)="continueToPreview()"
-        >
-          <span>Continue to Application Preview</span>
-          <span class="arrow-icon">→</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================================= -->
-  <!-- MODAL 3: FINAL SUBMISSION CONFIRMATION                                    -->
-  <!-- ========================================================================= -->
-  <div *ngIf="showSubmitConfirmModal()" class="gov-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="submit-confirm-title">
-    <div class="gov-modal-box confirm-dialog-box">
-      <div class="gov-modal-header">
-        <h3 id="submit-confirm-title" class="gov-modal-title">Confirm Application Submission</h3>
-        <button type="button" class="modal-close-btn" (click)="closeSubmitConfirmModal()" aria-label="Close dialog">✕</button>
-      </div>
-      <div class="gov-modal-body confirm-dialog-body">
-        <div class="confirm-icon-wrap icon-submit-wrap">
-          <span class="confirm-question-icon">📤</span>
-        </div>
-        <div class="confirm-text-wrap">
-          <h4 class="confirm-main-prompt">Submit EOI Application?</h4>
-          <p class="confirm-sub-prompt">
-            Please confirm that all information and documents provided in the application are correct. After submission, the application will be submitted for official scrutiny.
-          </p>
-        </div>
-      </div>
-      <div class="gov-modal-footer confirm-dialog-footer">
-        <button type="button" class="gov-btn gov-btn-secondary" (click)="closeSubmitConfirmModal()">
+      
+      <div class="gov-modal-footer bg-slate-50 px-6 py-4 flex justify-end gap-3 border-t border-slate-100">
+        <button type="button" class="px-5 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors" (click)="closePaymentModal()">
           Cancel
         </button>
-        <button type="button" id="btn-confirm-final" class="gov-btn gov-btn-submit" (click)="confirmFinalSubmission()">
-          ✓ Confirm &amp; Submit
+        <button type="button" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm" (click)="processPayment()">
+          Make Payment
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ========================================================================= -->
-  <!-- MODAL 4: MOCK PDF DOCUMENT VIEWER                                         -->
-  <!-- ========================================================================= -->
-  <div *ngIf="showPdfViewerModal()" class="gov-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pdf-viewer-title">
-    <div class="gov-modal-box pdf-viewer-modal-box">
-      <div class="gov-modal-header pdf-viewer-header">
-        <div class="pdf-header-titles">
-          <span class="pdf-tag">PDF PREVIEW • MAX 5 MB VERIFIED</span>
-          <h3 id="pdf-viewer-title" class="gov-modal-title">{{ currentViewingDoc()?.title }}</h3>
-        </div>
-        <button type="button" class="modal-close-btn" (click)="closePdfViewer()" aria-label="Close document preview">✕</button>
+  <!-- PAYMENT SUCCESS MODAL -->
+  <div *ngIf="showPaymentSuccessModal()" class="gov-modal-backdrop flex items-center justify-center fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm" role="dialog" aria-modal="true">
+    <div class="gov-modal-box bg-white rounded-2xl shadow-xl w-full max-w-sm text-center p-8 animate-in zoom-in-95 duration-300">
+      <div class="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-6">
+        <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
       </div>
-      <div class="gov-modal-body pdf-viewer-body">
-        <div class="mock-pdf-page">
-          <div class="pdf-top-bar">
-            <span>📄 {{ currentViewingDoc()?.fileName }}</span>
-            <span>Size: {{ currentViewingDoc()?.fileSize }} • Format: PDF</span>
-          </div>
-          <div class="mock-pdf-content">
-            <div class="mock-pdf-emblem-wrap">
-              <img src="ashok.png" alt="Emblem" style="height: 48px; filter: grayscale(1);" />
-              <h4>GOVERNMENT OF RAJASTHAN • ISMS 2.0</h4>
-              <p>Official Upload Verification for {{ currentViewingDoc()?.title }}</p>
-            </div>
-            <div class="mock-pdf-lines">
-              <div class="mock-line line-wide"></div>
-              <div class="mock-line line-med"></div>
-              <div class="mock-line line-wide"></div>
-              <div class="mock-line line-short"></div>
-              <div class="mock-line line-wide"></div>
-            </div>
-            <div class="pdf-certified-stamp">
-              <span>✓ VERIFIED PDF (≤ 5 MB)</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="gov-modal-footer">
-        <button type="button" class="gov-btn gov-btn-primary" (click)="closePdfViewer()">
-          Close Preview
-        </button>
-      </div>
+      <h3 class="font-bold text-2xl text-slate-800 mb-2">Payment Successful!</h3>
+      <p class="text-slate-600 mb-8">Your application and fee payment have been successfully received and recorded.</p>
+      <button type="button" class="w-full px-5 py-3 text-sm font-medium text-white bg-green-600 rounded-xl hover:bg-green-700 transition-colors shadow-sm" (click)="continueToReceipt()">
+        View Acknowledgement Receipt
+      </button>
     </div>
-  </div>
-
-  <!-- Persistent Notification Toast -->
-  <div *ngIf="eoiService.toastMessage()" class="gov-toast-banner" role="alert" aria-live="polite">
-    <span class="toast-icon">ℹ️</span>
-    <span class="toast-text">{{ eoiService.toastMessage() }}</span>
   </div>
 </div>

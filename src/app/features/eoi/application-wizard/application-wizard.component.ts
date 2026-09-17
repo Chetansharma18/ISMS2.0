@@ -1,17 +1,14 @@
-import { Component, inject, signal, computed, effect, HostListener, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, effect, HostListener, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from './components/header/header.component';
-import { StepNavComponent } from './components/step-nav/step-nav.component';
-import { StepDocumentsComponent } from './components/step-documents/step-documents.component';
-import { StepPaymentComponent } from './components/step-payment/step-payment.component';
-import { StepPreviewComponent } from './components/step-preview/step-preview.component';
 import { StepReceiptComponent } from './components/step-receipt/step-receipt.component';
+import { FormFieldComponent } from './components/shared/form-field.component';
 import { EoiService } from './services/eoi.service';
 import { EoiStateService, Scheme } from '../../../core/services/eoi-state.service';
-import { PdfGeneratorService } from './services/pdf-generator.service';
-import { RAJASTHAN_DISTRICTS, EOI_SECTIONS } from './models/eoi.model';
+import { EoiFieldService } from '../../admin/core/services/eoi-field.service';
+import { EoiFormField } from '../../admin/core/models/admin.models';
 
 @Component({
   selector: 'app-application-wizard',
@@ -21,11 +18,9 @@ import { RAJASTHAN_DISTRICTS, EOI_SECTIONS } from './models/eoi.model';
     CommonModule,
     FormsModule,
     HeaderComponent,
-    StepNavComponent,
-    StepDocumentsComponent,
-    StepPaymentComponent,
-    StepPreviewComponent,
-    StepReceiptComponent
+    StepReceiptComponent,
+    FormFieldComponent,
+    DecimalPipe
   ],
   templateUrl: './application-wizard.component.html',
   styleUrls: ['./application-wizard.component.css'],
@@ -36,35 +31,28 @@ export class ApplicationWizardComponent implements OnInit {
   readonly route = inject(ActivatedRoute);
   readonly eoiStateService = inject(EoiStateService);
   readonly eoiService = inject(EoiService);
-  readonly pdfService = inject(PdfGeneratorService);
-  readonly districts = RAJASTHAN_DISTRICTS;
-  readonly sections = EOI_SECTIONS;
+  readonly eoiFieldService = inject(EoiFieldService);
 
-  // Currently selected Scheme & Tender info
   readonly selectedScheme = signal<Scheme | null>(null);
+  
+  // Dynamic fields
+  readonly dynamicFields = signal<EoiFormField[]>([]);
+  readonly dynamicResponses: Record<string, any> = {};
 
   // Modals state
-  readonly showDocConfirmModal = signal<boolean>(false);
+  readonly showPaymentModal = signal<boolean>(false);
   readonly showPaymentSuccessModal = signal<boolean>(false);
-  readonly showSubmitConfirmModal = signal<boolean>(false);
-  readonly showPdfViewerModal = signal<boolean>(false);
-  readonly currentViewingDoc = signal<{ title: string; fileName: string; fileSize: string } | null>(null);
-
-  // Validation errors map
   readonly validationErrors = signal<Record<string, string>>({});
+  
+  // Payment mock fields
+  readonly paymentMethod = signal<string>('');
 
   // Receipt copy state
   readonly copiedRef = signal<boolean>(false);
 
   constructor() {
-    // Lock body scroll when any modal is active
     effect(() => {
-      const anyModalOpen =
-        this.showDocConfirmModal() ||
-        this.showPaymentSuccessModal() ||
-        this.showSubmitConfirmModal() ||
-        this.showPdfViewerModal();
-
+      const anyModalOpen = this.showPaymentModal() || this.showPaymentSuccessModal();
       if (anyModalOpen) {
         document.body.style.overflow = 'hidden';
       } else {
@@ -72,14 +60,10 @@ export class ApplicationWizardComponent implements OnInit {
       }
     });
 
-    // Automatically scroll to the top of the page on step/flow transition
     effect(() => {
       this.eoiService.flowStage();
-      this.eoiService.currentSection();
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
       }
     });
   }
@@ -93,10 +77,16 @@ export class ApplicationWizardComponent implements OnInit {
 
   private loadSchemeDetails(schemeId: string): void {
     this.eoiStateService.schemes$.subscribe(schemes => {
-      const found = schemes.find(s => s.id === schemeId || s.schemeCode === schemeId || s.tenderId === schemeId);
-      const active = found || (schemes.length > 0 ? schemes[0] : null);
+      const active = schemes.find(s => s.id === schemeId || s.schemeCode === schemeId || s.tenderId === schemeId) || (schemes.length > 0 ? schemes[0] : null);
       if (active) {
         this.selectedScheme.set(active);
+        
+        // Fetch dynamic fields for this scheme
+        this.eoiFieldService.getFieldsForEoi(active.schemeCode).subscribe((list: any) => {
+          this.dynamicFields.set(list);
+        });
+
+        // Setup fees
         this.eoiService.setSchemeFees(
           active.processingFee,
           active.emdAmount,
@@ -112,101 +102,10 @@ export class ApplicationWizardComponent implements OnInit {
     this.router.navigate(['/schemes']);
   }
 
-  // Keyboard accessibility: Escape closes open modal
   @HostListener('document:keydown.escape')
   onEscapePress(): void {
-    if (this.showDocConfirmModal()) this.showDocConfirmModal.set(false);
-    if (this.showSubmitConfirmModal()) this.showSubmitConfirmModal.set(false);
-    if (this.showPdfViewerModal()) this.showPdfViewerModal.set(false);
-  }
-
-  // Document view helper
-  onViewDocument(doc: { title: string; fileName: string; fileSize: string }): void {
-    this.currentViewingDoc.set(doc);
-    this.showPdfViewerModal.set(true);
-  }
-
-  closePdfViewer(): void {
-    this.showPdfViewerModal.set(false);
-    this.currentViewingDoc.set(null);
-  }
-
-  // 1. Step 1 Documents: Save & Next
-  handleDocumentsNext(): void {
-    const errors: Record<string, string> = {};
-    const slots = this.eoiService.uploadSlots();
-
-    // Check mandatory documents
-    slots.forEach(slot => {
-      if (slot.isMandatory && !slot.fileName) {
-        errors[`doc_${slot.id}`] = `${slot.title} is required. Please upload a valid PDF (max 5 MB).`;
-      }
-    });
-
-    if (Object.keys(errors).length > 0) {
-      this.validationErrors.set(errors);
-      this.eoiService.showToast('Please upload all mandatory documents (* Required) before proceeding.');
-      window.scrollTo({ top: 180, behavior: 'smooth' });
-      return;
-    }
-
-    this.validationErrors.set({});
-    this.showDocConfirmModal.set(true);
-  }
-
-  confirmProceedToFees(): void {
-    this.showDocConfirmModal.set(false);
-    this.eoiService.goToFees();
-  }
-
-  closeDocConfirmModal(): void {
-    this.showDocConfirmModal.set(false);
-  }
-
-  // 2. Step 2 Fees: Proceed to Payment
-  handleProceedToPayment(): void {
-    const pay = this.eoiService.paymentData();
-    const errors: Record<string, string> = {};
-
-    const procFee = pay.processingFee || 2500;
-    const emdFee = pay.emdFee || 50000;
-    const procFeeStr = '₹' + procFee.toLocaleString('en-IN');
-    const emdFeeStr = '₹' + emdFee.toLocaleString('en-IN');
-
-    if (!pay.processingFeeSelected && !pay.emdFeeSelected) {
-      errors['fees_selection'] = `Both Processing Fee (${procFeeStr}) and Earnest Money Deposit (EMD ${emdFeeStr}) are compulsory. Please select both fees to proceed.`;
-    } else if (!pay.processingFeeSelected) {
-      errors['fees_selection'] = `Processing Fee (${procFeeStr}) is compulsory. Please select it to proceed.`;
-    } else if (!pay.emdFeeSelected) {
-      errors['fees_selection'] = `Earnest Money Deposit (EMD ${emdFeeStr}) is compulsory. Please select it to proceed.`;
-    }
-
-    if (!pay.paymentMethod) {
-      errors['payment_method'] = 'Please select a payment method.';
-    }
-
-    if (Object.keys(errors).length > 0) {
-      this.validationErrors.set(errors);
-      this.eoiService.showToast('Both Processing Fee and EMD Fee are compulsory to proceed.');
-      return;
-    }
-
-    this.validationErrors.set({});
-    this.eoiService.processMockPayment(() => {
-      this.showPaymentSuccessModal.set(true);
-    });
-  }
-
-  continueToPreview(): void {
-    this.showPaymentSuccessModal.set(false);
-    this.eoiService.goToPreview();
-  }
-
-  // 3. Step 3 Preview: Section-level Edit & Submit
-  editSection(sectionId: number): void {
-    this.validationErrors.set({});
-    this.eoiService.editIndividualSection(sectionId);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (this.showPaymentModal()) this.showPaymentModal.set(false);
+    if (this.showPaymentSuccessModal()) this.showPaymentSuccessModal.set(false);
   }
 
   clearFieldError(field: string): void {
@@ -217,143 +116,84 @@ export class ApplicationWizardComponent implements OnInit {
     }
   }
 
-  private scrollToPreviewSection(secId: number | null): void {
-    if (!secId) return;
-    setTimeout(() => {
-      const targetEl = document.getElementById(`preview-sec-${secId}`);
-      if (targetEl) {
-        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        targetEl.classList.add('section-highlight-pulse');
-        setTimeout(() => targetEl.classList.remove('section-highlight-pulse'), 2500);
-      }
-    }, 120);
-  }
-
-  saveSectionAndReturn(): void {
-    const targetSecId = this.eoiService.activeEditSectionId();
-    const form = this.eoiService.formData();
+  // Submit flow
+  initiateSubmitAndPay(): void {
     const errors: Record<string, string> = {};
-
-    if (targetSecId === 1) {
-      const org = form.orgBasicDetails;
-      if (!String(org.tp_full_name || '').trim()) errors['tp_full_name'] = 'TP/PIA Full Name is required';
-      if (!String(org.tp_short_name || '').trim()) errors['tp_short_name'] = 'TP/PIA Short Name is required';
-      if (!String(org.organisation_contact_no || '').trim()) errors['organisation_contact_no'] = 'Contact Number is required';
-      if (!String(org.company_email || '').trim()) errors['company_email'] = 'Company Email is required';
-      if (!String(org.registered_address || '').trim()) errors['registered_address'] = 'Registered Address is required';
-      if (!String(org.state_ut || '').trim()) errors['state_ut'] = 'State / UT is required';
-      if (!String(org.district || '').trim()) errors['district'] = 'District is required';
-      if (!String(org.pincode || '').trim()) errors['pincode'] = 'Pincode is required';
-      if (!String(org.turnover_lakhs ?? '').trim()) errors['turnover_lakhs'] = 'Turnover is required';
-      if (!String(org.postal_address || '').trim()) errors['postal_address'] = 'Postal Address is required';
-    } else if (targetSecId === 2) {
-      const auth = form.authPersonDetails;
-      if (!String(auth.auth_name || '').trim()) errors['auth_name'] = 'Authorized Person Name is required';
-      if (!String(auth.auth_mobile || '').trim()) errors['auth_mobile'] = 'Mobile Number is required';
-      if (!String(auth.auth_pan || '').trim()) errors['auth_pan'] = 'PAN is required';
-    } else if (targetSecId === 3) {
-      const bank = form.bankDetails;
-      if (!String(bank.bank_name || '').trim()) errors['bank_name'] = 'Bank Name is required';
-      if (!String(bank.bank_account_no || '').trim()) errors['bank_account_no'] = 'Account Number is required';
-      if (!String(bank.bank_ifsc || '').trim()) errors['bank_ifsc'] = 'IFSC Code is required';
-      if (!String(bank.bank_branch_name || '').trim()) errors['bank_branch_name'] = 'Branch Name is required';
-      if (!String(bank.bank_branch_address || '').trim()) errors['bank_branch_address'] = 'Branch Address is required';
-    } else if (targetSecId === 5) {
-      const sec5 = form.section6;
-      if (!String(sec5.district_city || '').trim()) errors['district_city'] = 'District / City is required';
-      if (!String(sec5.training_center_name || '').trim()) errors['training_center_name'] = 'Training Centre Name is required';
-      if (!String(sec5.telephone_number || '').trim()) errors['telephone_number'] = 'Telephone Number is required';
-      if (!String(sec5.number_of_classrooms ?? '').trim()) errors['number_of_classrooms'] = 'Number of Classrooms is required';
-      if (!String(sec5.full_address || '').trim()) errors['full_address'] = 'Full Address is required';
-    }
+    
+    // Basic validation of required dynamic fields
+    this.dynamicFields().forEach(field => {
+      if (field.required && !this.dynamicResponses[field.id]) {
+        errors[field.id] = `${field.fieldLabel} is required`;
+      }
+    });
 
     if (Object.keys(errors).length > 0) {
       this.validationErrors.set(errors);
-      this.eoiService.showToast('Please fill all compulsory fields marked with * before saving.');
+      this.eoiService.showToast('Please fill all mandatory fields before submitting.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     this.validationErrors.set({});
-    this.eoiService.saveAndReturnToPreview();
-    this.scrollToPreviewSection(targetSecId);
+    
+    // Save the dynamic responses into the service if needed
+    // this.eoiService.saveDynamicResponses(this.dynamicResponses);
+
+    this.showPaymentModal.set(true);
   }
 
-  cancelSectionAndReturn(): void {
-    const targetSecId = this.eoiService.activeEditSectionId();
-    this.validationErrors.set({});
-    this.eoiService.editingSectionId.set(null);
-    this.eoiService.setFlowStage('preview');
-    this.scrollToPreviewSection(targetSecId);
+  processPayment(): void {
+    if (!this.paymentMethod()) {
+       this.eoiService.showToast('Please select a payment method.');
+       return;
+    }
+    
+    // Process mock payment
+    this.eoiService.processMockPayment(() => {
+      this.showPaymentModal.set(false);
+      this.showPaymentSuccessModal.set(true);
+    });
   }
 
-  openSubmitConfirmation(): void {
-    this.showSubmitConfirmModal.set(true);
+  continueToReceipt(): void {
+    this.showPaymentSuccessModal.set(false);
+    this.eoiService.setFlowStage('receipt');
   }
 
-  closeSubmitConfirmModal(): void {
-    this.showSubmitConfirmModal.set(false);
+  closePaymentModal(): void {
+    this.showPaymentModal.set(false);
   }
 
-  confirmFinalSubmission(): void {
-    this.showSubmitConfirmModal.set(false);
-    this.eoiService.finalizeSubmission();
+  // Receipt Actions
+  copyApplicationNumber(): void {
+    const sub = this.eoiService.submissionData();
+    if (sub.applicationNumber) {
+      navigator.clipboard.writeText(sub.applicationNumber).then(() => {
+        this.copiedRef.set(true);
+        setTimeout(() => this.copiedRef.set(false), 2000);
+      });
+    }
   }
 
-  // 4. Step 4 Receipt Actions
   printReceipt(): void {
     window.print();
   }
 
   downloadReceipt(): void {
-    const sub = this.eoiService.submissionData();
-    const pay = this.eoiService.paymentData();
-    const org = this.eoiService.formData().orgBasicDetails;
-    const auth = this.eoiService.formData().authPersonDetails;
-
-    this.pdfService.downloadReceiptPdf({
-      applicationNumber: sub.applicationNumber || 'ISMS-TP-2026-884921',
-      acknowledgementReceiptNumber: sub.acknowledgementReceiptNumber || 'ACK-RSLDC-2026-9921',
-      eoiRefNumber: sub.eoiRefNumber || 'EOI/RSLDC/ISMS/2026/04',
-      submissionDate: sub.submissionDate || '08-Sep-2026',
-      submissionTimestamp: sub.submissionTimestamp || '08-Sep-2026, 03:45 PM',
-      tpName: org.tp_full_name || sub.applicantName || 'Apex Skill Development Foundation',
-      regNumber: org.registration_number || 'REG/RAJ/2018/88921',
-      tpPan: org.organisation_pan || 'AAACA1234C',
-      tpEmail: org.company_email || 'contact@apexskills.org',
-      tpMobile: org.organisation_contact_no || '9829012345',
-      authPerson: auth.auth_name || 'Rajesh Kumar Sharma',
-      authDesignation: auth.auth_designation || 'Managing Director & CEO',
-      processingFee: pay.processingFee || pay.processingFeeAmount || 2500,
-      emdFee: pay.emdFee || pay.emdFeeAmount || 50000,
-      totalFee: pay.totalAmount || this.eoiService.computedTotalFee() || ((pay.processingFee || 2500) + (pay.emdFee || 50000)),
-      transactionId: pay.transactionId || 'TXN-ISMS-2026-884921',
-      paymentMethod: pay.paymentMethod || 'UPI / Online Gateway',
-      paymentDate: pay.paymentDate || '08-Sep-2026',
-      status: 'SUBMITTED'
-    }, `Receipt_${sub.applicationNumber || 'ISMS_2026'}.pdf`);
-
-    this.eoiService.showToast('Official PDF Receipt downloaded successfully.');
-  }
-
-  copyApplicationNumber(): void {
-    const appNum = this.eoiService.submissionData().applicationNumber;
-    navigator.clipboard.writeText(appNum).then(() => {
-      this.copiedRef.set(true);
-      setTimeout(() => this.copiedRef.set(false), 2500);
-      this.eoiService.showToast('Application Number copied to clipboard.');
-    });
+    this.eoiService.showToast('Receipt download started...');
   }
 
   reopenForModification(): void {
-    this.eoiService.reopenApplicationForEdit();
+    this.eoiService.setFlowStage('documents');
   }
 
   toggleDeadlineSimulation(): void {
     const current = this.eoiService.simulateExpiredDeadline();
     this.eoiService.simulateExpiredDeadline.set(!current);
-    const msg = !current
-      ? 'Simulated: Modification Deadline Expired (Modification Window Closed)'
-      : 'Simulated: Within Deadline (22 days remaining until 30 Sep 2026)';
-    this.eoiService.showToast(msg);
+    if (!current) {
+      this.eoiService.showToast('Testing Mode: Modification deadline marked as EXPIRED.');
+    } else {
+      this.eoiService.showToast('Testing Mode: Modification deadline reset to ACTIVE.');
+    }
   }
 }

@@ -1,0 +1,71 @@
+<div>
+  <admin-page-header 
+    title="Create Expression of Interest (EOI)"
+    subtitle="Configure a new Expression of Interest using the dynamic master template"
+    [breadcrumbs]="[
+      { label: 'EOI Management', url: '/admin/eoi' },
+      { label: 'Create EOI' }
+    ]">
+    <div header-actions class="flex items-center gap-2">
+      <button 
+        type="button" 
+        (click)="saveAsDraft()" 
+        class="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-xs rounded-lg shadow-2xs transition-colors cursor-pointer">
+        Save as Draft
+      </button>
+      <a 
+        routerLink="/admin/eoi" 
+        class="px-3.5 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+        Cancel
+      </a>
+    </div>
+  </admin-page-header>
+
+  <div class="bg-white rounded-xl shadow-lg border border-slate-200 border-t-4 border-t-[#002244] p-6 md:p-8">
+    <div *ngIf="dynamicFields().length === 0" class="py-12 text-center text-slate-500">
+      <span class="material-symbols-outlined text-[48px] text-slate-300 mb-4 block">edit_note</span>
+      <h3 class="text-lg font-bold text-slate-700 mb-2">No Form Configuration Found</h3>
+      <p class="text-sm">Please define fields for 'EOI-2025-001' in the Form Builder to render the EOI Creation Form.</p>
+    </div>
+
+    <form *ngIf="dynamicFields().length > 0" (ngSubmit)="onSubmitPublish()" class="space-y-6">
+      
+      <div class="grid grid-cols-1 gap-6">
+        <ng-container *ngFor="let field of dynamicFields()">
+          <app-form-field
+            [label]="field.fieldLabel"
+            [type]="field.fieldType === 'Number' ? 'number' : 
+                    field.fieldType === 'Date' ? 'date' : 
+                    field.fieldType === 'File Upload' ? 'file' : 
+                    field.fieldType === 'Dropdown' || field.fieldType === 'Multi Select' ? 'select' : 
+                    'text'"
+            [required]="field.required || false"
+            [hint]="field.helpText"
+            [placeholder]="field.placeholder"
+            [options]="field.options || []"
+            [errorMessage]="validationErrors()[field.id]"
+            [value]="dynamicResponses[field.id]"
+            (valueChange)="dynamicResponses[field.id] = $event; clearFieldError(field.id)"
+          ></app-form-field>
+        </ng-container>
+      </div>
+
+      <!-- FORM SUBMIT CONTROLS -->
+      <div class="flex flex-col sm:flex-row items-center justify-end pt-8 mt-6 border-t border-slate-200 gap-4">
+        <button 
+          type="button" 
+          (click)="saveAsDraft()" 
+          class="w-full sm:w-auto px-6 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-extrabold text-xs tracking-wide rounded-xl shadow-sm transition-all cursor-pointer">
+          SAVE AS DRAFT
+        </button>
+        <button 
+          type="submit" 
+          class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-700 to-[#131A4D] hover:from-blue-800 hover:to-[#090d2e] text-white font-extrabold text-xs tracking-wide rounded-xl shadow-lg shadow-blue-900/20 transition-all transform hover:scale-[1.02] cursor-pointer flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">publish</span>
+          PUBLISH EOI
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

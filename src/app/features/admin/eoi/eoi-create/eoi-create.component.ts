@@ -42,237 +42,315 @@ import { SchemeMaster, DepartmentMaster, EoiCategoryMaster, Committee, EoiItem }
         </div>
       </admin-page-header>
 
-      <form [formGroup]="eoiForm" (ngSubmit)="onSubmitPublish()" class="space-y-8">
+      <form [formGroup]="eoiForm" (ngSubmit)="onSubmitPublish()" class="bg-white rounded-xl shadow-lg border border-slate-200 border-t-4 border-t-[#002244] p-6 md:p-8 space-y-10">
 
         <!-- SECTION 1: BASIC DETAILS -->
-        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
-          <div class="border-b border-slate-100 pb-3">
-            <h3 class="text-sm font-bold text-slate-900">Section 1: EOI Basic Details</h3>
-            <p class="text-xs text-slate-500">Specify official tender reference number, associated scheme, and nodal department</p>
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3 pb-3 border-b border-slate-200">
+            <div class="bg-[#002244] text-white font-black text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-md shadow-xs">Section 1</div>
+            <div>
+              <h3 class="text-sm font-extrabold text-[#002244] uppercase tracking-wide">EOI Basic Details</h3>
+              <p class="text-[11px] text-slate-500 font-medium mt-0.5">Specify official tender reference number, associated scheme, and nodal department</p>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- EOI Reference No. * -->
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">
                 EOI Reference No. <span class="text-rose-600">*</span>
               </label>
               <input 
                 type="text" 
                 formControlName="referenceNo"
                 placeholder="e.g. RSLDC/EOI/2025-26/001"
-                class="w-full px-3 py-2 border rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-blue-600 focus:outline-hidden"
-                [ngClass]="{'border-rose-300 ring-1 ring-rose-300': hasError('referenceNo')}" />
-              <p *ngIf="hasError('referenceNo')" class="text-[11px] text-rose-600 mt-1">Reference number is required.</p>
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden"
+                [ngClass]="{'border-rose-400 bg-rose-50 ring-1 ring-rose-400': hasError('referenceNo')}" />
+              <p *ngIf="hasError('referenceNo')" class="text-[11px] text-rose-600 mt-1 font-medium">Reference number is required.</p>
             </div>
 
             <!-- EOI Title * -->
             <div class="md:col-span-2">
-              <label class="block text-xs font-bold text-slate-700 mb-1">
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">
                 EOI Title <span class="text-rose-600">*</span>
               </label>
               <input 
                 type="text" 
                 formControlName="title"
                 placeholder="Full official subject of the Expression of Interest..."
-                class="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden"
-                [ngClass]="{'border-rose-300 ring-1 ring-rose-300': hasError('title')}" />
-              <p *ngIf="hasError('title')" class="text-[11px] text-rose-600 mt-1">Title is required.</p>
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden"
+                [ngClass]="{'border-rose-400 bg-rose-50 ring-1 ring-rose-400': hasError('title')}" />
+              <p *ngIf="hasError('title')" class="text-[11px] text-rose-600 mt-1 font-medium">Title is required.</p>
             </div>
 
-            <!-- Scheme * (Rule 1 & 2: Loaded dynamically from Scheme Master) -->
+            <!-- Scheme * -->
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">
                 Scheme <span class="text-rose-600">*</span>
               </label>
               <select 
                 formControlName="schemeId"
                 (change)="onSchemeChange()"
-                class="w-full px-3 py-2 border rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-600 focus:outline-hidden"
-                [ngClass]="{'border-rose-300 ring-1 ring-rose-300': hasError('schemeId')}">
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden"
+                [ngClass]="{'border-rose-400 bg-rose-50 ring-1 ring-rose-400': hasError('schemeId')}">
                 <option value="">Select Scheme from Master</option>
                 <option *ngFor="let s of activeSchemes()" [value]="s.id">{{ s.schemeName }} ({{ s.schemeCode }})</option>
               </select>
-              <p *ngIf="hasError('schemeId')" class="text-[11px] text-rose-600 mt-1">Active Scheme must be selected.</p>
+              <p *ngIf="hasError('schemeId')" class="text-[11px] text-rose-600 mt-1 font-medium">Active Scheme must be selected.</p>
             </div>
 
             <!-- Department * -->
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">
                 Department <span class="text-rose-600">*</span>
               </label>
               <select 
                 formControlName="department"
-                class="w-full px-3 py-2 border rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-600 focus:outline-hidden"
-                [ngClass]="{'border-rose-300 ring-1 ring-rose-300': hasError('department')}">
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden"
+                [ngClass]="{'border-rose-400 bg-rose-50 ring-1 ring-rose-400': hasError('department')}">
                 <option value="">Select Department</option>
                 <option *ngFor="let d of departments()" [value]="d.departmentName">{{ d.departmentName }}</option>
               </select>
-              <p *ngIf="hasError('department')" class="text-[11px] text-rose-600 mt-1">Department is required.</p>
+              <p *ngIf="hasError('department')" class="text-[11px] text-rose-600 mt-1 font-medium">Department is required.</p>
             </div>
 
             <!-- EOI Category * -->
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">
                 EOI Category <span class="text-rose-600">*</span>
               </label>
               <select 
                 formControlName="eoiCategory"
-                class="w-full px-3 py-2 border rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-600 focus:outline-hidden"
-                [ngClass]="{'border-rose-300 ring-1 ring-rose-300': hasError('eoiCategory')}">
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden"
+                [ngClass]="{'border-rose-400 bg-rose-50 ring-1 ring-rose-400': hasError('eoiCategory')}">
                 <option value="">Select EOI Category</option>
                 <option *ngFor="let c of categories()" [value]="c.categoryName">{{ c.categoryName }}</option>
               </select>
-              <p *ngIf="hasError('eoiCategory')" class="text-[11px] text-rose-600 mt-1">EOI Category is required.</p>
+              <p *ngIf="hasError('eoiCategory')" class="text-[11px] text-rose-600 mt-1 font-medium">EOI Category is required.</p>
             </div>
 
             <!-- Description * -->
             <div class="col-span-full">
-              <label class="block text-xs font-bold text-slate-700 mb-1">
-                EOI Description *
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                EOI Description <span class="text-rose-600">*</span>
               </label>
               <textarea 
                 rows="4" 
                 formControlName="description"
                 placeholder="Comprehensive scope of work, background, and delivery expectations..."
-                class="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden"
-                [ngClass]="{'border-rose-300 ring-1 ring-rose-300': hasError('description')}"></textarea>
-              <p *ngIf="hasError('description')" class="text-[11px] text-rose-600 mt-1">Description is required.</p>
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden"
+                [ngClass]="{'border-rose-400 bg-rose-50 ring-1 ring-rose-400': hasError('description')}"></textarea>
+              <p *ngIf="hasError('description')" class="text-[11px] text-rose-600 mt-1 font-medium">Description is required.</p>
             </div>
           </div>
         </div>
+
+        <hr class="border-slate-200">
 
         <!-- SECTION 2: IMPORTANT DATES -->
-        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
-          <div class="border-b border-slate-100 pb-3">
-            <h3 class="text-sm font-bold text-slate-900">Section 2: Important Tender Milestone Dates</h3>
-            <p class="text-xs text-slate-500">All dates are strictly validated. Submission deadline enforces applicant form closing.</p>
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3 pb-3 border-b border-slate-200">
+            <div class="bg-[#002244] text-white font-black text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-md shadow-xs">Section 2</div>
+            <div>
+              <h3 class="text-sm font-extrabold text-[#002244] uppercase tracking-wide">Important Tender Milestone Dates</h3>
+              <p class="text-[11px] text-slate-500 font-medium mt-0.5">All dates are strictly validated. Submission deadline enforces applicant form closing.</p>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Date of EOI Published *</label>
-              <input type="date" formControlName="publishedDate" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Date of EOI Published <span class="text-rose-600">*</span></label>
+              <input type="date" formControlName="publishedDate" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden" />
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Application Start Date *</label>
-              <input type="date" formControlName="applicationStartDate" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Application Start Date <span class="text-rose-600">*</span></label>
+              <input type="date" formControlName="applicationStartDate" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden" />
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Last Date of EOI Submission *</label>
-              <input type="date" formControlName="closingDate" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-amber-900 focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Last Date of EOI Submission <span class="text-rose-600">*</span></label>
+              <input type="date" formControlName="closingDate" class="w-full px-3.5 py-2.5 bg-amber-50 border border-amber-300 rounded-lg text-xs font-bold text-amber-900 transition-all focus:bg-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-hidden" />
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">EOI Opening Date</label>
-              <input type="date" formControlName="openingDate" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">EOI Opening Date</label>
+              <input type="date" formControlName="openingDate" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden" />
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Technical Review Start Date</label>
-              <input type="date" formControlName="reviewStartDate" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Technical Review Start Date</label>
+              <input type="date" formControlName="reviewStartDate" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden" />
             </div>
           </div>
         </div>
 
+        <hr class="border-slate-200">
+
         <!-- SECTION 3: FEES -->
-        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
-          <div class="border-b border-slate-100 pb-3">
-            <h3 class="text-sm font-bold text-slate-900">Section 3: Statutory Fees & Earnest Money Deposit (EMD)</h3>
-            <p class="text-xs text-slate-500">Values calculate automatic totals and GST billing requirements</p>
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3 pb-3 border-b border-slate-200">
+            <div class="bg-[#002244] text-white font-black text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-md shadow-xs">Section 3</div>
+            <div>
+              <h3 class="text-sm font-extrabold text-[#002244] uppercase tracking-wide">Statutory Fees & Earnest Money Deposit (EMD)</h3>
+              <p class="text-[11px] text-slate-500 font-medium mt-0.5">Values calculate automatic totals and GST billing requirements</p>
+            </div>
           </div>
 
-          <div formGroupName="fees" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div formGroupName="fees" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">EMD Fee (INR)</label>
-              <input type="number" formControlName="emdFee" (input)="recalculateFees()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">EMD Fee (INR)</label>
+              <input type="number" formControlName="emdFee" (input)="recalculateFees()" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden" />
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">EOI / Application Fee (INR)</label>
-              <input type="number" formControlName="applicationFee" (input)="recalculateFees()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">EOI / Application Fee (INR)</label>
+              <input type="number" formControlName="applicationFee" (input)="recalculateFees()" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden" />
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Processing Fee (RISL) (INR)</label>
-              <input type="number" formControlName="processingFee" (input)="recalculateFees()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Processing Fee (RISL) (INR)</label>
+              <input type="number" formControlName="processingFee" (input)="recalculateFees()" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden" />
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">GST Percentage (%)</label>
-              <input type="number" formControlName="gstPercentage" (input)="recalculateFees()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">GST Percentage (%)</label>
+              <input type="number" formControlName="gstPercentage" (input)="recalculateFees()" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden" />
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">GST Amount (Calculated)</label>
-              <input type="number" formControlName="gstAmount" readonly class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-lg text-xs font-semibold text-slate-600" />
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">GST Amount (Calculated)</label>
+              <input type="number" formControlName="gstAmount" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-lg text-xs font-bold text-slate-500 cursor-not-allowed" />
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Other Charges (INR)</label>
-              <input type="number" formControlName="otherCharges" (input)="recalculateFees()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Other Charges (INR)</label>
+              <input type="number" formControlName="otherCharges" (input)="recalculateFees()" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden" />
             </div>
           </div>
 
           <!-- Total Calculation Card -->
-          <div class="p-4 rounded-xl bg-blue-50/70 border border-blue-200 flex items-center justify-between">
+          <div class="p-5 rounded-xl bg-gradient-to-r from-blue-50 to-white border border-blue-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6">
             <div>
-              <span class="text-xs font-bold text-blue-900 block">Total Calculated Application Package Amount</span>
-              <span class="text-[11px] text-blue-700">Base Application + Processing + GST + Refundable EMD</span>
+              <span class="text-sm font-extrabold text-blue-900 block tracking-wide uppercase">Total Calculated Application Package Amount</span>
+              <span class="text-xs text-blue-700 font-medium">Base Application + Processing + GST + Refundable EMD</span>
             </div>
-            <div class="text-2xl font-black text-blue-950 font-mono">
+            <div class="text-3xl font-black text-blue-950 font-mono tracking-tight bg-white px-5 py-2.5 rounded-lg shadow-sm border border-blue-100">
               ₹{{ totalCalculatedFee() | number:'1.0-0' }}
             </div>
           </div>
         </div>
 
+        <hr class="border-slate-200">
+
         <!-- SECTION 4: ATTACHMENT & DOCUMENTS -->
-        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-6">
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3 pb-3 border-b border-slate-200">
+            <div class="bg-[#002244] text-white font-black text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-md shadow-xs">Section 4</div>
+            <div>
+              <h3 class="text-sm font-extrabold text-[#002244] uppercase tracking-wide">Attachment & Documents Checklist</h3>
+              <p class="text-[11px] text-slate-500 font-medium mt-0.5">Configure mandatory attachments and compliance documents</p>
+            </div>
+          </div>
+
           <!-- Official EOI File -->
-          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
-            <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 transition-colors hover:border-slate-300">
+            <h4 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-1.5">
               <span class="material-symbols-outlined text-blue-700 text-[18px]">attachment</span>
-              Official EOI RFP Document Upload *
+              Official EOI RFP Document Upload <span class="text-rose-600 ml-1">*</span>
             </h4>
             <div class="flex flex-col sm:flex-row items-center gap-4">
-              <input type="file" (change)="onFileSelected($event)" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-700 file:text-white hover:file:bg-blue-800 cursor-pointer" />
-              <div *ngIf="attachedFileName()" class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-700 whitespace-nowrap">
-                <span class="material-symbols-outlined text-[16px] text-emerald-600">check_circle</span>
-                <span class="font-medium">{{ attachedFileName() }} ({{ attachedFileSize() }})</span>
-                <button type="button" (click)="removeAttachedFile()" class="text-rose-500 hover:text-rose-700 ml-1">
-                  <span class="material-symbols-outlined text-[16px]">close</span>
+              <input type="file" (change)="onFileSelected($event)" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-700 file:text-white hover:file:bg-blue-800 cursor-pointer shadow-sm transition-colors" />
+              <div *ngIf="attachedFileName()" class="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-emerald-200 shadow-sm text-xs text-slate-800 whitespace-nowrap">
+                <span class="material-symbols-outlined text-[18px] text-emerald-600">check_circle</span>
+                <span class="font-bold">{{ attachedFileName() }}</span>
+                <span class="text-slate-500 font-medium">({{ attachedFileSize() }})</span>
+                <button type="button" (click)="removeAttachedFile()" class="text-rose-500 hover:text-rose-700 ml-2 p-1 hover:bg-rose-50 rounded transition-colors">
+                  <span class="material-symbols-outlined text-[16px] block">close</span>
                 </button>
               </div>
             </div>
           </div>
 
           <!-- Required Applicant Document Checklist -->
-          <div>
-            <div class="flex items-center justify-between mb-3">
+          <div class="mt-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
               <div>
-                <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Mandatory Applicant Submission Checklist</h4>
-                <p class="text-[11px] text-slate-500">Applicant will be required to upload these verified documents</p>
+                <h4 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider">Mandatory Applicant Submission Checklist</h4>
+                <p class="text-[11px] text-slate-500 font-medium mt-0.5">Applicant will be required to upload these verified documents</p>
               </div>
               <button 
                 type="button" 
                 (click)="addDocumentRow()"
-                class="px-3 py-1 bg-slate-800 hover:bg-slate-900 text-white rounded-md text-xs font-semibold shadow-2xs">
-                + Add Document
+                class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold shadow-md transition-colors flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">add</span>
+                Add Document
               </button>
             </div>
 
-            <table class="w-full text-xs border border-slate-200 rounded-lg overflow-hidden">
-              <thead class="bg-slate-50 text-slate-700 text-[10px] uppercase font-bold">
+            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+              <table class="w-full text-xs text-left">
+                <thead class="bg-slate-100 text-slate-700 text-[10px] uppercase font-black tracking-wider border-b border-slate-200">
+                  <tr>
+                    <th class="p-3.5">Document Name</th>
+                    <th class="p-3.5">Allowed Format</th>
+                    <th class="p-3.5 text-center">Required</th>
+                    <th class="p-3.5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                  <tr *ngFor="let doc of docChecklist(); let i = index" class="hover:bg-slate-50 transition-colors">
+                    <td class="p-3.5 font-bold text-slate-800">{{ doc.name }}</td>
+                    <td class="p-3.5 text-slate-600 font-medium">{{ doc.format }}</td>
+                    <td class="p-3.5 text-center">
+                      <span class="px-2.5 py-1 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200">Mandatory</span>
+                    </td>
+                    <td class="p-3.5 text-right">
+                      <button type="button" (click)="removeDocumentRow(i)" class="text-slate-400 hover:text-rose-600 transition-colors p-1.5 hover:bg-rose-50 rounded-lg">
+                        <span class="material-symbols-outlined text-[18px] block">delete</span>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-slate-200">
+
+        <!-- SECTION 5: TRANSACTIONS -->
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-200">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div class="bg-[#002244] text-white font-black text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-md shadow-xs">Section 5</div>
+              <div>
+                <h3 class="text-sm font-extrabold text-[#002244] uppercase tracking-wide">Transaction Configuration</h3>
+                <p class="text-[11px] text-slate-500 font-medium mt-0.5">Define milestone payment and scrutiny transaction heads for reconciliation</p>
+              </div>
+            </div>
+            <button 
+              type="button" 
+              (click)="addTransactionRow()"
+              class="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-xs font-bold shadow-md transition-colors flex items-center gap-1.5 shrink-0">
+              <span class="material-symbols-outlined text-[16px]">add</span>
+              Add Transaction Head
+            </button>
+          </div>
+
+          <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-slate-100 text-slate-700 text-[10px] uppercase font-black tracking-wider border-b border-slate-200">
                 <tr>
-                  <th class="p-2.5 text-left">Document Name</th>
-                  <th class="p-2.5 text-left">Allowed Format</th>
-                  <th class="p-2.5 text-center">Required</th>
-                  <th class="p-2.5 text-right">Actions</th>
+                  <th class="p-3.5">Transaction Name</th>
+                  <th class="p-3.5">Reference Head</th>
+                  <th class="p-3.5 text-right">Amount (INR)</th>
+                  <th class="p-3.5 text-center">Status</th>
+                  <th class="p-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-100">
-                <tr *ngFor="let doc of docChecklist(); let i = index">
-                  <td class="p-2.5 font-semibold text-slate-800">{{ doc.name }}</td>
-                  <td class="p-2.5 text-slate-600">{{ doc.format }}</td>
-                  <td class="p-2.5 text-center">
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900">Mandatory</span>
+              <tbody class="divide-y divide-slate-100 bg-white">
+                <tr *ngFor="let t of transactionList(); let i = index" class="hover:bg-slate-50 transition-colors">
+                  <td class="p-3.5 font-bold text-slate-800">{{ t.name }}</td>
+                  <td class="p-3.5 font-mono text-slate-600 bg-slate-50 px-2 rounded">{{ t.ref }}</td>
+                  <td class="p-3.5 text-right font-black text-slate-900 text-sm">₹{{ t.amount | number:'1.0-0' }}</td>
+                  <td class="p-3.5 text-center">
+                    <span class="px-2.5 py-1 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Active</span>
                   </td>
-                  <td class="p-2.5 text-right">
-                    <button type="button" (click)="removeDocumentRow(i)" class="text-rose-600 hover:text-rose-800">
-                      <span class="material-symbols-outlined text-[16px]">delete</span>
+                  <td class="p-3.5 text-right">
+                    <button type="button" (click)="removeTransactionRow(i)" class="text-slate-400 hover:text-rose-600 transition-colors p-1.5 hover:bg-rose-50 rounded-lg">
+                      <span class="material-symbols-outlined text-[18px] block">delete</span>
                     </button>
                   </td>
                 </tr>
@@ -281,142 +359,148 @@ import { SchemeMaster, DepartmentMaster, EoiCategoryMaster, Committee, EoiItem }
           </div>
         </div>
 
-        <!-- SECTION 5: TRANSACTIONS -->
-        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div>
-              <h3 class="text-sm font-bold text-slate-900">Section 5: Transaction Configuration</h3>
-              <p class="text-xs text-slate-500">Define milestone payment and scrutiny transaction heads for reconciliation</p>
-            </div>
-            <button 
-              type="button" 
-              (click)="addTransactionRow()"
-              class="px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-xs font-bold shadow-xs">
-              + Add Transaction Head
-            </button>
-          </div>
-
-          <table class="w-full text-xs border border-slate-200 rounded-lg overflow-hidden">
-            <thead class="bg-slate-50 text-slate-700 text-[10px] uppercase font-bold">
-              <tr>
-                <th class="p-2.5 text-left">Transaction Name</th>
-                <th class="p-2.5 text-left">Reference Head</th>
-                <th class="p-2.5 text-right">Amount (INR)</th>
-                <th class="p-2.5 text-center">Status</th>
-                <th class="p-2.5 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-              <tr *ngFor="let t of transactionList(); let i = index">
-                <td class="p-2.5 font-semibold text-slate-800">{{ t.name }}</td>
-                <td class="p-2.5 font-mono text-slate-600">{{ t.ref }}</td>
-                <td class="p-2.5 text-right font-bold text-slate-900">₹{{ t.amount | number:'1.0-0' }}</td>
-                <td class="p-2.5 text-center">
-                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Active</span>
-                </td>
-                <td class="p-2.5 text-right">
-                  <button type="button" (click)="removeTransactionRow(i)" class="text-rose-600 hover:text-rose-800">
-                    <span class="material-symbols-outlined text-[16px]">delete</span>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <hr class="border-slate-200">
 
         <!-- SECTION 6: ELIGIBILITY CRITERIA -->
-        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
-          <div class="border-b border-slate-100 pb-3">
-            <h3 class="text-sm font-bold text-slate-900">Section 6: Minimum Eligibility Configuration</h3>
-            <p class="text-xs text-slate-500">Applicant responses must satisfy these quantitative and qualification filters</p>
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3 pb-3 border-b border-slate-200">
+            <div class="bg-[#002244] text-white font-black text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-md shadow-xs">Section 6</div>
+            <div>
+              <h3 class="text-sm font-extrabold text-[#002244] uppercase tracking-wide">Minimum Eligibility Configuration</h3>
+              <p class="text-[11px] text-slate-500 font-medium mt-0.5">Applicant responses must satisfy these quantitative and qualification filters</p>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Min Experience (Years)</label>
-              <input type="number" formControlName="minExperience" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Min Experience (Years)</label>
+              <div class="relative">
+                <input type="number" formControlName="minExperience" class="w-full pl-3.5 pr-12 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden" />
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none">
+                  <span class="text-slate-400 text-xs font-bold">YRS</span>
+                </div>
+              </div>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Min Turnover (in Crores INR)</label>
-              <input type="number" step="0.1" formControlName="minTurnover" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Min Turnover (in Crores INR)</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                  <span class="text-slate-400 text-xs font-bold">₹</span>
+                </div>
+                <input type="number" step="0.1" formControlName="minTurnover" class="w-full pl-8 pr-12 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden" />
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none">
+                  <span class="text-slate-400 text-xs font-bold">CR</span>
+                </div>
+              </div>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Geographic Location Scope</label>
-              <input type="text" formControlName="location" placeholder="e.g. Rajasthan (All 33 Districts)" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Geographic Location Scope</label>
+              <input type="text" formControlName="location" placeholder="e.g. Rajasthan (All 33 Districts)" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden" />
             </div>
           </div>
         </div>
 
+        <hr class="border-slate-200">
+
         <!-- SECTION 7: COMMITTEE ASSIGNMENT (Rule 7 & 30) -->
-        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
-          <div class="border-b border-slate-100 pb-3">
-            <h3 class="text-sm font-bold text-slate-900">Section 7: Approval Committee Assignment</h3>
-            <p class="text-xs text-slate-500">Assign a designated Technical Evaluation Committee to score proposals post-closure</p>
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3 pb-3 border-b border-slate-200">
+            <div class="bg-[#002244] text-white font-black text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-md shadow-xs">Section 7</div>
+            <div>
+              <h3 class="text-sm font-extrabold text-[#002244] uppercase tracking-wide">Approval Committee Assignment</h3>
+              <p class="text-[11px] text-slate-500 font-medium mt-0.5">Assign a designated Technical Evaluation Committee to score proposals post-closure</p>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Select Evaluation Committee *</label>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Select Evaluation Committee <span class="text-rose-600">*</span></label>
               <select 
                 formControlName="committeeId"
                 (change)="onCommitteeSelect()"
-                class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-600 focus:outline-hidden">
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 transition-all focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-hidden">
                 <option value="">Unassigned (Assign Later)</option>
                 <option *ngFor="let c of committees()" [value]="c.id">{{ c.committeeName }} ({{ c.committeeCode }})</option>
               </select>
             </div>
 
-            <div *ngIf="selectedCommittee()" class="p-4 bg-blue-50/60 rounded-xl border border-blue-200 text-xs space-y-1">
-              <span class="font-bold text-blue-900 block">{{ selectedCommittee()?.committeeName }}</span>
-              <p class="text-slate-600">Chairperson: <strong class="text-slate-800">{{ selectedCommittee()?.chairpersonName }}</strong></p>
-              <p class="text-slate-600">Department: {{ selectedCommittee()?.department }}</p>
-              <p class="text-slate-600">Total Members: {{ selectedCommittee()?.members?.length }} Technical Experts</p>
+            <div *ngIf="selectedCommittee()" class="p-5 bg-gradient-to-br from-blue-50 to-white rounded-xl border border-blue-200 text-xs space-y-2 shadow-sm">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-[18px] text-blue-700">groups</span>
+                </div>
+                <div>
+                  <span class="font-extrabold text-slate-900 block text-sm">{{ selectedCommittee()?.committeeName }}</span>
+                  <span class="text-[10px] uppercase font-bold text-blue-700 tracking-wider">{{ selectedCommittee()?.committeeCode }}</span>
+                </div>
+              </div>
+              <div class="mt-3 pl-11 space-y-1.5">
+                <p class="text-slate-600 flex justify-between"><span class="font-medium text-slate-500">Chairperson:</span> <strong class="text-slate-900">{{ selectedCommittee()?.chairpersonName }}</strong></p>
+                <p class="text-slate-600 flex justify-between"><span class="font-medium text-slate-500">Department:</span> <strong class="text-slate-900">{{ selectedCommittee()?.department }}</strong></p>
+                <p class="text-slate-600 flex justify-between"><span class="font-medium text-slate-500">Members:</span> <strong class="text-blue-900 bg-blue-100 px-2 py-0.5 rounded font-bold">{{ selectedCommittee()?.members?.length }} Technical Experts</strong></p>
+              </div>
             </div>
           </div>
         </div>
 
+        <hr class="border-slate-200">
+
         <!-- SECTION 8: PREVIEW & PUBLISH -->
-        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-6">
-          <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
-            <div>
-              <h3 class="text-sm font-bold text-slate-900">Section 8: Review Tender Summary & Final Publish</h3>
-              <p class="text-xs text-slate-500">Confirm all parameters before pushing live to the public portal</p>
+        <div class="space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-200">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div class="bg-[#002244] text-white font-black text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-md shadow-xs">Section 8</div>
+              <div>
+                <h3 class="text-sm font-extrabold text-[#002244] uppercase tracking-wide">Review Tender Summary & Final Publish</h3>
+                <p class="text-[11px] text-slate-500 font-medium mt-0.5">Confirm all parameters before pushing live to the public portal</p>
+              </div>
             </div>
-            <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900">
-              Ready for Super Admin Publication
+            <span class="px-3.5 py-1.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1.5 shadow-sm">
+              <span class="material-symbols-outlined text-[14px]">verified</span>
+              Ready for Publication
             </span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-              <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[10px]">Tender Summary</h4>
-              <p>Ref: <strong class="font-mono text-blue-900">{{ eoiForm.get('referenceNo')?.value }}</strong></p>
-              <p>Title: <strong class="text-slate-900">{{ eoiForm.get('title')?.value }}</strong></p>
-              <p>Department: {{ eoiForm.get('department')?.value }}</p>
-              <p>Category: {{ eoiForm.get('eoiCategory')?.value }}</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+            <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3 shadow-sm">
+              <h4 class="font-black text-slate-800 uppercase tracking-wider text-[11px] border-b border-slate-200 pb-2 mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px] text-blue-700">info</span>
+                Tender Summary
+              </h4>
+              <div class="space-y-2">
+                <div class="flex justify-between"><span class="text-slate-500 font-medium">Reference:</span> <strong class="font-mono text-blue-900 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">{{ eoiForm.get('referenceNo')?.value || 'N/A' }}</strong></div>
+                <div class="flex justify-between"><span class="text-slate-500 font-medium">Title:</span> <strong class="text-slate-900 truncate max-w-[200px]" [title]="eoiForm.get('title')?.value">{{ eoiForm.get('title')?.value || 'N/A' }}</strong></div>
+                <div class="flex justify-between"><span class="text-slate-500 font-medium">Department:</span> <span class="text-slate-800 font-semibold truncate max-w-[200px]">{{ eoiForm.get('department')?.value || 'N/A' }}</span></div>
+                <div class="flex justify-between"><span class="text-slate-500 font-medium">Category:</span> <span class="text-slate-800 font-semibold">{{ eoiForm.get('eoiCategory')?.value || 'N/A' }}</span></div>
+              </div>
             </div>
 
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-              <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[10px]">Schedule & Financials</h4>
-              <p>Application Window: <strong>{{ eoiForm.get('applicationStartDate')?.value }} to {{ eoiForm.get('closingDate')?.value }}</strong></p>
-              <p>Total Fee: <strong class="text-blue-900">₹{{ totalCalculatedFee() | number:'1.0-0' }}</strong></p>
-              <p>Assigned Committee: <strong>{{ selectedCommittee()?.committeeName || 'Unassigned' }}</strong></p>
+            <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3 shadow-sm">
+              <h4 class="font-black text-slate-800 uppercase tracking-wider text-[11px] border-b border-slate-200 pb-2 mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px] text-emerald-700">event_note</span>
+                Schedule & Financials
+              </h4>
+              <div class="space-y-2">
+                <div class="flex justify-between"><span class="text-slate-500 font-medium">Application Window:</span> <strong class="text-slate-900">{{ eoiForm.get('applicationStartDate')?.value }} to {{ eoiForm.get('closingDate')?.value }}</strong></div>
+                <div class="flex justify-between"><span class="text-slate-500 font-medium">Total Fee:</span> <strong class="text-[#002244] text-sm font-black">₹{{ totalCalculatedFee() | number:'1.0-0' }}</strong></div>
+                <div class="flex justify-between"><span class="text-slate-500 font-medium">Assigned Committee:</span> <strong class="text-slate-900">{{ selectedCommittee()?.committeeName || 'Unassigned' }}</strong></div>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- FORM SUBMIT CONTROLS -->
-        <div class="flex items-center justify-end pt-4 border-t border-slate-200 gap-3">
+        <div class="flex flex-col sm:flex-row items-center justify-end pt-8 mt-6 border-t border-slate-200 gap-4">
           <button 
             type="button" 
             (click)="saveAsDraft()" 
-            class="px-5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-lg shadow-2xs transition-colors cursor-pointer">
-            Save as Draft
+            class="w-full sm:w-auto px-6 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-extrabold text-xs tracking-wide rounded-xl shadow-sm transition-all cursor-pointer">
+            SAVE AS DRAFT
           </button>
           <button 
             type="submit" 
-            class="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-extrabold shadow-md flex items-center gap-2 cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]">rocket_launch</span>
+            class="w-full sm:w-auto px-8 py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold tracking-wide uppercase shadow-lg shadow-emerald-700/30 transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined text-[20px]">rocket_launch</span>
             Publish EOI Live
           </button>
         </div>

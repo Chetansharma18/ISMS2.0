@@ -12,26 +12,14 @@ export type FontSize = 'sm' | 'md' | 'lg';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <header class="w-full bg-white border-b border-slate-200/90 shadow-2xs font-sans sticky top-0 z-40 select-none">
-      <div class="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-2.5 flex items-center justify-between gap-4 min-h-[68px]">
+    <header class="w-full bg-white shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] border-b border-slate-200/60 font-sans sticky top-0 z-40 select-none">
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-4 min-h-[72px]">
         
-        <!-- Left: Sidebar Toggle, Dual Government Emblems & Portal Title -->
-        <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
-          <!-- Sidebar Mobile & Desktop Toggle Button (Commented Out) -->
-          <!--
-          <button 
-            type="button"
-            (click)="toggleSidebar.emit()"
-            class="p-2 rounded-xs text-[#002244] hover:bg-slate-100 transition-colors border border-slate-200 cursor-pointer shrink-0"
-            title="Toggle Navigation Menu">
-            <span class="material-symbols-outlined text-[22px]">menu</span>
-          </button>
-          -->
-
-          <!-- Dual Emblems & Branding -->
-          <div class="flex items-center gap-2 sm:gap-3 min-w-0 cursor-pointer" routerLink="/admin/dashboard">
+        <!-- Left: Dual Government Emblems & Portal Title -->
+        <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+          <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0 cursor-pointer group" routerLink="/admin/dashboard">
             <!-- Official Ashoka Lion Capital Emblem of India -->
-            <div class="shrink-0 w-8 h-10 sm:w-10 sm:h-12 flex items-center justify-center">
+            <div class="shrink-0 w-9 h-11 sm:w-11 sm:h-14 flex items-center justify-center transition-transform group-hover:scale-105">
               <img 
                 src="emblem-new.png" 
                 alt="Government of Rajasthan - State Emblem of India"
@@ -40,107 +28,106 @@ export type FontSize = 'sm' | 'md' | 'lg';
             </div>
 
             <!-- Official RSLDC Circular Emblem -->
-            <div class="shrink-0 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
+            <div class="shrink-0 w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center transition-transform group-hover:scale-105">
               <img 
                 src="rsldc-logo.png" 
                 alt="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)"
-                class="h-full w-full object-contain select-none drop-shadow-2xs" 
+                class="h-full w-full object-contain select-none drop-shadow-sm" 
               />
             </div>
 
             <!-- Department Text Block -->
-            <div class="text-left flex flex-col justify-center min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="text-[10px] sm:text-[12px] font-bold text-[#002244] leading-[1.2] whitespace-nowrap">
+            <div class="text-left flex flex-col justify-center min-w-0 ml-1">
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="text-[11px] sm:text-[13px] font-black text-[#002244] uppercase tracking-wide leading-tight whitespace-nowrap">
                   Government of Rajasthan
                 </span>
-                <span class="hidden sm:inline-flex items-center px-2 py-0.2 rounded-xs text-[9.5px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
-                  SUPER ADMIN
+                <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-sm text-[9.5px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 shadow-sm">
+                  Super Admin
                 </span>
               </div>
-              <div class="text-[9.5px] sm:text-[11.5px] font-bold text-[#002244] leading-[1.2] whitespace-nowrap">
+              <div class="text-[10px] sm:text-[12px] font-bold text-[#002244] leading-tight whitespace-nowrap">
                 Skill, Employment &amp; Entrepreneurship Department
               </div>
-              <div class="text-[9px] sm:text-[11px] text-slate-500 font-medium whitespace-nowrap hidden xs:block">
+              <div class="text-[9.5px] sm:text-[11px] text-slate-500 font-semibold whitespace-nowrap hidden xs:block mt-0.5">
                 Rajasthan Skill and Livelihoods Development Corporation (RSLDC)
               </div>
             </div>
 
             <!-- Thin Vertical Divider Line -->
-            <div class="hidden md:block h-9 w-[1.5px] bg-slate-300 mx-1 shrink-0"></div>
+            <div class="hidden lg:block h-10 w-[1.5px] bg-slate-200 mx-3 shrink-0"></div>
 
             <!-- System Branding: ISMS 2.0 Administration Portal -->
-            <div class="hidden md:flex text-left flex-col justify-center shrink-0">
-              <div class="flex items-baseline leading-none">
-                <span class="text-xl sm:text-2xl font-black text-[#002244] tracking-tight">ISMS</span>
-                <span class="text-xl sm:text-2xl font-black text-[#f59e0b] ml-1">2.0</span>
+            <div class="hidden lg:flex text-left flex-col justify-center shrink-0">
+              <div class="flex items-baseline leading-none mb-0.5">
+                <span class="text-2xl sm:text-[26px] font-black text-[#002244] tracking-tight drop-shadow-sm">ISMS</span>
+                <span class="text-2xl sm:text-[26px] font-black text-[#f59e0b] ml-1 drop-shadow-sm">2.0</span>
               </div>
-              <div class="text-[10.5px] text-slate-500 font-semibold tracking-tight mt-0.5">
-                Central Administration Portal
+              <div class="text-[10.5px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">
+                Central Administration
               </div>
             </div>
           </div>
         </div>
 
         <!-- Right Utilities: Accessibility, Language, Notifications, Quick Help & Super Admin Profile -->
-        <div class="flex items-center justify-end gap-2 sm:gap-3 shrink-0">
+        <div class="flex items-center justify-end gap-3 sm:gap-4 shrink-0">
           
           <!-- Font Sizing: A- A A+ -->
-          <div class="hidden lg:flex items-center space-x-1.5 text-slate-700">
+          <div class="hidden lg:flex items-center space-x-1.5 bg-slate-50 border border-slate-200 rounded-md p-1 shadow-sm">
             <button 
               type="button" 
               (click)="setFontSize('sm')"
-              [ngClass]="fontSize() === 'sm' ? 'font-extrabold text-[#002244] underline' : ''"
-              class="hover:text-blue-700 text-[11px] px-1 transition cursor-pointer"
+              [ngClass]="fontSize() === 'sm' ? 'bg-white font-extrabold text-[#002244] shadow-sm rounded-sm' : 'text-slate-600'"
+              class="hover:text-[#002244] text-[11px] px-2 py-0.5 transition cursor-pointer"
               title="Decrease text size (A-)">
               A-
             </button>
             <button 
               type="button" 
               (click)="setFontSize('md')"
-              [ngClass]="fontSize() === 'md' ? 'font-extrabold text-[#002244] underline' : ''"
-              class="hover:text-blue-700 text-xs px-1 transition cursor-pointer"
+              [ngClass]="fontSize() === 'md' ? 'bg-white font-extrabold text-[#002244] shadow-sm rounded-sm' : 'text-slate-600'"
+              class="hover:text-[#002244] text-xs px-2 py-0.5 transition cursor-pointer"
               title="Standard text size (A)">
               A
             </button>
             <button 
               type="button" 
               (click)="setFontSize('lg')"
-              [ngClass]="fontSize() === 'lg' ? 'font-extrabold text-[#002244] underline' : ''"
-              class="hover:text-blue-700 text-xs font-semibold px-1 transition cursor-pointer"
+              [ngClass]="fontSize() === 'lg' ? 'bg-white font-extrabold text-[#002244] shadow-sm rounded-sm' : 'text-slate-600'"
+              class="hover:text-[#002244] text-xs font-semibold px-2 py-0.5 transition cursor-pointer"
               title="Increase text size (A+)">
               A+
             </button>
           </div>
 
-          <span class="hidden lg:block text-slate-300">|</span>
+          <span class="hidden lg:block w-[1px] h-6 bg-slate-200"></span>
 
           <!-- Language Switcher: English | हिंदी -->
-          <div class="hidden sm:flex items-center space-x-1 sm:space-x-1.5 text-xs">
+          <div class="hidden sm:flex items-center space-x-2 text-xs font-semibold">
             <button 
               (click)="setLanguage('en')" 
-              [ngClass]="currentLanguage() === 'en' ? 'text-[#002244] font-bold' : 'text-slate-600'" 
-              class="hover:text-blue-700 transition cursor-pointer">
-              English
+              [ngClass]="currentLanguage() === 'en' ? 'text-[#002244] border-b-2 border-[#002244]' : 'text-slate-500 border-b-2 border-transparent hover:text-slate-700'" 
+              class="pb-1 transition cursor-pointer uppercase tracking-wider text-[11px]">
+              Eng
             </button>
-            <span class="text-slate-300">|</span>
             <button 
               (click)="setLanguage('hi')" 
-              [ngClass]="currentLanguage() === 'hi' ? 'text-[#002244] font-bold' : 'text-slate-600'" 
-              class="hover:text-blue-700 transition cursor-pointer">
+              [ngClass]="currentLanguage() === 'hi' ? 'text-[#002244] border-b-2 border-[#002244]' : 'text-slate-500 border-b-2 border-transparent hover:text-slate-700'" 
+              class="pb-1 transition cursor-pointer uppercase tracking-wider text-[11px]">
               हिंदी
             </button>
           </div>
 
-          <span class="hidden sm:block text-slate-300">|</span>
+          <span class="hidden sm:block w-[1px] h-6 bg-slate-200"></span>
 
           <!-- Quick Help Modal Toggle -->
           <button 
             type="button"
             (click)="showHelpModal.set(true)"
-            class="p-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-slate-100 transition-colors border border-slate-200 cursor-pointer"
+            class="p-2.5 rounded-full text-slate-500 hover:text-[#002244] hover:bg-slate-100 hover:shadow-sm transition-all cursor-pointer"
             title="Administrative System Help & Documentation">
-            <span class="material-symbols-outlined text-[20px]">help_outline</span>
+            <span class="material-symbols-outlined text-[20px]">help</span>
           </button>
 
           <!-- Notifications Dropdown -->
@@ -148,79 +135,86 @@ export type FontSize = 'sm' | 'md' | 'lg';
             <button 
               type="button"
               (click)="toggleNotifications()"
-              class="p-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-slate-100 transition-colors border border-slate-200 relative cursor-pointer"
+              class="p-2.5 rounded-full text-slate-500 hover:text-[#002244] hover:bg-slate-100 hover:shadow-sm transition-all relative cursor-pointer"
               title="System Alerts & Intimations">
               <span class="material-symbols-outlined text-[20px]">notifications</span>
-              <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-600 ring-2 ring-white"></span>
+              <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-rose-600 ring-2 ring-white animate-pulse"></span>
             </button>
 
             <!-- Notifications Popover -->
             <div 
               *ngIf="notificationsOpen()" 
-              class="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-2xl border border-slate-200 py-2 z-50 animate-fade-in">
-              <div class="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between">
-                <h4 class="text-xs font-bold text-[#002244] uppercase tracking-wider">Administrative Alerts</h4>
-                <span class="text-[11px] font-semibold text-[#002244] bg-[#002244]/10 px-2 py-0.5 rounded-full">3 New</span>
+              class="absolute right-0 mt-3 w-80 sm:w-[400px] bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-slate-100 py-2 z-50 animate-fade-in overflow-hidden">
+              <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
+                <h4 class="text-xs font-black text-[#002244] uppercase tracking-widest">Alerts</h4>
+                <span class="text-[10px] font-bold text-white bg-rose-600 px-2 py-0.5 rounded-full shadow-sm">3 New Alerts</span>
               </div>
-              <div class="max-h-72 overflow-y-auto divide-y divide-slate-100">
-                <div class="p-3 hover:bg-slate-50 transition-colors flex items-start gap-2.5">
-                  <span class="material-symbols-outlined text-amber-500 text-[20px] mt-0.5">schedule</span>
+              <div class="max-h-[320px] overflow-y-auto divide-y divide-slate-50">
+                <div class="p-4 hover:bg-slate-50/80 transition-colors flex items-start gap-3.5 cursor-pointer">
+                  <div class="p-2 rounded-full bg-amber-50 text-amber-600 border border-amber-100">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                  </div>
                   <div>
-                    <p class="text-xs font-semibold text-slate-800">EOI Closing Soon: RSLDC/EOI/2025-26/003</p>
-                    <p class="text-[11px] text-slate-500 mt-0.5">Closing on 15-04-2025 (29 applications received).</p>
-                    <span class="text-[10px] text-slate-400">10 mins ago</span>
+                    <p class="text-[13px] font-bold text-slate-800">EOI Closing Soon: RSLDC/EOI/2025-26/003</p>
+                    <p class="text-[12px] text-slate-500 mt-1 leading-relaxed">Closing on 15-04-2025 (29 applications received).</p>
+                    <span class="text-[10px] font-semibold text-slate-400 mt-1.5 block uppercase tracking-wider">10 mins ago</span>
                   </div>
                 </div>
-                <div class="p-3 hover:bg-slate-50 transition-colors flex items-start gap-2.5">
-                  <span class="material-symbols-outlined text-[#002244] text-[20px] mt-0.5">rate_review</span>
+                <div class="p-4 hover:bg-slate-50/80 transition-colors flex items-start gap-3.5 cursor-pointer">
+                  <div class="p-2 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+                    <span class="material-symbols-outlined text-[18px]">rate_review</span>
+                  </div>
                   <div>
-                    <p class="text-xs font-semibold text-slate-800">Committee Evaluation Pending</p>
-                    <p class="text-[11px] text-slate-500 mt-0.5">State Skill Evaluation Committee has 18 proposals ready for final scoring.</p>
-                    <span class="text-[10px] text-slate-400">2 hours ago</span>
+                    <p class="text-[13px] font-bold text-slate-800">Committee Evaluation Pending</p>
+                    <p class="text-[12px] text-slate-500 mt-1 leading-relaxed">State Skill Evaluation Committee has 18 proposals ready for final scoring.</p>
+                    <span class="text-[10px] font-semibold text-slate-400 mt-1.5 block uppercase tracking-wider">2 hours ago</span>
                   </div>
                 </div>
-                <div class="p-3 hover:bg-slate-50 transition-colors flex items-start gap-2.5">
-                  <span class="material-symbols-outlined text-emerald-500 text-[20px] mt-0.5">verified</span>
+                <div class="p-4 hover:bg-slate-50/80 transition-colors flex items-start gap-3.5 cursor-pointer">
+                  <div class="p-2 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+                    <span class="material-symbols-outlined text-[18px]">verified</span>
+                  </div>
                   <div>
-                    <p class="text-xs font-semibold text-slate-800">Corrigendum Published</p>
-                    <p class="text-[11px] text-slate-500 mt-0.5">Corrigendum-01 successfully attached and versioned to v1.1.</p>
-                    <span class="text-[10px] text-slate-400">Yesterday</span>
+                    <p class="text-[13px] font-bold text-slate-800">Corrigendum Published</p>
+                    <p class="text-[12px] text-slate-500 mt-1 leading-relaxed">Corrigendum-01 successfully attached and versioned to v1.1.</p>
+                    <span class="text-[10px] font-semibold text-slate-400 mt-1.5 block uppercase tracking-wider">Yesterday</span>
                   </div>
                 </div>
               </div>
-              <div class="px-4 py-2 border-t border-slate-100 bg-slate-50/50 text-center">
-                <a routerLink="/admin/audit-logs" (click)="notificationsOpen.set(false)" class="text-xs font-semibold text-[#002244] hover:underline">
-                  View Full Audit Activity Log →
+              <div class="px-5 py-3 border-t border-slate-100 bg-slate-50/80 text-center">
+                <a routerLink="/admin/audit-logs" (click)="notificationsOpen.set(false)" class="text-xs font-bold text-[#002244] hover:text-[#003366] hover:underline transition-all">
+                  View Full Audit Activity Log &rarr;
                 </a>
               </div>
             </div>
           </div>
 
-          <span class="text-slate-300">|</span>
+          <span class="w-[1px] h-6 bg-slate-200 ml-1 mr-1"></span>
 
-          <!-- Super Admin Profile Dropdown (Initial circle placed BEFORE name) -->
+          <!-- Super Admin Profile Dropdown -->
           <div class="relative">
             <button 
               type="button"
               (click)="toggleProfileMenu()"
-              class="flex items-center gap-2 sm:gap-2.5 p-1 rounded-xs hover:bg-slate-100 transition-colors cursor-pointer group">
+              class="flex items-center gap-2 sm:gap-3 p-1.5 rounded-full hover:bg-slate-50 hover:shadow-sm border border-transparent hover:border-slate-200 transition-all cursor-pointer group">
               
               <!-- Avatar Circle with Initial 'RS' -->
-              <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#002244] text-amber-300 border border-[#002244]/20 flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#002244] to-[#003366] text-amber-300 border-2 border-white shadow-sm flex items-center justify-center font-black text-sm shrink-0">
                 RS
               </div>
 
               <!-- Admin User Name & Designation -->
-              <div class="text-left hidden md:block leading-none">
-                <div class="text-xs sm:text-[13px] font-extrabold text-[#002244] truncate max-w-[180px]" [title]="authService.currentUser().fullName">
+              <div class="text-left hidden md:block leading-tight">
+                <div class="text-[13px] font-extrabold text-[#002244] truncate max-w-[180px] group-hover:text-[#003366] transition-colors" [title]="authService.currentUser().fullName">
                   {{ authService.currentUser().fullName }}
                 </div>
-                <div class="mt-1 flex items-center justify-start gap-1 text-[10.5px] text-emerald-700 font-semibold">
-                  <span>✓ Super Admin • RSLDC HQ</span>
+                <div class="flex items-center justify-start gap-1 text-[11px] text-emerald-700 font-bold tracking-wide mt-0.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  RSLDC HQ
                 </div>
               </div>
 
-              <span class="material-symbols-outlined text-[18px] text-slate-400 group-hover:text-slate-700">
+              <span class="material-symbols-outlined text-[20px] text-slate-400 group-hover:text-[#002244] transition-colors pl-1">
                 arrow_drop_down
               </span>
             </button>
@@ -228,44 +222,46 @@ export type FontSize = 'sm' | 'md' | 'lg';
             <!-- Dropdown Menu -->
             <div 
               *ngIf="profileMenuOpen()" 
-              class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-2xl border border-slate-200 py-2 z-50 animate-fade-in">
-              <div class="px-4 py-2.5 border-b border-slate-100 bg-slate-50/50">
-                <p class="text-xs font-bold text-[#002244]">{{ authService.currentUser().fullName }}</p>
-                <p class="text-[11px] text-slate-500 truncate">{{ authService.currentUser().email }}</p>
-                <p class="text-[10px] font-semibold text-blue-700 mt-1">SSO: {{ authService.currentUser().ssoId }}</p>
+              class="absolute right-0 mt-3 w-72 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-slate-100 py-2 z-50 animate-fade-in overflow-hidden">
+              <div class="px-5 py-4 border-b border-slate-100 bg-[#002244] text-white">
+                <p class="text-sm font-black tracking-wide">{{ authService.currentUser().fullName }}</p>
+                <p class="text-xs text-blue-200 font-medium mt-0.5 truncate">{{ authService.currentUser().email }}</p>
+                <div class="mt-3 inline-block px-2 py-1 rounded-md bg-white/10 border border-white/20 text-[10px] font-bold text-amber-300 uppercase tracking-wider">
+                  SSO: {{ authService.currentUser().ssoId }}
+                </div>
               </div>
 
-              <div class="py-1">
+              <div class="py-2">
                 <a 
                   routerLink="/admin/settings" 
                   (click)="profileMenuOpen.set(false)"
-                  class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-[#002244] transition-colors">
+                  class="flex items-center gap-3 px-5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-[#002244] transition-colors">
                   <span class="material-symbols-outlined text-[18px] text-slate-400">person</span>
                   My Profile
                 </a>
                 <button 
                   type="button"
                   (click)="openChangePasswordModal()" 
-                  class="w-full text-left flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-[#002244] transition-colors cursor-pointer">
+                  class="w-full text-left flex items-center gap-3 px-5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-[#002244] transition-colors cursor-pointer">
                   <span class="material-symbols-outlined text-[18px] text-slate-400">lock_reset</span>
                   Change Password
                 </button>
                 <a 
                   routerLink="/admin/audit-logs" 
                   (click)="profileMenuOpen.set(false)"
-                  class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-[#002244] transition-colors">
+                  class="flex items-center gap-3 px-5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-[#002244] transition-colors">
                   <span class="material-symbols-outlined text-[18px] text-slate-400">manage_history</span>
                   Audit Activity
                 </a>
               </div>
 
-              <div class="border-t border-slate-100 pt-1">
+              <div class="border-t border-slate-100 pt-2 pb-1">
                 <button 
                   type="button"
                   (click)="handleLogout()" 
-                  class="w-full text-left flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer">
+                  class="w-full text-left flex items-center gap-3 px-5 py-2.5 text-xs font-black text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer">
                   <span class="material-symbols-outlined text-[18px]">logout</span>
-                  Logout
+                  Secure Logout
                 </button>
               </div>
             </div>
@@ -275,36 +271,40 @@ export type FontSize = 'sm' | 'md' | 'lg';
 
       </div>
 
-      <!-- Saffron / Gold Accent Line at bottom -->
-      <div class="h-[2.5px] w-full bg-gradient-to-r from-[#002244] via-[#f59e0b] to-[#002244]"></div>
+      <!-- Saffron / White / Green Accent Line at bottom for National Colors -->
+      <div class="h-[3.5px] w-full flex">
+        <div class="h-full bg-[#f59e0b] w-1/3"></div>
+        <div class="h-full bg-white w-1/3 border-y border-slate-200/50"></div>
+        <div class="h-full bg-emerald-600 w-1/3"></div>
+      </div>
     </header>
 
     <!-- Help Modal -->
-    <div *ngIf="showHelpModal()" class="fixed inset-0 z-50 overflow-y-auto">
-      <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs" (click)="showHelpModal.set(false)"></div>
+    <div *ngIf="showHelpModal()" class="fixed inset-0 z-[100] overflow-y-auto">
+      <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" (click)="showHelpModal.set(false)"></div>
       <div class="flex min-h-full items-center justify-center p-4">
-        <div class="relative bg-white rounded-lg shadow-2xl max-w-xl w-full p-6 border border-slate-200">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div class="flex items-center gap-2 text-[#002244]">
-              <span class="material-symbols-outlined text-[24px]">help</span>
-              <h3 class="font-bold text-base">Super Admin Standard Operating Guidelines</h3>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-xl w-full border border-slate-200 overflow-hidden transform transition-all">
+          <div class="flex items-center justify-between px-6 py-4 bg-[#002244] text-white">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[24px] text-amber-300">menu_book</span>
+              <h3 class="font-black text-sm uppercase tracking-wider">Super Admin SOP Guidelines</h3>
             </div>
-            <button (click)="showHelpModal.set(false)" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+            <button (click)="showHelpModal.set(false)" class="text-slate-300 hover:text-white p-1 cursor-pointer transition-colors">
               <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
-          <div class="py-4 text-xs text-slate-600 space-y-3 leading-relaxed">
-            <div class="p-3 bg-blue-50/80 rounded-xs border border-blue-100 text-[#002244] font-medium">
+          <div class="px-6 py-6 text-[13px] text-slate-600 space-y-5 leading-relaxed">
+            <div class="p-4 bg-blue-50/80 rounded-xl border-l-4 border-l-blue-600 text-blue-900 font-medium">
               <strong>Order of Operations:</strong> Master Data (Schemes, Categories, Fees, Document Types) must be verified before initializing any new EOI.
             </div>
-            <p><strong>Rule 1 (Scheme Master):</strong> Active Scheme must be created prior to EOI generation.</p>
-            <p><strong>Rule 2 (Dynamic Form Builder):</strong> Custom form fields define applicant input schema. Fields with historical submissions cannot be physically deleted; use archive instead.</p>
-            <p><strong>Rule 3 (EOI Rescheduling):</strong> Rescheduling dates strictly mandates uploading an official Corrigendum or Amendment notification document.</p>
-            <p><strong>Rule 4 (Response Visibility):</strong> In compliance with Government tender secrecy, applicant submissions remain sealed until official EOI closure.</p>
+            <p><strong class="text-slate-800">Rule 1 (Scheme Master):</strong> Active Scheme must be created prior to EOI generation.</p>
+            <p><strong class="text-slate-800">Rule 2 (Dynamic Form Builder):</strong> Custom form fields define applicant input schema. Fields with historical submissions cannot be physically deleted; use archive instead.</p>
+            <p><strong class="text-slate-800">Rule 3 (EOI Rescheduling):</strong> Rescheduling dates strictly mandates uploading an official Corrigendum or Amendment notification document.</p>
+            <p><strong class="text-slate-800">Rule 4 (Response Visibility):</strong> In compliance with Government tender secrecy, applicant submissions remain sealed until official EOI closure.</p>
           </div>
-          <div class="text-right pt-3 border-t border-slate-100">
-            <button (click)="showHelpModal.set(false)" class="px-4 py-2 bg-[#002244] hover:bg-[#003366] text-white font-semibold text-xs rounded-xs shadow-xs cursor-pointer">
-              Understood
+          <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 text-right">
+            <button (click)="showHelpModal.set(false)" class="px-6 py-2.5 bg-[#002244] hover:bg-[#003366] text-white font-bold text-xs rounded-lg shadow-sm cursor-pointer transition-colors">
+              I Understand
             </button>
           </div>
         </div>
@@ -312,38 +312,38 @@ export type FontSize = 'sm' | 'md' | 'lg';
     </div>
 
     <!-- Change Password Modal -->
-    <div *ngIf="showPasswordModal()" class="fixed inset-0 z-50 overflow-y-auto">
-      <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs" (click)="showPasswordModal.set(false)"></div>
+    <div *ngIf="showPasswordModal()" class="fixed inset-0 z-[100] overflow-y-auto">
+      <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" (click)="showPasswordModal.set(false)"></div>
       <div class="flex min-h-full items-center justify-center p-4">
-        <div class="relative bg-white rounded-lg shadow-2xl max-w-md w-full p-6 border border-slate-200">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div class="flex items-center gap-2 text-[#002244]">
-              <span class="material-symbols-outlined text-[22px]">lock_reset</span>
-              <h3 class="font-bold text-base">Change Super Admin Password</h3>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full border border-slate-200 overflow-hidden transform transition-all">
+          <div class="flex items-center justify-between px-6 py-4 bg-[#002244] text-white">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-[22px] text-amber-300">lock_reset</span>
+              <h3 class="font-black text-sm uppercase tracking-wider">Change Password</h3>
             </div>
-            <button (click)="showPasswordModal.set(false)" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+            <button (click)="showPasswordModal.set(false)" class="text-slate-300 hover:text-white p-1 cursor-pointer transition-colors">
               <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
-          <div class="py-4 space-y-3">
+          <div class="px-6 py-6 space-y-5">
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Current Password *</label>
-              <input type="password" class="w-full px-3 py-2 border border-slate-300 rounded-xs text-xs focus:ring-2 focus:ring-[#002244] focus:outline-hidden" placeholder="••••••••••••" />
+              <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider mb-2">Current Password *</label>
+              <input type="password" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[13px] focus:bg-white focus:ring-2 focus:ring-[#002244] focus:border-[#002244] transition-all outline-hidden" placeholder="••••••••••••" />
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">New Secure Password *</label>
-              <input type="password" class="w-full px-3 py-2 border border-slate-300 rounded-xs text-xs focus:ring-2 focus:ring-[#002244] focus:outline-hidden" placeholder="Minimum 8 characters with symbols" />
+              <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider mb-2">New Secure Password *</label>
+              <input type="password" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[13px] focus:bg-white focus:ring-2 focus:ring-[#002244] focus:border-[#002244] transition-all outline-hidden" placeholder="Minimum 8 characters with symbols" />
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Confirm New Password *</label>
-              <input type="password" class="w-full px-3 py-2 border border-slate-300 rounded-xs text-xs focus:ring-2 focus:ring-[#002244] focus:outline-hidden" placeholder="Re-enter new password" />
+              <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider mb-2">Confirm New Password *</label>
+              <input type="password" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[13px] focus:bg-white focus:ring-2 focus:ring-[#002244] focus:border-[#002244] transition-all outline-hidden" placeholder="Re-enter new password" />
             </div>
           </div>
-          <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-            <button (click)="showPasswordModal.set(false)" class="px-4 py-2 border border-slate-300 text-slate-700 font-medium text-xs rounded-xs hover:bg-slate-50 cursor-pointer">
+          <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+            <button (click)="showPasswordModal.set(false)" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 font-bold text-xs rounded-lg hover:bg-slate-50 transition-colors cursor-pointer shadow-sm">
               Cancel
             </button>
-            <button (click)="saveNewPassword()" class="px-4 py-2 bg-[#002244] hover:bg-[#003366] text-white font-semibold text-xs rounded-xs shadow-xs cursor-pointer">
+            <button (click)="saveNewPassword()" class="px-5 py-2.5 bg-[#002244] hover:bg-[#003366] text-white font-bold text-xs rounded-lg shadow-sm cursor-pointer transition-colors">
               Update Password
             </button>
           </div>

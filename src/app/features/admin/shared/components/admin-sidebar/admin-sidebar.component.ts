@@ -9,19 +9,21 @@ import { EoiService } from '../../../core/services/eoi.service';
   imports: [CommonModule, RouterModule],
   template: `
     <aside 
-      class="w-64 bg-white border-r border-slate-200 flex flex-col h-full font-sans text-xs shrink-0 select-none shadow-2xs transition-all duration-300 z-40"
-      [ngClass]="{ 'hidden md:flex': !isOpen, 'fixed inset-y-0 left-0 flex md:relative': isOpen }">
+      class="w-[270px] bg-white border-r border-slate-200/80 flex flex-col h-full font-sans text-xs shrink-0 select-none shadow-[4px_0_24px_-4px_rgba(0,0,0,0.04)] transition-all duration-300 z-40 relative"
+      [ngClass]="{ 'hidden lg:flex': !isOpen, 'fixed inset-y-0 left-0 flex lg:relative': isOpen }">
       
       <!-- Top Brand Header inside Sidebar -->
-      <div class="p-3.5 border-b border-slate-200 bg-slate-50/80 flex items-center justify-between">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <div class="w-8 h-8 rounded-full bg-[#002244] text-amber-300 flex items-center justify-center font-black text-xs shadow-xs shrink-0">
+      <div class="p-4 bg-[#002244] flex items-center justify-between shadow-md relative overflow-hidden">
+        <div class="absolute inset-0 bg-white/5 bg-no-repeat bg-right-bottom opacity-10 blur-[1px]"></div>
+        
+        <div class="flex items-center gap-3 min-w-0 relative z-10">
+          <div class="w-10 h-10 rounded-lg bg-white/10 border border-white/20 text-amber-300 flex items-center justify-center font-black text-sm shadow-sm shrink-0 backdrop-blur-sm">
             🏛
           </div>
           <div class="leading-tight min-w-0">
-            <span class="text-[12px] font-extrabold text-[#002244] tracking-tight block truncate">ISMS 2.0 Governance</span>
-            <span class="inline-flex items-center gap-1 text-[9.5px] font-bold text-amber-800 bg-amber-100/90 border border-amber-300 px-1.5 py-0.2 rounded-2xs mt-0.5">
-              <span>★ State Super Admin</span>
+            <span class="text-[13px] font-black text-white tracking-wide block truncate uppercase">ISMS 2.0 Gov</span>
+            <span class="inline-flex items-center gap-1 text-[9.5px] font-bold text-amber-300 bg-black/20 border border-amber-300/30 px-1.5 py-0.5 rounded-sm mt-1 uppercase tracking-wider">
+              <span>★ State Admin</span>
             </span>
           </div>
         </div>
@@ -29,206 +31,188 @@ import { EoiService } from '../../../core/services/eoi.service';
         <button 
           type="button"
           (click)="closeSidebar.emit()"
-          class="md:hidden p-1.5 rounded-xs text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition-colors cursor-pointer"
+          class="lg:hidden p-1.5 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer relative z-10"
           title="Close Navigation Menu">
           <span class="material-symbols-outlined text-[20px]">close</span>
         </button>
       </div>
 
       <!-- Navigation Links Container -->
-      <nav class="flex-1 overflow-y-auto px-2.5 py-3 space-y-1 text-xs font-medium min-h-0">
+      <nav class="flex-1 overflow-y-auto px-3 py-5 space-y-1.5 text-xs font-semibold min-h-0 bg-slate-50/30">
         
         <!-- DASHBOARD (Commented out per request) -->
         <!--
         <a 
           routerLink="/admin/dashboard" 
-          routerLinkActive="bg-[#002244]/10 text-[#002244] font-bold border-l-[3.5px] border-[#002244]"
+          routerLinkActive="bg-[#002244] text-white shadow-md font-bold"
           [routerLinkActiveOptions]="{ exact: true }"
           (click)="onNavigate()"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-xs text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-semibold border-l-[3.5px] border-transparent group">
-          <span class="material-symbols-outlined text-[20px] text-slate-500 group-hover:text-[#002244] transition-colors">dashboard</span>
-          <span>DASHBOARD</span>
+          class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-[#002244] transition-all cursor-pointer group">
+          <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">dashboard</span>
+          <span class="uppercase tracking-wide">DASHBOARD</span>
         </a>
         -->
 
         <!-- MASTERS (Collapsible Accordion) -->
-        <div>
+        <div class="rounded-lg overflow-hidden transition-all" [ngClass]="mastersOpen() ? 'bg-slate-100/80 border border-slate-200/60 shadow-sm' : ''">
           <button 
             type="button"
             (click)="toggleSection('masters')"
-            class="w-full flex items-center justify-between px-3 py-2.5 rounded-xs text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all group cursor-pointer border-l-[3.5px]"
-            [ngClass]="mastersOpen() ? 'text-[#002244] font-bold bg-slate-50 border-[#002244]/40' : 'border-transparent'">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[20px] text-slate-500 group-hover:text-[#002244] transition-colors" [ngClass]="mastersOpen() ? 'text-[#002244]' : ''">database</span>
-              <span>MASTERS</span>
+            class="w-full flex items-center justify-between px-3.5 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-[#002244] transition-all group cursor-pointer"
+            [ngClass]="mastersOpen() ? 'text-[#002244] font-bold bg-white shadow-sm' : ''">
+            <div class="flex items-center gap-3.5">
+              <span class="material-symbols-outlined text-[20px] transition-colors" [ngClass]="mastersOpen() ? 'text-[#002244]' : 'text-slate-400 group-hover:text-[#002244]'">database</span>
+              <span class="uppercase tracking-wide">MASTERS</span>
             </div>
-            <span class="material-symbols-outlined text-[16px] transition-transform duration-200 text-slate-400 group-hover:text-[#002244]" [ngClass]="{ 'rotate-180': mastersOpen() }">
+            <span class="material-symbols-outlined text-[18px] transition-transform duration-200 text-slate-400 group-hover:text-[#002244]" [ngClass]="{ 'rotate-180': mastersOpen() }">
               expand_more
             </span>
           </button>
 
-          <!-- 16 Master Sub-items -->
-          <div *ngIf="mastersOpen()" class="pl-7 pr-1 py-1 space-y-0.5 border-l-2 border-slate-200 ml-5 my-1 text-[11px]">
-            <a routerLink="/admin/masters/schemes" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Scheme Master</a>
-            <!--
-            <a routerLink="/admin/masters/scheme-categories" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Scheme Category Master</a>
-            -->
-            <a routerLink="/admin/masters/eoi-categories" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Category Master</a>
-            <a routerLink="/admin/masters/departments" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Department Master</a>
-            <!--
-            <a routerLink="/admin/masters/organization-types" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Organization Type Master</a>
-            <a routerLink="/admin/masters/user-types" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">User Type Master</a>
-            <a routerLink="/admin/masters/designations" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Designation Master</a>
-            <a routerLink="/admin/masters/states" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">State Master</a>
-            <a routerLink="/admin/masters/districts" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">District Master</a>
-            <a routerLink="/admin/masters/blocks" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Block Master</a>
-            <a routerLink="/admin/masters/document-types" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Document Type Master</a>
-            <a routerLink="/admin/masters/transactions" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Transaction Master</a>
-            <a routerLink="/admin/masters/fees" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Fee Master</a>
-            <a routerLink="/admin/masters/roles" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Role Master</a>
-            <a routerLink="/admin/masters/access-levels" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Access Level Master</a>
-            <a routerLink="/admin/masters/application-status" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Application Status Master</a>
-            <a routerLink="/admin/masters/committee-roles" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Committee Role Master</a>
-            -->
+          <!-- Master Sub-items -->
+          <div *ngIf="mastersOpen()" class="px-2 py-2 space-y-1 text-[11px] bg-slate-100/50">
+            <a routerLink="/admin/masters/schemes" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">Scheme Master</a>
+            <a routerLink="/admin/masters/eoi-categories" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">EOI Category Master</a>
+            <a routerLink="/admin/masters/departments" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">Department Master</a>
           </div>
         </div>
 
         <!-- EOI MANAGEMENT (Collapsible Accordion) -->
-        <div>
+        <div class="rounded-lg overflow-hidden transition-all" [ngClass]="eoiOpen() ? 'bg-slate-100/80 border border-slate-200/60 shadow-sm' : ''">
           <button 
             type="button"
             (click)="toggleSection('eoi')"
-            class="w-full flex items-center justify-between px-3 py-2.5 rounded-xs text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all group cursor-pointer border-l-[3.5px]"
-            [ngClass]="eoiOpen() ? 'text-[#002244] font-bold bg-slate-50 border-[#002244]/40' : 'border-transparent'">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[20px] text-slate-500 group-hover:text-[#002244] transition-colors" [ngClass]="eoiOpen() ? 'text-[#002244]' : ''">assignment</span>
-              <span>EOI MANAGEMENT</span>
+            class="w-full flex items-center justify-between px-3.5 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-[#002244] transition-all group cursor-pointer"
+            [ngClass]="eoiOpen() ? 'text-[#002244] font-bold bg-white shadow-sm' : ''">
+            <div class="flex items-center gap-3.5">
+              <span class="material-symbols-outlined text-[20px] transition-colors" [ngClass]="eoiOpen() ? 'text-amber-600' : 'text-slate-400 group-hover:text-amber-600'">assignment</span>
+              <span class="uppercase tracking-wide">EOI MANAGEMENT</span>
             </div>
-            <span class="material-symbols-outlined text-[16px] transition-transform duration-200 text-slate-400 group-hover:text-[#002244]" [ngClass]="{ 'rotate-180': eoiOpen() }">
+            <span class="material-symbols-outlined text-[18px] transition-transform duration-200 text-slate-400 group-hover:text-[#002244]" [ngClass]="{ 'rotate-180': eoiOpen() }">
               expand_more
             </span>
           </button>
 
-          <div *ngIf="eoiOpen()" class="pl-7 pr-1 py-1 space-y-0.5 border-l-2 border-slate-200 ml-5 my-1 text-[11px]">
-            <a routerLink="/admin/eoi" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" [routerLinkActiveOptions]="{ exact: true }" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Configure</a>
-            <a routerLink="/admin/eoi/create" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">+ Create EOI</a>
-            <a routerLink="/admin/masters/eoi-categories" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Categories</a>
-            <a routerLink="/admin/eoi/EOI-2025-001/form-builder" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Form Builder</a>
-            <a routerLink="/admin/masters/document-types" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Documents</a>
-            <a routerLink="/admin/masters/transactions" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Transactions</a>
-            <a routerLink="/admin/masters/fees" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Fees</a>
-            <a routerLink="/admin/eoi/EOI-2025-002/responses" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Responses</a>
-            <a routerLink="/admin/eoi/EOI-2025-001/amendments" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Corrigendum &amp; Amendments</a>
-            <a routerLink="/admin/eoi/EOI-2025-001/reschedule" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Reschedule EOI</a>
-            <a routerLink="/admin/eoi/EOI-2025-001/history" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI History &amp; Versions</a>
+          <div *ngIf="eoiOpen()" class="px-2 py-2 space-y-1 text-[11px] bg-slate-100/50">
+            <a routerLink="/admin/eoi" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" [routerLinkActiveOptions]="{ exact: true }" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all relative">EOI Configure <span class="absolute right-2 top-2 w-1.5 h-1.5 rounded-full bg-amber-500"></span></a>
+            <a routerLink="/admin/eoi/create" routerLinkActive="text-white font-bold bg-[#002244] shadow-md" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-emerald-700 font-bold hover:text-white hover:bg-emerald-700 transition-all">+ Create New EOI</a>
+            <a routerLink="/admin/masters/eoi-categories" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">EOI Categories</a>
+            <a routerLink="/admin/eoi/EOI-2025-001/form-builder" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">EOI Form Builder</a>
+            <a routerLink="/admin/masters/document-types" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">EOI Documents</a>
+            <a routerLink="/admin/masters/transactions" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">EOI Transactions</a>
+            <a routerLink="/admin/masters/fees" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">EOI Fees</a>
+            <a routerLink="/admin/eoi/EOI-2025-002/responses" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">EOI Responses</a>
+            <a routerLink="/admin/eoi/EOI-2025-001/amendments" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">Corrigendum &amp; Amendments</a>
+            <a routerLink="/admin/eoi/EOI-2025-001/reschedule" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">Reschedule EOI</a>
+            <a routerLink="/admin/eoi/EOI-2025-001/history" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">EOI History &amp; Versions</a>
           </div>
         </div>
 
         <!-- COMMITTEE MANAGEMENT (Collapsible Accordion) -->
-        <div>
+        <div class="rounded-lg overflow-hidden transition-all" [ngClass]="committeeOpen() ? 'bg-slate-100/80 border border-slate-200/60 shadow-sm' : ''">
           <button 
             type="button"
             (click)="toggleSection('committee')"
-            class="w-full flex items-center justify-between px-3 py-2.5 rounded-xs text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all group cursor-pointer border-l-[3.5px]"
-            [ngClass]="committeeOpen() ? 'text-[#002244] font-bold bg-slate-50 border-[#002244]/40' : 'border-transparent'">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[20px] text-slate-500 group-hover:text-[#002244] transition-colors" [ngClass]="committeeOpen() ? 'text-[#002244]' : ''">groups</span>
-              <span>COMMITTEE MGMT</span>
+            class="w-full flex items-center justify-between px-3.5 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-[#002244] transition-all group cursor-pointer"
+            [ngClass]="committeeOpen() ? 'text-[#002244] font-bold bg-white shadow-sm' : ''">
+            <div class="flex items-center gap-3.5">
+              <span class="material-symbols-outlined text-[20px] transition-colors" [ngClass]="committeeOpen() ? 'text-[#002244]' : 'text-slate-400 group-hover:text-[#002244]'">groups</span>
+              <span class="uppercase tracking-wide">COMMITTEE MGMT</span>
             </div>
-            <span class="material-symbols-outlined text-[16px] transition-transform duration-200 text-slate-400 group-hover:text-[#002244]" [ngClass]="{ 'rotate-180': committeeOpen() }">
+            <span class="material-symbols-outlined text-[18px] transition-transform duration-200 text-slate-400 group-hover:text-[#002244]" [ngClass]="{ 'rotate-180': committeeOpen() }">
               expand_more
             </span>
           </button>
 
-          <div *ngIf="committeeOpen()" class="pl-7 pr-1 py-1 space-y-0.5 border-l-2 border-slate-200 ml-5 my-1 text-[11px]">
-            <a routerLink="/admin/committees" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" [routerLinkActiveOptions]="{ exact: true }" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Committee List</a>
-            <a routerLink="/admin/committees/create" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">+ Create Committee</a>
-            <a routerLink="/admin/eoi/committee-assign" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">EOI Committee Assignment</a>
+          <div *ngIf="committeeOpen()" class="px-2 py-2 space-y-1 text-[11px] bg-slate-100/50">
+            <a routerLink="/admin/committees" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" [routerLinkActiveOptions]="{ exact: true }" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">Committee List</a>
+            <a routerLink="/admin/committees/create" routerLinkActive="text-white font-bold bg-[#002244] shadow-md" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">+ Create Committee</a>
+            <a routerLink="/admin/eoi/committee-assign" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">EOI Committee Assignment</a>
           </div>
         </div>
 
         <!-- USER MANAGEMENT (Collapsible Accordion) -->
-        <div>
+        <div class="rounded-lg overflow-hidden transition-all" [ngClass]="usersOpen() ? 'bg-slate-100/80 border border-slate-200/60 shadow-sm' : ''">
           <button 
             type="button"
             (click)="toggleSection('users')"
-            class="w-full flex items-center justify-between px-3 py-2.5 rounded-xs text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all group cursor-pointer border-l-[3.5px]"
-            [ngClass]="usersOpen() ? 'text-[#002244] font-bold bg-slate-50 border-[#002244]/40' : 'border-transparent'">
-            <div class="flex items-center gap-3">
-              <span class="material-symbols-outlined text-[20px] text-slate-500 group-hover:text-[#002244] transition-colors" [ngClass]="usersOpen() ? 'text-[#002244]' : ''">manage_accounts</span>
-              <span>USER MANAGEMENT</span>
+            class="w-full flex items-center justify-between px-3.5 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-[#002244] transition-all group cursor-pointer"
+            [ngClass]="usersOpen() ? 'text-[#002244] font-bold bg-white shadow-sm' : ''">
+            <div class="flex items-center gap-3.5">
+              <span class="material-symbols-outlined text-[20px] transition-colors" [ngClass]="usersOpen() ? 'text-[#002244]' : 'text-slate-400 group-hover:text-[#002244]'">manage_accounts</span>
+              <span class="uppercase tracking-wide">USER MANAGEMENT</span>
             </div>
-            <span class="material-symbols-outlined text-[16px] transition-transform duration-200 text-slate-400 group-hover:text-[#002244]" [ngClass]="{ 'rotate-180': usersOpen() }">
+            <span class="material-symbols-outlined text-[18px] transition-transform duration-200 text-slate-400 group-hover:text-[#002244]" [ngClass]="{ 'rotate-180': usersOpen() }">
               expand_more
             </span>
           </button>
 
-          <div *ngIf="usersOpen()" class="pl-7 pr-1 py-1 space-y-0.5 border-l-2 border-slate-200 ml-5 my-1 text-[11px]">
-            <a routerLink="/admin/users" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" [routerLinkActiveOptions]="{ exact: true }" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">User List</a>
-            <a routerLink="/admin/users/create" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">+ Create User</a>
-            <!--
-            <a routerLink="/admin/masters/roles" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Roles</a>
-            <a routerLink="/admin/masters/access-levels" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">Access Levels</a>
-            <a routerLink="/admin/users" [queryParams]="{ filter: 'sso' }" routerLinkActive="text-[#002244] font-bold bg-[#002244]/10" (click)="onNavigate()" class="block py-1.5 px-2 rounded-xs text-slate-600 hover:text-[#002244] hover:bg-[#002244]/5 transition-colors">SSO Mapping</a>
-            -->
+          <div *ngIf="usersOpen()" class="px-2 py-2 space-y-1 text-[11px] bg-slate-100/50">
+            <a routerLink="/admin/users" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" [routerLinkActiveOptions]="{ exact: true }" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">User List</a>
+            <a routerLink="/admin/users/create" routerLinkActive="text-white font-bold bg-[#002244] shadow-md" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">+ Create User</a>
           </div>
         </div>
+
+        <div class="h-4"></div> <!-- Spacer -->
 
         <!-- APPLICATIONS -->
         <a 
           routerLink="/admin/applications" 
-          routerLinkActive="bg-[#002244]/10 text-[#002244] font-bold border-l-[3.5px] border-[#002244]"
+          routerLinkActive="bg-[#002244] text-white shadow-md font-bold"
           (click)="onNavigate()"
-          class="flex items-center justify-between px-3 py-2.5 rounded-xs text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-semibold border-l-[3.5px] border-transparent group">
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px] text-slate-500 group-hover:text-[#002244] transition-colors">inventory</span>
-            <span>APPLICATIONS</span>
+          class="flex items-center justify-between px-3.5 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-[#002244] transition-all cursor-pointer group border border-transparent">
+          <div class="flex items-center gap-3.5">
+            <span class="material-symbols-outlined text-[20px] text-slate-400 group-hover:text-[#002244] transition-colors">inventory</span>
+            <span class="uppercase tracking-wide">APPLICATIONS</span>
           </div>
-          <span class="bg-[#002244] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{{ appCount() }}</span>
+          <span class="bg-[#f59e0b] text-[#002244] text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">{{ appCount() }}</span>
         </a>
 
         <!-- REPORTS -->
         <a 
           routerLink="/admin/reports" 
-          routerLinkActive="bg-[#002244]/10 text-[#002244] font-bold border-l-[3.5px] border-[#002244]"
+          routerLinkActive="bg-[#002244] text-white shadow-md font-bold"
           (click)="onNavigate()"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-xs text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-semibold border-l-[3.5px] border-transparent group">
-          <span class="material-symbols-outlined text-[20px] text-slate-500 group-hover:text-[#002244] transition-colors">analytics</span>
-          <span>REPORTS</span>
+          class="flex items-center gap-3.5 px-3.5 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-[#002244] transition-all cursor-pointer group border border-transparent">
+          <span class="material-symbols-outlined text-[20px] text-slate-400 group-hover:text-[#002244] transition-colors">analytics</span>
+          <span class="uppercase tracking-wide">REPORTS</span>
         </a>
 
         <!-- AUDIT LOGS -->
         <a 
           routerLink="/admin/audit-logs" 
-          routerLinkActive="bg-[#002244]/10 text-[#002244] font-bold border-l-[3.5px] border-[#002244]"
+          routerLinkActive="bg-[#002244] text-white shadow-md font-bold"
           (click)="onNavigate()"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-xs text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-semibold border-l-[3.5px] border-transparent group">
-          <span class="material-symbols-outlined text-[20px] text-slate-500 group-hover:text-[#002244] transition-colors">fact_check</span>
-          <span>AUDIT LOGS</span>
+          class="flex items-center gap-3.5 px-3.5 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-[#002244] transition-all cursor-pointer group border border-transparent">
+          <span class="material-symbols-outlined text-[20px] text-slate-400 group-hover:text-[#002244] transition-colors">fact_check</span>
+          <span class="uppercase tracking-wide">AUDIT LOGS</span>
         </a>
 
         <!-- SETTINGS -->
         <a 
           routerLink="/admin/settings" 
-          routerLinkActive="bg-[#002244]/10 text-[#002244] font-bold border-l-[3.5px] border-[#002244]"
+          routerLinkActive="bg-[#002244] text-white shadow-md font-bold"
           (click)="onNavigate()"
-          class="flex items-center gap-3 px-3 py-2.5 rounded-xs text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-semibold border-l-[3.5px] border-transparent group">
-          <span class="material-symbols-outlined text-[20px] text-slate-500 group-hover:text-[#002244] transition-colors">settings</span>
-          <span>SETTINGS</span>
+          class="flex items-center gap-3.5 px-3.5 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-[#002244] transition-all cursor-pointer group border border-transparent">
+          <span class="material-symbols-outlined text-[20px] text-slate-400 group-hover:text-[#002244] transition-colors">settings</span>
+          <span class="uppercase tracking-wide">SETTINGS</span>
         </a>
 
       </nav>
 
       <!-- Bottom Session Info -->
-      <div class="p-3 border-t border-slate-200 bg-slate-50/70 text-[11px] text-slate-600">
-        <div class="flex items-center justify-between mb-1">
-          <span class="flex items-center gap-1.5 text-emerald-700 font-bold">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <div class="p-4 border-t border-slate-200/80 bg-slate-50 text-[11px] text-slate-600 shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.02)]">
+        <div class="flex items-center justify-between mb-2">
+          <span class="flex items-center gap-1.5 text-emerald-700 font-bold uppercase tracking-wide">
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
             Secured Session
           </span>
-          <span class="text-slate-400 text-[10px] font-mono">TLS 1.3</span>
+          <span class="text-slate-400 text-[9px] font-black tracking-widest bg-slate-200 px-1.5 py-0.5 rounded-sm">TLS 1.3</span>
         </div>
-        <p class="truncate text-[10.5px] text-slate-500 font-mono">SSO: RAJ_GOV_ADMIN_01</p>
+        <p class="truncate text-[10.5px] text-slate-500 font-bold tracking-wide">SSO: RAJ_GOV_ADMIN_01</p>
       </div>
 
     </aside>

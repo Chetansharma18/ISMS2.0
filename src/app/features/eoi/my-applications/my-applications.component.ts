@@ -28,14 +28,14 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
     StatusBadgeComponent
   ],
   template: `
-    <div class="min-h-screen flex flex-col bg-[#f8fafc] font-sans text-slate-800 antialiased font-['Poppins',sans-serif]">
-      <app-header></app-header>
+    <div class="h-screen flex flex-col bg-[#f8fafc] font-sans text-slate-800 antialiased font-['Poppins',sans-serif] overflow-hidden">
+      <app-header class="shrink-0"></app-header>
 
-      <div class="flex flex-grow w-full">
+      <div class="flex flex-1 min-h-0 w-full overflow-hidden">
         <!-- Persistent Portal Sidebar -->
-        <app-sidebar class="hidden md:block flex-shrink-0"></app-sidebar>
+        <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>
 
-        <main class="flex-1 min-w-0 w-full px-3 sm:px-5 py-4 overflow-y-auto space-y-3">
+        <main class="flex-1 min-h-0 min-w-0 w-full px-3 sm:px-5 py-4 overflow-y-auto overflow-x-hidden space-y-3">
 
           <!-- Page Heading: Tender Status -->
           <div class="bg-white border border-slate-200 shadow-xs p-4 sm:p-5 rounded-xs">
@@ -99,7 +99,7 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
               <table class="w-full min-w-[800px] table-fixed text-left text-xs border-collapse">
                 
                 <thead>
-                  <tr class="bg-[#002244] text-white text-[11px] font-bold tracking-wide uppercase border-b-2 border-amber-500">
+                  <tr class="bg-[#002244] text-white text-xs font-bold tracking-wide uppercase border-b-2 border-amber-500">
                     <!-- 1. Application Ref & Date (22%) -->
                     <th class="p-2.5 w-[22%] border-r border-[#0e3b6e] whitespace-nowrap">
                       Application Ref &amp; Date
@@ -109,7 +109,7 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
                       Scheme &amp; Department
                     </th>
                     <!-- 3. Treasury EMD Paid (16%) -->
-                    <th class="p-2.5 w-[16%] border-r border-[#0e3b6e] whitespace-nowrap text-right">
+                    <th class="p-2.5 w-[16%] border-r border-[#0e3b6e] whitespace-nowrap">
                       Treasury EMD Paid
                     </th>
                     <!-- 4. Status (12%) -->
@@ -123,14 +123,14 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
                   </tr>
                 </thead>
 
-                <tbody class="divide-y divide-slate-200 text-slate-800 bg-white" *ngIf="getFiltered(allApps) as apps">
+                <tbody class="divide-y divide-slate-200 text-slate-800 bg-white font-['Poppins',sans-serif]" *ngIf="getFiltered(allApps) as apps">
                   
                   <tr *ngFor="let app of apps; let idx = index" class="hover:bg-blue-50/50 transition-colors group">
                     
                     <!-- 1. Application Ref & Date -->
                     <td class="p-2.5 border-r border-slate-200 align-middle">
                       <div class="flex items-center gap-1.5 flex-wrap">
-                        <span class="font-mono font-bold text-[#002244] text-[11.5px]">
+                        <span class="font-mono font-bold text-[#002244] text-xs sm:text-[13px] leading-snug">
                           {{ app.id }}
                         </span>
                         <button 
@@ -144,8 +144,8 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
                           <span *ngIf="copiedId === app.id" class="text-[10px] text-emerald-600 font-bold">✓</span>
                         </button>
                       </div>
-                      <div class="text-[10.5px] text-slate-500 mt-0.5 flex items-center gap-1 font-medium">
-                        <svg class="w-3 h-3 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <div class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1 font-medium">
+                        <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                           <line x1="16" y1="2" x2="16" y2="6"></line>
                           <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -157,23 +157,23 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
 
                     <!-- 2. Scheme & Department -->
                     <td class="p-2.5 border-r border-slate-200 align-middle">
-                      <div class="font-bold text-[#002244] text-[11.5px] leading-snug line-clamp-2" [title]="app.schemeName">
+                      <div class="font-bold text-[#002244] text-xs sm:text-[13px] leading-snug line-clamp-2" [title]="app.schemeName">
                         {{ app.schemeName }}
                       </div>
-                      <div class="text-[10.5px] text-slate-500 mt-0.5 truncate" [title]="app.department">
+                      <div class="text-[11px] text-slate-500 mt-0.5 truncate font-medium" [title]="app.department">
                         {{ app.department }}
                       </div>
                     </td>
 
-                    <!-- 3. Treasury EMD Paid -->
-                    <td class="p-2.5 border-r border-slate-200 align-middle text-right whitespace-nowrap">
-                      <div class="font-bold text-slate-900 text-xs">
+                    <!-- 3. Treasury EMD Paid (Left Aligned) -->
+                    <td class="p-2.5 border-r border-slate-200 align-middle whitespace-nowrap">
+                      <div class="font-bold text-slate-900 text-xs sm:text-[13px]">
                         ₹{{ (app.emdPayment.baseEmd || app.emdPayment.totalPaid) | number:'1.0-0' }}
                       </div>
-                      <div class="text-[10px] text-slate-500 font-medium mt-0.5">
+                      <div class="text-[11px] text-slate-500 font-medium mt-0.5">
                         Fee: ₹{{ (app.emdPayment.processingFee || 2500) | number:'1.0-0' }}
                       </div>
-                      <div class="text-[9.5px] text-emerald-700 font-mono font-semibold truncate max-w-[140px] ml-auto" [title]="app.emdPayment.txnReference">
+                      <div class="text-[10.5px] text-emerald-700 font-mono font-semibold truncate max-w-[140px]" [title]="app.emdPayment.txnReference">
                         {{ app.emdPayment.txnReference }}
                       </div>
                     </td>
@@ -188,7 +188,7 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
                       <button 
                         type="button"
                         (click)="downloadReceiptPdf(app)"
-                        class="w-full max-w-[105px] mx-auto px-2 py-1 bg-white hover:bg-slate-100 text-[#002244] border border-[#002244]/40 text-[10.5px] font-bold rounded-xs shadow-2xs transition-colors flex items-center justify-center gap-1 cursor-pointer active:scale-95"
+                        class="text-[#002244] hover:text-blue-700 hover:underline text-xs font-semibold inline-flex items-center gap-1 cursor-pointer transition-colors bg-transparent border-0 p-0"
                         title="Download Official EOI Treasury & Empanelment Receipt (PDF)">
                         <svg class="w-3.5 h-3.5 text-red-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -219,13 +219,6 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
                 </tbody>
 
               </table>
-            </div>
-
-            <!-- Footer Summary Strip (Without ISMS text) -->
-            <div class="bg-slate-50 border-t border-slate-200 px-4 py-2.5" *ngIf="(history$ | async) as allApps">
-              <div class="text-[11px] text-slate-600 font-mono">
-                Showing {{ getFiltered(allApps).length }} of {{ allApps.length }} total submitted tenders
-              </div>
             </div>
 
           </div>

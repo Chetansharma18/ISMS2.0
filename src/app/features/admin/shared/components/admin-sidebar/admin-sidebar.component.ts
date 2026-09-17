@@ -223,7 +223,14 @@ import { RouterModule } from '@angular/router';
       </div>
 
     </aside>
-  `
+  `,
+  styles: [`
+    :host {
+      display: block;
+      flex-shrink: 0;
+      height: 100%;
+    }
+  `]
 })
 export class AdminSidebarComponent {
   @Input() isOpen: boolean = true;

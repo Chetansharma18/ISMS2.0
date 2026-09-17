@@ -13,14 +13,14 @@ import { Observable } from 'rxjs';
   standalone: true,
   imports: [RouterLink, NgIf, NgFor, AsyncPipe, CurrencyPipe, DecimalPipe, HeaderComponent, SidebarComponent, StatusBadgeComponent, GradeBadgeComponent],
   template: `
-    <div class="min-h-screen flex flex-col bg-paper-50 font-sans">
-      <app-header></app-header>
+    <div class="h-screen flex flex-col bg-paper-50 font-sans overflow-hidden">
+      <app-header class="shrink-0"></app-header>
 
-      <div class="flex flex-grow">
+      <div class="flex flex-1 min-h-0 overflow-hidden w-full">
         <!-- Persistent Portal Sidebar -->
-        <app-sidebar class="hidden md:block"></app-sidebar>
+        <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>
 
-        <main class="flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full overflow-y-auto">
+        <main class="flex-1 min-w-0 min-h-0 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full overflow-y-auto overflow-x-hidden">
         
         <!-- Header & Top TP Profile Banner -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 pb-4 border-b border-line-200 mb-8" *ngIf="userProfile$ | async as profile">

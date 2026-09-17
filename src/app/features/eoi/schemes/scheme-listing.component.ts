@@ -22,17 +22,17 @@ import { Observable } from 'rxjs';
     SidebarComponent
   ],
   template: `
-    <div class="min-h-screen flex flex-col bg-[#f0f4f8] font-['Poppins',sans-serif] text-slate-800 antialiased">
+    <div class="h-screen flex flex-col bg-[#f0f4f8] font-['Poppins',sans-serif] text-slate-800 antialiased overflow-hidden">
       
       <!-- TOP POST-LOGIN HEADER: Dual Logos, User Profile Name, Language/Font Tools (No News Bar) -->
-      <app-header></app-header>
+      <app-header class="shrink-0"></app-header>
 
-      <div class="flex flex-grow w-full">
+      <div class="flex flex-1 min-h-0 w-full overflow-hidden">
         <!-- PERSISTENT PORTAL SIDEBAR -->
-        <app-sidebar class="hidden md:block flex-shrink-0"></app-sidebar>
+        <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>
 
         <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 min-w-0 w-full px-3 sm:px-4 py-4 overflow-y-auto">
+        <main class="flex-1 min-h-0 min-w-0 w-full px-3 sm:px-4 py-4 overflow-y-auto overflow-x-hidden">
 
           <!-- ================================================================= -->
           <!-- VIEW 1: ACTIVE SCHEMES & TENDERS TABLE VIEW                      -->
@@ -49,16 +49,16 @@ import { Observable } from 'rxjs';
             <!-- Crisp Government Schemes Table -->
             <div class="bg-white border border-slate-200 shadow-sm rounded-xs overflow-hidden">
               <div class="w-full overflow-x-auto">
-                <table class="w-full min-w-[860px] table-fixed text-left text-xs border-collapse">
+                <table class="w-full min-w-[900px] table-fixed text-left border-collapse">
                   <thead>
-                    <tr class="bg-[#002244] text-white text-[11px] font-bold tracking-wide uppercase border-b-2 border-amber-500">
-                      <th class="p-2 w-[5%] text-center border-r border-[#0e3b6e] whitespace-nowrap">S.No</th>
-                      <th class="p-2 w-[18%] border-r border-[#0e3b6e] whitespace-nowrap">EOI Reference No.</th>
-                      <th class="p-2 w-[27%] border-r border-[#0e3b6e]">Scheme &amp; Department Chain</th>
-                      <th class="p-2 w-[13%] border-r border-[#0e3b6e] text-center whitespace-nowrap">Category</th>
-                      <th class="p-2 w-[15%] border-r border-[#0e3b6e] whitespace-nowrap">Date Published</th>
-                      <th class="p-2 w-[15%] border-r border-[#0e3b6e] whitespace-nowrap">Closing Date</th>
-                      <th class="p-2 w-[7%] text-center whitespace-nowrap">Actions</th>
+                    <tr class="bg-[#002244] text-white text-xs font-bold tracking-wide uppercase border-b-2 border-amber-500">
+                      <th class="p-2.5 w-[4%] text-center border-r border-[#0e3b6e] whitespace-nowrap">S.No</th>
+                      <th class="p-2.5 w-[17%] border-r border-[#0e3b6e] whitespace-nowrap">EOI Reference No.</th>
+                      <th class="p-2.5 w-[26%] border-r border-[#0e3b6e]">Scheme &amp; Department Chain</th>
+                      <th class="p-2.5 w-[15%] border-r border-[#0e3b6e] text-center whitespace-nowrap">Category</th>
+                      <th class="p-2.5 w-[14%] border-r border-[#0e3b6e] whitespace-nowrap">Date Published</th>
+                      <th class="p-2.5 w-[14%] border-r border-[#0e3b6e] whitespace-nowrap">Closing Date</th>
+                      <th class="p-2.5 w-[10%] text-center whitespace-nowrap">Actions</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-slate-200 text-slate-800 font-['Poppins',sans-serif]">
@@ -68,79 +68,72 @@ import { Observable } from 'rxjs';
                       class="hover:bg-blue-50/60 transition-colors group">
                       
                       <!-- 1. S.No -->
-                      <td class="p-2 text-center font-bold text-slate-600 border-r border-slate-200 align-middle bg-slate-50/40">
+                      <td class="p-2.5 text-center font-bold text-slate-700 text-xs sm:text-[13px] border-r border-slate-200 align-middle bg-slate-50/40">
                         {{ idx + 1 }}
                       </td>
 
                       <!-- 2. EOI Reference No -->
-                      <td class="p-2 border-r border-slate-200 align-middle whitespace-nowrap">
-                        <div class="font-semibold text-[#002244] text-[11px] leading-snug">
+                      <td class="p-2.5 border-r border-slate-200 align-middle whitespace-nowrap">
+                        <div class="font-bold text-[#002244] text-xs sm:text-[13px] font-mono leading-snug">
                           {{ scheme.eoiReferenceNo }}
                         </div>
                       </td>
 
                       <!-- 3. Scheme & Department Chain (Only Scheme Name) -->
-                      <td class="p-2 border-r border-slate-200 align-middle">
+                      <td class="p-2.5 border-r border-slate-200 align-middle">
                         <div 
                           (click)="selectScheme(scheme)"
-                          class="font-semibold text-[#002244] hover:text-blue-800 text-[11px] leading-snug cursor-pointer group-hover:underline line-clamp-2"
+                          class="font-bold text-[#002244] hover:text-blue-800 text-xs sm:text-[13px] leading-snug cursor-pointer group-hover:underline line-clamp-2"
                           [title]="scheme.name">
                           {{ scheme.name }}
                         </div>
                       </td>
 
-                      <!-- 4. Category (Only Category Name) -->
-                      <td class="p-2 border-r border-slate-200 align-middle text-center whitespace-nowrap">
-                        <span 
-                          [ngClass]="{
-                            'bg-blue-50 text-blue-800 border-blue-200': scheme.schemeCategory.includes('RAJKVIK'),
-                            'bg-amber-50 text-amber-800 border-amber-200': scheme.schemeCategory.includes('SAKSHM'),
-                            'bg-purple-50 text-purple-800 border-purple-200': scheme.schemeCategory.includes('SAMARTH'),
-                            'bg-slate-50 text-slate-800 border-slate-200': !scheme.schemeCategory.includes('RAJKVIK') && !scheme.schemeCategory.includes('SAKSHM') && !scheme.schemeCategory.includes('SAMARTH')
-                          }"
-                          class="inline-block px-1.5 py-0.5 text-[10px] font-semibold rounded-xs border">
-                          {{ scheme.schemeCategory }}
+                      <!-- 4. Category (Only Category Name: RAJKVIK, SAKSHM, SAMARTH, etc.) -->
+                      <td class="p-2.5 border-r border-slate-200 align-middle text-center whitespace-nowrap">
+                        <span class="text-xs sm:text-[13px] font-semibold text-slate-700">
+                          {{ getCategoryName(scheme.schemeCategory) }}
                         </span>
                       </td>
 
-                      <!-- 5. Date of EOI Published -->
-                      <td class="p-2 border-r border-slate-200 align-middle whitespace-nowrap">
-                        <div class="text-[11px] font-semibold text-slate-800 flex items-center gap-1">
-                          <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <!-- 5. Date of EOI Published (Date Only) -->
+                      <td class="p-2.5 border-r border-slate-200 align-middle">
+                        <div class="flex items-center gap-2">
+                          <svg class="w-4 h-4 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                             <line x1="16" y1="2" x2="16" y2="6"></line>
                             <line x1="8" y1="2" x2="8" y2="6"></line>
                             <line x1="3" y1="10" x2="21" y2="10"></line>
                           </svg>
-                          <span>{{ getSplitDate(scheme.ePublishedDate).date }}</span>
-                          <span class="text-[10px] text-slate-500 font-normal">{{ getSplitDate(scheme.ePublishedDate).time }}</span>
+                          <span class="text-xs sm:text-[13px] font-bold text-slate-800 whitespace-nowrap">
+                            {{ getSplitDate(scheme.ePublishedDate).date }}
+                          </span>
                         </div>
                       </td>
 
-                      <!-- 6. Closing Date of EOI & Bid Opening -->
-                      <td class="p-2 border-r border-slate-200 align-middle whitespace-nowrap">
-                        <div class="text-[11px] font-semibold text-slate-800 flex items-center gap-1">
-                          <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <!-- 6. Closing Date of EOI (Simple Neutral Text - No Red) -->
+                      <td class="p-2.5 border-r border-slate-200 align-middle">
+                        <div class="flex items-center gap-2">
+                          <svg class="w-4 h-4 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 16 14"></polyline>
+                            <polyline points="12 6 12 12 16 14"></polyline>
                           </svg>
-                          <span>{{ getSplitDate(scheme.closingDate).date }}</span>
-                          <span class="text-[10px] text-slate-500 font-normal">{{ getSplitDate(scheme.closingDate).time }}</span>
-                        </div>
-                        <div class="text-[9.5px] text-slate-500 mt-0.5 font-medium flex items-center gap-1">
-                          <span class="text-slate-400">Opening:</span>
-                          <span>{{ scheme.openingDate }}</span>
+                          <div class="leading-tight">
+                            <div class="text-xs sm:text-[13px] font-bold text-slate-800 whitespace-nowrap">{{ getSplitDate(scheme.closingDate).date }}</div>
+                            <div class="text-[11px] text-slate-500 font-medium">{{ getSplitDate(scheme.closingDate).time }}</div>
+                          </div>
                         </div>
                       </td>
 
-                      <!-- 7. Actions: View Details & Apply -->
-                      <td class="p-2 align-middle text-center whitespace-nowrap">
-                        <div class="flex flex-col gap-1 w-full max-w-[70px] mx-auto">
+                      <!-- 7. Actions: View & Apply (Clean Text Links Without Boxes) -->
+                      <td class="p-2.5 align-middle text-center whitespace-nowrap">
+                        <div class="flex flex-col gap-1 items-center justify-center">
                           <button 
                             type="button"
                             (click)="selectScheme(scheme)"
-                            class="w-full px-1.5 py-0.5 bg-white hover:bg-slate-100 text-[#002244] border border-[#002244]/40 text-[10.5px] font-semibold rounded-xs shadow-2xs transition-colors flex items-center justify-center gap-1 cursor-pointer">
-                            <svg class="w-3 h-3 text-[#002244]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            class="text-[#002244] hover:text-blue-700 hover:underline text-xs font-semibold inline-flex items-center gap-1 cursor-pointer transition-colors bg-transparent border-0 p-0"
+                            title="View Tender Details">
+                            <svg class="w-3.5 h-3.5 text-[#002244]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                               <circle cx="12" cy="12" r="3"></circle>
                             </svg>
@@ -150,7 +143,8 @@ import { Observable } from 'rxjs';
                           <button 
                             type="button"
                             (click)="onApplyClicked(scheme)"
-                            class="w-full px-1.5 py-0.5 bg-[#002244] hover:bg-[#003366] text-white text-[10.5px] font-semibold rounded-xs shadow-xs transition-colors flex items-center justify-center gap-0.5 cursor-pointer">
+                            class="text-[#002244] hover:text-blue-700 hover:underline text-xs font-bold inline-flex items-center gap-0.5 cursor-pointer transition-colors bg-transparent border-0 p-0"
+                            title="Apply for this Scheme">
                             <span>Apply</span>
                             <span>→</span>
                           </button>
@@ -185,42 +179,34 @@ import { Observable } from 'rxjs';
           <!-- ================================================================= -->
           <div *ngIf="viewMode === 'details' && selectedScheme" class="space-y-4 animate-in fade-in duration-150">
             
-            <!-- Window Navigation & Hero Banner -->
-            <div class="bg-[#002244] text-white rounded-xs shadow-md overflow-hidden border-b-4 border-amber-500">
+            <!-- Window Navigation & Scheme Title Box -->
+            <div class="space-y-3">
               
               <!-- Top Row: Breadcrumbs -->
-              <div class="px-5 py-3 border-b border-white/15 flex items-center justify-between">
-                <div class="flex items-center gap-2 text-xs">
-                  <button 
-                    type="button"
-                    (click)="showTable()" 
-                    class="text-amber-300 hover:text-white font-semibold flex items-center gap-1 cursor-pointer">
-                    <span>←</span>
-                    <span>All Tenders List</span>
-                  </button>
-                  <span class="text-white/40">/</span>
-                  <span class="text-slate-300">EOI Schemes</span>
-                  <span class="text-white/40">/</span>
-                  <span class="text-white font-semibold">{{ selectedScheme.schemeCode }}</span>
-                </div>
+              <div class="flex items-center gap-2 text-xs font-['Poppins',sans-serif]">
+                <button 
+                  type="button"
+                  (click)="showTable()" 
+                  class="text-blue-700 hover:text-blue-900 font-semibold flex items-center gap-1 cursor-pointer">
+                  <span>←</span>
+                  <span>All Tenders List</span>
+                </button>
+                <span class="text-slate-400">/</span>
+                <span class="text-slate-500">EOI Schemes</span>
+                <span class="text-slate-400">/</span>
+                <span class="text-slate-800 font-semibold">{{ selectedScheme.schemeCode }}</span>
               </div>
 
-              <!-- Main Hero Content: Ref & Scheme Name (Tender ID removed) -->
-              <div class="p-5 sm:p-6 space-y-3">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span class="px-3 py-1 bg-white/15 text-white text-xs font-semibold rounded-2xs border border-white/20 font-['Poppins',sans-serif]">
-                    Ref: {{ selectedScheme.eoiReferenceNo }}
-                  </span>
-                </div>
-
-                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white leading-tight font-['Poppins',sans-serif]">
+              <!-- Page Heading Bar (Box like Active Schemes & Tenders) -->
+              <div class="bg-white border border-slate-200 shadow-xs p-3.5 sm:p-4 rounded-xs">
+                <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-[#002244]">
                   {{ selectedScheme.name }}
                 </h1>
               </div>
 
             </div>
 
-            <!-- Full-Width Content: Official Documents & Milestones Table & Application Section -->
+            <!-- Full-Width Content: Official Documents & Milestones Table -->
             <div class="space-y-6">
               
               <!-- SECTION 1: Scheme Related Official Documents & RFP Downloads -->
@@ -374,77 +360,68 @@ import { Observable } from 'rxjs';
                           Online scrutiny &amp; empanelment desk opening
                         </td>
                       </tr>
-
                     </tbody>
                   </table>
                 </div>
-
               </div>
 
-              <!-- SECTION 3: Submission Deadline, Fees & Apply Action Card (Placed below Milestones) -->
-              <div class="bg-white border border-slate-200 rounded-xs shadow-xs p-5 sm:p-6">
-                
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
-                  
-                  <!-- Left Box: Submission Deadline & Status -->
-                  <div class="lg:col-span-5 bg-amber-50/70 border border-amber-300 p-4 rounded-xs">
-                    <div class="text-[11px] uppercase tracking-wider font-bold text-amber-900 flex items-center gap-1.5 font-['Poppins',sans-serif]">
-                      <svg class="w-3.5 h-3.5 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                      </svg>
-                      <span>SUBMISSION DEADLINE (CLOSING DATE)</span>
-                    </div>
-                    <div class="text-lg sm:text-xl font-bold text-[#002244] mt-1 font-['Poppins',sans-serif]">
-                      {{ selectedScheme.closingDate }}
-                    </div>
-                    <div class="text-xs text-amber-800 font-medium mt-1 flex items-center gap-1.5 font-['Poppins',sans-serif]">
-                      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                      <span>Status: Open for Proposal Submission ({{ selectedScheme.daysRemaining || 20 }} Days Left)</span>
-                    </div>
-                  </div>
-
-                  <!-- Middle: Financial Parameters (EMD Fee & Process Fee) -->
-                  <div class="lg:col-span-4 grid grid-cols-2 gap-3">
-                    <!-- EMD Fee -->
-                    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xs text-center">
-                      <div class="text-[10.5px] uppercase font-bold text-slate-500 tracking-wider font-['Poppins',sans-serif]">EMD Fee</div>
-                      <div class="text-base sm:text-lg font-bold text-[#002244] mt-0.5 font-['Poppins',sans-serif]">
-                        ₹{{ selectedScheme.emdAmount | number:'1.0-0' }}
-                      </div>
-                      <div class="text-[10px] text-emerald-700 font-semibold mt-0.5 flex items-center justify-center gap-1 font-['Poppins',sans-serif]">
-                        <svg class="w-3 h-3 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        <span>100% Refundable</span>
-                      </div>
-                    </div>
-
-                    <!-- Process Fee -->
-                    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xs text-center">
-                      <div class="text-[10.5px] uppercase font-bold text-slate-500 tracking-wider font-['Poppins',sans-serif]">Process Fee</div>
-                      <div class="text-base sm:text-lg font-bold text-[#002244] mt-0.5 font-['Poppins',sans-serif]">
-                        ₹{{ selectedScheme.processingFee | number:'1.0-0' }}
-                      </div>
-                      <div class="text-[10px] text-slate-500 font-medium mt-0.5 font-['Poppins',sans-serif]">
-                        Non-Refundable
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Right: Apply Action Button (Return to Tenders Table button removed) -->
-                  <div class="lg:col-span-3 flex flex-col justify-center">
-                    <button 
-                      type="button"
-                      (click)="onApplyClicked(selectedScheme)"
-                      class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-[#002244] font-bold text-xs uppercase tracking-wider rounded-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 font-['Poppins',sans-serif]">
-                      <span>Apply for this Scheme Now</span>
-                      <span>→</span>
-                    </button>
-                  </div>
-
+              <!-- SECTION 3: Submission Deadline & Financial Parameters (Clean Gov Style) -->
+              <div class="bg-white border border-slate-200 rounded-xs shadow-xs p-5 sm:p-6 space-y-4">
+                <div class="pb-3 border-b border-slate-200">
+                  <h2 class="text-base font-bold text-[#002244] flex items-center gap-2 font-['Poppins',sans-serif]">
+                    <svg class="w-5 h-5 text-[#002244]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="4" width="20" height="16" rx="1"></rect>
+                      <line x1="6" y1="8" x2="6" y2="8"></line>
+                      <line x1="10" y1="8" x2="18" y2="8"></line>
+                      <line x1="6" y1="12" x2="6" y2="12"></line>
+                      <line x1="10" y1="12" x2="18" y2="12"></line>
+                      <line x1="6" y1="16" x2="6" y2="16"></line>
+                      <line x1="10" y1="16" x2="18" y2="16"></line>
+                    </svg>
+                    <span>Submission &amp; Financial Parameters</span>
+                  </h2>
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <!-- 1. Submission Deadline -->
+                  <div class="border border-slate-200 p-4 rounded-xs bg-slate-50/60">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      Submission Deadline (Closing Date)
+                    </div>
+                    <div class="text-sm sm:text-base font-bold text-[#002244] mt-1.5 font-['Poppins',sans-serif]">
+                      {{ selectedScheme.closingDate }}
+                    </div>
+                    <div class="text-xs text-slate-600 font-medium mt-1">
+                      Status: Open for Proposal Submission ({{ selectedScheme.daysRemaining || 20 }} Days Left)
+                    </div>
+                  </div>
+
+                  <!-- 2. EMD Fee -->
+                  <div class="border border-slate-200 p-4 rounded-xs bg-slate-50/60">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      EMD Fee
+                    </div>
+                    <div class="text-sm sm:text-base font-bold text-[#002244] mt-1.5 font-['Poppins',sans-serif]">
+                      ₹{{ selectedScheme.emdAmount | number:'1.0-0' }}
+                    </div>
+                    <div class="text-xs text-emerald-700 font-medium mt-1">
+                      ✓ 100% Refundable
+                    </div>
+                  </div>
+
+                  <!-- 3. Process Fee -->
+                  <div class="border border-slate-200 p-4 rounded-xs bg-slate-50/60">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      Process Fee
+                    </div>
+                    <div class="text-sm sm:text-base font-bold text-[#002244] mt-1.5 font-['Poppins',sans-serif]">
+                      ₹{{ selectedScheme.processingFee | number:'1.0-0' }}
+                    </div>
+                    <div class="text-xs text-slate-500 font-medium mt-1">
+                      Non-Refundable
+                    </div>
+                  </div>
+                </div>
               </div>
 
             </div>
@@ -705,7 +682,7 @@ export class SchemeListingComponent implements OnInit {
     private eoiService: EoiStateService,
     private router: Router,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.userProfile$ = this.eoiService.userProfile$;
@@ -740,7 +717,7 @@ export class SchemeListingComponent implements OnInit {
     // Filter by Keyword
     if (this.searchKeyword && this.searchKeyword.trim() !== '') {
       const q = this.searchKeyword.toLowerCase().trim();
-      result = result.filter(s => 
+      result = result.filter(s =>
         s.name.toLowerCase().includes(q) ||
         s.eoiReferenceNo.toLowerCase().includes(q) ||
         s.schemeCode.toLowerCase().includes(q) ||
@@ -768,7 +745,7 @@ export class SchemeListingComponent implements OnInit {
 
   onApplyClicked(scheme: Scheme): void {
     this.selectedScheme = scheme;
-    
+
     // Check if user has an active, verified profile
     this.eoiService.userProfile$.subscribe(profile => {
       if (!profile || !profile.isRegistered) {
@@ -809,6 +786,14 @@ export class SchemeListingComponent implements OnInit {
       return { date: parts[0], time: `${parts[1]} ${parts[2]}` };
     }
     return { date: dateStr, time: '' };
+  }
+
+  getCategoryName(category: string): string {
+    if (!category) return '';
+    if (category.includes(':')) {
+      return category.split(':')[1].trim();
+    }
+    return category.replace(/Category\s+[IVX0-9]+:?\s*/i, '').trim();
   }
 
   openPdf(doc: SchemeDocument): void {

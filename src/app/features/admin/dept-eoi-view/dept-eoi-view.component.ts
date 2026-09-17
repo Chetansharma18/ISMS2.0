@@ -11,15 +11,15 @@ import { Observable } from 'rxjs';
   standalone: true,
   imports: [RouterLink, NgIf, NgFor, AsyncPipe, DatePipe, DecimalPipe, HeaderComponent, SidebarComponent],
   template: `
-    <div class="min-h-screen flex flex-col bg-[#F4F7F9] font-sans text-slate-800 antialiased">
-      <app-header></app-header>
+    <div class="h-screen flex flex-col bg-[#F4F7F9] font-sans text-slate-800 antialiased overflow-hidden">
+      <app-header class="shrink-0"></app-header>
 
-      <div class="flex flex-grow">
+      <div class="flex flex-1 min-h-0 w-full overflow-hidden">
         <!-- Persistent Portal Sidebar -->
-        <app-sidebar class="hidden md:block"></app-sidebar>
+        <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>
 
         <!-- Main Department Content Area -->
-        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto">
+        <main class="flex-1 min-w-0 min-h-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full overflow-y-auto overflow-x-hidden">
           
           <!-- Top Breadcrumb & Department Header -->
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-200 mb-6" *ngIf="userProfile$ | async as profile">

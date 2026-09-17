@@ -157,9 +157,9 @@ export type FontSize = 'sm' | 'md' | 'lg';
       </div>
 
       <!-- Mobile Drawer Navigation (Slide down on screens < md) -->
-      <div *ngIf="mobileMenuOpen()" class="md:hidden bg-white border-b border-slate-200 shadow-lg px-4 py-3 space-y-2.5 max-h-[80vh] overflow-y-auto">
+      <div *ngIf="mobileMenuOpen() && (userProfile$ | async) as profile" class="md:hidden bg-white border-b border-slate-200 shadow-lg px-4 py-3 space-y-2.5 max-h-[80vh] overflow-y-auto">
         <!-- User Organization Info (If logged in) -->
-        <div *ngIf="userProfile$ | async as profile" class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
+        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
           <div class="font-bold text-xs text-[#002244] truncate">
             {{ profile.organization.name || 'Applicant Organization' }}
           </div>
@@ -172,64 +172,88 @@ export type FontSize = 'sm' | 'md' | 'lg';
         </div>
 
         <!-- Navigation Links -->
+        <!-- Navigation Links -->
         <nav class="space-y-1">
-          <a 
-            routerLink="/schemes" 
-            (click)="closeMobileMenu()"
-            routerLinkActive="bg-[#002244]/10 text-[#002244] font-bold border-l-2 border-[#002244]"
-            class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-md transition">
-            <span>📋</span>
-            <span>Active Schemes &amp; Tenders</span>
-          </a>
-          <a 
-            routerLink="/eoi/tender-status" 
-            (click)="closeMobileMenu()"
-            routerLinkActive="bg-[#002244]/10 text-[#002244] font-bold border-l-2 border-[#002244]"
-            class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-md transition">
-            <span>⏱</span>
-            <span>Tender Status</span>
-          </a>
-          
-          <!-- Profile Group in Mobile Drawer with Direct Links to all 4 Sub-Sections -->
-          <div class="pt-1">
-            <div class="px-3 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              Profile Sections
+          <!-- For New Applicant User: Show only Tenders & Profile -->
+          <ng-container *ngIf="profile.role === 'applicant' && (!profile.isRegistered || profile.userState === 'new')">
+            <a 
+              routerLink="/schemes" 
+              (click)="closeMobileMenu()"
+              routerLinkActive="bg-[#002244]/10 text-[#002244] font-bold border-l-2 border-[#002244]"
+              class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-md transition">
+              <span>📋</span>
+              <span>Tenders</span>
+            </a>
+            <a 
+              routerLink="/profile" 
+              (click)="closeMobileMenu()"
+              routerLinkActive="bg-[#002244]/10 text-[#002244] font-bold border-l-2 border-[#002244]"
+              class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-md transition">
+              <span>👤</span>
+              <span>Profile</span>
+            </a>
+          </ng-container>
+
+          <!-- For Existing / Registered Users -->
+          <ng-container *ngIf="!(profile.role === 'applicant' && (!profile.isRegistered || profile.userState === 'new'))">
+            <a 
+              routerLink="/schemes" 
+              (click)="closeMobileMenu()"
+              routerLinkActive="bg-[#002244]/10 text-[#002244] font-bold border-l-2 border-[#002244]"
+              class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-md transition">
+              <span>📋</span>
+              <span>Active Schemes &amp; Tenders</span>
+            </a>
+            <a 
+              routerLink="/eoi/tender-status" 
+              (click)="closeMobileMenu()"
+              routerLinkActive="bg-[#002244]/10 text-[#002244] font-bold border-l-2 border-[#002244]"
+              class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-md transition">
+              <span>⏱</span>
+              <span>Tender Status</span>
+            </a>
+            
+            <!-- Profile Group in Mobile Drawer with Direct Links to all 4 Sub-Sections -->
+            <div class="pt-1">
+              <div class="px-3 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                Profile Sections
+              </div>
+              <div class="space-y-0.5 pl-2 border-l-2 border-slate-200 ml-2">
+                <a 
+                  routerLink="/profile" 
+                  [queryParams]="{ section: 1 }"
+                  (click)="closeMobileMenu()"
+                  class="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 rounded-md transition font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#002244]"></span>
+                  <span>1. Organisation Details</span>
+                </a>
+                <a 
+                  routerLink="/profile" 
+                  [queryParams]="{ section: 2 }"
+                  (click)="closeMobileMenu()"
+                  class="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 rounded-md transition font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#002244]"></span>
+                  <span>2. Authorized Person Details</span>
+                </a>
+                <a 
+                  routerLink="/profile" 
+                  [queryParams]="{ section: 3 }"
+                  (click)="closeMobileMenu()"
+                  class="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 rounded-md transition font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#002244]"></span>
+                  <span>3. Bank Details</span>
+                </a>
+                <a 
+                  routerLink="/profile" 
+                  [queryParams]="{ section: 4 }"
+                  (click)="closeMobileMenu()"
+                  class="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 rounded-md transition font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#002244]"></span>
+                  <span>4. Uploaded Documents</span>
+                </a>
+              </div>
             </div>
-            <div class="space-y-0.5 pl-2 border-l-2 border-slate-200 ml-2">
-              <a 
-                routerLink="/profile" 
-                [queryParams]="{ section: 1 }"
-                (click)="closeMobileMenu()"
-                class="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 rounded-md transition font-medium">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#002244]"></span>
-                <span>1. Organisation Details</span>
-              </a>
-              <a 
-                routerLink="/profile" 
-                [queryParams]="{ section: 2 }"
-                (click)="closeMobileMenu()"
-                class="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 rounded-md transition font-medium">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#002244]"></span>
-                <span>2. Authorized Person Details</span>
-              </a>
-              <a 
-                routerLink="/profile" 
-                [queryParams]="{ section: 3 }"
-                (click)="closeMobileMenu()"
-                class="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 rounded-md transition font-medium">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#002244]"></span>
-                <span>3. Bank Details</span>
-              </a>
-              <a 
-                routerLink="/profile" 
-                [queryParams]="{ section: 4 }"
-                (click)="closeMobileMenu()"
-                class="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 rounded-md transition font-medium">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#002244]"></span>
-                <span>4. Uploaded Documents</span>
-              </a>
-            </div>
-          </div>
+          </ng-container>
         </nav>
       </div>
 

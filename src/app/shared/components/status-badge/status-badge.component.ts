@@ -6,14 +6,14 @@ import { NgIf, NgClass } from '@angular/common';
   standalone: true,
   imports: [NgIf, NgClass],
   template: `
-    <span [ngClass]="badgeClass" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xs text-[11px] font-bold border tabular-nums">
+    <span [ngClass]="textClass" class="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-semibold tabular-nums">
       <!-- Pencil Icon for Draft -->
-      <svg *ngIf="normalizedStatus === 'DRAFT'" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg *ngIf="normalizedStatus === 'DRAFT'" class="w-3.5 h-3.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
       </svg>
 
       <!-- Check Icon for Submitted -->
-      <svg *ngIf="normalizedStatus === 'SUBMITTED'" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg *ngIf="normalizedStatus === 'SUBMITTED'" class="w-3.5 h-3.5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20 6 9 17 4 12"></polyline>
       </svg>
 
@@ -68,25 +68,25 @@ export class StatusBadgeComponent {
     }
   }
 
-  get badgeClass(): string {
+  get textClass(): string {
     switch (this.normalizedStatus) {
       case 'DRAFT':
-        return 'bg-slate-100 text-slate-700 border-slate-300';
+        return 'text-slate-600';
       case 'SUBMITTED':
-        return 'bg-blue-50 text-blue-800 border-blue-200';
+        return 'text-blue-700';
       case 'UNDER_SCRUTINY':
       case 'UNDER_PROCESS':
       case 'PENDING':
-        return 'bg-amber-50 text-amber-800 border-amber-300';
+        return 'text-amber-800';
       case 'APPROVED':
       case 'ACCEPTED':
-        return 'bg-emerald-50 text-emerald-800 border-emerald-300';
+        return 'text-emerald-800';
       case 'REJECTED':
-        return 'bg-rose-50 text-rose-800 border-rose-300';
+        return 'text-rose-800';
       case 'AOC':
-        return 'bg-indigo-50 text-indigo-800 border-indigo-300';
+        return 'text-indigo-800';
       default:
-        return 'bg-slate-50 text-slate-700 border-slate-300';
+        return 'text-slate-700';
     }
   }
 }

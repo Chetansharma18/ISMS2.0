@@ -383,9 +383,9 @@ export class SsoLoginComponent implements OnInit {
         this.eoiService.resetToDeptAdmin(rawSsoId);
         this.router.navigate(['/admin/eoi-view']);
       } else if (ssoLower.includes('new') || ssoLower.includes('citizen') || ssoLower.includes('reg') || ssoLower.includes('fresh')) {
-        // New User -> One-Time SSO ID to Email Mapping (/auth/sso-mapping)
+        // New User -> Portal with New Applicant Sidebar (Tenders & Profile)
         this.eoiService.resetToNewCitizen(rawSsoId);
-        this.router.navigate(['/auth/sso-mapping']);
+        this.router.navigate(['/schemes']);
       } else {
         // Existing Registered Training Partner / Applicant -> Full Schemes Dashboard
         this.eoiService.resetToRegisteredApplicant(rawSsoId);

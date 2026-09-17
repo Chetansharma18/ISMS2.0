@@ -16,21 +16,22 @@ import { ToastContainerComponent } from '../shared/components/toast/toast.compon
     ToastContainerComponent
   ],
   template: `
-    <div class="min-h-screen flex flex-col bg-[#f8fafc] font-sans text-slate-800 antialiased">
+    <div class="h-screen flex flex-col bg-[#f8fafc] font-sans text-slate-800 antialiased overflow-hidden">
       <!-- Admin Top Header -->
-      <admin-header (toggleSidebar)="toggleSidebar()"></admin-header>
+      <admin-header class="shrink-0" (toggleSidebar)="toggleSidebar()"></admin-header>
 
       <!-- Main Layout Body with Sidebar and Content -->
-      <div class="flex-1 flex overflow-hidden">
+      <div class="flex-1 min-h-0 flex overflow-hidden">
         
         <!-- Sidebar Navigation -->
         <admin-sidebar 
+          class="shrink-0 h-full"
           [isOpen]="sidebarOpen()" 
           (closeSidebar)="sidebarOpen.set(false)">
         </admin-sidebar>
 
         <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
+        <main class="flex-1 min-w-0 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
           <div class="max-w-7xl w-full mx-auto">
             <router-outlet></router-outlet>
           </div>

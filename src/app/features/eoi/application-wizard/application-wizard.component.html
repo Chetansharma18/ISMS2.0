@@ -34,19 +34,20 @@
             </div>
           </div>
 
-          <div class="gov-form-layout grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div *ngFor="let field of dynamicFields()">
+          <div class="gov-form-layout grid grid-cols-1 gap-6">
+            <ng-container *ngFor="let field of dynamicFields()">
               <app-form-field 
                 [label]="field.fieldLabel" 
                 [required]="field.required" 
                 [type]="field.fieldType === 'Number' || field.fieldType === 'Decimal' || field.fieldType === 'Currency' || field.fieldType === 'Percentage' ? 'number' : field.fieldType === 'Date' ? 'date' : field.fieldType === 'File Upload' ? 'file' : field.fieldType === 'Dropdown' || field.fieldType === 'Multi Select' ? 'select' : 'text'"
                 [options]="field.options || []"
                 [hint]="field.helpText"
+                [placeholder]="field.placeholder"
                 [value]="dynamicResponses[field.id]" 
                 (valueChange)="dynamicResponses[field.id] = $event; clearFieldError(field.id)"
                 [errorMessage]="validationErrors()[field.id]">
               </app-form-field>
-            </div>
+            </ng-container>
           </div>
         </div>
       </div>

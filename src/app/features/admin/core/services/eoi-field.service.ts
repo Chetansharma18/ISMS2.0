@@ -61,7 +61,14 @@ export class EoiFieldService {
     const fields = this.fieldsStore
       .filter(f => f.eoiId === eoiId && !f.archived)
       .sort((a, b) => a.displayOrder - b.displayOrder);
-    
+    if (fields.length === 0) {
+      const cloned = this.fieldsStore
+        .filter(f => f.eoiId === 'EOI-2025-001' && !f.archived)
+        .map(f => ({ ...f, id: `FLD-${Math.floor(1000 + Math.random() * 9000)}`, eoiId, hasHistoricalResponses: false }))
+        .sort((a, b) => a.displayOrder - b.displayOrder);
+      return of(cloned);
+    }
+
     return of(fields);
   }
 

@@ -2,18 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgIf, NgFor, AsyncPipe } from '@angular/common';
 import { EoiStateService, DynamicFormField, Scheme } from '../../../../core/services/eoi-state.service';
-import { HeaderComponent } from '../../../../shared/components/header/header.component';
 import { SidebarComponent } from '../../../../shared/components/sidebar/sidebar.component';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-configure-eoi',
   standalone: true,
-  imports: [ReactiveFormsModule, FormsModule, NgIf, NgFor, AsyncPipe, HeaderComponent, SidebarComponent],
+  imports: [ReactiveFormsModule, FormsModule, NgIf, NgFor, AsyncPipe, SidebarComponent],
   template: `
     <div class="h-screen flex flex-col bg-[#F4F7F9] font-sans text-slate-800 antialiased overflow-hidden">
-      <app-header class="shrink-0"></app-header>
-
       <div class="flex flex-1 min-h-0 overflow-hidden w-full">
         <!-- Persistent Portal Sidebar -->
         <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>

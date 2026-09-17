@@ -3,18 +3,15 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgIf, NgFor, AsyncPipe, CurrencyPipe } from '@angular/common';
 import { EoiStateService, EoiApplication, Scheme } from '../../../core/services/eoi-state.service';
-import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { StepperComponent } from '../../../shared/components/stepper/stepper.component';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-emd-payment',
   standalone: true,
-  imports: [FormsModule, NgIf, NgFor, AsyncPipe, CurrencyPipe, RouterLink, HeaderComponent, StepperComponent],
+  imports: [FormsModule, NgIf, NgFor, AsyncPipe, CurrencyPipe, RouterLink, StepperComponent],
   template: `
     <div class="min-h-screen flex flex-col bg-paper-50 font-sans">
-      <app-header></app-header>
-
       <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           

@@ -2,7 +2,7 @@ import { Component, inject, signal, computed, effect, HostListener, OnInit, View
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HeaderComponent } from './components/header/header.component';
+import { HeaderComponent } from '../../../layout/header/header.component';
 import { StepNavComponent } from './components/step-nav/step-nav.component';
 import { SchemeBannerComponent } from './components/scheme-banner/scheme-banner.component';
 import { StepDocumentsComponent } from './components/step-documents/step-documents.component';

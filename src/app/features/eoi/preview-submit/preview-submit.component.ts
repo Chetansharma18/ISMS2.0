@@ -3,7 +3,6 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgIf, NgFor, NgClass, AsyncPipe, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { EoiStateService, EoiApplication, UserProfile } from '../../../core/services/eoi-state.service';
-import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { StepperComponent } from '../../../shared/components/stepper/stepper.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Observable } from 'rxjs';
@@ -11,11 +10,9 @@ import { Observable } from 'rxjs';
 @Component({
   selector: 'app-preview-submit',
   standalone: true,
-  imports: [FormsModule, NgIf, NgFor, NgClass, AsyncPipe, CurrencyPipe, DecimalPipe, RouterLink, HeaderComponent, StepperComponent, ConfirmDialogComponent],
+  imports: [FormsModule, NgIf, NgFor, NgClass, AsyncPipe, CurrencyPipe, DecimalPipe, RouterLink, StepperComponent, ConfirmDialogComponent],
   template: `
     <div class="min-h-screen flex flex-col bg-paper-50 font-sans">
-      <app-header></app-header>
-
       <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           

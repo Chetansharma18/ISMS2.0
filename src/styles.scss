@@ -3,7 +3,9 @@
 @import "tailwindcss/utilities";
 
 /* Global Base Styles */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -11,7 +13,8 @@ html {
   scroll-behavior: smooth;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif !important;
   color: #172B3A;
@@ -23,25 +26,38 @@ html, body {
 }
 
 /* Angular Host Custom Elements layout enforcement & horizontal scrollbar prevention */
-app-header, admin-header {
+app-header,
+admin-header {
   display: block;
   width: 100%;
   flex-shrink: 0;
 }
 
-app-sidebar, admin-sidebar, aside {
+app-sidebar,
+admin-sidebar,
+aside {
   display: block;
   flex-shrink: 0;
   height: 100%;
   overflow-x: hidden !important;
 }
 
-app-sidebar nav, admin-sidebar nav {
+app-sidebar nav,
+admin-sidebar nav {
   overflow-x: hidden !important;
 }
 
 /* Heading & Typography with Inter */
-h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*="Poppins"] {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-serif,
+.font-heading,
+.font-serif-display,
+[class*="Poppins"] {
   font-family: "Inter", system-ui, -apple-system, sans-serif !important;
   letter-spacing: -0.015em;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -71,10 +87,12 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
     opacity: 0;
     transform: scale(1.6) rotate(-8deg);
   }
+
   70% {
     opacity: 1;
     transform: scale(0.95) rotate(1deg);
   }
+
   100% {
     opacity: 1;
     transform: scale(1) rotate(0deg);
@@ -217,11 +235,13 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
   padding: 0 12px !important;
   transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
+
 .isms-input:focus {
   border-color: #0B3558 !important;
   outline: none !important;
   box-shadow: 0 0 0 1px #0B3558 !important;
 }
+
 .isms-input::placeholder {
   color: #7A8793 !important;
 }
@@ -246,9 +266,11 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
   transition: background-color 0.15s ease !important;
   text-decoration: none !important;
 }
+
 .isms-btn-primary:hover {
   background-color: #082A46 !important;
 }
+
 .isms-btn-primary:disabled {
   opacity: 0.6 !important;
   cursor: not-allowed !important;
@@ -273,9 +295,11 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
   transition: background-color 0.15s ease !important;
   text-decoration: none !important;
 }
+
 .isms-btn-secondary:hover {
   background-color: #F4F7F9 !important;
 }
+
 .isms-btn-secondary:disabled {
   opacity: 0.6 !important;
   cursor: not-allowed !important;
@@ -299,6 +323,7 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
   cursor: pointer !important;
   transition: background-color 0.15s ease !important;
 }
+
 .isms-btn-success:hover {
   background-color: #11683B !important;
 }
@@ -321,6 +346,7 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
   cursor: pointer !important;
   transition: background-color 0.15s ease !important;
 }
+
 .isms-btn-danger:hover {
   background-color: #A31F1F !important;
 }
@@ -340,6 +366,7 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
   border-collapse: collapse !important;
   font-family: 'Inter', sans-serif !important;
 }
+
 .isms-th {
   background-color: #EEF3F7 !important;
   color: #173B59 !important;
@@ -349,6 +376,7 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
   text-align: left !important;
   border-bottom: 1px solid #D9E1E8 !important;
 }
+
 .isms-td {
   background-color: #FFFFFF !important;
   color: #172B3A !important;
@@ -357,6 +385,7 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
   padding: 12px 14px !important;
   border-bottom: 1px solid #E8EDF2 !important;
 }
+
 .isms-tr:hover .isms-td {
   background-color: #F7FAFC !important;
 }
@@ -374,6 +403,7 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
   padding: 2px 8px !important;
   border-radius: 4px !important;
 }
+
 .isms-badge-pending {
   display: inline-flex !important;
   align-items: center !important;
@@ -386,6 +416,7 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
   padding: 2px 8px !important;
   border-radius: 4px !important;
 }
+
 .isms-badge-rejected {
   display: inline-flex !important;
   align-items: center !important;
@@ -398,6 +429,7 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
   padding: 2px 8px !important;
   border-radius: 4px !important;
 }
+
 .isms-badge-draft {
   display: inline-flex !important;
   align-items: center !important;
@@ -410,6 +442,7 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
   padding: 2px 8px !important;
   border-radius: 4px !important;
 }
+
 .isms-badge-submitted {
   display: inline-flex !important;
   align-items: center !important;
@@ -425,8 +458,13 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
 
 /* Global Marquee & Ticker Animations */
 @keyframes tickerScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .ticker-track {
@@ -443,8 +481,13 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
 
 /* Continuous Vertical Upward Marquee */
 @keyframes scrollUpContinuous {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-50%); }
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-50%);
+  }
 }
 
 .tender-track {
@@ -463,6 +506,7 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -471,13 +515,16 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: #f8fafc;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 9999px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
@@ -488,6 +535,7 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
     opacity: 0;
     transform: translateY(6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -499,7 +547,8 @@ h1, h2, h3, h4, h5, h6, .font-serif, .font-heading, .font-serif-display, [class*
 }
 
 /* Micro smooth transitions for inputs */
-input, select, textarea {
+input,
+select,
+textarea {
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.15s ease-in-out;
 }
-

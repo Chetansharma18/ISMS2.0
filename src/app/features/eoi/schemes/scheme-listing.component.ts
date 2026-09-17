@@ -3,7 +3,7 @@ import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule, NgIf, NgFor, AsyncPipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EoiStateService, Scheme, SchemeDocument, UserProfile } from '../../../core/services/eoi-state.service';
-import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { HeaderComponent } from '../../../layout/header/header.component';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 import { Observable } from 'rxjs';
 
@@ -18,20 +18,18 @@ import { Observable } from 'rxjs';
     AsyncPipe,
     DecimalPipe,
     FormsModule,
-    HeaderComponent,
-    SidebarComponent
+    SidebarComponent,
+    HeaderComponent
   ],
   template: `
     <div class="h-screen flex flex-col bg-[#F6F8FA] font-sans text-[#172B3A] antialiased overflow-hidden">
-      
-      <!-- TOP POST-LOGIN HEADER: Dual Logos, User Profile Name, Language/Font Tools (No News Bar) -->
+      <!-- Unified Post-Login Header -->
       <app-header class="shrink-0"></app-header>
-
+      
       <div class="flex flex-1 min-h-0 w-full overflow-hidden">
         <!-- PERSISTENT PORTAL SIDEBAR -->
         <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>
 
-        <!-- MAIN CONTENT AREA -->
         <main class="flex-1 min-h-0 min-w-0 w-full p-6 overflow-y-auto overflow-x-hidden bg-[#F6F8FA]">
 
           <!-- ================================================================= -->

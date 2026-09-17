@@ -2,26 +2,25 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { NgIf, NgFor, AsyncPipe, DatePipe, DecimalPipe, NgClass } from '@angular/common';
 import { EoiStateService, Scheme, UserProfile } from '../../../core/services/eoi-state.service';
-import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { HeaderComponent } from '../../../layout/header/header.component';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-dept-eoi-view',
   standalone: true,
-  imports: [RouterLink, NgIf, NgFor, AsyncPipe, DatePipe, DecimalPipe, NgClass, HeaderComponent, SidebarComponent],
+  imports: [RouterLink, NgIf, NgFor, AsyncPipe, DatePipe, DecimalPipe, NgClass, SidebarComponent, HeaderComponent],
   template: `
     <div class="h-screen flex flex-col bg-[#F6F8FA] font-sans text-[#172B3A] antialiased overflow-hidden">
+      <!-- Unified Post-Login Header -->
       <app-header class="shrink-0"></app-header>
-
+      
       <div class="flex flex-1 min-h-0 w-full overflow-hidden">
         <!-- Persistent Portal Sidebar -->
         <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>
 
         <!-- Main Department Content Area -->
         <main class="flex-1 min-h-0 min-w-0 w-full p-6 overflow-y-auto overflow-x-hidden bg-[#F6F8FA]">
-          
-          <!-- Top Breadcrumb & Department Header -->
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-[#D9E1E8] mb-6">
             <div>
               <h1 class="text-[28px] font-bold text-[#0B3558] tracking-tight leading-[36px]">

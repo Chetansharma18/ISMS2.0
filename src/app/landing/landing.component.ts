@@ -1,29 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import { NavbarComponent } from './components/navbar/navbar.component';
+import { HeaderComponent } from '../layout/header/header.component';
 import { HeroComponent } from './components/hero/hero.component';
 import { AboutComponent } from './components/about/about.component';
 // import { ServicesComponent } from './components/services/services.component';
 import { MobileAppComponent } from './components/mobile-app/mobile-app.component';
 import { ImportantLinksComponent } from './components/important-links/important-links.component';
-import { FooterComponent } from './components/footer/footer.component';
-import { HelpdeskChatComponent } from './components/helpdesk-chat/helpdesk-chat.component';
+import { FooterComponent } from '../layout/footer/footer.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
   imports: [
-    NavbarComponent,
+    HeaderComponent,
     HeroComponent,
     AboutComponent,
     // ServicesComponent,
     MobileAppComponent,
     ImportantLinksComponent,
     FooterComponent
-    // HelpdeskChatComponent // Commented out for now
   ],
   template: `
     <div class="min-h-screen bg-[#f0f6fc] flex flex-col selection:bg-amber-400 selection:text-slate-900 overflow-x-hidden w-full max-w-full scroll-smooth">
-      <app-navbar />
+      <app-header />
       <main id="main-content" class="flex-grow">
         <app-hero />
         <app-about />
@@ -34,9 +32,6 @@ import { HelpdeskChatComponent } from './components/helpdesk-chat/helpdesk-chat.
         <app-important-links />
         <app-footer />
       </div>
-      <!-- Helpdesk button commented out for now:
-      <app-helpdesk-chat />
-      -->
     </div>
   `
 })

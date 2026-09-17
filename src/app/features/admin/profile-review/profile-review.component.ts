@@ -3,18 +3,15 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NgIf, NgFor, NgClass, AsyncPipe, DecimalPipe } from '@angular/common';
 import { EoiStateService, ApplicantResponse, UserProfile, EoiApplication } from '../../../core/services/eoi-state.service';
-import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-profile-review',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, NgIf, NgFor, NgClass, AsyncPipe, DecimalPipe, HeaderComponent, SidebarComponent],
+  imports: [ReactiveFormsModule, RouterLink, NgIf, NgFor, NgClass, AsyncPipe, DecimalPipe, SidebarComponent],
   template: `
     <div class="h-screen flex flex-col bg-[#F4F7F9] font-sans text-slate-800 antialiased overflow-hidden">
-      <app-header class="shrink-0"></app-header>
-
       <div class="flex flex-1 min-h-0 w-full overflow-hidden">
         <!-- Persistent Portal Sidebar -->
         <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>

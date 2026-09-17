@@ -4,7 +4,7 @@ import { NgIf, NgFor, AsyncPipe, DatePipe, DecimalPipe, CommonModule } from '@an
 import { FormsModule } from '@angular/forms';
 import { EoiStateService, UserProfile, EoiApplication } from '../../core/services/eoi-state.service';
 import { EoiService } from '../eoi/application-wizard/services/eoi.service';
-import { HeaderComponent } from '../../shared/components/header/header.component';
+import { HeaderComponent } from '../../layout/header/header.component';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { GradeBadgeComponent } from '../../shared/components/grade-badge/grade-badge.component';
@@ -33,16 +33,16 @@ export interface OfficialDocItem {
     DatePipe,
     DecimalPipe,
     FormsModule,
-    HeaderComponent,
     SidebarComponent,
+    HeaderComponent,
     StatusBadgeComponent,
     GradeBadgeComponent
   ],
   template: `
     <div class="h-screen flex flex-col bg-[#F6F8FA] font-sans text-[#172B3A] antialiased selection:bg-[#0B3558] selection:text-white overflow-hidden">
-      <!-- Portal Post-Login Header with Dual Emblems & User Profile Information -->
+      <!-- Unified Post-Login Header -->
       <app-header class="shrink-0"></app-header>
-
+      
       <div class="flex flex-1 min-h-0 w-full overflow-hidden">
         <!-- Persistent Portal Sidebar -->
         <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>

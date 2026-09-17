@@ -2,18 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NgIf, AsyncPipe } from '@angular/common';
 import { EoiStateService, EoiApplication, UserProfile } from '../../../core/services/eoi-state.service';
-import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { GradeBadgeComponent } from '../../../shared/components/grade-badge/grade-badge.component';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-outcome-approved',
   standalone: true,
-  imports: [RouterLink, NgIf, AsyncPipe, HeaderComponent, GradeBadgeComponent],
+  imports: [RouterLink, NgIf, AsyncPipe, GradeBadgeComponent],
   template: `
     <div class="min-h-screen flex flex-col bg-paper-50 font-sans">
-      <app-header></app-header>
-
       <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full flex flex-col items-center">
         
         <!-- Certificate Document Card (max 640px) -->

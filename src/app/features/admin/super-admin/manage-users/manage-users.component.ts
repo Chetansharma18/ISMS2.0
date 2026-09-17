@@ -2,18 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NgIf, NgFor, NgClass, AsyncPipe } from '@angular/common';
 import { EoiStateService, UserAccount } from '../../../../core/services/eoi-state.service';
-import { HeaderComponent } from '../../../../shared/components/header/header.component';
 import { SidebarComponent } from '../../../../shared/components/sidebar/sidebar.component';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-manage-users',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, NgFor, NgClass, AsyncPipe, HeaderComponent, SidebarComponent],
+  imports: [ReactiveFormsModule, NgIf, NgFor, NgClass, AsyncPipe, SidebarComponent],
   template: `
     <div class="h-screen flex flex-col bg-[#F4F7F9] font-sans text-slate-800 antialiased overflow-hidden">
-      <app-header class="shrink-0"></app-header>
-
       <div class="flex flex-1 min-h-0 overflow-hidden w-full">
         <!-- Persistent Portal Sidebar -->
         <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>

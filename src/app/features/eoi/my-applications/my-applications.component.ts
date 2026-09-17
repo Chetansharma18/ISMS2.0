@@ -3,7 +3,7 @@ import { CommonModule, NgFor, NgIf, NgClass, AsyncPipe, DecimalPipe } from '@ang
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { EoiStateService, EoiApplication } from '../../../core/services/eoi-state.service';
-import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { HeaderComponent } from '../../../layout/header/header.component';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { PdfGeneratorService } from '../application-wizard/services/pdf-generator.service';
@@ -23,14 +23,15 @@ type AppFilter = 'ALL' | 'PENDING' | 'ACCEPTED' | 'AOC' | 'REJECTED';
     DecimalPipe,
     RouterLink,
     FormsModule,
-    HeaderComponent,
     SidebarComponent,
+    HeaderComponent,
     StatusBadgeComponent
   ],
   template: `
     <div class="h-screen flex flex-col bg-[#F6F8FA] font-sans text-[#172B3A] antialiased overflow-hidden">
+      <!-- Unified Post-Login Header -->
       <app-header class="shrink-0"></app-header>
-
+      
       <div class="flex flex-1 min-h-0 w-full overflow-hidden">
         <!-- Persistent Portal Sidebar -->
         <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule, NgIf, NgFor, NgClass, AsyncPipe, DecimalPipe } from '@angular/common';
 import { EoiStateService, EoiApplication, UserProfile } from '../../../core/services/eoi-state.service';
-import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { HeaderComponent } from '../../../layout/header/header.component';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { Observable, of, switchMap, map } from 'rxjs';
@@ -18,14 +18,15 @@ import { Observable, of, switchMap, map } from 'rxjs';
     NgClass,
     AsyncPipe,
     DecimalPipe,
-    HeaderComponent,
     SidebarComponent,
+    HeaderComponent,
     StatusBadgeComponent
   ],
   template: `
     <div class="h-screen flex flex-col bg-[#f8fafc] font-sans text-slate-800 antialiased overflow-hidden">
+      <!-- Unified Post-Login Header -->
       <app-header class="shrink-0"></app-header>
-
+      
       <div class="flex flex-1 min-h-0 overflow-hidden w-full">
         <!-- Persistent Portal Sidebar -->
         <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>

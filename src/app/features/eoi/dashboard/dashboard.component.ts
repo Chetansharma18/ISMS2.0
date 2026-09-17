@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgIf, NgFor, AsyncPipe, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { EoiStateService, EoiApplication, UserProfile } from '../../../core/services/eoi-state.service';
-import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { HeaderComponent } from '../../../layout/header/header.component';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { GradeBadgeComponent } from '../../../shared/components/grade-badge/grade-badge.component';
@@ -11,17 +11,17 @@ import { Observable } from 'rxjs';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, NgIf, NgFor, AsyncPipe, CurrencyPipe, DecimalPipe, HeaderComponent, SidebarComponent, StatusBadgeComponent, GradeBadgeComponent],
+  imports: [RouterLink, NgIf, NgFor, AsyncPipe, CurrencyPipe, DecimalPipe, SidebarComponent, HeaderComponent, StatusBadgeComponent, GradeBadgeComponent],
   template: `
     <div class="h-screen flex flex-col bg-paper-50 font-sans overflow-hidden">
+      <!-- Unified Post-Login Header -->
       <app-header class="shrink-0"></app-header>
-
+      
       <div class="flex flex-1 min-h-0 overflow-hidden w-full">
         <!-- Persistent Portal Sidebar -->
         <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>
 
         <main class="flex-1 min-w-0 min-h-0 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full overflow-y-auto overflow-x-hidden">
-        
         <!-- Header & Top TP Profile Banner -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 pb-4 border-b border-line-200 mb-8" *ngIf="userProfile$ | async as profile">
           <div>

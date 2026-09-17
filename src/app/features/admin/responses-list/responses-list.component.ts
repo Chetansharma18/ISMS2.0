@@ -2,18 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIf, NgFor, NgClass, AsyncPipe, DecimalPipe } from '@angular/common';
 import { EoiStateService, ApplicantResponse, Scheme } from '../../../core/services/eoi-state.service';
-import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-responses-list',
   standalone: true,
-  imports: [RouterLink, NgIf, NgFor, NgClass, AsyncPipe, DecimalPipe, HeaderComponent, SidebarComponent],
+  imports: [RouterLink, NgIf, NgFor, NgClass, AsyncPipe, DecimalPipe, SidebarComponent],
   template: `
     <div class="h-screen flex flex-col bg-[#F6F8FA] font-sans text-[#172B3A] antialiased overflow-hidden">
-      <app-header class="shrink-0"></app-header>
-
       <div class="flex flex-1 min-h-0 w-full overflow-hidden">
         <!-- Persistent Portal Sidebar -->
         <app-sidebar class="hidden md:block shrink-0 h-full"></app-sidebar>

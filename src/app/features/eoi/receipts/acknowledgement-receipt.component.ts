@@ -2,17 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NgIf, AsyncPipe, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { EoiStateService, EoiApplication, UserProfile } from '../../../core/services/eoi-state.service';
-import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-acknowledgement-receipt',
   standalone: true,
-  imports: [RouterLink, NgIf, AsyncPipe, CurrencyPipe, DecimalPipe, HeaderComponent],
+  imports: [RouterLink, NgIf, AsyncPipe, CurrencyPipe, DecimalPipe],
   template: `
     <div class="min-h-screen flex flex-col bg-paper-50 font-sans">
-      <app-header></app-header>
-
       <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full flex flex-col items-center">
         
         <!-- Document Card (max 640px, centered receipt style on paper background) -->

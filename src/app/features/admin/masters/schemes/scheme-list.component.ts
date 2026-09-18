@@ -76,7 +76,6 @@ import { SchemeMaster } from '../../core/models/admin.models';
                 <th class="px-4 py-3.5">Department</th>
                 <th class="px-4 py-3.5">Scheme Category</th>
                 <th class="px-4 py-3.5">Validity Period</th>
-                <th class="px-4 py-3.5 text-center">EOI Count</th>
                 <th class="px-4 py-3.5">Status</th>
                 <th class="px-4 py-3.5 text-right">Actions</th>
               </tr>
@@ -104,11 +103,6 @@ import { SchemeMaster } from '../../core/models/admin.models';
                 </td>
                 <td class="px-4 py-3 text-slate-500 whitespace-nowrap font-medium text-[11px]">
                   {{ s.startDate }} to {{ s.endDate }}
-                </td>
-                <td class="px-4 py-3 text-center">
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                    {{ s.eoiCount }}
-                  </span>
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap">
                   <admin-status-badge [status]="s.status"></admin-status-badge>

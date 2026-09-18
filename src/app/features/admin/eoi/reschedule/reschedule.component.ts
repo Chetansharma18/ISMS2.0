@@ -39,6 +39,19 @@ import { EoiItem } from '../../core/models/admin.models';
         </div>
       </admin-page-header>
 
+      <div class="mb-6 bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center gap-4">
+        <label for="eoiSelect" class="text-sm font-bold text-slate-700 whitespace-nowrap">Select EOI to Reschedule:</label>
+        <select 
+          id="eoiSelect" 
+          class="flex-1 p-2.5 border border-slate-300 rounded-lg text-sm font-medium text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none cursor-pointer"
+          (change)="onEoiSelectChange($event)">
+          <option value="" disabled>-- Select an EOI --</option>
+          <option *ngFor="let opt of availableEois()" [value]="opt.id" [selected]="opt.id === eoiId">
+            {{ opt.referenceNo }} - {{ opt.title }} ({{ opt.status }})
+          </option>
+        </select>
+      </div>
+
       <div *ngIf="eoi() as item" class="space-y-6">
         
         <!-- CURRENT SCHEDULE SUMMARY CARD -->
@@ -288,6 +301,7 @@ export class RescheduleComponent implements OnInit {
 
   eoiId = 'EOI-2025-001';
   eoi = signal<EoiItem | null>(null);
+  availableEois = signal<EoiItem[]>([]);
 
   rescheduleForm!: FormGroup;
   uploadedFileName = signal<string>('Corrigendum_02_Extension_Notice.pdf');
@@ -296,10 +310,27 @@ export class RescheduleComponent implements OnInit {
   showConfirmModal = signal<boolean>(false);
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.eoiId = id;
-    }
+    this.eoiService.getEois().subscribe(eois => this.availableEois.set(eois));
+
+    this.rescheduleForm = this.fb.group({
+      newStartDate: ['', Validators.required],
+      newClosingDate: ['', Validators.required],
+      reason: ['', [Validators.required, Validators.minLength(10)]],
+      docType: ['Corrigendum', Validators.required],
+      docNumber: ['RSLDC/EOI/CORR/2025/02', Validators.required],
+      docTitle: ['Corrigendum-02: Extension of Submission Last Date & RFP Clarification', Validators.required]
+    });
+
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (id) {
+        this.eoiId = id;
+      }
+      this.loadEoiData();
+    });
+  }
+
+  loadEoiData(): void {
     this.eoiService.getEoiById(this.eoiId).subscribe(item => {
       this.eoi.set(item || null);
       if (item) {
@@ -310,16 +341,18 @@ export class RescheduleComponent implements OnInit {
         });
       }
     });
-
-    this.rescheduleForm = this.fb.group({
-      newStartDate: ['', Validators.required],
-      newClosingDate: ['', Validators.required],
-      reason: ['', [Validators.required, Validators.minLength(10)]],
-      docType: ['Corrigendum', Validators.required],
-      docNumber: ['RSLDC/EOI/CORR/2025/02', Validators.required],
-      docTitle: ['Corrigendum-02: Extension of Submission Last Date & RFP Clarification', Validators.required]
-    });
   }
+
+  onEoiSelectChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const newId = selectElement.value;
+    if (newId && newId !== this.eoiId) {
+      this.router.navigate(['/admin/eoi', newId, 'reschedule']);
+    }
+  }
+
+
+
 
   onFileSelect(event: any): void {
     const file = event.target.files?.[0];

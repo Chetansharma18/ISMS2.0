@@ -95,11 +95,8 @@ import { EoiService } from '../../../core/services/eoi.service';
 
           <div *ngIf="eoiOpen()" class="px-2 py-2 space-y-1 text-[11px] bg-slate-100/50">
             <a routerLink="/admin/eoi" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" [routerLinkActiveOptions]="{ exact: true }" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all relative">EOI Configure <span class="absolute right-2 top-2 w-1.5 h-1.5 rounded-full bg-amber-500"></span></a>
-            <a routerLink="/admin/eoi/create" routerLinkActive="text-white font-bold bg-[#002244] shadow-md" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-emerald-700 font-bold hover:text-white hover:bg-emerald-700 transition-all">+ Create New EOI</a>
-            <a routerLink="/admin/eoi/EOI-2025-001/form-builder" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">EOI Form Builder</a>
+            <a routerLink="/admin/eoi/create" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">+ Create New EOI</a>
             <a routerLink="/admin/eoi/EOI-2025-002/responses" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">EOI Responses</a>
-            <a routerLink="/admin/eoi/EOI-2025-001/reschedule" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">Reschedule EOI</a>
-            <a routerLink="/admin/eoi/EOI-2025-001/history" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">EOI History &amp; Versions</a>
           </div>
         </div>
 

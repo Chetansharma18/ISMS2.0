@@ -6,7 +6,7 @@ import { Scheme } from '../../../../../core/services/eoi-state.service';
 @Component({
   selector: 'app-step-receipt',
   standalone: true,
-  imports: [CommonModule, DecimalPipe],
+  imports: [CommonModule],
   styleUrls: ['../../application-wizard.component.css'],
   encapsulation: ViewEncapsulation.None,
   template: `

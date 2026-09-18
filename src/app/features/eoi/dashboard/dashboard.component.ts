@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NgIf, NgFor, AsyncPipe, CurrencyPipe, DecimalPipe } from '@angular/common';
+import { NgIf, NgFor, AsyncPipe, DecimalPipe } from '@angular/common';
 import { EoiStateService, EoiApplication, UserProfile } from '../../../core/services/eoi-state.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, NgIf, NgFor, AsyncPipe, CurrencyPipe, DecimalPipe, HeaderComponent, SidebarComponent, StatusBadgeComponent, GradeBadgeComponent],
+  imports: [RouterLink, NgIf, NgFor, AsyncPipe, DecimalPipe, HeaderComponent, SidebarComponent, StatusBadgeComponent, GradeBadgeComponent],
   template: `
     <div class="min-h-screen flex flex-col bg-paper-50 font-sans">
       <app-header></app-header>

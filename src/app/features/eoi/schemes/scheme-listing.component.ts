@@ -12,10 +12,8 @@ import { Observable } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
     NgIf,
     NgFor,
-    AsyncPipe,
     DecimalPipe,
     FormsModule,
     HeaderComponent,

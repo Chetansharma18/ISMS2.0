@@ -103,7 +103,9 @@ export class ImportantLinksComponent implements OnInit, OnDestroy {
   private updateItemsPerPage() {
     if (typeof window === 'undefined') return;
     const width = window.innerWidth;
-    if (width >= 1024) {
+    if (width >= 1440) {
+      this.itemsPerPage.set(5);
+    } else if (width >= 1024) {
       this.itemsPerPage.set(4);
     } else if (width >= 640) {
       this.itemsPerPage.set(2);

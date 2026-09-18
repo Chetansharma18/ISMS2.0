@@ -1,0 +1,55 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-poppins: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-inter: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --breakpoint-xs: 380px;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px;
+}
+
+@media (min-width: 640px) {
+  html {
+    scroll-padding-top: 135px;
+  }
+}
+
+html,
+body {
+  font-family: var(--font-sans);
+  overflow-x: clip;
+  max-width: 100vw;
+  width: 100%;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+/* Accessibility: Global Font Scaling (A- / A / A+) */
+body.font-scale-sm {
+  zoom: 0.9;
+}
+
+body.font-scale-md {
+  zoom: 1;
+}
+
+body.font-scale-lg {
+  zoom: 1.12;
+}

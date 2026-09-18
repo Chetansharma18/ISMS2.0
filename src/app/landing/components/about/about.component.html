@@ -1,7 +1,7 @@
 <section id="about"
-  class="w-full bg-white py-10 sm:py-14 lg:py-16 border-t border-slate-200/80 select-none"
+  class="w-full bg-white py-8 sm:py-12 lg:py-14 xl:py-16 border-t border-slate-200/80 select-none scroll-mt-28 sm:scroll-mt-36 lg:scroll-mt-40"
   aria-label="About ISMS">
-  <div class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="max-w-[1400px] xl:max-w-[1440px] w-full mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 xl:px-10">
 
     <!-- 2-Column Layout Matching User Reference -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
@@ -10,61 +10,40 @@
       <div class="flex flex-col justify-center text-left">
 
         <!-- Main Heading -->
-        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#002244] tracking-tight">
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl 2xl:text-[42px] font-extrabold text-[#002244] tracking-tight">
           {{ t().about.heading }}
         </h2>
         <!-- Orange accent line below heading -->
         <div class="w-12 h-1 bg-[#ea580c] rounded-full mt-2.5 mb-5"></div>
 
         <!-- RFP Paragraph 1 -->
-        <p class="text-slate-600 text-sm sm:text-[14.5px] leading-relaxed text-left sm:text-justify mb-3.5">
+        <p class="text-slate-800 text-sm sm:text-[14.5px] 2xl:text-[15.5px] font-medium leading-relaxed text-justify mb-3.5">
           {{ t().about.p1 }}
         </p>
 
         <!-- RFP Paragraph 2 -->
-        <p class="text-slate-600 text-sm sm:text-[14.5px] leading-relaxed text-left sm:text-justify mb-6">
+        <p class="text-slate-800 text-sm sm:text-[14.5px] 2xl:text-[15.5px] font-medium leading-relaxed text-justify">
           {{ t().about.p2 }}
         </p>
 
-        <!-- Action Button: [ Know More -> ] -->
-        <div>
-          <a href="#services"
-            class="px-5 py-2.5 rounded-md bg-[#002244] hover:bg-[#003366] text-white text-xs sm:text-[13px] font-semibold tracking-wide shadow-xs transition inline-flex items-center gap-2">
-            <span>{{ t().about.knowMore }}</span>
-            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </a>
-        </div>
-
       </div>
 
-      <!-- Right Column: Card with Lab Training Photo & RFP Quote -->
-      <div class="bg-[#f0f6ff] rounded-xl border border-blue-200/80 shadow-2xs overflow-hidden flex flex-col">
+      <!-- Right Column: Card with Lab Training Photo & Official Statement -->
+      <div class="bg-[#f0f6ff] rounded-xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col">
 
         <!-- Computer Lab Classroom Training Photo -->
-        <div class="w-full h-44 xs:h-52 sm:h-56 lg:h-60 overflow-hidden border-b border-blue-200/60 relative">
+        <div class="w-full h-44 xs:h-52 sm:h-56 lg:h-60 2xl:h-64 overflow-hidden border-b border-slate-200/80 relative">
           <img src="about-lab-training.jpg" alt="Rajasthan Government Skill Development Center - Classroom Training"
             class="w-full h-full object-cover object-center" />
         </div>
 
-        <!-- Content Area: Blue Quote Icon & Text with Closing Commas -->
-        <div class="p-4 sm:p-6 flex items-start gap-2.5 sm:gap-3.5">
-          <!-- Quote Icon in Bright Blue (Opening) -->
-          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
-            <path
-              d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-          </svg>
-          <div class="flex-1">
-            <p class="text-slate-700 text-xs sm:text-[13.5px] leading-relaxed font-medium text-left sm:text-justify">
-              &ldquo;{{ t().about.quote }}&rdquo;
+        <!-- Official Statement Callout Area -->
+        <div class="p-4 sm:p-5 bg-white">
+          <div class="border-l-3 border-[#002244] pl-3.5 sm:pl-4 py-0.5">
+            <p class="text-slate-800 text-xs sm:text-[13px] 2xl:text-[13.5px] leading-relaxed font-medium text-justify italic">
+              {{ t().about.quote }}
             </p>
           </div>
-          <!-- Quote Icon in Bright Blue (Closing) -->
-          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0 self-end mb-0.5 rotate-180" fill="currentColor" viewBox="0 0 24 24">
-            <path
-              d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-          </svg>
         </div>
 
       </div>
@@ -73,21 +52,21 @@
 
     <!-- RFP-supported Statistics & Heritage Banner (Continuation of About Section) -->
     <div
-      class="mt-4 sm:mt-5 lg:mt-6 rounded-2xl bg-gradient-to-r from-[#feeade] via-[#fcf4ec] to-[#fcf4ec] border border-[#fae2ce] shadow-xs overflow-hidden">
+      class="mt-5 sm:mt-6 lg:mt-8 rounded-xl bg-gradient-to-r from-[#feeade] via-[#fcf4ec] to-[#fcf4ec] border border-[#fae2ce] shadow-xs overflow-hidden">
       <div class="flex flex-col lg:flex-row items-stretch justify-between">
 
         <!-- LEFT Side: Heritage Palace Artwork with 'Building a Skilled Rajasthan' -->
         <div
           class="w-full lg:w-[42%] xl:w-[40%] flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
           <img src="banner-left-part.png" alt="Building a Skilled Rajasthan - Heritage Architecture"
-            class="w-full h-full object-cover object-left max-h-[160px] sm:max-h-[180px] lg:max-h-[190px]" />
+            class="w-full h-full object-cover object-left max-h-[160px] sm:max-h-[180px] lg:max-h-[200px] 2xl:max-h-[210px]" />
         </div>
 
         <!-- Vertical Divider between Heritage Artwork and Statistics -->
         <div class="hidden lg:block w-px bg-amber-200/80 my-4 shrink-0"></div>
 
         <!-- RIGHT Side: RFP-supported Statistics -->
-        <div class="w-full lg:w-[58%] xl:w-[60%] px-4 sm:px-6 lg:px-8 py-5 sm:py-6 flex items-center">
+        <div class="w-full lg:w-[58%] xl:w-[60%] px-3.5 xs:px-4 sm:px-6 lg:px-8 py-5 sm:py-6 flex items-center">
 
           <!-- 3 Statistics Row with Vertical Dividers -->
           <div class="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0">
@@ -104,7 +83,7 @@
               </div>
               <div>
                 <div
-                  class="text-2xl sm:text-3xl lg:text-[32px] font-black text-[#002244] tracking-tight leading-none mb-1">
+                  class="text-2xl sm:text-3xl lg:text-[32px] 2xl:text-[36px] font-black text-[#002244] tracking-tight leading-none mb-1">
                   16
                 </div>
                 <div class="text-xs sm:text-[12.5px] font-semibold text-slate-600 leading-tight">
@@ -128,7 +107,7 @@
               </div>
               <div>
                 <div
-                  class="text-2xl sm:text-3xl lg:text-[32px] font-black text-[#002244] tracking-tight leading-none mb-1">
+                  class="text-2xl sm:text-3xl lg:text-[32px] 2xl:text-[36px] font-black text-[#002244] tracking-tight leading-none mb-1">
                   6.0L+
                 </div>
                 <div class="text-xs sm:text-[12.5px] font-semibold text-slate-600 leading-tight">
@@ -152,7 +131,7 @@
               </div>
               <div>
                 <div
-                  class="text-2xl sm:text-3xl lg:text-[32px] font-black text-[#002244] tracking-tight leading-none mb-1">
+                  class="text-2xl sm:text-3xl lg:text-[32px] 2xl:text-[36px] font-black text-[#002244] tracking-tight leading-none mb-1">
                   2,670+
                 </div>
                 <div class="text-xs sm:text-[12.5px] font-semibold text-slate-600 leading-tight">

@@ -1,10 +1,10 @@
-<section id="home" class="w-full bg-[#f0f6fc] lg:min-h-[calc(100vh-140px)] lg:min-h-[calc(100dvh-140px)] flex flex-col justify-center items-center select-none relative">
+<section id="home" class="w-full bg-[#f0f6fc] flex flex-col justify-center items-center select-none relative py-2.5 xs:py-3 sm:py-4 md:py-5 lg:py-6 xl:py-8 2xl:py-10">
   <!-- Container for Tender Box on Left and Hero Banner on Right -->
-  <div class="max-w-[1400px] w-full mx-auto my-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-stretch gap-3.5 sm:gap-4 lg:gap-5 py-3 sm:py-4 lg:py-5">
+  <div class="max-w-[1400px] xl:max-w-[1440px] w-full mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 xl:px-10 flex flex-col lg:flex-row items-stretch gap-3.5 sm:gap-4 lg:gap-5 xl:gap-6">
 
     <!-- LEFT: Tender Box (Order-2 on mobile, Order-1 on lg screens) -->
     <div
-      class="order-2 lg:order-1 w-full lg:w-[330px] xl:w-[360px] shrink-0 bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-slate-200/90 overflow-hidden flex flex-col h-[320px] xs:h-[360px] sm:h-[420px] lg:h-[480px] xl:h-[510px] relative group/box">
+      class="order-2 lg:order-1 w-full lg:w-[330px] xl:w-[360px] 2xl:w-[380px] shrink-0 bg-white rounded-xl sm:rounded-2xl shadow-md border border-slate-200 overflow-hidden flex flex-col h-[320px] xs:h-[350px] sm:h-[400px] lg:h-[480px] xl:h-[510px] 2xl:h-[540px] relative group/box">
 
       <!-- Tender Box Header: Website Navy & Amber Theme (#002244) -->
       <div
@@ -41,7 +41,7 @@
           <!-- First Set of Tenders -->
           @for (item of tenders; track item.id) {
             <div
-              (click)="openModal(item)"
+              (click)="openTender(item, $event)"
               class="p-3 sm:p-3.5 px-4 border-b border-slate-100 hover:bg-blue-50/60 transition-all cursor-pointer group/item flex flex-col justify-center">
               <div class="flex items-center justify-between gap-2 mb-1">
                 <span class="text-[11px] font-medium text-slate-500 font-sans">
@@ -58,19 +58,30 @@
                   </span>
                 </div>
               </div>
-              <p class="text-[12px] sm:text-[12.5px] font-medium text-slate-800 group-hover/item:text-[#002244] leading-snug line-clamp-2 transition-colors font-['Poppins',sans-serif]">
+              <p class="text-[12px] sm:text-[12.5px] font-medium text-slate-800 group-hover/item:text-[#002244] leading-snug line-clamp-2 transition-colors">
                 {{ item.title }}
               </p>
-              <span class="text-[10px] font-mono text-slate-400 mt-1 block truncate">
-                {{ item.refNo }}
-              </span>
+              <div class="flex items-center justify-between mt-1.5 gap-2">
+                <span class="text-[10px] font-mono text-slate-400 truncate">
+                  {{ item.refNo }}
+                </span>
+                @if (item.pdfUrl) {
+                  <span class="inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200/80 shrink-0 group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors">
+                    PDF ↗
+                  </span>
+                } @else {
+                  <span class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0 group-hover/item:bg-[#002244] group-hover/item:text-white transition-colors">
+                    Portal ↗
+                  </span>
+                }
+              </div>
             </div>
           }
 
           <!-- Second Set of Tenders (Duplicate for seamless infinite loop) -->
           @for (item of tenders; track 'dup-' + item.id) {
             <div
-              (click)="openModal(item)"
+              (click)="openTender(item, $event)"
               class="p-3 sm:p-3.5 px-4 border-b border-slate-100 hover:bg-blue-50/60 transition-all cursor-pointer group/item flex flex-col justify-center">
               <div class="flex items-center justify-between gap-2 mb-1">
                 <span class="text-[11px] font-medium text-slate-500 font-sans">
@@ -87,12 +98,23 @@
                   </span>
                 </div>
               </div>
-              <p class="text-[12px] sm:text-[12.5px] font-medium text-slate-800 group-hover/item:text-[#002244] leading-snug line-clamp-2 transition-colors font-['Poppins',sans-serif]">
+              <p class="text-[12px] sm:text-[12.5px] font-medium text-slate-800 group-hover/item:text-[#002244] leading-snug line-clamp-2 transition-colors">
                 {{ item.title }}
               </p>
-              <span class="text-[10px] font-mono text-slate-400 mt-1 block truncate">
-                {{ item.refNo }}
-              </span>
+              <div class="flex items-center justify-between mt-1.5 gap-2">
+                <span class="text-[10px] font-mono text-slate-400 truncate">
+                  {{ item.refNo }}
+                </span>
+                @if (item.pdfUrl) {
+                  <span class="inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200/80 shrink-0 group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors">
+                    PDF ↗
+                  </span>
+                } @else {
+                  <span class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0 group-hover/item:bg-[#002244] group-hover/item:text-white transition-colors">
+                    Portal ↗
+                  </span>
+                }
+              </div>
             </div>
           }
         </div>
@@ -105,7 +127,7 @@
 
     <!-- RIGHT: Hero Banner with Artwork & Content (Order-1 on mobile, Order-2 on lg screens) -->
     <div
-      class="order-1 lg:order-2 flex-1 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl bg-[#00234a] relative min-h-[340px] sm:min-h-[420px] lg:h-[480px] xl:h-[510px] flex items-center border border-blue-950/40">
+      class="order-1 lg:order-2 flex-1 rounded-xl sm:rounded-2xl overflow-hidden shadow-md bg-[#00234a] relative min-h-[330px] xs:min-h-[360px] sm:min-h-[400px] lg:h-[480px] xl:h-[510px] 2xl:h-[540px] flex items-center border border-blue-950/40">
 
       <!-- Background Panoramic Artwork: Scaled and anchored to right to display full content -->
       <div class="absolute inset-0 z-0 overflow-hidden flex justify-end">
@@ -123,18 +145,18 @@
 
       <!-- Left Column: Compact Refined Typography & Clean Left Content -->
       <div
-        class="relative z-10 w-full md:w-[72%] lg:w-[64%] xl:w-[58%] px-4 sm:px-8 lg:px-10 py-5 sm:py-8 lg:py-10 flex flex-col justify-center text-left">
+        class="relative z-10 w-full md:w-[72%] lg:w-[64%] xl:w-[58%] px-3.5 xs:px-4 sm:px-8 lg:px-10 py-5 sm:py-8 lg:py-10 flex flex-col justify-center text-left">
 
         <!-- Eyebrow: Skills for Today / Opportunities for Tomorrow -->
         <div
-          class="text-xs sm:text-[13.5px] font-medium tracking-wide text-slate-200 mb-2 leading-snug drop-shadow-sm font-['Poppins',sans-serif]">
+          class="text-xs sm:text-[13.5px] font-medium tracking-wide text-slate-200 mb-2 leading-snug drop-shadow-sm">
           <span class="text-[#f5a02f] font-semibold">{{ t().hero.eyebrowSkills }}</span> {{ t().hero.eyebrowToday }}<br />
           {{ t().hero.eyebrowOpportunities }}
         </div>
 
         <!-- Hero Heading: Integrated Scheme Management System (Compact & balanced) -->
         <h1
-          class="text-[21px] xs:text-[23px] sm:text-3xl md:text-[34px] lg:text-[38px] xl:text-[42px] font-semibold text-white tracking-tight leading-[1.18] sm:leading-[1.14] drop-shadow-sm mb-2.5 sm:mb-3 font-['Poppins',sans-serif]">
+          class="text-[20px] xs:text-[22px] sm:text-3xl md:text-[34px] lg:text-[37px] xl:text-[41px] 2xl:text-[44px] font-semibold text-white tracking-tight leading-[1.18] sm:leading-[1.15] drop-shadow-sm mb-2.5 sm:mb-3 font-['Poppins',sans-serif]">
           {{ t().hero.headingPart1 }} <br class="hidden sm:inline" /><span class="inline-block sm:whitespace-nowrap">{{ t().hero.headingPart2 }}</span>
         </h1>
 
@@ -143,22 +165,15 @@
 
         <!-- Description from RFP (Compact) -->
         <p
-          class="text-xs sm:text-[13.5px] lg:text-[14.5px] text-slate-200/95 font-normal leading-relaxed max-w-lg mb-4 sm:mb-5 drop-shadow font-['Poppins',sans-serif]">
+          class="text-xs sm:text-[13.5px] lg:text-[14.5px] 2xl:text-[15px] text-slate-200/95 font-normal leading-relaxed max-w-lg mb-3.5 sm:mb-5 drop-shadow">
           {{ t().hero.description }}
         </p>
 
-        <!-- Action Buttons: [Get Started ↗] [Know More] -->
-        <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 font-['Poppins',sans-serif] w-full">
-          <!-- Get Started Button -->
-          <a href="#registration"
-            class="flex-1 xs:flex-initial px-4 sm:px-5 py-2.5 rounded-lg bg-[#f5a02f] hover:bg-[#e09025] text-[#002244] font-semibold text-xs sm:text-[14px] tracking-wide shadow-md hover:shadow-lg transition-all transform active:scale-95 inline-flex items-center justify-center gap-1.5 group text-center whitespace-nowrap">
-            <span>{{ t().hero.getStarted }}</span>
-            <span class="transition-transform duration-150 group-hover:translate-x-0.5 font-bold">↗</span>
-          </a>
-
+        <!-- Action Button: [Know More] -->
+        <div class="flex items-center gap-2 xs:gap-2.5 sm:gap-3 font-['Poppins',sans-serif]">
           <!-- Know More Button -->
-          <a href="#about"
-            class="flex-1 xs:flex-initial px-4 sm:px-5 py-2.5 rounded-lg bg-[#002244]/80 hover:bg-[#002244] text-white border border-white/30 hover:border-white/60 font-semibold text-xs sm:text-[14px] tracking-wide transition-all transform active:scale-95 inline-flex items-center justify-center shadow-md text-center whitespace-nowrap">
+          <a href="#about" (click)="scrollToAbout($event)"
+            class="px-5 sm:px-6 py-2 xs:py-2.5 rounded-lg bg-[#002244]/80 hover:bg-[#002244] text-white border border-white/30 hover:border-white/60 font-semibold text-xs sm:text-[14px] tracking-wide transition-all transform active:scale-95 inline-flex items-center justify-center shadow-md text-center whitespace-nowrap cursor-pointer">
             <span>{{ t().hero.knowMore }}</span>
           </a>
         </div>
@@ -173,10 +188,10 @@
 <!-- Tenders "View All" Modal Dialog -->
 @if (isModalOpen()) {
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-slate-900/60 backdrop-blur-xs select-none"
+    class="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-5 md:p-6 bg-slate-900/60 backdrop-blur-xs select-none"
     (click)="closeModal()">
     <div
-      class="bg-white w-full max-w-4xl xl:max-w-5xl rounded-2xl shadow-2xl border border-slate-200/90 overflow-hidden flex flex-col max-h-[85vh]"
+      class="bg-white w-full max-w-[calc(100vw-1.25rem)] sm:max-w-4xl xl:max-w-5xl rounded-2xl shadow-2xl border border-slate-200/90 overflow-hidden flex flex-col max-h-[85vh]"
       (click)="$event.stopPropagation()">
 
       <!-- Modal Header: Professional Deep Navy Banner (#002244) with Amber Accent Line -->
@@ -190,6 +205,16 @@
           </p>
         </div>
         <div class="flex items-center gap-2.5 sm:gap-4">
+          <a
+            href="https://livelihoods.rajasthan.gov.in/rsldc/#/pages/tender-list/403"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white text-xs font-semibold border border-white/20 transition-all">
+            <span>RSLDC Official Portal</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+            </svg>
+          </a>
           <button
             type="button"
             (click)="closeModal()"
@@ -202,15 +227,16 @@
 
       <!-- Modal Content: Broad Professional Horizontal Notice List -->
       <div class="p-3.5 sm:p-5 overflow-y-auto space-y-2.5 flex-1 custom-scrollbar bg-slate-50/40">
-        @for (item of tenders; track item.id) {
+        @for (item of filteredTenders(); track item.id) {
           <div
-            class="bg-white p-3.5 sm:p-4.5 rounded-xl border border-slate-200 hover:border-blue-300/80 hover:shadow-xs transition-all group flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+            (click)="openTender(item, $event)"
+            class="bg-white p-3.5 sm:p-4.5 rounded-xl border border-slate-200 hover:border-blue-300/80 hover:shadow-xs transition-all group flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 cursor-pointer">
 
             <!-- Left: Metadata + Title -->
             <div class="flex-1 min-w-0">
               <!-- Meta line: Date, Ref No, Category, Status -->
               <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-                <!-- Date: Plain text, NO highlight background -->
+                <!-- Date: Plain text -->
                 <span class="text-slate-500 font-medium font-sans">
                   {{ item.date }}
                 </span>
@@ -221,7 +247,7 @@
                 </span>
                 <span class="text-slate-300">•</span>
                 <!-- Category -->
-                <span class="text-slate-600 font-medium font-['Poppins',sans-serif]">
+                <span class="text-slate-600 font-medium font-sans">
                   {{ item.category }}
                 </span>
                 @if (item.isNew) {
@@ -231,7 +257,7 @@
                   </span>
                 }
                 <span class="text-slate-300">•</span>
-                <!-- Status: Open (Plain text with green dot, NO highlight background) -->
+                <!-- Status: Open -->
                 <span class="inline-flex items-center gap-1.5 font-semibold text-emerald-700 font-sans">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
                   <span>{{ t().tenderBox.activeStatus }}</span>
@@ -239,30 +265,56 @@
               </div>
 
               <!-- Title -->
-              <h4 class="text-[13px] sm:text-[14.5px] font-semibold text-slate-800 group-hover:text-[#002244] leading-snug mt-1.5 font-['Poppins',sans-serif]">
+              <h4 class="text-[13px] sm:text-[14px] font-semibold text-slate-800 group-hover:text-[#002244] leading-snug mt-1.5 font-sans">
                 {{ item.title }}
               </h4>
             </div>
 
-            <!-- Right: Download PDF Button -->
-            <div class="shrink-0 flex items-center justify-end w-full sm:w-auto">
-              <button
-                type="button"
-                (click)="downloadDoc(item, $event)"
-                class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#002244] hover:bg-[#001730] text-white text-xs font-semibold shadow-xs hover:shadow transition-all cursor-pointer font-['Poppins',sans-serif] whitespace-nowrap">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            <!-- Right: Action Buttons -->
+            <div class="shrink-0 flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
+              @if (item.pdfUrl) {
+                <button
+                  type="button"
+                  (click)="downloadDoc(item, $event)"
+                  class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#002244] hover:bg-[#001730] text-white text-xs font-semibold shadow-xs hover:shadow transition-all cursor-pointer font-sans whitespace-nowrap">
+                  <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                  </svg>
+                  <span>{{ t().tenderBox.downloadPdf }}</span>
+                </button>
+              }
+              <a
+                [href]="item.portalUrl || officialPortalUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                (click)="$event.stopPropagation()"
+                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-[#002244] text-xs font-semibold border border-slate-200 transition-all whitespace-nowrap">
+                <span>RSLDC Portal</span>
+                <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                 </svg>
-                <span>{{ t().tenderBox.downloadPdf }}</span>
-              </button>
+              </a>
             </div>
 
           </div>
         } @empty {
-          <div class="py-12 text-center text-slate-400 text-sm font-['Poppins',sans-serif]">
+          <div class="py-12 text-center text-slate-400 text-sm font-sans">
             {{ t().tenderBox.noTendersFound || 'No tenders found.' }}
           </div>
         }
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="bg-slate-100 px-4 sm:px-6 py-2.5 sm:py-3 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600 font-sans">
+        <span>Showing {{ filteredTenders().length }} training & education tenders</span>
+        <a
+          href="https://livelihoods.rajasthan.gov.in/rsldc/#/pages/tender-list/403"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-[#002244] hover:underline font-bold inline-flex items-center gap-1">
+          <span>View All on Official Portal</span>
+          <span>↗</span>
+        </a>
       </div>
 
     </div>

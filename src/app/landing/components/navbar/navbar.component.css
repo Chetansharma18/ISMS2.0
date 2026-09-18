@@ -1,6 +1,9 @@
 :host {
   display: block;
   width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 40;
 }
 
 @keyframes tickerScroll {
@@ -15,7 +18,7 @@
 .ticker-track {
   width: max-content;
   display: flex;
-  animation: tickerScroll 65s linear infinite;
+  animation: tickerScroll 115s linear infinite;
   will-change: transform;
 }
 

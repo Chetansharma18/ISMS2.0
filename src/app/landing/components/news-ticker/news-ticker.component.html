@@ -31,7 +31,8 @@
           <!-- Loop 1 -->
           @for (item of pressReleases; track item.id) {
           <div class="inline-flex items-center gap-2 mx-4 sm:mx-6 shrink-0 group/item cursor-pointer"
-            (click)="openModal()">
+            (click)="openPressRelease(item, $event)"
+            title="Click to view news on official RSLDC portal">
             <span
               class="bg-white/15 text-amber-300 font-semibold px-2 py-0.5 rounded text-[11px] tracking-tight border border-amber-400/25">
               {{ item.date }}
@@ -47,7 +48,8 @@
           <!-- Loop 2 (Seamless continuous loop) -->
           @for (item of pressReleases; track 'loop2-' + item.id) {
           <div class="inline-flex items-center gap-2 mx-4 sm:mx-6 shrink-0 group/item cursor-pointer"
-            (click)="openModal()">
+            (click)="openPressRelease(item, $event)"
+            title="Click to view news on official RSLDC portal">
             <span
               class="bg-white/15 text-amber-300 font-semibold px-2 py-0.5 rounded text-[11px] tracking-tight border border-amber-400/25">
               {{ item.date }}
@@ -110,20 +112,28 @@
         </button>
       </div>
 
-      <!-- Modal Body (All 5 Press Releases list) -->
-      <div class="p-5 overflow-y-auto space-y-4 divide-y divide-slate-100">
+      <!-- Modal Body (All Press Releases list) -->
+      <div class="p-5 overflow-y-auto space-y-3.5 divide-y divide-slate-100">
         @for (pr of pressReleases; track pr.id) {
-        <div class="pt-3 first:pt-0 group">
-          <div class="flex items-center gap-2 mb-1.5">
-            <span class="inline-block bg-[#002244] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">
-              {{ pr.date }}
+        <div
+          (click)="openPressRelease(pr, $event)"
+          class="pt-3 first:pt-0 group cursor-pointer hover:bg-blue-50/50 p-2.5 rounded-xl transition-all">
+          <div class="flex items-center justify-between gap-2 mb-1.5">
+            <div class="flex items-center gap-2">
+              <span class="inline-block bg-[#002244] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+                {{ pr.date }}
+              </span>
+              @if (pr.category) {
+              <span
+                class="text-[10px] font-semibold text-orange-600 bg-orange-50 px-2 py-0.5 rounded border border-orange-200">
+                {{ pr.category }}
+              </span>
+              }
+            </div>
+            <span class="text-[11.5px] font-semibold text-blue-700 group-hover:text-orange-600 flex items-center gap-1 transition-colors">
+              <span>View Portal</span>
+              <span class="font-bold text-xs">↗</span>
             </span>
-            @if (pr.category) {
-            <span
-              class="text-[10px] font-semibold text-orange-600 bg-orange-50 px-2 py-0.5 rounded border border-orange-200">
-              {{ pr.category }}
-            </span>
-            }
           </div>
           <p class="text-sm text-slate-800 font-medium leading-relaxed group-hover:text-[#002244] transition-colors">
             {{ pr.title }}
@@ -135,7 +145,11 @@
       <!-- Modal Footer -->
       <div
         class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
-        <span>{{ t().newsTicker.modalSource }}</span>
+        <a [href]="officialPortalUrl" target="_blank" rel="noopener noreferrer"
+          class="text-[#002244] hover:text-orange-600 hover:underline font-bold inline-flex items-center gap-1 cursor-pointer">
+          <span>RSLDC Department Portal</span>
+          <span class="font-bold">↗</span>
+        </a>
         <button type="button" (click)="closeModal()"
           class="px-4 py-1.5 rounded-lg bg-[#002244] hover:bg-[#001730] text-white font-medium transition-colors cursor-pointer">
           {{ t().newsTicker.close }}

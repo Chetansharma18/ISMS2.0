@@ -51,6 +51,11 @@ export interface LandingTranslations {
     modalSubtitle: string;
     modalSource: string;
     close: string;
+    readDetails?: string;
+    officialPortal?: string;
+    viewAllPortal?: string;
+    searchPlaceholder?: string;
+    noNewsFound?: string;
   };
   about: {
     heading: string;
@@ -204,7 +209,12 @@ export const LANDING_TRANSLATIONS: Record<'en' | 'hi', LandingTranslations> = {
       modalTitle: 'Press Releases & Official Statements',
       modalSubtitle: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
       modalSource: 'Source: RSLDC Public Relations & Media',
-      close: 'Close'
+      close: 'Close',
+      readDetails: 'Read Details',
+      officialPortal: 'RSLDC Official Portal',
+      viewAllPortal: 'View All on Official Portal',
+      searchPlaceholder: 'Search press releases by title or category...',
+      noNewsFound: 'No press releases found matching your search.'
     },
     about: {
       heading: 'About ISMS 2.0',
@@ -356,7 +366,12 @@ export const LANDING_TRANSLATIONS: Record<'en' | 'hi', LandingTranslations> = {
       modalTitle: 'प्रेस विज्ञप्तियां एवं आधिकारिक वक्तव्य',
       modalSubtitle: 'राजस्थान कौशल एवं आजीविका विकास निगम (RSLDC)',
       modalSource: 'स्रोत: RSLDC जनसंपर्क एवं मीडिया प्रकोष्ठ',
-      close: 'बंद करें'
+      close: 'बंद करें',
+      readDetails: 'विवरण देखें',
+      officialPortal: 'RSLDC आधिकारिक पोर्टल',
+      viewAllPortal: 'आधिकारिक पोर्टल पर सभी देखें',
+      searchPlaceholder: 'प्रेस विज्ञप्ति या श्रेणी खोजें...',
+      noNewsFound: 'खोजे गए विवरण से संबंधित कोई प्रेस विज्ञप्ति उपलब्ध नहीं है।'
     },
     about: {
       heading: 'ISMS 2.0 के बारे में',

@@ -22,8 +22,8 @@ import { HelpdeskChatComponent } from './components/helpdesk-chat/helpdesk-chat.
     // HelpdeskChatComponent // Commented out for now
   ],
   template: `
-    <div class="min-h-screen bg-[#f0f6fc] flex flex-col selection:bg-amber-400 selection:text-slate-900 overflow-x-hidden w-full max-w-full scroll-smooth">
-      <app-navbar />
+    <div class="min-h-screen bg-[#f0f6fc] flex flex-col selection:bg-amber-400 selection:text-slate-900 overflow-x-clip w-full max-w-full scroll-smooth">
+      <app-navbar class="sticky top-0 z-40 block w-full" />
       <main id="main-content" class="flex-grow">
         <app-hero />
         <app-about />

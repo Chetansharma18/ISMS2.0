@@ -7,6 +7,8 @@ export interface TenderItem {
   title: string;
   refNo: string;
   category: string;
+  pdfUrl?: string;
+  portalUrl: string;
   isNew?: boolean;
 }
 
@@ -25,6 +27,7 @@ export class HeroComponent {
   readonly isModalOpen = signal<boolean>(false);
   readonly selectedTender = signal<TenderItem | null>(null);
   readonly searchQuery = signal<string>('');
+  readonly officialPortalUrl = 'https://livelihoods.rajasthan.gov.in/rsldc/#/pages/tender-list/403';
 
   readonly filteredTenders = computed(() => {
     const q = this.searchQuery().trim().toLowerCase();
@@ -39,68 +42,120 @@ export class HeroComponent {
     );
   });
 
-  scrollToAbout(): void {
+  scrollToAbout(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (typeof document === 'undefined' || typeof window === 'undefined') {
+      return;
+    }
     const el = document.getElementById('about');
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+      const header = document.querySelector('header');
+      const headerHeight = header ? header.getBoundingClientRect().height : 115;
+      const targetPosition = el.getBoundingClientRect().top + window.pageYOffset - headerHeight - 10;
+
+      window.scrollTo({
+        top: Math.max(0, targetPosition),
+        behavior: 'smooth'
+      });
+
+      if (window.history && window.history.pushState) {
+        window.history.pushState(null, '', '#about');
+      }
     }
   }
 
   readonly tenders: TenderItem[] = [
     {
-      id: 't-1',
-      date: '10 Mar, 2026',
-      title: 'ई.एम.आई. भवन, हॉस्टल भवन व कौशल भवन परिसर में साफ-सफाई कार्य की संविदा हेतु निविदा-2026-27',
-      refNo: 'RSLDC/ADMIN/CLEAN/2026-27/01',
-      category: 'Services',
+      id: 't-soft-skill',
+      date: '14 Sep, 2023',
+      title: 'RFP FOR SELECTION SERVICES PROVIDER TO PROVIDE SOFT SKILL TRAINING TO GOVT ITI, SCHOOL, COLLEGE ON ONLINE MODE',
+      refNo: 'RSLDC/RFP/ONLINESOFTSKILL/2023-24',
+      category: 'Skill Training',
+      pdfUrl: 'https://jankalyanfile.rajasthan.gov.in/Files//Content/UploadFolder/Tender/7666_Main_51593627-c244-45dd-a797-7214cf075841.pdf',
+      portalUrl: 'https://livelihoods.rajasthan.gov.in/rsldc/#/pages/tender-list/403',
       isNew: true
     },
     {
-      id: 't-2',
-      date: '20 Jan, 2025',
-      title: 'Tender regarding Toner refilling and consumable parts',
-      refNo: 'RSLDC/STORE/TONER/2025/11',
-      category: 'Procurement',
+      id: 't-mmysy',
+      date: '09 Aug, 2023',
+      title: 'RFP FOR STRATEGIC TRAINING PARTNERS FOR CONDUCTING ONLINE TRAINING UNDER MMYSY SCHEME OF RSLDC',
+      refNo: 'RSLDC/MMYSY/RFP/2023-24/01',
+      category: 'Training Partner RFP',
+      pdfUrl: 'https://jankalyanfile.rajasthan.gov.in/Files//Content/UploadFolder/Tender/6609_Main_5f780b61-0991-4aaf-b32d-8e2edcd8ba43.pdf',
+      portalUrl: 'https://livelihoods.rajasthan.gov.in/rsldc/#/pages/tender-list/403',
+      isNew: true
+    },
+    {
+      id: 't-samarth',
+      date: '18 Apr, 2023',
+      title: 'EoI for submission of proposal to undertake the project under MMKVY(Cat-III: SAMARTH) scheme of RSLDC',
+      refNo: 'RSLDC/EoI/2023-24/1-MMKVY(Cat-III: SAMARTH)',
+      category: 'Special Skill Schemes',
+      pdfUrl: 'https://jankalyanfile.rajasthan.gov.in/Files//Content/UploadFolder/Tender/4000_Main_5ff60be1-f4e6-4930-9398-198dd81ebe9c.pdf',
+      portalUrl: 'https://livelihoods.rajasthan.gov.in/rsldc/#/pages/tender-list/403',
       isNew: false
     },
     {
-      id: 't-3',
-      date: '20 Jan, 2025',
-      title: 'RFP for cleaning and maintenance in RSLDC',
-      refNo: 'RSLDC/EST/CLEAN/2025/08',
-      category: 'Facility Management',
+      id: 't-saksham',
+      date: '18 Apr, 2023',
+      title: 'EoI for submission of proposal to undertake the project under MMKVY(Cat-II: SAKSHM) scheme of RSLDC',
+      refNo: 'RSLDC/EoI/2023-24/1-MMKVY(Cat-II: SAKSHM)',
+      category: 'Skill Training EoI',
+      pdfUrl: 'https://jankalyanfile.rajasthan.gov.in/Files//Content/UploadFolder/Tender/3999_Main_4d6d3da9-943e-4279-bbd3-3cfdf479eddc.pdf',
+      portalUrl: 'https://livelihoods.rajasthan.gov.in/rsldc/#/pages/tender-list/403',
       isNew: false
     },
     {
-      id: 't-4',
+      id: 't-rajkvik',
+      date: '18 Apr, 2023',
+      title: 'EoI for submission of proposal to undertake the project under RAJKViK scheme of RSLDC',
+      refNo: 'RSLDC/EoI/2023-24/1-RAJKViK General',
+      category: 'Skill Training EoI',
+      pdfUrl: 'https://jankalyanfile.rajasthan.gov.in/Files//Content/UploadFolder/Tender/3997_Main_299bca9f-9ae2-4184-a51e-03aa93ef64c1.pdf',
+      portalUrl: 'https://livelihoods.rajasthan.gov.in/rsldc/#/pages/tender-list/403',
+      isNew: false
+    },
+    {
+      id: 't-pmu-tech',
+      date: '02 Aug, 2023',
+      title: 'Selection of a Project Management Unit for providing Services of Technical Manpower to Rajasthan Skill and Livelihood Development Corporation (RSLDC)',
+      refNo: 'RSLDC/PMU/RFP/2023-24/1478',
+      category: 'Scheme Technical Manpower',
+      pdfUrl: 'https://jankalyanfile.rajasthan.gov.in/Files//Content/UploadFolder/Tender/6465_Main_4260a91b-46ce-44c2-9812-967b22de952d.pdf',
+      portalUrl: 'https://livelihoods.rajasthan.gov.in/rsldc/#/pages/tender-list/403',
+      isNew: false
+    },
+    {
+      id: 't-pmca',
       date: '23 Oct, 2024',
-      title: 'Request for proposal:-Selection of Project Management Consulting Agency for providing Project Management consulting support services to Rajasthan Skill and Livelihoods Development Corporation (RSLDC).',
-      refNo: 'RSLDC/PMCA/RFP/2024/04',
-      category: 'Consultancy',
+      title: 'Request for proposal:-Selection of Project Management Consulting Agency for providing Project Management consulting support services to Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
+      refNo: 'RSLDC/PMCA/11310599',
+      category: 'Skill Project Management',
+      pdfUrl: 'https://jankalyanfile.rajasthan.gov.in/Files//Content/UploadFolder/Tender/17351_Main_6d035056-5d74-4cb7-bbb7-406f7ace3743.pdf',
+      portalUrl: 'https://livelihoods.rajasthan.gov.in/rsldc/#/pages/tender-list/403',
       isNew: false
     },
     {
-      id: 't-5',
-      date: '22 Jul, 2024',
-      title: 'Amendment in dates of tender submission',
-      refNo: 'RSLDC/PROC/AMEND/2024/22',
-      category: 'Corrigendum',
-      isNew: false
-    },
-    {
-      id: 't-6',
+      id: 't-sca-scsp',
       date: '15 May, 2024',
       title: 'Empanelment of Private Training Partners (PTPs) for execution of Special Central Assistance to Scheduled Castes Sub-Plan (SCA to SCSP) training programs',
       refNo: 'RSLDC/SKILL/SCA-SCSP/2024/03',
-      category: 'Empanelment',
+      category: 'Training Partner Empanelment',
+      pdfUrl: '',
+      portalUrl: 'https://livelihoods.rajasthan.gov.in/rsldc/#/pages/tender-list/403',
       isNew: false
     },
     {
-      id: 't-7',
+      id: 't-smart-class',
       date: '12 Feb, 2024',
       title: 'Tender for Supply and Installation of Smart Classroom Equipment in Government ITIs and Skill Centers across Rajasthan',
       refNo: 'RSLDC/IT/SMART-CLASS/2024/15',
-      category: 'Equipment',
+      category: 'Educational Infrastructure',
+      pdfUrl: '',
+      portalUrl: 'https://livelihoods.rajasthan.gov.in/rsldc/#/pages/tender-list/403',
       isNew: false
     }
   ];
@@ -122,20 +177,26 @@ export class HeroComponent {
     this.searchQuery.set(target?.value ?? '');
   }
 
+  openTender(item: TenderItem, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    const targetUrl = item.pdfUrl || item.portalUrl || this.officialPortalUrl;
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+  }
+
   downloadDoc(item: TenderItem, event?: Event): void {
     if (event) {
       event.stopPropagation();
     }
-    const docName = `${item.refNo.replace(/[\/\s]/g, '_')}.pdf`;
-    const content = `Rajasthan Skill and Livelihoods Development Corporation (RSLDC)\nNotice Inviting Tender / RFP\n\nReference No: ${item.refNo}\nDate: ${item.date}\nCategory: ${item.category}\nTitle: ${item.title}\nStatus: Open`;
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = docName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+    const targetUrl = item.pdfUrl || item.portalUrl || this.officialPortalUrl;
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+  }
+
+  redirectToPortal(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    window.open(this.officialPortalUrl, '_blank', 'noopener,noreferrer');
   }
 }

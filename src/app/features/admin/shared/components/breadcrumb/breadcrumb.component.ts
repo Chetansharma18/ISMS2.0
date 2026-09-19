@@ -16,7 +16,7 @@ export interface BreadcrumbItem {
     <nav class="flex items-center text-xs text-slate-500 mb-2.5" aria-label="Breadcrumb">
       <ol class="inline-flex items-center space-x-1 md:space-x-2">
         <li class="inline-flex items-center">
-          <a routerLink="/admin/dashboard" class="inline-flex items-center text-slate-500 hover:text-blue-700 transition-colors">
+          <a routerLink="/admin" class="inline-flex items-center text-slate-500 hover:text-blue-700 transition-colors">
             <span class="material-symbols-outlined text-[16px] mr-1 text-slate-400">home</span>
             Admin
           </a>

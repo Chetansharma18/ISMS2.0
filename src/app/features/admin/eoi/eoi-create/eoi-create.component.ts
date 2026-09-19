@@ -216,6 +216,29 @@ export class EoiCreateComponent implements OnInit {
     }
   }
 
+  toggleCheckbox(fieldId: string, value: string): void {
+    if (!this.dynamicResponses[fieldId]) {
+      this.dynamicResponses[fieldId] = [];
+    }
+    const idx = this.dynamicResponses[fieldId].indexOf(value);
+    if (idx > -1) {
+      this.dynamicResponses[fieldId].splice(idx, 1);
+    } else {
+      this.dynamicResponses[fieldId].push(value);
+    }
+    this.clearFieldError(fieldId);
+  }
+
+  onFileSelect(event: Event, fieldId: string): void {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      this.dynamicResponses[fieldId] = target.files[0];
+      this.clearFieldError(fieldId);
+    } else {
+      this.dynamicResponses[fieldId] = null;
+    }
+  }
+
   saveAsDraft(): void {
     this.toastService.success('Draft Saved', 'Your EOI draft has been saved successfully.');
     this.router.navigate(['/admin/eoi']);
@@ -224,16 +247,46 @@ export class EoiCreateComponent implements OnInit {
   onSubmitPublish(): void {
     const errors: Record<string, string> = {};
     
-    // Validate required fields
+    // Validate required fields and constraints
     this.dynamicFields().forEach(field => {
-      if (field.required && !this.dynamicResponses[field.id]) {
-        errors[field.id] = `${field.fieldLabel} is required`;
+      const val = this.dynamicResponses[field.id];
+      
+      // 1. Required Check
+      if (field.required) {
+        if (val === undefined || val === null || val === '') {
+          errors[field.id] = `${field.fieldLabel} is required`;
+        } else if (Array.isArray(val) && val.length === 0) {
+          errors[field.id] = `${field.fieldLabel} is required (select at least one)`;
+        }
+      }
+
+      // 2. Length Checks (Text)
+      if (val && typeof val === 'string') {
+        if (field.minLength && val.length < field.minLength) {
+          errors[field.id] = `Minimum length is ${field.minLength} characters`;
+        }
+        if (field.maxLength && val.length > field.maxLength) {
+          errors[field.id] = `Maximum length is ${field.maxLength} characters`;
+        }
+      }
+
+      // 3. Value Checks (Numbers)
+      if (val !== undefined && val !== null && val !== '') {
+        const numVal = Number(val);
+        if (!isNaN(numVal)) {
+          if (field.minValue !== undefined && field.minValue !== null && numVal < field.minValue) {
+            errors[field.id] = `Minimum value is ${field.minValue}`;
+          }
+          if (field.maxValue !== undefined && field.maxValue !== null && numVal > field.maxValue) {
+            errors[field.id] = `Maximum value is ${field.maxValue}`;
+          }
+        }
       }
     });
 
     if (Object.keys(errors).length > 0) {
       this.validationErrors.set(errors);
-      this.toastService.error('Validation Error', 'Please fill all mandatory fields before publishing.');
+      this.toastService.error('Validation Error', 'Please correct the errors in the preview form before publishing.');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }

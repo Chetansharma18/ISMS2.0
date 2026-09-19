@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AdminUserService } from '../../core/services/admin-user.service';
 import { MasterService } from '../../core/services/master.service';
@@ -18,6 +18,7 @@ import {
   imports: [
     CommonModule, 
     ReactiveFormsModule, 
+    FormsModule,
     RouterModule, 
     PageHeaderComponent, 
     StatusBadgeComponent
@@ -185,8 +186,9 @@ import {
             <div *ngIf="subTab() === 'roles'" class="space-y-4 text-xs">
               <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                 <span class="font-bold text-slate-800 uppercase tracking-wider">Assigned Security Roles</span>
-                <button type="button" (click)="addRoleRow()" class="px-3 py-1 bg-blue-700 hover:bg-blue-800 text-white rounded text-xs font-bold">
-                  + Add Role
+                <button type="button" (click)="addRoleRow()" class="px-3.5 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer">
+                  <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                  Add Role
                 </button>
               </div>
 
@@ -202,11 +204,26 @@ import {
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                   <tr *ngFor="let r of rolesList(); let rIdx = index">
-                    <td class="p-2.5 font-bold text-slate-900">{{ r.role }}</td>
-                    <td class="p-2.5 text-slate-600">{{ r.startDate }}</td>
-                    <td class="p-2.5 text-slate-600">{{ r.endDate }}</td>
+                    <td class="p-2.5">
+                      <select [(ngModel)]="r.role" [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded text-xs font-bold text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-hidden">
+                        <option value="">-- Select Role --</option>
+                        <option value="DEPARTMENT_USER">Department User</option>
+                        <option value="APPROVAL_COMMITTEE">Approval Committee</option>
+                        <option value="EVALUATOR">Evaluator</option>
+                        <option value="SYSTEM_ADMIN">System Admin</option>
+                      </select>
+                    </td>
+                    <td class="p-2.5">
+                      <input type="date" [(ngModel)]="r.startDate" [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded text-xs text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+                    </td>
+                    <td class="p-2.5">
+                      <input type="date" [(ngModel)]="r.endDate" [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded text-xs text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+                    </td>
                     <td class="p-2.5 text-center">
-                      <admin-status-badge [status]="r.status"></admin-status-badge>
+                      <select [(ngModel)]="r.status" [ngModelOptions]="{standalone: true}" class="px-2 py-1.5 bg-white border border-slate-300 rounded text-xs font-bold focus:ring-2 focus:ring-blue-600 focus:outline-hidden" [ngClass]="r.status === 'Active' ? 'text-emerald-700' : 'text-slate-500'">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
                     </td>
                     <td class="p-2.5 text-right">
                       <button type="button" (click)="removeRoleRow(rIdx)" class="text-rose-600 hover:text-rose-800 p-1">
@@ -260,8 +277,9 @@ import {
             <div *ngIf="subTab() === 'schemes'" class="space-y-4 text-xs">
               <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                 <span class="font-bold text-slate-800 uppercase tracking-wider">Authorized Scheme Portfolio</span>
-                <button type="button" (click)="addSchemeRow()" class="px-3 py-1 bg-blue-700 hover:bg-blue-800 text-white rounded text-xs font-bold">
-                  + Add Scheme
+                <button type="button" (click)="addSchemeRow()" class="px-3.5 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer">
+                  <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                  Add Scheme
                 </button>
               </div>
 
@@ -277,11 +295,27 @@ import {
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                   <tr *ngFor="let s of schemesList(); let sIdx = index">
-                    <td class="p-2.5 font-bold text-slate-900">{{ s.schemeName }}</td>
-                    <td class="p-2.5 text-slate-600">{{ s.startDate }}</td>
-                    <td class="p-2.5 text-slate-600">{{ s.endDate }}</td>
+                    <td class="p-2.5">
+                      <select [(ngModel)]="s.schemeId" (ngModelChange)="updateSchemeName(s)" [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded text-xs font-bold text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-hidden">
+                        <option value="">-- Select Scheme --</option>
+                        <option value="SCH-1">Mukhya Mantri Kaushal Vikas Yojana</option>
+                        <option value="SCH-2">Samarth Scheme for Special Vulnerable Groups</option>
+                        <option value="SCH-3">Rajkvik Recognition of Prior Learning</option>
+                        <option value="SCH-4">Rajasthan Kaushal Vikas Kendra Scheme</option>
+                        <option value="SCH-5">Saksham Scheme for Women Empowerment</option>
+                      </select>
+                    </td>
+                    <td class="p-2.5">
+                      <input type="date" [(ngModel)]="s.startDate" [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded text-xs text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+                    </td>
+                    <td class="p-2.5">
+                      <input type="date" [(ngModel)]="s.endDate" [ngModelOptions]="{standalone: true}" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded text-xs text-slate-900 focus:ring-2 focus:ring-blue-600 focus:outline-hidden" />
+                    </td>
                     <td class="p-2.5 text-center">
-                      <admin-status-badge [status]="s.status"></admin-status-badge>
+                      <select [(ngModel)]="s.status" [ngModelOptions]="{standalone: true}" class="px-2 py-1.5 bg-white border border-slate-300 rounded text-xs font-bold focus:ring-2 focus:ring-blue-600 focus:outline-hidden" [ngClass]="s.status === 'Active' ? 'text-emerald-700' : 'text-slate-500'">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
                     </td>
                     <td class="p-2.5 text-right">
                       <button type="button" (click)="removeSchemeRow(sIdx)" class="text-rose-600 hover:text-rose-800 p-1">
@@ -443,7 +477,7 @@ export class UserCreateComponent implements OnInit {
   addRoleRow(): void {
     this.rolesList.update(list => [
       ...list,
-      { id: `UR-${Date.now()}`, role: 'APPROVAL_COMMITTEE', startDate: '2024-01-01', endDate: '2026-12-31', status: 'Active' }
+      { id: `UR-${Date.now()}`, role: '', startDate: '', endDate: '', status: 'Active' }
     ]);
   }
 
@@ -454,12 +488,23 @@ export class UserCreateComponent implements OnInit {
   addSchemeRow(): void {
     this.schemesList.update(list => [
       ...list,
-      { id: `US-${Date.now()}`, schemeId: 'SCH-002', schemeName: 'PMKVY (State Component)', startDate: '2024-01-01', endDate: '2026-12-31', status: 'Active' }
+      { id: `US-${Date.now()}`, schemeId: '', schemeName: '', startDate: '', endDate: '', status: 'Active' }
     ]);
   }
 
   removeSchemeRow(idx: number): void {
     this.schemesList.update(list => list.filter((_, i) => i !== idx));
+  }
+
+  updateSchemeName(s: any): void {
+    const map: any = {
+      'SCH-1': 'Mukhya Mantri Kaushal Vikas Yojana',
+      'SCH-2': 'Samarth Scheme for Special Vulnerable Groups',
+      'SCH-3': 'Rajkvik Recognition of Prior Learning',
+      'SCH-4': 'Rajasthan Kaushal Vikas Kendra Scheme',
+      'SCH-5': 'Saksham Scheme for Women Empowerment'
+    };
+    s.schemeName = map[s.schemeId] || '';
   }
 
   onSubmit(): void {

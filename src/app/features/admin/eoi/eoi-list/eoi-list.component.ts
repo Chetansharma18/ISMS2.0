@@ -146,7 +146,7 @@ import { EoiItem, EoiStatus } from '../../core/models/admin.models';
                 </td>
 
                 <!-- Scheme & Category -->
-                <td class="px-4 py-3 whitespace-nowrap">
+                <td class="px-4 py-3 min-w-[150px] max-w-[250px] leading-snug">
                   <div class="font-semibold text-slate-800">{{ row.schemeName }}</div>
                   <div class="text-[11px] text-slate-500">{{ row.eoiCategory }}</div>
                 </td>

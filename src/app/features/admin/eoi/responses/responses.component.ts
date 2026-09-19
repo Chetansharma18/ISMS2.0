@@ -141,66 +141,66 @@ import { EoiItem, ApplicationItem } from '../../core/models/admin.models';
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-slate-600 border-collapse min-w-[900px]">
+          <table class="w-full text-left text-xs text-slate-600 border-collapse">
             <thead class="bg-slate-50 text-[#002244] uppercase font-bold text-[10.5px] border-b border-slate-200">
               <tr>
-                <th class="px-4 py-3.5">App Number</th>
-                <th class="px-4 py-3.5">Registration No.</th>
-                <th class="px-4 py-3.5">Applicant Entity Name</th>
-                <th class="px-4 py-3.5">Category</th>
-                <th class="px-4 py-3.5">Submission Date</th>
-                <th class="px-4 py-3.5">Payment</th>
-                <th class="px-4 py-3.5">Scrutiny Status</th>
-                <th class="px-4 py-3.5">Awarded Grade</th>
-                <th class="px-4 py-3.5 text-right">Actions</th>
+                <th class="px-2 py-3.5">App Number</th>
+                <th class="px-2 py-3.5">Registration No.</th>
+                <th class="px-2 py-3.5">Applicant Entity Name</th>
+                <th class="px-2 py-3.5">Category</th>
+                <th class="px-2 py-3.5">Submission Date</th>
+                <th class="px-2 py-3.5">Payment</th>
+                <th class="px-2 py-3.5">Scrutiny Status</th>
+                <th class="px-2 py-3.5">Awarded Grade</th>
+                <th class="px-2 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
               <tr *ngFor="let a of applications()" class="hover:bg-slate-50/80 transition-colors">
                 
                 <!-- App Number -->
-                <td class="px-4 py-3 font-mono font-bold text-[#002244] whitespace-nowrap">
+                <td class="px-2 py-3 font-mono font-bold text-[#002244] whitespace-nowrap">
                   <a [routerLink]="['/admin/eoi', eoiId, 'responses', a.id]" class="hover:underline">
                     {{ a.applicationNumber }}
                   </a>
                 </td>
 
                 <!-- Registration No -->
-                <td class="px-4 py-3 font-mono text-slate-600 whitespace-nowrap">
+                <td class="px-2 py-3 font-mono text-slate-600">
                   {{ a.registrationNumber }}
                 </td>
 
                 <!-- Applicant Entity -->
-                <td class="px-4 py-3 max-w-xs">
-                  <div class="font-bold text-slate-900 line-clamp-1">{{ a.organizationName }}</div>
-                  <div class="text-[11px] text-slate-500 truncate">{{ a.applicantName }} • {{ a.applicantPhone }}</div>
+                <td class="px-2 py-3 max-w-[200px]">
+                  <div class="font-bold text-slate-900 line-clamp-1" [title]="a.organizationName">{{ a.organizationName }}</div>
+                  <div class="text-[11px] text-slate-500 truncate" [title]="a.applicantName + ' • ' + a.applicantPhone">{{ a.applicantName }} • {{ a.applicantPhone }}</div>
                 </td>
 
                 <!-- Category -->
-                <td class="px-4 py-3 whitespace-nowrap text-slate-700">
+                <td class="px-2 py-3 min-w-[130px] max-w-[200px] leading-snug text-slate-700">
                   {{ a.assignedCategory || a.category }}
                 </td>
 
                 <!-- Submission Date -->
-                <td class="px-4 py-3 whitespace-nowrap text-slate-600">
+                <td class="px-2 py-3 text-slate-600">
                   {{ a.submissionDate | date:'dd-MM-yyyy HH:mm' }}
                 </td>
 
                 <!-- Payment Status -->
-                <td class="px-4 py-3 whitespace-nowrap">
-                  <span class="inline-flex items-center gap-1 font-semibold text-emerald-700">
+                <td class="px-2 py-3">
+                  <span class="inline-flex flex-wrap items-center gap-1 font-semibold text-emerald-700">
                     <span class="material-symbols-outlined text-[14px]">verified</span>
                     ₹{{ a.amount | number:'1.0-0' }} ({{ a.paymentStatus }})
                   </span>
                 </td>
 
                 <!-- Scrutiny Status -->
-                <td class="px-4 py-3 whitespace-nowrap">
+                <td class="px-2 py-3 whitespace-nowrap">
                   <admin-status-badge [status]="a.status"></admin-status-badge>
                 </td>
 
                 <!-- Awarded Grade -->
-                <td class="px-4 py-3 whitespace-nowrap font-bold">
+                <td class="px-2 py-3 font-bold">
                   <span *ngIf="a.grading" class="inline-flex items-center px-2 py-0.5 rounded-2xs text-[10.5px] font-extrabold bg-[#002244]/10 text-[#002244] border border-[#002244]/20">
                     {{ a.grading.split(' ')[0] + ' ' + (a.grading.split(' ')[1] || '') }}
                   </span>
@@ -210,13 +210,13 @@ import { EoiItem, ApplicationItem } from '../../core/models/admin.models';
                 </td>
 
                 <!-- Actions: View Detailed Profile & Scrutiny -->
-                <td class="px-4 py-3 text-right whitespace-nowrap">
+                <td class="px-2 py-3 text-right whitespace-nowrap">
                   <a 
                     [routerLink]="['/admin/eoi', eoiId, 'responses', a.id]" 
                     class="px-3 py-1.5 bg-[#002244] hover:bg-[#003366] text-white rounded-xs text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-2xs cursor-pointer"
                     title="View Detailed Profile & Committee Evaluation">
                     <span class="material-symbols-outlined text-[16px]">visibility</span>
-                    <span>View Profile</span>
+                    <span>View</span>
                   </a>
                 </td>
 

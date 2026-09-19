@@ -1,10 +1,10 @@
 <div>
   <admin-page-header 
-    title="Create Expression of Interest (EOI)"
-    subtitle="Configure a new Expression of Interest using the dynamic master template"
+    [title]="isEditMode() ? 'Edit Expression of Interest' : 'Create Expression of Interest (EOI)'"
+    [subtitle]="isEditMode() ? eoiTitle() : 'Configure a new Expression of Interest using the dynamic master template'"
     [breadcrumbs]="[
       { label: 'EOI Management', url: '/admin/eoi' },
-      { label: 'Create EOI' }
+      { label: isEditMode() ? 'Edit EOI' : 'Create EOI' }
     ]">
     <div header-actions class="flex items-center gap-2">
       <button 
@@ -33,6 +33,52 @@
       </a>
     </div>
   </admin-page-header>
+
+  <!-- EOI Basic Details Form -->
+  <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden mt-6">
+    <div class="p-4 bg-slate-50/80 border-b border-slate-200">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">
+        EOI Basic Details
+      </h3>
+    </div>
+    <form [formGroup]="eoiDetailsForm" class="p-6 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">EOI Title <span class="text-rose-600">*</span></label>
+          <input type="text" formControlName="title" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" placeholder="Enter EOI Title">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Reference No. <span class="text-rose-600">*</span></label>
+          <input type="text" formControlName="referenceNo" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" placeholder="e.g. RSLDC/EOI/2025-26/001">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Scheme Name <span class="text-rose-600">*</span></label>
+          <input type="text" formControlName="schemeName" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" placeholder="e.g. Mukhya Mantri Kaushal Vikas Yojana">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">EOI Category <span class="text-rose-600">*</span></label>
+          <select formControlName="eoiCategory" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden">
+            <option value="">-- Select Category --</option>
+            <option value="General">General</option>
+            <option value="Government Institution / PSU">Government Institution / PSU</option>
+            <option value="NGO / Non-Profit Trust">NGO / Non-Profit Trust</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Published Date <span class="text-rose-600">*</span></label>
+          <input type="date" formControlName="publishedDate" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Closing Date <span class="text-rose-600">*</span></label>
+          <input type="date" formControlName="closingDate" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden">
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Description</label>
+        <textarea formControlName="description" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-600 focus:outline-hidden" placeholder="Enter EOI description..."></textarea>
+      </div>
+    </form>
+  </div>
 
   <!-- Main Layout: Left Fields Table, Right Live Preview -->
   <div class="grid grid-cols-1 mt-6" [ngClass]="{'lg:grid-cols-12 gap-6': showPreview()}">

@@ -29,7 +29,7 @@ import { EoiItem } from '../../core/models/admin.models';
           <a [routerLink]="['/admin/eoi', eoiId, 'responses']" class="px-3 py-1.5 bg-[#131A4D] hover:bg-[#1D246B] text-white rounded-lg text-xs font-bold shadow-xs">
             Responses ({{ eoi()?.applicationCount }})
           </a>
-          <button (click)="showEditConfirm.set(true)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold shadow-xs cursor-pointer">
+          <button (click)="modalStep.set(1)" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold shadow-xs cursor-pointer">
             Edit
           </button>
         </div>
@@ -100,22 +100,39 @@ import { EoiItem } from '../../core/models/admin.models';
         </div>
       </div>
 
-      <!-- Edit Confirmation Modal -->
-      <div *ngIf="showEditConfirm()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <!-- Two-step Edit Confirmation Modal -->
+      <div *ngIf="modalStep() > 0" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6 max-w-md w-full mx-4">
-          <h3 class="text-lg font-bold text-slate-800 mb-2">Are you sure?</h3>
-          <p class="text-sm text-slate-600 mb-6">What would you like to do with this EOI?</p>
-          <div class="flex flex-col sm:flex-row gap-3">
-            <a (click)="showEditConfirm.set(false)" [routerLink]="['/admin/eoi/edit', eoiId]" class="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-center rounded-lg text-sm font-bold shadow-xs cursor-pointer">
-              Update (Edit)
-            </a>
-            <a (click)="showEditConfirm.set(false)" [routerLink]="['/admin/eoi', eoiId, 'reschedule']" class="flex-1 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-center rounded-lg text-sm font-bold shadow-xs cursor-pointer">
-              Reschedule
-            </a>
-            <button (click)="showEditConfirm.set(false)" class="flex-1 px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-center rounded-lg text-sm font-bold shadow-xs cursor-pointer">
-              Cancel
-            </button>
-          </div>
+          <!-- Step 1 -->
+          <ng-container *ngIf="modalStep() === 1">
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Are you sure?</h3>
+            <p class="text-sm text-slate-600 mb-6">Are you sure you want to modify this EOI?</p>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button (click)="modalStep.set(2)" class="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-center rounded-lg text-sm font-bold shadow-xs cursor-pointer">
+                Yes
+              </button>
+              <button (click)="modalStep.set(0)" class="flex-1 px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-center rounded-lg text-sm font-bold shadow-xs cursor-pointer">
+                No
+              </button>
+            </div>
+          </ng-container>
+
+          <!-- Step 2 -->
+          <ng-container *ngIf="modalStep() === 2">
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Select Action</h3>
+            <p class="text-sm text-slate-600 mb-6">What would you like to do with this EOI?</p>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <a (click)="modalStep.set(0)" [routerLink]="['/admin/eoi/edit', eoiId]" class="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-center rounded-lg text-sm font-bold shadow-xs cursor-pointer">
+                Update (Edit)
+              </a>
+              <a (click)="modalStep.set(0)" [routerLink]="['/admin/eoi', eoiId, 'reschedule']" class="flex-1 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-center rounded-lg text-sm font-bold shadow-xs cursor-pointer">
+                Reschedule
+              </a>
+              <button (click)="modalStep.set(0)" class="flex-1 px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-center rounded-lg text-sm font-bold shadow-xs cursor-pointer">
+                Cancel
+              </button>
+            </div>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -127,7 +144,7 @@ export class EoiDetailsComponent implements OnInit {
 
   eoiId = 'EOI-2025-001';
   eoi = signal<EoiItem | null>(null);
-  showEditConfirm = signal(false);
+  modalStep = signal<0 | 1 | 2>(0);
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');

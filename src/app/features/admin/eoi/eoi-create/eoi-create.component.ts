@@ -2,9 +2,10 @@ import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { EoiFieldService } from '../../core/services/eoi-field.service';
+import { EoiService } from '../../core/services/eoi.service';
 import { EoiFormField, FormFieldType, FormOption } from '../../core/models/admin.models';
 import { ToastService } from '../../core/services/toast.service';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
@@ -27,7 +28,9 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
 })
 export class EoiCreateComponent implements OnInit {
   readonly router = inject(Router);
+  readonly route = inject(ActivatedRoute);
   readonly eoiFieldService = inject(EoiFieldService);
+  readonly eoiService = inject(EoiService);
   readonly toastService = inject(ToastService);
   private fb = inject(FormBuilder);
 
@@ -35,11 +38,14 @@ export class EoiCreateComponent implements OnInit {
   readonly dynamicResponses: Record<string, any> = {};
   readonly validationErrors = signal<Record<string, string>>({});
 
-  eoiId = 'EOI-2025-001'; // Mock or actual EOI ID
+  eoiId = 'EOI-2025-001'; // Default
+  isEditMode = signal<boolean>(false);
+  eoiTitle = signal<string>('');
   showPreview = signal<boolean>(true);
   isModalOpen = signal<boolean>(false);
   editingFieldId: string | null = null;
   fieldForm!: FormGroup;
+  eoiDetailsForm!: FormGroup;
   optionsList = signal<FormOption[]>([]);
 
   fieldTypes: FormFieldType[] = [
@@ -49,8 +55,40 @@ export class EoiCreateComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.initEoiDetailsForm();
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.eoiId = id;
+      this.isEditMode.set(true);
+      this.eoiService.getEoiById(id).subscribe(eoi => {
+        if (eoi) {
+          this.eoiTitle.set(eoi.title);
+          this.eoiDetailsForm.patchValue({
+            referenceNo: eoi.referenceNo,
+            title: eoi.title,
+            schemeName: eoi.schemeName,
+            eoiCategory: eoi.eoiCategory,
+            description: eoi.description,
+            publishedDate: eoi.publishedDate,
+            closingDate: eoi.closingDate
+          });
+        }
+      });
+    }
     this.loadFields();
     this.initFieldForm();
+  }
+
+  initEoiDetailsForm(): void {
+    this.eoiDetailsForm = this.fb.group({
+      referenceNo: ['', Validators.required],
+      title: ['', Validators.required],
+      schemeName: ['', Validators.required],
+      eoiCategory: ['', Validators.required],
+      description: [''],
+      publishedDate: ['', Validators.required],
+      closingDate: ['', Validators.required]
+    });
   }
 
   loadFields(): void {

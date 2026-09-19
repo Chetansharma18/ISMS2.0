@@ -35,7 +35,7 @@
   </admin-page-header>
 
   <!-- EOI Basic Details Form -->
-  <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden mt-6">
+  <div *ngIf="isEditMode()" class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden mt-6">
     <div class="p-4 bg-slate-50/80 border-b border-slate-200">
       <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">
         EOI Basic Details

@@ -11,45 +11,39 @@ export class EoiFieldService {
 
   private fieldsStore: EoiFormField[] = [
     {
-      id: 'FLD-IMG-1', eoiId: 'EOI-2025-001', fieldLabel: 'Training Center Legal Name', fieldCode: 'TC_LEGAL_NAME', fieldType: 'Text', required: true, displayOrder: 1, active: true, hasHistoricalResponses: false
+      id: 'FLD-IMG-1', eoiId: 'EOI-2025-001', fieldLabel: 'EOI Reference No.', fieldCode: 'REF_NO', fieldType: 'Text', required: true, displayOrder: 1, active: true, hasHistoricalResponses: false
     },
     {
-      id: 'FLD-IMG-2', eoiId: 'EOI-2025-001', fieldLabel: 'Sectors Offered', fieldCode: 'SECTORS_OFFERED', fieldType: 'Multi Select', required: true, displayOrder: 2, active: true, options: [{label: 'Apparel', value: 'Apparel, Made-Ups & Home Furnishing'}, {label: 'IT-ITeS', value: 'IT-ITeS & Artificial Intelligence'}, {label: 'Renewable Energy', value: 'Renewable Energy & Solar Installations'}, {label: 'Automotive', value: 'Automotive & Electric Vehicles (EV)'}], hasHistoricalResponses: false
+      id: 'FLD-IMG-2', eoiId: 'EOI-2025-001', fieldLabel: 'Scheme', fieldCode: 'SCHEME', fieldType: 'Dropdown', required: true, displayOrder: 2, active: true, options: [{label: 'MMKVY', value: 'MMKVY'}, {label: 'DDU-GKY', value: 'DDU-GKY'}, {label: 'PMKVY', value: 'PMKVY'}], hasHistoricalResponses: false
     },
     {
-      id: 'FLD-IMG-3', eoiId: 'EOI-2025-001', fieldLabel: 'Annual Training Capacity', fieldCode: 'ANNUAL_CAPACITY', fieldType: 'Number', required: true, displayOrder: 3, active: true, hasHistoricalResponses: false
+      id: 'FLD-IMG-3', eoiId: 'EOI-2025-001', fieldLabel: 'Scheme Category', fieldCode: 'SCHEME_CAT', fieldType: 'Text', required: false, displayOrder: 3, active: true, hasHistoricalResponses: false
     },
     {
-      id: 'FLD-IMG-4', eoiId: 'EOI-2025-001', fieldLabel: 'Center Carpet Area (sq.ft)', fieldCode: 'CENTER_CARPET_AREA', fieldType: 'Number', required: true, displayOrder: 4, active: true, hasHistoricalResponses: false
+      id: 'FLD-IMG-4', eoiId: 'EOI-2025-001', fieldLabel: 'Date of EOI Published', fieldCode: 'PUB_DATE', fieldType: 'Date', required: true, displayOrder: 4, active: true, hasHistoricalResponses: false
     },
     {
-      id: 'FLD-IMG-5', eoiId: 'EOI-2025-001', fieldLabel: 'Average Turnover (INR Lakhs)', fieldCode: 'AVG_TURNOVER_LAKHS', fieldType: 'Decimal', required: true, displayOrder: 5, active: true, hasHistoricalResponses: false
+      id: 'FLD-IMG-5', eoiId: 'EOI-2025-001', fieldLabel: 'Last Date of EOI Submission', fieldCode: 'SUB_DATE', fieldType: 'Date', required: true, displayOrder: 5, active: true, hasHistoricalResponses: false
     },
     {
-      id: 'FLD-IMG-6', eoiId: 'EOI-2025-001', fieldLabel: 'Historical Placement %', fieldCode: 'HISTORICAL_PLACEMENT_PERC', fieldType: 'Percentage', required: false, displayOrder: 6, active: true, hasHistoricalResponses: false
+      id: 'FLD-IMG-6', eoiId: 'EOI-2025-001', fieldLabel: 'EOI Category', fieldCode: 'EOI_CAT', fieldType: 'Dropdown', required: true, displayOrder: 6, active: true, options: [{label: 'General', value: 'General'}, {label: 'SC/ST', value: 'SC_ST'}, {label: 'Women', value: 'Women'}], hasHistoricalResponses: false
     },
     {
-      id: 'FLD-IMG-7', eoiId: 'EOI-2025-001', fieldLabel: 'Nodal Officer Email', fieldCode: 'NODAL_EMAIL', fieldType: 'Email', required: true, displayOrder: 7, active: true, hasHistoricalResponses: false
+      id: 'FLD-IMG-7', eoiId: 'EOI-2025-001', fieldLabel: 'EOI Description', fieldCode: 'DESC', fieldType: 'Textarea', required: false, displayOrder: 7, active: true, hasHistoricalResponses: false
     },
     {
-      id: 'FLD-IMG-8', eoiId: 'EOI-2025-001', fieldLabel: 'Nodal Officer Mobile', fieldCode: 'NODAL_MOBILE', fieldType: 'Mobile', required: true, displayOrder: 8, active: true, hasHistoricalResponses: false
+      id: 'FLD-IMG-8', eoiId: 'EOI-2025-001', fieldLabel: 'EMD Fee', fieldCode: 'EMD_FEE', fieldType: 'Number', required: true, displayOrder: 8, active: true, hasHistoricalResponses: false
     },
     {
-      id: 'FLD-IMG-9', eoiId: 'EOI-2025-001', fieldLabel: 'Date of Commissioning', fieldCode: 'COMMISSIONING_DATE', fieldType: 'Date', required: false, displayOrder: 9, active: true, hasHistoricalResponses: false
+      id: 'FLD-IMG-9', eoiId: 'EOI-2025-001', fieldLabel: 'Process Fee', fieldCode: 'PROC_FEE', fieldType: 'Number', required: true, displayOrder: 9, active: true, hasHistoricalResponses: false
     },
     {
-      id: 'FLD-IMG-10', eoiId: 'EOI-2025-001', fieldLabel: 'Building Ownership Type', fieldCode: 'OWNERSHIP_TYPE', fieldType: 'Dropdown', required: true, displayOrder: 10, active: true, options: [{label: 'Self Owned Freehold Property', value: 'Self Owned Freehold Property'}, {label: 'Registered Long-Term Lease (3+ Years)', value: 'Registered Long-Term Lease (3+ Years)'}, {label: 'Rented', value: 'Rented'}], hasHistoricalResponses: false
-    },
-    {
-      id: 'FLD-IMG-11', eoiId: 'EOI-2025-001', fieldLabel: 'Power Backup Details', fieldCode: 'POWER_BACKUP_AVAILABLE', fieldType: 'Text', required: false, displayOrder: 11, active: true, hasHistoricalResponses: false
-    },
-    {
-      id: 'FLD-IMG-12', eoiId: 'EOI-2025-001', fieldLabel: 'Safety & Security Amenities', fieldCode: 'SAFETY_AMENITIES', fieldType: 'Multi Select', required: false, displayOrder: 12, active: true, options: [{label: 'CCTV Surveillance', value: 'CCTV Surveillance with 30-Day Storage'}, {label: 'Fire Extinguishers', value: 'Fire Extinguishers & Exit Signage'}, {label: 'Biometric Attendance', value: 'Biometric Attendance Integration'}], hasHistoricalResponses: false
+      id: 'FLD-IMG-10', eoiId: 'EOI-2025-001', fieldLabel: 'Attach File', fieldCode: 'ATTACH_FILE', fieldType: 'File Upload', required: true, displayOrder: 10, active: true, hasHistoricalResponses: false
     }
   ];
 
   constructor() {
-    const saved = localStorage.getItem('eoi_dynamic_fields_v3');
+    const saved = localStorage.getItem('eoi_dynamic_fields_v2');
     if (saved) {
       try {
         this.fieldsStore = JSON.parse(saved);
@@ -60,7 +54,7 @@ export class EoiFieldService {
   }
 
   private saveToStorage(): void {
-    localStorage.setItem('eoi_dynamic_fields_v3', JSON.stringify(this.fieldsStore));
+    localStorage.setItem('eoi_dynamic_fields_v2', JSON.stringify(this.fieldsStore));
   }
 
   getFieldsForEoi(eoiId: string): Observable<EoiFormField[]> {

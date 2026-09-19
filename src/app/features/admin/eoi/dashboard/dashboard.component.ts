@@ -1,11 +1,11 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { EoiService } from '../core/services/eoi.service';
-import { AuditService } from '../core/services/audit.service';
-import { PageHeaderComponent } from '../shared/components/page-header/page-header.component';
-import { StatusBadgeComponent } from '../shared/components/status-badge/status-badge.component';
-import { DashboardSummary, EoiItem, AuditLog } from '../core/models/admin.models';
+import { EoiService } from '../../core/services/eoi.service';
+import { AuditService } from '../../core/services/audit.service';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
+import { DashboardSummary, EoiItem, AuditLog } from '../../core/models/admin.models';
 
 @Component({
   selector: 'admin-dashboard',
@@ -21,7 +21,7 @@ import { DashboardSummary, EoiItem, AuditLog } from '../core/models/admin.models
       
       <!-- Page Header -->
       <admin-page-header 
-        title="Super Admin Overview & EOI Control Center"
+        title="EOI Management Dashboard"
         subtitle="Real-time monitoring of State Expression of Interest tenders, master configurations, and scrutiny milestones"
         icon="dashboard">
         <div header-actions class="flex items-center gap-3">
@@ -41,7 +41,7 @@ import { DashboardSummary, EoiItem, AuditLog } from '../core/models/admin.models
       </admin-page-header>
 
       <!-- 12 SUMMARY CARDS GRID (Enhanced with subtle gradients and crisp typography) -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
         
         <!-- Total Schemes -->
         <div class="bg-gradient-to-br from-white to-slate-50/80 p-4 sm:p-5 rounded-xl border border-slate-200/80 shadow-sm hover:shadow-md hover:border-[#002244]/30 transition-all group">
@@ -82,17 +82,6 @@ import { DashboardSummary, EoiItem, AuditLog } from '../core/models/admin.models
           <div class="text-[11px] text-emerald-700 font-bold mt-2 tracking-wide">Accepting Apps</div>
         </div>
 
-        <!-- Published EOIs -->
-        <div class="bg-gradient-to-br from-blue-50 to-white p-4 sm:p-5 rounded-xl border border-blue-200 shadow-sm hover:shadow-md hover:border-blue-400 transition-all group">
-          <div class="flex items-start justify-between text-blue-800 mb-2">
-            <span class="text-[10px] font-black uppercase tracking-widest text-blue-700">Published</span>
-            <div class="p-1.5 rounded-md bg-blue-100 text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-              <span class="material-symbols-outlined text-[18px]">public</span>
-            </div>
-          </div>
-          <div class="text-3xl font-black text-blue-900 tracking-tight">{{ summary().publishedEOIs }}</div>
-          <div class="text-[11px] text-blue-700 font-semibold mt-2 tracking-wide">Ready for Window</div>
-        </div>
 
         <!-- Closed EOIs -->
         <div class="bg-gradient-to-br from-slate-100 to-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-400 transition-all group">
@@ -166,17 +155,6 @@ import { DashboardSummary, EoiItem, AuditLog } from '../core/models/admin.models
           <div class="text-[11px] text-rose-700 font-semibold mt-2 tracking-wide">Criteria Ineligible</div>
         </div>
 
-        <!-- Draft EOIs -->
-        <div class="bg-gradient-to-br from-slate-100 to-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-400 transition-all group">
-          <div class="flex items-start justify-between text-slate-500 mb-2">
-            <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Draft EOIs</span>
-            <div class="p-1.5 rounded-md bg-slate-200 text-slate-600 group-hover:bg-slate-600 group-hover:text-white transition-colors">
-              <span class="material-symbols-outlined text-[18px]">edit_note</span>
-            </div>
-          </div>
-          <div class="text-3xl font-black text-slate-700 tracking-tight">{{ summary().draftEOIs }}</div>
-          <div class="text-[11px] text-slate-500 font-semibold mt-2 tracking-wide">In Configuration</div>
-        </div>
 
         <!-- Fee Volume -->
         <div class="bg-gradient-to-br from-sky-50 to-white p-4 sm:p-5 rounded-xl border border-sky-200 shadow-sm hover:shadow-md hover:border-sky-400 transition-all group relative overflow-hidden">
@@ -228,42 +206,42 @@ import { DashboardSummary, EoiItem, AuditLog } from '../core/models/admin.models
             <table class="w-full text-left text-xs text-slate-600 border-collapse min-w-[900px]">
               <thead class="bg-slate-50 border-y border-slate-200/80 text-[#002244] font-black uppercase tracking-widest text-[10px]">
                 <tr>
-                  <th class="px-5 py-4 w-40">EOI Ref No.</th>
-                  <th class="px-5 py-4 w-64">EOI Title / Dept</th>
-                  <th class="px-5 py-4">Scheme</th>
-                  <th class="px-5 py-4 text-center">Dates</th>
-                  <th class="px-5 py-4 text-center">Apps</th>
-                  <th class="px-5 py-4 text-center">Status</th>
-                  <th class="px-5 py-4 text-right">Actions</th>
+                  <th class="px-3 py-4 w-32">EOI Ref No.</th>
+                  <th class="px-3 py-4 w-56">EOI Title / Dept</th>
+                  <th class="px-3 py-4">Scheme</th>
+                  <th class="px-3 py-4 text-center">Dates</th>
+                  <th class="px-3 py-4 text-center">Apps</th>
+                  <th class="px-3 py-4 text-center">Status</th>
+                  <th class="px-3 py-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
                 <tr *ngFor="let e of eois()" class="hover:bg-blue-50/30 transition-colors group">
-                  <td class="px-5 py-3.5 whitespace-nowrap">
-                    <a [routerLink]="['/admin/eoi', e.id, 'details']" class="font-bold text-[#002244] text-[13px] hover:underline">{{ e.referenceNo }}</a>
+                  <td class="px-3 py-3.5">
+                    <a [routerLink]="['/admin/eoi', e.id, 'details']" class="font-bold text-[#002244] text-[13px] hover:underline break-words">{{ e.referenceNo }}</a>
                     <span class="text-[10px] text-slate-400 block font-bold tracking-wider mt-0.5">VERSION {{ e.version }}</span>
                   </td>
-                  <td class="px-5 py-3.5">
-                    <div class="font-bold text-slate-800 text-[13px] line-clamp-1" [title]="e.title">{{ e.title }}</div>
+                  <td class="px-3 py-3.5">
+                    <div class="font-bold text-slate-800 text-[13px] line-clamp-2" [title]="e.title">{{ e.title }}</div>
                     <div class="text-[11px] text-slate-500 truncate font-medium mt-0.5">{{ e.department }}</div>
                   </td>
-                  <td class="px-5 py-3.5">
+                  <td class="px-3 py-3.5">
                     <div class="font-bold text-slate-700 text-xs">{{ e.schemeName }}</div>
                     <div class="text-[10px] text-slate-500 uppercase tracking-wider mt-0.5">{{ e.eoiCategory }}</div>
                   </td>
-                  <td class="px-5 py-3.5 text-center whitespace-nowrap">
+                  <td class="px-3 py-3.5 text-center whitespace-nowrap">
                     <div class="text-[11px] font-medium text-slate-500">Pub: {{ e.publishedDate }}</div>
                     <div class="text-[11px] font-bold mt-0.5" [ngClass]="{'text-amber-700': e.status === 'OPEN', 'text-slate-700': e.status !== 'OPEN'}">Close: {{ e.closingDate }}</div>
                   </td>
-                  <td class="px-5 py-3.5 text-center">
+                  <td class="px-3 py-3.5 text-center">
                     <span class="inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-full text-xs font-black bg-[#002244]/10 text-[#002244] border border-[#002244]/20">
                       {{ e.applicationCount }}
                     </span>
                   </td>
-                  <td class="px-5 py-3.5 text-center whitespace-nowrap">
+                  <td class="px-3 py-3.5 text-center">
                     <admin-status-badge [status]="e.status"></admin-status-badge>
                   </td>
-                  <td class="px-5 py-3.5 text-right whitespace-nowrap">
+                  <td class="px-3 py-3.5 text-right whitespace-nowrap">
                     <div class="flex items-center justify-end gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
                       <a [routerLink]="['/admin/eoi', e.id, 'details']" class="p-1.5 text-slate-500 hover:text-[#002244] hover:bg-slate-100 rounded-md transition-colors" title="View Details">
                         <span class="material-symbols-outlined text-[18px]">visibility</span>

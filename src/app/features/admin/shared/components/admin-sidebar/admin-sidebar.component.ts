@@ -94,6 +94,7 @@ import { EoiService } from '../../../core/services/eoi.service';
           </button>
 
           <div *ngIf="eoiOpen()" class="px-2 py-2 space-y-1 text-[11px] bg-slate-100/50">
+            <a routerLink="/admin/eoi/dashboard" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" [routerLinkActiveOptions]="{ exact: true }" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all relative">EOI Dashboard <span class="absolute right-2 top-2 w-1.5 h-1.5 rounded-full bg-emerald-500"></span></a>
             <a routerLink="/admin/eoi" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" [routerLinkActiveOptions]="{ exact: true }" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all relative">EOI Configure <span class="absolute right-2 top-2 w-1.5 h-1.5 rounded-full bg-amber-500"></span></a>
             <a routerLink="/admin/eoi/create" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">+ Create New EOI</a>
             <a routerLink="/admin/eoi/EOI-2025-002/responses" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">EOI Responses</a>

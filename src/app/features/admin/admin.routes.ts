@@ -10,13 +10,7 @@ export const ADMIN_ROUTES: Routes = [
     children: [
       { path: '', redirectTo: 'masters/schemes', pathMatch: 'full' },
       
-      // 1. Dashboard (Commented as per request)
-      /*
-      {
-        path: 'dashboard',
-        loadComponent: () => import('./dashboard/dashboard.component').then(m => m.AdminDashboardComponent)
-      },
-      */
+      // 1. EOI Dashboard (Moved from root)
 
       // 2. Masters - Schemes
       {
@@ -115,6 +109,10 @@ export const ADMIN_ROUTES: Routes = [
       },
 
       // 3. EOI Management
+      {
+        path: 'eoi/dashboard',
+        loadComponent: () => import('./eoi/dashboard/dashboard.component').then(m => m.AdminDashboardComponent)
+      },
       {
         path: 'eoi',
         loadComponent: () => import('./eoi/eoi-list/eoi-list.component').then(m => m.EoiListComponent)

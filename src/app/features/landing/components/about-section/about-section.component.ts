@@ -1,0 +1,192 @@
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { LanguageService } from '../../../../core/services/language.service';
+
+@Component({
+  selector: 'app-about-section',
+  standalone: true,
+  imports: [CommonModule],
+  host: {
+    class: 'block w-full'
+  },
+  template: `
+    <section id="about"
+      class="w-full bg-white py-10 sm:py-14 lg:py-16 border-t border-slate-200/80 select-none"
+      aria-label="About ISMS">
+      <div class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- 2-Column Layout Matching User Reference -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+
+          <!-- Left Column: Department Context, RFP Content & Action -->
+          <div class="flex flex-col justify-center text-left">
+
+            <!-- Main Heading -->
+            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#002244] tracking-tight">
+              {{ t().about.heading }}
+            </h2>
+            <!-- Orange accent line below heading -->
+            <div class="w-12 h-1 bg-[#ea580c] rounded-full mt-2.5 mb-5"></div>
+
+            <!-- RFP Paragraph 1 -->
+            <p class="text-slate-600 text-sm sm:text-[14.5px] leading-relaxed text-left sm:text-justify mb-3.5">
+              {{ t().about.p1 }}
+            </p>
+
+            <!-- RFP Paragraph 2 -->
+            <p class="text-slate-600 text-sm sm:text-[14.5px] leading-relaxed text-left sm:text-justify mb-6">
+              {{ t().about.p2 }}
+            </p>
+
+            <!-- Action Button: [ Know More -> ] -->
+            <div>
+              <a href="#services"
+                class="px-5 py-2.5 rounded-md bg-[#002244] hover:bg-[#003366] text-white text-xs sm:text-[13px] font-semibold tracking-wide shadow-xs transition inline-flex items-center gap-2">
+                <span>{{ t().about.knowMore }}</span>
+                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
+
+          </div>
+
+          <!-- Right Column: Card with Lab Training Photo & RFP Quote -->
+          <div class="bg-[#f0f6ff] rounded-xl border border-blue-200/80 shadow-2xs overflow-hidden flex flex-col">
+
+            <!-- Computer Lab Classroom Training Photo -->
+            <div class="w-full h-44 xs:h-52 sm:h-56 lg:h-60 overflow-hidden border-b border-blue-200/60 relative">
+              <img src="assets/landing/about-lab-training.jpg" alt="Rajasthan Government Skill Development Center - Classroom Training"
+                class="w-full h-full object-cover object-center"
+                onerror="this.src='/about-lab-training.jpg'" />
+            </div>
+
+            <!-- Content Area: Blue Quote Icon & Text with Closing Commas -->
+            <div class="p-4 sm:p-6 flex items-start gap-2.5 sm:gap-3.5">
+              <!-- Quote Icon in Bright Blue (Opening) -->
+              <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+              </svg>
+              <div class="flex-1">
+                <p class="text-slate-700 text-xs sm:text-[13.5px] leading-relaxed font-medium text-left sm:text-justify">
+                  &ldquo;{{ t().about.quote }}&rdquo;
+                </p>
+              </div>
+              <!-- Quote Icon in Bright Blue (Closing) -->
+              <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 shrink-0 self-end mb-0.5 rotate-180" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+              </svg>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- RFP-supported Statistics & Heritage Banner (Continuation of About Section) -->
+        <div
+          class="mt-4 sm:mt-5 lg:mt-6 rounded-2xl bg-gradient-to-r from-[#feeade] via-[#fcf4ec] to-[#fcf4ec] border border-[#fae2ce] shadow-xs overflow-hidden">
+          <div class="flex flex-col lg:flex-row items-stretch justify-between">
+
+            <!-- LEFT Side: Heritage Palace Artwork with 'Building a Skilled Rajasthan' -->
+            <div
+              class="w-full lg:w-[42%] xl:w-[40%] flex items-center justify-center shrink-0 overflow-hidden bg-transparent">
+              <img src="assets/landing/banner-left-part.png" alt="Building a Skilled Rajasthan - Heritage Architecture"
+                class="w-full h-full object-cover object-left max-h-[160px] sm:max-h-[180px] lg:max-h-[190px]"
+                onerror="this.src='/banner-left-part.png'" />
+            </div>
+
+            <!-- Vertical Divider between Heritage Artwork and Statistics -->
+            <div class="hidden lg:block w-px bg-amber-200/80 my-4 shrink-0"></div>
+
+            <!-- RIGHT Side: RFP-supported Statistics -->
+            <div class="w-full lg:w-[58%] xl:w-[60%] px-4 sm:px-6 lg:px-8 py-5 sm:py-6 flex items-center">
+
+              <!-- 3 Statistics Row with Vertical Dividers -->
+              <div class="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0">
+
+                <!-- Metric 1: 16 Official RFP Modules -->
+                <div
+                  class="flex-1 flex items-center justify-start gap-3 sm:gap-3.5 px-3 lg:px-4 py-2.5 sm:py-0 border-b sm:border-b-0 border-amber-200/60">
+                  <div
+                    class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-orange-500/10 border border-orange-200/80 text-[#ea580c] flex items-center justify-center shrink-0 shadow-2xs">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div
+                      class="text-2xl sm:text-3xl lg:text-[32px] font-black text-[#002244] tracking-tight leading-none mb-1">
+                      16
+                    </div>
+                    <div class="text-xs sm:text-[12.5px] font-semibold text-slate-600 leading-tight">
+                      {{ t().about.stat1Label }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Vertical Divider 1 -->
+                <div class="hidden sm:block w-px h-12 sm:h-14 bg-amber-200/80 shrink-0"></div>
+
+                <!-- Metric 2: 6.0L+ Candidates -->
+                <div
+                  class="flex-1 flex items-center justify-start gap-3 sm:gap-3.5 px-3 lg:px-4 py-2.5 sm:py-0 border-b sm:border-b-0 border-amber-200/60">
+                  <div
+                    class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-orange-500/10 border border-orange-200/80 text-[#ea580c] flex items-center justify-center shrink-0 shadow-2xs">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div
+                      class="text-2xl sm:text-3xl lg:text-[32px] font-black text-[#002244] tracking-tight leading-none mb-1">
+                      6.0L+
+                    </div>
+                    <div class="text-xs sm:text-[12.5px] font-semibold text-slate-600 leading-tight">
+                      {{ t().about.stat2Label }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Vertical Divider 2 -->
+                <div class="hidden sm:block w-px h-12 sm:h-14 bg-amber-200/80 shrink-0"></div>
+
+                <!-- Metric 3: 2,670+ Training Partners -->
+                <div
+                  class="flex-1 flex items-center justify-start gap-3 sm:gap-3.5 px-3 lg:px-4 py-2.5 sm:py-0">
+                  <div
+                    class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-orange-500/10 border border-orange-200/80 text-[#ea580c] flex items-center justify-center shrink-0 shadow-2xs">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div
+                      class="text-2xl sm:text-3xl lg:text-[32px] font-black text-[#002244] tracking-tight leading-none mb-1">
+                      2,670+
+                    </div>
+                    <div class="text-xs sm:text-[12.5px] font-semibold text-slate-600 leading-tight">
+                      {{ t().about.stat3Label }}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+  `
+})
+export class AboutSectionComponent {
+  protected readonly languageService = inject(LanguageService);
+  readonly t = this.languageService.t;
+}

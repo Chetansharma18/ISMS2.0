@@ -36,7 +36,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
             </h4>
 
             <h1 class="text-white text-4xl sm:text-5xl lg:text-[54px] font-black leading-[1.1] mb-5 tracking-tight drop-shadow-md font-sans">
-              Integrated Scheme <br/> Management System
+              Integrated Scheme <br class="hidden lg:block"/> Management System
             </h1>
 
             <p class="text-slate-100 text-sm sm:text-base mb-8 max-w-md leading-relaxed drop-shadow">
@@ -48,7 +48,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
           </div>
 
           <!-- Floating Tenders Sidebar (Right) -->
-          <div class="hidden lg:flex absolute top-2.5 right-2.5 lg:right-6 bottom-2.5 w-[420px] bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/50 flex-col overflow-hidden z-20">
+          <div class="flex lg:absolute relative mt-8 lg:mt-0 top-0 lg:top-2.5 right-0 lg:right-6 bottom-0 lg:bottom-2.5 w-full lg:w-[420px] h-[360px] lg:h-auto bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/50 flex-col overflow-hidden z-20">
             <!-- Header -->
             <div class="bg-[#0B3558] px-6 py-5 flex items-center justify-between z-10 shrink-0 shadow-sm">
               <div class="flex items-center gap-2 text-white font-bold tracking-wide">

@@ -7,15 +7,15 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterModule],
   host: {
-    class: 'block w-full'
+    class: 'block w-full transition-shadow duration-150',
+    '[class.sticky]': 'isSticky',
+    '[class.top-0]': 'isSticky',
+    '[class.z-50]': 'isSticky',
+    '[class.shadow-md]': 'isSticky'
   },
   template: `
     <header
-      class="w-full bg-[#f8fbff] border-b border-slate-200 box-border transition-shadow duration-150"
-      [class.sticky]="isSticky"
-      [class.top-0]="isSticky"
-      [class.z-50]="isSticky"
-      [class.shadow-sm]="isSticky"
+      class="w-full bg-[#f8fbff] border-b border-slate-200 box-border"
       role="banner"
     >
       <div
@@ -101,7 +101,7 @@ import { RouterModule } from '@angular/router';
           <!-- Login Button -->
           <button
             type="button"
-            class="inline-flex items-center gap-2 bg-[#0B3558] text-white rounded-lg px-4 sm:px-6 py-2 text-sm sm:text-[15px] font-semibold tracking-wide cursor-pointer shadow hover:bg-[#07233B] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+            class="inline-flex items-center gap-2 bg-[#0B3558] text-white rounded-lg px-5 sm:px-8 py-2.5 sm:py-3 text-[15px] sm:text-[17px] font-semibold tracking-wide cursor-pointer shadow hover:bg-[#07233B] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
             (click)="onLoginClick()"
             aria-label="Sign in to ISMS 2.0 Portal"
           >

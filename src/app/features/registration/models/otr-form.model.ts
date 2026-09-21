@@ -341,3 +341,156 @@ export function createInitialOtrFormData(): OtrFormData {
     status: 'Draft'
   };
 }
+
+export function createExistingUserOtrData(): OtrFormData {
+  return {
+    step1: {
+      shortName: 'RSLDC-PARTNER',
+      fullName: 'Rajasthan Skill & Livelihoods Development Council Partner Ltd.',
+      natureOfEntity: 'PUBLIC LIMITED',
+      registrationNumber: 'U80302RJ2022NPL079811',
+      dateOfRegistration: '2022-04-15',
+      stateOfLegalReg: 'Rajasthan',
+      registrationCertDoc: {
+        fileName: 'CIN_Incorporation_Cert_2022.pdf',
+        fileSize: '1.8 MB',
+        uploadDate: '15-Apr-2022',
+        status: 'uploaded'
+      },
+      companyPan: 'AAACR1234F',
+      panCardDoc: {
+        fileName: 'Company_PAN_Verified.pdf',
+        fileSize: '850 KB',
+        uploadDate: '15-Apr-2022',
+        status: 'uploaded'
+      },
+      gstRegistered: 'Yes',
+      gstin: '08AAACR1234F1Z5',
+      gstCertDoc: {
+        fileName: 'GST_Registration_Certificate.pdf',
+        fileSize: '1.2 MB',
+        uploadDate: '20-Apr-2022',
+        status: 'uploaded'
+      },
+      msmeRegistered: 'Yes',
+      udyamNumber: 'UDYAM-RJ-14-0019284',
+      msmeCertDoc: {
+        fileName: 'Udyam_Certificate.pdf',
+        fileSize: '950 KB',
+        uploadDate: '01-May-2022',
+        status: 'uploaded'
+      },
+      turnOver: '450.00',
+      blackListed: 'No',
+      nsdcPartner: 'Funded Partner',
+      contactNo: '0141-2700891',
+      emailId: 'partner@rsldc-skill.org',
+      website: 'https://rsldc-skill.org',
+      registeredAddress: 'Plot No. 42, Institutional Area, Jhalana Doongri',
+      registeredState: 'Rajasthan',
+      registeredDistrict: 'Jaipur',
+      registeredPincode: '302004',
+      sameAsRegistered: true,
+      officeAddress: 'Plot No. 42, Institutional Area, Jhalana Doongri',
+      officeState: 'Rajasthan',
+      officeDistrict: 'Jaipur',
+      officePincode: '302004'
+    },
+    step2: [
+      {
+        id: 'oic-1',
+        name: 'Dr. Rajesh Sharma',
+        designation: 'Managing Director (MD)',
+        mobileNo: '9829012345',
+        emailId: 'rajesh.sharma@rsldc-skill.org',
+        pan: 'ABCPS1234K',
+        aadhaarNo: '987654321098',
+        bhamashahNo: 'BHM889210',
+        voterIdNo: 'RJ/14/098/123456',
+        passportNo: 'Z9876543',
+        appointmentLetterDoc: {
+          fileName: 'MD_Appointment_Letter.pdf',
+          fileSize: '1.1 MB',
+          uploadDate: '15-Apr-2022',
+          status: 'uploaded'
+        },
+        idProofDoc: {
+          fileName: 'MD_Aadhaar_PAN.pdf',
+          fileSize: '1.4 MB',
+          uploadDate: '15-Apr-2022',
+          status: 'uploaded'
+        },
+        isExpanded: true
+      },
+      {
+        id: 'oic-2',
+        name: 'Sunita Verma',
+        designation: 'Operations Head',
+        mobileNo: '9414098765',
+        emailId: 'sunita.verma@rsldc-skill.org',
+        pan: 'ABQPV5678L',
+        aadhaarNo: '876543210987',
+        bhamashahNo: 'BHM441092',
+        voterIdNo: 'RJ/14/098/654321',
+        passportNo: '',
+        appointmentLetterDoc: {
+          fileName: 'Operations_Head_Order.pdf',
+          fileSize: '980 KB',
+          uploadDate: '10-May-2022',
+          status: 'uploaded'
+        },
+        idProofDoc: null,
+        isExpanded: false
+      }
+    ],
+    step3: {
+      name: 'Vikram Singh Mehta',
+      dob: '1982-08-14',
+      age: '44',
+      designation: 'Authorized Representative',
+      pan: 'BNYPM9876Q',
+      emailId: 'vikram.mehta@rsldc-skill.org',
+      mobileNo: '9829154321',
+      aadhaarNo: '765432109876',
+      bhamashahNo: 'BHM771209',
+      voterIdNo: 'RJ/14/098/987123',
+      passportNo: '',
+      state: 'Rajasthan',
+      residenceAddress: 'B-14, Malviya Nagar, Jaipur, Rajasthan - 302017',
+      authorizationLetterDoc: {
+        fileName: 'Board_Resolution_Authorization.pdf',
+        fileSize: '2.1 MB',
+        uploadDate: '01-May-2022',
+        status: 'uploaded'
+      },
+      idProofDoc: {
+        fileName: 'Auth_Signatory_ID_Proof.pdf',
+        fileSize: '1.2 MB',
+        uploadDate: '01-May-2022',
+        status: 'uploaded'
+      }
+    },
+    step4: {
+      bankName: 'State Bank of India',
+      branchName: 'Secretariat Branch, Jaipur',
+      transferMode: 'RTGS / NEFT',
+      accountType: 'Current',
+      accountHolderName: 'Rajasthan Skill & Livelihoods Development Council Partner Ltd.',
+      accountNo: '3948201948201',
+      ifscCode: 'SBIN0001234',
+      micrCode: '302002011',
+      branchAddress: 'Government Secretariat Campus, Bhagwan Das Road, Jaipur',
+      cancelledChequeDoc: {
+        fileName: 'Cancelled_Cheque_Verified.pdf',
+        fileSize: '850 KB',
+        uploadDate: '25-Apr-2022',
+        status: 'uploaded'
+      }
+    },
+    step5DeclarationAgreed: true,
+    status: 'Submitted',
+    registrationId: 'RJ-OTR-2026-004819',
+    submittedAt: '15-May-2022 11:30 AM'
+  };
+}
+

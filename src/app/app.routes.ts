@@ -39,6 +39,27 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'tenders',
+    loadComponent: () =>
+      import('./features/tenders/tenders-page.component').then(
+        (m) => m.TendersPageComponent
+      )
+  },
+  {
+    path: 'profile',
+    loadComponent: () =>
+      import('./features/profile/profile-page.component').then(
+        (m) => m.ProfilePageComponent
+      )
+  },
+  {
+    path: 'tender-status',
+    loadComponent: () =>
+      import('./features/tenders/tender-status.component').then(
+        (m) => m.TenderStatusComponent
+      )
+  },
+  {
     path: '**',
     redirectTo: ''
   }

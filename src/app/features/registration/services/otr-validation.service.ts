@@ -343,6 +343,13 @@ export class OtrValidationService {
         return this.validateStep3(formData.step3);
       case 4:
         return this.validateStep4(formData.step4);
+      case 5: {
+        const errors: string[] = [];
+        if (!formData.step5DeclarationAgreed) {
+          errors.push('Statutory Legal Undertaking & Declaration agreement is required.');
+        }
+        return errors;
+      }
       default:
         return [];
     }

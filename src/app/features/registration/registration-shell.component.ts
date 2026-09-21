@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { OtrFormService } from './services/otr-form.service';
 import { OtrValidationService } from './services/otr-validation.service';
 
@@ -30,15 +30,15 @@ export interface StepMeta {
     <div class="min-h-screen bg-white flex flex-col justify-between selection:bg-[#131862] selection:text-white">
 
       <!-- ====================================================================
-           1. Top Navy Banner (Matching Reference Image)
+           1. Form Heading (No dark background banner, only blue heading text)
            ==================================================================== -->
-      <header class="w-full bg-[#131862] text-white py-4 px-4 sm:px-6 lg:px-8 shadow-xs">
+      <div class="w-full bg-white border-b border-slate-100 py-3.5 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
-          <h1 class="text-base sm:text-xl md:text-2xl font-bold text-white tracking-tight leading-snug">
+          <h1 class="text-base sm:text-xl md:text-2xl font-black text-[#0B3558] tracking-tight leading-snug m-0">
             TP (Training Partners) / PIA (Project Implementing Agency) One Time Registration Form
           </h1>
         </div>
-      </header>
+      </div>
 
       <!-- ====================================================================
            2. Floating Feedback Toast
@@ -98,24 +98,21 @@ export interface StepMeta {
            ==================================================================== -->
       <nav class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
         <div class="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8">
-          <div class="flex items-center justify-between overflow-x-auto no-scrollbar py-0.5">
+          <div class="flex items-center justify-between overflow-x-auto no-scrollbar pt-3 pb-2">
             @for (step of steps; track step.number) {
               <button
                 type="button"
                 (click)="goToStep(step.number)"
-                class="flex-1 min-w-[130px] sm:min-w-0 py-4 px-2 sm:px-3 flex items-center justify-center gap-2.5 transition-all text-xs sm:text-[13px] border-b-2 cursor-pointer relative group"
-                [class.border-[#131862]]="activeStep() === step.number"
-                [class.text-[#131862]]="activeStep() === step.number"
+                class="flex-1 min-w-[130px] sm:min-w-0 py-2 px-2 sm:px-3 flex items-center justify-center gap-2.5 transition-all text-xs sm:text-[13px] cursor-pointer relative group bg-transparent"
+                [class.text-[#0B3558]]="activeStep() === step.number"
                 [class.font-bold]="activeStep() === step.number"
-                [class.border-transparent]="activeStep() !== step.number"
                 [class.text-slate-600]="activeStep() !== step.number"
                 [class.hover:text-slate-900]="activeStep() !== step.number"
-                [class.hover:border-slate-300]="activeStep() !== step.number"
               >
                 <!-- Number Badge / Status Icon with High Contrast Visible Text -->
                 <span
                   class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors"
-                  [class.bg-[#131862]]="activeStep() === step.number"
+                  [class.bg-[#0B3558]]="activeStep() === step.number"
                   [class.text-white]="activeStep() === step.number"
                   [class.bg-emerald-600]="isStepCompleted(step.number) && activeStep() !== step.number"
                   [class.text-white]="isStepCompleted(step.number) && activeStep() !== step.number"
@@ -145,6 +142,18 @@ export interface StepMeta {
                 </span>
               </button>
             }
+          </div>
+
+          <!-- Horizontal Progress Bar Line: Starts exactly at Step 1 bottom and ends when steps finish -->
+          <div class="w-full bg-slate-100 h-1 relative overflow-hidden rounded-full mb-2" title="Overall Form Completion Progress">
+            <div
+              class="h-full bg-linear-to-r from-emerald-500 to-teal-600 transition-all duration-500 ease-out rounded-full"
+              [style.width.%]="otrFormService.completionPercentage()"
+              role="progressbar"
+              [attr.aria-valuenow]="otrFormService.completionPercentage()"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
           </div>
         </div>
       </nav>
@@ -309,11 +318,21 @@ export interface StepMeta {
 })
 export class RegistrationShellComponent {
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   otrFormService = inject(OtrFormService);
   validationService = inject(OtrValidationService);
 
   readonly activeStep = signal<number>(1);
   readonly submittedRegId = signal<string | null>(null);
+
+  constructor() {
+    this.route.queryParams.subscribe(params => {
+      const step = parseInt(params['step'], 10);
+      if (step >= 1 && step <= 5) {
+        this.activeStep.set(step);
+      }
+    });
+  }
 
   readonly steps: StepMeta[] = [
     { number: 1, label: 'Organization Details' },
@@ -324,11 +343,17 @@ export class RegistrationShellComponent {
   ];
 
   isStepCompleted(stepNumber: number): boolean {
+    if (stepNumber === 5) {
+      return this.submittedRegId() !== null;
+    }
     const data = this.otrFormService.formData();
     return this.validationService.isStepValid(stepNumber, data);
   }
 
   isStepError(stepNumber: number): boolean {
+    if (stepNumber === 5) {
+      return false;
+    }
     const isSubmitted = this.validationService.submittedSteps().has(stepNumber);
     if (!isSubmitted) return false;
     return !this.isStepCompleted(stepNumber);

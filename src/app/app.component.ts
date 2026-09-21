@@ -4,6 +4,7 @@ import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { HeaderComponent } from './core/layout/header/header.component';
 import { FooterComponent } from './core/layout/footer/footer.component';
+import { SidebarComponent } from './core/layout/sidebar/sidebar.component';
 import { AuthService } from './core/auth/auth.service';
 import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-modal/sso-redirect-modal.component';
 
@@ -15,10 +16,11 @@ import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-m
     RouterOutlet,
     HeaderComponent,
     FooterComponent,
+    SidebarComponent,
     SsoRedirectModalComponent
   ],
   template: `
-    <div class="min-h-screen flex flex-col bg-slate-50 text-slate-900 antialiased relative">
+    <div class="h-screen overflow-hidden flex flex-col bg-slate-50 text-slate-900 antialiased relative">
       <!-- Theme-Based Blurred SSO Redirection Popup -->
       @if (authService.isRedirecting()) {
         <app-sso-redirect-modal></app-sso-redirect-modal>
@@ -26,18 +28,27 @@ import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-m
 
       <!-- Main Portal Header (Always visible across all pages) -->
       <app-header
-        [isSticky]="true"
+        [isSticky]="false"
+        class="shrink-0 z-40"
         (loginClicked)="onLoginClick()"
       ></app-header>
 
-      <!-- Main Page Content -->
-      <main class="flex-1 flex flex-col">
-        <router-outlet></router-outlet>
-      </main>
-
-      <!-- Main Portal Footer (Strictly displayed ONLY on the landing page when not logged in) -->
-      @if (showFooter()) {
-        <app-footer></app-footer>
+      <!-- Main Content Area: Flex layout with Fixed Sidebar when logged in -->
+      @if (showSidebar()) {
+        <div class="flex-1 flex w-full overflow-hidden">
+          <app-sidebar class="h-full shrink-0"></app-sidebar>
+          <main class="flex-1 min-w-0 h-full overflow-y-auto bg-slate-50 flex flex-col">
+            <router-outlet></router-outlet>
+          </main>
+        </div>
+      } @else {
+        <main class="flex-1 min-w-0 h-full overflow-y-auto flex flex-col">
+          <router-outlet></router-outlet>
+          <!-- Main Portal Footer (Displayed on landing page) -->
+          @if (showFooter()) {
+            <app-footer class="shrink-0"></app-footer>
+          }
+        </main>
       }
     </div>
   `
@@ -47,9 +58,14 @@ export class AppComponent {
   private router = inject(Router);
 
   isLandingRoute = signal<boolean>(true);
+  isSsoRoute = signal<boolean>(false);
 
   readonly showFooter = () => {
-    return this.isLandingRoute() && !this.authService.currentUser();
+    return this.isLandingRoute();
+  };
+
+  readonly showSidebar = () => {
+    return !!this.authService.currentUser() && !this.isLandingRoute() && !this.isSsoRoute();
   };
 
   constructor() {
@@ -58,7 +74,10 @@ export class AppComponent {
       .subscribe((event: NavigationEnd) => {
         const cleanUrl = event.urlAfterRedirects.split('?')[0].split('#')[0];
         const isLanding = cleanUrl === '/' || cleanUrl === '';
+        const isSso = cleanUrl.includes('/sso-login');
+
         this.isLandingRoute.set(isLanding);
+        this.isSsoRoute.set(isSso);
       });
   }
 

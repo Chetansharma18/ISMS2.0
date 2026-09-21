@@ -1,8 +1,9 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { AuthService } from '../../../../core/auth/auth.service';
+import { Router, RouterModule } from '@angular/router';
+import { AuthService, UserRole, USER_ROLES } from '../../../../core/auth/auth.service';
+import { OtrFormService } from '../../../registration/services/otr-form.service';
 
 @Component({
   selector: 'app-sso-login',
@@ -12,7 +13,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
     class: 'block w-full flex-1 min-h-[calc(100vh-60px)] md:min-h-[calc(100vh-68px)] bg-white'
   },
   template: `
-    <div class="w-full min-h-[calc(100vh-68px)] flex flex-col justify-between bg-white text-slate-800 font-sans selection:bg-[#131862] selection:text-white">
+    <div class="w-full min-h-[calc(100vh-68px)] flex flex-col justify-between bg-white text-slate-800 font-sans selection:bg-[#131862] selection:text-white relative">
       
       <!-- Top Notice Banner -->
       <div class="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center shrink-0">
@@ -69,7 +70,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
 
           <!-- Right Column: Rajasthan SSO Login Card -->
           <div class="w-full">
-            <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden w-full max-w-[440px] mx-auto lg:mx-0">
+            <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden w-full max-w-[450px] mx-auto lg:mx-0">
               
               <!-- Card Header -->
               <div class="px-5 py-3.5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
@@ -81,6 +82,34 @@ import { AuthService } from '../../../../core/auth/auth.service';
               <!-- Card Body -->
               <form (ngSubmit)="handleLogin()" class="p-6 space-y-4">
                 
+                <!-- Role Selector Toolbar -->
+                <div>
+                  <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Select Test Persona Role:
+                  </span>
+                  <div class="grid grid-cols-2 gap-1.5">
+                    @for (r of availableRoles; track r.role) {
+                      <button
+                        type="button"
+                        (click)="selectRole(r.role)"
+                        class="px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-all text-left flex items-center justify-between cursor-pointer"
+                        [class.bg-[#0B3558]]="selectedRole() === r.role"
+                        [class.text-white]="selectedRole() === r.role"
+                        [class.border-[#0B3558]]="selectedRole() === r.role"
+                        [class.bg-slate-50]="selectedRole() !== r.role"
+                        [class.text-slate-700]="selectedRole() !== r.role"
+                        [class.border-slate-200]="selectedRole() !== r.role"
+                        [class.hover:bg-slate-100]="selectedRole() !== r.role"
+                      >
+                        <span class="truncate">{{ r.label }}</span>
+                        @if (selectedRole() === r.role) {
+                          <span class="text-[10px] font-bold">&check;</span>
+                        }
+                      </button>
+                    }
+                  </div>
+                </div>
+
                 <!-- Email ID / SSOID Field (Underline style) -->
                 <div>
                   <label for="emailOrSsoIdInput" class="block text-xs font-semibold text-slate-600 mb-1">
@@ -92,7 +121,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
                     type="text"
                     [(ngModel)]="emailOrSsoId"
                     placeholder="SSOID or Email ID"
-                    class="w-full border-b border-slate-300 py-1.5 text-sm text-slate-800 focus:outline-none focus:border-[#131862] transition-colors bg-transparent"
+                    class="w-full border-b border-slate-300 py-1.5 text-sm text-slate-800 focus:outline-none focus:border-[#131862] transition-colors bg-transparent font-medium"
                     required
                   />
                 </div>
@@ -158,7 +187,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
                   <button
                     type="submit"
                     [disabled]="isLoading()"
-                    class="w-full bg-[#131862] hover:bg-[#0c1046] text-white font-bold text-sm py-2.5 px-4 rounded-md transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 shadow-xs"
+                    class="w-full bg-[#0B3558] hover:bg-[#07233B] text-white font-bold text-sm py-2.5 px-4 rounded-md transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 shadow-xs"
                   >
                     @if (isLoading()) {
                       <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -183,17 +212,116 @@ import { AuthService } from '../../../../core/auth/auth.service';
       <!-- Bottom Spacer to keep layout balanced -->
       <div class="h-6"></div>
 
+      <!-- Post-SSO Login Choice Popup Modal (For new_user) -->
+      @if (showPostLoginModal()) {
+        <div
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            class="relative max-w-lg w-full bg-white rounded-2xl shadow-2xl border border-slate-100 p-6 sm:p-8 text-left animate-in fade-in zoom-in-95 duration-200 overflow-hidden"
+          >
+            <!-- Top Gradient Accent -->
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-linear-to-r from-[#0B3558] via-[#EA580C] to-[#0B3558]"></div>
+
+            <!-- Success Badge -->
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold tracking-wide uppercase mb-3 border border-emerald-200/60 select-none">
+              <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+              </svg>
+              SSO Login Verified
+            </div>
+
+            <!-- Heading & Message -->
+            <h2 class="text-xl sm:text-2xl font-black text-[#0B3558] tracking-tight">
+              Welcome to ISMS 2.0 Portal
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1.5 leading-relaxed">
+              You are authenticated successfully as <strong>{{ emailOrSsoId }}</strong>. Please choose how you would like to proceed:
+            </p>
+
+            <!-- 2 Options Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+              
+              <!-- Option 1: Complete Registration -->
+              <button
+                type="button"
+                (click)="selectOption('registration')"
+                class="group text-left p-4 sm:p-5 rounded-xl border-2 border-slate-200 hover:border-[#0B3558] bg-slate-50/70 hover:bg-blue-50/40 transition-all cursor-pointer flex flex-col justify-between"
+              >
+                <div>
+                  <div class="w-10 h-10 rounded-lg bg-blue-100 text-[#0B3558] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h3 class="text-sm font-bold text-slate-900 group-hover:text-[#0B3558] transition-colors">
+                    Complete Registration (OTR)
+                  </h3>
+                  <p class="text-[11.5px] text-slate-500 mt-1.5 leading-relaxed">
+                    Fill or update your Training Partner / PIA profile details and submit your application.
+                  </p>
+                </div>
+                <div class="mt-4 pt-2.5 border-t border-slate-200/80 flex items-center justify-between text-xs font-bold text-[#0B3558] group-hover:text-[#EA580C] transition-colors">
+                  <span>Open Form</span>
+                  <span>&rarr;</span>
+                </div>
+              </button>
+
+              <!-- Option 2: View Tenders -->
+              <button
+                type="button"
+                (click)="selectOption('tenders')"
+                class="group text-left p-4 sm:p-5 rounded-xl border-2 border-slate-200 hover:border-[#EA580C] bg-slate-50/70 hover:bg-orange-50/40 transition-all cursor-pointer flex flex-col justify-between"
+              >
+                <div>
+                  <div class="w-10 h-10 rounded-lg bg-orange-100 text-[#EA580C] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                  </div>
+                  <h3 class="text-sm font-bold text-slate-900 group-hover:text-[#EA580C] transition-colors">
+                    View Tenders & Schemes
+                  </h3>
+                  <p class="text-[11.5px] text-slate-500 mt-1.5 leading-relaxed">
+                    Explore published tenders, Expressions of Interest (EOI), and active scheme notices.
+                  </p>
+                </div>
+                <div class="mt-4 pt-2.5 border-t border-slate-200/80 flex items-center justify-between text-xs font-bold text-[#EA580C] group-hover:text-[#0B3558] transition-colors">
+                  <span>View Tenders</span>
+                  <span>&rarr;</span>
+                </div>
+              </button>
+
+            </div>
+
+          </div>
+        </div>
+      }
+
     </div>
   `
 })
 export class SsoLoginComponent {
   private authService = inject(AuthService);
+  private otrFormService = inject(OtrFormService);
+  private router = inject(Router);
 
-  emailOrSsoId = 'applicant_rj';
+  readonly availableRoles = USER_ROLES;
+  selectedRole = signal<UserRole>('new_user');
+
+  emailOrSsoId = 'new_user';
   password = '••••••••••••';
   enteredCaptcha = '313198';
   captchaCode = signal<string>('3 1 3 1 9 8');
   isLoading = signal<boolean>(false);
+  showPostLoginModal = signal<boolean>(false);
+
+  selectRole(role: UserRole): void {
+    this.selectedRole.set(role);
+    this.emailOrSsoId = role;
+  }
 
   refreshCaptcha(): void {
     const d1 = Math.floor(1 + Math.random() * 9);
@@ -212,8 +340,35 @@ export class SsoLoginComponent {
 
     setTimeout(() => {
       this.isLoading.set(false);
-      const identifier = this.emailOrSsoId.trim() || 'applicant_rj';
-      this.authService.loginWithCredentials(identifier);
+      const identifier = this.emailOrSsoId.trim() || 'new_user';
+      const role = this.selectedRole();
+
+      // Seed prefilled data for existing_user or clean draft for new_user
+      if (role === 'existing_user') {
+        this.otrFormService.loadExistingUserData();
+      } else if (role === 'new_user') {
+        this.otrFormService.resetToInitialDraft();
+      }
+
+      // Authenticate user session
+      this.authService.loginWithCredentials(identifier, role, null);
+
+      if (role === 'new_user') {
+        // Open post-login choice popup modal for new_user
+        this.showPostLoginModal.set(true);
+      } else {
+        // Other roles navigate directly to tenders/portal
+        this.router.navigate(['/tenders']);
+      }
     }, 600);
+  }
+
+  selectOption(choice: 'registration' | 'tenders'): void {
+    this.showPostLoginModal.set(false);
+    if (choice === 'registration') {
+      this.router.navigate(['/registration']);
+    } else {
+      this.router.navigate(['/tenders']);
+    }
   }
 }

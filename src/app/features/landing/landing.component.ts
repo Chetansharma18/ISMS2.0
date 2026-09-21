@@ -6,6 +6,7 @@ import { StatsSectionComponent } from './components/stats-section/stats-section.
 import { SchemesSectionComponent } from './components/schemes-section/schemes-section.component';
 import { ServicesSectionComponent } from './components/services-section/services-section.component';
 import { AboutSectionComponent } from './components/about-section/about-section.component';
+import { ImportantLinksComponent } from './components/important-links/important-links.component';
 
 @Component({
   selector: 'app-landing',
@@ -14,10 +15,8 @@ import { AboutSectionComponent } from './components/about-section/about-section.
     CommonModule,
     NewsTickerComponent,
     HeroSectionComponent,
-    StatsSectionComponent,
-    SchemesSectionComponent,
-    ServicesSectionComponent,
-    AboutSectionComponent
+    AboutSectionComponent,
+    ServicesSectionComponent
   ],
   host: {
     class: 'block w-full'
@@ -31,17 +30,20 @@ import { AboutSectionComponent } from './components/about-section/about-section.
       <app-hero-section></app-hero-section>
 
       <!-- 3. Key Impact & Transparent Governance Metrics -->
-      <app-stats-section></app-stats-section>
+      <!-- <app-stats-section></app-stats-section> -->
 
-      <!-- 4. Active Schemes & Open EOI Opportunities -->
-      <app-schemes-section></app-schemes-section>
+      <!-- 4. About ISMS 2.0 & Stats -->
+      <app-about-section></app-about-section>
 
-      <!-- 5. 4-Stage Governance Pipeline -->
+      <!-- 5. Active Schemes & Open EOI Opportunities -->
+      <!-- <app-schemes-section></app-schemes-section> -->
+
+      <!-- 6. Mobile App & Support -->
       <app-services-section></app-services-section>
 
-      <!-- 6. About RSLDC & Vocational Labs -->
-      <app-about-section></app-about-section>
+      <!-- 7. Important Links -->
+      <!-- <app-important-links></app-important-links> -->
     </div>
   `
 })
-export class LandingComponent {}
+export class LandingComponent { }

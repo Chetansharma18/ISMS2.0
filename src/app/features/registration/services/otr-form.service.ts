@@ -5,8 +5,10 @@ import {
   OfficerInCharge,
   Step3AuthorizedPerson,
   Step4BankDetails,
-  createInitialOtrFormData
+  createInitialOtrFormData,
+  createExistingUserOtrData
 } from '../models/otr-form.model';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -63,6 +65,13 @@ export class OtrFormService {
   private loadInitialData(): OtrFormData {
     if (typeof localStorage !== 'undefined') {
       try {
+        const userSaved = localStorage.getItem('isms_user');
+        if (userSaved) {
+          const user = JSON.parse(userSaved);
+          if (user && user.role === 'existing_user') {
+            return createExistingUserOtrData();
+          }
+        }
         const cached = localStorage.getItem(this.STORAGE_KEY);
         if (cached) {
           const parsed = JSON.parse(cached);
@@ -75,6 +84,18 @@ export class OtrFormService {
       }
     }
     return createInitialOtrFormData();
+  }
+
+  loadExistingUserData(): void {
+    const data = createExistingUserOtrData();
+    this._formData.set(data);
+    this.persistDraft(data);
+  }
+
+  resetToInitialDraft(): void {
+    const data = createInitialOtrFormData();
+    this._formData.set(data);
+    this.persistDraft(data);
   }
 
   /* ==========================================================================

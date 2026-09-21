@@ -25,47 +25,47 @@ import { PressReleasesModalComponent } from '../press-releases-modal/press-relea
         </div>
 
         <!-- Ticker Text (Seamless Auto Scrolling Loop) -->
-        <div class="flex-1 overflow-hidden relative h-full flex items-center cursor-pointer group" (click)="isModalOpen.set(true)">
+        <div class="flex-1 overflow-hidden relative h-full flex items-center group">
           <div class="flex whitespace-nowrap animate-marquee group-hover:[animation-play-state:paused]">
             
             <!-- Loop 1 -->
             <div class="flex items-center gap-6 pr-6">
-              <div class="flex items-center gap-2 group/item">
+              <a href="/dummy.pdf" download="news-17-aug.pdf" class="flex items-center gap-2 group/item cursor-pointer">
                 <span class="inline-flex items-center bg-[#1E4E79] text-[#fcd34d] font-semibold px-2 py-0.5 rounded text-[11px] whitespace-nowrap">17 Aug, 2026</span>
                 <span class="text-slate-200 font-medium group-hover/item:text-yellow-300 group-hover/item:underline transition-colors">राज्य कौशल एवं उद्यमिता समिति की प्रथम बैठक आयोजित</span>
-              </div>
+              </a>
               <span class="text-slate-500">|</span>
               
-              <div class="flex items-center gap-2 group/item">
+              <a href="/dummy.pdf" download="news-15-jul.pdf" class="flex items-center gap-2 group/item cursor-pointer">
                 <span class="inline-flex items-center bg-[#1E4E79] text-[#fcd34d] font-semibold px-2 py-0.5 rounded text-[11px] whitespace-nowrap">15 Jul, 2026</span>
                 <span class="text-slate-200 font-medium group-hover/item:text-yellow-300 group-hover/item:underline transition-colors">विश्व युवा कौशल दिवस पर राज्य स्तरीय कार्यक्रम आयोजित</span>
-              </div>
+              </a>
               <span class="text-slate-500">|</span>
               
-              <div class="flex items-center gap-2 group/item">
+              <a href="/dummy.pdf" download="news-23-apr.pdf" class="flex items-center gap-2 group/item cursor-pointer">
                 <span class="inline-flex items-center bg-[#1E4E79] text-[#fcd34d] font-semibold px-2 py-0.5 rounded text-[11px] whitespace-nowrap">23 Apr, 2026</span>
                 <span class="text-slate-200 font-medium group-hover/item:text-yellow-300 group-hover/item:underline transition-colors">राज्य की 2 हजार युवतियों को डिजिटल सशक्त बनाने के लिए यूनिसेफ एफडीसीआर के माध्यम से करेगा प्रशिक्षित</span>
-              </div>
+              </a>
             </div>
 
             <!-- Loop 2 (Duplicate for seamless continuous scroll) -->
             <div class="flex items-center gap-6 pr-6" aria-hidden="true">
-              <div class="flex items-center gap-2 group/item">
+              <a href="/dummy.pdf" download="news-17-aug.pdf" class="flex items-center gap-2 group/item cursor-pointer">
                 <span class="inline-flex items-center bg-[#1E4E79] text-[#fcd34d] font-semibold px-2 py-0.5 rounded text-[11px] whitespace-nowrap">17 Aug, 2026</span>
                 <span class="text-slate-200 font-medium group-hover/item:text-yellow-300 group-hover/item:underline transition-colors">राज्य कौशल एवं उद्यमिता समिति की प्रथम बैठक आयोजित</span>
-              </div>
+              </a>
               <span class="text-slate-500">|</span>
               
-              <div class="flex items-center gap-2 group/item">
+              <a href="/dummy.pdf" download="news-15-jul.pdf" class="flex items-center gap-2 group/item cursor-pointer">
                 <span class="inline-flex items-center bg-[#1E4E79] text-[#fcd34d] font-semibold px-2 py-0.5 rounded text-[11px] whitespace-nowrap">15 Jul, 2026</span>
                 <span class="text-slate-200 font-medium group-hover/item:text-yellow-300 group-hover/item:underline transition-colors">विश्व युवा कौशल दिवस पर राज्य स्तरीय कार्यक्रम आयोजित</span>
-              </div>
+              </a>
               <span class="text-slate-500">|</span>
               
-              <div class="flex items-center gap-2 group/item">
+              <a href="/dummy.pdf" download="news-23-apr.pdf" class="flex items-center gap-2 group/item cursor-pointer">
                 <span class="inline-flex items-center bg-[#1E4E79] text-[#fcd34d] font-semibold px-2 py-0.5 rounded text-[11px] whitespace-nowrap">23 Apr, 2026</span>
                 <span class="text-slate-200 font-medium group-hover/item:text-yellow-300 group-hover/item:underline transition-colors">राज्य की 2 हजार युवतियों को डिजिटल सशक्त बनाने के लिए यूनिसेफ एफडीसीआर के माध्यम से करेगा प्रशिक्षित</span>
-              </div>
+              </a>
             </div>
 
           </div>

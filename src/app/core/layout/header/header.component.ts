@@ -27,8 +27,8 @@ import { RouterModule } from '@angular/router';
           <!-- Logos Container -->
           <div class="flex items-center gap-3">
             <!-- Government of India Emblem (Placeholder) -->
-            <img
-              src="/emblem-new.png"
+            <img 
+              src="/Rajasthan-Sarkar.png"
               alt="Government of India"
               class="h-10 sm:h-12 md:h-[50px] w-auto object-contain select-none"
             />
@@ -105,6 +105,7 @@ import { RouterModule } from '@angular/router';
             (click)="onLoginClick()"
             aria-label="Sign in to ISMS 2.0 Portal"
           >
+            <span>Login</span>
             <svg
               class="w-4 h-4 shrink-0"
               fill="none"
@@ -116,10 +117,9 @@ import { RouterModule } from '@angular/router';
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                d="M11 16l4-4m0 0l-4-4m4 4H3m10 4v1a3 3 0 003 3h4a3 3 0 003-3V7a3 3 0 00-3-3h-4a3 3 0 00-3 3v1"
               />
             </svg>
-            <span>Login</span>
           </button>
         </div>
       </div>

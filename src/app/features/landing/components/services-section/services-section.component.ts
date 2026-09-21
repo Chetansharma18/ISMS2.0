@@ -23,8 +23,6 @@ interface ServiceStep {
           <!-- Background Image Layer -->
           <div class="absolute inset-0 z-0">
             <img src="/jar.jpg" alt="" class="w-full h-full object-cover" />
-            <!-- Transparent side gradient: clear on left, solid on right for text readability -->
-            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-[#f4f8fc]/80 to-[#f4f8fc]"></div>
           </div>
           
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center max-w-5xl mx-auto relative z-10">
@@ -43,12 +41,12 @@ interface ServiceStep {
 
             <!-- Right Column: Text & Circular Features -->
             <div class="flex flex-col justify-center">
-              <div class="mb-10 text-center lg:text-left">
-                <h4 class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-2">Mobile Application</h4>
-                <h2 class="text-3xl sm:text-4xl font-black text-[#0B3558] mb-3 tracking-tight font-sans">
+              <div class="mb-10 text-center lg:text-left bg-gradient-to-r from-white/90 via-white/70 to-transparent p-6 rounded-2xl backdrop-blur-sm max-w-xl shadow-[0_4px_20px_rgba(255,255,255,0.5)]">
+                <h4 class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 drop-shadow-sm">Mobile Application</h4>
+                <h2 class="text-3xl sm:text-4xl font-black text-[#0B3558] mb-3 tracking-tight font-sans drop-shadow-sm">
                   ISMS 2.0 Mobile App
                 </h2>
-                <p class="text-[13px] sm:text-sm text-slate-600 leading-relaxed max-w-md mx-auto lg:mx-0">
+                <p class="text-[13px] sm:text-sm text-slate-800 font-medium leading-relaxed drop-shadow-sm">
                   An integrated mobile application to enable access to key ISMS 
                   2.0 services for all stakeholders.
                 </p>
@@ -86,20 +84,20 @@ interface ServiceStep {
               </div>
 
               <!-- App Stats -->
-              <div class="mt-8 flex flex-wrap justify-center lg:justify-start items-center gap-8 border-t border-blue-100 pt-6">
+              <div class="mt-8 flex flex-wrap justify-center lg:justify-start items-center gap-8 border-t border-white/50 pt-6 bg-gradient-to-r from-white/90 via-white/60 to-transparent p-6 rounded-2xl backdrop-blur-sm shadow-[0_4px_20px_rgba(255,255,255,0.3)]">
                 <div class="text-center lg:text-left">
-                  <p class="text-2xl sm:text-3xl font-black text-[#0B3558]">1K+</p>
-                  <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Downloads</p>
+                  <p class="text-2xl sm:text-3xl font-black text-[#0B3558] drop-shadow-sm">1K+</p>
+                  <p class="text-[10px] sm:text-xs font-bold text-slate-700 uppercase tracking-widest mt-1 drop-shadow-sm">Downloads</p>
                 </div>
-                <div class="hidden sm:block w-px h-10 bg-blue-100"></div>
+                <div class="hidden sm:block w-px h-10 bg-slate-300"></div>
                 <div class="text-center lg:text-left">
-                  <p class="text-2xl sm:text-3xl font-black text-[#0B3558]">4.8 <span class="text-[#EA580C] text-xl">★</span></p>
-                  <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">User Rating</p>
+                  <p class="text-2xl sm:text-3xl font-black text-[#0B3558] drop-shadow-sm">4.8 <span class="text-[#EA580C] text-xl">★</span></p>
+                  <p class="text-[10px] sm:text-xs font-bold text-slate-700 uppercase tracking-widest mt-1 drop-shadow-sm">User Rating</p>
                 </div>
-                <div class="hidden sm:block w-px h-10 bg-blue-100"></div>
+                <div class="hidden sm:block w-px h-10 bg-slate-300"></div>
                 <div class="text-center lg:text-left">
-                  <p class="text-2xl sm:text-3xl font-black text-[#0B3558]">200+</p>
-                  <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Active Users</p>
+                  <p class="text-2xl sm:text-3xl font-black text-[#0B3558] drop-shadow-sm">200+</p>
+                  <p class="text-[10px] sm:text-xs font-bold text-slate-700 uppercase tracking-widest mt-1 drop-shadow-sm">Active Users</p>
                 </div>
               </div>
 

@@ -16,7 +16,7 @@ interface ServiceStep {
     class: 'block w-full'
   },
   template: `
-    <section class="py-12 bg-white border-b border-slate-200">
+    <section class="pt-4 pb-12 bg-white border-b border-slate-200">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         
         <div class="rounded-3xl border border-blue-100 p-8 sm:p-12 relative overflow-hidden">
@@ -88,7 +88,7 @@ interface ServiceStep {
               <!-- App Stats -->
               <div class="mt-8 flex flex-wrap justify-center lg:justify-start items-center gap-8 border-t border-blue-100 pt-6">
                 <div class="text-center lg:text-left">
-                  <p class="text-2xl sm:text-3xl font-black text-[#0B3558]">1M+</p>
+                  <p class="text-2xl sm:text-3xl font-black text-[#0B3558]">1K+</p>
                   <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Downloads</p>
                 </div>
                 <div class="hidden sm:block w-px h-10 bg-blue-100"></div>
@@ -98,7 +98,7 @@ interface ServiceStep {
                 </div>
                 <div class="hidden sm:block w-px h-10 bg-blue-100"></div>
                 <div class="text-center lg:text-left">
-                  <p class="text-2xl sm:text-3xl font-black text-[#0B3558]">500K+</p>
+                  <p class="text-2xl sm:text-3xl font-black text-[#0B3558]">200+</p>
                   <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Active Users</p>
                 </div>
               </div>
@@ -124,7 +124,7 @@ interface ServiceStep {
 
           <!-- Helpdesk Support Area -->
           <div class="w-full md:w-auto flex justify-center md:justify-end">
-            <div class="flex items-center gap-5 text-left w-full sm:w-[450px]">
+            <div class="flex items-center gap-5 text-left w-full sm:w-auto">
               <div class="w-14 h-14 rounded-full bg-[#f4f8fc] text-[#0B3558] flex items-center justify-center shrink-0">
                 <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -132,7 +132,22 @@ interface ServiceStep {
               </div>
               <div>
                 <p class="text-[17px] sm:text-[19px] font-black text-[#0B3558] leading-tight mb-1.5">Helpdesk Support</p>
-                <p class="text-[13px] sm:text-[14px] text-slate-500">For any queries or support related to ISMS 2.0</p>
+                <p class="text-[13px] sm:text-[14px] text-slate-500 mb-2">For any queries or support related to ISMS 2.0</p>
+                <div class="flex flex-row flex-nowrap whitespace-nowrap items-center gap-4 mt-1 overflow-x-auto">
+                  <a href="mailto:support@isms.rajasthan.gov.in" class="text-[13px] sm:text-[14px] font-bold text-[#EA580C] hover:text-[#0B3558] transition-colors flex items-center gap-1.5 w-fit">
+                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    support@isms.rajasthan.gov.in
+                  </a>
+                  <div class="w-px h-3 bg-slate-300 hidden sm:block"></div>
+                  <a href="tel:+919876543210" class="text-[13px] sm:text-[14px] font-bold text-[#EA580C] hover:text-[#0B3558] transition-colors flex items-center gap-1.5 w-fit">
+                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    +91 98765 43210
+                  </a>
+                </div>
               </div>
             </div>
           </div>

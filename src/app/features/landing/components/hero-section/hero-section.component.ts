@@ -66,138 +66,44 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                 
                 <!-- Loop 1 -->
                 <div class="flex flex-col">
-                  
-                  <!-- Item 1 -->
-                  <div (click)="downloadSamplePdf()" class="p-3 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group">
-                    <div class="flex justify-between items-center mb-1.5">
-                      <span class="text-[10px] text-slate-500 font-medium">10 Mar, 2026</span>
-                      <div class="flex gap-1.5">
-                        <span class="text-[9px] font-bold text-[#EA580C]">NEW</span>
-                        <span class="text-[9px] font-bold text-emerald-600">Open</span>
+                  @for (item of tenders; track item.id) {
+                    <div (click)="downloadSamplePdf()" class="p-3 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group">
+                      <div class="flex justify-between items-center mb-1.5">
+                        <span class="text-[10px] sm:text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
+                        <div class="flex gap-1.5">
+                          @if (item.isNew) {
+                            <span class="text-[9px] font-bold text-[#EA580C]">NEW</span>
+                          }
+                          <span class="text-[9px] font-bold text-emerald-600">{{ item.status }}</span>
+                        </div>
                       </div>
+                      <h4 class="text-[13px] sm:text-sm font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors">
+                        {{ item.title }}
+                      </h4>
+                      <p class="text-[10px] text-slate-400 font-mono">{{ item.id }}</p>
                     </div>
-                    <h4 class="text-[13px] sm:text-sm font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors">
-                      ई.एम.आई. भवन, हॉस्टल भवन व कौशल भवन परिसर में साफ-सफाई कार्य की संविदा हेतु निविदा-2026-27
-                    </h4>
-                    <p class="text-[10px] text-slate-400 font-mono">RSLDC/ADMIN/CLEAN/2026-27/01</p>
-                  </div>
-
-                  <!-- Item 2 -->
-                  <div (click)="downloadSamplePdf()" class="p-3 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group">
-                    <div class="flex justify-between items-center mb-1.5">
-                      <span class="text-[11px] sm:text-xs text-slate-500 font-medium">20 Jan, 2025</span>
-                      <span class="text-[9px] font-bold text-emerald-600">Open</span>
-                    </div>
-                    <h4 class="text-[13px] sm:text-sm font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors">
-                      Tender regarding Toner refilling and consumable parts
-                    </h4>
-                    <p class="text-[10px] text-slate-400 font-mono">RSLDC/STORE/TONER/2025/11</p>
-                  </div>
-
-                  <!-- Item 3 -->
-                  <div (click)="downloadSamplePdf()" class="p-3 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group">
-                    <div class="flex justify-between items-center mb-1.5">
-                      <span class="text-[11px] sm:text-xs text-slate-500 font-medium">20 Jan, 2025</span>
-                      <span class="text-[9px] font-bold text-emerald-600">Open</span>
-                    </div>
-                    <h4 class="text-[13px] sm:text-sm font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors">
-                      RFP for cleaning and maintenance in RSLDC
-                    </h4>
-                    <p class="text-[10px] text-slate-400 font-mono">RSLDC/EST/CLEAN/2025/08</p>
-                  </div>
-
-                  <!-- Item 4 -->
-                  <div (click)="downloadSamplePdf()" class="p-3 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group">
-                    <div class="flex justify-between items-center mb-1.5">
-                      <span class="text-[11px] sm:text-xs text-slate-500 font-medium">23 Oct, 2024</span>
-                      <span class="text-[9px] font-bold text-emerald-600">Open</span>
-                    </div>
-                    <h4 class="text-[13px] sm:text-sm font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors">
-                      Request for proposal:-Selection of Project Management Consulting Agency for providing...
-                    </h4>
-                    <p class="text-[10px] text-slate-400 font-mono">RSLDC/PMCA/RFP/2024/04</p>
-                  </div>
-
-                  <!-- Item 5 -->
-                  <div (click)="downloadSamplePdf()" class="p-3 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group">
-                    <div class="flex justify-between items-center mb-1.5">
-                      <span class="text-[11px] sm:text-xs text-slate-500 font-medium">22 Jul, 2024</span>
-                      <span class="text-[9px] font-bold text-emerald-600">Open</span>
-                    </div>
-                    <h4 class="text-[13px] sm:text-sm font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors">
-                      Amendment in dates of tender submission
-                    </h4>
-                    <p class="text-[10px] text-slate-400 font-mono">RSLDC/PROC/AMEND/2024/22</p>
-                  </div>
-
+                  }
                 </div>
                 
                 <!-- Loop 2 (Duplicate for Seamless Scroll) -->
                 <div class="flex flex-col" aria-hidden="true">
-                  
-                  <!-- Item 1 -->
-                  <div (click)="downloadSamplePdf()" class="p-3 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group">
-                    <div class="flex justify-between items-center mb-1.5">
-                      <span class="text-[11px] sm:text-xs text-slate-500 font-medium">10 Mar, 2026</span>
-                      <div class="flex gap-1.5">
-                        <span class="text-[9px] font-bold text-[#EA580C]">NEW</span>
-                        <span class="text-[9px] font-bold text-emerald-600">Open</span>
+                  @for (item of tenders; track item.id) {
+                    <div (click)="downloadSamplePdf()" class="p-3 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group">
+                      <div class="flex justify-between items-center mb-1.5">
+                        <span class="text-[10px] sm:text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
+                        <div class="flex gap-1.5">
+                          @if (item.isNew) {
+                            <span class="text-[9px] font-bold text-[#EA580C]">NEW</span>
+                          }
+                          <span class="text-[9px] font-bold text-emerald-600">{{ item.status }}</span>
+                        </div>
                       </div>
+                      <h4 class="text-[13px] sm:text-sm font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors">
+                        {{ item.title }}
+                      </h4>
+                      <p class="text-[10px] text-slate-400 font-mono">{{ item.id }}</p>
                     </div>
-                    <h4 class="text-[13px] sm:text-sm font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors">
-                      ई.एम.आई. भवन, हॉस्टल भवन व कौशल भवन परिसर में साफ-सफाई कार्य की संविदा हेतु निविदा-2026-27
-                    </h4>
-                    <p class="text-[10px] text-slate-400 font-mono">RSLDC/ADMIN/CLEAN/2026-27/01</p>
-                  </div>
-
-                  <!-- Item 2 -->
-                  <div (click)="downloadSamplePdf()" class="p-3 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group">
-                    <div class="flex justify-between items-center mb-1.5">
-                      <span class="text-[11px] sm:text-xs text-slate-500 font-medium">20 Jan, 2025</span>
-                      <span class="text-[9px] font-bold text-emerald-600">Open</span>
-                    </div>
-                    <h4 class="text-[13px] sm:text-sm font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors">
-                      Tender regarding Toner refilling and consumable parts
-                    </h4>
-                    <p class="text-[10px] text-slate-400 font-mono">RSLDC/STORE/TONER/2025/11</p>
-                  </div>
-
-                  <!-- Item 3 -->
-                  <div (click)="downloadSamplePdf()" class="p-3 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group">
-                    <div class="flex justify-between items-center mb-1.5">
-                      <span class="text-[11px] sm:text-xs text-slate-500 font-medium">20 Jan, 2025</span>
-                      <span class="text-[9px] font-bold text-emerald-600">Open</span>
-                    </div>
-                    <h4 class="text-[13px] sm:text-sm font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors">
-                      RFP for cleaning and maintenance in RSLDC
-                    </h4>
-                    <p class="text-[10px] text-slate-400 font-mono">RSLDC/EST/CLEAN/2025/08</p>
-                  </div>
-
-                  <!-- Item 4 -->
-                  <div (click)="downloadSamplePdf()" class="p-3 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group">
-                    <div class="flex justify-between items-center mb-1.5">
-                      <span class="text-[11px] sm:text-xs text-slate-500 font-medium">23 Oct, 2024</span>
-                      <span class="text-[9px] font-bold text-emerald-600">Open</span>
-                    </div>
-                    <h4 class="text-[13px] sm:text-sm font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors">
-                      Request for proposal:-Selection of Project Management Consulting Agency for providing...
-                    </h4>
-                    <p class="text-[10px] text-slate-400 font-mono">RSLDC/PMCA/RFP/2024/04</p>
-                  </div>
-
-                  <!-- Item 5 -->
-                  <div (click)="downloadSamplePdf()" class="p-3 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer group">
-                    <div class="flex justify-between items-center mb-1.5">
-                      <span class="text-[11px] sm:text-xs text-slate-500 font-medium">22 Jul, 2024</span>
-                      <span class="text-[9px] font-bold text-emerald-600">Open</span>
-                    </div>
-                    <h4 class="text-[13px] sm:text-sm font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors">
-                      Amendment in dates of tender submission
-                    </h4>
-                    <p class="text-[10px] text-slate-400 font-mono">RSLDC/PROC/AMEND/2024/22</p>
-                  </div>
-
+                  }
                 </div>
 
               </div>
@@ -225,6 +131,65 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
 export class HeroSectionComponent {
   isTendersModalOpen = signal(false);
   isHoveringTenders = signal(false);
+
+  tenders = [
+    {
+      date: '10 Mar, 2026',
+      id: 'RSLDC/ADMIN/CLEAN/2026-27/01',
+      category: 'Services',
+      isNew: true,
+      status: 'Open',
+      title: 'ई.एम.आई. भवन, हॉस्टल भवन व कौशल भवन परिसर में साफ-सफाई कार्य की संविदा हेतु निविदा-2026-27'
+    },
+    {
+      date: '20 Jan, 2025',
+      id: 'RSLDC/STORE/TONER/2025/11',
+      category: 'Procurement',
+      isNew: false,
+      status: 'Open',
+      title: 'Tender regarding Toner refilling and consumable parts'
+    },
+    {
+      date: '20 Jan, 2025',
+      id: 'RSLDC/EST/CLEAN/2025/08',
+      category: 'Facility Management',
+      isNew: false,
+      status: 'Open',
+      title: 'RFP for cleaning and maintenance in RSLDC'
+    },
+    {
+      date: '23 Oct, 2024',
+      id: 'RSLDC/PMCA/RFP/2024/04',
+      category: 'Consultancy',
+      isNew: false,
+      status: 'Open',
+      title: 'Request for proposal:-Selection of Project Management Consulting Agency for providing Project Management consulting support services to Rajasthan Skill and Livelihoods Development Corporation (RSLDC).'
+    },
+    {
+      date: '22 Jul, 2024',
+      id: 'RSLDC/PROC/AMEND/2024/22',
+      category: 'Corrigendum',
+      isNew: false,
+      status: 'Open',
+      title: 'Amendment in dates of tender submission'
+    },
+    {
+      date: '15 May, 2024',
+      id: 'RSLDC/SKILL/SCA-SCSP/2024/03',
+      category: 'Empanelment',
+      isNew: false,
+      status: 'Open',
+      title: 'Empanelment of Private Training Partners (PTPs) for execution of Special Central Assistance to Scheduled Castes Sub-Plan (SCA to SCSP) training programs'
+    },
+    {
+      date: '12 Feb, 2024',
+      id: 'RSLDC/IT/SMART-CLASS/2024/15',
+      category: 'Equipment',
+      isNew: false,
+      status: 'Open',
+      title: 'Tender for Supply and Installation of Smart Classroom Equipment in Government ITIs and Skill Centers across Rajasthan'
+    }
+  ];
 
   downloadSamplePdf() {
     // Generate a dummy PDF text and create a downloadable blob

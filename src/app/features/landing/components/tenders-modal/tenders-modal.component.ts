@@ -41,7 +41,7 @@ interface Tender {
         <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50">
           
           @for (item of tenders; track item.id) {
-            <div class="bg-white border border-slate-200 rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:shadow-md transition-shadow">
+            <div (click)="downloadPdf()" class="bg-white border border-slate-200 rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:shadow-md transition-shadow cursor-pointer">
               
               <div class="flex-1">
                 <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -69,7 +69,7 @@ interface Tender {
 
               <!-- Download Action -->
               <div class="shrink-0">
-                <button (click)="downloadPdf()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0B3558] hover:bg-[#07233B] text-white px-5 py-2.5 rounded-md text-xs font-bold transition-colors">
+                <button (click)="downloadPdf(); $event.stopPropagation()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0B3558] hover:bg-[#07233B] text-white px-5 py-2.5 rounded-md text-xs font-bold transition-colors">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>

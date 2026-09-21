@@ -257,10 +257,43 @@ export const routes: Routes = [
       },
 
       // ================= TP MODULE =================
-      // ================= TP MODULE =================
       {
         path: 'tp/sanction-orders',
         loadComponent: () => import('./features/tp-pia/sanction-orders/tp-sanction-order-list.component').then(m => m.TpSanctionOrderListComponent),
+        data: { roles: ['TP_PIA'] }
+      },
+      
+      // ================= TRAINEE MODULE =================
+      {
+        path: 'trainees',
+        loadComponent: () => import('./features/trainees/pages/trainee-list/trainee-list.component').then(m => m.TraineeListComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'TP_PIA'] }
+      },
+      {
+        path: 'trainees/register',
+        loadComponent: () => import('./features/trainees/pages/trainee-form/trainee-form.component').then(m => m.TraineeFormComponent),
+        data: { roles: ['TP_PIA'] }
+      },
+      {
+        path: 'trainees/assign',
+        loadComponent: () => import('./features/trainees/pages/assign-batch/assign-batch.component').then(m => m.AssignBatchComponent),
+        data: { roles: ['TP_PIA'] }
+      },
+      {
+        path: 'trainees/unmap',
+        loadComponent: () => import('./features/trainees/pages/unmap-batch/unmap-batch.component').then(m => m.UnmapBatchComponent),
+        data: { roles: ['TP_PIA'] }
+      },
+
+      // ================= ATTENDANCE MODULE =================
+      {
+        path: 'attendance/users',
+        loadComponent: () => import('./features/attendance/pages/attendance-user-list/attendance-user-list.component').then(m => m.AttendanceUserListComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'TP_PIA'] }
+      },
+      {
+        path: 'attendance/capture',
+        loadComponent: () => import('./features/attendance/pages/attendance-capture/attendance-capture.component').then(m => m.AttendanceCaptureComponent),
         data: { roles: ['TP_PIA'] }
       },
 

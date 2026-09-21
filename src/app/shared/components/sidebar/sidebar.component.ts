@@ -355,6 +355,32 @@ import { Observable, filter } from 'rxjs';
                </div>
                <span class="tracking-tight">Sanction Orders</span>
              </a>
+             
+             <!-- Trainee Management -->
+             <a 
+               routerLink="/trainees" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Trainee Monitoring</span>
+             </a>
+
+             <!-- Attendance Logs -->
+             <a 
+               routerLink="/attendance/users" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M2 12h4l2-9 5 18 2-9h5"></path>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Attendance Users</span>
+             </a>
           </div>
         </ng-container>
 
@@ -362,7 +388,7 @@ import { Observable, filter } from 'rxjs';
         <ng-container *ngIf="authService.currentUser()?.role === 'TP_PIA'">
           <div class="pt-2 mt-2 border-t border-slate-200">
              <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-               Execution (ISMS 2.0)
+               TP Management
              </div>
 
              <!-- Sanction Orders (TP) -->
@@ -409,6 +435,82 @@ import { Observable, filter } from 'rxjs';
                  </svg>
                </div>
                <span class="tracking-tight">Batch Management</span>
+             </a>
+             <!-- Aspirant Management Group -->
+             <div class="px-3 py-1 mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+               Aspirant Management
+             </div>
+
+             <a 
+               routerLink="/trainees/register" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+               </div>
+               <span class="tracking-tight">Aspirant Registration</span>
+             </a>
+
+             <a 
+               routerLink="/trainees" 
+               [routerLinkActiveOptions]="{exact: true}"
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+               </div>
+               <span class="tracking-tight">Aspirant List</span>
+             </a>
+
+             <a 
+               routerLink="/trainees/assign" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+               </div>
+               <span class="tracking-tight">Assign Aspirant to Batch</span>
+             </a>
+
+             <a 
+               routerLink="/trainees/unmap" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="18" y1="8" x2="22" y2="12"></line><line x1="22" y1="8" x2="18" y2="12"></line></svg>
+               </div>
+               <span class="tracking-tight">Unmap Aspirants</span>
+             </a>
+
+             <!-- Attendance Setup Group -->
+             <div class="px-3 py-1 mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+               Attendance
+             </div>
+
+             <!-- Attendance Setup -->
+             <a 
+               routerLink="/attendance/users" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                 </svg>
+               </div>
+               <span class="tracking-tight">Attendance Setup</span>
+             </a>
+
+             <!-- Aspirant Attendance Capture -->
+             <a 
+               routerLink="/attendance/capture" 
+               routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
+               class="flex items-center gap-3 px-3 py-2.5 bg-blue-50/50 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
+               <div class="w-6 h-6 rounded flex items-center justify-center text-rsldc-blueAccent group-hover:text-[#002244]">
+                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline>
+                 </svg>
+               </div>
+               <span class="tracking-tight text-rsldc-blueAccent">Mark Attendance</span>
              </a>
           </div>
         </ng-container>

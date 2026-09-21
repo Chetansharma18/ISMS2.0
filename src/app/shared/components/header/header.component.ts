@@ -13,7 +13,7 @@ export type FontSize = 'sm' | 'md' | 'lg';
   imports: [CommonModule, RouterLink, RouterModule, NgIf, AsyncPipe],
   template: `
     <!-- Top Government Authenticated Portal Header (Dual Logos, Bilingual, User Name & Profile) -->
-    <header class="w-full bg-[#f0f6fc] border-b border-slate-200/90 shadow-2xs font-['Poppins',sans-serif] sticky top-0 z-40 select-none">
+    <header class="w-full bg-[#f0f6fc] border-b border-slate-200/90 shadow-2xs font-['Poppins',sans-serif] sticky top-0 z-50 select-none">
       <div class="w-full px-3 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3 flex items-center justify-between gap-2 sm:gap-4">
         
         <!-- Left Branding: Two Emblems (Ashoka + RSLDC) + Government Titles + ISMS 2.0 -->
@@ -72,7 +72,7 @@ export type FontSize = 'sm' | 'md' | 'lg';
           <span class="text-slate-300 hidden sm:inline">|</span>
 
           <!-- User's Personal Name & Profile Dropdown Trigger -->
-          <div *ngIf="userProfile$ | async as profile" class="relative">
+          <div *ngIf="userProfile$ | async as profile; else unauthBlock" class="relative">
             
             <!-- Profile Button Trigger -->
             <button 
@@ -142,6 +142,14 @@ export type FontSize = 'sm' | 'md' | 'lg';
 
             </div>
           </div>
+          <ng-template #unauthBlock>
+            <button
+              routerLink="/auth/login"
+              class="flex items-center gap-2 bg-[#0B3558] hover:bg-[#07233B] text-white text-xs sm:text-[13px] font-bold px-4 py-1.5 sm:py-2 rounded-lg transition shadow-xs cursor-pointer">
+              <span>SSO Login</span>
+              <span class="hidden sm:inline">&rarr;</span>
+            </button>
+          </ng-template>
 
           <!-- Mobile Menu Toggle Button (Visible only on screens < md) -->
           <button 

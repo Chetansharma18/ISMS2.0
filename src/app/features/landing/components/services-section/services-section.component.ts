@@ -136,7 +136,7 @@ interface ServiceStep {
                     <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    support@isms.rajasthan.gov.in
+                    support&#64;isms.rajasthan.gov.in
                   </a>
                   <div class="w-px h-3 bg-slate-300 hidden sm:block"></div>
                   <a href="tel:+919876543210" class="text-[13px] sm:text-[14px] font-bold text-[#EA580C] hover:text-[#0B3558] transition-colors flex items-center gap-1.5 w-fit">

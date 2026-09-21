@@ -2,13 +2,13 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TraineeService, Trainee } from '../../../../core/services/trainee.service';
-import { UiSelectComponent } from '../../../../shared/components/ui/ui-select/ui-select.component';
+import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
 import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-assign-batch',
   standalone: true,
-  imports: [CommonModule, FormsModule, UiSelectComponent],
+  imports: [CommonModule, FormsModule, FormSelectComponent],
   template: `
     <div class="space-y-6 animate-in fade-in zoom-in-95 duration-300">
       <!-- Page Header -->
@@ -20,11 +20,11 @@ import { map } from 'rxjs/operators';
       <!-- Batch Selection & Actions -->
       <div class="bg-white p-6 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col md:flex-row gap-4 items-end justify-between">
         <div class="w-full md:w-1/3">
-          <app-ui-select 
+          <app-form-select 
             [(ngModel)]="selectedBatch"
             label="Select Target Batch"
-            [options]="[{label:'B-26-0001 (Web Development)',value:'B-26-0001'},{label:'B-26-0002 (Data Entry)',value:'B-26-0002'}]">
-          </app-ui-select>
+            [options]="['B-26-0001', 'B-26-0002']">
+          </app-form-select>
         </div>
         
         <button 

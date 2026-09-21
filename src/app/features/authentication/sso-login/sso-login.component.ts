@@ -1,412 +1,414 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { NgIf, NgFor, NgClass } from '@angular/common';
-import { EoiStateService } from '../../../core/services/eoi-state.service';
+import { Component, signal, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
+import { EoiStateService } from '../../../core/services/eoi-state.service';
 
+export type UserRole = 'new_user' | 'existing_user' | 'dept_admin' | 'super_admin';
+
+export interface RoleConfig {
+  role: UserRole;
+  label: string;
+  badge: string;
+  description: string;
+}
+
+export const USER_ROLES: RoleConfig[] = [
+  {
+    role: 'new_user',
+    label: 'New Applicant',
+    badge: 'First Time User',
+    description: 'First time applicant with incomplete OTR profile'
+  },
+  {
+    role: 'existing_user',
+    label: 'Existing Partner',
+    badge: 'Registered TP/PIA',
+    description: 'Registered agency with verified entity profile'
+  },
+  {
+    role: 'dept_admin',
+    label: 'Department Admin',
+    badge: 'Officer Portal',
+    description: 'Departmental scheme officer and scrutiny incharge'
+  },
+  {
+    role: 'super_admin',
+    label: 'Super Admin',
+    badge: 'System Admin',
+    description: 'State system master manager and portal controller'
+  }
+];
 @Component({
   selector: 'app-sso-login',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf, NgFor, RouterLink],
+  imports: [CommonModule, FormsModule, RouterModule],
+  host: {
+    class: 'block w-full flex-1 min-h-[calc(100vh-60px)] md:min-h-[calc(100vh-68px)] bg-white'
+  },
   template: `
-    <div class="min-h-screen flex flex-col bg-white font-sans text-slate-800 antialiased selection:bg-[#131A4D] selection:text-white">
+    <div class="w-full min-h-[calc(100vh-68px)] flex flex-col justify-between bg-white text-slate-800 font-sans selection:bg-[#131862] selection:text-white relative">
       
-      <!-- Top Rajasthan Single Sign On Header Bar -->
-      <header class="bg-gradient-to-r from-[#131A4D] via-[#18205C] to-[#1D246B] text-white px-4 sm:px-8 py-3 border-b-[3px] border-[#E67E22] shadow-md">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
-          
-          <!-- State Logo & Branding -->
-          <div class="flex items-center gap-3.5 cursor-pointer" routerLink="/">
-            <div class="flex items-center justify-center flex-shrink-0">
-              <img src="ashok.png" alt="Emblem of India" class="h-11 w-auto max-w-[44px] object-contain brightness-0 invert drop-shadow-xs" />
-            </div>
-
-            <div class="w-px h-9 bg-white/20 hidden sm:block"></div>
-
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="text-[11px] font-semibold text-[#F8B471]">राजस्थान सरकार</span>
-                <span class="text-[11px] text-white/80">Government of Rajasthan</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white leading-none">
-                  Rajasthan Single Sign On
-                </h1>
-                <span class="text-[10px] bg-white/10 text-slate-200 border border-white/20 px-1.5 py-0.5 rounded font-mono">
-                  v46.5
-                </span>
-              </div>
-              <div class="text-xs text-slate-300 font-light mt-0.5">
-                One Digital Identity for all Applications · Integrated Scheme Management System (ISMS 2.0)
-              </div>
-            </div>
-          </div>
-
-          <!-- Right: Language Switcher & Public Portal Link -->
-          <div class="flex items-center gap-4 text-xs">
-            <a routerLink="/" class="text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-1 rounded border border-white/20 transition-colors">
-              ← Public Portal
-            </a>
-            <span class="text-white/30">|</span>
-            <div class="flex items-center gap-1.5 font-medium">
-              <span class="text-[#F8B471] font-bold cursor-pointer">English</span>
-              <span class="text-white/40">|</span>
-              <span class="text-slate-300 hover:text-white cursor-pointer">हिन्दी</span>
-            </div>
-          </div>
-
+      <!-- Top Notice Banner -->
+      <div class="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center shrink-0">
+        <div class="max-w-7xl mx-auto flex items-center justify-center gap-2 text-[13.5px] font-semibold text-amber-900">
+          <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-200 text-amber-900 shrink-0 text-[10px] font-bold">
+            !
+          </span>
+          <span>
+            <strong>PROTOTYPE NOTICE:</strong> This is a dummy login screen for testing and demonstration purposes. It will be replaced by the official Rajasthan SSO (sso.rajasthan.gov.in) portal integration.
+          </span>
         </div>
-      </header>
+      </div>
 
-      <!-- Main Two-Column Layout -->
-      <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-8 py-8 sm:py-12">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+      <!-- Main Two-Column Layout (Centered Perfectly in the Middle of Screen) -->
+      <main class="flex-1 w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+        <div class="max-w-[960px] w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           
-          <!-- Left Column: SSO Statistics & Services -->
-          <div class="lg:col-span-7 space-y-8 pt-2">
+          <!-- Left Column: Official Statistics (G2G, G2C/G2B, IDENTITIES) -->
+          <div class="space-y-6">
             
-            <!-- Block 1: G2G APPS -->
-            <div class="space-y-3 pb-6 border-b-2 border-[#131A4D]">
-              <h2 class="text-3xl sm:text-4xl font-extrabold text-[#131A4D] tracking-tight">
+            <!-- G2G APPS -->
+            <div>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-[#131862] tracking-tight mb-2">
                 G2G APPS
               </h2>
-              <div class="inline-block bg-[#eef2f6] text-slate-800 text-lg font-bold px-4 py-1 rounded shadow-xs font-mono">
+              <div class="inline-block px-3.5 py-1 rounded bg-slate-100 border border-slate-200 text-sm font-bold text-slate-700 shadow-2xs">
                 421
               </div>
+              <div class="w-full h-px bg-slate-300 mt-5"></div>
             </div>
 
-            <!-- Block 2: G2C / G2B APPS -->
-            <div class="space-y-3 pb-6 border-b-2 border-[#131A4D]">
-              <h2 class="text-3xl sm:text-4xl font-extrabold text-[#131A4D] tracking-tight">
+            <!-- G2C/ G2B APPS -->
+            <div>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-[#131862] tracking-tight mb-2">
                 G2C/ G2B APPS
               </h2>
-              <div class="inline-block bg-[#eef2f6] text-slate-800 text-lg font-bold px-4 py-1 rounded shadow-xs font-mono">
+              <div class="inline-block px-3.5 py-1 rounded bg-slate-100 border border-slate-200 text-sm font-bold text-slate-700 shadow-2xs">
                 263
               </div>
+              <div class="w-full h-px bg-slate-300 mt-5"></div>
             </div>
 
-            <!-- Block 3: IDENTITIES -->
-            <div class="space-y-3">
-              <h2 class="text-3xl sm:text-4xl font-extrabold text-[#131A4D] tracking-tight">
+            <!-- IDENTITIES -->
+            <div>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-[#131862] tracking-tight mb-2">
                 IDENTITIES
               </h2>
-              <div class="inline-block bg-[#eef2f6] text-slate-800 text-lg font-bold px-4 py-1 rounded shadow-xs font-mono">
-                34,204,388
+              <div class="inline-block px-3.5 py-1 rounded bg-slate-100 border border-slate-200 text-sm font-bold text-slate-700 shadow-2xs">
+                34, 204, 388
               </div>
             </div>
 
           </div>
 
-          <!-- Right Column: Login Card & Form -->
-          <div class="lg:col-span-5 bg-white border border-slate-200 shadow-sm">
-            
-            <!-- Top Header: SSO Login Only -->
-            <div class="border-b border-slate-200 py-3.5 px-6 bg-slate-50/70 flex items-center justify-between">
-              <h2 class="text-sm font-bold text-[#131A4D] uppercase tracking-wide">
-                Rajasthan SSO Login · Sign In
-              </h2>
-              <span class="text-[11px] font-mono text-slate-500 bg-white border border-slate-200 px-2 py-0.5 rounded">
-                v46.5
-              </span>
-            </div>
-
-            <div class="p-6 sm:p-8 space-y-6">
+          <!-- Right Column: Rajasthan SSO Login Card -->
+          <div class="w-full">
+            <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden w-full max-w-[450px] mx-auto lg:mx-0">
               
-              <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-5">
+              <!-- Card Header -->
+              <div class="px-5 py-3.5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  RAJASTHAN SSO LOGIN - SIGN IN
+                </h3>
+              </div>
+
+              <!-- Card Body -->
+              <form (ngSubmit)="handleLogin()" class="p-6 space-y-4">
                 
-                <!-- Field 1: Digital Identity (SSOID/ Username/ Email/ Mobile) -->
-                <div class="space-y-1">
-                  <input 
-                    type="text" 
-                    formControlName="ssoId"
-                    placeholder="Digital Identity (SSOID / Username / Mobile)"
-                    class="w-full py-2.5 px-1 text-sm bg-transparent border-b border-slate-300 focus:border-[#131A4D] focus:outline-none placeholder-slate-400 text-slate-800 transition-colors font-['Poppins',sans-serif] font-medium"
-                  />
-                  <div *ngIf="loginForm.get('ssoId')?.touched && loginForm.get('ssoId')?.invalid" class="text-[11px] text-red-600 pt-0.5">
-                    Please enter your SSOID / Username
+                <!-- Role Selector Toolbar -->
+                <div>
+                  <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Select Test Persona Role:
+                  </span>
+                  <div class="grid grid-cols-2 gap-1.5">
+                    @for (r of availableRoles; track r.role) {
+                      <button
+                        type="button"
+                        (click)="selectRole(r.role)"
+                        class="px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-all text-left flex items-center justify-between cursor-pointer"
+                        [class.bg-[#0B3558]]="selectedRole() === r.role"
+                        [class.text-white]="selectedRole() === r.role"
+                        [class.border-[#0B3558]]="selectedRole() === r.role"
+                        [class.bg-slate-50]="selectedRole() !== r.role"
+                        [class.text-slate-700]="selectedRole() !== r.role"
+                        [class.border-slate-200]="selectedRole() !== r.role"
+                        [class.hover:bg-slate-100]="selectedRole() !== r.role"
+                      >
+                        <span class="truncate">{{ r.label }}</span>
+                        @if (selectedRole() === r.role) {
+                          <span class="text-[10px] font-bold">&check;</span>
+                        }
+                      </button>
+                    }
                   </div>
                 </div>
 
-                <!-- Field 2: Password -->
-                <div class="space-y-1">
-                  <input 
-                    type="password" 
-                    formControlName="password"
+                <!-- Email ID / SSOID Field (Underline style) -->
+                <div>
+                  <label for="emailOrSsoIdInput" class="block text-xs font-semibold text-slate-600 mb-1">
+                    SSOID / Email ID
+                  </label>
+                  <input
+                    id="emailOrSsoIdInput"
+                    name="emailOrSsoId"
+                    type="text"
+                    [(ngModel)]="emailOrSsoId"
+                    placeholder="SSOID or Email ID"
+                    class="w-full border-b border-slate-300 py-1.5 text-sm text-slate-800 focus:outline-none focus:border-[#131862] transition-colors bg-transparent font-medium"
+                    required
+                  />
+                </div>
+
+                <!-- Password Field (Underline style) -->
+                <div>
+                  <label for="passwordInput" class="block text-xs font-semibold text-slate-600 mb-1">
+                    Password
+                  </label>
+                  <input
+                    id="passwordInput"
+                    name="password"
+                    type="password"
+                    [(ngModel)]="password"
                     placeholder="Password"
-                    class="w-full py-2.5 px-1 text-sm bg-transparent border-b border-slate-300 focus:border-[#131A4D] focus:outline-none placeholder-slate-400 text-slate-800 transition-colors"
+                    class="w-full border-b border-slate-300 py-1.5 text-sm text-slate-800 tracking-widest focus:outline-none focus:border-[#131862] transition-colors bg-transparent"
+                    required
                   />
-                  <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="text-[11px] text-red-600 pt-0.5">
-                    Please enter your password
-                  </div>
                 </div>
 
-                <!-- Field 3: Captcha Box -->
-                <div class="flex items-center gap-3 pt-2">
-                  <div class="relative bg-slate-100 border border-slate-300 px-3 py-1.5 flex items-center justify-center select-none overflow-hidden rounded-xs w-36 h-10">
-                    <div class="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:6px_6px]"></div>
-                    
-                    <div class="flex items-center gap-1.5 font-bold font-mono tracking-wider text-lg text-slate-800">
-                      <span *ngFor="let digit of captchaDigits; let i = index" 
-                            [style.transform]="'rotate(' + getDigitRotation(i) + 'deg) scale(' + getDigitScale(i) + ')'"
-                            [style.color]="getDigitColor(i)"
-                            class="inline-block transition-transform duration-200">
-                        {{ digit }}
-                      </span>
+                <!-- Captcha Row -->
+                <div class="pt-1">
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">
+                    Security Verification
+                  </label>
+                  <div class="flex items-center gap-2.5">
+                    <!-- Dotted pattern captcha display -->
+                    <div
+                      class="px-3 py-1.5 border border-slate-300 bg-slate-100 rounded select-none font-mono text-sm sm:text-base font-extrabold text-slate-800 tracking-[0.25em] flex items-center justify-center min-w-[110px]"
+                      style="background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 6px 6px;"
+                      aria-label="Captcha code"
+                    >
+                      {{ captchaCode() }}
                     </div>
-                  </div>
 
-                  <div class="flex-grow">
-                    <input 
-                      type="text" 
-                      formControlName="captchaInput"
-                      placeholder="Enter Captcha"
-                      class="w-full py-1.5 px-2.5 text-xs border border-slate-300 focus:border-[#131A4D] focus:outline-none bg-white text-slate-800 font-mono"
+                    <!-- Captcha Input Box -->
+                    <input
+                      name="enteredCaptcha"
+                      type="text"
+                      [(ngModel)]="enteredCaptcha"
+                      placeholder="Captcha"
+                      class="w-28 px-2.5 py-1.5 border border-slate-300 rounded text-xs text-slate-800 focus:outline-none focus:border-[#131862]"
+                      required
                     />
-                  </div>
 
-                  <div class="flex items-center gap-1.5 text-slate-600">
-                    <button 
-                      type="button" 
-                      (click)="speakCaptcha()"
-                      title="Audio Captcha"
-                      class="p-1 hover:text-[#131A4D] transition-colors text-sm">
-                      🔊
-                    </button>
-                    <button 
-                      type="button" 
+                    <!-- Refresh captcha icon -->
+                    <button
+                      type="button"
                       (click)="refreshCaptcha()"
+                      class="p-1.5 text-[#131862] hover:bg-slate-100 rounded transition-colors cursor-pointer"
                       title="Refresh Captcha"
-                      class="p-1 hover:text-[#131A4D] transition-colors text-base font-bold">
-                      🔄
+                      aria-label="Refresh Captcha"
+                    >
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
                     </button>
                   </div>
                 </div>
 
-                <div *ngIf="captchaError" class="text-[11px] text-red-600 font-medium">
-                  {{ captchaError }}
-                </div>
-
-                <!-- Submit Button -->
-                <div class="pt-2">
-                  <button 
-                    type="submit" 
-                    [disabled]="isLoading"
-                    class="w-full py-2.5 bg-[#131A4D] hover:bg-[#1D246B] text-white font-bold text-sm tracking-wide transition-colors shadow-xs flex items-center justify-center gap-2">
-                    <span *ngIf="isLoading">Authenticating Rajasthan SSO Session...</span>
-                    <span *ngIf="!isLoading">Verify & Continue →</span>
+                <!-- Submit Button: Verify & Continue -->
+                <div class="pt-3">
+                  <button
+                    type="submit"
+                    [disabled]="isLoading()"
+                    class="w-full bg-[#0B3558] hover:bg-[#07233B] text-white font-bold text-sm py-2.5 px-4 rounded-md transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 shadow-xs"
+                  >
+                    @if (isLoading()) {
+                      <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Verifying with RajSSO...</span>
+                    } @else {
+                      <span>Verify &amp; Continue &rarr;</span>
+                    }
                   </button>
                 </div>
 
               </form>
 
-              <!-- OR Separator -->
-              <div class="relative flex items-center justify-center my-4">
-                <div class="border-t border-slate-300 w-full"></div>
-                <span class="bg-white px-3 text-xs text-slate-500 font-semibold uppercase absolute">
-                  OR
-                </span>
-              </div>
-
-              <!-- Login with Meri Pehchaan -->
-              <div class="text-center">
-                <button 
-                  type="button"
-                  (click)="loginWithMeriPehchaan()"
-                  class="inline-flex items-center border border-[#004b87] bg-[#004b87] text-white text-xs font-semibold px-4 py-1.5 rounded hover:bg-[#003660] transition-colors shadow-xs">
-                  <span class="font-bold text-[11px] mr-1.5 uppercase">Login With</span>
-                  <span class="bg-[#d9222a] text-white px-1 py-0.5 text-[10px] font-bold rounded-xs mr-1">Meri</span>
-                  <span class="font-bold text-white mr-1.5">Pehchaan</span>
-                  <span class="text-[9px] opacity-80 border-l border-white/40 pl-1.5">e-Pramaan</span>
-                </button>
-              </div>
-
-              <!-- Quick Test Personas Picker -->
-              <div class="pt-4 border-t border-dashed border-slate-200">
-                <div class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2 flex items-center justify-between">
-                  <span>Quick Test User Personas:</span>
-                  <span class="text-[10px] font-normal text-slate-400">Click to autofill & login</span>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-1.5 text-[11px]">
-                  <button 
-                    type="button"
-                    (click)="fillAndSubmitPersona('citizen')"
-                    class="p-2 bg-slate-50 hover:bg-amber-50 hover:border-amber-300 border border-slate-200 text-slate-700 text-left transition-colors">
-                    <div class="font-bold text-slate-900">1. new_citizen_rj</div>
-                    <div class="text-[9px] text-amber-700 mt-0.5">New User (OTR Skippable)</div>
-                  </button>
-
-                  <button 
-                    type="button"
-                    (click)="fillAndSubmitPersona('applicant')"
-                    class="p-2 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 border border-slate-200 text-slate-700 text-left transition-colors">
-                    <div class="font-bold text-slate-900">2. applicant_rj</div>
-                    <div class="text-[9px] text-blue-700 mt-0.5">Approved TP (SDC Flow)</div>
-                  </button>
-
-                  <button 
-                    type="button"
-                    (click)="fillAndSubmitPersona('dept')"
-                    class="p-2 bg-slate-50 hover:bg-cyan-50 hover:border-cyan-300 border border-slate-200 text-slate-700 text-left transition-colors">
-                    <div class="font-bold text-cyan-900">3. dept_admin_rj</div>
-                    <div class="text-[9px] text-cyan-700 mt-0.5">Dept. Scrutiny Admin</div>
-                  </button>
-
-
-                  <button 
-                    type="button"
-                    (click)="fillAndSubmitPersona('super')"
-                    class="p-2 bg-slate-50 hover:bg-purple-50 hover:border-purple-300 border border-slate-200 text-slate-700 text-left transition-colors">
-                    <div class="font-bold text-purple-900">4. super_admin_rj</div>
-                    <div class="text-[9px] text-purple-700 mt-0.5">Master Control</div>
-                  </button>
-                </div>
-              </div>
-
             </div>
-
           </div>
 
         </div>
       </main>
 
+      <!-- Bottom Spacer to keep layout balanced -->
+      <div class="h-6"></div>
+
+      <!-- Post-SSO Login Choice Popup Modal (For new_user) -->
+      @if (showPostLoginModal()) {
+        <div
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            class="relative max-w-lg w-full bg-white rounded-2xl shadow-2xl border border-slate-100 p-6 sm:p-8 text-left animate-in fade-in zoom-in-95 duration-200 overflow-hidden"
+          >
+            <!-- Top Gradient Accent -->
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-linear-to-r from-[#0B3558] via-[#EA580C] to-[#0B3558]"></div>
+
+            <!-- Success Badge -->
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold tracking-wide uppercase mb-3 border border-emerald-200/60 select-none">
+              <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+              </svg>
+              SSO Login Verified
+            </div>
+
+            <!-- Heading & Message -->
+            <h2 class="text-xl sm:text-2xl font-black text-[#0B3558] tracking-tight">
+              Welcome to ISMS 2.0 Portal
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1.5 leading-relaxed">
+              You are authenticated successfully as <strong>{{ emailOrSsoId }}</strong>. Please choose how you would like to proceed:
+            </p>
+
+            <!-- 2 Options Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+              
+              <!-- Option 1: Complete Registration -->
+              <button
+                type="button"
+                (click)="selectOption('registration')"
+                class="group text-left p-4 sm:p-5 rounded-xl border-2 border-slate-200 hover:border-[#0B3558] bg-slate-50/70 hover:bg-blue-50/40 transition-all cursor-pointer flex flex-col justify-between"
+              >
+                <div>
+                  <div class="w-10 h-10 rounded-lg bg-blue-100 text-[#0B3558] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h3 class="text-sm font-bold text-slate-900 group-hover:text-[#0B3558] transition-colors">
+                    Complete Registration (OTR)
+                  </h3>
+                  <p class="text-[11.5px] text-slate-500 mt-1.5 leading-relaxed">
+                    Fill or update your Training Partner / PIA profile details and submit your application.
+                  </p>
+                </div>
+                <div class="mt-4 pt-2.5 border-t border-slate-200/80 flex items-center justify-between text-xs font-bold text-[#0B3558] group-hover:text-[#EA580C] transition-colors">
+                  <span>Open Form</span>
+                  <span>&rarr;</span>
+                </div>
+              </button>
+
+              <!-- Option 2: View Tenders -->
+              <button
+                type="button"
+                (click)="selectOption('tenders')"
+                class="group text-left p-4 sm:p-5 rounded-xl border-2 border-slate-200 hover:border-[#EA580C] bg-slate-50/70 hover:bg-orange-50/40 transition-all cursor-pointer flex flex-col justify-between"
+              >
+                <div>
+                  <div class="w-10 h-10 rounded-lg bg-orange-100 text-[#EA580C] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                  </div>
+                  <h3 class="text-sm font-bold text-slate-900 group-hover:text-[#EA580C] transition-colors">
+                    View Tenders & Schemes
+                  </h3>
+                  <p class="text-[11.5px] text-slate-500 mt-1.5 leading-relaxed">
+                    Explore published tenders, Expressions of Interest (EOI), and active scheme notices.
+                  </p>
+                </div>
+                <div class="mt-4 pt-2.5 border-t border-slate-200/80 flex items-center justify-between text-xs font-bold text-[#EA580C] group-hover:text-[#0B3558] transition-colors">
+                  <span>View Tenders</span>
+                  <span>&rarr;</span>
+                </div>
+              </button>
+
+            </div>
+
+          </div>
+        </div>
+      }
+
     </div>
   `
 })
-export class SsoLoginComponent implements OnInit {
-  loginForm!: FormGroup;
-  captchaDigits: string[] = [];
-  captchaCode: string = '';
-  captchaError: string = '';
-  isLoading = false;
+export class SsoLoginComponent {
+  private authService = inject(AuthService);
+  private eoiService = inject(EoiStateService);
+  private router = inject(Router);
 
-  constructor(
-    private fb: FormBuilder,
-    private eoiService: EoiStateService,
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  readonly availableRoles = USER_ROLES;
+  selectedRole = signal<UserRole>('new_user');
 
-  ngOnInit(): void {
-    this.refreshCaptcha();
-    this.loginForm = this.fb.group({
-      ssoId: ['applicant_rj', Validators.required],
-      password: ['Rajasthan@2026', Validators.required],
-      captchaInput: [this.captchaCode, Validators.required]
-    });
+  emailOrSsoId = 'new_user';
+  password = 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢';
+  enteredCaptcha = '313198';
+  captchaCode = signal<string>('3 1 3 1 9 8');
+  isLoading = signal<boolean>(false);
+  showPostLoginModal = signal<boolean>(false);
+
+  selectRole(role: UserRole): void {
+    this.selectedRole.set(role);
+    this.emailOrSsoId = role;
   }
 
   refreshCaptcha(): void {
-    const digits: string[] = [];
-    for (let i = 0; i < 6; i++) {
-      digits.push(Math.floor(Math.random() * 10).toString());
-    }
-    this.captchaDigits = digits;
-    this.captchaCode = digits.join('');
-    this.captchaError = '';
-    
-    if (this.loginForm) {
-      this.loginForm.patchValue({ captchaInput: this.captchaCode });
-    }
+    const d1 = Math.floor(1 + Math.random() * 9);
+    const d2 = Math.floor(1 + Math.random() * 9);
+    const d3 = Math.floor(1 + Math.random() * 9);
+    const d4 = Math.floor(1 + Math.random() * 9);
+    const d5 = Math.floor(1 + Math.random() * 9);
+    const d6 = Math.floor(1 + Math.random() * 9);
+    const formatted = `${d1} ${d2} ${d3} ${d4} ${d5} ${d6}`;
+    this.captchaCode.set(formatted);
+    this.enteredCaptcha = `${d1}${d2}${d3}${d4}${d5}${d6}`;
   }
 
-  getDigitRotation(index: number): number {
-    const rotations = [-8, 6, -4, 8, -6, 4];
-    return rotations[index % rotations.length];
-  }
-
-  getDigitScale(index: number): number {
-    const scales = [1.1, 0.95, 1.15, 1.0, 1.2, 0.9];
-    return scales[index % scales.length];
-  }
-
-  getDigitColor(index: number): string {
-    const colors = ['#131A4D', '#1D246B', '#0f172a', '#334155', '#1e293b', '#18205C'];
-    return colors[index % colors.length];
-  }
-
-  speakCaptcha(): void {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(this.captchaDigits.join(' '));
-      utterance.rate = 0.8;
-      window.speechSynthesis.speak(utterance);
-    } else {
-      alert(`Captcha is: ${this.captchaCode}`);
-    }
-  }
-
-  fillAndSubmitPersona(type: 'citizen' | 'applicant' | 'dept' | 'super'): void {
-    if (type === 'citizen') {
-      this.loginForm.patchValue({ ssoId: 'new_citizen_rj', password: 'Password@123', captchaInput: this.captchaCode });
-    } else if (type === 'applicant') {
-      this.loginForm.patchValue({ ssoId: 'applicant_rj', password: 'Password@123', captchaInput: this.captchaCode });
-    } else if (type === 'dept') {
-      this.loginForm.patchValue({ ssoId: 'dept_admin_rj', password: 'Password@123', captchaInput: this.captchaCode });
-    } else {
-      this.loginForm.patchValue({ ssoId: 'super_admin_rj', password: 'Password@123', captchaInput: this.captchaCode });
-    }
-    this.onLogin();
-  }
-
-  loginWithMeriPehchaan(): void {
-    this.fillAndSubmitPersona('applicant');
-  }
-
-  onLogin(): void {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-      return;
-    }
-
-    const val = this.loginForm.value;
-    const inputCaptcha = (val.captchaInput || '').trim();
-
-    if (inputCaptcha !== this.captchaCode) {
-      this.captchaError = 'Invalid Captcha code entered. Please try again.';
-      this.refreshCaptcha();
-      return;
-    }
-
-    this.isLoading = true;
-    this.captchaError = '';
+  handleLogin(): void {
+    this.isLoading.set(true);
 
     setTimeout(() => {
-      this.isLoading = false;
-      const rawSsoId = (val.ssoId || 'applicant_rj').trim();
-      const ssoLower = rawSsoId.toLowerCase();
+      this.isLoading.set(false);
+      const identifier = this.emailOrSsoId.trim() || 'new_user';
+      const role = this.selectedRole();
 
-      // New ISMS 2.0 Auth Flow (Bypass EOI legacy if using ISMS roles)
-      if (ssoLower === 'tppia' || ssoLower === 'applicant_rj') {
-        this.authService.login(ssoLower).subscribe(() => {
-          this.eoiService.resetToApprovedTp('A', rawSsoId);
+      if (role === 'new_user') {
+        // Authenticate user session for new user
+        this.eoiService.resetToNewCitizen(identifier);
+        this.authService.login('new_citizen_rj').subscribe(() => {
+          this.showPostLoginModal.set(true);
+        });
+      } else if (role === 'existing_user') {
+        this.eoiService.resetToApprovedTp('A', identifier);
+        this.authService.login('applicant_rj').subscribe(() => {
           this.router.navigate(['/dashboard']);
         });
-        return;
-      }
-
-      // Legacy Branching by Role & User State
-      if (ssoLower.includes('super') || ssoLower.includes('root') || ssoLower.includes('sysadmin')) {
-        // Super Admin -> Dashboard
-        this.authService.login('superadmin').subscribe();
-        this.eoiService.resetToSuperAdmin(rawSsoId);
-        this.router.navigate(['/admin']);
-      } else if (ssoLower.includes('dept') || ssoLower.includes('officer') || ssoLower.includes('scrutiny')) {
-        // Department Admin -> EOI View
-        this.authService.login('deptadmin').subscribe();
-        this.eoiService.resetToDeptAdmin(rawSsoId);
-        this.router.navigate(['/admin/eoi-view']);
-      } else if (ssoLower.includes('new') || ssoLower.includes('citizen') || ssoLower.includes('reg') || ssoLower.includes('fresh')) {
-        // New User -> Directly to Active Schemes
-        this.eoiService.resetToNewCitizen(rawSsoId);
-        this.authService.login('new_citizen_rj').subscribe(() => {
-          this.router.navigate(['/schemes']);
+      } else if (role === 'dept_admin') {
+        this.eoiService.resetToDeptAdmin(identifier);
+        this.authService.login('deptadmin').subscribe(() => {
+          this.router.navigate(['/admin/eoi-view']);
         });
-      } else {
-        // Fallback for any other legacy roles
-        this.eoiService.resetToRegisteredApplicant(rawSsoId);
-        this.router.navigate(['/schemes']);
+      } else if (role === 'super_admin') {
+        this.eoiService.resetToSuperAdmin(identifier);
+        this.authService.login('superadmin').subscribe(() => {
+          this.router.navigate(['/admin']);
+        });
       }
-    }, 500);
+    }, 600);
+  }
+
+  selectOption(choice: 'registration' | 'tenders'): void {
+    this.showPostLoginModal.set(false);
+    if (choice === 'registration') {
+      this.router.navigate(['/auth/register']);
+    } else {
+      this.router.navigate(['/schemes']);
+    }
   }
 }

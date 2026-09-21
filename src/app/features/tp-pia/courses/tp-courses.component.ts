@@ -6,8 +6,8 @@ import { CourseProposalService, CourseProposal } from '../../../core/services/co
 import { SdcService } from '../../../core/services/sdc.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { UiInputComponent } from '../../../shared/components/ui/ui-input/ui-input.component';
-import { UiSelectComponent, SelectOption } from '../../../shared/components/ui/ui-select/ui-select.component';
+import { FormInputComponent } from '../../../shared/components/form-controls/form-input/form-input.component';
+import { FormSelectComponent } from '../../../shared/components/form-controls/form-select/form-select.component';
 import { UiModalComponent } from '../../../shared/components/ui/ui-modal/ui-modal.component';
 import { UiTableComponent, TableColumn } from '../../../shared/components/ui/ui-table/ui-table.component';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -19,8 +19,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
   imports: [
     CommonModule, 
     ReactiveFormsModule, 
-    UiInputComponent, 
-    UiSelectComponent, 
+    FormInputComponent, 
+    FormSelectComponent, 
     UiModalComponent, 
     UiTableComponent
   ],
@@ -87,50 +87,50 @@ import { toSignal } from '@angular/core/rxjs-interop';
         (closed)="showCreateModal.set(false)">
         
         <form [formGroup]="courseForm" (ngSubmit)="submitCourse()" class="space-y-4">
-          <app-ui-select
+          <app-form-select
             formControlName="sdcId"
             label="Select Skill Development Center (SDC)"
             [required]="true"
             [options]="sdcOptions() || []">
-          </app-ui-select>
+          </app-form-select>
 
-          <app-ui-input
+          <app-form-input
             formControlName="courseName"
             label="Course Name"
             [required]="true"
             placeholder="e.g. Advanced Solar Technician">
-          </app-ui-input>
+          </app-form-input>
 
           <div class="grid grid-cols-2 gap-4">
-            <app-ui-select
+            <app-form-select
               formControlName="sector"
               label="Sector"
               [required]="true"
               [options]="sectorOptions">
-            </app-ui-select>
+            </app-form-select>
 
-            <app-ui-select
+            <app-form-select
               formControlName="nsqfLevel"
               label="NSQF Level"
               [required]="true"
               [options]="nsqfOptions">
-            </app-ui-select>
+            </app-form-select>
 
-            <app-ui-input
+            <app-form-input
               formControlName="durationHrs"
               type="number"
               label="Duration (Hrs)"
               [required]="true"
               placeholder="400">
-            </app-ui-input>
+            </app-form-input>
 
-            <app-ui-input
+            <app-form-input
               formControlName="targetCapacity"
               type="number"
               label="Target Capacity"
               [required]="true"
               placeholder="100">
-            </app-ui-input>
+            </app-form-input>
           </div>
           
           <div class="mt-4">
@@ -179,16 +179,13 @@ export class TpCoursesComponent implements OnInit {
     { key: 'action', label: 'Action', align: 'right' }
   ];
 
-  sectorOptions: SelectOption[] = [
-    { label: 'IT & ITeS', value: 'IT & ITeS' },
-    { label: 'Apparel', value: 'Apparel' },
-    { label: 'Green Energy', value: 'Green Energy' }
+  sectorOptions: string[] = [
+    'IT & ITeS',
+    'Apparel',
+    'Green Energy'
   ];
 
-  nsqfOptions: SelectOption[] = Array.from({length: 10}, (_, i) => ({
-    label: `Level ${i + 1}`,
-    value: `Level ${i + 1}`
-  }));
+  nsqfOptions: string[] = Array.from({length: 10}, (_, i) => `Level ${i + 1}`);
 
   ngOnInit() {
     this.courseForm = this.fb.group({

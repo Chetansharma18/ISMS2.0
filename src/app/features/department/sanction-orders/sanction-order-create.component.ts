@@ -2,14 +2,14 @@ import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { UiInputComponent } from '../../../shared/components/ui/ui-input/ui-input.component';
-import { UiSelectComponent } from '../../../shared/components/ui/ui-select/ui-select.component';
+import { FormInputComponent } from '../../../shared/components/form-controls/form-input/form-input.component';
+import { FormSelectComponent } from '../../../shared/components/form-controls/form-select/form-select.component';
 import { SanctionOrderService } from '../../../core/services/sanction-order.service';
 
 @Component({
   selector: 'app-sanction-order-create',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, UiInputComponent, UiSelectComponent],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, FormInputComponent, FormSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="max-w-4xl mx-auto space-y-6 pb-12">
@@ -32,21 +32,21 @@ import { SanctionOrderService } from '../../../core/services/sanction-order.serv
         
         <!-- Selection -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <app-ui-select
+          <app-form-select
             formControlName="tenderId"
             label="Select Tender"
             [required]="true"
-            [options]="[{label: 'TND-2026-001 (MMKAY)', value: 'TND-2026-001'}]"
+            [options]="['TND-2026-001']"
             placeholder="Select a Tender">
-          </app-ui-select>
+          </app-form-select>
 
-          <app-ui-select
+          <app-form-select
             formControlName="tpId"
             label="Select Approved TP"
             [required]="true"
-            [options]="[{label: 'SkillMasters Rajasthan (TP042)', value: 'TP042'}]"
+            [options]="['TP042']"
             placeholder="Select an Approved TP">
-          </app-ui-select>
+          </app-form-select>
         </div>
 
         <hr class="border-slate-100">
@@ -56,27 +56,27 @@ import { SanctionOrderService } from '../../../core/services/sanction-order.serv
           <h3 class="text-lg font-bold text-[#131A4D]">Capacity & Validity</h3>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <app-ui-input
+            <app-form-input
               formControlName="capacity"
               type="number"
               label="Approved Capacity (Aspirants)"
               [required]="true"
               placeholder="e.g. 500">
-            </app-ui-input>
+            </app-form-input>
 
-            <app-ui-input
+            <app-form-input
               formControlName="validFrom"
               type="date"
               label="Valid From"
               [required]="true">
-            </app-ui-input>
+            </app-form-input>
 
-            <app-ui-input
+            <app-form-input
               formControlName="validTo"
               type="date"
               label="Valid To"
               [required]="true">
-            </app-ui-input>
+            </app-form-input>
           </div>
         </div>
 

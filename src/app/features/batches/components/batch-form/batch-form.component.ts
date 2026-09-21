@@ -1,24 +1,109 @@
 import { Component, EventEmitter, Output, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
-import { UiInputComponent } from '../../../../shared/components/ui/ui-input/ui-input.component';
+import { FormInputComponent } from '../../../../shared/components/form-controls/form-input/form-input.component';
+import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
+import { CourseService } from '../../../../core/services/course.service';
+import { CourseMaster } from '../../../../core/models/course.model';
 
 @Component({
   selector: 'app-batch-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, UiInputComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormInputComponent, FormSelectComponent],
   template: `
     <div class="bg-white rounded-xl shadow-2xs border border-slate-200 p-6 font-sans">
       <form [formGroup]="batchForm" (ngSubmit)="onSubmit()">
         
-        <h2 class="text-lg font-bold text-rsldc-navy border-b pb-2 mb-4">Basic Details</h2>
+        <h2 class="text-lg font-bold text-rsldc-navy border-b pb-2 mb-4">Course & Scheme Details</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 bg-slate-50 p-5 rounded-lg border border-slate-200">
+          
+          <app-form-select 
+            formControlName="schemeId" 
+            label="Scheme" 
+            [options]="schemeOptions" 
+            [required]="true">
+          </app-form-select>
+          
+          <app-form-select 
+            formControlName="sector" 
+            label="Sector" 
+            [options]="sectorOptions" 
+            [required]="true"
+            [disabled]="!batchForm.get('schemeId')?.value">
+          </app-form-select>
+          
+          <app-form-select 
+            formControlName="qpCode" 
+            label="Course / Job Role" 
+            [options]="jobRoleOptions" 
+            [required]="true"
+            [disabled]="!batchForm.get('sector')?.value">
+          </app-form-select>
+
+          <app-form-select 
+            formControlName="courseVersionId" 
+            label="Course Version" 
+            [options]="versionOptions" 
+            [required]="true"
+            [disabled]="!batchForm.get('qpCode')?.value">
+          </app-form-select>
+          
+        </div>
+
+        <!-- Selected Course Details Auto-fill Card -->
+        <div *ngIf="selectedCourse" class="mb-8 p-5 bg-white border border-slate-200 rounded-lg shadow-xs ring-1 ring-slate-100 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-[#EA580C]"></div>
+          <div class="flex justify-between items-center mb-4">
+             <h3 class="font-bold text-slate-800 text-sm tracking-wide uppercase">Course Specifications</h3>
+             <span class="px-2 py-0.5 rounded text-[10px] font-bold" 
+               [ngClass]="selectedCourse.source_status === 'Active' || selectedCourse.source_status === 'New Course' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'">
+               {{ selectedCourse.source_status || 'Active' }}
+             </span>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+            <div>
+              <div class="text-slate-400 font-medium mb-0.5 text-[10px] uppercase tracking-wider">NSQF Level</div>
+              <div class="font-bold text-slate-800">{{ selectedCourse.nsqf_level || 'N/A' }}</div>
+            </div>
+            <div>
+              <div class="text-slate-400 font-medium mb-0.5 text-[10px] uppercase tracking-wider">Category</div>
+              <div class="font-bold text-slate-800">{{ selectedCourse.common_norms_category || 'N/A' }}</div>
+            </div>
+            <div>
+              <div class="text-slate-400 font-medium mb-0.5 text-[10px] uppercase tracking-wider">Theory Hours</div>
+              <div class="font-bold text-slate-800">{{ selectedCourse.theory_duration_hours }} Hrs</div>
+            </div>
+            <div>
+              <div class="text-slate-400 font-medium mb-0.5 text-[10px] uppercase tracking-wider">Practical + OJT</div>
+              <div class="font-bold text-slate-800">{{ selectedCourse.practical_mandatory_ojt_duration }} Hrs</div>
+            </div>
+            <div>
+              <div class="text-slate-400 font-medium mb-0.5 text-[10px] uppercase tracking-wider">IT & Soft Skills</div>
+              <div class="font-bold text-slate-800">{{ selectedCourse.it_soft_skill_training_hours }} Hrs</div>
+            </div>
+            <div>
+              <div class="text-slate-400 font-medium mb-0.5 text-[10px] uppercase tracking-wider">Total Duration</div>
+              <div class="font-bold text-[#0B3558] text-sm">{{ selectedCourse.total_qp_hours }} Hrs</div>
+            </div>
+            <div class="md:col-span-2">
+              <div class="text-slate-400 font-medium mb-0.5 text-[10px] uppercase tracking-wider">Valid Up To</div>
+              <div class="font-bold" [ngClass]="isValidCourse ? 'text-emerald-600' : 'text-rose-600'">
+                {{ selectedCourse.course_valid_up_to || 'N/A' }}
+              </div>
+            </div>
+          </div>
+          
+          <div *ngIf="!isValidCourse" class="mt-4 p-2.5 bg-rose-50 border border-rose-200 rounded text-rose-700 text-xs font-medium flex items-start gap-2">
+            <svg class="w-4 h-4 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            This course version is expired or invalid for new batch creation. Please select a valid version.
+          </div>
+        </div>
+
+        <h2 class="text-lg font-bold text-rsldc-navy border-b pb-2 mb-4">Batch Identity</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <app-ui-input formControlName="tpName" label="TP Name" [required]="true"></app-ui-input>
-          <app-ui-input formControlName="schemeName" label="Scheme Name" [required]="true"></app-ui-input>
-          <app-ui-input formControlName="sdcCode" label="SDC Code" [required]="true"></app-ui-input>
-          <app-ui-input formControlName="sector" label="Sector" [required]="true"></app-ui-input>
-          <app-ui-input formControlName="batchCode" label="Batch Code (Auto-generated)" [disabled]="true"></app-ui-input>
-          <app-ui-input formControlName="course" label="Course" [required]="true"></app-ui-input>
+          <app-form-input formControlName="tpName" label="TP Name" [required]="true"></app-form-input>
+          <app-form-input formControlName="sdcCode" label="SDC Code" [required]="true"></app-form-input>
+          <app-form-input formControlName="batchCode" label="Batch Code (Auto-generated)" [disabled]="true"></app-form-input>
           
           <div class="md:col-span-3">
             <label class="flex items-center gap-2 cursor-pointer">
@@ -30,23 +115,23 @@ import { UiInputComponent } from '../../../../shared/components/ui/ui-input/ui-i
 
         <h2 class="text-lg font-bold text-rsldc-navy border-b pb-2 mb-4">Batch Strength & Details</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <app-ui-input formControlName="minStrength" type="number" label="Batch Minimum Strength" [required]="true"></app-ui-input>
-          <app-ui-input formControlName="maxStrength" type="number" label="Batch Maximum Strength" [required]="true"></app-ui-input>
-          <app-ui-input formControlName="nipaNo" label="N IPA No"></app-ui-input>
-          <app-ui-input formControlName="psdStatus" label="PSD Status"></app-ui-input>
-          <app-ui-input formControlName="paymentStatus" label="Payment Status"></app-ui-input>
-          <app-ui-input formControlName="totalTrained" type="number" label="Total No of Youth Trained"></app-ui-input>
-          <app-ui-input formControlName="totalPlaced" type="number" label="Total No of Youth Placed"></app-ui-input>
+          <app-form-input formControlName="minStrength" type="number" label="Batch Minimum Strength" [required]="true"></app-form-input>
+          <app-form-input formControlName="maxStrength" type="number" label="Batch Maximum Strength" [required]="true"></app-form-input>
+          <app-form-input formControlName="nipaNo" label="N IPA No"></app-form-input>
+          <app-form-input formControlName="psdStatus" label="PSD Status"></app-form-input>
+          <app-form-input formControlName="paymentStatus" label="Payment Status"></app-form-input>
+          <app-form-input formControlName="totalTrained" type="number" label="Total No of Youth Trained"></app-form-input>
+          <app-form-input formControlName="totalPlaced" type="number" label="Total No of Youth Placed"></app-form-input>
         </div>
 
         <h2 class="text-lg font-bold text-rsldc-navy border-b pb-2 mb-4">Dates & Timings</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <app-ui-input formControlName="durationHrs" type="number" label="Batch Duration (Hrs)"></app-ui-input>
-          <app-ui-input formControlName="startDate" type="date" label="Batch Start Date" [required]="true"></app-ui-input>
-          <app-ui-input formControlName="freezeDate" type="date" label="Batch Freeze Date"></app-ui-input>
-          <app-ui-input formControlName="endDate" type="date" label="Batch End Date" [required]="true"></app-ui-input>
-          <app-ui-input formControlName="startTime" type="time" label="Batch Start Time" [required]="true"></app-ui-input>
-          <app-ui-input formControlName="endTime" type="time" label="Batch End Time" [required]="true"></app-ui-input>
+          <app-form-input formControlName="durationHrs" type="number" label="Batch Duration (Hrs)"></app-form-input>
+          <app-form-input formControlName="startDate" type="date" label="Batch Start Date" [required]="true"></app-form-input>
+          <app-form-input formControlName="freezeDate" type="date" label="Batch Freeze Date"></app-form-input>
+          <app-form-input formControlName="endDate" type="date" label="Batch End Date" [required]="true"></app-form-input>
+          <app-form-input formControlName="startTime" type="time" label="Batch Start Time" [required]="true"></app-form-input>
+          <app-form-input formControlName="endTime" type="time" label="Batch End Time" [required]="true"></app-form-input>
         </div>
 
         <!-- Faculty Details -->
@@ -57,10 +142,10 @@ import { UiInputComponent } from '../../../../shared/components/ui/ui-input/ui-i
           </div>
           <div formArrayName="facultyDetails" class="space-y-4">
             <div *ngFor="let faculty of facultyFormArray.controls; let i=index" [formGroupName]="i" class="flex items-center gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
-              <app-ui-input formControlName="name" label="Name of Faculty" class="flex-1"></app-ui-input>
-              <app-ui-input formControlName="type" label="Type" class="flex-1"></app-ui-input>
-              <app-ui-input formControlName="qualification" label="Qualification" class="flex-1"></app-ui-input>
-              <app-ui-input formControlName="experience" label="Experience (Yrs)" type="number" class="w-24"></app-ui-input>
+              <app-form-input formControlName="name" label="Name of Faculty" class="flex-1"></app-form-input>
+              <app-form-input formControlName="type" label="Type" class="flex-1"></app-form-input>
+              <app-form-input formControlName="qualification" label="Qualification" class="flex-1"></app-form-input>
+              <app-form-input formControlName="experience" label="Experience (Yrs)" type="number" class="w-24"></app-form-input>
               <button type="button" (click)="removeFaculty(i)" class="mt-6 text-red-500 hover:text-red-700"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
             <p *ngIf="facultyFormArray.length === 0" class="text-sm text-slate-500 text-center py-4">No faculty added.</p>
@@ -75,10 +160,10 @@ import { UiInputComponent } from '../../../../shared/components/ui/ui-input/ui-i
           </div>
           <div formArrayName="hostelDetails" class="space-y-4">
             <div *ngFor="let hostel of hostelFormArray.controls; let i=index" [formGroupName]="i" class="flex items-center gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
-              <app-ui-input formControlName="hostelCode" label="Hostel Code" class="w-32"></app-ui-input>
-              <app-ui-input formControlName="type" label="Type" class="w-32"></app-ui-input>
-              <app-ui-input formControlName="capacity" type="number" label="Capacity" class="w-24"></app-ui-input>
-              <app-ui-input formControlName="address" label="Hostel Address" class="flex-1"></app-ui-input>
+              <app-form-input formControlName="hostelCode" label="Hostel Code" class="w-32"></app-form-input>
+              <app-form-input formControlName="type" label="Type" class="w-32"></app-form-input>
+              <app-form-input formControlName="capacity" type="number" label="Capacity" class="w-24"></app-form-input>
+              <app-form-input formControlName="address" label="Hostel Address" class="flex-1"></app-form-input>
               <button type="button" (click)="removeHostel(i)" class="mt-6 text-red-500 hover:text-red-700"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
             </div>
             <p *ngIf="hostelFormArray.length === 0" class="text-sm text-slate-500 text-center py-4">No hostels added.</p>
@@ -98,7 +183,7 @@ import { UiInputComponent } from '../../../../shared/components/ui/ui-input/ui-i
         </div>
 
         <div class="flex justify-end pt-4 border-t border-slate-200">
-          <button type="submit" [disabled]="batchForm.invalid" class="px-6 py-2 bg-rsldc-navy text-white rounded-lg font-bold text-sm hover:bg-rsldc-navyLight transition shadow-md disabled:opacity-50">
+          <button type="submit" [disabled]="batchForm.invalid || !isValidCourse" class="px-6 py-2 bg-[#EA580C] hover:bg-[#c2410a] text-white rounded-lg font-bold text-sm transition shadow-md disabled:opacity-50 disabled:bg-slate-400">
             Submit Batch Details
           </button>
         </div>
@@ -108,15 +193,19 @@ import { UiInputComponent } from '../../../../shared/components/ui/ui-input/ui-i
 })
 export class BatchFormComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private courseService = inject(CourseService);
+  
   @Output() formSubmit = new EventEmitter<any>();
 
   batchForm: FormGroup = this.fb.group({
-    tpName: ['', Validators.required],
-    schemeName: ['', Validators.required],
-    sdcCode: ['', Validators.required],
+    schemeId: ['', Validators.required],
     sector: ['', Validators.required],
+    qpCode: ['', Validators.required],
+    courseVersionId: ['', Validators.required],
+    
+    tpName: ['', Validators.required],
+    sdcCode: ['', Validators.required],
     batchCode: [{value: 'BTH-' + Math.floor(Math.random() * 10000), disabled: true}],
-    course: ['', Validators.required],
     isResidential: [false],
     minStrength: ['', Validators.required],
     maxStrength: ['', Validators.required],
@@ -136,8 +225,93 @@ export class BatchFormComponent implements OnInit {
     hostelDetails: this.fb.array([])
   });
 
+  // Select Options Data
+  schemeOptions: {label: string, value: string}[] = [];
+  sectorOptions: {label: string, value: string}[] = [];
+  jobRoleOptions: {label: string, value: string}[] = [];
+  versionOptions: {label: string, value: string}[] = [];
+
+  // Currently Selected Course Data
+  selectedCourse?: CourseMaster;
+  isValidCourse = false;
+
   ngOnInit() {
     this.addFaculty();
+    this.loadSchemes();
+    this.setupCascadingDropdowns();
+  }
+
+  private loadSchemes() {
+    this.courseService.getSchemes().subscribe(schemes => {
+      this.schemeOptions = schemes.map(s => ({ label: s.name, value: s.id }));
+    });
+  }
+
+  private setupCascadingDropdowns() {
+    // Scheme -> Sector
+    this.batchForm.get('schemeId')?.valueChanges.subscribe(schemeId => {
+      this.batchForm.patchValue({ sector: '', qpCode: '', courseVersionId: '' }, { emitEvent: false });
+      this.sectorOptions = [];
+      this.jobRoleOptions = [];
+      this.versionOptions = [];
+      this.selectedCourse = undefined;
+      
+      if (schemeId) {
+        this.courseService.getSectorsByScheme(schemeId).subscribe(sectors => {
+          this.sectorOptions = sectors.map(s => ({ label: s, value: s }));
+        });
+      }
+    });
+
+    // Sector -> Job Role (Course)
+    this.batchForm.get('sector')?.valueChanges.subscribe(sector => {
+      this.batchForm.patchValue({ qpCode: '', courseVersionId: '' }, { emitEvent: false });
+      this.jobRoleOptions = [];
+      this.versionOptions = [];
+      this.selectedCourse = undefined;
+      
+      const schemeId = this.batchForm.get('schemeId')?.value;
+      if (sector && schemeId) {
+        this.courseService.getJobRoles(schemeId, sector).subscribe(roles => {
+          this.jobRoleOptions = roles.map(r => ({ label: r.name, value: r.code }));
+        });
+      }
+    });
+
+    // Job Role -> Version
+    this.batchForm.get('qpCode')?.valueChanges.subscribe(qpCode => {
+      this.batchForm.patchValue({ courseVersionId: '' }, { emitEvent: false });
+      this.versionOptions = [];
+      this.selectedCourse = undefined;
+      
+      if (qpCode) {
+        this.courseService.getCourseVersions(qpCode).subscribe(versions => {
+          this.versionOptions = versions.map(v => ({ 
+            label: `v${v.version} - ${this.courseService.isValidForNewBatch(v) ? 'Active' : 'Expired'}`, 
+            value: v.course_version_id 
+          }));
+        });
+      }
+    });
+
+    // Version -> Update Details
+    this.batchForm.get('courseVersionId')?.valueChanges.subscribe(versionId => {
+      if (versionId) {
+        this.courseService.getCourseDetails(versionId).subscribe(course => {
+          this.selectedCourse = course;
+          if (course) {
+            this.isValidCourse = this.courseService.isValidForNewBatch(course);
+            // Autofill duration
+            this.batchForm.patchValue({ durationHrs: course.total_qp_hours }, { emitEvent: false });
+          } else {
+            this.isValidCourse = false;
+          }
+        });
+      } else {
+        this.selectedCourse = undefined;
+        this.isValidCourse = false;
+      }
+    });
   }
 
   get facultyFormArray() {
@@ -175,7 +349,7 @@ export class BatchFormComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.batchForm.valid) {
+    if (this.batchForm.valid && this.isValidCourse) {
       this.formSubmit.emit(this.batchForm.getRawValue());
     }
   }

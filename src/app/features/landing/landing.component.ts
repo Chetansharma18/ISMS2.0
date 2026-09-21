@@ -7,7 +7,8 @@ import { SchemesSectionComponent } from './components/schemes-section/schemes-se
 import { ServicesSectionComponent } from './components/services-section/services-section.component';
 import { AboutSectionComponent } from './components/about-section/about-section.component';
 import { ImportantLinksComponent } from './components/important-links/important-links.component';
-
+import { HeaderComponent } from '../../shared/components/header/header.component';
+import { FooterComponent } from '../../shared/components/footer/footer.component';
 @Component({
   selector: 'app-landing',
   standalone: true,
@@ -16,14 +17,20 @@ import { ImportantLinksComponent } from './components/important-links/important-
     NewsTickerComponent,
     HeroSectionComponent,
     AboutSectionComponent,
-    ServicesSectionComponent
+    ServicesSectionComponent,
+    HeaderComponent,
+    FooterComponent
   ],
   host: {
     class: 'block w-full'
   },
   template: `
-    <div class="w-full flex flex-col">
-      <!-- 1. Government Circulars & News Ticker -->
+    <div class="w-full flex flex-col min-h-screen">
+      <!-- Global Header -->
+      <app-header [isAuthenticated]="false"></app-header>
+
+      <main class="flex-grow">
+        <!-- 1. Government Circulars & News Ticker -->
       <app-news-ticker></app-news-ticker>
 
       <!-- 2. Flagship Hero Banner with RSLDC Branding -->
@@ -43,6 +50,10 @@ import { ImportantLinksComponent } from './components/important-links/important-
 
       <!-- 7. Important Links -->
       <!-- <app-important-links></app-important-links> -->
+      </main>
+
+      <!-- Global Footer -->
+      <app-footer></app-footer>
     </div>
   `
 })

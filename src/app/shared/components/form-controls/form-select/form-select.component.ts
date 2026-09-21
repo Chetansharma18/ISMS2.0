@@ -6,15 +6,25 @@ import {
   signal,
   computed,
   ElementRef,
-  HostListener
+  HostListener,
+  forwardRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+
+export type SelectOption = string | { label: string; value: string };
 
 @Component({
   selector: 'app-form-select',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => FormSelectComponent),
+      multi: true
+    }
+  ],
   template: `
     <div class="w-full flex flex-col relative">
       <!-- Label Row -->
@@ -48,7 +58,7 @@ import { FormsModule } from '@angular/forms';
         [attr.aria-expanded]="isOpen()"
       >
         <span [class.text-slate-400]="!value" [class.text-slate-800]="!!value" class="truncate">
-          {{ value || placeholder }}
+          {{ displayValue || placeholder }}
         </span>
 
         <svg
@@ -62,13 +72,12 @@ import { FormsModule } from '@angular/forms';
         </svg>
       </button>
 
-      <!-- Dropdown Popup Menu with Outside-Click Detector -->
+      <!-- Dropdown Popup Menu -->
       @if (isOpen()) {
         <div
           class="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-md border border-slate-200 shadow-xl overflow-hidden animate-fade-in"
           role="listbox"
         >
-          <!-- Search input for large lists -->
           @if (shouldShowSearch()) {
             <div class="p-2 border-b border-slate-100 bg-slate-50/70">
               <input
@@ -81,22 +90,21 @@ import { FormsModule } from '@angular/forms';
             </div>
           }
 
-          <!-- Options List -->
           <ul class="max-h-56 overflow-y-auto py-1 divide-y divide-slate-50 text-xs sm:text-[13px]">
-            @for (opt of filteredOptions(); track opt) {
+            @for (opt of filteredOptions(); track getOptionValue(opt)) {
               <li
                 (click)="selectOption(opt)"
                 class="px-3 py-2 cursor-pointer transition-colors flex items-center justify-between"
-                [class.bg-blue-50]="opt === value"
-                [class.text-[#0B3558]]="opt === value"
-                [class.font-semibold]="opt === value"
-                [class.hover:bg-slate-50]="opt !== value"
-                [class.text-slate-700]="opt !== value"
+                [class.bg-blue-50]="getOptionValue(opt) === value"
+                [class.text-[#0B3558]]="getOptionValue(opt) === value"
+                [class.font-semibold]="getOptionValue(opt) === value"
+                [class.hover:bg-slate-50]="getOptionValue(opt) !== value"
+                [class.text-slate-700]="getOptionValue(opt) !== value"
                 role="option"
-                [attr.aria-selected]="opt === value"
+                [attr.aria-selected]="getOptionValue(opt) === value"
               >
-                <span class="truncate">{{ opt }}</span>
-                @if (opt === value) {
+                <span class="truncate">{{ getOptionLabel(opt) }}</span>
+                @if (getOptionValue(opt) === value) {
                   <svg class="w-3.5 h-3.5 text-[#0B3558] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                   </svg>
@@ -111,7 +119,6 @@ import { FormsModule } from '@angular/forms';
         </div>
       }
 
-      <!-- Inline Error Message -->
       @if (error) {
         <p class="text-[11px] text-rose-600 font-medium mt-1 flex items-center gap-1 animate-fade-in">
           <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -121,7 +128,6 @@ import { FormsModule } from '@angular/forms';
         </p>
       }
 
-      <!-- Helper Hint -->
       @if (!error && hint) {
         <p class="text-[11px] text-slate-400 mt-1 leading-tight">
           {{ hint }}
@@ -130,28 +136,60 @@ import { FormsModule } from '@angular/forms';
     </div>
   `
 })
-export class FormSelectComponent {
+export class FormSelectComponent implements ControlValueAccessor {
   private static nextId = 0;
   readonly id = `form-select-${++FormSelectComponent.nextId}`;
 
   @Input() label: string = '';
-  @Input() value: string = '';
-  @Input() options: string[] = [];
+  @Input() value: any = '';
+  @Input() options: SelectOption[] = [];
   @Input() placeholder: string = 'Please select';
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;
   @Input() hint?: string;
   @Input() error?: string;
 
-  @Output() valueChange = new EventEmitter<string>();
+  @Output() valueChange = new EventEmitter<any>();
 
   isOpen = signal<boolean>(false);
   searchQuery = '';
 
+  private onChange: (value: any) => void = () => {};
+  private onTouched: () => void = () => {};
+
   constructor(private elementRef: ElementRef) {}
+
+  writeValue(value: any): void {
+    this.value = value || '';
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled = isDisabled;
+  }
 
   shouldShowSearch(): boolean {
     return (this.options?.length || 0) > 6;
+  }
+
+  getOptionLabel(opt: SelectOption): string {
+    return typeof opt === 'string' ? opt : opt.label;
+  }
+
+  getOptionValue(opt: SelectOption): any {
+    return typeof opt === 'string' ? opt : opt.value;
+  }
+
+  get displayValue(): string {
+    const selected = (this.options || []).find(opt => this.getOptionValue(opt) === this.value);
+    return selected ? this.getOptionLabel(selected) : this.value;
   }
 
   filteredOptions = computed(() => {
@@ -160,19 +198,24 @@ export class FormSelectComponent {
       return list;
     }
     const q = this.searchQuery.toLowerCase();
-    return list.filter(item => item.toLowerCase().includes(q));
+    return list.filter(item => this.getOptionLabel(item).toLowerCase().includes(q));
   });
 
   toggleDropdown(): void {
     if (!this.disabled) {
       this.isOpen.update(v => !v);
       this.searchQuery = '';
+      if (this.isOpen()) {
+        this.onTouched();
+      }
     }
   }
 
-  selectOption(option: string): void {
-    this.value = option;
-    this.valueChange.emit(option);
+  selectOption(option: SelectOption): void {
+    const val = this.getOptionValue(option);
+    this.value = val;
+    this.valueChange.emit(val);
+    this.onChange(val);
     this.isOpen.set(false);
   }
 

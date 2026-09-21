@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { AttendanceService } from '../../../../core/services/attendance.service';
-import { UiSelectComponent } from '../../../../shared/components/ui/ui-select/ui-select.component';
-import { UiInputComponent } from '../../../../shared/components/ui/ui-input/ui-input.component';
+import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
+import { FormInputComponent } from '../../../../shared/components/form-controls/form-input/form-input.component';
 
 @Component({
   selector: 'app-attendance-capture',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, UiSelectComponent, UiInputComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormSelectComponent, FormInputComponent],
   template: `
     <div class="space-y-6 animate-in fade-in zoom-in-95 duration-300 max-w-4xl mx-auto pb-12">
       <!-- Page Header -->
@@ -30,26 +30,26 @@ import { UiInputComponent } from '../../../../shared/components/ui/ui-input/ui-i
           </div>
 
           <form [formGroup]="captureForm" class="space-y-4">
-            <app-ui-select 
+            <app-form-select 
               formControlName="deviceType" 
               label="Select Device" 
               [required]="true" 
-              [options]="[{label:'MANTRA',value:'MANTRA'},{label:'MORPHO',value:'MORPHO'},{label:'COGENT',value:'COGENT'},{label:'SECUGEN',value:'SECUGEN'}]">
-            </app-ui-select>
+              [options]="['MANTRA', 'MORPHO', 'COGENT', 'SECUGEN']">
+            </app-form-select>
             
-            <app-ui-input 
+            <app-form-input 
               formControlName="deviceSerial" 
               label="Device Serial No." 
               [required]="true" 
               placeholder="e.g. MN12345678">
-            </app-ui-input>
+            </app-form-input>
 
-            <app-ui-select 
+            <app-form-select 
               formControlName="batchCode" 
               label="Select Batch" 
               [required]="true" 
-              [options]="[{label:'B-26-0001 (Data Entry)',value:'B-26-0001'},{label:'B-26-0002 (Web Dev)',value:'B-26-0002'}]">
-            </app-ui-select>
+              [options]="['B-26-0001', 'B-26-0002']">
+            </app-form-select>
           </form>
         </div>
 

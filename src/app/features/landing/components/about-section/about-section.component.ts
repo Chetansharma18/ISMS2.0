@@ -23,7 +23,7 @@ import { CommonModule } from '@angular/common';
                 class="w-full h-[400px] object-cover object-center"
                 autoplay 
                 loop 
-                muted 
+                [muted]="true" 
                 playsinline>
               </video>
               

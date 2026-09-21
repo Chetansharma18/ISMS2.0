@@ -1,11 +1,19 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { forwardRef } from '@angular/core';
 
 @Component({
   selector: 'app-form-input',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => FormInputComponent),
+      multi: true
+    }
+  ],
   template: `
     <div class="w-full flex flex-col">
       <!-- Label Row with Required Star and Character Count -->
@@ -55,6 +63,7 @@ import { FormsModule } from '@angular/forms';
           [disabled]="disabled"
           [readOnly]="readonly"
           [attr.maxlength]="maxLength || null"
+          (blur)="handleBlur()"
           class="flex-1 min-w-0 w-full px-3 py-2 text-xs sm:text-[13px] text-slate-800 placeholder:text-slate-400 focus:outline-none bg-transparent"
           [class.uppercase]="uppercase"
           [class.cursor-not-allowed]="disabled"
@@ -88,13 +97,13 @@ import { FormsModule } from '@angular/forms';
     </div>
   `
 })
-export class FormInputComponent {
+export class FormInputComponent implements ControlValueAccessor {
   private static nextId = 0;
   readonly id = `form-input-${++FormInputComponent.nextId}`;
 
   @Input() label: string = '';
   @Input() value: string = '';
-  @Input() type: 'text' | 'email' | 'date' | 'number' | 'tel' | 'password' = 'text';
+  @Input() type: 'text' | 'password' | 'email' | 'number' | 'tel' | 'date' | 'time' = 'text';
   @Input() placeholder: string = '';
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;
@@ -109,6 +118,26 @@ export class FormInputComponent {
 
   @Output() valueChange = new EventEmitter<string>();
 
+  // ControlValueAccessor callbacks
+  private onChange: (value: string) => void = () => {};
+  private onTouched: () => void = () => {};
+
+  writeValue(value: any): void {
+    this.value = value || '';
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled = isDisabled;
+  }
+
   onInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     let val = input.value;
@@ -118,5 +147,10 @@ export class FormInputComponent {
     }
     this.value = val;
     this.valueChange.emit(val);
+    this.onChange(val);
+  }
+
+  handleBlur(): void {
+    this.onTouched();
   }
 }

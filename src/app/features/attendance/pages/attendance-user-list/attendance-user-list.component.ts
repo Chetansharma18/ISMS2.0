@@ -5,13 +5,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AuthService } from '../../../../core/auth/auth.service';
 import { AttendanceService, AttendanceUser } from '../../../../core/services/attendance.service';
 import { UiTableComponent, TableColumn } from '../../../../shared/components/ui/ui-table/ui-table.component';
-import { UiInputComponent } from '../../../../shared/components/ui/ui-input/ui-input.component';
-import { UiSelectComponent } from '../../../../shared/components/ui/ui-select/ui-select.component';
+import { FormInputComponent } from '../../../../shared/components/form-controls/form-input/form-input.component';
+import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
 
 @Component({
   selector: 'app-attendance-user-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, UiTableComponent, UiInputComponent, UiSelectComponent],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, UiTableComponent, FormInputComponent, FormSelectComponent],
   template: `
     <div class="space-y-6 animate-in fade-in zoom-in-95 duration-300">
       <!-- Page Header -->
@@ -45,15 +45,15 @@ import { UiSelectComponent } from '../../../../shared/components/ui/ui-select/ui
 
         <form [formGroup]="userForm" (ngSubmit)="submitForm()" class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <app-ui-input formControlName="userName" label="User Name" [required]="true" placeholder="e.g. attendance_abc"></app-ui-input>
-            <app-ui-input formControlName="password" type="password" label="Password" [required]="true"></app-ui-input>
-            <app-ui-input formControlName="nickName" label="Nick Name" [required]="true" placeholder="e.g. ABC Operator"></app-ui-input>
-            <app-ui-input formControlName="email" type="email" label="Email" [required]="true"></app-ui-input>
-            <app-ui-input formControlName="altEmail" type="email" label="Alternate Email"></app-ui-input>
-            <app-ui-input formControlName="mobile" type="tel" label="Mobile Number" [required]="true"></app-ui-input>
-            <app-ui-input formControlName="altMobile" type="tel" label="Alternate Mobile"></app-ui-input>
-            <app-ui-input formControlName="address" label="Address"></app-ui-input>
-            <app-ui-select formControlName="status" label="Status" [required]="true" [options]="[{label:'Active',value:'ACTIVE'},{label:'Inactive',value:'INACTIVE'}]"></app-ui-select>
+            <app-form-input formControlName="userName" label="User Name" [required]="true" placeholder="e.g. attendance_abc"></app-form-input>
+            <app-form-input formControlName="password" type="password" label="Password" [required]="true"></app-form-input>
+            <app-form-input formControlName="nickName" label="Nick Name" [required]="true" placeholder="e.g. ABC Operator"></app-form-input>
+            <app-form-input formControlName="email" type="email" label="Email" [required]="true"></app-form-input>
+            <app-form-input formControlName="altEmail" type="email" label="Alternate Email"></app-form-input>
+            <app-form-input formControlName="mobile" type="tel" label="Mobile Number" [required]="true"></app-form-input>
+            <app-form-input formControlName="altMobile" type="tel" label="Alternate Mobile"></app-form-input>
+            <app-form-input formControlName="address" label="Address"></app-form-input>
+            <app-form-select formControlName="status" label="Status" [required]="true" [options]="['ACTIVE', 'INACTIVE']"></app-form-select>
           </div>
           
           <div class="flex justify-end gap-3 mt-4">

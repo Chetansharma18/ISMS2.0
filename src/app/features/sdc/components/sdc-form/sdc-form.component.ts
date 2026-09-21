@@ -4,13 +4,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { CourseProposalService, CourseProposal } from '../../../../core/services/course-proposal.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { UiInputComponent } from '../../../../shared/components/ui/ui-input/ui-input.component';
-import { UiSelectComponent, SelectOption } from '../../../../shared/components/ui/ui-select/ui-select.component';
+import { FormInputComponent } from '../../../../shared/components/form-controls/form-input/form-input.component';
+import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
 
 @Component({
   selector: 'app-sdc-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, UiInputComponent, UiSelectComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormInputComponent, FormSelectComponent],
   template: `
     <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 font-sans relative overflow-hidden">
       <!-- Decorative background accent -->
@@ -70,61 +70,61 @@ import { UiSelectComponent, SelectOption } from '../../../../shared/components/u
               <h2 class="text-xl font-bold text-slate-800">Organization Details</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-            <app-ui-select
+            <app-form-select
               formControlName="schemeId"
               label="Scheme"
               [required]="true"
               placeholder="Select Scheme"
               [options]="schemeOptions">
-            </app-ui-select>
+            </app-form-select>
 
-            <app-ui-input
+            <app-form-input
               formControlName="name"
               label="SDC Name"
               [required]="true"
               placeholder="e.g. Jaipur Excellence Center">
-            </app-ui-input>
+            </app-form-input>
 
-            <app-ui-input
+            <app-form-input
               formControlName="mouNo"
               label="MoU Reference No."
               [required]="true"
               placeholder="MOU/2026/001">
-            </app-ui-input>
-            <app-ui-input
+            </app-form-input>
+            <app-form-input
               formControlName="tpName"
               label="TP Name"
               [required]="true"
               placeholder="e.g. SkillMasters Rajasthan">
-            </app-ui-input>
+            </app-form-input>
 
-            <app-ui-input
+            <app-form-input
               formControlName="sdcCode"
               label="SDC Code"
               [required]="true"
               placeholder="e.g. SDC-001">
-            </app-ui-input>
+            </app-form-input>
 
-            <app-ui-input
+            <app-form-input
               formControlName="proposedStartDate"
               type="date"
               label="Proposed Start Date"
               [required]="true">
-            </app-ui-input>
+            </app-form-input>
 
-            <app-ui-input
+            <app-form-input
               formControlName="totalTrained"
               type="number"
               label="Total Trained Aspirants"
               placeholder="e.g. 500">
-            </app-ui-input>
+            </app-form-input>
 
-            <app-ui-input
+            <app-form-input
               formControlName="totalPlaced"
               type="number"
               label="Total TP Placed Aspirants"
               placeholder="e.g. 400">
-            </app-ui-input>
+            </app-form-input>
             </div>
           </div>
         </div>
@@ -139,70 +139,70 @@ import { UiSelectComponent, SelectOption } from '../../../../shared/components/u
               <h2 class="text-xl font-bold text-slate-800">Location and Centre Details</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
-            <app-ui-select
+            <app-form-select
               label="State"
               [required]="true"
-              [options]="[{label: 'Rajasthan', value: 'Rajasthan'}]"
+              [options]="['Rajasthan']"
               placeholder="Rajasthan"
-              [isDisabled]="true"
+              [disabled]="true"
               class="w-full">
-            </app-ui-select>
+            </app-form-select>
 
-            <app-ui-select
+            <app-form-select
               formControlName="district"
               label="District"
               [required]="true"
               placeholder="Select District"
               [options]="districtOptions">
-            </app-ui-select>
+            </app-form-select>
 
-            <app-ui-input
+            <app-form-input
               formControlName="assemblyConstituency"
               label="Assembly Constituency"
               placeholder="Select Assembly Constituency">
-            </app-ui-input>
+            </app-form-input>
 
-            <app-ui-input
+            <app-form-input
               formControlName="parliamentConstituency"
               label="Parliament Constituency"
               placeholder="Select Parliament Constituency">
-            </app-ui-input>
+            </app-form-input>
 
-            <app-ui-input
+            <app-form-input
               formControlName="division"
               label="Division"
               placeholder="Select Division">
-            </app-ui-input>
+            </app-form-input>
 
-            <app-ui-input
+            <app-form-input
               formControlName="block"
               label="Block"
               placeholder="Select Block">
-            </app-ui-input>
+            </app-form-input>
 
-            <app-ui-input
+            <app-form-input
               formControlName="capacity"
               type="number"
               label="SDC Capacity"
               [required]="true"
               placeholder="Max students">
-            </app-ui-input>
+            </app-form-input>
 
-            <app-ui-input
+            <app-form-input
               formControlName="centerEmail"
               type="email"
               label="Center Email"
               [required]="true"
               placeholder="center@example.com">
-            </app-ui-input>
+            </app-form-input>
             
-            <app-ui-input
+            <app-form-input
               formControlName="pincode"
               type="text"
               label="Pincode"
               [required]="true"
               placeholder="e.g. 302001">
-            </app-ui-input>
+            </app-form-input>
 
             <div class="md:col-span-3">
               <label class="block font-semibold text-slate-700 text-xs tracking-wide mb-1.5">Full Address <span class="text-red-500">*</span></label>
@@ -228,18 +228,18 @@ import { UiSelectComponent, SelectOption } from '../../../../shared/components/u
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-              <app-ui-input
+              <app-form-input
                 formControlName="latitude"
                 label="Latitude"
                 [required]="true"
                 placeholder="e.g. 26.9124">
-              </app-ui-input>
-              <app-ui-input
+              </app-form-input>
+              <app-form-input
                 formControlName="longitude"
                 label="Longitude"
                 [required]="true"
                 placeholder="e.g. 75.7873">
-              </app-ui-input>
+              </app-form-input>
             </div>
           </div>
         </div>
@@ -372,17 +372,17 @@ export class SdcFormComponent implements OnInit {
 
   currentStep = 1;
   allCourses$!: Observable<CourseProposal[]>;
-  courseOptions$!: Observable<SelectOption[]>;
+  courseOptions$!: Observable<{label: string, value: string, disabled?: boolean}[]>;
 
-  schemeOptions: SelectOption[] = [
-    { label: 'SAMARTH (State Fund)', value: 'SCH-001' },
-    { label: 'PMKVY (Central Fund)', value: 'SCH-002' }
+  schemeOptions: string[] = [
+    'SAMARTH (State Fund)',
+    'PMKVY (Central Fund)'
   ];
 
-  districtOptions: SelectOption[] = [
-    { label: 'Jaipur', value: 'Jaipur' },
-    { label: 'Ajmer', value: 'Ajmer' },
-    { label: 'Jodhpur', value: 'Jodhpur' }
+  districtOptions: string[] = [
+    'Jaipur',
+    'Ajmer',
+    'Jodhpur'
   ];
 
   sdcForm: FormGroup = this.fb.group({

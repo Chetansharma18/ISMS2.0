@@ -5,12 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { TraineeService } from '../../../../core/services/trainee.service';
 import { UiTableComponent, TableColumn } from '../../../../shared/components/ui/ui-table/ui-table.component';
-import { UiSelectComponent } from '../../../../shared/components/ui/ui-select/ui-select.component';
+import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
 
 @Component({
   selector: 'app-trainee-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, UiTableComponent, UiSelectComponent],
+  imports: [CommonModule, RouterModule, FormsModule, UiTableComponent, FormSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="space-y-6 animate-in fade-in zoom-in-95 duration-300">

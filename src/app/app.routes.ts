@@ -3,10 +3,10 @@ import { AuthenticatedLayoutComponent } from './layout/authenticated-layout/auth
 import { roleGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
-  // Screen 1: Portal Landing (Krtika's Component)
+  // Screen 1: Portal Landing (Chetan's Component)
   {
     path: '',
-    loadComponent: () => import('./landing/landing.component').then(m => m.LandingComponent)
+    loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent)
   },
   {
     path: 'schemes',
@@ -226,11 +226,6 @@ export const routes: Routes = [
       {
         path: 'department/sanction-orders/create',
         loadComponent: () => import('./features/department/sanction-orders/sanction-order-create.component').then(m => m.SanctionOrderCreateComponent),
-        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
-      },
-      {
-        path: 'admin/courses',
-        loadComponent: () => import('./features/admin/department/admin-courses.component').then(m => m.AdminCoursesComponent),
         data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
       },
       

@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { TraineeService } from '../../../../core/services/trainee.service';
-import { UiInputComponent } from '../../../../shared/components/ui/ui-input/ui-input.component';
-import { UiSelectComponent } from '../../../../shared/components/ui/ui-select/ui-select.component';
+import { FormInputComponent } from '../../../../shared/components/form-controls/form-input/form-input.component';
+import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
 
 @Component({
   selector: 'app-trainee-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, UiInputComponent, UiSelectComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormInputComponent, FormSelectComponent],
   template: `
     <div class="space-y-6 animate-in fade-in zoom-in-95 duration-300 max-w-5xl mx-auto pb-12">
       <!-- Page Header -->
@@ -52,26 +52,26 @@ import { UiSelectComponent } from '../../../../shared/components/ui/ui-select/ui
         <div *ngIf="currentStep === 1" class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
           <h2 class="text-xl font-bold text-slate-800 mb-6 pb-2 border-b">Basic Information</h2>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
-            <app-ui-select formControlName="aspirantCategory" label="Aspirant Category" [required]="true" [options]="[{label:'General',value:'General'}]"></app-ui-select>
-            <app-ui-input formControlName="aadhaarNo" label="Aadhaar No." [required]="true"></app-ui-input>
-            <app-ui-input formControlName="janaadhaarId" label="Janaadhaar ID"></app-ui-input>
-            <app-ui-input formControlName="name" label="Name of Aspirant" [required]="true"></app-ui-input>
-            <app-ui-select formControlName="gender" label="Gender" [required]="true" [options]="[{label:'Male',value:'Male'},{label:'Female',value:'Female'},{label:'Other',value:'Other'}]"></app-ui-select>
-            <app-ui-select formControlName="relationType" label="Select Relation" [required]="true" [options]="[{label:'Father',value:'Father'},{label:'Mother',value:'Mother'},{label:'Guardian',value:'Guardian'}]"></app-ui-select>
-            <app-ui-input formControlName="motherName" label="Mother's Name"></app-ui-input>
-            <app-ui-input formControlName="dob" type="date" label="Date of Birth" [required]="true"></app-ui-input>
-            <app-ui-input formControlName="age" type="number" label="Age"></app-ui-input>
-            <app-ui-select formControlName="education" label="Educational Qualification" [required]="true" [options]="[{label:'8th Pass',value:'8th Pass'},{label:'10th Pass',value:'10th Pass'},{label:'12th Pass',value:'12th Pass'},{label:'Graduate',value:'Graduate'}]"></app-ui-select>
-            <app-ui-select formControlName="religion" label="Religion" [required]="true" [options]="[{label:'Hindu',value:'Hindu'},{label:'Muslim',value:'Muslim'},{label:'Sikh',value:'Sikh'}]"></app-ui-select>
-            <app-ui-select formControlName="category" label="Category" [required]="true" [options]="[{label:'OBC',value:'OBC'},{label:'SC',value:'SC'},{label:'ST',value:'ST'},{label:'General',value:'General'}]"></app-ui-select>
-            <app-ui-select formControlName="aspirantCategoryType" label="Aspirant Category Type" [required]="true" [options]="[{label:'Type A',value:'Type A'}]"></app-ui-select>
+            <app-form-select formControlName="aspirantCategory" label="Aspirant Category" [required]="true" [options]="['General']"></app-form-select>
+            <app-form-input formControlName="aadhaarNo" label="Aadhaar No." [required]="true"></app-form-input>
+            <app-form-input formControlName="janaadhaarId" label="Janaadhaar ID"></app-form-input>
+            <app-form-input formControlName="name" label="Name of Aspirant" [required]="true"></app-form-input>
+            <app-form-select formControlName="gender" label="Gender" [required]="true" [options]="['Male', 'Female', 'Other']"></app-form-select>
+            <app-form-select formControlName="relationType" label="Select Relation" [required]="true" [options]="['Father', 'Mother', 'Guardian']"></app-form-select>
+            <app-form-input formControlName="motherName" label="Mother's Name"></app-form-input>
+            <app-form-input formControlName="dob" type="date" label="Date of Birth" [required]="true"></app-form-input>
+            <app-form-input formControlName="age" type="number" label="Age"></app-form-input>
+            <app-form-select formControlName="education" label="Educational Qualification" [required]="true" [options]="['8th Pass', '10th Pass', '12th Pass', 'Graduate']"></app-form-select>
+            <app-form-select formControlName="religion" label="Religion" [required]="true" [options]="['Hindu', 'Muslim', 'Sikh']"></app-form-select>
+            <app-form-select formControlName="category" label="Category" [required]="true" [options]="['OBC', 'SC', 'ST', 'General']"></app-form-select>
+            <app-form-select formControlName="aspirantCategoryType" label="Aspirant Category Type" [required]="true" [options]="['Type A']"></app-form-select>
           </div>
           
           <h2 class="text-xl font-bold text-slate-800 mt-8 mb-6 pb-2 border-b">Training Preference</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            <app-ui-select formControlName="trainingPreferredDistrict" label="Training Preferred District" [options]="[{label:'Ajmer',value:'Ajmer'},{label:'Jaipur',value:'Jaipur'}]"></app-ui-select>
-            <app-ui-select formControlName="typeOfEmployment" label="Type of Employment" [options]="[{label:'Wage Employment',value:'Wage Employment'},{label:'Self Employment',value:'Self Employment'}]"></app-ui-select>
-            <app-ui-select formControlName="ruralUrban" label="Rural/Urban" [options]="[{label:'Rural',value:'Rural'},{label:'Urban',value:'Urban'}]"></app-ui-select>
+            <app-form-select formControlName="trainingPreferredDistrict" label="Training Preferred District" [options]="['Ajmer', 'Jaipur']"></app-form-select>
+            <app-form-select formControlName="typeOfEmployment" label="Type of Employment" [options]="['Wage Employment', 'Self Employment']"></app-form-select>
+            <app-form-select formControlName="ruralUrban" label="Rural/Urban" [options]="['Rural', 'Urban']"></app-form-select>
           </div>
         </div>
 
@@ -79,23 +79,23 @@ import { UiSelectComponent } from '../../../../shared/components/ui/ui-select/ui
         <div *ngIf="currentStep === 2" class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
           <h2 class="text-xl font-bold text-slate-800 mb-6 pb-2 border-b">Contact Details</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            <app-ui-input formControlName="mobile" type="tel" label="Mobile Number" [required]="true"></app-ui-input>
-            <app-ui-input formControlName="altMobile" type="tel" label="Alternate Mobile Number"></app-ui-input>
-            <app-ui-input formControlName="landlineNumber" label="Landline Number"></app-ui-input>
-            <app-ui-input formControlName="email" type="email" label="Email Id"></app-ui-input>
+            <app-form-input formControlName="mobile" type="tel" label="Mobile Number" [required]="true"></app-form-input>
+            <app-form-input formControlName="altMobile" type="tel" label="Alternate Mobile Number"></app-form-input>
+            <app-form-input formControlName="landlineNumber" label="Landline Number"></app-form-input>
+            <app-form-input formControlName="email" type="email" label="Email Id"></app-form-input>
           </div>
 
           <h2 class="text-xl font-bold text-slate-800 mt-8 mb-6 pb-2 border-b">Permanent Address</h2>
           <div formGroupName="permanentAddress" class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
-            <app-ui-input formControlName="houseNo" label="House No."></app-ui-input>
-            <app-ui-input formControlName="streetName" label="Street/Colony Name"></app-ui-input>
-            <app-ui-input formControlName="wardNo" label="Ward No."></app-ui-input>
-            <app-ui-input formControlName="villageTownCity" label="Village/Town/City Name"></app-ui-input>
-            <app-ui-input formControlName="district" label="District"></app-ui-input>
-            <app-ui-input formControlName="blockName" label="Block Name"></app-ui-input>
-            <app-ui-input formControlName="tehsil" label="Tehsil"></app-ui-input>
-            <app-ui-input formControlName="municipality" label="Municipality/Panchayat"></app-ui-input>
-            <app-ui-input formControlName="pincode" label="Pincode"></app-ui-input>
+            <app-form-input formControlName="houseNo" label="House No."></app-form-input>
+            <app-form-input formControlName="streetName" label="Street/Colony Name"></app-form-input>
+            <app-form-input formControlName="wardNo" label="Ward No."></app-form-input>
+            <app-form-input formControlName="villageTownCity" label="Village/Town/City Name"></app-form-input>
+            <app-form-input formControlName="district" label="District"></app-form-input>
+            <app-form-input formControlName="blockName" label="Block Name"></app-form-input>
+            <app-form-input formControlName="tehsil" label="Tehsil"></app-form-input>
+            <app-form-input formControlName="municipality" label="Municipality/Panchayat"></app-form-input>
+            <app-form-input formControlName="pincode" label="Pincode"></app-form-input>
           </div>
 
           <div class="flex items-center gap-3 mt-8 mb-6 pb-2 border-b">
@@ -105,15 +105,15 @@ import { UiSelectComponent } from '../../../../shared/components/ui/ui-select/ui
             </label>
           </div>
           <div formGroupName="communicationAddress" class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
-            <app-ui-input formControlName="houseNo" label="House No."></app-ui-input>
-            <app-ui-input formControlName="streetName" label="Street/Colony Name"></app-ui-input>
-            <app-ui-input formControlName="wardNo" label="Ward No."></app-ui-input>
-            <app-ui-input formControlName="villageTownCity" label="Village/Town/City Name"></app-ui-input>
-            <app-ui-input formControlName="district" label="District"></app-ui-input>
-            <app-ui-input formControlName="blockName" label="Block Name"></app-ui-input>
-            <app-ui-input formControlName="tehsil" label="Tehsil"></app-ui-input>
-            <app-ui-input formControlName="municipality" label="Municipality/Panchayat"></app-ui-input>
-            <app-ui-input formControlName="pincode" label="Pincode"></app-ui-input>
+            <app-form-input formControlName="houseNo" label="House No."></app-form-input>
+            <app-form-input formControlName="streetName" label="Street/Colony Name"></app-form-input>
+            <app-form-input formControlName="wardNo" label="Ward No."></app-form-input>
+            <app-form-input formControlName="villageTownCity" label="Village/Town/City Name"></app-form-input>
+            <app-form-input formControlName="district" label="District"></app-form-input>
+            <app-form-input formControlName="blockName" label="Block Name"></app-form-input>
+            <app-form-input formControlName="tehsil" label="Tehsil"></app-form-input>
+            <app-form-input formControlName="municipality" label="Municipality/Panchayat"></app-form-input>
+            <app-form-input formControlName="pincode" label="Pincode"></app-form-input>
           </div>
         </div>
 
@@ -121,13 +121,13 @@ import { UiSelectComponent } from '../../../../shared/components/ui/ui-select/ui
         <div *ngIf="currentStep === 3" class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
           <h2 class="text-xl font-bold text-slate-800 mb-6 pb-2 border-b">Bank Details</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-            <app-ui-input formControlName="accountNo" label="Account No"></app-ui-input>
-            <app-ui-input formControlName="accountName" label="Account Name"></app-ui-input>
-            <app-ui-select formControlName="accountType" label="Account Type" [options]="[{label:'Savings',value:'Savings'},{label:'Current',value:'Current'}]"></app-ui-select>
-            <app-ui-input formControlName="bankName" label="Bank Name"></app-ui-input>
-            <app-ui-input formControlName="branchName" label="Bank Branch"></app-ui-input>
-            <app-ui-input formControlName="ifscCode" label="IFSC Code"></app-ui-input>
-            <app-ui-input formControlName="micrCode" label="MICR Code"></app-ui-input>
+            <app-form-input formControlName="accountNo" label="Account No"></app-form-input>
+            <app-form-input formControlName="accountName" label="Account Name"></app-form-input>
+            <app-form-select formControlName="accountType" label="Account Type" [options]="['Savings', 'Current']"></app-form-select>
+            <app-form-input formControlName="bankName" label="Bank Name"></app-form-input>
+            <app-form-input formControlName="branchName" label="Bank Branch"></app-form-input>
+            <app-form-input formControlName="ifscCode" label="IFSC Code"></app-form-input>
+            <app-form-input formControlName="micrCode" label="MICR Code"></app-form-input>
           </div>
         </div>
 
@@ -135,18 +135,18 @@ import { UiSelectComponent } from '../../../../shared/components/ui/ui-select/ui
         <div *ngIf="currentStep === 4" class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
           <h2 class="text-xl font-bold text-slate-800 mb-6 pb-2 border-b">Additional Details</h2>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
-            <app-ui-input formControlName="courseName" label="Course Name"></app-ui-input>
-            <app-ui-select formControlName="schemeEnquiry" label="Scheme Enquiry" [options]="[{label:'Yes',value:'Yes'},{label:'No',value:'No'}]"></app-ui-select>
-            <app-ui-select formControlName="specialAbility" label="Person with Special Ability" [options]="[{label:'Yes',value:'Yes'},{label:'No',value:'No'}]"></app-ui-select>
-            <app-ui-input formControlName="annualFamilyIncome" label="Annual Family Income"></app-ui-input>
-            <app-ui-input formControlName="economicStatus" label="Economic Status"></app-ui-input>
+            <app-form-input formControlName="courseName" label="Course Name"></app-form-input>
+            <app-form-select formControlName="schemeEnquiry" label="Scheme Enquiry" [options]="['Yes', 'No']"></app-form-select>
+            <app-form-select formControlName="specialAbility" label="Person with Special Ability" [options]="['Yes', 'No']"></app-form-select>
+            <app-form-input formControlName="annualFamilyIncome" label="Annual Family Income"></app-form-input>
+            <app-form-input formControlName="economicStatus" label="Economic Status"></app-form-input>
             
-            <app-ui-input formControlName="bocwNo" label="BOCW No."></app-ui-input>
-            <app-ui-input formControlName="mgnregaNo" label="MGNREGA No."></app-ui-input>
-            <app-ui-input formControlName="rsbyNo" label="RSBY No."></app-ui-input>
-            <app-ui-input formControlName="nrlmNo" label="NRLM No. of SHG Member"></app-ui-input>
-            <app-ui-input formControlName="epicNo" label="EPIC No."></app-ui-input>
-            <app-ui-input formControlName="incomeSlab" label="Income Slab (Annual)"></app-ui-input>
+            <app-form-input formControlName="bocwNo" label="BOCW No."></app-form-input>
+            <app-form-input formControlName="mgnregaNo" label="MGNREGA No."></app-form-input>
+            <app-form-input formControlName="rsbyNo" label="RSBY No."></app-form-input>
+            <app-form-input formControlName="nrlmNo" label="NRLM No. of SHG Member"></app-form-input>
+            <app-form-input formControlName="epicNo" label="EPIC No."></app-form-input>
+            <app-form-input formControlName="incomeSlab" label="Income Slab (Annual)"></app-form-input>
           </div>
         </div>
 

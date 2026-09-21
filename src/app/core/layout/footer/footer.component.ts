@@ -39,12 +39,6 @@ import { CommonModule } from '@angular/common';
         <!-- Carousel Container -->
         <div class="relative flex items-center justify-between gap-4 sm:gap-8 max-w-6xl mx-auto">
           
-          <!-- Left Arrow -->
-          <button class="w-10 h-10 rounded-full border border-slate-500 flex items-center justify-center text-slate-400 hover:text-[#12223a] hover:border-[#F59E0B] hover:bg-[#F59E0B] transition-colors shrink-0 z-10">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
 
           <!-- Infinite Marquee Track -->
           <div class="flex-1 overflow-hidden mask-fade relative">
@@ -79,12 +73,6 @@ import { CommonModule } from '@angular/common';
             </div>
           </div>
 
-          <!-- Right Arrow -->
-          <button class="w-10 h-10 rounded-full border border-slate-500 flex items-center justify-center text-slate-400 hover:text-[#12223a] hover:border-[#F59E0B] hover:bg-[#F59E0B] transition-colors shrink-0 z-10">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
         </div>
       </div>
       <div class="w-full h-px bg-slate-700/50"></div>
@@ -103,7 +91,8 @@ import { CommonModule } from '@angular/common';
             <p class="text-sm font-semibold text-white mb-1">Integrated Scheme Management System</p>
             <p class="text-xs text-slate-400 leading-snug">
               Rajasthan Skill & Livelihoods Development Corporation<br/>
-              Department of Skill, Employment and Entrepreneurship
+              Department of Skill, Employment and Entrepreneurship<br/>
+              Government of Rajasthan
             </p>
           </div>
 
@@ -114,8 +103,8 @@ import { CommonModule } from '@angular/common';
               <ul class="space-y-3 text-xs text-slate-300 mb-8 flex flex-col items-center">
                 <li><a href="https://rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Rajasthan Government</a></li>
                 <li><a href="https://livelihoods.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">RSLDC</a></li>
-                <li><a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="/terms" class="hover:text-white transition-colors">Terms & Conditions</a></li>
+                <li><a (click)="downloadSamplePdf('Privacy_Policy.pdf', 'Privacy Policy')" class="hover:text-white transition-colors cursor-pointer">Privacy Policy</a></li>
+                <li><a (click)="downloadSamplePdf('Terms_and_Conditions.pdf', 'Terms & Conditions')" class="hover:text-white transition-colors cursor-pointer">Terms & Conditions</a></li>
               </ul>
               
               <div class="flex flex-row justify-center items-center gap-3 sm:gap-4 text-[13px] text-slate-300 font-bold pt-4 border-t border-slate-700/50 w-full mt-auto whitespace-nowrap">
@@ -177,7 +166,7 @@ import { CommonModule } from '@angular/common';
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div class="flex justify-center items-center text-xs text-slate-400">
             <div class="text-center">
-              &copy; 2024 ISMS 2.0. All Rights Reserved.
+              &copy; 2026 Government of Rajasthan. All rights reserved (ISMS 2.0)
             </div>
           </div>
         </div>
@@ -186,4 +175,18 @@ import { CommonModule } from '@angular/common';
     </footer>
   `
 })
-export class FooterComponent {}
+export class FooterComponent {
+  downloadSamplePdf(fileName: string, title: string) {
+    // Generate a dummy PDF text and create a downloadable blob
+    const pdfContent = `This is a sample PDF document for ${title}.\n\nISMS 2.0 Official Document.`;
+    const blob = new Blob([pdfContent], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  }
+}

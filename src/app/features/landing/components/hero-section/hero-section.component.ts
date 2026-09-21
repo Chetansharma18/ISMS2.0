@@ -134,60 +134,60 @@ export class HeroSectionComponent {
 
   tenders = [
     {
-      date: '10 Mar, 2026',
-      id: 'RSLDC/ADMIN/CLEAN/2026-27/01',
-      category: 'Services',
+      date: '28 Sep, 2026',
+      id: 'NIB 28 2026-27',
+      category: 'Procurement',
       isNew: true,
       status: 'Open',
-      title: 'ई.एम.आई. भवन, हॉस्टल भवन व कौशल भवन परिसर में साफ-सफाई कार्य की संविदा हेतु निविदा-2026-27'
+      title: 'Procurement of various sizes C.I. Detachable Joints for HDPE Pipe at Divisional Store of Distt Rural Div I Bikaner'
     },
     {
-      date: '20 Jan, 2025',
-      id: 'RSLDC/STORE/TONER/2025/11',
-      category: 'Procurement',
+      date: '21 Sep, 2026',
+      id: 'NIT 03/2026-27 ACE PWD Zone Tonk',
+      category: 'Construction',
+      isNew: true,
+      status: 'Open',
+      title: 'CONSTRUCTION OF ROAD FROM SH-122 TO KARIRI UPTO DISTRICT BOARDER'
+    },
+    {
+      date: '11 Jun, 2026',
+      id: 'RCVET/2026/01',
+      category: 'Services',
       isNew: false,
       status: 'Open',
-      title: 'Tender regarding Toner refilling and consumable parts'
+      title: 'Tender for Computer Operator for RCVET Jodhpur'
     },
     {
-      date: '20 Jan, 2025',
-      id: 'RSLDC/EST/CLEAN/2025/08',
-      category: 'Facility Management',
-      isNew: false,
-      status: 'Open',
-      title: 'RFP for cleaning and maintenance in RSLDC'
-    },
-    {
-      date: '23 Oct, 2024',
-      id: 'RSLDC/PMCA/RFP/2024/04',
-      category: 'Consultancy',
-      isNew: false,
-      status: 'Open',
-      title: 'Request for proposal:-Selection of Project Management Consulting Agency for providing Project Management consulting support services to Rajasthan Skill and Livelihoods Development Corporation (RSLDC).'
-    },
-    {
-      date: '22 Jul, 2024',
-      id: 'RSLDC/PROC/AMEND/2024/22',
+      date: '07 Feb, 2026',
+      id: 'CORR/2026/09',
       category: 'Corrigendum',
       isNew: false,
       status: 'Open',
-      title: 'Amendment in dates of tender submission'
+      title: 'Corrigendum - 9 (Old RO Number is 4424)'
     },
     {
-      date: '15 May, 2024',
-      id: 'RSLDC/SKILL/SCA-SCSP/2024/03',
-      category: 'Empanelment',
+      date: '07 Feb, 2026',
+      id: 'CORR/2026/04',
+      category: 'Corrigendum',
       isNew: false,
       status: 'Open',
-      title: 'Empanelment of Private Training Partners (PTPs) for execution of Special Central Assistance to Scheduled Castes Sub-Plan (SCA to SCSP) training programs'
+      title: 'CORRIGENDUM-4'
     },
     {
-      date: '12 Feb, 2024',
-      id: 'RSLDC/IT/SMART-CLASS/2024/15',
-      category: 'Equipment',
+      date: '07 Feb, 2026',
+      id: 'CORR/2026/05',
+      category: 'Corrigendum',
       isNew: false,
       status: 'Open',
-      title: 'Tender for Supply and Installation of Smart Classroom Equipment in Government ITIs and Skill Centers across Rajasthan'
+      title: 'Corrigendum-5 API for PM-SETU'
+    },
+    {
+      date: '07 Feb, 2026',
+      id: 'CORR/2026/06',
+      category: 'Corrigendum',
+      isNew: false,
+      status: 'Open',
+      title: 'Corrigendum-6 API for PM-SETU'
     }
   ];
 

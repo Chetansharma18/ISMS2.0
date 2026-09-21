@@ -45,7 +45,7 @@ import { ImportantLinksComponent } from './components/important-links/important-
       <app-services-section></app-services-section>
 
       <!-- 7. Important Links -->
-      <app-important-links></app-important-links>
+      <!-- <app-important-links></app-important-links> -->
     </div>
   `
 })

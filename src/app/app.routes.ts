@@ -269,15 +269,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/trainees/pages/trainee-form/trainee-form.component').then(m => m.TraineeFormComponent),
         data: { roles: ['TP_PIA'] }
       },
+
       {
-        path: 'trainees/assign',
-        loadComponent: () => import('./features/trainees/pages/assign-batch/assign-batch.component').then(m => m.AssignBatchComponent),
-        data: { roles: ['TP_PIA'] }
-      },
-      {
-        path: 'trainees/unmap',
-        loadComponent: () => import('./features/trainees/pages/unmap-batch/unmap-batch.component').then(m => m.UnmapBatchComponent),
-        data: { roles: ['TP_PIA'] }
+        path: 'trainees/view/:id',
+        loadComponent: () => import('./features/trainees/pages/trainee-view/trainee-view.component').then(m => m.TraineeViewComponent),
+        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'TP_PIA'] }
       },
 
       // ================= ATTENDANCE MODULE =================

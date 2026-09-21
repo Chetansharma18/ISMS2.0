@@ -6,6 +6,7 @@ export interface TableColumn {
   label: string;
   align?: 'left' | 'center' | 'right';
   width?: string;
+  isCheckbox?: boolean;
 }
 
 @Component({
@@ -45,7 +46,12 @@ export interface TableColumn {
                 }"
                 [style.width]="col.width || 'auto'"
               >
-                {{ col.label }}
+                <ng-container *ngIf="col.isCheckbox">
+                  <input type="checkbox" [checked]="allSelected" (change)="onSelectAll($event)" class="rounded text-rsldc-navy focus:ring-rsldc-navy cursor-pointer">
+                </ng-container>
+                <ng-container *ngIf="!col.isCheckbox">
+                  {{ col.label }}
+                </ng-container>
               </th>
             </tr>
           </thead>
@@ -99,13 +105,19 @@ export class UiTableComponent {
   @Input() emptyMessage = 'No records found.';
   @Input() showSearch = false;
   @Input() showPagination = false;
+  @Input() allSelected = false;
   
   @Output() search = new EventEmitter<string>();
+  @Output() selectAll = new EventEmitter<boolean>();
 
   @ContentChild('rowTemplate') rowTemplate?: TemplateRef<any>;
 
   onSearch(event: Event) {
     const val = (event.target as HTMLInputElement).value;
     this.search.emit(val);
+  }
+
+  onSelectAll(event: any) {
+    this.selectAll.emit(event.target.checked);
   }
 }

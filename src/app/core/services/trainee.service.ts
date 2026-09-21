@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, switchMap } from 'rxjs/operators';
 
 export interface Trainee {
   id: string;
@@ -108,33 +108,39 @@ export class TraineeService {
     });
   }
 
+  private fetchTraineesObservable(): Observable<Trainee[]> {
+    return this.http.get<Trainee[]>('/api/trainees').pipe(
+      tap((data) => this.traineesSubject.next(data))
+    );
+  }
+
   registerTrainee(payload: any): Observable<any> {
     return this.http.post('/api/trainees', payload).pipe(
-      tap(() => this.fetchTrainees())
+      switchMap(() => this.fetchTraineesObservable())
     );
   }
 
   approveTrainee(id: string): Observable<any> {
     return this.http.post(`/api/trainees/${id}/approve`, {}).pipe(
-      tap(() => this.fetchTrainees())
+      switchMap(() => this.fetchTraineesObservable())
     );
   }
 
   assignToBatch(traineeId: string, batchCode: string): Observable<any> {
     return this.http.post(`/api/trainees/${traineeId}/assign-batch`, { batchCode }).pipe(
-      tap(() => this.fetchTrainees())
+      switchMap(() => this.fetchTraineesObservable())
     );
   }
 
   bulkAssignToBatch(traineeIds: string[], batchCode: string): Observable<any> {
     return this.http.post('/api/trainees/bulk-assign-batch', { traineeIds, batchCode }).pipe(
-      tap(() => this.fetchTrainees())
+      switchMap(() => this.fetchTraineesObservable())
     );
   }
 
   unmapFromBatch(traineeId: string): Observable<any> {
     return this.http.post(`/api/trainees/${traineeId}/unmap`, {}).pipe(
-      tap(() => this.fetchTrainees())
+      switchMap(() => this.fetchTraineesObservable())
     );
   }
 }

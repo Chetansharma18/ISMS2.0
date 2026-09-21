@@ -11,11 +11,11 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
     class: 'block w-full'
   },
   template: `
-    <section class="relative w-full min-h-[calc(100vh-112px)] flex items-center bg-slate-200 py-10 lg:py-16 overflow-hidden">
+    <section class="relative w-full min-h-[500px] sm:min-h-[560px] flex items-stretch bg-slate-200 overflow-hidden">
       
       <!-- Full-bleed Background Image -->
       <img 
-        src="/hero-banner.jpg" 
+        src="/raj.png" 
         alt="Skill Development Building" 
         class="absolute inset-0 w-full h-full object-cover"
         onerror="this.src='https://images.unsplash.com/photo-1541888081622-1c25143a3721?q=80&w=2000&auto=format&fit=crop'"
@@ -24,7 +24,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
       <!-- Gradient Overlay (Full bleed) -->
       <div class="absolute inset-0 bg-gradient-to-r from-[#0B3558] via-[#0B3558]/80 to-[#0B3558]/30 sm:to-transparent"></div>
 
-      <div class="max-w-[1440px] mx-auto w-full px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+      <div class="max-w-[1440px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 lg:py-16 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
         
         <!-- Hero Content (Left) -->
         <div class="w-full lg:w-[60%]">
@@ -48,9 +48,9 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
           </div>
 
           <!-- Floating Tenders Sidebar (Right) -->
-          <div class="hidden lg:flex absolute top-6 right-6 bottom-6 w-[420px] bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/50 flex-col overflow-hidden z-20">
+          <div class="hidden lg:flex absolute top-2.5 right-2.5 lg:right-6 bottom-2.5 w-[420px] bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-white/50 flex-col overflow-hidden z-20">
             <!-- Header -->
-            <div class="bg-[#0B3558] px-5 py-4 flex items-center justify-between z-10 shrink-0 shadow-sm">
+            <div class="bg-[#0B3558] px-6 py-5 flex items-center justify-between z-10 shrink-0 shadow-sm">
               <div class="flex items-center gap-2 text-white font-bold tracking-wide">
                 <span class="w-2 h-2 rounded-full bg-[#EA580C]"></span>
                 Tender

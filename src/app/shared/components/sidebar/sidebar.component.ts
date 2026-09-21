@@ -365,20 +365,22 @@ import { Observable, filter } from 'rxjs';
                Execution (ISMS 2.0)
              </div>
 
-             <!-- Propose Courses -->
+             <!-- Sanction Orders (TP) -->
              <a 
-               routerLink="/tp/courses" 
+               routerLink="/tp/sanction-orders" 
                routerLinkActive="bg-[#002244]/10 text-[#002244] font-black border-l-[3.5px] border-[#002244]" 
                class="flex items-center gap-3 px-3 py-2.5 text-slate-700 hover:bg-slate-100 hover:text-[#002244] transition-all font-bold text-xs rounded-xs border-l-[3.5px] border-transparent group">
                <div class="w-6 h-6 rounded flex items-center justify-center text-slate-500 group-hover:text-[#002244]">
                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                   <path d="M12 20h9"></path>
-                   <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                   <line x1="16" y1="2" x2="16" y2="6"></line>
+                   <line x1="8" y1="2" x2="8" y2="6"></line>
+                   <line x1="3" y1="10" x2="21" y2="10"></line>
                  </svg>
                </div>
-               <span class="tracking-tight">Propose Courses</span>
+               <span class="tracking-tight">Sanction Orders</span>
              </a>
-             
+
              <!-- SDC Management -->
              <a 
                routerLink="/sdcs" 

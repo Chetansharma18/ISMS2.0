@@ -257,9 +257,10 @@ export const routes: Routes = [
       },
 
       // ================= TP MODULE =================
+      // ================= TP MODULE =================
       {
-        path: 'tp/courses',
-        loadComponent: () => import('./features/tp-pia/courses/tp-courses.component').then(m => m.TpCoursesComponent),
+        path: 'tp/sanction-orders',
+        loadComponent: () => import('./features/tp-pia/sanction-orders/tp-sanction-order-list.component').then(m => m.TpSanctionOrderListComponent),
         data: { roles: ['TP_PIA'] }
       },
 

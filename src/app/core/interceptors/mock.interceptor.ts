@@ -13,8 +13,8 @@ export const mockInterceptor: HttpInterceptorFn = (req, next) => {
       success: true,
       data: {
         items: [
-          { id: '1', sdcCode: 'SDC-0001', name: 'Jaipur Skill Center', tpName: 'ARNOLD SAMARTH', scheme: 'SAMARTH', status: 'APPROVED' },
-          { id: '2', sdcCode: 'SDC-0002', name: 'Ajmer Training Inst.', tpName: 'ARNOLD SAMARTH', scheme: 'SAMARTH', status: 'PENDING_INSPECTION' }
+          { id: '1', sdcCode: 'SDC-0001', name: 'Jaipur Skill Center', tpName: 'ARNOLD SAMARTH', scheme: 'SAMARTH', status: 'APPROVED', district: 'Jaipur', noOfApprovedBatches: 3, noOfCompletedBatches: 5, noOfOngoingBatches: 2 },
+          { id: '2', sdcCode: 'SDC-0002', name: 'Ajmer Training Inst.', tpName: 'ARNOLD SAMARTH', scheme: 'SAMARTH', status: 'PENDING_INSPECTION', district: 'Ajmer', noOfApprovedBatches: 1, noOfCompletedBatches: 0, noOfOngoingBatches: 1 }
         ],
         total: 2,
         page: 1,

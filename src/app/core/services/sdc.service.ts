@@ -9,6 +9,10 @@ export interface Sdc {
   tpName: string;
   scheme: string;
   status: 'DRAFT' | 'SUBMITTED' | 'PENDING_INSPECTION' | 'APPROVED' | 'REJECTED';
+  district?: string;
+  noOfApprovedBatches?: number;
+  noOfCompletedBatches?: number;
+  noOfOngoingBatches?: number;
 }
 
 @Injectable({
@@ -45,9 +49,9 @@ export class SdcService {
 
   private getMockSdcs(): Sdc[] {
     return [
-      { id: '1', sdcCode: 'SDC-001', name: 'Skill Center Jaipur', tpName: 'TP Alpha', scheme: 'PMKVY', status: 'APPROVED' },
-      { id: '2', sdcCode: 'SDC-002', name: 'Tech Training Jodhpur', tpName: 'TP Beta', scheme: 'DDU-GKY', status: 'PENDING_INSPECTION' },
-      { id: '3', sdcCode: 'SDC-003', name: 'Rural Skilling Udaipur', tpName: 'TP Gamma', scheme: 'State Scheme', status: 'DRAFT' }
+      { id: '1', sdcCode: 'SDC-001', name: 'Skill Center Jaipur', tpName: 'TP Alpha', scheme: 'PMKVY', status: 'APPROVED', district: 'Jaipur', noOfApprovedBatches: 2, noOfCompletedBatches: 1, noOfOngoingBatches: 1 },
+      { id: '2', sdcCode: 'SDC-002', name: 'Tech Training Jodhpur', tpName: 'TP Beta', scheme: 'DDU-GKY', status: 'PENDING_INSPECTION', district: 'Jodhpur', noOfApprovedBatches: 0, noOfCompletedBatches: 0, noOfOngoingBatches: 0 },
+      { id: '3', sdcCode: 'SDC-003', name: 'Rural Skilling Udaipur', tpName: 'TP Gamma', scheme: 'State Scheme', status: 'DRAFT', district: 'Udaipur', noOfApprovedBatches: 0, noOfCompletedBatches: 0, noOfOngoingBatches: 0 }
     ];
   }
 }

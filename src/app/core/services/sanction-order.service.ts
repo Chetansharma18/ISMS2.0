@@ -10,6 +10,11 @@ export interface SanctionOrder {
   tpId: string;
   status: 'DRAFT' | 'PENDING_RELEASE' | 'RELEASED';
   target?: number;
+  tpCode?: string;
+  scheme?: string;
+  mouStartDate?: string;
+  mouExpiryDate?: string;
+  totalSdc?: number;
 }
 
 @Injectable({
@@ -24,8 +29,13 @@ export class SanctionOrderService {
       eoi: 'EOI-2026-9871',
       tpName: 'SkillMasters Rajasthan',
       tpId: 'TP042',
-      status: 'PENDING_RELEASE',
-      target: 500
+      status: 'RELEASED',
+      target: 500,
+      tpCode: 'TP-2026-001',
+      scheme: 'SAMARTH',
+      mouStartDate: '2026-01-01',
+      mouExpiryDate: '2027-01-01',
+      totalSdc: 2
     }
   ]);
 

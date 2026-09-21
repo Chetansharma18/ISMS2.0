@@ -21,7 +21,7 @@ export interface SelectOption {
   ],
   template: `
     <div class="mb-4">
-      <label *ngIf="label" [for]="id" class="block font-bold text-slate-700 text-sm mb-1">
+      <label *ngIf="label" [for]="id" class="block font-semibold text-slate-700 text-xs tracking-wide mb-1.5">
         {{ label }} <span *ngIf="required" class="text-red-500">*</span>
       </label>
       <div class="relative">
@@ -31,11 +31,11 @@ export interface SelectOption {
           [value]="value"
           (change)="onChangeEvent($event)"
           (blur)="onTouched()"
-          class="w-full px-4 py-2 border rounded-lg text-sm transition-colors outline-none appearance-none focus:ring-2 focus:ring-[#131A4D]/20 disabled:bg-slate-50 disabled:text-slate-500 font-semibold"
+          class="w-full px-4 py-2.5 border rounded-xl text-sm transition-all duration-200 outline-none appearance-none hover:border-slate-300 focus:ring-4 focus:ring-rsldc-navy/10 disabled:bg-slate-50 disabled:text-slate-400 font-semibold shadow-sm hover:shadow"
           [ngClass]="{
-            'border-red-400 focus:border-red-500': showError,
-            'border-slate-300 focus:border-[#131A4D]': !showError,
-            'bg-slate-100 cursor-not-allowed': isDisabled,
+            'border-red-400 focus:border-red-500 bg-red-50/30': showError,
+            'border-slate-200 focus:border-rsldc-navy bg-white focus:bg-slate-50/50': !showError,
+            'bg-slate-100 cursor-not-allowed opacity-75': isDisabled,
             'text-slate-400 font-normal': value === ''
           }"
         >

@@ -6,7 +6,6 @@ import { AdminUserService } from '../../core/services/admin-user.service';
 import { MasterService } from '../../core/services/master.service';
 import { ToastService } from '../../core/services/toast.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
-import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { 
   DepartmentMaster, DesignationMaster, StateMaster, DistrictMaster, 
   BlockMaster, UserTypeMaster, RoleMaster, SchemeMaster, UserRoleAssignment, UserSchemeAssignment 
@@ -20,8 +19,7 @@ import {
     ReactiveFormsModule, 
     FormsModule,
     RouterModule, 
-    PageHeaderComponent, 
-    StatusBadgeComponent
+    PageHeaderComponent
   ],
   template: `
     <div>

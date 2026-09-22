@@ -9,8 +9,30 @@ export const routes: Routes = [
     loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent)
   },
   {
+    path: 'sso-login',
+    redirectTo: 'auth/login',
+    pathMatch: 'full'
+  },
+  {
+    path: 'registration',
+    redirectTo: 'auth/register',
+    pathMatch: 'full'
+  },
+  {
+    path: 'tenders',
+    loadComponent: () => import('./features/tenders/tenders-page.component').then(m => m.TendersPageComponent)
+  },
+  {
+    path: 'tender-status',
+    loadComponent: () => import('./features/tenders/tender-status.component').then(m => m.TenderStatusComponent)
+  },
+  {
     path: 'schemes',
     loadComponent: () => import('./features/eoi/schemes/scheme-listing.component').then(m => m.SchemeListingComponent)
+  },
+  {
+    path: 'scheme-form',
+    loadComponent: () => import('./features/eoi/components/scheme-form/scheme-form.component').then(m => m.SchemeFormComponent)
   },
   
   // Forms Module (Redirect to Unified TP-PIA Registration)

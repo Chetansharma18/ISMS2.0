@@ -55,10 +55,7 @@ export interface SubmittedTender {
             <span>All</span>
             <span
               class="px-1.5 py-0.2 rounded-full text-[10px]"
-              [class.bg-white/20]="activeFilter() === 'All'"
-              [class.text-white]="activeFilter() === 'All'"
-              [class.bg-slate-200]="activeFilter() !== 'All'"
-              [class.text-slate-700]="activeFilter() !== 'All'"
+              [ngClass]="{'bg-white/20 text-white': activeFilter() === 'All', 'bg-slate-200 text-slate-700': activeFilter() !== 'All'}"
             >
               {{ tenders.length }}
             </span>
@@ -78,10 +75,7 @@ export interface SubmittedTender {
             <span>Submitted</span>
             <span
               class="px-1.5 py-0.2 rounded-full text-[10px]"
-              [class.bg-white/20]="activeFilter() === 'Submitted'"
-              [class.text-white]="activeFilter() === 'Submitted'"
-              [class.bg-slate-200]="activeFilter() !== 'Submitted'"
-              [class.text-slate-700]="activeFilter() !== 'Submitted'"
+              [ngClass]="{'bg-white/20 text-white': activeFilter() === 'Submitted', 'bg-slate-200 text-slate-700': activeFilter() !== 'Submitted'}"
             >
               {{ countBySubmitted('Submitted') }}
             </span>
@@ -101,10 +95,7 @@ export interface SubmittedTender {
             <span>Accepted</span>
             <span
               class="px-1.5 py-0.2 rounded-full text-[10px]"
-              [class.bg-white/20]="activeFilter() === 'Accepted'"
-              [class.text-white]="activeFilter() === 'Accepted'"
-              [class.bg-slate-200]="activeFilter() !== 'Accepted'"
-              [class.text-slate-700]="activeFilter() !== 'Accepted'"
+              [ngClass]="{'bg-white/20 text-white': activeFilter() === 'Accepted', 'bg-slate-200 text-slate-700': activeFilter() !== 'Accepted'}"
             >
               {{ countBySubmitted('Accepted') }}
             </span>
@@ -124,10 +115,7 @@ export interface SubmittedTender {
             <span>Technical Opening</span>
             <span
               class="px-1.5 py-0.2 rounded-full text-[10px]"
-              [class.bg-white/20]="activeFilter() === 'Technical Opening'"
-              [class.text-white]="activeFilter() === 'Technical Opening'"
-              [class.bg-slate-200]="activeFilter() !== 'Technical Opening'"
-              [class.text-slate-700]="activeFilter() !== 'Technical Opening'"
+              [ngClass]="{'bg-white/20 text-white': activeFilter() === 'Technical Opening', 'bg-slate-200 text-slate-700': activeFilter() !== 'Technical Opening'}"
             >
               {{ countByEoi('Technical Opening') }}
             </span>
@@ -147,10 +135,7 @@ export interface SubmittedTender {
             <span>Technical Evaluation</span>
             <span
               class="px-1.5 py-0.2 rounded-full text-[10px]"
-              [class.bg-white/20]="activeFilter() === 'Technical Evaluation'"
-              [class.text-white]="activeFilter() === 'Technical Evaluation'"
-              [class.bg-slate-200]="activeFilter() !== 'Technical Evaluation'"
-              [class.text-slate-700]="activeFilter() !== 'Technical Evaluation'"
+              [ngClass]="{'bg-white/20 text-white': activeFilter() === 'Technical Evaluation', 'bg-slate-200 text-slate-700': activeFilter() !== 'Technical Evaluation'}"
             >
               {{ countByEoi('Technical Evaluation') }}
             </span>
@@ -170,10 +155,7 @@ export interface SubmittedTender {
             <span>AOC</span>
             <span
               class="px-1.5 py-0.2 rounded-full text-[10px]"
-              [class.bg-white/20]="activeFilter() === 'AOC'"
-              [class.text-white]="activeFilter() === 'AOC'"
-              [class.bg-slate-200]="activeFilter() !== 'AOC'"
-              [class.text-slate-700]="activeFilter() !== 'AOC'"
+              [ngClass]="{'bg-white/20 text-white': activeFilter() === 'AOC', 'bg-slate-200 text-slate-700': activeFilter() !== 'AOC'}"
             >
               {{ countByEoi('AOC') }}
             </span>
@@ -193,10 +175,7 @@ export interface SubmittedTender {
             <span>Rejected</span>
             <span
               class="px-1.5 py-0.2 rounded-full text-[10px]"
-              [class.bg-white/20]="activeFilter() === 'Rejected'"
-              [class.text-white]="activeFilter() === 'Rejected'"
-              [class.bg-slate-200]="activeFilter() !== 'Rejected'"
-              [class.text-slate-700]="activeFilter() !== 'Rejected'"
+              [ngClass]="{'bg-white/20 text-white': activeFilter() === 'Rejected', 'bg-slate-200 text-slate-700': activeFilter() !== 'Rejected'}"
             >
               {{ countBySubmitted('Rejected') }}
             </span>
@@ -574,3 +553,4 @@ export class TenderStatusComponent {
     alert(`Downloading E-Treasury Receipt for ${this.selectedReceiptTender()?.appRef}`);
   }
 }
+

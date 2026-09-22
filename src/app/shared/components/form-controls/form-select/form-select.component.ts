@@ -11,6 +11,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 export type SelectOption = string | { label: string; value: string };
 
@@ -82,7 +84,8 @@ export type SelectOption = string | { label: string; value: string };
             <div class="p-2 border-b border-slate-100 bg-slate-50/70">
               <input
                 type="text"
-                [(ngModel)]="searchQuery"
+                [ngModel]="searchQuery()"
+                (ngModelChange)="onSearchChange($event)"
                 placeholder="Search options..."
                 class="w-full px-2.5 py-1.5 text-xs rounded border border-slate-200 focus:outline-none focus:border-[#0B3558] bg-white"
                 (click)="$event.stopPropagation()"
@@ -142,7 +145,15 @@ export class FormSelectComponent implements ControlValueAccessor {
 
   @Input() label: string = '';
   @Input() value: any = '';
-  @Input() options: SelectOption[] = [];
+  
+  _options = signal<SelectOption[]>([]);
+  @Input() set options(val: SelectOption[]) {
+    this._options.set(val || []);
+  }
+  get options(): SelectOption[] {
+    return this._options();
+  }
+  
   @Input() placeholder: string = 'Please select';
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;
@@ -152,12 +163,17 @@ export class FormSelectComponent implements ControlValueAccessor {
   @Output() valueChange = new EventEmitter<any>();
 
   isOpen = signal<boolean>(false);
-  searchQuery = '';
+  searchQuery = signal<string>('');
+  private searchSubject = new Subject<string>();
 
   private onChange: (value: any) => void = () => {};
   private onTouched: () => void = () => {};
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(private elementRef: ElementRef) {
+    this.searchSubject.pipe(debounceTime(300)).subscribe(query => {
+      this.searchQuery.set(query);
+    });
+  }
 
   writeValue(value: any): void {
     this.value = value || '';
@@ -193,18 +209,22 @@ export class FormSelectComponent implements ControlValueAccessor {
   }
 
   filteredOptions = computed(() => {
-    const list = this.options || [];
-    if (!this.searchQuery.trim()) {
+    const list = this._options();
+    const query = this.searchQuery().trim().toLowerCase();
+    if (!query) {
       return list;
     }
-    const q = this.searchQuery.toLowerCase();
-    return list.filter(item => this.getOptionLabel(item).toLowerCase().includes(q));
+    return list.filter(item => this.getOptionLabel(item).toLowerCase().includes(query));
   });
+
+  onSearchChange(value: string) {
+    this.searchSubject.next(value);
+  }
 
   toggleDropdown(): void {
     if (!this.disabled) {
       this.isOpen.update(v => !v);
-      this.searchQuery = '';
+      this.searchQuery.set('');
       if (this.isOpen()) {
         this.onTouched();
       }

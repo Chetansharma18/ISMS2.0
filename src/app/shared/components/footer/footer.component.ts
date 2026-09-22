@@ -38,6 +38,7 @@ import { CommonModule } from '@angular/common';
 
         <!-- Carousel Container -->
         <div class="relative flex items-center justify-between gap-4 sm:gap-8 max-w-6xl mx-auto">
+          
 
           <!-- Infinite Marquee Track -->
           <div class="flex-1 overflow-hidden mask-fade relative">
@@ -89,7 +90,7 @@ import { CommonModule } from '@angular/common';
             <h2 class="text-3xl font-black text-white mb-2 tracking-tight">ISMS <span class="text-[#F59E0B]">2.0</span></h2>
             <p class="text-sm font-semibold text-white mb-1">Integrated Scheme Management System</p>
             <p class="text-xs text-slate-400 leading-snug">
-              Rajasthan Skill &amp; Livelihoods Development Corporation<br/>
+              Rajasthan Skill & Livelihoods Development Corporation<br/>
               Department of Skill, Employment and Entrepreneurship<br/>
               Government of Rajasthan
             </p>
@@ -103,7 +104,7 @@ import { CommonModule } from '@angular/common';
                 <li><a href="https://rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Rajasthan Government</a></li>
                 <li><a href="https://livelihoods.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">RSLDC</a></li>
                 <li><a (click)="downloadSamplePdf('Privacy_Policy.pdf', 'Privacy Policy')" class="hover:text-white transition-colors cursor-pointer">Privacy Policy</a></li>
-                <li><a (click)="downloadSamplePdf('Terms_and_Conditions.pdf', 'Terms & Conditions')" class="hover:text-white transition-colors cursor-pointer">Terms &amp; Conditions</a></li>
+                <li><a (click)="downloadSamplePdf('Terms_and_Conditions.pdf', 'Terms & Conditions')" class="hover:text-white transition-colors cursor-pointer">Terms & Conditions</a></li>
               </ul>
               
               <div class="flex flex-row justify-center items-center gap-3 sm:gap-4 text-[13px] text-slate-300 font-bold pt-4 border-t border-slate-700/50 w-full mt-auto whitespace-nowrap">
@@ -126,16 +127,16 @@ import { CommonModule } from '@angular/common';
               <h4 class="text-sm font-bold text-white mb-4">Connect With Us</h4>
               <div class="flex items-center gap-3 mb-8 lg:justify-end">
                 <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-[#12223a] hover:bg-slate-200 transition-colors">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
                 </a>
                 <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-[#12223a] hover:bg-slate-200 transition-colors">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg>
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
                 </a>
                 <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-[#12223a] hover:bg-slate-200 transition-colors">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
                 </a>
                 <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-[#12223a] hover:bg-slate-200 transition-colors">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" fill="white"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="white" stroke-width="2"/></svg>
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z"/></svg>
                 </a>
               </div>
 
@@ -176,6 +177,7 @@ import { CommonModule } from '@angular/common';
 })
 export class FooterComponent {
   downloadSamplePdf(fileName: string, title: string) {
+    // Generate a dummy PDF text and create a downloadable blob
     const pdfContent = `This is a sample PDF document for ${title}.\n\nISMS 2.0 Official Document.`;
     const blob = new Blob([pdfContent], { type: 'application/pdf' });
     const url = window.URL.createObjectURL(blob);

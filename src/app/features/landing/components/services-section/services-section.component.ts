@@ -132,7 +132,7 @@ interface ServiceStep {
                 <p class="text-[17px] sm:text-[19px] font-black text-[#0B3558] leading-tight mb-1.5">Helpdesk Support</p>
                 <p class="text-[13px] sm:text-[14px] text-slate-500 mb-2">For any queries or support related to ISMS 2.0</p>
                 <div class="flex flex-row flex-nowrap whitespace-nowrap items-center gap-4 mt-1 overflow-x-auto">
-                  <a href="mailto:support@isms.rajasthan.gov.in" class="text-[13px] sm:text-[14px] font-bold text-[#EA580C] hover:text-[#0B3558] transition-colors flex items-center gap-1.5 w-fit">
+                  <a href="mailto:support&#64;isms.rajasthan.gov.in" class="text-[13px] sm:text-[14px] font-bold text-[#EA580C] hover:text-[#0B3558] transition-colors flex items-center gap-1.5 w-fit">
                     <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>

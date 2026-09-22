@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { MMKVY_COURSES } from '../constants/mmkvy-courses';
 
 export interface UserProfile {
   ssoId: string;
@@ -206,6 +207,15 @@ export interface FeeStructureMaster {
   defaultFormFee: number;
   defaultEmd: number;
   exemptionApplicable: boolean;
+}
+
+export interface CourseMaster {
+  id: string;
+  courseCode: string;
+  courseName: string;
+  duration: number;
+  nsqfLevel: string;
+  schemes?: string[];
 }
 
 export interface DynamicFormField {
@@ -1031,6 +1041,19 @@ export class EoiStateService {
 
   public feeStructures$: Observable<FeeStructureMaster[]> = this.feeStructuresSubject.asObservable();
 
+  private coursesSubject = new BehaviorSubject<CourseMaster[]>(
+    MMKVY_COURSES.map((course, index) => ({
+      id: `CRS-${index + 1}`,
+      courseCode: course.courseCode || `C-${(index + 1).toString().padStart(3, '0')}`,
+      courseName: course.courseName || course,
+      duration: course.duration || 300,
+      nsqfLevel: course.nsqfLevel || 'Level 4',
+      schemes: course.schemes || []
+    }))
+  );
+
+  public courses$: Observable<CourseMaster[]> = this.coursesSubject.asObservable();
+
   // Super Admin: Dynamic Form Fields per Scheme
   private dynamicFormFieldsSubject = new BehaviorSubject<DynamicFormField[]>([
     { id: 'f-1', schemeCode: 'MMKVY', label: 'Proposed Training Capacity (Annual Candidates)', fieldType: 'number', required: true, placeholder: 'e.g. 500', order: 1 },
@@ -1344,14 +1367,59 @@ export class EoiStateService {
     this.departmentsSubject.next([...depts, { ...dept, id: `DEPT-0${depts.length + 1}` }]);
   }
 
+  updateDepartment(id: string, updatedData: Partial<DepartmentMaster>): void {
+    const depts = this.departmentsSubject.getValue();
+    const index = depts.findIndex(d => d.id === id);
+    if (index !== -1) {
+      const updated = [...depts];
+      updated[index] = { ...updated[index], ...updatedData };
+      this.departmentsSubject.next(updated);
+    }
+  }
+
   addSchemeMaster(sch: Omit<SchemeMaster, 'id'>): void {
     const schs = this.schemeMastersSubject.getValue();
     this.schemeMastersSubject.next([...schs, { ...sch, id: `SCH-0${schs.length + 1}` }]);
   }
 
+  updateSchemeMaster(id: string, updatedData: Partial<SchemeMaster>): void {
+    const schs = this.schemeMastersSubject.getValue();
+    const index = schs.findIndex(s => s.id === id);
+    if (index !== -1) {
+      const updated = [...schs];
+      updated[index] = { ...updated[index], ...updatedData };
+      this.schemeMastersSubject.next(updated);
+    }
+  }
+
   addFeeStructure(fee: Omit<FeeStructureMaster, 'id'>): void {
     const fees = this.feeStructuresSubject.getValue();
     this.feeStructuresSubject.next([...fees, { ...fee, id: `FEE-0${fees.length + 1}` }]);
+  }
+
+  updateFeeStructure(id: string, updatedData: Partial<FeeStructureMaster>): void {
+    const fees = this.feeStructuresSubject.getValue();
+    const index = fees.findIndex(f => f.id === id);
+    if (index !== -1) {
+      const updated = [...fees];
+      updated[index] = { ...updated[index], ...updatedData };
+      this.feeStructuresSubject.next(updated);
+    }
+  }
+
+  addCourse(course: Omit<CourseMaster, 'id'>): void {
+    const courses = this.coursesSubject.getValue();
+    this.coursesSubject.next([...courses, { ...course, id: `CRS-${courses.length + 1}` }]);
+  }
+
+  updateCourse(id: string, updatedData: Partial<CourseMaster>): void {
+    const courses = this.coursesSubject.getValue();
+    const index = courses.findIndex(c => c.id === id);
+    if (index !== -1) {
+      const updatedCourses = [...courses];
+      updatedCourses[index] = { ...updatedCourses[index], ...updatedData };
+      this.coursesSubject.next(updatedCourses);
+    }
   }
 
   // Missing methods for applicant wizard & status tracker

@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { TraineeService } from '../../../../core/services/trainee.service';
 import { FormInputComponent } from '../../../../shared/components/form-controls/form-input/form-input.component';
 import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
+import { EoiStateService, CourseMaster } from '../../../../core/services/eoi-state.service';
 
 @Component({
   selector: 'app-trainee-form',
@@ -64,7 +65,6 @@ import { FormSelectComponent } from '../../../../shared/components/form-controls
             <app-form-select formControlName="education" label="Educational Qualification" [required]="true" [options]="['8th Pass', '10th Pass', '12th Pass', 'Graduate']"></app-form-select>
             <app-form-select formControlName="religion" label="Religion" [required]="true" [options]="['Hindu', 'Muslim', 'Sikh']"></app-form-select>
             <app-form-select formControlName="category" label="Category" [required]="true" [options]="['OBC', 'SC', 'ST', 'General']"></app-form-select>
-            <app-form-select formControlName="aspirantCategoryType" label="Aspirant Category Type" [required]="true" [options]="['Type A']"></app-form-select>
           </div>
           
           <h2 class="text-xl font-bold text-slate-800 mt-8 mb-6 pb-2 border-b">Training Preference</h2>
@@ -104,7 +104,7 @@ import { FormSelectComponent } from '../../../../shared/components/form-controls
               <input type="checkbox" (change)="copyAddress($event)" class="rounded text-rsldc-navy focus:ring-rsldc-navy"> Same as Permanent
             </label>
           </div>
-          <div formGroupName="communicationAddress" class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
+          <div *ngIf="!isSameAddress" formGroupName="communicationAddress" class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 animate-in slide-in-from-top-2 duration-300">
             <app-form-input formControlName="houseNo" label="House No."></app-form-input>
             <app-form-input formControlName="streetName" label="Street/Colony Name"></app-form-input>
             <app-form-input formControlName="wardNo" label="Ward No."></app-form-input>
@@ -134,19 +134,35 @@ import { FormSelectComponent } from '../../../../shared/components/form-controls
         <!-- STEP 4: Additional Details -->
         <div *ngIf="currentStep === 4" class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
           <h2 class="text-xl font-bold text-slate-800 mb-6 pb-2 border-b">Additional Details</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
-            <app-form-input formControlName="courseName" label="Course Name"></app-form-input>
-            <app-form-select formControlName="schemeEnquiry" label="Scheme Enquiry" [options]="['Yes', 'No']"></app-form-select>
-            <app-form-select formControlName="specialAbility" label="Person with Special Ability" [options]="['Yes', 'No']"></app-form-select>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 items-start">
+
+            <div class="space-y-4">
+              <app-form-select formControlName="schemeEnquiry" label="Scheme Enquiry" [options]="['Yes', 'No']"></app-form-select>
+              <div *ngIf="traineeForm.get('schemeEnquiry')?.value === 'Yes'" class="animate-in slide-in-from-top-1 duration-200">
+                <app-form-select formControlName="schemeName" label="Select Scheme" [options]="['MMKVY', 'RAJKViK', 'MNSKSY', 'PMKVY', 'DDU-GKY', 'Samarth']"></app-form-select>
+              </div>
+            </div>
+
+            <div *ngIf="traineeForm.get('schemeName')?.value" class="animate-in zoom-in-95 duration-200">
+              <app-form-select formControlName="courseName" label="Course Name" [options]="availableCourses"></app-form-select>
+            </div>
+
+            <div class="space-y-4">
+              <app-form-select formControlName="specialAbility" label="Person with Special Ability" [options]="['Yes', 'No']"></app-form-select>
+              <div *ngIf="traineeForm.get('specialAbility')?.value === 'Yes'" class="animate-in slide-in-from-top-1 duration-200">
+                <app-form-select formControlName="disabilityType" label="Disability Type" [options]="['Visual Impairment', 'Hearing Impairment', 'Locomotor Disability', 'Intellectual Disability', 'Other']"></app-form-select>
+              </div>
+            </div>
+
             <app-form-input formControlName="annualFamilyIncome" label="Annual Family Income"></app-form-input>
-            <app-form-input formControlName="economicStatus" label="Economic Status"></app-form-input>
+            <app-form-select formControlName="economicStatus" label="Economic Status" [options]="['APL', 'BPL', 'Antyodaya']"></app-form-select>
             
             <app-form-input formControlName="bocwNo" label="BOCW No."></app-form-input>
             <app-form-input formControlName="mgnregaNo" label="MGNREGA No."></app-form-input>
             <app-form-input formControlName="rsbyNo" label="RSBY No."></app-form-input>
             <app-form-input formControlName="nrlmNo" label="NRLM No. of SHG Member"></app-form-input>
             <app-form-input formControlName="epicNo" label="EPIC No."></app-form-input>
-            <app-form-input formControlName="incomeSlab" label="Income Slab (Annual)"></app-form-input>
+            <app-form-select formControlName="incomeSlab" label="Income Slab (Annual)" [options]="['Below 1 Lakh', '1 Lakh - 2.5 Lakhs', '2.5 Lakhs - 5 Lakhs', 'Above 5 Lakhs']"></app-form-select>
           </div>
         </div>
 
@@ -181,14 +197,39 @@ import { FormSelectComponent } from '../../../../shared/components/form-controls
 export class TraineeFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private traineeService = inject(TraineeService);
+  private eoiStateService = inject(EoiStateService);
   private router = inject(Router);
 
   steps = ['Basic Info', 'Contact & Address', 'Bank Details', 'Additional Details', 'Attachments'];
   currentStep = 1;
   traineeForm!: FormGroup;
+  isSameAddress = false;
+
+  allCourses: CourseMaster[] = [];
+
+  get availableCourses(): string[] {
+    if (!this.traineeForm) return [];
+    const scheme = this.traineeForm.get('schemeName')?.value;
+    if (!scheme) return [];
+
+    const matchedCourses = this.allCourses.filter(c => c.schemes && c.schemes.includes(scheme));
+    if (matchedCourses.length > 0) {
+      return matchedCourses.map(c => c.courseName);
+    }
+
+    const fallbacks: Record<string, string[]> = {
+      'PMKVY': ['Plumber General', 'Mason', 'Welder', 'Fitter'],
+      'DDU-GKY': ['BPO Executive', 'Customer Care Executive', 'Field Technician'],
+      'Samarth': ['Tailoring', 'Handicrafts', 'Beauty Therapist', 'Embroidery Worker']
+    };
+    return fallbacks[scheme] || [];
+  }
 
   ngOnInit() {
     this.initForm();
+    this.eoiStateService.courses$.subscribe(courses => {
+      this.allCourses = courses;
+    });
   }
 
   initForm() {
@@ -206,7 +247,6 @@ export class TraineeFormComponent implements OnInit {
       education: ['', Validators.required],
       religion: ['', Validators.required],
       category: ['', Validators.required],
-      aspirantCategoryType: ['', Validators.required],
       
       // Preference & Employment
       trainingPreferredDistrict: [''],
@@ -240,8 +280,10 @@ export class TraineeFormComponent implements OnInit {
 
       // Additional
       courseName: [''],
-      schemeEnquiry: [''],
-      specialAbility: [''],
+      schemeEnquiry: ['No'],
+      schemeName: [''],
+      specialAbility: ['No'],
+      disabilityType: [''],
       annualFamilyIncome: [''],
       economicStatus: [''],
       bocwNo: [''],
@@ -251,10 +293,16 @@ export class TraineeFormComponent implements OnInit {
       epicNo: [''],
       incomeSlab: ['']
     });
+
+    // Reset course name when scheme changes
+    this.traineeForm.get('schemeName')?.valueChanges.subscribe(() => {
+      this.traineeForm.get('courseName')?.reset('');
+    });
   }
 
   copyAddress(event: any) {
-    if (event.target.checked) {
+    this.isSameAddress = event.target.checked;
+    if (this.isSameAddress) {
       const permAddress = this.traineeForm.get('permanentAddress')?.value;
       this.traineeForm.get('communicationAddress')?.patchValue(permAddress);
     } else {

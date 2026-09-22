@@ -38,63 +38,7 @@ import { FormSelectComponent } from '../../../../shared/components/form-controls
         </a>
       </div>
 
-      <!-- Batch Mapping Panel -->
-      <div *ngIf="authService.hasRole('TP_PIA')" class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-5">
-        <div class="flex flex-col md:flex-row gap-4 items-end justify-between">
-          <div class="w-full md:w-72">
-            <app-form-select
-              [(ngModel)]="selectedBatch"
-              (ngModelChange)="onBatchChange()"
-              label="Select Batch for Mapping"
-              [options]="['B-26-0001', 'B-26-0002']">
-            </app-form-select>
-          </div>
 
-          <!-- Stats chips -->
-          <div *ngIf="selectedBatch" class="flex flex-wrap gap-3 text-sm">
-            <div class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-200 font-semibold">
-              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              {{ eligibleCount }} eligible to map
-            </div>
-            <div class="flex items-center gap-2 px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg border border-purple-200 font-semibold">
-              <span class="w-2 h-2 rounded-full bg-purple-500"></span>
-              {{ mappedCount }} mapped to {{ selectedBatch }}
-            </div>
-          </div>
-
-          <!-- Action Buttons -->
-          <div *ngIf="selectedBatch" class="flex gap-2 shrink-0">
-            <button
-              (click)="assignSelected()"
-              [disabled]="selectedToAssign.size === 0 || isAssigning"
-              class="inline-flex items-center gap-2 px-4 py-2 bg-rsldc-navy text-white font-bold text-sm rounded-lg shadow-md hover:bg-[#0f1540] transition disabled:opacity-40">
-              <svg *ngIf="!isAssigning" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-              <svg *ngIf="isAssigning" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-              {{ isAssigning ? 'Assigning...' : 'Map Selected (' + selectedToAssign.size + ')' }}
-            </button>
-            <button
-              (click)="unmapSelected()"
-              [disabled]="selectedToUnmap.size === 0 || isUnmapping"
-              class="inline-flex items-center gap-2 px-4 py-2 bg-reject-50 text-reject-600 border border-reject-200 font-bold text-sm rounded-lg hover:bg-reject-100 transition disabled:opacity-40">
-              <svg *ngIf="!isUnmapping" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-              <svg *ngIf="isUnmapping" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-              {{ isUnmapping ? 'Unmapping...' : 'Unmap Selected (' + selectedToUnmap.size + ')' }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Helper text -->
-        <div *ngIf="selectedBatch" class="mt-3 flex flex-wrap gap-4 text-xs text-slate-500">
-          <span class="flex items-center gap-1.5">
-            <span class="w-3 h-3 rounded-sm bg-emerald-100 border border-emerald-400 inline-block"></span>
-            Check APPROVED aspirants to map them to <strong>{{ selectedBatch }}</strong>
-          </span>
-          <span class="flex items-center gap-1.5">
-            <span class="w-3 h-3 rounded-sm bg-purple-100 border border-purple-400 inline-block"></span>
-            Check ASSIGNED aspirants (this batch) to unmap them
-          </span>
-        </div>
-      </div>
 
       <!-- Search & Filter -->
       <div class="bg-white p-4 rounded-xl shadow-2xs border border-slate-200 flex flex-wrap gap-4 items-end">

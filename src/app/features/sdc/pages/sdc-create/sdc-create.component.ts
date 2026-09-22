@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { SdcFormComponent } from '../../components/sdc-form/sdc-form.component';
+import { SdcService } from '../../../../core/services/sdc.service';
 
 @Component({
   selector: 'app-sdc-create',
@@ -28,11 +29,15 @@ import { SdcFormComponent } from '../../components/sdc-form/sdc-form.component';
 })
 export class SdcCreateComponent {
   private router = inject(Router);
+  private sdcService = inject(SdcService);
 
   handleSubmission(data: any) {
-    // In a real app, this calls the backend API to save the SDC Draft -> Submit workflow.
-    console.log('SDC Submitted:', data);
-    alert('SDC Successfully Submitted for Inspection!');
+    this.sdcService.addSdc({
+      name: data.centerName || data.name || 'New Skill Center',
+      scheme: data.scheme || 'MMKVY',
+      district: data.district || 'Jaipur',
+      status: 'SUBMITTED'
+    });
     this.router.navigate(['/sdcs']);
   }
 }

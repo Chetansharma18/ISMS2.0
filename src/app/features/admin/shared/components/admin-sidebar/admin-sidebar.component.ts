@@ -74,7 +74,9 @@ import { EoiService } from '../../../core/services/eoi.service';
             <a routerLink="/admin/masters/schemes" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">Scheme Master</a>
             <a routerLink="/admin/masters/eoi-categories" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">EOI Category Master</a>
             <a routerLink="/admin/masters/departments" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">Department Master</a>
+            <a routerLink="/admin/masters" [queryParams]="{tab: 'COURSES'}" routerLinkActive="text-[#002244] font-bold bg-white shadow-sm border border-slate-200" [routerLinkActiveOptions]="{exact: true}" (click)="onNavigate()" class="block py-2 px-3 rounded-md text-slate-600 hover:text-[#002244] hover:bg-white transition-all">📚 Course Master</a>
           </div>
+
         </div>
 
         <!-- EOI MANAGEMENT (Collapsible Accordion) -->

@@ -257,6 +257,7 @@ export class HeaderComponent {
 
   onLoginClick(): void {
     this.loginClicked.emit();
+    this.router.navigate(['/auth/login']);
   }
 
   onLogout(): void {

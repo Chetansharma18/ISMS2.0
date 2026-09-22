@@ -359,16 +359,16 @@ export interface EoiDocumentItem {
                     <thead class="bg-slate-50 text-slate-700 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
                       <tr>
                         <th class="py-2 px-3">Financial Year</th>
-                        <th class="py-2 px-3 text-right">Total Turnover (₹)</th>
-                        <th class="py-2 px-3 text-right">Skill Turnover (₹)</th>
+                        <th class="py-2 px-3 text-right">Total Turnover (Γé╣)</th>
+                        <th class="py-2 px-3 text-right">Skill Turnover (Γé╣)</th>
                       </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 font-medium">
                       @for (t of financialTurnover; track t.year) {
                         <tr>
                           <td class="py-2 px-3 font-bold text-slate-800">{{ t.year }}</td>
-                          <td class="py-2 px-3 text-right font-mono text-slate-700">₹ {{ t.totalTurnover }}</td>
-                          <td class="py-2 px-3 text-right font-mono font-bold text-[#0B3558]">₹ {{ t.skillTurnover }}</td>
+                          <td class="py-2 px-3 text-right font-mono text-slate-700">Γé╣ {{ t.totalTurnover }}</td>
+                          <td class="py-2 px-3 text-right font-mono font-bold text-[#0B3558]">Γé╣ {{ t.skillTurnover }}</td>
                         </tr>
                       }
                     </tbody>
@@ -751,7 +751,7 @@ export interface EoiDocumentItem {
                       1. Applicable EOI Application Fees (Compulsory)
                     </h3>
                     <p class="text-xs text-slate-500 mt-0.5">
-                      Both Processing Fee (₹2,000) and Earnest Money Deposit (₹50,000) are compulsory for EOI proposal submission under MMKVY-RAJKVIK.
+                      Both Processing Fee (Γé╣2,000) and Earnest Money Deposit (Γé╣50,000) are compulsory for EOI proposal submission under MMKVY-RAJKVIK.
                     </p>
                   </div>
 
@@ -771,7 +771,7 @@ export interface EoiDocumentItem {
                           </p>
                         </div>
                       </div>
-                      <span class="text-sm sm:text-base font-black text-slate-900">₹2,000</span>
+                      <span class="text-sm sm:text-base font-black text-slate-900">Γé╣2,000</span>
                     </div>
 
                     <!-- Fee 2: Earnest Money Deposit (EMD) -->
@@ -789,7 +789,7 @@ export interface EoiDocumentItem {
                           </p>
                         </div>
                       </div>
-                      <span class="text-sm sm:text-base font-black text-slate-900">₹50,000</span>
+                      <span class="text-sm sm:text-base font-black text-slate-900">Γé╣50,000</span>
                     </div>
                   </div>
                 </div>
@@ -808,18 +808,18 @@ export interface EoiDocumentItem {
                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     
                     <!-- UPI -->
-                    <label
+                    <div
                       class="p-4 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between"
-                      [class.border-[#0B3558]]="paymentMethod() === 'UPI'"
-                      [class.bg-blue-50/40]="paymentMethod() === 'UPI'"
-                      [class.border-slate-200]="paymentMethod() !== 'UPI'"
+                      [ngClass]="{'border-[#0B3558] bg-blue-50/40': paymentMethod() === 'UPI', 'border-slate-200': paymentMethod() !== 'UPI'}"
+                      (click)="paymentMethod.set('UPI')"
                     >
                       <div class="flex items-center justify-between mb-3">
                         <input
                           type="radio"
                           name="payMode"
                           value="UPI"
-                          [(ngModel)]="paymentMethod"
+                          [ngModel]="paymentMethod()"
+                          (ngModelChange)="paymentMethod.set($event)"
                           class="w-4 h-4 text-[#0B3558] focus:ring-[#0B3558]"
                         />
                         <span class="text-xs font-bold px-2 py-0.5 bg-blue-100 text-[#0B3558] rounded">Instant</span>
@@ -828,21 +828,21 @@ export interface EoiDocumentItem {
                         <div class="text-xs font-bold text-slate-900">UPI</div>
                         <div class="text-[11px] text-slate-400 mt-0.5">Google Pay, PhonePe, Paytm, BHIM</div>
                       </div>
-                    </label>
+                    </div>
 
                     <!-- Net Banking -->
-                    <label
+                    <div
                       class="p-4 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between"
-                      [class.border-[#0B3558]]="paymentMethod() === 'NetBanking'"
-                      [class.bg-blue-50/40]="paymentMethod() === 'NetBanking'"
-                      [class.border-slate-200]="paymentMethod() !== 'NetBanking'"
+                      [ngClass]="{'border-[#0B3558] bg-blue-50/40': paymentMethod() === 'NetBanking', 'border-slate-200': paymentMethod() !== 'NetBanking'}"
+                      (click)="paymentMethod.set('NetBanking')"
                     >
                       <div class="flex items-center justify-between mb-3">
                         <input
                           type="radio"
                           name="payMode"
                           value="NetBanking"
-                          [(ngModel)]="paymentMethod"
+                          [ngModel]="paymentMethod()"
+                          (ngModelChange)="paymentMethod.set($event)"
                           class="w-4 h-4 text-[#0B3558] focus:ring-[#0B3558]"
                         />
                         <span class="text-xs font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded">Bank</span>
@@ -851,21 +851,21 @@ export interface EoiDocumentItem {
                         <div class="text-xs font-bold text-slate-900">Net Banking</div>
                         <div class="text-[11px] text-slate-400 mt-0.5">SBI, HDFC, ICICI, PNB, BoB &amp; 50+ Banks</div>
                       </div>
-                    </label>
+                    </div>
 
                     <!-- Debit / Credit Card -->
-                    <label
+                    <div
                       class="p-4 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between"
-                      [class.border-[#0B3558]]="paymentMethod() === 'Card'"
-                      [class.bg-blue-50/40]="paymentMethod() === 'Card'"
-                      [class.border-slate-200]="paymentMethod() !== 'Card'"
+                      [ngClass]="{'border-[#0B3558] bg-blue-50/40': paymentMethod() === 'Card', 'border-slate-200': paymentMethod() !== 'Card'}"
+                      (click)="paymentMethod.set('Card')"
                     >
                       <div class="flex items-center justify-between mb-3">
                         <input
                           type="radio"
                           name="payMode"
                           value="Card"
-                          [(ngModel)]="paymentMethod"
+                          [ngModel]="paymentMethod()"
+                          (ngModelChange)="paymentMethod.set($event)"
                           class="w-4 h-4 text-[#0B3558] focus:ring-[#0B3558]"
                         />
                         <span class="text-xs font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded">Cards</span>
@@ -874,7 +874,7 @@ export interface EoiDocumentItem {
                         <div class="text-xs font-bold text-slate-900">Debit / Credit Card</div>
                         <div class="text-[11px] text-slate-400 mt-0.5">RuPay, Visa, MasterCard, Maestro</div>
                       </div>
-                    </label>
+                    </div>
 
                   </div>
                 </div>
@@ -891,16 +891,16 @@ export interface EoiDocumentItem {
                 <div class="p-5 space-y-4 text-xs">
                   <div class="flex justify-between text-slate-600 pb-2 border-b border-slate-100">
                     <span>Processing Fee</span>
-                    <span class="font-bold text-slate-900">₹2,000</span>
+                    <span class="font-bold text-slate-900">Γé╣2,000</span>
                   </div>
                   <div class="flex justify-between text-slate-600 pb-2 border-b border-slate-100">
                     <span>EMD Fee</span>
-                    <span class="font-bold text-slate-900">₹50,000</span>
+                    <span class="font-bold text-slate-900">Γé╣50,000</span>
                   </div>
 
                   <div class="flex justify-between items-baseline pt-1">
                     <span class="text-sm font-bold text-slate-900">Total Payable Amount</span>
-                    <span class="text-xl font-black text-[#0B3558]">₹52,000</span>
+                    <span class="text-xl font-black text-[#0B3558]">Γé╣52,000</span>
                   </div>
 
                   <div class="p-2.5 bg-slate-50 rounded-lg text-[11px] text-slate-500 font-medium">
@@ -921,7 +921,7 @@ export interface EoiDocumentItem {
                       </svg>
                       <span>Connecting to e-GRAS...</span>
                     } @else {
-                      <span>Proceed to Payment (₹52,000) &rarr;</span>
+                      <span>Proceed to Payment (Γé╣52,000) &rarr;</span>
                     }
                   </button>
                 </div>
@@ -1054,15 +1054,15 @@ export interface EoiDocumentItem {
                     <tbody class="divide-y divide-slate-100 font-medium">
                       <tr>
                         <td class="py-2.5 px-4">Earnest Money Deposit (EMD) - Refundable Security</td>
-                        <td class="py-2.5 px-4 text-right font-mono font-bold">₹ 50,000.00</td>
+                        <td class="py-2.5 px-4 text-right font-mono font-bold">Γé╣ 50,000.00</td>
                       </tr>
                       <tr>
                         <td class="py-2.5 px-4">Administrative Scrutiny Processing Fee - Non Refundable</td>
-                        <td class="py-2.5 px-4 text-right font-mono font-bold">₹ 2,000.00</td>
+                        <td class="py-2.5 px-4 text-right font-mono font-bold">Γé╣ 2,000.00</td>
                       </tr>
                       <tr class="bg-slate-50 font-bold text-slate-900">
                         <td class="py-3 px-4 text-sm">Total Paid Amount:</td>
-                        <td class="py-3 px-4 text-right font-mono text-base text-[#0B3558]">₹ 52,000.00</td>
+                        <td class="py-3 px-4 text-right font-mono text-base text-[#0B3558]">Γé╣ 52,000.00</td>
                       </tr>
                     </tbody>
                   </table>
@@ -1141,7 +1141,7 @@ export interface EoiDocumentItem {
                   </div>
                   <div>
                     <span class="text-slate-400 block font-medium">Fee Payment Ref</span>
-                    <span class="font-mono text-slate-700 font-bold">TXN-ISMS-2026-004520402 (₹52,000)</span>
+                    <span class="font-mono text-slate-700 font-bold">TXN-ISMS-2026-004520402 (Γé╣52,000)</span>
                   </div>
                 </div>
 
@@ -1205,7 +1205,7 @@ export interface EoiDocumentItem {
                 Payment Successful!
               </h3>
               <p class="text-xs text-slate-500 mt-1">
-                Your EMD and Processing Fee of <strong>₹52,000</strong> have been successfully processed via e-GRAS Cyber Treasury.
+                Your EMD and Processing Fee of <strong>Γé╣52,000</strong> have been successfully processed via e-GRAS Cyber Treasury.
               </p>
             </div>
 
@@ -1221,7 +1221,7 @@ export interface EoiDocumentItem {
               </div>
               <div class="flex justify-between font-bold text-slate-900 pt-1 border-t border-slate-200">
                 <span>Amount Paid:</span>
-                <span class="text-emerald-700">₹ 52,000.00</span>
+                <span class="text-emerald-700">Γé╣ 52,000.00</span>
               </div>
             </div>
 
@@ -1260,8 +1260,8 @@ export class SchemeFormComponent {
   schemeTitle = signal<string>('Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)');
   schemeCode = signal<string>('MMKVY-RAJKVIK');
   schemeCategory = signal<string>('Category I: RAJKVIK');
-  schemeEmdFee = signal<string>('₹50,000');
-  schemeProcessFee = signal<string>('₹2,000');
+  schemeEmdFee = signal<string>('Γé╣50,000');
+  schemeProcessFee = signal<string>('Γé╣2,000');
 
   // =========================================================================
   // Subsection 1: Training Centres (From PDF Page 2)
@@ -1441,7 +1441,7 @@ export class SchemeFormComponent {
     {
       id: 4,
       name: 'Non-Blacklisted Affidavit',
-      description: 'Notarized self-affidavit on ₹100 stamp paper for not being blacklisted by any Government department',
+      description: 'Notarized self-affidavit on Γé╣100 stamp paper for not being blacklisted by any Government department',
       fileName: 'non_blacklisted_notarized_affidavit.pdf',
       fileSize: '1.1 MB',
       uploadedDate: '08-Sep-2026',

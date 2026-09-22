@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
+import { HeaderComponent } from '../../core/layout/header/header.component';
+import { FooterComponent } from '../../core/layout/footer/footer.component';
 
 export interface SchemeTender {
   sNo: number;
@@ -24,9 +26,10 @@ export interface SchemeTender {
 @Component({
   selector: 'app-tenders-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, HeaderComponent, FooterComponent],
   template: `
-    <div class="w-full min-h-full bg-white text-slate-800">
+    <div class="w-full min-h-screen flex flex-col bg-white text-slate-800">
+      <app-header></app-header>
       
       <!-- ====================================================================
            VIEW 1: ACTIVE SCHEMES & TENDERS TABLE (Matching Screenshot 1)
@@ -394,6 +397,7 @@ export interface SchemeTender {
         </div>
       }
 
+      <app-footer></app-footer>
     </div>
   `
 })
@@ -407,7 +411,7 @@ export class TendersPageComponent {
     const user = this.currentUser();
     if (!user) return true;
     if (user.role === 'new_user') return true;
-    return user.isProfileComplete === false;
+    return (user as any).isProfileComplete === false;
   });
 
   selectedScheme = signal<SchemeTender | null>(null);

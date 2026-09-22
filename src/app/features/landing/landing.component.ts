@@ -2,16 +2,11 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NewsTickerComponent } from './components/news-ticker/news-ticker.component';
 import { HeroSectionComponent } from './components/hero-section/hero-section.component';
-import { StatsSectionComponent } from './components/stats-section/stats-section.component';
-import { SchemesSectionComponent } from './components/schemes-section/schemes-section.component';
 import { ServicesSectionComponent } from './components/services-section/services-section.component';
 import { AboutSectionComponent } from './components/about-section/about-section.component';
-import { ImportantLinksComponent } from './components/important-links/important-links.component';
 import { HeaderComponent } from '../../core/layout/header/header.component';
 import { FooterComponent } from '../../core/layout/footer/footer.component';
-import { AuthService } from '../../core/auth/auth.service';
-import { inject } from '@angular/core';
-import { SsoRedirectModalComponent } from '../../core/auth/components/sso-redirect-modal/sso-redirect-modal.component';
+
 
 @Component({
   selector: 'app-landing',
@@ -23,20 +18,16 @@ import { SsoRedirectModalComponent } from '../../core/auth/components/sso-redire
     AboutSectionComponent,
     ServicesSectionComponent,
     HeaderComponent,
-    FooterComponent,
-    SsoRedirectModalComponent
+    FooterComponent
   ],
   host: {
     class: 'block w-full'
   },
   template: `
     <div class="w-full flex flex-col min-h-screen">
-      @if (authService.isRedirecting()) {
-        <app-sso-redirect-modal></app-sso-redirect-modal>
-      }
+      <!-- Site-wide Header -->
+      <app-header></app-header>
 
-      <app-header (loginClicked)="onLoginClick()"></app-header>
-      
       <!-- 1. Government Circulars & News Ticker -->
       <app-news-ticker></app-news-ticker>
 
@@ -57,15 +48,10 @@ import { SsoRedirectModalComponent } from '../../core/auth/components/sso-redire
 
       <!-- 7. Important Links -->
       <!-- <app-important-links></app-important-links> -->
-      
+
+      <!-- Site-wide Footer -->
       <app-footer></app-footer>
     </div>
   `
 })
-export class LandingComponent {
-  authService = inject(AuthService);
-
-  onLoginClick(): void {
-    this.authService.triggerSsoRedirect();
-  }
-}
+export class LandingComponent { }

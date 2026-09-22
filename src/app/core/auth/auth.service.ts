@@ -10,6 +10,9 @@ import { Router } from '@angular/router';
 export class AuthService {
   private currentUserSignal = signal<User | null>(null);
   public currentUser = this.currentUserSignal.asReadonly();
+  
+  private isRedirectingSignal = signal<boolean>(false);
+  public isRedirecting = this.isRedirectingSignal.asReadonly();
 
   constructor(private router: Router) {
     // Load from local storage on init
@@ -37,6 +40,15 @@ export class AuthService {
     this.currentUserSignal.set(null);
     localStorage.removeItem('currentUser');
     this.router.navigate(['/login']);
+  }
+
+  triggerSsoRedirect(): void {
+    this.isRedirectingSignal.set(true);
+  }
+
+  proceedToSsoLogin(): void {
+    this.isRedirectingSignal.set(false);
+    this.router.navigate(['/auth/login']);
   }
 
   hasRole(role: string | string[]): boolean {

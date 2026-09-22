@@ -1,6 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+interface ServiceStep {
+  step: string;
+  title: string;
+  description: string;
+  badge: string;
+}
+
 @Component({
   selector: 'app-services-section',
   standalone: true,
@@ -62,7 +69,7 @@ import { CommonModule } from '@angular/common';
                   <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#f4f8fc] text-blue-500 flex items-center justify-center mb-1 sm:mb-2 shrink-0">
                     <span class="font-bold text-sm">A/अ</span>
                   </div>
-                  <p class="text-[11px] sm:text-[12px] font-bold text-slate-700 leading-tight">In English &amp;<br/>Hindi</p>
+                  <p class="text-[11px] sm:text-[12px] font-bold text-slate-700 leading-tight">In English &<br/>Hindi</p>
                 </div>
 
                 <!-- Feature 3 -->
@@ -72,7 +79,7 @@ import { CommonModule } from '@angular/common';
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
                   </div>
-                  <p class="text-[11px] sm:text-[12px] font-bold text-[#1f2937] leading-tight">Secure &amp; role<br/>based access</p>
+                  <p class="text-[11px] sm:text-[12px] font-bold text-[#1f2937] leading-tight">Secure & role<br/>based access</p>
                 </div>
               </div>
 
@@ -98,12 +105,12 @@ import { CommonModule } from '@angular/common';
           </div>
         </div>
 
-        <!-- Help & Support Section -->
+        <!-- Help & Support Section (Below Mobile App Box) -->
         <div class="mt-16 mb-8 max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 px-4 sm:px-0">
           
           <!-- Text Content -->
           <div class="text-center md:text-left max-w-md">
-            <h4 class="text-xs font-bold text-[#EA580C] uppercase tracking-wider mb-2">Help &amp; Support</h4>
+            <h4 class="text-xs font-bold text-[#EA580C] uppercase tracking-wider mb-2">Help & Support</h4>
             <h2 class="text-3xl sm:text-4xl font-black text-[#0B3558] mb-3 tracking-tight font-sans">
               Need Assistance?
             </h2>

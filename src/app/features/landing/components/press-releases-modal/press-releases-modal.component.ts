@@ -28,12 +28,12 @@ interface PressRelease {
               </svg>
             </div>
             <div>
-              <h3 class="text-lg font-bold leading-tight">Press Releases &amp; Official Statements</h3>
+              <h3 class="text-lg font-bold leading-tight">Press Releases & Official Statements</h3>
               <p class="text-[11px] text-blue-200 mt-0.5">Rajasthan Skill and Livelihoods Development Corporation (RSLDC)</p>
             </div>
           </div>
           
-          <button (click)="close.emit()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer">
+          <button (click)="close.emit()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -66,8 +66,8 @@ interface PressRelease {
 
         <!-- Footer -->
         <div class="border-t border-slate-200 bg-white px-6 py-4 flex items-center justify-between shrink-0">
-          <span class="text-xs text-slate-500 font-medium">Source: RSLDC Public Relations &amp; Media</span>
-          <button (click)="close.emit()" class="bg-[#0B3558] hover:bg-[#07233B] text-white px-5 py-2 rounded-md text-sm font-semibold transition-colors cursor-pointer">
+          <span class="text-xs text-slate-500 font-medium">Source: RSLDC Public Relations & Media</span>
+          <button (click)="close.emit()" class="bg-[#0B3558] hover:bg-[#07233B] text-white px-5 py-2 rounded-md text-sm font-semibold transition-colors">
             Close
           </button>
         </div>

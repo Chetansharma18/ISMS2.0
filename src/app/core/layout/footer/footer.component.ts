@@ -148,11 +148,13 @@ import { CommonModule } from '@angular/common';
                   </svg>
                   <span>0141-xxxxxxx</span>
                 </div>
-                <div class="flex items-center gap-2 lg:justify-end">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <span>support@isms.rajasthan.gov.in</span>
+                <div class="flex items-center gap-3">
+                  <span class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </span>
+                  <span>support&#64;isms.rajasthan.gov.in</span>
                 </div>
               </div>
             </div>

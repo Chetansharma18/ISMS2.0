@@ -158,10 +158,8 @@ import { AuthService } from '../../auth/auth.service';
                 </div>
               }
             </div>
-          }
-
-          <!-- === ON SSO PAGE (not logged in): Back link === -->
-          @else if (isSsoPage()) {
+          } @else if (isSsoPage()) {
+            <!-- === ON SSO PAGE (not logged in): Back link === -->
             <a
               routerLink="/"
               class="inline-flex items-center gap-1.5 text-[#0B3558] hover:text-[#EA580C] border border-slate-300 hover:border-orange-300 rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors"
@@ -171,10 +169,8 @@ import { AuthService } from '../../auth/auth.service';
               </svg>
               <span>Back to ISMS</span>
             </a>
-          }
-
-          <!-- === NOT LOGGED IN: Login button === -->
-          @else {
+          } @else {
+            <!-- === NOT LOGGED IN: Login button === -->
             <button
               type="button"
               class="inline-flex items-center gap-2 bg-[#0B3558] text-white rounded-lg px-4 sm:px-6 py-2 sm:py-2.5 text-sm font-semibold cursor-pointer shadow-sm hover:bg-[#07233B] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
@@ -218,7 +214,7 @@ export class HeaderComponent {
   readonly displayName = computed(() => {
     const u = this.currentUser();
     if (!u) return '';
-    return u.label || u.ssoId || u.id;
+    return u.name || u.username || u.id;
   });
 
   readonly avatarChar = computed(() => {
@@ -227,11 +223,11 @@ export class HeaderComponent {
   });
 
   constructor() {
-    this.isSsoPage.set(this.router.url.includes('/sso-login'));
+    this.isSsoPage.set(this.router.url.includes('/auth/login'));
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
-        this.isSsoPage.set(event.urlAfterRedirects.includes('/sso-login'));
+        this.isSsoPage.set(event.urlAfterRedirects.includes('/auth/login'));
         // Close dropdown on navigation
         this.dropdownOpen.set(false);
       });

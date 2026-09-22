@@ -101,12 +101,7 @@ export class OtrValidationService {
       }
     }
 
-    // Financial & Contact
-    if (!step1.turnOver?.trim()) {
-      errors.push('Turn Over (₹ in Lakhs) is mandatory.');
-    } else if (isNaN(Number(step1.turnOver)) || Number(step1.turnOver) < 0) {
-      errors.push('Turn Over must be a valid non-negative numeric amount.');
-    }
+    // Contact Details
     if (!step1.contactNo?.trim()) {
       errors.push('Company Contact Number is mandatory.');
     } else if (!REGEX.INDIAN_MOBILE.test(step1.contactNo)) {
@@ -162,7 +157,7 @@ export class OtrValidationService {
      Step 2: Officer In-Charge Directory Validation
      ========================================================================== */
   validateSingleOic(oic: OfficerInCharge, index: number): string[] {
-    const prefix = `Officer #${index + 1}: `;
+    const prefix = 'Officer In-Charge: ';
     const errors: string[] = [];
 
     if (!oic.name?.trim() || oic.name.trim().length < 2) {
@@ -299,7 +294,7 @@ export class OtrValidationService {
       errors.push('Branch Name is mandatory.');
     }
     if (!step4.transferMode?.trim()) {
-      errors.push('Mode of Electronic Transfer selection is mandatory.');
+      errors.push('Mode of Transfer selection is mandatory.');
     }
     if (!step4.accountType?.trim()) {
       errors.push('Type of Account selection is mandatory.');

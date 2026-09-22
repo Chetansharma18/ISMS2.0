@@ -32,11 +32,11 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
   template: `
     <div class="w-full space-y-4">
 
-      <!-- Section 1.1: Organization Profile & Constitution -->
-      <app-form-section title="Organization Profile & Constitution">
+      <!-- Section 1.1: Step 1 - Organization Details -->
+      <app-form-section title="Step 1 - Organization Details">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <app-form-input
-            label="TP / PIA Short Name"
+            label="TP/PIA Short Name"
             [value]="data().shortName"
             (valueChange)="update('shortName', $event)"
             placeholder="e.g. RSLDC-SKILLS"
@@ -45,7 +45,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           ></app-form-input>
 
           <app-form-input
-            label="TP / PIA Full Legal Name"
+            label="TP/PIA Full Name"
             [value]="data().fullName"
             (valueChange)="update('fullName', $event)"
             placeholder="e.g. Rajasthan Skill Development Solutions Pvt Ltd"
@@ -63,7 +63,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           ></app-form-select>
 
           <app-form-input
-            label="Registration / CIN No."
+            label="Registration Number of Entity (CIN / Registration No. / Other)"
             [value]="data().registrationNumber"
             (valueChange)="update('registrationNumber', $event)"
             placeholder="e.g. U74999RJ2010PTC032456"
@@ -81,7 +81,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           ></app-form-input>
 
           <app-form-select
-            label="State / UT of Legal Registration"
+            label="State/UT of Legal Registration"
             [value]="data().stateOfLegalReg"
             (valueChange)="update('stateOfLegalReg', $event)"
             [options]="statesList"
@@ -90,7 +90,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
 
           <div class="md:col-span-2">
             <app-form-file-upload
-              label="Certificate of Registration Document"
+              label="Certificate of Registration / Incorporation"
               [fileDoc]="data().registrationCertDoc"
               (fileChange)="updateDoc('registrationCertDoc', $event)"
               [required]="true"
@@ -99,8 +99,8 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
         </div>
       </app-form-section>
 
-      <!-- Section 1.2: Statutory & Tax Compliance Details -->
-      <app-form-section title="Statutory & Tax Compliance Details">
+      <!-- Section 1.2: Statutory Compliance Details -->
+      <app-form-section title="Statutory & Tax Compliance">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <app-form-input
             label="Company PAN"
@@ -113,14 +113,14 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           ></app-form-input>
 
           <app-form-file-upload
-            label="Organization PAN Card Document"
+            label="Organization PAN Card"
             [fileDoc]="data().panCardDoc"
             (fileChange)="updateDoc('panCardDoc', $event)"
             [required]="true"
           ></app-form-file-upload>
 
           <app-form-select
-            label="GST Registered?"
+            label="GST Registered"
             [value]="data().gstRegistered"
             (valueChange)="onGstRegisteredChange($event)"
             [options]="['Yes', 'No']"
@@ -129,7 +129,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
 
           @if (data().gstRegistered === 'Yes') {
             <app-form-input
-              label="GSTIN Number"
+              label="GSTIN"
               [value]="data().gstin"
               (valueChange)="update('gstin', $event)"
               placeholder="e.g. 08ABCDE1234F1Z5"
@@ -149,7 +149,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           }
 
           <app-form-select
-            label="MSME / Udyam Registered?"
+            label="MSME Registered"
             [value]="data().msmeRegistered"
             (valueChange)="onMsmeRegisteredChange($event)"
             [options]="['Yes', 'No']"
@@ -158,7 +158,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
 
           @if (data().msmeRegistered === 'Yes') {
             <app-form-input
-              label="Udyam Registration Number"
+              label="Udyam Number"
               [value]="data().udyamNumber"
               (valueChange)="update('udyamNumber', $event)"
               placeholder="e.g. UDYAM-RJ-14-0012345"
@@ -169,7 +169,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
 
             <div class="md:col-span-2">
               <app-form-file-upload
-                label="MSME / Udyam Certificate"
+                label="MSME / Udyam Registration Certificate"
                 [fileDoc]="data().msmeCertDoc"
                 (fileChange)="updateDoc('msmeCertDoc', $event)"
                 [required]="true"
@@ -179,48 +179,29 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
         </div>
       </app-form-section>
 
-      <!-- Section 1.3: Financial, Governance & Digital Profile -->
-      <app-form-section title="Financial, Governance & Digital Profile">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3">
-          <app-form-input
-            label="Turn Over (₹ in Lakhs)"
-            type="number"
-            [value]="data().turnOver"
-            (valueChange)="update('turnOver', $event)"
-            placeholder="e.g. 250.50"
-            prefixText="₹"
-            suffixText="Lakhs"
-            [required]="true"
-          ></app-form-input>
-
+      <!-- Section 1.3: Governance & Contact Profile -->
+      <app-form-section title="Governance & Contact Profile">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-3">
           <app-form-select
-            label="Blacklisted by any Govt Dept?"
-            [value]="data().blackListed"
-            (valueChange)="update('blackListed', $event)"
-            [options]="['No', 'Yes']"
-            [required]="true"
-          ></app-form-select>
-
-          <app-form-select
-            label="NSDC Partner Affiliation"
+            label="NSDC Partner"
             [value]="data().nsdcPartner"
             (valueChange)="update('nsdcPartner', $event)"
             [options]="nsdcPartnersList"
-            [required]="true"
+            [required]="false"
           ></app-form-select>
 
           <app-form-input
-            label="Company Contact Number"
+            label="Company Contact No."
             type="tel"
             [value]="data().contactNo"
             (valueChange)="update('contactNo', $event)"
             placeholder="e.g. 9829012345"
             [required]="true"
-            [maxLength]="10"
+            [maxLength]="15"
           ></app-form-input>
 
           <app-form-input
-            label="Official Company Email-ID"
+            label="Company Email-ID"
             type="email"
             [value]="data().emailId"
             (valueChange)="update('emailId', $event)"
@@ -229,7 +210,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           ></app-form-input>
 
           <app-form-input
-            label="Official Website URL"
+            label="Website"
             [value]="data().website"
             (valueChange)="update('website', $event)"
             placeholder="e.g. https://www.organisation.com"
@@ -237,17 +218,16 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
         </div>
       </app-form-section>
 
-      <!-- Section 1.4: Registered & Operational Addresses -->
-      <app-form-section title="Registered & Operational Address">
+      <!-- Section 1.4: Addresses -->
+      <app-form-section title="Registered & Office Addresses">
         <div class="space-y-4">
           
           <!-- Registered Address Block -->
           <div>
-            <span class="text-xs font-bold text-slate-700 block mb-2">Registered Office Address</span>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-3">
               <div class="sm:col-span-3">
                 <app-form-textarea
-                  label="Registered Premise Address"
+                  label="Registered Address"
                   [value]="data().registeredAddress"
                   (valueChange)="update('registeredAddress', $event)"
                   placeholder="Street, locality, building name and number"
@@ -257,7 +237,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
               </div>
 
               <app-form-select
-                label="Registered State"
+                label="State / UT"
                 [value]="data().registeredState"
                 (valueChange)="onRegisteredStateChange($event)"
                 [options]="statesList"
@@ -265,7 +245,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
               ></app-form-select>
 
               <app-form-select
-                label="Registered District"
+                label="District"
                 [value]="data().registeredDistrict"
                 (valueChange)="update('registeredDistrict', $event)"
                 [options]="registeredDistricts()"
@@ -274,7 +254,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
               ></app-form-select>
 
               <app-form-input
-                label="Registered PIN Code"
+                label="PIN Code"
                 type="tel"
                 [value]="data().registeredPincode"
                 (valueChange)="update('registeredPincode', $event)"
@@ -292,20 +272,19 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
                 type="checkbox"
                 [ngModel]="data().sameAsRegistered"
                 (ngModelChange)="toggleSameAsRegistered($event)"
-                class="w-4 h-4 text-[#131862] border-slate-300 rounded focus:ring-[#131862]"
+                class="w-4 h-4 text-slate-800 border-slate-300 rounded focus:ring-slate-700 accent-slate-800"
               />
-              <span>Operational / Correspondence Address is the same as Registered Address</span>
+              <span>Office Address is the same as Registered Address</span>
             </label>
           </div>
 
-          <!-- Operational Address Block (if different) -->
+          <!-- Office Address Block (if different) -->
           @if (!data().sameAsRegistered) {
             <div>
-              <span class="text-xs font-bold text-slate-700 block mb-2">Operational Office Address</span>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-3">
                 <div class="sm:col-span-3">
                   <app-form-textarea
-                    label="Operational Office Address"
+                    label="Office Address"
                     [value]="data().officeAddress"
                     (valueChange)="update('officeAddress', $event)"
                     placeholder="Street, locality, building name and number"
@@ -315,7 +294,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
                 </div>
 
                 <app-form-select
-                  label="Operational State"
+                  label="State / UT"
                   [value]="data().officeState"
                   (valueChange)="onOfficeStateChange($event)"
                   [options]="statesList"
@@ -323,7 +302,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
                 ></app-form-select>
 
                 <app-form-select
-                  label="Operational District"
+                  label="District"
                   [value]="data().officeDistrict"
                   (valueChange)="update('officeDistrict', $event)"
                   [options]="officeDistricts()"
@@ -332,7 +311,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
                 ></app-form-select>
 
                 <app-form-input
-                  label="Operational PIN Code"
+                  label="PIN Code"
                   type="tel"
                   [value]="data().officePincode"
                   (valueChange)="update('officePincode', $event)"

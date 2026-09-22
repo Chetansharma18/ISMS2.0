@@ -60,6 +60,34 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/eoi-view',
+    loadComponent: () =>
+      import('./features/eoi/pages/department-eoi-view/department-eoi-view.component').then(
+        (m) => m.DepartmentEoiViewComponent
+      )
+  },
+  {
+    path: 'admin/responses/:schemeId',
+    loadComponent: () =>
+      import('./features/eoi/pages/applicant-submissions/applicant-submissions.component').then(
+        (m) => m.ApplicantSubmissionsComponent
+      )
+  },
+  {
+    path: 'admin/responses',
+    loadComponent: () =>
+      import('./features/eoi/pages/applicant-submissions/applicant-submissions.component').then(
+        (m) => m.ApplicantSubmissionsComponent
+      )
+  },
+  {
+    path: 'admin/review/:applicationId',
+    loadComponent: () =>
+      import('./features/eoi/pages/scrutiny-desk/scrutiny-desk.component').then(
+        (m) => m.ScrutinyDeskComponent
+      )
+  },
+  {
     path: '**',
     redirectTo: ''
   }

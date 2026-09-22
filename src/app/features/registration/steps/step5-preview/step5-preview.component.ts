@@ -25,12 +25,12 @@ import { OtrValidationService } from '../../services/otr-validation.service';
       <div class="space-y-3 pb-4 border-b border-slate-200">
         <div class="flex items-center justify-between">
           <h3 class="text-sm font-bold text-slate-800">
-            1. Organization Details
+            Step 1 - Organization Details
           </h3>
           <button
             type="button"
             (click)="onEditStep(1)"
-            class="text-xs text-[#131862] hover:underline font-semibold cursor-pointer"
+            class="text-xs text-slate-700 hover:text-slate-900 hover:underline font-semibold cursor-pointer"
           >
             Edit
           </button>
@@ -38,90 +38,89 @@ import { OtrValidationService } from '../../services/otr-validation.service';
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 text-xs">
           <div>
-            <span class="text-slate-400 block text-[11px]">Short Name</span>
+            <span class="text-slate-400 block text-[11px] font-medium">TP/PIA Short Name</span>
             <span class="font-medium text-slate-800">{{ step1().shortName || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">Full Legal Name</span>
+            <span class="text-slate-400 block text-[11px] font-medium">TP/PIA Full Name</span>
             <span class="font-medium text-slate-800">{{ step1().fullName || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">Entity Nature</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Nature of Entity</span>
             <span class="font-medium text-slate-800">{{ step1().natureOfEntity || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">Registration / CIN</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Registration Number of Entity (CIN / Registration No. / Other)</span>
             <span class="font-mono font-medium text-slate-800">{{ step1().registrationNumber || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">Date of Registration</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Date of Registration as Legal Entity</span>
             <span class="font-medium text-slate-800">{{ step1().dateOfRegistration || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">Company PAN</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Company PAN</span>
             <span class="font-mono font-medium text-slate-800">{{ step1().companyPan || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">GSTIN</span>
+            <span class="text-slate-400 block text-[11px] font-medium">GSTIN</span>
             <span class="font-medium text-slate-800">{{ step1().gstRegistered === 'Yes' ? step1().gstin : 'Not Applicable' }}</span>
           </div>
-          <div>
-            <span class="text-slate-400 block text-[11px]">Turn Over (₹ Lakhs)</span>
-            <span class="font-medium text-slate-800">₹ {{ step1().turnOver || '0' }} Lakhs</span>
-          </div>
           <div class="sm:col-span-2">
-            <span class="text-slate-400 block text-[11px]">Contact & Email</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Company Contact No. &amp; Company Email-ID</span>
             <span class="font-medium text-slate-800">{{ step1().contactNo || '-' }} &bull; {{ step1().emailId || '-' }}</span>
           </div>
           <div class="sm:col-span-2">
-            <span class="text-slate-400 block text-[11px]">Registered Address</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Registered Address</span>
             <span class="font-medium text-slate-800">{{ step1().registeredAddress || '-' }}, {{ step1().registeredDistrict }}, {{ step1().registeredState }} - {{ step1().registeredPincode }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Section 2 Review: Officer In-Charge Directory -->
+      <!-- Section 2 Review: Officer In-Charge Details -->
       <div class="space-y-3 pb-4 border-b border-slate-200">
         <div class="flex items-center justify-between">
           <h3 class="text-sm font-bold text-slate-800">
-            2. Officer In-Charge Directory ({{ step2().length }} Officer{{ step2().length > 1 ? 's' : '' }})
+            Step 2 – Details of Officer In-Charge
           </h3>
           <button
             type="button"
             (click)="onEditStep(2)"
-            class="text-xs text-[#131862] hover:underline font-semibold cursor-pointer"
+            class="text-xs text-slate-700 hover:text-slate-900 hover:underline font-semibold cursor-pointer"
           >
             Edit
           </button>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-xs text-left border border-slate-200">
-            <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
-              <tr>
-                <th class="py-2 px-3">#</th>
-                <th class="py-2 px-3">Name</th>
-                <th class="py-2 px-3">Designation</th>
-                <th class="py-2 px-3">Mobile</th>
-                <th class="py-2 px-3">Email</th>
-                <th class="py-2 px-3">PAN</th>
-                <th class="py-2 px-3">Appointment Document</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-              @for (oic of step2(); track oic.id; let idx = $index) {
-                <tr>
-                  <td class="py-2 px-3 text-slate-500">{{ idx + 1 }}</td>
-                  <td class="py-2 px-3 font-medium text-slate-800">{{ oic.name || '-' }}</td>
-                  <td class="py-2 px-3 text-slate-700">{{ oic.designation || '-' }}</td>
-                  <td class="py-2 px-3 text-slate-700">{{ oic.mobileNo || '-' }}</td>
-                  <td class="py-2 px-3 text-slate-700">{{ oic.emailId || '-' }}</td>
-                  <td class="py-2 px-3 font-mono text-slate-700">{{ oic.pan || '-' }}</td>
-                  <td class="py-2 px-3 text-slate-600">{{ oic.appointmentLetterDoc?.fileName || 'Not Uploaded' }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
+        @let oic = step2()[0] || {};
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 text-xs">
+          <div>
+            <span class="text-slate-400 block text-[11px] font-medium">Name</span>
+            <span class="font-medium text-slate-800">{{ oic.name || '-' }}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px] font-medium">Designation</span>
+            <span class="font-medium text-slate-800">{{ oic.designation || '-' }}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px] font-medium">Mobile No.</span>
+            <span class="font-medium text-slate-800">{{ oic.mobileNo || '-' }}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px] font-medium">Email-ID</span>
+            <span class="font-medium text-slate-800">{{ oic.emailId || '-' }}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px] font-medium">PAN</span>
+            <span class="font-mono font-medium text-slate-800">{{ oic.pan || '-' }}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px] font-medium">Aadhaar No.</span>
+            <span class="font-mono font-medium text-slate-800">{{ oic.aadhaarNo || '-' }}</span>
+          </div>
+          <div class="sm:col-span-2">
+            <span class="text-slate-400 block text-[11px] font-medium">OIC Appointment / Authorization Letter</span>
+            <span class="font-medium text-slate-800">{{ oic.appointmentLetterDoc?.fileName || 'Not Uploaded' }}</span>
+          </div>
         </div>
       </div>
 
@@ -129,12 +128,12 @@ import { OtrValidationService } from '../../services/otr-validation.service';
       <div class="space-y-3 pb-4 border-b border-slate-200">
         <div class="flex items-center justify-between">
           <h3 class="text-sm font-bold text-slate-800">
-            3. Authorized Signatory
+            Step 3 – Authorized Person Details
           </h3>
           <button
             type="button"
             (click)="onEditStep(3)"
-            class="text-xs text-[#131862] hover:underline font-semibold cursor-pointer"
+            class="text-xs text-slate-700 hover:text-slate-900 hover:underline font-semibold cursor-pointer"
           >
             Edit
           </button>
@@ -142,31 +141,39 @@ import { OtrValidationService } from '../../services/otr-validation.service';
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 text-xs">
           <div>
-            <span class="text-slate-400 block text-[11px]">Full Name</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Name</span>
             <span class="font-medium text-slate-800">{{ step3().name || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">Designation</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Designation</span>
             <span class="font-medium text-slate-800">{{ step3().designation || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">Date of Birth</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Date of Birth</span>
             <span class="font-medium text-slate-800">{{ step3().dob || '-' }} @if (step3().age) { ({{ step3().age }} yrs) }</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">Personal PAN</span>
+            <span class="text-slate-400 block text-[11px] font-medium">PAN</span>
             <span class="font-mono font-medium text-slate-800">{{ step3().pan || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">Mobile Number</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Mobile No.</span>
             <span class="font-medium text-slate-800">{{ step3().mobileNo || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">Official Email</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Email-ID</span>
             <span class="font-medium text-slate-800">{{ step3().emailId || '-' }}</span>
           </div>
+          <div>
+            <span class="text-slate-400 block text-[11px] font-medium">Aadhaar No.</span>
+            <span class="font-mono font-medium text-slate-800">{{ step3().aadhaarNo || '-' }}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px] font-medium">State</span>
+            <span class="font-medium text-slate-800">{{ step3().state || '-' }}</span>
+          </div>
           <div class="sm:col-span-2">
-            <span class="text-slate-400 block text-[11px]">Board Authorization Letter</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Authorization Letter / Board Resolution / Authority Document</span>
             <span class="font-medium text-slate-800">{{ step3().authorizationLetterDoc?.fileName || 'Not Uploaded' }}</span>
           </div>
         </div>
@@ -176,12 +183,12 @@ import { OtrValidationService } from '../../services/otr-validation.service';
       <div class="space-y-3 pb-4 border-b border-slate-200">
         <div class="flex items-center justify-between">
           <h3 class="text-sm font-bold text-slate-800">
-            4. Bank & PFMS Details
+            Step 4 – Bank Details
           </h3>
           <button
             type="button"
             (click)="onEditStep(4)"
-            class="text-xs text-[#131862] hover:underline font-semibold cursor-pointer"
+            class="text-xs text-slate-700 hover:text-slate-900 hover:underline font-semibold cursor-pointer"
           >
             Edit
           </button>
@@ -189,31 +196,31 @@ import { OtrValidationService } from '../../services/otr-validation.service';
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 text-xs">
           <div>
-            <span class="text-slate-400 block text-[11px]">Bank Name</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Name of the Bank</span>
             <span class="font-medium text-slate-800">{{ step4().bankName || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">Branch Name</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Branch Name</span>
             <span class="font-medium text-slate-800">{{ step4().branchName || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">Account Holder Name</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Account Holder Name</span>
             <span class="font-medium text-slate-800">{{ step4().accountHolderName || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">Account Number</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Account No.</span>
             <span class="font-mono font-medium text-slate-800">{{ step4().accountNo || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">IFSC Code</span>
+            <span class="text-slate-400 block text-[11px] font-medium">IFSC Code</span>
             <span class="font-mono font-medium text-slate-800">{{ step4().ifscCode || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-400 block text-[11px]">Transfer Mode</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Mode of Transfer</span>
             <span class="font-medium text-slate-800">{{ step4().transferMode || '-' }}</span>
           </div>
           <div class="sm:col-span-2">
-            <span class="text-slate-400 block text-[11px]">Cancelled Cheque / Passbook</span>
+            <span class="text-slate-400 block text-[11px] font-medium">Upload Cancelled Cheque</span>
             <span class="font-medium text-slate-800">{{ step4().cancelledChequeDoc?.fileName || 'Not Uploaded' }}</span>
           </div>
         </div>
@@ -227,7 +234,7 @@ import { OtrValidationService } from '../../services/otr-validation.service';
             type="checkbox"
             [ngModel]="declarationAgreed()"
             (ngModelChange)="onDeclarationChange($event)"
-            class="mt-1 w-4 h-4 text-[#131862] border-slate-300 rounded focus:ring-1 focus:ring-[#131862]"
+            class="mt-1 w-4 h-4 text-slate-800 border-slate-300 rounded focus:ring-1 focus:ring-slate-700 accent-slate-800"
           />
           <span>
             I hereby solemnly declare and affirm that all the particulars and documents provided above are true, complete, and correct to the best of my knowledge and belief.

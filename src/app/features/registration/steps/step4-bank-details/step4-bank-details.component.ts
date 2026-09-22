@@ -31,11 +31,11 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
   template: `
     <div class="w-full space-y-4">
 
-      <!-- Section 4.1: Banking Institution & Account Classification -->
-      <app-form-section title="Banking Institution & Account Classification">
+      <!-- Section 4.1: Step 4 – Bank Details -->
+      <app-form-section title="Step 4 – Bank Details">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <app-form-select
-            label="Select Bank"
+            label="Name of the Bank"
             [value]="data().bankName"
             (valueChange)="update('bankName', $event)"
             [options]="banks"
@@ -49,11 +49,11 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
             (valueChange)="update('branchName', $event)"
             placeholder="e.g. C-Scheme Branch, Jaipur"
             [required]="true"
-            [maxLength]="100"
+            [maxLength]="150"
           ></app-form-input>
 
           <app-form-select
-            label="Mode of Electronic Transfer"
+            label="Mode of Transfer"
             [value]="data().transferMode"
             (valueChange)="update('transferMode', $event)"
             [options]="transferModes"
@@ -73,25 +73,25 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
       </app-form-section>
 
       <!-- Section 4.2: Account Identification & Routing Codes -->
-      <app-form-section title="Account Identification & Routing Codes">
+      <app-form-section title="Account Details & Routing Codes">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <app-form-input
-            label="Account Holder Legal Name"
+            label="Account Holder Name"
             [value]="data().accountHolderName"
             (valueChange)="update('accountHolderName', $event)"
             placeholder="e.g. Rajasthan Skill Development Solutions Pvt Ltd"
             [required]="true"
-            [maxLength]="150"
+            [maxLength]="200"
           ></app-form-input>
 
           <app-form-input
-            label="Bank Account Number"
+            label="Account No."
             type="tel"
             [value]="data().accountNo"
             (valueChange)="update('accountNo', $event)"
             placeholder="e.g. 50200012345678"
             [required]="true"
-            [maxLength]="18"
+            [maxLength]="30"
           ></app-form-input>
 
           <app-form-input
@@ -105,7 +105,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           ></app-form-input>
 
           <app-form-input
-            label="MICR Code (Optional)"
+            label="MICR Code"
             type="tel"
             [value]="data().micrCode"
             (valueChange)="update('micrCode', $event)"
@@ -115,7 +115,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
 
           <div class="md:col-span-2">
             <app-form-textarea
-              label="Branch Postal Address"
+              label="Branch Address"
               [value]="data().branchAddress"
               (valueChange)="update('branchAddress', $event)"
               placeholder="Plot/Building No., Street, Landmark, City, PIN Code"
@@ -127,11 +127,11 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
       </app-form-section>
 
       <!-- Section 4.3: Financial Verification Instrument -->
-      <app-form-section title="Bank Verification Instrument">
+      <app-form-section title="Bank Verification Document">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <div class="md:col-span-2">
             <app-form-file-upload
-              label="Cancelled Cheque / First Page of Bank Passbook"
+              label="Upload Cancelled Cheque"
               [fileDoc]="data().cancelledChequeDoc"
               (fileDocChange)="updateFileDoc('cancelledChequeDoc', $event)"
               [required]="true"

@@ -31,10 +31,13 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
     <div class="w-full space-y-4">
 
       <!-- Section 3.1: Profile & Demographics -->
-      <app-form-section title="Authorized Signatory Profile">
+      <app-form-section title="Step 3 – Authorized Person Details">
+        <p class="text-xs text-slate-500 mb-3 -mt-2">
+          The Authorized Person is the person officially authorized to represent the TP/PIA.
+        </p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <app-form-input
-            label="Signatory Full Name"
+            label="Name"
             [value]="data().name"
             (valueChange)="update('name', $event)"
             placeholder="e.g. Vikramaditya Singh"
@@ -43,12 +46,12 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           ></app-form-input>
 
           <app-form-select
-            label="Designation in Organization"
+            label="Designation"
             [value]="data().designation"
             (valueChange)="update('designation', $event)"
             [options]="designations"
             placeholder="Select Designation"
-            [required]="true"
+            [required]="false"
           ></app-form-select>
 
           <app-form-input
@@ -60,7 +63,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           ></app-form-input>
 
           <app-form-input
-            label="Computed Age (Years)"
+            label="Age"
             [value]="data().age ? data().age + ' Years' : 'Enter Date of Birth'"
             [disabled]="true"
           ></app-form-input>
@@ -68,10 +71,10 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
       </app-form-section>
 
       <!-- Section 3.2: Contact & Identification Details -->
-      <app-form-section title="Statutory Identification & Contact Details">
+      <app-form-section title="Identification & Contact Details">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <app-form-input
-            label="Signatory Personal PAN"
+            label="PAN"
             [value]="data().pan"
             (valueChange)="update('pan', $event)"
             placeholder="e.g. ABCDE1234F"
@@ -81,7 +84,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           ></app-form-input>
 
           <app-form-input
-            label="Direct Mobile Number"
+            label="Mobile No."
             type="tel"
             [value]="data().mobileNo"
             (valueChange)="update('mobileNo', $event)"
@@ -91,7 +94,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           ></app-form-input>
 
           <app-form-input
-            label="Signatory Email-ID"
+            label="Email-ID"
             type="email"
             [value]="data().emailId"
             (valueChange)="update('emailId', $event)"
@@ -99,7 +102,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           ></app-form-input>
 
           <app-form-input
-            label="Aadhaar Card Number"
+            label="Aadhaar No."
             type="tel"
             [value]="data().aadhaarNo"
             (valueChange)="update('aadhaarNo', $event)"
@@ -110,15 +113,15 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-3 pt-3">
           <app-form-input
-            label="Bhamashah / Jan Aadhaar No."
+            label="Bhamashah No."
             [value]="data().bhamashahNo"
             (valueChange)="update('bhamashahNo', $event)"
             placeholder="Optional"
-            [maxLength]="15"
+            [maxLength]="20"
           ></app-form-input>
 
           <app-form-input
-            label="Voter ID Card No."
+            label="Voter ID No."
             [value]="data().voterIdNo"
             (valueChange)="update('voterIdNo', $event)"
             placeholder="Optional"
@@ -127,22 +130,22 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           ></app-form-input>
 
           <app-form-input
-            label="Passport Number"
+            label="Passport No."
             [value]="data().passportNo"
             (valueChange)="update('passportNo', $event)"
             placeholder="Optional"
             [uppercase]="true"
-            [maxLength]="12"
+            [maxLength]="8"
           ></app-form-input>
         </div>
       </app-form-section>
 
       <!-- Section 3.3: Residence Address & Authorization Document -->
-      <app-form-section title="Residential Address & Authorization Document">
+      <app-form-section title="Residence Address & Authorization Documents">
         <div class="space-y-3">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
             <app-form-select
-              label="State of Residence"
+              label="State"
               [value]="data().state"
               (valueChange)="update('state', $event)"
               [options]="states"
@@ -151,7 +154,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
 
             <div class="md:col-span-2">
               <app-form-textarea
-                label="Permanent / Current Residence Address"
+                label="Residence Address"
                 [value]="data().residenceAddress"
                 (valueChange)="update('residenceAddress', $event)"
                 placeholder="House/Flat No., Street, Locality, City, PIN code"
@@ -162,14 +165,14 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
 
           <div class="pt-2 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
             <app-form-file-upload
-              label="Board Resolution / Power of Attorney Letter"
+              label="Authorization Letter / Board Resolution / Authority Document"
               [fileDoc]="data().authorizationLetterDoc"
               (fileDocChange)="updateFileDoc('authorizationLetterDoc', $event)"
               [required]="true"
             ></app-form-file-upload>
 
             <app-form-file-upload
-              label="Signatory Identity Proof (PAN / Aadhaar)"
+              label="Authorized Person Identity Proof"
               [fileDoc]="data().idProofDoc"
               (fileDocChange)="updateFileDoc('idProofDoc', $event)"
               [required]="false"

@@ -29,56 +29,56 @@ import { AuthService } from '../../auth/auth.service';
       [class.shadow-sm]="isSticky"
       role="banner"
     >
-      <div class="max-w-[1440px] mx-auto px-4 md:px-6 h-[68px] md:h-[76px] flex items-center justify-between gap-4">
+      <div class="w-full px-4 sm:px-6 lg:px-8 h-[64px] sm:h-[70px] flex items-center justify-between gap-3 sm:gap-4 font-sans" style="font-family: 'Inter', sans-serif;">
 
         <!-- Left: Logos + Title -->
-        <a routerLink="/" class="flex items-center gap-3 sm:gap-4 shrink-0 group" aria-label="ISMS 2.0 Home">
-          <div class="flex items-center gap-2.5">
+        <a routerLink="/" class="flex items-center gap-2.5 sm:gap-3.5 shrink-0 group select-none" aria-label="ISMS 2.0 Home">
+          <div class="flex items-center gap-2 sm:gap-2.5">
             <img
               src="/Rajasthan-Sarkar.png"
               alt="Government of Rajasthan"
-              class="h-9 sm:h-11 md:h-[46px] w-auto object-contain select-none"
+              class="h-8 sm:h-10 md:h-[42px] w-auto object-contain shrink-0"
             />
             <img
               src="/rsldc-logo.png"
               alt="RSLDC"
-              class="h-9 sm:h-11 md:h-[46px] w-auto object-contain select-none"
+              class="h-8 sm:h-10 md:h-[42px] w-auto object-contain shrink-0"
               onerror="this.src='/Rajasthan-Sarkar.png'"
             />
           </div>
-          <div class="w-px h-7 sm:h-9 bg-slate-300 shrink-0"></div>
+          <div class="w-px h-6 sm:h-8 bg-slate-200 shrink-0"></div>
           <div class="flex flex-col justify-center leading-tight">
-            <span class="text-[20px] sm:text-[24px] md:text-[26px] font-black text-[#0B3558] tracking-tight">
+            <span class="text-[18px] sm:text-[22px] md:text-[24px] font-bold text-[#0B3558] tracking-tight">
               ISMS<span class="text-[#EA580C]">2.0</span>
             </span>
-            <p class="hidden sm:block text-[11px] font-medium text-slate-500 tracking-wide whitespace-nowrap m-0">
+            <p class="hidden md:block text-[11px] font-normal text-slate-500 tracking-wide whitespace-nowrap m-0">
               Integrated Scheme Management System
             </p>
           </div>
         </a>
 
         <!-- Right: Language + Auth -->
-        <div class="flex items-center gap-2 sm:gap-4 shrink-0">
+        <div class="flex items-center gap-2 sm:gap-3.5 shrink-0">
 
           <!-- Language Switcher (always visible) -->
-          <nav class="flex items-center gap-0.5 text-sm font-semibold" aria-label="Language selection">
+          <nav class="flex items-center gap-0.5 text-xs sm:text-sm font-semibold" aria-label="Language selection">
             <button
               type="button"
-              class="px-2.5 py-1.5 rounded transition-colors cursor-pointer border-0 bg-transparent text-sm"
+              class="px-2 py-1 rounded transition-colors cursor-pointer border-0 bg-transparent text-xs sm:text-sm"
               [class]="selectedLanguage() === 'en' ? 'text-[#0B3558] font-bold' : 'text-slate-400 hover:text-[#0B3558]'"
               (click)="onLanguageChange('en')"
             >English</button>
-            <span class="text-slate-300 select-none text-base leading-none">|</span>
+            <span class="text-slate-300 select-none text-xs sm:text-sm leading-none">|</span>
             <button
               type="button"
-              class="px-2.5 py-1.5 rounded transition-colors cursor-pointer border-0 bg-transparent text-sm"
+              class="px-2 py-1 rounded transition-colors cursor-pointer border-0 bg-transparent text-xs sm:text-sm"
               [class]="selectedLanguage() === 'hi' ? 'text-[#0B3558] font-bold' : 'text-slate-400 hover:text-[#0B3558]'"
               (click)="onLanguageChange('hi')"
             >हिंदी</button>
           </nav>
 
           <!-- Divider -->
-          <span class="text-slate-300 text-base select-none hidden sm:inline">|</span>
+          <span class="text-slate-200 text-base select-none hidden sm:inline">|</span>
 
           <!-- === LOGGED IN: Clean Username Pill with Dropdown (No Progress Bar) === -->
           @if (currentUser()) {
@@ -88,18 +88,18 @@ import { AuthService } from '../../auth/auth.service';
                 type="button"
                 id="user-menu-btn"
                 (click)="toggleDropdown()"
-                class="inline-flex items-center gap-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full py-1.5 pl-2 pr-3.5 transition-all shadow-xs cursor-pointer group"
+                class="inline-flex items-center gap-2 sm:gap-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full py-1.5 pl-1.5 sm:pl-2 pr-3 sm:pr-3.5 transition-all shadow-xs cursor-pointer group"
                 [attr.aria-expanded]="dropdownOpen()"
                 aria-haspopup="true"
                 aria-label="User menu"
               >
                 <!-- Avatar Icon -->
-                <div class="w-7 h-7 rounded-full bg-[#0B3558] text-white flex items-center justify-center font-bold text-xs uppercase shadow-2xs shrink-0 select-none">
+                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#0B3558] text-white flex items-center justify-center font-bold text-[11px] sm:text-xs uppercase shadow-2xs shrink-0 select-none">
                   {{ avatarChar() }}
                 </div>
 
                 <!-- Username -->
-                <span class="text-xs sm:text-sm font-semibold text-slate-800 max-w-[120px] sm:max-w-[150px] truncate group-hover:text-[#0B3558] transition-colors">
+                <span class="text-xs sm:text-sm font-semibold text-slate-800 max-w-[100px] sm:max-w-[150px] truncate group-hover:text-[#0B3558] transition-colors">
                   {{ displayName() }}
                 </span>
 
@@ -122,7 +122,7 @@ import { AuthService } from '../../auth/auth.service';
                   <!-- User Info Header (Clean name & SSOID, no progress bar) -->
                   <div class="px-4 py-2.5 border-b border-slate-100 bg-slate-50/75">
                     <p class="text-xs font-bold text-slate-800 truncate">{{ displayName() }}</p>
-                    <p class="text-[11px] text-slate-400 mt-0.5">SSOID Applicant</p>
+                    <p class="text-[11px] text-slate-400 mt-0.5">{{ currentUser()?.subLabel || 'SSOID User' }}</p>
                   </div>
 
                   <!-- Menu Items -->

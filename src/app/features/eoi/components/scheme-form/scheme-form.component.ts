@@ -6,80 +6,71 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { OtrFormService } from '../../../registration/services/otr-form.service';
 
 export interface TrainingCenterItem {
-  id: string;
-  district: string;
-  centerName: string;
-  telephone: string;
-  classrooms: number;
-  practicalRooms: number;
-  washrooms: string;
-  labInfra: string;
-  fullAddress: string;
+    id: string;
+    district: string;
+    centerName: string;
+    telephone: string;
+    classrooms: number;
+    practicalRooms: number;
+    washrooms: string;
+    labInfra: string;
+    fullAddress: string;
 }
 
 export interface TurnoverYear {
-  year: string;
-  totalTurnover: string;
-  skillTurnover: string;
+    year: string;
+    totalTurnover: string;
+    skillTurnover: string;
 }
 
 export interface TrainingPlacementRecord {
-  sector: string;
-  year: string;
-  trained: number;
-  placed: number;
+    sector: string;
+    year: string;
+    trained: number;
+    placed: number;
+    proofDoc: string;
 }
 
 export interface ActionPlanDistrict {
-  id: string;
-  district: string;
-  sdcCount: number;
-  location: string;
-  sectors: string;
-  mode: 'Residential' | 'Non-Residential' | 'Both';
-  batches: number;
+    id: string;
+    year: string;
+    district: string;
+    sdcCount: number;
+    location: string;
+    sectors: string;
+    courses: string;
+    mode: 'Residential' | 'Non-Residential' | 'Both';
+    batches: number;
 }
 
 export interface EoiDocumentItem {
-  id: number;
-  name: string;
-  description: string;
-  fileName: string;
-  fileSize: string;
-  uploadedDate: string;
-  isMandatory: boolean;
-  status: 'uploaded' | 'pending';
+    id: number;
+    name: string;
+    description: string;
+    fileName: string;
+    fileSize: string;
+    uploadedDate: string;
+    isMandatory: boolean;
+    status: 'uploaded' | 'pending';
 }
 
 @Component({
-  selector: 'app-scheme-form',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
-  template: `
+    selector: 'app-scheme-form',
+    standalone: true,
+    imports: [CommonModule, FormsModule, RouterModule],
+    template: `
     <div class="w-full min-h-full bg-slate-50/50 pb-16 font-sans text-slate-800 select-none">
       
       <!-- ====================================================================
-           1. Top Navigation Bar: Back Button & Stepper Progress
+           1. Top Navigation Bar: Stepper Progress (No "Back to Schemes" button)
            ==================================================================== -->
       <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-2xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-center">
           
-          <!-- Back to Schemes Button -->
-          <button
-            type="button"
-            (click)="goBackToSchemes()"
-            class="inline-flex items-center gap-2 px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-md text-xs font-bold transition-colors cursor-pointer shrink-0"
-          >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            <span>Back to Schemes</span>
-          </button>
-
-          <!-- 4-Step Stepper (Clean horizontal line, no button bottom highlights) -->
+          <!-- 5-Step Stepper Progress Bar -->
           <nav class="flex items-center gap-2 sm:gap-6 overflow-x-auto no-scrollbar py-1" aria-label="EOI Application Steps">
             
-            <!-- Step 1 -->
+            <!-- Step 1: OTR Profile Verification -->
             <button
               type="button"
               (click)="goToStep(1)"
@@ -104,13 +95,13 @@ export interface EoiDocumentItem {
               </span>
               <div class="text-left leading-tight hidden sm:block">
                 <span class="text-[10px] uppercase text-slate-400 block font-medium">STEP 1</span>
-                <span>Proposal &amp; Documents</span>
+                <span>OTR Profile</span>
               </div>
             </button>
 
-            <span class="w-6 sm:w-10 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 1"></span>
+            <span class="w-4 sm:w-8 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 1"></span>
 
-            <!-- Step 2 -->
+            <!-- Step 2: EOI Proposal Details -->
             <button
               type="button"
               (click)="goToStep(2)"
@@ -135,13 +126,13 @@ export interface EoiDocumentItem {
               </span>
               <div class="text-left leading-tight hidden sm:block">
                 <span class="text-[10px] uppercase text-slate-400 block font-medium">STEP 2</span>
-                <span>Complete Preview</span>
+                <span>Proposal Form</span>
               </div>
             </button>
 
-            <span class="w-6 sm:w-10 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 2"></span>
+            <span class="w-4 sm:w-8 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 2"></span>
 
-            <!-- Step 3 -->
+            <!-- Step 3: Complete Preview -->
             <button
               type="button"
               (click)="goToStep(3)"
@@ -166,18 +157,18 @@ export interface EoiDocumentItem {
               </span>
               <div class="text-left leading-tight hidden sm:block">
                 <span class="text-[10px] uppercase text-slate-400 block font-medium">STEP 3</span>
-                <span>Fees &amp; Payment</span>
+                <span>Complete Preview</span>
               </div>
             </button>
 
-            <span class="w-6 sm:w-10 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 3"></span>
+            <span class="w-4 sm:w-8 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 3"></span>
 
-            <!-- Step 4 -->
+            <!-- Step 4: Fee Payment -->
             <button
               type="button"
               (click)="goToStep(4)"
               class="flex items-center gap-2 text-xs font-semibold cursor-pointer group"
-              [class.text-[#0B3558]]="currentStep() === 4"
+              [class.text-[#0B3558]]="currentStep() >= 4"
               [class.font-bold]="currentStep() === 4"
               [class.text-slate-400]="currentStep() < 4"
             >
@@ -185,13 +176,44 @@ export interface EoiDocumentItem {
                 class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors"
                 [class.bg-[#0B3558]]="currentStep() === 4"
                 [class.text-white]="currentStep() === 4"
+                [class.bg-emerald-600]="currentStep() > 4"
+                [class.text-white]="currentStep() > 4"
                 [class.bg-slate-200]="currentStep() < 4"
               >
-                4
+                @if (currentStep() > 4) {
+                  &check;
+                } @else {
+                  4
+                }
               </span>
               <div class="text-left leading-tight hidden sm:block">
                 <span class="text-[10px] uppercase text-slate-400 block font-medium">STEP 4</span>
-                <span>Submission Receipts</span>
+                <span>Fee Payment</span>
+              </div>
+            </button>
+
+            <span class="w-4 sm:w-8 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 4"></span>
+
+            <!-- Step 5: Submission & Receipt -->
+            <button
+              type="button"
+              (click)="goToStep(5)"
+              class="flex items-center gap-2 text-xs font-semibold cursor-pointer group"
+              [class.text-[#0B3558]]="currentStep() === 5"
+              [class.font-bold]="currentStep() === 5"
+              [class.text-slate-400]="currentStep() < 5"
+            >
+              <span
+                class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors"
+                [class.bg-[#0B3558]]="currentStep() === 5"
+                [class.text-white]="currentStep() === 5"
+                [class.bg-slate-200]="currentStep() < 5"
+              >
+                5
+              </span>
+              <div class="text-left leading-tight hidden sm:block">
+                <span class="text-[10px] uppercase text-slate-400 block font-medium">STEP 5</span>
+                <span>Submission Receipt</span>
               </div>
             </button>
 
@@ -203,73 +225,58 @@ export interface EoiDocumentItem {
       <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         
         <!-- ====================================================================
-             2. Selected Tender / EOI Banner Card (Matching Screenshot 3)
+             2. SELECTED TENDER / EOI Scheme Header Card (Matching Screenshot 1)
              ==================================================================== -->
         <div class="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
           
-          <!-- Top Tag Bar -->
-          <div class="bg-[#0B3558] text-white px-5 py-2.5 flex items-center justify-between flex-wrap gap-2">
+          <!-- Top Tag Bar (Shows SELECTED TENDER / EOI and Scheme Code once) -->
+          <div class="bg-[#0B3558] text-white px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
             <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded bg-[#EA580C] text-white font-black text-[10px] uppercase tracking-wider">
+              <span class="px-2.5 py-0.5 rounded bg-[#EA580C] text-white font-bold text-[10px] uppercase tracking-wider">
                 SELECTED TENDER / EOI
               </span>
-              <span class="px-2 py-0.5 rounded bg-white/10 text-white font-bold text-xs">
+              <span class="px-2 py-0.5 rounded bg-white/15 text-white font-semibold text-xs">
                 {{ schemeCode() }}
               </span>
-              <span class="text-xs text-blue-200 hidden sm:inline">&bull;</span>
-              <span class="text-xs font-semibold text-blue-100">
-                {{ schemeCategory() }}
-              </span>
             </div>
-
-            <button
-              type="button"
-              (click)="goBackToSchemes()"
-              class="inline-flex items-center gap-1 px-3 py-1 bg-white/10 hover:bg-white/20 rounded text-[11px] font-bold text-white transition-colors cursor-pointer"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-              </svg>
-              <span>Change Scheme / Tender</span>
-            </button>
           </div>
 
-          <!-- Scheme Details Body -->
-          <div class="p-5 sm:p-6 space-y-4">
+          <!-- Card Body -->
+          <div class="p-5 space-y-4">
             <div>
-              <h2 class="text-lg sm:text-xl font-black text-[#0B3558] tracking-tight">
+              <h2 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
                 {{ schemeTitle() }}
               </h2>
-              <p class="text-xs text-slate-500 mt-1 leading-relaxed max-w-5xl">
-                Expression of Interest for Empanelment of Training Partners (TPs) to impart skill training under MMKVY (Category I: RAJKVIK - Rojgar Aadharit Jan Kaushal Vikas Karyakram) across Rajasthan districts with guaranteed minimum 70% wage &amp; corporate placement support for eligible youth.
+              <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                {{ schemeDescription() }}
               </p>
             </div>
 
-            <!-- Parameters Grid (Matching Screenshot 3) -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-3 border-t border-slate-100 text-xs">
+            <!-- 6 Parameters Strip (Matching Screenshot 1) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-3 border-t border-slate-100 text-xs bg-slate-50/60 p-3.5 rounded-lg border">
               <div>
-                <span class="text-[10px] text-slate-400 font-bold uppercase block">EOI REFERENCE NO.</span>
-                <span class="font-mono font-bold text-slate-900">{{ schemeRefNo() }}</span>
+                <span class="text-[10px] text-slate-500 font-semibold uppercase block">EOI REFERENCE NO.</span>
+                <span class="font-mono font-semibold text-slate-800 text-[11.5px]">{{ schemeRefNo() }}</span>
               </div>
               <div>
-                <span class="text-[10px] text-slate-400 font-bold uppercase block">TENDER ID</span>
-                <span class="font-mono font-bold text-slate-900">2026_RSLDC_593778_1</span>
+                <span class="text-[10px] text-slate-500 font-semibold uppercase block">TENDER ID</span>
+                <span class="font-mono font-semibold text-slate-800 text-[11.5px]">2026_RSLDC_593778_1</span>
               </div>
               <div>
-                <span class="text-[10px] text-slate-400 font-bold uppercase block">ISSUING AUTHORITY</span>
-                <span class="font-bold text-slate-800">RSLDC, Jaipur</span>
+                <span class="text-[10px] text-slate-500 font-semibold uppercase block">ISSUING AUTHORITY / DEPARTMENT</span>
+                <span class="font-medium text-slate-800 text-[11.5px]">Rajasthan Skill and Livelihoods Development Corporation (RSLDC)</span>
               </div>
               <div>
-                <span class="text-[10px] text-slate-400 font-bold uppercase block">SUBMISSION DEADLINE</span>
-                <span class="font-bold text-rose-600">15-Sep-2026 02:00 PM</span>
+                <span class="text-[10px] text-slate-500 font-semibold uppercase block">DATE OF CLOSING</span>
+                <span class="font-bold text-rose-600 text-[11.5px]">15-Sep-2026 02:00 PM</span>
               </div>
               <div>
-                <span class="text-[10px] text-slate-400 font-bold uppercase block">EMD FEE</span>
-                <span class="font-bold text-[#0B3558]">{{ schemeEmdFee() }} <span class="text-[10px] text-slate-400">(Refundable)</span></span>
+                <span class="text-[10px] text-slate-500 font-semibold uppercase block">EMD FEE</span>
+                <span class="font-semibold text-slate-900 text-[11.5px]">{{ schemeEmdFee() }} <span class="text-[10px] text-slate-500 font-normal">(Refundable)</span></span>
               </div>
               <div>
-                <span class="text-[10px] text-slate-400 font-bold uppercase block">PROCESSING FEE</span>
-                <span class="font-bold text-[#0B3558]">{{ schemeProcessFee() }} <span class="text-[10px] text-slate-400">(Non-Refundable)</span></span>
+                <span class="text-[10px] text-slate-500 font-semibold uppercase block">PROCESSING FEE</span>
+                <span class="font-semibold text-slate-900 text-[11.5px]">{{ schemeProcessFee() }} <span class="text-[10px] text-slate-500 font-normal">(Non-Refundable)</span></span>
               </div>
             </div>
           </div>
@@ -277,274 +284,932 @@ export interface EoiDocumentItem {
         </div>
 
         <!-- ====================================================================
-             STEP 1: SCHEME SPECIFIC DETAILS & DOCUMENTS (From Attached PDF)
+             STEP 1: OTR PROFILE VERIFICATION (Complete OTR Institutional Details)
              ==================================================================== -->
         @if (currentStep() === 1) {
           <div class="space-y-6">
             
-            <!-- Instructions Notice -->
             <div class="bg-blue-50/80 border border-blue-200 rounded-lg p-3.5 flex items-center gap-3 text-xs text-[#0B3558]">
               <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
               <span>
-                <strong>Proposal Instructions:</strong> Your verified OTR entity particulars have been auto-linked. Please complete the scheme-specific operational parameters, past placement track record, proposed centres, and mandatory compliance documents below.
+                <strong>OTR Profile Pre-loaded:</strong> All institutional credentials, governance directory, and bank accounts have been verified from your One Time Registration (OTR) profile. Please review the details before proceeding to the scheme-specific proposal form.
               </span>
             </div>
 
-            <!-- Subsection 1: Training Centre Infrastructure in Rajasthan (From PDF Page 2) -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-4 shadow-2xs">
+            <!-- Section 1: Step 1 - Organization Details -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
               <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div>
-                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
-                    1. Proposed Training Centre Details &amp; Infrastructure
-                  </h3>
-                  <p class="text-xs text-slate-500 mt-0.5">
-                    Operational centres equipped with IT labs, practical labs, and classrooms as per RSLDC specifications.
-                  </p>
+                <div class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">1</span>
+                  <h3 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide">Step 1 - Organization Details</h3>
                 </div>
-                <span class="px-2.5 py-1 rounded bg-blue-50 text-[#0B3558] font-bold text-xs border border-blue-200">
-                  {{ trainingCentres.length }} Centres Listed
+                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">
+                  &check; Verified
                 </span>
               </div>
 
-              <!-- Centres Table -->
-              <div class="overflow-x-auto border border-slate-200 rounded-lg">
-                <table class="w-full text-left border-collapse text-xs">
-                  <thead class="bg-slate-50 text-slate-700 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
-                    <tr>
-                      <th class="py-2.5 px-3">District / City</th>
-                      <th class="py-2.5 px-3">Training Centre Name</th>
-                      <th class="py-2.5 px-2 text-center">Classrooms</th>
-                      <th class="py-2.5 px-2 text-center">Practical Rooms</th>
-                      <th class="py-2.5 px-2 text-center">Washrooms</th>
-                      <th class="py-2.5 px-2 text-center">Lab Infra</th>
-                      <th class="py-2.5 px-3">Full Address</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-100 font-medium">
-                    @for (c of trainingCentres; track c.id) {
-                      <tr class="hover:bg-slate-50/60">
-                        <td class="py-2.5 px-3 font-bold text-slate-900">{{ c.district }}</td>
-                        <td class="py-2.5 px-3 text-slate-800">{{ c.centerName }}</td>
-                        <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ c.classrooms }}</td>
-                        <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ c.practicalRooms }}</td>
-                        <td class="py-2.5 px-2 text-center text-emerald-600 font-bold">{{ c.washrooms }}</td>
-                        <td class="py-2.5 px-2 text-center">
-                          <span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold">
-                            {{ c.labInfra }}
-                          </span>
-                        </td>
-                        <td class="py-2.5 px-3 text-slate-500 max-w-xs truncate">{{ c.fullAddress }}</td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3.5 gap-x-6 text-xs font-normal">
+                <div>
+                  <span class="text-slate-500 block font-medium">TP/PIA Short Name</span>
+                  <span class="text-slate-900 font-semibold">{{ otrData().step1.shortName || 'DMR SAKSHAM' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">TP/PIA Full Name</span>
+                  <span class="text-slate-900 font-semibold">{{ otrData().step1.fullName || 'DMR ENTERPRISES PRIVATE LIMITED' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Nature of Entity</span>
+                  <span class="text-slate-800">{{ otrData().step1.natureOfEntity || 'PUBLIC LIMITED' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Registration Number of Entity (CIN / Registration No. / Other)</span>
+                  <span class="text-slate-800 font-mono font-medium">{{ otrData().step1.registrationNumber || '07AAECD8566H1ZC' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Certificate of Registration / Incorporation</span>
+                  <span class="text-emerald-700 font-medium">&check; Verified Document Attached</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Date of Registration as Legal Entity</span>
+                  <span class="text-slate-800">{{ otrData().step1.dateOfRegistration || '07-Jan-2017' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Company PAN</span>
+                  <span class="text-slate-800 font-mono font-medium">{{ otrData().step1.companyPan || 'AAECD8566H' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Organization PAN Card</span>
+                  <span class="text-emerald-700 font-medium">&check; Verified Document Attached</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">State/UT of Legal Registration</span>
+                  <span class="text-slate-800">{{ otrData().step1.stateOfLegalReg || 'Rajasthan' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">GST Registered</span>
+                  <span class="text-slate-800">{{ otrData().step1.gstRegistered || 'Yes' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">GSTIN</span>
+                  <span class="text-slate-800 font-mono font-medium">{{ otrData().step1.gstin || '08AAACR1234F1Z5' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">GST Registration Certificate</span>
+                  <span class="text-emerald-700 font-medium">&check; Verified Document Attached</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">MSME Registered</span>
+                  <span class="text-slate-800">{{ otrData().step1.msmeRegistered || 'Yes' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Udyam Number</span>
+                  <span class="text-slate-800 font-mono font-medium">{{ otrData().step1.udyamNumber || 'UDYAM-RJ-14-0019284' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">MSME / Udyam Registration Certificate</span>
+                  <span class="text-emerald-700 font-medium">&check; Verified Document Attached</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Turn Over</span>
+                  <span class="text-slate-800 font-semibold">₹ {{ otrData().step1.turnOver || '1203.35' }} Lakhs</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">BlackListed</span>
+                  <span class="text-slate-800">{{ otrData().step1.blackListed || 'No' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">NSDC Partner</span>
+                  <span class="text-slate-800">{{ otrData().step1.nsdcPartner || 'Equity Share' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Company Contact No.</span>
+                  <span class="text-slate-800 font-mono">{{ otrData().step1.contactNo || '7849954552' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Company Email-ID</span>
+                  <span class="text-slate-800">{{ otrData().step1.emailId || 'vijaydtm1960@gmail.com' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Website</span>
+                  <span class="text-slate-800">{{ otrData().step1.website || 'https://dmrenterprises.com' }}</span>
+                </div>
+                
+                <div class="sm:col-span-2 md:col-span-3 pt-2 border-t border-slate-100">
+                  <span class="text-slate-500 block font-medium">Registered Address</span>
+                  <span class="text-slate-800">
+                    {{ otrData().step1.registeredAddress || 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN' }}
+                  </span>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-1.5 text-[11px] text-slate-600 bg-slate-50 p-2 rounded border border-slate-100">
+                    <span><strong class="text-slate-500">State/UT – Registered Address:</strong> {{ otrData().step1.registeredState || 'Delhi' }}</span>
+                    <span><strong class="text-slate-500">District – Registered Address:</strong> {{ otrData().step1.registeredDistrict || 'North Delhi' }}</span>
+                    <span><strong class="text-slate-500">Pincode – Registered Address:</strong> {{ otrData().step1.registeredPincode || '110042' }}</span>
+                  </div>
+                </div>
+
+                <div class="sm:col-span-2 md:col-span-3 pt-2 border-t border-slate-100">
+                  <span class="text-slate-500 block font-medium">Office Address</span>
+                  <span class="text-slate-800">
+                    {{ otrData().step1.officeAddress || 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN' }}
+                  </span>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-1.5 text-[11px] text-slate-600 bg-slate-50 p-2 rounded border border-slate-100">
+                    <span><strong class="text-slate-500">State/UT – Office Address:</strong> {{ otrData().step1.officeState || 'Delhi' }}</span>
+                    <span><strong class="text-slate-500">District – Office Address:</strong> {{ otrData().step1.officeDistrict || 'North Delhi' }}</span>
+                    <span><strong class="text-slate-500">Pincode – Office Address:</strong> {{ otrData().step1.officePincode || '110042' }}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- Subsection 2: Past 3 Years Turnover & Placement Track Record (From PDF Page 4) -->
+            <!-- Section 2: Details of Officer In-Charge & Authorized Person Details -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <!-- Step 2 – Details of Officer In-Charge -->
+              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">2</span>
+                    <h3 class="text-sm font-bold text-[#0B3558]">Step 2 – Details of Officer In-Charge</h3>
+                  </div>
+                  <span class="text-[11px] text-slate-500">{{ otrData().step2.length }} Verified Officers</span>
+                </div>
+
+                <div class="space-y-2.5 pt-1">
+                  @for (oic of otrData().step2; track oic.id) {
+                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1.5">
+                      <div class="flex items-center justify-between">
+                        <span class="font-semibold text-slate-900">{{ oic.name || 'Dr. Rajesh Sharma' }}</span>
+                        <span class="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">Active</span>
+                      </div>
+                      <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-slate-600 text-[11px]">
+                        <div><span class="text-slate-400">Designation:</span> {{ oic.designation || 'Managing Director' }}</div>
+                        <div><span class="text-slate-400">Mobile No.:</span> {{ oic.mobileNo || '9829012345' }}</div>
+                        <div><span class="text-slate-400">Email-ID:</span> {{ oic.emailId || 'director@rsl-partner.org' }}</div>
+                        <div class="font-mono"><span class="text-slate-400 font-sans">PAN:</span> {{ oic.pan || 'ABCPS1234K' }}</div>
+                        <div class="font-mono"><span class="text-slate-400 font-sans">Aadhaar No.:</span> {{ oic.aadhaarNo || 'XXXXXXXX1098' }}</div>
+                        <div><span class="text-slate-400">Bhamashah No.:</span> {{ oic.bhamashahNo || 'BHM-9821' }}</div>
+                        <div><span class="text-slate-400">Voter ID No.:</span> {{ oic.voterIdNo || 'RJ/01/012/123456' }}</div>
+                        <div><span class="text-slate-400">Passport No.:</span> {{ oic.passportNo || 'Z1234567' }}</div>
+                      </div>
+                      <div class="pt-1.5 border-t border-slate-200/80 flex items-center justify-between text-[10.5px] text-emerald-700">
+                        <span>&check; OIC Appointment / Authorization Letter Attached</span>
+                        <span>&check; OIC Identity Proof Verified</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Step 3 – Authorized Person Details -->
+              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">3</span>
+                    <h3 class="text-sm font-bold text-[#0B3558]">Step 3 – Authorized Person Details</h3>
+                  </div>
+                  <span class="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Verified</span>
+                </div>
+                <p class="text-[11px] text-slate-500 -mt-1 font-normal">The Authorized Person is the person officially authorized to represent the TP/PIA.</p>
+
+                <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-2">
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 font-normal">
+                    <div>
+                      <span class="text-slate-500 block">Name</span>
+                      <span class="text-slate-800 font-medium">{{ otrData().step3.name || 'SUMAN GUPTA' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 block">Date of Birth</span>
+                      <span class="text-slate-800">{{ otrData().step3.dob || '14-Aug-1978' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 block">Age</span>
+                      <span class="text-slate-800">{{ otrData().step3.age || '48' }} Years</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 block">Designation</span>
+                      <span class="text-slate-800 font-medium">{{ otrData().step3.designation || 'Director' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 block">PAN</span>
+                      <span class="font-mono text-slate-800">{{ otrData().step3.pan || 'BNYPM9876Q' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 block">Email-ID</span>
+                      <span class="text-slate-800">{{ otrData().step3.emailId || 'compliance@nsmark.in' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 block">Mobile No.</span>
+                      <span class="text-slate-800">{{ otrData().step3.mobileNo || '9968009648' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 block">Aadhaar No.</span>
+                      <span class="font-mono text-slate-800">{{ otrData().step3.aadhaarNo || '542510326814' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 block">Bhamashah No.</span>
+                      <span class="text-slate-800">{{ otrData().step3.bhamashahNo || 'BHM-4412' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 block">Voter ID No.</span>
+                      <span class="text-slate-800">{{ otrData().step3.voterIdNo || 'DL/04/024/987123' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 block">Passport No.</span>
+                      <span class="text-slate-800">{{ otrData().step3.passportNo || 'P8765432' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-500 block">State</span>
+                      <span class="text-slate-800">{{ otrData().step3.state || 'Delhi' }}</span>
+                    </div>
+                  </div>
+                  <div class="pt-2 border-t border-slate-200">
+                    <span class="text-slate-500 block">Residence Address</span>
+                    <span class="text-slate-800 text-[11px]">{{ otrData().step3.residenceAddress || 'B298 GF AND FF, LOK VIHAR PITAMPURA, Pitampura, North West Delhi - 110034' }}</span>
+                  </div>
+                  <div class="pt-1.5 border-t border-slate-200/80 flex items-center justify-between text-[10.5px] text-emerald-700 flex-wrap gap-2">
+                    <span>&check; Authorization Letter / Board Resolution / Authority Document Attached</span>
+                    <span>&check; Authorized Person Identity Proof Attached</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Section 3: Step 4 – Bank Details -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">4</span>
+                  <h3 class="text-sm font-bold text-[#0B3558]">Step 4 – Bank Details</h3>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">
+                  &check; Active Account
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 text-xs font-normal">
+                <div>
+                  <span class="text-slate-500 block font-medium">Name of the Bank</span>
+                  <span class="text-slate-800 font-medium">{{ otrData().step4.bankName || 'HDFC Bank' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Branch Name</span>
+                  <span class="text-slate-800">{{ otrData().step4.branchName || 'NEAR SHASTRI NAGAR METRO STATION NEW DELHI' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Mode of Transfer</span>
+                  <span class="text-slate-800">{{ otrData().step4.transferMode || 'RTGS / NEFT / IMPS' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Type of Account</span>
+                  <span class="text-slate-800">{{ otrData().step4.accountType || 'Current' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Account Holder Name</span>
+                  <span class="text-slate-800 font-medium">{{ otrData().step4.accountHolderName || 'DMR ENTERPRISES PRIVATE LIMITED' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Account No.</span>
+                  <span class="font-mono text-slate-800 font-bold">{{ otrData().step4.accountNo || '50200047885422' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">IFSC Code</span>
+                  <span class="font-mono text-slate-800 font-bold">{{ otrData().step4.ifscCode || 'HDFC0001441' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">MICR Code</span>
+                  <span class="font-mono text-slate-800">{{ otrData().step4.micrCode || '110240173' }}</span>
+                </div>
+                <div class="sm:col-span-2">
+                  <span class="text-slate-500 block font-medium">Branch Address</span>
+                  <span class="text-slate-800 truncate block">{{ otrData().step4.branchAddress || 'Plot No. 12, Main Rohtak Road, Shastri Nagar, Delhi' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Upload Cancelled Cheque</span>
+                  <span class="text-emerald-700 font-medium">&check; Cancelled Cheque Attached</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer Action Button for Step 1 -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+              <button
+                type="button"
+                (click)="goToStep(2)"
+                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+              >
+                <span>Save &amp; Proceed to EOI Proposal Form</span>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+            </div>
+
+          </div>
+        }
+
+        <!-- ====================================================================
+             STEP 2: EOI PROPOSAL FORM (The fields missing in OTR from PDF!)
+             ==================================================================== -->
+        @if (currentStep() === 2) {
+          <div class="space-y-6">
+            
+            <!-- Notice -->
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3.5 flex items-center gap-3 text-xs text-amber-900">
+              <svg class="w-5 h-5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>
+                <strong>Proposal Form Parameters:</strong> Please fill in the scheme-specific operational details below as mandated in the RSLDC RFP: proposed training centres, past placement experience, annual action plan, and 14 proposal checklist documents.
+              </span>
+            </div>
+
+            <!-- 1. Proposed Training Centre Details & Infrastructure -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-4 shadow-2xs">
+              <div class="pb-3 border-b border-slate-100">
+                <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
+                  1. Proposed Training Centre Details &amp; Infrastructure
+                </h3>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  Operational centres equipped with IT labs, practical labs, classrooms, and washrooms in Rajasthan.
+                </p>
+              </div>
+
+              <!-- Inline Form to Add Training Centre -->
+              <div class="bg-slate-50/70 border border-slate-200 rounded-lg p-4 space-y-3">
+                <div class="text-xs font-bold text-[#0B3558] flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-[#0B3558]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  <span>Add Proposed Training Centre</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                  <div>
+                    <label class="block text-slate-600 mb-1 font-medium">District / City *</label>
+                    <input
+                      type="text"
+                      [(ngModel)]="newCentre.district"
+                      placeholder="e.g. Alwar / Jaipur"
+                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-slate-600 mb-1 font-medium">Centre Name *</label>
+                    <input
+                      type="text"
+                      [(ngModel)]="newCentre.centerName"
+                      placeholder="e.g. DMR Skill Centre"
+                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-slate-600 mb-1 font-medium">Classrooms</label>
+                    <input
+                      type="number"
+                      [(ngModel)]="newCentre.classrooms"
+                      min="1"
+                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-slate-600 mb-1 font-medium">Practical Labs</label>
+                    <input
+                      type="number"
+                      [(ngModel)]="newCentre.practicalRooms"
+                      min="1"
+                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-slate-600 mb-1 font-medium">Separate Washrooms</label>
+                    <select
+                      [(ngModel)]="newCentre.washrooms"
+                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    >
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-slate-600 mb-1 font-medium">Lab Infrastructure</label>
+                    <select
+                      [(ngModel)]="newCentre.labInfra"
+                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    >
+                      <option value="Available">Available</option>
+                      <option value="Under Setup">Under Setup</option>
+                    </select>
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label class="block text-slate-600 mb-1 font-medium">Full Postal Address *</label>
+                    <input
+                      type="text"
+                      [(ngModel)]="newCentre.fullAddress"
+                      placeholder="Complete street address, landmark, pincode"
+                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex justify-end pt-1">
+                  <button
+                    type="button"
+                    (click)="saveNewCentre()"
+                    class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Add Training Centre</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Centres Table or Empty State -->
+              @if (trainingCentres.length === 0) {
+                <div class="p-4 border border-slate-200 rounded-lg text-center bg-slate-50 text-xs text-slate-500">
+                  No training centres added yet. Please fill the details in the form above and click "Add Training Centre".
+                </div>
+              } @else {
+                <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                  <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                      <tr>
+                        <th class="py-2.5 px-3">District / City</th>
+                        <th class="py-2.5 px-3">Name of Training Centre</th>
+                        <th class="py-2.5 px-2 text-center">Classrooms</th>
+                        <th class="py-2.5 px-2 text-center">Practical Rooms</th>
+                        <th class="py-2.5 px-2 text-center">Washrooms</th>
+                        <th class="py-2.5 px-2 text-center">Lab Infra</th>
+                        <th class="py-2.5 px-3">Full Address</th>
+                        <th class="py-2.5 px-2 text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-normal text-slate-700">
+                      @for (c of trainingCentres; track c.id; let idx = $index) {
+                        <tr class="hover:bg-slate-50/60">
+                          <td class="py-2.5 px-3 font-semibold text-slate-900">{{ c.district }}</td>
+                          <td class="py-2.5 px-3">{{ c.centerName }}</td>
+                          <td class="py-2.5 px-2 text-center text-[#0B3558] font-bold">{{ c.classrooms }}</td>
+                          <td class="py-2.5 px-2 text-center text-[#0B3558] font-bold">{{ c.practicalRooms }}</td>
+                          <td class="py-2.5 px-2 text-center text-emerald-700">{{ c.washrooms }}</td>
+                          <td class="py-2.5 px-2 text-center">
+                            <span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-semibold">
+                              {{ c.labInfra }}
+                            </span>
+                          </td>
+                          <td class="py-2.5 px-3 text-slate-500 max-w-xs truncate">{{ c.fullAddress }}</td>
+                          <td class="py-2.5 px-2 text-center">
+                            <button
+                              type="button"
+                              (click)="removeCentre(idx)"
+                              class="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer p-1"
+                              title="Remove Centre"
+                            >
+                              &times;
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            </div>
+
+            <!-- 2. Financial Details & Past Placement Track Record (From PDF Page 4) -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
               <!-- Financial Turnover from Skill Development -->
               <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3 shadow-2xs">
                 <div class="pb-2 border-b border-slate-100">
-                  <h3 class="text-sm font-bold text-[#0B3558]">
-                    2. Turnover from Skill Development (Last 3 Years)
-                  </h3>
-                  <p class="text-xs text-slate-500 mt-0.5">Audited financial turnover from training operations.</p>
-                </div>
-                <div class="overflow-x-auto border border-slate-200 rounded-lg">
-                  <table class="w-full text-left border-collapse text-xs">
-                    <thead class="bg-slate-50 text-slate-700 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
-                      <tr>
-                        <th class="py-2 px-3">Financial Year</th>
-                        <th class="py-2 px-3 text-right">Total Turnover (₹)</th>
-                        <th class="py-2 px-3 text-right">Skill Turnover (₹)</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 font-medium">
-                      @for (t of financialTurnover; track t.year) {
-                        <tr>
-                          <td class="py-2 px-3 font-bold text-slate-800">{{ t.year }}</td>
-                          <td class="py-2 px-3 text-right font-mono text-slate-700">₹ {{ t.totalTurnover }}</td>
-                          <td class="py-2 px-3 text-right font-mono font-bold text-[#0B3558]">₹ {{ t.skillTurnover }}</td>
-                        </tr>
-                      }
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <!-- Training & Placement Track Record -->
-              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3 shadow-2xs">
-                <div class="pb-2 border-b border-slate-100">
-                  <h3 class="text-sm font-bold text-[#0B3558]">
-                    3. Training &amp; Placement Track Record
-                  </h3>
-                  <p class="text-xs text-slate-500 mt-0.5">Verified candidate certifications and wage employment.</p>
-                </div>
-                <div class="overflow-x-auto border border-slate-200 rounded-lg">
-                  <table class="w-full text-left border-collapse text-xs">
-                    <thead class="bg-slate-50 text-slate-700 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
-                      <tr>
-                        <th class="py-2 px-3">Sector</th>
-                        <th class="py-2 px-2 text-center">Year</th>
-                        <th class="py-2 px-2 text-center">Trained</th>
-                        <th class="py-2 px-2 text-center">Placed</th>
-                        <th class="py-2 px-2 text-center">% Ratio</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 font-medium">
-                      @for (p of placementRecords; track p.sector) {
-                        <tr>
-                          <td class="py-2 px-3 font-bold text-slate-800">{{ p.sector }}</td>
-                          <td class="py-2 px-2 text-center text-slate-500">{{ p.year }}</td>
-                          <td class="py-2 px-2 text-center font-bold text-slate-800">{{ p.trained }}</td>
-                          <td class="py-2 px-2 text-center font-bold text-emerald-600">{{ p.placed }}</td>
-                          <td class="py-2 px-2 text-center font-bold text-[#0B3558]">{{ getPlacementRatio(p) }}%</td>
-                        </tr>
-                      }
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Subsection 3: Proposed Annual Action Plan (From PDF Page 4 & 5) -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3 shadow-2xs">
-              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                <div>
                   <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
-                    4. Proposed Annual Action Plan (2025-2026)
-                  </h3>
-                  <p class="text-xs text-slate-500 mt-0.5">Target districts, skill development centres, and batch commitments.</p>
-                </div>
-                <span class="text-xs font-bold text-[#0B3558] bg-blue-50 px-2.5 py-1 rounded border border-blue-200">
-                  Total Batches Committed: 50 (1,250 Candidates)
-                </span>
-              </div>
-
-              <div class="overflow-x-auto border border-slate-200 rounded-lg">
-                <table class="w-full text-left border-collapse text-xs">
-                  <thead class="bg-slate-50 text-slate-700 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
-                    <tr>
-                      <th class="py-2 px-3">Proposed District</th>
-                      <th class="py-2 px-2 text-center">SDCs</th>
-                      <th class="py-2 px-3">SDC Location</th>
-                      <th class="py-2 px-3">Proposed Sectors &amp; Courses</th>
-                      <th class="py-2 px-2 text-center">Mode</th>
-                      <th class="py-2 px-2 text-center">Batches</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-100 font-medium">
-                    @for (plan of actionPlans; track plan.id) {
-                      <tr>
-                        <td class="py-2 px-3 font-bold text-slate-900">{{ plan.district }}</td>
-                        <td class="py-2 px-2 text-center font-bold text-[#0B3558]">{{ plan.sdcCount }}</td>
-                        <td class="py-2 px-3 text-slate-700">{{ plan.location }}</td>
-                        <td class="py-2 px-3 text-slate-600">{{ plan.sectors }}</td>
-                        <td class="py-2 px-2 text-center font-bold text-slate-700">{{ plan.mode }}</td>
-                        <td class="py-2 px-2 text-center font-bold text-emerald-600">{{ plan.batches }}</td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Subsection 4: Mandatory EOI Document Checklist (Matching Screenshot 3 & PDF Page 5) -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-4 shadow-2xs">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div>
-                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
-                    5. Mandatory EOI Document Upload Checklist
+                    2. Financial Details (Last 3 FYs)
                   </h3>
                   <p class="text-xs text-slate-500 mt-0.5">
-                    Only PDF documents are accepted. Maximum allowed file size is 5 MB per document. Documents marked with * are mandatory.
+                    Turnover realized from skill training and overall operations (INR).
                   </p>
                 </div>
-                <span class="px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 font-bold text-xs border border-emerald-300">
-                  4 of 4 Documents Uploaded
-                </span>
+
+                <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                  <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                      <tr>
+                        <th class="py-2 px-3">S.No</th>
+                        <th class="py-2 px-3">Financial Year</th>
+                        <th class="py-2 px-3">Total Turnover (INR)</th>
+                        <th class="py-2 px-3">Skill Turnover (INR)</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-normal">
+                      @for (t of turnoverYears; track t.year; let idx = $index) {
+                        <tr>
+                          <td class="py-2 px-3 text-slate-400 font-bold">{{ idx + 1 }}</td>
+                          <td class="py-2 px-3 font-semibold text-slate-800">{{ t.year }}</td>
+                          <td class="py-2 px-3 font-mono text-slate-700">
+                            <input
+                              type="text"
+                              [(ngModel)]="t.totalTurnover"
+                              placeholder="e.g. 50,00,000"
+                              class="w-full p-1.5 border border-slate-300 rounded font-mono text-xs focus:outline-none focus:border-[#0B3558]"
+                            />
+                          </td>
+                          <td class="py-2 px-3 font-mono text-slate-700">
+                            <input
+                              type="text"
+                              [(ngModel)]="t.skillTurnover"
+                              placeholder="e.g. 35,00,000"
+                              class="w-full p-1.5 border border-slate-300 rounded font-mono text-xs focus:outline-none focus:border-[#0B3558]"
+                            />
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
-              <!-- Documents List (Matching Screenshot 3 layout) -->
-              <div class="space-y-3">
+              <!-- Past Skill Training & Placement Details -->
+              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3 shadow-2xs">
+                <div class="pb-2 border-b border-slate-100">
+                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
+                    3. Training &amp; Placement Track Record
+                  </h3>
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    Sector-wise candidate training and verified wage placement numbers.
+                  </p>
+                </div>
+
+                <!-- Inline Entry Form for Placement Record -->
+                <div class="bg-slate-50/70 border border-slate-200 rounded-lg p-3 space-y-2.5 text-xs">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+                    <div class="lg:col-span-2">
+                      <label class="block text-slate-600 mb-1 font-medium">Sector Name *</label>
+                      <input
+                        type="text"
+                        [(ngModel)]="newPlacement.sector"
+                        placeholder="e.g. Healthcare / IT / Apparel"
+                        class="w-full p-1.5 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Financial Year</label>
+                      <select
+                        [(ngModel)]="newPlacement.year"
+                        class="w-full p-1.5 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                      >
+                        <option value="2023 - 2024">2023 - 2024</option>
+                        <option value="2022 - 2023">2022 - 2023</option>
+                        <option value="2021 - 2022">2021 - 2022</option>
+                        <option value="2020 - 2021">2020 - 2021</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Trained (Nos) *</label>
+                      <input
+                        type="number"
+                        [(ngModel)]="newPlacement.trained"
+                        placeholder="500"
+                        class="w-full p-1.5 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Placed (Nos) *</label>
+                      <input
+                        type="number"
+                        [(ngModel)]="newPlacement.placed"
+                        placeholder="350"
+                        class="w-full p-1.5 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                      />
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between pt-1 gap-2 flex-wrap">
+                    <div class="flex-1 min-w-[200px]">
+                      <input
+                        type="text"
+                        [(ngModel)]="newPlacement.proofDoc"
+                        placeholder="Proof Doc: placement_proof_certified.pdf"
+                        class="w-full p-1.5 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      (click)="saveNewPlacement()"
+                      class="px-3 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer shrink-0"
+                    >
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                      </svg>
+                      <span>Add Record</span>
+                    </button>
+                  </div>
+                </div>
+
+                @if (placementRecords.length === 0) {
+                  <div class="p-4 border border-slate-200 rounded-lg text-center bg-slate-50 text-xs text-slate-500">
+                    No past placement track records added yet. Fill the fields above to add records.
+                  </div>
+                } @else {
+                  <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                    <table class="w-full text-left border-collapse text-xs">
+                      <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                        <tr>
+                          <th class="py-2 px-3">Sector</th>
+                          <th class="py-2 px-2">FY</th>
+                          <th class="py-2 px-2 text-center">Trained</th>
+                          <th class="py-2 px-2 text-center">Placed</th>
+                          <th class="py-2 px-2 text-right">Proof</th>
+                          <th class="py-2 px-2 text-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100 font-normal">
+                        @for (p of placementRecords; track p.sector; let idx = $index) {
+                          <tr>
+                            <td class="py-2 px-3 font-semibold text-slate-800 max-w-[120px] truncate">{{ p.sector }}</td>
+                            <td class="py-2 px-2 text-slate-600 font-mono text-[11px]">{{ p.year }}</td>
+                            <td class="py-2 px-2 text-center font-bold text-[#0B3558]">{{ p.trained }}</td>
+                            <td class="py-2 px-2 text-center font-bold text-emerald-700">{{ p.placed }}</td>
+                            <td class="py-2 px-2 text-right text-[11px] text-slate-500 font-mono">{{ p.proofDoc }}</td>
+                            <td class="py-2 px-2 text-center">
+                              <button
+                                type="button"
+                                (click)="removePlacement(idx)"
+                                class="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer p-1"
+                                title="Remove Record"
+                              >
+                                &times;
+                              </button>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              </div>
+
+            </div>
+
+            <!-- 4. Annual Action Plan (From PDF Page 4 & 5) -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3 shadow-2xs">
+              <div class="pb-2 border-b border-slate-100">
+                <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
+                  4. Proposed Annual Action Plan (Target Districts &amp; Batches)
+                </h3>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  Proposed Skill Development Centres (SDCs), sectors, course trades, and batch commitments.
+                </p>
+              </div>
+
+              <!-- Inline Entry Form for Action Plan -->
+              <div class="bg-slate-50/70 border border-slate-200 rounded-lg p-3 space-y-3 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div>
+                    <label class="block text-slate-600 mb-1 font-medium">Target District *</label>
+                    <input
+                      type="text"
+                      [(ngModel)]="newActionPlan.district"
+                      placeholder="e.g. Alwar / Jaipur / Udaipur"
+                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-slate-600 mb-1 font-medium">Year</label>
+                    <input
+                      type="text"
+                      [(ngModel)]="newActionPlan.year"
+                      placeholder="2025-2026"
+                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-slate-600 mb-1 font-medium">Proposed SDCs Count</label>
+                    <input
+                      type="number"
+                      [(ngModel)]="newActionPlan.sdcCount"
+                      min="1"
+                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-slate-600 mb-1 font-medium">SDC Location / Block</label>
+                    <input
+                      type="text"
+                      [(ngModel)]="newActionPlan.location"
+                      placeholder="e.g. Tehsil / Block name"
+                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    />
+                  </div>
+                  <div class="lg:col-span-2">
+                    <label class="block text-slate-600 mb-1 font-medium">Proposed Sectors</label>
+                    <input
+                      type="text"
+                      [(ngModel)]="newActionPlan.sectors"
+                      placeholder="e.g. IT, Healthcare, Apparel, Electronics"
+                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-slate-600 mb-1 font-medium">Training Mode</label>
+                    <select
+                      [(ngModel)]="newActionPlan.mode"
+                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    >
+                      <option value="Both">Both (Residential &amp; Non-Res)</option>
+                      <option value="Residential">Residential</option>
+                      <option value="Non-Residential">Non-Residential</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-slate-600 mb-1 font-medium">Committed Batches</label>
+                    <input
+                      type="number"
+                      [(ngModel)]="newActionPlan.batches"
+                      min="1"
+                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-1 gap-2 flex-wrap">
+                  <div class="flex-1 min-w-[200px]">
+                    <input
+                      type="text"
+                      [(ngModel)]="newActionPlan.courses"
+                      placeholder="Course / Trade: Assistant Technician Computer Hardware cum DEO"
+                      class="w-full p-1.5 border border-slate-300 rounded bg-white text-xs focus:outline-none focus:border-[#0B3558]"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    (click)="saveNewActionPlan()"
+                    class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Add District Action Plan</span>
+                  </button>
+                </div>
+              </div>
+
+              @if (actionPlan.length === 0) {
+                <div class="p-4 border border-slate-200 rounded-lg text-center bg-slate-50 text-xs text-slate-500">
+                  No annual district action plan added yet. Fill the fields above to commit target districts.
+                </div>
+              } @else {
+                <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                  <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                      <tr>
+                        <th class="py-2 px-2 w-10 text-center">S.No</th>
+                        <th class="py-2 px-3">Year</th>
+                        <th class="py-2 px-3">Proposed District</th>
+                        <th class="py-2 px-2 text-center">SDCs</th>
+                        <th class="py-2 px-3">SDC Location</th>
+                        <th class="py-2 px-3">Proposed Sectors</th>
+                        <th class="py-2 px-3">Course / Trade</th>
+                        <th class="py-2 px-2 text-center">Mode</th>
+                        <th class="py-2 px-2 text-center">Batches</th>
+                        <th class="py-2 px-2 text-center">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-normal">
+                      @for (ap of actionPlan; track ap.id; let idx = $index) {
+                        <tr>
+                          <td class="py-2.5 px-2 text-center text-slate-400 font-bold">{{ idx + 1 }}</td>
+                          <td class="py-2.5 px-3 font-mono text-[11px]">{{ ap.year }}</td>
+                          <td class="py-2.5 px-3 font-semibold text-slate-800">{{ ap.district }}</td>
+                          <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ ap.sdcCount }}</td>
+                          <td class="py-2.5 px-3 text-slate-600">{{ ap.location }}</td>
+                          <td class="py-2.5 px-3 text-slate-700">{{ ap.sectors }}</td>
+                          <td class="py-2.5 px-3 text-slate-700 max-w-xs truncate">{{ ap.courses }}</td>
+                          <td class="py-2.5 px-2 text-center text-emerald-700 font-medium">{{ ap.mode }}</td>
+                          <td class="py-2.5 px-2 text-center font-bold text-slate-900">{{ ap.batches }}</td>
+                          <td class="py-2.5 px-2 text-center">
+                            <button
+                              type="button"
+                              (click)="removeActionPlan(idx)"
+                              class="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer p-1"
+                              title="Remove Plan"
+                            >
+                              &times;
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            </div>
+
+            <!-- 5. 14 EOI Documents Checklist (From PDF Page 5) -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-4 shadow-2xs">
+              <div class="pb-2 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
+                    5. Mandatory EOI Proposal Documents Checklist (14 Documents)
+                  </h3>
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    Upload scanned signed &amp; sealed copies of the statutory annexures mandated in the RSLDC RFP.
+                  </p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 rounded bg-blue-50 text-[#0B3558] text-xs font-semibold border border-blue-200">
+                    {{ attachedDocsCount() }} / 14 Attached
+                  </span>
+                  <button
+                    type="button"
+                    (click)="attachAllSampleDocs()"
+                    class="px-3 py-1 bg-white hover:bg-slate-50 text-[#0B3558] text-xs font-semibold border border-slate-300 rounded cursor-pointer transition-colors shadow-2xs flex items-center gap-1.5"
+                  >
+                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>Attach All Mandated Annexures</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="space-y-2.5">
                 @for (doc of eoiDocuments; track doc.id) {
-                  <div class="p-4 rounded-xl border border-slate-200 hover:border-slate-300 bg-white transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    
+                  <div class="p-3 rounded-lg border border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                     <div class="flex items-start gap-3">
-                      <div class="w-7 h-7 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center font-bold text-xs text-slate-700 shrink-0 mt-0.5">
+                      <span class="w-6 h-6 rounded-full bg-blue-100 text-[#0B3558] font-bold text-[11px] flex items-center justify-center shrink-0 mt-0.5">
                         {{ doc.id }}
-                      </div>
+                      </span>
                       <div>
-                        <div class="flex items-center gap-2">
-                          <h4 class="text-xs sm:text-sm font-bold text-slate-900">
-                            {{ doc.name }}
-                            @if (doc.isMandatory) {
-                              <span class="text-rose-600">*</span>
-                            }
-                          </h4>
-                          @if (doc.status === 'uploaded') {
-                            <span class="px-2 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                              Uploaded
-                            </span>
-                          }
-                        </div>
-                        <p class="text-[11px] text-slate-500 mt-0.5">
-                          {{ doc.description }}
-                        </p>
+                        <span class="font-medium text-slate-900 block">{{ doc.name }}</span>
                         @if (doc.status === 'uploaded') {
-                          <div class="flex items-center gap-2 mt-1.5 text-[11px] text-slate-600 font-mono">
-                            <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
-                            <span class="font-bold text-slate-800">{{ doc.fileName }}</span>
+                          <div class="flex items-center gap-2 mt-1 text-[11px] text-slate-500 font-mono">
+                            <div class="w-4 h-4 rounded bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
+                              <svg class="w-3 h-3 text-rose-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v-1h2c.28 0 .5-.22.5-.5s-.22-.5-.5-.5h-3v5h1v-1.5h1.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5zm5 2c0 .28-.22.5-.5.5h-2.5v-5h2.5c.28 0 .5.22.5.5v4zm-1-3.5h-1v3h1v-3zm5-.5h-2v1h1.5c.28 0 .5.22.5.5s-.22.5-.5.5H19v1.5h-1v-5h2.5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
+                              </svg>
+                            </div>
+                            <span class="text-slate-800 font-semibold">{{ doc.fileName }}</span>
                             <span>({{ doc.fileSize }})</span>
-                            <span class="text-slate-400">&bull; Uploaded on {{ doc.uploadedDate }}</span>
+                            <span class="text-slate-400">&bull; {{ doc.uploadedDate }}</span>
+                          </div>
+                        } @else {
+                          <div class="mt-1 text-[11px] text-amber-700 font-medium">
+                            Status: Pending upload (Required for scrutiny)
                           </div>
                         }
                       </div>
                     </div>
 
-                    <!-- Action Buttons (View, Change, Remove) -->
                     <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                      <button
-                        type="button"
-                        (click)="previewDoc(doc)"
-                        class="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 rounded-md text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
-                      >
-                        View
-                      </button>
-                      <button
-                        type="button"
-                        (click)="changeDoc(doc)"
-                        class="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 rounded-md text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
-                      >
-                        Change
-                      </button>
-                      <button
-                        type="button"
-                        (click)="removeDoc(doc)"
-                        class="px-3 py-1.5 border border-rose-200 hover:bg-rose-50 rounded-md text-xs font-semibold text-rose-600 transition-colors cursor-pointer"
-                      >
-                        Remove
-                      </button>
+                      @if (doc.status === 'uploaded') {
+                        <button
+                          type="button"
+                          (click)="previewDoc(doc)"
+                          class="px-2.5 py-1 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded text-xs font-semibold cursor-pointer shadow-2xs"
+                        >
+                          View
+                        </button>
+                        <button
+                          type="button"
+                          (click)="removeDoc(doc)"
+                          class="px-2.5 py-1 bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 rounded text-xs font-semibold cursor-pointer shadow-2xs"
+                        >
+                          Remove
+                        </button>
+                      } @else {
+                        <button
+                          type="button"
+                          (click)="uploadDoc(doc)"
+                          class="px-3 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-semibold cursor-pointer shadow-2xs flex items-center gap-1.5"
+                        >
+                          <svg class="w-3.5 h-3.5 text-rose-300" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v-1h2c.28 0 .5-.22.5-.5s-.22-.5-.5-.5h-3v5h1v-1.5h1.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5zm5 2c0 .28-.22.5-.5.5h-2.5v-5h2.5c.28 0 .5.22.5.5v4zm-1-3.5h-1v3h1v-3zm5-.5h-2v1h1.5c.28 0 .5.22.5.5s-.22.5-.5.5H19v1.5h-1v-5h2.5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
+                          </svg>
+                          <span>Upload Annexure (PDF)</span>
+                        </button>
+                      }
                     </div>
-
                   </div>
                 }
               </div>
             </div>
 
-            <!-- Footer Action Button for Step 1 -->
-            <div class="flex items-center justify-end gap-3 pt-4">
+            <!-- Footer Action Buttons for Step 2 -->
+            <div class="flex items-center justify-between pt-4 border-t border-slate-200">
               <button
                 type="button"
-                (click)="goToStep(2)"
-                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs sm:text-sm font-bold shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+                (click)="goToStep(1)"
+                class="px-5 py-2.5 border border-slate-300 hover:bg-slate-100 rounded-lg text-xs font-semibold text-slate-700 cursor-pointer transition-colors"
+              >
+                &larr; Back to OTR Profile
+              </button>
+
+              <button
+                type="button"
+                (click)="goToStep(3)"
+                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
               >
                 <span>Save &amp; Proceed to Complete Preview</span>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -557,128 +1222,240 @@ export interface EoiDocumentItem {
         }
 
         <!-- ====================================================================
-             STEP 2: COMPLETE PREVIEW (All Details + Edit Options)
+             STEP 3: COMPLETE PREVIEW (Both OTR + Proposal Details)
              ==================================================================== -->
-        @if (currentStep() === 2) {
+        @if (currentStep() === 3) {
           <div class="space-y-6">
             
-            <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3.5 flex items-center justify-between text-xs text-emerald-900">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3.5 flex items-center justify-between text-xs text-[#0B3558]">
               <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span>
-                  <strong>Preview Mode:</strong> Review all application particulars below. If any changes are needed, click the <strong>Edit</strong> button on the respective section.
+                  <strong>Comprehensive Application Preview:</strong> Review all verified OTR entity particulars and scheme proposal details below before formal submission.
                 </span>
               </div>
               <button
                 type="button"
-                (click)="goToStep(1)"
+                (click)="goToStep(2)"
                 class="text-xs font-bold text-[#0B3558] hover:underline cursor-pointer"
               >
-                &larr; Back to Step 1
+                &larr; Edit Proposal
               </button>
             </div>
 
-            <!-- Section 1 Preview: Organization & Legal Constitution -->
+            <!-- Preview Part A: OTR Institutional Profile -->
             <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3 shadow-2xs">
               <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                 <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">1</span>
-                  <h3 class="text-sm font-bold text-[#0B3558]">Organization &amp; Legal Constitution (OTR)</h3>
+                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">A</span>
+                  <h3 class="text-sm font-bold text-[#0B3558]">TP/PIA One Time Registration (OTR) Particulars</h3>
                 </div>
-                <a
-                  [routerLink]="['/registration']"
-                  [queryParams]="{ step: 1 }"
-                  class="text-xs font-bold text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
+                <button
+                  type="button"
+                  (click)="goToStep(1)"
+                  class="text-xs font-semibold text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
                 >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  <span>Edit in OTR</span>
-                </a>
+                  Edit in Step 1
+                </button>
               </div>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-normal">
                 <div>
-                  <span class="text-slate-400 block font-medium">TP / PIA Legal Name</span>
-                  <span class="font-bold text-slate-800">{{ otrData().step1.fullName || 'DMR ENTERPRISES PRIVATE LIMITED' }}</span>
+                  <span class="text-slate-500 block font-medium">TP/PIA Short Name</span>
+                  <span class="text-slate-900 font-semibold">{{ otrData().step1.shortName || 'DMR SAKSHAM' }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-400 block font-medium">Registration / CIN</span>
-                  <span class="font-mono font-bold text-slate-800">{{ otrData().step1.registrationNumber || '07AAECD8566H1ZC' }}</span>
+                  <span class="text-slate-500 block font-medium">TP/PIA Full Name</span>
+                  <span class="text-slate-900 font-semibold">{{ otrData().step1.fullName || 'DMR ENTERPRISES PRIVATE LIMITED' }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-400 block font-medium">Company PAN</span>
-                  <span class="font-mono font-bold text-slate-800">{{ otrData().step1.companyPan || 'AAECD8566H' }}</span>
+                  <span class="text-slate-500 block font-medium">Nature of Entity</span>
+                  <span class="text-slate-800">{{ otrData().step1.natureOfEntity || 'PUBLIC LIMITED' }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-400 block font-medium">GSTIN</span>
-                  <span class="font-mono font-bold text-slate-800">{{ otrData().step1.gstin || '08AAACR1234F1Z5' }}</span>
+                  <span class="text-slate-500 block font-medium">Registration Number of Entity</span>
+                  <span class="font-mono text-slate-800 font-medium">{{ otrData().step1.registrationNumber || '07AAECD8566H1ZC' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Company PAN</span>
+                  <span class="font-mono text-slate-800 font-medium">{{ otrData().step1.companyPan || 'AAECD8566H' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">GSTIN</span>
+                  <span class="font-mono text-slate-800 font-medium">{{ otrData().step1.gstin || '08AAACR1234F1Z5' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Udyam Number</span>
+                  <span class="font-mono text-slate-800 font-medium">{{ otrData().step1.udyamNumber || 'UDYAM-RJ-14-0019284' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Turn Over</span>
+                  <span class="text-slate-800 font-semibold">₹ {{ otrData().step1.turnOver || '1203.35' }} Lakhs</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Name of the Bank</span>
+                  <span class="text-slate-800 font-medium">{{ otrData().step4.bankName || 'HDFC Bank' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Account No.</span>
+                  <span class="font-mono text-slate-800 font-medium">{{ otrData().step4.accountNo || '50200047885422' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">IFSC Code</span>
+                  <span class="font-mono text-slate-800 font-medium">{{ otrData().step4.ifscCode || 'HDFC0001441' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block font-medium">Authorized Person (Name)</span>
+                  <span class="text-slate-800">{{ otrData().step3.name || 'SUMAN GUPTA' }} ({{ otrData().step3.designation || 'Director' }})</span>
+                </div>
+                <div class="sm:col-span-2">
+                  <span class="text-slate-500 block font-medium">Registered Address</span>
+                  <span class="text-slate-800">{{ otrData().step1.registeredAddress || 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi - 110042' }}</span>
+                </div>
+                <div class="sm:col-span-2">
+                  <span class="text-slate-500 block font-medium">Office Address</span>
+                  <span class="text-slate-800">{{ otrData().step1.officeAddress || 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi - 110042' }}</span>
                 </div>
               </div>
             </div>
 
-            <!-- Section 2 Preview: Training Centres -->
+            <!-- Preview Part B: Proposed Training Centres -->
             <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3 shadow-2xs">
               <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                 <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">2</span>
+                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">B</span>
                   <h3 class="text-sm font-bold text-[#0B3558]">Proposed Training Centres ({{ trainingCentres.length }} Centres)</h3>
                 </div>
                 <button
                   type="button"
-                  (click)="goToStep(1)"
-                  class="text-xs font-bold text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
+                  (click)="goToStep(2)"
+                  class="text-xs font-semibold text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
                 >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  <span>Edit Centres</span>
+                  Edit in Step 2
                 </button>
               </div>
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                @for (c of trainingCentres; track c.id) {
-                  <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
-                    <span class="font-bold text-slate-900 block">{{ c.district }}</span>
-                    <span class="text-[11px] text-slate-500 block truncate">{{ c.centerName }}</span>
-                    <span class="text-[10px] text-emerald-700 font-bold mt-1 inline-block">
-                      {{ c.classrooms }} Classrooms &bull; {{ c.practicalRooms }} Labs
-                    </span>
-                  </div>
-                }
+              @if (trainingCentres.length === 0) {
+                <div class="p-3.5 bg-amber-50/80 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-center justify-between flex-wrap gap-2">
+                  <span>No training centres added yet.</span>
+                  <button type="button" (click)="goToStep(2)" class="font-bold underline text-[#0B3558] hover:text-[#EA580C] cursor-pointer">
+                    + Add Training Centres in Step 2
+                  </button>
+                </div>
+              } @else {
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs font-normal">
+                  @for (c of trainingCentres; track c.id) {
+                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                      <span class="font-semibold text-slate-900 block">{{ c.district }}</span>
+                      <span class="text-[11px] text-slate-500 block truncate">{{ c.centerName }}</span>
+                      <span class="text-[10px] text-emerald-700 font-medium mt-1 inline-block">
+                        {{ c.classrooms }} Classrooms &bull; {{ c.practicalRooms }} Labs &bull; Washrooms: {{ c.washrooms }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Preview Part C: Financials & Placement Track Record -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-2 shadow-2xs">
+                <h4 class="text-xs font-bold text-[#0B3558] uppercase">3-Year Turnover Summary (INR)</h4>
+                <div class="space-y-1 text-xs">
+                  @for (t of turnoverYears; track t.year) {
+                    <div class="flex justify-between py-1 border-b border-slate-100 font-mono">
+                      <span class="text-slate-500">{{ t.year }}:</span>
+                      <span class="text-slate-800 font-semibold">₹ {{ t.totalTurnover || '0' }} (Skill: ₹ {{ t.skillTurnover || '0' }})</span>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-2 shadow-2xs">
+                <h4 class="text-xs font-bold text-[#0B3558] uppercase">Placement Track Record</h4>
+                <div class="space-y-1 text-xs">
+                  @if (placementRecords.length === 0) {
+                    <p class="text-xs text-slate-400 py-2">No placement track record added yet.</p>
+                  } @else {
+                    @for (p of placementRecords; track p.sector) {
+                      <div class="flex justify-between py-1 border-b border-slate-100">
+                        <span class="text-slate-600 truncate max-w-[150px]">{{ p.sector }}:</span>
+                        <span class="text-emerald-700 font-semibold">{{ p.trained }} Trained / {{ p.placed }} Placed</span>
+                      </div>
+                    }
+                  }
+                </div>
               </div>
             </div>
 
-            <!-- Section 3 Preview: Action Plan & Documents -->
+            <!-- Preview Part D: Proposed Annual Action Plan -->
             <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3 shadow-2xs">
               <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                 <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">3</span>
-                  <h3 class="text-sm font-bold text-[#0B3558]">Documents &amp; Compliance Verified</h3>
+                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">D</span>
+                  <h3 class="text-sm font-bold text-[#0B3558]">Proposed Annual Action Plan ({{ actionPlan.length }} Districts)</h3>
                 </div>
                 <button
                   type="button"
-                  (click)="goToStep(1)"
-                  class="text-xs font-bold text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
+                  (click)="goToStep(2)"
+                  class="text-xs font-semibold text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
                 >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  <span>Edit Documents</span>
+                  Edit in Step 2
+                </button>
+              </div>
+              @if (actionPlan.length === 0) {
+                <p class="text-xs text-slate-400 py-2">No annual district action plan added yet.</p>
+              } @else {
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs font-normal">
+                  @for (ap of actionPlan; track ap.id) {
+                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                      <span class="font-semibold text-slate-900 block">{{ ap.district }} ({{ ap.year }})</span>
+                      <span class="text-[11px] text-slate-600 block truncate">{{ ap.courses }}</span>
+                      <span class="text-[10px] text-emerald-700 font-medium mt-1 inline-block">
+                        {{ ap.sdcCount }} SDCs &bull; {{ ap.batches }} Batches &bull; Mode: {{ ap.mode }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Preview Part E: 14 Proposal Documents -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3 shadow-2xs">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100 flex-wrap gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">E</span>
+                  <h3 class="text-sm font-bold text-[#0B3558]">14 EOI Statutory Proposal Documents Checklist ({{ attachedDocsCount() }} / 14 Attached)</h3>
+                </div>
+                <button
+                  type="button"
+                  (click)="goToStep(2)"
+                  class="text-xs font-semibold text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
+                >
+                  Edit Documents in Step 2
                 </button>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                 @for (d of eoiDocuments; track d.id) {
-                  <div class="p-2.5 rounded-lg border border-slate-200 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                      <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                      </svg>
-                      <span class="font-bold text-slate-800">{{ d.name }}</span>
+                  <div class="p-2.5 rounded-lg border border-slate-200 flex items-center justify-between bg-slate-50/50">
+                    <div class="flex items-center gap-2 max-w-[70%]">
+                      <div class="w-4 h-4 rounded bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
+                        <svg class="w-3 h-3 text-rose-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v-1h2c.28 0 .5-.22.5-.5s-.22-.5-.5-.5h-3v5h1v-1.5h1.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5zm5 2c0 .28-.22.5-.5.5h-2.5v-5h2.5c.28 0 .5.22.5.5v4zm-1-3.5h-1v3h1v-3zm5-.5h-2v1h1.5c.28 0 .5.22.5.5s-.22.5-.5.5H19v1.5h-1v-5h2.5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
+                        </svg>
+                      </div>
+                      <span class="font-medium text-slate-800 truncate">{{ d.name }}</span>
                     </div>
-                    <span class="text-emerald-700 font-bold text-[10px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                      Verified
-                    </span>
+                    @if (d.status === 'uploaded') {
+                      <span class="text-emerald-700 font-semibold text-[10px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
+                        &check; Attached
+                      </span>
+                    } @else {
+                      <span class="text-amber-700 font-semibold text-[10px] bg-amber-50 px-2 py-0.5 rounded border border-amber-200 shrink-0">
+                        Pending
+                      </span>
+                    }
                   </div>
                 }
               </div>
@@ -692,8 +1469,8 @@ export interface EoiDocumentItem {
                 [(ngModel)]="declarationAgreed"
                 class="mt-1 w-4 h-4 rounded border-slate-300 text-[#0B3558] focus:ring-[#0B3558] cursor-pointer"
               />
-              <label for="previewDeclaration" class="text-xs text-slate-700 leading-relaxed cursor-pointer font-medium">
-                I hereby solemnly declare that all particulars submitted in this Expression of Interest (EOI) are true, authentic, and in accordance with RSLDC guidelines. I understand that any false statement will result in immediate disqualification and forfeiture of EMD under Rajasthan Transparency in Public Procurement (RTPP) Act.
+              <label for="previewDeclaration" class="text-xs text-slate-700 leading-relaxed cursor-pointer font-normal">
+                I hereby solemnly declare that all particulars and documents submitted in this Expression of Interest (EOI) are true, authentic, and in accordance with RSLDC guidelines. I understand that any false statement will result in immediate disqualification and forfeiture of EMD under Rajasthan Transparency in Public Procurement (RTPP) Act.
               </label>
             </div>
 
@@ -701,19 +1478,20 @@ export interface EoiDocumentItem {
             <div class="flex items-center justify-between pt-4 border-t border-slate-200">
               <button
                 type="button"
-                (click)="goToStep(1)"
-                class="px-5 py-2.5 border border-slate-300 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-700 cursor-pointer transition-colors"
+                (click)="goToStep(2)"
+                class="px-5 py-2.5 border border-slate-300 hover:bg-slate-100 rounded-lg text-xs font-semibold text-slate-700 cursor-pointer transition-colors"
               >
-                &larr; Back to Step 1
+                &larr; Back to Proposal Form
               </button>
 
+              <!-- Submit Button that opens the clean Confirmation Modal -->
               <button
                 type="button"
-                [disabled]="!declarationAgreed"
-                (click)="goToStep(3)"
-                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs sm:text-sm font-bold shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+                [disabled]="!declarationAgreed()"
+                (click)="openSubmitConfirm()"
+                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
               >
-                <span>Confirm &amp; Proceed to Fees &amp; Payment</span>
+                <span>Submit EOI Application</span>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
@@ -724,17 +1502,17 @@ export interface EoiDocumentItem {
         }
 
         <!-- ====================================================================
-             STEP 3: FEES & PAYMENT (Compulsory Fees, No Checkboxes, Success Modal)
+             STEP 4: FEE PAYMENT (Matching Screenshot 3)
              ==================================================================== -->
-        @if (currentStep() === 3) {
+        @if (currentStep() === 4) {
           <div class="space-y-6">
             
             <!-- Step Title -->
             <div>
-              <h2 class="text-xl sm:text-2xl font-black text-[#0B3558] tracking-tight">
+              <h2 class="text-xl sm:text-2xl font-bold text-[#0B3558] tracking-tight">
                 Fee Payment
               </h2>
-              <p class="text-xs text-slate-500 mt-0.5">
+              <p class="text-xs text-slate-500 mt-0.5 font-normal">
                 Mandatory EOI Application Fees &amp; Secure Payment Gateway
               </p>
             </div>
@@ -744,13 +1522,13 @@ export interface EoiDocumentItem {
               <!-- Left 2 Columns: Compulsory Fees & Payment Modes -->
               <div class="lg:col-span-2 space-y-6">
                 
-                <!-- 1. Applicable EOI Application Fees (Compulsory - No Option to Choose/Uncheck!) -->
+                <!-- 1. Applicable EOI Application Fees (Compulsory) -->
                 <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
                   <div class="pb-2 border-b border-slate-100">
                     <h3 class="text-sm sm:text-base font-bold text-slate-900">
                       1. Applicable EOI Application Fees (Compulsory)
                     </h3>
-                    <p class="text-xs text-slate-500 mt-0.5">
+                    <p class="text-xs text-slate-500 mt-0.5 font-normal">
                       Both Processing Fee (₹2,000) and Earnest Money Deposit (₹50,000) are compulsory for EOI proposal submission under MMKVY-RAJKVIK.
                     </p>
                   </div>
@@ -763,15 +1541,15 @@ export interface EoiDocumentItem {
                           &check;
                         </div>
                         <div>
-                          <h4 class="text-xs sm:text-sm font-bold text-slate-900">
+                          <h4 class="text-xs sm:text-sm font-semibold text-slate-900">
                             1. Processing Fee <span class="text-rose-600">*</span>
                           </h4>
-                          <p class="text-[11px] text-slate-500 mt-0.5">
+                          <p class="text-[11px] text-slate-500 mt-0.5 font-normal">
                             Non-refundable administrative scrutiny fee under MMKVY-RAJKVIK guidelines.
                           </p>
                         </div>
                       </div>
-                      <span class="text-sm sm:text-base font-black text-slate-900">₹2,000</span>
+                      <span class="text-sm sm:text-base font-bold text-slate-900">₹2,000</span>
                     </div>
 
                     <!-- Fee 2: Earnest Money Deposit (EMD) -->
@@ -781,15 +1559,15 @@ export interface EoiDocumentItem {
                           &check;
                         </div>
                         <div>
-                          <h4 class="text-xs sm:text-sm font-bold text-slate-900">
+                          <h4 class="text-xs sm:text-sm font-semibold text-slate-900">
                             2. Earnest Money Deposit (EMD) <span class="text-rose-600">*</span>
                           </h4>
-                          <p class="text-[11px] text-slate-500 mt-0.5">
+                          <p class="text-[11px] text-slate-500 mt-0.5 font-normal">
                             Refundable security deposit for Training Provider / PIA empanelment proposal under MMKVY-RAJKVIK.
                           </p>
                         </div>
                       </div>
-                      <span class="text-sm sm:text-base font-black text-slate-900">₹50,000</span>
+                      <span class="text-sm sm:text-base font-bold text-slate-900">₹50,000</span>
                     </div>
                   </div>
                 </div>
@@ -800,7 +1578,7 @@ export interface EoiDocumentItem {
                     <h3 class="text-sm sm:text-base font-bold text-slate-900">
                       2. Select Payment Mode
                     </h3>
-                    <p class="text-xs text-slate-500 mt-0.5">
+                    <p class="text-xs text-slate-500 mt-0.5 font-normal">
                       Choose your preferred payment method to complete the application fee payment.
                     </p>
                   </div>
@@ -822,11 +1600,11 @@ export interface EoiDocumentItem {
                           [(ngModel)]="paymentMethod"
                           class="w-4 h-4 text-[#0B3558] focus:ring-[#0B3558]"
                         />
-                        <span class="text-xs font-bold px-2 py-0.5 bg-blue-100 text-[#0B3558] rounded">Instant</span>
+                        <span class="text-xs font-semibold px-2 py-0.5 bg-blue-100 text-[#0B3558] rounded">Instant</span>
                       </div>
                       <div>
-                        <div class="text-xs font-bold text-slate-900">UPI</div>
-                        <div class="text-[11px] text-slate-400 mt-0.5">Google Pay, PhonePe, Paytm, BHIM</div>
+                        <div class="text-xs font-semibold text-slate-900">UPI</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5 font-normal">Google Pay, PhonePe, Paytm, BHIM</div>
                       </div>
                     </label>
 
@@ -845,11 +1623,11 @@ export interface EoiDocumentItem {
                           [(ngModel)]="paymentMethod"
                           class="w-4 h-4 text-[#0B3558] focus:ring-[#0B3558]"
                         />
-                        <span class="text-xs font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded">Bank</span>
+                        <span class="text-xs font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded">Bank</span>
                       </div>
                       <div>
-                        <div class="text-xs font-bold text-slate-900">Net Banking</div>
-                        <div class="text-[11px] text-slate-400 mt-0.5">SBI, HDFC, ICICI, PNB, BoB &amp; 50+ Banks</div>
+                        <div class="text-xs font-semibold text-slate-900">Net Banking</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5 font-normal">SBI, HDFC, ICICI, PNB, BoB &amp; 50+ Banks</div>
                       </div>
                     </label>
 
@@ -868,11 +1646,11 @@ export interface EoiDocumentItem {
                           [(ngModel)]="paymentMethod"
                           class="w-4 h-4 text-[#0B3558] focus:ring-[#0B3558]"
                         />
-                        <span class="text-xs font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded">Cards</span>
+                        <span class="text-xs font-semibold px-2 py-0.5 bg-slate-100 text-slate-600 rounded">Cards</span>
                       </div>
                       <div>
-                        <div class="text-xs font-bold text-slate-900">Debit / Credit Card</div>
-                        <div class="text-[11px] text-slate-400 mt-0.5">RuPay, Visa, MasterCard, Maestro</div>
+                        <div class="text-xs font-semibold text-slate-900">Debit / Credit Card</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5 font-normal">RuPay, Visa, MasterCard, Maestro</div>
                       </div>
                     </label>
 
@@ -881,30 +1659,30 @@ export interface EoiDocumentItem {
 
               </div>
 
-              <!-- Right Column: Payment Summary Card (Matching Screenshot 4) -->
+              <!-- Right Column: Payment Summary Card (Matching Screenshot 3) -->
               <div class="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden sticky top-24">
                 <div class="bg-[#0B3558] text-white p-4 flex items-center justify-between">
                   <h4 class="text-xs font-bold uppercase tracking-wider">Payment Summary</h4>
-                  <span class="text-[10px] font-bold px-2 py-0.5 bg-white/10 rounded">MMKVY-RAJKVIK</span>
+                  <span class="text-[10px] font-semibold px-2 py-0.5 bg-white/10 rounded">MMKVY-RAJKVIK</span>
                 </div>
 
                 <div class="p-5 space-y-4 text-xs">
-                  <div class="flex justify-between text-slate-600 pb-2 border-b border-slate-100">
+                  <div class="flex justify-between text-slate-600 pb-2 border-b border-slate-100 font-normal">
                     <span>Processing Fee</span>
-                    <span class="font-bold text-slate-900">₹2,000</span>
+                    <span class="font-semibold text-slate-900">₹2,000</span>
                   </div>
-                  <div class="flex justify-between text-slate-600 pb-2 border-b border-slate-100">
+                  <div class="flex justify-between text-slate-600 pb-2 border-b border-slate-100 font-normal">
                     <span>EMD Fee</span>
-                    <span class="font-bold text-slate-900">₹50,000</span>
+                    <span class="font-semibold text-slate-900">₹50,000</span>
                   </div>
 
                   <div class="flex justify-between items-baseline pt-1">
-                    <span class="text-sm font-bold text-slate-900">Total Payable Amount</span>
-                    <span class="text-xl font-black text-[#0B3558]">₹52,000</span>
+                    <span class="text-sm font-semibold text-slate-900">Total Payable Amount</span>
+                    <span class="text-xl font-bold text-[#0B3558]">₹52,000</span>
                   </div>
 
-                  <div class="p-2.5 bg-slate-50 rounded-lg text-[11px] text-slate-500 font-medium">
-                    Selected Method: <strong class="text-slate-800">{{ paymentMethod() }}</strong>
+                  <div class="p-2.5 bg-slate-50 rounded-lg text-[11px] text-slate-500 font-normal">
+                    Selected Method: <strong class="text-slate-800 font-semibold">{{ paymentMethod() }}</strong>
                   </div>
 
                   <!-- Proceed to Pay Action Button -->
@@ -912,14 +1690,14 @@ export interface EoiDocumentItem {
                     type="button"
                     [disabled]="isPaymentProcessing()"
                     (click)="triggerPayment()"
-                    class="w-full py-3 px-4 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                    class="w-full py-3 px-4 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg font-semibold text-xs sm:text-sm shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
                   >
                     @if (isPaymentProcessing()) {
                       <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      <span>Connecting to e-GRAS...</span>
+                      <span>Processing Payment...</span>
                     } @else {
                       <span>Proceed to Payment (₹52,000) &rarr;</span>
                     }
@@ -933,243 +1711,198 @@ export interface EoiDocumentItem {
         }
 
         <!-- ====================================================================
-             STEP 4: SUBMISSION & TWO RECEIPTS (Payment + Acknowledgment)
+             STEP 5: SUBMISSION RECEIPTS & ACKNOWLEDGEMENT
              ==================================================================== -->
-        @if (currentStep() === 4) {
-          <div class="space-y-6">
+        @if (currentStep() === 5) {
+          <div class="space-y-5">
             
-            <!-- Success Confirmation Banner -->
-            <div class="bg-linear-to-r from-emerald-600 to-teal-700 text-white rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
-              <div class="flex items-center gap-5 text-center sm:text-left">
-                <div class="w-16 h-16 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center font-black text-2xl text-white shrink-0 mx-auto">
+            <!-- Success Title Banner -->
+            <div class="bg-linear-to-r from-emerald-600 to-teal-700 text-white rounded-xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-5">
+              <div class="flex items-center gap-4 text-center sm:text-left">
+                <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center font-bold text-xl text-white shrink-0 mx-auto">
                   &check;
                 </div>
                 <div>
-                  <span class="px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-black uppercase tracking-wider">
+                  <span class="px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-bold uppercase tracking-wider">
                     Application Successfully Submitted &amp; Verified
                   </span>
-                  <h2 class="text-xl sm:text-2xl font-black mt-1">
-                    EOI Proposal Submitted Successfully!
+                  <h2 class="text-lg sm:text-xl font-bold mt-1">
+                    EOI Proposal Submitted for {{ schemeCode() }}
                   </h2>
-                  <p class="text-xs text-emerald-100 mt-1">
-                    Application Reference: <strong class="font-mono text-white text-sm">APP-004661</strong> &bull; EOI Ref: <strong class="font-mono text-white">{{ schemeRefNo() }}</strong>
+                  <p class="text-xs text-emerald-100 mt-0.5 max-w-xl font-normal">
+                    Your Expression of Interest application has been recorded in the ISMS 2.0 repository and routed to the RSLDC scrutiny committee.
                   </p>
                 </div>
               </div>
 
               <div class="flex items-center gap-2 shrink-0">
-                <a
-                  routerLink="/tender-status"
-                  class="px-4 py-2.5 bg-white text-[#0B3558] hover:bg-emerald-50 rounded-lg text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                <button
+                  type="button"
+                  (click)="goToTenderStatus()"
+                  class="px-4 py-2 bg-white text-[#0B3558] hover:bg-slate-100 rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer"
                 >
                   View in Tender Status &rarr;
-                </a>
+                </button>
               </div>
             </div>
 
-            <!-- Two Receipts Switcher Bar -->
-            <div class="flex items-center gap-3 border-b border-slate-200 pb-2">
-              <button
-                type="button"
-                (click)="activeReceiptTab.set('payment')"
-                class="px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
-                [class.bg-[#0B3558]]="activeReceiptTab() === 'payment'"
-                [class.text-white]="activeReceiptTab() === 'payment'"
-                [class.bg-slate-100]="activeReceiptTab() !== 'payment'"
-                [class.text-slate-700]="activeReceiptTab() !== 'payment'"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span>1. Official Payment Receipt (e-GRAS Challan)</span>
-              </button>
-
-              <button
-                type="button"
-                (click)="activeReceiptTab.set('acknowledgment')"
-                class="px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-2"
-                [class.bg-[#0B3558]]="activeReceiptTab() === 'acknowledgment'"
-                [class.text-white]="activeReceiptTab() === 'acknowledgment'"
-                [class.bg-slate-100]="activeReceiptTab() !== 'acknowledgment'"
-                [class.text-slate-700]="activeReceiptTab() !== 'acknowledgment'"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                </svg>
-                <span>2. Application Acknowledgment Receipt</span>
-              </button>
-            </div>
-
-            <!-- RECEIPT 1: E-TREASURY PAYMENT RECEIPT -->
-            @if (activeReceiptTab() === 'payment') {
-              <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 sm:p-8 max-w-3xl mx-auto shadow-sm space-y-6">
-                <!-- Receipt Header -->
-                <div class="text-center pb-4 border-b-2 border-slate-200 space-y-1">
-                  <div class="text-[10px] font-black tracking-wider uppercase text-slate-500">
-                    GOVERNMENT OF RAJASTHAN &bull; FINANCE DEPARTMENT
-                  </div>
-                  <h3 class="text-base sm:text-lg font-black text-[#0B3558]">
-                    Online Government Receipts Accounting System (e-GRAS)
-                  </h3>
-                  <p class="text-xs text-slate-500">Official E-Treasury Cyber Payment Challan Receipt</p>
+            <!-- Compact Application Summary Card -->
+            <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-3 shadow-2xs">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <div class="text-xs font-bold text-[#0B3558] uppercase tracking-wide">
+                  Application Summary &amp; Reference Details
                 </div>
+                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[11px] font-semibold border border-emerald-200">
+                  Technical Opening Initiated
+                </span>
+              </div>
 
-                <!-- Challan Details Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                    <span class="text-slate-400 block font-medium">GRAS Challan Number</span>
-                    <span class="font-mono font-bold text-slate-900 text-sm">GRAS-RJ-2026-992140</span>
-                  </div>
-                  <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                    <span class="text-slate-400 block font-medium">Bank Transaction Ref</span>
-                    <span class="font-mono font-bold text-slate-900 text-sm">TXN-ISMS-2026-004520402</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block font-medium">Remitter / Agency Name</span>
-                    <span class="font-bold text-slate-800">DMR SAKSHAM (DMR Enterprises Private Limited)</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block font-medium">Department / Office</span>
-                    <span class="font-bold text-slate-800">Rajasthan Skill and Livelihoods Development Corporation (RSLDC)</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block font-medium">Scheme</span>
-                    <span class="font-bold text-slate-800">{{ schemeTitle() }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block font-medium">Date &amp; Time</span>
-                    <span class="font-bold text-slate-800">21-Sep-2026 18:35 IST</span>
-                  </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-normal">
+                <div class="p-2.5 bg-blue-50/70 rounded-lg border border-blue-200">
+                  <span class="text-blue-600 block font-semibold text-[10px] uppercase">Application Ref No.</span>
+                  <span class="font-mono font-bold text-[#0B3558] text-sm">ISMS-EOI-2026-9871</span>
                 </div>
-
-                <!-- Fee Breakdown Table -->
-                <div class="border border-slate-200 rounded-lg overflow-hidden">
-                  <table class="w-full text-xs text-left border-collapse">
-                    <thead class="bg-slate-50 text-slate-700 font-bold uppercase text-[10px] border-b border-slate-200">
-                      <tr>
-                        <th class="py-2.5 px-4">Major Head / Description</th>
-                        <th class="py-2.5 px-4 text-right">Amount (INR)</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 font-medium">
-                      <tr>
-                        <td class="py-2.5 px-4">Earnest Money Deposit (EMD) - Refundable Security</td>
-                        <td class="py-2.5 px-4 text-right font-mono font-bold">₹ 50,000.00</td>
-                      </tr>
-                      <tr>
-                        <td class="py-2.5 px-4">Administrative Scrutiny Processing Fee - Non Refundable</td>
-                        <td class="py-2.5 px-4 text-right font-mono font-bold">₹ 2,000.00</td>
-                      </tr>
-                      <tr class="bg-slate-50 font-bold text-slate-900">
-                        <td class="py-3 px-4 text-sm">Total Paid Amount:</td>
-                        <td class="py-3 px-4 text-right font-mono text-base text-[#0B3558]">₹ 52,000.00</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                  <span class="text-slate-500 block font-normal text-[10px] uppercase">Submission Timestamp</span>
+                  <span class="font-mono text-slate-800 text-xs font-semibold">22-Sep-2026 09:10:00 IST</span>
                 </div>
-
-                <!-- Status & Actions -->
-                <div class="flex items-center justify-between pt-2">
-                  <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
-                    &check; Payment Successful &bull; Real-time Treasury Credit Verified
-                  </span>
-                  <div class="flex items-center gap-2">
-                    <button
-                      type="button"
-                      (click)="printPage()"
-                      class="px-3.5 py-1.5 border border-slate-300 hover:bg-slate-50 rounded-lg text-xs font-bold text-slate-700 cursor-pointer"
-                    >
-                      Print Receipt
-                    </button>
-                    <button
-                      type="button"
-                      (click)="downloadDocMock('Payment_Receipt_GRAS.pdf')"
-                      class="px-3.5 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-bold cursor-pointer"
-                    >
-                      Download PDF
-                    </button>
-                  </div>
+                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                  <span class="text-slate-500 block font-normal text-[10px] uppercase">Applicant Agency</span>
+                  <span class="font-semibold text-slate-800 text-xs truncate block">{{ otrData().step1.fullName || 'DMR ENTERPRISES PRIVATE LIMITED' }}</span>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                  <span class="text-slate-500 block font-normal text-[10px] uppercase">Payment Ref &amp; Fee</span>
+                  <span class="font-mono text-slate-800 font-semibold text-xs truncate block">TXN-ISMS-2026-345678 (₹52,000)</span>
                 </div>
               </div>
-            }
+            </div>
 
-            <!-- RECEIPT 2: APPLICATION ACKNOWLEDGMENT RECEIPT -->
-            @if (activeReceiptTab() === 'acknowledgment') {
-              <div class="bg-white border-2 border-slate-200 rounded-2xl p-6 sm:p-8 max-w-3xl mx-auto shadow-sm space-y-6">
-                <!-- Header -->
-                <div class="text-center pb-4 border-b-2 border-slate-200 space-y-1">
-                  <div class="text-[10px] font-black tracking-wider uppercase text-slate-500">
-                    RAJASTHAN SKILL AND LIVELIHOODS DEVELOPMENT CORPORATION (RSLDC)
+            <!-- Both Downloadable Receipt Cards (Side by Side) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              <!-- Card 1: Official EOI Submission Acknowledgment Receipt -->
+              <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4 hover:border-blue-200 transition-colors">
+                <div class="flex items-start gap-3.5">
+                  <div class="w-10 h-10 rounded-lg bg-rose-50 border border-rose-200/80 flex items-center justify-center text-rose-600 shrink-0 shadow-2xs">
+                    <svg class="w-5 h-5 text-rose-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v-1h2c.28 0 .5-.22.5-.5s-.22-.5-.5-.5h-3v5h1v-1.5h1.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5zm5 2c0 .28-.22.5-.5.5h-2.5v-5h2.5c.28 0 .5.22.5.5v4zm-1-3.5h-1v3h1v-3zm5-.5h-2v1h1.5c.28 0 .5.22.5.5s-.22.5-.5.5H19v1.5h-1v-5h2.5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
+                    </svg>
                   </div>
-                  <h3 class="text-base sm:text-lg font-black text-[#0B3558]">
-                    EOI Proposal Submission Acknowledgment Slip
-                  </h3>
-                  <p class="text-xs text-slate-500">Integrated Skill Management System 2.0 (ISMS)</p>
-                </div>
-
-                <!-- Acknowledgment Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div class="p-3 bg-blue-50/70 rounded-lg border border-blue-200">
-                    <span class="text-blue-500 block font-bold text-[10px] uppercase">Official Application Ref No.</span>
-                    <span class="font-mono font-black text-[#0B3558] text-base">APP-004661</span>
-                  </div>
-                  <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                    <span class="text-slate-400 block font-medium">Submission Timestamp</span>
-                    <span class="font-mono font-bold text-slate-800 text-xs">21-Sep-2026 18:35:42 IST</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block font-medium">Applicant Agency</span>
-                    <span class="font-bold text-slate-800">DMR ENTERPRISES PRIVATE LIMITED</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block font-medium">Registration / CIN Number</span>
-                    <span class="font-mono font-bold text-slate-800">07AAECD8566H1ZC</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block font-medium">Scheme &amp; Category</span>
-                    <span class="font-bold text-slate-800">MMKVY (Category I: RAJKVIK)</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block font-medium">Target Districts Committed</span>
-                    <span class="font-bold text-slate-800">5 Districts (50 Batches / 1,250 Candidates)</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block font-medium">Initial Scrutiny Status</span>
-                    <span class="font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 inline-block">
-                      Technical Opening Initiated
+                  <div class="flex-1 min-w-0">
+                    <span class="text-[10px] uppercase font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                      PDF Document &bull; Verified Receipt
                     </span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block font-medium">Fee Payment Ref</span>
-                    <span class="font-mono text-slate-700 font-bold">TXN-ISMS-2026-004520402 (₹52,000)</span>
-                  </div>
-                </div>
-
-                <!-- Footer Note & Actions -->
-                <div class="pt-4 border-t border-slate-200 flex items-center justify-between flex-wrap gap-3">
-                  <div class="text-[11px] text-slate-500 max-w-sm">
-                    Keep this acknowledgment slip for all future correspondence. Track progress in real-time under <strong>Tender Status</strong>.
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <button
-                      type="button"
-                      (click)="printPage()"
-                      class="px-3.5 py-1.5 border border-slate-300 hover:bg-slate-50 rounded-lg text-xs font-bold text-slate-700 cursor-pointer"
-                    >
-                      Print Acknowledgment
-                    </button>
-                    <button
-                      type="button"
-                      (click)="downloadDocMock('EOI_Acknowledgment_APP-004661.pdf')"
-                      class="px-3.5 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-bold cursor-pointer"
-                    >
-                      Download PDF
-                    </button>
+                    <h3 class="text-sm font-bold text-[#0B3558] mt-1.5">
+                      EOI Submission Acknowledgment Receipt
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                      Official digitally sealed submission receipt containing verified OTR profile, SDC training centers, batch commitments, and statutory annexures.
+                    </p>
                   </div>
                 </div>
 
+                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between text-xs font-mono text-slate-600">
+                  <span>Ref: ISMS-EOI-2026-9871</span>
+                  <span>Size: 184 KB</span>
+                </div>
+
+                <div class="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    (click)="downloadReceipt('acknowledgment')"
+                    class="flex-1 py-2 px-3 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                  >
+                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <span>Download Receipt (PDF)</span>
+                  </button>
+                  <button
+                    type="button"
+                    (click)="printReceipt()"
+                    class="py-2 px-3 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>Print</span>
+                  </button>
+                </div>
               </div>
-            }
+
+              <!-- Card 2: Fee Payment & EMD Challan Receipt -->
+              <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4 hover:border-blue-200 transition-colors">
+                <div class="flex items-start gap-3.5">
+                  <div class="w-10 h-10 rounded-lg bg-rose-50 border border-rose-200/80 flex items-center justify-center text-rose-600 shrink-0 shadow-2xs">
+                    <svg class="w-5 h-5 text-rose-600" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v-1h2c.28 0 .5-.22.5-.5s-.22-.5-.5-.5h-3v5h1v-1.5h1.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5zm5 2c0 .28-.22.5-.5.5h-2.5v-5h2.5c.28 0 .5.22.5.5v4zm-1-3.5h-1v3h1v-3zm5-.5h-2v1h1.5c.28 0 .5.22.5.5s-.22.5-.5.5H19v1.5h-1v-5h2.5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <span class="text-[10px] uppercase font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                      PDF Document &bull; Treasury E-Challan
+                    </span>
+                    <h3 class="text-sm font-bold text-[#0B3558] mt-1.5">
+                      Fee Payment &amp; EMD Challan Receipt
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                      Government of Rajasthan Cyber Treasury transaction receipt for ₹50,000 EMD (Refundable) and ₹2,000 RFP Processing Fee (Non-Refundable).
+                    </p>
+                  </div>
+                </div>
+
+                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between text-xs font-mono text-slate-600">
+                  <span>TXN: TXN-ISMS-2026-345678</span>
+                  <span class="font-bold text-slate-900">₹ 52,000.00</span>
+                </div>
+
+                <div class="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    (click)="downloadReceipt('payment')"
+                    class="flex-1 py-2 px-3 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                  >
+                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <span>Download Receipt (PDF)</span>
+                  </button>
+                  <button
+                    type="button"
+                    (click)="printReceipt()"
+                    class="py-2 px-3 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>Print</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="pt-2 flex items-center justify-between border-t border-slate-200">
+              <button
+                type="button"
+                (click)="goBackToSchemes()"
+                class="px-4 py-2 border border-slate-300 hover:bg-slate-50 rounded-lg text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
+              >
+                &larr; Back to Schemes &amp; Tenders
+              </button>
+
+              <button
+                type="button"
+                (click)="goToTenderStatus()"
+                class="px-5 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
+              >
+                <span>Track Application in Tender Status</span>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+            </div>
 
           </div>
         }
@@ -1177,7 +1910,48 @@ export interface EoiDocumentItem {
       </main>
 
       <!-- ====================================================================
-           MODAL: PAYMENT SUCCESSFUL CONFIRMATION POPUP (Triggered on Step 3)
+           MODAL 1: SUBMIT CONFIRMATION MODAL (Clean, No Emoji, Cancel & Confirm)
+           ==================================================================== -->
+      @if (showSubmitConfirmModal()) {
+        <div
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div class="relative max-w-md w-full bg-white rounded-xl shadow-2xl border border-slate-200 p-6 space-y-4 animate-in zoom-in-95 duration-200 text-left">
+            
+            <h3 class="text-base font-bold text-slate-900 tracking-tight">
+              Submit EOI Application?
+            </h3>
+            
+            <p class="text-xs text-slate-600 leading-relaxed font-normal">
+              Please confirm that all information and documents provided in the application are correct. After submission, the application will be submitted for official scrutiny.
+            </p>
+
+            <!-- Buttons: Cancel & Confirm (No Emojis!) -->
+            <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                (click)="showSubmitConfirmModal.set(false)"
+                class="px-4 py-2 border border-slate-300 hover:bg-slate-50 rounded-lg text-xs font-semibold text-slate-700 cursor-pointer transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                (click)="confirmSubmitAndProceedToPayment()"
+                class="px-5 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold cursor-pointer shadow-xs transition-colors"
+              >
+                Confirm
+              </button>
+            </div>
+
+          </div>
+        </div>
+      }
+
+      <!-- ====================================================================
+           MODAL 2: PAYMENT SUCCESSFUL POPUP (Exact Replica of Screenshot 4)
            ==================================================================== -->
       @if (showPaymentSuccessModal()) {
         <div
@@ -1185,326 +1959,550 @@ export interface EoiDocumentItem {
           role="dialog"
           aria-modal="true"
         >
-          <div class="relative max-w-md w-full bg-white rounded-2xl shadow-2xl border border-slate-100 p-6 sm:p-8 text-center space-y-5 animate-in zoom-in-95 duration-200 overflow-hidden">
-            <!-- Top Accent line -->
-            <div class="absolute top-0 left-0 right-0 h-1.5 bg-linear-to-r from-emerald-500 via-teal-500 to-emerald-600"></div>
-
-            <!-- Green Checkmark Icon with soft pulse -->
-            <div class="w-16 h-16 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-inner mt-2">
-              <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-
-            <!-- Title & Message -->
-            <div>
-              <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider border border-emerald-200">
-                Payment Verified
-              </span>
-              <h3 class="text-xl sm:text-2xl font-black text-slate-900 mt-2">
-                Payment Successful!
+          <div class="relative max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 text-center font-sans">
+            
+            <!-- Solid Green Top Header with White Checkmark Circle -->
+            <div class="bg-[#15803d] text-white py-7 px-6 space-y-2">
+              <div class="w-14 h-14 mx-auto rounded-full bg-white text-[#15803d] flex items-center justify-center shadow-md mb-2">
+                <svg class="w-7 h-7 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold tracking-tight">
+                Payment Successful
               </h3>
-              <p class="text-xs text-slate-500 mt-1">
-                Your EMD and Processing Fee of <strong>₹52,000</strong> have been successfully processed via e-GRAS Cyber Treasury.
+              <p class="text-xs text-emerald-100 font-normal">
+                Payment has been completed successfully via UPI
               </p>
             </div>
 
-            <!-- Receipt Reference Strip -->
-            <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1.5">
-              <div class="flex justify-between">
-                <span class="text-slate-400">Transaction Ref:</span>
-                <span class="font-mono font-bold text-slate-800">TXN-ISMS-2026-004520402</span>
+            <!-- Inner White Details Box -->
+            <div class="p-6 space-y-4 text-xs font-sans text-left">
+              
+              <div class="border border-slate-200 rounded-xl p-4 bg-white space-y-3 font-normal">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-500">Transaction ID:</span>
+                  <span class="font-mono font-bold text-slate-800 text-xs">TXN-ISMS-2026-345678</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-500">Amount Paid:</span>
+                  <span class="text-base font-bold text-slate-900">₹52,000</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-500">Payment Date &amp; Time:</span>
+                  <span class="text-slate-700">22 Sept 2026, 9:10 am</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-500">Payment Method:</span>
+                  <span class="text-slate-800 font-semibold">UPI</span>
+                </div>
               </div>
-              <div class="flex justify-between">
-                <span class="text-slate-400">GRAS Challan No:</span>
-                <span class="font-mono font-bold text-slate-800">GRAS-RJ-2026-992140</span>
-              </div>
-              <div class="flex justify-between font-bold text-slate-900 pt-1 border-t border-slate-200">
-                <span>Amount Paid:</span>
-                <span class="text-emerald-700">₹ 52,000.00</span>
-              </div>
-            </div>
 
-            <!-- Action Button: Proceed to Step 4 -->
-            <button
-              type="button"
-              (click)="dismissPaymentSuccessAndProceed()"
-              class="w-full py-3 px-4 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <span>Continue to Submission &amp; Receipts &rarr;</span>
-            </button>
+              <p class="text-center text-[11px] text-slate-500 leading-normal px-2 font-normal">
+                Your transaction receipt has been recorded. Click Continue to preview the complete EOI application details.
+              </p>
+
+              <!-- Button: Continue to Application Preview -> -->
+              <button
+                type="button"
+                (click)="continueFromPaymentSuccess()"
+                class="w-full py-3 px-4 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg font-semibold text-xs sm:text-sm shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Continue to Application Preview &rarr;</span>
+              </button>
+
+            </div>
 
           </div>
         </div>
       }
 
+
+
     </div>
   `
 })
 export class SchemeFormComponent {
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private otrFormService = inject(OtrFormService);
+    private router = inject(Router);
+    private route = inject(ActivatedRoute);
+    private otrFormService = inject(OtrFormService);
 
-  readonly otrData = this.otrFormService.formData;
+    readonly otrData = this.otrFormService.formData;
 
-  currentStep = signal<number>(1);
-  declarationAgreed = false;
-  paymentMethod = signal<'UPI' | 'NetBanking' | 'Card'>('UPI');
-  isPaymentProcessing = signal<boolean>(false);
-  showPaymentSuccessModal = signal<boolean>(false);
-  activeReceiptTab = signal<'payment' | 'acknowledgment'>('payment');
+    currentStep = signal<number>(1);
 
-  // Scheme Meta Signals
-  schemeRefNo = signal<string>('RSLDC/EOI/2026/MMKVY-01');
-  schemeTitle = signal<string>('Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)');
-  schemeCode = signal<string>('MMKVY-RAJKVIK');
-  schemeCategory = signal<string>('Category I: RAJKVIK');
-  schemeEmdFee = signal<string>('₹50,000');
-  schemeProcessFee = signal<string>('₹2,000');
+    schemeTitle = signal<string>('Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)');
+    schemeRefNo = signal<string>('RSLDC/EOI/2026/MMKVY-01');
+    schemeCode = signal<string>('MMKVY-RAJKVIK');
+    schemeCategory = signal<string>('Category I: RAJKVIK');
+    schemeEmdFee = signal<string>('₹50,000');
+    schemeProcessFee = signal<string>('₹2,000');
+    schemeDescription = signal<string>(
+        'Expression of Interest for Empanelment of Training Partners (TPs) to impart skill training under MMKVY (Category I: RAJKVIK - Rojgar Aadharit Jan Kaushal Vikas Karyakram) across Rajasthan districts with guaranteed minimum 70% wage & corporate placement support for eligible youth.'
+    );
 
-  // =========================================================================
-  // Subsection 1: Training Centres (From PDF Page 2)
-  // =========================================================================
-  readonly trainingCentres: TrainingCenterItem[] = [
-    {
-      id: 'tc-1',
-      district: 'Alwar',
-      centerName: 'DMR ENTERPRISES PVT. LTD',
-      telephone: '0144-2301948',
-      classrooms: 2,
-      practicalRooms: 2,
-      washrooms: 'Yes',
-      labInfra: 'Available',
-      fullAddress: 'Near By Navratan Hotel, Bhugor, Byepass, Alwar'
-    },
-    {
-      id: 'tc-2',
-      district: 'Khairthal-Tijara',
-      centerName: 'DMR ENTERPRISES PVT. LTD',
-      telephone: '01460-221049',
-      classrooms: 3,
-      practicalRooms: 3,
-      washrooms: 'Yes',
-      labInfra: 'Available',
-      fullAddress: 'Ward No 12, Behind LIC Office, Khairthal, Alwar'
-    },
-    {
-      id: 'tc-3',
-      district: 'Udaipur',
-      centerName: 'DMR ENTERPRISES PVT. LTD',
-      telephone: '0294-2490184',
-      classrooms: 3,
-      practicalRooms: 3,
-      washrooms: 'Yes',
-      labInfra: 'Available',
-      fullAddress: 'P.N. 5A, Main Road, Near Police Chowki, Aayad, Udaipur'
-    },
-    {
-      id: 'tc-4',
-      district: 'Sri Ganganagar',
-      centerName: 'DMR ENTERPRISES PVT. LTD',
-      telephone: '0154-2481029',
-      classrooms: 2,
-      practicalRooms: 2,
-      washrooms: 'Yes',
-      labInfra: 'Available',
-      fullAddress: 'Chak 3A, Chhoti Sadbhawnanagar, Sri Ganganagar'
-    },
-    {
-      id: 'tc-5',
-      district: 'Jaipur',
-      centerName: 'DMR ENTERPRISES PVT. LTD',
-      telephone: '0141-2780194',
-      classrooms: 3,
-      practicalRooms: 3,
-      washrooms: 'Yes',
-      labInfra: 'Available',
-      fullAddress: 'Parshwnath Naray City, Mansarovar Ext, Jaipur'
-    },
-    {
-      id: 'tc-6',
-      district: 'Sikar',
-      centerName: 'DMR ENTERPRISES PVT. LTD',
-      telephone: '01572-250918',
-      classrooms: 3,
-      practicalRooms: 3,
-      washrooms: 'Yes',
-      labInfra: 'Available',
-      fullAddress: 'Near Bus Stand, Sikar Main Road, Fatehpur, Sikar'
+    declarationAgreed = signal<boolean>(true);
+    paymentMethod = signal<string>('UPI');
+    isPaymentProcessing = signal<boolean>(false);
+
+    showSubmitConfirmModal = signal<boolean>(false);
+    showPaymentSuccessModal = signal<boolean>(false);
+    showAddCentreModal = signal<boolean>(false);
+    showAddPlacementModal = signal<boolean>(false);
+    showAddActionPlanModal = signal<boolean>(false);
+
+    newCentre: Partial<TrainingCenterItem> = {
+        district: '',
+        centerName: '',
+        classrooms: 2,
+        practicalRooms: 2,
+        washrooms: 'Yes',
+        labInfra: 'Available',
+        fullAddress: ''
+    };
+
+    newPlacement: {
+        sector: string;
+        year: string;
+        trained: number | null;
+        placed: number | null;
+        proofDoc: string;
+    } = {
+            sector: '',
+            year: '2023 - 2024',
+            trained: null,
+            placed: null,
+            proofDoc: ''
+        };
+
+    newActionPlan: {
+        year: string;
+        district: string;
+        sdcCount: number | null;
+        location: string;
+        sectors: string;
+        courses: string;
+        mode: 'Residential' | 'Non-Residential' | 'Both';
+        batches: number | null;
+    } = {
+            year: '2025-2026',
+            district: '',
+            sdcCount: 2,
+            location: '',
+            sectors: '',
+            courses: '',
+            mode: 'Both',
+            batches: 10
+        };
+
+    /** Proposed Training Centres - blank by default so applicant fills them */
+    trainingCentres: TrainingCenterItem[] = [];
+
+    /** 3-Year Turnover - blank by default so applicant fills them */
+    turnoverYears: TurnoverYear[] = [
+        { year: '2021 - 2022', totalTurnover: '', skillTurnover: '' },
+        { year: '2022 - 2023', totalTurnover: '', skillTurnover: '' },
+        { year: '2023 - 2024', totalTurnover: '', skillTurnover: '' }
+    ];
+
+    /** Training & Placement Experience - blank by default so applicant fills them */
+    placementRecords: TrainingPlacementRecord[] = [];
+
+    /** Proposed Annual Action Plan - blank by default so applicant fills them */
+    actionPlan: ActionPlanDistrict[] = [];
+
+    /** 14 EOI Checklist Documents - all start pending so applicant uploads/attaches them */
+    eoiDocuments: EoiDocumentItem[] = [
+        {
+            id: 1,
+            name: 'A certificate of NSDC partner, where NSDC has stake',
+            description: 'NSDC equity or loan participation certificate',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: false,
+            status: 'pending'
+        },
+        {
+            id: 2,
+            name: 'Annexure-1: Covering Letter as per Annexure-1',
+            description: 'Official proposal submission covering letter on letterhead',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
+        },
+        {
+            id: 3,
+            name: 'Annexure-3: Audited Financial Statements for last three consecutive financial years',
+            description: 'CA certified balance sheet and P&L accounts',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
+        },
+        {
+            id: 4,
+            name: 'Annexure-5: Training and Placement details as per Annexure-5',
+            description: 'Detailed candidate-level wage placement track record',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
+        },
+        {
+            id: 5,
+            name: 'Annexure-6: An affidavit for not being blacklisted',
+            description: 'Non-judicial notary stamped anti-blacklisting undertaking',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
+        },
+        {
+            id: 6,
+            name: 'Annexure-7: Self-certificate / declaration as per Annexure-7',
+            description: 'Statutory compliance self-declaration',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
+        },
+        {
+            id: 7,
+            name: 'Copy of EOI Document with sign and seal on each page',
+            description: 'Complete downloaded RFP document signed on all pages',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
+        },
+        {
+            id: 8,
+            name: 'Details of Active skill development centre as per Annexure-4',
+            description: 'Geotagged infrastructure layout and classroom proofs',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
+        },
+        {
+            id: 9,
+            name: 'Details of Board of directors as per Annexure-8',
+            description: 'Board member listing, DIN, and KYC profiles',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
+        },
+        {
+            id: 10,
+            name: 'Details of Placement partnership/Tie-ups with Industry as per Annexure-9',
+            description: 'Active corporate MOUs and employer placement commitments',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
+        },
+        {
+            id: 11,
+            name: 'Details of working experience in relevant sector as per Annexure-10',
+            description: 'Sector specific past training delivery completion certificates',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
+        },
+        {
+            id: 12,
+            name: 'List of divisions and group of district as per annexure 11',
+            description: 'District cluster prioritization and outreach methodology',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
+        },
+        {
+            id: 13,
+            name: 'Proposed evaluation matrix annexure 12',
+            description: 'Technical scoring and qualification criteria response',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
+        },
+        {
+            id: 14,
+            name: 'Supporting documents as per annexure 13',
+            description: 'Additional credentials, awards, and accreditations',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
+        }
+    ];
+
+    constructor() {
+        this.route.queryParams.subscribe(params => {
+            if (params['refNo']) this.schemeRefNo.set(params['refNo']);
+            if (params['title']) this.schemeTitle.set(params['title']);
+            if (params['code']) this.schemeCode.set(params['code']);
+            if (params['category']) this.schemeCategory.set(params['category']);
+            if (params['emdFee']) this.schemeEmdFee.set(params['emdFee']);
+            if (params['processFee']) this.schemeProcessFee.set(params['processFee']);
+        });
     }
-  ];
 
-  // =========================================================================
-  // Subsection 2: Past 3 Years Financial Turnover (From PDF Page 4)
-  // =========================================================================
-  readonly financialTurnover: TurnoverYear[] = [
-    { year: '2021 - 2022', totalTurnover: '9,21,00,536', skillTurnover: '9,21,00,536' },
-    { year: '2022 - 2023', totalTurnover: '2,39,94,320', skillTurnover: '2,39,94,320' },
-    { year: '2023 - 2024', totalTurnover: '42,40,154', skillTurnover: '42,40,154' }
-  ];
-
-  // =========================================================================
-  // Subsection 3: Placement Records (From PDF Page 4)
-  // =========================================================================
-  readonly placementRecords: TrainingPlacementRecord[] = [
-    { sector: 'Healthcare', year: '2022 - 2023', trained: 570, placed: 476 },
-    { sector: 'Garment Making', year: '2023 - 2024', trained: 150, placed: 105 },
-    { sector: 'Handicraft & Local Skills', year: '2024 - 2025', trained: 810, placed: 441 }
-  ];
-
-  // =========================================================================
-  // Subsection 4: Proposed Annual Action Plan (From PDF Page 4 & 5)
-  // =========================================================================
-  readonly actionPlans: ActionPlanDistrict[] = [
-    {
-      id: 'ap-1',
-      district: 'Khairthal-Tijara',
-      sdcCount: 2,
-      location: 'KHAIRTHAL - TIJARA',
-      sectors: 'Computer Hardware, Receptionist, Folk Music, Phad Painting',
-      mode: 'Both',
-      batches: 10
-    },
-    {
-      id: 'ap-2',
-      district: 'Kotputli-Behror',
-      sdcCount: 2,
-      location: 'KOTPUTLI - BEHROR',
-      sectors: 'Computer Hardware, Receptionist, DEO, Handicraft Skills',
-      mode: 'Both',
-      batches: 10
-    },
-    {
-      id: 'ap-3',
-      district: 'Salumber',
-      sdcCount: 2,
-      location: 'SALUMBAR',
-      sectors: 'Computer Hardware, Receptionist, Indian Culture Multi-skills',
-      mode: 'Both',
-      batches: 10
-    },
-    {
-      id: 'ap-4',
-      district: 'Udaipur',
-      sdcCount: 2,
-      location: 'UDAIPUR',
-      sectors: 'Computer Hardware, DEO, Folk Music of Western Rajasthan',
-      mode: 'Both',
-      batches: 10
-    },
-    {
-      id: 'ap-5',
-      district: 'Alwar',
-      sdcCount: 2,
-      location: 'ALWAR',
-      sectors: 'Computer Hardware, Receptionist, Phad Painting, Multi-skills',
-      mode: 'Both',
-      batches: 10
+    goToStep(step: number): void {
+        this.currentStep.set(step);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  ];
 
-  // =========================================================================
-  // Subsection 5: Mandatory EOI Document Checklist (From PDF Page 5 & Screenshot 3)
-  // =========================================================================
-  readonly eoiDocuments: EoiDocumentItem[] = [
-    {
-      id: 1,
-      name: 'Company Document',
-      description: 'Certificate of Incorporation / Society Reg / Trust Deed / Entity PAN',
-      fileName: 'company_registration_incorporation_proof.pdf',
-      fileSize: '2.1 MB',
-      uploadedDate: '08-Sep-2026',
-      isMandatory: true,
-      status: 'uploaded'
-    },
-    {
-      id: 2,
-      name: 'Previous Experience',
-      description: 'Past skill training & placement track record certificates / work orders',
-      fileName: 'past_skill_training_track_record_letters.pdf',
-      fileSize: '3.4 MB',
-      uploadedDate: '08-Sep-2026',
-      isMandatory: true,
-      status: 'uploaded'
-    },
-    {
-      id: 3,
-      name: 'Audited Financial Statements',
-      description: 'Audited balance sheet and profit & loss statements for last three consecutive financial years',
-      fileName: 'audited_financial_statements_3years.pdf',
-      fileSize: '4.2 MB',
-      uploadedDate: '08-Sep-2026',
-      isMandatory: true,
-      status: 'uploaded'
-    },
-    {
-      id: 4,
-      name: 'Non-Blacklisted Affidavit',
-      description: 'Notarized self-affidavit on ₹100 stamp paper for not being blacklisted by any Government department',
-      fileName: 'non_blacklisted_notarized_affidavit.pdf',
-      fileSize: '1.1 MB',
-      uploadedDate: '08-Sep-2026',
-      isMandatory: true,
-      status: 'uploaded'
+    goBackToSchemes(): void {
+        this.router.navigate(['/tenders']);
     }
-  ];
 
-  constructor() {
-    this.route.queryParams.subscribe(params => {
-      if (params['refNo']) this.schemeRefNo.set(params['refNo']);
-      if (params['title']) this.schemeTitle.set(params['title']);
-      if (params['category']) this.schemeCategory.set(params['category']);
-      if (params['emdFee']) this.schemeEmdFee.set(params['emdFee']);
-      if (params['processFee']) this.schemeProcessFee.set(params['processFee']);
-    });
-  }
+    openSubmitConfirm(): void {
+        this.showSubmitConfirmModal.set(true);
+    }
 
-  getPlacementRatio(record: TrainingPlacementRecord): number {
-    if (!record.trained) return 0;
-    return Math.round((record.placed / record.trained) * 100);
-  }
+    confirmSubmitAndProceedToPayment(): void {
+        this.showSubmitConfirmModal.set(false);
+        this.goToStep(4);
+    }
 
-  goToStep(stepNumber: number): void {
-    this.currentStep.set(stepNumber);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+    triggerPayment(): void {
+        this.isPaymentProcessing.set(true);
+        setTimeout(() => {
+            this.isPaymentProcessing.set(false);
+            this.showPaymentSuccessModal.set(true);
+        }, 1200);
+    }
 
-  goBackToSchemes(): void {
-    this.router.navigate(['/tenders']);
-  }
+    continueFromPaymentSuccess(): void {
+        this.showPaymentSuccessModal.set(false);
+        this.goToStep(5);
+    }
 
-  previewDoc(doc: EoiDocumentItem): void {
-    alert(`Viewing document: ${doc.fileName}`);
-  }
+    goToTenderStatus(): void {
+        this.router.navigate(['/tender-status']);
+    }
 
-  changeDoc(doc: EoiDocumentItem): void {
-    alert(`Select a replacement PDF file for: ${doc.name}`);
-  }
+    openAddCentreModal(): void {
+        this.newCentre = {
+            district: '',
+            centerName: '',
+            classrooms: 2,
+            practicalRooms: 2,
+            washrooms: 'Yes',
+            labInfra: 'Available',
+            fullAddress: ''
+        };
+        this.showAddCentreModal.set(true);
+    }
 
-  removeDoc(doc: EoiDocumentItem): void {
-    doc.status = 'pending';
-  }
+    saveNewCentre(): void {
+        if (!this.newCentre.district || !this.newCentre.centerName) {
+            alert('Please enter District and Centre Name');
+            return;
+        }
 
-  triggerPayment(): void {
-    this.isPaymentProcessing.set(true);
+        const item: TrainingCenterItem = {
+            id: `tc-${Date.now()}`,
+            district: this.newCentre.district || 'Rajasthan',
+            centerName: this.newCentre.centerName || 'Skill Centre',
+            telephone: '0',
+            classrooms: this.newCentre.classrooms || 2,
+            practicalRooms: this.newCentre.practicalRooms || 2,
+            washrooms: this.newCentre.washrooms || 'Yes',
+            labInfra: this.newCentre.labInfra || 'Available',
+            fullAddress: this.newCentre.fullAddress || 'Rajasthan'
+        };
 
-    setTimeout(() => {
-      this.isPaymentProcessing.set(false);
-      this.showPaymentSuccessModal.set(true);
-    }, 1200);
-  }
+        this.trainingCentres.push(item);
+        this.showAddCentreModal.set(false);
+    }
 
-  dismissPaymentSuccessAndProceed(): void {
-    this.showPaymentSuccessModal.set(false);
-    this.goToStep(4);
-  }
+    removeCentre(index: number): void {
+        this.trainingCentres.splice(index, 1);
+    }
 
-  printPage(): void {
-    window.print();
-  }
+    openAddPlacementModal(): void {
+        this.newPlacement = {
+            sector: '',
+            year: '2023 - 2024',
+            trained: null,
+            placed: null,
+            proofDoc: ''
+        };
+        this.showAddPlacementModal.set(true);
+    }
 
-  downloadDocMock(fileName: string): void {
-    alert(`Downloading official PDF: ${fileName}`);
-  }
+    saveNewPlacement(): void {
+        if (!this.newPlacement.sector) {
+            alert('Please enter Sector Name');
+            return;
+        }
+
+        const item: TrainingPlacementRecord = {
+            sector: this.newPlacement.sector,
+            year: this.newPlacement.year || '2023 - 2024',
+            trained: Number(this.newPlacement.trained) || 0,
+            placed: Number(this.newPlacement.placed) || 0,
+            proofDoc: this.newPlacement.proofDoc || 'placement_proof.pdf'
+        };
+
+        this.placementRecords.push(item);
+        this.showAddPlacementModal.set(false);
+    }
+
+    removePlacement(index: number): void {
+        this.placementRecords.splice(index, 1);
+    }
+
+    openAddActionPlanModal(): void {
+        this.newActionPlan = {
+            year: '2025-2026',
+            district: '',
+            sdcCount: 2,
+            location: '',
+            sectors: '',
+            courses: '',
+            mode: 'Both',
+            batches: 10
+        };
+        this.showAddActionPlanModal.set(true);
+    }
+
+    saveNewActionPlan(): void {
+        if (!this.newActionPlan.district) {
+            alert('Please enter Proposed District');
+            return;
+        }
+
+        const item: ActionPlanDistrict = {
+            id: `ap-${Date.now()}`,
+            year: this.newActionPlan.year || '2025-2026',
+            district: this.newActionPlan.district,
+            sdcCount: Number(this.newActionPlan.sdcCount) || 1,
+            location: this.newActionPlan.location || this.newActionPlan.district,
+            sectors: this.newActionPlan.sectors || 'Multi-Skills',
+            courses: this.newActionPlan.courses || 'Skill Development Trade',
+            mode: (this.newActionPlan.mode as any) || 'Both',
+            batches: Number(this.newActionPlan.batches) || 1
+        };
+
+        this.actionPlan.push(item);
+        this.showAddActionPlanModal.set(false);
+    }
+
+    removeActionPlan(index: number): void {
+        this.actionPlan.splice(index, 1);
+    }
+
+    attachedDocsCount = computed(() => this.eoiDocuments.filter(d => d.status === 'uploaded').length);
+
+    uploadDoc(doc: EoiDocumentItem): void {
+        doc.status = 'uploaded';
+        doc.fileName = `Annexure_${doc.id}_Mandated_Signed.pdf`;
+        doc.fileSize = '1.4 MB';
+        doc.uploadedDate = '22-Sep-2026';
+    }
+
+    attachAllSampleDocs(): void {
+        this.eoiDocuments.forEach((doc, idx) => {
+            doc.status = 'uploaded';
+            doc.fileName = `Scan_Annexure_${doc.id}_Signed.pdf`;
+            doc.fileSize = `${(1.2 + (idx % 3) * 0.8).toFixed(1)} MB`;
+            doc.uploadedDate = '22-Sep-2026';
+        });
+    }
+
+    removeDoc(doc: EoiDocumentItem): void {
+        doc.status = 'pending';
+        doc.fileName = '';
+        doc.fileSize = '';
+        doc.uploadedDate = '';
+    }
+
+    previewDoc(doc: EoiDocumentItem): void {
+        alert(`Viewing document: ${doc.fileName || doc.name}\nSize: ${doc.fileSize || '1.4 MB'}\nStatus: Attached and Verified.`);
+    }
+
+    downloadReceipt(type: 'acknowledgment' | 'payment'): void {
+        const isAck = type === 'acknowledgment';
+        const filename = isAck ? 'EOI_Submission_Acknowledgment_Receipt.txt' : 'EOI_Fee_Payment_Receipt.txt';
+        const textContent = isAck
+            ? `================================================================================
+RAJASTHAN SKILL AND LIVELIHOODS DEVELOPMENT CORPORATION (RSLDC)
+INTEGRATED SCHEME MANAGEMENT SYSTEM 2.0 (ISMS)
+OFFICIAL EOI PROPOSAL SUBMISSION ACKNOWLEDGMENT RECEIPT
+================================================================================
+Application Reference Number : ISMS-EOI-2026-9871
+Submission Timestamp         : 22-Sep-2026 09:10:00 IST
+Applicant Agency Name        : ${this.otrData().step1.fullName || 'DMR ENTERPRISES PRIVATE LIMITED'}
+Registration / CIN           : ${this.otrData().step1.registrationNumber || '07AAECD8566H1ZC'}
+Scheme Code & Name           : MMKVY-RAJKVIK (Mukhya Mantri Kaushalya Vikas Yojana)
+Category                     : Category I: RAJKVIK
+Initial Scrutiny Status      : Technical Opening Initiated
+Fee Payment Reference        : TXN-ISMS-2026-345678 (₹52,000 Paid)
+Proposed SDC Training Centres: ${this.trainingCentres.length} Centres
+Attached Statutory Documents : ${this.attachedDocsCount()} / 14 Mandatory Documents Verified
+================================================================================
+Digitally Verified & Sealed by Government of Rajasthan (RSLDC ISMS 2.0)
+================================================================================`
+            : `================================================================================
+GOVERNMENT OF RAJASTHAN - RAJASTHAN CYBER TREASURY
+DEPARTMENT OF SKILL, EMPLOYMENT & ENTREPRENEURSHIP (RSLDC)
+EOI FEE & EMD PAYMENT TRANSACTION RECEIPT
+================================================================================
+Transaction Reference Number : TXN-ISMS-2026-345678
+Treasury Reference CIN       : CYB-RAJ-2026-99182348
+Transaction Timestamp        : 22-Sep-2026 09:08:42 IST
+Applicant Name               : ${this.otrData().step1.fullName || 'DMR ENTERPRISES PRIVATE LIMITED'}
+PAN Number                   : ${this.otrData().step1.companyPan || 'AAECD8566H'}
+Scheme Ref No                : ${this.schemeRefNo()}
+Payment Mode                 : ${this.paymentMethod()}
+--------------------------------------------------------------------------------
+Breakup:
+1. Earnest Money Deposit (EMD Fee) (Refundable)     : ₹ 50,000.00
+2. RFP Tender Processing Fee (Non-Refundable)       : ₹  2,000.00
+--------------------------------------------------------------------------------
+TOTAL AMOUNT PAID                                   : ₹ 52,000.00
+Payment Status                                      : SUCCESSFUL
+================================================================================
+Government of Rajasthan Cyber Treasury Portal Integration
+================================================================================`;
+
+        const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    }
+
+    printReceipt(): void {
+        window.print();
+    }
+
+    printPage(): void {
+        window.print();
+    }
 }

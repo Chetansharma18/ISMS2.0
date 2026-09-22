@@ -10,108 +10,83 @@ import { AuthService } from '../../auth.service';
     class: 'block'
   },
   template: `
-    <!-- Blurred Background Overlay (Active throughout) -->
+    <!-- Calmed Backdrop Overlay -->
     <div
-      class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-md transition-all duration-300"
+      class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="sso-redirect-title"
     >
-      <!-- STEP 1: First Show ONLY The WHITE Loader on Blurred Screen -->
-      @if (stage() === 'loader') {
-        <div class="flex flex-col items-center justify-center animate-in fade-in zoom-in-95 duration-200">
-          <div class="loader"></div>
+      <!-- Modern GovTech Theme Card -->
+      <div
+        class="relative w-full max-w-sm bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden text-center p-6 sm:p-7 flex flex-col items-center animate-in fade-in zoom-in-95 duration-150"
+      >
+        <!-- Top Navy Theme Strip -->
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-[#0B3558]"></div>
+
+        <!-- GovTech Shield Icon -->
+        <div class="w-12 h-12 rounded-full bg-blue-50 text-[#0B3558] flex items-center justify-center mb-3 mt-1 border border-blue-100/80">
+          <svg class="w-6 h-6 text-[#0B3558]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
         </div>
-      }
 
-      <!-- STEP 2: Then Show The Modern White-Blue Redirect Message (No Logos) -->
-      @if (stage() === 'message') {
-        <div
-          class="relative w-full max-w-[380px] bg-white rounded-2xl shadow-2xl border border-slate-100 px-6 py-7 sm:p-8 text-center flex flex-col items-center animate-in fade-in zoom-in-95 duration-200"
-        >
-          <!-- Top Blue & Orange Accent Line -->
-          <div class="absolute top-0 left-0 right-0 h-1.5 bg-linear-to-r from-[#0B3558] via-[#EA580C] to-[#0B3558] rounded-t-2xl"></div>
+        <!-- Official Heading -->
+        <h3 id="sso-redirect-title" class="text-base sm:text-lg font-bold text-[#0B3558] tracking-tight m-0">
+          Connecting to Rajasthan SSO
+        </h3>
 
-          <!-- Status Tag -->
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200/70 text-[#0B3558] text-[11px] font-bold tracking-wider uppercase mb-3 select-none">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Secure Gateway
-          </div>
+        <!-- Subtext -->
+        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed m-0 max-w-[280px]">
+          Redirecting your session securely to Rajasthan Single Sign-On (sso.rajasthan.gov.in)...
+        </p>
 
-          <!-- Modern Elegant Heading -->
-          <h3 id="sso-redirect-title" class="text-lg sm:text-xl font-black text-[#0B3558] tracking-tight m-0">
-            Redirecting to SSO Login
-          </h3>
-
-          <!-- Subtext -->
-          <p class="text-xs sm:text-[13px] text-slate-500 mt-2 leading-relaxed m-0 max-w-[280px]">
-            Please wait while we connect your session to Rajasthan Single Sign-On...
-          </p>
-
-          <!-- Smooth Progress Line -->
-          <div class="w-full bg-slate-100 h-1 mt-5 rounded-full overflow-hidden">
-            <div class="h-full bg-linear-to-r from-[#0B3558] to-[#EA580C] rounded-full animate-pulse"></div>
-          </div>
+        <!-- Professional GovTech Navy Progress Bar -->
+        <div class="w-full bg-slate-100 h-1.5 mt-5 rounded-full overflow-hidden">
+          <div class="gov-progress-bar h-full bg-[#0B3558] rounded-full"></div>
         </div>
-      }
+
+        <!-- Official Portal Subtext -->
+        <div class="flex items-center gap-1.5 text-[11px] font-medium text-slate-400 mt-3 select-none">
+          <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <span>Government of Rajasthan · Secure Gateway</span>
+        </div>
+
+      </div>
     </div>
   `,
   styles: [`
-    .loader {
-      width: 54px;
-      aspect-ratio: 1;
-      display: grid;
-      border-radius: 50%;
-      background:
-        linear-gradient(0deg, rgb(255 255 255 / 50%) 30%, #0000 0 70%, rgb(255 255 255 / 100%) 0) 50%/8% 100%,
-        linear-gradient(90deg, rgb(255 255 255 / 25%) 30%, #0000 0 70%, rgb(255 255 255 / 75%) 0) 50%/100% 8%;
-      background-repeat: no-repeat;
-      animation: l23 1s infinite steps(12);
-      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+    .gov-progress-bar {
+      width: 45%;
+      animation: govIndeterminate 1.2s infinite ease-in-out;
     }
-    .loader::before,
-    .loader::after {
-      content: "";
-      grid-area: 1/1;
-      border-radius: 50%;
-      background: inherit;
-      opacity: 0.915;
-      transform: rotate(30deg);
-    }
-    .loader::after {
-      opacity: 0.83;
-      transform: rotate(60deg);
-    }
-    @keyframes l23 {
+    @keyframes govIndeterminate {
+      0% {
+        transform: translateX(-100%);
+      }
+      50% {
+        transform: translateX(100%);
+      }
       100% {
-        transform: rotate(1turn);
+        transform: translateX(250%);
       }
     }
   `]
 })
 export class SsoRedirectModalComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
-
-  readonly stage = signal<'loader' | 'message'>('loader');
-
-  private timerStage1: any = null;
-  private timerStage2: any = null;
+  private timerRedirect: any = null;
 
   ngOnInit(): void {
-    // Step 1: Show only the glowing white loader on blurred background for ~850ms
-    this.timerStage1 = setTimeout(() => {
-      // Step 2: Show the modern white-blue redirect message card
-      this.stage.set('message');
-
-      // Step 3: Complete redirect after message is viewed (~950ms)
-      this.timerStage2 = setTimeout(() => {
-        this.authService.proceedToSsoLogin();
-      }, 950);
-    }, 850);
+    // Smooth, professional 1.2s transition directly into Rajasthan SSO
+    this.timerRedirect = setTimeout(() => {
+      this.authService.proceedToSsoLogin();
+    }, 1200);
   }
 
   ngOnDestroy(): void {
-    if (this.timerStage1) clearTimeout(this.timerStage1);
-    if (this.timerStage2) clearTimeout(this.timerStage2);
+    if (this.timerRedirect) clearTimeout(this.timerRedirect);
   }
 }

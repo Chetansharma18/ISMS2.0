@@ -27,24 +27,90 @@ export interface StepMeta {
     Step5PreviewComponent
   ],
   template: `
-    <div class="min-h-screen bg-white flex flex-col justify-between selection:bg-[#131862] selection:text-white">
+    <div class="min-h-screen bg-white flex flex-col justify-between selection:bg-slate-900 selection:text-white font-sans" style="font-family: 'Inter', sans-serif;">
 
       <!-- ====================================================================
-           1. Form Heading (No dark background banner, only blue heading text)
+           Sticky Registration Header (Heading & Stepper combined so heading never hides on scroll)
            ==================================================================== -->
-      <div class="w-full bg-white border-b border-slate-100 py-3.5 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
-          <h1 class="text-base sm:text-xl md:text-2xl font-black text-[#0B3558] tracking-tight leading-snug m-0">
-            TP (Training Partners) / PIA (Project Implementing Agency) One Time Registration Form
-          </h1>
+      <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+        <!-- 1. Form Heading -->
+        <div class="w-full border-b border-slate-100 py-3 px-4 sm:px-6 lg:px-8">
+          <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <h1 class="text-base sm:text-lg md:text-xl font-bold text-slate-900 tracking-tight leading-snug m-0">
+              TP (Training Partners) / PIA (Project Implementing Agency) One Time Registration Form
+            </h1>
+          </div>
         </div>
-      </div>
+
+        <!-- 2. Horizontal Tabs Stepper (Clean Neutral Theme) -->
+        <nav class="w-full" aria-label="Registration Steps">
+          <div class="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between overflow-x-auto no-scrollbar pt-2.5 pb-2">
+              @for (step of steps; track step.number) {
+                <button
+                  type="button"
+                  (click)="goToStep(step.number)"
+                  class="flex-1 min-w-[120px] sm:min-w-0 py-1.5 px-2 sm:px-3 flex items-center justify-center gap-2 transition-all text-xs sm:text-[12.5px] cursor-pointer relative group bg-transparent"
+                  [class.text-slate-900]="activeStep() === step.number"
+                  [class.font-semibold]="activeStep() === step.number"
+                  [class.text-slate-500]="activeStep() !== step.number"
+                  [class.hover:text-slate-900]="activeStep() !== step.number"
+                >
+                  <!-- Number Badge / Status Icon -->
+                  <span
+                    class="w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 transition-colors"
+                    [class.bg-slate-900]="activeStep() === step.number"
+                    [class.text-white]="activeStep() === step.number"
+                    [class.bg-emerald-600]="isStepCompleted(step.number) && activeStep() !== step.number"
+                    [class.text-white]="isStepCompleted(step.number) && activeStep() !== step.number"
+                    [class.bg-rose-500]="isStepError(step.number) && activeStep() !== step.number"
+                    [class.text-white]="isStepError(step.number) && activeStep() !== step.number"
+                    [class.bg-slate-100]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
+                    [class.text-slate-700]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
+                    [class.border]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
+                    [class.border-slate-300]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
+                  >
+                    @if (isStepCompleted(step.number) && activeStep() !== step.number) {
+                      <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                      </svg>
+                    } @else if (isStepError(step.number) && activeStep() !== step.number) {
+                      <span class="text-white">!</span>
+                    } @else {
+                      <span [class.text-white]="activeStep() === step.number" [class.text-slate-700]="activeStep() !== step.number">
+                        {{ step.number }}
+                      </span>
+                    }
+                  </span>
+
+                  <!-- Step Label -->
+                  <span class="truncate tracking-tight font-medium">
+                    {{ step.label }}
+                  </span>
+                </button>
+              }
+            </div>
+
+            <!-- Horizontal Progress Bar Line -->
+            <div class="w-full bg-slate-100 h-1 relative overflow-hidden rounded-full mb-1.5" title="Overall Form Completion Progress">
+              <div
+                class="h-full bg-emerald-500 transition-all duration-500 ease-out rounded-full"
+                [style.width.%]="otrFormService.completionPercentage()"
+                role="progressbar"
+                [attr.aria-valuenow]="otrFormService.completionPercentage()"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+          </div>
+        </nav>
+      </header>
 
       <!-- ====================================================================
-           2. Floating Feedback Toast
+           Floating Feedback Toast
            ==================================================================== -->
       @if (validationService.toast(); as toast) {
-        <div class="fixed top-20 right-4 sm:right-8 z-50 max-w-md w-full animate-in fade-in slide-in-from-top-3 duration-300 pointer-events-auto">
+        <div class="fixed top-24 right-4 sm:right-8 z-50 max-w-md w-full animate-in fade-in slide-in-from-top-3 duration-300 pointer-events-auto">
           <div
             class="p-4 rounded-xl shadow-xl border flex items-start gap-3 backdrop-blur-md"
             [class.bg-emerald-900/95]="toast.type === 'success'"
@@ -94,71 +160,6 @@ export interface StepMeta {
       }
 
       <!-- ====================================================================
-           2. Horizontal Tabs Stepper (Single Heading, Clearly Visible Numbers)
-           ==================================================================== -->
-      <nav class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-        <div class="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8">
-          <div class="flex items-center justify-between overflow-x-auto no-scrollbar pt-3 pb-2">
-            @for (step of steps; track step.number) {
-              <button
-                type="button"
-                (click)="goToStep(step.number)"
-                class="flex-1 min-w-[130px] sm:min-w-0 py-2 px-2 sm:px-3 flex items-center justify-center gap-2.5 transition-all text-xs sm:text-[13px] cursor-pointer relative group bg-transparent"
-                [class.text-[#0B3558]]="activeStep() === step.number"
-                [class.font-bold]="activeStep() === step.number"
-                [class.text-slate-600]="activeStep() !== step.number"
-                [class.hover:text-slate-900]="activeStep() !== step.number"
-              >
-                <!-- Number Badge / Status Icon with High Contrast Visible Text -->
-                <span
-                  class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors"
-                  [class.bg-[#0B3558]]="activeStep() === step.number"
-                  [class.text-white]="activeStep() === step.number"
-                  [class.bg-emerald-600]="isStepCompleted(step.number) && activeStep() !== step.number"
-                  [class.text-white]="isStepCompleted(step.number) && activeStep() !== step.number"
-                  [class.bg-rose-500]="isStepError(step.number) && activeStep() !== step.number"
-                  [class.text-white]="isStepError(step.number) && activeStep() !== step.number"
-                  [class.bg-slate-100]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
-                  [class.text-slate-700]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
-                  [class.border]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
-                  [class.border-slate-300]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
-                >
-                  @if (isStepCompleted(step.number) && activeStep() !== step.number) {
-                    <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                    </svg>
-                  } @else if (isStepError(step.number) && activeStep() !== step.number) {
-                    <span class="text-white">!</span>
-                  } @else {
-                    <span [class.text-white]="activeStep() === step.number" [class.text-slate-700]="activeStep() !== step.number">
-                      {{ step.number }}
-                    </span>
-                  }
-                </span>
-
-                <!-- Single Heading -->
-                <span class="truncate tracking-tight">
-                  {{ step.label }}
-                </span>
-              </button>
-            }
-          </div>
-
-          <!-- Horizontal Progress Bar Line: Starts exactly at Step 1 bottom and ends when steps finish -->
-          <div class="w-full bg-slate-100 h-1 relative overflow-hidden rounded-full mb-2" title="Overall Form Completion Progress">
-            <div
-              class="h-full bg-linear-to-r from-emerald-500 to-teal-600 transition-all duration-500 ease-out rounded-full"
-              [style.width.%]="otrFormService.completionPercentage()"
-              role="progressbar"
-              [attr.aria-valuenow]="otrFormService.completionPercentage()"
-              aria-valuemin="0"
-              aria-valuemax="100"
-            ></div>
-          </div>
-        </div>
-      </nav>
-
-      <!-- ====================================================================
            3. Main Form Container (Single Unified White Background)
            ==================================================================== -->
       <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 bg-white">
@@ -194,13 +195,19 @@ export interface StepMeta {
            4. Sticky Bottom Action Bar (Neat Side-by-Side Previous & Next Buttons)
            ==================================================================== -->
       <footer class="w-full bg-white border-t border-slate-200 py-3.5 px-4 sm:px-6 lg:px-8 sticky bottom-0 z-30 shadow-md">
-        <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <!-- Step indicator / Auto-saved status -->
-          <div class="text-xs text-slate-500 font-medium flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="hidden sm:inline">All changes auto-saved &bull;</span>
-            <span>Step {{ activeStep() }} of 5</span>
-          </div>
+         
+
+          <!-- Inline Error Message near Submit Button -->
+          @if (submitErrorMessage()) {
+            <div class="text-xs text-rose-700 bg-rose-50 border border-rose-200 px-3.5 py-1.5 rounded-lg flex items-center gap-2 font-medium shadow-2xs animate-in fade-in duration-200 max-w-xl">
+              <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{{ submitErrorMessage() }}</span>
+            </div>
+          }
 
           <!-- Previous and Next buttons neatly set together -->
           <div class="flex items-center gap-2.5 sm:gap-3">
@@ -221,9 +228,9 @@ export interface StepMeta {
               <button
                 type="button"
                 (click)="nextStep()"
-                class="px-5 sm:px-7 py-2 rounded-lg bg-[#131862] hover:bg-[#0c1046] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer focus:ring-2 focus:ring-[#131862]/30"
+                class="px-5 sm:px-7 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer focus:ring-2 focus:ring-slate-900/30"
               >
-                Next Step
+                <span>Next Step</span>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
@@ -232,8 +239,7 @@ export interface StepMeta {
               <button
                 type="button"
                 (click)="submitApplication()"
-                [disabled]="!canSubmit()"
-                class="px-6 sm:px-8 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-6 sm:px-8 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
               >
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
@@ -272,7 +278,7 @@ export interface StepMeta {
                 Permanent Registration Reference Number
               </span>
               <div class="flex items-center justify-center gap-2">
-                <span class="text-lg sm:text-xl font-mono font-extrabold text-[#131862] tracking-wider">
+                <span class="text-lg sm:text-xl font-mono font-extrabold text-slate-900 tracking-wider">
                   {{ submittedRegId() }}
                 </span>
                 <button
@@ -292,7 +298,7 @@ export interface StepMeta {
               <button
                 type="button"
                 (click)="navigateToHome()"
-                class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#131862] hover:bg-[#0c1046] text-white text-xs sm:text-sm font-bold shadow-md active:scale-95 transition-all cursor-pointer"
+                class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold shadow-md active:scale-95 transition-all cursor-pointer"
               >
                 Return to Home
               </button>
@@ -324,6 +330,7 @@ export class RegistrationShellComponent {
 
   readonly activeStep = signal<number>(1);
   readonly submittedRegId = signal<string | null>(null);
+  readonly submitErrorMessage = signal<string | null>(null);
 
   constructor() {
     this.route.queryParams.subscribe(params => {
@@ -367,11 +374,13 @@ export class RegistrationShellComponent {
 
   goToStep(stepNumber: number): void {
     if (stepNumber < 1 || stepNumber > 5) return;
+    this.submitErrorMessage.set(null);
     this.activeStep.set(stepNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   nextStep(): void {
+    this.submitErrorMessage.set(null);
     const current = this.activeStep();
     this.validationService.markStepSubmitted(current);
 
@@ -390,6 +399,7 @@ export class RegistrationShellComponent {
   }
 
   previousStep(): void {
+    this.submitErrorMessage.set(null);
     const current = this.activeStep();
     if (current > 1) {
       this.activeStep.set(current - 1);
@@ -398,23 +408,30 @@ export class RegistrationShellComponent {
   }
 
   submitApplication(): void {
+    this.submitErrorMessage.set(null);
     const data = this.otrFormService.formData();
 
     for (let s = 1; s <= 4; s++) {
       this.validationService.markStepSubmitted(s);
       const errors = this.validationService.getStepErrors(s, data);
       if (errors.length > 0) {
-        this.goToStep(s);
-        this.validationService.showToast(errors[0], 'error', s);
+        const stepLabels: Record<number, string> = {
+          1: 'Step 1 (Organization Details)',
+          2: 'Step 2 (Details of Officer In-Charge)',
+          3: 'Step 3 (Authorized Person Details)',
+          4: 'Step 4 (Bank Details)'
+        };
+        this.submitErrorMessage.set(`Form is not filled, some entries are missing in ${stepLabels[s]}. Please fill all mandatory fields (${errors[0]}).`);
         return;
       }
     }
 
     if (!data.step5DeclarationAgreed) {
-      this.validationService.showToast('Please check the Statutory Legal Undertaking & Declaration checkbox before submitting.', 'warning', 5);
+      this.submitErrorMessage.set('Form is not filled, some entries are missing: Please check the declaration checkbox to agree before submitting.');
       return;
     }
 
+    this.submitErrorMessage.set(null);
     const regId = this.otrFormService.submitForm();
     this.submittedRegId.set(regId);
     this.validationService.showToast(`Application successfully submitted! Ref: ${regId}`, 'success');

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { FormInputComponent } from '../../../../shared/components/form-controls/form-input/form-input.component';
 import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
 import { CourseService } from '../../../../core/services/course.service';
@@ -12,6 +13,19 @@ import { CourseMaster } from '../../../../core/models/course.model';
   imports: [CommonModule, ReactiveFormsModule, FormInputComponent, FormSelectComponent],
   template: `
     <div class="bg-white rounded-xl shadow-2xs border border-slate-200 p-6 font-sans">
+      
+      <!-- Pre-selected SDC Banner -->
+      <div *ngIf="preselectedSdcCode" class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+        <div>
+          <span class="text-[10px] uppercase font-bold tracking-wider text-blue-600 block">Creating Batch for SDC Center</span>
+          <span class="font-bold text-[#131A4D] text-sm">{{ preselectedSdcName || preselectedSdcCode }}</span>
+          <span class="text-xs text-slate-500 font-mono ml-2">({{ preselectedSdcCode }})</span>
+        </div>
+        <span class="px-2.5 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded border border-blue-300 uppercase">
+          {{ preselectedScheme || 'SAMARTH' }}
+        </span>
+      </div>
+
       <form [formGroup]="batchForm" (ngSubmit)="onSubmit()">
         
         <h2 class="text-lg font-bold text-rsldc-navy border-b pb-2 mb-4">Course & Scheme Details</h2>
@@ -194,8 +208,13 @@ import { CourseMaster } from '../../../../core/models/course.model';
 export class BatchFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private courseService = inject(CourseService);
+  private route = inject(ActivatedRoute);
   
   @Output() formSubmit = new EventEmitter<any>();
+
+  preselectedSdcCode = '';
+  preselectedSdcName = '';
+  preselectedScheme = '';
 
   batchForm: FormGroup = this.fb.group({
     schemeId: ['', Validators.required],
@@ -203,23 +222,23 @@ export class BatchFormComponent implements OnInit {
     qpCode: ['', Validators.required],
     courseVersionId: ['', Validators.required],
     
-    tpName: ['', Validators.required],
+    tpName: ['Apex Skill Solutions Pvt Ltd', Validators.required],
     sdcCode: ['', Validators.required],
-    batchCode: [{value: 'BTH-' + Math.floor(Math.random() * 10000), disabled: true}],
+    batchCode: [{value: 'B-26-000' + Math.floor(4 + Math.random() * 9), disabled: true}],
     isResidential: [false],
-    minStrength: ['', Validators.required],
-    maxStrength: ['', Validators.required],
+    minStrength: [15, Validators.required],
+    maxStrength: [30, Validators.required],
     nipaNo: [''],
-    psdStatus: [''],
-    paymentStatus: [''],
-    totalTrained: [''],
-    totalPlaced: [''],
-    durationHrs: [''],
-    startDate: ['', Validators.required],
+    psdStatus: ['Active'],
+    paymentStatus: ['Approved'],
+    totalTrained: [0],
+    totalPlaced: [0],
+    durationHrs: [300],
+    startDate: ['2026-10-01', Validators.required],
     freezeDate: [''],
-    endDate: ['', Validators.required],
-    startTime: ['', Validators.required],
-    endTime: ['', Validators.required],
+    endDate: ['2026-12-31', Validators.required],
+    startTime: ['09:00', Validators.required],
+    endTime: ['17:00', Validators.required],
     comments: [''],
     facultyDetails: this.fb.array([]),
     hostelDetails: this.fb.array([])
@@ -239,6 +258,22 @@ export class BatchFormComponent implements OnInit {
     this.addFaculty();
     this.loadSchemes();
     this.setupCascadingDropdowns();
+    this.readQueryParams();
+  }
+
+  private readQueryParams() {
+    this.route.queryParams.subscribe(params => {
+      if (params['sdcCode']) {
+        this.preselectedSdcCode = params['sdcCode'];
+        this.preselectedSdcName = params['sdcName'] || '';
+        this.preselectedScheme = params['scheme'] || '';
+
+        this.batchForm.patchValue({
+          sdcCode: this.preselectedSdcCode,
+          tpName: 'Apex Skill Solutions Pvt Ltd'
+        });
+      }
+    });
   }
 
   private loadSchemes() {

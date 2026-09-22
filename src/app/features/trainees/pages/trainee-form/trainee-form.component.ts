@@ -27,7 +27,7 @@ import { EoiStateService, CourseMaster } from '../../../../core/services/eoi-sta
       <!-- Stepper Header -->
       <div class="flex items-center justify-between mb-8">
         <ng-container *ngFor="let step of steps; let i = index">
-          <div class="flex flex-col items-center flex-1 relative">
+          <div (click)="goToStep(i + 1)" class="flex flex-col items-center flex-1 relative cursor-pointer hover:opacity-80 transition-opacity" title="Go to Step {{ i + 1 }}: {{ step }}">
             <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 z-10 relative"
                  [ngClass]="{
                    'bg-rsldc-navy text-white shadow-md': currentStep === i + 1,
@@ -307,6 +307,12 @@ export class TraineeFormComponent implements OnInit {
       this.traineeForm.get('communicationAddress')?.patchValue(permAddress);
     } else {
       this.traineeForm.get('communicationAddress')?.reset();
+    }
+  }
+
+  goToStep(step: number) {
+    if (step >= 1 && step <= this.steps.length) {
+      this.currentStep = step;
     }
   }
 

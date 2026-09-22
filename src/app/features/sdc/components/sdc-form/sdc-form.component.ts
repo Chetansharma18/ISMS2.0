@@ -3,9 +3,17 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CourseProposalService, CourseProposal } from '../../../../core/services/course-proposal.service';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { FormInputComponent } from '../../../../shared/components/form-controls/form-input/form-input.component';
 import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
+
+export interface SchemeCourse {
+  code: string;
+  name: string;
+  sector?: string;
+  nsqfLevel: string;
+  duration: string;
+  scheme: string;
+}
 
 @Component({
   selector: 'app-sdc-form',
@@ -16,9 +24,9 @@ import { FormSelectComponent } from '../../../../shared/components/form-controls
       <!-- Decorative background accent -->
       <div class="absolute top-0 right-0 w-64 h-64 bg-rsldc-navy/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
       
-      <!-- Stepper Header -->
+      <!-- Stepper Header (Clickable Steps 1, 2, 3, 4) -->
       <div class="flex items-center justify-between mb-10 relative z-10">
-        <div class="flex-1 group">
+        <div (click)="goToStep(1)" class="flex-1 group cursor-pointer hover:opacity-80 transition-all" title="Go to Step 1: Organization">
           <div class="flex items-center">
             <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm transition-all duration-300"
                  [ngClass]="currentStep >= 1 ? 'bg-rsldc-navy text-white shadow-rsldc-navy/30' : 'bg-slate-100 text-slate-400 border border-slate-200'">1</div>
@@ -26,9 +34,10 @@ import { FormSelectComponent } from '../../../../shared/components/form-controls
                  [ngClass]="currentStep >= 2 ? 'bg-rsldc-navy' : 'bg-slate-100'"></div>
           </div>
           <p class="text-xs font-bold uppercase tracking-wider mt-3 transition-colors duration-300"
-             [ngClass]="currentStep >= 1 ? 'text-rsldc-navy' : 'text-slate-400'">Organization</p>
+             [ngClass]="currentStep >= 1 ? 'text-rsldc-navy' : 'text-slate-400'">1. Organization</p>
         </div>
-        <div class="flex-1 group">
+
+        <div (click)="goToStep(2)" class="flex-1 group cursor-pointer hover:opacity-80 transition-all" title="Go to Step 2: Location & Details">
           <div class="flex items-center">
             <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm transition-all duration-300"
                  [ngClass]="currentStep >= 2 ? 'bg-rsldc-navy text-white shadow-rsldc-navy/30' : 'bg-slate-100 text-slate-400 border border-slate-200'">2</div>
@@ -36,9 +45,10 @@ import { FormSelectComponent } from '../../../../shared/components/form-controls
                  [ngClass]="currentStep >= 3 ? 'bg-rsldc-navy' : 'bg-slate-100'"></div>
           </div>
           <p class="text-xs font-bold uppercase tracking-wider mt-3 transition-colors duration-300"
-             [ngClass]="currentStep >= 2 ? 'text-rsldc-navy' : 'text-slate-400'">Location & Details</p>
+             [ngClass]="currentStep >= 2 ? 'text-rsldc-navy' : 'text-slate-400'">2. Location & Details</p>
         </div>
-        <div class="flex-1 group">
+
+        <div (click)="goToStep(3)" class="flex-1 group cursor-pointer hover:opacity-80 transition-all" title="Go to Step 3: Courses & Docs">
           <div class="flex items-center">
             <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm transition-all duration-300"
                  [ngClass]="currentStep >= 3 ? 'bg-rsldc-navy text-white shadow-rsldc-navy/30' : 'bg-slate-100 text-slate-400 border border-slate-200'">3</div>
@@ -46,22 +56,23 @@ import { FormSelectComponent } from '../../../../shared/components/form-controls
                  [ngClass]="currentStep >= 4 ? 'bg-rsldc-navy' : 'bg-slate-100'"></div>
           </div>
           <p class="text-xs font-bold uppercase tracking-wider mt-3 transition-colors duration-300"
-             [ngClass]="currentStep >= 3 ? 'text-rsldc-navy' : 'text-slate-400'">Courses & Docs</p>
+             [ngClass]="currentStep >= 3 ? 'text-rsldc-navy' : 'text-slate-400'">3. Courses & Docs</p>
         </div>
-        <div class="group">
+
+        <div (click)="goToStep(4)" class="group cursor-pointer hover:opacity-80 transition-all" title="Go to Step 4: Review">
           <div class="flex items-center">
             <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm transition-all duration-300"
                  [ngClass]="currentStep >= 4 ? 'bg-rsldc-navy text-white shadow-rsldc-navy/30' : 'bg-slate-100 text-slate-400 border border-slate-200'">4</div>
           </div>
           <p class="text-xs font-bold uppercase tracking-wider mt-3 transition-colors duration-300"
-             [ngClass]="currentStep >= 4 ? 'text-rsldc-navy' : 'text-slate-400'">Review</p>
+             [ngClass]="currentStep >= 4 ? 'text-rsldc-navy' : 'text-slate-400'">4. Review</p>
         </div>
       </div>
 
       <form [formGroup]="sdcForm" class="relative z-10">
         
         <!-- STEP 1: ORGANIZATION -->
-        <div *ngIf="currentStep === 1" class="animate-in fade-in slide-in-from-right-4 duration-500">
+        <div *ngIf="currentStep === 1" class="animate-in fade-in slide-in-from-right-4 duration-300">
           <div class="bg-slate-50/50 border border-slate-100 rounded-2xl p-6 md:p-8">
             <div class="flex items-center gap-3 mb-6">
               <div class="p-2 bg-rsldc-navy/10 rounded-lg text-rsldc-navy">
@@ -130,7 +141,7 @@ import { FormSelectComponent } from '../../../../shared/components/form-controls
         </div>
 
         <!-- STEP 2: LOCATION & DETAILS -->
-        <div *ngIf="currentStep === 2" class="animate-in fade-in slide-in-from-right-4 duration-500">
+        <div *ngIf="currentStep === 2" class="animate-in fade-in slide-in-from-right-4 duration-300">
           <div class="bg-slate-50/50 border border-slate-100 rounded-2xl p-6 md:p-8 mb-6">
             <div class="flex items-center gap-3 mb-6">
               <div class="p-2 bg-rsldc-navy/10 rounded-lg text-rsldc-navy">
@@ -244,37 +255,96 @@ import { FormSelectComponent } from '../../../../shared/components/form-controls
           </div>
         </div>
 
-        <!-- STEP 3: COURSES & DOCS -->
-        <div *ngIf="currentStep === 3" class="animate-in fade-in slide-in-from-right-4 duration-500">
+        <!-- STEP 3: SCHEME-FILTERED COURSES & DOCS -->
+        <div *ngIf="currentStep === 3" class="animate-in fade-in slide-in-from-right-4 duration-300">
           <div class="bg-slate-50/50 border border-slate-100 rounded-2xl p-6 md:p-8 mb-6">
-            <div class="flex items-center gap-3 mb-6">
-              <div class="p-2 bg-rsldc-navy/10 rounded-lg text-rsldc-navy">
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-              </div>
-              <h2 class="text-xl font-bold text-slate-800">Section D: Courses Available</h2>
-            </div>
-            
-            <div class="mb-4">
-              <label class="block font-semibold text-slate-700 text-xs tracking-wide mb-1.5">Select Approved Course(s) <span class="text-red-500">*</span></label>
-              
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div *ngFor="let course of (courseOptions$ | async)" 
-                     class="border border-slate-200 rounded-xl p-4 flex items-start gap-4 hover:border-rsldc-navy/50 transition bg-white shadow-sm hover:shadow group cursor-pointer"
-                     (click)="toggleCourse(course.value)">
-                  <div class="mt-0.5">
-                    <input type="checkbox" 
-                           [checked]="isCourseSelected(course.value)"
-                           class="w-5 h-5 text-rsldc-navy border-slate-300 rounded focus:ring-rsldc-navy focus:ring-2 pointer-events-none">
-                  </div>
-                  <div>
-                    <h4 class="font-bold text-slate-800 group-hover:text-rsldc-navy transition-colors">{{ course.label.split(' (')[0] }}</h4>
-                    <p class="text-xs font-semibold text-slate-500 mt-1">Course Code: {{ course.value }}</p>
-                  </div>
+            <div class="flex items-center justify-between gap-3 mb-6 border-b border-slate-200 pb-4">
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-rsldc-navy/10 rounded-lg text-rsldc-navy">
+                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                </div>
+                <div>
+                  <h2 class="text-xl font-bold text-slate-800">Section D: Courses Available</h2>
+                  <p class="text-xs text-slate-500 font-medium mt-0.5">Approved courses for scheme: <strong class="text-[#131A4D] font-bold">{{ selectedSchemeName }}</strong></p>
                 </div>
               </div>
-              <p *ngIf="sdcFormControls['courses'].invalid && (sdcFormControls['courses'].dirty || sdcFormControls['courses'].touched)" class="text-xs text-red-500 mt-2 font-semibold">
-                Please select at least one course.
-              </p>
+              <span class="px-3 py-1 bg-blue-50 text-[#131A4D] border border-blue-200 font-bold rounded text-xs">
+                {{ availableSchemeCourses.length }} Course(s) Available
+              </span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <!-- Step 1: Select Sector -->
+              <div>
+                <label class="block font-semibold text-slate-700 text-xs tracking-wide mb-2">
+                  Select Sector for {{ selectedSchemeName }} <span class="text-red-500">*</span>
+                </label>
+                
+                <select 
+                  [value]="selectedSector"
+                  (change)="onSectorChange($event)" 
+                  class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#131A4D] focus:border-[#131A4D] shadow-xs cursor-pointer transition">
+                  <option value="">-- Choose Sector --</option>
+                  <option *ngFor="let sec of availableSectors" [value]="sec">
+                    {{ sec }}
+                  </option>
+                </select>
+                <p class="text-[11px] text-slate-400 mt-1.5">Select a sector under {{ selectedSchemeName }} scheme.</p>
+              </div>
+
+              <!-- Step 2: Select Course for Sector -->
+              <div>
+                <label class="block font-semibold text-slate-700 text-xs tracking-wide mb-2">
+                  Select Course for Sector <span class="text-red-500">*</span>
+                </label>
+                
+                <select 
+                  [disabled]="!selectedSector"
+                  (change)="onCourseDropdownSelect($event)" 
+                  class="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#131A4D] focus:border-[#131A4D] shadow-xs cursor-pointer transition disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed">
+                  <option value="" disabled selected>
+                    {{ selectedSector ? '-- Select Course for ' + selectedSector + ' --' : '-- Select Sector First --' }}
+                  </option>
+                  <option *ngFor="let course of availableCoursesForSector" [value]="course.code">
+                    {{ course.name }} (QP Code: {{ course.code }}) • {{ course.nsqfLevel }} • {{ course.duration }}
+                  </option>
+                </select>
+                <p class="text-[11px] text-slate-400 mt-1.5">
+                  {{ selectedSector ? 'Pick course to allocate to SDC center.' : 'Select sector first to enable course selection.' }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Selected Courses List -->
+            <div *ngIf="selectedCourseObjects.length > 0" class="mt-4 pt-4 border-t border-slate-200">
+              <h4 class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">Selected Approved Course(s) ({{ selectedCourseObjects.length }}):</h4>
+              <div class="space-y-3">
+                <div *ngFor="let course of selectedCourseObjects" 
+                     class="flex items-center justify-between p-3.5 bg-white border border-[#131A4D]/30 rounded-xl shadow-xs">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-[#131A4D]/10 text-[#131A4D] flex items-center justify-center font-bold text-xs shrink-0">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800 text-sm">{{ course.name }}</span>
+                        <span class="px-2 py-0.5 text-[10px] font-bold bg-blue-50 text-[#131A4D] rounded border border-blue-200">{{ course.nsqfLevel }}</span>
+                        <span *ngIf="course.sector" class="px-2 py-0.5 text-[10px] font-bold text-slate-600 bg-slate-100 rounded border border-slate-200 uppercase">{{ course.sector }}</span>
+                      </div>
+                      <p class="text-xs text-slate-500 font-mono mt-0.5">QP Code: <strong class="text-slate-800">{{ course.code }}</strong> • Duration: {{ course.duration }}</p>
+                    </div>
+                  </div>
+
+                  <button 
+                    type="button" 
+                    (click)="removeSelectedCourse(course.code)"
+                    class="px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-bold hover:bg-red-100 transition flex items-center gap-1 cursor-pointer shrink-0"
+                    title="Remove course">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    Remove
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -298,7 +368,7 @@ import { FormSelectComponent } from '../../../../shared/components/form-controls
         </div>
 
         <!-- STEP 4: REVIEW -->
-        <div *ngIf="currentStep === 4" class="animate-in fade-in slide-in-from-right-4 duration-500">
+        <div *ngIf="currentStep === 4" class="animate-in fade-in slide-in-from-right-4 duration-300">
           <div class="bg-slate-50/50 border border-slate-100 rounded-2xl p-6 md:p-8">
             <div class="flex items-center gap-3 mb-6">
               <div class="p-2 bg-rsldc-navy/10 rounded-lg text-rsldc-navy">
@@ -339,7 +409,7 @@ import { FormSelectComponent } from '../../../../shared/components/form-controls
         <button 
           *ngIf="currentStep > 1" 
           (click)="prevStep()"
-          class="px-6 py-2.5 border border-slate-300 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 hover:text-slate-800 transition-colors shadow-sm focus:ring-4 focus:ring-slate-100 outline-none">
+          class="px-6 py-2.5 border border-slate-300 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 hover:text-slate-800 transition-colors shadow-sm outline-none">
           Back
         </button>
         <div *ngIf="currentStep === 1"></div>
@@ -347,16 +417,15 @@ import { FormSelectComponent } from '../../../../shared/components/form-controls
         <button 
           *ngIf="currentStep < 4" 
           (click)="nextStep()"
-          [disabled]="isCurrentStepInvalid()"
-          class="px-8 py-2.5 bg-rsldc-navy text-white rounded-xl font-bold text-sm hover:bg-[#0f1540] transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed focus:ring-4 focus:ring-rsldc-navy/30 outline-none flex items-center gap-2">
-          Continue
+          class="px-8 py-2.5 bg-rsldc-navy text-white rounded-xl font-bold text-sm hover:bg-[#0f1540] transition-all shadow-md hover:shadow-lg outline-none flex items-center gap-2 cursor-pointer">
+          Continue to Step {{ currentStep + 1 }}
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
         </button>
         
         <button 
           *ngIf="currentStep === 4" 
           (click)="onSubmit()"
-          class="px-8 py-2.5 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg hover:shadow-emerald-600/20 flex items-center gap-2 focus:ring-4 focus:ring-emerald-600/30 outline-none">
+          class="px-8 py-2.5 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg flex items-center gap-2 outline-none cursor-pointer">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
           Submit Application
         </button>
@@ -371,42 +440,94 @@ export class SdcFormComponent implements OnInit {
   @Output() formSubmit = new EventEmitter<any>();
 
   currentStep = 1;
-  allCourses$!: Observable<CourseProposal[]>;
-  courseOptions$!: Observable<{label: string, value: string, disabled?: boolean}[]>;
 
   schemeOptions: string[] = [
     'SAMARTH (State Fund)',
-    'PMKVY (Central Fund)'
+    'MMKVY (State Fund)',
+    'PMKVY (Central Fund)',
+    'RAJKViK (Category I)',
+    'MNSKSY',
+    'ELSTP'
   ];
 
   districtOptions: string[] = [
     'Jaipur',
     'Ajmer',
-    'Jodhpur'
+    'Jodhpur',
+    'Kota',
+    'Udaipur'
   ];
 
+  coursesByScheme: Record<string, SchemeCourse[]> = {
+    'MMKVY': [
+      { code: 'SSC/Q2212', name: 'Domestic Data Entry Operator', sector: 'IT & ITeS', nsqfLevel: 'NSQF 4', duration: '400 Hrs', scheme: 'MMKVY' },
+      { code: 'AAS/Q6301', name: 'Drone Operator - Multi Rotor', sector: 'Aerospace & Aviation', nsqfLevel: 'NSQF 4', duration: '430 Hrs', scheme: 'MMKVY' },
+      { code: 'ASC/Q1401', name: 'Automotive Service Technician', sector: 'Automotive', nsqfLevel: 'NSQF 4', duration: '450 Hrs', scheme: 'MMKVY' },
+      { code: 'AGR/N0856', name: 'Design and Construct Vertical Garden', sector: 'Agriculture', nsqfLevel: 'NSQF 4', duration: '137 Hrs', scheme: 'MMKVY' },
+      { code: 'CSC/Q0115', name: 'CNC Operator Turning', sector: 'Capital Goods', nsqfLevel: 'NSQF 4', duration: '610 Hrs', scheme: 'MMKVY' },
+      { code: 'SSC/Q8113', name: 'AI - Machine Learning Engineer', sector: 'IT & ITeS', nsqfLevel: 'NSQF 5', duration: '580 Hrs', scheme: 'MMKVY' },
+      { code: 'ELE/Q4605', name: 'CCTV Installation Technician', sector: 'Electronics', nsqfLevel: 'NSQF 4', duration: '700 Hrs', scheme: 'MMKVY' }
+    ],
+    'RAJKVIK': [
+      { code: 'AAS/Q6301', name: 'Drone Operator - Multi Rotor', sector: 'Aerospace & Aviation', nsqfLevel: 'NSQF 4', duration: '430 Hrs', scheme: 'RAJKViK' },
+      { code: 'SSC/Q2212', name: 'Domestic Data Entry Operator', sector: 'IT & ITeS', nsqfLevel: 'NSQF 4', duration: '400 Hrs', scheme: 'RAJKViK' },
+      { code: 'ASC/Q1401', name: 'Automotive Service Technician', sector: 'Automotive', nsqfLevel: 'NSQF 4', duration: '450 Hrs', scheme: 'RAJKViK' },
+      { code: 'ELE/Q5901', name: 'Solar Panel Installation Technician', sector: 'Green Energy', nsqfLevel: 'NSQF 4', duration: '300 Hrs', scheme: 'RAJKViK' },
+      { code: 'CON/Q0602', name: 'Assistant Electrician', sector: 'Construction', nsqfLevel: 'NSQF 3', duration: '460 Hrs', scheme: 'RAJKViK' },
+      { code: 'CSC/Q0417', name: 'CNC Milling', sector: 'Capital Goods', nsqfLevel: 'NSQF 4.5', duration: '670 Hrs', scheme: 'RAJKViK' }
+    ],
+    'MNSKSY': [
+      { code: 'CSC/Q0115', name: 'CNC Operator Turning', sector: 'Capital Goods', nsqfLevel: 'NSQF 4', duration: '610 Hrs', scheme: 'MNSKSY' },
+      { code: 'AMH/Q1947', name: 'Sewing Machine Operator', sector: 'Apparel', nsqfLevel: 'NSQF 3', duration: '240 Hrs', scheme: 'MNSKSY' },
+      { code: 'IND/Q0102', name: 'Quality Control Inspector', sector: 'Capital Goods', nsqfLevel: 'NSQF 4', duration: '320 Hrs', scheme: 'MNSKSY' },
+      { code: 'BSC/Q8103', name: 'Accounts Assistant', sector: 'BFSI', nsqfLevel: 'NSQF 4', duration: '580 Hrs', scheme: 'MNSKSY' },
+      { code: 'LSC/Q6301', name: 'Air Cargo Booking Executive', sector: 'Logistics', nsqfLevel: 'NSQF 4', duration: '550 Hrs', scheme: 'MNSKSY' }
+    ],
+    'SAMARTH': [
+      { code: 'ELE/Q5901', name: 'Solar Panel Installation Technician', sector: 'Green Energy', nsqfLevel: 'NSQF 4', duration: '300 Hrs', scheme: 'SAMARTH' },
+      { code: 'AMH/Q1947', name: 'Sewing Machine Operator', sector: 'Apparel', nsqfLevel: 'NSQF 3', duration: '240 Hrs', scheme: 'SAMARTH' },
+      { code: 'TEX/Q1002', name: 'Handicrafts & Embroidery Worker', sector: 'Textiles', nsqfLevel: 'NSQF 3', duration: '200 Hrs', scheme: 'SAMARTH' },
+      { code: 'BWW/Q0101', name: 'Beauty Therapist & Wellness Specialist', sector: 'Beauty & Wellness', nsqfLevel: 'NSQF 4', duration: '350 Hrs', scheme: 'SAMARTH' },
+      { code: 'PSC/Q0101', name: 'Plumber General & Sanitation', sector: 'Plumbing', nsqfLevel: 'NSQF 4', duration: '300 Hrs', scheme: 'SAMARTH' },
+      { code: 'ELE/Q6001', name: 'Electrician Domestic Solutions', sector: 'Electronics', nsqfLevel: 'NSQF 4', duration: '350 Hrs', scheme: 'SAMARTH' }
+    ],
+    'PMKVY': [
+      { code: 'HSS/Q5101', name: 'General Duty Assistant (Healthcare)', sector: 'Healthcare', nsqfLevel: 'NSQF 4', duration: '400 Hrs', scheme: 'PMKVY' },
+      { code: 'ELE/Q4601', name: 'Field Technician - Computing and Peripherals', sector: 'Electronics', nsqfLevel: 'NSQF 4', duration: '350 Hrs', scheme: 'PMKVY' },
+      { code: 'SSC/Q0701', name: 'Customer Care Executive (BPO)', sector: 'IT & ITeS', nsqfLevel: 'NSQF 4', duration: '300 Hrs', scheme: 'PMKVY' },
+      { code: 'RAS/Q0104', name: 'Retail Sales Associate', sector: 'Retail', nsqfLevel: 'NSQF 3', duration: '280 Hrs', scheme: 'PMKVY' },
+      { code: 'CON/Q0203', name: 'Bar Bender and Steel Fixer', sector: 'Construction', nsqfLevel: 'NSQF 3.5', duration: '550 Hrs', scheme: 'PMKVY' }
+    ],
+    'ELSTP': [
+      { code: 'TEL/Q0102', name: 'Broadband Technician', sector: 'Telecom', nsqfLevel: 'NSQF 4', duration: '610 Hrs', scheme: 'ELSTP' },
+      { code: 'ELE/Q3122', name: 'Assistant Technician - CCTV', sector: 'Electronics', nsqfLevel: 'NSQF 3', duration: '310 Hrs', scheme: 'ELSTP' },
+      { code: 'CSC/Q0401', name: 'CNC Programmer', sector: 'Capital Goods', nsqfLevel: 'NSQF 5', duration: '640 Hrs', scheme: 'ELSTP' },
+      { code: 'SSC/Q2202', name: 'Associate Customer Care', sector: 'IT & ITeS', nsqfLevel: 'NSQF 4', duration: '490 Hrs', scheme: 'ELSTP' }
+    ]
+  };
+
   sdcForm: FormGroup = this.fb.group({
-    schemeId: ['', Validators.required],
-    name: ['', Validators.required],
-    mouNo: ['', Validators.required],
-    tpName: ['', Validators.required],
-    sdcCode: ['', Validators.required],
-    proposedStartDate: ['', Validators.required],
-    totalTrained: [''],
-    totalPlaced: [''],
-    district: ['', Validators.required],
-    assemblyConstituency: [''],
-    parliamentConstituency: [''],
-    division: [''],
-    block: [''],
-    capacity: ['', Validators.required],
-    centerEmail: ['', [Validators.required, Validators.email]],
-    address: ['', Validators.required],
-    pincode: ['', Validators.required],
-    remarks: [''],
-    latitude: ['', [Validators.required, Validators.min(-90), Validators.max(90)]],
-    longitude: ['', [Validators.required, Validators.min(-180), Validators.max(180)]],
-    courses: this.fb.array([], Validators.required),
+    schemeId: ['SAMARTH (State Fund)'],
+    name: ['Jaipur Excellence Center'],
+    mouNo: ['MOU/2026/001'],
+    tpName: ['SkillMasters Rajasthan'],
+    sdcCode: ['SDC-001'],
+    proposedStartDate: ['2026-10-01'],
+    totalTrained: [500],
+    totalPlaced: [400],
+    district: ['Jaipur'],
+    assemblyConstituency: ['Sanganer'],
+    parliamentConstituency: ['Jaipur Rural'],
+    division: ['Jaipur'],
+    block: ['Jaipur'],
+    capacity: [100],
+    centerEmail: ['center@jaipur.org'],
+    address: ['Plot 42, Skill Industrial Area, Sanganer, Jaipur'],
+    pincode: ['302029'],
+    remarks: ['Ready for auditor inspection'],
+    latitude: [26.9124],
+    longitude: [75.7873],
+    courses: [['ELE/Q5901']],
     tpRecommendation: ['']
   });
 
@@ -414,65 +535,116 @@ export class SdcFormComponent implements OnInit {
     return this.sdcForm.controls;
   }
 
-  isCourseSelected(courseCode: string | number): boolean {
-    const codeStr = String(courseCode);
-    const courses = this.sdcForm.get('courses')?.value as string[];
-    return courses ? courses.includes(codeStr) : false;
+  get selectedSchemeName(): string {
+    const raw = this.sdcForm.get('schemeId')?.value || 'SAMARTH';
+    if (raw.includes('MMKVY')) return 'MMKVY';
+    if (raw.includes('SAMARTH')) return 'SAMARTH';
+    if (raw.includes('PMKVY')) return 'PMKVY';
+    if (raw.includes('RAJKViK') || raw.includes('RAJKVIK')) return 'RAJKVIK';
+    if (raw.includes('MNSKSY')) return 'MNSKSY';
+    if (raw.includes('ELSTP')) return 'ELSTP';
+    return 'SAMARTH';
   }
 
-  toggleCourse(courseCode: string | number) {
-    const codeStr = String(courseCode);
-    const coursesControl = this.sdcForm.get('courses');
-    const currentCourses = coursesControl?.value as string[] || [];
-    
-    if (currentCourses.includes(codeStr)) {
-      coursesControl?.setValue(currentCourses.filter(c => c !== codeStr));
-    } else {
-      coursesControl?.setValue([...currentCourses, codeStr]);
-    }
-    coursesControl?.markAsDirty();
+  selectedSector: string = '';
+
+  get availableSchemeCourses(): SchemeCourse[] {
+    const key = this.selectedSchemeName;
+    return this.coursesByScheme[key] || this.coursesByScheme['SAMARTH'];
   }
 
-  isCurrentStepInvalid(): boolean {
-    switch (this.currentStep) {
-      case 1:
-        return this.sdcForm.get('schemeId')!.invalid || 
-               this.sdcForm.get('name')!.invalid || 
-               this.sdcForm.get('mouNo')!.invalid || 
-               this.sdcForm.get('tpName')!.invalid || 
-               this.sdcForm.get('sdcCode')!.invalid || 
-               this.sdcForm.get('proposedStartDate')!.invalid;
-      case 2:
-        return this.sdcForm.get('district')!.invalid || 
-               this.sdcForm.get('capacity')!.invalid || 
-               this.sdcForm.get('centerEmail')!.invalid || 
-               this.sdcForm.get('address')!.invalid || 
-               this.sdcForm.get('pincode')!.invalid || 
-               this.sdcForm.get('latitude')!.invalid || 
-               this.sdcForm.get('longitude')!.invalid;
-      case 3:
-        return this.sdcForm.get('courses')!.invalid;
-      default:
-        return false;
+  get availableSectors(): string[] {
+    const courses = this.availableSchemeCourses;
+    const sectors = new Set<string>();
+    courses.forEach(c => {
+      if (c.sector) sectors.add(c.sector);
+    });
+    return Array.from(sectors).sort();
+  }
+
+  get availableCoursesForSector(): SchemeCourse[] {
+    const courses = this.availableSchemeCourses;
+    if (!this.selectedSector) return courses; // If no sector selected, show all scheme courses
+    return courses.filter(c => c.sector === this.selectedSector);
+  }
+
+  onSectorChange(event: Event) {
+    const selectElem = event.target as HTMLSelectElement;
+    this.selectedSector = selectElem.value;
+  }
+
+  get selectedCourseObjects(): SchemeCourse[] {
+    const selectedCodes: string[] = this.sdcForm.get('courses')?.value || [];
+    const available = this.availableSchemeCourses;
+    return available.filter(c => selectedCodes.includes(c.code));
+  }
+
+  onCourseDropdownSelect(event: Event) {
+    const selectElem = event.target as HTMLSelectElement;
+    const selectedCode = selectElem.value;
+    if (selectedCode) {
+      const current = this.sdcForm.get('courses')?.value || [];
+      const currentCourses: string[] = Array.isArray(current) ? [...current] : [];
+      if (!currentCourses.includes(selectedCode)) {
+        currentCourses.push(selectedCode);
+        this.sdcForm.get('courses')?.setValue(currentCourses);
+        this.sdcForm.get('courses')?.markAsDirty();
+      }
+      selectElem.value = ''; // Reset dropdown to placeholder after selection
     }
+  }
+
+  removeSelectedCourse(courseCode: string) {
+    const current = this.sdcForm.get('courses')?.value || [];
+    const currentCourses: string[] = Array.isArray(current) ? [...current] : [];
+    const updated = currentCourses.filter(c => c !== courseCode);
+    this.sdcForm.get('courses')?.setValue(updated);
+    this.sdcForm.get('courses')?.markAsDirty();
   }
 
   ngOnInit() {
-    this.allCourses$ = this.courseService.getProposalsByTp('TP042');
-    this.courseOptions$ = this.allCourses$.pipe(
-      map(courses => courses.map(c => ({
-        label: `${c.courseName} (${c.courseCode}) - ${c.status === 'APPROVED' ? c.nsqfLevel : c.status.replace('_', ' ')}`,
-        value: c.courseCode,
-        disabled: c.status !== 'APPROVED'
-      })))
-    );
+    // Watch scheme changes to ensure selected courses align with new scheme
+    this.sdcForm.get('schemeId')?.valueChanges.subscribe(() => {
+      this.selectedSector = ''; // Reset sector selection on scheme change
+      const available = this.availableSchemeCourses;
+      if (available && available.length > 0) {
+        const currentSelected = this.sdcForm.get('courses')?.value || [];
+        const validForScheme = Array.isArray(currentSelected) 
+          ? currentSelected.filter((code: string) => available.some(c => c.code === code))
+          : [];
+        if (validForScheme.length > 0) {
+          this.sdcForm.get('courses')?.setValue(validForScheme);
+        } else {
+          // Pre-select first course of the selected scheme
+          this.sdcForm.get('courses')?.setValue([available[0].code]);
+        }
+      }
+    });
   }
 
-  useCurrentLocation() {
-    this.sdcForm.patchValue({
-      latitude: 26.9124,
-      longitude: 75.7873
-    });
+  goToStep(step: number) {
+    if (step >= 1 && step <= 4) {
+      this.currentStep = step;
+    }
+  }
+
+  isCourseSelected(courseCode: string): boolean {
+    const courses = this.sdcForm.get('courses')?.value;
+    return Array.isArray(courses) ? courses.includes(courseCode) : false;
+  }
+
+  toggleCourse(courseCode: string) {
+    const coursesControl = this.sdcForm.get('courses');
+    const current = coursesControl?.value;
+    let currentCourses: string[] = Array.isArray(current) ? [...current] : [];
+    
+    if (currentCourses.includes(courseCode)) {
+      currentCourses = currentCourses.filter(c => c !== courseCode);
+    } else {
+      currentCourses.push(courseCode);
+    }
+    coursesControl?.setValue(currentCourses);
+    coursesControl?.markAsDirty();
   }
 
   nextStep() {

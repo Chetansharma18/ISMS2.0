@@ -109,7 +109,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
                 <div class="flex justify-between items-start">
                    <div>
                      <span class="px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-bold rounded uppercase tracking-wider">Approved Course</span>
-                     <h4 class="font-bold text-rsldc-navy text-lg mt-1">Data Entry Operator (C-01)</h4>
+                     <h4 class="font-bold text-rsldc-navy text-lg mt-1">Domestic Data Entry Operator (SSC/Q2212)</h4>
                      <p class="text-sm text-slate-600 mt-1">IT-ITeS Sector &bull; 400 Hours Duration</p>
                    </div>
                    <div class="text-right">

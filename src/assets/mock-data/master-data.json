@@ -20,8 +20,8 @@
     { "id": "SEC-04", "name": "Construction" }
   ],
   "courses": [
-    { "id": "C-01", "sectorId": "SEC-01", "name": "Data Entry Operator", "durationHours": 400 },
-    { "id": "C-02", "sectorId": "SEC-01", "name": "Web Developer", "durationHours": 500 },
-    { "id": "C-03", "sectorId": "SEC-02", "name": "Sewing Machine Operator", "durationHours": 300 }
+    { "id": "SSC/Q2212", "sectorId": "SEC-01", "name": "Domestic Data Entry Operator", "durationHours": 400 },
+    { "id": "ELE/Q5901", "sectorId": "SEC-01", "name": "Solar Panel Installation Technician", "durationHours": 300 },
+    { "id": "AMH/Q1947", "sectorId": "SEC-02", "name": "Sewing Machine Operator", "durationHours": 240 }
   ]
 }

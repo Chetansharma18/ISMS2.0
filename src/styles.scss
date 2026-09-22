@@ -2,19 +2,46 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+/* Inter font for chetan-new header/footer */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 /* Global Base Styles */
 html {
   scroll-behavior: smooth;
 }
 
 html, body {
-  font-family: "Poppins", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: "Inter", "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color: #0F172A;
   background-color: #F8FAFC;
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar (chetan-new style) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+  border: 2px solid #f1f5f9;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+::-webkit-scrollbar-thumb:active {
+  background: #0b3558;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
 }
 
 /* Heading & Typography with Poppins */

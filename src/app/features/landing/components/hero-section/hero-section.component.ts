@@ -192,8 +192,7 @@ export class HeroSectionComponent {
   ];
 
   downloadSamplePdf() {
-    // Generate a dummy PDF text and create a downloadable blob
-    const pdfContent = 'This is a sample PDF document for the selected tender.\\n\\nRSLDC Official Notice.';
+    const pdfContent = 'This is a sample PDF document for the selected tender.\n\nRSLDC Official Notice.';
     const blob = new Blob([pdfContent], { type: 'application/pdf' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');

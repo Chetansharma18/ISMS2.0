@@ -3,6 +3,19 @@
   width: 100%;
 }
 
+/* Hard-cap logos so they never blow out the navbar regardless of Tailwind JIT */
+:host img[alt="State Emblem of India"] {
+  max-height: 68px;
+  width: auto;
+  object-fit: contain;
+}
+
+:host img[alt="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)"] {
+  max-height: 68px;
+  max-width: 68px;
+  object-fit: contain;
+}
+
 @keyframes tickerScroll {
   0% {
     transform: translateX(0);

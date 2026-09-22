@@ -23,13 +23,13 @@ interface Tender {
         <!-- Header -->
         <div class="bg-[#0B3558] text-white px-6 py-4 flex items-center justify-between shrink-0">
           <div>
-            <h3 class="text-lg font-bold leading-tight">Official Tenders & RFP Notices</h3>
+            <h3 class="text-lg font-bold leading-tight">Official Tenders &amp; RFP Notices</h3>
             <p class="text-[11px] text-blue-200 mt-0.5">Rajasthan Skill and Livelihoods Development Corporation (RSLDC)</p>
           </div>
           
           <div class="flex items-center gap-4">
             <span class="text-xs font-medium text-slate-300">Total Tenders: <span class="text-white font-bold">{{ tenders.length }}</span></span>
-            <button (click)="close.emit()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+            <button (click)="close.emit()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -69,7 +69,7 @@ interface Tender {
 
               <!-- Download Action -->
               <div class="shrink-0">
-                <button (click)="downloadPdf(); $event.stopPropagation()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0B3558] hover:bg-[#07233B] text-white px-5 py-2.5 rounded-md text-xs font-bold transition-colors">
+                <button (click)="downloadPdf(); $event.stopPropagation()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0B3558] hover:bg-[#07233B] text-white px-5 py-2.5 rounded-md text-xs font-bold transition-colors cursor-pointer">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
@@ -89,67 +89,17 @@ export class TendersModalComponent {
   @Output() close = new EventEmitter<void>();
 
   tenders: Tender[] = [
-    {
-      date: '28 Sep, 2026',
-      id: 'NIB 28 2026-27',
-      category: 'Procurement',
-      isNew: true,
-      status: 'Open',
-      title: 'Procurement of various sizes C.I. Detachable Joints for HDPE Pipe at Divisional Store of Distt Rural Div I Bikaner'
-    },
-    {
-      date: '21 Sep, 2026',
-      id: 'NIT 03/2026-27 ACE PWD Zone Tonk',
-      category: 'Construction',
-      isNew: true,
-      status: 'Open',
-      title: 'CONSTRUCTION OF ROAD FROM SH-122 TO KARIRI UPTO DISTRICT BOARDER'
-    },
-    {
-      date: '11 Jun, 2026',
-      id: 'RCVET/2026/01',
-      category: 'Services',
-      isNew: false,
-      status: 'Open',
-      title: 'Tender for Computer Operator for RCVET Jodhpur'
-    },
-    {
-      date: '07 Feb, 2026',
-      id: 'CORR/2026/09',
-      category: 'Corrigendum',
-      isNew: false,
-      status: 'Open',
-      title: 'Corrigendum - 9 (Old RO Number is 4424)'
-    },
-    {
-      date: '07 Feb, 2026',
-      id: 'CORR/2026/04',
-      category: 'Corrigendum',
-      isNew: false,
-      status: 'Open',
-      title: 'CORRIGENDUM-4'
-    },
-    {
-      date: '07 Feb, 2026',
-      id: 'CORR/2026/05',
-      category: 'Corrigendum',
-      isNew: false,
-      status: 'Open',
-      title: 'Corrigendum-5 API for PM-SETU'
-    },
-    {
-      date: '07 Feb, 2026',
-      id: 'CORR/2026/06',
-      category: 'Corrigendum',
-      isNew: false,
-      status: 'Open',
-      title: 'Corrigendum-6 API for PM-SETU'
-    }
+    { date: '28 Sep, 2026', id: 'NIB 28 2026-27', category: 'Procurement', isNew: true, status: 'Open', title: 'Procurement of various sizes C.I. Detachable Joints for HDPE Pipe at Divisional Store of Distt Rural Div I Bikaner' },
+    { date: '21 Sep, 2026', id: 'NIT 03/2026-27 ACE PWD Zone Tonk', category: 'Construction', isNew: true, status: 'Open', title: 'CONSTRUCTION OF ROAD FROM SH-122 TO KARIRI UPTO DISTRICT BOARDER' },
+    { date: '11 Jun, 2026', id: 'RCVET/2026/01', category: 'Services', isNew: false, status: 'Open', title: 'Tender for Computer Operator for RCVET Jodhpur' },
+    { date: '07 Feb, 2026', id: 'CORR/2026/09', category: 'Corrigendum', isNew: false, status: 'Open', title: 'Corrigendum - 9 (Old RO Number is 4424)' },
+    { date: '07 Feb, 2026', id: 'CORR/2026/04', category: 'Corrigendum', isNew: false, status: 'Open', title: 'CORRIGENDUM-4' },
+    { date: '07 Feb, 2026', id: 'CORR/2026/05', category: 'Corrigendum', isNew: false, status: 'Open', title: 'Corrigendum-5 API for PM-SETU' },
+    { date: '07 Feb, 2026', id: 'CORR/2026/06', category: 'Corrigendum', isNew: false, status: 'Open', title: 'Corrigendum-6 API for PM-SETU' }
   ];
 
   downloadPdf() {
-    // Generate a dummy PDF text and create a downloadable blob
-    const pdfContent = 'This is a sample PDF document for the selected tender.\\n\\nRSLDC Official Notice.';
+    const pdfContent = 'This is a sample PDF document for the selected tender.\n\nRSLDC Official Notice.';
     const blob = new Blob([pdfContent], { type: 'application/pdf' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');

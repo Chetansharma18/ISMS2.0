@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -19,13 +19,16 @@ import { CommonModule } from '@angular/common';
           <div class="w-full lg:w-[45%] lg:float-right lg:ml-10 lg:mt-[80px] mb-8 lg:mb-6">
             <div class="rounded-2xl overflow-hidden bg-slate-100 relative shadow-xl">
               <video 
-                src="/video.mp4" 
-                class="w-full h-[400px] object-cover object-center"
-                autoplay 
-                loop 
-                muted 
-                playsinline>
-              </video>
+                    #video
+                    src="/video.mp4"
+                    class="w-full h-[400px] object-cover object-center"
+                    autoplay
+                    loop
+                    [muted]="true"
+                    muted="muted"
+                    [volume]="0"
+                    playsinline>
+                  </video>
               
               <!-- Quote Block overlaid on video -->
               <div class="absolute bottom-0 left-0 right-0 bg-[#f0f6ff]/95 backdrop-blur-sm p-5 sm:p-6 border-t border-[#e2efff] shadow-[0_-4px_15px_rgba(0,0,0,0.1)]">
@@ -126,10 +129,19 @@ import { CommonModule } from '@angular/common';
     </section>
   `
 })
-export class AboutSectionComponent {
+export class AboutSectionComponent implements AfterViewInit {
+  @ViewChild('video') videoRef!: ElementRef<HTMLVideoElement>;
   isExpanded = false;
+
+  ngAfterViewInit() {
+    if (this.videoRef?.nativeElement) {
+      this.videoRef.nativeElement.muted = true;
+      this.videoRef.nativeElement.volume = 0;
+    }
+  }
 
   toggleExpand() {
     this.isExpanded = !this.isExpanded;
   }
 }
+

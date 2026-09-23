@@ -202,7 +202,7 @@ export interface SchemeCourse {
             <app-form-input
               formControlName="centerEmail"
               type="email"
-              label="Center Email"
+              label=" Email"
               [required]="true"
               placeholder="center@example.com">
             </app-form-input>
@@ -353,7 +353,7 @@ export interface SchemeCourse {
               <div class="p-2 bg-rsldc-navy/10 rounded-lg text-rsldc-navy">
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
               </div>
-              <h2 class="text-xl font-bold text-slate-800">Section E: Center Documents</h2>
+              <h2 class="text-xl font-bold text-slate-800">Section E:  Documents</h2>
             </div>
             
             <div class="border-2 border-dashed border-slate-300 rounded-2xl p-10 text-center hover:bg-white transition cursor-pointer hover:border-rsldc-navy/50 group">
@@ -521,7 +521,7 @@ export class SdcFormComponent implements OnInit {
     division: ['Jaipur'],
     block: ['Jaipur'],
     capacity: [100],
-    centerEmail: ['center@jaipur.org'],
+    Email: ['center@jaipur.org'],
     address: ['Plot 42, Skill Industrial Area, Sanganer, Jaipur'],
     pincode: ['302029'],
     remarks: ['Ready for auditor inspection'],

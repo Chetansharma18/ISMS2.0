@@ -41,12 +41,12 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
         <div class="lg:col-span-7 text-left">
           
 
-          <h1 class="text-white text-3xl sm:text-4xl md:text-5xl lg:text-[46px] xl:text-[50px] font-black leading-[1.12] mb-4 tracking-tight drop-shadow-md font-sans">
+          <h1 class="text-justify text-white text-3xl sm:text-4xl md:text-5xl lg:text-[46px] xl:text-[50px] font-black leading-[1.12] mb-4 tracking-tight drop-shadow-md" style="font-family: 'Inter', sans-serif;">
             Integrated Scheme <br class="hidden sm:inline" />
-            <span class="text-[#F6A820]">Management System</span>
+            <span class="text-white">Management System</span>
           </h1>
 
-          <p class="text-slate-100 text-xs sm:text-sm md:text-base mb-6 sm:mb-8 max-w-xl leading-relaxed drop-shadow font-normal">
+          <p class="text-justify text-slate-100 text-xs sm:text-sm md:text-base mb-6 sm:mb-8 max-w-xl leading-relaxed drop-shadow font-normal">
             A unified, transparent digital ecosystem empowering skill development schemes, 
             training operations, biometric verification, assessments, certifications, and 
             sustainable placements across Rajasthan.
@@ -57,7 +57,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
 
         <!-- Tenders Sidebar (Right) - Perfectly balanced column -->
         <div class="lg:col-span-5 w-full max-w-[460px] mx-auto lg:ml-auto">
-          <div class="w-full h-[360px] sm:h-[400px] bg-white rounded-2xl shadow-2xl border border-white/60 flex flex-col overflow-hidden relative z-20">
+          <div class="w-full h-[460px] sm:h-[500px] lg:h-[540px] bg-white rounded-2xl shadow-2xl border border-white/60 flex flex-col overflow-hidden relative z-20">
             
             <!-- Header -->
             <div class="bg-[#0B3558] px-5 sm:px-6 py-4 flex items-center justify-between z-10 shrink-0 shadow-sm border-b border-[#07233B]">

@@ -40,10 +40,6 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
         <!-- Hero Content (Left) -->
         <div class="lg:col-span-7 text-left">
           
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-orange-400 text-xs font-bold tracking-wide mb-3 sm:mb-4">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#F6A820] animate-ping"></span>
-            <span>Skills for Today &bull; Opportunities for Tomorrow</span>
-          </div>
 
           <h1 class="text-white text-3xl sm:text-4xl md:text-5xl lg:text-[46px] xl:text-[50px] font-black leading-[1.12] mb-4 tracking-tight drop-shadow-md font-sans">
             Integrated Scheme <br class="hidden sm:inline" />
@@ -56,21 +52,6 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
             sustainable placements across Rajasthan.
           </p>
 
-          <!-- Quick Actions & Highlights -->
-          <div class="flex flex-wrap items-center gap-3 sm:gap-4">
-            <div class="flex items-center gap-2 bg-white/10 backdrop-blur-xs border border-white/20 rounded-lg px-3.5 py-2 text-white text-xs sm:text-sm">
-              <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-              </svg>
-              <span>Single Sign-On (SSO) Ready</span>
-            </div>
-            <div class="flex items-center gap-2 bg-white/10 backdrop-blur-xs border border-white/20 rounded-lg px-3.5 py-2 text-white text-xs sm:text-sm">
-              <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-              </svg>
-              <span>RSLDC Governed</span>
-            </div>
-          </div>
 
         </div>
 

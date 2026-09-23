@@ -4,6 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { OtrFormService } from '../../../registration/services/otr-form.service';
+import {
+    Step1OrgDetails,
+    OfficerInCharge,
+    Step3AuthorizedPerson,
+    Step4BankDetails
+} from '../../../registration/models/otr-form.model';
 
 export interface TrainingCenterItem {
     id: string;
@@ -62,25 +68,25 @@ export interface EoiDocumentItem {
     <div class="w-full min-h-full bg-slate-50/50 pb-16 font-sans text-slate-800 select-none">
       
       <!-- ====================================================================
-           1. Top Navigation Bar: Stepper Progress (No "Back to Schemes" button)
+           1. Top Navigation Bar: Stepper Progress (Expands across header width)
            ==================================================================== -->
-      <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-2xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-center">
+      <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-2xs font-sans">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
           
-          <!-- 5-Step Stepper Progress Bar -->
-          <nav class="flex items-center gap-2 sm:gap-6 overflow-x-auto no-scrollbar py-1" aria-label="EOI Application Steps">
+          <!-- 5-Step Stepper Progress Bar (Distributed across width) -->
+          <nav class="w-full flex items-center justify-between overflow-x-auto no-scrollbar py-0.5" aria-label="EOI Application Steps">
             
             <!-- Step 1: OTR Profile Verification -->
             <button
               type="button"
               (click)="goToStep(1)"
-              class="flex items-center gap-2 text-xs font-semibold cursor-pointer group"
+              class="flex items-center gap-2 text-xs font-normal cursor-pointer group shrink-0 transition-colors"
               [class.text-[#0B3558]]="currentStep() >= 1"
-              [class.font-bold]="currentStep() === 1"
+              [class.font-medium]="currentStep() === 1"
               [class.text-slate-400]="currentStep() < 1"
             >
               <span
-                class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors"
+                class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold transition-colors"
                 [class.bg-[#0B3558]]="currentStep() === 1"
                 [class.text-white]="currentStep() === 1"
                 [class.bg-emerald-600]="currentStep() > 1"
@@ -94,24 +100,24 @@ export interface EoiDocumentItem {
                 }
               </span>
               <div class="text-left leading-tight hidden sm:block">
-                <span class="text-[10px] uppercase text-slate-400 block font-medium">STEP 1</span>
-                <span>OTR Profile</span>
+                <span class="text-[10px] uppercase text-slate-400 block font-normal">STEP 1</span>
+                <span class="text-xs">OTR Profile</span>
               </div>
             </button>
 
-            <span class="w-4 sm:w-8 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 1"></span>
+            <span class="flex-1 mx-2 sm:mx-4 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 1"></span>
 
             <!-- Step 2: EOI Proposal Details -->
             <button
               type="button"
               (click)="goToStep(2)"
-              class="flex items-center gap-2 text-xs font-semibold cursor-pointer group"
+              class="flex items-center gap-2 text-xs font-normal cursor-pointer group shrink-0 transition-colors"
               [class.text-[#0B3558]]="currentStep() >= 2"
-              [class.font-bold]="currentStep() === 2"
+              [class.font-medium]="currentStep() === 2"
               [class.text-slate-400]="currentStep() < 2"
             >
               <span
-                class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors"
+                class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold transition-colors"
                 [class.bg-[#0B3558]]="currentStep() === 2"
                 [class.text-white]="currentStep() === 2"
                 [class.bg-emerald-600]="currentStep() > 2"
@@ -125,24 +131,24 @@ export interface EoiDocumentItem {
                 }
               </span>
               <div class="text-left leading-tight hidden sm:block">
-                <span class="text-[10px] uppercase text-slate-400 block font-medium">STEP 2</span>
-                <span>Proposal Form</span>
+                <span class="text-[10px] uppercase text-slate-400 block font-normal">STEP 2</span>
+                <span class="text-xs">Proposal Form</span>
               </div>
             </button>
 
-            <span class="w-4 sm:w-8 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 2"></span>
+            <span class="flex-1 mx-2 sm:mx-4 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 2"></span>
 
             <!-- Step 3: Complete Preview -->
             <button
               type="button"
               (click)="goToStep(3)"
-              class="flex items-center gap-2 text-xs font-semibold cursor-pointer group"
+              class="flex items-center gap-2 text-xs font-normal cursor-pointer group shrink-0 transition-colors"
               [class.text-[#0B3558]]="currentStep() >= 3"
-              [class.font-bold]="currentStep() === 3"
+              [class.font-medium]="currentStep() === 3"
               [class.text-slate-400]="currentStep() < 3"
             >
               <span
-                class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors"
+                class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold transition-colors"
                 [class.bg-[#0B3558]]="currentStep() === 3"
                 [class.text-white]="currentStep() === 3"
                 [class.bg-emerald-600]="currentStep() > 3"
@@ -156,24 +162,24 @@ export interface EoiDocumentItem {
                 }
               </span>
               <div class="text-left leading-tight hidden sm:block">
-                <span class="text-[10px] uppercase text-slate-400 block font-medium">STEP 3</span>
-                <span>Complete Preview</span>
+                <span class="text-[10px] uppercase text-slate-400 block font-normal">STEP 3</span>
+                <span class="text-xs">Complete Preview</span>
               </div>
             </button>
 
-            <span class="w-4 sm:w-8 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 3"></span>
+            <span class="flex-1 mx-2 sm:mx-4 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 3"></span>
 
             <!-- Step 4: Fee Payment -->
             <button
               type="button"
               (click)="goToStep(4)"
-              class="flex items-center gap-2 text-xs font-semibold cursor-pointer group"
+              class="flex items-center gap-2 text-xs font-normal cursor-pointer group shrink-0 transition-colors"
               [class.text-[#0B3558]]="currentStep() >= 4"
-              [class.font-bold]="currentStep() === 4"
+              [class.font-medium]="currentStep() === 4"
               [class.text-slate-400]="currentStep() < 4"
             >
               <span
-                class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors"
+                class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold transition-colors"
                 [class.bg-[#0B3558]]="currentStep() === 4"
                 [class.text-white]="currentStep() === 4"
                 [class.bg-emerald-600]="currentStep() > 4"
@@ -187,24 +193,24 @@ export interface EoiDocumentItem {
                 }
               </span>
               <div class="text-left leading-tight hidden sm:block">
-                <span class="text-[10px] uppercase text-slate-400 block font-medium">STEP 4</span>
-                <span>Fee Payment</span>
+                <span class="text-[10px] uppercase text-slate-400 block font-normal">STEP 4</span>
+                <span class="text-xs">Fee Payment</span>
               </div>
             </button>
 
-            <span class="w-4 sm:w-8 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 4"></span>
+            <span class="flex-1 mx-2 sm:mx-4 h-0.5 bg-slate-200" [class.bg-emerald-500]="currentStep() > 4"></span>
 
             <!-- Step 5: Submission & Receipt -->
             <button
               type="button"
               (click)="goToStep(5)"
-              class="flex items-center gap-2 text-xs font-semibold cursor-pointer group"
+              class="flex items-center gap-2 text-xs font-normal cursor-pointer group shrink-0 transition-colors"
               [class.text-[#0B3558]]="currentStep() === 5"
-              [class.font-bold]="currentStep() === 5"
+              [class.font-medium]="currentStep() === 5"
               [class.text-slate-400]="currentStep() < 5"
             >
               <span
-                class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors"
+                class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold transition-colors"
                 [class.bg-[#0B3558]]="currentStep() === 5"
                 [class.text-white]="currentStep() === 5"
                 [class.bg-slate-200]="currentStep() < 5"
@@ -212,8 +218,8 @@ export interface EoiDocumentItem {
                 5
               </span>
               <div class="text-left leading-tight hidden sm:block">
-                <span class="text-[10px] uppercase text-slate-400 block font-medium">STEP 5</span>
-                <span>Submission Receipt</span>
+                <span class="text-[10px] uppercase text-slate-400 block font-normal">STEP 5</span>
+                <span class="text-xs">Submission Receipt</span>
               </div>
             </button>
 
@@ -222,372 +228,451 @@ export interface EoiDocumentItem {
       </header>
 
       <!-- Main Container -->
-      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6 font-sans">
         
         <!-- ====================================================================
-             2. SELECTED TENDER / EOI Scheme Header Card (Matching Screenshot 1)
+             2. SCHEME HEADER CARD (Exact replica of Screenshot 1 - only 8 fields)
              ==================================================================== -->
         <div class="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
-          
-          <!-- Top Tag Bar (Shows SELECTED TENDER / EOI and Scheme Code once) -->
-          <div class="bg-[#0B3558] text-white px-4 py-2.5 flex items-center justify-between flex-wrap gap-2">
-            <div class="flex items-center gap-2">
-              <span class="px-2.5 py-0.5 rounded bg-[#EA580C] text-white font-bold text-[10px] uppercase tracking-wider">
-                SELECTED TENDER / EOI
-              </span>
-              <span class="px-2 py-0.5 rounded bg-white/15 text-white font-semibold text-xs">
-                {{ schemeCode() }}
-              </span>
-            </div>
-          </div>
-
-          <!-- Card Body -->
-          <div class="p-5 space-y-4">
-            <div>
-              <h2 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+          <div class="p-5 sm:p-6 space-y-3.5">
+            <div class="space-y-1">
+              <!-- Scheme Title (Fixed heading size, clean font) -->
+              <h2 class="text-lg sm:text-xl font-medium text-[#0B3558] tracking-tight">
                 {{ schemeTitle() }}
               </h2>
-              <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+              <!-- Subtitle Description -->
+              <p class="text-xs sm:text-[12.5px] text-slate-600 leading-relaxed font-normal">
                 {{ schemeDescription() }}
               </p>
             </div>
 
-            <!-- 6 Parameters Strip (Matching Screenshot 1) -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-3 border-t border-slate-100 text-xs bg-slate-50/60 p-3.5 rounded-lg border">
+            <!-- The Exact 8 Parameters Strip from Screenshot 1 -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 pt-3.5 border-t border-slate-100 text-xs">
               <div>
-                <span class="text-[10px] text-slate-500 font-semibold uppercase block">EOI REFERENCE NO.</span>
-                <span class="font-mono font-semibold text-slate-800 text-[11.5px]">{{ schemeRefNo() }}</span>
+                <span class="text-[10px] text-slate-500 font-normal uppercase block tracking-wider">EOI REFERENCE NO.</span>
+                <span class="font-normal text-slate-700 text-[11.5px] block mt-1 break-all">{{ schemeRefNo() }}</span>
               </div>
               <div>
-                <span class="text-[10px] text-slate-500 font-semibold uppercase block">TENDER ID</span>
-                <span class="font-mono font-semibold text-slate-800 text-[11.5px]">2026_RSLDC_593778_1</span>
+                <span class="text-[10px] text-slate-500 font-normal uppercase block tracking-wider">SCHEME NAME</span>
+                <span class="font-normal text-slate-700 text-[11.5px] block mt-1">{{ schemeName() }}</span>
               </div>
               <div>
-                <span class="text-[10px] text-slate-500 font-semibold uppercase block">ISSUING AUTHORITY / DEPARTMENT</span>
-                <span class="font-medium text-slate-800 text-[11.5px]">Rajasthan Skill and Livelihoods Development Corporation (RSLDC)</span>
+                <span class="text-[10px] text-slate-500 font-normal uppercase block tracking-wider">SCHEME CATEGORY</span>
+                <span class="font-normal text-slate-700 text-[11.5px] block mt-1">{{ schemeCategory() }}</span>
               </div>
               <div>
-                <span class="text-[10px] text-slate-500 font-semibold uppercase block">DATE OF CLOSING</span>
-                <span class="font-bold text-rose-600 text-[11.5px]">15-Sep-2026 02:00 PM</span>
+                <span class="text-[10px] text-slate-500 font-normal uppercase block tracking-wider">EOI CATEGORY</span>
+                <span class="font-normal text-slate-700 text-[11.5px] block mt-1">{{ schemeEoiCategory() }}</span>
               </div>
               <div>
-                <span class="text-[10px] text-slate-500 font-semibold uppercase block">EMD FEE</span>
-                <span class="font-semibold text-slate-900 text-[11.5px]">{{ schemeEmdFee() }} <span class="text-[10px] text-slate-500 font-normal">(Refundable)</span></span>
+                <span class="text-[10px] text-slate-500 font-normal uppercase block tracking-wider">DATE OF EOI PUBLISHED</span>
+                <span class="font-normal text-slate-700 text-[11.5px] block mt-1">{{ schemeDatePublished() }}</span>
               </div>
               <div>
-                <span class="text-[10px] text-slate-500 font-semibold uppercase block">PROCESSING FEE</span>
-                <span class="font-semibold text-slate-900 text-[11.5px]">{{ schemeProcessFee() }} <span class="text-[10px] text-slate-500 font-normal">(Non-Refundable)</span></span>
+                <span class="text-[10px] text-slate-500 font-normal uppercase block tracking-wider">DATE OF CLOSING</span>
+                <span class="font-medium text-rose-600 text-[11.5px] block mt-1">{{ schemeClosingDate() }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-500 font-normal uppercase block tracking-wider">EMD FEE</span>
+                <span class="font-normal text-slate-700 text-[11.5px] block mt-1">{{ schemeEmdFee() }} <span class="text-[10px] text-slate-500 font-normal">(Refundable)</span></span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-500 font-normal uppercase block tracking-wider">PROCESSING FEE</span>
+                <span class="font-normal text-slate-700 text-[11.5px] block mt-1">{{ schemeProcessFee() }} <span class="text-[10px] text-slate-500 font-normal">(Non-Refundable)</span></span>
               </div>
             </div>
           </div>
-
         </div>
 
         <!-- ====================================================================
-             STEP 1: OTR PROFILE VERIFICATION (Complete OTR Institutional Details)
+             STEP 1: OTR PROFILE VERIFICATION (Editable Pre-Filled Form Inputs)
              ==================================================================== -->
         @if (currentStep() === 1) {
           <div class="space-y-6">
-            
-            <div class="bg-blue-50/80 border border-blue-200 rounded-lg p-3.5 flex items-center gap-3 text-xs text-[#0B3558]">
-              <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-              <span>
-                <strong>OTR Profile Pre-loaded:</strong> All institutional credentials, governance directory, and bank accounts have been verified from your One Time Registration (OTR) profile. Please review the details before proceeding to the scheme-specific proposal form.
-              </span>
-            </div>
 
             <!-- Section 1: Step 1 - Organization Details -->
             <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
               <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">1</span>
-                  <h3 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide">Step 1 - Organization Details</h3>
+                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">1</span>
+                  <h3 class="text-sm font-medium text-[#0B3558] uppercase tracking-wide">Step 1 - Organization Details</h3>
                 </div>
-                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">
+                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-normal border border-emerald-200">
                   &check; Verified
                 </span>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3.5 gap-x-6 text-xs font-normal">
+              <!-- Form Inputs Pre-filled with Registration Data -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6 text-xs">
                 <div>
-                  <span class="text-slate-500 block font-medium">TP/PIA Short Name</span>
-                  <span class="text-slate-900 font-semibold">{{ otrData().step1.shortName || 'DMR SAKSHAM' }}</span>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">TP/PIA Short Name</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editableStep1.shortName"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                  />
                 </div>
+
                 <div>
-                  <span class="text-slate-500 block font-medium">TP/PIA Full Name</span>
-                  <span class="text-slate-900 font-semibold">{{ otrData().step1.fullName || 'DMR ENTERPRISES PRIVATE LIMITED' }}</span>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">TP/PIA Full Name</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editableStep1.fullName"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                  />
                 </div>
+
                 <div>
-                  <span class="text-slate-500 block font-medium">Nature of Entity</span>
-                  <span class="text-slate-800">{{ otrData().step1.natureOfEntity || 'PUBLIC LIMITED' }}</span>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Nature of Entity</label>
+                  <select
+                    [(ngModel)]="editableStep1.natureOfEntity"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                  >
+                    <option value="PUBLIC LIMITED">PUBLIC LIMITED</option>
+                    <option value="PRIVATE LIMITED">PRIVATE LIMITED</option>
+                    <option value="SOCIETY">SOCIETY</option>
+                    <option value="TRUST">TRUST</option>
+                    <option value="PROPRIETORSHIP">PROPRIETORSHIP</option>
+                  </select>
                 </div>
+
                 <div>
-                  <span class="text-slate-500 block font-medium">Registration Number of Entity (CIN / Registration No. / Other)</span>
-                  <span class="text-slate-800 font-mono font-medium">{{ otrData().step1.registrationNumber || '07AAECD8566H1ZC' }}</span>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Registration Number of Entity (CIN / Reg. No.)</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editableStep1.registrationNumber"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors font-mono"
+                  />
                 </div>
+
                 <div>
-                  <span class="text-slate-500 block font-medium">Certificate of Registration / Incorporation</span>
-                  <span class="text-emerald-700 font-medium">&check; Verified Document Attached</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">Date of Registration as Legal Entity</span>
-                  <span class="text-slate-800">{{ otrData().step1.dateOfRegistration || '07-Jan-2017' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">Company PAN</span>
-                  <span class="text-slate-800 font-mono font-medium">{{ otrData().step1.companyPan || 'AAECD8566H' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">Organization PAN Card</span>
-                  <span class="text-emerald-700 font-medium">&check; Verified Document Attached</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">State/UT of Legal Registration</span>
-                  <span class="text-slate-800">{{ otrData().step1.stateOfLegalReg || 'Rajasthan' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">GST Registered</span>
-                  <span class="text-slate-800">{{ otrData().step1.gstRegistered || 'Yes' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">GSTIN</span>
-                  <span class="text-slate-800 font-mono font-medium">{{ otrData().step1.gstin || '08AAACR1234F1Z5' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">GST Registration Certificate</span>
-                  <span class="text-emerald-700 font-medium">&check; Verified Document Attached</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">MSME Registered</span>
-                  <span class="text-slate-800">{{ otrData().step1.msmeRegistered || 'Yes' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">Udyam Number</span>
-                  <span class="text-slate-800 font-mono font-medium">{{ otrData().step1.udyamNumber || 'UDYAM-RJ-14-0019284' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">MSME / Udyam Registration Certificate</span>
-                  <span class="text-emerald-700 font-medium">&check; Verified Document Attached</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">Turn Over</span>
-                  <span class="text-slate-800 font-semibold">₹ {{ otrData().step1.turnOver || '1203.35' }} Lakhs</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">BlackListed</span>
-                  <span class="text-slate-800">{{ otrData().step1.blackListed || 'No' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">NSDC Partner</span>
-                  <span class="text-slate-800">{{ otrData().step1.nsdcPartner || 'Equity Share' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">Company Contact No.</span>
-                  <span class="text-slate-800 font-mono">{{ otrData().step1.contactNo || '7849954552' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">Company Email-ID</span>
-                  <span class="text-slate-800">{{ otrData().step1.emailId || 'vijaydtm1960@gmail.com' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">Website</span>
-                  <span class="text-slate-800">{{ otrData().step1.website || 'https://dmrenterprises.com' }}</span>
-                </div>
-                
-                <div class="sm:col-span-2 md:col-span-3 pt-2 border-t border-slate-100">
-                  <span class="text-slate-500 block font-medium">Registered Address</span>
-                  <span class="text-slate-800">
-                    {{ otrData().step1.registeredAddress || 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN' }}
-                  </span>
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-1.5 text-[11px] text-slate-600 bg-slate-50 p-2 rounded border border-slate-100">
-                    <span><strong class="text-slate-500">State/UT – Registered Address:</strong> {{ otrData().step1.registeredState || 'Delhi' }}</span>
-                    <span><strong class="text-slate-500">District – Registered Address:</strong> {{ otrData().step1.registeredDistrict || 'North Delhi' }}</span>
-                    <span><strong class="text-slate-500">Pincode – Registered Address:</strong> {{ otrData().step1.registeredPincode || '110042' }}</span>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Certificate of Registration / Incorporation</label>
+                  <div class="flex items-center gap-2 py-1.5 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-emerald-700 text-xs font-normal">
+                    <span>&check; Verified Document Attached</span>
                   </div>
                 </div>
 
-                <div class="sm:col-span-2 md:col-span-3 pt-2 border-t border-slate-100">
-                  <span class="text-slate-500 block font-medium">Office Address</span>
-                  <span class="text-slate-800">
-                    {{ otrData().step1.officeAddress || 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN' }}
-                  </span>
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-1.5 text-[11px] text-slate-600 bg-slate-50 p-2 rounded border border-slate-100">
-                    <span><strong class="text-slate-500">State/UT – Office Address:</strong> {{ otrData().step1.officeState || 'Delhi' }}</span>
-                    <span><strong class="text-slate-500">District – Office Address:</strong> {{ otrData().step1.officeDistrict || 'North Delhi' }}</span>
-                    <span><strong class="text-slate-500">Pincode – Office Address:</strong> {{ otrData().step1.officePincode || '110042' }}</span>
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Date of Registration as Legal Entity</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editableStep1.dateOfRegistration"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Company PAN</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editableStep1.companyPan"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Organization PAN Card</label>
+                  <div class="flex items-center gap-2 py-1.5 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-emerald-700 text-xs font-normal">
+                    <span>&check; Verified Document Attached</span>
                   </div>
                 </div>
+
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">State/UT of Legal Registration</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editableStep1.stateOfLegalReg"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">GST Registered</label>
+                  <select
+                    [(ngModel)]="editableStep1.gstRegistered"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                  >
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">GSTIN</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editableStep1.gstin"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">GST Registration Certificate</label>
+                  <div class="flex items-center gap-2 py-1.5 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-emerald-700 text-xs font-normal">
+                    <span>&check; Verified Document Attached</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">MSME Registered</label>
+                  <select
+                    [(ngModel)]="editableStep1.msmeRegistered"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                  >
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Udyam Number</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editableStep1.udyamNumber"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Turn Over (₹ Lakhs)</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editableStep1.turnOver"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">BlackListed</label>
+                  <select
+                    [(ngModel)]="editableStep1.blackListed"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                  >
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">NSDC Partner</label>
+                  <select
+                    [(ngModel)]="editableStep1.nsdcPartner"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                  >
+                    <option value="Equity Share">Equity Share</option>
+                    <option value="Funded">Funded</option>
+                    <option value="Non-Funded">Non-Funded</option>
+                    <option value="None">None</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Company Contact No.</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editableStep1.contactNo"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Company Email-ID</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editableStep1.emailId"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Website</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="editableStep1.website"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                  />
+                </div>
+
+                <!-- Registered Address -->
+                <div class="sm:col-span-2 md:col-span-3 pt-2 border-t border-slate-100">
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Registered Address</label>
+                  <textarea
+                    rows="2"
+                    [(ngModel)]="editableStep1.registeredAddress"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                  ></textarea>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
+                    <div>
+                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">State/UT</label>
+                      <input type="text" [(ngModel)]="editableStep1.registeredState" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">District</label>
+                      <input type="text" [(ngModel)]="editableStep1.registeredDistrict" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Pincode</label>
+                      <input type="text" [(ngModel)]="editableStep1.registeredPincode" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Office Address -->
+                <div class="sm:col-span-2 md:col-span-3 pt-2 border-t border-slate-100">
+                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Office Address</label>
+                  <textarea
+                    rows="2"
+                    [(ngModel)]="editableStep1.officeAddress"
+                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                  ></textarea>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
+                    <div>
+                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">State/UT</label>
+                      <input type="text" [(ngModel)]="editableStep1.officeState" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">District</label>
+                      <input type="text" [(ngModel)]="editableStep1.officeDistrict" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Pincode</label>
+                      <input type="text" [(ngModel)]="editableStep1.officePincode" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
 
-            <!-- Section 2: Details of Officer In-Charge & Authorized Person Details -->
+            <!-- Section 2: Officer In-Charge & Authorized Person -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               
-              <!-- Step 2 – Details of Officer In-Charge -->
+              <!-- Officer In-Charge -->
               <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-3">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                   <div class="flex items-center gap-2">
-                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">2</span>
-                    <h3 class="text-sm font-bold text-[#0B3558]">Step 2 – Details of Officer In-Charge</h3>
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">2</span>
+                    <h3 class="text-sm font-medium text-[#0B3558]">Step 2 – Details of Officer In-Charge</h3>
                   </div>
-                  <span class="text-[11px] text-slate-500">{{ otrData().step2.length }} Verified Officers</span>
+                  <span class="text-[11px] text-slate-500">{{ editableStep2.length }} Officers</span>
                 </div>
 
-                <div class="space-y-2.5 pt-1">
-                  @for (oic of otrData().step2; track oic.id) {
-                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1.5">
-                      <div class="flex items-center justify-between">
-                        <span class="font-semibold text-slate-900">{{ oic.name || 'Dr. Rajesh Sharma' }}</span>
-                        <span class="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">Active</span>
-                      </div>
-                      <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-slate-600 text-[11px]">
-                        <div><span class="text-slate-400">Designation:</span> {{ oic.designation || 'Managing Director' }}</div>
-                        <div><span class="text-slate-400">Mobile No.:</span> {{ oic.mobileNo || '9829012345' }}</div>
-                        <div><span class="text-slate-400">Email-ID:</span> {{ oic.emailId || 'director@rsl-partner.org' }}</div>
-                        <div class="font-mono"><span class="text-slate-400 font-sans">PAN:</span> {{ oic.pan || 'ABCPS1234K' }}</div>
-                        <div class="font-mono"><span class="text-slate-400 font-sans">Aadhaar No.:</span> {{ oic.aadhaarNo || 'XXXXXXXX1098' }}</div>
-                        <div><span class="text-slate-400">Bhamashah No.:</span> {{ oic.bhamashahNo || 'BHM-9821' }}</div>
-                        <div><span class="text-slate-400">Voter ID No.:</span> {{ oic.voterIdNo || 'RJ/01/012/123456' }}</div>
-                        <div><span class="text-slate-400">Passport No.:</span> {{ oic.passportNo || 'Z1234567' }}</div>
-                      </div>
-                      <div class="pt-1.5 border-t border-slate-200/80 flex items-center justify-between text-[10.5px] text-emerald-700">
-                        <span>&check; OIC Appointment / Authorization Letter Attached</span>
-                        <span>&check; OIC Identity Proof Verified</span>
+                <div class="space-y-3 pt-1">
+                  @for (oic of editableStep2; track oic.id; let idx = $index) {
+                    <div class="p-3 bg-slate-50/70 rounded-lg border border-slate-200 text-xs space-y-2">
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Name</label>
+                          <input type="text" [(ngModel)]="oic.name" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
+                        </div>
+                        <div>
+                          <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Designation</label>
+                          <input type="text" [(ngModel)]="oic.designation" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
+                        </div>
+                        <div>
+                          <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Mobile No.</label>
+                          <input type="text" [(ngModel)]="oic.mobileNo" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
+                        </div>
+                        <div>
+                          <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Email-ID</label>
+                          <input type="text" [(ngModel)]="oic.emailId" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
+                        </div>
+                        <div>
+                          <label class="block text-[10px] text-slate-500 font-normal mb-0.5">PAN</label>
+                          <input type="text" [(ngModel)]="oic.pan" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
+                        </div>
+                        <div>
+                          <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Aadhaar No.</label>
+                          <input type="text" [(ngModel)]="oic.aadhaarNo" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
+                        </div>
                       </div>
                     </div>
                   }
                 </div>
               </div>
 
-              <!-- Step 3 – Authorized Person Details -->
+              <!-- Authorized Person Details -->
               <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-3">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                   <div class="flex items-center gap-2">
-                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">3</span>
-                    <h3 class="text-sm font-bold text-[#0B3558]">Step 3 – Authorized Person Details</h3>
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">3</span>
+                    <h3 class="text-sm font-medium text-[#0B3558]">Step 3 – Authorized Person Details</h3>
                   </div>
-                  <span class="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Verified</span>
+                  <span class="text-[11px] text-emerald-700 font-normal bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Verified</span>
                 </div>
-                <p class="text-[11px] text-slate-500 -mt-1 font-normal">The Authorized Person is the person officially authorized to represent the TP/PIA.</p>
 
-                <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-2">
-                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 font-normal">
+                <div class="p-3 bg-slate-50/70 rounded-lg border border-slate-200 text-xs space-y-2">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
-                      <span class="text-slate-500 block">Name</span>
-                      <span class="text-slate-800 font-medium">{{ otrData().step3.name || 'SUMAN GUPTA' }}</span>
+                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Name</label>
+                      <input type="text" [(ngModel)]="editableStep3.name" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
                     </div>
                     <div>
-                      <span class="text-slate-500 block">Date of Birth</span>
-                      <span class="text-slate-800">{{ otrData().step3.dob || '14-Aug-1978' }}</span>
+                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Designation</label>
+                      <input type="text" [(ngModel)]="editableStep3.designation" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
                     </div>
                     <div>
-                      <span class="text-slate-500 block">Age</span>
-                      <span class="text-slate-800">{{ otrData().step3.age || '48' }} Years</span>
+                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Date of Birth</label>
+                      <input type="text" [(ngModel)]="editableStep3.dob" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
                     </div>
                     <div>
-                      <span class="text-slate-500 block">Designation</span>
-                      <span class="text-slate-800 font-medium">{{ otrData().step3.designation || 'Director' }}</span>
+                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Age</label>
+                      <input type="text" [(ngModel)]="editableStep3.age" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
                     </div>
                     <div>
-                      <span class="text-slate-500 block">PAN</span>
-                      <span class="font-mono text-slate-800">{{ otrData().step3.pan || 'BNYPM9876Q' }}</span>
+                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">PAN</label>
+                      <input type="text" [(ngModel)]="editableStep3.pan" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
                     </div>
                     <div>
-                      <span class="text-slate-500 block">Email-ID</span>
-                      <span class="text-slate-800">{{ otrData().step3.emailId || 'compliance@nsmark.in' }}</span>
+                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Email-ID</label>
+                      <input type="text" [(ngModel)]="editableStep3.emailId" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
                     </div>
-                    <div>
-                      <span class="text-slate-500 block">Mobile No.</span>
-                      <span class="text-slate-800">{{ otrData().step3.mobileNo || '9968009648' }}</span>
-                    </div>
-                    <div>
-                      <span class="text-slate-500 block">Aadhaar No.</span>
-                      <span class="font-mono text-slate-800">{{ otrData().step3.aadhaarNo || '542510326814' }}</span>
-                    </div>
-                    <div>
-                      <span class="text-slate-500 block">Bhamashah No.</span>
-                      <span class="text-slate-800">{{ otrData().step3.bhamashahNo || 'BHM-4412' }}</span>
-                    </div>
-                    <div>
-                      <span class="text-slate-500 block">Voter ID No.</span>
-                      <span class="text-slate-800">{{ otrData().step3.voterIdNo || 'DL/04/024/987123' }}</span>
-                    </div>
-                    <div>
-                      <span class="text-slate-500 block">Passport No.</span>
-                      <span class="text-slate-800">{{ otrData().step3.passportNo || 'P8765432' }}</span>
-                    </div>
-                    <div>
-                      <span class="text-slate-500 block">State</span>
-                      <span class="text-slate-800">{{ otrData().step3.state || 'Delhi' }}</span>
-                    </div>
-                  </div>
-                  <div class="pt-2 border-t border-slate-200">
-                    <span class="text-slate-500 block">Residence Address</span>
-                    <span class="text-slate-800 text-[11px]">{{ otrData().step3.residenceAddress || 'B298 GF AND FF, LOK VIHAR PITAMPURA, Pitampura, North West Delhi - 110034' }}</span>
-                  </div>
-                  <div class="pt-1.5 border-t border-slate-200/80 flex items-center justify-between text-[10.5px] text-emerald-700 flex-wrap gap-2">
-                    <span>&check; Authorization Letter / Board Resolution / Authority Document Attached</span>
-                    <span>&check; Authorized Person Identity Proof Attached</span>
                   </div>
                 </div>
               </div>
 
             </div>
 
-            <!-- Section 3: Step 4 – Bank Details -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-3">
-              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <!-- Section 3: Bank Details -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">4</span>
-                  <h3 class="text-sm font-bold text-[#0B3558]">Step 4 – Bank Details</h3>
+                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">4</span>
+                  <h3 class="text-sm font-medium text-[#0B3558] uppercase tracking-wide">Step 4 – Bank Account Details</h3>
                 </div>
-                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">
-                  &check; Active Account
+                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-normal border border-emerald-200">
+                  &check; Verified
                 </span>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 text-xs font-normal">
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
                 <div>
-                  <span class="text-slate-500 block font-medium">Name of the Bank</span>
-                  <span class="text-slate-800 font-medium">{{ otrData().step4.bankName || 'HDFC Bank' }}</span>
+                  <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Name of the Bank</label>
+                  <input type="text" [(ngModel)]="editableStep4.bankName" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">Branch Name</span>
-                  <span class="text-slate-800">{{ otrData().step4.branchName || 'NEAR SHASTRI NAGAR METRO STATION NEW DELHI' }}</span>
+                  <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Branch Name</label>
+                  <input type="text" [(ngModel)]="editableStep4.branchName" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">Mode of Transfer</span>
-                  <span class="text-slate-800">{{ otrData().step4.transferMode || 'RTGS / NEFT / IMPS' }}</span>
+                  <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Type of Account</label>
+                  <input type="text" [(ngModel)]="editableStep4.accountType" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">Type of Account</span>
-                  <span class="text-slate-800">{{ otrData().step4.accountType || 'Current' }}</span>
+                  <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Account Holder Name</label>
+                  <input type="text" [(ngModel)]="editableStep4.accountHolderName" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">Account Holder Name</span>
-                  <span class="text-slate-800 font-medium">{{ otrData().step4.accountHolderName || 'DMR ENTERPRISES PRIVATE LIMITED' }}</span>
+                  <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Account No.</label>
+                  <input type="text" [(ngModel)]="editableStep4.accountNo" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">Account No.</span>
-                  <span class="font-mono text-slate-800 font-bold">{{ otrData().step4.accountNo || '50200047885422' }}</span>
+                  <label class="block text-[10px] text-slate-500 font-normal mb-0.5">IFSC Code</label>
+                  <input type="text" [(ngModel)]="editableStep4.ifscCode" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
                 </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">IFSC Code</span>
-                  <span class="font-mono text-slate-800 font-bold">{{ otrData().step4.ifscCode || 'HDFC0001441' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">MICR Code</span>
-                  <span class="font-mono text-slate-800">{{ otrData().step4.micrCode || '110240173' }}</span>
-                </div>
-                <div class="sm:col-span-2">
-                  <span class="text-slate-500 block font-medium">Branch Address</span>
-                  <span class="text-slate-800 truncate block">{{ otrData().step4.branchAddress || 'Plot No. 12, Main Rohtak Road, Shastri Nagar, Delhi' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block font-medium">Upload Cancelled Cheque</span>
-                  <span class="text-emerald-700 font-medium">&check; Cancelled Cheque Attached</span>
+                <div class="sm:col-span-2 md:col-span-3">
+                  <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Branch Address</label>
+                  <input type="text" [(ngModel)]="editableStep4.branchAddress" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
                 </div>
               </div>
             </div>
@@ -596,10 +681,10 @@ export interface EoiDocumentItem {
             <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
               <button
                 type="button"
-                (click)="goToStep(2)"
-                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+                (click)="saveAndProceedToStep2()"
+                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs sm:text-sm font-medium shadow-2xs transition-colors flex items-center gap-2 cursor-pointer"
               >
-                <span>Save &amp; Proceed to EOI Proposal Form</span>
+                <span>Save &amp; Next</span>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
@@ -784,36 +869,56 @@ export interface EoiDocumentItem {
               
               <!-- Financial Turnover from Skill Development -->
               <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3 shadow-2xs">
-                <div class="pb-2 border-b border-slate-100">
-                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
-                    2. Financial Details (Last 3 FYs)
-                  </h3>
-                  <p class="text-xs text-slate-500 mt-0.5">
-                    Turnover realized from skill training and overall operations (INR).
-                  </p>
+                <div class="pb-2 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <h3 class="text-sm sm:text-base font-medium text-[#0B3558]">
+                      2. Financial Details (Last 3 FYs)
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-0.5 font-normal">
+                      Turnover realized from skill training and overall operations (INR).
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    (click)="addFinancialYear()"
+                    class="px-2.5 py-1 bg-white hover:bg-slate-50 text-[#0B3558] border border-slate-300 rounded text-xs font-medium cursor-pointer transition-colors shadow-2xs flex items-center gap-1"
+                  >
+                    <svg class="w-3.5 h-3.5 text-[#0B3558]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Add Financial Year</span>
+                  </button>
                 </div>
 
                 <div class="overflow-x-auto border border-slate-200 rounded-lg">
                   <table class="w-full text-left border-collapse text-xs">
-                    <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                    <thead class="bg-slate-50 text-slate-600 font-medium uppercase text-[10px] tracking-wider border-b border-slate-200">
                       <tr>
-                        <th class="py-2 px-3">S.No</th>
-                        <th class="py-2 px-3">Financial Year</th>
+                        <th class="py-2 px-2.5 w-12 text-center">S.No</th>
+                        <th class="py-2 px-3 min-w-[130px]">Financial Year</th>
                         <th class="py-2 px-3">Total Turnover (INR)</th>
                         <th class="py-2 px-3">Skill Turnover (INR)</th>
+                        <th class="py-2 px-2 text-center w-12">Action</th>
                       </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 font-normal">
-                      @for (t of turnoverYears; track t.year; let idx = $index) {
+                      @for (t of turnoverYears; track $index; let idx = $index) {
                         <tr>
-                          <td class="py-2 px-3 text-slate-400 font-bold">{{ idx + 1 }}</td>
-                          <td class="py-2 px-3 font-semibold text-slate-800">{{ t.year }}</td>
+                          <td class="py-2 px-2.5 text-center text-slate-400 font-normal">{{ idx + 1 }}</td>
+                          <td class="py-2 px-3">
+                            <input
+                              type="text"
+                              [(ngModel)]="t.year"
+                              placeholder="e.g. 2023 - 2024"
+                              class="w-full p-1.5 border border-slate-300 rounded font-normal text-xs text-slate-800 focus:outline-none focus:border-[#0B3558]"
+                            />
+                          </td>
                           <td class="py-2 px-3 font-mono text-slate-700">
                             <input
                               type="text"
                               [(ngModel)]="t.totalTurnover"
                               placeholder="e.g. 50,00,000"
-                              class="w-full p-1.5 border border-slate-300 rounded font-mono text-xs focus:outline-none focus:border-[#0B3558]"
+                              class="w-full p-1.5 border border-slate-300 rounded font-mono font-normal text-xs text-slate-800 focus:outline-none focus:border-[#0B3558]"
                             />
                           </td>
                           <td class="py-2 px-3 font-mono text-slate-700">
@@ -821,8 +926,20 @@ export interface EoiDocumentItem {
                               type="text"
                               [(ngModel)]="t.skillTurnover"
                               placeholder="e.g. 35,00,000"
-                              class="w-full p-1.5 border border-slate-300 rounded font-mono text-xs focus:outline-none focus:border-[#0B3558]"
+                              class="w-full p-1.5 border border-slate-300 rounded font-mono font-normal text-xs text-slate-800 focus:outline-none focus:border-[#0B3558]"
                             />
+                          </td>
+                          <td class="py-2 px-2 text-center">
+                            @if (turnoverYears.length > 1) {
+                              <button
+                                type="button"
+                                (click)="removeFinancialYear(idx)"
+                                class="text-rose-500 hover:text-rose-700 text-sm font-normal cursor-pointer p-1"
+                                title="Remove FY"
+                              >
+                                &times;
+                              </button>
+                            }
                           </td>
                         </tr>
                       }
@@ -1106,25 +1223,25 @@ export interface EoiDocumentItem {
               }
             </div>
 
-            <!-- 5. 14 EOI Documents Checklist (From PDF Page 5) -->
+            <!-- 5. EOI Documents Checklist (16 Documents) -->
             <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-4 shadow-2xs">
               <div class="pb-2 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
-                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
-                    5. Mandatory EOI Proposal Documents Checklist (14 Documents)
+                  <h3 class="text-sm sm:text-base font-medium text-[#0B3558]">
+                    5. Mandatory EOI Proposal Documents Checklist ({{ eoiDocuments.length }} Documents)
                   </h3>
-                  <p class="text-xs text-slate-500 mt-0.5">
+                  <p class="text-xs text-slate-500 mt-0.5 font-normal">
                     Upload scanned signed &amp; sealed copies of the statutory annexures mandated in the RSLDC RFP.
                   </p>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="px-2.5 py-1 rounded bg-blue-50 text-[#0B3558] text-xs font-semibold border border-blue-200">
-                    {{ attachedDocsCount() }} / 14 Attached
+                  <span class="px-2.5 py-1 rounded bg-blue-50 text-[#0B3558] text-xs font-medium border border-blue-200">
+                    {{ attachedDocsCount() }} / {{ eoiDocuments.length }} Attached
                   </span>
                   <button
                     type="button"
                     (click)="attachAllSampleDocs()"
-                    class="px-3 py-1 bg-white hover:bg-slate-50 text-[#0B3558] text-xs font-semibold border border-slate-300 rounded cursor-pointer transition-colors shadow-2xs flex items-center gap-1.5"
+                    class="px-3 py-1 bg-white hover:bg-slate-50 text-[#0B3558] text-xs font-medium border border-slate-300 rounded cursor-pointer transition-colors shadow-2xs flex items-center gap-1.5"
                   >
                     <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
@@ -1137,12 +1254,19 @@ export interface EoiDocumentItem {
               <div class="space-y-2.5">
                 @for (doc of eoiDocuments; track doc.id) {
                   <div class="p-3 rounded-lg border border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                    <input
+                      #fileInput
+                      type="file"
+                      accept=".pdf,application/pdf"
+                      class="hidden"
+                      (change)="onFileSelected($event, doc)"
+                    />
                     <div class="flex items-start gap-3">
-                      <span class="w-6 h-6 rounded-full bg-blue-100 text-[#0B3558] font-bold text-[11px] flex items-center justify-center shrink-0 mt-0.5">
+                      <span class="w-6 h-6 rounded-full bg-blue-100 text-[#0B3558] font-medium text-[11px] flex items-center justify-center shrink-0 mt-0.5">
                         {{ doc.id }}
                       </span>
                       <div>
-                        <span class="font-medium text-slate-900 block">{{ doc.name }}</span>
+                        <span class="font-normal text-slate-800 block text-xs sm:text-[13px]">{{ doc.name }}</span>
                         @if (doc.status === 'uploaded') {
                           <div class="flex items-center gap-2 mt-1 text-[11px] text-slate-500 font-mono">
                             <div class="w-4 h-4 rounded bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
@@ -1150,12 +1274,12 @@ export interface EoiDocumentItem {
                                 <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v-1h2c.28 0 .5-.22.5-.5s-.22-.5-.5-.5h-3v5h1v-1.5h1.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5zm5 2c0 .28-.22.5-.5.5h-2.5v-5h2.5c.28 0 .5.22.5.5v4zm-1-3.5h-1v3h1v-3zm5-.5h-2v1h1.5c.28 0 .5.22.5.5s-.22.5-.5.5H19v1.5h-1v-5h2.5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
                               </svg>
                             </div>
-                            <span class="text-slate-800 font-semibold">{{ doc.fileName }}</span>
+                            <span class="text-slate-800 font-normal">{{ doc.fileName }}</span>
                             <span>({{ doc.fileSize }})</span>
                             <span class="text-slate-400">&bull; {{ doc.uploadedDate }}</span>
                           </div>
                         } @else {
-                          <div class="mt-1 text-[11px] text-amber-700 font-medium">
+                          <div class="mt-1 text-[11px] text-amber-700 font-normal">
                             Status: Pending upload (Required for scrutiny)
                           </div>
                         }
@@ -1167,22 +1291,22 @@ export interface EoiDocumentItem {
                         <button
                           type="button"
                           (click)="previewDoc(doc)"
-                          class="px-2.5 py-1 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded text-xs font-semibold cursor-pointer shadow-2xs"
+                          class="px-2.5 py-1 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded text-xs font-normal cursor-pointer shadow-2xs"
                         >
                           View
                         </button>
                         <button
                           type="button"
                           (click)="removeDoc(doc)"
-                          class="px-2.5 py-1 bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 rounded text-xs font-semibold cursor-pointer shadow-2xs"
+                          class="px-2.5 py-1 bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 rounded text-xs font-normal cursor-pointer shadow-2xs"
                         >
                           Remove
                         </button>
                       } @else {
                         <button
                           type="button"
-                          (click)="uploadDoc(doc)"
-                          class="px-3 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-semibold cursor-pointer shadow-2xs flex items-center gap-1.5"
+                          (click)="fileInput.click()"
+                          class="px-3 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-medium cursor-pointer shadow-2xs flex items-center gap-1.5"
                         >
                           <svg class="w-3.5 h-3.5 text-rose-300" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v-1h2c.28 0 .5-.22.5-.5s-.22-.5-.5-.5h-3v5h1v-1.5h1.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5zm5 2c0 .28-.22.5-.5.5h-2.5v-5h2.5c.28 0 .5.22.5.5v4zm-1-3.5h-1v3h1v-3zm5-.5h-2v1h1.5c.28 0 .5.22.5.5s-.22.5-.5.5H19v1.5h-1v-5h2.5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
@@ -1232,14 +1356,14 @@ export interface EoiDocumentItem {
                 <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>
-                  <strong>Comprehensive Application Preview:</strong> Review all verified OTR entity particulars and scheme proposal details below before formal submission.
+                <span class="font-normal">
+                  <strong class="font-medium">Comprehensive Application Preview:</strong> Review all verified OTR entity particulars and scheme proposal details below before formal submission.
                 </span>
               </div>
               <button
                 type="button"
                 (click)="goToStep(2)"
-                class="text-xs font-bold text-[#0B3558] hover:underline cursor-pointer"
+                class="text-xs font-normal text-[#0B3558] hover:underline cursor-pointer"
               >
                 &larr; Edit Proposal
               </button>
@@ -1249,13 +1373,13 @@ export interface EoiDocumentItem {
             <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3 shadow-2xs">
               <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                 <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">A</span>
-                  <h3 class="text-sm font-bold text-[#0B3558]">TP/PIA One Time Registration (OTR) Particulars</h3>
+                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">A</span>
+                  <h3 class="text-sm font-medium text-[#0B3558]">TP/PIA One Time Registration (OTR) Particulars</h3>
                 </div>
                 <button
                   type="button"
                   (click)="goToStep(1)"
-                  class="text-xs font-semibold text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
+                  class="text-xs font-normal text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
                 >
                   Edit in Step 1
                 </button>
@@ -1263,60 +1387,60 @@ export interface EoiDocumentItem {
 
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-normal">
                 <div>
-                  <span class="text-slate-500 block font-medium">TP/PIA Short Name</span>
-                  <span class="text-slate-900 font-semibold">{{ otrData().step1.shortName || 'DMR SAKSHAM' }}</span>
+                  <span class="text-slate-500 block font-normal text-[11px]">TP/PIA Short Name</span>
+                  <span class="text-slate-800 font-normal">{{ otrData().step1.shortName || 'DMR SAKSHAM' }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">TP/PIA Full Name</span>
-                  <span class="text-slate-900 font-semibold">{{ otrData().step1.fullName || 'DMR ENTERPRISES PRIVATE LIMITED' }}</span>
+                  <span class="text-slate-500 block font-normal text-[11px]">TP/PIA Full Name</span>
+                  <span class="text-slate-800 font-normal">{{ otrData().step1.fullName || 'DMR ENTERPRISES PRIVATE LIMITED' }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">Nature of Entity</span>
-                  <span class="text-slate-800">{{ otrData().step1.natureOfEntity || 'PUBLIC LIMITED' }}</span>
+                  <span class="text-slate-500 block font-normal text-[11px]">Nature of Entity</span>
+                  <span class="text-slate-800 font-normal">{{ otrData().step1.natureOfEntity || 'PUBLIC LIMITED' }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">Registration Number of Entity</span>
-                  <span class="font-mono text-slate-800 font-medium">{{ otrData().step1.registrationNumber || '07AAECD8566H1ZC' }}</span>
+                  <span class="text-slate-500 block font-normal text-[11px]">Registration Number of Entity</span>
+                  <span class="font-mono text-slate-800 font-normal">{{ otrData().step1.registrationNumber || '07AAECD8566H1ZC' }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">Company PAN</span>
-                  <span class="font-mono text-slate-800 font-medium">{{ otrData().step1.companyPan || 'AAECD8566H' }}</span>
+                  <span class="text-slate-500 block font-normal text-[11px]">Company PAN</span>
+                  <span class="font-mono text-slate-800 font-normal">{{ otrData().step1.companyPan || 'AAECD8566H' }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">GSTIN</span>
-                  <span class="font-mono text-slate-800 font-medium">{{ otrData().step1.gstin || '08AAACR1234F1Z5' }}</span>
+                  <span class="text-slate-500 block font-normal text-[11px]">GSTIN</span>
+                  <span class="font-mono text-slate-800 font-normal">{{ otrData().step1.gstin || '08AAACR1234F1Z5' }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">Udyam Number</span>
-                  <span class="font-mono text-slate-800 font-medium">{{ otrData().step1.udyamNumber || 'UDYAM-RJ-14-0019284' }}</span>
+                  <span class="text-slate-500 block font-normal text-[11px]">Udyam Number</span>
+                  <span class="font-mono text-slate-800 font-normal">{{ otrData().step1.udyamNumber || 'UDYAM-RJ-14-0019284' }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">Turn Over</span>
-                  <span class="text-slate-800 font-semibold">₹ {{ otrData().step1.turnOver || '1203.35' }} Lakhs</span>
+                  <span class="text-slate-500 block font-normal text-[11px]">Turn Over</span>
+                  <span class="text-slate-800 font-normal">₹ {{ otrData().step1.turnOver || '1203.35' }} Lakhs</span>
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">Name of the Bank</span>
-                  <span class="text-slate-800 font-medium">{{ otrData().step4.bankName || 'HDFC Bank' }}</span>
+                  <span class="text-slate-500 block font-normal text-[11px]">Name of the Bank</span>
+                  <span class="text-slate-800 font-normal">{{ otrData().step4.bankName || 'HDFC Bank' }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">Account No.</span>
-                  <span class="font-mono text-slate-800 font-medium">{{ otrData().step4.accountNo || '50200047885422' }}</span>
+                  <span class="text-slate-500 block font-normal text-[11px]">Account No.</span>
+                  <span class="font-mono text-slate-800 font-normal">{{ otrData().step4.accountNo || '50200047885422' }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">IFSC Code</span>
-                  <span class="font-mono text-slate-800 font-medium">{{ otrData().step4.ifscCode || 'HDFC0001441' }}</span>
+                  <span class="text-slate-500 block font-normal text-[11px]">IFSC Code</span>
+                  <span class="font-mono text-slate-800 font-normal">{{ otrData().step4.ifscCode || 'HDFC0001441' }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-500 block font-medium">Authorized Person (Name)</span>
-                  <span class="text-slate-800">{{ otrData().step3.name || 'SUMAN GUPTA' }} ({{ otrData().step3.designation || 'Director' }})</span>
+                  <span class="text-slate-500 block font-normal text-[11px]">Authorized Person (Name)</span>
+                  <span class="text-slate-800 font-normal">{{ otrData().step3.name || 'SUMAN GUPTA' }} ({{ otrData().step3.designation || 'Director' }})</span>
                 </div>
                 <div class="sm:col-span-2">
-                  <span class="text-slate-500 block font-medium">Registered Address</span>
-                  <span class="text-slate-800">{{ otrData().step1.registeredAddress || 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi - 110042' }}</span>
+                  <span class="text-slate-500 block font-normal text-[11px]">Registered Address</span>
+                  <span class="text-slate-800 font-normal">{{ otrData().step1.registeredAddress || 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi - 110042' }}</span>
                 </div>
                 <div class="sm:col-span-2">
-                  <span class="text-slate-500 block font-medium">Office Address</span>
-                  <span class="text-slate-800">{{ otrData().step1.officeAddress || 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi - 110042' }}</span>
+                  <span class="text-slate-500 block font-normal text-[11px]">Office Address</span>
+                  <span class="text-slate-800 font-normal">{{ otrData().step1.officeAddress || 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi - 110042' }}</span>
                 </div>
               </div>
             </div>
@@ -1325,21 +1449,21 @@ export interface EoiDocumentItem {
             <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3 shadow-2xs">
               <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                 <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">B</span>
-                  <h3 class="text-sm font-bold text-[#0B3558]">Proposed Training Centres ({{ trainingCentres.length }} Centres)</h3>
+                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">B</span>
+                  <h3 class="text-sm font-medium text-[#0B3558]">Proposed Training Centres ({{ trainingCentres.length }} Centres)</h3>
                 </div>
                 <button
                   type="button"
                   (click)="goToStep(2)"
-                  class="text-xs font-semibold text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
+                  class="text-xs font-normal text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
                 >
                   Edit in Step 2
                 </button>
               </div>
               @if (trainingCentres.length === 0) {
-                <div class="p-3.5 bg-amber-50/80 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-center justify-between flex-wrap gap-2">
+                <div class="p-3.5 bg-amber-50/80 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-center justify-between flex-wrap gap-2 font-normal">
                   <span>No training centres added yet.</span>
-                  <button type="button" (click)="goToStep(2)" class="font-bold underline text-[#0B3558] hover:text-[#EA580C] cursor-pointer">
+                  <button type="button" (click)="goToStep(2)" class="font-medium underline text-[#0B3558] hover:text-[#EA580C] cursor-pointer">
                     + Add Training Centres in Step 2
                   </button>
                 </div>
@@ -1347,9 +1471,9 @@ export interface EoiDocumentItem {
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs font-normal">
                   @for (c of trainingCentres; track c.id) {
                     <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
-                      <span class="font-semibold text-slate-900 block">{{ c.district }}</span>
-                      <span class="text-[11px] text-slate-500 block truncate">{{ c.centerName }}</span>
-                      <span class="text-[10px] text-emerald-700 font-medium mt-1 inline-block">
+                      <span class="font-medium text-slate-800 block">{{ c.district }}</span>
+                      <span class="text-[11px] text-slate-500 block truncate font-normal">{{ c.centerName }}</span>
+                      <span class="text-[10px] text-emerald-700 font-normal mt-1 inline-block">
                         {{ c.classrooms }} Classrooms &bull; {{ c.practicalRooms }} Labs &bull; Washrooms: {{ c.washrooms }}
                       </span>
                     </div>
@@ -1361,27 +1485,27 @@ export interface EoiDocumentItem {
             <!-- Preview Part C: Financials & Placement Track Record -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-2 shadow-2xs">
-                <h4 class="text-xs font-bold text-[#0B3558] uppercase">3-Year Turnover Summary (INR)</h4>
-                <div class="space-y-1 text-xs">
-                  @for (t of turnoverYears; track t.year) {
+                <h4 class="text-xs font-medium text-[#0B3558] uppercase">3-Year Turnover Summary (INR)</h4>
+                <div class="space-y-1 text-xs font-normal">
+                  @for (t of turnoverYears; track $index) {
                     <div class="flex justify-between py-1 border-b border-slate-100 font-mono">
                       <span class="text-slate-500">{{ t.year }}:</span>
-                      <span class="text-slate-800 font-semibold">₹ {{ t.totalTurnover || '0' }} (Skill: ₹ {{ t.skillTurnover || '0' }})</span>
+                      <span class="text-slate-800 font-normal">₹ {{ t.totalTurnover || '0' }} (Skill: ₹ {{ t.skillTurnover || '0' }})</span>
                     </div>
                   }
                 </div>
               </div>
 
               <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-2 shadow-2xs">
-                <h4 class="text-xs font-bold text-[#0B3558] uppercase">Placement Track Record</h4>
-                <div class="space-y-1 text-xs">
+                <h4 class="text-xs font-medium text-[#0B3558] uppercase">Placement Track Record</h4>
+                <div class="space-y-1 text-xs font-normal">
                   @if (placementRecords.length === 0) {
-                    <p class="text-xs text-slate-400 py-2">No placement track record added yet.</p>
+                    <p class="text-xs text-slate-400 py-2 font-normal">No placement track record added yet.</p>
                   } @else {
                     @for (p of placementRecords; track p.sector) {
                       <div class="flex justify-between py-1 border-b border-slate-100">
-                        <span class="text-slate-600 truncate max-w-[150px]">{{ p.sector }}:</span>
-                        <span class="text-emerald-700 font-semibold">{{ p.trained }} Trained / {{ p.placed }} Placed</span>
+                        <span class="text-slate-600 truncate max-w-[150px] font-normal">{{ p.sector }}:</span>
+                        <span class="text-emerald-700 font-normal">{{ p.trained }} Trained / {{ p.placed }} Placed</span>
                       </div>
                     }
                   }
@@ -1393,26 +1517,26 @@ export interface EoiDocumentItem {
             <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3 shadow-2xs">
               <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                 <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">D</span>
-                  <h3 class="text-sm font-bold text-[#0B3558]">Proposed Annual Action Plan ({{ actionPlan.length }} Districts)</h3>
+                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">D</span>
+                  <h3 class="text-sm font-medium text-[#0B3558]">Proposed Annual Action Plan ({{ actionPlan.length }} Districts)</h3>
                 </div>
                 <button
                   type="button"
                   (click)="goToStep(2)"
-                  class="text-xs font-semibold text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
+                  class="text-xs font-normal text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
                 >
                   Edit in Step 2
                 </button>
               </div>
               @if (actionPlan.length === 0) {
-                <p class="text-xs text-slate-400 py-2">No annual district action plan added yet.</p>
+                <p class="text-xs text-slate-400 py-2 font-normal">No annual district action plan added yet.</p>
               } @else {
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs font-normal">
                   @for (ap of actionPlan; track ap.id) {
                     <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
-                      <span class="font-semibold text-slate-900 block">{{ ap.district }} ({{ ap.year }})</span>
-                      <span class="text-[11px] text-slate-600 block truncate">{{ ap.courses }}</span>
-                      <span class="text-[10px] text-emerald-700 font-medium mt-1 inline-block">
+                      <span class="font-medium text-slate-800 block">{{ ap.district }} ({{ ap.year }})</span>
+                      <span class="text-[11px] text-slate-600 block truncate font-normal">{{ ap.courses }}</span>
+                      <span class="text-[10px] text-emerald-700 font-normal mt-1 inline-block">
                         {{ ap.sdcCount }} SDCs &bull; {{ ap.batches }} Batches &bull; Mode: {{ ap.mode }}
                       </span>
                     </div>
@@ -1421,17 +1545,17 @@ export interface EoiDocumentItem {
               }
             </div>
 
-            <!-- Preview Part E: 14 Proposal Documents -->
+            <!-- Preview Part E: Statutory Proposal Documents -->
             <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3 shadow-2xs">
               <div class="flex items-center justify-between pb-2 border-b border-slate-100 flex-wrap gap-2">
                 <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">E</span>
-                  <h3 class="text-sm font-bold text-[#0B3558]">14 EOI Statutory Proposal Documents Checklist ({{ attachedDocsCount() }} / 14 Attached)</h3>
+                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">E</span>
+                  <h3 class="text-sm font-medium text-[#0B3558]">EOI Statutory Proposal Documents Checklist ({{ attachedDocsCount() }} / {{ eoiDocuments.length }} Attached)</h3>
                 </div>
                 <button
                   type="button"
                   (click)="goToStep(2)"
-                  class="text-xs font-semibold text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
+                  class="text-xs font-normal text-[#0B3558] hover:text-[#EA580C] flex items-center gap-1 cursor-pointer"
                 >
                   Edit Documents in Step 2
                 </button>
@@ -1445,14 +1569,14 @@ export interface EoiDocumentItem {
                           <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v-1h2c.28 0 .5-.22.5-.5s-.22-.5-.5-.5h-3v5h1v-1.5h1.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5zm5 2c0 .28-.22.5-.5.5h-2.5v-5h2.5c.28 0 .5.22.5.5v4zm-1-3.5h-1v3h1v-3zm5-.5h-2v1h1.5c.28 0 .5.22.5.5s-.22.5-.5.5H19v1.5h-1v-5h2.5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
                         </svg>
                       </div>
-                      <span class="font-medium text-slate-800 truncate">{{ d.name }}</span>
+                      <span class="font-normal text-slate-800 truncate">{{ d.name }}</span>
                     </div>
                     @if (d.status === 'uploaded') {
-                      <span class="text-emerald-700 font-semibold text-[10px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
+                      <span class="text-emerald-700 font-normal text-[10px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
                         &check; Attached
                       </span>
                     } @else {
-                      <span class="text-amber-700 font-semibold text-[10px] bg-amber-50 px-2 py-0.5 rounded border border-amber-200 shrink-0">
+                      <span class="text-amber-700 font-normal text-[10px] bg-amber-50 px-2 py-0.5 rounded border border-amber-200 shrink-0">
                         Pending
                       </span>
                     }
@@ -1479,7 +1603,7 @@ export interface EoiDocumentItem {
               <button
                 type="button"
                 (click)="goToStep(2)"
-                class="px-5 py-2.5 border border-slate-300 hover:bg-slate-100 rounded-lg text-xs font-semibold text-slate-700 cursor-pointer transition-colors"
+                class="px-5 py-2.5 border border-slate-300 hover:bg-slate-100 rounded-lg text-xs font-normal text-slate-700 cursor-pointer transition-colors"
               >
                 &larr; Back to Proposal Form
               </button>
@@ -1489,7 +1613,7 @@ export interface EoiDocumentItem {
                 type="button"
                 [disabled]="!declarationAgreed()"
                 (click)="openSubmitConfirm()"
-                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs sm:text-sm font-medium shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
               >
                 <span>Submit EOI Application</span>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1717,16 +1841,16 @@ export interface EoiDocumentItem {
           <div class="space-y-5">
             
             <!-- Success Title Banner -->
-            <div class="bg-linear-to-r from-emerald-600 to-teal-700 text-white rounded-xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-5">
+            <div class="bg-emerald-700 text-white rounded-xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-5">
               <div class="flex items-center gap-4 text-center sm:text-left">
-                <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center font-bold text-xl text-white shrink-0 mx-auto">
+                <div class="w-11 h-11 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center font-normal text-xl text-white shrink-0 mx-auto">
                   &check;
                 </div>
                 <div>
-                  <span class="px-2 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-bold uppercase tracking-wider">
+                  <span class="px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[10.5px] font-normal uppercase tracking-wider">
                     Application Successfully Submitted &amp; Verified
                   </span>
-                  <h2 class="text-lg sm:text-xl font-bold mt-1">
+                  <h2 class="text-lg sm:text-xl font-medium mt-1">
                     EOI Proposal Submitted for {{ schemeCode() }}
                   </h2>
                   <p class="text-xs text-emerald-100 mt-0.5 max-w-xl font-normal">
@@ -1739,7 +1863,7 @@ export interface EoiDocumentItem {
                 <button
                   type="button"
                   (click)="goToTenderStatus()"
-                  class="px-4 py-2 bg-white text-[#0B3558] hover:bg-slate-100 rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                  class="px-4 py-2 bg-white text-[#0B3558] hover:bg-slate-50 rounded-lg text-xs font-medium shadow-xs transition-colors cursor-pointer whitespace-nowrap"
                 >
                   View in Tender Status &rarr;
                 </button>
@@ -1749,30 +1873,30 @@ export interface EoiDocumentItem {
             <!-- Compact Application Summary Card -->
             <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-3 shadow-2xs">
               <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                <div class="text-xs font-bold text-[#0B3558] uppercase tracking-wide">
+                <div class="text-xs font-medium text-[#0B3558] uppercase tracking-wide">
                   Application Summary &amp; Reference Details
                 </div>
-                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[11px] font-semibold border border-emerald-200">
+                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-normal border border-emerald-200">
                   Technical Opening Initiated
                 </span>
               </div>
 
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-normal">
                 <div class="p-2.5 bg-blue-50/70 rounded-lg border border-blue-200">
-                  <span class="text-blue-600 block font-semibold text-[10px] uppercase">Application Ref No.</span>
-                  <span class="font-mono font-bold text-[#0B3558] text-sm">ISMS-EOI-2026-9871</span>
+                  <span class="text-blue-600 block font-normal text-[10px] uppercase">Application Ref No.</span>
+                  <span class="font-mono font-medium text-[#0B3558] text-xs sm:text-sm">ISMS-EOI-2026-9871</span>
                 </div>
                 <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
                   <span class="text-slate-500 block font-normal text-[10px] uppercase">Submission Timestamp</span>
-                  <span class="font-mono text-slate-800 text-xs font-semibold">22-Sep-2026 09:10:00 IST</span>
+                  <span class="font-mono text-slate-800 text-xs font-normal">22-Sep-2026 09:10:00 IST</span>
                 </div>
                 <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
                   <span class="text-slate-500 block font-normal text-[10px] uppercase">Applicant Agency</span>
-                  <span class="font-semibold text-slate-800 text-xs truncate block">{{ otrData().step1.fullName || 'DMR ENTERPRISES PRIVATE LIMITED' }}</span>
+                  <span class="font-normal text-slate-800 text-xs truncate block">{{ otrData().step1.fullName || 'DMR ENTERPRISES PRIVATE LIMITED' }}</span>
                 </div>
                 <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
                   <span class="text-slate-500 block font-normal text-[10px] uppercase">Payment Ref &amp; Fee</span>
-                  <span class="font-mono text-slate-800 font-semibold text-xs truncate block">TXN-ISMS-2026-345678 (₹52,000)</span>
+                  <span class="font-mono text-slate-800 font-normal text-xs truncate block">TXN-ISMS-2026-345678 (₹52,000)</span>
                 </div>
               </div>
             </div>
@@ -1789,19 +1913,19 @@ export interface EoiDocumentItem {
                     </svg>
                   </div>
                   <div class="flex-1 min-w-0">
-                    <span class="text-[10px] uppercase font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                    <span class="text-[10px] uppercase font-normal text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
                       PDF Document &bull; Verified Receipt
                     </span>
-                    <h3 class="text-sm font-bold text-[#0B3558] mt-1.5">
+                    <h3 class="text-sm font-medium text-[#0B3558] mt-1.5">
                       EOI Submission Acknowledgment Receipt
                     </h3>
-                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    <p class="text-xs text-slate-500 mt-1 leading-relaxed font-normal">
                       Official digitally sealed submission receipt containing verified OTR profile, SDC training centers, batch commitments, and statutory annexures.
                     </p>
                   </div>
                 </div>
 
-                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between text-xs font-mono text-slate-600">
+                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between text-xs font-mono text-slate-600 font-normal">
                   <span>Ref: ISMS-EOI-2026-9871</span>
                   <span>Size: 184 KB</span>
                 </div>
@@ -1810,7 +1934,7 @@ export interface EoiDocumentItem {
                   <button
                     type="button"
                     (click)="downloadReceipt('acknowledgment')"
-                    class="flex-1 py-2 px-3 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                    class="flex-1 py-2 px-3 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                   >
                     <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -1820,7 +1944,7 @@ export interface EoiDocumentItem {
                   <button
                     type="button"
                     (click)="printReceipt()"
-                    class="py-2 px-3 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                    class="py-2 px-3 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -1839,28 +1963,28 @@ export interface EoiDocumentItem {
                     </svg>
                   </div>
                   <div class="flex-1 min-w-0">
-                    <span class="text-[10px] uppercase font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                    <span class="text-[10px] uppercase font-normal text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
                       PDF Document &bull; Treasury E-Challan
                     </span>
-                    <h3 class="text-sm font-bold text-[#0B3558] mt-1.5">
+                    <h3 class="text-sm font-medium text-[#0B3558] mt-1.5">
                       Fee Payment &amp; EMD Challan Receipt
                     </h3>
-                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    <p class="text-xs text-slate-500 mt-1 leading-relaxed font-normal">
                       Government of Rajasthan Cyber Treasury transaction receipt for ₹50,000 EMD (Refundable) and ₹2,000 RFP Processing Fee (Non-Refundable).
                     </p>
                   </div>
                 </div>
 
-                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between text-xs font-mono text-slate-600">
+                <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between text-xs font-mono text-slate-600 font-normal">
                   <span>TXN: TXN-ISMS-2026-345678</span>
-                  <span class="font-bold text-slate-900">₹ 52,000.00</span>
+                  <span class="font-medium text-slate-800">₹ 52,000.00</span>
                 </div>
 
                 <div class="flex items-center gap-2 pt-1">
                   <button
                     type="button"
                     (click)="downloadReceipt('payment')"
-                    class="flex-1 py-2 px-3 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                    class="flex-1 py-2 px-3 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                   >
                     <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -1870,7 +1994,7 @@ export interface EoiDocumentItem {
                   <button
                     type="button"
                     (click)="printReceipt()"
-                    class="py-2 px-3 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                    class="py-2 px-3 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -1887,7 +2011,7 @@ export interface EoiDocumentItem {
               <button
                 type="button"
                 (click)="goBackToSchemes()"
-                class="px-4 py-2 border border-slate-300 hover:bg-slate-50 rounded-lg text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
+                class="px-4 py-2 border border-slate-300 hover:bg-slate-50 rounded-lg text-xs font-medium text-slate-700 transition-colors cursor-pointer"
               >
                 &larr; Back to Schemes &amp; Tenders
               </button>
@@ -1895,7 +2019,7 @@ export interface EoiDocumentItem {
               <button
                 type="button"
                 (click)="goToTenderStatus()"
-                class="px-5 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
+                class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-medium transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
               >
                 <span>Track Application in Tender Status</span>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -2032,14 +2156,24 @@ export class SchemeFormComponent {
     currentStep = signal<number>(1);
 
     schemeTitle = signal<string>('Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)');
-    schemeRefNo = signal<string>('RSLDC/EOI/2026/MMKVY-01');
-    schemeCode = signal<string>('MMKVY-RAJKVIK');
-    schemeCategory = signal<string>('Category I: RAJKVIK');
+    schemeRefNo = signal<string>('RSLDC/EOI/MMKVY Cat I II III/2026-27/01');
+    schemeName = signal<string>('MMKVY');
+    schemeCode = signal<string>('MMKVY');
+    schemeCategory = signal<string>('ALL');
+    schemeEoiCategory = signal<string>('General');
+    schemeDatePublished = signal<string>('23/01/2026');
+    schemeClosingDate = signal<string>('10/03/2026');
     schemeEmdFee = signal<string>('₹50,000');
     schemeProcessFee = signal<string>('₹2,000');
     schemeDescription = signal<string>(
-        'Expression of Interest for Empanelment of Training Partners (TPs) to impart skill training under MMKVY (Category I: RAJKVIK - Rojgar Aadharit Jan Kaushal Vikas Karyakram) across Rajasthan districts with guaranteed minimum 70% wage & corporate placement support for eligible youth.'
+        'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme'
     );
+
+    // Local editable copies of OTR data that can be changed by the user in Step 1
+    editableStep1: Step1OrgDetails = JSON.parse(JSON.stringify(this.otrFormService.formData().step1));
+    editableStep2: OfficerInCharge[] = JSON.parse(JSON.stringify(this.otrFormService.formData().step2));
+    editableStep3: Step3AuthorizedPerson = JSON.parse(JSON.stringify(this.otrFormService.formData().step3));
+    editableStep4: Step4BankDetails = JSON.parse(JSON.stringify(this.otrFormService.formData().step4));
 
     declarationAgreed = signal<boolean>(true);
     paymentMethod = signal<string>('UPI');
@@ -2252,6 +2386,26 @@ export class SchemeFormComponent {
             uploadedDate: '',
             isMandatory: true,
             status: 'pending'
+        },
+        {
+            id: 15,
+            name: 'Turnover Proof Document / CA Turnover Certificate with UDIN',
+            description: 'Chartered Accountant certified balance sheet and turnover certificate for last 3 financial years',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
+        },
+        {
+            id: 16,
+            name: 'Not Blacklisted Proof / Anti-Blacklisting Notarized Affidavit',
+            description: 'Non-judicial notary stamped anti-blacklisting undertaking affirming entity is not blacklisted by any Govt agency',
+            fileName: '',
+            fileSize: '',
+            uploadedDate: '',
+            isMandatory: true,
+            status: 'pending'
         }
     ];
 
@@ -2259,11 +2413,25 @@ export class SchemeFormComponent {
         this.route.queryParams.subscribe(params => {
             if (params['refNo']) this.schemeRefNo.set(params['refNo']);
             if (params['title']) this.schemeTitle.set(params['title']);
+            if (params['schemeName']) this.schemeName.set(params['schemeName']);
             if (params['code']) this.schemeCode.set(params['code']);
             if (params['category']) this.schemeCategory.set(params['category']);
+            if (params['schemeCategory']) this.schemeCategory.set(params['schemeCategory']);
+            if (params['eoiCategory']) this.schemeEoiCategory.set(params['eoiCategory']);
+            if (params['datePublished']) this.schemeDatePublished.set(params['datePublished']);
+            if (params['closingDate']) this.schemeClosingDate.set(params['closingDate']);
             if (params['emdFee']) this.schemeEmdFee.set(params['emdFee']);
             if (params['processFee']) this.schemeProcessFee.set(params['processFee']);
+            if (params['eoiDescription']) this.schemeDescription.set(params['eoiDescription']);
         });
+    }
+
+    saveAndProceedToStep2(): void {
+        this.otrFormService.updateStep1(this.editableStep1);
+        this.otrFormService.updateStep2(this.editableStep2);
+        this.otrFormService.updateStep3(this.editableStep3);
+        this.otrFormService.updateStep4(this.editableStep4);
+        this.goToStep(2);
     }
 
     goToStep(step: number): void {
@@ -2413,13 +2581,38 @@ export class SchemeFormComponent {
         this.actionPlan.splice(index, 1);
     }
 
+    addFinancialYear(): void {
+        this.turnoverYears.push({ year: '', totalTurnover: '', skillTurnover: '' });
+    }
+
+    removeFinancialYear(index: number): void {
+        if (this.turnoverYears.length > 1) {
+            this.turnoverYears.splice(index, 1);
+        }
+    }
+
+    onFileSelected(event: Event, doc: EoiDocumentItem): void {
+        const input = event.target as HTMLInputElement;
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            doc.fileName = file.name;
+            const sizeMb = file.size / (1024 * 1024);
+            doc.fileSize = sizeMb >= 1 ? `${sizeMb.toFixed(1)} MB` : `${Math.max(1, Math.round(file.size / 1024))} KB`;
+            const now = new Date();
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            doc.uploadedDate = `${now.getDate()}-${months[now.getMonth()]}-${now.getFullYear()}`;
+            doc.status = 'uploaded';
+            input.value = '';
+        }
+    }
+
     attachedDocsCount = computed(() => this.eoiDocuments.filter(d => d.status === 'uploaded').length);
 
     uploadDoc(doc: EoiDocumentItem): void {
         doc.status = 'uploaded';
         doc.fileName = `Annexure_${doc.id}_Mandated_Signed.pdf`;
         doc.fileSize = '1.4 MB';
-        doc.uploadedDate = '22-Sep-2026';
+        doc.uploadedDate = '23-Sep-2026';
     }
 
     attachAllSampleDocs(): void {
@@ -2427,7 +2620,7 @@ export class SchemeFormComponent {
             doc.status = 'uploaded';
             doc.fileName = `Scan_Annexure_${doc.id}_Signed.pdf`;
             doc.fileSize = `${(1.2 + (idx % 3) * 0.8).toFixed(1)} MB`;
-            doc.uploadedDate = '22-Sep-2026';
+            doc.uploadedDate = '23-Sep-2026';
         });
     }
 
@@ -2452,7 +2645,7 @@ INTEGRATED SCHEME MANAGEMENT SYSTEM 2.0 (ISMS)
 OFFICIAL EOI PROPOSAL SUBMISSION ACKNOWLEDGMENT RECEIPT
 ================================================================================
 Application Reference Number : ISMS-EOI-2026-9871
-Submission Timestamp         : 22-Sep-2026 09:10:00 IST
+Submission Timestamp         : 23-Sep-2026 09:10:00 IST
 Applicant Agency Name        : ${this.otrData().step1.fullName || 'DMR ENTERPRISES PRIVATE LIMITED'}
 Registration / CIN           : ${this.otrData().step1.registrationNumber || '07AAECD8566H1ZC'}
 Scheme Code & Name           : MMKVY-RAJKVIK (Mukhya Mantri Kaushalya Vikas Yojana)
@@ -2460,7 +2653,7 @@ Category                     : Category I: RAJKVIK
 Initial Scrutiny Status      : Technical Opening Initiated
 Fee Payment Reference        : TXN-ISMS-2026-345678 (₹52,000 Paid)
 Proposed SDC Training Centres: ${this.trainingCentres.length} Centres
-Attached Statutory Documents : ${this.attachedDocsCount()} / 14 Mandatory Documents Verified
+Attached Statutory Documents : ${this.attachedDocsCount()} / ${this.eoiDocuments.length} Mandatory Documents Verified
 ================================================================================
 Digitally Verified & Sealed by Government of Rajasthan (RSLDC ISMS 2.0)
 ================================================================================`

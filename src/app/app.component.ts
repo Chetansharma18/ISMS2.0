@@ -42,7 +42,7 @@ import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-m
           </main>
         </div>
       } @else {
-        <main class="flex-1 min-w-0 h-full overflow-y-auto flex flex-col">
+        <main class="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden flex flex-col">
           <router-outlet></router-outlet>
           <!-- Main Portal Footer (Displayed on landing page) -->
           @if (showFooter()) {

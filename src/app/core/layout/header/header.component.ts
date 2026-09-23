@@ -29,26 +29,26 @@ import { AuthService } from '../../auth/auth.service';
       [class.shadow-sm]="isSticky"
       role="banner"
     >
-      <div class="w-full px-4 sm:px-6 lg:px-8 h-[64px] sm:h-[70px] flex items-center justify-between gap-3 sm:gap-4 font-sans" style="font-family: 'Inter', sans-serif;">
+      <div class="w-full px-2.5 sm:px-6 lg:px-8 h-[60px] sm:h-[70px] flex items-center justify-between gap-2 sm:gap-4 font-sans" style="font-family: 'Inter', sans-serif;">
 
         <!-- Left: Logos + Title -->
-        <a routerLink="/" class="flex items-center gap-2.5 sm:gap-3.5 shrink-0 group select-none" aria-label="ISMS 2.0 Home">
-          <div class="flex items-center gap-2 sm:gap-2.5">
+        <a routerLink="/" class="flex items-center gap-2 sm:gap-3.5 shrink-0 group select-none" aria-label="ISMS 2.0 Home">
+          <div class="flex items-center gap-1.5 sm:gap-2.5">
             <img
               src="/Rajasthan-Sarkar.png"
               alt="Government of Rajasthan"
-              class="h-8 sm:h-10 md:h-[42px] w-auto object-contain shrink-0"
+              class="h-7 sm:h-9 md:h-[40px] w-auto object-contain shrink-0"
             />
             <img
               src="/rsldc-logo.png"
               alt="RSLDC"
-              class="h-8 sm:h-10 md:h-[42px] w-auto object-contain shrink-0"
+              class="h-7 sm:h-9 md:h-[40px] w-auto object-contain shrink-0"
               onerror="this.src='/Rajasthan-Sarkar.png'"
             />
           </div>
-          <div class="w-px h-6 sm:h-8 bg-slate-200 shrink-0"></div>
+          <div class="w-px h-5 sm:h-8 bg-slate-200 shrink-0"></div>
           <div class="flex flex-col justify-center leading-tight">
-            <span class="text-[18px] sm:text-[22px] md:text-[24px] font-bold text-[#0B3558] tracking-tight">
+            <span class="text-[17px] sm:text-[22px] md:text-[24px] font-bold text-[#0B3558] tracking-tight">
               ISMS<span class="text-[#EA580C]">2.0</span>
             </span>
             <p class="hidden md:block text-[11px] font-normal text-slate-500 tracking-wide whitespace-nowrap m-0">
@@ -58,7 +58,7 @@ import { AuthService } from '../../auth/auth.service';
         </a>
 
         <!-- Right: Language + Auth -->
-        <div class="flex items-center gap-2 sm:gap-3.5 shrink-0">
+        <div class="flex items-center gap-1.5 sm:gap-3.5 shrink-0">
 
           <!-- Language Switcher (always visible) -->
           <nav class="flex items-center gap-0.5 text-xs sm:text-sm font-semibold" aria-label="Language selection">

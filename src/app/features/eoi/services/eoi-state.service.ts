@@ -7,7 +7,7 @@ export interface CommitteeApprovalDocument {
   documentName: string;
   uploadDate: string;
   fileSize: string;
-  signatories: {
+  signatories?: {
     name: string;
     designation: string;
     signedAt: string;

@@ -209,6 +209,17 @@ export class OtrFormService {
     });
   }
 
+  updateStep2(officers: OfficerInCharge[]): void {
+    this._formData.update(current => {
+      const nextData: OtrFormData = {
+        ...current,
+        step2: [...officers]
+      };
+      this.persistDraft(nextData);
+      return nextData;
+    });
+  }
+
   /* ==========================================================================
      Mutators: Step 3 (Authorized Signatory)
      ========================================================================== */

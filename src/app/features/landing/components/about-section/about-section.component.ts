@@ -1,5 +1,14 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  OnDestroy,
+  signal,
+  inject,
+  PLATFORM_ID
+} from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-about-section',
@@ -9,127 +18,334 @@ import { CommonModule } from '@angular/common';
     class: 'block w-full'
   },
   template: `
-    <section class="pt-12 pb-2 bg-white">
+    <section #sectionRef class="pt-8 sm:pt-12 pb-8 sm:pb-12 bg-white border-b border-slate-100">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         
-        <!-- Top Row: About Text & Video -->
-        <div class="block mb-6 relative clear-both">
-          
-          <!-- Floated Video & Quote (Must be first in DOM for text wrap) -->
-          <div class="w-full lg:w-[45%] lg:float-right lg:ml-10 lg:mt-[80px] mb-8 lg:mb-6">
-            <div class="rounded-2xl overflow-hidden bg-slate-100 relative shadow-xl">
-              <video 
-                src="/video.mp4" 
-                class="w-full h-[400px] object-cover object-center"
-                autoplay 
-                loop 
-                muted 
-                playsinline>
-              </video>
-              
-              <!-- Quote Block overlaid on video -->
-              <div class="absolute bottom-0 left-0 right-0 bg-[#f0f6ff]/95 backdrop-blur-sm p-5 sm:p-6 border-t border-[#e2efff] shadow-[0_-4px_15px_rgba(0,0,0,0.1)]">
-                <span class="absolute top-4 left-4 text-4xl text-blue-500 font-serif leading-none">“</span>
-                <p class="text-[13px] sm:text-sm text-slate-700 leading-relaxed pl-6 relative z-10 font-medium">
-                  ISMS 2.0 is an integrated MIS system of RSLDC to provide a single platform to 
-                  Youths, Training providers, Govt. Departments, Convergence Departments, and 
-                  Certification agencies for Skill Development Schemes.
-                </p>
-                <span class="absolute bottom-1 right-4 text-4xl text-blue-500 font-serif leading-none rotate-180">“</span>
-              </div>
-            </div>
-          </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
-          <!-- Text Content -->
-          <div class="pt-2">
-            <h2 class="text-3xl sm:text-4xl font-black text-[#0B3558] mb-6 tracking-tight font-sans">
+          <!-- Left Column: About Text & Highlights -->
+          <div class="lg:col-span-7 order-2 lg:order-1">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold tracking-wide uppercase mb-3">
+              <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+              e-Governance & MIS Portal
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-[#0B3558] mb-5 tracking-tight font-sans">
               About ISMS 2.0
             </h2>
-            <!-- Existing Content -->
-            <div class="space-y-4 text-[13px] sm:text-sm text-slate-600 leading-[1.8] text-justify mb-8">
+
+            <!-- Core Content -->
+            <div class="space-y-4 text-[13px] sm:text-[14px] text-slate-600 leading-relaxed sm:leading-[1.8] text-justify sm:text-left">
               <p>
-                <strong>Integrated Scheme Management System (ISMS 2.0)</strong> is a comprehensive <strong>e-Governance and Management Information System (MIS)</strong> designed to digitally transform, integrate, and streamline the processes involved in the planning, implementation, monitoring, and management of skill development schemes. The platform provides a centralized and secure digital ecosystem that brings together <strong>youth, training providers, government departments, empaneled agencies, assessment and certification agencies, and other stakeholders</strong> on a single platform.
+                <strong class="text-slate-800 font-bold">Integrated Scheme Management System (ISMS 2.0)</strong> is a comprehensive
+                <strong class="text-slate-800">e-Governance and Management Information System (MIS)</strong> designed to digitally transform, 
+                integrate, and streamline the processes involved in the planning, implementation, monitoring, and management of skill development 
+                schemes across Rajasthan.
               </p>
               <p>
-                ISMS 2.0 enables <strong>end-to-end scheme management</strong>, beginning from scheme and application management through training, monitoring, assessment, certification, approvals, and reporting. By replacing fragmented and manual processes with structured digital workflows, the system helps improve operational efficiency, reduce duplication, enhance transparency, and ensure timely execution of scheme-related activities.
+                The platform provides a centralized and secure digital ecosystem that unites
+                <strong class="text-slate-800 font-semibold">youth, training providers, government departments, empaneled agencies, and certification bodies</strong>
+                on a single, high-transparency platform.
               </p>
               <p>
-                The platform provides <strong>workflow-based approvals and role-based access</strong>, ensuring that every stakeholder can access the information and functions relevant to their responsibilities. Integrated dashboards and real-time monitoring capabilities provide authorities with a comprehensive view of scheme performance, applications, training activities, targets, achievements, assessments, certifications, and other key operational indicators.
+                ISMS 2.0 enables <strong class="text-slate-800 font-semibold">end-to-end scheme management</strong>, from scheme launching and candidate enrollment 
+                through bio-metric attendance, quality inspections, assessment, certification, and direct benefit/fund disbursements.
               </p>
-              <!-- Expanded Content -->
-              @if (isExpanded) {
-                <div class="space-y-4 animate-fade-in mt-4 pt-4 border-t border-slate-100">
+
+              <!-- Expandable In-Depth Overview -->
+              @if (isExpanded()) {
+                <div class="space-y-4 pt-4 border-t border-slate-100 animate-in fade-in duration-300">
                   <p>
-                    ISMS 2.0 also serves as a centralized <strong>MIS and decision-support platform</strong>, enabling stakeholders to generate structured reports, monitor performance against defined targets, identify gaps, and track the progress of various schemes and initiatives. Data-driven dashboards and analytics support informed decision-making and provide greater visibility into the overall implementation of skill development programs.
+                    ISMS 2.0 serves as a centralized <strong class="text-slate-800">decision-support platform</strong>, enabling stakeholders 
+                    to generate structured MIS reports, monitor target vs. achievement KPIs, detect bottlenecks, and track the progress of flagship skilling initiatives in real time.
                   </p>
                   <p>
-                    The system is designed with a strong focus on <strong>security, scalability, interoperability, and transparency</strong>. It can integrate with relevant government systems and digital services to facilitate secure data exchange and reduce repetitive data entry. With a modular and scalable architecture, ISMS 2.0 can support evolving departmental requirements, new schemes, additional stakeholders, and future digital initiatives.
+                    The system is built on a <strong class="text-slate-800">modular, scalable, and secure cloud architecture</strong>. 
+                    It integrates seamlessly with Rajasthan single sign-on (SSO), Jan Aadhaar, and national portals (PM-SETU, Skill India Digital) 
+                    via standardized APIs to eliminate redundant data entry.
                   </p>
                   <p>
-                    By bringing the complete scheme lifecycle onto a unified digital platform, <strong>ISMS 2.0 aims to create a more efficient, transparent, accountable, and citizen-centric ecosystem for skill development management</strong>, enabling government authorities to monitor implementation effectively while providing stakeholders with simplified and accessible digital services.
-                  </p>
-                  <p>
-                    The platform further strengthens <strong>stakeholder collaboration and coordination</strong> by providing a common digital environment for communication, information exchange, task management, and status tracking. Each stakeholder can perform assigned activities through defined workflows, while the system maintains a structured record of actions, approvals, updates, and transactions throughout the scheme lifecycle.
-                  </p>
-                  <p>
-                    A key objective of ISMS 2.0 is to establish a <strong>single source of truth for scheme-related information</strong>. Centralized data management enables authorized users to access consistent and up-to-date information across different stages of scheme implementation. This minimizes dependency on scattered records, spreadsheets, and manual documentation while improving data accuracy, traceability, and accessibility.
-                  </p>
-                  <p>
-                    ISMS 2.0 provides comprehensive capabilities for <strong>application and beneficiary management</strong>, allowing eligible candidates and stakeholders to be managed through a structured digital process. The platform can support application submission, verification, scrutiny, approval, allocation, and subsequent tracking, helping ensure that applications move through the appropriate stages in a transparent and systematic manner.
-                  </p>
-                  <p>
-                    The system also supports <strong>training provider and agency management</strong>, enabling authorities to maintain relevant organizational information, monitor activities, track assigned targets, and evaluate performance. Training-related activities can be monitored through centralized dashboards, providing visibility into batches, candidates, attendance, training progress, assessments, and certifications.
-                  </p>
-                  <p>
-                    Through its <strong>monitoring and performance management capabilities</strong>, ISMS 2.0 enables government authorities to track progress at different administrative and operational levels. Key indicators can be presented through dashboards, charts, summaries, and analytical reports, allowing stakeholders to quickly understand current performance, identify areas requiring attention, and take appropriate administrative action.
-                  </p>
-                  <p>
-                    The platform incorporates <strong>auditability and traceability</strong> across critical processes. Important transactions, approvals, status changes, and user activities can be recorded to provide a transparent history of actions performed within the system. This supports accountability, facilitates monitoring and review, and helps authorities maintain reliable digital records.
-                  </p>
-                  <p>
-                    ISMS 2.0 is also designed to facilitate <strong>seamless integration with existing and future government digital infrastructure</strong>. Through secure APIs and standardized integration mechanisms, the platform can exchange relevant information with external applications and departmental systems wherever required. This interoperability helps reduce duplicate data entry and enables coordinated delivery of digital services.
-                  </p>
-                  <p>
-                    From an administrative perspective, the system provides <strong>centralized configuration and control mechanisms</strong>, allowing authorized administrators to manage schemes, workflows, roles, permissions, organizational structures, parameters, and other configurable components. This provides flexibility to adapt the platform to changing policy requirements and operational processes without disrupting the overall system.
-                  </p>
-                  <p>
-                    The solution places strong emphasis on <strong>data security and controlled access</strong>. Role-based permissions ensure that users can access only the information and functionality required for their assigned responsibilities. Security controls, authentication mechanisms, audit trails, and secure data exchange help protect sensitive information and maintain the integrity of the platform.
-                  </p>
-                  <p>
-                    The architecture of ISMS 2.0 is intended to be <strong>modular, scalable, and future-ready</strong>, allowing additional modules and services to be introduced as requirements evolve. The platform can progressively incorporate advanced analytics, automated notifications, enhanced dashboards, mobile-enabled services, intelligent monitoring capabilities, and other emerging technologies to further improve scheme administration and service delivery.
-                  </p>
-                  <p>
-                    By combining <strong>digital workflows, centralized data, integrated services, real-time monitoring, analytics, and stakeholder management</strong>, ISMS 2.0 provides a unified foundation for modern scheme administration. It enables government authorities to move from fragmented and process-intensive operations toward a more connected, measurable, and technology-driven approach to managing skill development initiatives.
-                  </p>
-                  <p>
-                    Ultimately, ISMS 2.0 is envisioned as more than a conventional MIS platform. It serves as a <strong>digital governance ecosystem</strong> that connects people, processes, data, and institutions through a common platform. By improving visibility, accountability, coordination, and access to information, the system supports more effective implementation of skill development programs and strengthens the overall digital governance framework.
+                    By establishing a <strong class="text-slate-800">single source of truth</strong> with rigorous audit trails and role-based permissions, 
+                    ISMS 2.0 ensures accountable, transparent, and citizen-centric governance for the youth of Rajasthan.
                   </p>
                 </div>
               }
             </div>
-            
-            <!-- 
-            <button (click)="toggleExpand()" class="bg-[#0B3558] hover:bg-[#07233B] text-white text-[13px] font-semibold px-6 py-2.5 rounded transition-colors inline-flex items-center gap-2 mb-4 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:ring-offset-2 shadow hover:shadow-md">
-              {{ isExpanded ? 'Read Less' : 'Know More' }}
-              <svg class="w-4 h-4 transition-transform duration-300" [class.rotate-180]="isExpanded" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path *ngIf="!isExpanded" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                <path *ngIf="isExpanded" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-            </button>
-            -->
+
+            <!-- Read More / Less Toggle Button -->
+            <div class="mt-6 flex items-center gap-4">
+              <button 
+                type="button"
+                (click)="toggleExpand()" 
+                class="inline-flex items-center gap-2 bg-[#0B3558] hover:bg-[#07233B] text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-lg transition-all shadow-sm hover:shadow-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:ring-offset-2"
+                [attr.aria-expanded]="isExpanded()">
+                <span>{{ isExpanded() ? 'Read Less' : 'Read Full Overview' }}</span>
+                <svg 
+                  class="w-4 h-4 transition-transform duration-300" 
+                  [class.rotate-180]="isExpanded()" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              <!-- Quick Feature Pills -->
+              <div class="hidden sm:flex items-center gap-2 text-xs text-slate-500 font-medium">
+                <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md">
+                  <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Role-Based Access
+                </span>
+                <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md">
+                  <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Real-time Tracking
+                </span>
+              </div>
+            </div>
+
           </div>
-          
-          <div class="clear-both"></div>
+
+          <!-- Right Column: Video Showcase & Quote -->
+          <div class="lg:col-span-5 order-1 lg:order-2 w-full">
+            <div class="rounded-2xl overflow-hidden bg-slate-900 border border-slate-200/80 shadow-xl relative group">
+              
+              <!-- Video Player with Lazy-Load & Controls -->
+              <div class="relative w-full aspect-video sm:h-[320px] lg:h-[360px] bg-slate-950 overflow-hidden flex items-center justify-center">
+                
+                <!-- Video Element (Sound Off by Default, Playsinline, Lazy loaded) -->
+                <video 
+                  #videoRef
+                  class="w-full h-full object-cover object-center transition-opacity duration-500"
+                  [class.opacity-0]="!isVideoLoaded()"
+                  [class.opacity-100]="isVideoLoaded()"
+                  playsinline
+                  loop
+                  muted
+                  preload="none"
+                  aria-label="ISMS 2.0 Skill Development Overview Video">
+                </video>
+
+                <!-- Poster / Loading Placeholder Before Video Plays -->
+                @if (!isVideoLoaded()) {
+                  <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0B3558] to-slate-900 flex flex-col items-center justify-center p-6 text-center">
+                    <div class="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center mb-3 text-white">
+                      <svg class="w-6 h-6 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                    </div>
+                    <p class="text-xs font-semibold text-slate-300 tracking-wide uppercase">RSLDC Skill Training in Action</p>
+                    <p class="text-[11px] text-slate-400 mt-1">Scroll into view to play video</p>
+                  </div>
+                }
+
+                <!-- Sound Off / Sound Toggle Badge (Top Right) -->
+                <div class="absolute top-3 right-3 z-20 flex items-center gap-2">
+                  <button 
+                    type="button"
+                    (click)="toggleSound()"
+                    class="bg-black/60 hover:bg-black/80 backdrop-blur-md text-white text-xs px-2.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all shadow cursor-pointer border border-white/20"
+                    [attr.aria-label]="isMuted() ? 'Unmute video audio' : 'Mute video audio'">
+                    @if (isMuted()) {
+                      <svg class="w-3.5 h-3.5 text-orange-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                      </svg>
+                      <span class="text-[11px] font-medium">Sound Off</span>
+                    } @else {
+                      <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                      </svg>
+                      <span class="text-[11px] font-medium">Sound On</span>
+                    }
+                  </button>
+                </div>
+
+                <!-- Play / Pause Overlay Control (Bottom Left) -->
+                <div class="absolute bottom-3 left-3 z-20">
+                  <button 
+                    type="button"
+                    (click)="togglePlayPause()"
+                    class="bg-black/60 hover:bg-black/80 backdrop-blur-md text-white w-8 h-8 rounded-full flex items-center justify-center transition-all shadow cursor-pointer border border-white/20"
+                    [attr.aria-label]="isPlaying() ? 'Pause video' : 'Play video'">
+                    @if (isPlaying()) {
+                      <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                      </svg>
+                    } @else {
+                      <svg class="w-3.5 h-3.5 translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    }
+                  </button>
+                </div>
+
+              </div>
+              
+              <!-- Quote Block Docked Below Video -->
+              <div class="bg-gradient-to-r from-[#0B3558] to-[#122b46] text-white p-4 sm:p-5 relative border-t border-slate-700/50">
+                <span class="text-3xl text-orange-400 font-serif leading-none select-none absolute top-3 left-3 opacity-60">“</span>
+                <p class="text-[12px] sm:text-[13px] text-slate-200 leading-relaxed pl-5 pr-2 font-medium">
+                  ISMS 2.0 is an integrated MIS system of RSLDC to provide a single platform to 
+                  Youths, Training providers, Govt. Departments, Convergence Departments, and 
+                  Certification agencies for Skill Development Schemes.
+                </p>
+              </div>
+
+            </div>
+          </div>
+
         </div>
 
       </div>
     </section>
   `
 })
-export class AboutSectionComponent {
-  isExpanded = false;
+export class AboutSectionComponent implements AfterViewInit, OnDestroy {
+  private platformId = inject(PLATFORM_ID);
 
-  toggleExpand() {
-    this.isExpanded = !this.isExpanded;
+  @ViewChild('sectionRef') sectionRef?: ElementRef<HTMLElement>;
+  @ViewChild('videoRef') videoRef?: ElementRef<HTMLVideoElement>;
+
+  readonly isExpanded = signal<boolean>(false);
+  readonly isVideoLoaded = signal<boolean>(false);
+  readonly isPlaying = signal<boolean>(false);
+  readonly isMuted = signal<boolean>(true); // Strictly sound off by default
+
+  private observer?: IntersectionObserver;
+  private isVisible = false;
+  private visibilityHandler?: () => void;
+
+  toggleExpand(): void {
+    this.isExpanded.update(v => !v);
+  }
+
+  ngAfterViewInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const el = this.sectionRef?.nativeElement;
+    const video = this.videoRef?.nativeElement;
+    if (!el || !video) return;
+
+    // Ensure audio starts muted
+    video.muted = true;
+    video.volume = 0;
+    this.isMuted.set(true);
+
+    // Setup IntersectionObserver to lazy load & play only when visible
+    this.observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          this.isVisible = entry.isIntersecting;
+          if (entry.isIntersecting) {
+            this.handleEnterViewport();
+          } else {
+            this.handleExitViewport();
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: '100px 0px', // Preload just slightly before user reaches it
+        threshold: 0.15
+      }
+    );
+
+    this.observer.observe(el);
+
+    // Page visibility listener: pause when browser tab is inactive
+    this.visibilityHandler = () => {
+      if (document.hidden) {
+        this.pauseVideo();
+      } else if (this.isVisible && this.isVideoLoaded()) {
+        this.playVideo();
+      }
+    };
+    document.addEventListener('visibilitychange', this.visibilityHandler);
+  }
+
+  private handleEnterViewport(): void {
+    const video = this.videoRef?.nativeElement;
+    if (!video) return;
+
+    if (!this.isVideoLoaded()) {
+      // Lazy attach the MP4 source only when needed
+      video.src = '/video.mp4';
+      video.load();
+      video.onloadeddata = () => {
+        this.isVideoLoaded.set(true);
+        this.playVideo();
+      };
+      // Fallback in case onloadeddata was already ready
+      setTimeout(() => {
+        if (!this.isVideoLoaded()) {
+          this.isVideoLoaded.set(true);
+          this.playVideo();
+        }
+      }, 500);
+    } else {
+      this.playVideo();
+    }
+  }
+
+  private handleExitViewport(): void {
+    this.pauseVideo();
+  }
+
+  private playVideo(): void {
+    const video = this.videoRef?.nativeElement;
+    if (!video) return;
+    video.play().then(() => {
+      this.isPlaying.set(true);
+    }).catch(() => {
+      this.isPlaying.set(false);
+    });
+  }
+
+  private pauseVideo(): void {
+    const video = this.videoRef?.nativeElement;
+    if (!video) return;
+    video.pause();
+    this.isPlaying.set(false);
+  }
+
+  togglePlayPause(): void {
+    const video = this.videoRef?.nativeElement;
+    if (!video) return;
+
+    if (this.isPlaying()) {
+      this.pauseVideo();
+    } else {
+      this.playVideo();
+    }
+  }
+
+  toggleSound(): void {
+    const video = this.videoRef?.nativeElement;
+    if (!video) return;
+
+    const nextMuted = !this.isMuted();
+    video.muted = nextMuted;
+    video.volume = nextMuted ? 0 : 0.8;
+    this.isMuted.set(nextMuted);
+  }
+
+  ngOnDestroy(): void {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+    if (this.visibilityHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityHandler);
+    }
+    const video = this.videoRef?.nativeElement;
+    if (video) {
+      video.pause();
+      video.src = '';
+      video.load();
+    }
   }
 }

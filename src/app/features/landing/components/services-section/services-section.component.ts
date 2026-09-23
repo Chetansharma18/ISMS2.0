@@ -112,49 +112,6 @@ import { CommonModule } from '@angular/common';
           </div>
         </div>
 
-        <!-- Help & Support Section (Clean Responsive Card) -->
-        <div class="mt-10 sm:mt-14 max-w-5xl mx-auto bg-slate-50 border border-slate-200/80 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
-          
-          <!-- Text Content -->
-          <div class="text-center md:text-left max-w-md">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-100 text-[#EA580C] text-[11px] font-bold uppercase tracking-wider mb-2">
-              Help & Support
-            </span>
-            <h3 class="text-3xl sm:text-4xl md:text-5xl font-black text-[#0B3558] mb-2 tracking-tight font-sans">
-              Need Assistance?
-            </h3>
-            <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
-              Get dedicated assistance with registration, portal navigation, training center inspections, and technical inquiries.
-            </p>
-          </div>
-
-          <!-- Helpdesk Contacts (Responsive Touch-Friendly Cards) -->
-          <div class="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <a 
-              href="mailto:support@isms.rajasthan.gov.in" 
-              class="inline-flex items-center justify-center gap-2 bg-white hover:bg-orange-50 border border-slate-200 hover:border-orange-300 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-[#0B3558] hover:text-[#EA580C] transition-all shadow-xs group">
-              <div class="w-7 h-7 rounded-full bg-orange-100 text-[#EA580C] flex items-center justify-center shrink-0">
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <span class="truncate">support&#64;isms.rajasthan.gov.in</span>
-            </a>
-
-            <a 
-              href="tel:+919876543210" 
-              class="inline-flex items-center justify-center gap-2 bg-[#0B3558] hover:bg-[#07233B] px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white transition-all shadow-xs group">
-              <div class="w-7 h-7 rounded-full bg-white/20 text-white flex items-center justify-center shrink-0">
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-              </div>
-              <span>+91 98765 43210</span>
-            </a>
-          </div>
-
-        </div>
-
       </div>
     </section>
   `

@@ -43,15 +43,12 @@ import { CommonModule } from '@angular/common';
             <!-- Right Column: Text & Circular Features -->
             <div class="lg:col-span-7 flex flex-col justify-center">
               
-              <!-- Header Pill & Title -->
-              <div class="mb-6 sm:mb-8 text-center lg:text-left bg-white/85 p-5 sm:p-6 rounded-2xl border border-white/70 shadow-xs backdrop-blur-xs">
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[11px] font-bold uppercase tracking-wider mb-2">
-                  <span>Smart Governance</span>
-                </div>
-                <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-[#0B3558] mb-2 tracking-tight font-sans">
+              <!-- Header Title -->
+              <div class="mb-6 sm:mb-8 text-center lg:text-left">
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-[#0B3558] mb-3 tracking-tight font-sans">
                   ISMS 2.0 Mobile App
                 </h2>
-                <p class="text-sm sm:text-base text-slate-700 font-medium leading-relaxed max-w-lg">
+                <p class="text-sm sm:text-base text-slate-700 font-medium leading-relaxed max-w-lg mx-auto lg:mx-0">
                   An integrated, multilingual mobile application providing instantaneous access to 
                   scheme notifications, biometric attendance, training center verifications, and grievances.
                 </p>
@@ -89,23 +86,26 @@ import { CommonModule } from '@angular/common';
               </div>
 
               <!-- App Stats (Responsive Grid without Overflow) -->
-              <div class="mt-6 sm:mt-8 flex flex-wrap justify-around lg:justify-start items-center gap-4 sm:gap-8 border-t border-white/60 pt-5 bg-white/80 p-4 sm:p-5 rounded-2xl shadow-2xs">
-                <div class="text-center lg:text-left">
+              <!-- App Stats (Downloads, Rating, Users) -->
+              <div class="mt-6 sm:mt-8 grid grid-cols-3 items-center divide-x divide-slate-300 bg-white/80 p-4 sm:p-5 rounded-2xl shadow-2xs w-full max-w-md mx-auto lg:mx-0">
+                
+                <div class="text-center px-2">
                   <p class="text-xl sm:text-2xl lg:text-3xl font-black text-[#0B3558]">1K+</p>
                   <p class="text-[9px] sm:text-[11px] font-bold text-slate-600 uppercase tracking-wider mt-0.5">Downloads</p>
                 </div>
-                <div class="w-px h-8 bg-slate-300"></div>
-                <div class="text-center lg:text-left">
-                  <p class="text-xl sm:text-2xl lg:text-3xl font-black text-[#0B3558] flex items-center justify-center lg:justify-start gap-1">
-                    4.8 <span class="text-[#EA580C] text-lg">★</span>
+                
+                <div class="text-center px-2">
+                  <p class="text-xl sm:text-2xl lg:text-3xl font-black text-[#0B3558] flex items-center justify-center gap-1">
+                    4.8 <span class="text-[#EA580C] text-lg leading-none">★</span>
                   </p>
                   <p class="text-[9px] sm:text-[11px] font-bold text-slate-600 uppercase tracking-wider mt-0.5">User Rating</p>
                 </div>
-                <div class="w-px h-8 bg-slate-300"></div>
-                <div class="text-center lg:text-left">
+                
+                <div class="text-center px-2">
                   <p class="text-xl sm:text-2xl lg:text-3xl font-black text-[#0B3558]">200+</p>
                   <p class="text-[9px] sm:text-[11px] font-bold text-slate-600 uppercase tracking-wider mt-0.5">Active Users</p>
                 </div>
+
               </div>
 
             </div>

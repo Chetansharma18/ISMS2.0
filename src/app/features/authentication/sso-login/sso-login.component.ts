@@ -387,7 +387,7 @@ export class SsoLoginComponent {
       } else if (role === 'existing_user') {
         this.eoiService.resetToApprovedTp('A', identifier);
         this.authService.login('applicant_rj').subscribe(() => {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/schemes']);
         });
       } else if (role === 'dept_admin') {
         this.eoiService.resetToDeptAdmin(identifier);

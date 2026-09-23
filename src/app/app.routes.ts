@@ -233,6 +233,10 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
+      {
+        path: 'schemes',
+        loadComponent: () => import('./features/eoi/schemes/scheme-listing.component').then(m => m.SchemeListingComponent)
+      },
       
       // ================= DEPARTMENT MODULE =================
       {

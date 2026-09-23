@@ -194,7 +194,7 @@ export class SsoMappingComponent implements OnInit {
         this.eoiService.updateProfile({
           personal: { ...updated.personal, email: email }
         });
-        this.router.navigate(['/eoi/dashboard']);
+        this.router.navigate(['/schemes']);
       } else {
         this.eoiService.resetToRegisteredApplicant(this.currentSsoId);
         const updated = this.eoiService.getProfile();
@@ -202,9 +202,9 @@ export class SsoMappingComponent implements OnInit {
           personal: { ...updated.personal, email: email }
         });
         
-        // Log into ISMS 2.0 and route to the new dashboard
+        // Log into ISMS 2.0 and route to active schemes
         this.authService.login('applicant_rj').subscribe(() => {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/schemes']);
         });
       }
     }, 400);

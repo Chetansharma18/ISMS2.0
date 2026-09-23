@@ -77,8 +77,8 @@ import { Observable } from 'rxjs';
               <span>⬇ Download Sanction Order (PDF)</span>
             </button>
 
-            <a routerLink="/eoi/dashboard" class="px-6 py-2.5 bg-seal-600 text-surface-0 font-semibold hover:bg-[#9B4523] transition-colors flex items-center justify-center gap-2 w-full sm:w-auto">
-              <span>Go to TP Dashboard</span>
+            <a routerLink="/schemes" class="px-6 py-2.5 bg-seal-600 text-surface-0 font-semibold hover:bg-[#9B4523] transition-colors flex items-center justify-center gap-2 w-full sm:w-auto">
+              <span>View Active Schemes &amp; Tenders</span>
               <span aria-hidden="true">→</span>
             </a>
           </div>

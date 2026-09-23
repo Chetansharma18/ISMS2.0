@@ -29,13 +29,53 @@ export interface SchemeTender {
   imports: [CommonModule, RouterModule, FormsModule, HeaderComponent, FooterComponent],
   template: `
     <div class="w-full min-h-screen flex flex-col bg-[#F8FAFC] text-slate-800 font-['Inter',sans-serif] antialiased">
-      <app-header (loginClicked)="onLoginClick()"></app-header>
+      @if (!currentUser()) {
+        <app-header (loginClicked)="onLoginClick()"></app-header>
+      }
       
-      <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <!-- ====================================================================
              VIEW 1: ACTIVE SCHEMES & TENDERS TABLE (Matching Screenshot 1)
              ==================================================================== -->
         @if (!selectedScheme()) {
+          <!-- Quick Portal Options Bar for Logged-In Users -->
+          @if (currentUser()) {
+            <div class="mb-6 p-4 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-[#0B3558] text-white flex items-center justify-center font-bold text-xs shadow-2xs">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </div>
+                <div>
+                  <span class="text-xs font-black text-slate-800 block">Training Partner Options</span>
+                  <span class="text-[11px] text-slate-500 font-medium">Quickly jump to any ISMS 2.0 module</span>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2">
+                <a routerLink="/sdcs" class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/80 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer">
+                  <span>🏢 SDCs</span>
+                </a>
+                <a routerLink="/batches" class="px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200/80 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer">
+                  <span>👥 Batches</span>
+                </a>
+                <a routerLink="/tp/sanction-orders" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200/80 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer">
+                  <span>📄 Sanction Orders</span>
+                </a>
+                <a routerLink="/trainees" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200/80 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer">
+                  <span>👨‍🎓 Aspirants</span>
+                </a>
+                <a routerLink="/attendance/users" class="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-200/80 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer">
+                  <span>⏱️ Attendance</span>
+                </a>
+                <a routerLink="/profile" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer">
+                  <span>👤 Profile</span>
+                </a>
+              </div>
+            </div>
+          }
+
           <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="p-6 sm:p-8 space-y-5">
               
@@ -400,7 +440,9 @@ export interface SchemeTender {
         }
       </main>
 
-      <app-footer></app-footer>
+      @if (!currentUser()) {
+        <app-footer></app-footer>
+      }
     </div>
   `
 })

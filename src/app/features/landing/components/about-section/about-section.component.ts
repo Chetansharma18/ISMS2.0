@@ -21,21 +21,17 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
     <section #sectionRef class="pt-8 sm:pt-12 pb-8 sm:pb-12 bg-white border-b border-slate-100">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-[#0B3558] mb-6 sm:mb-8 tracking-tight font-sans">
+          About ISMS 2.0
+        </h2>
+        
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
           <!-- Left Column: About Text & Highlights -->
           <div class="lg:col-span-7 order-2 lg:order-1">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold tracking-wide uppercase mb-3">
-              <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-              e-Governance & MIS Portal
-            </div>
-
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-[#0B3558] mb-5 tracking-tight font-sans">
-              About ISMS 2.0
-            </h2>
 
             <!-- Core Content -->
-            <div class="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed sm:leading-[1.8] text-justify sm:text-left">
+            <div class="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed sm:leading-[1.8] text-justify hyphens-auto">
               <p>
                 <strong class="text-slate-800 font-bold">Integrated Scheme Management System (ISMS 2.0)</strong> is a comprehensive
                 <strong class="text-slate-800">e-Governance and Management Information System (MIS)</strong> designed to digitally transform, 
@@ -71,47 +67,11 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
                 </div>
               }
             </div>
-
-            <!-- Read More / Less Toggle Button -->
-            <div class="mt-6 flex items-center gap-4">
-              <button 
-                type="button"
-                (click)="toggleExpand()" 
-                class="inline-flex items-center gap-2 bg-[#0B3558] hover:bg-[#07233B] text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-lg transition-all shadow-sm hover:shadow-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:ring-offset-2"
-                [attr.aria-expanded]="isExpanded()">
-                <span>{{ isExpanded() ? 'Read Less' : 'Read Full Overview' }}</span>
-                <svg 
-                  class="w-4 h-4 transition-transform duration-300" 
-                  [class.rotate-180]="isExpanded()" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              <!-- Quick Feature Pills -->
-              <div class="hidden sm:flex items-center gap-2 text-xs text-slate-500 font-medium">
-                <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md">
-                  <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                  </svg>
-                  Role-Based Access
-                </span>
-                <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md">
-                  <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                  </svg>
-                  Real-time Tracking
-                </span>
-              </div>
-            </div>
-
           </div>
 
           <!-- Right Column: Video Showcase & Quote -->
           <div class="lg:col-span-5 order-1 lg:order-2 w-full">
-            <div class="rounded-2xl overflow-hidden bg-slate-900 border border-slate-200/80 shadow-xl relative group">
+            <div class="rounded-2xl overflow-hidden bg-slate-900 border border-[#0B3558]/30 shadow-[0_0_25px_rgba(11,53,88,0.25)] relative group transition-shadow duration-500 hover:shadow-[0_0_40px_rgba(11,53,88,0.4)]">
               
               <!-- Video Player with Lazy-Load & Controls -->
               <div class="relative w-full aspect-video sm:h-[320px] lg:h-[360px] bg-slate-950 overflow-hidden flex items-center justify-center">
@@ -165,8 +125,8 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
                   </button>
                 </div>
 
-                <!-- Play / Pause Overlay Control (Bottom Left) -->
-                <div class="absolute bottom-3 left-3 z-20">
+                <!-- Play / Pause Overlay Control (Top Left) -->
+                <div class="absolute top-3 left-3 z-20">
                   <button 
                     type="button"
                     (click)="togglePlayPause()"
@@ -186,13 +146,12 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 
               </div>
               
-              <!-- Quote Block Docked Below Video -->
-              <div class="bg-gradient-to-r from-[#0B3558] to-[#122b46] text-white p-4 sm:p-5 relative border-t border-slate-700/50">
-                <span class="text-3xl text-orange-400 font-serif leading-none select-none absolute top-3 left-3 opacity-60">“</span>
-                <p class="text-[12px] sm:text-[13px] text-slate-200 leading-relaxed pl-5 pr-2 font-medium">
-                  ISMS 2.0 is an integrated MIS system of RSLDC to provide a single platform to 
-                  Youths, Training providers, Govt. Departments, Convergence Departments, and 
-                  Certification agencies for Skill Development Schemes.
+              <!-- Quote Block Overlayed on Video -->
+              <div class="absolute bottom-0 inset-x-0 z-10 pointer-events-none bg-gradient-to-t from-[#0B3558]/95 via-[#0B3558]/60 to-transparent pt-20 pb-5 sm:pb-6 px-4 sm:px-6">
+                <p class="text-[12px] sm:text-[13px] text-white leading-relaxed px-2 font-medium drop-shadow-md min-h-[55px] sm:min-h-[60px] text-justify">
+                  <span class="text-2xl text-orange-400 font-serif leading-none relative top-1.5 opacity-90">“</span>
+                  <span class="px-1">{{ displayedQuote() }}</span><span class="animate-pulse text-orange-400 font-bold" [class.hidden]="hasFinishedTyping()">|</span>
+                  <span class="text-2xl text-orange-400 font-serif leading-none relative top-1.5 opacity-90" [class.hidden]="!hasFinishedTyping()">”</span>
                 </p>
               </div>
 
@@ -215,6 +174,12 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
   readonly isVideoLoaded = signal<boolean>(false);
   readonly isPlaying = signal<boolean>(false);
   readonly isMuted = signal<boolean>(true); // Strictly sound off by default
+  
+  readonly fullQuote = 'ISMS 2.0 is an integrated MIS system of RSLDC to provide a single platform to Youths, Training providers, Govt. Departments, Convergence Departments, and Certification agencies for Skill Development Schemes.';
+  readonly displayedQuote = signal<string>('');
+  readonly hasFinishedTyping = signal<boolean>(false);
+  private typewriterInterval: any;
+  private hasTyped = false;
 
   private observer?: IntersectionObserver;
   private isVisible = false;
@@ -272,6 +237,9 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
     const video = this.videoRef?.nativeElement;
     if (!video) return;
 
+    // Start typewriter effect when video enters viewport
+    this.startTypewriter();
+
     if (!this.isVideoLoaded()) {
       // Lazy attach the MP4 source only when needed
       video.src = '/video.mp4';
@@ -290,6 +258,25 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
     } else {
       this.playVideo();
     }
+  }
+
+  private startTypewriter(): void {
+    if (this.hasTyped) return;
+    this.hasTyped = true;
+    let i = 0;
+    this.displayedQuote.set('');
+    
+    this.typewriterInterval = setInterval(() => {
+      if (i < this.fullQuote.length) {
+        this.displayedQuote.update(q => q + this.fullQuote.charAt(i));
+        i++;
+      } else {
+        this.hasFinishedTyping.set(true);
+        if (this.typewriterInterval) {
+          clearInterval(this.typewriterInterval);
+        }
+      }
+    }, 25);
   }
 
   private handleExitViewport(): void {
@@ -340,6 +327,9 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
     }
     if (this.visibilityHandler) {
       document.removeEventListener('visibilitychange', this.visibilityHandler);
+    }
+    if (this.typewriterInterval) {
+      clearInterval(this.typewriterInterval);
     }
     const video = this.videoRef?.nativeElement;
     if (video) {

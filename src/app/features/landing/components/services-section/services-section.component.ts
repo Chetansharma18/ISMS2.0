@@ -48,10 +48,10 @@ import { CommonModule } from '@angular/common';
                 <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[11px] font-bold uppercase tracking-wider mb-2">
                   <span>Smart Governance</span>
                 </div>
-                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-[#0B3558] mb-2 tracking-tight font-sans">
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-[#0B3558] mb-2 tracking-tight font-sans">
                   ISMS 2.0 Mobile App
                 </h2>
-                <p class="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed max-w-lg">
+                <p class="text-sm sm:text-base text-slate-700 font-medium leading-relaxed max-w-lg">
                   An integrated, multilingual mobile application providing instantaneous access to 
                   scheme notifications, biometric attendance, training center verifications, and grievances.
                 </p>
@@ -120,10 +120,10 @@ import { CommonModule } from '@angular/common';
             <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-100 text-[#EA580C] text-[11px] font-bold uppercase tracking-wider mb-2">
               Help & Support
             </span>
-            <h3 class="text-xl sm:text-2xl font-black text-[#0B3558] mb-2 tracking-tight font-sans">
+            <h3 class="text-3xl sm:text-4xl md:text-5xl font-black text-[#0B3558] mb-2 tracking-tight font-sans">
               Need Assistance?
             </h3>
-            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
               Get dedicated assistance with registration, portal navigation, training center inspections, and technical inquiries.
             </p>
           </div>

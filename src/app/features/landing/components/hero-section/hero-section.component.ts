@@ -41,15 +41,13 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
         <div class="lg:col-span-7 text-left">
           
 
-          <h1 class="text-justify text-white text-3xl sm:text-4xl md:text-5xl lg:text-[46px] xl:text-[50px] font-black leading-[1.12] mb-4 tracking-tight drop-shadow-md" style="font-family: 'Inter', sans-serif;">
+          <h1 class="text-white text-3xl sm:text-4xl md:text-5xl font-black leading-[1.12] mb-4 tracking-tight drop-shadow-md" style="font-family: 'Inter', sans-serif;">
             Integrated Scheme <br class="hidden sm:inline" />
             <span class="text-white">Management System</span>
           </h1>
 
-          <p class="text-justify text-slate-100 text-xs sm:text-sm md:text-base mb-6 sm:mb-8 max-w-xl leading-relaxed drop-shadow font-normal">
-            A unified, transparent digital ecosystem empowering skill development schemes, 
-            training operations, biometric verification, assessments, certifications, and 
-            sustainable placements across Rajasthan.
+          <p class="text-slate-100 text-sm sm:text-base mb-6 sm:mb-8 max-w-xl leading-tight drop-shadow font-normal">
+            A unified, transparent digital ecosystem empowering skill development schemes, training operations, biometric verification, assessments, certifications, and sustainable placements across Rajasthan.
           </p>
 
 
@@ -90,15 +88,12 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                   @for (item of tenders; track item.id) {
                     <div 
                       (click)="downloadSamplePdf()" 
-                      class="p-3 sm:p-3.5 bg-white border border-slate-100 shadow-sm rounded-lg hover:shadow-md hover:border-slate-200 hover:bg-slate-50 transition-all group">
+                      class="relative p-3 sm:p-3.5 bg-white border border-slate-100 shadow-sm rounded-lg hover:shadow-md hover:border-slate-200 hover:bg-slate-50 transition-all group">
+                      @if (item.isNew) {
+                        <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-lg" />
+                      }
                       <div class="flex justify-between items-center mb-1">
                         <span class="text-[10px] sm:text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
-                        <div class="flex items-center gap-1.5">
-                          @if (item.isNew) {
-                            <span class="text-[9px] font-bold text-yellow-700 bg-yellow-100 px-1.5 py-0.5 rounded">NEW</span>
-                          }
-                          <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">{{ item.status }}</span>
-                        </div>
                       </div>
                       <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors line-clamp-2">
                         {{ item.title }}
@@ -113,15 +108,12 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                   @for (item of tenders; track item.id + '-dup') {
                     <div 
                       (click)="downloadSamplePdf()" 
-                      class="p-3 sm:p-3.5 bg-white border border-slate-100 shadow-sm rounded-lg hover:shadow-md hover:border-slate-200 hover:bg-slate-50 transition-all group">
+                      class="relative p-3 sm:p-3.5 bg-white border border-slate-100 shadow-sm rounded-lg hover:shadow-md hover:border-slate-200 hover:bg-slate-50 transition-all group">
+                      @if (item.isNew) {
+                        <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-lg" />
+                      }
                       <div class="flex justify-between items-center mb-1">
                         <span class="text-[10px] sm:text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
-                        <div class="flex items-center gap-1.5">
-                          @if (item.isNew) {
-                            <span class="text-[9px] font-bold text-yellow-700 bg-yellow-100 px-1.5 py-0.5 rounded">NEW</span>
-                          }
-                          <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">{{ item.status }}</span>
-                        </div>
                       </div>
                       <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors line-clamp-2">
                         {{ item.title }}

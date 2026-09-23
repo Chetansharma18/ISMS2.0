@@ -30,12 +30,12 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
               e-Governance & MIS Portal
             </div>
 
-            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-[#0B3558] mb-5 tracking-tight font-sans">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-[#0B3558] mb-5 tracking-tight font-sans">
               About ISMS 2.0
             </h2>
 
             <!-- Core Content -->
-            <div class="space-y-4 text-[13px] sm:text-[14px] text-slate-600 leading-relaxed sm:leading-[1.8] text-justify sm:text-left">
+            <div class="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed sm:leading-[1.8] text-justify sm:text-left">
               <p>
                 <strong class="text-slate-800 font-bold">Integrated Scheme Management System (ISMS 2.0)</strong> is a comprehensive
                 <strong class="text-slate-800">e-Governance and Management Information System (MIS)</strong> designed to digitally transform, 

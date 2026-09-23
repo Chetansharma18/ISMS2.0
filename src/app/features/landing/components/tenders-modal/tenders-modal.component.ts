@@ -52,7 +52,7 @@ interface Tender {
                   <span class="text-[11px] text-slate-500 font-medium">{{ item.category }}</span>
                   
                   @if (item.isNew) {
-                    <span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold text-[#EA580C] bg-orange-50 border border-orange-200">
+                    <span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold text-yellow-700 bg-yellow-100 border border-yellow-300">
                       NEW
                     </span>
                   }
@@ -90,60 +90,84 @@ export class TendersModalComponent {
 
   tenders: Tender[] = [
     {
-      date: '28 Sep, 2026',
-      id: 'NIB 28 2026-27',
-      category: 'Procurement',
+      date: '23/01/2026',
+      id: 'RSLDC/EOI/MMKVY Cat I II III/2026-27/01',
+      category: 'MMKVY',
       isNew: true,
       status: 'Open',
-      title: 'Procurement of various sizes C.I. Detachable Joints for HDPE Pipe at Divisional Store of Distt Rural Div I Bikaner'
+      title: 'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme'
     },
     {
-      date: '21 Sep, 2026',
-      id: 'NIT 03/2026-27 ACE PWD Zone Tonk',
-      category: 'Construction',
+      date: '17/02/2026',
+      id: 'RSLDC/EOI/MNSKSY/2025-26/01',
+      category: 'MNSKSY',
       isNew: true,
       status: 'Open',
-      title: 'CONSTRUCTION OF ROAD FROM SH-122 TO KARIRI UPTO DISTRICT BOARDER'
+      title: 'Expression of Interest (EOI) MNSKSY in RSLDC.'
     },
     {
-      date: '11 Jun, 2026',
-      id: 'RCVET/2026/01',
-      category: 'Services',
+      date: '26/09/2024',
+      id: 'RSLDC/EOI/MMKVY Cat I II III/2024-25/01',
+      category: 'MMKVY',
       isNew: false,
-      status: 'Open',
-      title: 'Tender for Computer Operator for RCVET Jodhpur'
+      status: 'Closed',
+      title: 'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme'
     },
     {
-      date: '07 Feb, 2026',
-      id: 'CORR/2026/09',
-      category: 'Corrigendum',
+      date: '26/09/2024',
+      id: 'RSLDC/EOI/IMSHAKTI/2024-25/01',
+      category: 'IM_Shakti',
       isNew: false,
-      status: 'Open',
-      title: 'Corrigendum - 9 (Old RO Number is 4424)'
+      status: 'Closed',
+      title: 'Expression of Interest for submission of proposal to undertake the Skill Training under IM Shakti Scheme'
     },
     {
-      date: '07 Feb, 2026',
-      id: 'CORR/2026/04',
-      category: 'Corrigendum',
+      date: '02/05/2023',
+      id: 'RSLDC/EOI2023-24/Cat-III/RAJKVik RTD',
+      category: 'RAJKVIKRTD',
       isNew: false,
-      status: 'Open',
-      title: 'CORRIGENDUM-4'
+      status: 'Closed',
+      title: "EOI for Recruit-TrainDeploy (RTD) model under Mukhya Mantri Kaushal Vikas Yojana Category-1 'Rojgar Aadharit Jan Kaushal Vikas Karyakram (MMKVY-CAT-III 'RAJKVIK)' scheme of RSLDC"
     },
     {
-      date: '07 Feb, 2026',
-      id: 'CORR/2026/05',
-      category: 'Corrigendum',
+      date: '05/07/2023',
+      id: 'RSLDC/MMYKY2/EoI23-24/01',
+      category: 'MMYKY',
       isNew: false,
-      status: 'Open',
-      title: 'Corrigendum-5 API for PM-SETU'
+      status: 'Closed',
+      title: 'EoI for MMYKY 2.O for RSLDC'
     },
     {
-      date: '07 Feb, 2026',
-      id: 'CORR/2026/06',
-      category: 'Corrigendum',
+      date: '18/04/2023',
+      id: 'RSLDC/EoI/2023-24/1/MMKVYSAMARTH',
+      category: 'SAMARTH',
       isNew: false,
-      status: 'Open',
-      title: 'Corrigendum-6 API for PM-SETU'
+      status: 'Closed',
+      title: 'EoI for submission of proposal to undertake the project under MMKVY(Cat-III: SAMARTH) scheme of RSLDC'
+    },
+    {
+      date: '18/04/2023',
+      id: 'RSLDC/EoI/2023-24/1-RAJKVIK General',
+      category: 'RAJKVIK',
+      isNew: false,
+      status: 'Closed',
+      title: 'Eol for submission of proposal to undertake the project under RAJKVIK scheme of RSLDC.'
+    },
+    {
+      date: '18/04/2023',
+      id: 'RSLDC/EoI/2023-24/1/MMKVYSAKSHM',
+      category: 'SAKSHM',
+      isNew: false,
+      status: 'Closed',
+      title: 'Eol for submission of proposal to undertake the project under MMKVY(Cat-II: SAKSHM) scheme of RSLDC'
+    },
+    {
+      date: '08/07/2022',
+      id: 'RSLDC/EOI/2022-23/1MMKVYRTD',
+      category: 'RAJKVIK',
+      isNew: false,
+      status: 'Closed',
+      title: "EOI for Recruit-TrainDeploy (RTD) model under Mukhya Mantri Kaushal Vikas Yojana Category-1 'Rojgar Aadharit Jan"
     }
   ];
 

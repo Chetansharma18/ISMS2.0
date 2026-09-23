@@ -65,30 +65,30 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
               [style.animation-play-state]="shouldAnimate() ? 'running' : 'paused'">
               
               <!-- Set 1 (Original) -->
-              <a href="https://bis.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-3 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20">
+              <a href="https://bis.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-1 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20">
                 <img src="/footer-images/bis-care.png" alt="BIS Care App" class="max-h-full max-w-full object-contain" loading="lazy" onerror="this.src='/footer-images/bis.png'">
               </a>
-              <a href="https://acb.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-3 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20">
+              <a href="https://acb.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-1 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20">
                 <img src="/footer-images/acb.png" alt="Anti Corruption Bureau" class="max-h-full max-w-full object-contain" loading="lazy">
               </a>
-              <a href="https://pledge.mygov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-3 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20">
+              <a href="https://pledge.mygov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-1 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20">
                 <img src="/footer-images/pledge.jpeg" alt="Register for Pledge" class="max-h-full max-w-full object-contain" loading="lazy">
               </a>
-              <a href="https://jansoochna.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-3 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20">
+              <a href="https://jansoochna.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-1 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20">
                 <img src="/footer-images/jansoochna.png" alt="Jan Soochna Portal" class="max-h-full max-w-full object-contain" loading="lazy">
               </a>
 
               <!-- Set 2 (Duplicated for Seamless Loop) -->
-              <a href="https://bis.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-3 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20" aria-hidden="true">
+              <a href="https://bis.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-1 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20" aria-hidden="true">
                 <img src="/footer-images/bis-care.png" alt="BIS Care App" class="max-h-full max-w-full object-contain" loading="lazy" onerror="this.src='/footer-images/bis.png'">
               </a>
-              <a href="https://acb.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-3 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20" aria-hidden="true">
+              <a href="https://acb.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-1 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20" aria-hidden="true">
                 <img src="/footer-images/acb.png" alt="Anti Corruption Bureau" class="max-h-full max-w-full object-contain" loading="lazy">
               </a>
-              <a href="https://pledge.mygov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-3 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20" aria-hidden="true">
+              <a href="https://pledge.mygov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-1 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20" aria-hidden="true">
                 <img src="/footer-images/pledge.jpeg" alt="Register for Pledge" class="max-h-full max-w-full object-contain" loading="lazy">
               </a>
-              <a href="https://jansoochna.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-3 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20" aria-hidden="true">
+              <a href="https://jansoochna.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[240px] bg-white rounded-xl h-20 sm:h-24 flex items-center justify-center p-1 shrink-0 hover:shadow-lg transition-all cursor-pointer block border border-white/20" aria-hidden="true">
                 <img src="/footer-images/jansoochna.png" alt="Jan Soochna Portal" class="max-h-full max-w-full object-contain" loading="lazy">
               </a>
             </div>

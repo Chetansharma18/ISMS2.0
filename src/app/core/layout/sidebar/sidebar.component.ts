@@ -130,39 +130,54 @@ import { AuthService } from '../../auth/auth.service';
                     routerLink="/profile"
                     [queryParams]="{ tab: 'org' }"
                     routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
+                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
                     class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
                   >
                     <span class="truncate">1. Organisation Details</span>
                   </a>
 
-                  <!-- 2. Authorized Person Details -->
+                  <!-- 2. Officer In-Charge Details -->
+                  <a
+                    routerLink="/profile"
+                    [queryParams]="{ tab: 'officers' }"
+                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
+                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
+                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
+                  >
+                    <span class="truncate">2. Officer In-Charge</span>
+                  </a>
+
+                  <!-- 3. Authorized Person Details -->
                   <a
                     routerLink="/profile"
                     [queryParams]="{ tab: 'auth' }"
                     routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
+                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
                     class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
                   >
-                    <span class="truncate">2. Authorized Person</span>
+                    <span class="truncate">3. Authorized Person</span>
                   </a>
 
-                  <!-- 3. Bank Details -->
+                  <!-- 4. Bank Details -->
                   <a
                     routerLink="/profile"
                     [queryParams]="{ tab: 'bank' }"
                     routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
+                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
                     class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
                   >
-                    <span class="truncate">3. Bank Details</span>
+                    <span class="truncate">4. Bank Details</span>
                   </a>
 
-                  <!-- 4. Uploaded Documents -->
+                  <!-- 5. Uploaded Documents -->
                   <a
                     routerLink="/profile"
                     [queryParams]="{ tab: 'docs' }"
                     routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
+                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
                     class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
                   >
-                    <span class="truncate">4. Documents</span>
+                    <span class="truncate">5. Documents</span>
                   </a>
 
                 </div>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { OtrFormService } from '../registration/services/otr-form.service';
+import { OtrValidationService } from '../registration/services/otr-validation.service';
 
 @Component({
   selector: 'app-profile-page',
@@ -12,58 +13,244 @@ import { OtrFormService } from '../registration/services/otr-form.service';
     <div class="w-full min-h-full bg-white text-slate-800 select-none font-sans">
       
       <!-- ====================================================================
-           CASE 1: INCOMPLETE PROFILE (Centered Perfectly on Page)
+           CASE 1: INCOMPLETE PROFILE (Integrated Full-Page Dashboard)
            ==================================================================== -->
       @if (isProfileIncomplete()) {
-        <div class="min-h-[calc(100vh-140px)] flex items-center justify-center p-4 sm:p-6">
-          <div class="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 max-w-2xl w-full shadow-sm animate-in fade-in duration-200">
-            <div class="space-y-4 font-sans" style="font-family: 'Inter', sans-serif;">
+        <div class="p-5 sm:p-6 lg:p-7 space-y-4 max-w-6xl mx-auto font-sans" style="font-family: 'Inter', sans-serif;">
+          
+          <!-- Top Page Header (Matching Portal Structure) -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2.5">
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                  Profile
+                </h1>
+      
+            
               
-              <!-- Heading -->
-              <div>
-                <h2 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
-                  Please complete your profile first
-                </h2>
-                <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-                  Your entity profile is currently incomplete. Please complete your One Time Registration (OTR) profile to register your organization as a Training Partner (TP) / Project Implementing Agency (PIA) and submit EOI proposals for state skill schemes.
-                </p>
               </div>
+              <p class="text-xs text-slate-500 font-normal">
+                Finish your One Time Registration (OTR) profile to register your organization and unlock EOI proposal submissions.
+              </p>
+            </div>
 
-              <!-- Features requiring profile -->
-              <div class="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 font-normal">
-                <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
-                  <span>Organization &amp; Legal Constitution</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
-                  <span>Officer In-Charge Directory</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
-                  <span>Authorized Representative Documents</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
-                  <span>Verified Bank Account for Disbursals</span>
-                </div>
+            <!-- Header Action Button -->
+            <a
+              [routerLink]="['/registration']"
+              [queryParams]="ctaQueryParams()"
+              class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#0B3558] hover:bg-[#123B59] active:bg-[#07233B] text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow transition-all cursor-pointer shrink-0 self-start sm:self-auto group"
+              style="color: #ffffff !important;"
+            >
+              <span>{{ ctaText() }}</span>
+              <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+          </div>
+
+          <!-- Hero Progress Card (Spans full width naturally) -->
+          <div class="p-4 sm:p-5 rounded-xl bg-gradient-to-r from-slate-50 via-white to-blue-50/30 border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            <!-- Circular Progress Ring (64x64px, r=26) -->
+            <div class="relative w-16 h-16 shrink-0 flex items-center justify-center">
+              <svg class="w-16 h-16 -rotate-90 transform" viewBox="0 0 64 64">
+                <circle
+                  cx="32"
+                  cy="32"
+                  [attr.r]="circleRadius"
+                  stroke="#e2e8f0"
+                  stroke-width="5"
+                  fill="transparent"
+                />
+                <circle
+                  cx="32"
+                  cy="32"
+                  [attr.r]="circleRadius"
+                  [attr.stroke]="progressStrokeColor()"
+                  stroke-width="5"
+                  stroke-linecap="round"
+                  fill="transparent"
+                  [attr.stroke-dasharray]="circleCircumference"
+                  [attr.stroke-dashoffset]="circleDashOffset()"
+                  class="transition-all duration-700 ease-out"
+                />
+              </svg>
+              
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <span class="text-sm sm:text-base font-black text-slate-900 tracking-tight leading-none">
+                  {{ completionPercentage() }}%
+                </span>
+                <span class="text-[8px] font-extrabold uppercase tracking-widest text-slate-400 mt-0.5">
+                  DONE
+                </span>
               </div>
+            </div>
 
-              <!-- Action Button to open Registration Form (Complete Registration) -->
-              <div class="pt-3">
-                <a
-                  routerLink="/registration"
-                  class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow transition-all cursor-pointer"
+            <!-- Details & Progress Track -->
+            <div class="flex-1 min-w-0 w-full space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold uppercase tracking-wider text-[#0B3558]">
+                    Profile Completion
+                  </span>
+                  <span class="text-xs font-bold text-slate-800">
+                    — {{ completionPercentage() }}% Complete
+                  </span>
+                </div>
+
+                <span
+                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold shrink-0"
+                  [class.bg-emerald-100]="completionPercentage() === 100"
+                  [class.text-emerald-800]="completionPercentage() === 100"
+                  [class.bg-amber-100]="completionPercentage() > 0 && completionPercentage() < 100"
+                  [class.text-amber-800]="completionPercentage() > 0 && completionPercentage() < 100"
+                  [class.bg-slate-200/80]="completionPercentage() === 0"
+                  [class.text-slate-700]="completionPercentage() === 0"
                 >
-                  <span>Complete Registration</span>
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </a>
+                  <span
+                    class="w-1.5 h-1.5 rounded-full"
+                    [class.bg-emerald-500]="completionPercentage() === 100"
+                    [class.bg-amber-500]="completionPercentage() > 0 && completionPercentage() < 100"
+                    [class.bg-slate-400]="completionPercentage() === 0"
+                  ></span>
+                  {{ completedSectionsCount() }} of 4 sections completed
+                </span>
               </div>
 
+              <!-- Horizontal Progress Bar Track -->
+              <div class="w-full bg-slate-200/90 rounded-full h-2.5 overflow-hidden shadow-inner">
+                <div
+                  class="h-2.5 rounded-full transition-all duration-700 ease-out shadow-xs"
+                  [style.width.%]="completionPercentage()"
+                  [style.background]="progressBarGradient()"
+                ></div>
+              </div>
+
+              <!-- Contextual Status Message Banner -->
+              <p class="text-xs text-slate-600 flex items-center gap-1.5 truncate">
+                @if (completionPercentage() === 100) {
+                  <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span class="font-medium text-emerald-900 truncate">{{ contextualMessage() }}</span>
+                } @else if (completedSectionsCount() > 0) {
+                  <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span class="truncate"><strong class="font-bold text-slate-800">You're almost there!</strong> {{ contextualMessage() }}</span>
+                } @else {
+                  <svg class="w-4 h-4 text-[#0B3558] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span class="truncate">{{ contextualMessage() }}</span>
+                }
+              </p>
             </div>
           </div>
+
+          <!-- Section Cards Grid (Full-width 2-column dashboard) -->
+          <div class="space-y-2 pt-1">
+            <div class="flex items-center justify-between text-xs text-slate-500 font-semibold px-0.5">
+              <span class="uppercase tracking-wider">Mandatory Registration Sections</span>
+              <span class="text-slate-400 font-normal">Click any section to fill or edit</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              @for (section of sections(); track section.id) {
+                <a
+                  [routerLink]="['/registration']"
+                  [queryParams]="{ step: section.stepNumber }"
+                  class="group p-3.5 sm:p-4 rounded-xl border transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 hover:shadow-xs hover:border-[#0B3558]/40"
+                  [class.bg-white]="!section.isCompleted"
+                  [class.border-slate-200]="!section.isCompleted"
+                  [class.bg-emerald-50/25]="section.isCompleted"
+                  [class.border-emerald-200]="section.isCompleted"
+                  [class.hover:border-emerald-300]="section.isCompleted"
+                >
+                  <div class="flex items-center gap-3 min-w-0">
+                    <!-- Section Icon -->
+                    <div
+                      class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
+                      [class.bg-emerald-100]="section.isCompleted"
+                      [class.text-emerald-700]="section.isCompleted"
+                      [class.bg-slate-100]="!section.isCompleted"
+                      [class.text-slate-600]="!section.isCompleted"
+                      [class.group-hover:bg-blue-50]="!section.isCompleted"
+                      [class.group-hover:text-[#0B3558]]="!section.isCompleted"
+                    >
+                      @if (section.icon === 'building') {
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                      } @else if (section.icon === 'user-check') {
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                      } @else if (section.icon === 'users') {
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                      } @else {
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                      }
+                    </div>
+
+                    <!-- Title and Subtitle -->
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 0{{ section.stepNumber }}</span>
+                      </div>
+                      <h3 class="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-[#0B3558] transition-colors truncate">
+                        {{ section.title }}
+                      </h3>
+                      <p class="text-[11px] text-slate-500 truncate">
+                        {{ section.subtitle }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Right: Status Badge & Chevron -->
+                  <div class="flex items-center gap-2 shrink-0">
+                    <span
+                      class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide border"
+                      [class.bg-emerald-100]="section.isCompleted"
+                      [class.text-emerald-800]="section.isCompleted"
+                      [class.border-emerald-200]="section.isCompleted"
+                      [class.bg-slate-100]="!section.isCompleted"
+                      [class.text-slate-600]="!section.isCompleted"
+                      [class.border-slate-200]="!section.isCompleted"
+                    >
+                      @if (section.isCompleted) {
+                        <svg class="w-3 h-3 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Completed</span>
+                      } @else {
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        <span>Pending</span>
+                      }
+                    </span>
+
+                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B3558] group-hover:translate-x-0.5 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </a>
+              }
+            </div>
+          </div>
+
+          <!-- Bottom Notice -->
+          <div class="pt-2 flex items-center justify-between text-xs text-slate-500 border-t border-slate-200">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span>Government of Rajasthan Statutory Requirement: Completed OTR profile is required for submitting technical proposals under state skill schemes.</span>
+            </div>
+          </div>
+
         </div>
       } @else {
         <!-- ====================================================================
@@ -74,7 +261,7 @@ import { OtrFormService } from '../registration/services/otr-form.service';
           <!-- Top Heading -->
           <div class="space-y-1">
             <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-              Entity Profile
+              Profile
             </h1>
             <p class="text-xs text-slate-500 font-normal">
               One Time Registration (OTR) details and verified institutional profile
@@ -602,20 +789,6 @@ import { OtrFormService } from '../registration/services/otr-form.service';
 
               </div>
 
-              <!-- Declaration Box -->
-              <div class="p-4 bg-blue-50/40 border border-blue-100 rounded-lg text-xs space-y-2">
-                <div class="flex items-center gap-2">
-                  <span class="text-emerald-600 font-bold">&check;</span>
-                  <span class="font-semibold text-slate-800">OTR Statutory Declaration &amp; Undertaking</span>
-                </div>
-                <p class="text-[11px] text-slate-600 leading-relaxed font-normal">
-                  The applicant organization confirms that all particulars, officer listings, signatory records, and uploaded documents in this One Time Registration (OTR) profile are authentic, legally accurate, and compliant with the Government of Rajasthan and RSLDC operational guidelines.
-                </p>
-                <div class="text-[11px] text-slate-500 pt-1 flex items-center justify-between">
-                  <span>Profile Status: <strong class="text-emerald-700 font-semibold">Active &amp; Verified</strong></span>
-                  <span>Registration ID: <strong class="text-[#0B3558] font-mono">REG/RAJ/2018/88921</strong></span>
-                </div>
-              </div>
 
             </div>
           }
@@ -629,12 +802,17 @@ import { OtrFormService } from '../registration/services/otr-form.service';
 export class ProfilePageComponent {
   private authService = inject(AuthService);
   private otrFormService = inject(OtrFormService);
+  private validationService = inject(OtrValidationService);
   private route = inject(ActivatedRoute);
 
   readonly currentUser = this.authService.currentUser;
   readonly formData = this.otrFormService.formData;
 
   activeTab = signal<'all' | 'org' | 'officers' | 'auth' | 'bank' | 'docs'>('all');
+
+  // Math for SVG Circular Progress Ring (r = 26, viewBox 0 0 64 64)
+  readonly circleRadius = 26;
+  readonly circleCircumference = 2 * Math.PI * 26; // 163.363
 
   constructor() {
     this.route.queryParams.subscribe(params => {
@@ -661,5 +839,165 @@ export class ProfilePageComponent {
   readonly userChar = computed(() => {
     const name = this.userDisplayName();
     return name ? name.charAt(0).toUpperCase() : 'U';
+  });
+
+  /**
+   * Evaluates the 4 registration sections based on actual OTR form data & validation rules.
+   */
+  readonly sections = computed(() => {
+    const data = this.formData();
+    const isStep1Complete = this.validationService.validateStep1(data.step1).length === 0;
+    const isStep3Complete = this.validationService.validateStep3(data.step3).length === 0;
+    const isStep2Complete = this.validationService.validateStep2(data.step2).length === 0;
+    const isStep4Complete = this.validationService.validateStep4(data.step4).length === 0;
+
+    return [
+      {
+        id: 'org',
+        stepNumber: 1,
+        title: 'Organization & Legal Constitution',
+        subtitle: 'Entity type, registration number, PAN & verified incorporation documents',
+        isCompleted: isStep1Complete,
+        icon: 'building'
+      },
+      {
+        id: 'auth',
+        stepNumber: 2,
+        title: 'Authorized Representative Documents',
+        subtitle: 'Signatory identity, PAN, Aadhaar & board resolution authorization',
+        isCompleted: isStep3Complete,
+        icon: 'user-check'
+      },
+      {
+        id: 'officers',
+        stepNumber: 3,
+        title: 'Officer In-Charge Directory',
+        subtitle: 'Key managerial personnel, designations & appointment letters',
+        isCompleted: isStep2Complete,
+        icon: 'users'
+      },
+      {
+        id: 'bank',
+        stepNumber: 4,
+        title: 'Verified Bank Account for Disbursements',
+        subtitle: 'Institutional bank account, IFSC code & uploaded cancelled cheque',
+        isCompleted: isStep4Complete,
+        icon: 'bank'
+      }
+    ];
+  });
+
+  /** Total count of fully completed sections (0 to 4) */
+  readonly completedSectionsCount = computed(() => {
+    return this.sections().filter(s => s.isCompleted).length;
+  });
+
+  /**
+   * Dynamic profile completion percentage (0 - 100).
+   * Computed from actual section validity and field completion in draft.
+   */
+  readonly completionPercentage = computed(() => {
+    const data = this.formData();
+    if (data.status === 'Submitted') return 100;
+
+    const s1Complete = this.validationService.validateStep1(data.step1).length === 0;
+    const s3Complete = this.validationService.validateStep3(data.step3).length === 0;
+    const s2Complete = this.validationService.validateStep2(data.step2).length === 0;
+    const s4Complete = this.validationService.validateStep4(data.step4).length === 0;
+
+    if (s1Complete && s3Complete && s2Complete && s4Complete) {
+      return 100;
+    }
+
+    // Step 1: Organization Details (Max 25%)
+    const s1 = data.step1;
+    const s1Fields = [s1.shortName, s1.fullName, s1.natureOfEntity, s1.registrationNumber, s1.companyPan, s1.contactNo, s1.emailId, s1.registeredAddress];
+    const s1Filled = s1Fields.filter(f => !!f && f.trim().length > 0).length;
+    const r1 = s1Complete ? 1 : (s1Filled / s1Fields.length);
+
+    // Step 2 in UI (Authorized Person, step3 in data) (Max 25%)
+    const s3 = data.step3;
+    const s3Fields = [s3.name, s3.dob, s3.pan, s3.mobileNo];
+    const s3Filled = s3Fields.filter(f => !!f && f.trim().length > 0).length;
+    const r2 = s3Complete ? 1 : (s3Filled / s3Fields.length);
+
+    // Step 3 in UI (Officer In-Charge, step2 in data) (Max 25%)
+    const s2 = data.step2;
+    let r3 = 0;
+    if (s2Complete) {
+      r3 = 1;
+    } else if (s2 && s2.length > 0) {
+      const o1 = s2[0];
+      const s2Fields = [o1?.name, o1?.designation, o1?.mobileNo, o1?.emailId, o1?.pan];
+      const s2Filled = s2Fields.filter(f => !!f && f.trim().length > 0).length;
+      r3 = s2Filled / s2Fields.length;
+    }
+
+    // Step 4: Bank Details (Max 25%)
+    const s4 = data.step4;
+    const s4Fields = [s4.bankName, s4.branchName, s4.accountNo, s4.ifscCode];
+    const s4Filled = s4Fields.filter(f => !!f && f.trim().length > 0).length;
+    const r4 = s4Complete ? 1 : (s4Filled / s4Fields.length);
+
+    const totalAverage = (r1 + r2 + r3 + r4) / 4;
+    return Math.min(100, Math.max(0, Math.round(totalAverage * 100)));
+  });
+
+  /** SVG stroke dashoffset for circular progress ring */
+  readonly circleDashOffset = computed(() => {
+    const pct = this.completionPercentage();
+    return this.circleCircumference - (pct / 100) * this.circleCircumference;
+  });
+
+  /** Dynamic color for circular SVG progress stroke */
+  readonly progressStrokeColor = computed(() => {
+    const pct = this.completionPercentage();
+    if (pct === 100) return '#059669'; // Emerald
+    if (pct >= 50) return '#0B3558';   // Navy Blue
+    return '#d97706';                  // Saffron / Amber
+  });
+
+  /** Gradient for the horizontal progress bar */
+  readonly progressBarGradient = computed(() => {
+    const pct = this.completionPercentage();
+    if (pct === 100) return 'linear-gradient(90deg, #10b981 0%, #059669 100%)';
+    return 'linear-gradient(90deg, #0B3558 0%, #800020 55%, #ea580c 100%)';
+  });
+
+  /** Primary CTA button text */
+  readonly ctaText = computed(() => {
+    const pct = this.completionPercentage();
+    const count = this.completedSectionsCount();
+    if (pct === 0) return 'Start Registration';
+    if (count === 4 || pct === 100) return 'Profile Complete';
+    return 'Continue Registration';
+  });
+
+  /** First incomplete step for dynamic routing */
+  readonly nextIncompleteStep = computed(() => {
+    const list = this.sections();
+    const firstIncomplete = list.find(s => !s.isCompleted);
+    return firstIncomplete ? firstIncomplete.stepNumber : 1;
+  });
+
+  /** Dynamic query parameters for CTA button navigation */
+  readonly ctaQueryParams = computed(() => {
+    if (this.completedSectionsCount() === 4) {
+      return { step: 5 };
+    }
+    return { step: this.nextIncompleteStep() };
+  });
+
+  /** Contextual status and encouragement message */
+  readonly contextualMessage = computed(() => {
+    const count = this.completedSectionsCount();
+    const remaining = 4 - count;
+    if (count === 4) {
+      return 'Great job! All 4 sections are completed and ready for submission.';
+    }
+    if (count > 0) {
+      return `You're almost there! Complete the remaining ${remaining} section${remaining > 1 ? 's' : ''} to finish your organization profile.`;
+    }
+    return 'Get started with your registration to access EOI proposals and state skill schemes.';
   });
 }

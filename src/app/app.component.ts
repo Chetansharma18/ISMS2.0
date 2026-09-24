@@ -37,7 +37,7 @@ import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-m
       @if (showSidebar()) {
         <div class="flex-1 flex w-full overflow-hidden">
           <app-sidebar class="h-full shrink-0"></app-sidebar>
-          <main class="flex-1 min-w-0 h-full overflow-y-auto bg-slate-50 flex flex-col">
+          <main class="flex-1 min-w-0 h-full overflow-y-auto bg-white flex flex-col">
             <router-outlet></router-outlet>
           </main>
         </div>

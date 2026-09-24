@@ -42,9 +42,6 @@ export interface SubmittedTender {
         <!-- Page Header via Reusable PageHeaderComponent -->
         <app-page-header
           title="Tender Status"
-          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Tender Status' }]"
-          backUrl="/tenders"
-          backTitle="Back to Active EOI"
         ></app-page-header>
 
         <!-- Filter Controls & Search Toolbar -->

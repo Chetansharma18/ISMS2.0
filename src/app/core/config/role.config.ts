@@ -11,7 +11,7 @@ export const USER_ROLES_CONFIG: RoleConfig[] = [
     role: 'existing_user',
     label: 'Existing Partner',
     badge: 'Registered TP/PIA',
-    description: 'Registered agency with verified entity profile'
+    description: 'Registered agency with verified profile'
   },
   {
     role: 'dept_admin',

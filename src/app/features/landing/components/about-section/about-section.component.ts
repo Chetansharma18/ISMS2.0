@@ -33,18 +33,18 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
             <!-- Core Content -->
             <div class="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed sm:leading-[1.8] text-justify hyphens-auto">
               <p>
-                <strong class="text-slate-800 font-bold">Integrated Scheme Management System (ISMS 2.0)</strong> is a comprehensive
-                <strong class="text-slate-800">e-Governance and Management Information System (MIS)</strong> designed to digitally transform, 
+                Integrated Scheme Management System (ISMS 2.0) is a comprehensive
+                e-Governance and Management Information System (MIS) designed to digitally transform, 
                 integrate, and streamline the processes involved in the planning, implementation, monitoring, and management of skill development 
                 schemes across Rajasthan.
               </p>
               <p>
                 The platform provides a centralized and secure digital ecosystem that unites
-                <strong class="text-slate-800 font-semibold">youth, training providers, government departments, empaneled agencies, and certification bodies</strong>
+                youth, training providers, government departments, empaneled agencies, and certification bodies
                 on a single, high-transparency platform.
               </p>
               <p>
-                ISMS 2.0 enables <strong class="text-slate-800 font-semibold">end-to-end scheme management</strong>, from scheme launching and candidate enrollment 
+                ISMS 2.0 enables end-to-end scheme management, from scheme launching and candidate enrollment 
                 through bio-metric attendance, quality inspections, assessment, certification, and direct benefit/fund disbursements.
               </p>
 
@@ -52,16 +52,16 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
               @if (isExpanded()) {
                 <div class="space-y-4 pt-4 border-t border-slate-100 animate-in fade-in duration-300">
                   <p>
-                    ISMS 2.0 serves as a centralized <strong class="text-slate-800">decision-support platform</strong>, enabling stakeholders 
+                    ISMS 2.0 serves as a centralized decision-support platform, enabling stakeholders 
                     to generate structured MIS reports, monitor target vs. achievement KPIs, detect bottlenecks, and track the progress of flagship skilling initiatives in real time.
                   </p>
                   <p>
-                    The system is built on a <strong class="text-slate-800">modular, scalable, and secure cloud architecture</strong>. 
+                    The system is built on a modular, scalable, and secure cloud architecture. 
                     It integrates seamlessly with Rajasthan single sign-on (SSO), Jan Aadhaar, and national portals (PM-SETU, Skill India Digital) 
                     via standardized APIs to eliminate redundant data entry.
                   </p>
                   <p>
-                    By establishing a <strong class="text-slate-800">single source of truth</strong> with rigorous audit trails and role-based permissions, 
+                    By establishing a single source of truth with rigorous audit trails and role-based permissions, 
                     ISMS 2.0 ensures accountable, transparent, and citizen-centric governance for the youth of Rajasthan.
                   </p>
                 </div>

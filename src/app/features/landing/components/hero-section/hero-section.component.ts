@@ -88,7 +88,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                   @for (item of tenders; track item.id) {
                     <div 
                       (click)="downloadSamplePdf()" 
-                      class="relative p-3 sm:p-3.5 bg-white border border-slate-100 shadow-sm rounded-lg hover:shadow-md hover:border-slate-200 hover:bg-slate-50 transition-all group">
+                      class="relative p-3 sm:p-3.5 bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-[#0B3558]/40 hover:bg-slate-50 transition-all group">
                       @if (item.isNew) {
                         <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-lg" />
                       }
@@ -108,7 +108,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                   @for (item of tenders; track item.id + '-dup') {
                     <div 
                       (click)="downloadSamplePdf()" 
-                      class="relative p-3 sm:p-3.5 bg-white border border-slate-100 shadow-sm rounded-lg hover:shadow-md hover:border-slate-200 hover:bg-slate-50 transition-all group">
+                      class="relative p-3 sm:p-3.5 bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-[#0B3558]/40 hover:bg-slate-50 transition-all group">
                       @if (item.isNew) {
                         <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-lg" />
                       }

@@ -41,8 +41,12 @@ interface Tender {
         <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50">
           
           @for (item of tenders; track item.id) {
-            <div (click)="downloadPdf()" class="bg-white border border-slate-200 rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:shadow-md transition-shadow cursor-pointer">
+            <div (click)="downloadPdf()" class="relative bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-[#0B3558]/40 transition-all cursor-pointer">
               
+              @if (item.isNew) {
+                <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-lg" />
+              }
+
               <div class="flex-1">
                 <div class="flex flex-wrap items-center gap-2 mb-2">
                   <span class="text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
@@ -50,16 +54,6 @@ interface Tender {
                   <span class="text-[11px] text-slate-500 font-mono">{{ item.id }}</span>
                   <span class="text-slate-300">•</span>
                   <span class="text-[11px] text-slate-500 font-medium">{{ item.category }}</span>
-                  
-                  @if (item.isNew) {
-                    <span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold text-yellow-700 bg-yellow-100 border border-yellow-300">
-                      NEW
-                    </span>
-                  }
-                  <span class="ml-1 inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    {{ item.status }}
-                  </span>
                 </div>
                 
                 <h4 class="text-sm font-bold text-slate-800 leading-snug">

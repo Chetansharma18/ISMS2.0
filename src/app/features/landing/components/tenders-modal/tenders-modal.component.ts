@@ -41,7 +41,7 @@ interface Tender {
         <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50">
           
           @for (item of tenders; track item.id) {
-            <div (click)="downloadPdf()" class="relative bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-[#0B3558]/40 transition-all cursor-pointer">
+            <div (click)="downloadPdf()" class="group relative bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-[#0B3558]/40 transition-all cursor-pointer">
               
               @if (item.isNew) {
                 <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-lg" />
@@ -56,7 +56,7 @@ interface Tender {
                   <span class="text-[11px] text-slate-500 font-medium">{{ item.category }}</span>
                 </div>
                 
-                <h4 class="text-sm font-bold text-slate-800 leading-snug">
+                <h4 class="text-sm font-bold text-slate-800 leading-snug group-hover:text-blue-600 group-hover:underline transition-all">
                   {{ item.title }}
                 </h4>
               </div>

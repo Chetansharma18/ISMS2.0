@@ -122,8 +122,8 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
             <div class="w-full flex flex-col items-center">
               <h4 class="text-sm font-bold text-white mb-4">Important Links</h4>
               <ul class="space-y-2.5 text-xs text-slate-300 mb-6 flex flex-col items-center">
-                <li><a href="https://rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Rajasthan Government</a></li>
-                <li><a href="https://livelihoods.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">RSLDC Official Portal</a></li>
+                <li><a href="https://rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" title="Redirects to Rajasthan Government site" class="hover:text-white transition-colors">Rajasthan Government</a></li>
+                <li><a href="https://livelihoods.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" title="Redirects to RSLDC Official Portal" class="hover:text-white transition-colors">RSLDC Official Portal</a></li>
                 <li><a (click)="downloadSamplePdf('Privacy_Policy.pdf', 'Privacy Policy')" class="hover:text-white transition-colors cursor-pointer">Privacy Policy</a></li>
                 <li><a (click)="downloadSamplePdf('Terms_and_Conditions.pdf', 'Terms & Conditions')" class="hover:text-white transition-colors cursor-pointer">Terms & Conditions</a></li>
               </ul>

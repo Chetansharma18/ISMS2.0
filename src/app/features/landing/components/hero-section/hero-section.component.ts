@@ -95,7 +95,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                       <div class="flex justify-between items-center mb-1">
                         <span class="text-[10px] sm:text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
                       </div>
-                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors line-clamp-2">
+                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:text-blue-600 group-hover:underline transition-all line-clamp-2">
                         {{ item.title }}
                       </h4>
                       <p class="text-[10px] text-slate-400 font-mono">{{ item.id }}</p>
@@ -115,7 +115,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                       <div class="flex justify-between items-center mb-1">
                         <span class="text-[10px] sm:text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
                       </div>
-                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:text-[#0B3558] transition-colors line-clamp-2">
+                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:text-blue-600 group-hover:underline transition-all line-clamp-2">
                         {{ item.title }}
                       </h4>
                       <p class="text-[10px] text-slate-400 font-mono">{{ item.id }}</p>

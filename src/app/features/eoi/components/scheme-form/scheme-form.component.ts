@@ -290,269 +290,343 @@ export interface EoiDocumentItem {
         @if (currentStep() === 1) {
           <div class="space-y-6">
 
-            <!-- Section 1: Step 1 - Organization Details -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <!-- Top Header & Edit Toggle Bar -->
+            <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-2xs flex items-center justify-between flex-wrap gap-3">
+              <div>
                 <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">1</span>
-                  <h3 class="text-sm font-medium text-[#0B3558] uppercase tracking-wide">Step 1 - Organization Details</h3>
+                  <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">1</span>
+                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">OTR Profile Verification</h3>
+                  <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-medium border border-emerald-200">
+                    &check; Pre-filled from Registration
+                  </span>
                 </div>
-                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-normal border border-emerald-200">
-                  &check; Verified
-                </span>
+                <p class="text-xs text-slate-500 mt-1">
+                  @if (!isEditingOtr()) {
+                    All registration details below are currently in <strong>read-only preview</strong>. Click <strong>Edit Information</strong> to modify particulars before proceeding.
+                  } @else {
+                    You are in <strong>edit mode</strong>. Update particulars below and click <strong>Lock &amp; Review</strong> or <strong>Save &amp; Next</strong>.
+                  }
+                </p>
               </div>
 
-              <!-- Form Inputs Pre-filled with Registration Data -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6 text-xs">
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">TP/PIA Short Name</label>
-                  <input
-                    type="text"
-                    [(ngModel)]="editableStep1.shortName"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">TP/PIA Full Name</label>
-                  <input
-                    type="text"
-                    [(ngModel)]="editableStep1.fullName"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Nature of Entity</label>
-                  <select
-                    [(ngModel)]="editableStep1.natureOfEntity"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+              <div>
+                @if (!isEditingOtr()) {
+                  <button
+                    type="button"
+                    (click)="isEditingOtr.set(true)"
+                    class="px-4 py-2 bg-sky-50 hover:bg-sky-100 text-[#0483AC] border border-sky-300 rounded-lg text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
-                    <option value="PUBLIC LIMITED">PUBLIC LIMITED</option>
-                    <option value="PRIVATE LIMITED">PRIVATE LIMITED</option>
-                    <option value="SOCIETY">SOCIETY</option>
-                    <option value="TRUST">TRUST</option>
-                    <option value="PROPRIETORSHIP">PROPRIETORSHIP</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Registration Number of Entity (CIN / Reg. No.)</label>
-                  <input
-                    type="text"
-                    [(ngModel)]="editableStep1.registrationNumber"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Certificate of Registration / Incorporation</label>
-                  <div class="flex items-center gap-2 py-1.5 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-emerald-700 text-xs font-normal">
-                    <span>&check; Verified Document Attached</span>
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Date of Registration as Legal Entity</label>
-                  <input
-                    type="text"
-                    [(ngModel)]="editableStep1.dateOfRegistration"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Company PAN</label>
-                  <input
-                    type="text"
-                    [(ngModel)]="editableStep1.companyPan"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Organization PAN Card</label>
-                  <div class="flex items-center gap-2 py-1.5 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-emerald-700 text-xs font-normal">
-                    <span>&check; Verified Document Attached</span>
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">State/UT of Legal Registration</label>
-                  <input
-                    type="text"
-                    [(ngModel)]="editableStep1.stateOfLegalReg"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">GST Registered</label>
-                  <select
-                    [(ngModel)]="editableStep1.gstRegistered"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    <span>Edit Information</span>
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    (click)="isEditingOtr.set(false)"
+                    class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">GSTIN</label>
-                  <input
-                    type="text"
-                    [(ngModel)]="editableStep1.gstin"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">GST Registration Certificate</label>
-                  <div class="flex items-center gap-2 py-1.5 px-2.5 bg-slate-50 border border-slate-200 rounded-md text-emerald-700 text-xs font-normal">
-                    <span>&check; Verified Document Attached</span>
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">MSME Registered</label>
-                  <select
-                    [(ngModel)]="editableStep1.msmeRegistered"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
-                  >
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Udyam Number</label>
-                  <input
-                    type="text"
-                    [(ngModel)]="editableStep1.udyamNumber"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Turn Over (₹ Lakhs)</label>
-                  <input
-                    type="text"
-                    [(ngModel)]="editableStep1.turnOver"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">BlackListed</label>
-                  <select
-                    [(ngModel)]="editableStep1.blackListed"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
-                  >
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">NSDC Partner</label>
-                  <select
-                    [(ngModel)]="editableStep1.nsdcPartner"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
-                  >
-                    <option value="Equity Share">Equity Share</option>
-                    <option value="Funded">Funded</option>
-                    <option value="Non-Funded">Non-Funded</option>
-                    <option value="None">None</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Company Contact No.</label>
-                  <input
-                    type="text"
-                    [(ngModel)]="editableStep1.contactNo"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Company Email-ID</label>
-                  <input
-                    type="text"
-                    [(ngModel)]="editableStep1.emailId"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Website</label>
-                  <input
-                    type="text"
-                    [(ngModel)]="editableStep1.website"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
-                  />
-                </div>
-
-                <!-- Registered Address -->
-                <div class="sm:col-span-2 md:col-span-3 pt-2 border-t border-slate-100">
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Registered Address</label>
-                  <textarea
-                    rows="2"
-                    [(ngModel)]="editableStep1.registeredAddress"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
-                  ></textarea>
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">State/UT</label>
-                      <input type="text" [(ngModel)]="editableStep1.registeredState" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
-                    </div>
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">District</label>
-                      <input type="text" [(ngModel)]="editableStep1.registeredDistrict" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
-                    </div>
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Pincode</label>
-                      <input type="text" [(ngModel)]="editableStep1.registeredPincode" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Office Address -->
-                <div class="sm:col-span-2 md:col-span-3 pt-2 border-t border-slate-100">
-                  <label class="block text-[11px] font-medium text-slate-600 mb-1">Office Address</label>
-                  <textarea
-                    rows="2"
-                    [(ngModel)]="editableStep1.officeAddress"
-                    class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors"
-                  ></textarea>
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">State/UT</label>
-                      <input type="text" [(ngModel)]="editableStep1.officeState" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
-                    </div>
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">District</label>
-                      <input type="text" [(ngModel)]="editableStep1.officeDistrict" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
-                    </div>
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Pincode</label>
-                      <input type="text" [(ngModel)]="editableStep1.officePincode" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
-                    </div>
-                  </div>
-                </div>
-
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Lock &amp; Review</span>
+                  </button>
+                }
               </div>
             </div>
 
-            <!-- Section 2: Officer In-Charge & Authorized Person -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              <!-- Officer In-Charge -->
+            <!-- ================================================================
+                 MODE A: READ-ONLY VIEW (DEFAULT)
+                 ================================================================ -->
+            @if (!isEditingOtr()) {
+              <!-- 1. Organization Details -->
+              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-medium">1</span>
+                    <h3 class="text-sm font-semibold text-[#0B3558] uppercase tracking-wide">Step 1 – Organization Details</h3>
+                  </div>
+                  <span class="text-xs text-slate-500 font-mono">CIN: {{ editableStep1.registrationNumber || '-' }}</span>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                  <div><span class="text-slate-400 block text-[10.5px]">Short Name</span><span class="font-medium text-slate-800">{{ editableStep1.shortName || '-' }}</span></div>
+                  <div class="sm:col-span-2"><span class="text-slate-400 block text-[10.5px]">Full Name</span><span class="font-medium text-slate-800">{{ editableStep1.fullName || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Nature of Entity</span><span class="font-medium text-slate-800">{{ editableStep1.natureOfEntity || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Date of Registration</span><span class="text-slate-800">{{ editableStep1.dateOfRegistration || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">State of Reg.</span><span class="text-slate-800">{{ editableStep1.stateOfLegalReg || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Company PAN</span><span class="font-mono font-semibold text-slate-800">{{ editableStep1.companyPan || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">GST Registered</span><span class="text-slate-800">{{ editableStep1.gstRegistered }} ({{ editableStep1.gstin || 'N/A' }})</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">MSME / Udyam</span><span class="text-slate-800">{{ editableStep1.msmeRegistered }} @if(editableStep1.udyamNumber){ - {{ editableStep1.udyamNumber }} }</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">NSDC Partner</span><span class="text-slate-800">{{ editableStep1.nsdcPartner || 'None' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Blacklisted</span><span class="font-semibold" [class.text-rose-600]="editableStep1.blackListed === 'Yes'">{{ editableStep1.blackListed }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Contact / Email</span><span class="text-slate-800">{{ editableStep1.contactNo }} | {{ editableStep1.emailId }}</span></div>
+                </div>
+
+                <!-- 3-Year Turnover Table -->
+                @if (editableStep1.financialYears && editableStep1.financialYears.length > 0) {
+                  <div class="pt-3 border-t border-slate-100">
+                    <span class="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Financial Turnover (₹ in Lacs)</span>
+                    <table class="w-full text-left border-collapse border border-slate-200 rounded text-xs">
+                      <thead>
+                        <tr class="bg-slate-50 text-slate-700 font-semibold text-[11px] border-b border-slate-200">
+                          <th class="py-1.5 px-3 border-r border-slate-200">Financial Year</th>
+                          <th class="py-1.5 px-3 border-r border-slate-200">Total Turnover (₹ Lacs)</th>
+                          <th class="py-1.5 px-3">Skill Turnover (₹ Lacs)</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100">
+                        @for (fy of editableStep1.financialYears; track fy.year) {
+                          <tr>
+                            <td class="py-1 px-3 text-slate-700 border-r border-slate-100">{{ fy.year }}</td>
+                            <td class="py-1 px-3 text-slate-700 border-r border-slate-100">{{ fy.totalTurnover || '-' }}</td>
+                            <td class="py-1 px-3 text-slate-700">{{ fy.skillTurnover || '-' }}</td>
+                          </tr>
+                        }
+                        <tr class="bg-slate-50 font-semibold border-t border-slate-200">
+                          <td class="py-1 px-3 text-slate-700 border-r border-slate-100">3-Year Average</td>
+                          <td class="py-1 px-3 text-[#0483AC] border-r border-slate-100">{{ avgTotalTurnover() }} Lacs</td>
+                          <td class="py-1 px-3 text-[#0483AC]">{{ avgSkillTurnover() }} Lacs</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                }
+
+                <div class="pt-2 border-t border-slate-100 text-xs">
+                  <span class="text-slate-400 block text-[10.5px]">Registered Address</span>
+                  <span class="text-slate-800">{{ editableStep1.registeredAddress || '-' }}</span>
+                </div>
+              </div>
+
+              <!-- 2. Authorized Person Details (Swapped to Step 2) -->
+              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-medium">2</span>
+                    <h3 class="text-sm font-semibold text-[#0B3558] uppercase tracking-wide">Step 2 – Authorized Person Details</h3>
+                  </div>
+                  <span class="text-[11px] text-emerald-700 font-normal bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">&check; Verified</span>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                  <div><span class="text-slate-400 block text-[10.5px]">Name</span><span class="font-semibold text-slate-800">{{ editableStep3.name || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Designation</span><span class="text-slate-800">{{ editableStep3.designation || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">DOB / Age</span><span class="text-slate-800">{{ editableStep3.dob || '-' }} @if(editableStep3.age){ ({{ editableStep3.age }} yrs) }</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Mobile No.</span><span class="font-mono text-slate-800">{{ editableStep3.mobileNo || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Email ID</span><span class="text-slate-800">{{ editableStep3.emailId || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">PAN</span><span class="font-mono text-slate-800">{{ editableStep3.pan || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Aadhaar No.</span><span class="font-mono text-slate-800">{{ editableStep3.aadhaarNo || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">State</span><span class="text-slate-800">{{ editableStep3.state || '-' }}</span></div>
+                  <div class="sm:col-span-4"><span class="text-slate-400 block text-[10.5px]">Residence Address</span><span class="text-slate-800">{{ editableStep3.residenceAddress || '-' }}</span></div>
+                </div>
+              </div>
+
+              <!-- 3. Details of Officer In-Charge (Swapped to Step 3) + PROPOSAL SELECTION -->
+              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-medium">3</span>
+                    <h3 class="text-sm font-semibold text-[#0B3558] uppercase tracking-wide">
+                      Step 3 – Details of Officer(s) In-Charge ({{ editableStep2.length }})
+                    </h3>
+                  </div>
+                </div>
+
+                <!-- Scheme Designated OIC Selector -->
+                <div class="bg-sky-50/70 border border-sky-200 rounded-lg p-3 text-xs">
+                  <label class="block font-bold text-[#0B3558] mb-1">
+                    Designated Officer In-Charge for this Proposal:
+                  </label>
+                  <p class="text-[11px] text-slate-600 mb-2">
+                    Select the registered Officer In-Charge who will manage and sign operations for this specific scheme application.
+                  </p>
+                  <select
+                    [ngModel]="selectedOicId()"
+                    (ngModelChange)="selectedOicId.set($event)"
+                    class="w-full sm:w-auto min-w-[280px] bg-white border border-slate-300 rounded px-3 py-1.5 text-xs text-slate-800 font-semibold focus:ring-1 focus:ring-[#0483AC]"
+                  >
+                    @for (oic of editableStep2; track oic.id) {
+                      <option [value]="oic.id">
+                        {{ oic.name }} ({{ oic.designation || 'OIC' }}) - {{ oic.mobileNo }}
+                      </option>
+                    }
+                  </select>
+                </div>
+
+                <!-- OIC Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  @for (oic of editableStep2; track oic.id; let idx = $index) {
+                    <div
+                      class="p-3 rounded-lg border transition-colors"
+                      [class.border-[#0483AC]]="selectedOicId() === oic.id"
+                      [class.bg-sky-50/30]="selectedOicId() === oic.id"
+                      [class.border-slate-200]="selectedOicId() !== oic.id"
+                    >
+                      <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-100">
+                        <span class="font-bold text-slate-800">{{ oic.name || 'Officer #' + (idx + 1) }}</span>
+                        @if (selectedOicId() === oic.id) {
+                          <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#0483AC] text-white">Designated for Scheme</span>
+                        }
+                      </div>
+                      <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+                        <div><span class="text-slate-400">Designation:</span> <span class="font-medium text-slate-700">{{ oic.designation || '-' }}</span></div>
+                        <div><span class="text-slate-400">Mobile:</span> <span class="font-mono text-slate-700">{{ oic.mobileNo || '-' }}</span></div>
+                        <div><span class="text-slate-400">Email:</span> <span class="text-slate-700">{{ oic.emailId || '-' }}</span></div>
+                        <div><span class="text-slate-400">PAN:</span> <span class="font-mono text-slate-700">{{ oic.pan || '-' }}</span></div>
+                        <div><span class="text-slate-400">Aadhaar:</span> <span class="font-mono text-slate-700">{{ oic.aadhaarNo || '-' }}</span></div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- 4. Bank Account Details -->
+              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-medium">4</span>
+                    <h3 class="text-sm font-semibold text-[#0B3558] uppercase tracking-wide">Step 4 – Bank Account Details</h3>
+                  </div>
+                  <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-normal border border-emerald-200">&check; Verified</span>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                  <div><span class="text-slate-400 block text-[10.5px]">Name of the Bank</span><span class="font-medium text-slate-800">{{ editableStep4.bankName || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Branch Name</span><span class="text-slate-800">{{ editableStep4.branchName || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Type of Account</span><span class="text-slate-800">{{ editableStep4.accountType || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Account Holder Name</span><span class="font-medium text-slate-800">{{ editableStep4.accountHolderName || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Account No.</span><span class="font-mono text-slate-800">{{ editableStep4.accountNo || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">IFSC Code</span><span class="font-mono text-slate-800">{{ editableStep4.ifscCode || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Mode of Transfer</span><span class="text-slate-800">{{ editableStep4.transferMode || '-' }}</span></div>
+                  <div><span class="text-slate-400 block text-[10.5px]">Cancelled Cheque</span><span class="text-emerald-700 font-medium">{{ editableStep4.cancelledChequeDoc?.fileName || 'Attached' }}</span></div>
+                </div>
+              </div>
+            }
+
+            <!-- ================================================================
+                 MODE B: EDITABLE FORM INPUTS (WHEN isEditingOtr() IS TRUE)
+                 ================================================================ -->
+            @if (isEditingOtr()) {
+              <!-- Section 1: Step 1 - Organization Details (Editable) -->
+              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">1</span>
+                    <h3 class="text-sm font-medium text-[#0B3558] uppercase tracking-wide">Step 1 - Organization Details</h3>
+                  </div>
+                  <span class="text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">Editing</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6 text-xs">
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">TP/PIA Short Name</label>
+                    <input type="text" [(ngModel)]="editableStep1.shortName" class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558]" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">TP/PIA Full Name</label>
+                    <input type="text" [(ngModel)]="editableStep1.fullName" class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal focus:outline-none focus:ring-1 focus:ring-[#0B3558]" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Nature of Entity</label>
+                    <select [(ngModel)]="editableStep1.natureOfEntity" class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-normal">
+                      <option value="PUBLIC LIMITED">PUBLIC LIMITED</option>
+                      <option value="PRIVATE LIMITED">PRIVATE LIMITED</option>
+                      <option value="SOCIETY">SOCIETY</option>
+                      <option value="TRUST">TRUST</option>
+                      <option value="PROPRIETORSHIP">PROPRIETORSHIP</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Registration Number (CIN)</label>
+                    <input type="text" [(ngModel)]="editableStep1.registrationNumber" class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-mono" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Date of Registration</label>
+                    <input type="text" [(ngModel)]="editableStep1.dateOfRegistration" class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Company PAN</label>
+                    <input type="text" [(ngModel)]="editableStep1.companyPan" class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-mono" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">GST Registered</label>
+                    <select [(ngModel)]="editableStep1.gstRegistered" class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800">
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">GSTIN</label>
+                    <input type="text" [(ngModel)]="editableStep1.gstin" class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-mono" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">MSME Registered</label>
+                    <select [(ngModel)]="editableStep1.msmeRegistered" class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800">
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Company Contact No.</label>
+                    <input type="text" [(ngModel)]="editableStep1.contactNo" class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-mono" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Company Email-ID</label>
+                    <input type="text" [(ngModel)]="editableStep1.emailId" class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800" />
+                  </div>
+                  <div class="sm:col-span-2 md:col-span-3">
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Registered Address</label>
+                    <textarea rows="2" [(ngModel)]="editableStep1.registeredAddress" class="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 2: Step 2 - Authorized Person Details (Editable) -->
               <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-3">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                   <div class="flex items-center gap-2">
                     <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">2</span>
-                    <h3 class="text-sm font-medium text-[#0B3558]">Step 2 – Details of Officer In-Charge</h3>
+                    <h3 class="text-sm font-medium text-[#0B3558]">Step 2 – Authorized Person Details</h3>
+                  </div>
+                  <span class="text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">Editing</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Name</label>
+                    <input type="text" [(ngModel)]="editableStep3.name" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Designation</label>
+                    <input type="text" [(ngModel)]="editableStep3.designation" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Mobile No.</label>
+                    <input type="text" [(ngModel)]="editableStep3.mobileNo" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Email-ID</label>
+                    <input type="text" [(ngModel)]="editableStep3.emailId" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-500 font-normal mb-0.5">PAN</label>
+                    <input type="text" [(ngModel)]="editableStep3.pan" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Aadhaar No.</label>
+                    <input type="text" [(ngModel)]="editableStep3.aadhaarNo" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 3: Step 3 - Officer(s) In-Charge (Editable) -->
+              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">3</span>
+                    <h3 class="text-sm font-medium text-[#0B3558]">Step 3 – Details of Officer(s) In-Charge</h3>
                   </div>
                   <span class="text-[11px] text-slate-500">{{ editableStep2.length }} Officers</span>
                 </div>
@@ -560,7 +634,7 @@ export interface EoiDocumentItem {
                 <div class="space-y-3 pt-1">
                   @for (oic of editableStep2; track oic.id; let idx = $index) {
                     <div class="p-3 bg-slate-50/70 rounded-lg border border-slate-200 text-xs space-y-2">
-                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                         <div>
                           <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Name</label>
                           <input type="text" [(ngModel)]="oic.name" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
@@ -591,91 +665,44 @@ export interface EoiDocumentItem {
                 </div>
               </div>
 
-              <!-- Authorized Person Details -->
-              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-3">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <!-- Section 4: Bank Details (Editable) -->
+              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                   <div class="flex items-center gap-2">
-                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">3</span>
-                    <h3 class="text-sm font-medium text-[#0B3558]">Step 3 – Authorized Person Details</h3>
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">4</span>
+                    <h3 class="text-sm font-medium text-[#0B3558] uppercase tracking-wide">Step 4 – Bank Account Details</h3>
                   </div>
-                  <span class="text-[11px] text-emerald-700 font-normal bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Verified</span>
+                  <span class="text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">Editing</span>
                 </div>
 
-                <div class="p-3 bg-slate-50/70 rounded-lg border border-slate-200 text-xs space-y-2">
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Name</label>
-                      <input type="text" [(ngModel)]="editableStep3.name" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
-                    </div>
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Designation</label>
-                      <input type="text" [(ngModel)]="editableStep3.designation" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
-                    </div>
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Date of Birth</label>
-                      <input type="text" [(ngModel)]="editableStep3.dob" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
-                    </div>
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Age</label>
-                      <input type="text" [(ngModel)]="editableStep3.age" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
-                    </div>
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">PAN</label>
-                      <input type="text" [(ngModel)]="editableStep3.pan" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
-                    </div>
-                    <div>
-                      <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Email-ID</label>
-                      <input type="text" [(ngModel)]="editableStep3.emailId" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
-                    </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Name of the Bank</label>
+                    <input type="text" [(ngModel)]="editableStep4.bankName" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Branch Name</label>
+                    <input type="text" [(ngModel)]="editableStep4.branchName" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Type of Account</label>
+                    <input type="text" [(ngModel)]="editableStep4.accountType" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Account Holder Name</label>
+                    <input type="text" [(ngModel)]="editableStep4.accountHolderName" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Account No.</label>
+                    <input type="text" [(ngModel)]="editableStep4.accountNo" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-500 font-normal mb-0.5">IFSC Code</label>
+                    <input type="text" [(ngModel)]="editableStep4.ifscCode" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
                   </div>
                 </div>
               </div>
-
-            </div>
-
-            <!-- Section 3: Bank Details -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-normal">4</span>
-                  <h3 class="text-sm font-medium text-[#0B3558] uppercase tracking-wide">Step 4 – Bank Account Details</h3>
-                </div>
-                <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-normal border border-emerald-200">
-                  &check; Verified
-                </span>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-                <div>
-                  <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Name of the Bank</label>
-                  <input type="text" [(ngModel)]="editableStep4.bankName" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
-                </div>
-                <div>
-                  <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Branch Name</label>
-                  <input type="text" [(ngModel)]="editableStep4.branchName" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
-                </div>
-                <div>
-                  <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Type of Account</label>
-                  <input type="text" [(ngModel)]="editableStep4.accountType" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
-                </div>
-                <div>
-                  <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Account Holder Name</label>
-                  <input type="text" [(ngModel)]="editableStep4.accountHolderName" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
-                </div>
-                <div>
-                  <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Account No.</label>
-                  <input type="text" [(ngModel)]="editableStep4.accountNo" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
-                </div>
-                <div>
-                  <label class="block text-[10px] text-slate-500 font-normal mb-0.5">IFSC Code</label>
-                  <input type="text" [(ngModel)]="editableStep4.ifscCode" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-mono" />
-                </div>
-                <div class="sm:col-span-2 md:col-span-3">
-                  <label class="block text-[10px] text-slate-500 font-normal mb-0.5">Branch Address</label>
-                  <input type="text" [(ngModel)]="editableStep4.branchAddress" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-800 font-normal" />
-                </div>
-              </div>
-            </div>
+            }
 
             <!-- Footer Action Button for Step 1 -->
             <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
@@ -2175,6 +2202,23 @@ export class SchemeFormComponent {
     editableStep3: Step3AuthorizedPerson = JSON.parse(JSON.stringify(this.otrFormService.formData().step3));
     editableStep4: Step4BankDetails = JSON.parse(JSON.stringify(this.otrFormService.formData().step4));
 
+    isEditingOtr = signal<boolean>(false);
+    selectedOicId = signal<string>('');
+
+    readonly avgTotalTurnover = computed(() => {
+        const rows = this.editableStep1?.financialYears;
+        if (!rows || !rows.length) return '0.00';
+        const sum = rows.reduce((acc, r) => acc + (parseFloat(r.totalTurnover) || 0), 0);
+        return (sum / rows.length).toFixed(2);
+    });
+
+    readonly avgSkillTurnover = computed(() => {
+        const rows = this.editableStep1?.financialYears;
+        if (!rows || !rows.length) return '0.00';
+        const sum = rows.reduce((acc, r) => acc + (parseFloat(r.skillTurnover) || 0), 0);
+        return (sum / rows.length).toFixed(2);
+    });
+
     declarationAgreed = signal<boolean>(true);
     paymentMethod = signal<string>('UPI');
     isPaymentProcessing = signal<boolean>(false);
@@ -2423,6 +2467,11 @@ export class SchemeFormComponent {
             if (params['emdFee']) this.schemeEmdFee.set(params['emdFee']);
             if (params['processFee']) this.schemeProcessFee.set(params['processFee']);
             if (params['eoiDescription']) this.schemeDescription.set(params['eoiDescription']);
+            if (params['selectedOicId']) {
+                this.selectedOicId.set(params['selectedOicId']);
+            } else if (this.editableStep2 && this.editableStep2.length > 0) {
+                this.selectedOicId.set(this.editableStep2[0].id);
+            }
         });
     }
 

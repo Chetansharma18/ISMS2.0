@@ -7,40 +7,41 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="w-full flex flex-col">
+    <div class="w-full flex flex-col font-sans">
       <!-- Label Row with Required Star and Character Count -->
-      <div class="flex items-center justify-between gap-2 mb-1">
-        <label [for]="id" class="text-xs sm:text-[13px] font-semibold text-slate-700 select-none">
-          {{ label }}
-          @if (required) {
-            <span class="text-rose-500 font-bold ml-0.5">*</span>
-          }
-        </label>
+      @if (label) {
+        <div class="flex items-center justify-between gap-2 mb-1.5">
+          <label [for]="id" class="text-[13px] font-medium leading-[20px] text-[#1F2933] select-none">
+            {{ label }}
+            @if (required) {
+              <span class="text-rose-600 font-bold ml-0.5">*</span>
+            }
+          </label>
 
-        @if (showCharCount && maxLength) {
-          <span class="text-[11px] font-mono text-slate-400">
-            {{ (value || '').length }}/{{ maxLength }}
-          </span>
-        }
-      </div>
+          @if (showCharCount && maxLength) {
+            <span class="text-[11px] font-mono text-[#7A8792]">
+              {{ (value || '').length }}/{{ maxLength }}
+            </span>
+          }
+        </div>
+      }
 
       <!-- Input Box Wrapper with Prefix & Suffix -->
       <div
-        class="relative flex items-center rounded-md border transition-all duration-150 bg-white"
-        [class.border-slate-300]="!error && !disabled"
-        [class.border-rose-500]="!!error"
+        class="relative flex items-center h-[38px] rounded-[4px] border transition-all duration-150 bg-white"
+        [class.border-[#D9E1E7]]="!error && !disabled"
+        [class.border-rose-600]="!!error"
         [class.ring-1]="!!error"
-        [class.ring-rose-500]="!!error"
-        [class.bg-slate-50]="disabled"
+        [class.ring-rose-600]="!!error"
+        [class.bg-[#F5F7F9]]="disabled"
         [class.cursor-not-allowed]="disabled"
-        [class.focus-within:border-[#0B3558]]="!error && !disabled"
-        [class.focus-within:ring-1]="!error && !disabled"
-        [class.focus-within:ring-[#0B3558]]="!error && !disabled"
-        [class.shadow-2xs]="!disabled"
+        [class.focus-within:border-[#174A6E]]="!error && !disabled"
+        [class.focus-within:ring-2]="!error && !disabled"
+        [class.focus-within:ring-[#EAF2F6]]="!error && !disabled"
       >
         <!-- Optional Prefix Tag -->
         @if (prefixText) {
-          <span class="inline-flex items-center px-3 py-2 border-r border-slate-200 bg-slate-50 text-xs font-semibold text-slate-600 select-none rounded-l-md">
+          <span class="inline-flex items-center h-full px-3 border-r border-[#D9E1E7] bg-[#F5F7F9] text-[12px] font-medium text-[#5F6B76] select-none rounded-l-[4px]">
             {{ prefixText }}
           </span>
         }
@@ -55,15 +56,15 @@ import { FormsModule } from '@angular/forms';
           [disabled]="disabled"
           [readOnly]="readonly"
           [attr.maxlength]="maxLength || null"
-          class="flex-1 min-w-0 w-full px-3 py-2 text-xs sm:text-[13px] text-slate-800 placeholder:text-slate-400 focus:outline-none bg-transparent"
+          class="flex-1 min-w-0 w-full h-full px-3 text-[14px] leading-[22px] text-[#1F2933] placeholder:text-[#7A8792] focus:outline-none bg-transparent"
           [class.uppercase]="uppercase"
           [class.cursor-not-allowed]="disabled"
-          [class.text-slate-500]="disabled"
+          [class.text-[#7A8792]]="disabled"
         />
 
         <!-- Optional Suffix Tag -->
         @if (suffixText) {
-          <span class="inline-flex items-center px-3 py-2 border-l border-slate-200 bg-slate-50 text-xs font-semibold text-slate-600 select-none rounded-r-md">
+          <span class="inline-flex items-center h-full px-3 border-l border-[#D9E1E7] bg-[#F5F7F9] text-[12px] font-medium text-[#5F6B76] select-none rounded-r-[4px]">
             {{ suffixText }}
           </span>
         }
@@ -71,8 +72,8 @@ import { FormsModule } from '@angular/forms';
 
       <!-- Error message alert -->
       @if (error) {
-        <p class="text-[11px] text-rose-600 font-medium mt-1 flex items-center gap-1 animate-fade-in">
-          <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <p class="text-[12px] text-rose-600 font-medium mt-1 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
           </svg>
           <span>{{ error }}</span>
@@ -81,7 +82,7 @@ import { FormsModule } from '@angular/forms';
 
       <!-- Helper Hint -->
       @if (!error && hint) {
-        <p class="text-[11px] text-slate-400 mt-1 leading-tight">
+        <p class="text-[12px] text-[#7A8792] mt-1 leading-tight">
           {{ hint }}
         </p>
       }

@@ -6,6 +6,12 @@ export interface FileDoc {
   fileUrl?: string;
 }
 
+export interface FinancialYearEntry {
+  year: string;         // e.g. '2025-26'
+  totalTurnover: string; // in Lacs
+  skillTurnover: string; // in Lacs
+}
+
 export interface Step1OrgDetails {
   shortName: string;
   fullName: string;
@@ -24,7 +30,9 @@ export interface Step1OrgDetails {
   udyamNumber: string;
   msmeCertDoc: FileDoc | null;
 
-  turnOver: string;
+  turnOver: string;                  // legacy single-field, kept for compatibility
+  financialYears: FinancialYearEntry[]; // NEW: dynamic financial year rows
+  turnoverCertDoc: FileDoc | null;      // NEW: CA-certified turnover certificate
   blackListed: 'Yes' | 'No';
   nsdcPartner: string;
   contactNo: string;
@@ -276,6 +284,12 @@ export function createInitialOtrFormData(): OtrFormData {
       udyamNumber: '',
       msmeCertDoc: null,
       turnOver: '',
+      financialYears: [
+        { year: '2025-26', totalTurnover: '', skillTurnover: '' },
+        { year: '2024-25', totalTurnover: '', skillTurnover: '' },
+        { year: '2023-24', totalTurnover: '', skillTurnover: '' }
+      ],
+      turnoverCertDoc: null,
       blackListed: 'No',
       nsdcPartner: 'Not Applicable',
       contactNo: '',
@@ -381,6 +395,17 @@ export function createExistingUserOtrData(): OtrFormData {
         status: 'uploaded'
       },
       turnOver: '450.00',
+      financialYears: [
+        { year: '2025-26', totalTurnover: '180.00', skillTurnover: '72.00' },
+        { year: '2024-25', totalTurnover: '150.00', skillTurnover: '60.00' },
+        { year: '2023-24', totalTurnover: '120.00', skillTurnover: '48.00' }
+      ],
+      turnoverCertDoc: {
+        fileName: 'CA_Certified_Turnover_Certificate.pdf',
+        fileSize: '1.3 MB',
+        uploadDate: '01-May-2022',
+        status: 'uploaded'
+      },
       blackListed: 'No',
       nsdcPartner: 'Funded Partner',
       contactNo: '0141-2700891',

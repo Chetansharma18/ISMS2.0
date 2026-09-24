@@ -9,20 +9,22 @@ import { FormsModule } from '@angular/forms';
   template: `
     <div class="w-full flex flex-col">
       <!-- Label Row with Count -->
-      <div class="flex items-center justify-between gap-2 mb-1.5">
-        <label [for]="id" class="text-xs sm:text-[13px] font-semibold text-slate-700 select-none">
-          {{ label }}
-          @if (required) {
-            <span class="text-rose-500 font-bold ml-0.5">*</span>
-          }
-        </label>
+      @if (label) {
+        <div class="flex items-center justify-between gap-2 mb-1.5 font-sans">
+          <label [for]="id" class="text-[13px] font-medium leading-[20px] text-[#1F2933] select-none">
+            {{ label }}
+            @if (required) {
+              <span class="text-rose-600 font-bold ml-0.5">*</span>
+            }
+          </label>
 
-        @if (showCharCount && maxLength) {
-          <span class="text-[11px] font-mono text-slate-400">
-            {{ (value || '').length }}/{{ maxLength }}
-          </span>
-        }
-      </div>
+          @if (showCharCount && maxLength) {
+            <span class="text-[11px] font-mono text-[#7A8792]">
+              {{ (value || '').length }}/{{ maxLength }}
+            </span>
+          }
+        </div>
+      }
 
       <!-- Textarea Box -->
       <textarea
@@ -33,17 +35,17 @@ import { FormsModule } from '@angular/forms';
         [placeholder]="placeholder"
         [disabled]="disabled"
         [attr.maxlength]="maxLength || null"
-        class="w-full px-3 py-2 text-xs sm:text-[13px] text-slate-800 placeholder:text-slate-400 rounded-md border transition-all duration-150 focus:outline-none bg-white shadow-2xs resize-y"
-        [class.border-slate-300]="!error && !disabled"
-        [class.border-rose-500]="!!error"
+        class="w-full px-3 py-2 text-[14px] leading-[22px] text-[#1F2933] placeholder:text-[#7A8792] rounded-[4px] border transition-all duration-150 focus:outline-none bg-white resize-y font-sans"
+        [class.border-[#D9E1E7]]="!error && !disabled"
+        [class.border-rose-600]="!!error"
         [class.ring-1]="!!error"
-        [class.ring-rose-500]="!!error"
-        [class.bg-slate-50]="disabled"
+        [class.ring-rose-600]="!!error"
+        [class.bg-[#F5F7F9]]="disabled"
         [class.cursor-not-allowed]="disabled"
-        [class.text-slate-500]="disabled"
-        [class.focus:border-[#0B3558]]="!error && !disabled"
-        [class.focus:ring-1]="!error && !disabled"
-        [class.focus:ring-[#0B3558]]="!error && !disabled"
+        [class.text-[#7A8792]]="disabled"
+        [class.focus:border-[#174A6E]]="!error && !disabled"
+        [class.focus:ring-2]="!error && !disabled"
+        [class.focus:ring-[#EAF2F6]]="!error && !disabled"
       ></textarea>
 
       <!-- Error Message -->

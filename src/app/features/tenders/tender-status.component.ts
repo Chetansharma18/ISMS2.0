@@ -2,6 +2,12 @@ import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import {
+  PageHeaderComponent,
+  TableComponent,
+  ButtonComponent,
+  TableColumn
+} from '../../shared';
 
 export interface SubmittedTender {
   id: string;
@@ -21,29 +27,25 @@ export interface SubmittedTender {
 @Component({
   selector: 'app-tender-status',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    PageHeaderComponent,
+    TableComponent,
+    ButtonComponent
+  ],
   template: `
-    <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
+    <div class="w-full min-h-full bg-[#F5F7F9] text-[#1F2933] font-sans">
       <div class="p-4 sm:p-5 space-y-3 font-sans">
         
-        <!-- Breadcrumbs with Home Icon (Identical to Active EOI screen) -->
-        <nav class="flex items-center gap-2 text-xs text-slate-500 font-normal" aria-label="Breadcrumb">
-          <a routerLink="/" class="inline-flex items-center gap-1.5 text-slate-600 hover:text-[#0B3558] transition-colors">
-            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            <span>Home</span>
-          </a>
-          <span class="text-slate-400">/</span>
-          <span class="text-slate-700 font-normal">Tender Status</span>
-        </nav>
-
-        <!-- Top Page Header (Matching Active EOI header typography) -->
-        <div>
-          <h1 class="text-lg sm:text-xl font-semibold text-[#0B3558] tracking-tight">
-            Tender Status
-          </h1>
-        </div>
+        <!-- Page Header via Reusable PageHeaderComponent -->
+        <app-page-header
+          title="Tender Status"
+          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Tender Status' }]"
+          backUrl="/tenders"
+          backTitle="Back to Active EOI"
+        ></app-page-header>
 
         <!-- Filter Controls & Search Toolbar -->
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-1">
@@ -54,22 +56,23 @@ export interface SubmittedTender {
               <button
                 type="button"
                 (click)="setFilter(f.id)"
-                class="px-2.5 py-1 rounded text-xs font-normal transition-colors flex items-center gap-1.5 cursor-pointer border shadow-2xs"
-                [class.bg-[#0B3558]]="activeFilter() === f.id"
+                class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
+                [class.bg-[#174A6E]]="activeFilter() === f.id"
                 [class.text-white]="activeFilter() === f.id"
-                [class.border-[#0B3558]]="activeFilter() === f.id"
+                [class.border-[#174A6E]]="activeFilter() === f.id"
                 [class.bg-white]="activeFilter() !== f.id"
-                [class.text-slate-600]="activeFilter() !== f.id"
-                [class.border-slate-200]="activeFilter() !== f.id"
-                [class.hover:bg-slate-50]="activeFilter() !== f.id"
+                [class.text-[#5F6B76]]="activeFilter() !== f.id"
+                [class.border-[#D9E1E7]]="activeFilter() !== f.id"
+                [class.hover:bg-[#EAF2F6]]="activeFilter() !== f.id"
+                [class.hover:text-[#174A6E]]="activeFilter() !== f.id"
               >
                 <span>{{ f.label }}</span>
                 <span
                   class="px-1.5 py-0.2 rounded-full text-[10px]"
                   [class.bg-white/20]="activeFilter() === f.id"
                   [class.text-white]="activeFilter() === f.id"
-                  [class.bg-slate-100]="activeFilter() !== f.id"
-                  [class.text-slate-600]="activeFilter() !== f.id"
+                  [class.bg-[#F5F7F9]]="activeFilter() !== f.id"
+                  [class.text-[#5F6B76]]="activeFilter() !== f.id"
                 >
                   {{ f.count }}
                 </span>
@@ -79,7 +82,7 @@ export interface SubmittedTender {
 
           <!-- Search Input with Search Icon -->
           <div class="relative w-full sm:w-64">
-            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-3.5 h-3.5 text-[#7A8792] absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
@@ -87,7 +90,7 @@ export interface SubmittedTender {
               [(ngModel)]="searchQuery"
               (ngModelChange)="onSearchChange()"
               placeholder="Search Ref, Scheme, Department..."
-              class="w-full pl-8 pr-7 py-1 text-xs bg-white border border-slate-200 rounded text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#0B3558] transition-colors font-normal shadow-2xs"
+              class="w-full pl-8 pr-7 py-1.5 text-[13px] bg-white border border-[#D9E1E7] rounded-[4px] text-[#1F2933] placeholder:text-[#7A8792] focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-colors font-normal"
             />
             @if (searchQuery) {
               <button
@@ -102,157 +105,49 @@ export interface SubmittedTender {
 
         </div>
 
-        <!-- Main Status Table (Matching Active EOI design exactly) -->
-        <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-xs">
-              
-              <!-- Soft Light Themed Table Header matching Active EOI -->
-              <thead>
-                <tr class="bg-[#F4F7FB] text-slate-700 text-[11px] sm:text-[11.5px] font-medium select-none border-b border-slate-200">
-                  <th class="py-2.5 px-2.5 w-12 text-center border-r border-slate-200 whitespace-nowrap">S. No.</th>
-                  <th class="py-2.5 px-3 border-r border-slate-200 whitespace-nowrap">Application Ref. No.</th>
-                  <th class="py-2.5 px-3 border-r border-slate-200 whitespace-nowrap">Scheme Name</th>
-                  <th class="py-2.5 px-3 border-r border-slate-200 min-w-[200px]">Department</th>
-                  <th class="py-2.5 px-2.5 border-r border-slate-200 whitespace-nowrap text-center">Applied Date</th>
-                  <th class="py-2.5 px-2.5 border-r border-slate-200 whitespace-nowrap text-center">Submitted Status</th>
-                  <th class="py-2.5 px-2.5 border-r border-slate-200 whitespace-nowrap text-center">EOI Status</th>
-                  <th class="py-2.5 px-2.5 text-center whitespace-nowrap w-20">View</th>
-                </tr>
-              </thead>
+        <!-- Main Status Table via Reusable TableComponent -->
+        <app-table
+          [columns]="tenderColumns"
+          [data]="filteredTenders()"
+          [pagination]="true"
+          [pageSize]="pageSize"
+          emptyMessage="No applications match your filter criteria."
+          [customTemplates]="{
+            appRef: appRefTemplate,
+            department: deptTemplate,
+            view: viewTemplate
+          }"
+        >
+        </app-table>
 
-              <!-- Table Rows: Regular non-bold typography -->
-              <tbody class="divide-y divide-slate-100 bg-white font-normal text-slate-700">
-                @for (tender of paginatedTenders(); track tender.id; let idx = $index) {
-                  <tr class="hover:bg-slate-50/70 transition-colors">
-                    
-                    <!-- S. No. -->
-                    <td class="py-2.5 px-2.5 text-center font-normal text-slate-700 border-r border-slate-100">
-                      {{ (currentPage() - 1) * pageSize + idx + 1 }}
-                    </td>
+        <ng-template #appRefTemplate let-tender>
+          <button
+            type="button"
+            (click)="openReceipt(tender)"
+            class="hover:text-[#0B3558] hover:underline cursor-pointer text-left inline-flex items-center gap-1 font-normal text-slate-800 transition-colors"
+            title="View Submission Details"
+          >
+            <span>{{ tender.appRef }}</span>
+            <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </button>
+        </ng-template>
 
-                    <!-- Application Ref. No. -->
-                    <td class="py-2.5 px-3 font-normal text-slate-800 whitespace-nowrap border-r border-slate-100">
-                      <button
-                        type="button"
-                        (click)="openReceipt(tender)"
-                        class="hover:text-[#0B3558] hover:underline cursor-pointer text-left inline-flex items-center gap-1 font-normal text-slate-800 transition-colors"
-                        title="View Submission Details"
-                      >
-                        <span>{{ tender.appRef }}</span>
-                        <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      </button>
-                    </td>
+        <ng-template #deptTemplate let-tender>
+          <span class="line-clamp-2 text-slate-600 text-[11px] leading-relaxed">{{ tender.department }}</span>
+        </ng-template>
 
-                    <!-- Scheme Name -->
-                    <td class="py-2.5 px-3 font-medium text-slate-800 whitespace-nowrap border-r border-slate-100">
-                      {{ tender.schemeTitle }}
-                    </td>
-
-                    <!-- Department -->
-                    <td class="py-2.5 px-3 font-normal text-slate-600 text-[11px] leading-relaxed border-r border-slate-100 max-w-sm">
-                      <span class="line-clamp-2">{{ tender.department }}</span>
-                    </td>
-
-                    <!-- Applied Date -->
-                    <td class="py-2.5 px-2.5 text-center font-normal text-slate-700 whitespace-nowrap border-r border-slate-100">
-                      {{ tender.appliedDate }}
-                    </td>
-
-                    <!-- Submitted Status (Clean non-bold text) -->
-                    <td class="py-2.5 px-2.5 text-center font-normal whitespace-nowrap border-r border-slate-100">
-                      <span [ngClass]="getSubmittedStatusClass(tender.submittedStatus)">
-                        {{ tender.submittedStatus }}
-                      </span>
-                    </td>
-
-                    <!-- EOI Status (Clean non-bold text) -->
-                    <td class="py-2.5 px-2.5 text-center font-normal text-slate-700 whitespace-nowrap border-r border-slate-100">
-                      <span>{{ tender.eoiStatus }}</span>
-                    </td>
-
-                    <!-- View Action (Light Theme button with authentic Adobe PDF icon) -->
-                    <td class="py-2.5 px-2 text-center whitespace-nowrap">
-                      <button
-                        type="button"
-                        (click)="openReceipt(tender)"
-                        class="inline-flex items-center gap-1 px-2 py-1 rounded bg-sky-50 hover:bg-sky-100 text-[#0B3558] border border-sky-200 hover:border-sky-300 transition-colors font-normal text-xs cursor-pointer shadow-2xs"
-                        title="View Receipt PDF"
-                      >
-                        <!-- Authentic Adobe PDF Icon -->
-                        <svg class="w-3.5 h-3.5 shrink-0 select-none shadow-2xs" viewBox="0 0 24 24">
-                          <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
-                          <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
-                        </svg>
-                        <span>View</span>
-                      </button>
-                    </td>
-
-                  </tr>
-                }
-
-                @if (filteredTenders().length === 0) {
-                  <tr>
-                    <td colspan="8" class="py-10 text-center text-slate-500">
-                      <div class="max-w-sm mx-auto text-center space-y-1.5">
-                        <svg class="w-8 h-8 text-slate-300 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <p class="text-xs font-medium text-slate-700">No applications match your filter criteria.</p>
-                        <p class="text-[11px] text-slate-400">Try clearing your search query or selecting a different status pill.</p>
-                      </div>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Table Pagination Bar (Identical to Active EOI screen) -->
-          <div class="px-4 py-2 bg-slate-50/90 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 select-none">
-            <span class="text-[11px]">
-              Showing {{ filteredTenders().length === 0 ? 0 : (currentPage() - 1) * pageSize + 1 }} to {{ Math.min(currentPage() * pageSize, filteredTenders().length) }} of {{ filteredTenders().length }} applications
-            </span>
-
-            <div class="flex items-center gap-1.5">
-              <button
-                type="button"
-                (click)="setPage(currentPage() - 1)"
-                [disabled]="currentPage() === 1"
-                class="px-2 py-0.5 rounded border border-slate-200 text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white cursor-pointer"
-              >
-                Previous
-              </button>
-
-              @for (p of totalPagesArray(); track p) {
-                <button
-                  type="button"
-                  (click)="setPage(p)"
-                  class="w-6 h-6 rounded flex items-center justify-center text-xs transition-colors cursor-pointer border"
-                  [class.bg-[#0B3558]]="currentPage() === p"
-                  [class.text-white]="currentPage() === p"
-                  [class.border-[#0B3558]]="currentPage() === p"
-                  [class.bg-white]="currentPage() !== p"
-                  [class.text-slate-700]="currentPage() !== p"
-                  [class.border-slate-200]="currentPage() !== p"
-                >
-                  {{ p }}
-                </button>
-              }
-
-              <button
-                type="button"
-                (click)="setPage(currentPage() + 1)"
-                [disabled]="currentPage() === totalPages() || filteredTenders().length === 0"
-                class="px-2 py-0.5 rounded border border-slate-200 text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white cursor-pointer"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        </div>
+        <ng-template #viewTemplate let-tender>
+          <app-button
+            variant="pdf-view"
+            size="sm"
+            (btnClick)="openReceipt(tender)"
+            title="View Receipt PDF"
+          >
+            View
+          </app-button>
+        </ng-template>
 
       </div>
 
@@ -472,6 +367,17 @@ export class TenderStatusComponent {
   currentPage = signal<number>(1);
   readonly pageSize = 6;
   selectedReceiptTender = signal<SubmittedTender | null>(null);
+
+  readonly tenderColumns: TableColumn<SubmittedTender>[] = [
+    { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
+    { key: 'appRef', label: 'Application Ref. No.', cellClass: 'whitespace-nowrap font-normal text-slate-800', type: 'custom' },
+    { key: 'schemeTitle', label: 'Scheme Name', cellClass: 'whitespace-nowrap font-medium text-slate-800' },
+    { key: 'department', label: 'Department', width: 'min-w-[200px] max-w-sm', type: 'custom' },
+    { key: 'appliedDate', label: 'Applied Date', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: 'submittedStatus', label: 'Submitted Status', align: 'center', type: 'status' },
+    { key: 'eoiStatus', label: 'EOI Status', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: 'view', label: 'View', align: 'center', width: 'w-20', type: 'custom' }
+  ];
 
   /**
    * Sample submitted applications

@@ -12,7 +12,6 @@ import {
 
 import { FormInputComponent } from '../../../../shared/components/form-controls/form-input/form-input.component';
 import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
-import { FormTextareaComponent } from '../../../../shared/components/form-controls/form-textarea/form-textarea.component';
 import { FormFileUploadComponent } from '../../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
 import { FormSectionComponent } from '../../../../shared/components/form-controls/form-section/form-section.component';
 
@@ -24,7 +23,6 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
     FormsModule,
     FormInputComponent,
     FormSelectComponent,
-    FormTextareaComponent,
     FormFileUploadComponent,
     FormSectionComponent
   ],
@@ -73,7 +71,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
       </app-form-section>
 
       <!-- Section 4.2: Account Identification & Routing Codes -->
-      <app-form-section title="Account Details & Routing Codes">
+      <app-form-section title="Account Details">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <app-form-input
             label="Account Holder Name"
@@ -113,16 +111,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
             [maxLength]="9"
           ></app-form-input>
 
-          <div class="md:col-span-2">
-            <app-form-textarea
-              label="Branch Address"
-              [value]="data().branchAddress"
-              (valueChange)="update('branchAddress', $event)"
-              placeholder="Plot/Building No., Street, Landmark, City, PIN Code"
-              [required]="true"
-              [rows]="2"
-            ></app-form-textarea>
-          </div>
+         
         </div>
       </app-form-section>
 

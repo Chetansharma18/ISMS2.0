@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OtrFormService } from '../../services/otr-form.service';
@@ -29,11 +29,28 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
       <!-- Header -->
       <div class="pb-3 border-b border-slate-200">
         <h2 class="text-base font-bold text-slate-900">
-          Step 2 – Details of Officer In-Charge
+          Step 3 – Details of Officer In-Charge
         </h2>
         <p class="text-xs text-slate-500 mt-0.5">
           Enter details of the authorized project officer and nodal contact.
         </p>
+      </div>
+
+      <!-- Same as Authorized Person Toggle -->
+      <div class="flex items-start gap-3 p-3.5 rounded-lg bg-sky-50 border border-sky-200">
+        <input
+          type="checkbox"
+          id="sameAsAuthPerson"
+          [checked]="sameAsAuthPerson()"
+          (change)="toggleSameAsAuthPerson($any($event.target).checked)"
+          class="mt-0.5 w-4 h-4 text-[#0483AC] border-slate-300 rounded focus:ring-[#0483AC] accent-[#0483AC] cursor-pointer shrink-0"
+        />
+        <label for="sameAsAuthPerson" class="text-xs font-medium text-sky-900 cursor-pointer leading-snug">
+          Officer In-Charge is the same as Authorized Person
+          <span class="block text-sky-600 font-normal mt-0.5">
+            Checking this will auto-fill the OIC details from the Authorized Person information entered in Step 2.
+          </span>
+        </label>
       </div>
 
       <!-- Single Officer In-Charge Details Card -->
@@ -52,7 +69,11 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               </span>
             }
           </div>
-          <span class="text-xs text-slate-500 font-medium">Primary Nodal Contact</span>
+          @if (sameAsAuthPerson()) {
+            <span class="text-xs text-sky-600 font-medium bg-sky-50 px-2 py-0.5 rounded border border-sky-200">Auto-filled from Auth. Person</span>
+          } @else {
+            <span class="text-xs text-slate-500 font-medium">Primary Nodal Contact</span>
+          }
         </div>
 
         <div class="p-4 sm:p-5 space-y-4 bg-white">
@@ -64,6 +85,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               placeholder="e.g. Ramesh Kumar Verma"
               [required]="true"
               [maxLength]="100"
+              [disabled]="sameAsAuthPerson()"
             ></app-form-input>
 
             <app-form-select
@@ -73,6 +95,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               [options]="designations"
               placeholder="Select Designation"
               [required]="true"
+              [disabled]="sameAsAuthPerson()"
             ></app-form-select>
 
             <app-form-input
@@ -83,6 +106,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               placeholder="e.g. 9829012345"
               [required]="true"
               [maxLength]="10"
+              [disabled]="sameAsAuthPerson()"
             ></app-form-input>
 
             <app-form-input
@@ -92,6 +116,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               (valueChange)="updateField('emailId', $event)"
               placeholder="e.g. officer@organisation.com"
               [required]="true"
+              [disabled]="sameAsAuthPerson()"
             ></app-form-input>
 
             <app-form-input
@@ -102,6 +127,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               [required]="true"
               [uppercase]="true"
               [maxLength]="10"
+              [disabled]="sameAsAuthPerson()"
             ></app-form-input>
 
             <app-form-input
@@ -112,6 +138,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               placeholder="e.g. 123456789012"
               [required]="true"
               [maxLength]="12"
+              [disabled]="sameAsAuthPerson()"
             ></app-form-input>
           </div>
 
@@ -173,8 +200,48 @@ export class Step2OicDetailsComponent {
   readonly oicList = computed(() => this.otrFormService.step2());
   readonly oic = computed(() => this.oicList()[0] || ({} as OfficerInCharge));
 
+  /** Toggle: OIC same as Authorized Person */
+  readonly sameAsAuthPerson = signal<boolean>(false);
+
+  /**
+   * When toggled ON, copy Authorized Person fields (step3) into OIC (step2[0]).
+   * When toggled OFF, reset OIC personal fields to empty so user can fill manually.
+   */
+  toggleSameAsAuthPerson(checked: boolean): void {
+    this.sameAsAuthPerson.set(checked);
+    if (checked) {
+      const authPerson = this.otrFormService.step3();
+      this.otrFormService.updateOic(0, {
+        name: authPerson.name,
+        designation: authPerson.designation,
+        mobileNo: authPerson.mobileNo,
+        emailId: authPerson.emailId,
+        pan: authPerson.pan,
+        aadhaarNo: authPerson.aadhaarNo,
+        bhamashahNo: authPerson.bhamashahNo,
+        voterIdNo: authPerson.voterIdNo,
+        passportNo: authPerson.passportNo
+      });
+    } else {
+      // Clear auto-filled fields so user can fill fresh
+      this.otrFormService.updateOic(0, {
+        name: '',
+        designation: '',
+        mobileNo: '',
+        emailId: '',
+        pan: '',
+        aadhaarNo: '',
+        bhamashahNo: '',
+        voterIdNo: '',
+        passportNo: ''
+      });
+    }
+  }
+
   updateField(field: keyof OfficerInCharge, value: string): void {
-    this.otrFormService.updateOic(0, { [field]: value });
+    if (!this.sameAsAuthPerson()) {
+      this.otrFormService.updateOic(0, { [field]: value });
+    }
   }
 
   updateFileDoc(field: 'appointmentLetterDoc' | 'idProofDoc', file: FileDoc | null): void {

@@ -1,13 +1,34 @@
+@import "./styles/theme.css";
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: 'Inter', Arial, sans-serif;
+
+  /* ISMS Centralized Design System Palette */
+  --color-primary: #174A6E;
+  --color-primary-dark: #123B59;
+  --color-primary-light: #EAF2F6;
+  --color-background: #F5F7F9;
+  --color-surface: #FFFFFF;
+  --color-border: #D9E1E7;
+  --color-text-primary: #1F2933;
+  --color-text-secondary: #5F6B76;
+  --color-text-muted: #7A8792;
+
+  /* Theme-aligned aliases */
+  --color-gov-blue: #174A6E;
+  --color-gov-blue-dark: #123B59;
+  --color-header-blue: #174A6E;
+  --color-table-header: #EAF2F6;
 }
 
 html,
 body {
   overflow-x: hidden;
   max-width: 100vw;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-base) !important;
 }
 
 html,
@@ -16,7 +37,7 @@ input,
 button,
 select,
 textarea {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+  font-family: 'Inter', Arial, sans-serif !important;
 }
 
 .material-icons,
@@ -78,7 +99,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb:active {
-  background: #0b3558;
+  background: #174a6e;
 }
 
 /* Firefox */

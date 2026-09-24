@@ -30,8 +30,8 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
   template: `
     <div class="w-full space-y-4">
 
-      <!-- Section 3.1: Profile & Demographics -->
-      <app-form-section title="Step 3 – Authorized Person Details">
+      <!-- Section: Authorized Person Details (now Step 2) -->
+      <app-form-section title="Step 2 – Authorized Person Details">
         <p class="text-xs text-slate-500 mb-3 -mt-2">
           The Authorized Person is the person officially authorized to represent the TP/PIA.
         </p>

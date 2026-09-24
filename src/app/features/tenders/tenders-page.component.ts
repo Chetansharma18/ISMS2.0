@@ -3,6 +3,13 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
+import {
+  PageHeaderComponent,
+  TableComponent,
+  ButtonComponent,
+  TableColumn,
+  ProfilePreviewModalComponent
+} from '../../shared';
 
 export interface SchemeTender {
   sNo: number;
@@ -34,34 +41,31 @@ export interface EoiDocumentItem {
 @Component({
   selector: 'app-tenders-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    PageHeaderComponent,
+    TableComponent,
+    ButtonComponent,
+    ProfilePreviewModalComponent
+  ],
   template: `
     <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
       
       <!-- ====================================================================
-           VIEW 1: ACTIVE EOI TABLE (Matching Screenshot 2 layout & typography)
+           VIEW 1: ACTIVE EOI TABLE (Using Reusable PageHeader & DataTable)
            ==================================================================== -->
       @if (!selectedScheme()) {
         <div class="p-4 sm:p-5 space-y-3 font-sans">
           
-          <!-- Path / Breadcrumbs with Home Icon -->
-          <nav class="flex items-center gap-2 text-xs text-slate-500 font-normal" aria-label="Breadcrumb">
-            <a routerLink="/" class="inline-flex items-center gap-1.5 text-slate-600 hover:text-[#0B3558] transition-colors">
-              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              <span>Home</span>
-            </a>
-            <span class="text-slate-400">/</span>
-            <span class="text-slate-700 font-normal">Active EOI</span>
-          </nav>
-
-          <!-- Top Page Header -->
-          <div>
-            <h1 class="text-lg sm:text-xl font-semibold text-[#0B3558] tracking-tight">
-              Active EOI
-            </h1>
-          </div>
+          <!-- Themed Header Bar via Reusable PageHeaderComponent -->
+          <app-page-header
+            title="Active EOI"
+            [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Active EOI' }]"
+            backUrl="/registration"
+            backTitle="Back to Registration Form"
+          ></app-page-header>
 
           <!-- Incomplete Profile Notice Banner (if applicable) -->
           @if (isProfileIncomplete()) {
@@ -84,135 +88,34 @@ export interface EoiDocumentItem {
             </div>
           }
 
-          <!-- Schemes Table (Matching Screenshot 2: Clean header, non-bold text, Inter font, View button, fits screen cleanly) -->
-          <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
-            <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse text-xs">
-                <!-- Soft Light Themed Table Header matching Screenshot 2 -->
-                <thead>
-                  <tr class="bg-[#F4F7FB] text-slate-700 text-[11px] sm:text-[11.5px] font-medium select-none border-b border-slate-200">
-                    <th class="py-2.5 px-2.5 w-12 text-center border-r border-slate-200 whitespace-nowrap">S. No.</th>
-                    <th class="py-2.5 px-3 border-r border-slate-200 whitespace-nowrap">EOI Reference No.</th>
-                    <th class="py-2.5 px-3 border-r border-slate-200 whitespace-nowrap">Scheme Name</th>
-                    <th class="py-2.5 px-2.5 border-r border-slate-200 whitespace-nowrap text-center">Scheme Category</th>
-                    <th class="py-2.5 px-2.5 border-r border-slate-200 whitespace-nowrap text-center">Date of EOI Published</th>
-                    <th class="py-2.5 px-2.5 border-r border-slate-200 whitespace-nowrap text-center">Date of Closing</th>
-                    <th class="py-2.5 px-2.5 border-r border-slate-200 whitespace-nowrap text-center">EOI Category</th>
-                    <th class="py-2.5 px-3 border-r border-slate-200 min-w-[200px]">EOI Description</th>
-                    <th class="py-2.5 px-2.5 text-center whitespace-nowrap w-20">View</th>
-                  </tr>
-                </thead>
+          <!-- Schemes Table via Reusable TableComponent -->
+          <app-table
+            [columns]="schemeColumns"
+            [data]="schemes"
+            [pagination]="true"
+            [pageSize]="pageSize"
+            itemUnit="schemes"
+            [customTemplates]="{
+              eoiDescription: descTemplate,
+              viewAction: viewActionTemplate
+            }"
+          >
+          </app-table>
 
-                <!-- Table Rows: Regular non-bold typography -->
-                <tbody class="divide-y divide-slate-100 bg-white font-normal text-slate-700">
-                  @for (item of paginatedSchemes(); track item.sNo) {
-                    <tr class="hover:bg-slate-50/70 transition-colors">
-                      <!-- S. No. -->
-                      <td class="py-2.5 px-2.5 text-center font-normal text-slate-700 border-r border-slate-100">
-                        {{ item.sNo }}
-                      </td>
+          <ng-template #descTemplate let-item>
+            <span class="line-clamp-2 text-slate-600 text-[11px] leading-relaxed">{{ item.eoiDescription }}</span>
+          </ng-template>
 
-                      <!-- EOI Reference No. -->
-                      <td class="py-2.5 px-3 font-normal text-slate-800 whitespace-nowrap border-r border-slate-100">
-                        {{ item.refNo }}
-                      </td>
-
-                      <!-- Scheme Name -->
-                      <td class="py-2.5 px-3 font-medium text-slate-800 whitespace-nowrap border-r border-slate-100">
-                        {{ item.schemeName }}
-                      </td>
-
-                      <!-- Scheme Category -->
-                      <td class="py-2.5 px-2.5 text-center font-normal text-slate-700 whitespace-nowrap border-r border-slate-100">
-                        {{ item.schemeCategory }}
-                      </td>
-
-                      <!-- Date of EOI Published -->
-                      <td class="py-2.5 px-2.5 text-center font-normal text-slate-700 whitespace-nowrap border-r border-slate-100">
-                        {{ item.datePublished }}
-                      </td>
-
-                      <!-- Last Date of EOI Submission -->
-                      <td class="py-2.5 px-2.5 text-center font-normal text-rose-600 whitespace-nowrap border-r border-slate-100">
-                        {{ item.closingDate }}
-                      </td>
-
-                      <!-- EOI Category -->
-                      <td class="py-2.5 px-2.5 text-center font-normal text-slate-700 whitespace-nowrap border-r border-slate-100">
-                        {{ item.eoiCategory }}
-                      </td>
-
-                      <!-- EOI Description -->
-                      <td class="py-2.5 px-3 font-normal text-slate-600 text-[11px] leading-relaxed border-r border-slate-100 max-w-sm">
-                        <span class="line-clamp-2">{{ item.eoiDescription }}</span>
-                      </td>
-
-                      <!-- View Action (Light Theme button with authentic Adobe PDF icon) -->
-                      <td class="py-2.5 px-2 text-center whitespace-nowrap">
-                        <button
-                          type="button"
-                          (click)="viewSchemeDetails(item)"
-                          class="inline-flex items-center gap-1 px-2 py-1 rounded bg-sky-50 hover:bg-sky-100 text-[#0B3558] border border-sky-200 hover:border-sky-300 transition-colors font-normal text-xs cursor-pointer shadow-2xs"
-                          title="View EOI Details"
-                        >
-                          <!-- Authentic Adobe PDF Icon -->
-                          <svg class="w-3.5 h-3.5 shrink-0 select-none shadow-2xs" viewBox="0 0 24 24">
-                            <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
-                            <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
-                          </svg>
-                          <span>View</span>
-                        </button>
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Table Pagination Bar (Fits Screen, Clean Navigation) -->
-            <div class="px-4 py-2 bg-slate-50/90 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 select-none">
-              <span class="text-[11px]">
-                Showing {{ (currentPage() - 1) * pageSize + 1 }} to {{ Math.min(currentPage() * pageSize, schemes.length) }} of {{ schemes.length }} schemes
-              </span>
-
-              <div class="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  (click)="setPage(currentPage() - 1)"
-                  [disabled]="currentPage() === 1"
-                  class="px-2 py-0.5 rounded border border-slate-200 text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white cursor-pointer"
-                >
-                  Previous
-                </button>
-
-                @for (p of totalPagesArray(); track p) {
-                  <button
-                    type="button"
-                    (click)="setPage(p)"
-                    class="w-6 h-6 rounded flex items-center justify-center text-xs transition-colors cursor-pointer border"
-                    [class.bg-[#0B3558]]="currentPage() === p"
-                    [class.text-white]="currentPage() === p"
-                    [class.border-[#0B3558]]="currentPage() === p"
-                    [class.bg-white]="currentPage() !== p"
-                    [class.text-slate-700]="currentPage() !== p"
-                    [class.border-slate-200]="currentPage() !== p"
-                  >
-                    {{ p }}
-                  </button>
-                }
-
-                <button
-                  type="button"
-                  (click)="setPage(currentPage() + 1)"
-                  [disabled]="currentPage() === totalPages()"
-                  class="px-2 py-0.5 rounded border border-slate-200 text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white cursor-pointer"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-
-          </div>
+          <ng-template #viewActionTemplate let-item>
+            <app-button
+              variant="pdf-view"
+              size="sm"
+              (btnClick)="viewSchemeDetails(item)"
+              title="View EOI Details"
+            >
+              View
+            </app-button>
+          </ng-template>
 
         </div>
       }
@@ -322,17 +225,20 @@ export interface EoiDocumentItem {
           </div>
 
           <!-- ================================================================
-               EOI DOCUMENTS TABLE (Matching Screenshot 1 & 2)
+               SECTION A: CORE EOI DOCUMENTS (Download Templates)
                ================================================================ -->
           <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
-            <!-- Header Bar matching Screenshot 1 & 2 -->
+            <!-- Header -->
             <div class="bg-[#F4F7FB] border-b border-slate-200 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
               <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-[#0B3558]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
                 <h3 class="text-sm font-semibold tracking-tight text-[#0B3558]">
-                  EOI Documents
+                  Section A: EOI Core Documents
+                  <span class="ml-2 text-[11px] font-normal text-slate-500">(Download templates &amp; reference documents)</span>
                 </h3>
               </div>
-          
             </div>
 
             <!-- Documents Table -->
@@ -341,26 +247,18 @@ export interface EoiDocumentItem {
                 <thead>
                   <tr class="bg-[#F4F7FB] text-slate-700 text-[11px] sm:text-[11.5px] font-semibold border-b border-slate-200">
                     <th class="py-2.5 px-3 w-12 text-center border-r border-slate-200 whitespace-nowrap">S. No.</th>
-                    <th class="py-2.5 px-4 border-r border-slate-200">
-                      <span>Documents</span> <span class="text-rose-500">*</span>
-                    </th>
+                    <th class="py-2.5 px-4 border-r border-slate-200">Documents</th>
                     <th class="py-2.5 px-3 w-28 text-center border-r border-slate-200 whitespace-nowrap">Format</th>
                     <th class="py-2.5 px-3 w-28 text-center border-r border-slate-200 whitespace-nowrap">File Size</th>
                     <th class="py-2.5 px-4 w-32 text-center whitespace-nowrap">Action</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-normal text-slate-700">
-                  @for (doc of eoiDocuments; track doc.sNo) {
+                  @for (doc of eoiDownloadDocuments; track doc.sNo) {
                     <tr class="hover:bg-slate-50/80 transition-colors">
-                      <!-- S. No. -->
-                      <td class="py-3 px-3 text-center text-slate-600 font-normal border-r border-slate-100">
-                        {{ doc.sNo }}
-                      </td>
-
-                      <!-- Document Title with Authentic Adobe PDF Icon -->
+                      <td class="py-3 px-3 text-center text-slate-600 font-normal border-r border-slate-100">{{ doc.sNo }}</td>
                       <td class="py-3 px-4 text-slate-800 font-normal border-r border-slate-100">
                         <div class="flex items-center gap-2.5">
-                          <!-- Actual PDF Icon -->
                           <svg class="w-4 h-4 shrink-0 select-none shadow-2xs" viewBox="0 0 24 24">
                             <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
                             <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
@@ -368,20 +266,10 @@ export interface EoiDocumentItem {
                           <span class="text-xs sm:text-[12.5px] text-slate-800 font-normal leading-relaxed">{{ doc.name }}</span>
                         </div>
                       </td>
-
-                      <!-- Format Badge -->
                       <td class="py-3 px-3 text-center border-r border-slate-100 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200/70">
-                          PDF Format
-                        </span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200/70">PDF Format</span>
                       </td>
-
-                      <!-- File Size -->
-                      <td class="py-3 px-3 text-center text-slate-500 font-normal text-[11.5px] whitespace-nowrap border-r border-slate-100">
-                        {{ doc.size }}
-                      </td>
-
-                      <!-- Download Facility Button (Light Theme Button matching our theme) -->
+                      <td class="py-3 px-3 text-center text-slate-500 font-normal text-[11.5px] whitespace-nowrap border-r border-slate-100">{{ doc.size }}</td>
                       <td class="py-3 px-4 text-center whitespace-nowrap">
                         <button
                           type="button"
@@ -397,6 +285,42 @@ export interface EoiDocumentItem {
                   }
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               SECTION B: INFORMATION REQUIRED TO FILL EOI
+               ================================================================ -->
+          <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+            <!-- Header -->
+            <div class="bg-[#F4F7FB] border-b border-slate-200 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3 class="text-sm font-semibold tracking-tight text-[#0B3558]">
+                  Section B: Information Required to Fill EOI
+                  <span class="ml-2 text-[11px] font-normal text-slate-500">(Documents &amp; details you must have ready before filling the online EOI form)</span>
+                </h3>
+              </div>
+            </div>
+
+            <!-- Informational Requirements List -->
+            <div class="p-4">
+              <p class="text-xs text-slate-500 mb-3">The following documents and information must be prepared and available before you begin filling the online EOI application form.</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                @for (req of eoiRequiredInfo; track req.sNo) {
+                  <div class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 bg-slate-50/50">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">{{ req.sNo }}</span>
+                    <div>
+                      <p class="text-xs font-medium text-slate-800 leading-snug">{{ req.name }}</p>
+                      @if (req.note) {
+                        <p class="text-[10.5px] text-slate-500 mt-0.5">{{ req.note }}</p>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
             </div>
           </div>
 
@@ -450,6 +374,13 @@ export interface EoiDocumentItem {
         </div>
       }
 
+      <!-- Applicant Registration Profile Preview Confirmation Modal -->
+      <app-profile-preview-modal
+        [isOpen]="showProfilePreviewModal()"
+        (close)="showProfilePreviewModal.set(false)"
+        (proceed)="proceedToSchemeForm($event)"
+      ></app-profile-preview-modal>
+
     </div>
   `
 })
@@ -468,25 +399,56 @@ export class TendersPageComponent {
 
   selectedScheme = signal<SchemeTender | null>(null);
   showApplyBlockedModal = signal<boolean>(false);
+  showProfilePreviewModal = signal<boolean>(false);
 
-  // All official EOI documents & annexures matching Screenshot 2 with download facility
-  readonly eoiDocuments: EoiDocumentItem[] = [
+  // All official downloadable EOI documents (RFP, SOP, Annexures)
+  readonly eoiDownloadDocuments: EoiDocumentItem[] = [
     { sNo: 1, name: 'Request for Proposal (RFP)', size: '2.4 MB' },
     { sNo: 2, name: 'Standard Operating Procedure (SOP) for Training Partners', size: '1.8 MB' },
     { sNo: 3, name: 'Annexure-1: Covering Letter as per Annexure-1', size: '245 KB' },
-    { sNo: 4, name: 'Annexure-3: Audited Financial Statements for last three consecutive financial years.', size: '1.2 MB' },
-    { sNo: 5, name: 'Details of Active skill development centre as per Annexure-4', size: '380 KB' },
-    { sNo: 6, name: 'Annexure-5: Training and Placement details as per Annexure-5.', size: '520 KB' },
+    { sNo: 4, name: 'Annexure-3: Audited Financial Statements for last three consecutive financial years', size: '1.2 MB' },
+    { sNo: 5, name: 'Annexure-4: Details of Active skill development centre', size: '380 KB' },
+    { sNo: 6, name: 'Annexure-5: Training and Placement details', size: '520 KB' },
     { sNo: 7, name: 'Annexure-6: An affidavit for not being blacklisted', size: '180 KB' },
-    { sNo: 8, name: 'Annexure-7: Self-certificate /declaration as per Annexure-7', size: '195 KB' },
-    { sNo: 9, name: 'Details of Board of directors as per Annexure-8', size: '290 KB' },
-    { sNo: 10, name: 'Details of Placement partnership/Tie-ups with Company/Industry as per Annexure-9', size: '440 KB' },
-    { sNo: 11, name: 'Details of working experience in relevant sector as per Annexure-10', size: '610 KB' },
-    { sNo: 12, name: 'List of divisions and group of district as per annexure 11', size: '310 KB' },
-    { sNo: 13, name: 'Proposed evaluation matrix annexure 12', size: '420 KB' },
-    { sNo: 14, name: 'Supporting documents as per annexure 13', size: '850 KB' },
-    { sNo: 15, name: 'A certificate of NSDC partner, i.e. where NSDC has a stake, either through equity or loan (if Applicable)', size: '350 KB' },
-    { sNo: 16, name: 'Copy of Eol Document with sign and seal of Company Secretary/ Authorized Representative and Signatory on each page', size: '1.5 MB' }
+    { sNo: 8, name: 'Annexure-7: Self-certificate / declaration as per Annexure-7', size: '195 KB' },
+    { sNo: 9, name: 'Annexure-8: Details of Board of Directors', size: '290 KB' },
+    { sNo: 10, name: 'Annexure-9: Details of Placement partnership / Tie-ups with Company / Industry', size: '440 KB' },
+    { sNo: 11, name: 'Annexure-10: Details of working experience in relevant sector', size: '610 KB' },
+    { sNo: 12, name: 'Annexure-11: List of divisions and group of district', size: '310 KB' },
+    { sNo: 13, name: 'Annexure-12: Proposed evaluation matrix', size: '420 KB' },
+    { sNo: 14, name: 'Annexure-13: Supporting documents as per Annexure-13', size: '850 KB' }
+  ];
+
+  // Informational requirements — what the applicant must have ready before filling the online EOI form
+  readonly eoiRequiredInfo: Array<{ sNo: number; name: string; note?: string }> = [
+    { sNo: 1, name: 'Company PAN Card', note: 'Self-attested copy' },
+    { sNo: 2, name: 'GST Registration Certificate', note: 'If registered' },
+    { sNo: 3, name: 'Certificate of Incorporation / Registration', note: 'Issued by respective authority' },
+    { sNo: 4, name: 'MSME / Udyam Registration Certificate', note: 'If applicable' },
+    { sNo: 5, name: 'Audited Financial Statements (Last 3 years)', note: 'Signed by CA with UDIN' },
+    { sNo: 6, name: 'CA-Certified Turnover Certificate', note: 'For total & skill-sector turnover' },
+    { sNo: 7, name: 'Affidavit for not being blacklisted by any Govt. / PSU', note: 'Notarized' },
+    { sNo: 8, name: 'Authorized Person / Signatory Details', note: 'PAN, Aadhaar, Board resolution / authorization letter' },
+    { sNo: 9, name: 'Details of Officer In-Charge (OIC)', note: 'PAN, Aadhaar, appointment letter' },
+    { sNo: 10, name: 'Bank Account Details with Cancelled Cheque', note: 'IFSC code required' },
+    { sNo: 11, name: 'Training Centre Infrastructure Details', note: 'As per Annexure-4 format' },
+    { sNo: 12, name: 'Placement & Training Track Record', note: 'Sector-wise data as per Annexure-5' },
+    { sNo: 13, name: 'NSDC Partnership Certificate', note: 'If applicable' },
+    { sNo: 14, name: 'EOI Document with Sign & Seal on each page', note: 'By Company Secretary or Authorized Representative' }
+  ];
+
+
+
+  readonly schemeColumns: TableColumn<SchemeTender>[] = [
+    { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
+    { key: 'refNo', label: 'EOI Reference No.', cellClass: 'whitespace-nowrap font-normal text-slate-800' },
+    { key: 'schemeName', label: 'Scheme Name', cellClass: 'whitespace-nowrap font-medium text-slate-800' },
+    { key: 'schemeCategory', label: 'Scheme Category', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: 'datePublished', label: 'Date of EOI Published', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: 'closingDate', label: 'Date of Closing', align: 'center', cellClass: 'whitespace-nowrap font-normal text-rose-600' },
+    { key: 'eoiCategory', label: 'EOI Category', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: 'eoiDescription', label: 'EOI Description', width: 'min-w-[200px] max-w-sm', type: 'custom' },
+    { key: 'viewAction', label: 'View', align: 'center', width: 'w-20', type: 'custom' }
   ];
 
   // Exact 10 schemes from Screenshot 2
@@ -729,7 +691,12 @@ export class TendersPageComponent {
       return;
     }
 
-    // If profile is complete, navigate to scheme proposal form with all 8 scheme details
+    // Show full registration profile preview modal first before proceeding
+    this.showProfilePreviewModal.set(true);
+  }
+
+  proceedToSchemeForm(event: { selectedOicId: string }): void {
+    this.showProfilePreviewModal.set(false);
     const scheme = this.selectedScheme();
     this.router.navigate(['/scheme-form'], {
       queryParams: {
@@ -742,7 +709,8 @@ export class TendersPageComponent {
         closingDate: scheme?.closingDate || '10/03/2026',
         emdFee: scheme?.emdFee || '₹50,000',
         processFee: scheme?.processFee || '₹2,000',
-        eoiDescription: scheme?.eoiDescription || 'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme'
+        eoiDescription: scheme?.eoiDescription || 'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme',
+        selectedOicId: event.selectedOicId
       }
     });
   }

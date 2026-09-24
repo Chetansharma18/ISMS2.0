@@ -169,14 +169,14 @@ export interface StepMeta {
           <app-step1-org-details></app-step1-org-details>
         </div>
 
-        <!-- Step 2 Container -->
+        <!-- Step 2 Container (NOW: Authorized Person) -->
         <div [class.hidden]="activeStep() !== 2">
-          <app-step2-oic-details></app-step2-oic-details>
+          <app-step3-auth-person></app-step3-auth-person>
         </div>
 
-        <!-- Step 3 Container -->
+        <!-- Step 3 Container (NOW: Officer In-Charge) -->
         <div [class.hidden]="activeStep() !== 3">
-          <app-step3-auth-person></app-step3-auth-person>
+          <app-step2-oic-details></app-step2-oic-details>
         </div>
 
         <!-- Step 4 Container -->
@@ -297,10 +297,13 @@ export interface StepMeta {
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <button
                 type="button"
-                (click)="navigateToHome()"
-                class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold shadow-md active:scale-95 transition-all cursor-pointer"
+                (click)="downloadOtrPdf()"
+                class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#0483AC] hover:bg-[#036c8f] text-white text-xs sm:text-sm font-bold shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
-                Return to Home
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Download PDF
               </button>
 
               <button
@@ -312,6 +315,14 @@ export interface StepMeta {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
                 Print Acknowledgement
+              </button>
+
+              <button
+                type="button"
+                (click)="navigateToHome()"
+                class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold shadow-md active:scale-95 transition-all cursor-pointer"
+              >
+                Return to Home
               </button>
             </div>
 
@@ -343,8 +354,8 @@ export class RegistrationShellComponent {
 
   readonly steps: StepMeta[] = [
     { number: 1, label: 'Organization Details' },
-    { number: 2, label: 'Officer In-Charge' },
-    { number: 3, label: 'Authorized Person' },
+    { number: 2, label: 'Authorized Person' },
+    { number: 3, label: 'Officer In-Charge' },
     { number: 4, label: 'Bank Details' },
     { number: 5, label: 'Preview & Submit' }
   ];
@@ -417,8 +428,8 @@ export class RegistrationShellComponent {
       if (errors.length > 0) {
         const stepLabels: Record<number, string> = {
           1: 'Step 1 (Organization Details)',
-          2: 'Step 2 (Details of Officer In-Charge)',
-          3: 'Step 3 (Authorized Person Details)',
+          2: 'Step 2 (Authorized Person Details)',
+          3: 'Step 3 (Details of Officer In-Charge)',
           4: 'Step 4 (Bank Details)'
         };
         this.submitErrorMessage.set(`Form is not filled, some entries are missing in ${stepLabels[s]}. Please fill all mandatory fields (${errors[0]}).`);
@@ -448,6 +459,182 @@ export class RegistrationShellComponent {
 
   printAcknowledgement(): void {
     window.print();
+  }
+
+  downloadOtrPdf(): void {
+    const regId = this.submittedRegId() || 'OTR-RSLDC-2026';
+    const s1 = this.otrFormService.step1();
+    const s2 = this.otrFormService.step2(); // OIC
+    const s3 = this.otrFormService.step3(); // Auth person
+    const s4 = this.otrFormService.step4(); // Bank
+
+    const printWindow = window.open('', '_blank', 'width=900,height=800');
+    if (!printWindow) {
+      window.print();
+      return;
+    }
+
+    const fyRows = (s1.financialYears || [])
+      .map(
+        (fy) =>
+          `<tr><td style="padding:6px 10px;border:1px solid #cbd5e1;">${fy.year}</td><td style="padding:6px 10px;border:1px solid #cbd5e1;">${fy.totalTurnover || '-'}</td><td style="padding:6px 10px;border:1px solid #cbd5e1;">${fy.skillTurnover || '-'}</td></tr>`
+      )
+      .join('');
+
+    const oicRows = (s2 || [])
+      .map(
+        (oic, idx) =>
+          `<div style="margin-bottom:8px;padding:8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;">
+            <strong>Officer #${idx + 1}: ${oic.name}</strong> (${oic.designation || 'OIC'})<br/>
+            <span style="color:#64748b;font-size:11px;">Mobile: ${oic.mobileNo} | Email: ${oic.emailId} | PAN: ${oic.pan} | Aadhaar: ${oic.aadhaarNo}</span>
+          </div>`
+      )
+      .join('');
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>OTR Registration Acknowledgement - ${regId}</title>
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+          <style>
+            * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+            body { margin: 0; padding: 24px; background: #ffffff; color: #1e293b; font-size: 12px; line-height: 1.5; }
+            .receipt-container { max-width: 820px; margin: 0 auto; border: 1px solid #cbd5e1; }
+            .header { background: #0483AC; color: #ffffff; padding: 18px 24px; }
+            .state-title { color: #fef08a; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+            .system-title { color: #ffffff; font-size: 16px; font-weight: 700; margin-top: 4px; }
+            .sub-title { color: #e0f2fe; font-size: 11px; margin-top: 2px; }
+            .content { padding: 18px 24px; }
+            .ref-card { background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+            .ref-label { font-size: 11px; color: #166534; font-weight: 500; }
+            .ref-value { font-size: 16px; color: #166534; font-weight: 700; font-family: monospace; }
+            .section { margin-bottom: 14px; }
+            .section-header { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 6px 12px; font-size: 11px; font-weight: 700; color: #0f172a; text-transform: uppercase; }
+            .section-body { border: 1px solid #cbd5e1; border-top: none; padding: 12px; font-size: 11.5px; }
+            .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+            .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+            .lbl { color: #64748b; font-size: 10.5px; }
+            .val { font-weight: 600; color: #1e293b; }
+            table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; }
+            .footer-notes { font-size: 10px; color: #64748b; margin-top: 20px; border-top: 1px dashed #cbd5e1; padding-top: 10px; text-align: center; }
+            @media print {
+              body { padding: 0; }
+              .receipt-container { border: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="receipt-container">
+            <div class="header">
+              <div class="state-title">GOVERNMENT OF RAJASTHAN • RSLDC</div>
+              <div class="system-title">INTEGRATED SCHEME MANAGEMENT SYSTEM (ISMS 2.0)</div>
+              <div class="sub-title">One Time Registration (OTR) Permanent Acknowledgement</div>
+            </div>
+            <div class="content">
+              <div class="ref-card">
+                <div>
+                  <div class="ref-label">PERMANENT REGISTRATION REFERENCE NO.</div>
+                  <div class="ref-value">${regId}</div>
+                </div>
+                <div style="text-align:right;">
+                  <div class="ref-label">STATUS</div>
+                  <div style="color:#166534;font-weight:700;">SUBMITTED &amp; VERIFIED</div>
+                </div>
+              </div>
+
+              <!-- Step 1 -->
+              <div class="section">
+                <div class="section-header">Step 1 – Organization Details</div>
+                <div class="section-body">
+                  <div class="grid-3" style="margin-bottom:8px;">
+                    <div><span class="lbl">Entity Full Name:</span><br/><span class="val">${s1.fullName || '-'}</span></div>
+                    <div><span class="lbl">Entity Short Name:</span><br/><span class="val">${s1.shortName || '-'}</span></div>
+                    <div><span class="lbl">Nature of Entity:</span><br/><span class="val">${s1.natureOfEntity || '-'}</span></div>
+                  </div>
+                  <div class="grid-3" style="margin-bottom:8px;">
+                    <div><span class="lbl">Registration No.:</span><br/><span class="val">${s1.registrationNumber || '-'}</span></div>
+                    <div><span class="lbl">Date of Reg.:</span><br/><span class="val">${s1.dateOfRegistration || '-'}</span></div>
+                    <div><span class="lbl">State of Reg.:</span><br/><span class="val">${s1.stateOfLegalReg || '-'}</span></div>
+                  </div>
+                  <div class="grid-3" style="margin-bottom:8px;">
+                    <div><span class="lbl">Company PAN:</span><br/><span class="val">${s1.companyPan || '-'}</span></div>
+                    <div><span class="lbl">GSTIN:</span><br/><span class="val">${s1.gstRegistered === 'Yes' ? s1.gstin : 'Not Applicable'}</span></div>
+                    <div><span class="lbl">MSME / Udyam:</span><br/><span class="val">${s1.msmeRegistered === 'Yes' ? s1.udyamNumber : 'Not Applicable'}</span></div>
+                  </div>
+                  ${
+                    fyRows
+                      ? `
+                    <div style="margin-top:6px;">
+                      <span class="lbl" style="font-weight:600;">Financial Turnover Summary (₹ in Lacs):</span>
+                      <table>
+                        <thead><tr style="background:#f1f5f9;"><th style="padding:6px;border:1px solid #cbd5e1;text-align:left;">Financial Year</th><th style="padding:6px;border:1px solid #cbd5e1;text-align:left;">Total Turnover</th><th style="padding:6px;border:1px solid #cbd5e1;text-align:left;">Skill Turnover</th></tr></thead>
+                        <tbody>${fyRows}</tbody>
+                      </table>
+                    </div>
+                  `
+                      : ''
+                  }
+                  <div style="margin-top:8px;">
+                    <span class="lbl">Registered Office Address:</span><br/>
+                    <span class="val">${s1.registeredAddress || '-'}, ${s1.registeredDistrict || ''}, ${s1.registeredState || ''} - ${s1.registeredPincode || ''}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div class="section">
+                <div class="section-header">Step 2 – Authorized Person Details</div>
+                <div class="section-body">
+                  <div class="grid-3">
+                    <div><span class="lbl">Authorized Person Name:</span><br/><span class="val">${s3.name || '-'}</span></div>
+                    <div><span class="lbl">Designation:</span><br/><span class="val">${s3.designation || '-'}</span></div>
+                    <div><span class="lbl">Mobile No.:</span><br/><span class="val">${s3.mobileNo || '-'}</span></div>
+                    <div><span class="lbl">Email ID:</span><br/><span class="val">${s3.emailId || '-'}</span></div>
+                    <div><span class="lbl">PAN:</span><br/><span class="val">${s3.pan || '-'}</span></div>
+                    <div><span class="lbl">Aadhaar No.:</span><br/><span class="val">${s3.aadhaarNo || '-'}</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div class="section">
+                <div class="section-header">Step 3 – Officer(s) In-Charge (${s2.length})</div>
+                <div class="section-body">
+                  ${oicRows}
+                </div>
+              </div>
+
+              <!-- Step 4 -->
+              <div class="section">
+                <div class="section-header">Step 4 – Bank Account Particulars</div>
+                <div class="section-body">
+                  <div class="grid-3">
+                    <div><span class="lbl">Bank Name:</span><br/><span class="val">${s4.bankName || '-'}</span></div>
+                    <div><span class="lbl">Branch Name:</span><br/><span class="val">${s4.branchName || '-'}</span></div>
+                    <div><span class="lbl">Account Type:</span><br/><span class="val">${s4.accountType || '-'}</span></div>
+                    <div><span class="lbl">Account Holder:</span><br/><span class="val">${s4.accountHolderName || '-'}</span></div>
+                    <div><span class="lbl">Account Number:</span><br/><span class="val">${s4.accountNo || '-'}</span></div>
+                    <div><span class="lbl">IFSC Code:</span><br/><span class="val">${s4.ifscCode || '-'}</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="footer-notes">
+                This is a computer-generated permanent registration acknowledgment under ISMS 2.0 (RSLDC, Government of Rajasthan).<br/>
+                For verification, reference ID: <strong>${regId}</strong> | Generated on: ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+              </div>
+            </div>
+          </div>
+          <script>
+            window.onload = function() { window.print(); };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   }
 
   navigateToHome(): void {

@@ -88,6 +88,96 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'sdc',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/sdc/components/sdc-list.component').then(
+            (m) => m.SdcListComponent
+          )
+      },
+      {
+        path: 'create',
+        loadComponent: () =>
+          import('./features/sdc/components/sdc-create.component').then(
+            (m) => m.SdcCreateComponent
+          )
+      },
+      {
+        path: 'batches',
+        loadComponent: () =>
+          import('./features/sdc/components/batch-list.component').then(
+            (m) => m.BatchListComponent
+          )
+      },
+      {
+        path: ':sdcId/batch/create',
+        loadComponent: () =>
+          import('./features/sdc/components/batch-form.component').then(
+            (m) => m.BatchFormComponent
+          )
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/sdc/components/sdc-detail.component').then(
+            (m) => m.SdcDetailComponent
+          )
+      }
+    ]
+  },
+  {
+    path: 'sdcs',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/sdc/components/sdc-list.component').then(
+            (m) => m.SdcListComponent
+          )
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/sdc/components/sdc-detail.component').then(
+            (m) => m.SdcDetailComponent
+          )
+      }
+    ]
+  },
+  {
+    path: 'batches',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/sdc/components/batch-list.component').then(
+            (m) => m.BatchListComponent
+          )
+      },
+      {
+        path: 'create',
+        loadComponent: () =>
+          import('./features/sdc/components/batch-form.component').then(
+            (m) => m.BatchFormComponent
+          )
+      }
+    ]
+  },
+  {
+    path: 'tp/sanction-orders',
+    loadComponent: () =>
+      import('./features/sdc/components/sanction-orders.component').then(
+        (m) => m.SanctionOrdersComponent
+      )
+  },
+  {
+    path: 'sanction-orders',
+    redirectTo: 'tp/sanction-orders',
+    pathMatch: 'full'
+  },
+  {
     path: '**',
     redirectTo: ''
   }

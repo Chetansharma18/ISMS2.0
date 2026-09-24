@@ -26,10 +26,10 @@ interface StatMetric {
           <span class="text-xs font-bold text-[#EA580C] uppercase tracking-wider bg-orange-50 px-3 py-1 rounded-full border border-orange-200/60">
             Real-Time Governance Metrics
           </span>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0B3558] mt-2.5 tracking-tight">
+          <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0B3558] mt-2.5 tracking-tight">
             Impact Across Rajasthan
           </h2>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1.5">
+          <p class="text-sm sm:text-base text-slate-500 mt-1.5">
             Transparent reporting of candidate mobilization, training infrastructure, and scheme disbursements.
           </p>
         </div>

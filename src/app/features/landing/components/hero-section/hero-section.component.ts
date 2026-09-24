@@ -54,7 +54,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
         </div>
 
         <!-- Tenders Sidebar (Right) - Perfectly balanced column -->
-        <div class="lg:col-span-5 w-full max-w-[460px] mx-auto lg:ml-auto">
+        <div class="lg:col-span-5 w-full max-w-[460px] mx-auto lg:ml-auto relative">
           <div class="w-full h-[460px] sm:h-[500px] lg:h-[540px] bg-white rounded-2xl shadow-2xl border border-white/60 flex flex-col overflow-hidden relative z-20">
             
             <!-- Header -->
@@ -87,7 +87,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                 <div class="flex flex-col gap-2 p-2">
                   @for (item of tenders; track item.id) {
                     <div 
-                      (click)="downloadSamplePdf()" 
+                      (click)="openTenderPreview(item)" 
                       class="relative p-3 sm:p-3.5 bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-[#0B3558]/40 hover:bg-slate-50 transition-all group">
                       @if (item.isNew) {
                         <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-lg" />
@@ -107,7 +107,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                 <div class="flex flex-col gap-2 p-2 mt-2" aria-hidden="true">
                   @for (item of tenders; track item.id + '-dup') {
                     <div 
-                      (click)="downloadSamplePdf()" 
+                      (click)="openTenderPreview(item)" 
                       class="relative p-3 sm:p-3.5 bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-[#0B3558]/40 hover:bg-slate-50 transition-all group">
                       @if (item.isNew) {
                         <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-lg" />
@@ -130,6 +130,92 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
 
 
           </div>
+          
+          <!-- Slide-out Preview Panel -->
+          @if (selectedPreviewTender()) {
+            <div class="absolute inset-y-0 right-[calc(100%-24px)] w-[280px] sm:w-[360px] bg-white shadow-[-10px_0_20px_rgba(0,0,0,0.15)] z-10 rounded-l-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-right-12 duration-300">
+              
+              <!-- Header -->
+              <div class="p-4 pr-10 border-b border-slate-100 bg-slate-50 flex justify-between items-start gap-2">
+                <div>
+                  <h3 class="text-xs sm:text-sm font-bold text-slate-800 leading-snug line-clamp-2">{{ selectedPreviewTender().title }}</h3>
+                  <p class="text-[10px] text-slate-500 font-mono mt-1">{{ selectedPreviewTender().id }}</p>
+                </div>
+                <button (click)="closeTenderPreview()" class="p-1.5 hover:bg-slate-200 rounded-full transition-colors shrink-0">
+                  <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Preview Area -->
+              <div class="flex-1 overflow-y-auto p-4 pr-10 bg-slate-200/60 flex flex-col items-center gap-4 custom-scrollbar">
+                
+                <!-- Page 1 -->
+                <div class="w-full aspect-[1/1.414] bg-white shadow-sm border border-slate-300 flex flex-col shrink-0 relative overflow-hidden p-4 sm:p-5">
+                  <div class="w-full h-6 border-b border-slate-200 mb-4 flex items-center justify-between pb-2">
+                    <div class="w-10 h-2 bg-slate-200 rounded"></div>
+                    <div class="w-5 h-5 bg-slate-100 rounded-full"></div>
+                  </div>
+                  <div class="w-3/4 h-3 bg-slate-200 rounded mb-5"></div>
+                  <div class="space-y-2">
+                    <div class="w-full h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-full h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-5/6 h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-full h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-4/5 h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-full h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-11/12 h-1.5 bg-slate-100 rounded"></div>
+                  </div>
+                </div>
+
+                <!-- Page 2 -->
+                <div class="w-full aspect-[1/1.414] bg-white shadow-sm border border-slate-300 flex flex-col shrink-0 relative overflow-hidden p-4 sm:p-5">
+                  <div class="space-y-2 mt-2">
+                    <div class="w-full h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-full h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-11/12 h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-full h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-4/5 h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-full h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-full h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-5/6 h-1.5 bg-slate-100 rounded"></div>
+                  </div>
+                  <div class="space-y-2 mt-6">
+                    <div class="w-full h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-full h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-3/4 h-1.5 bg-slate-100 rounded"></div>
+                  </div>
+                </div>
+
+                <!-- Page 3 -->
+                <div class="w-full aspect-[1/1.414] bg-white shadow-sm border border-slate-300 flex flex-col shrink-0 relative overflow-hidden p-4 sm:p-5">
+                  <div class="space-y-2 mt-2">
+                    <div class="w-full h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-10/12 h-1.5 bg-slate-100 rounded"></div>
+                    <div class="w-full h-1.5 bg-slate-100 rounded"></div>
+                  </div>
+                  <div class="mt-auto border-t border-slate-100 pt-4 flex justify-between items-end">
+                     <div class="w-16 h-1.5 bg-slate-200 rounded"></div>
+                     <div class="w-12 h-6 bg-slate-100 rounded"></div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Footer Action -->
+              <div class="p-4 pr-10 border-t border-slate-100 bg-white">
+                <button (click)="downloadSamplePdf()" class="w-full bg-[#0B3558] hover:bg-[#07233B] text-white font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-all shadow-md text-xs sm:text-sm">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Download PDF
+                </button>
+              </div>
+
+            </div>
+          }
+
         </div>
 
       </div>
@@ -163,6 +249,15 @@ export class HeroSectionComponent implements AfterViewInit, OnDestroy {
   @ViewChild('heroSection') heroSectionRef?: ElementRef<HTMLElement>;
 
   readonly isTendersModalOpen = signal(false);
+  readonly selectedPreviewTender = signal<any | null>(null);
+
+  openTenderPreview(tender: any) {
+    this.selectedPreviewTender.set(tender);
+  }
+
+  closeTenderPreview() {
+    this.selectedPreviewTender.set(null);
+  }
   readonly isHoveringTenders = signal(false);
   readonly isSectionVisible = signal(true);
   readonly isTabActive = signal(true);
@@ -171,7 +266,7 @@ export class HeroSectionComponent implements AfterViewInit, OnDestroy {
   private visibilityHandler?: () => void;
 
   readonly shouldAnimate = () => {
-    return this.isSectionVisible() && this.isTabActive() && !this.isHoveringTenders();
+    return this.isSectionVisible() && this.isTabActive() && !this.isHoveringTenders() && !this.selectedPreviewTender();
   };
 
   tenders = [

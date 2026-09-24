@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 interface Tender {
@@ -41,7 +41,7 @@ interface Tender {
         <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50">
           
           @for (item of tenders; track item.id) {
-            <div (click)="downloadPdf()" class="group relative bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-[#0B3558]/40 transition-all cursor-pointer">
+            <div (click)="openTenderPreview(item)" class="group relative bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-[#0B3558]/40 transition-all cursor-pointer">
               
               @if (item.isNew) {
                 <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-lg" />
@@ -77,10 +77,82 @@ interface Tender {
         </div>
       </div>
     </div>
+
+    <!-- Tender Preview Sidebar (Drawer) -->
+    @if (selectedPreviewTender()) {
+      <div class="fixed inset-0 z-[60] flex justify-end">
+        <!-- Backdrop -->
+        <div 
+          class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-300" 
+          (click)="closeTenderPreview()">
+        </div>
+
+        <!-- Sidebar Panel -->
+        <div class="relative w-full max-w-md h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300 border-l border-slate-200">
+          
+          <!-- Header -->
+          <div class="p-4 sm:p-6 border-b border-slate-100 bg-slate-50 flex justify-between items-start gap-4">
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 leading-snug">{{ selectedPreviewTender().title }}</h3>
+              <p class="text-xs text-slate-500 font-mono mt-1">{{ selectedPreviewTender().id }}</p>
+            </div>
+            <button (click)="closeTenderPreview()" class="p-2 hover:bg-slate-200 rounded-full transition-colors shrink-0">
+              <svg class="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Preview Area -->
+          <div class="flex-1 overflow-y-auto p-6 bg-slate-100/50 flex flex-col items-center justify-start">
+            <p class="text-xs text-slate-500 mb-4 font-medium uppercase tracking-wider">Document Preview (Page 1)</p>
+            <div class="w-full aspect-[1/1.4] bg-white shadow-md border border-slate-200 rounded shrink-0 p-8 flex flex-col relative overflow-hidden">
+              <div class="w-full h-12 border-b-2 border-blue-900/10 mb-6 flex items-center justify-between">
+                <div class="w-16 h-4 bg-slate-200 rounded"></div>
+                <div class="w-8 h-8 bg-blue-900/10 rounded-full"></div>
+              </div>
+              <div class="w-3/4 h-6 bg-slate-200 rounded mb-8"></div>
+              <div class="space-y-3">
+                <div class="w-full h-3 bg-slate-100 rounded"></div>
+                <div class="w-full h-3 bg-slate-100 rounded"></div>
+                <div class="w-5/6 h-3 bg-slate-100 rounded"></div>
+                <div class="w-full h-3 bg-slate-100 rounded"></div>
+                <div class="w-4/5 h-3 bg-slate-100 rounded"></div>
+              </div>
+              <div class="mt-auto pt-6 border-t border-slate-100 flex justify-between">
+                <div class="w-20 h-4 bg-slate-200 rounded"></div>
+                <div class="w-24 h-4 bg-slate-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer Action -->
+          <div class="p-4 sm:p-6 border-t border-slate-100 bg-white">
+            <button (click)="downloadPdf()" class="w-full bg-[#0B3558] hover:bg-[#07233B] text-white font-bold py-3.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download PDF Document
+            </button>
+          </div>
+
+        </div>
+      </div>
+    }
   `
 })
 export class TendersModalComponent {
   @Output() close = new EventEmitter<void>();
+
+  selectedPreviewTender = signal<any | null>(null);
+
+  openTenderPreview(tender: any) {
+    this.selectedPreviewTender.set(tender);
+  }
+
+  closeTenderPreview() {
+    this.selectedPreviewTender.set(null);
+  }
 
   tenders: Tender[] = [
     {

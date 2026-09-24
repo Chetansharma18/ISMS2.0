@@ -7,8 +7,7 @@ import {
   PageHeaderComponent,
   TableComponent,
   ButtonComponent,
-  TableColumn,
-  ProfilePreviewModalComponent
+  TableColumn
 } from '../../shared';
 
 export interface SchemeTender {
@@ -47,8 +46,7 @@ export interface EoiDocumentItem {
     FormsModule,
     PageHeaderComponent,
     TableComponent,
-    ButtonComponent,
-    ProfilePreviewModalComponent
+    ButtonComponent
   ],
   template: `
     <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
@@ -225,20 +223,18 @@ export interface EoiDocumentItem {
           </div>
 
           <!-- ================================================================
-               SECTION A: CORE EOI DOCUMENTS (Download Templates)
+               SECTION A: REQUEST FOR PROPOSAL (RFP) & SOP DOCUMENTS
                ================================================================ -->
           <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
             <!-- Header -->
             <div class="bg-[#F4F7FB] border-b border-slate-200 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
               <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-[#0B3558]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+             
                 <h3 class="text-sm font-semibold tracking-tight text-[#0B3558]">
-                  Section A: EOI Core Documents
-                  <span class="ml-2 text-[11px] font-normal text-slate-500">(Download templates &amp; reference documents)</span>
+                  Section A: Request for Proposal (RFP) &amp; SOP Documents
                 </h3>
               </div>
+           
             </div>
 
             <!-- Documents Table -->
@@ -247,23 +243,23 @@ export interface EoiDocumentItem {
                 <thead>
                   <tr class="bg-[#F4F7FB] text-slate-700 text-[11px] sm:text-[11.5px] font-semibold border-b border-slate-200">
                     <th class="py-2.5 px-3 w-12 text-center border-r border-slate-200 whitespace-nowrap">S. No.</th>
-                    <th class="py-2.5 px-4 border-r border-slate-200">Documents</th>
+                    <th class="py-2.5 px-4 border-r border-slate-200">Document Title</th>
                     <th class="py-2.5 px-3 w-28 text-center border-r border-slate-200 whitespace-nowrap">Format</th>
                     <th class="py-2.5 px-3 w-28 text-center border-r border-slate-200 whitespace-nowrap">File Size</th>
-                    <th class="py-2.5 px-4 w-32 text-center whitespace-nowrap">Action</th>
+                    <th class="py-2.5 px-4 w-36 text-center whitespace-nowrap">Action</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 font-normal text-slate-700">
-                  @for (doc of eoiDownloadDocuments; track doc.sNo) {
+                  @for (doc of rfpDocuments; track doc.sNo) {
                     <tr class="hover:bg-slate-50/80 transition-colors">
                       <td class="py-3 px-3 text-center text-slate-600 font-normal border-r border-slate-100">{{ doc.sNo }}</td>
-                      <td class="py-3 px-4 text-slate-800 font-normal border-r border-slate-100">
+                      <td class="py-3 px-4 text-slate-800 font-medium border-r border-slate-100">
                         <div class="flex items-center gap-2.5">
                           <svg class="w-4 h-4 shrink-0 select-none shadow-2xs" viewBox="0 0 24 24">
                             <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
                             <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
                           </svg>
-                          <span class="text-xs sm:text-[12.5px] text-slate-800 font-normal leading-relaxed">{{ doc.name }}</span>
+                          <span class="text-xs sm:text-[12.5px] text-slate-800 font-semibold leading-relaxed">{{ doc.name }}</span>
                         </div>
                       </td>
                       <td class="py-3 px-3 text-center border-r border-slate-100 whitespace-nowrap">
@@ -274,7 +270,7 @@ export interface EoiDocumentItem {
                         <button
                           type="button"
                           (click)="downloadDoc(doc.name)"
-                          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-sky-50 hover:bg-sky-100 text-[#0B3558] border border-sky-200 hover:border-sky-300 text-xs font-normal transition-colors cursor-pointer shadow-2xs"
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-sky-50 hover:bg-sky-100 text-[#0B3558] border border-sky-200 hover:border-sky-300 text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
                           title="Download {{ doc.name }}"
                         >
                           <span class="material-icons text-[#0B3558] text-[15px] leading-none shrink-0 select-none">download</span>
@@ -289,18 +285,75 @@ export interface EoiDocumentItem {
           </div>
 
           <!-- ================================================================
-               SECTION B: INFORMATION REQUIRED TO FILL EOI
+               SECTION B: PRESCRIBED ANNEXURE FORMATS (Download Templates)
                ================================================================ -->
           <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
             <!-- Header -->
             <div class="bg-[#F4F7FB] border-b border-slate-200 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
               <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
                 <h3 class="text-sm font-semibold tracking-tight text-[#0B3558]">
-                  Section B: Information Required to Fill EOI
-                  <span class="ml-2 text-[11px] font-normal text-slate-500">(Documents &amp; details you must have ready before filling the online EOI form)</span>
+                  Section B: Prescribed Annexure Formats
+                </h3>
+              </div>
+        
+            </div>
+
+            <!-- Annexures Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-[#F4F7FB] text-slate-700 text-[11px] sm:text-[11.5px] font-semibold border-b border-slate-200">
+                    <th class="py-2.5 px-3 w-12 text-center border-r border-slate-200 whitespace-nowrap">S. No.</th>
+                    <th class="py-2.5 px-4 border-r border-slate-200">Annexure &amp; Format Title</th>
+                    <th class="py-2.5 px-3 w-28 text-center border-r border-slate-200 whitespace-nowrap">Format</th>
+                    <th class="py-2.5 px-3 w-28 text-center border-r border-slate-200 whitespace-nowrap">File Size</th>
+                    <th class="py-2.5 px-4 w-36 text-center whitespace-nowrap">Action</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-normal text-slate-700">
+                  @for (doc of annexureDocuments; track doc.sNo) {
+                    <tr class="hover:bg-slate-50/80 transition-colors">
+                      <td class="py-3 px-3 text-center text-slate-600 font-normal border-r border-slate-100">{{ doc.sNo }}</td>
+                      <td class="py-3 px-4 text-slate-800 font-normal border-r border-slate-100">
+                        <div class="flex items-center gap-2.5">
+                          <svg class="w-4 h-4 shrink-0 select-none shadow-2xs" viewBox="0 0 24 24">
+                            <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                            <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                          </svg>
+                          <span class="text-xs sm:text-[12.5px] text-slate-800 font-normal leading-relaxed">{{ doc.name }}</span>
+                        </div>
+                      </td>
+                      <td class="py-3 px-3 text-center border-r border-slate-100 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-50 text-sky-700 border border-sky-200/70">PDF / Word</span>
+                      </td>
+                      <td class="py-3 px-3 text-center text-slate-500 font-normal text-[11.5px] whitespace-nowrap border-r border-slate-100">{{ doc.size }}</td>
+                      <td class="py-3 px-4 text-center whitespace-nowrap">
+                        <button
+                          type="button"
+                          (click)="downloadDoc(doc.name)"
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-sky-50 hover:bg-sky-100 text-[#0B3558] border border-sky-200 hover:border-sky-300 text-xs font-normal transition-colors cursor-pointer shadow-2xs"
+                          title="Download {{ doc.name }}"
+                        >
+                          <span class="material-icons text-[#0B3558] text-[15px] leading-none shrink-0 select-none">download</span>
+                          <span>Download Format</span>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ================================================================
+               SECTION C: INFORMATION REQUIRED TO FILL EOI
+               ================================================================ -->
+          <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+            <!-- Header -->
+            <div class="bg-[#F4F7FB] border-b border-slate-200 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <h3 class="text-sm font-semibold tracking-tight text-[#0B3558]">
+                  Section C: Information Required to Fill EOI
                 </h3>
               </div>
             </div>
@@ -374,13 +427,6 @@ export interface EoiDocumentItem {
         </div>
       }
 
-      <!-- Applicant Registration Profile Preview Confirmation Modal -->
-      <app-profile-preview-modal
-        [isOpen]="showProfilePreviewModal()"
-        (close)="showProfilePreviewModal.set(false)"
-        (proceed)="proceedToSchemeForm($event)"
-      ></app-profile-preview-modal>
-
     </div>
   `
 })
@@ -399,24 +445,27 @@ export class TendersPageComponent {
 
   selectedScheme = signal<SchemeTender | null>(null);
   showApplyBlockedModal = signal<boolean>(false);
-  showProfilePreviewModal = signal<boolean>(false);
 
-  // All official downloadable EOI documents (RFP, SOP, Annexures)
-  readonly eoiDownloadDocuments: EoiDocumentItem[] = [
+  // Section A: Core RFP & Policy Guidelines Documents
+  readonly rfpDocuments: EoiDocumentItem[] = [
     { sNo: 1, name: 'Request for Proposal (RFP)', size: '2.4 MB' },
-    { sNo: 2, name: 'Standard Operating Procedure (SOP) for Training Partners', size: '1.8 MB' },
-    { sNo: 3, name: 'Annexure-1: Covering Letter as per Annexure-1', size: '245 KB' },
-    { sNo: 4, name: 'Annexure-3: Audited Financial Statements for last three consecutive financial years', size: '1.2 MB' },
-    { sNo: 5, name: 'Annexure-4: Details of Active skill development centre', size: '380 KB' },
-    { sNo: 6, name: 'Annexure-5: Training and Placement details', size: '520 KB' },
-    { sNo: 7, name: 'Annexure-6: An affidavit for not being blacklisted', size: '180 KB' },
-    { sNo: 8, name: 'Annexure-7: Self-certificate / declaration as per Annexure-7', size: '195 KB' },
-    { sNo: 9, name: 'Annexure-8: Details of Board of Directors', size: '290 KB' },
-    { sNo: 10, name: 'Annexure-9: Details of Placement partnership / Tie-ups with Company / Industry', size: '440 KB' },
-    { sNo: 11, name: 'Annexure-10: Details of working experience in relevant sector', size: '610 KB' },
-    { sNo: 12, name: 'Annexure-11: List of divisions and group of district', size: '310 KB' },
-    { sNo: 13, name: 'Annexure-12: Proposed evaluation matrix', size: '420 KB' },
-    { sNo: 14, name: 'Annexure-13: Supporting documents as per Annexure-13', size: '850 KB' }
+    { sNo: 2, name: 'Standard Operating Procedure (SOP) for Training Partners', size: '1.8 MB' }
+  ];
+
+  // Section B: Official Prescribed Annexure Formats & Templates (Download to fill & execute)
+  readonly annexureDocuments: EoiDocumentItem[] = [
+    { sNo: 1, name: 'Annexure-1: Covering Letter Format as per Annexure-1', size: '245 KB' },
+    { sNo: 2, name: 'Annexure-3: Audited Financial Statements Format for Last Three Consecutive Financial Years', size: '1.2 MB' },
+    { sNo: 3, name: 'Annexure-4: Details of Active Skill Development Centre Format', size: '380 KB' },
+    { sNo: 4, name: 'Annexure-5: Training and Placement Details Format', size: '520 KB' },
+    { sNo: 5, name: 'Annexure-6: Affidavit Format for Not Being Blacklisted by Govt. / PSU', size: '180 KB' },
+    { sNo: 6, name: 'Annexure-7: Self-Certificate / Declaration Format as per Annexure-7', size: '195 KB' },
+    { sNo: 7, name: 'Annexure-8: Details of Board of Directors Format', size: '290 KB' },
+    { sNo: 8, name: 'Annexure-9: Details of Placement Partnership / Industry Tie-ups Format', size: '440 KB' },
+    { sNo: 9, name: 'Annexure-10: Details of Working Experience in Relevant Sector Format', size: '610 KB' },
+    { sNo: 10, name: 'Annexure-11: List of Divisions and Group of District', size: '310 KB' },
+    { sNo: 11, name: 'Annexure-12: Proposed Evaluation Matrix Template', size: '420 KB' },
+    { sNo: 12, name: 'Annexure-13: Supporting Documents Checklist & Format as per Annexure-13', size: '850 KB' }
   ];
 
   // Informational requirements — what the applicant must have ready before filling the online EOI form
@@ -691,12 +740,7 @@ export class TendersPageComponent {
       return;
     }
 
-    // Show full registration profile preview modal first before proceeding
-    this.showProfilePreviewModal.set(true);
-  }
-
-  proceedToSchemeForm(event: { selectedOicId: string }): void {
-    this.showProfilePreviewModal.set(false);
+    // Direct navigation to scheme proposal form without showing the registration preview modal
     const scheme = this.selectedScheme();
     this.router.navigate(['/scheme-form'], {
       queryParams: {
@@ -709,8 +753,7 @@ export class TendersPageComponent {
         closingDate: scheme?.closingDate || '10/03/2026',
         emdFee: scheme?.emdFee || '₹50,000',
         processFee: scheme?.processFee || '₹2,000',
-        eoiDescription: scheme?.eoiDescription || 'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme',
-        selectedOicId: event.selectedOicId
+        eoiDescription: scheme?.eoiDescription || 'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme'
       }
     });
   }

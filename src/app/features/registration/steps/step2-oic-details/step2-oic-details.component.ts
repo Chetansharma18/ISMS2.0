@@ -28,12 +28,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
 
       <!-- Header -->
       <div class="pb-3 border-b border-slate-200">
-        <h2 class="text-base font-bold text-slate-900">
-          Step 3 – Details of Officer In-Charge
-        </h2>
-        <p class="text-xs text-slate-500 mt-0.5">
-          Enter details of the authorized project officer and nodal contact.
-        </p>
+        
       </div>
 
       <!-- Same as Authorized Person Toggle -->

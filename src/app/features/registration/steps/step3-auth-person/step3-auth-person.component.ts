@@ -31,9 +31,9 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
     <div class="w-full space-y-4">
 
       <!-- Section: Authorized Person Details (now Step 2) -->
-      <app-form-section title="Step 2 – Authorized Person Details">
-        <p class="text-xs text-slate-500 mb-3 -mt-2">
-          The Authorized Person is the person officially authorized to represent the TP/PIA.
+      <app-form-section>
+        <p class="text-xs text-slate-500 mb-3">
+          
         </p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <app-form-input
@@ -71,7 +71,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
       </app-form-section>
 
       <!-- Section 3.2: Contact & Identification Details -->
-      <app-form-section title="Identification & Contact Details">
+      <app-form-section>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <app-form-input
             label="PAN"
@@ -141,7 +141,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
       </app-form-section>
 
       <!-- Section 3.3: Residence Address & Authorization Document -->
-      <app-form-section title="Residence Address & Authorization Documents">
+      <app-form-section>
         <div class="space-y-3">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
             <app-form-select

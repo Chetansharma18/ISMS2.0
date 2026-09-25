@@ -33,8 +33,8 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
   template: `
     <div class="w-full space-y-4">
 
-      <!-- Section 1.1: Step 1 - Organization Details -->
-      <app-form-section title="Step 1 - Organization Details">
+      <!-- Section 1.1: Organization Details -->
+      <app-form-section>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <app-form-input
             label="TP/PIA Short Name"
@@ -101,7 +101,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
       </app-form-section>
 
       <!-- Section 1.2: Statutory Compliance Details -->
-      <app-form-section title="Statutory & Tax Compliance">
+      <app-form-section>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <app-form-input
             label="Company PAN"
@@ -181,8 +181,8 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
       </app-form-section>
 
       <!-- Section 1.3: Financial Details -->
-      <app-form-section title="Financial Details">
-        <p class="text-xs text-slate-500 mb-3 -mt-2">
+      <app-form-section>
+        <p class="text-xs font-bold text-slate-800 mb-3">
           Enter the total turnover and skill-specific turnover for the last 3 financial years (in Indian Rupees, in Lacs).
         </p>
 
@@ -191,65 +191,76 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-[#F4F7FB] text-slate-700 text-[11px] font-semibold border-b border-slate-200">
-                <th class="py-2 px-3 w-8 text-center border-r border-slate-200">#</th>
-                <th class="py-2 px-3 border-r border-slate-200">Financial Year</th>
-                <th class="py-2 px-3 border-r border-slate-200">
+                <th class="py-2.5 px-3 w-10 text-center border-r border-slate-200">#</th>
+                <th class="py-2.5 px-3 w-52 border-r border-slate-200">Financial Year</th>
+                <th class="py-2.5 px-3 border-r border-slate-200">
                   Total Turnover <span class="font-normal text-slate-400">(₹ in Lacs)</span>
                 </th>
-                <th class="py-2 px-3 border-r border-slate-200">
+                <th class="py-2.5 px-3 border-r border-slate-200">
                   Skill Turnover <span class="font-normal text-slate-400">(₹ in Lacs)</span>
                 </th>
-                <th class="py-2 px-3 w-16 text-center">Action</th>
+                <th class="py-2.5 px-3 w-16 text-center">Action</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
               @for (fy of data().financialYears; track fy.year; let i = $index) {
                 <tr class="bg-white hover:bg-slate-50/50 transition-colors">
-                  <td class="py-2 px-3 text-center text-slate-500 text-xs border-r border-slate-100">{{ i + 1 }}</td>
+                  <td class="py-2.5 px-3 text-center text-slate-500 text-xs border-r border-slate-100">{{ i + 1 }}</td>
                   <!-- Financial Year Dropdown -->
-                  <td class="py-2 px-3 border-r border-slate-100">
-                    <select
-                      [value]="fy.year"
-                      (change)="updateFyYear(i, $any($event.target).value)"
-                      class="w-full text-xs border border-slate-300 rounded px-2 py-1.5 text-slate-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#0483AC] focus:border-[#0483AC]"
-                    >
-                      @for (yr of availableYears; track yr) {
-                        <option [value]="yr" [selected]="fy.year === yr">{{ yr }}</option>
-                      }
-                    </select>
+                  <td class="py-2.5 px-3 border-r border-slate-100">
+                    <div class="relative">
+                      <select
+                        [value]="fy.year"
+                        (change)="updateFyYear(i, $any($event.target).value)"
+                        class="w-full h-[36px] appearance-none pl-3 pr-8 text-xs font-medium border border-[#D9E1E7] rounded-[4px] text-slate-800 bg-white focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] cursor-pointer"
+                      >
+                        @for (yr of availableYears; track yr) {
+                          <option [value]="yr" [selected]="fy.year === yr">{{ yr }}</option>
+                        }
+                      </select>
+                      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#7A8792]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
                   </td>
                   <!-- Total Turnover -->
-                  <td class="py-2 px-3 border-r border-slate-100">
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      [value]="fy.totalTurnover"
-                      (input)="updateFyField(i, 'totalTurnover', $any($event.target).value)"
-                      placeholder="e.g. 150.00"
-                      class="w-full text-xs border border-slate-300 rounded px-2 py-1.5 text-slate-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#0483AC] focus:border-[#0483AC]"
-                    />
+                  <td class="py-2.5 px-3 border-r border-slate-100">
+                    <div class="relative">
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        [value]="fy.totalTurnover"
+                        (input)="updateFyField(i, 'totalTurnover', $any($event.target).value)"
+                        placeholder="e.g. 150.00"
+                        class="w-full h-[36px] px-3 text-xs border border-[#D9E1E7] rounded-[4px] text-slate-800 bg-white focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
+                      />
+                    </div>
                   </td>
                   <!-- Skill Turnover -->
-                  <td class="py-2 px-3 border-r border-slate-100">
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      [value]="fy.skillTurnover"
-                      (input)="updateFyField(i, 'skillTurnover', $any($event.target).value)"
-                      placeholder="e.g. 60.00"
-                      class="w-full text-xs border border-slate-300 rounded px-2 py-1.5 text-slate-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#0483AC] focus:border-[#0483AC]"
-                    />
+                  <td class="py-2.5 px-3 border-r border-slate-100">
+                    <div class="relative">
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        [value]="fy.skillTurnover"
+                        (input)="updateFyField(i, 'skillTurnover', $any($event.target).value)"
+                        placeholder="e.g. 60.00"
+                        class="w-full h-[36px] px-3 text-xs border border-[#D9E1E7] rounded-[4px] text-slate-800 bg-white focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
+                      />
+                    </div>
                   </td>
                   <!-- Delete Row -->
-                  <td class="py-2 px-3 text-center">
+                  <td class="py-2.5 px-3 text-center">
                     @if (data().financialYears.length > 1) {
                       <button
                         type="button"
                         (click)="removeFyRow(i)"
                         title="Remove this year"
-                        class="text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-1 rounded transition-colors cursor-pointer"
+                        class="text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-1.5 rounded transition-colors cursor-pointer"
                       >
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -262,17 +273,17 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
               <!-- 3-Year Average Row -->
               @if (data().financialYears.length > 0) {
                 <tr class="bg-slate-50 border-t-2 border-slate-200">
-                  <td class="py-2 px-3 border-r border-slate-100"></td>
-                  <td class="py-2 px-3 text-xs font-semibold text-slate-700 border-r border-slate-100">
+                  <td class="py-2.5 px-3 border-r border-slate-100"></td>
+                  <td class="py-2.5 px-3 text-xs font-semibold text-slate-700 border-r border-slate-100">
                     3-Year Average
                   </td>
-                  <td class="py-2 px-3 text-xs font-semibold text-[#0483AC] border-r border-slate-100">
+                  <td class="py-2.5 px-3 text-xs font-semibold text-[#174A6E] border-r border-slate-100">
                     ₹ {{ avgTotalTurnover() }} Lacs
                   </td>
-                  <td class="py-2 px-3 text-xs font-semibold text-[#0483AC] border-r border-slate-100">
+                  <td class="py-2.5 px-3 text-xs font-semibold text-[#174A6E] border-r border-slate-100">
                     ₹ {{ avgSkillTurnover() }} Lacs
                   </td>
-                  <td class="py-2 px-3"></td>
+                  <td class="py-2.5 px-3"></td>
                 </tr>
               }
             </tbody>
@@ -284,7 +295,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
           <button
             type="button"
             (click)="addFyRow()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#0483AC] border border-[#0483AC]/40 rounded-md hover:bg-[#0483AC]/5 transition-colors cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#174A6E] border border-[#174A6E]/40 rounded-md hover:bg-[#174A6E]/5 transition-colors cursor-pointer"
           >
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
@@ -305,7 +316,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
       </app-form-section>
 
       <!-- Section 1.4: Governance & Contact Profile -->
-      <app-form-section title="Governance & Contact Profile">
+      <app-form-section>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-3">
           <app-form-select
             label="NSDC Partner"
@@ -344,7 +355,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
       </app-form-section>
 
       <!-- Section 1.4: Addresses -->
-      <app-form-section title="Registered & Office Addresses">
+      <app-form-section>
         <div class="space-y-4">
           
           <!-- Registered Address Block -->
@@ -352,7 +363,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-3">
               <div class="sm:col-span-3">
                 <app-form-textarea
-                  label="Address"
+                  label="Registered Address"
                   [value]="data().registeredAddress"
                   (valueChange)="update('registeredAddress', $event)"
                   placeholder="Street, locality, building name and number"

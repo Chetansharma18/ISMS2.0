@@ -7,9 +7,11 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <section class="w-full bg-white pb-4 mb-4 border-b border-slate-200/70 last:border-b-0">
-      <h2 class="text-sm sm:text-base font-bold text-slate-900 mb-3 pb-2 border-b border-slate-100">
-        {{ title }}
-      </h2>
+      @if (title) {
+        <h2 class="text-sm sm:text-base font-bold text-slate-900 mb-3 pb-2 border-b border-slate-100">
+          {{ title }}
+        </h2>
+      }
       <div>
         <ng-content></ng-content>
       </div>

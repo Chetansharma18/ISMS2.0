@@ -24,15 +24,16 @@ import { MOCK_SANCTION_ORDERS, SanctionOrder } from '../models/sdc.model';
         <!-- Sanction Orders Table -->
         <div class="border border-[#D9E1E7] rounded-lg overflow-hidden bg-white shadow-2xs">
           <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-[13px]">
+            <table class="w-full text-left border-collapse text-[13px] min-w-[900px]">
               <thead>
                 <tr class="border-b border-[#D9E1E7] bg-white text-[#5F6B76] text-[11px] font-bold tracking-wider uppercase select-none">
                   <th class="py-3.5 px-4">TP CODE</th>
                   <th class="py-3.5 px-4">SCHEME</th>
                   <th class="py-3.5 px-4">MOU START DATE</th>
-                  <th class="py-3.5 px-4">MOU EXPIRY DATE</th>
-                  <th class="py-3.5 px-4 text-center">TOTAL SDC</th>
-                  <th class="py-3.5 px-4 text-right">ACTIONS</th>
+                  <th class="py-3.5 px-4">MOU EXPIRY</th>
+                  <th class="py-3.5 px-4 text-center">Total no. of SDC</th>
+                  <th class="py-3.5 px-4 text-center whitespace-nowrap">NO. OF APPROVAL SDC'S</th>
+                  <th class="py-3.5 px-4 text-center">ACTIONS</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#D9E1E7]/70 text-[13px] text-slate-800">
@@ -53,7 +54,10 @@ import { MOCK_SANCTION_ORDERS, SanctionOrder } from '../models/sdc.model';
                     <td class="py-4 px-4 text-center font-medium text-slate-800">
                       {{ so.totalSdc }}
                     </td>
-                    <td class="py-4 px-4 text-right">
+                    <td class="py-4 px-4 text-center font-medium text-slate-800">
+                      {{ so.approvedSdc ?? 1 }}
+                    </td>
+                    <td class="py-4 px-4 text-center whitespace-nowrap">
                       <button
                         type="button"
                         (click)="createSdc(so.scheme)"
@@ -61,7 +65,7 @@ import { MOCK_SANCTION_ORDERS, SanctionOrder } from '../models/sdc.model';
                         style="color: #ffffff !important;"
                       >
                         <span class="text-sm font-bold leading-none">+</span>
-                        <span>Create SDC</span>
+                        <span>Add SDC</span>
                       </button>
                     </td>
                   </tr>

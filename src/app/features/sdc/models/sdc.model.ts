@@ -317,6 +317,7 @@ export interface SanctionOrder {
   mouStartDate: string;
   mouExpiryDate: string;
   totalSdc: number;
+  approvedSdc?: number;
 }
 
 export const MOCK_SANCTION_ORDERS: SanctionOrder[] = [
@@ -326,6 +327,7 @@ export const MOCK_SANCTION_ORDERS: SanctionOrder[] = [
     scheme: 'SAMARTH',
     mouStartDate: '01-01-2026',
     mouExpiryDate: '01-01-2027',
-    totalSdc: 2
+    totalSdc: 2,
+    approvedSdc: 1
   }
 ];

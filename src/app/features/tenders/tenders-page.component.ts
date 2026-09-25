@@ -60,6 +60,7 @@ export interface EoiDocumentItem {
           <!-- Themed Header Bar via Reusable PageHeaderComponent -->
           <app-page-header
             title="Active EOI"
+            bgColor="#0B3558"
           ></app-page-header>
 
           <!-- Incomplete Profile Notice Banner (if applicable) -->
@@ -696,7 +697,7 @@ export class TendersPageComponent {
 
   readonly Math = Math;
   readonly currentPage = signal<number>(1);
-  readonly pageSize = 6;
+  readonly pageSize = 10;
 
   readonly totalPages = computed(() => Math.ceil(this.schemes.length / this.pageSize));
   readonly totalPagesArray = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));

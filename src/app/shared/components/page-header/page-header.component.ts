@@ -101,7 +101,7 @@ export class PageHeaderComponent {
   @Input() showBack = false;
   @Input() backTitle = 'Go Back';
   @Input() badge?: string;
-  @Input() bgColor = '#0483AC';
+  @Input() bgColor = 'var(--color-primary, #174A6E)';
 
   @Output() back = new EventEmitter<void>();
 

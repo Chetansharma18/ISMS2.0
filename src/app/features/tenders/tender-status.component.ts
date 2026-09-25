@@ -493,10 +493,16 @@ export class TenderStatusComponent {
     const query = this.searchQuery.trim().toLowerCase();
 
     return this.tenders.filter(t => {
-      const matchFilter =
-        filter === 'All' ||
-        t.submittedStatus === filter ||
-        t.eoiStatus === filter;
+      let matchFilter = false;
+      if (filter === 'All') {
+        matchFilter = true;
+      } else if (['Submitted', 'Accepted', 'Rejected'].includes(filter)) {
+        matchFilter = t.submittedStatus === filter;
+      } else if (['Technical Opening', 'Technical Evaluation', 'AOC'].includes(filter)) {
+        matchFilter = t.eoiStatus === filter;
+      } else {
+        matchFilter = t.submittedStatus === filter || t.eoiStatus === filter;
+      }
 
       const matchQuery = !query ||
         t.appRef.toLowerCase().includes(query) ||

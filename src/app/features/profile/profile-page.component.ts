@@ -5,35 +5,25 @@ import { AuthService } from '../../core/auth/auth.service';
 import { OtrFormService } from '../registration/services/otr-form.service';
 import { OtrValidationService } from '../registration/services/otr-validation.service';
 
+import { PageHeaderComponent } from '../../shared';
+
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, PageHeaderComponent],
   template: `
-    <div class="w-full min-h-full bg-white text-slate-800 select-none font-sans">
+    <div class="w-full min-h-full bg-[#F5F7F9] text-[#1F2933] select-none font-sans">
       
       <!-- ====================================================================
            CASE 1: INCOMPLETE PROFILE (Integrated Full-Page Dashboard)
            ==================================================================== -->
       @if (isProfileIncomplete()) {
-        <div class="p-5 sm:p-6 lg:p-7 space-y-4 max-w-6xl mx-auto font-sans" style="font-family: 'Inter', sans-serif;">
+        <div class="p-4 sm:p-5 space-y-3 font-sans">
           
           <!-- Top Page Header (Matching Portal Structure) -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
-            <div class="space-y-1">
-              <div class="flex items-center gap-2.5">
-                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                  Profile
-                </h1>
-      
-            
-              
-              </div>
-              <p class="text-xs text-slate-500 font-normal">
-                Finish your One Time Registration (OTR) profile to register your organization and unlock EOI proposal submissions.
-              </p>
-            </div>
-
+          <app-page-header
+            title="Profile"
+          >
             <!-- Right Side: Progress Indicator -->
             <div class="shrink-0">
               <div class="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center bg-white rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.04)] border border-slate-100/60 z-10">
@@ -47,8 +37,7 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                 </div>
               </div>
             </div>
-
-          </div>
+          </app-page-header>
 
           <!-- Main Progress and Sections Layout -->
           <div class="flex gap-6 sm:gap-10 mt-6 items-stretch">
@@ -202,83 +191,96 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
         <!-- ====================================================================
              CASE 2: VERIFIED PROFILE WITH ALL 5 OTR STEPS FILLED
              ==================================================================== -->
-        <div class="p-6 sm:p-8 space-y-6 max-w-6xl font-sans" style="font-family: 'Inter', sans-serif;">
+        <div class="p-4 sm:p-5 space-y-4 font-sans">
           
           <!-- Top Heading -->
-          <div class="space-y-1">
-            <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-              Profile
-            </h1>
-            <p class="text-xs text-slate-500 font-normal">
-              One Time Registration (OTR) details and verified institutional profile
-            </p>
-          </div>
+          <app-page-header
+            title="Profile"
+          ></app-page-header>
 
           <!-- Quick Tab Filter Bar -->
           <div class="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto no-scrollbar font-sans text-xs">
             <button
               type="button"
               (click)="activeTab.set('all')"
-              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0"
-              [class.bg-slate-900]="activeTab() === 'all'"
-              [class.text-white]="activeTab() === 'all'"
+              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0 border"
+              [class.bg-sky-50]="activeTab() === 'all'"
+              [class.text-[#0483AC]]="activeTab() === 'all'"
+              [class.border-sky-300]="activeTab() === 'all'"
+              [class.shadow-2xs]="activeTab() === 'all'"
               [class.text-slate-600]="activeTab() !== 'all'"
-              [class.hover:bg-slate-100]="activeTab() !== 'all'"
+              [class.border-transparent]="activeTab() !== 'all'"
+              [class.hover:bg-slate-50]="activeTab() !== 'all'"
             >
               All Steps
             </button>
             <button
               type="button"
               (click)="activeTab.set('org')"
-              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0"
-              [class.bg-slate-900]="activeTab() === 'org'"
-              [class.text-white]="activeTab() === 'org'"
+              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0 border"
+              [class.bg-sky-50]="activeTab() === 'org'"
+              [class.text-[#0483AC]]="activeTab() === 'org'"
+              [class.border-sky-300]="activeTab() === 'org'"
+              [class.shadow-2xs]="activeTab() === 'org'"
               [class.text-slate-600]="activeTab() !== 'org'"
-              [class.hover:bg-slate-100]="activeTab() !== 'org'"
+              [class.border-transparent]="activeTab() !== 'org'"
+              [class.hover:bg-slate-50]="activeTab() !== 'org'"
             >
               Step 1 - Organization Details
             </button>
             <button
               type="button"
               (click)="activeTab.set('officers')"
-              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0"
-              [class.bg-slate-900]="activeTab() === 'officers'"
-              [class.text-white]="activeTab() === 'officers'"
+              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0 border"
+              [class.bg-sky-50]="activeTab() === 'officers'"
+              [class.text-[#0483AC]]="activeTab() === 'officers'"
+              [class.border-sky-300]="activeTab() === 'officers'"
+              [class.shadow-2xs]="activeTab() === 'officers'"
               [class.text-slate-600]="activeTab() !== 'officers'"
-              [class.hover:bg-slate-100]="activeTab() !== 'officers'"
+              [class.border-transparent]="activeTab() !== 'officers'"
+              [class.hover:bg-slate-50]="activeTab() !== 'officers'"
             >
               Step 2 – Details of Officer In-Charge
             </button>
             <button
               type="button"
               (click)="activeTab.set('auth')"
-              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0"
-              [class.bg-slate-900]="activeTab() === 'auth'"
-              [class.text-white]="activeTab() === 'auth'"
+              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0 border"
+              [class.bg-sky-50]="activeTab() === 'auth'"
+              [class.text-[#0483AC]]="activeTab() === 'auth'"
+              [class.border-sky-300]="activeTab() === 'auth'"
+              [class.shadow-2xs]="activeTab() === 'auth'"
               [class.text-slate-600]="activeTab() !== 'auth'"
-              [class.hover:bg-slate-100]="activeTab() !== 'auth'"
+              [class.border-transparent]="activeTab() !== 'auth'"
+              [class.hover:bg-slate-50]="activeTab() !== 'auth'"
             >
               Step 3 – Authorized Person Details
             </button>
             <button
               type="button"
               (click)="activeTab.set('bank')"
-              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0"
-              [class.bg-slate-900]="activeTab() === 'bank'"
-              [class.text-white]="activeTab() === 'bank'"
+              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0 border"
+              [class.bg-sky-50]="activeTab() === 'bank'"
+              [class.text-[#0483AC]]="activeTab() === 'bank'"
+              [class.border-sky-300]="activeTab() === 'bank'"
+              [class.shadow-2xs]="activeTab() === 'bank'"
               [class.text-slate-600]="activeTab() !== 'bank'"
-              [class.hover:bg-slate-100]="activeTab() !== 'bank'"
+              [class.border-transparent]="activeTab() !== 'bank'"
+              [class.hover:bg-slate-50]="activeTab() !== 'bank'"
             >
               Step 4 – Bank Details
             </button>
             <button
               type="button"
               (click)="activeTab.set('docs')"
-              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0"
-              [class.bg-slate-900]="activeTab() === 'docs'"
-              [class.text-white]="activeTab() === 'docs'"
+              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0 border"
+              [class.bg-sky-50]="activeTab() === 'docs'"
+              [class.text-[#0483AC]]="activeTab() === 'docs'"
+              [class.border-sky-300]="activeTab() === 'docs'"
+              [class.shadow-2xs]="activeTab() === 'docs'"
               [class.text-slate-600]="activeTab() !== 'docs'"
-              [class.hover:bg-slate-100]="activeTab() !== 'docs'"
+              [class.border-transparent]="activeTab() !== 'docs'"
+              [class.hover:bg-slate-50]="activeTab() !== 'docs'"
             >
               Step 5: Documents &amp; Declaration
             </button>
@@ -288,16 +290,16 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                STEP 1: ORGANIZATION DETAILS (All Fields)
                ==================================================================== -->
           @if (activeTab() === 'all' || activeTab() === 'org') {
-            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs space-y-4 font-sans">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="bg-white border border-slate-200 rounded-xl shadow-2xs font-sans overflow-hidden">
+              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[#0B3558] to-[#174A6E] text-white">
                 <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-semibold">1</span>
-                  <h3 class="text-sm font-semibold text-slate-900 uppercase tracking-wide">Step 1 - Organization Details</h3>
+                  <span class="w-6 h-6 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-semibold">1</span>
+                  <h3 class="text-sm font-semibold text-white uppercase tracking-wide" style="color: #ffffff !important;">Step 1 - Organization Details</h3>
                 </div>
                 <a
                   [routerLink]="['/registration']"
                   [queryParams]="{ step: 1 }"
-                  class="text-xs font-normal text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-1 cursor-pointer"
+                  class="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -306,7 +308,7 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                 </a>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6 text-xs font-normal">
+              <div class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6 text-xs font-normal">
                 <div>
                   <span class="text-slate-500 block">TP/PIA Short Name</span>
                   <span class="text-slate-800">{{ formData().step1.shortName || 'RSLDC' }}</span>
@@ -392,16 +394,16 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                STEP 2: OFFICER IN-CHARGE DIRECTORY (All Fields & Members)
                ==================================================================== -->
           @if (activeTab() === 'all' || activeTab() === 'officers') {
-            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs space-y-4 font-sans">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="bg-white border border-slate-200 rounded-xl shadow-2xs font-sans overflow-hidden">
+              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[#0B3558] to-[#174A6E] text-white">
                 <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-semibold">2</span>
-                  <h3 class="text-sm font-semibold text-slate-900 uppercase tracking-wide">Step 2 – Details of Officer In-Charge</h3>
+                  <span class="w-6 h-6 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-semibold">2</span>
+                  <h3 class="text-sm font-semibold text-white uppercase tracking-wide" style="color: #ffffff !important;">Step 2 – Details of Officer In-Charge</h3>
                 </div>
                 <a
                   [routerLink]="['/registration']"
                   [queryParams]="{ step: 2 }"
-                  class="text-xs font-normal text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-1 cursor-pointer"
+                  class="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -410,6 +412,7 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                 </a>
               </div>
 
+              <div class="p-6 space-y-4">
               @let oic = formData().step2[0] || {};
               <div class="border border-slate-200 rounded-lg p-4 bg-slate-50/50 space-y-3">
                 <div class="flex items-center justify-between border-b border-slate-200 pb-2">
@@ -471,25 +474,25 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                 </div>
               </div>
             </div>
+            </div>
           }
 
           <!-- ====================================================================
                STEP 3: AUTHORIZED PERSON DETAILS (All Fields)
                ==================================================================== -->
           @if (activeTab() === 'all' || activeTab() === 'auth') {
-            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs space-y-4 font-sans">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="bg-white border border-slate-200 rounded-xl shadow-2xs font-sans overflow-hidden">
+              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[#0B3558] to-[#174A6E] text-white">
                 <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-semibold">3</span>
+                  <span class="w-6 h-6 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-semibold">3</span>
                   <div>
-                    <h3 class="text-sm font-semibold text-slate-900 uppercase tracking-wide">Step 3 – Authorized Person Details</h3>
-                    <p class="text-[11px] text-slate-500 font-normal">The Authorized Person is the person officially authorized to represent the TP/PIA.</p>
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wide" style="color: #ffffff !important;">Step 3 – Authorized Person Details</h3>
                   </div>
                 </div>
                 <a
                   [routerLink]="['/registration']"
                   [queryParams]="{ step: 3 }"
-                  class="text-xs font-normal text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-1 cursor-pointer"
+                  class="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 cursor-pointer shrink-0"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -498,7 +501,7 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                 </a>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-3 gap-x-6 text-xs font-normal">
+              <div class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-3 gap-x-6 text-xs font-normal">
                 <div>
                   <span class="text-slate-500 block">Name</span>
                   <span class="text-slate-800">{{ formData().step3.name || 'Vikram Singh Mehta' }}</span>
@@ -567,16 +570,16 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                STEP 4: BANK DETAILS (All Fields)
                ==================================================================== -->
           @if (activeTab() === 'all' || activeTab() === 'bank') {
-            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs space-y-4 font-sans">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="bg-white border border-slate-200 rounded-xl shadow-2xs font-sans overflow-hidden">
+              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[#0B3558] to-[#174A6E] text-white">
                 <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-semibold">4</span>
-                  <h3 class="text-sm font-semibold text-slate-900 uppercase tracking-wide">Step 4 – Bank Details</h3>
+                  <span class="w-6 h-6 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-semibold">4</span>
+                  <h3 class="text-sm font-semibold text-white uppercase tracking-wide" style="color: #ffffff !important;">Step 4 – Bank Details</h3>
                 </div>
                 <a
                   [routerLink]="['/registration']"
                   [queryParams]="{ step: 4 }"
-                  class="text-xs font-normal text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-1 cursor-pointer"
+                  class="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -585,7 +588,7 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                 </a>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6 text-xs font-normal">
+              <div class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6 text-xs font-normal">
                 <div>
                   <span class="text-slate-500 block">Name of the Bank</span>
                   <span class="text-slate-800">{{ formData().step4.bankName || 'State Bank of India' }}</span>
@@ -634,16 +637,16 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                STEP 5: UPLOADED DOCUMENTS & DECLARATION
                ==================================================================== -->
           @if (activeTab() === 'all' || activeTab() === 'docs') {
-            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs space-y-4 font-sans">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="bg-white border border-slate-200 rounded-xl shadow-2xs font-sans overflow-hidden">
+              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[#0B3558] to-[#174A6E] text-white">
                 <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-semibold">5</span>
-                  <h3 class="text-sm font-semibold text-slate-900 uppercase tracking-wide">Step 5: Uploaded Documents &amp; Declaration</h3>
+                  <span class="w-6 h-6 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-semibold">5</span>
+                  <h3 class="text-sm font-semibold text-white uppercase tracking-wide" style="color: #ffffff !important;">Step 5: Uploaded Documents &amp; Declaration</h3>
                 </div>
                 <a
                   [routerLink]="['/registration']"
                   [queryParams]="{ step: 5 }"
-                  class="text-xs font-normal text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-1 cursor-pointer"
+                  class="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -653,7 +656,7 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
               </div>
 
               <!-- Uploaded Documents Cards -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs font-normal">
+              <div class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs font-normal">
                 
                 <div class="p-3 border border-slate-200 rounded-lg flex items-center justify-between bg-slate-50/50">
                   <div class="flex items-center gap-2">

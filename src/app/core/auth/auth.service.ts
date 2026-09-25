@@ -136,7 +136,7 @@ export class AuthService {
         localStorage.removeItem(this.STORAGE_KEY);
       } catch { }
     }
-    this.router.navigate(['/']);
+    this.router.navigate(['/sso-login']);
   }
 
   getRoleConfig(role: UserRole): RoleConfig {

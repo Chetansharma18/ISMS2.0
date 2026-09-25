@@ -18,20 +18,20 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
     class: 'block w-full'
   },
   template: `
-    <section #sectionRef class="pt-8 sm:pt-12 pb-8 sm:pb-12 bg-white border-b border-slate-100">
+    <section #sectionRef class="py-8 sm:py-12 bg-white border-b border-slate-100">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         
-        <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-[#0B3558] mb-6 sm:mb-8 tracking-tight font-sans">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0B3558] mb-6 sm:mb-8 tracking-tight font-sans" style="color: var(--color-primary, #174A6E);">
           About ISMS 2.0
         </h2>
         
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
 
-          <!-- Left Column: About Text & Highlights -->
-          <div class="lg:col-span-7 order-2 lg:order-1">
+          <!-- Left Column: About Text (Aligned parallel with right side video) -->
+          <div class="lg:col-span-7 flex flex-col justify-center">
 
             <!-- Core Content -->
-            <div class="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed sm:leading-[1.8] text-justify hyphens-auto">
+            <div class="space-y-4 text-sm sm:text-base text-slate-700 leading-relaxed sm:leading-[1.75] text-justify">
               <p>
                 Integrated Scheme Management System (ISMS 2.0) is a comprehensive
                 e-Governance and Management Information System (MIS) designed to digitally transform, 
@@ -47,25 +47,6 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
                 ISMS 2.0 enables end-to-end scheme management, from scheme launching and candidate enrollment 
                 through bio-metric attendance, quality inspections, assessment, certification, and direct benefit/fund disbursements.
               </p>
-
-              <!-- Expandable In-Depth Overview -->
-              @if (isExpanded()) {
-                <div class="space-y-4 pt-4 border-t border-slate-100 animate-in fade-in duration-300">
-                  <p>
-                    ISMS 2.0 serves as a centralized decision-support platform, enabling stakeholders 
-                    to generate structured MIS reports, monitor target vs. achievement KPIs, detect bottlenecks, and track the progress of flagship skilling initiatives in real time.
-                  </p>
-                  <p>
-                    The system is built on a modular, scalable, and secure cloud architecture. 
-                    It integrates seamlessly with Rajasthan single sign-on (SSO), Jan Aadhaar, and national portals (PM-SETU, Skill India Digital) 
-                    via standardized APIs to eliminate redundant data entry.
-                  </p>
-                  <p>
-                    By establishing a single source of truth with rigorous audit trails and role-based permissions, 
-                    ISMS 2.0 ensures accountable, transparent, and citizen-centric governance for the youth of Rajasthan.
-                  </p>
-                </div>
-              }
             </div>
           </div>
 
@@ -170,7 +151,6 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
   @ViewChild('sectionRef') sectionRef?: ElementRef<HTMLElement>;
   @ViewChild('videoRef') videoRef?: ElementRef<HTMLVideoElement>;
 
-  readonly isExpanded = signal<boolean>(false);
   readonly isVideoLoaded = signal<boolean>(false);
   readonly isPlaying = signal<boolean>(false);
   readonly isMuted = signal<boolean>(true); // Strictly sound off by default
@@ -184,10 +164,6 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
   private observer?: IntersectionObserver;
   private isVisible = false;
   private visibilityHandler?: () => void;
-
-  toggleExpand(): void {
-    this.isExpanded.update(v => !v);
-  }
 
   ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;

@@ -13,7 +13,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
       [type]="type"
       [disabled]="disabled || loading"
       (click)="onClick($event)"
-      class="inline-flex items-center justify-center gap-2 font-medium rounded-[4px] transition-colors cursor-pointer select-none focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed font-sans"
+      class="btn inline-flex items-center justify-center gap-2 font-medium rounded-[4px] transition-colors cursor-pointer select-none focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed font-sans"
       [ngClass]="[variantClasses, sizeClasses]"
       [title]="title"
       [attr.aria-label]="ariaLabel || title"
@@ -58,32 +58,31 @@ export class ButtonComponent {
   get variantClasses(): string {
     switch (this.variant) {
       case 'primary':
-        return 'bg-[#174A6E] hover:bg-[#123B59] text-white border border-[#174A6E]';
+        return 'btn-primary';
       case 'secondary':
-        return 'bg-[#EAF2F6] hover:bg-[#d5e6f0] text-[#174A6E] border border-[#EAF2F6]';
+        return 'btn-secondary';
       case 'outline':
-        return 'bg-white hover:bg-[#F5F7F9] text-[#174A6E] border border-[#174A6E]';
+        return 'btn-outline';
       case 'ghost':
-        return 'bg-transparent hover:bg-[#EAF2F6] text-[#174A6E] border border-transparent';
+        return 'btn-ghost';
       case 'danger':
-        return 'bg-rose-700 hover:bg-rose-800 text-white border border-rose-700';
+        return 'btn-danger';
       case 'pdf-view':
-        return 'bg-white hover:bg-slate-100 text-[#1F2933] border border-[#D9E1E7] shadow-2xs';
+        return 'bg-surface hover:bg-background text-primary border border-theme shadow-2xs';
       default:
-        return 'bg-[#174A6E] text-white border border-[#174A6E]';
+        return 'btn-primary';
     }
   }
 
   get sizeClasses(): string {
     switch (this.size) {
       case 'sm':
-        return 'h-[32px] px-3 text-[13px] leading-[18px]';
+        return 'btn-sm';
       case 'lg':
-        return 'h-[44px] px-6 text-[15px] leading-[22px]';
+        return 'btn-lg';
       case 'md':
       default:
-        // Design System Standard: Height 38px, horizontal padding 16px, font 14px / 500
-        return 'h-[38px] px-4 text-[14px] leading-[20px]';
+        return '';
     }
   }
 }

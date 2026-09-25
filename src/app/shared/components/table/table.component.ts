@@ -17,13 +17,13 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
   standalone: true,
   imports: [CommonModule, FormsModule, StatusBadgeComponent],
   template: `
-    <div class="border border-[#D9E1E7] rounded-[6px] overflow-hidden bg-white shadow-[0_1px_3px_rgba(31,41,51,0.06)] font-sans">
+    <div class="card overflow-hidden font-sans">
       
       <!-- Optional Search & Toolbar -->
       @if (searchable) {
-        <div class="p-3 bg-white border-b border-[#D9E1E7] flex items-center justify-between gap-3">
+        <div class="p-3 bg-surface border-b border-theme flex items-center justify-between gap-3">
           <div class="relative w-full max-w-xs">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#7A8792]">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -32,7 +32,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
               type="text"
               [(ngModel)]="searchQuery"
               [placeholder]="searchPlaceholder"
-              class="w-full h-[38px] pl-9 pr-3 text-[13px] bg-white border border-[#D9E1E7] rounded-[4px] text-[#1F2933] placeholder:text-[#7A8792] focus:outline-none focus:border-[#174A6E] focus:ring-2 focus:ring-[#EAF2F6] transition-all"
+              class="form-control pl-9 text-[13px]"
             />
           </div>
           <div class="flex items-center gap-2">
@@ -43,17 +43,17 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 
       <!-- Main Responsive Table Container -->
       <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-[13px]">
+        <table class="table w-full text-left border-collapse text-[13px]">
           <!-- Themed Table Header -->
           <thead>
-            <tr class="bg-[#F4F7FB] text-[#1F2933] text-[13px] font-semibold select-none border-b border-[#D9E1E7]">
+            <tr class="bg-primary-light text-primary text-[13px] font-semibold select-none border-b border-theme">
               @for (col of columns; track col.key; let last = $last) {
                 <th
                   class="h-[44px] px-3.5 select-none"
                   [ngClass]="[
                     col.width || '',
                     col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left',
-                    !last ? 'border-r border-[#D9E1E7]/70' : '',
+                    !last ? 'border-r border-theme/70' : '',
                     col.headerClass || ''
                   ]"
                 >
@@ -64,7 +64,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                   >
                     <span>{{ col.label }}</span>
                     @if (col.sortable && sortKey() === col.key) {
-                      <span class="text-[11px] text-[#174A6E]">
+                      <span class="text-[11px] text-brand">
                         {{ sortAsc() ? '▲' : '▼' }}
                       </span>
                     }
@@ -75,12 +75,12 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
           </thead>
 
           <!-- Table Body -->
-          <tbody class="divide-y divide-[#D9E1E7] bg-white font-normal text-[#1F2933]">
+          <tbody class="divide-y divide-border bg-surface font-normal text-primary">
             @if (loading) {
               <tr>
-                <td [attr.colspan]="columns.length" class="py-12 text-center text-[#5F6B76]">
+                <td [attr.colspan]="columns.length" class="py-12 text-center text-secondary">
                   <div class="inline-flex items-center gap-2 text-[13px] font-normal">
-                    <svg class="animate-spin h-5 w-5 text-[#174A6E]" fill="none" viewBox="0 0 24 24">
+                    <svg class="animate-spin h-5 w-5 text-brand" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                     </svg>
@@ -91,7 +91,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
             } @else {
               @for (item of paginatedData(); track getTrackBy(item, $index); let idx = $index) {
                 <tr
-                  class="h-[46px] hover:bg-[#EAF2F6] transition-colors"
+                  class="h-[46px] hover:bg-primary-light transition-colors"
                   [ngClass]="rowClass ? rowClass(item, idx) : ''"
                   (click)="rowClick.emit(item)"
                 >
@@ -100,7 +100,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                       class="px-3.5 text-[13px]"
                       [ngClass]="[
                         col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left',
-                        !last ? 'border-r border-[#D9E1E7]/50' : '',
+                        !last ? 'border-r border-theme/50' : '',
                         getCellClass(col, item)
                       ]"
                     >
@@ -143,9 +143,9 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 
       <!-- Table Pagination Bar -->
       @if (pagination && filteredData().length > 0) {
-        <div class="px-4 py-2.5 bg-[#F5F7F9] border-t border-[#D9E1E7] flex flex-col sm:flex-row items-center justify-between gap-3 text-[13px] text-[#5F6B76] select-none font-sans">
+        <div class="px-4 py-2.5 bg-background border-t border-theme flex flex-col sm:flex-row items-center justify-between gap-3 text-[13px] text-secondary select-none font-sans">
           <span>
-            Showing <strong class="text-[#1F2933] font-semibold">{{ (currentPage() - 1) * pageSize + 1 }}</strong> to <strong class="text-[#1F2933] font-semibold">{{ Math.min(currentPage() * pageSize, filteredData().length) }}</strong> of <strong class="text-[#1F2933] font-semibold">{{ filteredData().length }}</strong> {{ itemUnit }}
+            Showing <strong class="text-primary font-semibold">{{ (currentPage() - 1) * pageSize + 1 }}</strong> to <strong class="text-primary font-semibold">{{ Math.min(currentPage() * pageSize, filteredData().length) }}</strong> of <strong class="text-primary font-semibold">{{ filteredData().length }}</strong> {{ itemUnit }}
           </span>
 
           <div class="flex items-center gap-1.5">
@@ -153,7 +153,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
               type="button"
               (click)="setPage(currentPage() - 1)"
               [disabled]="currentPage() === 1"
-              class="h-[30px] px-2.5 rounded-[4px] border border-[#D9E1E7] bg-white text-[12px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#EAF2F6] cursor-pointer"
+              class="h-[30px] px-2.5 rounded-[4px] border border-theme bg-surface text-[12px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary-light cursor-pointer"
             >
               Previous
             </button>
@@ -163,13 +163,13 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                 type="button"
                 (click)="setPage(p)"
                 class="min-w-[30px] h-[30px] px-1.5 rounded-[4px] flex items-center justify-center text-[12px] font-medium transition-colors cursor-pointer border"
-                [class.bg-[#174A6E]]="currentPage() === p"
+                [class.bg-primary]="currentPage() === p"
                 [class.text-white]="currentPage() === p"
-                [class.border-[#174A6E]]="currentPage() === p"
-                [class.bg-white]="currentPage() !== p"
-                [class.text-[#1F2933]]="currentPage() !== p"
-                [class.border-[#D9E1E7]]="currentPage() !== p"
-                [class.hover:bg-[#EAF2F6]]="currentPage() !== p"
+                [class.border-primary]="currentPage() === p"
+                [class.bg-surface]="currentPage() !== p"
+                [class.text-primary]="currentPage() !== p"
+                [class.border-theme]="currentPage() !== p"
+                [class.hover:bg-primary-light]="currentPage() !== p"
               >
                 {{ p }}
               </button>
@@ -179,7 +179,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
               type="button"
               (click)="setPage(currentPage() + 1)"
               [disabled]="currentPage() === totalPages()"
-              class="h-[30px] px-2.5 rounded-[4px] border border-[#D9E1E7] bg-white text-[12px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#EAF2F6] cursor-pointer"
+              class="h-[30px] px-2.5 rounded-[4px] border border-theme bg-surface text-[12px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary-light cursor-pointer"
             >
               Next
             </button>

@@ -40,16 +40,14 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
         <!-- Hero Content (Left) -->
         <div class="lg:col-span-7 text-left">
           
-
-          <h1 class="text-white text-3xl sm:text-4xl md:text-5xl font-black leading-[1.12] mb-4 tracking-tight drop-shadow-md" style="font-family: 'Inter', sans-serif;">
-            Integrated Scheme <br class="hidden sm:inline" />
-            <span class="text-white">Management System</span>
+          <h1 class="text-white !text-white text-3xl sm:text-4xl md:text-5xl lg:text-[46px] font-extrabold leading-[1.18] mb-5 tracking-tight drop-shadow-md" style="color: #ffffff !important; font-family: var(--font-family-base, 'Inter', sans-serif);">
+            <span class="text-white !text-white font-extrabold inline-block" style="color: #ffffff !important;">Integrated Scheme</span> <br class="hidden sm:inline" />
+            <span class="text-white !text-white font-extrabold inline-block" style="color: #ffffff !important;">Management System</span>
           </h1>
 
-          <p class="text-slate-100 text-sm sm:text-base mb-6 sm:mb-8 max-w-xl leading-tight drop-shadow font-normal">
+          <p class="text-slate-100 !text-slate-100 text-sm sm:text-base lg:text-[17px] max-w-xl leading-relaxed drop-shadow font-normal" style="color: #f1f5f9 !important;">
             A unified, transparent digital ecosystem empowering skill development schemes, training operations, biometric verification, assessments, certifications, and sustainable placements across Rajasthan.
           </p>
-
 
         </div>
 
@@ -58,7 +56,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
           <div class="w-full h-[460px] sm:h-[500px] lg:h-[540px] bg-white rounded-2xl shadow-2xl border border-white/60 flex flex-col overflow-hidden relative z-20">
             
             <!-- Header -->
-            <div class="bg-[#0B3558] px-5 sm:px-6 py-4 flex items-center justify-between z-10 shrink-0 shadow-sm border-b border-[#07233B]">
+            <div class="bg-primary px-5 sm:px-6 py-4 flex items-center justify-between z-10 shrink-0 shadow-sm border-b border-[#07233B]" style="background-color: var(--color-primary, #174A6E);">
               <div class="flex items-center gap-2.5 text-white font-bold tracking-wide text-sm sm:text-base">
                 <span>TENDER</span>
               </div>
@@ -95,7 +93,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                       <div class="flex justify-between items-center mb-1">
                         <span class="text-[10px] sm:text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
                       </div>
-                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:text-blue-600 group-hover:underline transition-all line-clamp-2">
+                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:text-primary transition-all line-clamp-2">
                         {{ item.title }}
                       </h4>
                       <p class="text-[10px] text-slate-400 font-mono">{{ item.id }}</p>
@@ -115,7 +113,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                       <div class="flex justify-between items-center mb-1">
                         <span class="text-[10px] sm:text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
                       </div>
-                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:text-blue-600 group-hover:underline transition-all line-clamp-2">
+                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:text-primary transition-all line-clamp-2">
                         {{ item.title }}
                       </h4>
                       <p class="text-[10px] text-slate-400 font-mono">{{ item.id }}</p>
@@ -205,7 +203,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
 
               <!-- Footer Action -->
               <div class="p-4 pr-10 border-t border-slate-100 bg-white">
-                <button (click)="downloadSamplePdf()" class="w-full bg-[#0B3558] hover:bg-[#07233B] text-white font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-all shadow-md text-xs sm:text-sm">
+                <button (click)="downloadSamplePdf()" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-all shadow-md text-xs sm:text-sm" style="background-color: var(--color-primary, #174A6E);">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>

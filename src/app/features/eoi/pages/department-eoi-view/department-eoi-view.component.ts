@@ -13,7 +13,7 @@ import {
   standalone: true,
   imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent],
   template: `
-    <div class="w-full min-h-full bg-[#F5F7F9] text-[#1F2933] font-sans">
+    <div class="w-full min-h-full bg-background text-primary font-sans">
       <div class="p-4 sm:p-5 space-y-3 font-sans">
         
         <!-- Header via Reusable PageHeaderComponent -->
@@ -42,24 +42,24 @@ import {
         </app-table>
 
         <ng-template #schemeTitleTemplate let-scheme>
-          <div class="font-medium text-[#1F2933] text-[13px] leading-snug">
+          <div class="font-medium text-primary text-[13px] leading-snug">
             {{ scheme.schemeTitle }}
           </div>
-          <div class="text-[11px] font-mono text-[#7A8792] mt-0.5">
+          <div class="text-[11px] font-mono text-muted mt-0.5">
             Ref: {{ scheme.refNo }}
           </div>
         </ng-template>
 
         <ng-template #responseCountTemplate let-scheme>
-          <span class="font-medium text-[#1F2933] text-[13px]">{{ scheme.responseCount }}</span>
-          <span class="text-[#5F6B76] text-[11px] ml-1">EOIs</span>
+          <span class="font-medium text-primary text-[13px]">{{ scheme.responseCount }}</span>
+          <span class="text-secondary text-[11px] ml-1">EOIs</span>
         </ng-template>
 
         <ng-template #actionTemplate let-scheme>
           @if (scheme.status === 'Closed') {
             <a
               [routerLink]="['/admin/responses', scheme.id]"
-              class="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-[4px] bg-[#EAF2F6] hover:bg-[#d5e6f0] text-[#174A6E] border border-[#D9E1E7] transition-colors font-medium text-[13px] cursor-pointer"
+              class="btn btn-secondary btn-sm"
             >
               <span>View List</span>
             </a>
@@ -68,9 +68,9 @@ import {
               <button
                 type="button"
                 disabled
-                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-[4px] bg-[#F5F7F9] text-[#7A8792] border border-[#D9E1E7] text-[13px] font-normal cursor-not-allowed opacity-60"
+                class="btn btn-outline btn-sm opacity-60 cursor-not-allowed"
               >
-                <svg class="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-3.5 h-3.5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
                 <span>View List</span>

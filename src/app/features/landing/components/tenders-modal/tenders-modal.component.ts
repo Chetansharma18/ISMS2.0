@@ -21,16 +21,16 @@ interface Tender {
       <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl flex flex-col max-h-full overflow-hidden border border-slate-200">
         
         <!-- Header -->
-        <div class="bg-[#0B3558] text-white px-6 py-4 flex items-center justify-between shrink-0">
+        <div class="bg-primary text-white px-6 py-4 flex items-center justify-between shrink-0" style="background-color: var(--color-primary, #174A6E);">
           <div>
-            <h3 class="text-lg font-bold leading-tight">Official Tenders & RFP Notices</h3>
-            <p class="text-[11px] text-blue-200 mt-0.5">Rajasthan Skill and Livelihoods Development Corporation (RSLDC)</p>
+            <h3 class="text-lg font-bold leading-tight text-white">Official Tenders & RFP Notices</h3>
+            <p class="text-[11px] text-blue-100 mt-0.5">Rajasthan Skill and Livelihoods Development Corporation (RSLDC)</p>
           </div>
           
           <div class="flex items-center gap-4">
-            <span class="text-xs font-medium text-slate-300">Total Tenders: <span class="text-white font-bold">{{ tenders.length }}</span></span>
+            <span class="text-xs font-medium text-slate-200">Total Tenders: <span class="text-white font-bold">{{ tenders.length }}</span></span>
             <button (click)="close.emit()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -56,14 +56,14 @@ interface Tender {
                   <span class="text-[11px] text-slate-500 font-medium">{{ item.category }}</span>
                 </div>
                 
-                <h4 class="text-sm font-bold text-slate-800 leading-snug group-hover:text-blue-600 group-hover:underline transition-all">
+                <h4 class="text-sm font-bold text-slate-800 leading-snug group-hover:text-primary transition-all">
                   {{ item.title }}
                 </h4>
               </div>
 
               <!-- Download Action -->
               <div class="shrink-0">
-                <button (click)="downloadPdf(); $event.stopPropagation()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#0B3558] hover:bg-[#07233B] text-white px-5 py-2.5 rounded-md text-xs font-bold transition-colors">
+                <button (click)="downloadPdf(); $event.stopPropagation()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-md text-xs font-bold transition-colors" style="background-color: var(--color-primary, #174A6E);">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
@@ -128,7 +128,7 @@ interface Tender {
 
           <!-- Footer Action -->
           <div class="p-4 sm:p-6 border-t border-slate-100 bg-white">
-            <button (click)="downloadPdf()" class="w-full bg-[#0B3558] hover:bg-[#07233B] text-white font-bold py-3.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg">
+            <button (click)="downloadPdf()" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg" style="background-color: var(--color-primary, #174A6E);">
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>

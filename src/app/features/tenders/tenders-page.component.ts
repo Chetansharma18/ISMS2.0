@@ -60,9 +60,6 @@ export interface EoiDocumentItem {
           <!-- Themed Header Bar via Reusable PageHeaderComponent -->
           <app-page-header
             title="Active EOI"
-            [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Active EOI' }]"
-            backUrl="/registration"
-            backTitle="Back to Registration Form"
           ></app-page-header>
 
           <!-- Incomplete Profile Notice Banner (if applicable) -->
@@ -73,15 +70,19 @@ export interface EoiDocumentItem {
                   Please complete your profile first
                 </h4>
                 <p class="text-[11px] sm:text-xs text-amber-800 mt-0.5 font-normal">
-                  Your entity profile is currently incomplete. Please complete your profile to submit EOI.
+                  Your profile is currently incomplete. Please complete your profile to submit EOI.
                 </p>
               </div>
 
               <a
                 routerLink="/registration"
-                class="px-3.5 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white text-xs font-normal rounded shadow-2xs whitespace-nowrap transition-colors flex items-center justify-center shrink-0 cursor-pointer"
+                class="px-4 py-2 bg-[#0B3558] hover:bg-[#123B59] active:bg-[#07233B] !text-white text-xs font-semibold rounded-md shadow-xs whitespace-nowrap transition-all flex items-center gap-1.5 justify-center shrink-0 cursor-pointer"
+                style="color: #ffffff !important;"
               >
-                <span>Complete Registration</span>
+                <span class="!text-white font-semibold" style="color: #ffffff !important;">Complete Registration</span>
+                <svg class="w-3.5 h-3.5 text-white" style="stroke: #ffffff !important; color: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
               </a>
             </div>
           }
@@ -127,34 +128,18 @@ export interface EoiDocumentItem {
       @if (selectedScheme(); as s) {
         <div class="p-6 sm:p-8 space-y-5 animate-in fade-in duration-200">
           
-          <!-- Back Navigation Bar & Breadcrumb Path with Back Icon -->
-          <div class="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-slate-200">
-            <div class="flex items-center gap-3">
-              <button
-                type="button"
-                (click)="backToList()"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-normal text-slate-700 hover:text-[#0B3558] bg-slate-100 hover:bg-slate-200 rounded-md transition-colors cursor-pointer border border-slate-300/80"
-                title="Back to Active EOI"
-              >
-                <!-- Material Arrow Back Icon -->
-                <span class="material-icons text-slate-600 text-[16px] leading-none shrink-0 select-none">arrow_back</span>
-                <span>Back to Active EOI</span>
-              </button>
-
-              <!-- Path with Material Home Icon -->
-              <nav class="flex items-center gap-1.5 text-xs text-slate-500 font-normal" aria-label="Breadcrumb">
-                <a routerLink="/" class="hover:text-[#0B3558] flex items-center gap-1 text-slate-600">
-                  <span class="material-icons text-slate-400 text-[16px] leading-none shrink-0 select-none">home</span>
-                  <span>Home</span>
-                </a>
-                <span class="text-slate-400">/</span>
-                <button type="button" (click)="backToList()" class="hover:text-[#0B3558] hover:underline cursor-pointer bg-transparent border-0 p-0 text-xs text-slate-600 font-normal">
-                  Active EOI
-                </button>
-                <span class="text-slate-400">/</span>
-                <span class="text-slate-800 font-normal truncate max-w-xs sm:max-w-md">{{ s.schemeTitle || s.schemeName }}</span>
-              </nav>
-            </div>
+          <!-- Back Navigation: Half Arrow Only -->
+          <div class="flex items-center pb-2 border-b border-slate-200">
+            <button
+              type="button"
+              (click)="backToList()"
+              class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-700 hover:text-[#0B3558] hover:bg-slate-100 active:scale-95 transition-all cursor-pointer -ml-1"
+              title="Back to Active EOI"
+            >
+              <svg class="w-5 h-5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
           </div>
 
           <!-- SCHEME HEADER & DETAILS (Clean Background Presentation) -->
@@ -409,7 +394,7 @@ export interface EoiDocumentItem {
               Please Complete Your Profile 
             </h3>
             <p class="text-xs sm:text-[13px] text-slate-600 mt-2.5 leading-relaxed px-1 font-normal">
-              Your entity profile is currently incomplete. To submit an Expression of Interest (EOI) proposal for <strong>{{ selectedScheme()?.schemeTitle || selectedScheme()?.schemeName }}</strong>, your One Time Registration (OTR) profile must be completed and submitted first.
+              Your  profile is currently incomplete. To submit an Expression of Interest (EOI) proposal for <strong>{{ selectedScheme()?.schemeTitle || selectedScheme()?.schemeName }}</strong>, your One Time Registration (OTR) profile must be completed and submitted first.
             </p>
 
             <!-- Single Clean Action Button: Complete Profile -->

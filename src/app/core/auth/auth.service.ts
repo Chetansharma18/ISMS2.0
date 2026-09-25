@@ -30,7 +30,7 @@ export const USER_ROLES: RoleConfig[] = [
     role: 'existing_user',
     label: 'Existing Partner',
     badge: 'Registered TP/PIA',
-    description: 'Registered agency with verified entity profile'
+    description: 'Registered agency with verified  profile'
   },
   {
     role: 'dept_admin',
@@ -69,6 +69,15 @@ export class AuthService {
         const saved = localStorage.getItem(this.STORAGE_KEY);
         if (saved) {
           this.currentUser.set(JSON.parse(saved));
+        } else {
+          this.currentUser.set({
+            id: 'Approved Citizen (TP)',
+            ssoId: 'Approved Citizen (TP)',
+            label: 'Approved Citizen (TP)',
+            subLabel: 'Registered TP/PIA',
+            role: 'existing_user',
+            isProfileComplete: true
+          });
         }
       } catch {
         // Fallback gracefully

@@ -61,6 +61,21 @@ import { AuthService } from '../../auth/auth.service';
                 <span class="tracking-tight">Applicant Submissions</span>
               </div>
             </a>
+
+            <!-- 3. SDC Approvals & Inspection -->
+            <a
+              routerLink="/sdc"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <span class="tracking-tight">SDC Approvals & Inspection</span>
+              </div>
+            </a>
           } @else if (isExistingUser()) {
             <!-- ================================================================
                  ROLE: EXISTING USER
@@ -76,7 +91,7 @@ import { AuthService } from '../../auth/auth.service';
                 <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
-                <span class="tracking-tight">Active EOI</span>
+                <span class="tracking-tight">Active Schemes &amp; Tenders</span>
               </div>
             </a>
 
@@ -89,7 +104,7 @@ import { AuthService } from '../../auth/auth.service';
             >
               <div class="flex items-center gap-2.5">
                 <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span class="tracking-tight">Tender Status</span>
               </div>
@@ -130,44 +145,111 @@ import { AuthService } from '../../auth/auth.service';
                     routerLink="/profile"
                     [queryParams]="{ tab: 'org' }"
                     routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
+                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
                     class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
                   >
                     <span class="truncate">1. Organisation Details</span>
                   </a>
 
-                  <!-- 2. Authorized Person Details -->
+                  <!-- 2. Officer In-Charge Details -->
+                  <a
+                    routerLink="/profile"
+                    [queryParams]="{ tab: 'officers' }"
+                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
+                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
+                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
+                  >
+                    <span class="truncate">2. Officer In-Charge</span>
+                  </a>
+
+                  <!-- 3. Authorized Person Details -->
                   <a
                     routerLink="/profile"
                     [queryParams]="{ tab: 'auth' }"
                     routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
+                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
                     class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
                   >
-                    <span class="truncate">2. Authorized Person</span>
+                    <span class="truncate">3. Authorized Person</span>
                   </a>
 
-                  <!-- 3. Bank Details -->
+                  <!-- 4. Bank Details -->
                   <a
                     routerLink="/profile"
                     [queryParams]="{ tab: 'bank' }"
                     routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
+                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
                     class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
                   >
-                    <span class="truncate">3. Bank Details</span>
+                    <span class="truncate">4. Bank Details</span>
                   </a>
 
-                  <!-- 4. Uploaded Documents -->
+                  <!-- 5. Uploaded Documents -->
                   <a
                     routerLink="/profile"
                     [queryParams]="{ tab: 'docs' }"
                     routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
+                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
                     class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
                   >
-                    <span class="truncate">4. Documents</span>
+                    <span class="truncate">5. Documents</span>
                   </a>
 
                 </div>
               }
             </div>
+
+            <!-- ================================================================
+                 TP MANAGEMENT (Matching Screenshot 1)
+                 ================================================================ -->
+            <div class="pt-3 pb-1 px-3">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-[#8F9AA3]">TP Management</span>
+            </div>
+
+            <!-- Sanction Orders -->
+            <a
+              routerLink="/tp/sanction-orders"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <span class="tracking-tight">Sanction Orders</span>
+              </div>
+            </a>
+
+            <!-- SDC Management -->
+            <a
+              routerLink="/sdcs"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <span class="tracking-tight">SDC Management</span>
+              </div>
+            </a>
+
+            <!-- Batch Management -->
+            <a
+              routerLink="/batches"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <span class="tracking-tight">Batch Management</span>
+              </div>
+            </a>
           } @else {
             <!-- ================================================================
                  ROLE: NEW USER / STANDARD

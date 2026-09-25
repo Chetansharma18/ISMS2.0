@@ -28,7 +28,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
         alt="Skill Development Building" 
         class="absolute inset-0 w-full h-full object-cover object-center transform scale-105 select-none pointer-events-none"
         fetchpriority="high"
-        onerror="this.src='https://images.unsplash.com/photo-1541888081622-1c25143a3721?q=80&w=2000&auto=format&fit=crop'"
+      
       />
       
       <!-- High-Readability Gradient Overlay -->

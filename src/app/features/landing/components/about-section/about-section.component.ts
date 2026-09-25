@@ -51,7 +51,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
           </div>
 
           <!-- Right Column: Video Showcase & Quote -->
-          <div class="lg:col-span-5 order-1 lg:order-2 w-full">
+          <div class="lg:col-span-5 order-1 lg:order-2 w-full mt-[10px]">
             <div class="rounded-2xl overflow-hidden bg-slate-900 border border-[#0B3558]/30 shadow-[0_0_25px_rgba(11,53,88,0.25)] relative group transition-shadow duration-500 hover:shadow-[0_0_40px_rgba(11,53,88,0.4)]">
               
               <!-- Video Player with Lazy-Load & Controls -->

@@ -30,7 +30,7 @@ interface SchemeCard {
             <span class="text-xs font-bold text-[#0B3558] uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full border border-blue-200/70">
               State & Central Flagship Programmes
             </span>
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0B3558] mt-2 tracking-tight font-sans">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl !font-black text-[#0B3558] mt-2 tracking-tight font-sans" style="font-family: var(--font-family-base, 'Inter', sans-serif);">
               Active Government Schemes
             </h2>
             <p class="text-sm sm:text-base text-slate-500 mt-1 max-w-2xl text-justify hyphens-auto">

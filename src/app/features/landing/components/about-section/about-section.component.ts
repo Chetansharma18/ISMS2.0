@@ -21,14 +21,14 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
     <section #sectionRef class="py-8 sm:py-12 bg-white border-b border-slate-100">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         
-        <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0B3558] mb-6 sm:mb-8 tracking-tight font-sans" style="color: var(--color-primary, #174A6E);">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl !font-black text-[#0B3558] mb-6 sm:mb-8 tracking-tight font-sans" style="color: var(--color-primary, #174A6E); font-family: var(--font-family-base, 'Inter', sans-serif);">
           About ISMS 2.0
         </h2>
         
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
           <!-- Left Column: About Text (Aligned parallel with right side video) -->
-          <div class="lg:col-span-7 flex flex-col justify-center">
+          <div class="lg:col-span-7 flex flex-col justify-start pt-1">
 
             <!-- Core Content -->
             <div class="space-y-4 text-sm sm:text-base text-slate-700 leading-relaxed sm:leading-[1.75] text-justify hyphens-auto">

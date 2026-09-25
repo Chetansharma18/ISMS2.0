@@ -154,7 +154,7 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
   readonly isVideoLoaded = signal<boolean>(false);
   readonly isPlaying = signal<boolean>(false);
   readonly isMuted = signal<boolean>(true); // Strictly sound off by default
-  
+
   readonly fullQuote = 'ISMS 2.0 is an integrated MIS system of RSLDC to provide a single platform to Youths, Training providers, Govt. Departments, Convergence Departments, and Certification agencies for Skill Development Schemes.';
   readonly displayedQuote = signal<string>('');
   readonly hasFinishedTyping = signal<boolean>(false);
@@ -241,7 +241,7 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
     this.hasTyped = true;
     let i = 0;
     this.displayedQuote.set('');
-    
+
     this.typewriterInterval = setInterval(() => {
       if (i < this.fullQuote.length) {
         this.displayedQuote.update(q => q + this.fullQuote.charAt(i));

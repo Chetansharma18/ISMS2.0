@@ -30,10 +30,10 @@ interface SchemeCard {
             <span class="text-xs font-bold text-[#0B3558] uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full border border-blue-200/70">
               State & Central Flagship Programmes
             </span>
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0B3558] mt-2 tracking-tight">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0B3558] mt-2 tracking-tight font-sans">
               Active Government Schemes
             </h2>
-            <p class="text-sm sm:text-base text-slate-500 mt-1 max-w-2xl">
+            <p class="text-sm sm:text-base text-slate-500 mt-1 max-w-2xl text-justify hyphens-auto">
               Empanelling Training Partners and offering funded NSQF-aligned courses to Rajasthan youth.
             </p>
           </div>

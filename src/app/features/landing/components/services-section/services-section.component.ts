@@ -45,10 +45,10 @@ import { CommonModule } from '@angular/common';
               
               <!-- Header Title -->
               <div class="mb-6 sm:mb-8 text-center lg:text-left">
-                <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-[#0B3558] mb-3 tracking-tight font-sans">
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0B3558] mb-3 tracking-tight font-sans">
                   ISMS 2.0 Mobile App
                 </h2>
-                <p class="text-sm sm:text-base text-slate-700 font-medium leading-relaxed max-w-lg mx-auto lg:mx-0">
+                <p class="text-sm sm:text-base text-slate-700 font-medium leading-relaxed max-w-lg mx-auto lg:mx-0 text-justify hyphens-auto">
                   An integrated, multilingual mobile application providing instantaneous access to 
                   scheme notifications, biometric attendance, training center verifications, and grievances.
                 </p>

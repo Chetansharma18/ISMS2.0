@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
   template: `
     <section class="py-12 bg-white border-t border-slate-200">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-[#0B3558] mb-8 tracking-tight font-sans relative inline-block">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0B3558] mb-8 tracking-tight font-sans relative inline-block">
           Important Links
           <div class="w-16 h-1 bg-[#EA580C] mt-2 mx-auto"></div>
         </h2>

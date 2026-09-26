@@ -13,24 +13,14 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
   template: `
     <div class="w-full space-y-6 font-sans">
 
-      <!-- Header & Verification Notice -->
-      <div class="pb-3 border-b border-slate-200">
-        <h2 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
-          Application Review &amp; Declaration
-        </h2>
-        <p class="text-xs text-slate-500 mt-0.5">
-          Please carefully verify all entered particulars and uploaded documents before submitting your One Time Registration (OTR).
-        </p>
-      </div>
-
       <!-- ====================================================================
-           SECTION 1: STEP 1 - ORGANIZATION DETAILS (Complete Comprehensive View)
+           SECTION 1: STEP 1 - ORGANIZATION DETAILS
            ==================================================================== -->
-      <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
-        <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+      <section class="w-full bg-white pb-5 mb-5 border-b border-slate-200/70 last:border-b-0 space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
           <div class="flex items-center gap-2">
             <span class="w-6 h-6 rounded-full bg-slate-800 text-white text-xs font-bold flex items-center justify-center">1</span>
-            <h3 class="text-sm font-bold text-slate-800">
+            <h3 class="text-sm sm:text-base font-bold text-slate-800">
               Step 1 – Organization Details
             </h3>
           </div>
@@ -46,201 +36,161 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
           </button>
         </div>
 
-        <div class="p-4 sm:p-5 space-y-5 bg-white text-xs">
-          <!-- 1.1 Entity Basic Info -->
-          <div>
-            <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">
-              1.1 Basic Entity Information
-            </h4>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-3">
-              <div>
-                <span class="text-slate-400 block text-[11px] font-medium">TP/PIA Short Name</span>
-                <span class="font-semibold text-slate-800">{{ step1().shortName || '-' }}</span>
-              </div>
-              <div class="sm:col-span-2">
-                <span class="text-slate-400 block text-[11px] font-medium">TP/PIA Full Name</span>
-                <span class="font-semibold text-slate-800">{{ step1().fullName || '-' }}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px] font-medium">Nature of Entity</span>
-                <span class="font-semibold text-slate-800">{{ step1().natureOfEntity || '-' }}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px] font-medium">Registration Number</span>
-                <span class="font-mono font-medium text-slate-800">{{ step1().registrationNumber || '-' }}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px] font-medium">Date of Registration</span>
-                <span class="font-medium text-slate-800">{{ step1().dateOfRegistration || '-' }}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px] font-medium">State of Legal Reg.</span>
-                <span class="font-medium text-slate-800">{{ step1().stateOfLegalReg || '-' }}</span>
-              </div>
+        <div class="space-y-4 text-xs">
+          <!-- Entity & Compliance Info Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-3">
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">TP/PIA Short Name</span>
+              <span class="font-semibold text-slate-800">{{ step1().shortName || '-' }}</span>
             </div>
-
-            <!-- Registration Certificate Doc -->
-            <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between flex-wrap gap-2 bg-slate-50/70 p-2.5 rounded border border-slate-200/80">
-              <span class="font-medium text-slate-700">Certificate of Registration / Incorporation:</span>
-              <ng-container *ngTemplateOutlet="docBadgeTemplate; context: { doc: step1().registrationCertDoc, title: 'Certificate of Registration' }"></ng-container>
+            <div class="sm:col-span-2">
+              <span class="text-slate-400 block text-[11px] font-medium">TP/PIA Full Name</span>
+              <span class="font-semibold text-slate-800">{{ step1().fullName || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">Nature of Entity</span>
+              <span class="font-semibold text-slate-800">{{ step1().natureOfEntity || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">Registration Number</span>
+              <span class="font-mono font-medium text-slate-800">{{ step1().registrationNumber || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">Date of Registration</span>
+              <span class="font-medium text-slate-800">{{ step1().dateOfRegistration || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">State of Legal Reg.</span>
+              <span class="font-medium text-slate-800">{{ step1().stateOfLegalReg || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">Company PAN</span>
+              <span class="font-mono font-semibold text-slate-800">{{ step1().companyPan || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">GST Registered</span>
+              <span class="font-medium text-slate-800">{{ step1().gstRegistered }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">GSTIN</span>
+              <span class="font-mono font-medium text-slate-800">{{ step1().gstRegistered === 'Yes' ? (step1().gstin || '-') : 'Not Applicable' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">MSME Registered</span>
+              <span class="font-medium text-slate-800">{{ step1().msmeRegistered }}</span>
+            </div>
+            @if (step1().msmeRegistered === 'Yes') {
+              <div>
+                <span class="text-slate-400 block text-[11px] font-medium">Udyam Registration No.</span>
+                <span class="font-mono font-medium text-slate-800">{{ step1().udyamNumber || '-' }}</span>
+              </div>
+            }
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">NSDC Partner Status</span>
+              <span class="font-medium text-slate-800">{{ step1().nsdcPartner || 'Not Applicable' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">Blacklisted by Govt / PSU</span>
+              <span class="font-medium" [class.text-rose-600]="step1().blackListed === 'Yes'">{{ step1().blackListed }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">Contact Number</span>
+              <span class="font-medium text-slate-800">{{ step1().contactNo || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">Email ID</span>
+              <span class="font-medium text-slate-800">{{ step1().emailId || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">Official Website</span>
+              <span class="font-medium text-slate-800">{{ step1().website || '-' }}</span>
+            </div>
+            <div class="sm:col-span-3">
+              <span class="text-slate-400 block text-[11px] font-medium">Registered Office Address</span>
+              <span class="font-medium text-slate-800">{{ registeredAddressDisplay() }}</span>
+            </div>
+            <div class="sm:col-span-3">
+              <span class="text-slate-400 block text-[11px] font-medium">Corporate / Branch Office Address</span>
+              <span class="font-medium text-slate-800">{{ officeAddressDisplay() }}</span>
             </div>
           </div>
 
-          <!-- 1.2 Tax & Statutory Particulars -->
-          <div class="pt-2 border-t border-slate-100">
-            <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">
-              1.2 Tax &amp; Statutory Particulars
-            </h4>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3">
-              <div>
-                <span class="text-slate-400 block text-[11px] font-medium">Company PAN</span>
-                <span class="font-mono font-semibold text-slate-800">{{ step1().companyPan || '-' }}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px] font-medium">GST Registered</span>
-                <span class="font-medium text-slate-800">{{ step1().gstRegistered }}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px] font-medium">GSTIN</span>
-                <span class="font-mono font-medium text-slate-800">{{ step1().gstRegistered === 'Yes' ? (step1().gstin || '-') : 'Not Applicable' }}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px] font-medium">MSME Registered</span>
-                <span class="font-medium text-slate-800">{{ step1().msmeRegistered }}</span>
-              </div>
-              @if (step1().msmeRegistered === 'Yes') {
-                <div>
-                  <span class="text-slate-400 block text-[11px] font-medium">Udyam Registration No.</span>
-                  <span class="font-mono font-medium text-slate-800">{{ step1().udyamNumber || '-' }}</span>
-                </div>
-              }
-              <div>
-                <span class="text-slate-400 block text-[11px] font-medium">NSDC Partner Status</span>
-                <span class="font-medium text-slate-800">{{ step1().nsdcPartner || 'Not Applicable' }}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px] font-medium">Blacklisted by Govt / PSU</span>
-                <span class="font-medium" [class.text-rose-600]="step1().blackListed === 'Yes'">{{ step1().blackListed }}</span>
+          <!-- Financial Years Table -->
+          @if (step1().financialYears && step1().financialYears.length > 0) {
+            <div class="pt-2 border-t border-slate-100">
+              <div class="border border-slate-200 rounded-md overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-[#F4F7FB] text-slate-700 text-[10.5px] font-semibold border-b border-slate-200">
+                      <th class="py-1.5 px-3 border-r border-slate-200">Financial Year</th>
+                      <th class="py-1.5 px-3 border-r border-slate-200">Total Turnover (₹ Lacs)</th>
+                      <th class="py-1.5 px-3">Skill Turnover (₹ Lacs)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    @for (fy of step1().financialYears; track fy.year) {
+                      <tr class="bg-white">
+                        <td class="py-1.5 px-3 text-xs font-medium text-slate-700 border-r border-slate-100">{{ fy.year }}</td>
+                        <td class="py-1.5 px-3 text-xs text-slate-700 border-r border-slate-100">{{ fy.totalTurnover || '-' }}</td>
+                        <td class="py-1.5 px-3 text-xs text-slate-700">{{ fy.skillTurnover || '-' }}</td>
+                      </tr>
+                    }
+                    <!-- Average Row -->
+                    <tr class="bg-slate-50 border-t-2 border-slate-200">
+                      <td class="py-1.5 px-3 text-xs font-semibold text-slate-700 border-r border-slate-100">3-Year Average</td>
+                      <td class="py-1.5 px-3 text-xs font-semibold text-[#174A6E] border-r border-slate-100">{{ avgTotalTurnover() }} Lacs</td>
+                      <td class="py-1.5 px-3 text-xs font-semibold text-[#174A6E]">{{ avgSkillTurnover() }} Lacs</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
+          }
 
-            <!-- Tax Documents Row -->
-            <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+          <!-- Uploaded Documents -->
+          <div class="pt-2 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+            <div class="bg-slate-50/70 p-2.5 rounded border border-slate-200/80 flex items-center justify-between gap-2">
+              <span class="text-[11px] text-slate-600 font-medium truncate">Certificate of Registration:</span>
+              <ng-container *ngTemplateOutlet="docBadgeTemplate; context: { doc: step1().registrationCertDoc, title: 'Certificate of Registration' }"></ng-container>
+            </div>
+
+            <div class="bg-slate-50/70 p-2.5 rounded border border-slate-200/80 flex items-center justify-between gap-2">
+              <span class="text-[11px] text-slate-600 font-medium truncate">Company PAN Doc:</span>
+              <ng-container *ngTemplateOutlet="docBadgeTemplate; context: { doc: step1().panCardDoc, title: 'Company PAN Card' }"></ng-container>
+            </div>
+
+            @if (step1().gstRegistered === 'Yes') {
               <div class="bg-slate-50/70 p-2.5 rounded border border-slate-200/80 flex items-center justify-between gap-2">
-                <span class="text-[11px] text-slate-600 font-medium truncate">Company PAN Doc:</span>
-                <ng-container *ngTemplateOutlet="docBadgeTemplate; context: { doc: step1().panCardDoc, title: 'Company PAN Card' }"></ng-container>
-              </div>
-
-              @if (step1().gstRegistered === 'Yes') {
-                <div class="bg-slate-50/70 p-2.5 rounded border border-slate-200/80 flex items-center justify-between gap-2">
-                  <span class="text-[11px] text-slate-600 font-medium truncate">GST Certificate:</span>
-                  <ng-container *ngTemplateOutlet="docBadgeTemplate; context: { doc: step1().gstCertDoc, title: 'GST Registration Certificate' }"></ng-container>
-                </div>
-              }
-
-              @if (step1().msmeRegistered === 'Yes') {
-                <div class="bg-slate-50/70 p-2.5 rounded border border-slate-200/80 flex items-center justify-between gap-2">
-                  <span class="text-[11px] text-slate-600 font-medium truncate">Udyam Certificate:</span>
-                  <ng-container *ngTemplateOutlet="docBadgeTemplate; context: { doc: step1().msmeCertDoc, title: 'MSME Udyam Certificate' }"></ng-container>
-                </div>
-              }
-            </div>
-
-            <!-- Financial Years Table -->
-            @if (step1().financialYears && step1().financialYears.length > 0) {
-              <div class="mt-3 pt-3 border-t border-slate-100">
-                <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Financial Details (Turnover in ₹ Lacs)</h4>
-                <div class="border border-slate-200 rounded-md overflow-hidden">
-                  <table class="w-full text-left border-collapse">
-                    <thead>
-                      <tr class="bg-[#F4F7FB] text-slate-700 text-[10.5px] font-semibold border-b border-slate-200">
-                        <th class="py-1.5 px-3 border-r border-slate-200">Financial Year</th>
-                        <th class="py-1.5 px-3 border-r border-slate-200">Total Turnover (₹ Lacs)</th>
-                        <th class="py-1.5 px-3">Skill Turnover (₹ Lacs)</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                      @for (fy of step1().financialYears; track fy.year) {
-                        <tr class="bg-white">
-                          <td class="py-1.5 px-3 text-xs font-medium text-slate-700 border-r border-slate-100">{{ fy.year }}</td>
-                          <td class="py-1.5 px-3 text-xs text-slate-700 border-r border-slate-100">{{ fy.totalTurnover || '-' }}</td>
-                          <td class="py-1.5 px-3 text-xs text-slate-700">{{ fy.skillTurnover || '-' }}</td>
-                        </tr>
-                      }
-                      <!-- Average Row -->
-                      <tr class="bg-slate-50 border-t-2 border-slate-200">
-                        <td class="py-1.5 px-3 text-xs font-semibold text-slate-700 border-r border-slate-100">3-Year Average</td>
-                        <td class="py-1.5 px-3 text-xs font-semibold text-[#0483AC] border-r border-slate-100">{{ avgTotalTurnover() }} Lacs</td>
-                        <td class="py-1.5 px-3 text-xs font-semibold text-[#0483AC]">{{ avgSkillTurnover() }} Lacs</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <!-- Turnover Certificate Doc -->
-                <div class="mt-2 bg-slate-50/70 p-2.5 rounded border border-slate-200/80 flex items-center justify-between gap-2">
-                  <span class="text-[11px] text-slate-600 font-medium truncate">CA-Certified Turnover Certificate:</span>
-                  <ng-container *ngTemplateOutlet="docBadgeTemplate; context: { doc: step1().turnoverCertDoc, title: 'Turnover Certificate' }"></ng-container>
-                </div>
+                <span class="text-[11px] text-slate-600 font-medium truncate">GST Certificate:</span>
+                <ng-container *ngTemplateOutlet="docBadgeTemplate; context: { doc: step1().gstCertDoc, title: 'GST Registration Certificate' }"></ng-container>
               </div>
             }
 
-          </div><!-- end 1.2 Tax & Statutory -->
+            @if (step1().msmeRegistered === 'Yes') {
+              <div class="bg-slate-50/70 p-2.5 rounded border border-slate-200/80 flex items-center justify-between gap-2">
+                <span class="text-[11px] text-slate-600 font-medium truncate">Udyam Certificate:</span>
+                <ng-container *ngTemplateOutlet="docBadgeTemplate; context: { doc: step1().msmeCertDoc, title: 'MSME Udyam Certificate' }"></ng-container>
+              </div>
+            }
 
-          <!-- 1.3 Communication & Addresses -->
-          <div class="pt-2 border-t border-slate-100">
-            <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">
-              1.3 Communication &amp; Office Locations
-            </h4>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-3">
-              <div>
-                <span class="text-slate-400 block text-[11px] font-medium">Contact Number</span>
-                <span class="font-medium text-slate-800">{{ step1().contactNo || '-' }}</span>
+            @if (step1().financialYears && step1().financialYears.length > 0) {
+              <div class="bg-slate-50/70 p-2.5 rounded border border-slate-200/80 flex items-center justify-between gap-2">
+                <span class="text-[11px] text-slate-600 font-medium truncate">Turnover Certificate:</span>
+                <ng-container *ngTemplateOutlet="docBadgeTemplate; context: { doc: step1().turnoverCertDoc, title: 'Turnover Certificate' }"></ng-container>
               </div>
-              <div>
-                <span class="text-slate-400 block text-[11px] font-medium">Email ID</span>
-                <span class="font-medium text-slate-800">{{ step1().emailId || '-' }}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px] font-medium">Official Website</span>
-                <span class="font-medium text-slate-800">{{ step1().website || '-' }}</span>
-              </div>
-
-              <div class="sm:col-span-3 pt-1">
-                <span class="text-slate-400 block text-[11px] font-medium">Registered Office Address</span>
-                <span class="font-medium text-slate-800">
-                  {{ step1().registeredAddress || '-' }}
-                  @if (step1().registeredDistrict || step1().registeredState) {
-                    , {{ step1().registeredDistrict }}, {{ step1().registeredState }} - {{ step1().registeredPincode }}
-                  }
-                </span>
-              </div>
-
-              <div class="sm:col-span-3">
-                <span class="text-slate-400 block text-[11px] font-medium">Corporate / Branch Office Address</span>
-                <span class="font-medium text-slate-800">
-                  @if (step1().sameAsRegistered) {
-                    Same as Registered Office Address
-                  } @else {
-                    {{ step1().officeAddress || '-' }}
-                    @if (step1().officeDistrict || step1().officeState) {
-                      , {{ step1().officeDistrict }}, {{ step1().officeState }} - {{ step1().officePincode }}
-                    }
-                  }
-                </span>
-              </div>
-            </div>
+            }
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- ====================================================================
-           SECTION 2: STEP 2 - AUTHORIZED PERSON DETAILS (now Step 2)
+           SECTION 2: STEP 2 - AUTHORIZED PERSON DETAILS
            ==================================================================== -->
-      <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
-        <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+      <section class="w-full bg-white pb-5 mb-5 border-b border-slate-200/70 last:border-b-0 space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
           <div class="flex items-center gap-2">
             <span class="w-6 h-6 rounded-full bg-slate-800 text-white text-xs font-bold flex items-center justify-center">2</span>
-            <h3 class="text-sm font-bold text-slate-800">
+            <h3 class="text-sm sm:text-base font-bold text-slate-800">
               Step 2 – Authorized Person Details
             </h3>
           </div>
@@ -256,8 +206,8 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
           </button>
         </div>
 
-        <div class="p-4 sm:p-5 space-y-4 bg-white text-xs">
-          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-x-4 gap-y-3">
+        <div class="space-y-4 text-xs">
+          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-3">
             <div>
               <span class="text-slate-400 block text-[11px] font-medium">Authorized Person Name</span>
               <span class="font-semibold text-slate-800">{{ step3().name || '-' }}</span>
@@ -267,8 +217,12 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
               <span class="font-medium text-slate-800">{{ step3().designation || '-' }}</span>
             </div>
             <div>
-              <span class="text-slate-400 block text-[11px] font-medium">Date of Birth &amp; Age</span>
-              <span class="font-medium text-slate-800">{{ step3().dob || '-' }} @if (step3().age) { ({{ step3().age }} yrs) }</span>
+              <span class="text-slate-400 block text-[11px] font-medium">Date of Birth</span>
+              <span class="font-medium text-slate-800">{{ step3().dob || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">Age</span>
+              <span class="font-medium text-slate-800">{{ step3().age || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-400 block text-[11px] font-medium">Mobile No.</span>
@@ -285,6 +239,18 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
             <div>
               <span class="text-slate-400 block text-[11px] font-medium">Aadhaar No.</span>
               <span class="font-mono font-medium text-slate-800">{{ step3().aadhaarNo || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">Bhamashah No.</span>
+              <span class="font-medium text-slate-800">{{ step3().bhamashahNo || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">Voter ID No.</span>
+              <span class="font-medium text-slate-800">{{ step3().voterIdNo || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[11px] font-medium">Passport No.</span>
+              <span class="font-medium text-slate-800">{{ step3().passportNo || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-400 block text-[11px] font-medium">State</span>
@@ -309,16 +275,16 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- ====================================================================
-           SECTION 3: STEP 3 - OFFICER(S) IN-CHARGE (now Step 3)
+           SECTION 3: STEP 3 - OFFICER(S) IN-CHARGE
            ==================================================================== -->
-      <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
-        <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+      <section class="w-full bg-white pb-5 mb-5 border-b border-slate-200/70 last:border-b-0 space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
           <div class="flex items-center gap-2">
             <span class="w-6 h-6 rounded-full bg-slate-800 text-white text-xs font-bold flex items-center justify-center">3</span>
-            <h3 class="text-sm font-bold text-slate-800">
+            <h3 class="text-sm sm:text-base font-bold text-slate-800">
               Step 3 – Details of Officer In-Charge ({{ step2().length }} Officer{{ step2().length > 1 ? 's' : '' }})
             </h3>
           </div>
@@ -334,7 +300,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
           </button>
         </div>
 
-        <div class="p-4 sm:p-5 space-y-4 bg-white divide-y divide-slate-100 text-xs">
+        <div class="space-y-4 divide-y divide-slate-100 text-xs">
           @for (oic of step2(); track oic.id; let idx = $index) {
             <div class="space-y-3" [class.pt-4]="idx > 0">
               <div class="flex items-center justify-between">
@@ -373,21 +339,18 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
                   <span class="text-slate-400 block text-[11px] font-medium">Aadhaar No.</span>
                   <span class="font-mono font-medium text-slate-800">{{ oic.aadhaarNo || '-' }}</span>
                 </div>
-
-                @if (oic.bhamashahNo || oic.voterIdNo || oic.passportNo) {
-                  <div>
-                    <span class="text-slate-400 block text-[11px] font-medium">Bhamashah No.</span>
-                    <span class="font-medium text-slate-800">{{ oic.bhamashahNo || '-' }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block text-[11px] font-medium">Voter ID No.</span>
-                    <span class="font-medium text-slate-800">{{ oic.voterIdNo || '-' }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block text-[11px] font-medium">Passport No.</span>
-                    <span class="font-medium text-slate-800">{{ oic.passportNo || '-' }}</span>
-                  </div>
-                }
+                <div>
+                  <span class="text-slate-400 block text-[11px] font-medium">Bhamashah No.</span>
+                  <span class="font-medium text-slate-800">{{ oic.bhamashahNo || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px] font-medium">Voter ID No.</span>
+                  <span class="font-medium text-slate-800">{{ oic.voterIdNo || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px] font-medium">Passport No.</span>
+                  <span class="font-medium text-slate-800">{{ oic.passportNo || '-' }}</span>
+                </div>
               </div>
 
               <!-- Officer Documents Row -->
@@ -405,16 +368,16 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
             </div>
           }
         </div>
-      </div>
+      </section>
 
       <!-- ====================================================================
            SECTION 4: STEP 4 - BANK DETAILS
            ==================================================================== -->
-      <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
-        <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+      <section class="w-full bg-white pb-5 mb-5 border-b border-slate-200/70 last:border-b-0 space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
           <div class="flex items-center gap-2">
             <span class="w-6 h-6 rounded-full bg-slate-800 text-white text-xs font-bold flex items-center justify-center">4</span>
-            <h3 class="text-sm font-bold text-slate-800">
+            <h3 class="text-sm sm:text-base font-bold text-slate-800">
               Step 4 – Bank Details
             </h3>
           </div>
@@ -430,7 +393,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
           </button>
         </div>
 
-        <div class="p-4 sm:p-5 space-y-4 bg-white text-xs">
+        <div class="space-y-4 text-xs">
           <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-x-4 gap-y-3">
             <div>
               <span class="text-slate-400 block text-[11px] font-medium">Name of the Bank</span>
@@ -464,6 +427,10 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
               <span class="text-slate-400 block text-[11px] font-medium">MICR Code</span>
               <span class="font-mono font-medium text-slate-800">{{ step4().micrCode || '-' }}</span>
             </div>
+            <div class="sm:col-span-2 lg:col-span-4">
+              <span class="text-slate-400 block text-[11px] font-medium">Branch Address</span>
+              <span class="font-medium text-slate-800">{{ step4().branchAddress || '-' }}</span>
+            </div>
           </div>
 
           <!-- Bank Verification Document -->
@@ -472,7 +439,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
             <ng-container *ngTemplateOutlet="docBadgeTemplate; context: { doc: step4().cancelledChequeDoc, title: 'Bank Cancelled Cheque' }"></ng-container>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- ====================================================================
            STATUTORY DECLARATION
@@ -559,6 +526,31 @@ export class Step5PreviewComponent {
     return this.isStep1Valid() && this.isStep2Valid() && this.isStep3Valid() && this.isStep4Valid();
   });
 
+  readonly registeredAddressDisplay = computed(() => {
+    const s = this.step1();
+    const parts: string[] = [];
+    if (s.registeredAddress?.trim()) parts.push(s.registeredAddress.trim());
+    if (s.registeredDistrict?.trim()) parts.push(s.registeredDistrict.trim());
+    if (s.registeredState?.trim()) parts.push(s.registeredState.trim());
+    let str = parts.join(', ');
+    if (s.registeredPincode?.trim()) str += (str ? ' - ' : '') + s.registeredPincode.trim();
+    return str || '-';
+  });
+
+  readonly officeAddressDisplay = computed(() => {
+    const s = this.step1();
+    if (s.sameAsRegistered) {
+      return 'Same as Registered Office Address';
+    }
+    const parts: string[] = [];
+    if (s.officeAddress?.trim()) parts.push(s.officeAddress.trim());
+    if (s.officeDistrict?.trim()) parts.push(s.officeDistrict.trim());
+    if (s.officeState?.trim()) parts.push(s.officeState.trim());
+    let str = parts.join(', ');
+    if (s.officePincode?.trim()) str += (str ? ' - ' : '') + s.officePincode.trim();
+    return str || '-';
+  });
+
   /** Computed 3-year average for Total Turnover (for preview display) */
   readonly avgTotalTurnover = computed(() => {
     const rows = this.step1().financialYears;
@@ -574,7 +566,6 @@ export class Step5PreviewComponent {
     const sum = rows.reduce((acc, r) => acc + (parseFloat(r.skillTurnover) || 0), 0);
     return (sum / rows.length).toFixed(2);
   });
-
 
   editStep = output<number>();
 

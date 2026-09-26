@@ -35,9 +35,9 @@ export interface StepMeta {
       <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
         <!-- 1. Form Heading -->
         <div class="w-full border-b border-slate-100 py-3 px-4 sm:px-6 lg:px-8">
-          <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <h1 class="text-base sm:text-lg md:text-xl font-bold text-slate-900 tracking-tight leading-snug m-0">
-              TP (Training Partners) / PIA (Project Implementing Agency) One Time Registration Form
+          <div class="max-w-6xl mx-auto flex items-center justify-center text-center">
+            <h1 class="text-base sm:text-lg md:text-xl font-bold text-slate-900 tracking-tight leading-snug m-0 text-center">
+              One Time Registration Form
             </h1>
           </div>
         </div>

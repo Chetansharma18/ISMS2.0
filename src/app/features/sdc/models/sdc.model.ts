@@ -123,7 +123,7 @@ export interface SdcRecord {
   proposedStartDate: string;
   totalTrainedAspirants?: number;
   totalPlacedAspirants?: number;
-  
+
   // Location
   state: string;
   district: string;

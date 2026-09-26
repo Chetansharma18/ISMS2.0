@@ -29,8 +29,8 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
   template: `
     <div class="w-full space-y-4">
 
-      <!-- Section 4.1: Step 4 – Bank Details -->
-      <app-form-section title="Step 4 – Bank Details">
+      <!-- Section 4.1: Bank Details -->
+      <app-form-section>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <app-form-select
             label="Name of the Bank"
@@ -71,7 +71,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
       </app-form-section>
 
       <!-- Section 4.2: Account Identification & Routing Codes -->
-      <app-form-section title="Account Details">
+      <app-form-section>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <app-form-input
             label="Account Holder Name"
@@ -116,7 +116,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
       </app-form-section>
 
       <!-- Section 4.3: Financial Verification Instrument -->
-      <app-form-section title="Bank Verification Document">
+      <app-form-section>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <div class="md:col-span-2">
             <app-form-file-upload

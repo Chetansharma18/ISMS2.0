@@ -109,62 +109,29 @@ import { SdcFormData } from '../models/sdc.model';
           (stepChange)="goToStep($event)"
         ></app-sdc-form>
 
-        <!-- Bottom Action Buttons (Inside the card, matching Screenshots 2-5) -->
-        <div class="pt-4 flex items-center justify-between gap-3">
-          <!-- Back / Cancel Button -->
-          @if (activeStep() > 1) {
-            <button
-              type="button"
-              (click)="prevStep()"
-              class="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-2xs active:scale-95"
-            >
-              <svg class="w-4 h-4 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-              <span>Back</span>
-            </button>
-          } @else {
-            <button
-              type="button"
-              (click)="goBack()"
-              class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-medium transition-all cursor-pointer shadow-2xs active:scale-95"
-            >
-              <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-              <span>Cancel</span>
-            </button>
-          }
+        <!-- Bottom Action Buttons: Back on the left of Next -->
+        <div class="pt-4 flex items-center justify-end gap-3">
+          <!-- Back Button (on the left of Next) -->
+          <button
+            type="button"
+            (click)="goBack()"
+            class="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-2xs active:scale-95"
+          >
+            <svg class="w-4 h-4 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Back</span>
+          </button>
 
-          <!-- Continue / Submit Button -->
-          @if (activeStep() === 1) {
-            <button
-              type="button"
-              (click)="nextStep()"
-              class="ml-auto inline-flex items-center gap-1.5 px-6 py-2.5 rounded-lg bg-[#0F172A] hover:bg-slate-800 active:bg-black text-white text-xs sm:text-sm font-semibold transition-all shadow-sm active:scale-95 cursor-pointer"
-              style="color: #ffffff !important;"
-            >
-              <span>Continue to Step 2</span>
-              <span>&rarr;</span>
-            </button>
-          } @else if (activeStep() === 2) {
+          <!-- Next / Submit Button -->
+          @if (activeStep() < 4) {
             <button
               type="button"
               (click)="nextStep()"
               class="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-lg bg-[#0F172A] hover:bg-slate-800 active:bg-black text-white text-xs sm:text-sm font-semibold transition-all shadow-sm active:scale-95 cursor-pointer"
               style="color: #ffffff !important;"
             >
-              <span>Continue to Step 3</span>
-              <span>&rarr;</span>
-            </button>
-          } @else if (activeStep() === 3) {
-            <button
-              type="button"
-              (click)="nextStep()"
-              class="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-lg bg-[#0F172A] hover:bg-slate-800 active:bg-black text-white text-xs sm:text-sm font-semibold transition-all shadow-sm active:scale-95 cursor-pointer"
-              style="color: #ffffff !important;"
-            >
-              <span>Continue to Step 4</span>
+              <span>Next</span>
               <span>&rarr;</span>
             </button>
           } @else if (activeStep() === 4) {

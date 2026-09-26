@@ -33,7 +33,7 @@ import {
           <button
             type="button"
             (click)="router.navigate(['/batches/create'])"
-            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-[4px] bg-white text-[#174A6E] hover:bg-slate-100 active:scale-95 text-xs font-semibold shadow-xs transition-all cursor-pointer select-none"
+            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-sm bg-white text-primary hover:bg-slate-100 active:scale-95 text-xs font-semibold shadow-xs transition-all cursor-pointer select-none"
           >
             <span class="text-sm font-bold leading-none">+</span>
             <span>Create New Batch</span>
@@ -49,15 +49,15 @@ import {
               <button
                 type="button"
                 (click)="setFilter(f.id)"
-                class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-                [class.bg-[#174A6E]]="activeFilter() === f.id"
+                class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
+                [class.bg-primary]="activeFilter() === f.id"
                 [class.text-white]="activeFilter() === f.id"
-                [class.border-[#174A6E]]="activeFilter() === f.id"
+                [class.border-primary]="activeFilter() === f.id"
                 [class.bg-white]="activeFilter() !== f.id"
-                [class.text-[#5F6B76]]="activeFilter() !== f.id"
-                [class.border-[#D9E1E7]]="activeFilter() !== f.id"
-                [class.hover:bg-[#EAF2F6]]="activeFilter() !== f.id"
-                [class.hover:text-[#174A6E]]="activeFilter() !== f.id"
+                [class.text-text-secondary]="activeFilter() !== f.id"
+                [class.border-border]="activeFilter() !== f.id"
+                [class.hover:bg-primary-light]="activeFilter() !== f.id"
+                [class.hover:text-primary]="activeFilter() !== f.id"
               >
                 <span>{{ f.label }}</span>
                 <span
@@ -65,7 +65,7 @@ import {
                   [class.bg-white/20]="activeFilter() === f.id"
                   [class.text-white]="activeFilter() === f.id"
                   [class.bg-[#F5F7F9]]="activeFilter() !== f.id"
-                  [class.text-[#5F6B76]]="activeFilter() !== f.id"
+                  [class.text-text-secondary]="activeFilter() !== f.id"
                 >
                   {{ f.count }}
                 </span>
@@ -75,14 +75,14 @@ import {
 
           <!-- Search Input with Search Icon & Clear Button -->
           <div class="relative w-full sm:w-72">
-            <svg class="w-3.5 h-3.5 text-[#7A8792] absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-3.5 h-3.5 text-text-muted absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
               type="text"
               [(ngModel)]="searchQuery"
               placeholder="Search Batch Code, Course, Center, Scheme..."
-              class="w-full pl-8 pr-7 py-1.5 text-[13px] bg-white border border-[#D9E1E7] rounded-[4px] text-[#1F2933] placeholder:text-[#7A8792] focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-colors font-normal"
+              class="w-full pl-8 pr-7 py-1.5 text-[13px] bg-white border border-border rounded-sm placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-primary transition-colors font-normal"
             />
             @if (searchQuery) {
               <button
@@ -157,7 +157,7 @@ import {
 
         <!-- Template: Capacity & Mapped Progress -->
         <ng-template #capacityTemplate let-b>
-          <div class="min-w-[140px]">
+          <div class="min-w-35">
             <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1">
               <span>{{ b.mappedAspirantsCount }}/{{ b.maxStrength }} Aspirants</span>
               <span class="text-slate-400 font-normal text-[11px]">{{ getMappedPercent(b) }}%</span>

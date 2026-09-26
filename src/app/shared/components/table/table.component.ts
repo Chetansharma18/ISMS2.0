@@ -49,7 +49,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
             <tr class="bg-primary-light text-primary text-[13px] font-semibold select-none border-b border-theme">
               @for (col of columns; track col.key; let last = $last) {
                 <th
-                  class="h-[44px] px-3.5 select-none"
+                  class="h-11 px-3.5 select-none"
                   [ngClass]="[
                     col.width || '',
                     col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left',
@@ -91,7 +91,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
             } @else {
               @for (item of paginatedData(); track getTrackBy(item, $index); let idx = $index) {
                 <tr
-                  class="h-[46px] hover:bg-primary-light transition-colors"
+                  class="h-11.5 hover:bg-primary-light transition-colors"
                   [ngClass]="rowClass ? rowClass(item, idx) : ''"
                   (click)="rowClick.emit(item)"
                 >
@@ -116,7 +116,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                         </app-status-badge>
                       } @else if (col.type === 'number' && col.key === '$index') {
                         <!-- 3. Auto Sequential S. No. -->
-                        <span class="font-medium text-[#5F6B76]">{{ (currentPage() - 1) * pageSize + idx + 1 }}</span>
+                        <span class="font-medium text-text-secondary">{{ (currentPage() - 1) * pageSize + idx + 1 }}</span>
                       } @else {
                         <!-- 4. Default Text Output -->
                         <span>{{ getFormattedValue(item, col, idx) }}</span>
@@ -126,12 +126,12 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                 </tr>
               } @empty {
                 <tr>
-                  <td [attr.colspan]="columns.length" class="py-12 text-center text-[#5F6B76]">
+                  <td [attr.colspan]="columns.length" class="py-12 text-center text-text-secondary">
                     <div class="max-w-sm mx-auto text-center space-y-2">
-                      <svg class="w-9 h-9 text-[#7A8792]/60 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg class="w-9 h-9 text-text-muted/60 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      <p class="text-[14px] font-medium text-[#1F2933]">{{ emptyMessage }}</p>
+                      <p class="text-[14px] font-medium text-text-primary">{{ emptyMessage }}</p>
                     </div>
                   </td>
                 </tr>
@@ -153,7 +153,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
               type="button"
               (click)="setPage(currentPage() - 1)"
               [disabled]="currentPage() === 1"
-              class="h-[30px] px-2.5 rounded-[4px] border border-theme bg-surface text-[12px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary-light cursor-pointer"
+              class="h-7.5 px-2.5 rounded-sm border border-theme bg-surface text-[12px] font-medium transition-colors disabled:opacity-40 disabled:pointer-events-none hover:bg-primary-light cursor-pointer"
             >
               Previous
             </button>
@@ -162,7 +162,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
               <button
                 type="button"
                 (click)="setPage(p)"
-                class="min-w-[30px] h-[30px] px-1.5 rounded-[4px] flex items-center justify-center text-[12px] font-medium transition-colors cursor-pointer border"
+                class="min-w-7.5 h-7.5 px-1.5 rounded-sm flex items-center justify-center text-[12px] font-medium transition-colors cursor-pointer border"
                 [class.bg-primary]="currentPage() === p"
                 [class.text-white]="currentPage() === p"
                 [class.border-primary]="currentPage() === p"
@@ -179,7 +179,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
               type="button"
               (click)="setPage(currentPage() + 1)"
               [disabled]="currentPage() === totalPages()"
-              class="h-[30px] px-2.5 rounded-[4px] border border-theme bg-surface text-[12px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary-light cursor-pointer"
+              class="h-7.5 px-2.5 rounded-sm border border-theme bg-surface text-[12px] font-medium transition-colors disabled:opacity-40 disabled:pointer-events-none hover:bg-primary-light cursor-pointer"
             >
               Next
             </button>

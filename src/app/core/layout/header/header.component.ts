@@ -29,7 +29,7 @@ import { AuthService } from '../../auth/auth.service';
       [class.shadow-sm]="isSticky"
       role="banner"
     >
-      <div class="w-full px-2.5 sm:px-6 lg:px-8 h-[60px] sm:h-[70px] flex items-center justify-between gap-2 sm:gap-4 font-sans" style="font-family: 'Inter', sans-serif;">
+      <div class="w-full px-2.5 sm:px-6 lg:px-8 h-15 sm:h-17.5 flex items-center justify-between gap-2 sm:gap-4 font-sans" style="font-family: 'Inter', sans-serif;">
 
         <!-- Left: Logos + Title -->
         <a routerLink="/" class="flex items-center gap-2 sm:gap-3.5 shrink-0 group select-none" aria-label="ISMS 2.0 Home">
@@ -37,12 +37,12 @@ import { AuthService } from '../../auth/auth.service';
             <img
               src="/Rajasthan-Sarkar.png"
               alt="Government of Rajasthan"
-              class="h-7 sm:h-9 md:h-[40px] w-auto object-contain shrink-0"
+              class="h-7 sm:h-9 md:h-10 w-auto object-contain shrink-0"
             />
             <img
               src="/rsldc-logo.png"
               alt="RSLDC"
-              class="h-7 sm:h-9 md:h-[40px] w-auto object-contain shrink-0"
+              class="h-7 sm:h-9 md:h-10 w-auto object-contain shrink-0"
               onerror="this.src='/Rajasthan-Sarkar.png'"
             />
           </div>
@@ -51,7 +51,7 @@ import { AuthService } from '../../auth/auth.service';
             <span class="text-[17px] sm:text-[22px] md:text-[24px] font-bold text-[#174A6E] tracking-tight">
               ISMS<span class="text-[#EA580C]">2.0</span>
             </span>
-            <p class="hidden md:block text-[11px] font-normal text-[#5F6B76] tracking-wide whitespace-nowrap m-0">
+            <p class="hidden md:block text-[11px] font-normal text-text-secondary tracking-wide whitespace-nowrap m-0">
               Integrated Scheme Management System
             </p>
           </div>
@@ -65,20 +65,20 @@ import { AuthService } from '../../auth/auth.service';
             <button
               type="button"
               class="px-2 py-1 rounded transition-colors cursor-pointer border-0 bg-transparent text-xs sm:text-sm"
-              [class]="selectedLanguage() === 'en' ? 'text-[#174A6E] font-bold' : 'text-[#7A8792] hover:text-[#174A6E]'"
+              [class]="selectedLanguage() === 'en' ? 'text-[#174A6E] font-bold' : 'text-text-muted hover:text-[#174A6E]'"
               (click)="onLanguageChange('en')"
             >English</button>
-            <span class="text-[#D9E1E7] select-none text-xs sm:text-sm leading-none">|</span>
+            <span class="text-border select-none text-xs sm:text-sm leading-none">|</span>
             <button
               type="button"
               class="px-2 py-1 rounded transition-colors cursor-pointer border-0 bg-transparent text-xs sm:text-sm"
-              [class]="selectedLanguage() === 'hi' ? 'text-[#174A6E] font-bold' : 'text-[#7A8792] hover:text-[#174A6E]'"
+              [class]="selectedLanguage() === 'hi' ? 'text-[#174A6E] font-bold' : 'text-text-muted hover:text-[#174A6E]'"
               (click)="onLanguageChange('hi')"
             >हिंदी</button>
           </nav>
 
           <!-- Divider -->
-          <span class="text-[#D9E1E7] text-base select-none hidden sm:inline">|</span>
+          <span class="text-border text-base select-none hidden sm:inline">|</span>
 
           <!-- === LOGGED IN: Clean Username Pill with Dropdown (No Progress Bar) === -->
           @if (currentUser()) {
@@ -88,7 +88,7 @@ import { AuthService } from '../../auth/auth.service';
                 type="button"
                 id="user-menu-btn"
                 (click)="toggleDropdown()"
-                class="inline-flex items-center gap-2 sm:gap-2.5 bg-[#F5F7F9] hover:bg-[#EAF2F6] border border-[#D9E1E7] rounded-full py-1.5 pl-1.5 sm:pl-2 pr-3 sm:pr-3.5 transition-all shadow-xs cursor-pointer group"
+                class="inline-flex items-center gap-2 sm:gap-2.5 bg-[#F5F7F9] hover:bg-[#EAF2F6] border border-border rounded-full py-1.5 pl-1.5 sm:pl-2 pr-3 sm:pr-3.5 transition-all shadow-xs cursor-pointer group"
                 [attr.aria-expanded]="dropdownOpen()"
                 aria-haspopup="true"
                 aria-label="User menu"
@@ -99,13 +99,13 @@ import { AuthService } from '../../auth/auth.service';
                 </div>
 
                 <!-- Username -->
-                <span class="text-xs sm:text-sm font-semibold text-[#1F2933] max-w-[100px] sm:max-w-[150px] truncate group-hover:text-[#174A6E] transition-colors">
+                <span class="text-xs sm:text-sm font-semibold text-text-primary max-w-25 sm:max-w-37.5 truncate group-hover:text-[#174A6E] transition-colors">
                   {{ displayName() }}
                 </span>
 
                 <!-- Chevron -->
                 <svg
-                  class="w-3.5 h-3.5 text-[#7A8792] shrink-0 transition-transform duration-200"
+                  class="w-3.5 h-3.5 text-text-muted shrink-0 transition-transform duration-200"
                   [class.rotate-180]="dropdownOpen()"
                   fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 >
@@ -116,13 +116,13 @@ import { AuthService } from '../../auth/auth.service';
               <!-- Dropdown Menu -->
               @if (dropdownOpen()) {
                 <div
-                  class="absolute right-0 top-full mt-2 w-48 bg-white border border-[#D9E1E7] rounded-[6px] shadow-[0_8px_24px_rgba(31,41,51,0.12)] z-[60] overflow-hidden py-1 animate-in fade-in slide-in-from-top-2 duration-150"
+                  class="absolute right-0 top-full mt-2 w-48 bg-white border border-border rounded-md shadow-[0_8px_24px_rgba(31,41,51,0.12)] z-60 overflow-hidden py-1 animate-in fade-in slide-in-from-top-2 duration-150"
                   role="menu"
                 >
                   <!-- User Info Header (Clean name & SSOID, no progress bar) -->
-                  <div class="px-4 py-2.5 border-b border-[#D9E1E7]/60 bg-[#F5F7F9]">
-                    <p class="text-xs font-bold text-[#1F2933] truncate">{{ displayName() }}</p>
-                    <p class="text-[11px] text-[#7A8792] mt-0.5">{{ currentUser()?.subLabel || 'SSOID User' }}</p>
+                  <div class="px-4 py-2.5 border-b border-border/60 bg-[#F5F7F9]">
+                    <p class="text-xs font-bold text-text-primary truncate">{{ displayName() }}</p>
+                    <p class="text-[11px] text-text-muted mt-0.5">{{ currentUser()?.subLabel || 'SSOID User' }}</p>
                   </div>
 
                   <!-- Menu Items -->
@@ -131,16 +131,16 @@ import { AuthService } from '../../auth/auth.service';
                     <a
                       routerLink="/profile"
                       (click)="closeDropdown()"
-                      class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1F2933] hover:bg-[#EAF2F6] hover:text-[#174A6E] transition-colors cursor-pointer"
+                      class="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-primary hover:bg-[#EAF2F6] hover:text-[#174A6E] transition-colors cursor-pointer"
                       role="menuitem"
                     >
-                      <svg class="w-4 h-4 text-[#7A8792]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg class="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                       <span class="font-medium">Profile</span>
                     </a>
 
-                    <div class="h-px bg-[#D9E1E7]/60 mx-3 my-1"></div>
+                    <div class="h-px bg-border/60 mx-3 my-1"></div>
 
                     <!-- Logout -->
                     <button
@@ -164,7 +164,7 @@ import { AuthService } from '../../auth/auth.service';
           @else if (isSsoPage()) {
             <a
               routerLink="/"
-              class="inline-flex items-center gap-1.5 text-[#174A6E] hover:text-[#123B59] border border-[#D9E1E7] hover:border-[#174A6E] rounded-[4px] px-3.5 h-[38px] text-[14px] font-medium transition-colors"
+              class="inline-flex items-center gap-1.5 text-[#174A6E] hover:text-[#123B59] border border-border hover:border-[#174A6E] rounded-sm px-3.5 h-9.5 text-[14px] font-medium transition-colors"
             >
               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -177,7 +177,7 @@ import { AuthService } from '../../auth/auth.service';
           @else {
             <button
               type="button"
-              class="inline-flex items-center justify-center gap-2 bg-[#174A6E] hover:bg-[#123B59] text-white rounded-[4px] px-5 h-[38px] text-[14px] font-medium cursor-pointer transition-colors shadow-none"
+              class="inline-flex items-center justify-center gap-2 bg-[#174A6E] hover:bg-[#123B59] text-white rounded-sm px-5 h-9.5 text-[14px] font-medium cursor-pointer transition-colors shadow-none"
               (click)="onLoginClick()"
               aria-label="Sign in to ISMS 2.0 Portal"
             >

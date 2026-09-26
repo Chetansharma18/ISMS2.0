@@ -6,27 +6,27 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="px-4 py-3 bg-[#F5F7F9] border-t border-[#D9E1E7] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-[13px] text-[#5F6B76] font-sans">
+    <div class="px-4 py-3 bg-[#F5F7F9] border-t border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-[13px] text-text-secondary font-sans">
       
       <!-- Left: Item counts -->
       <div class="flex items-center gap-2">
         <span>
           Showing
-          <strong class="font-semibold text-[#1F2933]">{{ startItem() }}</strong>
+          <strong class="font-semibold text-text-primary">{{ startItem() }}</strong>
           to
-          <strong class="font-semibold text-[#1F2933]">{{ endItem() }}</strong>
+          <strong class="font-semibold text-text-primary">{{ endItem() }}</strong>
           of
-          <strong class="font-semibold text-[#1F2933]">{{ totalItems }}</strong>
+          <strong class="font-semibold text-text-primary">{{ totalItems }}</strong>
           entries
         </span>
 
         @if (showPageSizeSelector && pageSizeOptions.length > 1) {
-          <div class="flex items-center gap-1.5 ml-3 pl-3 border-l border-[#D9E1E7]">
+          <div class="flex items-center gap-1.5 ml-3 pl-3 border-l border-border">
             <span>Show</span>
             <select
               [value]="pageSize"
               (change)="onPageSizeChange($event)"
-              class="bg-white border border-[#D9E1E7] rounded-[4px] px-2 py-0.5 text-[12px] text-[#1F2933] focus:outline-none focus:border-[#174A6E]"
+              class="bg-white border border-border rounded-sm px-2 py-0.5 text-[12px] text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
               @for (size of pageSizeOptions; track size) {
                 <option [value]="size">{{ size }}</option>
@@ -43,7 +43,7 @@ import { CommonModule } from '@angular/common';
           type="button"
           (click)="goToPage(1)"
           [disabled]="currentPage === 1"
-          class="h-[30px] px-2 rounded-[4px] border border-[#D9E1E7] bg-white hover:bg-[#EAF2F6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-[12px] cursor-pointer"
+          class="h-7.5 px-2 rounded-sm border border-border bg-white hover:bg-primary-light disabled:opacity-40 disabled:pointer-events-none transition-colors text-[12px] cursor-pointer"
           title="First Page"
         >
           «
@@ -54,7 +54,7 @@ import { CommonModule } from '@angular/common';
           type="button"
           (click)="goToPage(currentPage - 1)"
           [disabled]="currentPage === 1"
-          class="h-[30px] px-2.5 rounded-[4px] border border-[#D9E1E7] bg-white hover:bg-[#EAF2F6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-[12px] font-medium cursor-pointer"
+          class="h-7.5 px-2.5 rounded-sm border border-border bg-white hover:bg-primary-light disabled:opacity-40 disabled:pointer-events-none transition-colors text-[12px] font-medium cursor-pointer"
         >
           Previous
         </button>
@@ -62,19 +62,19 @@ import { CommonModule } from '@angular/common';
         <!-- Visible page numbers -->
         @for (page of visiblePages(); track page) {
           @if (page === -1) {
-            <span class="px-1.5 py-1 text-[#7A8792]">...</span>
+            <span class="px-1.5 py-1 text-text-muted">...</span>
           } @else {
             <button
               type="button"
               (click)="goToPage(page)"
-              class="min-w-[30px] h-[30px] px-2 rounded-[4px] border text-[12px] font-medium transition-colors cursor-pointer"
-              [class.bg-[#174A6E]]="page === currentPage"
+              class="min-w-7.5 h-7.5 px-2 rounded-sm border text-[12px] font-medium transition-colors cursor-pointer"
+              [class.bg-primary]="page === currentPage"
               [class.text-white]="page === currentPage"
-              [class.border-[#174A6E]]="page === currentPage"
+              [class.border-primary]="page === currentPage"
               [class.bg-white]="page !== currentPage"
-              [class.text-[#1F2933]]="page !== currentPage"
-              [class.border-[#D9E1E7]]="page !== currentPage"
-              [class.hover:bg-[#EAF2F6]]="page !== currentPage"
+              [class.text-text-primary]="page !== currentPage"
+              [class.border-border]="page !== currentPage"
+              [class.hover:bg-primary-light]="page !== currentPage"
             >
               {{ page }}
             </button>
@@ -86,7 +86,7 @@ import { CommonModule } from '@angular/common';
           type="button"
           (click)="goToPage(currentPage + 1)"
           [disabled]="currentPage >= totalPages()"
-          class="h-[30px] px-2.5 rounded-[4px] border border-[#D9E1E7] bg-white hover:bg-[#EAF2F6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-[12px] font-medium cursor-pointer"
+          class="h-7.5 px-2.5 rounded-sm border border-border bg-white hover:bg-primary-light disabled:opacity-40 disabled:pointer-events-none transition-colors text-[12px] font-medium cursor-pointer"
         >
           Next
         </button>
@@ -96,7 +96,7 @@ import { CommonModule } from '@angular/common';
           type="button"
           (click)="goToPage(totalPages())"
           [disabled]="currentPage >= totalPages()"
-          class="h-[30px] px-2 rounded-[4px] border border-[#D9E1E7] bg-white hover:bg-[#EAF2F6] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-[12px] cursor-pointer"
+          class="h-7.5 px-2 rounded-sm border border-border bg-white hover:bg-primary-light disabled:opacity-40 disabled:pointer-events-none transition-colors text-[12px] cursor-pointer"
           title="Last Page"
         >
           »

@@ -43,14 +43,14 @@ import {
 
           <!-- Search Input with Search Icon & Clear Button -->
           <div class="relative w-full sm:w-72">
-            <svg class="w-3.5 h-3.5 text-[#7A8792] absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-3.5 h-3.5 text-text-muted absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
               type="text"
               [(ngModel)]="searchQuery"
               placeholder="Search TP-Code, Scheme..."
-              class="w-full pl-8 pr-7 py-1.5 text-[13px] bg-white border border-[#D9E1E7] rounded-[4px] text-[#1F2933] placeholder:text-[#7A8792] focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-colors font-normal"
+              class="w-full pl-8 pr-7 py-1.5 text-[13px] bg-white border border-border rounded-sm placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-primary transition-colors font-normal"
             />
             @if (searchQuery) {
               <button
@@ -89,7 +89,7 @@ import {
           <button
             type="button"
             (click)="createSdc(so.scheme)"
-            class="text-[#0284c7] hover:text-[#0369a1] hover:underline font-semibold text-[13px] cursor-pointer inline-flex items-center gap-1 select-none transition-colors"
+            class="text-sky-600 hover:text-sky-700 hover:underline font-semibold text-[13px] cursor-pointer inline-flex items-center gap-1 select-none transition-colors"
             title="Add SDC for {{ so.scheme }}"
           >
             Add SDC

@@ -19,7 +19,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
   },
   template: `
     <section #sectionRef class="py-8 sm:py-12 bg-white border-b border-slate-100">
-      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-360 mx-auto px-4 sm:px-6 lg:px-8">
         
         <h2 class="landing-section-title text-2xl sm:text-3xl lg:text-[32px] font-bold text-[#0B3558] mb-6 sm:mb-8 tracking-tight font-sans" style="color: var(--color-primary, #174A6E); font-family: var(--font-family-base, 'Inter', sans-serif);">
           About ISMS 2.0
@@ -51,11 +51,11 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
           </div>
 
           <!-- Right Column: Video Showcase & Quote -->
-          <div class="lg:col-span-5 order-1 lg:order-2 w-full mt-[10px]">
+          <div class="lg:col-span-5 order-1 lg:order-2 w-full mt-2.5">
             <div class="rounded-2xl overflow-hidden bg-slate-900 border border-[#0B3558]/30 shadow-[0_0_25px_rgba(11,53,88,0.25)] relative group transition-shadow duration-500 hover:shadow-[0_0_40px_rgba(11,53,88,0.4)]">
               
               <!-- Video Player with Lazy-Load & Controls -->
-              <div class="relative w-full aspect-video sm:h-[320px] lg:h-[360px] bg-slate-950 overflow-hidden flex items-center justify-center">
+              <div class="relative w-full aspect-video sm:h-80 lg:h-90 bg-slate-950 overflow-hidden flex items-center justify-center">
                 
                 <!-- Video Element (Sound Off by Default, Playsinline, Lazy loaded) -->
                 <video 
@@ -72,7 +72,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 
                 <!-- Poster / Loading Placeholder Before Video Plays -->
                 @if (!isVideoLoaded()) {
-                  <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0B3558] to-slate-900 flex flex-col items-center justify-center p-6 text-center">
+                  <div class="absolute inset-0 bg-linear-to-br from-slate-900 via-[#0B3558] to-slate-900 flex flex-col items-center justify-center p-6 text-center">
                     <div class="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center mb-3 text-white">
                       <svg class="w-6 h-6 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
@@ -128,8 +128,8 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
               </div>
               
               <!-- Quote Block Overlayed on Video -->
-              <div class="absolute bottom-0 inset-x-0 z-10 pointer-events-none bg-gradient-to-t from-[#0B3558]/95 via-[#0B3558]/60 to-transparent pt-20 pb-5 sm:pb-6 px-4 sm:px-6">
-                <p class="text-[12px] sm:text-[13px] text-white leading-relaxed px-2 font-medium drop-shadow-md min-h-[55px] sm:min-h-[60px] text-justify">
+              <div class="absolute bottom-0 inset-x-0 z-10 pointer-events-none bg-linear-to-t from-[#0B3558]/95 via-[#0B3558]/60 to-transparent pt-20 pb-5 sm:pb-6 px-4 sm:px-6">
+                <p class="text-[12px] sm:text-[13px] text-white leading-relaxed px-2 font-medium drop-shadow-md min-h-13.75 sm:min-h-15 text-justify">
                   <span class="text-2xl text-orange-400 font-serif leading-none relative top-1.5 opacity-90">“</span>
                   <span class="px-1">{{ displayedQuote() }}</span><span class="animate-pulse text-orange-400 font-bold" [class.hidden]="hasFinishedTyping()">|</span>
                   <span class="text-2xl text-orange-400 font-serif leading-none relative top-1.5 opacity-90" [class.hidden]="!hasFinishedTyping()">”</span>

@@ -117,7 +117,7 @@ import { SdcFormData } from '../models/sdc.model';
             (click)="goBack()"
             class="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-2xs active:scale-95"
           >
-            <svg class="w-4 h-4 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-4 h-4 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
             <span>Back</span>
@@ -128,7 +128,7 @@ import { SdcFormData } from '../models/sdc.model';
             <button
               type="button"
               (click)="nextStep()"
-              class="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-lg bg-[#0F172A] hover:bg-slate-800 active:bg-black text-white text-xs sm:text-sm font-semibold transition-all shadow-sm active:scale-95 cursor-pointer"
+              class="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold transition-all shadow-sm active:scale-95 cursor-pointer"
               style="color: #ffffff !important;"
             >
               <span>Next</span>
@@ -138,7 +138,7 @@ import { SdcFormData } from '../models/sdc.model';
             <button
               type="button"
               (click)="submitSdcForm()"
-              class="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-lg bg-[#059669] hover:bg-[#047857] active:bg-[#065f46] text-white text-xs sm:text-sm font-bold transition-all shadow-sm active:scale-95 cursor-pointer"
+              class="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold transition-all shadow-sm active:scale-95 cursor-pointer"
               style="color: #ffffff !important;"
             >
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

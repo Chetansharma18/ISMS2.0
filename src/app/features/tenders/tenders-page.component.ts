@@ -80,10 +80,10 @@ export interface EoiDocumentItem {
               <div class="flex items-center gap-2">
                 <a
                   routerLink="/profile"
-                  class="px-4 py-2 bg-[#0B3558] hover:bg-[#123B59] active:bg-[#07233B] !text-white text-xs font-semibold rounded-md shadow-xs whitespace-nowrap transition-all flex items-center gap-1.5 justify-center shrink-0 cursor-pointer"
+                  class="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-xs font-semibold rounded-md shadow-xs whitespace-nowrap transition-all flex items-center gap-1.5 justify-center shrink-0 cursor-pointer active:scale-95"
                   style="color: #ffffff !important;"
                 >
-                  <span class="!text-white font-semibold" style="color: #ffffff !important;">Complete Registration</span>
+                  <span class="text-white font-semibold" style="color: #ffffff !important;">Complete Registration</span>
                   <svg class="w-3.5 h-3.5 text-white" style="stroke: #ffffff !important; color: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
@@ -134,7 +134,7 @@ export interface EoiDocumentItem {
         <div class="p-6 sm:p-8 space-y-5 animate-in fade-in duration-200">
           
           <!-- Back Navigation: Half Arrow Only -->
-          <div class="flex items-center -mt-[20px] mb-2">
+          <div class="flex items-center -mt-5 mb-2">
             <button
               type="button"
               (click)="backToList()"

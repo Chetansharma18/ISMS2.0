@@ -20,7 +20,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
     class: 'block w-full'
   },
   template: `
-    <section #heroSection class="relative w-full min-h-[500px] sm:min-h-[540px] lg:min-h-[580px] flex items-center bg-slate-900 overflow-hidden">
+    <section #heroSection class="relative w-full min-h-125 sm:min-h-135 lg:min-h-145 flex items-center bg-slate-900 overflow-hidden">
       
       <!-- Full-bleed Background Image with Performance Optimization -->
       <img 
@@ -32,28 +32,28 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
       />
       
       <!-- High-Readability Gradient Overlay -->
-      <div class="absolute inset-0 bg-gradient-to-r from-[#07233B]/95 via-[#0B3558]/90 to-[#0B3558]/50 sm:to-[#0B3558]/30"></div>
+      <div class="absolute inset-0 bg-linear-to-r from-[#07233B]/95 via-[#0B3558]/90 to-[#0B3558]/50 sm:to-[#0B3558]/30"></div>
       <div class="absolute inset-0 bg-radial-at-t from-transparent via-transparent to-black/30 pointer-events-none"></div>
 
-      <div class="max-w-[1440px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-14 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
+      <div class="max-w-360 mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-14 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
         
         <!-- Hero Content (Left) -->
         <div class="lg:col-span-7 text-left">
           
-          <h1 class="landing-hero-title text-white !text-white text-3xl sm:text-4xl lg:text-[44px] font-extrabold leading-[1.18] mb-5 max-w-lg tracking-tight drop-shadow-md font-sans" style="color: #ffffff !important; font-family: var(--font-family-base, 'Inter', sans-serif);">
-            <span class="text-white !text-white font-extrabold inline-block" style="color: #ffffff !important;">Integrated Scheme</span> <br class="hidden sm:inline" />
-            <span class="text-white !text-white font-extrabold inline-block" style="color: #ffffff !important;">Management System</span>
+          <h1 class="landing-hero-title text-white text-3xl sm:text-4xl lg:text-[44px] font-extrabold leading-[1.18] mb-5 max-w-lg tracking-tight drop-shadow-md font-sans" style="color: #ffffff !important; font-family: var(--font-family-base, 'Inter', sans-serif);">
+            <span class="text-white font-extrabold inline-block" style="color: #ffffff !important;">Integrated Scheme</span> <br class="hidden sm:inline" />
+            <span class="text-white font-extrabold inline-block" style="color: #ffffff !important;">Management System</span>
           </h1>
 
-          <p class="landing-body-text text-slate-100 !text-slate-100 text-sm sm:text-base max-w-md lg:max-w-[480px] xl:max-w-lg leading-relaxed drop-shadow font-normal text-left" style="color: #f1f5f9 !important;">
+          <p class="landing-body-text text-slate-100 text-sm sm:text-base max-w-md lg:max-w-120 xl:max-w-lg leading-relaxed drop-shadow font-normal text-left" style="color: #f1f5f9 !important;">
             A unified, transparent digital ecosystem empowering skill development schemes, training operations, biometric verification, assessments, certifications, and sustainable placements across Rajasthan.
           </p>
 
         </div>
 
         <!-- Tenders Sidebar (Right) - Perfectly balanced column -->
-        <div class="lg:col-span-5 w-full max-w-[460px] mx-auto lg:ml-auto relative">
-          <div class="w-full h-[460px] sm:h-[500px] lg:h-[540px] bg-white rounded-2xl shadow-2xl border border-white/60 flex flex-col overflow-hidden relative z-20">
+        <div class="lg:col-span-5 w-full max-w-115 mx-auto lg:ml-auto relative">
+          <div class="w-full h-115 sm:h-125 lg:h-135 bg-white rounded-2xl shadow-2xl border border-white/60 flex flex-col overflow-hidden relative z-20">
             
             <!-- Header -->
             <div class="bg-primary px-5 sm:px-6 py-4 flex items-center justify-between z-10 shrink-0 shadow-sm border-b border-[#07233B]" style="background-color: var(--color-primary, #174A6E);">
@@ -93,7 +93,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                       <div class="flex justify-between items-center mb-1">
                         <span class="text-[10px] sm:text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
                       </div>
-                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:!text-blue-600 group-hover:underline group-hover:underline-offset-2 transition-all line-clamp-2">
+                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:text-blue-600 group-hover:underline group-hover:underline-offset-2 transition-all line-clamp-2">
                         {{ item.title }}
                       </h4>
                       <p class="text-[10px] text-slate-400 font-mono">{{ item.id }}</p>
@@ -113,7 +113,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                       <div class="flex justify-between items-center mb-1">
                         <span class="text-[10px] sm:text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
                       </div>
-                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:!text-blue-600 group-hover:underline group-hover:underline-offset-2 transition-all line-clamp-2">
+                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:text-blue-600 group-hover:underline group-hover:underline-offset-2 transition-all line-clamp-2">
                         {{ item.title }}
                       </h4>
                       <p class="text-[10px] text-slate-400 font-mono">{{ item.id }}</p>
@@ -131,7 +131,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
           
           <!-- Slide-out Preview Panel -->
           @if (selectedPreviewTender()) {
-            <div class="absolute inset-y-0 right-[calc(100%-24px)] w-[280px] sm:w-[360px] bg-white shadow-[-10px_0_20px_rgba(0,0,0,0.15)] z-10 rounded-l-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-right-12 duration-300">
+            <div class="absolute inset-y-0 right-[calc(100%-24px)] w-70 sm:w-90 bg-white shadow-[-10px_0_20px_rgba(0,0,0,0.15)] z-10 rounded-l-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-right-12 duration-300">
               
               <!-- Header -->
               <div class="p-4 pr-10 border-b border-slate-100 bg-slate-50 flex justify-between items-start gap-2">

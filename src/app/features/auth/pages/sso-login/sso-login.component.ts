@@ -13,7 +13,7 @@ import { OtrFormService } from '../../../registration/services/otr-form.service'
     class: 'block w-full flex-1 min-h-[calc(100vh-60px)] md:min-h-[calc(100vh-68px)] bg-white'
   },
   template: `
-    <div class="w-full min-h-[calc(100vh-68px)] flex flex-col justify-between bg-white text-slate-800 font-sans selection:bg-[#131862] selection:text-white relative">
+    <div class="w-full min-h-[calc(100vh-68px)] flex flex-col justify-between bg-white text-slate-800 font-sans selection:bg-sso-blue selection:text-white relative">
       
       <!-- Top Notice Banner -->
       <div class="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center shrink-0">
@@ -26,14 +26,14 @@ import { OtrFormService } from '../../../registration/services/otr-form.service'
 
       <!-- Main Two-Column Layout (Centered Perfectly in the Middle of Screen) -->
       <main class="flex-1 w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-        <div class="max-w-[960px] w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div class="max-w-240 w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           
           <!-- Left Column: Official Statistics (G2G, G2C/G2B, IDENTITIES) -->
           <div class="space-y-6">
             
             <!-- G2G APPS -->
             <div>
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-[#131862] tracking-tight mb-2">
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-sso-blue tracking-tight mb-2">
                 G2G APPS
               </h2>
               <div class="inline-block px-3.5 py-1 rounded bg-slate-100 border border-slate-200 text-sm font-bold text-slate-700 shadow-2xs">
@@ -44,7 +44,7 @@ import { OtrFormService } from '../../../registration/services/otr-form.service'
 
             <!-- G2C/ G2B APPS -->
             <div>
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-[#131862] tracking-tight mb-2">
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-sso-blue tracking-tight mb-2">
                 G2C/ G2B APPS
               </h2>
               <div class="inline-block px-3.5 py-1 rounded bg-slate-100 border border-slate-200 text-sm font-bold text-slate-700 shadow-2xs">
@@ -55,7 +55,7 @@ import { OtrFormService } from '../../../registration/services/otr-form.service'
 
             <!-- IDENTITIES -->
             <div>
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-[#131862] tracking-tight mb-2">
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-sso-blue tracking-tight mb-2">
                 IDENTITIES
               </h2>
               <div class="inline-block px-3.5 py-1 rounded bg-slate-100 border border-slate-200 text-sm font-bold text-slate-700 shadow-2xs">
@@ -67,7 +67,7 @@ import { OtrFormService } from '../../../registration/services/otr-form.service'
 
           <!-- Right Column: Rajasthan SSO Login Card -->
           <div class="w-full">
-            <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden w-full max-w-[450px] mx-auto lg:mx-0">
+            <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden w-full max-w-112.5 mx-auto lg:mx-0">
               
               <!-- Card Header -->
               <div class="px-5 py-3.5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
@@ -118,7 +118,7 @@ import { OtrFormService } from '../../../registration/services/otr-form.service'
                     type="text"
                     [(ngModel)]="emailOrSsoId"
                     placeholder="SSOID or Email ID"
-                    class="w-full border-b border-slate-300 py-1.5 text-sm text-slate-800 focus:outline-none focus:border-[#131862] transition-colors bg-transparent font-medium"
+                    class="sso-input w-full border-b border-slate-300 py-1.5 text-sm text-slate-800 focus:outline-none transition-colors bg-transparent font-medium"
                     required
                   />
                 </div>
@@ -134,7 +134,7 @@ import { OtrFormService } from '../../../registration/services/otr-form.service'
                     type="password"
                     [(ngModel)]="password"
                     placeholder="Password"
-                    class="w-full border-b border-slate-300 py-1.5 text-sm text-slate-800 tracking-widest focus:outline-none focus:border-[#131862] transition-colors bg-transparent"
+                    class="sso-input w-full border-b border-slate-300 py-1.5 text-sm text-slate-800 tracking-widest focus:outline-none transition-colors bg-transparent"
                     required
                   />
                 </div>
@@ -147,7 +147,7 @@ import { OtrFormService } from '../../../registration/services/otr-form.service'
                   <div class="flex items-center gap-2.5">
                     <!-- Dotted pattern captcha display -->
                     <div
-                      class="px-3 py-1.5 border border-slate-300 bg-slate-100 rounded select-none font-mono text-sm sm:text-base font-extrabold text-slate-800 tracking-[0.25em] flex items-center justify-center min-w-[110px]"
+                      class="px-3 py-1.5 border border-slate-300 bg-slate-100 rounded select-none font-mono text-sm sm:text-base font-extrabold text-slate-800 tracking-[0.25em] flex items-center justify-center min-w-27.5"
                       style="background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 6px 6px;"
                       aria-label="Captcha code"
                     >
@@ -160,7 +160,7 @@ import { OtrFormService } from '../../../registration/services/otr-form.service'
                       type="text"
                       [(ngModel)]="enteredCaptcha"
                       placeholder="Captcha"
-                      class="w-28 px-2.5 py-1.5 border border-slate-300 rounded text-xs text-slate-800 focus:outline-none focus:border-[#131862]"
+                      class="sso-input w-28 px-2.5 py-1.5 border border-slate-300 rounded text-xs text-slate-800 focus:outline-none"
                       required
                     />
 
@@ -168,7 +168,7 @@ import { OtrFormService } from '../../../registration/services/otr-form.service'
                     <button
                       type="button"
                       (click)="refreshCaptcha()"
-                      class="p-1.5 text-[#131862] hover:bg-slate-100 rounded transition-colors cursor-pointer"
+                      class="p-1.5 text-sso-blue hover:bg-slate-100 rounded transition-colors cursor-pointer"
                       title="Refresh Captcha"
                       aria-label="Refresh Captcha"
                     >
@@ -210,7 +210,12 @@ import { OtrFormService } from '../../../registration/services/otr-form.service'
       <div class="h-6"></div>
 
     </div>
-  `
+  `,
+  styles: [`
+    .sso-input:focus {
+      border-color: #131862 !important;
+    }
+  `]
 })
 export class SsoLoginComponent {
   private authService = inject(AuthService);

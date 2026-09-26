@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
   template: `
     <div class="space-y-1.5 font-sans">
       @if (label) {
-        <label [for]="forId" class="block text-[13px] font-medium leading-[20px] text-[#1F2933]">
+        <label [for]="forId" class="block text-[13px] font-medium leading-5 text-text-primary">
           {{ label }}
           @if (required) {
             <span class="text-rose-600 font-bold ml-0.5">*</span>
@@ -30,7 +30,7 @@ import { CommonModule } from '@angular/common';
           <span>{{ errorMessage }}</span>
         </p>
       } @else if (hint) {
-        <p class="text-[12px] text-[#7A8792] mt-1">{{ hint }}</p>
+        <p class="text-[12px] text-text-muted mt-1">{{ hint }}</p>
       }
     </div>
   `

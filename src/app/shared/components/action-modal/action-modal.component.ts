@@ -89,7 +89,7 @@ import { CommonModule } from '@angular/common';
                 <button
                   type="button"
                   (click)="onPrimaryAction()"
-                  class="w-full py-2.5 px-3.5 rounded-lg bg-[#0B3558] hover:bg-[#07233B] active:bg-[#041d31] text-white text-xs sm:text-[13px] font-semibold shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  class="w-full py-2.5 px-3.5 rounded-lg bg-primary hover:bg-primary-dark active:scale-95 text-white text-xs sm:text-[13px] font-semibold shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                   [ngClass]="secondaryLabel ? 'sm:w-1/2' : 'w-full'"
                   style="color: #ffffff !important;"
                 >

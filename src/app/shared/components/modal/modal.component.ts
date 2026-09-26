@@ -20,19 +20,19 @@ import { CommonModule } from '@angular/common';
         (click)="onBackdropClick($event)"
       >
         <div
-          class="bg-white rounded-[8px] border border-[#D9E1E7] shadow-[0_8px_24px_rgba(31,41,51,0.12)] w-full overflow-hidden flex flex-col max-h-[90vh] font-sans"
+          class="bg-white rounded-lg border border-border shadow-[0_8px_24px_rgba(31,41,51,0.12)] w-full overflow-hidden flex flex-col max-h-[90vh] font-sans"
           [ngClass]="maxWidthClass"
           (click)="$event.stopPropagation()"
         >
           <!-- Modal Header -->
-          <div class="px-5 py-3.5 border-b border-[#D9E1E7] bg-white flex items-center justify-between gap-3 shrink-0">
-            <h3 class="text-[16px] leading-[24px] font-semibold text-[#1F2933] tracking-tight m-0">
+          <div class="px-5 py-3.5 border-b border-border bg-white flex items-center justify-between gap-3 shrink-0">
+            <h3 class="text-[16px] leading-6 font-semibold text-text-primary tracking-tight m-0">
               {{ title }}
             </h3>
             <button
               type="button"
               (click)="closeModal()"
-              class="w-7 h-7 rounded-[4px] text-[#7A8792] hover:text-[#1F2933] hover:bg-[#EAF2F6] flex items-center justify-center transition-colors cursor-pointer focus:outline-none"
+              class="w-7 h-7 rounded-sm text-text-muted hover:text-text-primary hover:bg-primary-light flex items-center justify-center transition-colors cursor-pointer focus:outline-none"
               title="Close modal"
               aria-label="Close modal"
             >
@@ -43,12 +43,12 @@ import { CommonModule } from '@angular/common';
           </div>
 
           <!-- Modal Scrollable Body -->
-          <div class="p-5 overflow-y-auto flex-1 text-[14px] leading-[22px] text-[#1F2933]">
+          <div class="p-5 overflow-y-auto flex-1 text-[14px] leading-5.5 text-text-primary">
             <ng-content></ng-content>
           </div>
 
           <!-- Modal Footer (Optional Slot) -->
-          <div class="px-5 py-3 border-t border-[#D9E1E7] bg-[#F5F7F9] flex items-center justify-end gap-2.5 shrink-0">
+          <div class="px-5 py-3 border-t border-border bg-[#F5F7F9] flex items-center justify-end gap-2.5 shrink-0">
             <ng-content select="[modal-footer]"></ng-content>
           </div>
         </div>

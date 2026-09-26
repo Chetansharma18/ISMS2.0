@@ -317,15 +317,17 @@ export interface SanctionOrder {
   mouStartDate: string;
   mouExpiryDate: string;
   totalSdc: number;
+  approvedSdcCount: number;
 }
 
 export const MOCK_SANCTION_ORDERS: SanctionOrder[] = [
   {
     id: 'so-1',
-    tpCode: 'TP-2026-001',
+    tpCode: 'MoU-001658',
     scheme: 'SAMARTH',
-    mouStartDate: '01-01-2026',
-    mouExpiryDate: '01-01-2027',
-    totalSdc: 2
+    mouStartDate: '08/09/2023',
+    mouExpiryDate: '02/08/2026',
+    totalSdc: 6,
+    approvedSdcCount: 2
   }
 ];

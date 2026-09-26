@@ -60,6 +60,7 @@ export interface EoiDocumentItem {
           <!-- Themed Header Bar via Reusable PageHeaderComponent -->
           <app-page-header
             title="Active EOI"
+            bgColor="#0B3558"
           ></app-page-header>
 
           <!-- Incomplete Profile Notice Banner (if applicable) -->
@@ -129,16 +130,17 @@ export interface EoiDocumentItem {
         <div class="p-6 sm:p-8 space-y-5 animate-in fade-in duration-200">
           
           <!-- Back Navigation: Half Arrow Only -->
-          <div class="flex items-center pb-2 border-b border-slate-200">
+          <div class="flex items-center -mt-[20px] mb-2">
             <button
               type="button"
               (click)="backToList()"
-              class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-700 hover:text-[#0B3558] hover:bg-slate-100 active:scale-95 transition-all cursor-pointer -ml-1"
+              class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 h-8 rounded-md border border-sky-300 bg-sky-50 hover:bg-sky-100 text-[#0483AC] active:scale-95 transition-all cursor-pointer font-semibold shadow-2xs"
               title="Back to Active EOI"
             >
               <svg class="w-5 h-5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
+              <span class="font-semibold text-sm">Back</span>
             </button>
           </div>
 
@@ -696,7 +698,7 @@ export class TendersPageComponent {
 
   readonly Math = Math;
   readonly currentPage = signal<number>(1);
-  readonly pageSize = 6;
+  readonly pageSize = 10;
 
   readonly totalPages = computed(() => Math.ceil(this.schemes.length / this.pageSize));
   readonly totalPagesArray = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));

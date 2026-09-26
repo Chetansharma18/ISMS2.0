@@ -6,7 +6,7 @@
 /* ---------------------------------------------------------
    1. FONTS & TAILWIND CORE
    --------------------------------------------------------- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 /* ---------------------------------------------------------
@@ -56,12 +56,12 @@
 
   /* Typography */
   --font-family-base: 'Inter', Arial, sans-serif;
-  --font-size-page-title: 24px;
-  --font-size-section-title: 18px;
-  --font-size-card-title: 16px;
-  --font-size-body: 14px;
-  --font-size-label: 13px;
-  --font-size-table: 13px;
+  --font-size-page-title: 48px;
+  --font-size-section-title: 36px;
+  --font-size-card-title: 20px;
+  --font-size-body: 16px;
+  --font-size-label: 14px;
+  --font-size-table: 14px;
   --font-size-small: 12px;
   --font-size-caption: 11px;
 
@@ -153,12 +153,12 @@ textarea {
 
 :where(h1) {
   font-size: var(--font-size-page-title);
-  line-height: 32px;
+  line-height: 1.15;
 }
 
 :where(h2) {
   font-size: var(--font-size-section-title);
-  line-height: 26px;
+  line-height: 1.2;
 }
 
 :where(h3) {

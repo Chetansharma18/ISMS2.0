@@ -194,7 +194,16 @@ export class TableComponent {
   readonly Math = Math;
 
   @Input({ required: true }) columns: TableColumn[] = [];
-  @Input() data: any[] = [];
+  
+  // Use a setter to update an internal signal so computed properties re-evaluate when data changes
+  private _dataSignal = signal<any[]>([]);
+  @Input() set data(value: any[]) {
+    this._dataSignal.set(value || []);
+  }
+  get data(): any[] {
+    return this._dataSignal();
+  }
+
   @Input() loading = false;
   @Input() searchable = false;
   @Input() searchPlaceholder = 'Search records...';
@@ -215,7 +224,7 @@ export class TableComponent {
   currentPage = signal<number>(1);
 
   filteredData = computed(() => {
-    let result = [...(this.data || [])];
+    let result = [...this._dataSignal()];
 
     // 1. Text Search Filter
     const query = this.searchQuery.trim().toLowerCase();

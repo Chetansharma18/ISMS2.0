@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -235,6 +235,21 @@ export interface EoiDocumentItem {
         <!-- ====================================================================
              2. SCHEME HEADER CARD (8 Parameters Strip)
              ==================================================================== -->
+        
+        <!-- Back Navigation -->
+        <div class="flex items-center -mt-1 mb-2">
+          <button
+            type="button"
+            (click)="goBack()"
+            class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 h-8 rounded-md border border-sky-300 bg-sky-50 hover:bg-sky-100 text-[#0483AC] active:scale-95 transition-all cursor-pointer font-semibold shadow-2xs"
+            title="Back"
+          >
+            <svg class="w-5 h-5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span class="font-semibold text-sm">Back</span>
+          </button>
+        </div>
         <div class="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
           <div class="p-4 sm:p-5 lg:p-6 space-y-3.5">
             <div class="space-y-1">
@@ -2156,6 +2171,7 @@ export class SchemeFormComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private otrFormService = inject(OtrFormService);
+  private location = inject(Location);
 
   readonly otrData = this.otrFormService.formData;
 
@@ -2182,6 +2198,10 @@ export class SchemeFormComponent {
   editableStep4: Step4BankDetails = JSON.parse(JSON.stringify(this.otrFormService.formData().step4));
 
   isEditingOtr = signal<boolean>(false);
+
+  goBack(): void {
+    this.location.back();
+  }
   selectedOicId = signal<string>('');
 
   readonly selectedOic = computed(() => {

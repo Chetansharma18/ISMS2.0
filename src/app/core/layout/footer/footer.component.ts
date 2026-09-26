@@ -66,30 +66,30 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
               [style.animation-play-state]="shouldAnimate() ? 'running' : 'paused'">
               
               <!-- Set 1 (Original) -->
-              <a href="https://bis.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-3.5 sm:p-4 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20">
+              <a href="https://bis.gov.in/" target="_blank" rel="noopener noreferrer" title="BIS Care App" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-1.5 sm:p-2 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20">
                 <img src="/footer-images/bis-care.png" alt="BIS Care App" class="max-h-full max-w-full object-contain" loading="lazy" onerror="this.src='/footer-images/bis.png'">
               </a>
-              <a href="https://acb.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-3.5 sm:p-4 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20">
+              <a href="https://acb.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" title="Anti Corruption Bureau" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-1.5 sm:p-2 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20">
                 <img src="/footer-images/acb.png" alt="Anti Corruption Bureau" class="max-h-full max-w-full object-contain" loading="lazy">
               </a>
-              <a href="https://pledge.mygov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-3.5 sm:p-4 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20">
+              <a href="https://pledge.mygov.in/" target="_blank" rel="noopener noreferrer" title="Register for Pledge" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-1.5 sm:p-2 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20">
                 <img src="/footer-images/pledge.jpeg" alt="Register for Pledge" class="max-h-full max-w-full object-contain" loading="lazy">
               </a>
-              <a href="https://jansoochna.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-3.5 sm:p-4 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20">
+              <a href="https://jansoochna.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" title="Jan Soochna Portal" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-1.5 sm:p-2 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20">
                 <img src="/footer-images/jansoochna.png" alt="Jan Soochna Portal" class="max-h-full max-w-full object-contain" loading="lazy">
               </a>
 
               <!-- Set 2 (Duplicated for Seamless Loop) -->
-              <a href="https://bis.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-3.5 sm:p-4 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20" aria-hidden="true">
+              <a href="https://bis.gov.in/" target="_blank" rel="noopener noreferrer" title="BIS Care App" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-1.5 sm:p-2 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20" aria-hidden="true">
                 <img src="/footer-images/bis-care.png" alt="BIS Care App" class="max-h-full max-w-full object-contain" loading="lazy" onerror="this.src='/footer-images/bis.png'">
               </a>
-              <a href="https://acb.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-3.5 sm:p-4 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20" aria-hidden="true">
+              <a href="https://acb.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" title="Anti Corruption Bureau" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-1.5 sm:p-2 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20" aria-hidden="true">
                 <img src="/footer-images/acb.png" alt="Anti Corruption Bureau" class="max-h-full max-w-full object-contain" loading="lazy">
               </a>
-              <a href="https://pledge.mygov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-3.5 sm:p-4 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20" aria-hidden="true">
+              <a href="https://pledge.mygov.in/" target="_blank" rel="noopener noreferrer" title="Register for Pledge" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-1.5 sm:p-2 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20" aria-hidden="true">
                 <img src="/footer-images/pledge.jpeg" alt="Register for Pledge" class="max-h-full max-w-full object-contain" loading="lazy">
               </a>
-              <a href="https://jansoochna.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-3.5 sm:p-4 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20" aria-hidden="true">
+              <a href="https://jansoochna.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" title="Jan Soochna Portal" class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-22 flex items-center justify-center p-1.5 sm:p-2 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all cursor-pointer block border border-white/20" aria-hidden="true">
                 <img src="/footer-images/jansoochna.png" alt="Jan Soochna Portal" class="max-h-full max-w-full object-contain" loading="lazy">
               </a>
             </div>
@@ -100,7 +100,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
       <div class="w-full h-px bg-slate-700/50"></div>
 
       <!-- Tier 2: Main Footer Info -->
-      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-4 sm:pt-14 sm:pb-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 lg:gap-10 items-start">
           
           <!-- Column 1: Branding -->
@@ -119,35 +119,35 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
           </div>
 
           <!-- Column 2: Important Links -->
-          <div class="flex flex-col items-center text-center">
-            <div class="w-full flex flex-col items-center">
-              <h4 class="text-sm sm:text-base font-bold text-white !text-white mb-4 tracking-wide" style="color: #ffffff !important;">Important Links</h4>
-              <ul class="space-y-2.5 text-xs sm:text-sm mb-4 flex flex-col items-center">
+          <div class="flex flex-col items-center w-full">
+            <div class="flex flex-col items-start text-left w-fit">
+              <h4 class="text-xs sm:text-sm font-bold text-white !text-white !mb-3 tracking-wide" style="color: #ffffff !important; margin-bottom: 12px !important;">Important Links</h4>
+              <ul class="space-y-3 text-xs flex flex-col items-start">
                 <li><a href="https://rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" title="Redirects to Rajasthan Government site" class="text-slate-200 !text-slate-200 hover:!text-amber-400 hover:underline transition-colors" style="color: #e2e8f0 !important;">Rajasthan Government</a></li>
-                <li><a href="https://livelihoods.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" title="Redirects to RSLDC Official Portal" class="text-slate-200 !text-slate-200 hover:!text-amber-400 hover:underline transition-colors" style="color: #e2e8f0 !important;">RSLDC Official Portal</a></li>
+                <li><a href="https://livelihoods.rajasthan.gov.in/" target="_blank" rel="noopener noreferrer" title="Redirects to RSLDC Official Portal" class="text-slate-200 !text-slate-200 hover:!text-amber-400 hover:underline transition-colors" style="color: #e2e8f0 !important;">RSLDC</a></li>
                 <li><a (click)="downloadSamplePdf('Privacy_Policy.pdf', 'Privacy Policy')" class="text-slate-200 !text-slate-200 hover:!text-amber-400 hover:underline transition-colors cursor-pointer" style="color: #e2e8f0 !important;">Privacy Policy</a></li>
                 <li><a (click)="downloadSamplePdf('Terms_and_Conditions.pdf', 'Terms & Conditions')" class="text-slate-200 !text-slate-200 hover:!text-amber-400 hover:underline transition-colors cursor-pointer" style="color: #e2e8f0 !important;">Terms & Conditions</a></li>
               </ul>
-              
-              <div class="flex flex-wrap justify-center items-center gap-2 sm:gap-4 text-xs sm:text-[13px] text-slate-300 font-medium pt-4 border-t border-slate-700/50 w-full mt-auto">
-                <div class="flex items-center gap-1.5">
-                  <span class="text-slate-300">Total Visitors:</span>
-                  <span class="text-white font-mono font-bold" style="color: #ffffff !important;">042,159</span>
-                </div>
-                <div class="w-1 h-1 rounded-full bg-slate-500 hidden sm:block"></div>
-                <div class="flex items-center gap-1.5">
-                  <span class="text-slate-300">Last Updated:</span>
-                  <span class="text-white font-medium" style="color: #ffffff !important;">21 Sep 2026</span>
-                </div>
+            </div>
+            
+            <div class="flex flex-row flex-wrap justify-center items-center gap-4 text-xs text-slate-300 font-medium mt-8 border-t border-slate-700/50 pt-4 w-fit max-w-full">
+              <div class="flex items-center gap-1.5">
+                <span class="text-slate-300">Total Visitors:</span>
+                <span class="text-white font-mono font-bold" style="color: #ffffff !important;">042,159</span>
+              </div>
+              <div class="w-1 h-1 rounded-full bg-slate-500 hidden sm:block"></div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-slate-300">Last Updated:</span>
+                <span class="text-white font-medium" style="color: #ffffff !important;">21 Sep 2026</span>
               </div>
             </div>
           </div>
 
           <!-- Column 3: Connect With Us -->
-          <div class="flex flex-col items-center md:items-end text-center md:text-right">
+          <div class="flex flex-col items-start text-left md:ml-auto w-fit">
             <div>
-              <h4 class="text-sm sm:text-base font-bold text-white !text-white mb-3" style="color: #ffffff !important;">Connect With Us</h4>
-              <div class="flex items-center justify-center md:justify-end gap-3 mb-5">
+              <h4 class="text-xs sm:text-sm font-bold text-white !text-white !mb-3" style="color: #ffffff !important; margin-bottom: 12px !important;">Connect With Us</h4>
+              <div class="flex items-center justify-start gap-3 mb-4">
                 <a [href]="helplineGlobal.social.facebook" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-[#12223a] hover:bg-amber-400 transition-colors" aria-label="Facebook">
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
                 </a>
@@ -161,17 +161,17 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z"/></svg>
                 </a>
               </div>
-
-              <h4 class="text-xs font-bold text-amber-400 !text-amber-400 uppercase tracking-wider mb-2" style="color: #fbbf24 !important;">Helpline Contacts</h4>
-              <div class="space-y-2 text-xs text-slate-200">
-                <div class="flex items-center justify-center md:justify-end gap-2">
-                  <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              
+              <h4 class="text-xs sm:text-sm font-bold text-white !text-white !mb-3" style="color: #ffffff !important; margin-bottom: 12px !important;">Helpline</h4>
+              <div class="text-xs text-slate-200 leading-relaxed space-y-2.5">
+                <div class="flex items-center justify-start gap-2">
+                  <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                   <span class="text-slate-200 font-semibold" style="color: #f1f5f9 !important;">{{ helplineGlobal.contacts.phone }}</span>
                 </div>
-                <div class="flex items-center justify-center md:justify-end gap-2">
-                  <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="flex items-center justify-start gap-2">
+                  <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <span class="text-slate-200 font-semibold" style="color: #f1f5f9 !important;">{{ helplineGlobal.contacts.email }}</span>

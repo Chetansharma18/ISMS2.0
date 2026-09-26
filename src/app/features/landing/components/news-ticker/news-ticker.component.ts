@@ -114,7 +114,6 @@ import { PressReleasesModalComponent } from '../press-releases-modal/press-relea
       animation: marquee 32s linear infinite;
       will-change: transform;
       backface-visibility: hidden;
-      transform: translate3d(0, 0, 0);
     }
   `]
 })

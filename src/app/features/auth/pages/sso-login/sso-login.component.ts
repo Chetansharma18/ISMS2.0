@@ -18,9 +18,6 @@ import { OtrFormService } from '../../../registration/services/otr-form.service'
       <!-- Top Notice Banner -->
       <div class="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center shrink-0">
         <div class="max-w-7xl mx-auto flex items-center justify-center gap-2 text-[13.5px] font-semibold text-amber-900">
-          <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-200 text-amber-900 shrink-0 text-[10px] font-bold">
-            !
-          </span>
           <span>
             <strong>PROTOTYPE NOTICE:</strong> This is a dummy login screen for testing and demonstration purposes. It will be replaced by the official Rajasthan SSO (sso.rajasthan.gov.in) portal integration.
           </span>

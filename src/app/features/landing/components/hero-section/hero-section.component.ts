@@ -40,12 +40,12 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
         <!-- Hero Content (Left) -->
         <div class="lg:col-span-7 text-left">
           
-          <h1 class="text-white !text-white text-3xl sm:text-4xl md:text-5xl lg:text-[46px] font-extrabold leading-[1.18] mb-5 tracking-tight drop-shadow-md" style="color: #ffffff !important; font-family: var(--font-family-base, 'Inter', sans-serif);">
+          <h1 class="text-white !text-white text-3xl sm:text-4xl md:text-5xl font-extrabold leading-[1.18] mb-5 max-w-lg tracking-tight drop-shadow-md font-sans" style="color: #ffffff !important; font-family: var(--font-family-base, 'Inter', sans-serif);">
             <span class="text-white !text-white font-extrabold inline-block" style="color: #ffffff !important;">Integrated Scheme</span> <br class="hidden sm:inline" />
             <span class="text-white !text-white font-extrabold inline-block" style="color: #ffffff !important;">Management System</span>
           </h1>
 
-          <p class="text-slate-100 !text-slate-100 text-sm sm:text-base lg:text-[17px] max-w-xl leading-relaxed drop-shadow font-normal" style="color: #f1f5f9 !important;">
+          <p class="text-slate-100 !text-slate-100 text-sm sm:text-base max-w-md lg:max-w-[440px] xl:max-w-lg leading-relaxed drop-shadow font-normal text-justify hyphens-auto" style="color: #f1f5f9 !important;">
             A unified, transparent digital ecosystem empowering skill development schemes, training operations, biometric verification, assessments, certifications, and sustainable placements across Rajasthan.
           </p>
 
@@ -93,7 +93,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                       <div class="flex justify-between items-center mb-1">
                         <span class="text-[10px] sm:text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
                       </div>
-                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:text-primary transition-all line-clamp-2">
+                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:!text-blue-600 group-hover:underline group-hover:underline-offset-2 transition-all line-clamp-2">
                         {{ item.title }}
                       </h4>
                       <p class="text-[10px] text-slate-400 font-mono">{{ item.id }}</p>
@@ -113,7 +113,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                       <div class="flex justify-between items-center mb-1">
                         <span class="text-[10px] sm:text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
                       </div>
-                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:text-primary transition-all line-clamp-2">
+                      <h4 class="text-xs sm:text-[13px] font-bold text-slate-800 leading-snug mb-1 group-hover:!text-blue-600 group-hover:underline group-hover:underline-offset-2 transition-all line-clamp-2">
                         {{ item.title }}
                       </h4>
                       <p class="text-[10px] text-slate-400 font-mono">{{ item.id }}</p>
@@ -237,7 +237,6 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
       animation: marquee-vertical 28s linear infinite;
       will-change: transform;
       backface-visibility: hidden;
-      transform: translate3d(0, 0, 0);
     }
   `]
 })

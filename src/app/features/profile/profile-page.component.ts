@@ -5,239 +5,174 @@ import { AuthService } from '../../core/auth/auth.service';
 import { OtrFormService } from '../registration/services/otr-form.service';
 import { OtrValidationService } from '../registration/services/otr-validation.service';
 
+import { PageHeaderComponent } from '../../shared';
+
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, PageHeaderComponent],
   template: `
-    <div class="w-full min-h-full bg-white text-slate-800 select-none font-sans">
+    <div class="w-full min-h-full bg-[#F5F7F9] text-[#1F2933] select-none font-sans">
       
       <!-- ====================================================================
            CASE 1: INCOMPLETE PROFILE (Integrated Full-Page Dashboard)
            ==================================================================== -->
       @if (isProfileIncomplete()) {
-        <div class="p-5 sm:p-6 lg:p-7 space-y-4 max-w-6xl mx-auto font-sans" style="font-family: 'Inter', sans-serif;">
+        <div class="p-4 sm:p-5 space-y-3 font-sans">
           
           <!-- Top Page Header (Matching Portal Structure) -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
-            <div class="space-y-1">
-              <div class="flex items-center gap-2.5">
-                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                  Profile
-                </h1>
-      
+          <app-page-header
+            title="Profile"
+          >
+            <!-- Right Side: Progress Indicator -->
+            <div class="shrink-0">
+              <div class="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center bg-white rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.04)] border border-slate-100/60 z-10">
+                <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 64 64">
+                  <circle cx="32" cy="32" [attr.r]="circleRadius" stroke="#f1f5f9" stroke-width="4.5" fill="transparent"/>
+                  <circle cx="32" cy="32" [attr.r]="circleRadius" [attr.stroke]="progressStrokeColor()" stroke-width="4.5" stroke-linecap="round" fill="transparent" [attr.stroke-dasharray]="circleCircumference" [attr.stroke-dashoffset]="circleDashOffset()" class="transition-all duration-700 ease-out"/>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <span class="text-sm sm:text-base font-black text-slate-900 tracking-tight leading-none">{{ completionPercentage() }}%</span>
+                  <span class="text-[8px] sm:text-[9px] font-extrabold uppercase tracking-widest text-slate-400 mt-1">DONE</span>
+                </div>
+              </div>
+            </div>
+          </app-page-header>
+
+          <!-- Main Progress and Sections Layout -->
+          <div class="flex gap-6 sm:gap-10 mt-6 items-stretch">
             
+
+
+            <!-- RIGHT COLUMN: Details & Cards -->
+            <div class="flex-1 min-w-0">
               
-              </div>
-              <p class="text-xs text-slate-500 font-normal">
-                Finish your One Time Registration (OTR) profile to register your organization and unlock EOI proposal submissions.
-              </p>
-            </div>
-
-            <!-- Header Action Button -->
-            <a
-              [routerLink]="['/registration']"
-              [queryParams]="ctaQueryParams()"
-              class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#0B3558] hover:bg-[#123B59] active:bg-[#07233B] text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow transition-all cursor-pointer shrink-0 self-start sm:self-auto group"
-              style="color: #ffffff !important;"
-            >
-              <span>{{ ctaText() }}</span>
-              <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </a>
-          </div>
-
-          <!-- Hero Progress Card (Spans full width naturally) -->
-          <div class="p-4 sm:p-5 rounded-xl bg-gradient-to-r from-slate-50 via-white to-blue-50/30 border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-            <!-- Circular Progress Ring (64x64px, r=26) -->
-            <div class="relative w-16 h-16 shrink-0 flex items-center justify-center">
-              <svg class="w-16 h-16 -rotate-90 transform" viewBox="0 0 64 64">
-                <circle
-                  cx="32"
-                  cy="32"
-                  [attr.r]="circleRadius"
-                  stroke="#e2e8f0"
-                  stroke-width="5"
-                  fill="transparent"
-                />
-                <circle
-                  cx="32"
-                  cy="32"
-                  [attr.r]="circleRadius"
-                  [attr.stroke]="progressStrokeColor()"
-                  stroke-width="5"
-                  stroke-linecap="round"
-                  fill="transparent"
-                  [attr.stroke-dasharray]="circleCircumference"
-                  [attr.stroke-dashoffset]="circleDashOffset()"
-                  class="transition-all duration-700 ease-out"
-                />
-              </svg>
-              
-              <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span class="text-sm sm:text-base font-black text-slate-900 tracking-tight leading-none">
-                  {{ completionPercentage() }}%
-                </span>
-                <span class="text-[8px] font-extrabold uppercase tracking-widest text-slate-400 mt-0.5">
-                  DONE
-                </span>
-              </div>
-            </div>
-
-            <!-- Details & Progress Track -->
-            <div class="flex-1 min-w-0 w-full space-y-2">
-              <div class="flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2">
-                  <span class="text-xs font-bold uppercase tracking-wider text-[#0B3558]">
-                    Profile Completion
-                  </span>
-                  <span class="text-xs font-bold text-slate-800">
-                    — {{ completionPercentage() }}% Complete
-                  </span>
+              <!-- Section Cards Vertical List -->
+              <div class="space-y-4 pt-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-500 font-semibold px-0.5 mb-3 gap-3 sm:gap-1">
+                  <span class="uppercase tracking-wider text-[#0B3558] font-bold">Mandatory Registration Sections</span>
+                  
+                  <!-- Action Button -->
+                  <a
+                    [routerLink]="['/registration']"
+                    [queryParams]="ctaQueryParams()"
+                    class="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-lg bg-[#0B3558] hover:bg-[#123B59] active:bg-[#07233B] text-white text-xs font-semibold shadow-xs hover:shadow transition-all cursor-pointer shrink-0 group"
+                    style="color: #ffffff !important;"
+                  >
+                    <span>{{ ctaText() }}</span>
+                    <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </a>
                 </div>
 
-                <span
-                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold shrink-0"
-                  [class.bg-emerald-100]="completionPercentage() === 100"
-                  [class.text-emerald-800]="completionPercentage() === 100"
-                  [class.bg-amber-100]="completionPercentage() > 0 && completionPercentage() < 100"
-                  [class.text-amber-800]="completionPercentage() > 0 && completionPercentage() < 100"
-                  [class.bg-slate-200/80]="completionPercentage() === 0"
-                  [class.text-slate-700]="completionPercentage() === 0"
-                >
-                  <span
-                    class="w-1.5 h-1.5 rounded-full"
-                    [class.bg-emerald-500]="completionPercentage() === 100"
-                    [class.bg-amber-500]="completionPercentage() > 0 && completionPercentage() < 100"
-                    [class.bg-slate-400]="completionPercentage() === 0"
-                  ></span>
-                  {{ completedSectionsCount() }} of 4 sections completed
-                </span>
-              </div>
-
-              <!-- Horizontal Progress Bar Track -->
-              <div class="w-full bg-slate-200/90 rounded-full h-2.5 overflow-hidden shadow-inner">
-                <div
-                  class="h-2.5 rounded-full transition-all duration-700 ease-out shadow-xs"
-                  [style.width.%]="completionPercentage()"
-                  [style.background]="progressBarGradient()"
-                ></div>
-              </div>
-
-              <!-- Contextual Status Message Banner -->
-              <p class="text-xs text-slate-600 flex items-center gap-1.5 truncate">
-                @if (completionPercentage() === 100) {
-                  <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span class="font-medium text-emerald-900 truncate">{{ contextualMessage() }}</span>
-                } @else if (completedSectionsCount() > 0) {
-                  <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  <span class="truncate"><strong class="font-bold text-slate-800">You're almost there!</strong> {{ contextualMessage() }}</span>
-                } @else {
-                  <svg class="w-4 h-4 text-[#0B3558] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span class="truncate">{{ contextualMessage() }}</span>
-                }
-              </p>
-            </div>
-          </div>
-
-          <!-- Section Cards Grid (Full-width 2-column dashboard) -->
-          <div class="space-y-2 pt-1">
-            <div class="flex items-center justify-between text-xs text-slate-500 font-semibold px-0.5">
-              <span class="uppercase tracking-wider">Mandatory Registration Sections</span>
-              <span class="text-slate-400 font-normal">Click any section to fill or edit</span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              @for (section of sections(); track section.id) {
-                <a
-                  [routerLink]="['/registration']"
-                  [queryParams]="{ step: section.stepNumber }"
-                  class="group p-3.5 sm:p-4 rounded-xl border transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 hover:shadow-xs hover:border-[#0B3558]/40"
-                  [class.bg-white]="!section.isCompleted"
-                  [class.border-slate-200]="!section.isCompleted"
-                  [class.bg-emerald-50/25]="section.isCompleted"
-                  [class.border-emerald-200]="section.isCompleted"
-                  [class.hover:border-emerald-300]="section.isCompleted"
-                >
-                  <div class="flex items-center gap-3 min-w-0">
-                    <!-- Section Icon -->
-                    <div
-                      class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
-                      [class.bg-emerald-100]="section.isCompleted"
-                      [class.text-emerald-700]="section.isCompleted"
-                      [class.bg-slate-100]="!section.isCompleted"
-                      [class.text-slate-600]="!section.isCompleted"
-                      [class.group-hover:bg-blue-50]="!section.isCompleted"
-                      [class.group-hover:text-[#0B3558]]="!section.isCompleted"
+                <div class="flex flex-col gap-3">
+                  @for (section of sections(); track section.id; let i = $index) {
+                    <a
+                      [routerLink]="['/registration']"
+                      [queryParams]="{ step: section.stepNumber }"
+                      class="relative group p-4 sm:p-5 rounded-xl border bg-gradient-to-br backdrop-blur-md shadow-[0_4px_20px_rgba(11,53,88,0.03)] transition-all duration-500 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 overflow-hidden"
+                      [class.from-[#0B3558]/10]="!section.isCompleted"
+                      [class.to-[#0B3558]/[0.02]]="!section.isCompleted"
+                      [class.border-[#0B3558]/20]="!section.isCompleted"
+                      [class.hover:border-[#0B3558]/40]="!section.isCompleted"
+                      [class.hover:shadow-[0_8px_30px_rgba(11,53,88,0.08)]]="!section.isCompleted"
+                      [class.hover:-translate-y-0.5]="!section.isCompleted"
+                      [class.from-emerald-50/90]="section.isCompleted"
+                      [class.to-emerald-50/40]="section.isCompleted"
+                      [class.border-emerald-200/60]="section.isCompleted"
+                      [class.hover:border-emerald-300]="section.isCompleted"
                     >
-                      @if (section.icon === 'building') {
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                      } @else if (section.icon === 'user-check') {
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                      } @else if (section.icon === 'users') {
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                      } @else {
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                        </svg>
+                      <!-- Subtle Wave Background -->
+                      @if (!section.isCompleted) {
+                        <div class="absolute inset-0 opacity-20 pointer-events-none z-0 overflow-hidden mix-blend-multiply">
+                          <svg viewBox="0 0 1000 200" preserveAspectRatio="none" class="absolute bottom-0 w-full h-full transform translate-y-10 group-hover:translate-y-6 transition-transform duration-700">
+                            <path fill="#0B3558" d="M0,100 C150,200 350,0 500,100 C650,200 850,0 1000,100 L1000,200 L0,200 Z" opacity="0.1"></path>
+                            <path fill="#0B3558" d="M0,150 C200,50 400,250 600,150 C800,50 900,200 1000,150 L1000,200 L0,200 Z" opacity="0.15"></path>
+                          </svg>
+                        </div>
                       }
-                    </div>
 
-                    <!-- Title and Subtitle -->
-                    <div class="min-w-0">
-                      <div class="flex items-center gap-1.5">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 0{{ section.stepNumber }}</span>
+                      <!-- Mirror/Reflection Shine Effect -->
+                      <div class="absolute inset-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 ease-in-out -translate-x-full group-hover:translate-x-1/2 pointer-events-none transform-gpu z-0"></div>
+
+                      <div class="flex items-center gap-5 min-w-0 relative z-10">
+                        <!-- Section Icon -->
+                        <div
+                          class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 relative z-10"
+                          [class.bg-emerald-50]="section.isCompleted"
+                          [class.text-emerald-600]="section.isCompleted"
+                          [class.bg-blue-50]="!section.isCompleted && i === completedSectionsCount()"
+                          [class.text-[#0B3558]]="!section.isCompleted && i === completedSectionsCount()"
+                          [class.bg-slate-50]="!section.isCompleted && i > completedSectionsCount()"
+                          [class.text-slate-500]="!section.isCompleted && i > completedSectionsCount()"
+                        >
+                          @if (section.icon === 'building') {
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                          } @else if (section.icon === 'user-check') {
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                          } @else if (section.icon === 'users') {
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                          } @else {
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            </svg>
+                          }
+                        </div>
+    
+                        <!-- Title and Subtitle -->
+                        <div class="min-w-0">
+                          <div class="flex items-center gap-1.5 mb-1">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 0{{ section.stepNumber }}</span>
+                          </div>
+                          <h3 class="text-sm sm:text-[15px] font-bold text-slate-900 group-hover:text-[#0B3558] transition-colors truncate">
+                            {{ section.title }}
+                          </h3>
+                          <p class="text-xs text-slate-500 truncate mt-0.5">
+                            {{ section.subtitle }}
+                          </p>
+                        </div>
                       </div>
-                      <h3 class="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-[#0B3558] transition-colors truncate">
-                        {{ section.title }}
-                      </h3>
-                      <p class="text-[11px] text-slate-500 truncate">
-                        {{ section.subtitle }}
-                      </p>
-                    </div>
-                  </div>
-
-                  <!-- Right: Status Badge & Chevron -->
-                  <div class="flex items-center gap-2 shrink-0">
-                    <span
-                      class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide border"
-                      [class.bg-emerald-100]="section.isCompleted"
-                      [class.text-emerald-800]="section.isCompleted"
-                      [class.border-emerald-200]="section.isCompleted"
-                      [class.bg-slate-100]="!section.isCompleted"
-                      [class.text-slate-600]="!section.isCompleted"
-                      [class.border-slate-200]="!section.isCompleted"
-                    >
-                      @if (section.isCompleted) {
-                        <svg class="w-3 h-3 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+    
+                      <!-- Right: Status Badge & Chevron -->
+                      <div class="flex items-center gap-4 shrink-0 self-end sm:self-auto relative z-10">
+                        <span
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold tracking-wide"
+                          [class.bg-emerald-50]="section.isCompleted"
+                          [class.text-emerald-700]="section.isCompleted"
+                          [class.bg-blue-50]="!section.isCompleted && i === completedSectionsCount()"
+                          [class.text-[#0B3558]]="!section.isCompleted && i === completedSectionsCount()"
+                          [class.bg-slate-50]="!section.isCompleted && i > completedSectionsCount()"
+                          [class.text-slate-500]="!section.isCompleted && i > completedSectionsCount()"
+                        >
+                          @if (section.isCompleted) {
+                            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Completed</span>
+                          } @else if (!section.isCompleted && i === completedSectionsCount()) {
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#0B3558]"></span>
+                            <span>In Progress</span>
+                          } @else {
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                            <span>Pending</span>
+                          }
+                        </span>
+    
+                        <svg class="w-4 h-4 text-slate-400 group-hover:text-[#0B3558] group-hover:translate-x-0.5 transition-all hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
-                        <span>Completed</span>
-                      } @else {
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                        <span>Pending</span>
-                      }
-                    </span>
-
-                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0B3558] group-hover:translate-x-0.5 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </a>
-              }
+                      </div>
+                    </a>
+                  }
+                </div>
+              </div>
             </div>
           </div>
 
@@ -256,83 +191,96 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
         <!-- ====================================================================
              CASE 2: VERIFIED PROFILE WITH ALL 5 OTR STEPS FILLED
              ==================================================================== -->
-        <div class="p-6 sm:p-8 space-y-6 max-w-6xl font-sans" style="font-family: 'Inter', sans-serif;">
+        <div class="p-4 sm:p-5 space-y-4 font-sans">
           
           <!-- Top Heading -->
-          <div class="space-y-1">
-            <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-              Profile
-            </h1>
-            <p class="text-xs text-slate-500 font-normal">
-              One Time Registration (OTR) details and verified institutional profile
-            </p>
-          </div>
+          <app-page-header
+            title="Profile"
+          ></app-page-header>
 
           <!-- Quick Tab Filter Bar -->
           <div class="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto no-scrollbar font-sans text-xs">
             <button
               type="button"
               (click)="activeTab.set('all')"
-              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0"
-              [class.bg-slate-900]="activeTab() === 'all'"
-              [class.text-white]="activeTab() === 'all'"
+              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0 border"
+              [class.bg-sky-50]="activeTab() === 'all'"
+              [class.text-[#0483AC]]="activeTab() === 'all'"
+              [class.border-sky-300]="activeTab() === 'all'"
+              [class.shadow-2xs]="activeTab() === 'all'"
               [class.text-slate-600]="activeTab() !== 'all'"
-              [class.hover:bg-slate-100]="activeTab() !== 'all'"
+              [class.border-transparent]="activeTab() !== 'all'"
+              [class.hover:bg-slate-50]="activeTab() !== 'all'"
             >
               All Steps
             </button>
             <button
               type="button"
               (click)="activeTab.set('org')"
-              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0"
-              [class.bg-slate-900]="activeTab() === 'org'"
-              [class.text-white]="activeTab() === 'org'"
+              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0 border"
+              [class.bg-sky-50]="activeTab() === 'org'"
+              [class.text-[#0483AC]]="activeTab() === 'org'"
+              [class.border-sky-300]="activeTab() === 'org'"
+              [class.shadow-2xs]="activeTab() === 'org'"
               [class.text-slate-600]="activeTab() !== 'org'"
-              [class.hover:bg-slate-100]="activeTab() !== 'org'"
+              [class.border-transparent]="activeTab() !== 'org'"
+              [class.hover:bg-slate-50]="activeTab() !== 'org'"
             >
               Step 1 - Organization Details
             </button>
             <button
               type="button"
               (click)="activeTab.set('officers')"
-              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0"
-              [class.bg-slate-900]="activeTab() === 'officers'"
-              [class.text-white]="activeTab() === 'officers'"
+              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0 border"
+              [class.bg-sky-50]="activeTab() === 'officers'"
+              [class.text-[#0483AC]]="activeTab() === 'officers'"
+              [class.border-sky-300]="activeTab() === 'officers'"
+              [class.shadow-2xs]="activeTab() === 'officers'"
               [class.text-slate-600]="activeTab() !== 'officers'"
-              [class.hover:bg-slate-100]="activeTab() !== 'officers'"
+              [class.border-transparent]="activeTab() !== 'officers'"
+              [class.hover:bg-slate-50]="activeTab() !== 'officers'"
             >
               Step 2 – Details of Officer In-Charge
             </button>
             <button
               type="button"
               (click)="activeTab.set('auth')"
-              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0"
-              [class.bg-slate-900]="activeTab() === 'auth'"
-              [class.text-white]="activeTab() === 'auth'"
+              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0 border"
+              [class.bg-sky-50]="activeTab() === 'auth'"
+              [class.text-[#0483AC]]="activeTab() === 'auth'"
+              [class.border-sky-300]="activeTab() === 'auth'"
+              [class.shadow-2xs]="activeTab() === 'auth'"
               [class.text-slate-600]="activeTab() !== 'auth'"
-              [class.hover:bg-slate-100]="activeTab() !== 'auth'"
+              [class.border-transparent]="activeTab() !== 'auth'"
+              [class.hover:bg-slate-50]="activeTab() !== 'auth'"
             >
               Step 3 – Authorized Person Details
             </button>
             <button
               type="button"
               (click)="activeTab.set('bank')"
-              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0"
-              [class.bg-slate-900]="activeTab() === 'bank'"
-              [class.text-white]="activeTab() === 'bank'"
+              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0 border"
+              [class.bg-sky-50]="activeTab() === 'bank'"
+              [class.text-[#0483AC]]="activeTab() === 'bank'"
+              [class.border-sky-300]="activeTab() === 'bank'"
+              [class.shadow-2xs]="activeTab() === 'bank'"
               [class.text-slate-600]="activeTab() !== 'bank'"
-              [class.hover:bg-slate-100]="activeTab() !== 'bank'"
+              [class.border-transparent]="activeTab() !== 'bank'"
+              [class.hover:bg-slate-50]="activeTab() !== 'bank'"
             >
               Step 4 – Bank Details
             </button>
             <button
               type="button"
               (click)="activeTab.set('docs')"
-              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0"
-              [class.bg-slate-900]="activeTab() === 'docs'"
-              [class.text-white]="activeTab() === 'docs'"
+              class="px-3 py-1.5 rounded-md font-semibold transition-colors cursor-pointer shrink-0 border"
+              [class.bg-sky-50]="activeTab() === 'docs'"
+              [class.text-[#0483AC]]="activeTab() === 'docs'"
+              [class.border-sky-300]="activeTab() === 'docs'"
+              [class.shadow-2xs]="activeTab() === 'docs'"
               [class.text-slate-600]="activeTab() !== 'docs'"
-              [class.hover:bg-slate-100]="activeTab() !== 'docs'"
+              [class.border-transparent]="activeTab() !== 'docs'"
+              [class.hover:bg-slate-50]="activeTab() !== 'docs'"
             >
               Step 5: Documents &amp; Declaration
             </button>
@@ -342,16 +290,16 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                STEP 1: ORGANIZATION DETAILS (All Fields)
                ==================================================================== -->
           @if (activeTab() === 'all' || activeTab() === 'org') {
-            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs space-y-4 font-sans">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="bg-white border border-slate-200 rounded-xl shadow-2xs font-sans overflow-hidden">
+              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[#0B3558] to-[#174A6E] text-white">
                 <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-semibold">1</span>
-                  <h3 class="text-sm font-semibold text-slate-900 uppercase tracking-wide">Step 1 - Organization Details</h3>
+                  <span class="w-6 h-6 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-semibold">1</span>
+                  <h3 class="text-sm font-semibold text-white uppercase tracking-wide" style="color: #ffffff !important;">Step 1 - Organization Details</h3>
                 </div>
                 <a
                   [routerLink]="['/registration']"
                   [queryParams]="{ step: 1 }"
-                  class="text-xs font-normal text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-1 cursor-pointer"
+                  class="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -360,7 +308,7 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                 </a>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6 text-xs font-normal">
+              <div class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6 text-xs font-normal">
                 <div>
                   <span class="text-slate-500 block">TP/PIA Short Name</span>
                   <span class="text-slate-800">{{ formData().step1.shortName || 'RSLDC' }}</span>
@@ -446,16 +394,16 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                STEP 2: OFFICER IN-CHARGE DIRECTORY (All Fields & Members)
                ==================================================================== -->
           @if (activeTab() === 'all' || activeTab() === 'officers') {
-            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs space-y-4 font-sans">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="bg-white border border-slate-200 rounded-xl shadow-2xs font-sans overflow-hidden">
+              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[#0B3558] to-[#174A6E] text-white">
                 <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-semibold">2</span>
-                  <h3 class="text-sm font-semibold text-slate-900 uppercase tracking-wide">Step 2 – Details of Officer In-Charge</h3>
+                  <span class="w-6 h-6 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-semibold">2</span>
+                  <h3 class="text-sm font-semibold text-white uppercase tracking-wide" style="color: #ffffff !important;">Step 2 – Details of Officer In-Charge</h3>
                 </div>
                 <a
                   [routerLink]="['/registration']"
                   [queryParams]="{ step: 2 }"
-                  class="text-xs font-normal text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-1 cursor-pointer"
+                  class="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -464,6 +412,7 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                 </a>
               </div>
 
+              <div class="p-6 space-y-4">
               @let oic = formData().step2[0] || {};
               <div class="border border-slate-200 rounded-lg p-4 bg-slate-50/50 space-y-3">
                 <div class="flex items-center justify-between border-b border-slate-200 pb-2">
@@ -525,25 +474,25 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                 </div>
               </div>
             </div>
+            </div>
           }
 
           <!-- ====================================================================
                STEP 3: AUTHORIZED PERSON DETAILS (All Fields)
                ==================================================================== -->
           @if (activeTab() === 'all' || activeTab() === 'auth') {
-            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs space-y-4 font-sans">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="bg-white border border-slate-200 rounded-xl shadow-2xs font-sans overflow-hidden">
+              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[#0B3558] to-[#174A6E] text-white">
                 <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-semibold">3</span>
+                  <span class="w-6 h-6 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-semibold">3</span>
                   <div>
-                    <h3 class="text-sm font-semibold text-slate-900 uppercase tracking-wide">Step 3 – Authorized Person Details</h3>
-                    <p class="text-[11px] text-slate-500 font-normal">The Authorized Person is the person officially authorized to represent the TP/PIA.</p>
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wide" style="color: #ffffff !important;">Step 3 – Authorized Person Details</h3>
                   </div>
                 </div>
                 <a
                   [routerLink]="['/registration']"
                   [queryParams]="{ step: 3 }"
-                  class="text-xs font-normal text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-1 cursor-pointer"
+                  class="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 cursor-pointer shrink-0"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -552,7 +501,7 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                 </a>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-3 gap-x-6 text-xs font-normal">
+              <div class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-3 gap-x-6 text-xs font-normal">
                 <div>
                   <span class="text-slate-500 block">Name</span>
                   <span class="text-slate-800">{{ formData().step3.name || 'Vikram Singh Mehta' }}</span>
@@ -621,16 +570,16 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                STEP 4: BANK DETAILS (All Fields)
                ==================================================================== -->
           @if (activeTab() === 'all' || activeTab() === 'bank') {
-            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs space-y-4 font-sans">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="bg-white border border-slate-200 rounded-xl shadow-2xs font-sans overflow-hidden">
+              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[#0B3558] to-[#174A6E] text-white">
                 <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-semibold">4</span>
-                  <h3 class="text-sm font-semibold text-slate-900 uppercase tracking-wide">Step 4 – Bank Details</h3>
+                  <span class="w-6 h-6 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-semibold">4</span>
+                  <h3 class="text-sm font-semibold text-white uppercase tracking-wide" style="color: #ffffff !important;">Step 4 – Bank Details</h3>
                 </div>
                 <a
                   [routerLink]="['/registration']"
                   [queryParams]="{ step: 4 }"
-                  class="text-xs font-normal text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-1 cursor-pointer"
+                  class="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -639,7 +588,7 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                 </a>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6 text-xs font-normal">
+              <div class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6 text-xs font-normal">
                 <div>
                   <span class="text-slate-500 block">Name of the Bank</span>
                   <span class="text-slate-800">{{ formData().step4.bankName || 'State Bank of India' }}</span>
@@ -688,16 +637,16 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
                STEP 5: UPLOADED DOCUMENTS & DECLARATION
                ==================================================================== -->
           @if (activeTab() === 'all' || activeTab() === 'docs') {
-            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-2xs space-y-4 font-sans">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="bg-white border border-slate-200 rounded-xl shadow-2xs font-sans overflow-hidden">
+              <div class="flex items-center justify-between p-4 bg-gradient-to-r from-[#0B3558] to-[#174A6E] text-white">
                 <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-semibold">5</span>
-                  <h3 class="text-sm font-semibold text-slate-900 uppercase tracking-wide">Step 5: Uploaded Documents &amp; Declaration</h3>
+                  <span class="w-6 h-6 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-semibold">5</span>
+                  <h3 class="text-sm font-semibold text-white uppercase tracking-wide" style="color: #ffffff !important;">Step 5: Uploaded Documents &amp; Declaration</h3>
                 </div>
                 <a
                   [routerLink]="['/registration']"
                   [queryParams]="{ step: 5 }"
-                  class="text-xs font-normal text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-1 cursor-pointer"
+                  class="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -707,7 +656,7 @@ import { OtrValidationService } from '../registration/services/otr-validation.se
               </div>
 
               <!-- Uploaded Documents Cards -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs font-normal">
+              <div class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs font-normal">
                 
                 <div class="p-3 border border-slate-200 rounded-lg flex items-center justify-between bg-slate-50/50">
                   <div class="flex items-center gap-2">

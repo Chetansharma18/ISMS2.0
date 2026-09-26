@@ -1,12 +1,13 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
 import {
   PageHeaderComponent,
   TableComponent,
   ButtonComponent,
+  ActionModalComponent,
   TableColumn
 } from '../../shared';
 
@@ -46,7 +47,8 @@ export interface EoiDocumentItem {
     FormsModule,
     PageHeaderComponent,
     TableComponent,
-    ButtonComponent
+    ButtonComponent,
+    ActionModalComponent
   ],
   template: `
     <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
@@ -75,16 +77,18 @@ export interface EoiDocumentItem {
                 </p>
               </div>
 
-              <a
-                routerLink="/registration"
-                class="px-4 py-2 bg-[#0B3558] hover:bg-[#123B59] active:bg-[#07233B] !text-white text-xs font-semibold rounded-md shadow-xs whitespace-nowrap transition-all flex items-center gap-1.5 justify-center shrink-0 cursor-pointer"
-                style="color: #ffffff !important;"
-              >
-                <span class="!text-white font-semibold" style="color: #ffffff !important;">Complete Registration</span>
-                <svg class="w-3.5 h-3.5 text-white" style="stroke: #ffffff !important; color: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </a>
+              <div class="flex items-center gap-2">
+                <a
+                  routerLink="/profile"
+                  class="px-4 py-2 bg-[#0B3558] hover:bg-[#123B59] active:bg-[#07233B] !text-white text-xs font-semibold rounded-md shadow-xs whitespace-nowrap transition-all flex items-center gap-1.5 justify-center shrink-0 cursor-pointer"
+                  style="color: #ffffff !important;"
+                >
+                  <span class="!text-white font-semibold" style="color: #ffffff !important;">Complete Registration</span>
+                  <svg class="w-3.5 h-3.5 text-white" style="stroke: #ffffff !important; color: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </a>
+              </div>
             </div>
           }
 
@@ -368,51 +372,35 @@ export interface EoiDocumentItem {
       }
 
       <!-- ====================================================================
-           MODAL: PROFILE INCOMPLETE WARNING ON APPLY CLICK (Blue & White Theme)
+           MODAL: REUSABLE ONE-TIME REGISTRATION (OTR) POPUP PROMPT
            ==================================================================== -->
-      @if (showApplyBlockedModal()) {
-        <div
-          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-xs animate-in fade-in duration-200"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div class="max-w-md w-full bg-white rounded-xl shadow-2xl border border-slate-200 p-6 sm:p-7 animate-in fade-in zoom-in-95 duration-200 relative overflow-hidden text-center">
-            
-            <!-- Top Right Close Icon Button (Cancel button removed) -->
-            <button
-              type="button"
-              (click)="showApplyBlockedModal.set(false)"
-              class="absolute top-3.5 right-3.5 text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
-              title="Close"
-              aria-label="Close"
-            >
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            <!-- Proper Heading & Well-Aligned Message (No emoji) -->
-            <h3 class="text-base sm:text-lg font-bold text-[#0B3558] tracking-tight">
-              Please Complete Your Profile 
-            </h3>
-            <p class="text-xs sm:text-[13px] text-slate-600 mt-2.5 leading-relaxed px-1 font-normal">
-              Your  profile is currently incomplete. To submit an Expression of Interest (EOI) proposal for <strong>{{ selectedScheme()?.schemeTitle || selectedScheme()?.schemeName }}</strong>, your One Time Registration (OTR) profile must be completed and submitted first.
-            </p>
-
-            <!-- Single Clean Action Button: Complete Profile -->
-            <div class="mt-6">
-              <button
-                type="button"
-                (click)="goToRegistration()"
-                class="w-full py-2.5 px-4 rounded-lg bg-[#0B3558] hover:bg-[#07233B] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center justify-center cursor-pointer"
-              >
-                Complete Profile
-              </button>
-            </div>
-
+      <app-action-modal
+        [isOpen]="showOtrPromptModal()"
+        [showCloseButton]="false"
+        title="Complete Profile to be Eligible for EOI"
+        description="To be eligible to participate and submit Expression of Interest (EOI) proposals under RSLDC schemes, please complete your One-Time Registration (OTR) and organization profile first."
+        primaryLabel="Complete Registration"
+        secondaryLabel="Skip for Now"
+        (primaryAction)="goToProfile()"
+        (secondaryAction)="dismissOtrPrompt()"
+        (close)="dismissOtrPrompt()"
+      >
+        <!-- Information Highlights Box -->
+        <div class="w-full mt-4 p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-left text-xs text-slate-700 space-y-2">
+          <div class="flex items-start gap-2">
+            <svg class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+            <span><strong>Verified Partner Status:</strong> Upload PAN, GST, and legal incorporation documents.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <svg class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+            <span><strong>Scheme EOI Access:</strong> Unlocks direct online application for all open flagship tenders.</span>
           </div>
         </div>
-      }
+      </app-action-modal>
 
     </div>
   `
@@ -420,18 +408,62 @@ export interface EoiDocumentItem {
 export class TendersPageComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   readonly currentUser = this.authService.currentUser;
 
   readonly isProfileIncomplete = computed(() => {
     const user = this.currentUser();
-    if (!user) return true;
-    if (user.role === 'new_user') return true;
-    return user.isProfileComplete === false;
+    if (!user) return false;
+    return user.role === 'new_user';
   });
 
   selectedScheme = signal<SchemeTender | null>(null);
-  showApplyBlockedModal = signal<boolean>(false);
+  readonly showOtrPromptModal = signal<boolean>(false);
+  private promptDismissed = false;
+
+  constructor() {
+    this.route.queryParams.subscribe(params => {
+      const fromLogin = params['fromLogin'] === 'true';
+      const promptOtr = params['promptOtr'] === 'true';
+      if (fromLogin || promptOtr) {
+        this.promptDismissed = false;
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.removeItem('isms_otr_prompt_dismissed');
+        }
+      }
+      this.evaluateOtrModalPrompt();
+    });
+
+    effect(() => {
+      // Re-evaluate whenever currentUser signal changes
+      this.evaluateOtrModalPrompt();
+    });
+  }
+
+  private evaluateOtrModalPrompt(): void {
+    const user = this.currentUser();
+    const isNewUser = user?.role === 'new_user';
+    const isDismissed = (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('isms_otr_prompt_dismissed') === 'true') || this.promptDismissed;
+
+    // Show popup strictly for new_user role on their first visit / fresh login
+    if (isNewUser && !isDismissed) {
+      this.showOtrPromptModal.set(true);
+    } else {
+      this.showOtrPromptModal.set(false);
+    }
+  }
+
+  dismissOtrPrompt(): void {
+    this.showOtrPromptModal.set(false);
+    this.promptDismissed = true;
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('isms_otr_prompt_dismissed', 'true');
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('isms_eoi_prompt_shown_new_user', 'true');
+    }
+  }
 
   // Section A: Core RFP & Policy Guidelines Documents
   readonly rfpDocuments: EoiDocumentItem[] = [
@@ -723,7 +755,7 @@ export class TendersPageComponent {
   handleApplyForScheme(): void {
     // Check if profile is incomplete
     if (this.isProfileIncomplete()) {
-      this.showApplyBlockedModal.set(true);
+      this.showOtrPromptModal.set(true);
       return;
     }
 
@@ -745,9 +777,13 @@ export class TendersPageComponent {
     });
   }
 
+  goToProfile(): void {
+    this.dismissOtrPrompt();
+    this.router.navigate(['/profile']);
+  }
+
   goToRegistration(): void {
-    this.showApplyBlockedModal.set(false);
-    this.router.navigate(['/registration']);
+    this.goToProfile();
   }
 
   downloadDoc(docType: string): void {

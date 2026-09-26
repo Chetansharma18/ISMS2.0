@@ -36,7 +36,7 @@ export interface SubmittedTender {
     ButtonComponent
   ],
   template: `
-    <div class="w-full min-h-full bg-[#F5F7F9] text-[#1F2933] font-sans">
+    <div class="w-full min-h-full bg-white text-[#1F2933] font-sans">
       <div class="p-4 sm:p-5 space-y-3 font-sans">
         
         <!-- Page Header via Reusable PageHeaderComponent -->

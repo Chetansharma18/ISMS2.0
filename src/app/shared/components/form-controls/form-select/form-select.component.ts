@@ -19,8 +19,8 @@ import { FormsModule } from '@angular/forms';
     <div class="w-full flex flex-col relative">
       <!-- Label Row -->
       @if (label) {
-        <div class="flex items-center justify-between mb-1.5 font-sans">
-          <label [for]="id" class="text-[13px] font-medium leading-[20px] text-[#1F2933] select-none">
+        <div class="flex items-center justify-between mb-1 font-sans">
+          <label [for]="id" class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#1F2933] select-none">
             {{ label }}
             @if (required) {
               <span class="text-rose-600 font-bold ml-0.5">*</span>
@@ -35,7 +35,7 @@ import { FormsModule } from '@angular/forms';
         type="button"
         (click)="toggleDropdown()"
         [disabled]="disabled"
-        class="w-full h-[38px] flex items-center justify-between px-3 text-[14px] leading-[22px] rounded-[4px] border transition-all duration-150 text-left bg-white font-sans cursor-pointer"
+        class="w-full h-[35px] flex items-center justify-between px-2.5 text-xs sm:text-[13px] leading-[20px] rounded-[4px] border transition-all duration-150 text-left bg-white font-sans cursor-pointer"
         [class.border-[#D9E1E7]]="!error && !disabled"
         [class.border-rose-600]="!!error"
         [class.ring-1]="!!error"

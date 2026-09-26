@@ -110,94 +110,20 @@ import { AuthService } from '../../auth/auth.service';
               </div>
             </a>
 
-            <!-- 3. Profile Accordion Section -->
-            <div class="pt-0.5">
-              <button
-                type="button"
-                (click)="toggleProfileAccordion()"
-                class="w-full flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
-                [class.text-[#174A6E]]="profileExpanded()"
-                [class.font-medium]="profileExpanded()"
-              >
-                <div class="flex items-center gap-2.5">
-                  <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  <span class="tracking-tight">Profile</span>
-                </div>
-                <svg
-                  class="w-3.5 h-3.5 text-[#7A8792] transition-transform duration-200"
-                  [class.rotate-180]="profileExpanded()"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+            <!-- 3. Profile -->
+            <a
+              routerLink="/profile"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-              </button>
-
-              <!-- Profile Sub-Items List -->
-              @if (profileExpanded()) {
-                <div class="flex flex-col gap-0.5 pl-3 pr-1 pt-0.5 border-l-2 border-[#D9E1E7] ml-4">
-                  
-                  <!-- 1. Organisation Details -->
-                  <a
-                    routerLink="/profile"
-                    [queryParams]="{ tab: 'org' }"
-                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
-                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
-                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
-                  >
-                    <span class="truncate">1. Organisation Details</span>
-                  </a>
-
-                  <!-- 2. Officer In-Charge Details -->
-                  <a
-                    routerLink="/profile"
-                    [queryParams]="{ tab: 'officers' }"
-                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
-                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
-                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
-                  >
-                    <span class="truncate">2. Officer In-Charge</span>
-                  </a>
-
-                  <!-- 3. Authorized Person Details -->
-                  <a
-                    routerLink="/profile"
-                    [queryParams]="{ tab: 'auth' }"
-                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
-                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
-                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
-                  >
-                    <span class="truncate">3. Authorized Person</span>
-                  </a>
-
-                  <!-- 4. Bank Details -->
-                  <a
-                    routerLink="/profile"
-                    [queryParams]="{ tab: 'bank' }"
-                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
-                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
-                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
-                  >
-                    <span class="truncate">4. Bank Details</span>
-                  </a>
-
-                  <!-- 5. Uploaded Documents -->
-                  <a
-                    routerLink="/profile"
-                    [queryParams]="{ tab: 'docs' }"
-                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
-                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
-                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
-                  >
-                    <span class="truncate">5. Documents</span>
-                  </a>
-
-                </div>
-              }
-            </div>
+                <span class="tracking-tight">Profile</span>
+              </div>
+            </a>
 
             <!-- ================================================================
                  TP MANAGEMENT (Matching Screenshot 1)
@@ -299,8 +225,6 @@ import { AuthService } from '../../auth/auth.service';
 export class SidebarComponent {
   authService = inject(AuthService);
 
-  profileExpanded = signal<boolean>(true);
-
   readonly currentUser = this.authService.currentUser;
 
   readonly isExistingUser = computed(() => {
@@ -312,8 +236,4 @@ export class SidebarComponent {
     const user = this.currentUser();
     return user?.role === 'dept_admin';
   });
-
-  toggleProfileAccordion(): void {
-    this.profileExpanded.update(v => !v);
-  }
 }

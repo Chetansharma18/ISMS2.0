@@ -40,12 +40,12 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
         <!-- Hero Content (Left) -->
         <div class="lg:col-span-7 text-left">
           
-          <h1 class="text-white !text-white text-3xl sm:text-4xl md:text-5xl font-extrabold leading-[1.18] mb-5 max-w-lg tracking-tight drop-shadow-md font-sans" style="color: #ffffff !important; font-family: var(--font-family-base, 'Inter', sans-serif);">
+          <h1 class="landing-hero-title text-white !text-white text-3xl sm:text-4xl lg:text-[44px] font-extrabold leading-[1.18] mb-5 max-w-lg tracking-tight drop-shadow-md font-sans" style="color: #ffffff !important; font-family: var(--font-family-base, 'Inter', sans-serif);">
             <span class="text-white !text-white font-extrabold inline-block" style="color: #ffffff !important;">Integrated Scheme</span> <br class="hidden sm:inline" />
             <span class="text-white !text-white font-extrabold inline-block" style="color: #ffffff !important;">Management System</span>
           </h1>
 
-          <p class="text-slate-100 !text-slate-100 text-sm sm:text-base max-w-md lg:max-w-[440px] xl:max-w-lg leading-relaxed drop-shadow font-normal text-justify hyphens-auto" style="color: #f1f5f9 !important;">
+          <p class="landing-body-text text-slate-100 !text-slate-100 text-sm sm:text-base max-w-md lg:max-w-[480px] xl:max-w-lg leading-relaxed drop-shadow font-normal text-left" style="color: #f1f5f9 !important;">
             A unified, transparent digital ecosystem empowering skill development schemes, training operations, biometric verification, assessments, certifications, and sustainable placements across Rajasthan.
           </p>
 

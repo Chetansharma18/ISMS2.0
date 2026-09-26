@@ -17,3 +17,4 @@ export * from './form-controls/form-file-upload/form-file-upload.component';
 export * from './form-controls/form-section/form-section.component';
 export * from './document-viewer-modal/document-viewer-modal.component';
 export * from './profile-preview-modal/profile-preview-modal.component';
+export * from './action-modal/action-modal.component';

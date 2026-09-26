@@ -6,11 +6,12 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <section class="w-full bg-white pb-4 mb-4 border-b border-slate-200/70 last:border-b-0">
+    <section class="w-full bg-white pb-3 mb-3 border-b border-slate-200/60 last:border-b-0 last:pb-0 last:mb-0">
       @if (title) {
-        <h2 class="text-sm sm:text-base font-bold text-slate-900 mb-3 pb-2 border-b border-slate-100">
-          {{ title }}
-        </h2>
+        <div class="font-bold pb-1.5 mb-2.5 border-b border-slate-200/80 flex items-center gap-2" style="font-size: 13.5px !important; color: #0B3558 !important;">
+          <span class="w-1.5 h-3.5 bg-[#0B3558] rounded-xs inline-block"></span>
+          <span>{{ title }}</span>
+        </div>
       }
       <div>
         <ng-content></ng-content>

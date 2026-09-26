@@ -32,59 +32,59 @@ export interface StepMeta {
       <!-- ====================================================================
            Sticky Registration Header (Heading & Stepper combined so heading never hides on scroll)
            ==================================================================== -->
-      <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-        <!-- 1. Form Heading -->
-        <div class="w-full border-b border-slate-100 py-3 px-4 sm:px-6 lg:px-8">
-          <div class="max-w-6xl mx-auto flex items-center justify-center text-center">
-            <h1 class="text-base sm:text-lg md:text-xl font-bold text-slate-900 tracking-tight leading-snug m-0 text-center">
+      <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-2xs">
+        <!-- 1. Form Heading (Reduced Size, Professional & Clean in Theme Blue) -->
+        <div class="w-full border-b border-slate-100 py-2 px-4 sm:px-6 lg:px-8 bg-white">
+          <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <h1 class="font-bold tracking-tight m-0" style="font-size: 16px !important; line-height: 22px !important; color: #0B3558 !important;">
               One Time Registration Form
             </h1>
           </div>
         </div>
 
-        <!-- 2. Horizontal Tabs Stepper (Clean Neutral Theme) -->
-        <nav class="w-full" aria-label="Registration Steps">
+        <!-- 2. Horizontal Tabs Stepper (Clean & Purely Responsive) -->
+        <nav class="w-full bg-white" aria-label="Registration Steps">
           <div class="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between overflow-x-auto no-scrollbar pt-2.5 pb-2">
+            <div class="flex items-center justify-between overflow-x-auto no-scrollbar py-2 gap-1 sm:gap-2">
               @for (step of steps; track step.number) {
                 <button
                   type="button"
                   (click)="goToStep(step.number)"
-                  class="flex-1 min-w-[120px] sm:min-w-0 py-1.5 px-2 sm:px-3 flex items-center justify-center gap-2 transition-all text-xs sm:text-[12.5px] cursor-pointer relative group bg-transparent"
-                  [class.text-slate-900]="activeStep() === step.number"
-                  [class.font-semibold]="activeStep() === step.number"
+                  class="flex-1 min-w-[90px] sm:min-w-0 py-1 px-1.5 sm:px-2 flex items-center justify-center gap-1.5 transition-all text-xs cursor-pointer relative group bg-transparent"
+                  [class.text-[#0B3558]]="activeStep() === step.number"
+                  [class.font-bold]="activeStep() === step.number"
                   [class.text-slate-500]="activeStep() !== step.number"
-                  [class.hover:text-slate-900]="activeStep() !== step.number"
+                  [class.hover:text-[#0B3558]]="activeStep() !== step.number"
                 >
                   <!-- Number Badge / Status Icon -->
                   <span
-                    class="w-5.5 h-5.5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 transition-colors"
-                    [class.bg-slate-900]="activeStep() === step.number"
+                    class="w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full flex items-center justify-center text-[10.5px] sm:text-xs font-semibold shrink-0 transition-colors"
+                    [class.bg-[#0B3558]]="activeStep() === step.number"
                     [class.text-white]="activeStep() === step.number"
                     [class.bg-emerald-600]="isStepCompleted(step.number) && activeStep() !== step.number"
                     [class.text-white]="isStepCompleted(step.number) && activeStep() !== step.number"
                     [class.bg-rose-500]="isStepError(step.number) && activeStep() !== step.number"
                     [class.text-white]="isStepError(step.number) && activeStep() !== step.number"
                     [class.bg-slate-100]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
-                    [class.text-slate-700]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
+                    [class.text-slate-600]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
                     [class.border]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
                     [class.border-slate-300]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
                   >
                     @if (isStepCompleted(step.number) && activeStep() !== step.number) {
-                      <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                       </svg>
                     } @else if (isStepError(step.number) && activeStep() !== step.number) {
-                      <span class="text-white">!</span>
+                      <span class="text-white font-bold">!</span>
                     } @else {
-                      <span [class.text-white]="activeStep() === step.number" [class.text-slate-700]="activeStep() !== step.number">
+                      <span [class.text-white]="activeStep() === step.number" [class.text-slate-600]="activeStep() !== step.number">
                         {{ step.number }}
                       </span>
                     }
                   </span>
 
                   <!-- Step Label -->
-                  <span class="truncate tracking-tight font-medium">
+                  <span class="truncate tracking-tight font-medium text-[11px] sm:text-xs">
                     {{ step.label }}
                   </span>
                 </button>
@@ -92,7 +92,7 @@ export interface StepMeta {
             </div>
 
             <!-- Horizontal Progress Bar Line -->
-            <div class="w-full bg-slate-100 h-1 relative overflow-hidden rounded-full mb-1.5" title="Overall Form Completion Progress">
+            <div class="w-full bg-slate-100 h-1 relative overflow-hidden rounded-full mb-1" title="Overall Form Completion Progress">
               <div
                 class="h-full bg-emerald-500 transition-all duration-500 ease-out rounded-full"
                 [style.width.%]="otrFormService.completionPercentage()"
@@ -116,9 +116,12 @@ export interface StepMeta {
             [class.bg-emerald-900/95]="toast.type === 'success'"
             [class.border-emerald-500/50]="toast.type === 'success'"
             [class.text-emerald-50]="toast.type === 'success'"
-            [class.bg-[#0B3558]]="toast.type === 'error' || toast.type === 'info'"
-            [class.border-[#1b4b73]]="toast.type === 'error' || toast.type === 'info'"
-            [class.text-white]="toast.type === 'error' || toast.type === 'info'"
+            [class.bg-rose-600]="toast.type === 'error'"
+            [class.border-rose-700]="toast.type === 'error'"
+            [class.text-white]="toast.type === 'error'"
+            [class.bg-[#0B3558]]="toast.type === 'info'"
+            [class.border-[#1b4b73]]="toast.type === 'info'"
+            [class.text-white]="toast.type === 'info'"
             [class.bg-amber-900/95]="toast.type === 'warning'"
             [class.border-amber-500/50]="toast.type === 'warning'"
             [class.text-amber-50]="toast.type === 'warning'"
@@ -161,9 +164,9 @@ export interface StepMeta {
       }
 
       <!-- ====================================================================
-           3. Main Form Container (Single Unified White Background)
+           3. Main Form Container (Single Unified White Background, Optimized Height)
            ==================================================================== -->
-      <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 bg-white">
+      <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-white">
         
         <!-- Step 1 Container -->
         <div [class.hidden]="activeStep() !== 1">
@@ -195,15 +198,15 @@ export interface StepMeta {
       <!-- ====================================================================
            4. Sticky Bottom Action Bar (Neat Side-by-Side Previous & Next Buttons)
            ==================================================================== -->
-      <footer class="w-full bg-white border-t border-slate-200 py-3.5 px-4 sm:px-6 lg:px-8 sticky bottom-0 z-30 shadow-md">
+      <footer class="w-full bg-white border-t border-slate-200 py-2.5 px-4 sm:px-6 lg:px-8 sticky bottom-0 z-30 shadow-md">
         <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <!-- Step indicator / Auto-saved status -->
          
 
           <!-- Inline Error Message near Submit Button -->
           @if (submitErrorMessage()) {
-            <div class="text-xs text-[#0B3558] bg-blue-50/90 border border-blue-200/90 px-3.5 py-1.5 rounded-lg flex items-center gap-2 font-medium shadow-2xs animate-in fade-in duration-200 max-w-xl">
-              <svg class="w-4 h-4 text-[#0B3558] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="text-xs text-rose-700 bg-rose-50 border border-rose-300 px-3.5 py-1.5 rounded-lg flex items-center gap-2 font-medium shadow-2xs animate-in fade-in duration-200 max-w-xl">
+              <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>{{ submitErrorMessage() }}</span>
@@ -237,6 +240,18 @@ export interface StepMeta {
                 </svg>
               </button>
             } @else {
+              <button
+                type="button"
+                (click)="downloadOtrPdf()"
+                class="px-4 sm:px-5 py-2 rounded-lg border border-[#0483AC] text-[#0483AC] hover:bg-sky-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                title="Download complete details in tabular PDF"
+              >
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Download PDF</span>
+              </button>
+
               <button
                 type="button"
                 (click)="submitApplication()"
@@ -400,6 +415,7 @@ export class RegistrationShellComponent {
     const errors = this.validationService.getStepErrors(current, data);
 
     if (errors.length > 0) {
+      this.submitErrorMessage.set(`Please fill all required mandatory fields highlighted in red (${errors[0]}).`);
       this.validationService.showToast(errors[0], 'error', current);
       return;
     }
@@ -465,177 +481,436 @@ export class RegistrationShellComponent {
   downloadOtrPdf(): void {
     const regId = this.submittedRegId() || 'OTR-RSLDC-2026';
     const s1 = this.otrFormService.step1();
-    const s2 = this.otrFormService.step2(); // OIC
+    const s2 = this.otrFormService.step2(); // OIC list
     const s3 = this.otrFormService.step3(); // Auth person
-    const s4 = this.otrFormService.step4(); // Bank
+    const s4 = this.otrFormService.step4(); // Bank Details
 
-    const printWindow = window.open('', '_blank', 'width=900,height=800');
+    const printWindow = window.open('', '_blank', 'width=950,height=850');
     if (!printWindow) {
       window.print();
       return;
     }
 
-    const fyRows = (s1.financialYears || [])
-      .map(
-        (fy) =>
-          `<tr><td style="padding:6px 10px;border:1px solid #cbd5e1;">${fy.year}</td><td style="padding:6px 10px;border:1px solid #cbd5e1;">${fy.totalTurnover || '-'}</td><td style="padding:6px 10px;border:1px solid #cbd5e1;">${fy.skillTurnover || '-'}</td></tr>`
-      )
-      .join('');
+    const regAddress = `${s1.registeredAddress || ''}${s1.registeredDistrict ? ', ' + s1.registeredDistrict : ''}${s1.registeredState ? ', ' + s1.registeredState : ''}${s1.registeredPincode ? ' - ' + s1.registeredPincode : ''}`.trim() || '-';
+    const officeAddress = s1.sameAsRegistered
+      ? 'Same as Registered Office Address'
+      : (`${s1.officeAddress || ''}${s1.officeDistrict ? ', ' + s1.officeDistrict : ''}${s1.officeState ? ', ' + s1.officeState : ''}${s1.officePincode ? ' - ' + s1.officePincode : ''}`.trim() || '-');
 
-    const oicRows = (s2 || [])
-      .map(
-        (oic, idx) =>
-          `<div style="margin-bottom:8px;padding:8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;">
-            <strong>Officer #${idx + 1}: ${oic.name}</strong> (${oic.designation || 'OIC'})<br/>
-            <span style="color:#64748b;font-size:11px;">Mobile: ${oic.mobileNo} | Email: ${oic.emailId} | PAN: ${oic.pan} | Aadhaar: ${oic.aadhaarNo}</span>
-          </div>`
-      )
-      .join('');
+    const oicRows = (s2 && s2.length > 0)
+      ? s2.map((o, idx) => `
+        <tr>
+          <td style="text-align:center;font-weight:600;">${idx + 1}</td>
+          <td style="font-weight:700;">${o.name || '-'}</td>
+          <td>${o.designation || '-'}</td>
+          <td>${o.mobileNo || '-'}</td>
+          <td>${o.emailId || '-'}</td>
+          <td style="font-family:monospace;">${o.pan || '-'}</td>
+          <td style="font-family:monospace;">${o.aadhaarNo || '-'}</td>
+          <td>${idx === 0 ? 'Primary Nodal Officer' : 'Additional Officer'}</td>
+        </tr>
+      `).join('')
+      : '<tr><td colspan="8" style="text-align:center;color:#64748b;padding:8px;">No Officer Details Provided</td></tr>';
 
-    printWindow.document.write(`
+    const docs = [
+      { name: 'Certificate of Registration', doc: s1.registrationCertDoc },
+      { name: 'Company PAN Card', doc: s1.panCardDoc },
+      ...(s1.gstRegistered === 'Yes' ? [{ name: 'GST Registration Certificate', doc: s1.gstCertDoc }] : []),
+      ...(s1.msmeRegistered === 'Yes' ? [{ name: 'MSME Udyam Certificate', doc: s1.msmeCertDoc }] : []),
+      { name: 'Authorization Letter / Board Resolution', doc: s3.authorizationLetterDoc },
+      { name: 'Authorized Signatory Identity Proof', doc: s3.idProofDoc },
+      ...s2.map((o, i) => ({ name: `Officer #${i + 1} Appointment Letter (${o.name || 'OIC'})`, doc: o.appointmentLetterDoc })),
+      ...s2.map((o, i) => ({ name: `Officer #${i + 1} ID Proof (${o.name || 'OIC'})`, doc: o.idProofDoc })),
+      { name: 'Bank Cancelled Cheque / Passbook Copy', doc: s4.cancelledChequeDoc }
+    ];
+
+    const docRows = docs.map((d, idx) => {
+      const isUp = d.doc && d.doc.status === 'uploaded';
+      return `
+        <tr>
+          <td style="text-align:center;font-weight:600;">${idx + 1}</td>
+          <td style="font-weight:600;">${d.name}</td>
+          <td>${isUp ? d.doc!.fileName : '<span style="color:#94a3b8;">-</span>'}</td>
+          <td style="text-align:center;">${isUp ? d.doc!.fileSize : '<span style="color:#94a3b8;">-</span>'}</td>
+          <td style="text-align:center;font-weight:600;color:${isUp ? '#15803d' : '#94a3b8'};">
+            ${isUp ? 'Attached' : 'Not Attached'}
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    const printDate = new Date().toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const html = `
       <!DOCTYPE html>
-      <html>
+      <html lang="en">
         <head>
-          <title>OTR Registration Acknowledgement - ${regId}</title>
-          <link rel="preconnect" href="https://fonts.googleapis.com">
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+          <meta charset="utf-8">
+          <title>ISMS 2.0 - OTR Registration Details - ${regId}</title>
           <style>
-            * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
-            body { margin: 0; padding: 24px; background: #ffffff; color: #1e293b; font-size: 12px; line-height: 1.5; }
-            .receipt-container { max-width: 820px; margin: 0 auto; border: 1px solid #cbd5e1; }
-            .header { background: #0483AC; color: #ffffff; padding: 18px 24px; }
-            .state-title { color: #fef08a; font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
-            .system-title { color: #ffffff; font-size: 16px; font-weight: 700; margin-top: 4px; }
-            .sub-title { color: #e0f2fe; font-size: 11px; margin-top: 2px; }
-            .content { padding: 18px 24px; }
-            .ref-card { background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-            .ref-label { font-size: 11px; color: #166534; font-weight: 500; }
-            .ref-value { font-size: 16px; color: #166534; font-weight: 700; font-family: monospace; }
-            .section { margin-bottom: 14px; }
-            .section-header { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 6px 12px; font-size: 11px; font-weight: 700; color: #0f172a; text-transform: uppercase; }
-            .section-body { border: 1px solid #cbd5e1; border-top: none; padding: 12px; font-size: 11.5px; }
-            .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-            .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-            .lbl { color: #64748b; font-size: 10.5px; }
-            .val { font-weight: 600; color: #1e293b; }
-            table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; }
-            .footer-notes { font-size: 10px; color: #64748b; margin-top: 20px; border-top: 1px dashed #cbd5e1; padding-top: 10px; text-align: center; }
+            @page {
+              size: A4 portrait;
+              margin: 10mm 12mm;
+            }
+            * {
+              box-sizing: border-box;
+              font-family: Arial, Helvetica, sans-serif;
+            }
+            body {
+              margin: 0;
+              padding: 16px;
+              background: #ffffff;
+              color: #0f172a;
+              font-size: 11px;
+              line-height: 1.4;
+            }
+            .pdf-header {
+              border-bottom: 2px solid #0B3558;
+              padding-bottom: 8px;
+              margin-bottom: 12px;
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+            }
+            .gov-subhead {
+              font-size: 9.5px;
+              font-weight: 700;
+              color: #0483AC;
+              letter-spacing: 0.08em;
+              text-transform: uppercase;
+            }
+            .gov-mainhead {
+              font-size: 15px;
+              font-weight: 800;
+              color: #0B3558;
+              margin-top: 2px;
+            }
+            .gov-docname {
+              font-size: 11.5px;
+              font-weight: 700;
+              color: #334155;
+              margin-top: 3px;
+            }
+            .meta-block {
+              text-align: right;
+              font-size: 9.5px;
+              color: #64748b;
+            }
+            .sec-header {
+              background: #0B3558;
+              color: #ffffff;
+              font-size: 10.5px;
+              font-weight: 700;
+              padding: 5px 8px;
+              text-transform: uppercase;
+              letter-spacing: 0.04em;
+              margin-top: 12px;
+              border-radius: 3px 3px 0 0;
+            }
+            table.tbl {
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 10px;
+              border: 1px solid #cbd5e1;
+              margin-bottom: 4px;
+            }
+            table.tbl th {
+              background: #f1f5f9;
+              color: #0B3558;
+              font-weight: 700;
+              padding: 5px 6px;
+              text-align: left;
+              border: 1px solid #cbd5e1;
+            }
+            table.tbl td {
+              padding: 4.5px 6px;
+              border: 1px solid #cbd5e1;
+              vertical-align: top;
+            }
+            table.tbl td.lbl {
+              background: #f8fafc;
+              color: #475569;
+              font-weight: 600;
+              width: 22%;
+            }
+            table.tbl td.val {
+              color: #0f172a;
+              font-weight: 500;
+              width: 28%;
+            }
+            .declaration-card {
+              margin-top: 14px;
+              padding: 8px 10px;
+              background: #f8fafc;
+              border: 1px solid #cbd5e1;
+              border-radius: 4px;
+              page-break-inside: avoid;
+            }
+            .declaration-title {
+              font-weight: 700;
+              color: #0B3558;
+              font-size: 10px;
+              margin-bottom: 4px;
+              text-transform: uppercase;
+            }
+            .declaration-text {
+              font-size: 9.5px;
+              color: #334155;
+              line-height: 1.45;
+            }
+            .sign-row {
+              display: flex;
+              justify-content: space-between;
+              margin-top: 24px;
+              padding-top: 8px;
+              page-break-inside: avoid;
+            }
+            .sign-col {
+              text-align: center;
+              font-size: 9.5px;
+              color: #475569;
+              min-width: 180px;
+            }
+            .sign-line {
+              border-top: 1px solid #94a3b8;
+              margin-bottom: 4px;
+            }
             @media print {
               body { padding: 0; }
-              .receipt-container { border: none; }
             }
           </style>
         </head>
         <body>
-          <div class="receipt-container">
-            <div class="header">
-              <div class="state-title">GOVERNMENT OF RAJASTHAN • RSLDC</div>
-              <div class="system-title">INTEGRATED SCHEME MANAGEMENT SYSTEM (ISMS 2.0)</div>
-              <div class="sub-title">One Time Registration (OTR) Permanent Acknowledgement</div>
+          <div class="pdf-header">
+            <div>
+              <div class="gov-subhead">GOVERNMENT OF RAJASTHAN • RSLDC</div>
+              <div class="gov-mainhead">INTEGRATED SCHEME MANAGEMENT SYSTEM (ISMS 2.0)</div>
+              <div class="gov-docname">ONE TIME REGISTRATION (OTR) - APPLICATION DETAILS</div>
             </div>
-            <div class="content">
-              <div class="ref-card">
-                <div>
-                  <div class="ref-label">PERMANENT REGISTRATION REFERENCE NO.</div>
-                  <div class="ref-value">${regId}</div>
-                </div>
-                <div style="text-align:right;">
-                  <div class="ref-label">STATUS</div>
-                  <div style="color:#166534;font-weight:700;">SUBMITTED &amp; VERIFIED</div>
-                </div>
-              </div>
-
-              <!-- Step 1 -->
-              <div class="section">
-                <div class="section-header">Step 1 – Organization Details</div>
-                <div class="section-body">
-                  <div class="grid-3" style="margin-bottom:8px;">
-                    <div><span class="lbl">Entity Full Name:</span><br/><span class="val">${s1.fullName || '-'}</span></div>
-                    <div><span class="lbl">Entity Short Name:</span><br/><span class="val">${s1.shortName || '-'}</span></div>
-                    <div><span class="lbl">Nature of Entity:</span><br/><span class="val">${s1.natureOfEntity || '-'}</span></div>
-                  </div>
-                  <div class="grid-3" style="margin-bottom:8px;">
-                    <div><span class="lbl">Registration No.:</span><br/><span class="val">${s1.registrationNumber || '-'}</span></div>
-                    <div><span class="lbl">Date of Reg.:</span><br/><span class="val">${s1.dateOfRegistration || '-'}</span></div>
-                    <div><span class="lbl">State of Reg.:</span><br/><span class="val">${s1.stateOfLegalReg || '-'}</span></div>
-                  </div>
-                  <div class="grid-3" style="margin-bottom:8px;">
-                    <div><span class="lbl">Company PAN:</span><br/><span class="val">${s1.companyPan || '-'}</span></div>
-                    <div><span class="lbl">GSTIN:</span><br/><span class="val">${s1.gstRegistered === 'Yes' ? s1.gstin : 'Not Applicable'}</span></div>
-                    <div><span class="lbl">MSME / Udyam:</span><br/><span class="val">${s1.msmeRegistered === 'Yes' ? s1.udyamNumber : 'Not Applicable'}</span></div>
-                  </div>
-                  ${
-                    fyRows
-                      ? `
-                    <div style="margin-top:6px;">
-                      <span class="lbl" style="font-weight:600;">Financial Turnover Summary (₹ in Lacs):</span>
-                      <table>
-                        <thead><tr style="background:#f1f5f9;"><th style="padding:6px;border:1px solid #cbd5e1;text-align:left;">Financial Year</th><th style="padding:6px;border:1px solid #cbd5e1;text-align:left;">Total Turnover</th><th style="padding:6px;border:1px solid #cbd5e1;text-align:left;">Skill Turnover</th></tr></thead>
-                        <tbody>${fyRows}</tbody>
-                      </table>
-                    </div>
-                  `
-                      : ''
-                  }
-                  <div style="margin-top:8px;">
-                    <span class="lbl">Registered Office Address:</span><br/>
-                    <span class="val">${s1.registeredAddress || '-'}, ${s1.registeredDistrict || ''}, ${s1.registeredState || ''} - ${s1.registeredPincode || ''}</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Step 2 -->
-              <div class="section">
-                <div class="section-header">Step 2 – Authorized Person Details</div>
-                <div class="section-body">
-                  <div class="grid-3">
-                    <div><span class="lbl">Authorized Person Name:</span><br/><span class="val">${s3.name || '-'}</span></div>
-                    <div><span class="lbl">Designation:</span><br/><span class="val">${s3.designation || '-'}</span></div>
-                    <div><span class="lbl">Mobile No.:</span><br/><span class="val">${s3.mobileNo || '-'}</span></div>
-                    <div><span class="lbl">Email ID:</span><br/><span class="val">${s3.emailId || '-'}</span></div>
-                    <div><span class="lbl">PAN:</span><br/><span class="val">${s3.pan || '-'}</span></div>
-                    <div><span class="lbl">Aadhaar No.:</span><br/><span class="val">${s3.aadhaarNo || '-'}</span></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Step 3 -->
-              <div class="section">
-                <div class="section-header">Step 3 – Officer(s) In-Charge (${s2.length})</div>
-                <div class="section-body">
-                  ${oicRows}
-                </div>
-              </div>
-
-              <!-- Step 4 -->
-              <div class="section">
-                <div class="section-header">Step 4 – Bank Account Particulars</div>
-                <div class="section-body">
-                  <div class="grid-3">
-                    <div><span class="lbl">Bank Name:</span><br/><span class="val">${s4.bankName || '-'}</span></div>
-                    <div><span class="lbl">Branch Name:</span><br/><span class="val">${s4.branchName || '-'}</span></div>
-                    <div><span class="lbl">Account Type:</span><br/><span class="val">${s4.accountType || '-'}</span></div>
-                    <div><span class="lbl">Account Holder:</span><br/><span class="val">${s4.accountHolderName || '-'}</span></div>
-                    <div><span class="lbl">Account Number:</span><br/><span class="val">${s4.accountNo || '-'}</span></div>
-                    <div><span class="lbl">IFSC Code:</span><br/><span class="val">${s4.ifscCode || '-'}</span></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="footer-notes">
-                This is a computer-generated permanent registration acknowledgment under ISMS 2.0 (RSLDC, Government of Rajasthan).<br/>
-                For verification, reference ID: <strong>${regId}</strong> | Generated on: ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-              </div>
+            <div class="meta-block">
+              <div><strong>Registration Ref:</strong> ${regId}</div>
+              <div><strong>Generated Date:</strong> ${printDate}</div>
             </div>
           </div>
-          <script>
-            window.onload = function() { window.print(); };
-          </script>
+
+          <!-- 1. Organization & Legal Particulars Table -->
+          <div class="sec-header">1. Organization &amp; Legal Particulars</div>
+          <table class="tbl">
+            <tr>
+              <td class="lbl">TP/PIA Full Name:</td>
+              <td class="val" colspan="3" style="font-weight:700;">${s1.fullName || '-'}</td>
+            </tr>
+            <tr>
+              <td class="lbl">TP/PIA Short Name:</td>
+              <td class="val">${s1.shortName || '-'}</td>
+              <td class="lbl">Nature of Entity:</td>
+              <td class="val">${s1.natureOfEntity || '-'}</td>
+            </tr>
+            <tr>
+              <td class="lbl">Registration Number:</td>
+              <td class="val" style="font-family:monospace;">${s1.registrationNumber || '-'}</td>
+              <td class="lbl">Date of Registration:</td>
+              <td class="val">${s1.dateOfRegistration || '-'}</td>
+            </tr>
+            <tr>
+              <td class="lbl">State of Legal Reg.:</td>
+              <td class="val">${s1.stateOfLegalReg || '-'}</td>
+              <td class="lbl">Company PAN:</td>
+              <td class="val" style="font-family:monospace;font-weight:700;">${s1.companyPan || '-'}</td>
+            </tr>
+            <tr>
+              <td class="lbl">GST Registered:</td>
+              <td class="val">${s1.gstRegistered} ${s1.gstRegistered === 'Yes' ? '(' + (s1.gstin || '-') + ')' : ''}</td>
+              <td class="lbl">MSME Registered:</td>
+              <td class="val">${s1.msmeRegistered} ${s1.msmeRegistered === 'Yes' ? '(' + (s1.udyamNumber || '-') + ')' : ''}</td>
+            </tr>
+            <tr>
+              <td class="lbl">NSDC Partner Status:</td>
+              <td class="val">${s1.nsdcPartner || 'Not Applicable'}</td>
+              <td class="lbl">Blacklisted by Govt/PSU:</td>
+              <td class="val">${s1.blackListed}</td>
+            </tr>
+            <tr>
+              <td class="lbl">Official Contact No.:</td>
+              <td class="val">${s1.contactNo || '-'}</td>
+              <td class="lbl">Official Email ID:</td>
+              <td class="val">${s1.emailId || '-'}</td>
+            </tr>
+            <tr>
+              <td class="lbl">Official Website:</td>
+              <td class="val" colspan="3">${s1.website || '-'}</td>
+            </tr>
+          </table>
+
+          <!-- 2. Address Particulars Table -->
+          <div class="sec-header">2. Official Address Details</div>
+          <table class="tbl">
+            <tr>
+              <td class="lbl" style="width:25%;">Registered Office Address:</td>
+              <td class="val" style="width:75%;">${regAddress}</td>
+            </tr>
+            <tr>
+              <td class="lbl" style="width:25%;">Corporate / Branch Address:</td>
+              <td class="val" style="width:75%;">${officeAddress}</td>
+            </tr>
+          </table>
+
+          <!-- 3. Authorized Person Details Table -->
+          <div class="sec-header">3. Authorized Signatory Particulars</div>
+          <table class="tbl">
+            <tr>
+              <td class="lbl">Full Name:</td>
+              <td class="val" style="font-weight:700;">${s3.name || '-'}</td>
+              <td class="lbl">Designation:</td>
+              <td class="val">${s3.designation || '-'}</td>
+            </tr>
+            <tr>
+              <td class="lbl">Date of Birth:</td>
+              <td class="val">${s3.dob || '-'}</td>
+              <td class="lbl">Age:</td>
+              <td class="val">${s3.age || '-'} Years</td>
+            </tr>
+            <tr>
+              <td class="lbl">Mobile Number:</td>
+              <td class="val">${s3.mobileNo || '-'}</td>
+              <td class="lbl">Email Address:</td>
+              <td class="val">${s3.emailId || '-'}</td>
+            </tr>
+            <tr>
+              <td class="lbl">PAN:</td>
+              <td class="val" style="font-family:monospace;font-weight:700;">${s3.pan || '-'}</td>
+              <td class="lbl">Aadhaar Number:</td>
+              <td class="val" style="font-family:monospace;">${s3.aadhaarNo || '-'}</td>
+            </tr>
+            <tr>
+              <td class="lbl">Bhamashah Number:</td>
+              <td class="val">${s3.bhamashahNo || '-'}</td>
+              <td class="lbl">Voter ID Number:</td>
+              <td class="val">${s3.voterIdNo || '-'}</td>
+            </tr>
+            <tr>
+              <td class="lbl">Passport Number:</td>
+              <td class="val">${s3.passportNo || '-'}</td>
+              <td class="lbl">Domicile / State:</td>
+              <td class="val">${s3.state || '-'}</td>
+            </tr>
+            <tr>
+              <td class="lbl">Residence Address:</td>
+              <td class="val" colspan="3">${s3.residenceAddress || '-'}</td>
+            </tr>
+          </table>
+
+          <!-- 4. Officer(s) In-Charge Table -->
+          <div class="sec-header">4. Officer(s) In-Charge Details</div>
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:25px;text-align:center;">#</th>
+                <th>Officer Name</th>
+                <th>Designation</th>
+                <th>Mobile No.</th>
+                <th>Email ID</th>
+                <th>PAN</th>
+                <th>Aadhaar No.</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${oicRows}
+            </tbody>
+          </table>
+
+          <!-- 5. Bank Account Details Table -->
+          <div class="sec-header">5. Bank Account &amp; Settlement Details</div>
+          <table class="tbl">
+            <tr>
+              <td class="lbl">Name of the Bank:</td>
+              <td class="val" style="font-weight:700;">${s4.bankName || '-'}</td>
+              <td class="lbl">Branch Name:</td>
+              <td class="val">${s4.branchName || '-'}</td>
+            </tr>
+            <tr>
+              <td class="lbl">Account Holder Name:</td>
+              <td class="val" style="font-weight:600;">${s4.accountHolderName || '-'}</td>
+              <td class="lbl">Account Number:</td>
+              <td class="val" style="font-family:monospace;font-weight:700;">${s4.accountNo || '-'}</td>
+            </tr>
+            <tr>
+              <td class="lbl">Account Type:</td>
+              <td class="val">${s4.accountType || '-'}</td>
+              <td class="lbl">Transfer Mode:</td>
+              <td class="val">${s4.transferMode || '-'}</td>
+            </tr>
+            <tr>
+              <td class="lbl">IFSC Code:</td>
+              <td class="val" style="font-family:monospace;font-weight:700;">${s4.ifscCode || '-'}</td>
+              <td class="lbl">MICR Code:</td>
+              <td class="val" style="font-family:monospace;">${s4.micrCode || '-'}</td>
+            </tr>
+            <tr>
+              <td class="lbl">Branch Address:</td>
+              <td class="val" colspan="3">${s4.branchAddress || '-'}</td>
+            </tr>
+          </table>
+
+          <!-- 6. Uploaded Documents Verification Checklist Table -->
+          <div class="sec-header">6. Attached Verification Documents Checklist</div>
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:25px;text-align:center;">#</th>
+                <th>Document Description</th>
+                <th>Uploaded File Name</th>
+                <th style="width:75px;text-align:center;">File Size</th>
+                <th style="width:90px;text-align:center;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${docRows}
+            </tbody>
+          </table>
+
+          <!-- Statutory Declaration -->
+          <div class="declaration-card">
+            <div class="declaration-title">Solemn Declaration &amp; Affirmation</div>
+            <div class="declaration-text">
+              I hereby solemnly declare and affirm that all the particulars and documents provided above are true, complete, and correct to the best of my knowledge and belief. I acknowledge that any false or misleading statement will render my application liable for rejection.
+            </div>
+          </div>
+
+          <!-- Signature Block -->
+          <div class="sign-row">
+            <div class="sign-col" style="text-align:left;">
+              <div>Date: ${printDate}</div>
+              <div>Place: _____________________</div>
+            </div>
+            <div class="sign-col">
+              <div style="height:35px;"></div>
+              <div class="sign-line"></div>
+              <div><strong>Signature of Authorized Signatory</strong></div>
+              <div>(Name: ${s3.name || 'Authorized Signatory'})</div>
+            </div>
+            <div class="sign-col">
+              <div style="height:35px;"></div>
+              <div class="sign-line"></div>
+              <div><strong>Seal of the Organization</strong></div>
+            </div>
+          </div>
         </body>
       </html>
-    `);
+    `;
+
+    printWindow.document.write(html);
     printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+    }, 300);
   }
 
   navigateToHome(): void {

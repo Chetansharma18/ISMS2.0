@@ -21,7 +21,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
     <section #sectionRef class="py-8 sm:py-12 bg-white border-b border-slate-100">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         
-        <h2 class="text-3xl sm:text-4xl md:text-5xl !font-black text-[#0B3558] mb-6 sm:mb-8 tracking-tight font-sans" style="color: var(--color-primary, #174A6E); font-family: var(--font-family-base, 'Inter', sans-serif);">
+        <h2 class="landing-section-title text-2xl sm:text-3xl lg:text-[32px] font-bold text-[#0B3558] mb-6 sm:mb-8 tracking-tight font-sans" style="color: var(--color-primary, #174A6E); font-family: var(--font-family-base, 'Inter', sans-serif);">
           About ISMS 2.0
         </h2>
         
@@ -31,7 +31,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
           <div class="lg:col-span-7 flex flex-col justify-start pt-1">
 
             <!-- Core Content -->
-            <div class="space-y-4 text-sm sm:text-base text-slate-700 leading-relaxed sm:leading-[1.75] text-justify hyphens-auto">
+            <div class="landing-body-text space-y-4 text-sm sm:text-base text-slate-700 leading-relaxed sm:leading-[1.7] text-left">
               <p>
                 Integrated Scheme Management System (ISMS 2.0) is a comprehensive
                 e-Governance and Management Information System (MIS) designed to digitally transform, 

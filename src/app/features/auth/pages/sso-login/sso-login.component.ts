@@ -261,12 +261,20 @@ export class SsoLoginComponent {
       // Authenticate user session
       this.authService.loginWithCredentials(identifier, role, null);
 
+      // Reset the dismissed flag upon fresh login so the OTR prompt triggers
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.removeItem('isms_otr_prompt_dismissed');
+      }
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('isms_eoi_prompt_shown_new_user');
+      }
+
       if (role === 'dept_admin') {
         // Department Admin navigates directly to EOI Requests desk
         this.router.navigate(['/admin/eoi-view']);
       } else {
-        // Directly show tenders
-        this.router.navigate(['/tenders']);
+        // Directly show tenders with fromLogin query param
+        this.router.navigate(['/tenders'], { queryParams: { fromLogin: 'true' } });
       }
     }, 600);
   }

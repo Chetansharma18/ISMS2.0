@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OtrFormService } from '../../services/otr-form.service';
@@ -9,14 +9,13 @@ import {
   DISTRICTS_BY_STATE,
   NSDC_PARTNER_TYPES,
   FileDoc,
-  FinancialYearEntry
+  REGEX
 } from '../../models/otr-form.model';
 
 import { FormInputComponent } from '../../../../shared/components/form-controls/form-input/form-input.component';
 import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
 import { FormTextareaComponent } from '../../../../shared/components/form-controls/form-textarea/form-textarea.component';
 import { FormFileUploadComponent } from '../../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
-import { FormSectionComponent } from '../../../../shared/components/form-controls/form-section/form-section.component';
 
 @Component({
   selector: 'app-step1-org-details',
@@ -27,15 +26,15 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
     FormInputComponent,
     FormSelectComponent,
     FormTextareaComponent,
-    FormFileUploadComponent,
-    FormSectionComponent
+    FormFileUploadComponent
   ],
   template: `
-    <div class="w-full space-y-4">
-
-      <!-- Section 1.1: Organization Details -->
-      <app-form-section>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+    <div class="w-full space-y-3 font-sans">
+      
+      <!-- Organization, Compliance & Contact Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-3.5 gap-y-2.5">
+        <!-- Short Name -> 3 cols -->
+        <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
             label="TP/PIA Short Name"
             [value]="data().shortName"
@@ -43,8 +42,12 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
             placeholder="e.g. RSLDC-SKILLS"
             [required]="true"
             [maxLength]="50"
+            [error]="getFieldError('shortName')"
           ></app-form-input>
+        </div>
 
+        <!-- Full Corporate Name -> 6 cols -->
+        <div class="lg:col-span-6 sm:col-span-1">
           <app-form-input
             label="TP/PIA Full Name"
             [value]="data().fullName"
@@ -52,57 +55,74 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
             placeholder="e.g. Rajasthan Skill Development Solutions Pvt Ltd"
             [required]="true"
             [maxLength]="200"
+            [error]="getFieldError('fullName')"
           ></app-form-input>
+        </div>
 
+        <!-- Nature of Entity -> 3 cols -->
+        <div class="lg:col-span-3 sm:col-span-1">
           <app-form-select
             label="Nature of Entity"
             [value]="data().natureOfEntity"
             (valueChange)="update('natureOfEntity', $event)"
             [options]="natureOfEntitiesList"
-            placeholder="Select Nature of Entity"
+            placeholder="Select Nature"
             [required]="true"
+            [error]="getFieldError('natureOfEntity')"
           ></app-form-select>
+        </div>
 
+        <!-- Registration Number -> 4 cols -->
+        <div class="lg:col-span-4 sm:col-span-1">
           <app-form-input
-            label="Registration Number of Entity (CIN / Registration No. / Other)"
+            label="Registration No. (CIN / Reg No.)"
             [value]="data().registrationNumber"
             (valueChange)="update('registrationNumber', $event)"
             placeholder="e.g. U74999RJ2010PTC032456"
             [required]="true"
             [uppercase]="true"
             [maxLength]="50"
+            [error]="getFieldError('registrationNumber')"
           ></app-form-input>
+        </div>
 
+        <!-- Date of Registration -> 3 cols -->
+        <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
-            label="Date of Registration as Legal Entity"
+            label="Date of Registration"
             type="date"
             [value]="data().dateOfRegistration"
             (valueChange)="update('dateOfRegistration', $event)"
             [required]="true"
+            [error]="getFieldError('dateOfRegistration')"
           ></app-form-input>
+        </div>
 
+        <!-- State/UT of Legal Registration -> 5 cols -->
+        <div class="lg:col-span-5 sm:col-span-1">
           <app-form-select
-            label="State/UT of Legal Registration"
+            label="State/UT of Registration"
             [value]="data().stateOfLegalReg"
             (valueChange)="update('stateOfLegalReg', $event)"
             [options]="statesList"
             [required]="true"
+            [error]="getFieldError('stateOfLegalReg')"
           ></app-form-select>
-
-          <div class="md:col-span-2">
-            <app-form-file-upload
-              label="Certificate of Registration / Incorporation"
-              [fileDoc]="data().registrationCertDoc"
-              (fileChange)="updateDoc('registrationCertDoc', $event)"
-              [required]="true"
-            ></app-form-file-upload>
-          </div>
         </div>
-      </app-form-section>
 
-      <!-- Section 1.2: Statutory Compliance Details -->
-      <app-form-section>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+        <!-- Certificate of Incorporation Upload -> 12 cols -->
+        <div class="lg:col-span-12 sm:col-span-2">
+          <app-form-file-upload
+            label="Certificate of Registration / Incorporation"
+            [fileDoc]="data().registrationCertDoc"
+            (fileChange)="updateDoc('registrationCertDoc', $event)"
+            [required]="true"
+            [error]="getFieldError('registrationCertDoc')"
+          ></app-form-file-upload>
+        </div>
+
+        <!-- Company PAN -> 3 cols -->
+        <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
             label="Company PAN"
             [value]="data().companyPan"
@@ -111,24 +131,48 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
             [required]="true"
             [uppercase]="true"
             [maxLength]="10"
+            [error]="getFieldError('companyPan')"
           ></app-form-input>
+        </div>
 
+        <!-- Organization PAN Card Upload -> 5 cols -->
+        <div class="lg:col-span-5 sm:col-span-1">
           <app-form-file-upload
             label="Organization PAN Card"
             [fileDoc]="data().panCardDoc"
             (fileChange)="updateDoc('panCardDoc', $event)"
             [required]="true"
+            [error]="getFieldError('panCardDoc')"
           ></app-form-file-upload>
+        </div>
 
+        <!-- GST Registered -> 2 cols -->
+        <div class="lg:col-span-2 sm:col-span-1">
           <app-form-select
             label="GST Registered"
             [value]="data().gstRegistered"
             (valueChange)="onGstRegisteredChange($event)"
             [options]="['Yes', 'No']"
             [required]="true"
+            [error]="getFieldError('gstRegistered')"
           ></app-form-select>
+        </div>
 
-          @if (data().gstRegistered === 'Yes') {
+        <!-- MSME Registered -> 2 cols -->
+        <div class="lg:col-span-2 sm:col-span-1">
+          <app-form-select
+            label="MSME Registered"
+            [value]="data().msmeRegistered"
+            (valueChange)="onMsmeRegisteredChange($event)"
+            [options]="['Yes', 'No']"
+            [required]="true"
+            [error]="getFieldError('msmeRegistered')"
+          ></app-form-select>
+        </div>
+
+        <!-- Conditional: GST Details -->
+        @if (data().gstRegistered === 'Yes') {
+          <div class="lg:col-span-4 sm:col-span-1">
             <app-form-input
               label="GSTIN"
               [value]="data().gstin"
@@ -137,27 +181,24 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
               [required]="true"
               [uppercase]="true"
               [maxLength]="15"
+              [error]="getFieldError('gstin')"
             ></app-form-input>
+          </div>
 
-            <div class="md:col-span-2">
-              <app-form-file-upload
-                label="GST Registration Certificate"
-                [fileDoc]="data().gstCertDoc"
-                (fileChange)="updateDoc('gstCertDoc', $event)"
-                [required]="true"
-              ></app-form-file-upload>
-            </div>
-          }
+          <div class="lg:col-span-8 sm:col-span-1">
+            <app-form-file-upload
+              label="GST Registration Certificate"
+              [fileDoc]="data().gstCertDoc"
+              (fileChange)="updateDoc('gstCertDoc', $event)"
+              [required]="true"
+              [error]="getFieldError('gstCertDoc')"
+            ></app-form-file-upload>
+          </div>
+        }
 
-          <app-form-select
-            label="MSME Registered"
-            [value]="data().msmeRegistered"
-            (valueChange)="onMsmeRegisteredChange($event)"
-            [options]="['Yes', 'No']"
-            [required]="true"
-          ></app-form-select>
-
-          @if (data().msmeRegistered === 'Yes') {
+        <!-- Conditional: MSME Details -->
+        @if (data().msmeRegistered === 'Yes') {
+          <div class="lg:col-span-4 sm:col-span-1">
             <app-form-input
               label="Udyam Number"
               [value]="data().udyamNumber"
@@ -166,158 +207,23 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
               [required]="true"
               [uppercase]="true"
               [maxLength]="19"
+              [error]="getFieldError('udyamNumber')"
             ></app-form-input>
+          </div>
 
-            <div class="md:col-span-2">
-              <app-form-file-upload
-                label="MSME / Udyam Registration Certificate"
-                [fileDoc]="data().msmeCertDoc"
-                (fileChange)="updateDoc('msmeCertDoc', $event)"
-                [required]="true"
-              ></app-form-file-upload>
-            </div>
-          }
-        </div>
-      </app-form-section>
+          <div class="lg:col-span-8 sm:col-span-1">
+            <app-form-file-upload
+              label="MSME / Udyam Registration Certificate"
+              [fileDoc]="data().msmeCertDoc"
+              (fileChange)="updateDoc('msmeCertDoc', $event)"
+              [required]="true"
+              [error]="getFieldError('msmeCertDoc')"
+            ></app-form-file-upload>
+          </div>
+        }
 
-      <!-- Section 1.3: Financial Details -->
-      <app-form-section>
-        <p class="text-xs font-bold text-slate-800 mb-3">
-          Enter the total turnover and skill-specific turnover for the last 3 financial years (in Indian Rupees, in Lacs).
-        </p>
-
-        <!-- Financial Year Rows Table -->
-        <div class="border border-slate-200 rounded-lg overflow-hidden mb-3">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-[#F4F7FB] text-slate-700 text-[11px] font-semibold border-b border-slate-200">
-                <th class="py-2.5 px-3 w-10 text-center border-r border-slate-200">#</th>
-                <th class="py-2.5 px-3 w-52 border-r border-slate-200">Financial Year</th>
-                <th class="py-2.5 px-3 border-r border-slate-200">
-                  Total Turnover <span class="font-normal text-slate-400">(₹ in Lacs)</span>
-                </th>
-                <th class="py-2.5 px-3 border-r border-slate-200">
-                  Skill Turnover <span class="font-normal text-slate-400">(₹ in Lacs)</span>
-                </th>
-                <th class="py-2.5 px-3 w-16 text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-              @for (fy of data().financialYears; track fy.year; let i = $index) {
-                <tr class="bg-white hover:bg-slate-50/50 transition-colors">
-                  <td class="py-2.5 px-3 text-center text-slate-500 text-xs border-r border-slate-100">{{ i + 1 }}</td>
-                  <!-- Financial Year Dropdown -->
-                  <td class="py-2.5 px-3 border-r border-slate-100">
-                    <div class="relative">
-                      <select
-                        [value]="fy.year"
-                        (change)="updateFyYear(i, $any($event.target).value)"
-                        class="w-full h-[36px] appearance-none pl-3 pr-8 text-xs font-medium border border-[#D9E1E7] rounded-[4px] text-slate-800 bg-white focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] cursor-pointer"
-                      >
-                        @for (yr of availableYears; track yr) {
-                          <option [value]="yr" [selected]="fy.year === yr">{{ yr }}</option>
-                        }
-                      </select>
-                      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-[#7A8792]">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </td>
-                  <!-- Total Turnover -->
-                  <td class="py-2.5 px-3 border-r border-slate-100">
-                    <div class="relative">
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        [value]="fy.totalTurnover"
-                        (input)="updateFyField(i, 'totalTurnover', $any($event.target).value)"
-                        placeholder="e.g. 150.00"
-                        class="w-full h-[36px] px-3 text-xs border border-[#D9E1E7] rounded-[4px] text-slate-800 bg-white focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
-                      />
-                    </div>
-                  </td>
-                  <!-- Skill Turnover -->
-                  <td class="py-2.5 px-3 border-r border-slate-100">
-                    <div class="relative">
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        [value]="fy.skillTurnover"
-                        (input)="updateFyField(i, 'skillTurnover', $any($event.target).value)"
-                        placeholder="e.g. 60.00"
-                        class="w-full h-[36px] px-3 text-xs border border-[#D9E1E7] rounded-[4px] text-slate-800 bg-white focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
-                      />
-                    </div>
-                  </td>
-                  <!-- Delete Row -->
-                  <td class="py-2.5 px-3 text-center">
-                    @if (data().financialYears.length > 1) {
-                      <button
-                        type="button"
-                        (click)="removeFyRow(i)"
-                        title="Remove this year"
-                        class="text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-1.5 rounded transition-colors cursor-pointer"
-                      >
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    }
-                  </td>
-                </tr>
-              }
-              <!-- 3-Year Average Row -->
-              @if (data().financialYears.length > 0) {
-                <tr class="bg-slate-50 border-t-2 border-slate-200">
-                  <td class="py-2.5 px-3 border-r border-slate-100"></td>
-                  <td class="py-2.5 px-3 text-xs font-semibold text-slate-700 border-r border-slate-100">
-                    3-Year Average
-                  </td>
-                  <td class="py-2.5 px-3 text-xs font-semibold text-[#174A6E] border-r border-slate-100">
-                    ₹ {{ avgTotalTurnover() }} Lacs
-                  </td>
-                  <td class="py-2.5 px-3 text-xs font-semibold text-[#174A6E] border-r border-slate-100">
-                    ₹ {{ avgSkillTurnover() }} Lacs
-                  </td>
-                  <td class="py-2.5 px-3"></td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Add Row Button -->
-        <div class="flex items-center gap-3">
-          <button
-            type="button"
-            (click)="addFyRow()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#174A6E] border border-[#174A6E]/40 rounded-md hover:bg-[#174A6E]/5 transition-colors cursor-pointer"
-          >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-            </svg>
-            Add Financial Year
-          </button>
-        </div>
-
-        <!-- Turnover Certificate Upload -->
-        <div class="mt-4">
-          <app-form-file-upload
-            label="CA-Certified Turnover Certificate"
-            [fileDoc]="data().turnoverCertDoc"
-            (fileChange)="updateDoc('turnoverCertDoc', $event)"
-            [required]="true"
-          ></app-form-file-upload>
-        </div>
-      </app-form-section>
-
-      <!-- Section 1.4: Governance & Contact Profile -->
-      <app-form-section>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-3">
+        <!-- Contact Profile Fields -->
+        <div class="lg:col-span-3 sm:col-span-1">
           <app-form-select
             label="NSDC Partner"
             [value]="data().nsdcPartner"
@@ -325,7 +231,9 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
             [options]="nsdcPartnersList"
             [required]="false"
           ></app-form-select>
+        </div>
 
+        <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
             label="Company Contact No."
             type="tel"
@@ -334,8 +242,11 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
             placeholder="e.g. 9829012345"
             [required]="true"
             [maxLength]="15"
+            [error]="getFieldError('contactNo')"
           ></app-form-input>
+        </div>
 
+        <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
             label="Company Email-ID"
             type="email"
@@ -343,8 +254,11 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
             (valueChange)="update('emailId', $event)"
             placeholder="e.g. info@organisation.com"
             [required]="true"
+            [error]="getFieldError('emailId')"
           ></app-form-input>
+        </div>
 
+        <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
             label="Website"
             [value]="data().website"
@@ -352,34 +266,36 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
             placeholder="e.g. https://www.organisation.com"
           ></app-form-input>
         </div>
-      </app-form-section>
+      </div>
 
-      <!-- Section 1.4: Addresses -->
-      <app-form-section>
-        <div class="space-y-4">
-          
-          <!-- Registered Address Block -->
-          <div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-3">
-              <div class="sm:col-span-3">
-                <app-form-textarea
-                  label="Registered Address"
-                  [value]="data().registeredAddress"
-                  (valueChange)="update('registeredAddress', $event)"
-                  placeholder="Street, locality, building name and number"
-                  [required]="true"
-                  [rows]="2"
-                ></app-form-textarea>
-              </div>
+      <!-- Address Details (Direct screen, no sub-heading) -->
+      <div class="pt-2.5 border-t border-slate-200/80 space-y-2.5">
+        <!-- Registered Address Block -->
+        <div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-3.5 gap-y-2.5">
+            <div class="lg:col-span-6 sm:col-span-2">
+              <app-form-textarea
+                label="Registered Address"
+                [value]="data().registeredAddress"
+                (valueChange)="update('registeredAddress', $event)"
+                placeholder="Street, locality, building name and number"
+                [required]="true"
+                [error]="getFieldError('registeredAddress')"
+              ></app-form-textarea>
+            </div>
 
+            <div class="lg:col-span-2 sm:col-span-1">
               <app-form-select
                 label="State / UT"
                 [value]="data().registeredState"
                 (valueChange)="onRegisteredStateChange($event)"
                 [options]="statesList"
                 [required]="true"
+                [error]="getFieldError('registeredState')"
               ></app-form-select>
+            </div>
 
+            <div class="lg:col-span-2 sm:col-span-1">
               <app-form-select
                 label="District"
                 [value]="data().registeredDistrict"
@@ -387,8 +303,11 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
                 [options]="registeredDistricts()"
                 [disabled]="!data().registeredState"
                 [required]="true"
+                [error]="getFieldError('registeredDistrict')"
               ></app-form-select>
+            </div>
 
+            <div class="lg:col-span-2 sm:col-span-1">
               <app-form-input
                 label="PIN Code"
                 type="tel"
@@ -397,46 +316,52 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
                 placeholder="e.g. 302001"
                 [required]="true"
                 [maxLength]="6"
+                [error]="getFieldError('registeredPincode')"
               ></app-form-input>
             </div>
           </div>
+        </div>
 
-          <!-- Same As Registered Checkbox -->
-          <div class="pt-2 border-t border-slate-100">
-            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                [ngModel]="data().sameAsRegistered"
-                (ngModelChange)="toggleSameAsRegistered($event)"
-                class="w-4 h-4 text-slate-800 border-slate-300 rounded focus:ring-slate-700 accent-slate-800"
-              />
-              <span>Office Address is the same as Registered Address</span>
-            </label>
-          </div>
+        <!-- Same As Registered Checkbox -->
+        <div class="pt-1 border-t border-slate-100">
+          <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              [ngModel]="data().sameAsRegistered"
+              (ngModelChange)="toggleSameAsRegistered($event)"
+              class="w-4 h-4 text-[#0B3558] border-slate-300 rounded focus:ring-[#0B3558] accent-[#0B3558]"
+            />
+            <span>Office Address is the same as Registered Address</span>
+          </label>
+        </div>
 
-          <!-- Office Address Block (if different) -->
-          @if (!data().sameAsRegistered) {
-            <div>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-3">
-                <div class="sm:col-span-3">
-                  <app-form-textarea
-                    label="Office Address"
-                    [value]="data().officeAddress"
-                    (valueChange)="update('officeAddress', $event)"
-                    placeholder="Street, locality, building name and number"
-                    [required]="true"
-                    [rows]="2"
-                  ></app-form-textarea>
-                </div>
+        <!-- Office Address Block (if different) -->
+        @if (!data().sameAsRegistered) {
+          <div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-3.5 gap-y-2.5">
+              <div class="lg:col-span-6 sm:col-span-2">
+                <app-form-textarea
+                  label="Office Address"
+                  [value]="data().officeAddress"
+                  (valueChange)="update('officeAddress', $event)"
+                  placeholder="Street, locality, building name and number"
+                  [required]="true"
+                  [error]="getFieldError('officeAddress')"
+                ></app-form-textarea>
+              </div>
 
+              <div class="lg:col-span-2 sm:col-span-1">
                 <app-form-select
                   label="State / UT"
                   [value]="data().officeState"
                   (valueChange)="onOfficeStateChange($event)"
                   [options]="statesList"
                   [required]="true"
+                  [error]="getFieldError('officeState')"
                 ></app-form-select>
+              </div>
 
+              <div class="lg:col-span-2 sm:col-span-1">
                 <app-form-select
                   label="District"
                   [value]="data().officeDistrict"
@@ -444,8 +369,11 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
                   [options]="officeDistricts()"
                   [disabled]="!data().officeState"
                   [required]="true"
+                  [error]="getFieldError('officeDistrict')"
                 ></app-form-select>
+              </div>
 
+              <div class="lg:col-span-2 sm:col-span-1">
                 <app-form-input
                   label="PIN Code"
                   type="tel"
@@ -454,13 +382,13 @@ import { FormSectionComponent } from '../../../../shared/components/form-control
                   placeholder="e.g. 302001"
                   [required]="true"
                   [maxLength]="6"
+                  [error]="getFieldError('officePincode')"
                 ></app-form-input>
               </div>
             </div>
-          }
-
-        </div>
-      </app-form-section>
+          </div>
+        }
+      </div>
 
     </div>
   `
@@ -474,34 +402,7 @@ export class Step1OrgDetailsComponent {
   readonly nsdcPartnersList = NSDC_PARTNER_TYPES;
 
   readonly data = computed(() => this.otrFormService.step1());
-
-  /** Last 6 financial years available for selection */
-  readonly availableYears: string[] = this._buildYearOptions();
-
-  private _buildYearOptions(): string[] {
-    const currentYear = new Date().getFullYear();
-    const years: string[] = [];
-    for (let y = currentYear; y >= currentYear - 5; y--) {
-      years.push(`${y - 1}-${String(y).slice(2)}`);
-    }
-    return years;
-  }
-
-  /** Computed 3-year average for Total Turnover */
-  readonly avgTotalTurnover = computed(() => {
-    const rows = this.data().financialYears;
-    if (!rows.length) return '0.00';
-    const sum = rows.reduce((acc, r) => acc + (parseFloat(r.totalTurnover) || 0), 0);
-    return (sum / rows.length).toFixed(2);
-  });
-
-  /** Computed 3-year average for Skill Turnover */
-  readonly avgSkillTurnover = computed(() => {
-    const rows = this.data().financialYears;
-    if (!rows.length) return '0.00';
-    const sum = rows.reduce((acc, r) => acc + (parseFloat(r.skillTurnover) || 0), 0);
-    return (sum / rows.length).toFixed(2);
-  });
+  readonly isSubmitted = computed(() => this.validationService.submittedSteps().has(1));
 
   readonly registeredDistricts = computed(() => {
     const state = this.data().registeredState;
@@ -513,42 +414,111 @@ export class Step1OrgDetailsComponent {
     return state && DISTRICTS_BY_STATE[state] ? DISTRICTS_BY_STATE[state] : [];
   });
 
+  getFieldError(field: string): string | undefined {
+    if (!this.isSubmitted()) return undefined;
+    const d = this.data();
+    switch (field) {
+      case 'shortName':
+        if (!d.shortName?.trim()) return 'TP/PIA Short Name is required';
+        return undefined;
+      case 'fullName':
+        if (!d.fullName?.trim()) return 'TP/PIA Full Legal Name is required';
+        return undefined;
+      case 'natureOfEntity':
+        if (!d.natureOfEntity?.trim()) return 'Nature of Entity is required';
+        return undefined;
+      case 'registrationNumber':
+        if (!d.registrationNumber?.trim()) return 'Registration / CIN Number is required';
+        return undefined;
+      case 'dateOfRegistration':
+        if (!d.dateOfRegistration) return 'Date of Registration is required';
+        if (new Date(d.dateOfRegistration) > new Date()) return 'Date cannot be in the future';
+        return undefined;
+      case 'stateOfLegalReg':
+        if (!d.stateOfLegalReg?.trim()) return 'State of Legal Registration is required';
+        return undefined;
+      case 'registrationCertDoc':
+        if (!d.registrationCertDoc || d.registrationCertDoc.status !== 'uploaded') {
+          return 'Registration Certificate is required';
+        }
+        return undefined;
+      case 'companyPan':
+        if (!d.companyPan?.trim()) return 'Company PAN is required';
+        if (!REGEX.PAN.test(d.companyPan.toUpperCase())) return 'Invalid PAN format (e.g. ABCDE1234F)';
+        return undefined;
+      case 'panCardDoc':
+        if (!d.panCardDoc || d.panCardDoc.status !== 'uploaded') {
+          return 'Organization PAN Card is required';
+        }
+        return undefined;
+      case 'gstin':
+        if (d.gstRegistered === 'Yes') {
+          if (!d.gstin?.trim()) return 'GSTIN is required';
+          if (!REGEX.GSTIN.test(d.gstin.toUpperCase())) return 'Invalid GSTIN format (e.g. 08ABCDE1234F1Z5)';
+        }
+        return undefined;
+      case 'gstCertDoc':
+        if (d.gstRegistered === 'Yes' && (!d.gstCertDoc || d.gstCertDoc.status !== 'uploaded')) {
+          return 'GST Certificate is required';
+        }
+        return undefined;
+      case 'udyamNumber':
+        if (d.msmeRegistered === 'Yes') {
+          if (!d.udyamNumber?.trim()) return 'Udyam Registration Number is required';
+          if (!REGEX.UDYAM.test(d.udyamNumber)) return 'Invalid Udyam Number format';
+        }
+        return undefined;
+      case 'msmeCertDoc':
+        if (d.msmeRegistered === 'Yes' && (!d.msmeCertDoc || d.msmeCertDoc.status !== 'uploaded')) {
+          return 'MSME Certificate is required';
+        }
+        return undefined;
+      case 'contactNo':
+        if (!d.contactNo?.trim()) return 'Contact Number is required';
+        return undefined;
+      case 'emailId':
+        if (!d.emailId?.trim()) return 'Official Email ID is required';
+        if (!REGEX.EMAIL.test(d.emailId)) return 'Invalid Email ID format';
+        return undefined;
+      case 'registeredAddress':
+        if (!d.registeredAddress?.trim()) return 'Registered Address is required';
+        return undefined;
+      case 'registeredState':
+        if (!d.registeredState?.trim()) return 'Registered State is required';
+        return undefined;
+      case 'registeredDistrict':
+        if (!d.registeredDistrict?.trim()) return 'Registered District is required';
+        return undefined;
+      case 'registeredPincode':
+        if (!d.registeredPincode?.trim()) return 'PIN Code is required';
+        if (!REGEX.INDIAN_PIN.test(d.registeredPincode)) return 'Invalid 6-digit PIN Code';
+        return undefined;
+      case 'officeAddress':
+        if (!d.sameAsRegistered && !d.officeAddress?.trim()) return 'Office Address is required';
+        return undefined;
+      case 'officeState':
+        if (!d.sameAsRegistered && !d.officeState?.trim()) return 'Office State is required';
+        return undefined;
+      case 'officeDistrict':
+        if (!d.sameAsRegistered && !d.officeDistrict?.trim()) return 'Office District is required';
+        return undefined;
+      case 'officePincode':
+        if (!d.sameAsRegistered) {
+          if (!d.officePincode?.trim()) return 'Office PIN Code is required';
+          if (!REGEX.INDIAN_PIN.test(d.officePincode)) return 'Invalid 6-digit PIN Code';
+        }
+        return undefined;
+      default:
+        return undefined;
+    }
+  }
+
   update(field: string, value: any): void {
     this.otrFormService.updateStep1({ [field]: value });
   }
 
   updateDoc(field: string, file: FileDoc | null): void {
     this.otrFormService.updateStep1({ [field]: file });
-  }
-
-  /** Add a new financial year row (uses the next available year not already selected) */
-  addFyRow(): void {
-    const existing = this.data().financialYears.map(r => r.year);
-    const nextYear = this.availableYears.find(y => !existing.includes(y)) || '';
-    const updated = [...this.data().financialYears, { year: nextYear, totalTurnover: '', skillTurnover: '' }];
-    this.otrFormService.updateStep1({ financialYears: updated });
-  }
-
-  /** Remove a financial year row by index */
-  removeFyRow(index: number): void {
-    const updated = this.data().financialYears.filter((_, i) => i !== index);
-    this.otrFormService.updateStep1({ financialYears: updated });
-  }
-
-  /** Update the year dropdown for a specific row */
-  updateFyYear(index: number, year: string): void {
-    const updated = this.data().financialYears.map((r, i) =>
-      i === index ? { ...r, year } : r
-    );
-    this.otrFormService.updateStep1({ financialYears: updated });
-  }
-
-  /** Update a numeric field (totalTurnover or skillTurnover) for a specific row */
-  updateFyField(index: number, field: 'totalTurnover' | 'skillTurnover', value: string): void {
-    const updated = this.data().financialYears.map((r, i) =>
-      i === index ? { ...r, [field]: value } : r
-    );
-    this.otrFormService.updateStep1({ financialYears: updated });
   }
 
   onGstRegisteredChange(val: string): void {

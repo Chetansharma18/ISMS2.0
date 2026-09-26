@@ -22,7 +22,7 @@ export const MAIN_NAV_ITEMS: MenuItem[] = [
     roles: ['new_user', 'existing_user', 'super_admin']
   },
   {
-    label: 'Active EOI',
+    label: 'Active Schemes',
     route: '/tenders',
     icon: 'gavel'
   },

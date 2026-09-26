@@ -59,7 +59,7 @@ export interface EoiDocumentItem {
           
           <!-- Themed Header Bar via Reusable PageHeaderComponent -->
           <app-page-header
-            title="Active EOI"
+            title="Active Schemes"
             bgColor="#0B3558"
           ></app-page-header>
 
@@ -135,7 +135,7 @@ export interface EoiDocumentItem {
               type="button"
               (click)="backToList()"
               class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 h-8 rounded-md border border-sky-300 bg-sky-50 hover:bg-sky-100 text-[#0483AC] active:scale-95 transition-all cursor-pointer font-semibold shadow-2xs"
-              title="Back to Active EOI"
+              title="Back to Active Schemes"
             >
               <svg class="w-5 h-5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />

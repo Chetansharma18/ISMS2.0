@@ -56,10 +56,10 @@
 
   /* Typography */
   --font-family-base: 'Inter', Arial, sans-serif;
-  --font-size-page-title: 48px;
-  --font-size-section-title: 36px;
-  --font-size-card-title: 20px;
-  --font-size-body: 16px;
+  --font-size-page-title: 20px;
+  --font-size-section-title: 18px;
+  --font-size-card-title: 16px;
+  --font-size-body: 14px;
   --font-size-label: 14px;
   --font-size-table: 14px;
   --font-size-small: 12px;

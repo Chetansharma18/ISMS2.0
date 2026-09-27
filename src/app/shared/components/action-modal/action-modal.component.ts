@@ -122,6 +122,7 @@ export class ActionModalComponent {
   @Input() showCloseButton = false;
   @Input() maxWidthClass = 'max-w-[490px]';
   @Input() closeOnBackdrop = true;
+  @Input() disablePrimary = false;
 
   @Output() primaryAction = new EventEmitter<void>();
   @Output() secondaryAction = new EventEmitter<void>();

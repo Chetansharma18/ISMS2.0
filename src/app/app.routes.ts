@@ -53,10 +53,24 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'grievance',
+    loadComponent: () =>
+      import('./features/grievance/grievance-list.component').then(
+        (m) => m.GrievanceListComponent
+      )
+  },
+  {
     path: 'tender-status',
     loadComponent: () =>
       import('./features/tenders/tender-status.component').then(
         (m) => m.TenderStatusComponent
+      )
+  },
+  {
+    path: 'admin/grievance',
+    loadComponent: () =>
+      import('./features/admin-grievance/admin-grievance-list.component').then(
+        (m) => m.AdminGrievanceListComponent
       )
   },
   {

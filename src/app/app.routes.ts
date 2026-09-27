@@ -67,6 +67,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/grievance',
+    loadComponent: () =>
+      import('./features/admin-grievance/admin-grievance-list.component').then(
+        (m) => m.AdminGrievanceListComponent
+      )
+  },
+  {
     path: 'admin/eoi-view',
     loadComponent: () =>
       import('./features/eoi/pages/department-eoi-view/department-eoi-view.component').then(

@@ -351,7 +351,7 @@ export function createInitialOtrFormData(): OtrFormData {
       branchAddress: '',
       cancelledChequeDoc: null
     },
-    step5DeclarationAgreed: false,
+    step5DeclarationAgreed: true,
     status: 'Draft'
   };
 }

@@ -10,6 +10,7 @@ import {
   ActionModalComponent,
   TableColumn
 } from '../../shared';
+import { SchemeDetailViewComponent } from './scheme-detail-view.component';
 
 export interface SchemeTender {
   sNo: number;
@@ -48,7 +49,8 @@ export interface EoiDocumentItem {
     PageHeaderComponent,
     TableComponent,
     ButtonComponent,
-    ActionModalComponent
+    ActionModalComponent,
+    SchemeDetailViewComponent
   ],
   template: `
     <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
@@ -128,247 +130,18 @@ export interface EoiDocumentItem {
            VIEW 2: SCHEME DETAILS VIEW (Matching Screenshot 1 & 2)
            ==================================================================== -->
       <!-- ====================================================================
-           VIEW 2: SCHEME DETAILS & EOI DOCUMENTS VIEW (Matching Screenshot 1 & 2)
+           VIEW 2: SCHEME DETAILS VIEW (Tabular Layout matching Government eProcurement)
            ==================================================================== -->
       @if (selectedScheme(); as s) {
-        <div class="p-6 sm:p-8 space-y-5 animate-in fade-in duration-200">
-          
-          <!-- Back Navigation: Half Arrow Only -->
-          <div class="flex items-center -mt-5 mb-2">
-            <button
-              type="button"
-              (click)="backToList()"
-              class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 h-8 rounded-md border border-sky-300 bg-sky-50 hover:bg-sky-100 text-[#0483AC] active:scale-95 transition-all cursor-pointer font-semibold shadow-2xs"
-              title="Back to Active Schemes"
-            >
-              <svg class="w-5 h-5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-              <span class="font-semibold text-sm">Back</span>
-            </button>
-          </div>
-
-          <!-- SCHEME HEADER & DETAILS (Clean Background Presentation) -->
-          <div class="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
-            <!-- Header Row: Title, Description & Light Theme Apply Button -->
-            <div class="p-5 sm:p-6 space-y-4">
-              <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                <div class="space-y-1.5 max-w-4xl">
-                  <!-- Scheme Heading -->
-                  <h2 class="text-lg sm:text-xl font-bold text-[#0B3558] tracking-tight">
-                    {{ s.schemeTitle || s.schemeName }}
-                  </h2>
-                  <!-- Scheme Description at bottom of heading -->
-                  <p class="text-xs sm:text-[12.5px] text-slate-600 leading-relaxed font-normal">
-                    {{ s.eoiDescription }}
-                  </p>
-                </div>
-
-                <!-- Apply for this Scheme Button (Light Theme) -->
-                <button
-                  type="button"
-                  (click)="handleApplyForScheme()"
-                  class="px-4 py-2 rounded-md bg-sky-50 hover:bg-sky-100 text-[#0B3558] border border-sky-200 hover:border-sky-300 text-xs sm:text-[13px] font-semibold shadow-2xs transition-all flex items-center gap-2 cursor-pointer shrink-0"
-                >
-                  <span>Apply for this Scheme</span>
-                  <span class="material-icons text-[#0B3558] text-[16px] leading-none shrink-0 select-none">arrow_forward</span>
-                </button>
-              </div>
-
-              <!-- Table Fields Clean Presentation (Clean non-bold Inter font, Date of Closing, EMD Fee, Process Fee) -->
-              <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 pt-3.5 border-t border-slate-100 text-xs">
-                <div>
-                  <span class="text-[10px] text-slate-400 font-medium uppercase block tracking-wider">EOI REFERENCE NO.</span>
-                  <span class="font-normal text-slate-700 text-[11.5px] block mt-1 break-all">{{ s.refNo }}</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-slate-400 font-medium uppercase block tracking-wider">SCHEME NAME</span>
-                  <span class="font-normal text-slate-700 text-[11.5px] block mt-1">{{ s.schemeName }}</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-slate-400 font-medium uppercase block tracking-wider">SCHEME CATEGORY</span>
-                  <span class="font-normal text-slate-700 text-[11.5px] block mt-1">{{ s.schemeCategory }}</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-slate-400 font-medium uppercase block tracking-wider">EOI CATEGORY</span>
-                  <span class="font-normal text-slate-700 text-[11.5px] block mt-1">{{ s.eoiCategory }}</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-slate-400 font-medium uppercase block tracking-wider">DATE OF EOI PUBLISHED</span>
-                  <span class="font-normal text-slate-700 text-[11.5px] block mt-1">{{ s.datePublished }}</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-slate-400 font-medium uppercase block tracking-wider">DATE OF CLOSING</span>
-                  <span class="font-medium text-rose-600 text-[11.5px] block mt-1">{{ s.closingDate }}</span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-slate-400 font-medium uppercase block tracking-wider">EMD FEE</span>
-                  <span class="font-normal text-slate-700 text-[11.5px] block mt-1">{{ s.emdFee || '₹50,000' }} <span class="text-[10px] text-slate-400 font-normal">(Refundable)</span></span>
-                </div>
-                <div>
-                  <span class="text-[10px] text-slate-400 font-medium uppercase block tracking-wider">PROCESSING FEE</span>
-                  <span class="font-normal text-slate-700 text-[11.5px] block mt-1">{{ s.processFee || '₹2,000' }} <span class="text-[10px] text-slate-400 font-normal">(Non-Refundable)</span></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ================================================================
-               SECTION A: REQUEST FOR PROPOSAL (RFP) & SOP DOCUMENTS
-               ================================================================ -->
-          <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
-            <!-- Header -->
-            <div class="bg-[#F4F7FB] border-b border-slate-200 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
-              <div class="flex items-center gap-2">
-             
-                <h3 class="text-sm font-semibold tracking-tight text-[#0B3558]">
-                  Section A: Request for Proposal (RFP) &amp; SOP Documents
-                </h3>
-              </div>
-           
-            </div>
-
-            <!-- Documents Table -->
-            <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr class="bg-[#F4F7FB] text-slate-700 text-[11px] sm:text-[11.5px] font-semibold border-b border-slate-200">
-                    <th class="py-2.5 px-3 w-12 text-center border-r border-slate-200 whitespace-nowrap">S. No.</th>
-                    <th class="py-2.5 px-4 border-r border-slate-200">Document Title</th>
-                    <th class="py-2.5 px-3 w-28 text-center border-r border-slate-200 whitespace-nowrap">Format</th>
-                    <th class="py-2.5 px-3 w-28 text-center border-r border-slate-200 whitespace-nowrap">File Size</th>
-                    <th class="py-2.5 px-4 w-36 text-center whitespace-nowrap">Action</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 font-normal text-slate-700">
-                  @for (doc of rfpDocuments; track doc.sNo) {
-                    <tr class="hover:bg-slate-50/80 transition-colors">
-                      <td class="py-3 px-3 text-center text-slate-600 font-normal border-r border-slate-100">{{ doc.sNo }}</td>
-                      <td class="py-3 px-4 text-slate-800 font-medium border-r border-slate-100">
-                        <div class="flex items-center gap-2.5">
-                          <svg class="w-4 h-4 shrink-0 select-none shadow-2xs" viewBox="0 0 24 24">
-                            <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
-                            <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
-                          </svg>
-                          <span class="text-xs sm:text-[12.5px] text-slate-800 font-semibold leading-relaxed">{{ doc.name }}</span>
-                        </div>
-                      </td>
-                      <td class="py-3 px-3 text-center border-r border-slate-100 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200/70">PDF Format</span>
-                      </td>
-                      <td class="py-3 px-3 text-center text-slate-500 font-normal text-[11.5px] whitespace-nowrap border-r border-slate-100">{{ doc.size }}</td>
-                      <td class="py-3 px-4 text-center whitespace-nowrap">
-                        <button
-                          type="button"
-                          (click)="downloadDoc(doc.name)"
-                          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-sky-50 hover:bg-sky-100 text-[#0B3558] border border-sky-200 hover:border-sky-300 text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
-                          title="Download {{ doc.name }}"
-                        >
-                          <span class="material-icons text-[#0B3558] text-[15px] leading-none shrink-0 select-none">download</span>
-                          <span>Download</span>
-                        </button>
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- ================================================================
-               SECTION B: PRESCRIBED ANNEXURE FORMATS (Download Templates)
-               ================================================================ -->
-          <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
-            <!-- Header -->
-            <div class="bg-[#F4F7FB] border-b border-slate-200 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
-              <div class="flex items-center gap-2">
-                <h3 class="text-sm font-semibold tracking-tight text-[#0B3558]">
-                  Section B: Prescribed Annexure Formats
-                </h3>
-              </div>
-        
-            </div>
-
-            <!-- Annexures Table -->
-            <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr class="bg-[#F4F7FB] text-slate-700 text-[11px] sm:text-[11.5px] font-semibold border-b border-slate-200">
-                    <th class="py-2.5 px-3 w-12 text-center border-r border-slate-200 whitespace-nowrap">S. No.</th>
-                    <th class="py-2.5 px-4 border-r border-slate-200">Annexure &amp; Format Title</th>
-                    <th class="py-2.5 px-3 w-28 text-center border-r border-slate-200 whitespace-nowrap">Format</th>
-                    <th class="py-2.5 px-3 w-28 text-center border-r border-slate-200 whitespace-nowrap">File Size</th>
-                    <th class="py-2.5 px-4 w-36 text-center whitespace-nowrap">Action</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 font-normal text-slate-700">
-                  @for (doc of annexureDocuments; track doc.sNo) {
-                    <tr class="hover:bg-slate-50/80 transition-colors">
-                      <td class="py-3 px-3 text-center text-slate-600 font-normal border-r border-slate-100">{{ doc.sNo }}</td>
-                      <td class="py-3 px-4 text-slate-800 font-normal border-r border-slate-100">
-                        <div class="flex items-center gap-2.5">
-                          <svg class="w-4 h-4 shrink-0 select-none shadow-2xs" viewBox="0 0 24 24">
-                            <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
-                            <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
-                          </svg>
-                          <span class="text-xs sm:text-[12.5px] text-slate-800 font-normal leading-relaxed">{{ doc.name }}</span>
-                        </div>
-                      </td>
-                      <td class="py-3 px-3 text-center border-r border-slate-100 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-50 text-sky-700 border border-sky-200/70">PDF / Word</span>
-                      </td>
-                      <td class="py-3 px-3 text-center text-slate-500 font-normal text-[11.5px] whitespace-nowrap border-r border-slate-100">{{ doc.size }}</td>
-                      <td class="py-3 px-4 text-center whitespace-nowrap">
-                        <button
-                          type="button"
-                          (click)="downloadDoc(doc.name)"
-                          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-sky-50 hover:bg-sky-100 text-[#0B3558] border border-sky-200 hover:border-sky-300 text-xs font-normal transition-colors cursor-pointer shadow-2xs"
-                          title="Download {{ doc.name }}"
-                        >
-                          <span class="material-icons text-[#0B3558] text-[15px] leading-none shrink-0 select-none">download</span>
-                          <span>Download Format</span>
-                        </button>
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- ================================================================
-               SECTION C: INFORMATION REQUIRED TO FILL EOI
-               ================================================================ -->
-          <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
-            <!-- Header -->
-            <div class="bg-[#F4F7FB] border-b border-slate-200 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
-              <div class="flex items-center gap-2">
-                <h3 class="text-sm font-semibold tracking-tight text-[#0B3558]">
-                  Section C: Information Required to Fill EOI
-                </h3>
-              </div>
-            </div>
-
-            <!-- Informational Requirements List -->
-            <div class="p-4">
-              <p class="text-xs text-slate-500 mb-3">The following documents and information must be prepared and available before you begin filling the online EOI application form.</p>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                @for (req of eoiRequiredInfo; track req.sNo) {
-                  <div class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 bg-slate-50/50">
-                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">{{ req.sNo }}</span>
-                    <div>
-                      <p class="text-xs font-medium text-slate-800 leading-snug">{{ req.name }}</p>
-                      @if (req.note) {
-                        <p class="text-[10.5px] text-slate-500 mt-0.5">{{ req.note }}</p>
-                      }
-                    </div>
-                  </div>
-                }
-              </div>
-            </div>
-          </div>
-
-        </div>
+        <app-scheme-detail-view
+          [scheme]="s"
+          [rfpDocs]="rfpDocuments"
+          [annexures]="annexureDocuments"
+          [requiredInfo]="eoiRequiredInfo"
+          (back)="backToList()"
+          (apply)="handleApplyForScheme()"
+          (download)="downloadDoc($event)"
+        ></app-scheme-detail-view>
       }
 
       <!-- ====================================================================

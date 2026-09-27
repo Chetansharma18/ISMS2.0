@@ -89,7 +89,8 @@ import { CommonModule } from '@angular/common';
                 <button
                   type="button"
                   (click)="onPrimaryAction()"
-                  class="w-full py-2.5 px-3.5 rounded-lg bg-[#0B3558] hover:bg-[#07233B] active:bg-[#041d31] text-white text-xs sm:text-[13px] font-semibold shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  [disabled]="disablePrimary"
+                  class="w-full py-2.5 px-3.5 rounded-lg bg-[#0B3558] hover:bg-[#07233B] active:bg-[#041d31] text-white text-xs sm:text-[13px] font-semibold shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#0B3558]"
                   [ngClass]="secondaryLabel ? 'sm:w-1/2' : 'w-full'"
                   style="color: #ffffff !important;"
                 >
@@ -122,6 +123,7 @@ export class ActionModalComponent {
   @Input() showCloseButton = false;
   @Input() maxWidthClass = 'max-w-[490px]';
   @Input() closeOnBackdrop = true;
+  @Input() disablePrimary = false;
 
   @Output() primaryAction = new EventEmitter<void>();
   @Output() secondaryAction = new EventEmitter<void>();

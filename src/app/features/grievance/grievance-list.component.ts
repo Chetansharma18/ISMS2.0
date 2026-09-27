@@ -1,6 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   PageHeaderComponent,
   TableComponent,
@@ -11,11 +13,14 @@ import {
 
 export interface Grievance {
   sNo: number;
+  submittedAt: string;
   title: string;
   description: string;
   issueType: 'Enquire' | 'Technical' | 'accounts';
   attachment: string;
+  attachmentUrl?: SafeResourceUrl;
   status: 'Open' | 'In progress' | 'Resolved' | 'closed';
+  comments?: string;
 }
 
 @Component({
@@ -24,6 +29,7 @@ export interface Grievance {
   imports: [
     CommonModule,
     RouterModule,
+    FormsModule,
     PageHeaderComponent,
     TableComponent,
     ButtonComponent,
@@ -33,20 +39,17 @@ export interface Grievance {
     <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
       <div class="p-4 sm:p-5 space-y-3 font-sans">
         
-        <div class="flex items-center justify-between gap-4">
-          <div class="flex-1">
-            <app-page-header
-              title="Grievance"
-              bgColor="#0B3558"
-            ></app-page-header>
-          </div>
-          <button (click)="openRaiseTicket()" class="shrink-0 px-4 py-2 mt-1 bg-[#0B3558] text-white text-sm font-semibold rounded-md shadow-xs hover:bg-[#07233B] transition-colors flex items-center gap-2">
+        <app-page-header
+          title="Grievance"
+          bgColor="#0B3558"
+        >
+          <button (click)="openRaiseTicket()" class="px-3 py-1.5 bg-white hover:bg-slate-50 text-[#0B3558] text-sm font-semibold rounded shadow transition-colors flex items-center gap-1.5 cursor-pointer">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
             </svg>
             Raise Ticket
           </button>
-        </div>
+        </app-page-header>
 
         <app-table
           [columns]="grievanceColumns"
@@ -56,10 +59,29 @@ export interface Grievance {
           itemUnit="grievances"
           [customTemplates]="{
             status: statusTemplate,
-            viewAction: viewActionTemplate
+            viewAction: viewActionTemplate,
+            submittedAt: dateTimeTemplate,
+            attachment: attachmentTemplate
           }"
         >
         </app-table>
+
+        <ng-template #dateTimeTemplate let-item>
+          <div class="flex flex-col text-center">
+            <span class="text-slate-800 font-medium whitespace-nowrap">{{ item.submittedAt | date:'dd MMM yyyy' }}</span>
+            <span class="text-slate-500 text-[11px] whitespace-nowrap">{{ item.submittedAt | date:'hh:mm a' }}</span>
+          </div>
+        </ng-template>
+        
+        <ng-template #attachmentTemplate let-item>
+          @if (item.attachment && item.attachment !== 'None') {
+            <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-medium text-sky-600 hover:text-sky-700 hover:underline break-all max-w-[150px] inline-block">
+              {{ item.attachment }}
+            </a>
+          } @else {
+            <span class="text-slate-400">-</span>
+          }
+        </ng-template>
 
         <ng-template #statusTemplate let-item>
           <span class="font-semibold"
@@ -77,7 +99,7 @@ export interface Grievance {
           <app-button
             variant="pdf-view"
             size="sm"
-            title="View Details"
+            (click)="viewTicket(item)"
           >
             View
           </app-button>
@@ -88,10 +110,12 @@ export interface Grievance {
       <!-- Raise Ticket Modal -->
       <app-action-modal
         [isOpen]="isModalOpen()"
-        title="Raise Ticket"
+        [title]="'Raise Ticket'"
         primaryLabel="Forward"
         secondaryLabel="Cancel"
         [showCloseButton]="true"
+        [showAccentBar]="false"
+        [disablePrimary]="!isFormValid()"
         (primaryAction)="submitTicket()"
         (secondaryAction)="closeModal()"
         (close)="closeModal()"
@@ -99,15 +123,15 @@ export interface Grievance {
         <div class="mt-5 space-y-4 text-left">
           <div>
             <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Title <span class="text-rose-500">*</span></label>
-            <input type="text" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all placeholder:text-slate-400" placeholder="Enter title" />
+            <input type="text" [(ngModel)]="newTicket.title" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all placeholder:text-slate-400" placeholder="Enter title" />
           </div>
           <div>
             <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Description <span class="text-rose-500">*</span></label>
-            <textarea class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all placeholder:text-slate-400" rows="4" placeholder="Enter description"></textarea>
+            <textarea [(ngModel)]="newTicket.description" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all placeholder:text-slate-400" rows="4" placeholder="Enter description"></textarea>
           </div>
           <div>
             <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Issue Type <span class="text-rose-500">*</span></label>
-            <select class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all text-slate-700">
+            <select [(ngModel)]="newTicket.issueType" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all text-slate-700">
               <option value="" disabled selected>Select issue type</option>
               <option value="Enquire">Enquire</option>
               <option value="Technical">Technical</option>
@@ -115,9 +139,107 @@ export interface Grievance {
             </select>
           </div>
           <div>
-            <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Attachment</label>
-            <input type="file" class="w-full text-sm text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[13px] file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 cursor-pointer" />
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Attachment (PDF, PNG, JPG, TXT)</label>
+            <input type="file" accept=".pdf,.png,.jpg,.jpeg,.txt" (change)="onFileSelected($event)" class="w-full text-sm text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[13px] file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 cursor-pointer" />
           </div>
+        </div>
+      </app-action-modal>
+
+      <!-- View Ticket Modal -->
+      <app-action-modal
+        [isOpen]="isViewModalOpen()"
+        [title]="'Ticket Details'"
+        primaryLabel="Close"
+        secondaryLabel=""
+        [showPrimaryArrow]="false"
+        [showCloseButton]="true"
+        [showAccentBar]="false"
+        (primaryAction)="closeViewModal()"
+        (close)="closeViewModal()"
+      >
+        @if (selectedTicket()) {
+          <div class="mt-5 space-y-4 text-left">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status</label>
+                <span class="font-semibold text-[13px]"
+                  [ngClass]="{
+                    'text-blue-600': selectedTicket()!.status === 'Open',
+                    'text-amber-600': selectedTicket()!.status === 'In progress',
+                    'text-emerald-600': selectedTicket()!.status === 'Resolved',
+                    'text-slate-600': selectedTicket()!.status === 'closed'
+                  }">
+                  {{ selectedTicket()!.status }}
+                </span>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Issue Type</label>
+                <div class="text-[13px] font-semibold text-slate-800">{{ selectedTicket()!.issueType }}</div>
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Date & Time</label>
+              <div class="text-[13px] font-semibold text-slate-800">{{ selectedTicket()!.submittedAt | date:'medium' }}</div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Title</label>
+              <div class="text-[14px] font-medium text-slate-800">{{ selectedTicket()!.title }}</div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Description</label>
+              <div class="text-[13px] text-slate-700 bg-slate-50 p-3 rounded-md border border-slate-200 whitespace-pre-wrap leading-relaxed">{{ selectedTicket()!.description }}</div>
+            </div>
+
+            @if (selectedTicket()!.attachment && selectedTicket()!.attachment !== 'None') {
+              <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Attachment</label>
+                <a href="#" (click)="openPreview(selectedTicket()!); $event.preventDefault();" class="text-[13px] font-medium text-sky-600 hover:text-sky-700 hover:underline flex items-center gap-1.5 w-fit break-all">
+                  <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                  {{ selectedTicket()!.attachment }}
+                </a>
+              </div>
+            }
+
+            @if (selectedTicket()!.status !== 'Open' && selectedTicket()!.comments) {
+              <div>
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Admin Comments</label>
+                <div class="text-[13px] text-amber-900 bg-amber-50 p-3 rounded-md border border-amber-200/60 whitespace-pre-wrap leading-relaxed">
+                  {{ selectedTicket()!.comments }}
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </app-action-modal>
+
+      <!-- Attachment Preview Modal -->
+      <app-action-modal
+        [isOpen]="isPreviewModalOpen()"
+        [title]="'Preview: ' + previewAttachmentName()"
+        primaryLabel="Close"
+        secondaryLabel=""
+        [showPrimaryArrow]="false"
+        [showCloseButton]="true"
+        [showAccentBar]="false"
+        maxWidthClass="max-w-5xl"
+        (primaryAction)="closePreview()"
+        (close)="closePreview()"
+      >
+        <div class="mt-4 border border-slate-200 rounded-lg overflow-hidden bg-slate-50 flex flex-col items-center justify-center min-h-[400px]">
+          @if (previewAttachmentUrl()) {
+            <iframe [src]="previewAttachmentUrl()" class="w-full h-full min-h-[70vh] border-0 bg-white"></iframe>
+          } @else {
+            <svg class="w-16 h-16 text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <p class="text-slate-600 font-medium text-lg">No Preview Available</p>
+            <p class="text-slate-400 text-sm mt-1 text-center max-w-sm leading-relaxed">
+              This is a dummy file from the test data. <br> Raise a new ticket and upload a real PDF to see the live preview.
+            </p>
+          }
         </div>
       </app-action-modal>
 
@@ -125,54 +247,79 @@ export interface Grievance {
   `
 })
 export class GrievanceListComponent {
+  private sanitizer = inject(DomSanitizer);
+
   readonly isModalOpen = signal(false);
+  readonly isViewModalOpen = signal(false);
+  readonly isPreviewModalOpen = signal(false);
+  readonly selectedTicket = signal<Grievance | null>(null);
+  
+  readonly previewAttachmentName = signal('');
+  readonly previewAttachmentUrl = signal<SafeResourceUrl | null>(null);
+
+  newTicket = {
+    title: '',
+    description: '',
+    issueType: '' as 'Enquire' | 'Technical' | 'accounts' | '',
+    attachment: '',
+    attachmentUrl: null as SafeResourceUrl | null
+  };
 
   readonly grievanceColumns: TableColumn<Grievance>[] = [
     { key: 'sNo', label: 'Sr No.', type: 'number', align: 'center', width: 'w-12' },
-    { key: 'title', label: 'Title', cellClass: 'whitespace-nowrap font-medium text-slate-800' },
-    { key: 'description', label: 'Description', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: 'submittedAt', label: 'Date & Time', align: 'center', type: 'custom', width: 'w-24' },
+    { key: 'title', label: 'Title', cellClass: 'font-medium text-slate-800 min-w-[120px]' },
+    { key: 'description', label: 'Description', cellClass: 'font-normal text-slate-700 min-w-[180px]' },
     { key: 'issueType', label: 'Issue Type', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
-    { key: 'attachment', label: 'Attachment', align: 'center', cellClass: 'whitespace-nowrap font-normal text-sky-600 underline cursor-pointer' },
+    { key: 'attachment', label: 'Attachment', align: 'center', type: 'custom' },
     { key: 'status', label: 'Status', align: 'center', type: 'custom' },
-    { key: 'viewAction', label: 'View', align: 'center', width: 'w-20', type: 'custom' }
+    { key: 'viewAction', label: 'View', align: 'center', width: 'w-16', type: 'custom' }
   ];
 
   grievances: Grievance[] = [
     {
       sNo: 1,
+      submittedAt: '2026-09-27T10:15:30Z',
       title: 'Login Issue',
-      description: 'Unable to login to the portal using my credentials.',
+      description: 'Unable to login to the portal using my credentials. It shows invalid password every time.',
       issueType: 'Technical',
       attachment: 'screenshot.png',
       status: 'Open'
     },
     {
       sNo: 2,
+      submittedAt: '2026-09-26T14:45:00Z',
       title: 'Payment Failure',
-      description: 'Amount deducted but receipt not generated.',
+      description: 'Amount deducted from my bank account but the receipt was not generated on the portal.',
       issueType: 'accounts',
       attachment: 'transaction.pdf',
-      status: 'In progress'
+      status: 'In progress',
+      comments: 'We have escalated this to the payment gateway provider. Expecting a resolution in 24-48 hours.'
     },
     {
       sNo: 3,
+      submittedAt: '2026-09-25T09:12:00Z',
       title: 'Document Upload Error',
-      description: 'Getting an error while uploading the Aadhar card.',
+      description: 'Getting a 500 internal server error while uploading the Aadhar card in the profile section.',
       issueType: 'Technical',
       attachment: 'error_log.txt',
-      status: 'Resolved'
+      status: 'Resolved',
+      comments: 'The issue was caused by a temporary outage in our storage service. It has been fixed now. Please try again.'
     },
     {
       sNo: 4,
+      submittedAt: '2026-09-24T16:30:00Z',
       title: 'Process Inquiry',
-      description: 'How long does the approval process take?',
+      description: 'How long does the standard scheme approval process take after submission?',
       issueType: 'Enquire',
       attachment: 'query.pdf',
-      status: 'closed'
+      status: 'closed',
+      comments: 'Standard approval takes 3-5 business days. Your application is currently under review.'
     }
   ];
 
   openRaiseTicket() {
+    this.newTicket = { title: '', description: '', issueType: '', attachment: '', attachmentUrl: null };
     this.isModalOpen.set(true);
   }
 
@@ -180,9 +327,67 @@ export class GrievanceListComponent {
     this.isModalOpen.set(false);
   }
 
+  viewTicket(ticket: Grievance) {
+    this.selectedTicket.set(ticket);
+    this.isViewModalOpen.set(true);
+  }
+
+  closeViewModal() {
+    this.isViewModalOpen.set(false);
+    setTimeout(() => this.selectedTicket.set(null), 300);
+  }
+
+  openPreview(ticket: Grievance) {
+    this.previewAttachmentName.set(ticket.attachment);
+    this.previewAttachmentUrl.set(ticket.attachmentUrl || null);
+    this.isPreviewModalOpen.set(true);
+  }
+
+  closePreview() {
+    this.isPreviewModalOpen.set(false);
+    setTimeout(() => {
+      this.previewAttachmentName.set('');
+      this.previewAttachmentUrl.set(null);
+    }, 300);
+  }
+
+  isFormValid(): boolean {
+    return this.newTicket.title.trim().length > 0 &&
+           this.newTicket.description.trim().length > 0 &&
+           this.newTicket.issueType !== '';
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.newTicket.attachment = file.name;
+      // Create a local blob URL for the selected file to render in an iframe
+      const objectUrl = URL.createObjectURL(file);
+      this.newTicket.attachmentUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+    }
+  }
+
   submitTicket() {
-    // In a real application, form values would be collected and submitted here.
-    alert('Ticket Forwarded Successfully!');
+    if (!this.isFormValid()) return;
+
+    const newGrievance: Grievance = {
+      sNo: 0,
+      submittedAt: new Date().toISOString(),
+      title: this.newTicket.title,
+      description: this.newTicket.description,
+      issueType: this.newTicket.issueType as 'Enquire' | 'Technical' | 'accounts',
+      attachment: this.newTicket.attachment || 'None',
+      attachmentUrl: this.newTicket.attachmentUrl || undefined,
+      status: 'Open'
+    };
+
+    const updatedList = [newGrievance, ...this.grievances];
+    
+    updatedList.forEach((g, index) => {
+      g.sNo = index + 1;
+    });
+
+    this.grievances = [...updatedList];
     this.closeModal();
   }
 }

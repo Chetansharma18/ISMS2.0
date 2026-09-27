@@ -38,23 +38,23 @@ import {
               <button
                 type="button"
                 (click)="setFilter(f.id)"
-                class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer border shadow-2xs active:scale-95"
-                [class.bg-[#0F172A]]="activeFilter() === f.id"
+                class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
+                [class.bg-[#174A6E]]="activeFilter() === f.id"
                 [class.text-white]="activeFilter() === f.id"
-                [class.border-[#0F172A]]="activeFilter() === f.id"
+                [class.border-[#174A6E]]="activeFilter() === f.id"
                 [class.bg-white]="activeFilter() !== f.id"
-                [class.text-slate-600]="activeFilter() !== f.id"
-                [class.border-slate-300]="activeFilter() !== f.id"
-                [class.hover:bg-slate-50]="activeFilter() !== f.id"
-                [class.hover:text-slate-900]="activeFilter() !== f.id"
+                [class.text-[#5F6B76]]="activeFilter() !== f.id"
+                [class.border-[#D9E1E7]]="activeFilter() !== f.id"
+                [class.hover:bg-[#EAF2F6]]="activeFilter() !== f.id"
+                [class.hover:text-[#174A6E]]="activeFilter() !== f.id"
               >
                 <span>{{ f.label }}</span>
                 <span
-                  class="px-1.5 py-0.2 rounded-full text-[10.5px] font-bold"
+                  class="px-1.5 py-0.2 rounded-full text-[10px]"
                   [class.bg-white/20]="activeFilter() === f.id"
                   [class.text-white]="activeFilter() === f.id"
-                  [class.bg-slate-100]="activeFilter() !== f.id"
-                  [class.text-slate-600]="activeFilter() !== f.id"
+                  [class.bg-[#F5F7F9]]="activeFilter() !== f.id"
+                  [class.text-[#5F6B76]]="activeFilter() !== f.id"
                 >
                   {{ f.count }}
                 </span>
@@ -124,31 +124,31 @@ import {
           </span>
         </ng-template>
 
-        <!-- Template: Status Badge (Matching Batch Management status styling) -->
+        <!-- Template: Status (Colored text only, no box) -->
         <ng-template #statusTemplate let-sdc>
           <div class="flex items-center justify-center">
             @if (sdc.status === 'APPROVED') {
-              <span class="whitespace-nowrap inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-300 tracking-wider uppercase">
+              <span class="whitespace-nowrap font-bold text-xs text-sky-700 tracking-wider uppercase">
                 APPROVED
               </span>
             } @else if (sdc.status === 'PENDING_INSPECTION') {
-              <span class="whitespace-nowrap inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-300 tracking-wider uppercase">
+              <span class="whitespace-nowrap font-bold text-xs text-amber-700 tracking-wider uppercase">
                 PENDING INSPECTION
               </span>
             } @else if (sdc.status === 'PENDING_APPROVAL') {
-              <span class="whitespace-nowrap inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-300 tracking-wider uppercase">
+              <span class="whitespace-nowrap font-bold text-xs text-purple-700 tracking-wider uppercase">
                 PENDING APPROVAL
               </span>
             } @else if (sdc.status === 'REJECTED') {
-              <span class="whitespace-nowrap inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-300 tracking-wider uppercase">
+              <span class="whitespace-nowrap font-bold text-xs text-rose-700 tracking-wider uppercase">
                 REJECTED
               </span>
             } @else if (sdc.status === 'RETURNED_TO_TP') {
-              <span class="whitespace-nowrap inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold bg-orange-50 text-orange-700 border border-orange-300 tracking-wider uppercase">
+              <span class="whitespace-nowrap font-bold text-xs text-orange-700 tracking-wider uppercase">
                 RETURNED TO TP
               </span>
             } @else {
-              <span class="whitespace-nowrap inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-300 tracking-wider uppercase">
+              <span class="whitespace-nowrap font-bold text-xs text-slate-600 tracking-wider uppercase">
                 {{ sdc.status || 'DRAFT' }}
               </span>
             }
@@ -162,7 +162,7 @@ import {
               <button
                 type="button"
                 (click)="createBatch(sdc)"
-                class="whitespace-nowrap inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
+                class="whitespace-nowrap inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
                 title="Create Batch"
               >
                 <span class="text-sm font-bold leading-none">+</span>

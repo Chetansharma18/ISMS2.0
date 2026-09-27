@@ -31,7 +31,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200">
           <div>
             @if (title) {
-              <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight leading-snug m-0">
+              <h2 class="text-base sm:text-lg font-bold text-[#174A6E] tracking-tight leading-snug m-0">
                 {{ title }}
               </h2>
             }
@@ -88,7 +88,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
                   @if (section.title) {
                     <div class="flex items-center justify-between gap-3 pb-2 border-b border-slate-100/80">
                       <div class="flex items-center gap-2.5 min-w-0">
-                        <span class="w-1.5 h-4 bg-[#0F172A] rounded-full shrink-0"></span>
+                        <span class="w-1.5 h-4 bg-[#174A6E] rounded-full shrink-0"></span>
                         @if (section.icon) {
                           <div class="w-6 h-6 rounded-md bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
                             <ng-container [ngSwitch]="section.icon">
@@ -167,7 +167,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
                 
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                   <div class="flex items-center gap-2.5">
-                    <span class="w-1.5 h-4 bg-[#0F172A] rounded-full"></span>
+                    <span class="w-1.5 h-4 bg-[#174A6E] rounded-full"></span>
                     <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">
                       {{ section.title }}
                     </h3>
@@ -261,7 +261,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
                   [disabled]="isActionDisabled(action)"
                   class="w-full sm:w-auto px-4 py-2 text-xs font-semibold rounded-lg shadow-2xs transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1.5"
                   [ngClass]="{
-                    'bg-[#0F172A] hover:bg-slate-800 text-white': action.variant === 'primary',
+                    'bg-[#174A6E] hover:bg-[#123B59] text-white': action.variant === 'primary',
                     'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50': action.variant === 'secondary' || !action.variant,
                     'border border-slate-300 text-slate-700 hover:bg-slate-50': action.variant === 'outline',
                     'bg-rose-600 hover:bg-rose-700 text-white': action.variant === 'danger',
@@ -287,7 +287,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
               <button
                 type="submit"
                 [disabled]="submitDisabled || submitLoading"
-                class="w-full sm:w-auto px-5 py-2 text-xs font-semibold text-white bg-[#0F172A] hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-sm active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+                class="w-full sm:w-auto px-5 py-2 text-xs font-semibold text-white bg-[#174A6E] hover:bg-[#123B59] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-sm active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 @if (submitLoading) {
                   <svg class="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
@@ -331,7 +331,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
                   [checked]="!!getValue(field.key)"
                   (change)="onCheckboxChange(field, $event)"
                   [disabled]="isFieldDisabled(field)"
-                  class="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#0F172A] focus:ring-[#0F172A] cursor-pointer"
+                  class="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#174A6E] focus:ring-[#174A6E] cursor-pointer"
                 />
                 <div>
                   <span class="text-xs font-semibold text-slate-800 leading-tight block">
@@ -370,7 +370,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
                 (click)="toggleSwitch(field)"
                 [disabled]="isFieldDisabled(field)"
                 class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-                [class.bg-[#0F172A]="!!getValue(field.key)"
+                [class.bg-[#174A6E]="!!getValue(field.key)"
                 [class.bg-slate-200]="!getValue(field.key)"
               >
                 <span
@@ -466,7 +466,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
                       [checked]="getValue(field.key) === opt.value"
                       (change)="onValueChange(field, opt.value)"
                       [disabled]="isFieldDisabled(field) || opt.disabled"
-                      class="h-3.5 w-3.5 border-slate-300 text-[#0F172A] focus:ring-[#0F172A] cursor-pointer"
+                      class="h-3.5 w-3.5 border-slate-300 text-[#174A6E] focus:ring-[#174A6E] cursor-pointer"
                     />
                     <span>{{ opt.label }}</span>
                   </label>

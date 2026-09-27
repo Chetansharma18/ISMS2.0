@@ -420,7 +420,7 @@ export interface SanctionOrder {
 export const MOCK_SANCTION_ORDERS: SanctionOrder[] = [
   {
     id: 'so-1',
-    ipaNumber: 'IPA-2024-001',
+    ipaNumber: 'MoU-2024-001',
     tpCode: 'MoU-001658',
     schemeName: 'MMKVY',
     scheme: 'MMKVY',
@@ -432,7 +432,7 @@ export const MOCK_SANCTION_ORDERS: SanctionOrder[] = [
   },
   {
     id: 'so-2',
-    ipaNumber: 'IPA-2024-002',
+    ipaNumber: 'MoU-2024-002',
     tpCode: 'MoU-001659',
     schemeName: 'MNSKSY',
     scheme: 'MNSKSY',
@@ -444,7 +444,7 @@ export const MOCK_SANCTION_ORDERS: SanctionOrder[] = [
   },
   {
     id: 'so-3',
-    ipaNumber: 'IPA-2024-003',
+    ipaNumber: 'MoU-2024-003',
     tpCode: 'MoU-001660',
     schemeName: 'MMKVY',
     scheme: 'MMKVY',
@@ -456,7 +456,7 @@ export const MOCK_SANCTION_ORDERS: SanctionOrder[] = [
   },
   {
     id: 'so-4',
-    ipaNumber: 'IPA-2024-004',
+    ipaNumber: 'MoU-2024-004',
     tpCode: 'MoU-001661',
     schemeName: 'IM_Shakti',
     scheme: 'IM_Shakti',
@@ -468,7 +468,7 @@ export const MOCK_SANCTION_ORDERS: SanctionOrder[] = [
   },
   {
     id: 'so-5',
-    ipaNumber: 'IPA-2024-005',
+    ipaNumber: 'MoU-2024-005',
     tpCode: 'MoU-001662',
     schemeName: 'RAJKVIKRTD',
     scheme: 'RAJKVIKRTD',
@@ -480,7 +480,7 @@ export const MOCK_SANCTION_ORDERS: SanctionOrder[] = [
   },
   {
     id: 'so-6',
-    ipaNumber: 'IPA-2024-006',
+    ipaNumber: 'MoU-2024-006',
     tpCode: 'MoU-001663',
     schemeName: 'MMYKY',
     scheme: 'MMYKY',
@@ -492,7 +492,7 @@ export const MOCK_SANCTION_ORDERS: SanctionOrder[] = [
   },
   {
     id: 'so-7',
-    ipaNumber: 'IPA-2024-007',
+    ipaNumber: 'MoU-2024-007',
     tpCode: 'MoU-001664',
     schemeName: 'SAMARTH',
     scheme: 'SAMARTH',
@@ -504,7 +504,7 @@ export const MOCK_SANCTION_ORDERS: SanctionOrder[] = [
   },
   {
     id: 'so-8',
-    ipaNumber: 'IPA-2024-008',
+    ipaNumber: 'MoU-2024-008',
     tpCode: 'MoU-001665',
     schemeName: 'RAJKVIK',
     scheme: 'RAJKVIK',
@@ -516,7 +516,7 @@ export const MOCK_SANCTION_ORDERS: SanctionOrder[] = [
   },
   {
     id: 'so-9',
-    ipaNumber: 'IPA-2024-009',
+    ipaNumber: 'MoU-2024-009',
     tpCode: 'MoU-001666',
     schemeName: 'SAKSHM',
     scheme: 'SAKSHM',
@@ -528,7 +528,7 @@ export const MOCK_SANCTION_ORDERS: SanctionOrder[] = [
   },
   {
     id: 'so-10',
-    ipaNumber: 'IPA-2024-010',
+    ipaNumber: 'MoU-2024-010',
     tpCode: 'MoU-001667',
     schemeName: 'RAJKVIK',
     scheme: 'RAJKVIK',

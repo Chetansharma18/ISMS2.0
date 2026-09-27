@@ -12,7 +12,7 @@ import { getSdcFormFields } from '../config/sdc-form.config';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, FormSdcComponent],
   template: `
-    <div class="min-h-full bg-white py-4 sm:py-6 px-4 sm:px-8 font-sans selection:bg-slate-900 selection:text-white" style="font-family: 'Inter', sans-serif;">
+    <div class="min-h-full bg-white py-4 sm:py-6 px-4 sm:px-8 font-sans selection:bg-[#174A6E] selection:text-white" style="font-family: 'Inter', sans-serif;">
       
       <!-- Direct-on-Page Container (No card wrapper, directly on the page) -->
       <div class="max-w-7xl mx-auto space-y-4">
@@ -32,7 +32,7 @@ import { getSdcFormFields } from '../config/sdc-form.config';
               <span>Back</span>
             </button>
             
-            <h1 class="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight leading-snug m-0">
+            <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-snug m-0">
               Register New SDC
             </h1>
           </div>

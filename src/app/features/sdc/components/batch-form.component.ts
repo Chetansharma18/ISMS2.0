@@ -27,7 +27,7 @@ interface HostelItem {
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, FormSdcComponent],
   template: `
-    <div class="min-h-full bg-white py-4 sm:py-6 px-4 sm:px-8 font-sans selection:bg-slate-900 selection:text-white" style="font-family: 'Inter', sans-serif;">
+    <div class="min-h-full bg-white py-4 sm:py-6 px-4 sm:px-8 font-sans selection:bg-[#174A6E] selection:text-white" style="font-family: 'Inter', sans-serif;">
       
       <!-- Direct-on-Page Container (matching SDC creation layout) -->
       <div class="max-w-7xl mx-auto space-y-4">
@@ -48,7 +48,7 @@ interface HostelItem {
             </button>
             
             <div>
-              <h1 class="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight leading-snug m-0">
+              <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-snug m-0">
                 Create Batch
               </h1>
               <p class="text-[11px] text-slate-500 m-0">
@@ -80,7 +80,7 @@ interface HostelItem {
             >
               <span
                 class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all shadow-2xs"
-                [style.background-color]="isPaymentCompleted() || currentStep() > 1 ? '#16a34a' : '#0F172A'"
+                [style.background-color]="isPaymentCompleted() || currentStep() > 1 ? '#16a34a' : '#174A6E'"
                 style="color: #ffffff !important;"
               >
                 @if (isPaymentCompleted() || currentStep() > 1) {
@@ -116,7 +116,7 @@ interface HostelItem {
             >
               <span
                 class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all shadow-2xs"
-                [style.background-color]="currentStep() === 2 ? '#0F172A' : '#e2e8f0'"
+                [style.background-color]="currentStep() === 2 ? '#174A6E' : '#e2e8f0'"
                 [style.color]="currentStep() === 2 ? '#ffffff !important' : '#475569 !important'"
               >
                 <span [style.color]="currentStep() === 2 ? '#ffffff !important' : '#475569 !important'" style="font-weight: 700; font-size: 11px; line-height: 1;">2</span>
@@ -151,7 +151,7 @@ interface HostelItem {
             
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <h2 class="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight m-0">
+                <h2 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight m-0">
                   Fee Payment
                 </h2>
                 <p class="text-xs text-slate-500 mt-0.5 m-0">
@@ -223,7 +223,7 @@ interface HostelItem {
                       <!-- UPI -->
                       <label
                         class="p-4 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between"
-                        [class.border-[#0F172A]]="selectedPaymentMethod() === 'UPI'"
+                        [class.border-[#174A6E]]="selectedPaymentMethod() === 'UPI'"
                         [class.bg-slate-50]="selectedPaymentMethod() === 'UPI'"
                         [class.border-slate-200]="selectedPaymentMethod() !== 'UPI'"
                       >
@@ -233,9 +233,9 @@ interface HostelItem {
                             name="payMode"
                             value="UPI"
                             [(ngModel)]="selectedPaymentMethod"
-                            class="w-4 h-4 text-[#0F172A] focus:ring-[#0F172A]"
+                            class="w-4 h-4 text-[#174A6E] focus:ring-[#174A6E]"
                           />
-                          <span class="text-[10px] font-bold px-2 py-0.5 bg-blue-100 text-[#0F172A] rounded">Instant</span>
+                          <span class="text-[10px] font-bold px-2 py-0.5 bg-[#EAF2F6] text-[#174A6E] rounded">Instant</span>
                         </div>
                         <div>
                           <div class="text-xs font-bold text-slate-900">UPI / QR Code</div>
@@ -246,7 +246,7 @@ interface HostelItem {
                       <!-- Net Banking -->
                       <label
                         class="p-4 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between"
-                        [class.border-[#0F172A]]="selectedPaymentMethod() === 'NetBanking'"
+                        [class.border-[#174A6E]]="selectedPaymentMethod() === 'NetBanking'"
                         [class.bg-slate-50]="selectedPaymentMethod() === 'NetBanking'"
                         [class.border-slate-200]="selectedPaymentMethod() !== 'NetBanking'"
                       >
@@ -256,7 +256,7 @@ interface HostelItem {
                             name="payMode"
                             value="NetBanking"
                             [(ngModel)]="selectedPaymentMethod"
-                            class="w-4 h-4 text-[#0F172A] focus:ring-[#0F172A]"
+                            class="w-4 h-4 text-[#174A6E] focus:ring-[#174A6E]"
                           />
                           <span class="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded">Bank</span>
                         </div>
@@ -269,7 +269,7 @@ interface HostelItem {
                       <!-- Debit / Credit Card -->
                       <label
                         class="p-4 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between"
-                        [class.border-[#0F172A]]="selectedPaymentMethod() === 'Card'"
+                        [class.border-[#174A6E]]="selectedPaymentMethod() === 'Card'"
                         [class.bg-slate-50]="selectedPaymentMethod() === 'Card'"
                         [class.border-slate-200]="selectedPaymentMethod() !== 'Card'"
                       >
@@ -279,7 +279,7 @@ interface HostelItem {
                             name="payMode"
                             value="Card"
                             [(ngModel)]="selectedPaymentMethod"
-                            class="w-4 h-4 text-[#0F172A] focus:ring-[#0F172A]"
+                            class="w-4 h-4 text-[#174A6E] focus:ring-[#174A6E]"
                           />
                           <span class="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded">Cards</span>
                         </div>
@@ -296,7 +296,7 @@ interface HostelItem {
 
                 <!-- Right 1 Col: Payment Summary Card (Sticky) -->
                 <div class="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden sticky top-20">
-                  <div class="bg-[#0F172A] p-4 flex items-center justify-between" style="background-color: #0F172A !important;">
+                  <div class="bg-[#174A6E] p-4 flex items-center justify-between" style="background-color: #174A6E !important;">
                     <h4 class="text-xs font-bold uppercase tracking-wider m-0 !text-white" style="color: #ffffff !important;">Payment Summary</h4>
                     <span class="text-[10px] font-semibold px-2 py-0.5 rounded uppercase" style="color: #ffffff !important; background-color: rgba(255, 255, 255, 0.18) !important;">{{ scheme() }}</span>
                   </div>
@@ -313,7 +313,7 @@ interface HostelItem {
 
                     <div class="flex justify-between items-baseline pt-1">
                       <span class="text-sm font-bold text-slate-900">Total Payable</span>
-                      <span class="text-xl font-bold text-[#0F172A] font-mono">₹500.00</span>
+                      <span class="text-xl font-bold text-[#174A6E] font-mono">₹500.00</span>
                     </div>
 
                     <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] text-slate-600">
@@ -325,7 +325,7 @@ interface HostelItem {
                       type="button"
                       [disabled]="isPaymentProcessing()"
                       (click)="triggerPayment()"
-                      class="w-full py-3 px-4 bg-[#0F172A] hover:bg-slate-800 active:scale-95 text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                      class="w-full py-3 px-4 bg-[#174A6E] hover:bg-[#123B59] active:scale-95 text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
                     >
                       @if (isPaymentProcessing()) {
                         <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
@@ -492,7 +492,7 @@ interface HostelItem {
                       <button
                         type="button"
                         (click)="proceedToStep2()"
-                        class="w-full sm:w-auto px-6 py-2.5 bg-[#0F172A] hover:bg-slate-800 active:scale-95 text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-all cursor-pointer inline-flex items-center justify-center gap-2"
+                        class="w-full sm:w-auto px-6 py-2.5 bg-[#174A6E] hover:bg-[#123B59] active:scale-95 text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-all cursor-pointer inline-flex items-center justify-center gap-2"
                       >
                         <span>Proceed to Batch Details</span>
                         <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -522,7 +522,7 @@ interface HostelItem {
             <div class="space-y-2">
               <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-4 bg-[#0F172A] rounded-full shrink-0"></span>
+                  <span class="w-1.5 h-4 bg-[#174A6E] rounded-full shrink-0"></span>
                   <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">
                     Batch Parameters &amp; Schedule
                   </h3>
@@ -552,18 +552,18 @@ interface HostelItem {
             <div class="space-y-2.5 pt-2 border-t border-slate-200">
               <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-4 bg-[#0F172A] rounded-full shrink-0"></span>
+                  <span class="w-1.5 h-4 bg-[#174A6E] rounded-full shrink-0"></span>
                   <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">
                     Faculty Details
                   </h3>
                   <span class="text-[11px] text-slate-500">({{ facultyList.length }} trainer{{ facultyList.length > 1 ? 's' : '' }} assigned)</span>
                 </div>
 
-                <!-- Green + Add Faculty Button (matching Government Portal Screenshot) -->
+                <!-- Blue + Add Faculty Button -->
                 <button
                   type="button"
                   (click)="addFaculty()"
-                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#174A6E] hover:bg-[#123B59] active:scale-95 text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer"
                   title="Add Faculty Trainer"
                 >
                   <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -597,7 +597,7 @@ interface HostelItem {
                             [(ngModel)]="faculty.facultyName"
                             [name]="'faculty_name_' + i"
                             placeholder="e.g. Vikas Purohit"
-                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                           />
                         </td>
 
@@ -606,7 +606,7 @@ interface HostelItem {
                           <select
                             [(ngModel)]="faculty.trainerType"
                             [name]="'faculty_type_' + i"
-                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                           >
                             <option value="Primary Trainer">Primary Trainer</option>
                             <option value="Assistant Trainer">Assistant Trainer</option>
@@ -620,7 +620,7 @@ interface HostelItem {
                           <select
                             [(ngModel)]="faculty.qualification"
                             [name]="'faculty_qual_' + i"
-                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                           >
                             <option value="Graduate (B.A / B.Sc / B.Com / B.Tech)">Graduate (B.A / B.Sc / B.Com / B.Tech)</option>
                             <option value="Post Graduate (M.A / M.Sc / M.Tech)">Post Graduate (M.A / M.Sc / M.Tech)</option>
@@ -653,18 +653,18 @@ interface HostelItem {
             <div class="space-y-2.5 pt-2 border-t border-slate-200">
               <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-4 bg-[#0F172A] rounded-full shrink-0"></span>
+                  <span class="w-1.5 h-4 bg-[#174A6E] rounded-full shrink-0"></span>
                   <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">
                     Hostel Details
                   </h3>
                   <span class="text-[11px] text-slate-500">(Residential facility configuration)</span>
                 </div>
 
-                <!-- + Add Hostel Button -->
+                <!-- Blue + Add Hostel Button -->
                 <button
                   type="button"
                   (click)="addHostel()"
-                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#174A6E] hover:bg-[#123B59] active:scale-95 text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer"
                   title="Add Hostel"
                 >
                   <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -699,7 +699,7 @@ interface HostelItem {
                             [(ngModel)]="hostel.hostelAddress"
                             [name]="'hostel_addr_' + i"
                             placeholder="Plot / Campus Address"
-                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                           />
                         </td>
 
@@ -710,7 +710,7 @@ interface HostelItem {
                             [(ngModel)]="hostel.hostelCode"
                             [name]="'hostel_code_' + i"
                             placeholder="e.g. HST-JP-001"
-                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                           />
                         </td>
 
@@ -719,7 +719,7 @@ interface HostelItem {
                           <select
                             [(ngModel)]="hostel.type"
                             [name]="'hostel_type_' + i"
-                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                           >
                             <option value="Boys">Boys</option>
                             <option value="Girls">Girls</option>
@@ -737,7 +737,7 @@ interface HostelItem {
                             [(ngModel)]="hostel.capacity"
                             [name]="'hostel_cap_' + i"
                             placeholder="0"
-                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                           />
                         </td>
 
@@ -768,7 +768,7 @@ interface HostelItem {
                 type="button"
                 (click)="submitBatchForm()"
                 [disabled]="isSubmitting()"
-                class="w-full sm:w-auto px-6 py-2 text-xs font-semibold text-white bg-[#0F172A] hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-sm active:scale-95 transition-all cursor-pointer inline-flex items-center justify-center gap-2"
+                class="w-full sm:w-auto px-6 py-2 text-xs font-semibold text-white bg-[#174A6E] hover:bg-[#123B59] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-sm active:scale-95 transition-all cursor-pointer inline-flex items-center justify-center gap-2"
               >
                 @if (isSubmitting()) {
                   <svg class="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
@@ -851,7 +851,7 @@ interface HostelItem {
                 <button
                   type="button"
                   (click)="continueToBatchDetailsFromModal()"
-                  class="flex-[2] py-2.5 px-4 bg-[#0F172A] hover:bg-slate-800 text-white rounded-lg font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  class="flex-[2] py-2.5 px-4 bg-[#174A6E] hover:bg-[#123B59] text-white rounded-lg font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <span>Continue to Batch Details &rarr;</span>
                 </button>
@@ -1111,8 +1111,8 @@ export class BatchFormComponent implements OnInit {
     doc.setLineWidth(0.2);
     doc.rect(10, 10, 190, 277);
 
-    // 1. Top Header Banner (Navy)
-    doc.setFillColor(15, 23, 42); // #0F172A
+    // 1. Top Header Banner (Primary Blue)
+    doc.setFillColor(23, 74, 110); // #174A6E
     doc.rect(10, 10, 190, 32, 'F');
 
     // Gold accent stripe

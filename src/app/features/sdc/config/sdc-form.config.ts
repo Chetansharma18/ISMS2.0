@@ -527,10 +527,9 @@ export function getSdcFormFields(options: SdcFormConfigOptions = {}): FormFieldC
     {
       key: 'remarks',
       label: 'Remarks',
-      type: 'textarea',
-      rows: 2,
+      type: 'text',
       maxLength: 300,
-      placeholder: 'Inspection & operational remarks',
+      placeholder: 'Ready for auditor inspection',
       colSpan: 2,
       onChange: (val: string, _f: any, model: Record<string, any>) => {
         model['tpRemarks'] = val;

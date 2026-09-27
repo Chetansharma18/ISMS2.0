@@ -25,7 +25,7 @@ import { PageHeaderComponent } from '../../../shared/components';
           <!-- Top Page Header (No sub-points, no breadcrumbs, no badges, and NO Save/Cancel buttons during edit) -->
           <app-page-header
             [title]="center.sdcName + ' (' + center.sdcCode + ')'"
-            bgColor="#0B3558"
+            bgColor="var(--color-primary, #174A6E)"
             [showBack]="true"
             backUrl="/sdcs"
             backTitle="Back to SDC List"
@@ -522,7 +522,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                 <button
                   type="button"
                   (click)="saveEditing(center.id)"
-                  class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#0B3558] hover:bg-[#123B59] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                  class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer"
                   style="color: #ffffff !important;"
                 >
                   <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -557,7 +557,7 @@ import { PageHeaderComponent } from '../../../shared/components';
             (click)="$event.stopPropagation()"
           >
             <!-- Modal Header -->
-            <div class="px-5 py-3 border-b border-slate-200 bg-[#0B3558] text-white flex items-center justify-between gap-3 shrink-0">
+            <div class="px-5 py-3 border-b border-slate-200 bg-[#174A6E] text-white flex items-center justify-between gap-3 shrink-0">
               <div class="truncate">
                 <h3 class="text-sm font-semibold text-white tracking-tight m-0 truncate" style="color: #ffffff !important;">
                   {{ p.tag || p.name }}

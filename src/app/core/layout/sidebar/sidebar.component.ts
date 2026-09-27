@@ -2,6 +2,7 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
+import { AspirantService } from '../../../features/sdc/services/aspirant.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -250,6 +251,24 @@ import { AuthService } from '../../auth/auth.service';
                 <span class="tracking-tight">Batch Management</span>
               </div>
             </a>
+
+            <!-- Aspirants / Aspirant Management -->
+            <a
+              routerLink="/aspirants"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                </svg>
+                <span class="tracking-tight">Aspirants</span>
+              </div>
+              <span class="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-[#EAF2F6] text-[#174A6E] border border-[#D9E1E7]">
+                {{ aspirantCount() }}
+              </span>
+            </a>
           } @else {
             <!-- ================================================================
                  ROLE: NEW USER / STANDARD
@@ -298,10 +317,12 @@ import { AuthService } from '../../auth/auth.service';
 })
 export class SidebarComponent {
   authService = inject(AuthService);
+  aspirantService = inject(AspirantService);
 
   profileExpanded = signal<boolean>(true);
 
   readonly currentUser = this.authService.currentUser;
+  readonly aspirantCount = computed(() => this.aspirantService.aspirants().length);
 
   readonly isExistingUser = computed(() => {
     const user = this.currentUser();

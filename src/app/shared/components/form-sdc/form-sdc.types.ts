@@ -14,10 +14,14 @@ export type FormFieldType =
   | 'checkbox'
   | 'radio'
   | 'file'
+  | 'photos'
   | 'switch'
   | 'heading'
   | 'divider'
   | 'custom';
+
+export type FormDensity = 'compact' | 'normal';
+export type FormLayoutMode = 'unified' | 'cards' | 'plain';
 
 export interface FormOption {
   label: string;
@@ -42,13 +46,15 @@ export interface FormFieldConfig<T = any> {
   requiredMessage?: string;
   /** Helper text displayed below the field */
   hint?: string;
+  /** Tooltip or info note */
+  tooltip?: string;
   /** Disabled state or dynamic evaluator based on current model */
   disabled?: boolean | ((model: T) => boolean);
   /** Read-only state */
   readonly?: boolean;
   /** Options list for 'select' or 'radio' inputs */
   options?: FormOption[];
-  /** Grid column span: 1, 2, 3, 4, or 'full' */
+  /** Grid column span: 1, 2, 3, 4, or 'full' (default is 1) */
   colSpan?: 1 | 2 | 3 | 4 | 'full';
   /** Prefix text inside input (e.g. '+91', '₹') */
   prefixText?: string;
@@ -62,12 +68,14 @@ export interface FormFieldConfig<T = any> {
   min?: number | string;
   max?: number | string;
   step?: number | string;
-  /** Number of rows for textarea (default: 3) */
+  /** Number of rows for textarea (default: 2 in compact mode) */
   rows?: number;
   /** Accepted file formats (e.g. '.pdf,.jpg,.png') */
   accept?: string;
   /** Max file size in MB */
   maxFileSizeMb?: number;
+  /** Minimum number of photos required (for 'photos' field type, defaults to 3) */
+  minPhotos?: number;
   /** Whether to show live character count */
   showCharCount?: boolean;
   /** Regex pattern for format validation */
@@ -88,12 +96,12 @@ export interface FormFieldConfig<T = any> {
 export interface FormSectionConfig<T = any> {
   id?: string;
   /** Title of the section (e.g. 'Organization Details') */
-  title: string;
+  title?: string;
   /** Optional subtitle or description */
   subtitle?: string;
   /** Pre-defined icon name: 'building' | 'home' | 'location' | 'document' | 'user' | 'academic' | 'shield' | 'clock' | 'settings' */
   icon?: string;
-  /** Grid columns inside this section: 1 | 2 | 3 | 4 (default: 2) */
+  /** Grid columns inside this section: 1 | 2 | 3 | 4 (default: 4 for enterprise compact density) */
   gridCols?: 1 | 2 | 3 | 4;
   /** Fields inside this section */
   fields: FormFieldConfig<T>[];
@@ -116,3 +124,9 @@ export interface FormActionConfig<T = any> {
   disabled?: boolean | ((model: T) => boolean);
   action: (model: T) => void;
 }
+
+/** Universal Generic Aliases for use across any ISMS module */
+export type DynamicFormField<T = any> = FormFieldConfig<T>;
+export type DynamicFormSection<T = any> = FormSectionConfig<T>;
+export type DynamicFormOption = FormOption;
+export type DynamicFormAction<T = any> = FormActionConfig<T>;

@@ -21,11 +21,12 @@ import { FileDoc } from '../../../features/registration/models/otr-form.model';
           <!-- Modal Header -->
           <div class="px-5 py-3.5 border-b border-[#D9E1E7] bg-[#0483AC] text-white flex items-center justify-between gap-3 shrink-0">
             <div class="flex items-center gap-2.5 min-w-0">
-              <!-- Adobe PDF icon -->
-              <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
-                <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
-                <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
-              </svg>
+              <!-- Image/Document Icon (no PDF icon) -->
+              <div class="w-7 h-7 rounded-md bg-white/20 flex items-center justify-center shrink-0 text-white">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
               <div class="truncate">
                 <h3 class="text-[15px] font-semibold text-white tracking-tight m-0 truncate" style="color: #ffffff !important;">
                   {{ title || doc.fileName }}
@@ -60,7 +61,7 @@ import { FileDoc } from '../../../features/registration/models/otr-form.model';
               <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
               <div>
                 <span class="text-slate-400 text-[11px] font-medium block">File Size</span>
-                <span class="font-medium text-slate-700">{{ doc.fileSize || 'Standard PDF' }}</span>
+                <span class="font-medium text-slate-700">{{ doc.fileSize || 'Image / File' }}</span>
               </div>
               <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
               <div>
@@ -69,24 +70,27 @@ import { FileDoc } from '../../../features/registration/models/otr-form.model';
               </div>
             </div>
 
-            <div class="flex items-center gap-1.5">
-              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold">
-                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Verified Upload</span>
-              </span>
-            </div>
+
           </div>
 
           <!-- Document Canvas / Viewer Body -->
           <div class="p-6 overflow-y-auto flex-1 bg-slate-100 flex items-center justify-center">
             @if (doc.fileUrl) {
-              <iframe
-                [src]="doc.fileUrl"
-                class="w-full h-[480px] rounded border border-slate-300 bg-white"
-                title="Document viewer"
-              ></iframe>
+              @if (isImageFile(doc)) {
+                <div class="max-h-[500px] flex items-center justify-center p-2">
+                  <img
+                    [src]="doc.fileUrl"
+                    [alt]="doc.fileName"
+                    class="max-h-[460px] max-w-full object-contain rounded-md shadow-md"
+                  />
+                </div>
+              } @else {
+                <iframe
+                  [src]="doc.fileUrl"
+                  class="w-full h-[480px] rounded border border-slate-300 bg-white"
+                  title="Document viewer"
+                ></iframe>
+              }
             } @else {
               <!-- Government Document Preview Simulation Canvas -->
               <div class="w-full max-w-xl bg-white border-2 border-slate-200 rounded-lg p-6 sm:p-8 shadow-sm relative overflow-hidden text-center space-y-5">
@@ -150,32 +154,15 @@ import { FileDoc } from '../../../features/registration/models/otr-form.model';
             }
           </div>
 
-          <!-- Modal Footer -->
-          <div class="px-5 py-3 border-t border-[#D9E1E7] bg-white flex items-center justify-between gap-3 shrink-0">
-            <span class="text-xs text-slate-400 hidden sm:inline">
-              Press <kbd class="px-1.5 py-0.5 text-[10px] bg-slate-100 border border-slate-300 rounded font-mono">ESC</kbd> to exit preview
-            </span>
-
-            <div class="flex items-center gap-2.5 ml-auto">
-              <button
-                type="button"
-                (click)="simulateDownload()"
-                class="px-3.5 py-1.5 rounded border border-[#D9E1E7] bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
-              >
-                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                <span>Download Copy</span>
-              </button>
-
-              <button
-                type="button"
-                (click)="closeModal()"
-                class="px-4 py-1.5 rounded bg-[#0483AC] hover:bg-[#036c8f] text-white text-xs font-semibold transition-colors cursor-pointer shadow-xs"
-              >
-                Close
-              </button>
-            </div>
+          <!-- Modal Footer (Close option only, no download option, no ESC text) -->
+          <div class="px-5 py-3 border-t border-[#D9E1E7] bg-white flex items-center justify-end shrink-0">
+            <button
+              type="button"
+              (click)="closeModal()"
+              class="px-5 py-1.5 rounded-lg bg-[#0483AC] hover:bg-[#036c8f] text-white text-xs font-semibold transition-colors cursor-pointer shadow-xs active:scale-95"
+            >
+              Close
+            </button>
           </div>
         </div>
       </div>
@@ -204,6 +191,14 @@ export class DocumentViewerModalComponent {
 
   closeModal(): void {
     this.close.emit();
+  }
+
+  isImageFile(doc: any): boolean {
+    if (!doc) return false;
+    const url = (doc.fileUrl || '').toLowerCase();
+    const name = (doc.fileName || '').toLowerCase();
+    return url.startsWith('data:image/') || url.startsWith('blob:') ||
+      name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.png') || name.endsWith('.webp') || name.endsWith('.svg');
   }
 
   simulateDownload(): void {

@@ -29,16 +29,7 @@ import {
         <!-- Page Header via Reusable PageHeaderComponent -->
         <app-page-header
           title="Batch Management"
-        >
-          <button
-            type="button"
-            (click)="router.navigate(['/batches/create'])"
-            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-[4px] bg-white text-[#174A6E] hover:bg-slate-100 active:scale-95 text-xs font-semibold shadow-xs transition-all cursor-pointer select-none"
-          >
-            <span class="text-sm font-bold leading-none">+</span>
-            <span>Create New Batch</span>
-          </button>
-        </app-page-header>
+        ></app-page-header>
 
         <!-- Filter Controls & Search Toolbar (Matching Active EOI & Tender Status) -->
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-1">
@@ -198,10 +189,10 @@ import {
             variant="primary"
             size="sm"
             (btnClick)="selectAndMap(b)"
-            title="Select & Map Aspirants"
+            title="Register Aspirant"
           >
             <span class="text-sm font-bold leading-none">+</span>
-            <span>Select &amp; Map Aspirants</span>
+            <span>Register Aspirant</span>
           </app-button>
         </ng-template>
 
@@ -272,7 +263,7 @@ export class BatchListComponent {
   }
 
   selectAndMap(b: BatchRecord): void {
-    // Navigate to batch details or aspirant allocation
-    this.router.navigate(['/batches']);
+    // Navigate to aspirant registration and batch mapping form
+    this.router.navigate(['/batches', b.id, 'map-aspirant']);
   }
 }

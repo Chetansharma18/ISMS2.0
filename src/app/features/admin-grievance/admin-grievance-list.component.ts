@@ -1,8 +1,9 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { AuthService } from '../../core/auth/auth.service';
 import {
   PageHeaderComponent,
   TableComponent,
@@ -107,7 +108,7 @@ export interface AdminGrievance {
         [isOpen]="isViewModalOpen()"
         [title]="'Ticket Details'"
         [primaryLabel]="selectedTicket()?.status === 'Open' ? ((isForwarding() || isCommenting()) ? 'Submit' : 'Forward') : 'Close'"
-        [secondaryLabel]="selectedTicket()?.status === 'Open' ? ((isForwarding() || isCommenting()) ? 'Cancel' : 'Comment') : ''"
+        [secondaryLabel]="selectedTicket()?.status === 'Open' ? ((isForwarding() || isCommenting()) ? 'Cancel' : (isDeptAdmin() ? 'Comment' : 'Close')) : ''"
         [showPrimaryArrow]="false"
         [showCloseButton]="true"
         [showAccentBar]="false"
@@ -267,6 +268,11 @@ export interface AdminGrievance {
 })
 export class AdminGrievanceListComponent {
   private sanitizer = inject(DomSanitizer);
+  private authService = inject(AuthService);
+
+  readonly isDeptAdmin = computed(() => {
+    return this.authService.currentUser()?.role === 'dept_admin';
+  });
 
   readonly isViewModalOpen = signal(false);
   readonly isPreviewModalOpen = signal(false);
@@ -374,8 +380,10 @@ export class AdminGrievanceListComponent {
       if (this.isForwarding() || this.isCommenting()) {
         this.isForwarding.set(false);
         this.isCommenting.set(false);
-      } else {
+      } else if (this.isDeptAdmin()) {
         this.isCommenting.set(true);
+      } else {
+        this.closeViewModal();
       }
     }
   }

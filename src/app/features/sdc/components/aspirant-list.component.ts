@@ -56,7 +56,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         }
 
         <!-- Top Statistics Cards (No icon emojis, clean labels and figures) -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           
           <!-- Card 1: Total Aspirants -->
           <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 shadow-2xs">
@@ -105,18 +105,6 @@ import { TableColumn } from '../../../shared/components/table/table.types';
             </div>
             <div class="mt-1 text-[11px] text-slate-500 truncate">
               SAMARTH, MMKVY, RAJKViK
-            </div>
-          </div>
-
-          <!-- Card 5: Biometric Verification -->
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 shadow-2xs col-span-2 sm:col-span-1">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Biometric AEBAS</span>
-            <div class="mt-2 flex items-baseline gap-2">
-              <span class="text-2xl font-bold text-emerald-700 font-mono">{{ stats().verifiedPercent }}%</span>
-              <span class="text-[11px] text-slate-500">Verified</span>
-            </div>
-            <div class="mt-1 text-[11px] text-slate-500">
-              {{ stats().verifiedCount }}/{{ stats().total }} Aadhaar AEBAS synced
             </div>
           </div>
 
@@ -407,18 +395,20 @@ import { TableColumn } from '../../../shared/components/table/table.types';
 
         <!-- Template: Actions -->
         <ng-template #actionsTemplate let-a>
-          <div class="flex items-center justify-end gap-1.5">
-            <a
-              [routerLink]="['/aspirants', a.id]"
-              class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-[4px] bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer no-underline"
+          <div class="flex items-center justify-end gap-1.5 whitespace-nowrap">
+            <button
+              type="button"
+              (click)="viewDetails(a)"
+              class="whitespace-nowrap inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
+              style="color: #ffffff !important; background-color: #174A6E !important;"
               title="View & Edit Aspirant Details"
             >
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="w-3.5 h-3.5 text-white" style="color: #ffffff !important; stroke: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
-              <span>View Details</span>
-            </a>
+              <span style="color: #ffffff !important;">View Details</span>
+            </button>
           </div>
         </ng-template>
 

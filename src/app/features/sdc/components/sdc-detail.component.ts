@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { SdcService } from '../services/sdc.service';
 import { SdcRecord, CenterPhotoItem, SDC_SECTOR_OPTIONS } from '../models/sdc.model';
 import { RAJASTHAN_LOCATION_DATA } from '../config/sdc-form.config';
+import { AuthService } from '../../../core/auth/auth.service';
 import { PageHeaderComponent } from '../../../shared/components';
 
 @Component({
@@ -20,14 +21,14 @@ import { PageHeaderComponent } from '../../../shared/components';
     <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
       
       @if (sdc(); as center) {
-        <div class="p-4 sm:p-6 lg:p-7 space-y-4 max-w-7xl mx-auto">
+        <div class="p-4 sm:p-6 lg:p-7 space-y-5 max-w-7xl mx-auto">
           
-          <!-- Top Page Header (No sub-points, no breadcrumbs, no badges, and NO Save/Cancel buttons during edit) -->
+          <!-- Top Page Header -->
           <app-page-header
             [title]="center.sdcName + ' (' + center.sdcCode + ')'"
             bgColor="var(--color-primary, #174A6E)"
             [showBack]="true"
-            backUrl="/sdcs"
+            [backUrl]="backUrl()"
             backTitle="Back to SDC List"
           >
             <div class="flex items-center gap-2">
@@ -61,11 +62,221 @@ import { PageHeaderComponent } from '../../../shared/components';
           }
 
           <!-- ========================================================================= -->
+          <!-- HERO OVERVIEW STRIP: Training Partner + SDC Identity in ISMS Theme         -->
+          <!-- ========================================================================= -->
+          <div class="rounded-xl border border-[#D9E1E7] bg-[#EAF2F6]/60 p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Left: Training Partner & Center Code -->
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded bg-[#174A6E] text-white text-[10.5px] font-bold uppercase tracking-wider">
+                  Training Partner
+                </span>
+                <span class="font-mono text-xs font-semibold text-slate-600">
+                  {{ center.mouRefNo || 'MOU Registered' }}
+                </span>
+              </div>
+              <div class="text-base sm:text-lg font-bold text-slate-900">
+                {{ center.tpName }}
+              </div>
+              <div class="text-xs text-slate-600 flex items-center gap-2 flex-wrap">
+                <span>Center: <strong class="text-slate-800">{{ center.sdcName }}</strong></span>
+                <span>•</span>
+                <span class="font-mono font-medium text-[#174A6E]">{{ center.sdcCode }}</span>
+                <span>•</span>
+                <span>Scheme: <strong class="text-slate-800">{{ center.scheme }}</strong> ({{ center.schemeCategory || 'General' }})</span>
+              </div>
+            </div>
+
+            <!-- Right: Status & Capacity Badges -->
+            <div class="flex items-center gap-4 sm:gap-6">
+              
+              <!-- Target Capacity -->
+              <div class="text-right">
+                <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Target Capacity</span>
+                <span class="font-bold text-slate-900 text-sm">
+                  {{ center.approval?.approvedTargetCapacity || center.sdcCapacity }} Trainees
+                </span>
+              </div>
+
+              <!-- Status (Bold Black Uppercase Text) -->
+              <div class="text-right border-l border-[#D9E1E7] pl-4 sm:pl-6">
+                <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Current Status</span>
+                <span class="font-bold text-sm tracking-wide uppercase text-black" style="color: #000000 !important; font-weight: bold;">
+                  {{ formatStatus(center.status).toUpperCase() }}
+                </span>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- ADMIN SCRUTINY & APPROVAL DECISION PANEL (When role is Admin)              -->
+          <!-- ========================================================================= -->
+          @if (isAdmin() && !isEditing()) {
+            
+            @if (center.status === 'APPROVED') {
+              <!-- Approved Notice Card -->
+              <div class="rounded-xl border border-emerald-300 bg-emerald-50/80 p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-start gap-3">
+                  <div class="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-emerald-900 text-sm">SDC Approved by Department</h4>
+                    <p class="text-emerald-800 text-xs mt-0.5">
+                      {{ center.approval?.approvalRemarks || 'Center certified and sanctioned for training batches mobilization.' }}
+                    </p>
+                    <div class="text-[11px] text-emerald-700 mt-1 flex items-center gap-3">
+                      <span>Approved Target Capacity: <strong>{{ center.approval?.approvedTargetCapacity || center.sdcCapacity }} Trainees</strong></span>
+                      <span>•</span>
+                      <span>Approved Date: <strong>{{ center.approval?.approvedDate || '2026-09-15' }}</strong></span>
+                      <span>•</span>
+                      <span>Authority: <strong>{{ center.approval?.approvedBy || 'RSLDC Authority' }}</strong></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <!-- Actionable Scrutiny & Approval Box -->
+              <div class="rounded-xl border border-[#174A6E]/30 bg-white shadow-xs overflow-hidden">
+                
+                <!-- Decision Header -->
+                <div class="bg-[#174A6E] text-white px-5 py-3 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <span class="font-bold text-xs uppercase tracking-wider">Department Scrutiny & Approval Decision</span>
+                  </div>
+                  <span class="text-[11px] text-white/80 font-mono">Status: {{ center.status }}</span>
+                </div>
+
+                <!-- Inspection Findings Summary if available -->
+                @if (center.inspection) {
+                  <div class="bg-[#F8FAFC] border-b border-slate-200 p-4 text-xs">
+                    <div class="font-semibold text-slate-800 mb-2 flex items-center justify-between">
+                      <span>Auditor Physical Inspection Summary:</span>
+                      <span class="px-2 py-0.5 rounded text-[10.5px] font-bold"
+                            [class.bg-emerald-100]="center.inspection.recommendation === 'RECOMMENDED'"
+                            [class.text-emerald-800]="center.inspection.recommendation === 'RECOMMENDED'"
+                            [class.bg-amber-100]="center.inspection.recommendation !== 'RECOMMENDED'"
+                            [class.text-amber-800]="center.inspection.recommendation !== 'RECOMMENDED'">
+                        Recommendation: {{ center.inspection.recommendation }}
+                      </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11.5px] text-slate-600">
+                      <div>
+                        <span class="text-slate-400 block text-[10.5px]">Auditor</span>
+                        <strong class="text-slate-800">{{ center.inspection.auditorName }}</strong>
+                      </div>
+                      <div>
+                        <span class="text-slate-400 block text-[10.5px]">Inspection Date</span>
+                        <strong class="text-slate-800">{{ center.inspection.inspectionDate }}</strong>
+                      </div>
+                      <div>
+                        <span class="text-slate-400 block text-[10.5px]">Geo Distance</span>
+                        <strong [class.text-emerald-700]="center.inspection.geoMatched" [class.text-rose-700]="!center.inspection.geoMatched">
+                          {{ center.inspection.geoDistanceMeters }}m ({{ center.inspection.geoMatched ? 'Within 100m' : 'Exceeded' }})
+                        </strong>
+                      </div>
+                      <div>
+                        <span class="text-slate-400 block text-[10.5px]">AEBAS Biometric</span>
+                        <strong class="text-emerald-700">Functional & Verified</strong>
+                      </div>
+                    </div>
+
+                    <div class="mt-2 text-[11px] text-slate-600 italic bg-white p-2 rounded border border-slate-200">
+                      "{{ center.inspection.auditorRemarks }}"
+                    </div>
+                  </div>
+                }
+
+                <!-- Approval Form Controls -->
+                <div class="p-5 space-y-4 text-xs">
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label class="block font-semibold text-slate-700 mb-1">
+                        Sanctioned Target Capacity (Trainees) <span class="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        [(ngModel)]="adminTargetCapacity"
+                        min="1"
+                        max="5000"
+                        class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
+                      />
+                    </div>
+                    <div class="sm:col-span-2">
+                      <label class="block font-semibold text-slate-700 mb-1">
+                        Approval / Department Remarks <span class="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        [(ngModel)]="adminRemarks"
+                        class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
+                        placeholder="Enter official remarks..."
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Decision Actions -->
+                  <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100 flex-wrap">
+                    
+                    <button
+                      type="button"
+                      (click)="returnToTp(center)"
+                      class="px-3.5 py-2 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-semibold cursor-pointer transition-colors"
+                    >
+                      Return to TP for Corrections
+                    </button>
+
+                    <button
+                      type="button"
+                      (click)="rejectSdc(center)"
+                      class="px-3.5 py-2 rounded-lg border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-800 text-xs font-semibold cursor-pointer transition-colors"
+                    >
+                      Reject SDC
+                    </button>
+
+                    <button
+                      type="button"
+                      (click)="approveSdc(center)"
+                      class="px-5 py-2 rounded-lg bg-[#174A6E] hover:bg-[#123B59] active:bg-[#0E2D44] text-white text-xs font-semibold shadow-sm cursor-pointer transition-colors flex items-center gap-1.5"
+                    >
+                      <svg class="w-4 h-4 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Approve SDC</span>
+                    </button>
+
+                  </div>
+
+                </div>
+
+              </div>
+            }
+
+          }
+
+          <!-- ========================================================================= -->
           <!-- VIEW MODE: Complete SDC Creation Details in exact 7-row form sequence      -->
           <!-- ========================================================================= -->
           @if (!isEditing()) {
-            <div class="border border-slate-200 rounded-xl p-5 sm:p-6 bg-white shadow-2xs space-y-5">
+            <div class="border border-slate-200 rounded-xl p-5 sm:p-6 bg-white shadow-2xs space-y-6">
               
+              <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-[#174A6E]"></span>
+                  <span>Registered Center Details & Infrastructure</span>
+                </h3>
+                <span class="text-xs text-slate-500 font-mono">{{ center.sdcCode }}</span>
+              </div>
+
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
                 
                 <!-- Row 1: Center Name (colSpan 2) + Sector (colSpan 2) -->
@@ -171,7 +382,7 @@ import { PageHeaderComponent } from '../../../shared/components';
 
                 <!-- Row 7 (LAST): Center Photos (colSpan 4) -->
                 <div class="sm:col-span-2 lg:col-span-4 pt-4 border-t border-slate-100">
-                  <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2.5">Center Photos</span>
+                  <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-2.5">Center Photos (JPG)</span>
                   @if ((center.centerPhotos || []).length > 0) {
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5">
                       @for (photo of center.centerPhotos; track photo.name || photo.id; let idx = $index) {
@@ -208,15 +419,71 @@ import { PageHeaderComponent } from '../../../shared/components';
               </div>
 
             </div>
+
+            <!-- Uploaded Verification Documents Card -->
+            @if (center.documents) {
+              <div class="border border-slate-200 rounded-xl p-5 sm:p-6 bg-white shadow-2xs space-y-4">
+                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-[#174A6E]"></span>
+                  <span>Uploaded Center Documents</span>
+                </h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                  @if (center.documents.rentalAgreementDoc) {
+                    <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 font-bold text-[10px]">PDF</div>
+                      <div class="truncate">
+                        <div class="font-semibold text-slate-800 text-xs truncate">Rental / Lease Deed</div>
+                        <div class="text-[10.5px] text-slate-500 font-mono">{{ center.documents.rentalAgreementDoc.fileSize }}</div>
+                      </div>
+                    </div>
+                  }
+
+                  @if (center.documents.fireNocDoc) {
+                    <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 font-bold text-[10px]">PDF</div>
+                      <div class="truncate">
+                        <div class="font-semibold text-slate-800 text-xs truncate">Fire Safety NOC</div>
+                        <div class="text-[10.5px] text-slate-500 font-mono">{{ center.documents.fireNocDoc.fileSize }}</div>
+                      </div>
+                    </div>
+                  }
+
+                  @if (center.documents.signboardPhotoDoc) {
+                    <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 font-bold text-[10px]">IMG</div>
+                      <div class="truncate">
+                        <div class="font-semibold text-slate-800 text-xs truncate">Signboard Verification</div>
+                        <div class="text-[10.5px] text-slate-500 font-mono">{{ center.documents.signboardPhotoDoc.fileSize }}</div>
+                      </div>
+                    </div>
+                  }
+
+                  @if (center.documents.layoutDiagramDoc) {
+                    <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 font-bold text-[10px]">PDF</div>
+                      <div class="truncate">
+                        <div class="font-semibold text-slate-800 text-xs truncate">Classroom Blueprint</div>
+                        <div class="text-[10.5px] text-slate-500 font-mono">{{ center.documents.layoutDiagramDoc.fileSize }}</div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
           }
 
           <!-- ========================================================================= -->
           <!-- EDIT MODE: Edit SDC Creation Details directly on the page                 -->
-          <!-- Includes full option to edit / add / remove uploaded center photos        -->
           <!-- ========================================================================= -->
           @if (isEditing()) {
             <div class="border border-slate-200 rounded-xl p-5 sm:p-6 bg-white shadow-2xs space-y-4 animate-in fade-in duration-150">
               
+              <div class="border-b border-slate-100 pb-2">
+                <h3 class="text-sm font-bold text-slate-800">Edit SDC Registration Information</h3>
+                <p class="text-xs text-slate-500">Update center information, capacity, infrastructure parameters, and photos.</p>
+              </div>
+
               <!-- 4-Column Form Grid matching SDC creation form -->
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                 
@@ -228,7 +495,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <input
                     type="text"
                     [(ngModel)]="editModel.sdcName"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                     placeholder="Enter Center Name"
                   />
                 </div>
@@ -239,7 +506,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   </label>
                   <select
                     [(ngModel)]="editModel.sector"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                   >
                     @for (sec of sectors; track sec) {
                       <option [value]="sec">{{ sec }}</option>
@@ -265,7 +532,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <select
                     [ngModel]="editModel.district"
                     (ngModelChange)="onDistrictChange($event)"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                   >
                     @for (d of districts; track d) {
                       <option [value]="d">{{ d }}</option>
@@ -279,7 +546,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   </label>
                   <select
                     [(ngModel)]="editModel.assemblyConstituency"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                   >
                     @for (a of assemblyConstituencies; track a) {
                       <option [value]="a">{{ a }}</option>
@@ -293,7 +560,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   </label>
                   <select
                     [(ngModel)]="editModel.parliamentConstituency"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                   >
                     @for (p of parliamentConstituencies; track p) {
                       <option [value]="p">{{ p }}</option>
@@ -318,7 +585,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   </label>
                   <select
                     [(ngModel)]="editModel.block"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                   >
                     @for (b of blocks; track b) {
                       <option [value]="b">{{ b }}</option>
@@ -333,7 +600,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <input
                     type="date"
                     [(ngModel)]="editModel.proposedStartDate"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                   />
                 </div>
 
@@ -346,7 +613,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                     [(ngModel)]="editModel.sdcCapacity"
                     min="1"
                     max="1000"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                   />
                 </div>
 
@@ -358,7 +625,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <input
                     type="email"
                     [(ngModel)]="editModel.centerEmail"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                     placeholder="center@example.com"
                   />
                 </div>
@@ -370,7 +637,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <input
                     type="text"
                     [(ngModel)]="editModel.fullAddress"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                     placeholder="Street address, building, landmark"
                   />
                 </div>
@@ -383,7 +650,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                     type="text"
                     [(ngModel)]="editModel.pincode"
                     maxlength="6"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                     placeholder="302029"
                   />
                 </div>
@@ -394,7 +661,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <input
                     type="number"
                     [(ngModel)]="editModel.totalTrainedAspirants"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                   />
                 </div>
 
@@ -403,7 +670,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <input
                     type="number"
                     [(ngModel)]="editModel.totalPlacedAspirants"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                   />
                 </div>
 
@@ -411,7 +678,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <label class="block font-semibold text-slate-700 mb-1">Hostel Category</label>
                   <select
                     [(ngModel)]="editModel.hostelCategory"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                   >
                     @for (cat of hostelCategories; track cat) {
                       <option [value]="cat">{{ cat }}</option>
@@ -426,7 +693,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                     type="number"
                     step="0.0001"
                     [(ngModel)]="editModel.latitude"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                   />
                 </div>
 
@@ -436,7 +703,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                     type="number"
                     step="0.0001"
                     [(ngModel)]="editModel.longitude"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                   />
                 </div>
 
@@ -445,71 +712,51 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <input
                     type="text"
                     [(ngModel)]="editModel.remarks"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
                     placeholder="Remarks"
                   />
                 </div>
 
-                <!-- Row 7: Center Photos Edit (Add & Remove JPG photos) -->
-                <div class="sm:col-span-2 lg:col-span-4 pt-4 border-t border-slate-200">
-                  <div class="flex items-center justify-between mb-3">
-                    <div>
-                      <label class="block font-semibold text-slate-700 text-xs">Center Photos (JPG only)</label>
-                      <span class="text-[11px] text-slate-500">Upload or remove center photographs</span>
-                    </div>
-                    <span class="text-[11px] text-slate-400 font-mono">{{ (editModel.centerPhotos || []).length }} photos</span>
-                  </div>
-
-                  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5">
-                    @for (photo of editModel.centerPhotos; track photo.name || photo.id; let idx = $index) {
-                      <div class="group relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50 flex flex-col">
-                        <!-- Red Delete Photo Button -->
-                        <button
-                          type="button"
-                          (click)="removePhoto(idx)"
-                          class="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-rose-600 hover:bg-rose-700 active:scale-95 text-white flex items-center justify-center text-xs shadow-md transition-all cursor-pointer font-bold"
-                          title="Remove photo"
-                        >
-                          ✕
-                        </button>
-                        
-                        <div class="w-full h-32 bg-slate-100 overflow-hidden flex items-center justify-center">
-                          <img [src]="photo.url" [alt]="photo.name" class="w-full h-full object-cover" />
-                        </div>
-                        <div class="p-2 bg-white border-t border-slate-100 flex items-center justify-between text-xs">
-                          <span class="font-semibold text-slate-800 text-[11px] truncate">{{ photo.tag || ('Photo ' + (idx + 1)) }}</span>
-                          <span class="text-[10px] text-slate-400 font-mono">{{ photo.size || '' }}</span>
-                        </div>
-                      </div>
-                    }
-
-                    <!-- + Add JPG Photo Button (FileInput) -->
-                    <div
-                      (click)="photoFileInput.click()"
-                      class="h-40 rounded-xl border-2 border-dashed border-slate-300 hover:border-[#0B3558] bg-slate-50/70 hover:bg-blue-50/30 transition-all cursor-pointer flex flex-col items-center justify-center p-3 text-center group"
-                    >
+                <!-- Row 7 (LAST): Center Photos Manager -->
+                <div class="sm:col-span-2 lg:col-span-4 pt-4 border-t border-slate-100">
+                  <div class="flex items-center justify-between mb-2">
+                    <label class="block font-semibold text-slate-700">
+                      Center Photos (JPG) <span class="text-rose-500">*</span>
+                    </label>
+                    <label class="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#174A6E] hover:bg-[#123B59] text-white text-[11px] font-semibold cursor-pointer shadow-2xs">
+                      <span>+ Upload Photos</span>
                       <input
-                        #photoFileInput
                         type="file"
                         accept=".jpg,.jpeg,image/jpeg"
                         multiple
-                        (change)="onAddPhotos($event)"
                         class="hidden"
+                        (change)="onAddPhotos($event)"
                       />
-                      <div class="w-9 h-9 rounded-full bg-slate-200 group-hover:bg-[#0B3558] group-hover:text-white text-slate-600 flex items-center justify-center transition-all mb-1.5 shadow-2xs">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
+                    </label>
+                  </div>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5">
+                    @for (photo of editModel.centerPhotos; track photo.id || photo.name; let idx = $index) {
+                      <div class="relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50 group flex flex-col">
+                        <div class="w-full h-32 bg-slate-100 overflow-hidden flex items-center justify-center">
+                          <img [src]="photo.url" [alt]="photo.name" class="w-full h-full object-cover" />
+                        </div>
+                        <div class="p-2 bg-white border-t border-slate-100 flex items-center justify-between">
+                          <span class="text-[11px] font-semibold text-slate-700 truncate">{{ photo.tag || ('Photo ' + (idx + 1)) }}</span>
+                          <button
+                            type="button"
+                            (click)="removePhoto(idx)"
+                            class="text-rose-500 hover:text-rose-700 text-xs font-bold px-1.5 py-0.5 rounded hover:bg-rose-50"
+                          >✕</button>
+                        </div>
                       </div>
-                      <span class="text-xs font-semibold text-slate-700 group-hover:text-[#0B3558]">+ Add JPG Photo</span>
-                      <span class="text-[10.5px] text-slate-400 mt-0.5">JPG / JPEG</span>
-                    </div>
+                    }
                   </div>
                 </div>
 
               </div>
 
-              <!-- Form Action Buttons (Inside the form at the bottom) -->
+              <!-- Form Action Buttons -->
               <div class="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-200">
                 <button
                   type="button"
@@ -531,6 +778,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <span>Save Changes</span>
                 </button>
               </div>
+
             </div>
           }
 
@@ -538,7 +786,7 @@ import { PageHeaderComponent } from '../../../shared/components';
       } @else {
         <div class="p-12 text-center text-slate-500">
           <p>SDC Center not found.</p>
-          <a routerLink="/sdcs" class="text-[#0B3558] font-bold hover:underline mt-2 inline-block">
+          <a [routerLink]="backUrl()" class="text-[#174A6E] font-bold hover:underline mt-2 inline-block">
             Return to SDC Directory
           </a>
         </div>
@@ -595,11 +843,25 @@ export class SdcDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   readonly router = inject(Router);
   readonly sdcService = inject(SdcService);
+  readonly authService = inject(AuthService);
 
   centerId = signal<string>('');
   isEditing = signal<boolean>(false);
   successMessage = signal<string>('');
   selectedPhoto = signal<CenterPhotoItem | null>(null);
+
+  /** Detect Admin vs TP mode */
+  readonly isAdmin = computed(() => {
+    const role = this.authService.currentUser()?.role;
+    return role === 'dept_admin' || role === 'super_admin' || (this.router.url.startsWith('/sdc') && !this.router.url.startsWith('/sdcs'));
+  });
+
+  /** Dynamic back URL */
+  readonly backUrl = computed(() => this.isAdmin() ? '/sdc' : '/sdcs');
+
+  /** Admin decision form values */
+  adminTargetCapacity = 100;
+  adminRemarks = 'Approved in accordance with RSLDC guidelines and verified physical infrastructure.';
 
   sectors = SDC_SECTOR_OPTIONS;
   districts = Object.keys(RAJASTHAN_LOCATION_DATA);
@@ -625,8 +887,48 @@ export class SdcDetailComponent implements OnInit {
       const id = params.get('id');
       if (id) {
         this.centerId.set(id);
+        const center = this.sdcService.getSdcById(id);
+        if (center) {
+          this.adminTargetCapacity = center.sdcCapacity || 100;
+        }
       }
     });
+  }
+
+  formatStatus(status?: string): string {
+    switch (status) {
+      case 'APPROVED': return 'Approved';
+      case 'PENDING_INSPECTION': return 'Pending Inspection';
+      case 'INSPECTION_COMPLETED': return 'Inspection Completed';
+      case 'PENDING_APPROVAL': return 'Pending Approval';
+      case 'REJECTED': return 'Rejected';
+      case 'RETURNED_TO_TP': return 'Returned to TP';
+      case 'DRAFT': return 'Draft';
+      case 'SUBMITTED': return 'Submitted';
+      default: return status || '—';
+    }
+  }
+
+  approveSdc(center: SdcRecord): void {
+    this.sdcService.approveSdc(center.id, this.adminTargetCapacity || center.sdcCapacity, this.adminRemarks);
+    this.successMessage.set(`SDC "${center.sdcName}" has been successfully approved for ${center.tpName}!`);
+    setTimeout(() => this.successMessage.set(''), 5000);
+  }
+
+  rejectSdc(center: SdcRecord): void {
+    if (!confirm(`Are you sure you want to reject SDC "${center.sdcName}"?`)) return;
+    this.sdcService.rejectSdc(center.id, this.adminRemarks || 'Rejected by Department Authority');
+    this.successMessage.set(`SDC "${center.sdcName}" has been rejected.`);
+    setTimeout(() => this.successMessage.set(''), 5000);
+  }
+
+  returnToTp(center: SdcRecord): void {
+    const reason = prompt('Please enter correction instructions for the Training Partner:', 'Please upload updated NOC and lab verification photos.');
+    if (reason) {
+      this.sdcService.returnToTp(center.id, reason);
+      this.successMessage.set(`SDC returned to ${center.tpName} for corrections.`);
+      setTimeout(() => this.successMessage.set(''), 5000);
+    }
   }
 
   startEditing(center: SdcRecord): void {
@@ -720,7 +1022,7 @@ export class SdcDetailComponent implements OnInit {
   saveEditing(id: string): void {
     this.sdcService.updateSdc(id, this.editModel);
     this.isEditing.set(false);
-    this.successMessage.set('SDC creation details updated successfully!');
+    this.successMessage.set('SDC registration details updated successfully!');
     setTimeout(() => this.successMessage.set(''), 4000);
   }
 

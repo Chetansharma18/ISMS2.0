@@ -724,6 +724,11 @@ export class AspirantService {
 
     const newRecord: AspirantRecord = {
       ...formData,
+      documents: (formData.documents && formData.documents.length > 0) ? formData.documents : [
+        { id: 'doc-1', docType: 'Aadhaar Card', docName: 'Aadhaar Card Copy', fileName: formData.aadhaarDocName || 'Aadhaar_Document.pdf', fileSize: formData.aadhaarDocSize || '1.4 MB', status: 'UPLOADED' },
+        { id: 'doc-2', docType: 'Educational Qualification Certificate', docName: 'Educational Qualification Certificate', fileName: '12th_Pass_Certificate.pdf', fileSize: '2.1 MB', status: 'UPLOADED' },
+        { id: 'doc-3', docType: 'Bank Passbook / Cancelled Cheque', docName: 'Bank Passbook / Cancelled Cheque', fileName: 'Bank_Passbook.jpg', fileSize: '850 KB', status: 'UPLOADED' }
+      ],
       id: newId,
       aadhaarMasked,
       sdcId,

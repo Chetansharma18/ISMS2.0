@@ -86,7 +86,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                   @for (item of tenders; track item.id) {
                     <div 
                       (click)="openTenderPreview(item)" 
-                      class="relative p-3 sm:p-3.5 bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-[#0B3558]/40 hover:bg-slate-50 transition-all group">
+                      class="relative p-3 sm:p-3.5 bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg hover:shadow-lg hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer">
                       @if (item.isNew) {
                         <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-lg" />
                       }
@@ -106,7 +106,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                   @for (item of tenders; track item.id + '-dup') {
                     <div 
                       (click)="openTenderPreview(item)" 
-                      class="relative p-3 sm:p-3.5 bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-[#0B3558]/40 hover:bg-slate-50 transition-all group">
+                      class="relative p-3 sm:p-3.5 bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg hover:shadow-lg hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer">
                       @if (item.isNew) {
                         <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-lg" />
                       }
@@ -131,7 +131,10 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
           
           <!-- Slide-out Preview Panel -->
           @if (selectedPreviewTender()) {
-            <div class="absolute inset-y-0 right-[calc(100%-24px)] w-70 sm:w-90 bg-white shadow-[-10px_0_20px_rgba(0,0,0,0.15)] z-10 rounded-l-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-right-12 duration-300">
+            <!-- Invisible click-away overlay -->
+            <div class="fixed inset-0 z-[5]" (click)="closeTenderPreview()"></div>
+
+            <div class="absolute inset-y-0 right-[calc(100%-24px)] w-70 sm:w-90 bg-white shadow-[-10px_0_20px_rgba(0,0,0,0.15)] z-[10] rounded-l-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-right-12 duration-300">
               
               <!-- Header -->
               <div class="p-4 pr-10 border-b border-slate-100 bg-slate-50 flex justify-between items-start gap-2">

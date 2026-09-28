@@ -328,8 +328,12 @@ export function getStep1PersonalFields(
       type: 'text',
       required: true,
       requiredMessage: 'Aadhaar number is mandatory',
+      minLength: 12,
       maxLength: 12,
+      pattern: '^[0-9]{12}$',
+      patternMessage: 'Aadhaar must be exactly 12 digits (numbers only)',
       placeholder: '12 digit Aadhaar number',
+      hint: 'Enter 12-digit Aadhaar number without spaces',
       colSpan: 2
     },
     {
@@ -343,8 +347,12 @@ export function getStep1PersonalFields(
       key: 'janaadhaarId',
       label: 'Janaadhaar ID',
       type: 'text',
+      minLength: 10,
       maxLength: 10,
+      pattern: '^[0-9]{10}$',
+      patternMessage: 'Jan Aadhaar ID must be exactly 10 digits',
       placeholder: '10 digit Jan Aadhaar ID',
+      hint: 'Enter 10-digit Jan Aadhaar / Bhamashah number',
       colSpan: 1
     },
     {
@@ -367,20 +375,41 @@ export function getStep1PersonalFields(
         const type = m?.otherIdType;
         if (!type || type === 'None') return 'Other ID Nos.';
         if (type === 'PAN Card' || type.toLowerCase().includes('pan')) return 'PAN';
-        if (type.toLowerCase().includes('voter')) return 'Voter ID';
-        if (type.toLowerCase().includes('driving')) return 'Driving License';
-        if (type.toLowerCase().includes('passport')) return 'Passport';
-        if (type.toLowerCase().includes('ration')) return 'Ration Card';
+        if (type.toLowerCase().includes('voter')) return 'Voter ID (EPIC)';
+        if (type.toLowerCase().includes('driving')) return 'Driving License No.';
+        if (type.toLowerCase().includes('passport')) return 'Passport No.';
+        if (type.toLowerCase().includes('ration')) return 'Ration Card No.';
         return `${type}`;
       },
       placeholder: (m: any) => {
         const type = m?.otherIdType;
-        if (type === 'PAN Card' || type?.toLowerCase().includes('pan')) return 'Enter 10-digit PAN (e.g. ABCDE1234F)';
-        if (type === 'Voter ID') return 'Enter Voter ID number';
-        if (type === 'Driving License') return 'Enter Driving License number';
-        if (type === 'Passport') return 'Enter Passport number';
+        if (type === 'PAN Card' || type?.toLowerCase().includes('pan')) return 'e.g. ABCDE1234F  (10 chars)';
+        if (type === 'Voter ID') return 'e.g. ABC1234567  (10 chars)';
+        if (type === 'Driving License') return 'e.g. RJ01 20110012345  (up to 16 chars)';
+        if (type === 'Passport') return 'e.g. A1234567  (8 chars)';
         if (type === 'Ration Card') return 'Enter Ration Card number';
         return 'Enter document number';
+      },
+      uppercase: true,
+      validator: (value: string, model: any) => {
+        if (!value) return null;
+        const type = model?.otherIdType;
+        if (!type || type === 'None') return null;
+        const v = value.trim().toUpperCase();
+        if (type === 'PAN Card') {
+          if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(v))
+            return 'PAN must be 10 chars: 5 letters, 4 digits, 1 letter (e.g. ABCDE1234F)';
+        } else if (type === 'Voter ID') {
+          if (!/^[A-Z]{3}[0-9]{7}$/.test(v))
+            return 'Voter ID (EPIC) must be 10 chars: 3 letters followed by 7 digits (e.g. ABC1234567)';
+        } else if (type === 'Passport') {
+          if (!/^[A-Z]{1}[0-9]{7}$/.test(v))
+            return 'Passport No. must be 8 chars: 1 letter followed by 7 digits (e.g. A1234567)';
+        } else if (type === 'Driving License') {
+          if (!/^[A-Z]{2}[0-9]{2}[0-9A-Z]{0,12}$/.test(v) || v.length < 10 || v.length > 16)
+            return 'Driving License must be 10–16 alphanumeric characters (e.g. RJ0120110012345)';
+        }
+        return null;
       },
       type: 'text',
       colSpan: 2,
@@ -425,7 +454,6 @@ export function getStep1PersonalFields(
       options: [
         { label: 'Father (S/o, D/o)', value: 'Father' },
         { label: 'Husband (W/o)', value: 'Husband' },
-        { label: 'Mother', value: 'Mother' },
         { label: 'Guardian', value: 'Guardian' }
       ]
     },
@@ -647,7 +675,10 @@ export function getStep2PermanentAddressFields(): FormFieldConfig[] {
       label: 'Pincode',
       type: 'text',
       required: true,
+      minLength: 6,
       maxLength: 6,
+      pattern: '^[1-9][0-9]{5}$',
+      patternMessage: 'Pincode must be a valid 6-digit code (not starting with 0)',
       placeholder: '6 digit Pincode',
       colSpan: 1
     },
@@ -743,7 +774,10 @@ export function getStep2CommAddressFields(): FormFieldConfig[] {
       label: 'Pincode',
       type: 'text',
       required: true,
+      minLength: 6,
       maxLength: 6,
+      pattern: '^[1-9][0-9]{5}$',
+      patternMessage: 'Pincode must be a valid 6-digit code (not starting with 0)',
       placeholder: '6 digit Pincode',
       colSpan: 1
     }
@@ -769,7 +803,10 @@ export function getStep2ContactFields(): FormFieldConfig[] {
       required: true,
       requiredMessage: 'Mobile number is mandatory',
       prefixText: '+91',
+      minLength: 10,
       maxLength: 10,
+      pattern: '^[6-9][0-9]{9}$',
+      patternMessage: 'Mobile must be 10 digits starting with 6, 7, 8 or 9',
       placeholder: '10 digit mobile number',
       colSpan: 1
     },
@@ -778,7 +815,10 @@ export function getStep2ContactFields(): FormFieldConfig[] {
       label: 'Alternate Mobile Number',
       type: 'tel',
       prefixText: '+91',
+      minLength: 10,
       maxLength: 10,
+      pattern: '^[6-9][0-9]{9}$',
+      patternMessage: 'Alternate mobile must be 10 digits starting with 6, 7, 8 or 9',
       placeholder: 'Secondary contact number',
       colSpan: 1
     },
@@ -832,7 +872,12 @@ export function getStep3EconomicWorkerFields(): FormFieldConfig[] {
       key: 'bankAccountNo',
       label: 'Account No',
       type: 'text',
+      minLength: 9,
+      maxLength: 18,
+      pattern: '^[0-9]{9,18}$',
+      patternMessage: 'Bank account number must be 9–18 digits (numbers only)',
       placeholder: 'Bank savings account number',
+      hint: '9 to 18 digit bank account number',
       colSpan: 1
     },
     {
@@ -883,16 +928,24 @@ export function getStep3EconomicWorkerFields(): FormFieldConfig[] {
       label: 'IFSC Code',
       type: 'text',
       uppercase: true,
+      minLength: 11,
       maxLength: 11,
+      pattern: '^[A-Z]{4}0[A-Z0-9]{6}$',
+      patternMessage: 'IFSC must be 11 chars: 4 letters, 0, then 6 alphanumerics (e.g. SBIN0001234)',
       placeholder: 'e.g. SBIN0001234',
+      hint: '11-character IFSC code',
       colSpan: 1
     },
     {
       key: 'micrCode',
       label: 'MICR Code',
       type: 'text',
+      minLength: 9,
       maxLength: 9,
+      pattern: '^[0-9]{9}$',
+      patternMessage: 'MICR Code must be exactly 9 digits',
       placeholder: '9 digit MICR',
+      hint: 'Enter 9-digit MICR code from cheque',
       colSpan: 1
     },
 
@@ -1051,10 +1104,15 @@ export function getStep3EconomicWorkerFields(): FormFieldConfig[] {
     },
     {
       key: 'epicNo',
-      label: 'EPIC No.',
+      label: 'EPIC No. (Voter ID)',
       type: 'text',
       uppercase: true,
-      placeholder: 'Voter ID card number (e.g. RJ/01/001/123456)',
+      minLength: 10,
+      maxLength: 10,
+      pattern: '^[A-Z]{3}[0-9]{7}$',
+      patternMessage: 'EPIC / Voter ID must be 10 chars: 3 letters followed by 7 digits (e.g. RJA0001234)',
+      placeholder: 'e.g. RJA0001234  (10 chars)',
+      hint: '3 letters + 7 digits as on Voter ID card',
       colSpan: 2
     }
   ];

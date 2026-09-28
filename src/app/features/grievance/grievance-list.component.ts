@@ -115,23 +115,32 @@ export interface Grievance {
         secondaryLabel="Cancel"
         [showCloseButton]="true"
         [showAccentBar]="false"
-        [disablePrimary]="!isFormValid()"
         (primaryAction)="submitTicket()"
         (secondaryAction)="closeModal()"
         (close)="closeModal()"
       >
         <div class="mt-5 space-y-4 text-left">
           <div>
-            <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Title <span class="text-rose-500">*</span></label>
-            <input type="text" [(ngModel)]="newTicket.title" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all placeholder:text-slate-400" placeholder="Enter title" />
+            <div class="flex justify-between items-end mb-1.5">
+              <label class="block text-[13px] font-semibold text-slate-700">Title <span class="text-rose-500">*</span></label>
+              <span class="text-[11px]" [ngClass]="{'text-rose-500 font-medium': getWordCount(newTicket.title) > 100, 'text-slate-400': getWordCount(newTicket.title) <= 100}">
+                {{ getWordCount(newTicket.title) }}/100 words
+              </span>
+            </div>
+            <input type="text" [(ngModel)]="newTicket.title" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all placeholder:text-slate-400" [ngClass]="{'border-rose-300 focus:border-rose-500 focus:ring-rose-500/30': isFieldInvalid('title'), 'border-slate-300 focus:border-sky-500 focus:ring-sky-500/30': !isFieldInvalid('title')}" placeholder="Enter title" />
           </div>
           <div>
-            <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Description <span class="text-rose-500">*</span></label>
-            <textarea [(ngModel)]="newTicket.description" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all placeholder:text-slate-400" rows="4" placeholder="Enter description"></textarea>
+            <div class="flex justify-between items-end mb-1.5">
+              <label class="block text-[13px] font-semibold text-slate-700">Description <span class="text-rose-500">*</span></label>
+              <span class="text-[11px]" [ngClass]="{'text-rose-500 font-medium': getWordCount(newTicket.description) > 500, 'text-slate-400': getWordCount(newTicket.description) <= 500}">
+                {{ getWordCount(newTicket.description) }}/500 words
+              </span>
+            </div>
+            <textarea [(ngModel)]="newTicket.description" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all placeholder:text-slate-400" [ngClass]="{'border-rose-300 focus:border-rose-500 focus:ring-rose-500/30': isFieldInvalid('description'), 'border-slate-300 focus:border-sky-500 focus:ring-sky-500/30': !isFieldInvalid('description')}" rows="4" placeholder="Enter description"></textarea>
           </div>
           <div>
             <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Issue Type <span class="text-rose-500">*</span></label>
-            <select [(ngModel)]="newTicket.issueType" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all text-slate-700">
+            <select [(ngModel)]="newTicket.issueType" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all text-slate-700" [ngClass]="{'border-rose-300 focus:border-rose-500 focus:ring-rose-500/30': isFieldInvalid('issueType'), 'border-slate-300 focus:border-sky-500 focus:ring-sky-500/30': !isFieldInvalid('issueType')}">
               <option value="" disabled selected>Select issue type</option>
               <option value="Enquire">Enquire</option>
               <option value="Technical">Technical</option>
@@ -139,8 +148,17 @@ export interface Grievance {
             </select>
           </div>
           <div>
-            <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Attachment (PDF, PNG, JPG, TXT)</label>
+            <div class="flex justify-between items-end mb-1.5">
+              <label class="block text-[13px] font-semibold text-slate-700">Attachment (PDF, PNG, JPG, TXT)</label>
+              <span class="text-[11px] text-slate-400">Max upload 5MB</span>
+            </div>
             <input type="file" accept=".pdf,.png,.jpg,.jpeg,.txt" (change)="onFileSelected($event)" class="w-full text-sm text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[13px] file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 cursor-pointer" />
+            @if (attachmentError()) {
+              <p class="text-rose-500 text-[11px] font-medium mt-1.5 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                {{ attachmentError() }}
+              </p>
+            }
           </div>
         </div>
       </app-action-modal>
@@ -252,10 +270,12 @@ export class GrievanceListComponent {
   readonly isModalOpen = signal(false);
   readonly isViewModalOpen = signal(false);
   readonly isPreviewModalOpen = signal(false);
+  readonly isSubmitted = signal(false);
   readonly selectedTicket = signal<Grievance | null>(null);
   
   readonly previewAttachmentName = signal('');
   readonly previewAttachmentUrl = signal<SafeResourceUrl | null>(null);
+  readonly attachmentError = signal('');
 
   newTicket = {
     title: '',
@@ -320,6 +340,8 @@ export class GrievanceListComponent {
 
   openRaiseTicket() {
     this.newTicket = { title: '', description: '', issueType: '', attachment: '', attachmentUrl: null };
+    this.attachmentError.set('');
+    this.isSubmitted.set(false);
     this.isModalOpen.set(true);
   }
 
@@ -351,15 +373,49 @@ export class GrievanceListComponent {
     }, 300);
   }
 
+  getWordCount(text: string): number {
+    if (!text) return 0;
+    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+  }
+
   isFormValid(): boolean {
     return this.newTicket.title.trim().length > 0 &&
+           this.getWordCount(this.newTicket.title) <= 100 &&
            this.newTicket.description.trim().length > 0 &&
+           this.getWordCount(this.newTicket.description) <= 500 &&
            this.newTicket.issueType !== '';
   }
 
+  isFieldInvalid(field: 'title' | 'description' | 'issueType'): boolean {
+    if (!this.isSubmitted()) {
+      if (field === 'title') return this.getWordCount(this.newTicket.title) > 100;
+      if (field === 'description') return this.getWordCount(this.newTicket.description) > 500;
+      return false;
+    }
+    
+    if (field === 'title') {
+      return this.newTicket.title.trim().length === 0 || this.getWordCount(this.newTicket.title) > 100;
+    }
+    if (field === 'description') {
+      return this.newTicket.description.trim().length === 0 || this.getWordCount(this.newTicket.description) > 500;
+    }
+    if (field === 'issueType') {
+      return this.newTicket.issueType === '';
+    }
+    return false;
+  }
+
   onFileSelected(event: any) {
+    this.attachmentError.set('');
     const file = event.target.files[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        this.attachmentError.set('File size exceeds the 5MB limit.');
+        event.target.value = ''; // Reset input
+        this.newTicket.attachment = '';
+        this.newTicket.attachmentUrl = null;
+        return;
+      }
       this.newTicket.attachment = file.name;
       // Create a local blob URL for the selected file to render in an iframe
       const objectUrl = URL.createObjectURL(file);
@@ -368,6 +424,7 @@ export class GrievanceListComponent {
   }
 
   submitTicket() {
+    this.isSubmitted.set(true);
     if (!this.isFormValid()) return;
 
     const newGrievance: Grievance = {

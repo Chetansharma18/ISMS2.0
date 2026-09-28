@@ -46,10 +46,10 @@ export class OtrValidationService {
     const errors: string[] = [];
 
     if (!step1.shortName?.trim()) {
-      errors.push('Organization Short Name is mandatory.');
+      errors.push('Name is mandatory.');
     }
     if (!step1.fullName?.trim()) {
-      errors.push('Organization Full Legal Name is mandatory.');
+      errors.push('Full Name is mandatory.');
     }
     if (!step1.natureOfEntity?.trim()) {
       errors.push('Nature of Entity selection is mandatory.');

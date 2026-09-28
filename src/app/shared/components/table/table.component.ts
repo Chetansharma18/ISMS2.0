@@ -91,7 +91,8 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
             } @else {
               @for (item of paginatedData(); track getTrackBy(item, $index); let idx = $index) {
                 <tr
-                  class="h-11.5 hover:bg-primary-light transition-colors"
+                  class="h-11.5 transition-colors"
+                  [class.hover:bg-primary-light]="!rowClass"
                   [ngClass]="rowClass ? rowClass(item, idx) : ''"
                   (click)="rowClick.emit(item)"
                 >

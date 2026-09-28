@@ -50,8 +50,8 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
         </div>
 
         <div class="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-3.5 text-xs">
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'TP/PIA Short Name', value: step1().shortName, highlight: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'TP/PIA Full Name', value: step1().fullName, span: 'sm:col-span-2', highlight: true }"></ng-container>
+          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Name', value: step1().shortName, highlight: true }"></ng-container>
+          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Full Name', value: step1().fullName, span: 'sm:col-span-2', highlight: true }"></ng-container>
           <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Nature of Entity', value: step1().natureOfEntity }"></ng-container>
           <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Registration Number', value: step1().registrationNumber, mono: true }"></ng-container>
           <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Date of Registration', value: step1().dateOfRegistration }"></ng-container>

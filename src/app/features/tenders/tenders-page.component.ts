@@ -65,7 +65,8 @@ export interface EoiDocumentItem {
           <app-page-header
             title="Active Schemes"
             bgColor="#0B3558"
-          ></app-page-header>
+          >
+          </app-page-header>
 
           <!-- Incomplete Profile Notice Banner (if applicable) -->
           @if (isProfileIncomplete()) {
@@ -100,27 +101,64 @@ export interface EoiDocumentItem {
             [data]="schemes"
             [pagination]="true"
             [pageSize]="pageSize"
+            [rowClass]="getRowClass"
+            (rowClick)="onRowClick($event)"
             itemUnit="schemes"
             [customTemplates]="{
+              closingDate: closingDateTemplate,
               eoiDescription: descTemplate,
               viewAction: viewActionTemplate
             }"
           >
           </app-table>
 
+          <!-- Custom Template for Closing Date (with prominent highlight for Closed / Expired schemes) -->
+          <ng-template #closingDateTemplate let-item>
+            @if (isSchemeClosed(item)) {
+              <div
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11.5px] font-semibold bg-rose-50 text-rose-700 border border-rose-300 shadow-2xs select-none"
+                title="Application deadline has expired"
+              >
+                <span class="font-semibold text-rose-700">{{ item.closingDate }}</span>
+                <span class="px-1.5 py-0.5 rounded text-[9.5px] font-bold uppercase tracking-wider bg-rose-600 text-white shadow-2xs leading-none">
+                  Closed
+                </span>
+              </div>
+            } @else {
+              <span class="text-slate-800 font-medium text-[12.5px]">{{ item.closingDate }}</span>
+            }
+          </ng-template>
+
           <ng-template #descTemplate let-item>
-            <span class="line-clamp-2 text-slate-600 text-[11px] leading-relaxed">{{ item.eoiDescription }}</span>
+            <span
+              class="line-clamp-2 text-[11px] leading-relaxed"
+              [ngClass]="isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-600'"
+            >
+              {{ item.eoiDescription }}
+            </span>
           </ng-template>
 
           <ng-template #viewActionTemplate let-item>
-            <app-button
-              variant="pdf-view"
-              size="sm"
-              (btnClick)="viewSchemeDetails(item)"
-              title="View EOI Details"
-            >
-              View
-            </app-button>
+            @if (isSchemeClosed(item)) {
+              <span
+                class="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-medium bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none"
+                title="Scheme closed - Viewing is disabled"
+              >
+                <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                </svg>
+                <span>Closed</span>
+              </span>
+            } @else {
+              <app-button
+                variant="pdf-view"
+                size="sm"
+                (btnClick)="$event.stopPropagation(); viewSchemeDetails(item)"
+                title="View EOI Details"
+              >
+                View
+              </app-button>
+            }
           </ng-template>
 
         </div>
@@ -282,17 +320,92 @@ export class TendersPageComponent {
 
   readonly schemeColumns: TableColumn<SchemeTender>[] = [
     { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
-    { key: 'refNo', label: 'EOI Reference No.', cellClass: 'whitespace-nowrap font-normal text-slate-800' },
-    { key: 'schemeName', label: 'Scheme Name', cellClass: 'whitespace-nowrap font-medium text-slate-800' },
-    { key: 'schemeCategory', label: 'Scheme Category', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
-    { key: 'datePublished', label: 'Date of EOI Published', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
-    { key: 'closingDate', label: 'Date of Closing', align: 'center', cellClass: 'whitespace-nowrap font-normal text-rose-600' },
-    { key: 'eoiCategory', label: 'EOI Category', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
-    { key: 'eoiDescription', label: 'EOI Description', width: 'min-w-[200px] max-w-sm', type: 'custom' },
-    { key: 'viewAction', label: 'View', align: 'center', width: 'w-20', type: 'custom' }
+    {
+      key: 'refNo',
+      label: 'EOI Reference No.',
+      cellClass: (_val, item) => `whitespace-nowrap font-normal ${this.isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-800'}`
+    },
+    {
+      key: 'schemeName',
+      label: 'Scheme Name',
+      cellClass: (_val, item) => `whitespace-nowrap font-medium ${this.isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-800'}`
+    },
+    {
+      key: 'schemeCategory',
+      label: 'Scheme Category',
+      align: 'center',
+      cellClass: (_val, item) => `whitespace-nowrap font-normal ${this.isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-700'}`
+    },
+    {
+      key: 'datePublished',
+      label: 'Date of EOI Published',
+      align: 'center',
+      cellClass: (_val, item) => `whitespace-nowrap font-normal ${this.isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-700'}`
+    },
+    {
+      key: 'closingDate',
+      label: 'Date of Closing',
+      align: 'center',
+      type: 'custom',
+      cellClass: 'whitespace-nowrap'
+    },
+    {
+      key: 'eoiCategory',
+      label: 'EOI Category',
+      align: 'center',
+      cellClass: (_val, item) => `whitespace-nowrap font-normal ${this.isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-700'}`
+    },
+    {
+      key: 'eoiDescription',
+      label: 'EOI Description',
+      width: 'min-w-[200px] max-w-sm',
+      type: 'custom'
+    },
+    {
+      key: 'viewAction',
+      label: 'View',
+      align: 'center',
+      width: 'w-24',
+      type: 'custom'
+    }
   ];
 
-  // Exact 10 schemes from Screenshot 2
+  isSchemeClosed(scheme: SchemeTender | null | undefined): boolean {
+    if (!scheme) return false;
+    if (scheme.status === 'Closed') return true;
+    if (!scheme.closingDate) return false;
+
+    const parts = scheme.closingDate.includes('/')
+      ? scheme.closingDate.split('/')
+      : scheme.closingDate.split('-');
+
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const year = parseInt(parts[2], 10);
+      const closeDate = new Date(year, month, day, 23, 59, 59);
+      if (!isNaN(closeDate.getTime())) {
+        return closeDate.getTime() < Date.now();
+      }
+    }
+    return false;
+  }
+
+  getRowClass = (item: SchemeTender): string => {
+    if (this.isSchemeClosed(item)) {
+      return 'opacity-65 bg-slate-50/80 cursor-not-allowed select-none hover:bg-slate-100/60';
+    }
+    return 'cursor-pointer hover:bg-sky-50/70 transition-colors';
+  };
+
+  onRowClick(scheme: SchemeTender): void {
+    if (this.isSchemeClosed(scheme)) {
+      return; // Disabled: cannot view closed / expired schemes
+    }
+    this.viewSchemeDetails(scheme);
+  }
+
+  // 10 Schemes for demo: 8 active with current/latest dates (2026/2027) & 2 closed past date schemes
   schemes: SchemeTender[] = [
     {
       sNo: 1,
@@ -302,201 +415,204 @@ export class TendersPageComponent {
       code: 'MMKVY-2026',
       schemeCategory: 'ALL',
       category: 'ALL',
-      datePublished: '23/01/2026',
-      closingDate: '10/03/2026',
+      datePublished: '15/09/2026',
+      closingDate: '30/11/2026',
       eoiCategory: 'General',
       eoiDescription: 'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme',
       status: 'Open',
       rfpDocSize: '2.4 MB',
       sopDocSize: '1.8 MB',
-      preBidDate: '10-Feb-2026 11:30 AM',
-      techBidDate: '18-Mar-2026 02:30 PM',
+      preBidDate: '05-Oct-2026 11:30 AM',
+      techBidDate: '05-Dec-2026 02:30 PM',
       emdFee: '₹50,000',
       processFee: '₹2,000'
     },
     {
       sNo: 2,
-      refNo: 'RSLDC/EOI/MNSKSY/2025-26/01',
+      refNo: 'RSLDC/EOI/MNSKSY/2026-27/01',
       schemeName: 'MNSKSY',
       schemeTitle: 'Mukhyamantri Nishulk Solar Krishi Sinchayee Yojana (MNSKSY)',
-      code: 'MNSKSY-2025',
+      code: 'MNSKSY-2026',
       schemeCategory: 'NA',
       category: 'NA',
-      datePublished: '17/02/2026',
-      closingDate: '09/03/2026',
+      datePublished: '18/09/2026',
+      closingDate: '25/11/2026',
       eoiCategory: 'General',
       eoiDescription: 'Expression of Interest (EOI) MNSKSY in RSLDC.',
       status: 'Open',
       rfpDocSize: '3.1 MB',
       sopDocSize: '2.0 MB',
-      preBidDate: '25-Feb-2026 11:00 AM',
-      techBidDate: '15-Mar-2026 03:30 PM',
+      preBidDate: '08-Oct-2026 11:00 AM',
+      techBidDate: '01-Dec-2026 03:30 PM',
       emdFee: '₹75,000',
       processFee: '₹2,500'
     },
     {
       sNo: 3,
-      refNo: 'RSLDC/EOI/MMKVY Cat I II III/2024-25/01',
-      schemeName: 'MMKVY',
-      schemeTitle: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
-      code: 'MMKVY-2024',
-      schemeCategory: 'ALL',
-      category: 'ALL',
-      datePublished: '26/09/2024',
-      closingDate: '07/12/2024',
-      eoiCategory: 'General',
-      eoiDescription: 'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme',
-      status: 'Closed',
-      rfpDocSize: '2.8 MB',
-      sopDocSize: '1.5 MB',
-      preBidDate: '10-Oct-2024 02:00 PM',
-      techBidDate: '15-Dec-2024 04:00 PM',
-      emdFee: '₹50,000',
-      processFee: '₹2,000'
-    },
-    {
-      sNo: 4,
-      refNo: 'RSLDC/EOI/IMSHAKTI/2024-25/01',
+      refNo: 'RSLDC/EOI/IMSHAKTI/2026-27/01',
       schemeName: 'IM_Shakti',
       schemeTitle: 'Indira Mahila Shakti Prashikshan Va Kaushal Samvardhan Yojana (IM_Shakti)',
-      code: 'IM_SHAKTI',
+      code: 'IM_SHAKTI-2026',
       schemeCategory: 'General',
       category: 'General',
-      datePublished: '26/09/2024',
-      closingDate: '23/10/2024',
+      datePublished: '20/09/2026',
+      closingDate: '15/12/2026',
       eoiCategory: 'General',
       eoiDescription: 'Expression of Interest for submission of proposal to undertake the Skill Training under IM Shakti Scheme',
-      status: 'Closed',
+      status: 'Open',
       rfpDocSize: '4.2 MB',
       sopDocSize: '2.2 MB',
-      preBidDate: '05-Oct-2024 11:00 AM',
-      techBidDate: '28-Oct-2024 02:00 PM',
+      preBidDate: '10-Oct-2026 11:00 AM',
+      techBidDate: '20-Dec-2026 02:00 PM',
       emdFee: '₹1,00,000',
       processFee: '₹3,000'
     },
     {
-      sNo: 5,
-      refNo: 'RSLDC/EOI/2023-24/Cat-III/RAJKVIK RTD',
+      sNo: 4,
+      refNo: 'RSLDC/EOI/2026-27/Cat-III/RAJKVIK RTD',
       schemeName: 'RAJKVIKRTD',
       schemeTitle: 'Rojgar Aadharit Jan Kaushal Vikas Karyakram RTD (RAJKVIK RTD)',
-      code: 'RAJKVIK-RTD',
+      code: 'RAJKVIK-RTD-2026',
       schemeCategory: 'RAJKVIK',
       category: 'RAJKVIK',
-      datePublished: '02/05/2023',
-      closingDate: '31/03/2024',
+      datePublished: '22/09/2026',
+      closingDate: '10/12/2026',
       eoiCategory: 'General',
       eoiDescription: "EOI for Recruit-TrainDeploy (RTD) model under Mukhya Mantri Kaushal Vikas Yojana Category-1 'Rojgar Aadharit Jan Kaushal Vikas Karyakram (MMKVY-CAT-III 'RAJKVIK')' scheme of RSLDC",
-      status: 'Closed',
+      status: 'Open',
       rfpDocSize: '2.1 MB',
       sopDocSize: '1.4 MB',
-      preBidDate: '15-May-2023 03:00 PM',
-      techBidDate: '05-Apr-2024 03:00 PM',
+      preBidDate: '12-Oct-2026 03:00 PM',
+      techBidDate: '15-Dec-2026 03:00 PM',
       emdFee: '₹40,000',
       processFee: '₹1,500'
     },
     {
-      sNo: 6,
-      refNo: 'RSLDC/MMYKY2/Eol23-24/01',
+      sNo: 5,
+      refNo: 'RSLDC/MMYKY2/Eol26-27/01',
       schemeName: 'MMYKY',
       schemeTitle: 'Mukhya Mantri Yuva Kaushal Yojana (MMYKY 2.0)',
-      code: 'MMYKY-2.0',
+      code: 'MMYKY-2026',
       schemeCategory: 'General',
       category: 'General',
-      datePublished: '05/07/2023',
-      closingDate: '25/07/2023',
+      datePublished: '24/09/2026',
+      closingDate: '20/12/2026',
       eoiCategory: 'General',
       eoiDescription: 'Eol for MMYKY 2.0 for RSLDC',
-      status: 'Closed',
+      status: 'Open',
       rfpDocSize: '3.6 MB',
       sopDocSize: '2.5 MB',
-      preBidDate: '12-Jul-2023 11:00 AM',
-      techBidDate: '28-Jul-2023 03:00 PM',
+      preBidDate: '14-Oct-2026 11:00 AM',
+      techBidDate: '28-Dec-2026 03:00 PM',
       emdFee: '₹60,000',
       processFee: '₹2,000'
     },
     {
-      sNo: 7,
-      refNo: 'RSLDC/Eol/2023-24/1/MMKVYSAMARTH',
+      sNo: 6,
+      refNo: 'RSLDC/Eol/2026-27/1/MMKVYSAMARTH',
       schemeName: 'SAMARTH',
       schemeTitle: 'SAMARTH Skill Development Scheme (MMKVY Cat-II)',
-      code: 'MMKVY-SAMARTH',
+      code: 'MMKVY-SAMARTH-2026',
       schemeCategory: 'SAMARTH',
       category: 'SAMARTH',
-      datePublished: '18/04/2023',
-      closingDate: '15/05/2023',
+      datePublished: '25/09/2026',
+      closingDate: '31/12/2026',
       eoiCategory: 'General',
       eoiDescription: 'Eol for submission of proposal to undertake the project under MMKVY (Cat-II: SAMARTH) scheme of RSLDC',
-      status: 'Closed',
+      status: 'Open',
       rfpDocSize: '2.5 MB',
       sopDocSize: '1.6 MB',
-      preBidDate: '25-Apr-2023 11:30 AM',
-      techBidDate: '20-May-2023 02:30 PM',
+      preBidDate: '15-Oct-2026 11:30 AM',
+      techBidDate: '08-Jan-2027 02:30 PM',
+      emdFee: '₹50,000',
+      processFee: '₹2,000'
+    },
+    {
+      sNo: 7,
+      refNo: 'RSLDC/Eol/2026-27/1-RAJKVIK General',
+      schemeName: 'RAJKVIK',
+      schemeTitle: 'Rojgar Aadharit Jan Kaushal Vikas Karyakram (RAJKVIK General)',
+      code: 'RAJKVIK-GEN-2026',
+      schemeCategory: 'RAJKVIK',
+      category: 'RAJKVIK',
+      datePublished: '26/09/2026',
+      closingDate: '05/01/2027',
+      eoiCategory: 'General',
+      eoiDescription: 'Eol for submission of proposal to undertake the project under RAJKVIK scheme of RSLDC.',
+      status: 'Open',
+      rfpDocSize: '3.0 MB',
+      sopDocSize: '1.9 MB',
+      preBidDate: '18-Oct-2026 02:00 PM',
+      techBidDate: '12-Jan-2027 03:30 PM',
       emdFee: '₹50,000',
       processFee: '₹2,000'
     },
     {
       sNo: 8,
-      refNo: 'RSLDC/Eol/2023-24/1-RAJKVIK General',
-      schemeName: 'RAJKVIK',
-      schemeTitle: 'Rojgar Aadharit Jan Kaushal Vikas Karyakram (RAJKVIK General)',
-      code: 'RAJKVIK-GEN',
-      schemeCategory: 'RAJKVIK',
-      category: 'RAJKVIK',
-      datePublished: '18/04/2023',
-      closingDate: '15/05/2023',
-      eoiCategory: 'General',
-      eoiDescription: 'Eol for submission of proposal to undertake the project under RAJKVIK scheme of RSLDC.',
-      status: 'Closed',
-      rfpDocSize: '3.0 MB',
-      sopDocSize: '1.9 MB',
-      preBidDate: '26-Apr-2023 02:00 PM',
-      techBidDate: '20-May-2023 03:30 PM',
-      emdFee: '₹50,000',
-      processFee: '₹2,000'
-    },
-    {
-      sNo: 9,
-      refNo: 'RSLDC/Eol/2023-24/1/MMKVYSAKSHM',
+      refNo: 'RSLDC/Eol/2026-27/1/MMKVYSAKSHM',
       schemeName: 'SAKSHM',
       schemeTitle: 'SAKSHAM Skill Training Scheme (MMKVY Cat-II)',
-      code: 'MMKVY-SAKSHM',
+      code: 'MMKVY-SAKSHM-2026',
       schemeCategory: 'SAKSHM',
       category: 'SAKSHM',
-      datePublished: '18/04/2023',
-      closingDate: '15/05/2023',
+      datePublished: '27/09/2026',
+      closingDate: '15/01/2027',
       eoiCategory: 'General',
       eoiDescription: 'Eol for submission of proposal to undertake the project under MMKVY (Cat-II: SAKSHM) scheme of RSLDC',
-      status: 'Closed',
+      status: 'Open',
       rfpDocSize: '2.2 MB',
       sopDocSize: '1.5 MB',
-      preBidDate: '25-Apr-2023 03:00 PM',
-      techBidDate: '20-May-2023 04:00 PM',
+      preBidDate: '20-Oct-2026 03:00 PM',
+      techBidDate: '22-Jan-2027 04:00 PM',
       emdFee: '₹40,000',
       processFee: '₹1,500'
     },
     {
+      sNo: 9,
+      refNo: 'RSLDC/EOI/MMKVY-SPL/2026-27/01',
+      schemeName: 'MMKVY',
+      schemeTitle: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY - Special Window)',
+      code: 'MMKVY-SPL-2026',
+      schemeCategory: 'ALL',
+      category: 'ALL',
+      datePublished: '10/06/2026',
+      closingDate: '15/08/2026',
+      eoiCategory: 'General',
+      eoiDescription: 'Expression of Interest for Special Window Skill Training under MMKVY Scheme (Application window closed).',
+      status: 'Closed',
+      rfpDocSize: '2.8 MB',
+      sopDocSize: '1.5 MB',
+      preBidDate: '20-Jun-2026 02:00 PM',
+      techBidDate: '20-Aug-2026 04:00 PM',
+      emdFee: '₹50,000',
+      processFee: '₹2,000'
+    },
+    {
       sNo: 10,
-      refNo: 'RSLDC/EOI/2022-23/1MMKVYRTD',
+      refNo: 'RSLDC/EOI/2026/Cat-III/RAJKVIK-PILOT',
       schemeName: 'RAJKVIK',
-      schemeTitle: 'Rojgar Aadharit Jan Kaushal Vikas Karyakram (RAJKVIK RTD 2022-23)',
-      code: 'RAJKVIK-RTD-22',
+      schemeTitle: 'Rojgar Aadharit Jan Kaushal Vikas Karyakram (RAJKVIK Pilot Batch)',
+      code: 'RAJKVIK-PILOT-26',
       schemeCategory: 'RAJKVIK',
       category: 'RAJKVIK',
-      datePublished: '08/07/2022',
-      closingDate: '31/03/2023',
+      datePublished: '01/07/2026',
+      closingDate: '10/09/2026',
       eoiCategory: 'General',
-      eoiDescription: "EOI for Recruit-TrainDeploy (RTD) model under Mukhya Mantri Kaushal Vikas Yojana Category-1 'Rojgar Aadharit Jan Kaushal Vikas Karyakram (MMKVY-CAT-III 'RAJKVIK')' scheme of RSLDC",
+      eoiDescription: "EOI for Recruit-Train-Deploy (RTD) Pilot Batch under RAJKVIK Scheme (Bid submission period ended).",
       status: 'Closed',
       rfpDocSize: '2.9 MB',
       sopDocSize: '1.7 MB',
-      preBidDate: '18-Jul-2022 11:00 AM',
-      techBidDate: '05-Apr-2023 03:00 PM',
+      preBidDate: '15-Jul-2026 11:00 AM',
+      techBidDate: '15-Sep-2026 03:00 PM',
       emdFee: '₹50,000',
       processFee: '₹2,000'
     }
   ];
 
   viewSchemeDetails(scheme: SchemeTender): void {
+    if (this.isSchemeClosed(scheme)) {
+      return; // Disabled: Cannot view expired / closed schemes
+    }
     this.selectedScheme.set(scheme);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -541,8 +657,8 @@ export class TendersPageComponent {
         schemeName: scheme?.schemeName || 'MMKVY',
         category: scheme?.schemeCategory || scheme?.category || 'ALL',
         eoiCategory: scheme?.eoiCategory || 'General',
-        datePublished: scheme?.datePublished || '23/01/2026',
-        closingDate: scheme?.closingDate || '10/03/2026',
+        datePublished: scheme?.datePublished || '15/09/2026',
+        closingDate: scheme?.closingDate || '30/11/2026',
         emdFee: scheme?.emdFee || '₹50,000',
         processFee: scheme?.processFee || '₹2,000',
         eoiDescription: scheme?.eoiDescription || 'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme'
@@ -561,7 +677,7 @@ export class TendersPageComponent {
 
   downloadDoc(docType: string): void {
     const s = this.selectedScheme();
-    alert(`Downloading ${docType} for ${s?.schemeTitle || s?.schemeName} (${s?.refNo})...`);
+    console.log(`Downloading ${docType} for ${s?.schemeTitle || s?.schemeName} (${s?.refNo})`);
   }
 
   getSchemeDescription(scheme: SchemeTender | null): string {

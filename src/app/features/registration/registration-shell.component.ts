@@ -34,18 +34,18 @@ export interface StepMeta {
            Sticky Registration Header (Heading & Stepper combined so heading never hides on scroll)
            ==================================================================== -->
       <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-2xs">
-        <!-- 1. Form Heading (Reduced Size, Professional & Clean in Theme Blue) -->
-        <div class="w-full border-b border-slate-100 py-2 px-4 sm:px-6 lg:px-8 bg-white">
-          <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <h1 class="font-bold tracking-tight m-0" style="font-size: 16px !important; line-height: 22px !important; color: #0B3558 !important;">
-              One Time Registration Form
+        <!-- 1. Form Heading (Professional & Clean in Theme Blue) -->
+        <div class="w-full border-b border-slate-100 py-2.5 px-4 sm:px-6 lg:px-8 bg-white">
+          <div class="max-w-[1380px] mx-auto flex items-center justify-between">
+            <h1 class="font-bold tracking-tight m-0" style="font-size: 17px !important; line-height: 24px !important; color: #0B3558 !important;">
+              Company Registration Form
             </h1>
           </div>
         </div>
 
         <!-- 2. Horizontal Tabs Stepper (Clean & Purely Responsive) -->
         <nav class="w-full bg-white" aria-label="Registration Steps">
-          <div class="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8">
+          <div class="max-w-[1380px] mx-auto px-2 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between overflow-x-auto no-scrollbar py-2 gap-1 sm:gap-2">
               @for (step of steps; track step.number) {
                 <button
@@ -167,7 +167,7 @@ export interface StepMeta {
       <!-- ====================================================================
            3. Main Form Container (Single Unified White Background, Optimized Height)
            ==================================================================== -->
-      <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-white">
+      <main class="flex-1 max-w-[1380px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-white">
         
         <!-- Step 1 Container -->
         <div [class.hidden]="activeStep() !== 1">
@@ -200,7 +200,7 @@ export interface StepMeta {
            4. Sticky Bottom Action Bar (Neat Side-by-Side Previous & Next Buttons)
            ==================================================================== -->
       <footer class="w-full bg-white border-t border-slate-200 py-2.5 px-4 sm:px-6 lg:px-8 sticky bottom-0 z-30 shadow-md">
-        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="max-w-[1380px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <!-- Step indicator / Auto-saved status -->
          
 

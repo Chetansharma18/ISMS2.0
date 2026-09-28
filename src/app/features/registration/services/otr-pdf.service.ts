@@ -11,7 +11,7 @@ export class OtrPdfService {
     const s2 = data.step2 || [];
     const s3 = data.step3;
     const s4 = data.step4;
-    const regId = regIdOverride || data.registrationId || 'OTR-RSLDC-2026';
+    const regId = regIdOverride || data.registrationId || 'OTR-2026';
 
     const printWindow = window.open('', '_blank', 'width=950,height=850');
     if (!printWindow) {
@@ -201,11 +201,11 @@ export class OtrPdfService {
           <div class="sec-header">1. Organization &amp; Legal Particulars</div>
           <table class="tbl">
             <tr>
-              <td class="lbl">TP/PIA Full Name:</td>
+              <td class="lbl">Full Name:</td>
               <td class="val" colspan="3" style="font-weight:700;">${s1.fullName || '-'}</td>
             </tr>
             <tr>
-              <td class="lbl">TP/PIA Short Name:</td>
+              <td class="lbl">Name:</td>
               <td class="val">${s1.shortName || '-'}</td>
               <td class="lbl">Nature of Entity:</td>
               <td class="val">${s1.natureOfEntity || '-'}</td>

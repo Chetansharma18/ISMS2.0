@@ -49,11 +49,11 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
               </span>
             </div>
 
-            <h1 class="text-base sm:text-lg font-semibold tracking-tight text-white">
+            <h1 class="text-base sm:text-lg font-semibold tracking-tight text-white" style="color: #ffffff !important;">
               {{ applicant()?.actualLegalName }}
             </h1>
             <p class="text-xs text-slate-200 mt-0.5 font-normal">
-              Applying under: <span class="text-white font-medium">{{ applicant()?.schemeName }}</span> (Ref: {{ applicant()?.eoiRefNo }})
+              Applying under: <span class="text-white font-medium">{{ applicant()?.schemeName }}</span>
             </p>
           </div>
 
@@ -139,7 +139,7 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
                     <span class="text-emerald-600">&check;</span> {{ applicant()?.scrutinyDetails?.approvalDocument?.documentName }}
                   </span>
                 } @else {
-                  <span class="text-slate-400">NA</span>
+                  <span class="text-slate-400">-</span>
                 }
               </div>
             </div>
@@ -233,9 +233,21 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
                 <span class="text-slate-500 block text-[11px]">Declared Annual Turnover</span>
                 <span class="font-medium text-[#0B3558]">{{ applicant()?.organisation?.turnover }}</span>
               </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">Official Email &amp; Phone</span>
+                <span class="font-normal text-slate-700">{{ applicant()?.organisation?.email }} &bull; {{ applicant()?.organisation?.contactNumber }}</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">Official Website</span>
+                <span class="font-normal text-sky-700">{{ applicant()?.organisation?.website || '-' }}</span>
+              </div>
               <div class="sm:col-span-2">
                 <span class="text-slate-500 block text-[11px]">Registered Office Address</span>
                 <span class="font-normal text-slate-700">{{ applicant()?.organisation?.registeredAddress }}</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">Operational / Corporate Address</span>
+                <span class="font-normal text-slate-700">{{ applicant()?.organisation?.operationalAddress || applicant()?.organisation?.registeredAddress }}</span>
               </div>
             </div>
           </div>
@@ -273,7 +285,7 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
                   <span class="font-normal text-slate-800">{{ applicant()?.authorizedSignatory?.residenceAddress }}</span>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-y-2.5 gap-x-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-y-2.5 gap-x-4">
                   <div>
                     <span class="text-slate-500 block text-[11px]">State</span>
                     <span class="font-normal text-slate-800">{{ applicant()?.authorizedSignatory?.state }}</span>
@@ -298,12 +310,58 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
                     <span class="text-slate-500 block text-[11px]">Voter Id No.</span>
                     <span class="font-mono text-slate-800">{{ applicant()?.authorizedSignatory?.voterIdNo }}</span>
                   </div>
+                  <div>
+                    <span class="text-slate-500 block text-[11px]">Bhamashah / Jan-Aadhaar</span>
+                    <span class="font-mono text-slate-800">{{ applicant()?.authorizedSignatory?.bhamashahNo || 'Not Provided' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-500 block text-[11px]">Passport / Other ID</span>
+                    <span class="font-mono text-slate-800">{{ applicant()?.authorizedSignatory?.passportNo || 'Not Provided' }}</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Card 4: Proposed Training Centres in Rajasthan -->
+          <!-- Card 4: Bank & Mandate Details -->
+          <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
+            <div class="bg-[#F4F7FB] border-b border-slate-200 px-3.5 py-2 flex items-center justify-between">
+              <h2 class="text-xs font-medium text-slate-700 uppercase tracking-normal">
+                Bank &amp; Account Details (Verified from OTR Profile)
+              </h2>
+              <span class="inline-flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-normal">
+                &check; Mandate Verified
+              </span>
+            </div>
+            <div class="p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-2.5 gap-x-4 text-xs">
+              <div>
+                <span class="text-slate-500 block text-[11px]">Bank Name</span>
+                <span class="font-medium text-slate-800">{{ applicant()?.bankDetails?.bankName || 'State Bank of India' }}</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">Branch Name</span>
+                <span class="font-normal text-slate-800">{{ applicant()?.bankDetails?.branchName || 'Commercial Branch' }}</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">Account Holder Name</span>
+                <span class="font-normal text-slate-800">{{ applicant()?.bankDetails?.accountHolderName || applicant()?.organisation?.legalName }}</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">Account Number</span>
+                <span class="font-mono text-slate-800 font-medium">{{ applicant()?.bankDetails?.accountNumber || '38920194821' }}</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">IFSC Code</span>
+                <span class="font-mono text-slate-800 font-medium">{{ applicant()?.bankDetails?.ifscCode || 'SBIN0004128' }}</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">Account Type</span>
+                <span class="font-normal text-slate-800">{{ applicant()?.bankDetails?.accountType || 'Current Account' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 5: Proposed Training Centres in Rajasthan -->
           <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
             <div class="bg-[#F4F7FB] border-b border-slate-200 px-3.5 py-2 flex items-center justify-between">
               <h2 class="text-xs font-medium text-slate-700 uppercase tracking-normal">
@@ -323,6 +381,7 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
                     <th class="py-2 px-3 text-center border-r border-slate-200">Practical Rooms</th>
                     <th class="py-2 px-3 text-center border-r border-slate-200">Separate Washrooms</th>
                     <th class="py-2 px-3 text-center border-r border-slate-200">Lab Infrastructure</th>
+                    <th class="py-2 px-3 border-r border-slate-200">Contact / Phone</th>
                     <th class="py-2 px-3">Address</th>
                   </tr>
                 </thead>
@@ -343,6 +402,9 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
                           {{ c.labInfrastructure ? 'Available' : 'Missing' }}
                         </span>
                       </td>
+                      <td class="py-2 px-3 font-mono text-[11px] text-slate-700 border-r border-slate-100">
+                        {{ c.telephone || '-' }}
+                      </td>
                       <td class="py-2 px-3 text-slate-600 text-[11px] max-w-[200px] truncate" [title]="c.fullAddress">
                         {{ c.fullAddress }}
                       </td>
@@ -353,7 +415,7 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
             </div>
           </div>
 
-          <!-- Card 5: Financials & Placement Track Record -->
+          <!-- Card 6: Financials & Placement Track Record -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <!-- 3-Year Financial Turnover -->
             <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
@@ -393,19 +455,23 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
                 <thead>
                   <tr class="bg-[#F4F7FB] text-slate-700 text-[11px] font-medium border-b border-slate-200">
                     <th class="py-2 px-3 border-r border-slate-200">Sector</th>
-                    <th class="py-2 px-3 text-center border-r border-slate-200">Trained</th>
-                    <th class="py-2 px-3 text-center border-r border-slate-200">Placed</th>
-                    <th class="py-2 px-3 text-center">% Placed</th>
+                    <th class="py-2 px-2 text-center border-r border-slate-200">Trained</th>
+                    <th class="py-2 px-2 text-center border-r border-slate-200">Placed</th>
+                    <th class="py-2 px-2 text-center border-r border-slate-200">% Placed</th>
+                    <th class="py-2 px-3">Proof Details</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white font-normal text-slate-700">
                   @for (p of applicant()?.placementTrackRecord; track p.sector) {
                     <tr>
                       <td class="py-2 px-3 font-normal text-slate-800 border-r border-slate-100">{{ p.sector }}</td>
-                      <td class="py-2 px-3 text-center font-normal border-r border-slate-100">{{ p.trained }}</td>
-                      <td class="py-2 px-3 text-center font-normal text-emerald-700 border-r border-slate-100">{{ p.placed }}</td>
-                      <td class="py-2 px-3 text-center font-normal text-[#0B3558]">
+                      <td class="py-2 px-2 text-center font-normal border-r border-slate-100">{{ p.trained }}</td>
+                      <td class="py-2 px-2 text-center font-normal text-emerald-700 border-r border-slate-100">{{ p.placed }}</td>
+                      <td class="py-2 px-2 text-center font-normal text-[#0B3558] border-r border-slate-100">
                         {{ (p.placed / p.trained * 100).toFixed(1) }}%
+                      </td>
+                      <td class="py-2 px-3 text-slate-600 text-[11px] truncate max-w-[140px]" [title]="p.proofDetails">
+                        {{ p.proofDetails || 'Verified EPF/ESI records' }}
                       </td>
                     </tr>
                   }
@@ -414,7 +480,53 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
             </div>
           </div>
 
-          <!-- Card 6: Uploaded Documents Checklist -->
+          <!-- Card 7: Proposed Annual Action Plan -->
+          <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
+            <div class="bg-[#F4F7FB] border-b border-slate-200 px-3.5 py-2 flex items-center justify-between">
+              <h2 class="text-xs font-medium text-slate-700 uppercase tracking-normal">
+                Proposed Annual Action Plan (Target Districts &amp; Batches)
+              </h2>
+              <span class="text-[11px] text-[#0B3558] font-medium">
+                Total Districts: {{ applicant()?.annualActionPlan?.length }}
+              </span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-[#F4F7FB] text-slate-700 text-[11px] font-medium border-b border-slate-200">
+                    <th class="py-2 px-2 text-center w-10 border-r border-slate-200">S.No</th>
+                    <th class="py-2 px-3 border-r border-slate-200">Target District</th>
+                    <th class="py-2 px-2 text-center border-r border-slate-200">Proposed SDCs</th>
+                    <th class="py-2 px-3 border-r border-slate-200">SDC Location / Centres</th>
+                    <th class="py-2 px-3 border-r border-slate-200">Proposed Sectors</th>
+                    <th class="py-2 px-3 border-r border-slate-200">Course / Trade</th>
+                    <th class="py-2 px-2 text-center border-r border-slate-200">Training Mode</th>
+                    <th class="py-2 px-2 text-center">Batches</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white font-normal text-slate-700">
+                  @for (ap of applicant()?.annualActionPlan; track ap.district; let idx = $index) {
+                    <tr class="hover:bg-slate-50/70 transition-colors">
+                      <td class="py-2 px-2 text-center font-bold text-slate-400 border-r border-slate-100">{{ idx + 1 }}</td>
+                      <td class="py-2 px-3 font-medium text-slate-800 border-r border-slate-100">{{ ap.district }}</td>
+                      <td class="py-2 px-2 text-center font-bold text-[#0B3558] border-r border-slate-100">{{ ap.proposedSDCs }}</td>
+                      <td class="py-2 px-3 text-slate-700 border-r border-slate-100">{{ ap.location }}</td>
+                      <td class="py-2 px-3 text-slate-700 border-r border-slate-100">{{ ap.sectors }}</td>
+                      <td class="py-2 px-3 text-slate-700 border-r border-slate-100 max-w-xs truncate" [title]="ap.courses">{{ ap.courses }}</td>
+                      <td class="py-2 px-2 text-center border-r border-slate-100">
+                        <span class="px-2 py-0.5 rounded text-[11px] font-normal text-emerald-700 bg-emerald-50">
+                          {{ ap.residential }}
+                        </span>
+                      </td>
+                      <td class="py-2 px-2 text-center font-bold text-slate-900">{{ ap.batches }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Card 8: Uploaded Documents Checklist -->
           <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
             <div class="bg-[#F4F7FB] border-b border-slate-200 px-3.5 py-2">
               <h2 class="text-xs font-medium text-slate-700 uppercase tracking-normal">

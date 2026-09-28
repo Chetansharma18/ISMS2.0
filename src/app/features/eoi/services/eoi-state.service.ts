@@ -87,6 +87,16 @@ export interface ApplicantResponse {
     serviceTaxNo: string;
   };
 
+  // OTR Bank Account Details
+  bankDetails?: {
+    bankName: string;
+    branchName: string;
+    accountHolderName: string;
+    accountNumber: string;
+    ifscCode: string;
+    accountType: string;
+  };
+
   // Proposal specific fields
   trainingCentres: TrainingCentreDossier[];
   financialYears: { year: string; totalTurnover: string; skillTurnover: string }[];
@@ -159,7 +169,7 @@ export class EoiStateService {
       refNo: 'RSLDC/EOI/2026/SAMARTH-02',
       schemeTitle: 'SAMARTH Skill Development Scheme',
       code: 'SAMARTH-SPEC',
-      category: 'NA',
+      category: '-',
       dateOfOpening: '01-Sep-2026 11:00 AM',
       dateOfClosing: '15-Oct-2026 03:00 PM',
       status: 'Closed',
@@ -189,7 +199,7 @@ export class EoiStateService {
       refNo: 'RSLDC/EOI/2026/ELSTP-01',
       schemeTitle: 'Employment Linked Skill Training Programme (ELSTP)',
       code: 'ELSTP-PHASE4',
-      category: 'NA',
+      category: '-',
       dateOfOpening: '25-Aug-2026 04:30 PM',
       dateOfClosing: '17-Sep-2026 11:00 AM',
       status: 'Open',
@@ -219,7 +229,7 @@ export class EoiStateService {
       refNo: 'MORD/EOI/2026/DDUGKY-03',
       schemeTitle: 'Deen Dayal Upadhyaya Grameen Kaushalya Yojana (DDU-GKY)',
       code: 'DDU-GKY-RAJ',
-      category: 'NA',
+      category: '-',
       dateOfOpening: '25-Aug-2026 04:30 PM',
       dateOfClosing: '17-Sep-2026 11:00 AM',
       status: 'Open',
@@ -281,6 +291,15 @@ export class EoiStateService {
         voterIdNo: 'RJP1245789',
         passportNo: 'Z8945123',
         serviceTaxNo: 'Not Provided'
+      },
+
+      bankDetails: {
+        bankName: 'State Bank of India',
+        branchName: 'Specialized Commercial Branch, Jaipur',
+        accountHolderName: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
+        accountNumber: '38920194821',
+        ifscCode: 'SBIN0004128',
+        accountType: 'Current Account'
       },
 
       trainingCentres: [
@@ -405,6 +424,15 @@ export class EoiStateService {
         serviceTaxNo: 'Not Provided'
       },
 
+      bankDetails: {
+        bankName: 'Punjab National Bank',
+        branchName: 'Heavy Industrial Area Branch, Jodhpur',
+        accountHolderName: 'Marwar Skill Foundation',
+        accountNumber: '1129002100045812',
+        ifscCode: 'PUNB0112900',
+        accountType: 'Current Account'
+      },
+
       trainingCentres: [
         {
           district: 'Jodhpur',
@@ -524,6 +552,15 @@ export class EoiStateService {
         serviceTaxNo: 'Not Provided'
       },
 
+      bankDetails: {
+        bankName: 'HDFC Bank',
+        branchName: 'Chetak Circle Branch, Udaipur',
+        accountHolderName: 'Singhania Vocational & Technical Trust',
+        accountNumber: '50200034891240',
+        ifscCode: 'HDFC0000281',
+        accountType: 'Current Account'
+      },
+
       trainingCentres: [
         {
           district: 'Udaipur',
@@ -619,6 +656,15 @@ export class EoiStateService {
         voterIdNo: 'DLH6814990',
         passportNo: 'Not Provided',
         serviceTaxNo: 'Not Provided'
+      },
+
+      bankDetails: {
+        bankName: 'Bank of Baroda',
+        branchName: 'Bhugor Bypass Branch, Alwar',
+        accountHolderName: 'DMR Enterprises Pvt Ltd',
+        accountNumber: '08420200001923',
+        ifscCode: 'BARB0ALWARX',
+        accountType: 'Current Account'
       },
 
       trainingCentres: [
@@ -728,7 +774,20 @@ export class EoiStateService {
       try {
         const savedResponses = localStorage.getItem('isms_dept_admin_responses');
         if (savedResponses) {
-          this.responsesSubject.next(JSON.parse(savedResponses));
+          const parsed: ApplicantResponse[] = JSON.parse(savedResponses);
+          const merged = this.initialResponses.map(init => {
+            const match = parsed.find(p => p.id === init.id);
+            if (!match) return init;
+            return {
+              ...init,
+              ...match,
+              annualActionPlan: (match.annualActionPlan && match.annualActionPlan.length > 0) ? match.annualActionPlan : init.annualActionPlan,
+              bankDetails: match.bankDetails || init.bankDetails,
+              organisation: { ...init.organisation, ...match.organisation },
+              authorizedSignatory: { ...init.authorizedSignatory, ...match.authorizedSignatory }
+            };
+          });
+          this.responsesSubject.next(merged);
         }
       } catch (e) {
         console.error('Error loading stored responses', e);

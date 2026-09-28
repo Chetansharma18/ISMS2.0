@@ -39,12 +39,6 @@ export const MAIN_NAV_ITEMS: MenuItem[] = [
     roles: ['dept_admin', 'super_admin']
   },
   {
-    label: 'Applicant Submissions',
-    route: '/admin/responses',
-    icon: 'inventory_2',
-    roles: ['dept_admin', 'super_admin']
-  },
-  {
     label: 'My Profile',
     route: '/profile',
     icon: 'person'

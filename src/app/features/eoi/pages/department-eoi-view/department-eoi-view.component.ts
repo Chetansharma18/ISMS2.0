@@ -93,7 +93,13 @@ export class DepartmentEoiViewComponent {
   readonly schemeColumns: TableColumn<Scheme>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
     { key: 'schemeTitle', label: 'EOI Ref No. & Scheme Name', width: 'min-w-[280px]', type: 'custom' },
-    { key: 'category', label: 'Category', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    {
+      key: 'category',
+      label: 'Category',
+      align: 'center',
+      cellClass: 'whitespace-nowrap font-normal text-slate-700',
+      format: (val) => (!val || val === 'NA' || val === '-') ? '-' : val
+    },
     { key: 'dateOfOpening', label: 'Date of Opening', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'dateOfClosing', label: 'Date of Closing', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'status', label: 'Status', align: 'center', type: 'status' },

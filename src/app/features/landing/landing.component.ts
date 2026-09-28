@@ -22,7 +22,7 @@ import { ImportantLinksComponent } from './components/important-links/important-
     class: 'block w-full'
   },
   template: `
-    <div class="w-full flex flex-col">
+    <div class="w-full flex flex-col" style="zoom: 1.25;">
       <!-- 1. Government Circulars & News Ticker -->
       <app-news-ticker></app-news-ticker>
 

@@ -35,17 +35,17 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
       <div class="absolute inset-0 bg-linear-to-r from-[#07233B]/95 via-[#0B3558]/90 to-[#0B3558]/50 sm:to-[#0B3558]/30"></div>
       <div class="absolute inset-0 bg-radial-at-t from-transparent via-transparent to-black/30 pointer-events-none"></div>
 
-      <div class="max-w-360 mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-14 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
+      <div class="max-w-[95%] mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
         
         <!-- Hero Content (Left) -->
         <div class="lg:col-span-7 text-left">
           
-          <h1 class="landing-hero-title text-white text-3xl sm:text-4xl lg:text-[44px] font-extrabold leading-[1.18] mb-5 max-w-lg tracking-tight drop-shadow-md font-sans" style="color: #ffffff !important; font-family: var(--font-family-base, 'Inter', sans-serif);">
+          <h1 class="landing-hero-title text-white text-6xl sm:text-7xl lg:text-[96px] font-extrabold leading-[1.1] mb-6 max-w-3xl tracking-tight drop-shadow-lg font-sans" style="color: #ffffff !important; font-family: var(--font-family-base, 'Inter', sans-serif);">
             <span class="text-white font-extrabold inline-block" style="color: #ffffff !important;">Integrated Scheme</span> <br class="hidden sm:inline" />
             <span class="text-white font-extrabold inline-block" style="color: #ffffff !important;">Management System</span>
           </h1>
 
-          <p class="landing-body-text text-slate-100 text-sm sm:text-base max-w-md lg:max-w-120 xl:max-w-lg leading-relaxed drop-shadow font-normal text-left" style="color: #f1f5f9 !important;">
+          <p class="landing-body-text text-slate-100 text-xl sm:text-2xl lg:text-3xl max-w-2xl lg:max-w-120 xl:max-w-3xl leading-relaxed drop-shadow-md font-medium text-left" style="color: #f1f5f9 !important;">
             A unified, transparent digital ecosystem empowering skill development schemes, training operations, biometric verification, assessments, certifications, and sustainable placements across Rajasthan.
           </p>
 
@@ -86,7 +86,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                   @for (item of tenders; track item.id) {
                     <div 
                       (click)="openTenderPreview(item)" 
-                      class="relative p-3 sm:p-3.5 bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-[#0B3558]/40 hover:bg-slate-50 transition-all group">
+                      class="relative p-3 sm:p-3.5 bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg hover:shadow-lg hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer">
                       @if (item.isNew) {
                         <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-lg" />
                       }
@@ -106,7 +106,7 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
                   @for (item of tenders; track item.id + '-dup') {
                     <div 
                       (click)="openTenderPreview(item)" 
-                      class="relative p-3 sm:p-3.5 bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-[#0B3558]/40 hover:bg-slate-50 transition-all group">
+                      class="relative p-3 sm:p-3.5 bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg hover:shadow-lg hover:border-blue-400 hover:bg-blue-50 hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer">
                       @if (item.isNew) {
                         <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-lg" />
                       }
@@ -131,7 +131,10 @@ import { TendersModalComponent } from '../tenders-modal/tenders-modal.component'
           
           <!-- Slide-out Preview Panel -->
           @if (selectedPreviewTender()) {
-            <div class="absolute inset-y-0 right-[calc(100%-24px)] w-70 sm:w-90 bg-white shadow-[-10px_0_20px_rgba(0,0,0,0.15)] z-10 rounded-l-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-right-12 duration-300">
+            <!-- Invisible click-away overlay -->
+            <div class="fixed inset-0 z-[5]" (click)="closeTenderPreview()"></div>
+
+            <div class="absolute inset-y-0 right-[calc(100%-24px)] w-70 sm:w-90 bg-white shadow-[-10px_0_20px_rgba(0,0,0,0.15)] z-[10] rounded-l-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-right-12 duration-300">
               
               <!-- Header -->
               <div class="p-4 pr-10 border-b border-slate-100 bg-slate-50 flex justify-between items-start gap-2">

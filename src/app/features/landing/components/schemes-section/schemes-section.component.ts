@@ -22,7 +22,7 @@ interface SchemeCard {
   },
   template: `
     <section id="schemes" class="py-14 bg-slate-50 border-b border-slate-200 scroll-mt-20">
-      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
@@ -33,7 +33,7 @@ interface SchemeCard {
             <h2 class="landing-section-title text-2xl sm:text-3xl lg:text-[32px] font-bold text-[#0B3558] mt-2 tracking-tight font-sans" style="font-family: var(--font-family-base, 'Inter', sans-serif);">
               Active Government Schemes
             </h2>
-            <p class="landing-body-text text-sm sm:text-base text-slate-500 mt-1 max-w-2xl text-left">
+            <p class="landing-body-text text-base sm:text-lg text-slate-500 mt-1 max-w-2xl text-left">
               Empanelling Training Partners and offering funded NSQF-aligned courses to Rajasthan youth.
             </p>
           </div>

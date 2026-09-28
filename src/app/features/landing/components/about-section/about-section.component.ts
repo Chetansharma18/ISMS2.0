@@ -18,20 +18,19 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
     class: 'block w-full'
   },
   template: `
-    <section #sectionRef class="py-8 sm:py-12 bg-white border-b border-slate-100">
-      <div class="max-w-360 mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <h2 class="landing-section-title text-2xl sm:text-3xl lg:text-[32px] font-bold text-[#0B3558] mb-6 sm:mb-8 tracking-tight font-sans" style="color: var(--color-primary, #174A6E); font-family: var(--font-family-base, 'Inter', sans-serif);">
-          About ISMS 2.0
-        </h2>
+    <section #sectionRef class="py-2 sm:py-6 lg:py-8 bg-white border-b border-slate-100">
+      <div class="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
         
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
           <!-- Left Column: About Text (Aligned parallel with right side video) -->
-          <div class="lg:col-span-7 flex flex-col justify-start pt-1">
+          <div class="lg:col-span-7 flex flex-col justify-start ">
+            <h2 class="landing-section-title text-5xl sm:text-6xl lg:text-[72px] font-extrabold text-[#0B3558] mb-12 sm:mb-20 tracking-tight font-sans" style="color: var(--color-primary, #174A6E); font-family: var(--font-family-base, 'Inter', sans-serif);">
+              About ISMS 2.0
+            </h2>
 
             <!-- Core Content -->
-            <div class="landing-body-text space-y-4 text-sm sm:text-base text-slate-700 leading-relaxed sm:leading-[1.7] text-left">
+            <div class="landing-body-text space-y-6 text-xl sm:text-2xl text-slate-700 leading-relaxed sm:leading-[1.8] text-left font-medium mt-[15px]">
               <p>
                 Integrated Scheme Management System (ISMS 2.0) is a comprehensive
                 e-Governance and Management Information System (MIS) designed to digitally transform, 

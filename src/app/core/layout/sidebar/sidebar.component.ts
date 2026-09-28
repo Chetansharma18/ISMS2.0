@@ -94,9 +94,9 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
             </a>
           } @else if (isExistingUser()) {
             <!-- ================================================================
-                 ROLE: EXISTING USER
+                 ROLE: EXISTING USER (Flow: Active schemes, Tender status, Sanction Order, SDC Management, Batch Management, Aspirants, Grievance, Profile)
                  ================================================================ -->
-            <!-- 1. Active Schemes & Tenders -->
+            <!-- 1. Active Schemes -->
             <a
               routerLink="/tenders"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
@@ -126,44 +126,7 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
               </div>
             </a>
 
-            <!-- 3. Profile -->
-            <a
-              routerLink="/profile"
-              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
-              [routerLinkActiveOptions]="{ exact: false }"
-              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
-            >
-              <div class="flex items-center gap-2.5">
-                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span class="tracking-tight">Profile</span>
-              </div>
-            </a>
-
-            <!-- 4. Grievance -->
-            <a
-              routerLink="/grievance"
-              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
-              [routerLinkActiveOptions]="{ exact: false }"
-              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
-            >
-              <div class="flex items-center gap-2.5">
-                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <span class="tracking-tight">Grievance</span>
-              </div>
-            </a>
-
-            <!-- ================================================================
-                 TP MANAGEMENT (Matching Screenshot 1)
-                 ================================================================ -->
-            <div class="pt-3 pb-1 px-3">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-[#8F9AA3]">TP Management</span>
-            </div>
-
-            <!-- Sanction Orders -->
+            <!-- 3. Sanction Order -->
             <a
               routerLink="/tp/sanction-orders"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
@@ -174,11 +137,11 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
                 <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
-                <span class="tracking-tight">Sanction Orders</span>
+                <span class="tracking-tight">Sanction Order</span>
               </div>
             </a>
 
-            <!-- SDC Management -->
+            <!-- 4. SDC Management -->
             <a
               routerLink="/sdcs"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
@@ -193,7 +156,7 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
               </div>
             </a>
 
-            <!-- Batch Management -->
+            <!-- 5. Batch Management -->
             <a
               routerLink="/batches"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
@@ -208,7 +171,7 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
               </div>
             </a>
 
-            <!-- Aspirants / Aspirant Management -->
+            <!-- 6. Aspirants -->
             <a
               routerLink="/aspirants"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
@@ -224,6 +187,36 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
               <span class="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-[#EAF2F6] text-[#174A6E] border border-[#D9E1E7]">
                 {{ aspirantCount() }}
               </span>
+            </a>
+
+            <!-- 7. Grievance -->
+            <a
+              routerLink="/grievance"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span class="tracking-tight">Grievance</span>
+              </div>
+            </a>
+
+            <!-- 8. Profile -->
+            <a
+              routerLink="/profile"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span class="tracking-tight">Profile</span>
+              </div>
             </a>
           } @else {
             <!-- ================================================================

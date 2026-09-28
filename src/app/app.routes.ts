@@ -102,6 +102,27 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/camera-monitoring/batches/:sdcId',
+    loadComponent: () =>
+      import('./features/sdc/components/camera-batch-list.component').then(
+        (m) => m.CameraBatchListComponent
+      )
+  },
+  {
+    path: 'admin/camera-monitoring/:tpId',
+    loadComponent: () =>
+      import('./features/sdc/components/camera-sdc-list.component').then(
+        (m) => m.CameraSdcListComponent
+      )
+  },
+  {
+    path: 'admin/camera-monitoring',
+    loadComponent: () =>
+      import('./features/sdc/components/camera-monitoring.component').then(
+        (m) => m.CameraMonitoringComponent
+      )
+  },
+  {
     path: 'sdc',
     children: [
       {

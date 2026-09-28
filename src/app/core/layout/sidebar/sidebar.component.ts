@@ -92,6 +92,21 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
                 <span class="tracking-tight">Grievance Management</span>
               </div>
             </a>
+            
+            <!-- 5. Camera Monitoring -->
+            <a
+              routerLink="/admin/camera-monitoring"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <span class="tracking-tight">Camera Monitoring</span>
+              </div>
+            </a>
           } @else if (isExistingUser()) {
             <!-- ================================================================
                  ROLE: EXISTING USER
@@ -224,6 +239,54 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
               <span class="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-[#EAF2F6] text-[#174A6E] border border-[#D9E1E7]">
                 {{ aspirantCount() }}
               </span>
+            </a>
+          } @else if (isSuperAdmin()) {
+            <!-- ================================================================
+                 ROLE: SUPER ADMIN
+                 ================================================================ -->
+            <!-- Active Schemes Nav Item -->
+            <a
+              routerLink="/tenders"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                <span class="tracking-tight">Active Schemes</span>
+              </div>
+            </a>
+
+            <!-- Profile Nav Item -->
+            <a
+              routerLink="/profile"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span class="tracking-tight">Profile</span>
+              </div>
+            </a>
+            
+            <!-- Camera Monitoring -->
+            <a
+              routerLink="/admin/camera-monitoring"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <span class="tracking-tight">Camera Monitoring</span>
+              </div>
             </a>
           } @else {
             <!-- ================================================================

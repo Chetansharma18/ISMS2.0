@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
   },
   template: `
     <section class="pt-6 sm:pt-10 pb-12 sm:pb-16 bg-white border-b border-slate-200">
-      <div class="max-w-360 mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Mobile App Showcase Card -->
         <div class="rounded-3xl border border-blue-100/80 p-6 sm:p-10 lg:p-12 relative overflow-hidden shadow-sm">
@@ -48,7 +48,7 @@ import { CommonModule } from '@angular/common';
                 <h2 class="landing-section-title text-2xl sm:text-3xl lg:text-[32px] font-bold text-[#0B3558] mb-3 tracking-tight font-sans" style="font-family: var(--font-family-base, 'Inter', sans-serif);">
                   ISMS 2.0 Mobile App
                 </h2>
-                <p class="landing-body-text text-sm sm:text-base text-slate-700 font-normal leading-relaxed max-w-lg mx-auto lg:mx-0 text-left">
+                <p class="landing-body-text text-base sm:text-lg text-slate-700 font-normal leading-relaxed max-w-lg mx-auto lg:mx-0 text-left">
                   An integrated, multilingual mobile application providing instantaneous access to 
                   scheme notifications, biometric attendance, training center verifications, and grievances.
                 </p>
@@ -57,31 +57,37 @@ import { CommonModule } from '@angular/common';
               <!-- Circular Features (Fully Responsive Grid/Flex without Overflow) -->
               <div class="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-5">
                 <!-- Feature 1 -->
-                <div class="bg-white rounded-2xl sm:rounded-full w-24.5 h-24.5 sm:w-31 sm:h-31 border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center p-2 shrink-0 transition-all duration-300 hover:shadow-lg hover:-translate-y-1.5 hover:border-blue-200 cursor-pointer group">
+                <div class="bg-white rounded-2xl sm:rounded-full w-28 h-28 sm:w-32 sm:h-32 border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center p-2 shrink-0 transition-all duration-300 hover:shadow-lg hover:-translate-y-1.5 hover:border-blue-200 cursor-pointer group">
                   <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-blue-50 text-[#0B3558] flex items-center justify-center mb-1 shrink-0 transition-colors duration-300 group-hover:bg-[#0B3558] group-hover:text-white">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                   </div>
-                  <p class="text-[10px] sm:text-[11px] font-bold text-slate-800 leading-tight">For Multiple<br/>Stakeholders</p>
+                  <div class="mt-1 flex flex-col items-center justify-center w-full" style="zoom: 0.65;">
+                    <p class="text-xs font-bold text-slate-800 leading-tight">For Multiple<br/>Stakeholders</p>
+                  </div>
                 </div>
 
                 <!-- Feature 2 -->
-                <div class="bg-white rounded-2xl sm:rounded-full w-24.5 h-24.5 sm:w-31 sm:h-31 border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center p-2 shrink-0 transition-all duration-300 hover:shadow-lg hover:-translate-y-1.5 hover:border-blue-200 cursor-pointer group">
+                <div class="bg-white rounded-2xl sm:rounded-full w-28 h-28 sm:w-32 sm:h-32 border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center p-2 shrink-0 transition-all duration-300 hover:shadow-lg hover:-translate-y-1.5 hover:border-blue-200 cursor-pointer group">
                   <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-blue-50 text-[#0B3558] flex items-center justify-center mb-1 shrink-0 transition-colors duration-300 group-hover:bg-[#0B3558] group-hover:text-white">
                     <span class="font-black text-xs sm:text-sm">A / अ</span>
                   </div>
-                  <p class="text-[10px] sm:text-[11px] font-bold text-slate-800 leading-tight">In English &<br/>Hindi</p>
+                  <div class="mt-1 flex flex-col items-center justify-center w-full" style="zoom: 0.65;">
+                    <p class="text-xs font-bold text-slate-800 leading-tight">In English &<br/>Hindi</p>
+                  </div>
                 </div>
 
                 <!-- Feature 3 -->
-                <div class="bg-white rounded-2xl sm:rounded-full w-24.5 h-24.5 sm:w-31 sm:h-31 border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center p-2 shrink-0 transition-all duration-300 hover:shadow-lg hover:-translate-y-1.5 hover:border-blue-200 cursor-pointer group">
+                <div class="bg-white rounded-2xl sm:rounded-full w-28 h-28 sm:w-32 sm:h-32 border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center p-2 shrink-0 transition-all duration-300 hover:shadow-lg hover:-translate-y-1.5 hover:border-blue-200 cursor-pointer group">
                   <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-blue-50 text-[#0B3558] flex items-center justify-center mb-1 shrink-0 transition-colors duration-300 group-hover:bg-[#0B3558] group-hover:text-white">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
                   </div>
-                  <p class="text-[10px] sm:text-[11px] font-bold text-slate-800 leading-tight">Secure & Role<br/>Based Access</p>
+                  <div class="mt-1 flex flex-col items-center justify-center w-full" style="zoom: 0.65;">
+                    <p class="text-xs font-bold text-slate-800 leading-tight">Secure & Role<br/>Based Access</p>
+                  </div>
                 </div>
               </div>
 
@@ -89,21 +95,21 @@ import { CommonModule } from '@angular/common';
               <!-- App Stats (Downloads, Rating, Users) -->
               <div class="mt-6 sm:mt-8 grid grid-cols-3 items-center divide-x divide-slate-300 bg-white/80 p-4 sm:p-5 rounded-2xl shadow-2xs ring-1 ring-transparent hover:ring-blue-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 hover:bg-white cursor-pointer w-full max-w-md mx-auto lg:mx-0">
                 
-                <div class="text-center px-2">
-                  <p class="text-xl sm:text-2xl lg:text-3xl font-black text-[#0B3558]">1K+</p>
-                  <p class="text-[9px] sm:text-[11px] font-bold text-slate-600 uppercase tracking-wider mt-0.5">Downloads</p>
+                <div class="flex flex-col items-center justify-center px-2 py-1 h-full">
+                  <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0B3558] leading-none">1K+</h1>
+                  <p class="text-xs font-medium text-slate-600 mt-2">Downloads</p>
                 </div>
                 
-                <div class="text-center px-2">
-                  <p class="text-xl sm:text-2xl lg:text-3xl font-black text-[#0B3558] flex items-center justify-center gap-1">
-                    4.8 <span class="text-[#EA580C] text-lg leading-none">★</span>
-                  </p>
-                  <p class="text-[9px] sm:text-[11px] font-bold text-slate-600 uppercase tracking-wider mt-0.5">User Rating</p>
+                <div class="flex flex-col items-center justify-center px-2 py-1 h-full">
+                  <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0B3558] leading-none flex items-center justify-center gap-1">
+                    4.8 <span class="text-[#EA580C] text-xl sm:text-2xl -mt-1">★</span>
+                  </h1>
+                  <p class="text-xs font-medium text-slate-600 mt-2">User Rating</p>
                 </div>
                 
-                <div class="text-center px-2">
-                  <p class="text-xl sm:text-2xl lg:text-3xl font-black text-[#0B3558]">200+</p>
-                  <p class="text-[9px] sm:text-[11px] font-bold text-slate-600 uppercase tracking-wider mt-0.5">Active Users</p>
+                <div class="flex flex-col items-center justify-center px-2 py-1 h-full">
+                  <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0B3558] leading-none">200+</h1>
+                  <p class="text-xs font-medium text-slate-600 mt-2">Active Users</p>
                 </div>
 
               </div>

@@ -19,7 +19,7 @@ interface StatMetric {
   },
   template: `
     <section class="py-12 bg-white border-b border-slate-200">
-      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Section Header -->
         <div class="text-center max-w-3xl mx-auto mb-10">

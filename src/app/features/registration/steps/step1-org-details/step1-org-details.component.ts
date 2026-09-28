@@ -33,13 +33,13 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
       
       <!-- Organization, Compliance & Contact Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-3.5 gap-y-2.5">
-        <!-- Short Name -> 3 cols -->
+        <!-- Name -> 3 cols -->
         <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
-            label="TP/PIA Short Name"
+            label="Name"
             [value]="data().shortName"
             (valueChange)="update('shortName', $event)"
-            placeholder="e.g. RSLDC-SKILLS"
+            placeholder="e.g. SkillTech Solutions"
             [required]="true"
             [maxLength]="50"
             [error]="getFieldError('shortName')"
@@ -49,10 +49,10 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
         <!-- Full Corporate Name -> 6 cols -->
         <div class="lg:col-span-6 sm:col-span-1">
           <app-form-input
-            label="TP/PIA Full Name"
+            label="Full Name"
             [value]="data().fullName"
             (valueChange)="update('fullName', $event)"
-            placeholder="e.g. Rajasthan Skill Development Solutions Pvt Ltd"
+            placeholder="e.g. SkillTech Solutions Private Limited"
             [required]="true"
             [maxLength]="200"
             [error]="getFieldError('fullName')"
@@ -419,10 +419,10 @@ export class Step1OrgDetailsComponent {
     const d = this.data();
     switch (field) {
       case 'shortName':
-        if (!d.shortName?.trim()) return 'TP/PIA Short Name is required';
+        if (!d.shortName?.trim()) return 'Name is required';
         return undefined;
       case 'fullName':
-        if (!d.fullName?.trim()) return 'TP/PIA Full Legal Name is required';
+        if (!d.fullName?.trim()) return 'Full Name is required';
         return undefined;
       case 'natureOfEntity':
         if (!d.natureOfEntity?.trim()) return 'Nature of Entity is required';

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { OtrFormService } from './services/otr-form.service';
 import { OtrValidationService } from './services/otr-validation.service';
+import { OtrPdfService } from './services/otr-pdf.service';
 
 import { Step1OrgDetailsComponent } from './steps/step1-org-details/step1-org-details.component';
 import { Step2OicDetailsComponent } from './steps/step2-oic-details/step2-oic-details.component';
@@ -33,18 +34,18 @@ export interface StepMeta {
            Sticky Registration Header (Heading & Stepper combined so heading never hides on scroll)
            ==================================================================== -->
       <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-2xs">
-        <!-- 1. Form Heading (Reduced Size, Professional & Clean in Theme Blue) -->
-        <div class="w-full border-b border-slate-100 py-2 px-4 sm:px-6 lg:px-8 bg-white">
-          <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <h1 class="font-bold tracking-tight m-0" style="font-size: 16px !important; line-height: 22px !important; color: #0B3558 !important;">
-              One Time Registration Form
+        <!-- 1. Form Heading (Professional & Clean in Theme Blue) -->
+        <div class="w-full border-b border-slate-100 py-2.5 px-4 sm:px-6 lg:px-8 bg-white">
+          <div class="max-w-[1380px] mx-auto flex items-center justify-between">
+            <h1 class="font-bold tracking-tight m-0" style="font-size: 17px !important; line-height: 24px !important; color: #0B3558 !important;">
+              Company Registration Form
             </h1>
           </div>
         </div>
 
         <!-- 2. Horizontal Tabs Stepper (Clean & Purely Responsive) -->
         <nav class="w-full bg-white" aria-label="Registration Steps">
-          <div class="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8">
+          <div class="max-w-[1380px] mx-auto px-2 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between overflow-x-auto no-scrollbar py-2 gap-1 sm:gap-2">
               @for (step of steps; track step.number) {
                 <button
@@ -166,7 +167,7 @@ export interface StepMeta {
       <!-- ====================================================================
            3. Main Form Container (Single Unified White Background, Optimized Height)
            ==================================================================== -->
-      <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-white">
+      <main class="flex-1 max-w-[1380px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-white">
         
         <!-- Step 1 Container -->
         <div [class.hidden]="activeStep() !== 1">
@@ -199,7 +200,7 @@ export interface StepMeta {
            4. Sticky Bottom Action Bar (Neat Side-by-Side Previous & Next Buttons)
            ==================================================================== -->
       <footer class="w-full bg-white border-t border-slate-200 py-2.5 px-4 sm:px-6 lg:px-8 sticky bottom-0 z-30 shadow-md">
-        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="max-w-[1380px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <!-- Step indicator / Auto-saved status -->
          
 
@@ -354,6 +355,7 @@ export class RegistrationShellComponent {
   private route = inject(ActivatedRoute);
   otrFormService = inject(OtrFormService);
   validationService = inject(OtrValidationService);
+  private pdfService = inject(OtrPdfService);
 
   readonly activeStep = signal<number>(1);
   readonly submittedRegId = signal<string | null>(null);
@@ -395,8 +397,7 @@ export class RegistrationShellComponent {
 
   canSubmit(): boolean {
     const data = this.otrFormService.formData();
-    const allValid = [1, 2, 3, 4].every(s => this.validationService.isStepValid(s, data));
-    return allValid && data.step5DeclarationAgreed;
+    return [1, 2, 3, 4].every(s => this.validationService.isStepValid(s, data));
   }
 
   goToStep(stepNumber: number): void {
@@ -454,11 +455,6 @@ export class RegistrationShellComponent {
       }
     }
 
-    if (!data.step5DeclarationAgreed) {
-      this.submitErrorMessage.set('Form is not filled, some entries are missing: Please check the declaration checkbox to agree before submitting.');
-      return;
-    }
-
     this.submitErrorMessage.set(null);
     const regId = this.otrFormService.submitForm();
     this.submittedRegId.set(regId);
@@ -479,439 +475,10 @@ export class RegistrationShellComponent {
   }
 
   downloadOtrPdf(): void {
-    const regId = this.submittedRegId() || 'OTR-RSLDC-2026';
-    const s1 = this.otrFormService.step1();
-    const s2 = this.otrFormService.step2(); // OIC list
-    const s3 = this.otrFormService.step3(); // Auth person
-    const s4 = this.otrFormService.step4(); // Bank Details
-
-    const printWindow = window.open('', '_blank', 'width=950,height=850');
-    if (!printWindow) {
-      window.print();
-      return;
-    }
-
-    const regAddress = `${s1.registeredAddress || ''}${s1.registeredDistrict ? ', ' + s1.registeredDistrict : ''}${s1.registeredState ? ', ' + s1.registeredState : ''}${s1.registeredPincode ? ' - ' + s1.registeredPincode : ''}`.trim() || '-';
-    const officeAddress = s1.sameAsRegistered
-      ? 'Same as Registered Office Address'
-      : (`${s1.officeAddress || ''}${s1.officeDistrict ? ', ' + s1.officeDistrict : ''}${s1.officeState ? ', ' + s1.officeState : ''}${s1.officePincode ? ' - ' + s1.officePincode : ''}`.trim() || '-');
-
-    const oicRows = (s2 && s2.length > 0)
-      ? s2.map((o, idx) => `
-        <tr>
-          <td style="text-align:center;font-weight:600;">${idx + 1}</td>
-          <td style="font-weight:700;">${o.name || '-'}</td>
-          <td>${o.designation || '-'}</td>
-          <td>${o.mobileNo || '-'}</td>
-          <td>${o.emailId || '-'}</td>
-          <td style="font-family:monospace;">${o.pan || '-'}</td>
-          <td style="font-family:monospace;">${o.aadhaarNo || '-'}</td>
-          <td>${idx === 0 ? 'Primary Nodal Officer' : 'Additional Officer'}</td>
-        </tr>
-      `).join('')
-      : '<tr><td colspan="8" style="text-align:center;color:#64748b;padding:8px;">No Officer Details Provided</td></tr>';
-
-    const docs = [
-      { name: 'Certificate of Registration', doc: s1.registrationCertDoc },
-      { name: 'Company PAN Card', doc: s1.panCardDoc },
-      ...(s1.gstRegistered === 'Yes' ? [{ name: 'GST Registration Certificate', doc: s1.gstCertDoc }] : []),
-      ...(s1.msmeRegistered === 'Yes' ? [{ name: 'MSME Udyam Certificate', doc: s1.msmeCertDoc }] : []),
-      { name: 'Authorization Letter / Board Resolution', doc: s3.authorizationLetterDoc },
-      { name: 'Authorized Signatory Identity Proof', doc: s3.idProofDoc },
-      ...s2.map((o, i) => ({ name: `Officer #${i + 1} Appointment Letter (${o.name || 'OIC'})`, doc: o.appointmentLetterDoc })),
-      ...s2.map((o, i) => ({ name: `Officer #${i + 1} ID Proof (${o.name || 'OIC'})`, doc: o.idProofDoc })),
-      { name: 'Bank Cancelled Cheque / Passbook Copy', doc: s4.cancelledChequeDoc }
-    ];
-
-    const docRows = docs.map((d, idx) => {
-      const isUp = d.doc && d.doc.status === 'uploaded';
-      return `
-        <tr>
-          <td style="text-align:center;font-weight:600;">${idx + 1}</td>
-          <td style="font-weight:600;">${d.name}</td>
-          <td>${isUp ? d.doc!.fileName : '<span style="color:#94a3b8;">-</span>'}</td>
-          <td style="text-align:center;">${isUp ? d.doc!.fileSize : '<span style="color:#94a3b8;">-</span>'}</td>
-          <td style="text-align:center;font-weight:600;color:${isUp ? '#15803d' : '#94a3b8'};">
-            ${isUp ? 'Attached' : 'Not Attached'}
-          </td>
-        </tr>
-      `;
-    }).join('');
-
-    const printDate = new Date().toLocaleString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-
-    const html = `
-      <!DOCTYPE html>
-      <html lang="en">
-        <head>
-          <meta charset="utf-8">
-          <title>ISMS 2.0 - OTR Registration Details - ${regId}</title>
-          <style>
-            @page {
-              size: A4 portrait;
-              margin: 10mm 12mm;
-            }
-            * {
-              box-sizing: border-box;
-              font-family: Arial, Helvetica, sans-serif;
-            }
-            body {
-              margin: 0;
-              padding: 16px;
-              background: #ffffff;
-              color: #0f172a;
-              font-size: 11px;
-              line-height: 1.4;
-            }
-            .pdf-header {
-              border-bottom: 2px solid #0B3558;
-              padding-bottom: 8px;
-              margin-bottom: 12px;
-              display: flex;
-              justify-content: space-between;
-              align-items: flex-start;
-            }
-            .gov-subhead {
-              font-size: 9.5px;
-              font-weight: 700;
-              color: #0483AC;
-              letter-spacing: 0.08em;
-              text-transform: uppercase;
-            }
-            .gov-mainhead {
-              font-size: 15px;
-              font-weight: 800;
-              color: #0B3558;
-              margin-top: 2px;
-            }
-            .gov-docname {
-              font-size: 11.5px;
-              font-weight: 700;
-              color: #334155;
-              margin-top: 3px;
-            }
-            .meta-block {
-              text-align: right;
-              font-size: 9.5px;
-              color: #64748b;
-            }
-            .sec-header {
-              background: #0B3558;
-              color: #ffffff;
-              font-size: 10.5px;
-              font-weight: 700;
-              padding: 5px 8px;
-              text-transform: uppercase;
-              letter-spacing: 0.04em;
-              margin-top: 12px;
-              border-radius: 3px 3px 0 0;
-            }
-            table.tbl {
-              width: 100%;
-              border-collapse: collapse;
-              font-size: 10px;
-              border: 1px solid #cbd5e1;
-              margin-bottom: 4px;
-            }
-            table.tbl th {
-              background: #f1f5f9;
-              color: #0B3558;
-              font-weight: 700;
-              padding: 5px 6px;
-              text-align: left;
-              border: 1px solid #cbd5e1;
-            }
-            table.tbl td {
-              padding: 4.5px 6px;
-              border: 1px solid #cbd5e1;
-              vertical-align: top;
-            }
-            table.tbl td.lbl {
-              background: #f8fafc;
-              color: #475569;
-              font-weight: 600;
-              width: 22%;
-            }
-            table.tbl td.val {
-              color: #0f172a;
-              font-weight: 500;
-              width: 28%;
-            }
-            .declaration-card {
-              margin-top: 14px;
-              padding: 8px 10px;
-              background: #f8fafc;
-              border: 1px solid #cbd5e1;
-              border-radius: 4px;
-              page-break-inside: avoid;
-            }
-            .declaration-title {
-              font-weight: 700;
-              color: #0B3558;
-              font-size: 10px;
-              margin-bottom: 4px;
-              text-transform: uppercase;
-            }
-            .declaration-text {
-              font-size: 9.5px;
-              color: #334155;
-              line-height: 1.45;
-            }
-            .sign-row {
-              display: flex;
-              justify-content: space-between;
-              margin-top: 24px;
-              padding-top: 8px;
-              page-break-inside: avoid;
-            }
-            .sign-col {
-              text-align: center;
-              font-size: 9.5px;
-              color: #475569;
-              min-width: 180px;
-            }
-            .sign-line {
-              border-top: 1px solid #94a3b8;
-              margin-bottom: 4px;
-            }
-            @media print {
-              body { padding: 0; }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="pdf-header">
-            <div>
-              <div class="gov-subhead">GOVERNMENT OF RAJASTHAN • RSLDC</div>
-              <div class="gov-mainhead">INTEGRATED SCHEME MANAGEMENT SYSTEM (ISMS 2.0)</div>
-              <div class="gov-docname">ONE TIME REGISTRATION (OTR) - APPLICATION DETAILS</div>
-            </div>
-            <div class="meta-block">
-              <div><strong>Registration Ref:</strong> ${regId}</div>
-              <div><strong>Generated Date:</strong> ${printDate}</div>
-            </div>
-          </div>
-
-          <!-- 1. Organization & Legal Particulars Table -->
-          <div class="sec-header">1. Organization &amp; Legal Particulars</div>
-          <table class="tbl">
-            <tr>
-              <td class="lbl">TP/PIA Full Name:</td>
-              <td class="val" colspan="3" style="font-weight:700;">${s1.fullName || '-'}</td>
-            </tr>
-            <tr>
-              <td class="lbl">TP/PIA Short Name:</td>
-              <td class="val">${s1.shortName || '-'}</td>
-              <td class="lbl">Nature of Entity:</td>
-              <td class="val">${s1.natureOfEntity || '-'}</td>
-            </tr>
-            <tr>
-              <td class="lbl">Registration Number:</td>
-              <td class="val" style="font-family:monospace;">${s1.registrationNumber || '-'}</td>
-              <td class="lbl">Date of Registration:</td>
-              <td class="val">${s1.dateOfRegistration || '-'}</td>
-            </tr>
-            <tr>
-              <td class="lbl">State of Legal Reg.:</td>
-              <td class="val">${s1.stateOfLegalReg || '-'}</td>
-              <td class="lbl">Company PAN:</td>
-              <td class="val" style="font-family:monospace;font-weight:700;">${s1.companyPan || '-'}</td>
-            </tr>
-            <tr>
-              <td class="lbl">GST Registered:</td>
-              <td class="val">${s1.gstRegistered} ${s1.gstRegistered === 'Yes' ? '(' + (s1.gstin || '-') + ')' : ''}</td>
-              <td class="lbl">MSME Registered:</td>
-              <td class="val">${s1.msmeRegistered} ${s1.msmeRegistered === 'Yes' ? '(' + (s1.udyamNumber || '-') + ')' : ''}</td>
-            </tr>
-            <tr>
-              <td class="lbl">NSDC Partner Status:</td>
-              <td class="val">${s1.nsdcPartner || 'Not Applicable'}</td>
-              <td class="lbl">Blacklisted by Govt/PSU:</td>
-              <td class="val">${s1.blackListed}</td>
-            </tr>
-            <tr>
-              <td class="lbl">Official Contact No.:</td>
-              <td class="val">${s1.contactNo || '-'}</td>
-              <td class="lbl">Official Email ID:</td>
-              <td class="val">${s1.emailId || '-'}</td>
-            </tr>
-            <tr>
-              <td class="lbl">Official Website:</td>
-              <td class="val" colspan="3">${s1.website || '-'}</td>
-            </tr>
-          </table>
-
-          <!-- 2. Address Particulars Table -->
-          <div class="sec-header">2. Official Address Details</div>
-          <table class="tbl">
-            <tr>
-              <td class="lbl" style="width:25%;">Registered Office Address:</td>
-              <td class="val" style="width:75%;">${regAddress}</td>
-            </tr>
-            <tr>
-              <td class="lbl" style="width:25%;">Corporate / Branch Address:</td>
-              <td class="val" style="width:75%;">${officeAddress}</td>
-            </tr>
-          </table>
-
-          <!-- 3. Authorized Person Details Table -->
-          <div class="sec-header">3. Authorized Signatory Particulars</div>
-          <table class="tbl">
-            <tr>
-              <td class="lbl">Full Name:</td>
-              <td class="val" style="font-weight:700;">${s3.name || '-'}</td>
-              <td class="lbl">Designation:</td>
-              <td class="val">${s3.designation || '-'}</td>
-            </tr>
-            <tr>
-              <td class="lbl">Date of Birth:</td>
-              <td class="val">${s3.dob || '-'}</td>
-              <td class="lbl">Age:</td>
-              <td class="val">${s3.age || '-'} Years</td>
-            </tr>
-            <tr>
-              <td class="lbl">Mobile Number:</td>
-              <td class="val">${s3.mobileNo || '-'}</td>
-              <td class="lbl">Email Address:</td>
-              <td class="val">${s3.emailId || '-'}</td>
-            </tr>
-            <tr>
-              <td class="lbl">PAN:</td>
-              <td class="val" style="font-family:monospace;font-weight:700;">${s3.pan || '-'}</td>
-              <td class="lbl">Aadhaar Number:</td>
-              <td class="val" style="font-family:monospace;">${s3.aadhaarNo || '-'}</td>
-            </tr>
-            <tr>
-              <td class="lbl">Bhamashah Number:</td>
-              <td class="val">${s3.bhamashahNo || '-'}</td>
-              <td class="lbl">Voter ID Number:</td>
-              <td class="val">${s3.voterIdNo || '-'}</td>
-            </tr>
-            <tr>
-              <td class="lbl">Passport Number:</td>
-              <td class="val">${s3.passportNo || '-'}</td>
-              <td class="lbl">Domicile / State:</td>
-              <td class="val">${s3.state || '-'}</td>
-            </tr>
-            <tr>
-              <td class="lbl">Residence Address:</td>
-              <td class="val" colspan="3">${s3.residenceAddress || '-'}</td>
-            </tr>
-          </table>
-
-          <!-- 4. Officer(s) In-Charge Table -->
-          <div class="sec-header">4. Officer(s) In-Charge Details</div>
-          <table class="tbl">
-            <thead>
-              <tr>
-                <th style="width:25px;text-align:center;">#</th>
-                <th>Officer Name</th>
-                <th>Designation</th>
-                <th>Mobile No.</th>
-                <th>Email ID</th>
-                <th>PAN</th>
-                <th>Aadhaar No.</th>
-                <th>Role</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${oicRows}
-            </tbody>
-          </table>
-
-          <!-- 5. Bank Account Details Table -->
-          <div class="sec-header">5. Bank Account &amp; Settlement Details</div>
-          <table class="tbl">
-            <tr>
-              <td class="lbl">Name of the Bank:</td>
-              <td class="val" style="font-weight:700;">${s4.bankName || '-'}</td>
-              <td class="lbl">Branch Name:</td>
-              <td class="val">${s4.branchName || '-'}</td>
-            </tr>
-            <tr>
-              <td class="lbl">Account Holder Name:</td>
-              <td class="val" style="font-weight:600;">${s4.accountHolderName || '-'}</td>
-              <td class="lbl">Account Number:</td>
-              <td class="val" style="font-family:monospace;font-weight:700;">${s4.accountNo || '-'}</td>
-            </tr>
-            <tr>
-              <td class="lbl">Account Type:</td>
-              <td class="val">${s4.accountType || '-'}</td>
-              <td class="lbl">Transfer Mode:</td>
-              <td class="val">${s4.transferMode || '-'}</td>
-            </tr>
-            <tr>
-              <td class="lbl">IFSC Code:</td>
-              <td class="val" style="font-family:monospace;font-weight:700;">${s4.ifscCode || '-'}</td>
-              <td class="lbl">MICR Code:</td>
-              <td class="val" style="font-family:monospace;">${s4.micrCode || '-'}</td>
-            </tr>
-            <tr>
-              <td class="lbl">Branch Address:</td>
-              <td class="val" colspan="3">${s4.branchAddress || '-'}</td>
-            </tr>
-          </table>
-
-          <!-- 6. Uploaded Documents Verification Checklist Table -->
-          <div class="sec-header">6. Attached Verification Documents Checklist</div>
-          <table class="tbl">
-            <thead>
-              <tr>
-                <th style="width:25px;text-align:center;">#</th>
-                <th>Document Description</th>
-                <th>Uploaded File Name</th>
-                <th style="width:75px;text-align:center;">File Size</th>
-                <th style="width:90px;text-align:center;">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${docRows}
-            </tbody>
-          </table>
-
-          <!-- Statutory Declaration -->
-          <div class="declaration-card">
-            <div class="declaration-title">Solemn Declaration &amp; Affirmation</div>
-            <div class="declaration-text">
-              I hereby solemnly declare and affirm that all the particulars and documents provided above are true, complete, and correct to the best of my knowledge and belief. I acknowledge that any false or misleading statement will render my application liable for rejection.
-            </div>
-          </div>
-
-          <!-- Signature Block -->
-          <div class="sign-row">
-            <div class="sign-col" style="text-align:left;">
-              <div>Date: ${printDate}</div>
-              <div>Place: _____________________</div>
-            </div>
-            <div class="sign-col">
-              <div style="height:35px;"></div>
-              <div class="sign-line"></div>
-              <div><strong>Signature of Authorized Signatory</strong></div>
-              <div>(Name: ${s3.name || 'Authorized Signatory'})</div>
-            </div>
-            <div class="sign-col">
-              <div style="height:35px;"></div>
-              <div class="sign-line"></div>
-              <div><strong>Seal of the Organization</strong></div>
-            </div>
-          </div>
-        </body>
-      </html>
-    `;
-
-    printWindow.document.write(html);
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => {
-      printWindow.print();
-    }, 300);
+    this.pdfService.generateOtrPdf(this.otrFormService.formData(), this.submittedRegId());
   }
+
+
 
   navigateToHome(): void {
     this.submittedRegId.set(null);

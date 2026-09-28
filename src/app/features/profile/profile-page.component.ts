@@ -12,7 +12,7 @@ import { DocumentViewerModalComponent } from '../../shared/components/document-v
   standalone: true,
   imports: [CommonModule, RouterModule, DocumentViewerModalComponent],
   template: `
-    <div class="w-full min-h-full bg-white text-[#1F2933] font-sans pb-10">
+    <div class="w-full min-h-full bg-white text-text-primary font-sans pb-10">
       
       <!-- ====================================================================
            CASE 1: INCOMPLETE PROFILE
@@ -44,11 +44,11 @@ import { DocumentViewerModalComponent } from '../../shared/components/document-v
                 <div class="pt-1 max-w-md">
                   <div class="flex items-center justify-between text-xs font-medium mb-1.5">
                     <span class="text-slate-700 font-semibold">{{ completedSectionsCount() }} of 4 Steps Completed</span>
-                    <span class="text-[#0B3558] font-bold">{{ completionPercentage() }}%</span>
+                    <span class="text-primary font-bold">{{ completionPercentage() }}%</span>
                   </div>
                   <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                     <div
-                      class="h-full bg-[#0B3558] rounded-full transition-all duration-500 ease-out"
+                      class="h-full bg-primary rounded-full transition-all duration-500 ease-out"
                       [style.width.%]="completionPercentage()"
                     ></div>
                   </div>
@@ -60,7 +60,7 @@ import { DocumentViewerModalComponent } from '../../shared/components/document-v
                 <a
                   [routerLink]="['/registration']"
                   [queryParams]="ctaQueryParams()"
-                  class="px-6 py-2.5 rounded-lg bg-[#0B3558] hover:bg-[#123B59] active:bg-[#07233B] text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+                  class="px-6 py-2.5 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap active:brightness-90"
                   style="color: #ffffff !important;"
                 >
                   <span class="text-white font-semibold" style="color: #ffffff !important;">{{ ctaText() }}</span>
@@ -616,7 +616,7 @@ import { DocumentViewerModalComponent } from '../../shared/components/document-v
             class="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer shrink-0"
             title="Preview {{ title }}"
           >
-            <svg class="w-3 h-3 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-3 h-3 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>

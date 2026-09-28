@@ -176,6 +176,20 @@ export const routes: Routes = [
           import('./features/sdc/components/batch-form.component').then(
             (m) => m.BatchFormComponent
           )
+      },
+      {
+        path: ':batchId/map-aspirant',
+        loadComponent: () =>
+          import('./features/sdc/components/aspirant-mapping.component').then(
+            (m) => m.AspirantMappingComponent
+          )
+      },
+      {
+        path: 'map-aspirant',
+        loadComponent: () =>
+          import('./features/sdc/components/aspirant-mapping.component').then(
+            (m) => m.AspirantMappingComponent
+          )
       }
     ]
   },
@@ -189,6 +203,18 @@ export const routes: Routes = [
   {
     path: 'sanction-orders',
     redirectTo: 'tp/sanction-orders',
+    pathMatch: 'full'
+  },
+  {
+    path: 'aspirants',
+    loadComponent: () =>
+      import('./features/sdc/components/aspirant-list.component').then(
+        (m) => m.AspirantListComponent
+      )
+  },
+  {
+    path: 'tp/aspirants',
+    redirectTo: 'aspirants',
     pathMatch: 'full'
   },
   {

@@ -2,6 +2,7 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
+import { AspirantService } from '../../../features/sdc/services/aspirant.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -206,53 +207,23 @@ import { AuthService } from '../../auth/auth.service';
                 <span class="tracking-tight">Batch Management</span>
               </div>
             </a>
-          } @else if (isSuperAdmin()) {
-            <!-- ================================================================
-                 ROLE: SUPER ADMIN
-                 ================================================================ -->
-            <!-- Active Schemes -->
-            <a
-              routerLink="/tenders"
-              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
-              [routerLinkActiveOptions]="{ exact: false }"
-              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
-            >
-              <div class="flex items-center gap-2.5">
-                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                <span class="tracking-tight">Active Schemes</span>
-              </div>
-            </a>
 
-            <!-- Profile -->
+            <!-- Aspirants / Aspirant Management -->
             <a
-              routerLink="/profile"
+              routerLink="/aspirants"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
               [routerLinkActiveOptions]="{ exact: false }"
               class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
             >
               <div class="flex items-center gap-2.5">
                 <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
                 </svg>
-                <span class="tracking-tight">Profile</span>
+                <span class="tracking-tight">Aspirants</span>
               </div>
-            </a>
-
-            <!-- Grievance Management -->
-            <a
-              routerLink="/admin/grievance"
-              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
-              [routerLinkActiveOptions]="{ exact: false }"
-              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
-            >
-              <div class="flex items-center gap-2.5">
-                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <span class="tracking-tight">Grievance Management</span>
-              </div>
+              <span class="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-[#EAF2F6] text-[#174A6E] border border-[#D9E1E7]">
+                {{ aspirantCount() }}
+              </span>
             </a>
           } @else {
             <!-- ================================================================
@@ -302,8 +273,10 @@ import { AuthService } from '../../auth/auth.service';
 })
 export class SidebarComponent {
   authService = inject(AuthService);
+  aspirantService = inject(AspirantService);
 
   readonly currentUser = this.authService.currentUser;
+  readonly aspirantCount = computed(() => this.aspirantService.aspirants().length);
 
   readonly isExistingUser = computed(() => {
     const user = this.currentUser();

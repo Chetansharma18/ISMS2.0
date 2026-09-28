@@ -36,7 +36,7 @@ export interface SubmittedTender {
     ButtonComponent
   ],
   template: `
-    <div class="w-full min-h-full bg-white text-[#1F2933] font-sans">
+    <div class="w-full min-h-full bg-white text-text-primary font-sans">
       <div class="p-4 sm:p-5 space-y-3 font-sans">
         
         <!-- Page Header via Reusable PageHeaderComponent -->
@@ -53,15 +53,15 @@ export interface SubmittedTender {
               <button
                 type="button"
                 (click)="setFilter(f.id)"
-                class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-                [class.bg-[#174A6E]]="activeFilter() === f.id"
+                class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
+                [class.bg-primary]="activeFilter() === f.id"
                 [class.text-white]="activeFilter() === f.id"
-                [class.border-[#174A6E]]="activeFilter() === f.id"
+                [class.border-primary]="activeFilter() === f.id"
                 [class.bg-white]="activeFilter() !== f.id"
-                [class.text-[#5F6B76]]="activeFilter() !== f.id"
-                [class.border-[#D9E1E7]]="activeFilter() !== f.id"
-                [class.hover:bg-[#EAF2F6]]="activeFilter() !== f.id"
-                [class.hover:text-[#174A6E]]="activeFilter() !== f.id"
+                [class.text-text-secondary]="activeFilter() !== f.id"
+                [class.border-border]="activeFilter() !== f.id"
+                [class.hover:bg-primary-light]="activeFilter() !== f.id"
+                [class.hover:text-primary]="activeFilter() !== f.id"
               >
                 <span>{{ f.label }}</span>
                 <span
@@ -69,7 +69,7 @@ export interface SubmittedTender {
                   [class.bg-white/20]="activeFilter() === f.id"
                   [class.text-white]="activeFilter() === f.id"
                   [class.bg-[#F5F7F9]]="activeFilter() !== f.id"
-                  [class.text-[#5F6B76]]="activeFilter() !== f.id"
+                  [class.text-text-secondary]="activeFilter() !== f.id"
                 >
                   {{ f.count }}
                 </span>
@@ -79,7 +79,7 @@ export interface SubmittedTender {
 
           <!-- Search Input with Search Icon -->
           <div class="relative w-full sm:w-64">
-            <svg class="w-3.5 h-3.5 text-[#7A8792] absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-3.5 h-3.5 text-text-muted absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
@@ -87,7 +87,7 @@ export interface SubmittedTender {
               [(ngModel)]="searchQuery"
               (ngModelChange)="onSearchChange()"
               placeholder="Search Ref, Scheme, Department..."
-              class="w-full pl-8 pr-7 py-1.5 text-[13px] bg-white border border-[#D9E1E7] rounded-[4px] text-[#1F2933] placeholder:text-[#7A8792] focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-colors font-normal"
+              class="w-full pl-8 pr-7 py-1.5 text-[13px] bg-white border border-border rounded-sm placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-primary transition-colors font-normal"
             />
             @if (searchQuery) {
               <button

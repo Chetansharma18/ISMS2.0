@@ -67,7 +67,7 @@ export interface EoiDocumentItem {
            1. Top Navigation Bar: Stepper Progress (Full-width responsive header)
            ==================================================================== -->
       <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs font-sans">
-        <div class="w-full max-w-[1420px] mx-auto px-3 sm:px-6 lg:px-8 py-3">
+        <div class="w-full max-w-355 mx-auto px-3 sm:px-6 lg:px-8 py-3">
           
           <!-- 5-Step Stepper Progress Bar -->
           <nav class="w-full flex items-center justify-between overflow-x-auto no-scrollbar py-0.5" aria-label="EOI Application Steps">
@@ -230,7 +230,7 @@ export interface EoiDocumentItem {
       </header>
 
       <!-- Main Container: Fully responsive with balanced edge margins -->
-      <main class="w-full max-w-[1420px] mx-auto px-3 sm:px-6 lg:px-8 pt-5 space-y-6 font-sans">
+      <main class="w-full max-w-355 mx-auto px-3 sm:px-6 lg:px-8 pt-5 space-y-6 font-sans">
         
         <!-- ====================================================================
              2. SCHEME HEADER CARD (8 Parameters Strip)
@@ -463,7 +463,7 @@ export interface EoiDocumentItem {
                       <select
                         [ngModel]="selectedOicId()"
                         (ngModelChange)="selectedOicId.set($event)"
-                        class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent shadow-2xs"
+                        class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-[#0B3558] shadow-2xs"
                       >
                         @for (oic of editableStep2; track oic.id) {
                           <option [value]="oic.id">
@@ -1049,7 +1049,7 @@ export interface EoiDocumentItem {
                 </div>
 
                 <div class="flex items-center justify-between pt-1 gap-2 flex-wrap">
-                  <div class="flex-1 min-w-[220px]">
+                  <div class="flex-1 min-w-55">
                     <input
                       type="text"
                       [(ngModel)]="newPlacement.proofDoc"
@@ -1198,7 +1198,7 @@ export interface EoiDocumentItem {
                 </div>
 
                 <div class="flex items-center justify-between pt-1 gap-2 flex-wrap">
-                  <div class="flex-1 min-w-[220px]">
+                  <div class="flex-1 min-w-55">
                     <input
                       type="text"
                       [(ngModel)]="newActionPlan.courses"
@@ -1788,7 +1788,9 @@ export interface EoiDocumentItem {
                 type="button"
                 [disabled]="!declarationAgreed()"
                 (click)="openSubmitConfirm()"
-                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2"
+                [class.cursor-pointer]="declarationAgreed()"
+                [class.cursor-not-allowed]="!declarationAgreed()"
               >
                 <span>Submit EOI Proposal &amp; Pay Fees</span>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import {
   SdcFormData,
   SDC_SCHEME_OPTIONS,
+  SDC_SECTOR_OPTIONS,
   RAJASTHAN_DISTRICTS,
   SCHEME_COURSE_CATALOG,
   SdcCourseCatalogItem,
@@ -38,19 +39,18 @@ import {
           <!-- Two-Column Form Grid -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 text-xs">
             
-            <!-- Scheme -->
+            <!-- Sector -->
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1.5">
-                Scheme <span class="text-rose-500">*</span>
+                Sector <span class="text-rose-500">*</span>
               </label>
               <select
-                [(ngModel)]="data.step1.scheme"
-                (ngModelChange)="onSchemeChange()"
+                [(ngModel)]="data.step1.sector"
                 class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] transition-colors"
               >
-                <option value="" disabled>Select Scheme</option>
-                @for (opt of schemeOptions; track opt.value) {
-                  <option [value]="opt.value">{{ opt.label }}</option>
+                <option value="" disabled>Select Sector</option>
+                @for (opt of sectorOptions; track opt) {
+                  <option [value]="opt">{{ opt }}</option>
                 }
               </select>
             </div>
@@ -487,7 +487,7 @@ import {
                   Click to upload or drag &amp; drop
                 </span>
                 <span class="text-xs text-slate-500">
-                  Rental Agreement, Fire NOC, Front Photo (PDF, JPG up to 10MB)
+                  Center Photos &amp; Documents (JPG up to 10MB)
                 </span>
               </div>
 
@@ -797,15 +797,16 @@ export class SdcFormComponent implements OnInit {
   }
 
   readonly schemeOptions = SDC_SCHEME_OPTIONS;
+  readonly sectorOptions = SDC_SECTOR_OPTIONS;
   readonly districts = RAJASTHAN_DISTRICTS;
 
   selectedSector: string = '';
   selectedCourseQp: string = '';
 
   uploadedFileList: { name: string; size: string }[] = [
-    { name: 'Rental_Agreement_Center.pdf', size: '2.8 MB' },
-    { name: 'Fire_Safety_NOC_Certificate.pdf', size: '1.1 MB' },
-    { name: 'Center_Front_Signboard.jpg', size: '3.6 MB' }
+    { name: 'Center_Photo_1.jpg', size: '2.8 MB' },
+    { name: 'Center_Photo_2.jpg', size: '1.9 MB' },
+    { name: 'Center_Photo_3.jpg', size: '3.6 MB' }
   ];
 
   ngOnInit(): void {

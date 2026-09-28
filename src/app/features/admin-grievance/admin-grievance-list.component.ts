@@ -279,7 +279,7 @@ export class AdminGrievanceListComponent {
   readonly isForwarding = signal(false);
   readonly isCommenting = signal(false);
   readonly selectedTicket = signal<AdminGrievance | null>(null);
-  
+
   readonly previewAttachmentName = signal('');
   readonly previewAttachmentUrl = signal<SafeResourceUrl | null>(null);
 
@@ -411,8 +411,8 @@ export class AdminGrievanceListComponent {
 
   isForwardFormValid(): boolean {
     return this.forwardForm.priority !== '' &&
-           this.forwardForm.concernedUser !== '' &&
-           this.forwardForm.comments.trim().length > 0;
+      this.forwardForm.concernedUser !== '' &&
+      this.forwardForm.comments.trim().length > 0;
   }
 
   isCommentFormValid(): boolean {
@@ -421,7 +421,7 @@ export class AdminGrievanceListComponent {
 
   submitForward() {
     if (!this.isForwardFormValid()) return;
-    
+
     const ticket = this.selectedTicket();
     if (ticket) {
       ticket.status = 'In progress';

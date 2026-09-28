@@ -539,7 +539,7 @@ Note: All prescribed formats must be filled, stamped, and signed by the Authoriz
         <style>
           * { box-sizing: border-box; margin: 0; padding: 0; }
           body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', Arial, sans-serif;
             color: #0f172a;
             background: #ffffff;
             padding: 24px;

@@ -13,8 +13,13 @@ export type SdcScheme =
   | 'MMKVY'
   | 'PMKVY'
   | 'RAJKViK'
+  | 'RAJKVIK'
   | 'MNSKSY'
-  | 'ELSTP';
+  | 'ELSTP'
+  | 'IM_Shakti'
+  | 'RAJKVIKRTD'
+  | 'MMYKY'
+  | 'SAKSHM';
 
 export interface SdcCourseCatalogItem {
   scheme: SdcScheme;
@@ -48,7 +53,8 @@ export interface SdcDocuments {
 }
 
 export interface SdcStep1Data {
-  scheme: SdcScheme | '';
+  scheme?: SdcScheme | '';
+  sector?: string;
   sdcName: string;
   mouRefNo: string;
   tpName: string;
@@ -113,16 +119,98 @@ export interface SdcApprovalData {
   approvedBy: string;
 }
 
+export interface CenterPhotoItem {
+  id?: string;
+  name: string;
+  url: string;
+  size?: string;
+  tag?: string;
+}
+
+export const SDC_SECTOR_OPTIONS: string[] = [
+  'Aerospace and Aviation',
+  'Agriculture',
+  'Apparel',
+  'Automotive',
+  'Beauty & Wellness',
+  'BFSI',
+  'Capital Goods',
+  'Construction',
+  'Domestic Workers',
+  'Electronics',
+  'Food Processing',
+  'Furniture & Fittings',
+  'Green Jobs',
+  'Handicrafts and Carpet',
+  'Healthcare',
+  'Hydrocarbon',
+  'Information Technology Sector',
+  'Infrastructure Equipment',
+  'Iron and Steel',
+  'IT-ITeS',
+  'Leather',
+  'Life Sciences',
+  'Logistics',
+  'Management',
+  'Media & Entertainment',
+  'Mining',
+  'Plumbing',
+  'Power',
+  'Sports',
+  'Telecom',
+  'Textile',
+  'Tourism & Hospitality',
+  'PwD',
+  'Retail',
+  'Rubber'
+];
+
+export interface SdcNewRegistrationData {
+  sdcName?: string;
+  sector?: string;
+  tpName: string;
+  scheme?: SdcScheme | '';
+  schemeCategory?: string;
+  sdcCode?: string;
+  state: string;
+  district: string;
+  assemblyConstituency?: string;
+  parliamentConstituency?: string;
+  division?: string;
+  block?: string;
+  proposedStartDate: string;
+  sdcCapacity: number | null;
+  centerEmail: string;
+  fullAddress: string;
+  pincode: string;
+  remarks?: string;
+  totalTrainedAspirants?: number | null;
+  totalPlacedAspirants?: number | null;
+  hostelCategory?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  tpRecommendation?: string;
+  tpMandatoryMeasures?: string;
+  tpRemarks?: string;
+  documentType?: string;
+  uploadedDocument?: SdcDocumentItem | null;
+  centerPhotos?: CenterPhotoItem[];
+}
+
 export interface SdcRecord {
   id: string;
   sdcCode: string;
   sdcName: string;
   scheme: SdcScheme;
+  schemeCategory?: string;
+  sector?: string;
   tpName: string;
-  mouRefNo: string;
+  mouRefNo?: string;
   proposedStartDate: string;
   totalTrainedAspirants?: number;
   totalPlacedAspirants?: number;
+  hostelCategory?: string;
+  tpRecommendation?: string;
 
   // Location
   state: string;
@@ -139,10 +227,12 @@ export interface SdcRecord {
   longitude: number;
   remarks?: string;
 
-  // Courses & Docs
+  // Documents & Photos
+  uploadedDocument?: SdcDocumentItem;
+  centerPhotos?: CenterPhotoItem[];
   allocatedCourses: AllocatedCourse[];
-  documents: SdcDocuments;
-  declarationAccepted: boolean;
+  documents?: SdcDocuments;
+  declarationAccepted?: boolean;
 
   // Lifecycle & Status
   status: SdcStatus;
@@ -176,11 +266,15 @@ export const RAJASTHAN_DISTRICTS: string[] = [
 ];
 
 export const SDC_SCHEME_OPTIONS: { value: SdcScheme; label: string; badge: string }[] = [
-  { value: 'SAMARTH', label: 'SAMARTH (State Fund)', badge: 'State Fund' },
-  { value: 'MMKVY', label: 'MMKVY (State Fund)', badge: 'State Fund' },
-  { value: 'PMKVY', label: 'PMKVY (Central Fund)', badge: 'Central Fund' },
-  { value: 'RAJKViK', label: 'RAJKViK (Category I)', badge: 'Category I' },
+  { value: 'MMKVY', label: 'MMKVY', badge: 'State Fund' },
   { value: 'MNSKSY', label: 'MNSKSY', badge: 'State Special' },
+  { value: 'IM_Shakti', label: 'IM_Shakti', badge: 'Women Scheme' },
+  { value: 'RAJKVIKRTD', label: 'RAJKVIKRTD', badge: 'Category I' },
+  { value: 'MMYKY', label: 'MMYKY', badge: 'Youth Scheme' },
+  { value: 'SAMARTH', label: 'SAMARTH', badge: 'State Fund' },
+  { value: 'RAJKVIK', label: 'RAJKVIK', badge: 'Category I' },
+  { value: 'SAKSHM', label: 'SAKSHM', badge: 'Category III' },
+  { value: 'PMKVY', label: 'PMKVY', badge: 'Central Fund' },
   { value: 'ELSTP', label: 'ELSTP', badge: 'Employment Linked' }
 ];
 
@@ -312,8 +406,11 @@ export const SCHEME_COURSE_CATALOG: SdcCourseCatalogItem[] = [
 
 export interface SanctionOrder {
   id: string;
-  tpCode: string;
-  scheme: string;
+  ipaNumber: string;
+  tpCode?: string;
+  scheme?: string;
+  schemeName: string;
+  category: 'RAJKVIK' | 'SAMARTH' | 'SAKSHM';
   mouStartDate: string;
   mouExpiryDate: string;
   totalSdc: number;
@@ -323,11 +420,122 @@ export interface SanctionOrder {
 export const MOCK_SANCTION_ORDERS: SanctionOrder[] = [
   {
     id: 'so-1',
+    ipaNumber: 'IPA-2024-001',
     tpCode: 'MoU-001658',
-    scheme: 'SAMARTH',
+    schemeName: 'MMKVY',
+    scheme: 'MMKVY',
+    category: 'RAJKVIK',
     mouStartDate: '08/09/2023',
     mouExpiryDate: '02/08/2026',
     totalSdc: 6,
     approvedSdcCount: 2
+  },
+  {
+    id: 'so-2',
+    ipaNumber: 'IPA-2024-002',
+    tpCode: 'MoU-001659',
+    schemeName: 'MNSKSY',
+    scheme: 'MNSKSY',
+    category: 'SAMARTH',
+    mouStartDate: '15/10/2023',
+    mouExpiryDate: '14/10/2026',
+    totalSdc: 4,
+    approvedSdcCount: 1
+  },
+  {
+    id: 'so-3',
+    ipaNumber: 'IPA-2024-003',
+    tpCode: 'MoU-001660',
+    schemeName: 'MMKVY',
+    scheme: 'MMKVY',
+    category: 'SAMARTH',
+    mouStartDate: '01/11/2023',
+    mouExpiryDate: '31/10/2026',
+    totalSdc: 5,
+    approvedSdcCount: 3
+  },
+  {
+    id: 'so-4',
+    ipaNumber: 'IPA-2024-004',
+    tpCode: 'MoU-001661',
+    schemeName: 'IM_Shakti',
+    scheme: 'IM_Shakti',
+    category: 'SAMARTH',
+    mouStartDate: '12/12/2023',
+    mouExpiryDate: '11/12/2026',
+    totalSdc: 8,
+    approvedSdcCount: 4
+  },
+  {
+    id: 'so-5',
+    ipaNumber: 'IPA-2024-005',
+    tpCode: 'MoU-001662',
+    schemeName: 'RAJKVIKRTD',
+    scheme: 'RAJKVIKRTD',
+    category: 'RAJKVIK',
+    mouStartDate: '05/01/2024',
+    mouExpiryDate: '04/01/2027',
+    totalSdc: 6,
+    approvedSdcCount: 2
+  },
+  {
+    id: 'so-6',
+    ipaNumber: 'IPA-2024-006',
+    tpCode: 'MoU-001663',
+    schemeName: 'MMYKY',
+    scheme: 'MMYKY',
+    category: 'RAJKVIK',
+    mouStartDate: '20/01/2024',
+    mouExpiryDate: '19/01/2027',
+    totalSdc: 4,
+    approvedSdcCount: 2
+  },
+  {
+    id: 'so-7',
+    ipaNumber: 'IPA-2024-007',
+    tpCode: 'MoU-001664',
+    schemeName: 'SAMARTH',
+    scheme: 'SAMARTH',
+    category: 'SAMARTH',
+    mouStartDate: '10/02/2024',
+    mouExpiryDate: '09/02/2027',
+    totalSdc: 10,
+    approvedSdcCount: 5
+  },
+  {
+    id: 'so-8',
+    ipaNumber: 'IPA-2024-008',
+    tpCode: 'MoU-001665',
+    schemeName: 'RAJKVIK',
+    scheme: 'RAJKVIK',
+    category: 'RAJKVIK',
+    mouStartDate: '01/03/2024',
+    mouExpiryDate: '28/02/2027',
+    totalSdc: 6,
+    approvedSdcCount: 3
+  },
+  {
+    id: 'so-9',
+    ipaNumber: 'IPA-2024-009',
+    tpCode: 'MoU-001666',
+    schemeName: 'SAKSHM',
+    scheme: 'SAKSHM',
+    category: 'SAKSHM',
+    mouStartDate: '15/03/2024',
+    mouExpiryDate: '14/03/2027',
+    totalSdc: 5,
+    approvedSdcCount: 2
+  },
+  {
+    id: 'so-10',
+    ipaNumber: 'IPA-2024-010',
+    tpCode: 'MoU-001667',
+    schemeName: 'RAJKVIK',
+    scheme: 'RAJKVIK',
+    category: 'RAJKVIK',
+    mouStartDate: '01/04/2024',
+    mouExpiryDate: '31/03/2027',
+    totalSdc: 7,
+    approvedSdcCount: 4
   }
 ];

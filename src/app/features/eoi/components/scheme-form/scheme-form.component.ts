@@ -858,10 +858,21 @@ export interface EoiDocumentItem {
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-slate-100 font-normal">
-                    @for (fy of editableStep1.financialYears; track fy.year) {
+                    @for (fy of editableStep1.financialYears; track $index) {
                       <tr class="hover:bg-slate-50/70">
-                        <td class="py-2.5 px-3 font-semibold text-slate-800 font-mono text-xs">
-                          {{ fy.year }}
+                        <td class="py-2.5 px-3">
+                          <select
+                            [(ngModel)]="fy.year"
+                            (change)="onTurnoverChange()"
+                            class="w-full p-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 bg-white focus:ring-1 focus:ring-[#0B3558] cursor-pointer"
+                          >
+                            <option value="2025-26">2025-26</option>
+                            <option value="2024-25">2024-25</option>
+                            <option value="2023-24">2023-24</option>
+                            <option value="2022-23">2022-23</option>
+                            <option value="2021-22">2021-22</option>
+                            <option value="2020-21">2020-21</option>
+                          </select>
                         </td>
                         <td class="py-2.5 px-3">
                           <div class="relative max-w-xs">
@@ -1461,7 +1472,7 @@ export interface EoiDocumentItem {
             <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-7 space-y-6 shadow-xs">
               
               <!-- Dossier Header -->
-              <div class="flex items-center justify-between pb-4 border-b border-slate-200 flex-wrap gap-2">
+              <div class="flex items-center justify-between pb-4 border-b border-slate-200 flex-wrap gap-3">
                 <div>
                   <h3 class="text-base sm:text-lg font-bold text-[#0B3558]">
                     Expression of Interest (EOI) Proposal Submission Dossier
@@ -1470,74 +1481,248 @@ export interface EoiDocumentItem {
                     {{ schemeTitle() }} &bull; {{ schemeRefNo() }}
                   </p>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2.5 flex-wrap">
+                  <button
+                    type="button"
+                    (click)="downloadCompleteProposalDossier()"
+                    class="px-3.5 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <span>Download Full Proposal Dossier (PDF / Print)</span>
+                  </button>
                   <span class="px-2.5 py-1 rounded bg-sky-50 text-[#0B3558] text-xs font-bold border border-sky-200">
-                    Application Ref: ISMS-EOI-2026-9871
+                    Ref: ISMS-EOI-2026-9871
                   </span>
                   <span class="px-2.5 py-1 rounded bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200">
-                    Pending Fee Payment &amp; Submission
+                    Ready for Submission
                   </span>
                 </div>
               </div>
 
-              <!-- Section 1: Verified Company Registration & OTR Particulars -->
-              <div class="space-y-3 pb-6 border-b border-slate-200">
+              <!-- Section 1: Verified Complete OTR Profile Particulars (From Starting to End) -->
+              <div class="space-y-4 pb-6 border-b border-slate-200">
                 <div class="flex items-center justify-between flex-wrap gap-2">
                   <h4 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wider flex items-center gap-2">
                     <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-[10.5px] font-bold">1</span>
-                    <span>Company Profile &amp; Statutory Registration Particulars</span>
+                    <span>Applicant Institutional Profile &amp; OTR Registration Particulars</span>
                   </h4>
                   <button
                     type="button"
                     (click)="editSection('otr-step1')"
                     class="px-3 py-1 bg-sky-50 hover:bg-sky-100 text-[#0483AC] border border-sky-200 rounded-md text-xs font-semibold cursor-pointer shadow-2xs transition-colors"
                   >
-                    Edit Company Profile &rarr;
+                    Edit OTR Profile &rarr;
                   </button>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs p-4 rounded-xl bg-slate-50 border border-slate-200">
-                  <div>
-                    <span class="text-slate-400 block text-[10.5px]">Organization Short Name</span>
-                    <span class="font-bold text-slate-800 text-[12.5px]">{{ editableStep1.shortName || 'SkillTech Solutions' }}</span>
+                <!-- 1.A Organization & Statutory Details -->
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                  <div class="text-[11px] font-bold text-[#0B3558] uppercase tracking-wider pb-1.5 border-b border-slate-200">
+                    Organization &amp; Statutory Particulars
                   </div>
-                  <div class="sm:col-span-2">
-                    <span class="text-slate-400 block text-[10.5px]">Organization Full Legal Name</span>
-                    <span class="font-bold text-slate-800 text-[12.5px]">{{ editableStep1.fullName || 'SkillTech Solutions Private Limited' }}</span>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs">
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Organization Short Name</span>
+                      <span class="font-bold text-slate-800 text-[12px]">{{ editableStep1.shortName || '-' }}</span>
+                    </div>
+                    <div class="sm:col-span-2">
+                      <span class="text-slate-400 block text-[10.5px]">Organization Full Legal Name</span>
+                      <span class="font-bold text-slate-800 text-[12px]">{{ editableStep1.fullName || '-' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Nature of Entity</span>
+                      <span class="font-semibold text-slate-800">{{ editableStep1.natureOfEntity || 'PUBLIC LIMITED' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">CIN / Registration No</span>
+                      <span class="font-mono text-slate-800 font-semibold">{{ editableStep1.registrationNumber || '-' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Date of Registration</span>
+                      <span class="text-slate-800 font-medium">{{ editableStep1.dateOfRegistration || '-' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Company PAN</span>
+                      <span class="font-mono font-bold text-slate-800">{{ editableStep1.companyPan || '-' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">GST Registered &bull; GSTIN</span>
+                      <span class="font-mono text-slate-800 font-medium">{{ editableStep1.gstRegistered || 'No' }} &bull; {{ editableStep1.gstin || 'N/A' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">MSME Registered &bull; Udyam No</span>
+                      <span class="text-slate-800 font-medium">{{ editableStep1.msmeRegistered || 'No' }} &bull; {{ editableStep1.udyamNumber || 'N/A' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Blacklisted Status</span>
+                      <span class="font-semibold" [class.text-rose-600]="editableStep1.blackListed === 'Yes'" [class.text-slate-800]="editableStep1.blackListed !== 'Yes'">{{ editableStep1.blackListed || 'No' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Company Contact No &bull; Email</span>
+                      <span class="text-slate-800">{{ editableStep1.contactNo || '-' }} &bull; {{ editableStep1.emailId || '-' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Official Website</span>
+                      <span class="text-[#0483AC] font-medium">{{ editableStep1.website || '-' }}</span>
+                    </div>
+                    <div class="sm:col-span-2">
+                      <span class="text-slate-400 block text-[10.5px]">Registered Address</span>
+                      <span class="text-slate-800">{{ registeredAddressText }}</span>
+                    </div>
+                    <div class="sm:col-span-2">
+                      <span class="text-slate-400 block text-[10.5px]">Office Address</span>
+                      <span class="text-slate-800">{{ officeAddressText }}</span>
+                    </div>
                   </div>
-                  <div>
-                    <span class="text-slate-400 block text-[10.5px]">Nature of Entity</span>
-                    <span class="font-semibold text-slate-800">{{ editableStep1.natureOfEntity || 'PUBLIC LIMITED' }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block text-[10.5px]">CIN / Registration No</span>
-                    <span class="font-mono text-slate-800 font-semibold">{{ editableStep1.registrationNumber || '-' }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block text-[10.5px]">Company PAN</span>
-                    <span class="font-mono font-bold text-slate-800">{{ editableStep1.companyPan || '-' }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block text-[10.5px]">GSTIN</span>
-                    <span class="font-mono text-slate-800">{{ editableStep1.gstin || 'N/A' }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block text-[10.5px]">Bank Account</span>
-                    <span class="text-slate-800 font-medium">{{ editableStep4.bankName || '-' }} ({{ editableStep4.accountNo || '-' }})</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block text-[10.5px]">Authorized Person Signatory</span>
-                    <span class="font-bold text-slate-800">{{ editableStep3.name || '-' }} ({{ editableStep3.designation || '-' }})</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block text-[10.5px]">Designated Officer In-Charge</span>
-                    <span class="font-bold text-slate-800">{{ selectedOic()?.name || '-' }} ({{ selectedOic()?.designation || '-' }})</span>
-                  </div>
-                  <div class="sm:col-span-2">
-                    <span class="text-slate-400 block text-[10.5px]">Registered Address</span>
-                    <span class="text-slate-800">{{ registeredAddressText }}</span>
+
+                  <!-- Attached Statutory Registration Documents -->
+                  <div class="pt-2 border-t border-slate-200">
+                    <span class="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Attached Registration Documents:</span>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+                      <div class="p-2 bg-white rounded border border-slate-200">
+                        <span class="text-slate-400 block text-[10px]">Inc. Certificate</span>
+                        <span class="font-mono text-slate-800 truncate block">{{ editableStep1.registrationCertDoc?.fileName || 'Certificate_of_Incorporation.pdf' }}</span>
+                      </div>
+                      <div class="p-2 bg-white rounded border border-slate-200">
+                        <span class="text-slate-400 block text-[10px]">PAN Card</span>
+                        <span class="font-mono text-slate-800 truncate block">{{ editableStep1.panCardDoc?.fileName || 'Company_PAN_Card.pdf' }}</span>
+                      </div>
+                      <div class="p-2 bg-white rounded border border-slate-200">
+                        <span class="text-slate-400 block text-[10px]">GST Certificate</span>
+                        <span class="font-mono text-slate-800 truncate block">{{ editableStep1.gstCertDoc?.fileName || 'GST_Certificate.pdf' }}</span>
+                      </div>
+                      <div class="p-2 bg-white rounded border border-slate-200">
+                        <span class="text-slate-400 block text-[10px]">Udyam Certificate</span>
+                        <span class="font-mono text-slate-800 truncate block">{{ editableStep1.msmeCertDoc?.fileName || 'Udyam_Certificate.pdf' }}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
+
+                <!-- 1.B Authorized Signatory / Person Details -->
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                  <div class="text-[11px] font-bold text-[#0B3558] uppercase tracking-wider pb-1.5 border-b border-slate-200">
+                    Authorized Signatory / Person Particulars
+                  </div>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs">
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Signatory Full Name</span>
+                      <span class="font-bold text-slate-800">{{ editableStep3.name || '-' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Designation</span>
+                      <span class="font-semibold text-slate-800">{{ editableStep3.designation || '-' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Date of Birth &bull; Age</span>
+                      <span class="text-slate-800 font-medium">{{ editableStep3.dob || '-' }} @if(editableStep3.age){ ({{ editableStep3.age }} yrs) }</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Official Mobile No</span>
+                      <span class="font-mono font-semibold text-slate-800">{{ editableStep3.mobileNo || '-' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Official Email-ID</span>
+                      <span class="text-slate-800 font-medium">{{ editableStep3.emailId || '-' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Signatory PAN</span>
+                      <span class="font-mono font-bold text-slate-800">{{ editableStep3.pan || '-' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Aadhaar Number</span>
+                      <span class="font-mono text-slate-800">{{ editableStep3.aadhaarNo || '-' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Domicile State</span>
+                      <span class="text-slate-800 font-medium">{{ editableStep3.state || '-' }}</span>
+                    </div>
+                    <div class="sm:col-span-2">
+                      <span class="text-slate-400 block text-[10.5px]">Residence Address</span>
+                      <span class="text-slate-800">{{ residenceAddressText }}</span>
+                    </div>
+                    <div class="sm:col-span-2">
+                      <span class="text-slate-400 block text-[10.5px]">Attached Authorization &bull; ID Proof</span>
+                      <span class="text-slate-700 font-mono text-[11px]">{{ editableStep3.authorizationLetterDoc?.fileName || 'Board_Resolution_Auth.pdf' }} &bull; {{ editableStep3.idProofDoc?.fileName || 'Signatory_Identity_Proof.pdf' }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 1.C Officer(s) In-Charge Details -->
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                  <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
+                    <span class="text-[11px] font-bold text-[#0B3558] uppercase tracking-wider">
+                      Designated Officer(s) In-Charge ({{ editableStep2.length }} Registered)
+                    </span>
+                    <span class="text-[10.5px] text-slate-500 font-medium">Primary: <strong class="text-slate-800">{{ selectedOic().name || '-' }}</strong></span>
+                  </div>
+
+                  <div class="overflow-x-auto border border-slate-200 rounded-lg bg-white">
+                    <table class="w-full text-left border-collapse text-xs">
+                      <thead class="bg-slate-100/70 text-slate-600 font-bold text-[10px] uppercase border-b border-slate-200">
+                        <tr>
+                          <th class="py-2 px-3">Officer Name</th>
+                          <th class="py-2 px-3">Designation</th>
+                          <th class="py-2 px-3">Mobile No</th>
+                          <th class="py-2 px-3">Email Address</th>
+                          <th class="py-2 px-3">PAN &bull; Aadhaar</th>
+                          <th class="py-2 px-3">Appointment Document</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100">
+                        @for (oic of editableStep2; track oic.id; let idx = $index) {
+                          <tr class="hover:bg-slate-50/70">
+                            <td class="py-2 px-3 font-bold text-slate-800">{{ idx + 1 }}. {{ oic.name }}</td>
+                            <td class="py-2 px-3 text-slate-600">{{ oic.designation || 'Officer In-Charge' }}</td>
+                            <td class="py-2 px-3 font-mono font-medium text-slate-700">{{ oic.mobileNo || '-' }}</td>
+                            <td class="py-2 px-3 text-slate-700">{{ oic.emailId || '-' }}</td>
+                            <td class="py-2 px-3 font-mono text-slate-600 text-[11px]">{{ oic.pan || '-' }} &bull; {{ oic.aadhaarNo || '-' }}</td>
+                            <td class="py-2 px-3 font-mono text-[11px] text-slate-600">{{ oic.appointmentLetterDoc?.fileName || 'Appointment_Letter.pdf' }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- 1.D Bank Account Details -->
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                  <div class="text-[11px] font-bold text-[#0B3558] uppercase tracking-wider pb-1.5 border-b border-slate-200">
+                    Bank Account &amp; Treasury Settlement Particulars
+                  </div>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs">
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Bank Name</span>
+                      <span class="font-bold text-slate-800">{{ editableStep4.bankName || '-' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Account Holder Name</span>
+                      <span class="font-semibold text-slate-800">{{ editableStep4.accountHolderName || editableStep1.fullName || '-' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Account Number</span>
+                      <span class="font-mono font-bold text-slate-800">{{ editableStep4.accountNo || '-' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Account Type &bull; IFSC Code</span>
+                      <span class="font-mono font-semibold text-slate-800">{{ editableStep4.accountType || 'Current' }} &bull; {{ editableStep4.ifscCode || '-' }}</span>
+                    </div>
+                    <div class="sm:col-span-2">
+                      <span class="text-slate-400 block text-[10.5px]">Bank Branch Address</span>
+                      <span class="text-slate-800">{{ editableStep4.branchAddress || '-' }}</span>
+                    </div>
+                    <div class="sm:col-span-2">
+                      <span class="text-slate-400 block text-[10.5px]">Cancelled Cheque / Passbook Doc</span>
+                      <span class="font-mono text-slate-800 text-[11px]">{{ editableStep4.cancelledChequeDoc?.fileName || 'Cancelled_Cheque_Leaf.pdf' }}</span>
+                    </div>
+                  </div>
+                </div>
+
               </div>
 
               <!-- Section 2: Financial Eligibility & Turnover Qualification -->
@@ -1771,47 +1956,76 @@ export interface EoiDocumentItem {
                   </button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs">
-                  @for (d of eoiDocuments(); track d.id) {
-                    <div class="p-2.5 rounded-lg border border-slate-200 flex items-center justify-between bg-slate-50/70">
-                      <div class="flex items-center gap-2 min-w-0 max-w-[75%]">
-                        <span class="w-5 h-5 rounded-full font-bold text-[10px] bg-slate-200 text-slate-700 flex items-center justify-center shrink-0">
-                          {{ d.id }}
-                        </span>
-                        <div class="min-w-0">
-                          <span class="font-medium text-slate-800 truncate block">{{ d.name }}</span>
-                          @if (d.status === 'uploaded') {
-                            <span class="text-[10.5px] text-emerald-700 font-mono truncate block">{{ d.fileName }} ({{ d.fileSize }})</span>
-                          }
-                        </div>
-                      </div>
-                      <div class="shrink-0">
-                        @if (d.status === 'uploaded') {
-                          <span class="text-emerald-700 font-bold text-[10.5px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                            &check; Attached
-                          </span>
-                        } @else {
-                          <span class="text-amber-700 font-semibold text-[10.5px] bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                            Pending
-                          </span>
-                        }
-                      </div>
-                    </div>
-                  }
+                <div class="overflow-x-auto border border-slate-200 rounded-xl bg-white">
+                  <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-slate-50 text-slate-700 font-semibold text-[10.5px] uppercase tracking-wider border-b border-slate-200">
+                      <tr>
+                        <th class="py-2.5 px-3 text-center w-12">#</th>
+                        <th class="py-2.5 px-3">Mandatory Statutory Document / Annexure</th>
+                        <th class="py-2.5 px-3">Category</th>
+                        <th class="py-2.5 px-3">Uploaded File Name &amp; Size</th>
+                        <th class="py-2.5 px-3 text-center w-36">Scrutiny Status</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                      @for (d of eoiDocuments(); track d.id) {
+                        <tr class="hover:bg-slate-50/70">
+                          <td class="py-2.5 px-3 text-center font-bold text-slate-400 text-xs">{{ d.id }}</td>
+                          <td class="py-2.5 px-3 font-medium text-slate-800">{{ d.name }}</td>
+                          <td class="py-2.5 px-3">
+                            <span
+                              class="px-2 py-0.5 rounded text-[10px] font-semibold"
+                              [ngClass]="{
+                                'bg-rose-50 text-rose-700 border border-rose-200': d.category === 'mandatory',
+                                'bg-sky-50 text-sky-700 border border-sky-200': d.category === 'annexure',
+                                'bg-slate-100 text-slate-600 border border-slate-200': d.category === 'remaining'
+                              }"
+                            >
+                              {{ d.category === 'mandatory' ? 'Mandatory Statutory' : (d.category === 'annexure' ? 'Scheme Annexure' : 'Supporting') }}
+                            </span>
+                          </td>
+                          <td class="py-2.5 px-3 font-mono text-[11px] text-slate-700">
+                            @if (d.status === 'uploaded') {
+                              <span class="text-emerald-700 font-semibold">{{ d.fileName }}</span>
+                              <span class="text-slate-400 ml-1">({{ d.fileSize }})</span>
+                            } @else {
+                              <span class="text-amber-700 font-medium">Pending Upload</span>
+                            }
+                          </td>
+                          <td class="py-2.5 px-3 text-center">
+                            @if (d.status === 'uploaded') {
+                              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                &check; Attached &amp; Verified
+                              </span>
+                            } @else {
+                              <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                                Pending
+                              </span>
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
             </div>
 
             <!-- Declaration Checkbox -->
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3 shadow-xs">
+            <div
+              (click)="declarationAgreed.set(!declarationAgreed())"
+              class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-start gap-3 shadow-xs cursor-pointer select-none hover:bg-slate-100/60 transition-colors"
+            >
               <input
                 type="checkbox"
                 id="previewDeclaration"
-                [(ngModel)]="declarationAgreed"
+                [ngModel]="declarationAgreed()"
+                (ngModelChange)="declarationAgreed.set($event)"
+                (click)="$event.stopPropagation()"
                 class="mt-1 w-4 h-4 rounded border-slate-300 text-[#0B3558] focus:ring-[#0B3558] cursor-pointer"
               />
-              <label for="previewDeclaration" class="text-xs text-slate-700 leading-relaxed cursor-pointer font-normal">
+              <label for="previewDeclaration" (click)="$event.stopPropagation()" class="text-xs text-slate-700 leading-relaxed cursor-pointer font-normal">
                 I hereby solemnly declare that all particulars and documents submitted in this Expression of Interest (EOI) are true, authentic, and in accordance with RSLDC guidelines. I understand that any false statement will result in immediate disqualification and forfeiture of EMD under Rajasthan Transparency in Public Procurement (RTPP) Act.
               </label>
             </div>
@@ -2044,15 +2258,15 @@ export interface EoiDocumentItem {
         @if (currentStep() === 5) {
           <div class="space-y-6">
 
-            <!-- Executive Submission Success Banner (Project Theme #0B3558 Navy) -->
+            <!-- Executive Submission Success Banner (Project Theme #0B3558 Royal Navy) -->
             <div class="bg-gradient-to-r from-[#0B3558] via-[#0E436E] to-[#0483AC] text-white rounded-2xl p-6 sm:p-7 shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-[#0B3558]">
               <div class="flex items-start gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xs flex items-center justify-center text-2xl text-emerald-400 shrink-0 shadow-inner">
+                <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xs flex items-center justify-center text-2xl text-white shrink-0 shadow-inner">
                   &check;
                 </div>
                 <div>
                   <div class="flex items-center gap-2 flex-wrap">
-                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-bold uppercase tracking-wider">
+                    <span class="px-2.5 py-0.5 rounded-full bg-white/15 text-white border border-white/25 text-[10px] font-bold uppercase tracking-wider">
                       Application Successfully Submitted &amp; Verified
                     </span>
                     <span class="px-2.5 py-0.5 rounded-full bg-white/15 text-white/90 text-[10px] font-semibold">
@@ -2072,7 +2286,7 @@ export interface EoiDocumentItem {
                 <button
                   type="button"
                   (click)="goToTenderStatus()"
-                  class="w-full md:w-auto px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 hover:shadow-md"
+                  class="w-full md:w-auto px-5 py-2.5 bg-white text-[#0B3558] hover:bg-slate-100 rounded-xl text-xs font-bold shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 hover:shadow-md"
                 >
                   <span>Track in Tender Status &rarr;</span>
                 </button>
@@ -2102,10 +2316,10 @@ export interface EoiDocumentItem {
                 </div>
 
                 <!-- Digital Verification Badge -->
-                <div class="flex items-center gap-2 self-end md:self-auto bg-white border border-emerald-200 rounded-xl px-3.5 py-2 shadow-2xs">
-                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <div class="flex items-center gap-2 self-end md:self-auto bg-white border border-sky-200 rounded-xl px-3.5 py-2 shadow-2xs">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#0483AC]"></span>
                   <div class="text-right">
-                    <div class="text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider">Digitally Verified &amp; Signed</div>
+                    <div class="text-[10px] font-extrabold text-[#0B3558] uppercase tracking-wider">Digitally Verified &amp; Signed</div>
                     <div class="text-[9.5px] font-mono text-slate-500">28-Sep-2026 14:45 IST</div>
                   </div>
                 </div>
@@ -2123,7 +2337,7 @@ export interface EoiDocumentItem {
                 </div>
                 <div class="p-4">
                   <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Fee Paid</span>
-                  <span class="font-extrabold text-sm text-emerald-700">₹52,000 <span class="text-[10.5px] font-normal text-slate-500">(EMD + RFP)</span></span>
+                  <span class="font-extrabold text-sm text-[#0B3558]">₹52,000 <span class="text-[10.5px] font-normal text-slate-500">(EMD + RFP)</span></span>
                 </div>
                 <div class="p-4">
                   <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Current Status</span>
@@ -2153,8 +2367,8 @@ export interface EoiDocumentItem {
                       <span class="font-bold text-slate-800">{{ editableStep1.fullName || 'Apex Skill Development & Vocational Training Pvt. Ltd.' }}</span>
                     </div>
                     <div>
-                      <span class="text-slate-400 block text-[10.5px]">Entity Type &bull; Registration / CIN</span>
-                      <span class="font-medium text-slate-800">{{ editableStep1.companyType || 'Private Limited' }} &bull; {{ editableStep1.registrationNumber || 'U80302RJ2022NPL079811' }}</span>
+                      <span class="text-slate-400 block text-[10.5px]">Entity Nature &bull; Registration / CIN</span>
+                      <span class="font-medium text-slate-800">{{ editableStep1.natureOfEntity || 'Private Limited' }} &bull; {{ editableStep1.registrationNumber || 'U80302RJ2022NPL079811' }}</span>
                     </div>
                     <div>
                       <span class="text-slate-400 block text-[10.5px]">PAN &bull; GSTIN</span>
@@ -2166,7 +2380,7 @@ export interface EoiDocumentItem {
                     </div>
                     <div>
                       <span class="text-slate-400 block text-[10.5px]">Designated Officer In-Charge</span>
-                      <span class="font-semibold text-slate-800">{{ selectedOic()?.name || editableStep3.name || 'Dr. Rajesh Sharma' }} ({{ selectedOic()?.designation || editableStep3.designation || 'Director' }})</span>
+                      <span class="font-semibold text-slate-800">{{ selectedOic().name || editableStep3.name || 'Dr. Rajesh Sharma' }} ({{ selectedOic().designation || editableStep3.designation || 'Director' }})</span>
                     </div>
                   </div>
                 </div>
@@ -2199,7 +2413,7 @@ export interface EoiDocumentItem {
                       <span class="font-bold text-[#0B3558] text-sm">{{ selectedCentresForScheme().length }} Verified Centre(s)</span>
                       <div class="text-[10.5px] text-slate-500 truncate mt-0.5">
                         @for (c of selectedCentresForScheme(); track c.id; let last = $last) {
-                          {{ c.name }}{{ !last ? ', ' : '' }}
+                          {{ c.centerName }}{{ !last ? ', ' : '' }}
                         }
                       </div>
                     </div>
@@ -2207,13 +2421,13 @@ export interface EoiDocumentItem {
                       <span class="text-slate-400 block text-[10.5px]">Annual Trainee Target Commitment</span>
                       <span class="font-bold text-slate-800 text-sm">{{ totalTraineesTarget() }} Candidates</span>
                       <div class="text-[10.5px] text-slate-500 mt-0.5">
-                        Planned across {{ actionPlan().length }} target district(s)
+                        Planned across {{ actionPlan.length }} target district(s)
                       </div>
                     </div>
                     <div>
                       <span class="text-slate-400 block text-[10.5px]">Statutory Annexures &amp; Documents</span>
-                      <span class="font-bold text-emerald-700 text-sm">{{ attachedDocsCount() }} of {{ eoiDocuments().length }} Attached</span>
-                      <div class="text-[10.5px] text-emerald-600 mt-0.5">All mandatory files digitally verified</div>
+                      <span class="font-bold text-[#0B3558] text-sm">{{ attachedDocsCount() }} of {{ eoiDocuments().length }} Attached</span>
+                      <div class="text-[10.5px] text-slate-500 mt-0.5">All mandatory files digitally verified</div>
                     </div>
                   </div>
                 </div>
@@ -2225,7 +2439,7 @@ export interface EoiDocumentItem {
                       <span class="w-4 h-4 rounded bg-[#0B3558]/10 text-[#0B3558] flex items-center justify-center text-[10px]">3</span>
                       Cyber Treasury Fee Payment &amp; e-Challan Particulars
                     </h4>
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0B3558] border border-blue-200 text-[10px] font-bold">
                       &check; Payment Reconciled &amp; Settled
                     </span>
                   </div>
@@ -2312,10 +2526,21 @@ export interface EoiDocumentItem {
                     (click)="downloadReceipt('payment')"
                     class="flex-1 sm:flex-none px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-2xs transition-colors"
                   >
-                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-[#0483AC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     <span>Download Payment e-Challan</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    (click)="downloadCompleteProposalDossier()"
+                    class="flex-1 sm:flex-none px-4 py-2.5 bg-sky-50 border border-sky-200 hover:bg-sky-100 text-[#0483AC] rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-2xs transition-colors"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    <span>Download Complete Proposal (Tabular PDF)</span>
                   </button>
                 </div>
 
@@ -2334,7 +2559,7 @@ export interface EoiDocumentItem {
                   <button
                     type="button"
                     (click)="goToTenderStatus()"
-                    class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                    class="px-4 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-xl font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
                   >
                     <span>View in Tender Status &rarr;</span>
                   </button>
@@ -2518,6 +2743,10 @@ export class SchemeFormComponent {
     const sum = rows.reduce((acc, r) => acc + (parseFloat(r.skillTurnover) || 0), 0);
     return (sum / rows.length).toFixed(2);
   });
+
+  totalTraineesTarget(): number {
+    return this.actionPlan.reduce((acc, a) => acc + (a.batches * 30), 0) || 1200;
+  }
 
   declarationAgreed = signal<boolean>(true);
   paymentMethod = signal<string>('UPI');
@@ -3175,52 +3404,157 @@ export class SchemeFormComponent {
     alert(`Viewing document: ${doc.fileName || doc.name}\nSize: ${doc.fileSize || '1.4 MB'}\nStatus: Attached and Verified.`);
   }
 
-  downloadReceipt(type: 'acknowledgment' | 'payment'): void {
-    const isAck = type === 'acknowledgment';
-    const filename = isAck ? 'EOI_Submission_Acknowledgment_Receipt.txt' : 'EOI_Fee_Payment_Receipt.txt';
-    const textContent = isAck
-      ? `================================================================================
-RAJASTHAN SKILL AND LIVELIHOODS DEVELOPMENT CORPORATION (RSLDC)
-INTEGRATED SCHEME MANAGEMENT SYSTEM 2.0 (ISMS)
-OFFICIAL EOI PROPOSAL SUBMISSION ACKNOWLEDGMENT RECEIPT
-================================================================================
-Application Reference Number : ISMS-EOI-2026-9871
-Submission Timestamp         : 24-Sep-2026 13:30:00 IST
-Applicant Agency Name        : ${this.editableStep1.fullName || 'Rajasthan Skill & Livelihoods Development Council Partner Ltd.'}
-Registration / CIN           : ${this.editableStep1.registrationNumber || 'U80302RJ2022NPL079811'}
-Scheme Code & Name           : MMKVY (Mukhya Mantri Kaushalya Vikas Yojana)
-Category                     : ALL
-Designated Officer In-Charge : ${this.selectedOic()?.name || '-'} (${this.selectedOic()?.designation || '-'})
-Fee Payment Reference        : TXN-ISMS-2026-345678 (₹52,000 Paid)
-Proposed SDC Training Centres: ${this.selectedCentresForScheme().length} Centres Deployed
-Attached Statutory Documents : ${this.attachedDocsCount()} / ${this.eoiDocuments().length} Mandatory Documents Verified
-================================================================================
-Digitally Verified & Sealed by Government of Rajasthan (RSLDC ISMS 2.0)
-================================================================================`
-      : `================================================================================
-GOVERNMENT OF RAJASTHAN - RAJASTHAN CYBER TREASURY
-DEPARTMENT OF SKILL, EMPLOYMENT & ENTREPRENEURSHIP (RSLDC)
-EOI FEE & EMD PAYMENT TRANSACTION RECEIPT
-================================================================================
-Transaction Reference Number : TXN-ISMS-2026-345678
-Treasury Reference CIN       : CYB-RAJ-2026-99182348
-Transaction Timestamp        : 24-Sep-2026 13:28:42 IST
-Applicant Name               : ${this.editableStep1.fullName || 'Rajasthan Skill & Livelihoods Development Council Partner Ltd.'}
-PAN Number                   : ${this.editableStep1.companyPan || 'AAACR1234F'}
-Scheme Ref No                : ${this.schemeRefNo()}
-Payment Mode                 : ${this.paymentMethod()}
---------------------------------------------------------------------------------
-Breakup:
-1. Earnest Money Deposit (EMD Fee) (Refundable)     : ₹ 50,000.00
-2. RFP Tender Processing Fee (Non-Refundable)       : ₹  2,000.00
---------------------------------------------------------------------------------
-TOTAL AMOUNT PAID                                   : ₹ 52,000.00
-Payment Status                                      : SUCCESSFUL
-================================================================================
-Government of Rajasthan Cyber Treasury Portal Integration
-================================================================================`;
+  downloadCompleteProposalDossier(): void {
+    const filename = `MMKVY_Complete_Proposal_Dossier_ISMS-EOI-2026-9871.html`;
+    const docRows = this.eoiDocuments().map(d => `
+      <tr>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #64748b;">${d.id}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-weight: 600; color: #0f172a;">${d.name}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; color: #475569;">${d.category === 'mandatory' ? 'Mandatory Statutory' : (d.category === 'annexure' ? 'Scheme Annexure' : 'Supporting')}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-family: monospace; color: #1e293b;">${d.fileName ? `${d.fileName} (${d.fileSize})` : 'Attached (Verified)'}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #0483AC;">&check; Verified &amp; Attached</td>
+      </tr>
+    `).join('');
 
-    const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+    const centreRows = this.selectedCentresForScheme().map(c => `
+      <tr>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-weight: 600;">${c.district}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1;">${c.centerName}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-align: center;">${c.classrooms}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-align: center;">${c.practicalRooms}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-align: center;">${c.washrooms}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1;">${c.fullAddress}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-align: center;">${c.isExisting ? 'Existing' : 'Proposed'}</td>
+      </tr>
+    `).join('');
+
+    const placementRows = this.placementRecords.map(p => `
+      <tr>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-weight: 600;">${p.sector}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-family: monospace;">${p.year}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #0B3558;">${p.trained}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #0483AC;">${p.placed}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">${(p.trained && p.trained > 0) ? ((p.placed / p.trained) * 100).toFixed(1) + '%' : '-'}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-family: monospace; font-size: 11px;">${p.proofDoc}</td>
+      </tr>
+    `).join('');
+
+    const actionPlanRows = this.actionPlan.map((ap, idx) => `
+      <tr>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-align: center;">${idx + 1}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-family: monospace;">${ap.year}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-weight: 600;">${ap.district}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #0B3558;">${ap.sdcCount}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1;">${ap.location}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1;">${ap.sectors}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1;">${ap.courses}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">${ap.batches}</td>
+      </tr>
+    `).join('');
+
+    const fyRows = this.editableStep1.financialYears.map(fy => `
+      <tr>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-weight: 600; font-family: monospace;">${fy.year}</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-family: monospace;">₹ ${fy.totalTurnover || '0.00'} Lacs</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-family: monospace;">₹ ${fy.skillTurnover || '0.00'} Lacs</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #0483AC;">&check; Verified</td>
+      </tr>
+    `).join('');
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MMKVY Proposal Submission Dossier - ISMS-EOI-2026-9871</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 25px; color: #1e293b; background: #fff; line-height: 1.4; font-size: 12px; }
+    @media print { body { padding: 0; } @page { size: A4; margin: 12mm; } .no-print { display: none !important; } }
+    .header-box { border-bottom: 2px solid #0B3558; padding-bottom: 12px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+    .gov-title { font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; }
+    .main-title { font-size: 18px; font-weight: 800; color: #0B3558; margin: 3px 0; }
+    .sub-title { font-size: 12px; color: #334155; }
+    .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; background: #f1f5f9; color: #0B3558; border: 1px solid #cbd5e1; }
+    .section-title { font-size: 12px; font-weight: 800; color: #0B3558; text-transform: uppercase; letter-spacing: 0.5px; margin: 18px 0 8px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 11px; }
+    th { background: #f8fafc; color: #334155; font-weight: 700; padding: 6px 10px; border: 1px solid #cbd5e1; text-align: left; text-transform: uppercase; font-size: 10px; }
+    .btn-bar { margin-bottom: 15px; padding: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; gap: 10px; justify-content: flex-end; }
+    .btn { padding: 8px 14px; background: #0B3558; color: #fff; border: none; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="no-print btn-bar">
+    <button class="btn" onclick="window.print()">Print Dossier / Save as PDF</button>
+  </div>
+
+  <div class="header-box">
+    <div>
+      <div class="gov-title">Government of Rajasthan &bull; Department of Skill &amp; Livelihoods</div>
+      <div class="main-title">Rajasthan Skill &amp; Livelihoods Development Corporation (RSLDC)</div>
+      <div class="sub-title">Expression of Interest (EOI) Proposal Dossier &bull; Scheme: MMKVY (Mukhya Mantri Kaushalya Vikas Yojana)</div>
+    </div>
+    <div style="text-align: right;">
+      <span class="badge">Ref: ISMS-EOI-2026-9871</span><br>
+      <span style="font-size: 10px; color: #64748b; margin-top: 4px; display: inline-block;">Date: 28-Sep-2026</span>
+    </div>
+  </div>
+
+  <div class="section-title">1. Applicant Training Partner Organization &amp; OTR Profile</div>
+  <table>
+    <tr><th style="width: 25%;">Legal Entity Name</th><td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-weight: 700;">${this.editableStep1.fullName || 'Apex Skill Development & Vocational Training Pvt. Ltd.'}</td><th style="width: 25%;">Short Name</th><td style="padding: 6px 10px; border: 1px solid #cbd5e1;">${this.editableStep1.shortName || '-'}</td></tr>
+    <tr><th>CIN / Registration No</th><td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-family: monospace;">${this.editableStep1.registrationNumber || '-'}</td><th>Company PAN</th><td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-family: monospace;">${this.editableStep1.companyPan || '-'}</td></tr>
+    <tr><th>GSTIN</th><td style="padding: 6px 10px; border: 1px solid #cbd5e1; font-family: monospace;">${this.editableStep1.gstin || 'N/A'}</td><th>MSME Udyam</th><td style="padding: 6px 10px; border: 1px solid #cbd5e1;">${this.editableStep1.udyamNumber || 'N/A'}</td></tr>
+    <tr><th>Entity Nature &bull; Reg. Date</th><td style="padding: 6px 10px; border: 1px solid #cbd5e1;">${this.editableStep1.natureOfEntity || 'Private Limited'} &bull; ${this.editableStep1.dateOfRegistration || '-'}</td><th>Contact &bull; Email</th><td style="padding: 6px 10px; border: 1px solid #cbd5e1;">${this.editableStep1.contactNo || '-'} &bull; ${this.editableStep1.emailId || '-'}</td></tr>
+    <tr><th>Registered Address</th><td colspan="3" style="padding: 6px 10px; border: 1px solid #cbd5e1;">${this.registeredAddressText}</td></tr>
+    <tr><th>Authorized Signatory</th><td style="padding: 6px 10px; border: 1px solid #cbd5e1;">${this.editableStep3.name || '-'} (${this.editableStep3.designation || '-'})</td><th>Officer In-Charge</th><td style="padding: 6px 10px; border: 1px solid #cbd5e1;">${this.selectedOic().name || '-'} (${this.selectedOic().designation || '-'})</td></tr>
+    <tr><th>Bank Account</th><td colspan="3" style="padding: 6px 10px; border: 1px solid #cbd5e1;">${this.editableStep4.bankName || '-'} &bull; A/C: ${this.editableStep4.accountNo || '-'} &bull; IFSC: ${this.editableStep4.ifscCode || '-'}</td></tr>
+  </table>
+
+  <div class="section-title">2. Financial Turnover &amp; Eligibility Qualification</div>
+  <table>
+    <thead><tr><th>Financial Year</th><th>Total Entity Turnover</th><th>Skill Training Turnover</th><th style="text-align: center;">Scrutiny Status</th></tr></thead>
+    <tbody>
+      ${fyRows}
+      <tr style="background: #f1f5f9; font-weight: bold;">
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-transform: uppercase;">3-Year Average</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; color: #0B3558;">₹ ${this.avgTotalTurnover()} Lacs</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; color: #0483AC;">₹ ${this.avgSkillTurnover()} Lacs</td>
+        <td style="padding: 6px 10px; border: 1px solid #cbd5e1; text-align: center; color: #0483AC;">&check; Meets Eligibility Threshold</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">3. Deployed Training Centres Infrastructure (${this.selectedCentresForScheme().length} Centres)</div>
+  <table>
+    <thead><tr><th>District</th><th>Centre Name</th><th>Classrooms</th><th>Labs</th><th>Washrooms</th><th>Full Address</th><th>Type</th></tr></thead>
+    <tbody>${centreRows}</tbody>
+  </table>
+
+  <div class="section-title">4. Past Training &amp; Verified Wage Placement Track Record</div>
+  <table>
+    <thead><tr><th>Sector</th><th>Financial Year</th><th>Trained (Nos)</th><th>Placed (Nos)</th><th>Placement Rate</th><th>Proof Document</th></tr></thead>
+    <tbody>${placementRows}</tbody>
+  </table>
+
+  <div class="section-title">5. Proposed Annual Action Plan (Target Districts &amp; Batches)</div>
+  <table>
+    <thead><tr><th>#</th><th>Year</th><th>Target District</th><th>Proposed SDCs</th><th>Location / Centre</th><th>Sector</th><th>Courses</th><th>Batches</th></tr></thead>
+    <tbody>${actionPlanRows}</tbody>
+  </table>
+
+  <div class="section-title">6. Mandatory Statutory Documents &amp; Annexures Checklist (${this.eoiDocuments().length} Documents)</div>
+  <table>
+    <thead><tr><th>#</th><th>Mandatory Statutory Document / Annexure Title</th><th>Category</th><th>Uploaded File Name &amp; Size</th><th style="text-align: center;">Status</th></tr></thead>
+    <tbody>${docRows}</tbody>
+  </table>
+
+  <div style="margin-top: 25px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc; font-size: 11px;">
+    <strong>Statutory Undertaking:</strong> All particulars and attached documents submitted for the Expression of Interest (EOI) under MMKVY have been verified by the authorized signatory and attested digitally.
+    <div style="margin-top: 8px; font-family: monospace; font-size: 10px; color: #64748b;">Security Hash: SHA256: 7B9E-48A1-D992-MMKVY-2026-RSLDC-GOV &bull; ISMS 2.0 Electronic Submission</div>
+  </div>
+</body>
+</html>`;
+
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -3228,7 +3562,151 @@ Government of Rajasthan Cyber Treasury Portal Integration
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+
+    // Also open printable window
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+    }
+  }
+
+  downloadReceipt(type: 'acknowledgment' | 'payment'): void {
+    const isAck = type === 'acknowledgment';
+    const filename = isAck ? 'EOI_Submission_Acknowledgment_Receipt.html' : 'EOI_Cyber_Treasury_Payment_Receipt.html';
+    
+    const htmlContent = isAck
+      ? `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Official EOI Submission Acknowledgment - ISMS 2.0</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; padding: 30px; color: #0f172a; line-height: 1.5; font-size: 12px; }
+    .card { max-width: 800px; margin: 0 auto; border: 2px solid #0B3558; border-radius: 12px; padding: 25px; background: #fff; }
+    .header { text-align: center; border-bottom: 2px solid #0B3558; padding-bottom: 15px; margin-bottom: 20px; }
+    .gov-title { font-size: 12px; font-weight: bold; color: #475569; text-transform: uppercase; letter-spacing: 1px; }
+    .dept-title { font-size: 18px; font-weight: 800; color: #0B3558; margin: 5px 0; }
+    .doc-title { font-size: 14px; font-weight: 700; color: #0483AC; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
+    th, td { padding: 8px 12px; border: 1px solid #cbd5e1; text-align: left; }
+    th { background: #f8fafc; color: #334155; font-weight: bold; width: 35%; }
+    .seal-box { margin-top: 25px; padding: 15px; background: #f1f5f9; border-radius: 8px; border: 1px dashed #0B3558; text-align: center; font-size: 11px; }
+    @media print { .no-print { display: none; } body { padding: 0; } }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="max-width: 800px; margin: 0 auto 15px auto; text-align: right;">
+    <button onclick="window.print()" style="padding: 8px 16px; background: #0B3558; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Print / Save as PDF</button>
+  </div>
+  <div class="card">
+    <div class="header">
+      <div class="gov-title">Government of Rajasthan &bull; Department of Skill, Employment &amp; Entrepreneurship</div>
+      <div class="dept-title">Rajasthan Skill and Livelihoods Development Corporation (RSLDC)</div>
+      <div class="doc-title">OFFICIAL EOI PROPOSAL SUBMISSION ACKNOWLEDGMENT RECEIPT</div>
+    </div>
+    <table>
+      <tr><th>Application Reference No</th><td style="font-weight: bold; font-family: monospace; font-size: 14px; color: #0B3558;">ISMS-EOI-2026-9871</td></tr>
+      <tr><th>Submission Timestamp</th><td>28-Sep-2026 14:45:00 IST</td></tr>
+      <tr><th>Applicant Agency Legal Name</th><td style="font-weight: bold;">${this.editableStep1.fullName || 'Apex Skill Development & Vocational Training Pvt. Ltd.'}</td></tr>
+      <tr><th>OTR Registration Number</th><td style="font-family: monospace;">OTR-2026-RAJ-88421</td></tr>
+      <tr><th>CIN / Registration No</th><td style="font-family: monospace;">${this.editableStep1.registrationNumber || 'U80302RJ2022NPL079811'}</td></tr>
+      <tr><th>Company PAN &bull; GSTIN</th><td style="font-family: monospace;">${this.editableStep1.companyPan || 'AAACR1234F'} &bull; ${this.editableStep1.gstin || '08AAACR1234F1Z5'}</td></tr>
+      <tr><th>Scheme Applied</th><td style="font-weight: bold; color: #0B3558;">MMKVY (Mukhya Mantri Kaushalya Vikas Yojana)</td></tr>
+      <tr><th>EOI Tender Reference</th><td style="font-family: monospace;">${this.schemeRefNo()}</td></tr>
+      <tr><th>Designated Officer In-Charge</th><td>${this.selectedOic()?.name || '-'} (${this.selectedOic()?.designation || '-'})</td></tr>
+      <tr><th>Cyber Treasury Fee Paid</th><td style="font-weight: bold; color: #0B3558;">₹52,000.00 (TXN-ISMS-2026-345678)</td></tr>
+      <tr><th>Centres Deployed</th><td>${this.selectedCentresForScheme().length} Verified SDC Training Centres</td></tr>
+      <tr><th>Committed Trainee Target</th><td>${this.totalTraineesTarget()} Candidates across ${this.actionPlan.length} District(s)</td></tr>
+      <tr><th>Statutory Annexures Attached</th><td>${this.attachedDocsCount()} of ${this.eoiDocuments().length} Mandatory Documents Verified</td></tr>
+      <tr><th>Proposal Scrutiny Status</th><td style="font-weight: bold; color: #0B3558;">Stage-1 Technical Scrutiny Queue (Active)</td></tr>
+    </table>
+    <div class="seal-box">
+      <strong>DIGITALLY ATTESTED &amp; SEALED BY RSLDC ISMS 2.0 PORTAL</strong><br>
+      Security Hash: SHA256: 7B9E-48A1-D992-MMKVY-2026-RSLDC-GOV<br>
+      <em>Generated under Section 43A of Information Technology Act 2000. Physical signature not required.</em>
+    </div>
+  </div>
+</body>
+</html>`
+      : `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cyber Treasury Fee Payment Receipt - RSLDC ISMS 2.0</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; padding: 30px; color: #0f172a; line-height: 1.5; font-size: 12px; }
+    .card { max-width: 800px; margin: 0 auto; border: 2px solid #0B3558; border-radius: 12px; padding: 25px; background: #fff; }
+    .header { text-align: center; border-bottom: 2px solid #0B3558; padding-bottom: 15px; margin-bottom: 20px; }
+    .gov-title { font-size: 12px; font-weight: bold; color: #475569; text-transform: uppercase; letter-spacing: 1px; }
+    .dept-title { font-size: 18px; font-weight: 800; color: #0B3558; margin: 5px 0; }
+    .doc-title { font-size: 14px; font-weight: 700; color: #0483AC; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
+    th, td { padding: 8px 12px; border: 1px solid #cbd5e1; text-align: left; }
+    th { background: #f8fafc; color: #334155; font-weight: bold; }
+    .seal-box { margin-top: 25px; padding: 15px; background: #f1f5f9; border-radius: 8px; border: 1px dashed #0B3558; text-align: center; font-size: 11px; }
+    @media print { .no-print { display: none; } body { padding: 0; } }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="max-width: 800px; margin: 0 auto 15px auto; text-align: right;">
+    <button onclick="window.print()" style="padding: 8px 16px; background: #0B3558; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Print / Save as PDF</button>
+  </div>
+  <div class="card">
+    <div class="header">
+      <div class="gov-title">Government of Rajasthan &bull; Finance Department (Cyber Treasury)</div>
+      <div class="dept-title">Rajasthan Cyber Treasury e-Challan / Payment Receipt</div>
+      <div class="doc-title">EOI APPLICATION &amp; EMD SECURITY DEPOSIT TRANSACTION</div>
+    </div>
+    <table>
+      <tr><th>Transaction Reference No</th><td style="font-weight: bold; font-family: monospace; font-size: 14px; color: #0B3558;">TXN-ISMS-2026-345678</td></tr>
+      <tr><th>Cyber Treasury Challan GRN</th><td style="font-family: monospace; font-weight: bold;">GRN-RAJ-2026-99182348</td></tr>
+      <tr><th>Treasury CIN / Bank Reference</th><td style="font-family: monospace;">CIN-HDFC-9912081</td></tr>
+      <tr><th>Transaction Date &amp; Time</th><td>28-Sep-2026 14:42:15 IST</td></tr>
+      <tr><th>Applicant Agency Legal Name</th><td style="font-weight: bold;">${this.editableStep1.fullName || 'Apex Skill Development & Vocational Training Pvt. Ltd.'}</td></tr>
+      <tr><th>Organization PAN</th><td style="font-family: monospace;">${this.editableStep1.companyPan || 'AAACR1234F'}</td></tr>
+      <tr><th>Scheme Name &amp; Code</th><td>MMKVY &bull; ${this.schemeRefNo()}</td></tr>
+      <tr><th>Payment Mode</th><td>Cyber Treasury NetBanking / UPI (${this.paymentMethod()})</td></tr>
+      <tr><th>Transaction Status</th><td style="font-weight: bold; color: #0B3558;">&check; SUCCESSFUL / SETTLED</td></tr>
+    </table>
+
+    <table style="margin-top: 15px;">
+      <thead>
+        <tr><th>Fee Component Description</th><th>Treasury Major Head</th><th style="text-align: right;">Amount (₹)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1. RFP Tender Processing Fee (Non-Refundable)</td><td style="font-family: monospace;">0070-60-800-01-00</td><td style="text-align: right; font-family: monospace;">₹ 2,000.00</td></tr>
+        <tr><td>2. Earnest Money Deposit (EMD) (Refundable)</td><td style="font-family: monospace;">8443-00-103-00-00</td><td style="text-align: right; font-family: monospace;">₹ 50,000.00</td></tr>
+        <tr style="background: #f8fafc; font-weight: bold; font-size: 13px;">
+          <td colspan="2" style="text-align: right; text-transform: uppercase;">Total Amount Paid (Rupees Fifty-Two Thousand Only):</td>
+          <td style="text-align: right; font-family: monospace; color: #0B3558;">₹ 52,000.00</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="seal-box">
+      <strong>OFFICIAL CYBER TREASURY TRANSACTION RECORD &bull; GOVERNMENT OF RAJASTHAN</strong><br>
+      This is a system-generated cyber treasury acknowledgment receipt. No physical signature is required.
+    </div>
+  </div>
+</body>
+</html>`;
+
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Also open printable window
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+    }
   }
 
   printReceipt(): void {

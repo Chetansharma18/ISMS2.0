@@ -80,7 +80,7 @@ interface Tender {
 
     <!-- Tender Preview Sidebar (Drawer) -->
     @if (selectedPreviewTender()) {
-      <div class="fixed inset-0 z-[60] flex justify-end">
+      <div class="fixed inset-0 z-60 flex justify-end">
         <!-- Backdrop -->
         <div 
           class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-300" 

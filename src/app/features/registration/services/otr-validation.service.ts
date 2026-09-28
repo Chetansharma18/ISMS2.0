@@ -46,10 +46,10 @@ export class OtrValidationService {
     const errors: string[] = [];
 
     if (!step1.shortName?.trim()) {
-      errors.push('Organization Short Name is mandatory.');
+      errors.push('Name is mandatory.');
     }
     if (!step1.fullName?.trim()) {
-      errors.push('Organization Full Legal Name is mandatory.');
+      errors.push('Full Name is mandatory.');
     }
     if (!step1.natureOfEntity?.trim()) {
       errors.push('Nature of Entity selection is mandatory.');
@@ -333,18 +333,13 @@ export class OtrValidationService {
       case 1:
         return this.validateStep1(formData.step1);
       case 2:
-        return this.validateStep2(formData.step2);
+        return this.validateStep3(formData.step3); // Step 2 is Authorized Person
       case 3:
-        return this.validateStep3(formData.step3);
+        return this.validateStep2(formData.step2); // Step 3 is Officer In-Charge
       case 4:
         return this.validateStep4(formData.step4);
-      case 5: {
-        const errors: string[] = [];
-        if (!formData.step5DeclarationAgreed) {
-          errors.push('Statutory Legal Undertaking & Declaration agreement is required.');
-        }
-        return errors;
-      }
+      case 5:
+        return [];
       default:
         return [];
     }

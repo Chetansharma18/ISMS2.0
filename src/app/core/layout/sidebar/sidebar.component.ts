@@ -77,11 +77,26 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
                 <span class="tracking-tight">SDC Approvals & Inspection</span>
               </div>
             </a>
+
+            <!-- 4. Grievance Management -->
+            <a
+              routerLink="/admin/grievance"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <span class="tracking-tight">Grievance Management</span>
+              </div>
+            </a>
           } @else if (isExistingUser()) {
             <!-- ================================================================
-                 ROLE: EXISTING USER
+                 ROLE: EXISTING USER (Flow: Active schemes, Tender status, Sanction Order, SDC Management, Batch Management, Aspirants, Grievance, Profile)
                  ================================================================ -->
-            <!-- 1. Active Schemes & Tenders -->
+            <!-- 1. Active Schemes -->
             <a
               routerLink="/tenders"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
@@ -111,103 +126,7 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
               </div>
             </a>
 
-            <!-- 3. Profile Accordion Section -->
-            <div class="pt-0.5">
-              <button
-                type="button"
-                (click)="toggleProfileAccordion()"
-                class="w-full flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
-                [class.text-[#174A6E]]="profileExpanded()"
-                [class.font-medium]="profileExpanded()"
-              >
-                <div class="flex items-center gap-2.5">
-                  <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  <span class="tracking-tight">Profile</span>
-                </div>
-                <svg
-                  class="w-3.5 h-3.5 text-[#7A8792] transition-transform duration-200"
-                  [class.rotate-180]="profileExpanded()"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              <!-- Profile Sub-Items List -->
-              @if (profileExpanded()) {
-                <div class="flex flex-col gap-0.5 pl-3 pr-1 pt-0.5 border-l-2 border-[#D9E1E7] ml-4">
-                  
-                  <!-- 1. Organisation Details -->
-                  <a
-                    routerLink="/profile"
-                    [queryParams]="{ tab: 'org' }"
-                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
-                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
-                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
-                  >
-                    <span class="truncate">1. Organisation Details</span>
-                  </a>
-
-                  <!-- 2. Officer In-Charge Details -->
-                  <a
-                    routerLink="/profile"
-                    [queryParams]="{ tab: 'officers' }"
-                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
-                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
-                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
-                  >
-                    <span class="truncate">2. Officer In-Charge</span>
-                  </a>
-
-                  <!-- 3. Authorized Person Details -->
-                  <a
-                    routerLink="/profile"
-                    [queryParams]="{ tab: 'auth' }"
-                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
-                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
-                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
-                  >
-                    <span class="truncate">3. Authorized Person</span>
-                  </a>
-
-                  <!-- 4. Bank Details -->
-                  <a
-                    routerLink="/profile"
-                    [queryParams]="{ tab: 'bank' }"
-                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
-                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
-                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
-                  >
-                    <span class="truncate">4. Bank Details</span>
-                  </a>
-
-                  <!-- 5. Uploaded Documents -->
-                  <a
-                    routerLink="/profile"
-                    [queryParams]="{ tab: 'docs' }"
-                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium"
-                    [routerLinkActiveOptions]="{ matrixParams: 'ignored', queryParams: 'exact', paths: 'exact', fragment: 'ignored' }"
-                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-[4px] text-[12px] leading-[18px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer"
-                  >
-                    <span class="truncate">5. Documents</span>
-                  </a>
-
-                </div>
-              }
-            </div>
-
-            <!-- ================================================================
-                 TP MANAGEMENT (Matching Screenshot 1)
-                 ================================================================ -->
-            <div class="pt-3 pb-1 px-3">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-[#8F9AA3]">TP Management</span>
-            </div>
-
-            <!-- Sanction Orders -->
+            <!-- 3. Sanction Order -->
             <a
               routerLink="/tp/sanction-orders"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
@@ -218,11 +137,11 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
                 <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
-                <span class="tracking-tight">Sanction Orders</span>
+                <span class="tracking-tight">Sanction Order</span>
               </div>
             </a>
 
-            <!-- SDC Management -->
+            <!-- 4. SDC Management -->
             <a
               routerLink="/sdcs"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
@@ -237,7 +156,7 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
               </div>
             </a>
 
-            <!-- Batch Management -->
+            <!-- 5. Batch Management -->
             <a
               routerLink="/batches"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
@@ -252,7 +171,7 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
               </div>
             </a>
 
-            <!-- Aspirants / Aspirant Management -->
+            <!-- 6. Aspirants -->
             <a
               routerLink="/aspirants"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
@@ -268,6 +187,36 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
               <span class="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-[#EAF2F6] text-[#174A6E] border border-[#D9E1E7]">
                 {{ aspirantCount() }}
               </span>
+            </a>
+
+            <!-- 7. Grievance -->
+            <a
+              routerLink="/grievance"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span class="tracking-tight">Grievance</span>
+              </div>
+            </a>
+
+            <!-- 8. Profile -->
+            <a
+              routerLink="/profile"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span class="tracking-tight">Profile</span>
+              </div>
             </a>
           } @else {
             <!-- ================================================================
@@ -319,8 +268,6 @@ export class SidebarComponent {
   authService = inject(AuthService);
   aspirantService = inject(AspirantService);
 
-  profileExpanded = signal<boolean>(true);
-
   readonly currentUser = this.authService.currentUser;
   readonly aspirantCount = computed(() => this.aspirantService.aspirants().length);
 
@@ -334,7 +281,8 @@ export class SidebarComponent {
     return user?.role === 'dept_admin';
   });
 
-  toggleProfileAccordion(): void {
-    this.profileExpanded.update(v => !v);
-  }
+  readonly isSuperAdmin = computed(() => {
+    const user = this.currentUser();
+    return user?.role === 'super_admin';
+  });
 }

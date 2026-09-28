@@ -136,6 +136,9 @@ export class AuthService {
         localStorage.removeItem(this.STORAGE_KEY);
       } catch { }
     }
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem('isms_otr_prompt_dismissed');
+    }
     this.router.navigate(['/sso-login']);
   }
 

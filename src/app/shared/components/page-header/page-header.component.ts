@@ -33,7 +33,7 @@ export interface BreadcrumbItem {
   `],
   template: `
     <div
-      class="text-white px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-[4px] flex items-center justify-between gap-3 shadow-xs"
+      class="text-white px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-sm flex items-center justify-between gap-3 shadow-xs"
       [style.backgroundColor]="bgColor"
     >
       <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">

@@ -10,8 +10,8 @@ import { FormsModule } from '@angular/forms';
     <div class="w-full flex flex-col font-sans">
       <!-- Label Row with Required Star and Character Count -->
       @if (label) {
-        <div class="flex items-center justify-between gap-2 mb-1.5">
-          <label [for]="id" class="text-[13px] font-medium leading-[20px] text-[#1F2933] select-none">
+        <div class="flex items-center justify-between gap-2 mb-1">
+          <label [for]="id" class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#1F2933] select-none">
             {{ label }}
             @if (required) {
               <span class="text-rose-600 font-bold ml-0.5">*</span>
@@ -19,7 +19,7 @@ import { FormsModule } from '@angular/forms';
           </label>
 
           @if (showCharCount && maxLength) {
-            <span class="text-[11px] font-mono text-[#7A8792]">
+            <span class="text-[10.5px] font-mono text-[#7A8792]">
               {{ (value || '').length }}/{{ maxLength }}
             </span>
           }
@@ -28,7 +28,7 @@ import { FormsModule } from '@angular/forms';
 
       <!-- Input Box Wrapper with Prefix & Suffix -->
       <div
-        class="relative flex items-center h-[38px] rounded-[4px] border transition-all duration-150 bg-white"
+        class="relative flex items-center h-[35px] rounded-[4px] border transition-all duration-150 bg-white"
         [class.border-[#D9E1E7]]="!error && !disabled"
         [class.border-rose-600]="!!error"
         [class.ring-1]="!!error"
@@ -41,7 +41,7 @@ import { FormsModule } from '@angular/forms';
       >
         <!-- Optional Prefix Tag -->
         @if (prefixText) {
-          <span class="inline-flex items-center h-full px-3 border-r border-[#D9E1E7] bg-[#F5F7F9] text-[12px] font-medium text-[#5F6B76] select-none rounded-l-[4px]">
+          <span class="inline-flex items-center h-full px-2.5 border-r border-[#D9E1E7] bg-[#F5F7F9] text-[12px] font-medium text-[#5F6B76] select-none rounded-l-[4px]">
             {{ prefixText }}
           </span>
         }
@@ -56,7 +56,7 @@ import { FormsModule } from '@angular/forms';
           [disabled]="disabled"
           [readOnly]="readonly"
           [attr.maxlength]="maxLength || null"
-          class="flex-1 min-w-0 w-full h-full px-3 text-[14px] leading-[22px] text-[#1F2933] placeholder:text-[#7A8792] focus:outline-none bg-transparent"
+          class="flex-1 min-w-0 w-full h-full px-2.5 text-xs sm:text-[13px] leading-[20px] text-[#1F2933] placeholder:text-[#7A8792] focus:outline-none bg-transparent"
           [class.uppercase]="uppercase"
           [class.cursor-not-allowed]="disabled"
           [class.text-[#7A8792]]="disabled"

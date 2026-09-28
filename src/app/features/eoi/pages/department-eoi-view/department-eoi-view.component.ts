@@ -21,7 +21,7 @@ import {
           title="EOI Responses"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'EOI Responses' }]"
         >
-          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] bg-white/15 text-white border border-white/20 text-xs font-normal">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-white/15 text-white border border-white/20 text-xs font-normal">
             <span>Published Schemes:</span>
             <span class="font-semibold">{{ schemes().length }}</span>
           </div>

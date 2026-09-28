@@ -8,7 +8,7 @@ import { BadgeVariant } from '../table/table.types';
   imports: [CommonModule],
   template: `
     <span
-      class="inline-flex items-center justify-center min-h-[24px] px-2 rounded-[4px] text-[12px] font-medium leading-none select-none tracking-normal font-sans"
+      class="inline-flex items-center justify-center min-h-6 px-2 rounded-sm text-[12px] font-medium leading-none select-none tracking-normal font-sans"
       [ngClass]="variantClasses"
     >
       <ng-content></ng-content>

@@ -351,7 +351,7 @@ export function createInitialOtrFormData(): OtrFormData {
       branchAddress: '',
       cancelledChequeDoc: null
     },
-    step5DeclarationAgreed: false,
+    step5DeclarationAgreed: true,
     status: 'Draft'
   };
 }
@@ -359,8 +359,8 @@ export function createInitialOtrFormData(): OtrFormData {
 export function createExistingUserOtrData(): OtrFormData {
   return {
     step1: {
-      shortName: 'RSLDC-PARTNER',
-      fullName: 'Rajasthan Skill & Livelihoods Development Council Partner Ltd.',
+      shortName: 'SkillTech Solutions',
+      fullName: 'SkillTech Solutions Private Limited',
       natureOfEntity: 'PUBLIC LIMITED',
       registrationNumber: 'U80302RJ2022NPL079811',
       dateOfRegistration: '2022-04-15',
@@ -409,8 +409,8 @@ export function createExistingUserOtrData(): OtrFormData {
       blackListed: 'No',
       nsdcPartner: 'Funded Partner',
       contactNo: '0141-2700891',
-      emailId: 'partner@rsldc-skill.org',
-      website: 'https://rsldc-skill.org',
+      emailId: 'contact@skilltech.org',
+      website: 'https://www.skilltech.org',
       registeredAddress: 'Plot No. 42, Institutional Area, Jhalana Doongri',
       registeredState: 'Rajasthan',
       registeredDistrict: 'Jaipur',
@@ -427,7 +427,7 @@ export function createExistingUserOtrData(): OtrFormData {
         name: 'Dr. Rajesh Sharma',
         designation: 'Managing Director (MD)',
         mobileNo: '9829012345',
-        emailId: 'rajesh.sharma@rsldc-skill.org',
+        emailId: 'rajesh.sharma@skilltech.org',
         pan: 'ABCPS1234K',
         aadhaarNo: '987654321098',
         bhamashahNo: 'BHM889210',
@@ -452,7 +452,7 @@ export function createExistingUserOtrData(): OtrFormData {
         name: 'Sunita Verma',
         designation: 'Operations Head',
         mobileNo: '9414098765',
-        emailId: 'sunita.verma@rsldc-skill.org',
+        emailId: 'sunita.verma@skilltech.org',
         pan: 'ABQPV5678L',
         aadhaarNo: '876543210987',
         bhamashahNo: 'BHM441092',
@@ -474,7 +474,7 @@ export function createExistingUserOtrData(): OtrFormData {
       age: '44',
       designation: 'Authorized Representative',
       pan: 'BNYPM9876Q',
-      emailId: 'vikram.mehta@rsldc-skill.org',
+      emailId: 'vikram.mehta@skilltech.org',
       mobileNo: '9829154321',
       aadhaarNo: '765432109876',
       bhamashahNo: 'BHM771209',

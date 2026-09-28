@@ -67,7 +67,7 @@ export interface EoiDocumentItem {
            1. Top Navigation Bar: Stepper Progress (Full-width responsive header)
            ==================================================================== -->
       <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs font-sans">
-        <div class="w-full max-w-[1420px] mx-auto px-3 sm:px-6 lg:px-8 py-3">
+        <div class="w-full max-w-355 mx-auto px-3 sm:px-6 lg:px-8 py-3">
           
           <!-- 5-Step Stepper Progress Bar -->
           <nav class="w-full flex items-center justify-between overflow-x-auto no-scrollbar py-0.5" aria-label="EOI Application Steps">
@@ -230,7 +230,7 @@ export interface EoiDocumentItem {
       </header>
 
       <!-- Main Container: Fully responsive with balanced edge margins -->
-      <main class="w-full max-w-[1420px] mx-auto px-3 sm:px-6 lg:px-8 pt-5 space-y-6 font-sans">
+      <main class="w-full max-w-355 mx-auto px-3 sm:px-6 lg:px-8 pt-5 space-y-6 font-sans">
         
         <!-- ====================================================================
              2. SCHEME HEADER CARD (8 Parameters Strip)
@@ -300,338 +300,319 @@ export interface EoiDocumentItem {
         </div>
 
         <!-- ====================================================================
-             STEP 1: OTR PROFILE VERIFICATION
+             STEP 1: COMPANY PROFILE INFORMATION (Complete, 1 Page, No Icons)
              ==================================================================== -->
         @if (currentStep() === 1) {
-          <div class="space-y-5">
+          <div class="space-y-5 font-sans">
 
-            <!-- Top Header & Edit Toggle Bar -->
+            <!-- Section Title Strip (Text Only - No Icons) -->
             <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs flex items-center justify-between flex-wrap gap-3">
               <div>
-                <div class="flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">1</span>
-                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">OTR Profile Verification</h3>
-                  <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">
-                    &check; Pre-filled from Registration
-                  </span>
-                </div>
-                <p class="text-xs text-slate-500 mt-1">
-                  @if (!isEditingOtr()) {
-                    All registration details below are currently in <strong>read-only preview</strong>. Click <strong>Edit Information</strong> to modify particulars before proceeding.
-                  } @else {
-                    You are in <strong>edit mode</strong>. Update particulars below and click <strong>Lock &amp; Review</strong> or <strong>Save &amp; Next</strong>.
-                  }
+                <h3 class="text-base sm:text-lg font-bold text-[#0B3558] tracking-tight m-0">Company Profile Information</h3>
+                <p class="text-xs text-slate-500 mt-1 m-0">
+                  Complete verified registration, statutory particulars, and banking details retrieved from your company profile.
                 </p>
               </div>
+              <span class="text-xs font-semibold text-[#0B3558] bg-[#EAF2F6] px-3 py-1 rounded border border-[#D9E1E7]">
+                Step 1 of 5
+              </span>
+            </div>
 
-              <div>
-                @if (!isEditingOtr()) {
-                  <button
-                    type="button"
-                    (click)="isEditingOtr.set(true)"
-                    class="px-4 py-2 bg-sky-50 hover:bg-sky-100 text-[#0483AC] border border-sky-300 rounded-lg text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                    <span>Edit Information</span>
-                  </button>
-                } @else {
-                  <button
-                    type="button"
-                    (click)="isEditingOtr.set(false)"
-                    class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Lock &amp; Review</span>
-                  </button>
+            <!-- 1. Company Particulars & Registration Details -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h4 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide m-0">
+                  1. Company Particulars &amp; Registration Details
+                </h4>
+                <span class="text-xs text-slate-500 font-mono font-semibold">CIN: {{ editableStep1.registrationNumber || '-' }}</span>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 text-xs">
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Name (Short Name)</span>
+                  <span class="font-bold text-slate-800 text-xs sm:text-[13px] block mt-0.5">{{ editableStep1.shortName || '-' }}</span>
+                </div>
+                <div class="sm:col-span-2">
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Full Name of Organization</span>
+                  <span class="font-bold text-slate-800 text-xs sm:text-[13px] block mt-0.5">{{ editableStep1.fullName || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Nature of Entity</span>
+                  <span class="font-semibold text-slate-800 text-xs sm:text-[13px] block mt-0.5">{{ editableStep1.natureOfEntity || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Registration Number (CIN)</span>
+                  <span class="font-mono font-semibold text-slate-800 block mt-0.5">{{ editableStep1.registrationNumber || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Date of Registration</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep1.dateOfRegistration || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">State / UT of Registration</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep1.stateOfLegalReg || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Company PAN</span>
+                  <span class="font-mono font-bold text-slate-800 block mt-0.5">{{ editableStep1.companyPan || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">GST Registered</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep1.gstRegistered }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">GSTIN</span>
+                  <span class="font-mono font-semibold text-slate-800 block mt-0.5">{{ editableStep1.gstRegistered === 'Yes' ? (editableStep1.gstin || '-') : 'Not Applicable' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">MSME / Udyam Registered</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep1.msmeRegistered }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Udyam Registration No.</span>
+                  <span class="font-mono font-semibold text-slate-800 block mt-0.5">{{ editableStep1.msmeRegistered === 'Yes' ? (editableStep1.udyamNumber || '-') : 'Not Applicable' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">NSDC Partner Status</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep1.nsdcPartner || 'Not Applicable' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Blacklisted Status</span>
+                  <span class="font-semibold block mt-0.5" [class.text-rose-600]="editableStep1.blackListed === 'Yes'" [class.text-slate-800]="editableStep1.blackListed !== 'Yes'">
+                    {{ editableStep1.blackListed || 'No' }}
+                  </span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Company Contact No.</span>
+                  <span class="font-mono font-semibold text-slate-800 block mt-0.5">{{ editableStep1.contactNo || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Company Email-ID</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep1.emailId || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Website</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep1.website || '-' }}</span>
+                </div>
+                <div class="sm:col-span-2 lg:col-span-2">
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Registered Address</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5 leading-relaxed">{{ registeredAddressText }}</span>
+                </div>
+                <div class="sm:col-span-2 lg:col-span-2">
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Office Address</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5 leading-relaxed">{{ officeAddressText }}</span>
+                </div>
+              </div>
+
+
+              <!-- Attached Statutory Documents (Text only, no icons) -->
+              <div class="pt-3 border-t border-slate-100">
+                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-2">Attached Registration Documents</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
+                  <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Certificate of Incorporation</span>
+                      <span class="font-medium text-slate-800 block truncate">{{ editableStep1.registrationCertDoc?.fileName || 'Certificate_of_Incorporation.pdf' }}</span>
+                    </div>
+                    <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">Attached</span>
+                  </div>
+                  <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Organization PAN Card</span>
+                      <span class="font-medium text-slate-800 block truncate">{{ editableStep1.panCardDoc?.fileName || 'Company_PAN_Card.pdf' }}</span>
+                    </div>
+                    <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">Attached</span>
+                  </div>
+                  @if (editableStep1.gstRegistered === 'Yes') {
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+                      <div>
+                        <span class="text-slate-400 block text-[10.5px]">GST Certificate</span>
+                        <span class="font-medium text-slate-800 block truncate">{{ editableStep1.gstCertDoc?.fileName || 'GST_Certificate.pdf' }}</span>
+                      </div>
+                      <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">Attached</span>
+                    </div>
+                  }
+                  @if (editableStep1.msmeRegistered === 'Yes') {
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+                      <div>
+                        <span class="text-slate-400 block text-[10.5px]">Udyam Certificate</span>
+                        <span class="font-medium text-slate-800 block truncate">{{ editableStep1.msmeCertDoc?.fileName || 'Udyam_Certificate.pdf' }}</span>
+                      </div>
+                      <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">Attached</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Authorized Signatory / Person Details -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h4 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide m-0">
+                  2. Authorized Signatory / Person Details
+                </h4>
+                <span class="text-xs text-slate-500 font-semibold">Designated Signatory</span>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Full Name</span>
+                  <span class="font-bold text-slate-800 text-xs sm:text-[13px] block mt-0.5">{{ editableStep3.name || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Designation</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep3.designation || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Date of Birth / Age</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep3.dob || '-' }} @if(editableStep3.age){ ({{ editableStep3.age }} yrs) }</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Official Mobile No.</span>
+                  <span class="font-mono font-semibold text-slate-800 block mt-0.5">{{ editableStep3.mobileNo || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Official Email-ID</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep3.emailId || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">PAN</span>
+                  <span class="font-mono font-bold text-slate-800 block mt-0.5">{{ editableStep3.pan || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Aadhaar Number</span>
+                  <span class="font-mono font-semibold text-slate-800 block mt-0.5">{{ editableStep3.aadhaarNo || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">State</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep3.state || '-' }}</span>
+                </div>
+                <div class="sm:col-span-4">
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Residence Address</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5 leading-relaxed">{{ residenceAddressText }}</span>
+                </div>
+              </div>
+
+              <!-- Attached Signatory Documents (Text only, no icons) -->
+              <div class="pt-3 border-t border-slate-100">
+                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-2">Attached Signatory Documents</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                  <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Authorization Letter / Board Resolution</span>
+                      <span class="font-medium text-slate-800 block truncate">{{ editableStep3.authorizationLetterDoc?.fileName || 'Board_Resolution_Auth.pdf' }}</span>
+                    </div>
+                    <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">Attached</span>
+                  </div>
+                  <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Identity Proof</span>
+                      <span class="font-medium text-slate-800 block truncate">{{ editableStep3.idProofDoc?.fileName || 'Signatory_Identity_Proof.pdf' }}</span>
+                    </div>
+                    <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">Attached</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Officer(s) In-Charge Details -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h4 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide m-0">
+                  3. Details of Officer(s) In-Charge
+                </h4>
+                <span class="text-xs text-slate-500 font-semibold">{{ editableStep2.length }} Registered Officer(s)</span>
+              </div>
+
+              <div class="space-y-3">
+                @for (oic of editableStep2; track oic.id; let idx = $index) {
+                  <div class="p-4 border border-slate-200 rounded-lg bg-slate-50/50 space-y-3 text-xs">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-200/70">
+                      <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800 text-xs sm:text-[13px]">{{ idx + 1 }}. {{ oic.name }}</span>
+                        <span class="text-slate-500 text-xs">({{ oic.designation || 'Officer In-Charge' }})</span>
+                      </div>
+                      <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        {{ oic.appointmentLetterDoc?.fileName || 'Appointment_Letter.pdf' }}
+                      </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                      <div>
+                        <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Mobile Number</span>
+                        <span class="font-mono font-semibold text-slate-800 block mt-0.5">{{ oic.mobileNo || '-' }}</span>
+                      </div>
+                      <div>
+                        <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Email Address</span>
+                        <span class="font-semibold text-slate-800 block mt-0.5">{{ oic.emailId || '-' }}</span>
+                      </div>
+                      <div>
+                        <span class="text-slate-400 block text-[10.5px] uppercase font-medium">PAN</span>
+                        <span class="font-mono font-bold text-slate-800 block mt-0.5">{{ oic.pan || '-' }}</span>
+                      </div>
+                      <div>
+                        <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Aadhaar Number</span>
+                        <span class="font-mono font-semibold text-slate-800 block mt-0.5">{{ oic.aadhaarNo || '-' }}</span>
+                      </div>
+                    </div>
+                  </div>
                 }
               </div>
             </div>
 
-            <!-- MODE A: READ-ONLY VIEW (DEFAULT) -->
-            @if (!isEditingOtr()) {
-              <!-- 1. Organization Details -->
-              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div class="flex items-center gap-2">
-                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-semibold">1</span>
-                    <h3 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide">Step 1 – Organization Details</h3>
-                  </div>
-                  <span class="text-xs text-slate-500 font-mono">CIN: {{ editableStep1.registrationNumber || '-' }}</span>
-                </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs">
-                  <div><span class="text-slate-400 block text-[10.5px]">Short Name</span><span class="font-semibold text-slate-800">{{ editableStep1.shortName || '-' }}</span></div>
-                  <div class="sm:col-span-2"><span class="text-slate-400 block text-[10.5px]">Full Name</span><span class="font-semibold text-slate-800">{{ editableStep1.fullName || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Nature of Entity</span><span class="font-semibold text-slate-800">{{ editableStep1.natureOfEntity || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Date of Registration</span><span class="text-slate-800">{{ editableStep1.dateOfRegistration || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">State of Reg.</span><span class="text-slate-800">{{ editableStep1.stateOfLegalReg || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Company PAN</span><span class="font-mono font-bold text-slate-800">{{ editableStep1.companyPan || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">GST Registered</span><span class="text-slate-800">{{ editableStep1.gstRegistered }} ({{ editableStep1.gstin || 'N/A' }})</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">MSME / Udyam</span><span class="text-slate-800">{{ editableStep1.msmeRegistered }} @if(editableStep1.udyamNumber){ - {{ editableStep1.udyamNumber }} }</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">NSDC Partner</span><span class="text-slate-800">{{ editableStep1.nsdcPartner || 'None' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Blacklisted</span><span class="font-semibold" [class.text-rose-600]="editableStep1.blackListed === 'Yes'">{{ editableStep1.blackListed }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Contact / Email</span><span class="text-slate-800">{{ editableStep1.contactNo }} | {{ editableStep1.emailId }}</span></div>
-                </div>
-
-                <!-- 3-Year Turnover Table -->
-                @if (editableStep1.financialYears && editableStep1.financialYears.length > 0) {
-                  <div class="pt-3 border-t border-slate-100">
-                    <span class="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Financial Turnover (₹ in Lacs)</span>
-                    <table class="w-full text-left border-collapse border border-slate-200 rounded text-xs">
-                      <thead>
-                        <tr class="bg-slate-50 text-slate-700 font-semibold text-[11px] border-b border-slate-200">
-                          <th class="py-1.5 px-3 border-r border-slate-200">Financial Year</th>
-                          <th class="py-1.5 px-3 border-r border-slate-200">Total Turnover (₹ Lacs)</th>
-                          <th class="py-1.5 px-3">Skill Turnover (₹ Lacs)</th>
-                        </tr>
-                      </thead>
-                      <tbody class="divide-y divide-slate-100">
-                        @for (fy of editableStep1.financialYears; track fy.year) {
-                          <tr>
-                            <td class="py-1.5 px-3 text-slate-700 border-r border-slate-100">{{ fy.year }}</td>
-                            <td class="py-1.5 px-3 text-slate-700 border-r border-slate-100">{{ fy.totalTurnover || '-' }}</td>
-                            <td class="py-1.5 px-3 text-slate-700">{{ fy.skillTurnover || '-' }}</td>
-                          </tr>
-                        }
-                        <tr class="bg-slate-50 font-semibold border-t border-slate-200">
-                          <td class="py-1.5 px-3 text-slate-700 border-r border-slate-100">3-Year Average</td>
-                          <td class="py-1.5 px-3 text-[#0483AC] font-bold border-r border-slate-100">{{ avgTotalTurnover() }} Lacs</td>
-                          <td class="py-1.5 px-3 text-[#0483AC] font-bold">{{ avgSkillTurnover() }} Lacs</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                }
-
-                <div class="pt-2 border-t border-slate-100 text-xs">
-                  <span class="text-slate-400 block text-[10.5px]">Registered Address</span>
-                  <span class="text-slate-800">{{ editableStep1.registeredAddress || '-' }}</span>
-                </div>
+            <!-- 4. Bank Account Details -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h4 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide m-0">
+                  4. Bank Account Details
+                </h4>
+                <span class="text-xs text-slate-500 font-mono font-semibold">IFSC: {{ editableStep4.ifscCode || '-' }}</span>
               </div>
 
-              <!-- 2. Authorized Person Details -->
-              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div class="flex items-center gap-2">
-                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-semibold">2</span>
-                    <h3 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide">Step 2 – Authorized Person Details</h3>
-                  </div>
-                  <span class="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">&check; Verified</span>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Bank Name</span>
+                  <span class="font-bold text-slate-800 text-xs sm:text-[13px] block mt-0.5">{{ editableStep4.bankName || '-' }}</span>
                 </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs">
-                  <div><span class="text-slate-400 block text-[10.5px]">Name</span><span class="font-bold text-slate-800">{{ editableStep3.name || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Designation</span><span class="text-slate-800">{{ editableStep3.designation || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">DOB / Age</span><span class="text-slate-800">{{ editableStep3.dob || '-' }} @if(editableStep3.age){ ({{ editableStep3.age }} yrs) }</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Mobile No.</span><span class="font-mono text-slate-800">{{ editableStep3.mobileNo || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Email ID</span><span class="text-slate-800">{{ editableStep3.emailId || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">PAN</span><span class="font-mono text-slate-800">{{ editableStep3.pan || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Aadhaar No.</span><span class="font-mono text-slate-800">{{ editableStep3.aadhaarNo || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">State</span><span class="text-slate-800">{{ editableStep3.state || '-' }}</span></div>
-                  <div class="sm:col-span-4"><span class="text-slate-400 block text-[10.5px]">Residence Address</span><span class="text-slate-800">{{ editableStep3.residenceAddress || '-' }}</span></div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Branch Name</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep4.branchName || '-' }}</span>
                 </div>
-              </div>
-
-              <!-- 3. Officer In-Charge (Updated: DROPDOWN ONLY as requested) -->
-              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div class="flex items-center gap-2">
-                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-semibold">3</span>
-                    <h3 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide">
-                      Step 3 – Details of Officer In-Charge
-                    </h3>
-                  </div>
-                  <span class="text-xs text-sky-800 font-semibold bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
-                    Scheme Selection
-                  </span>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Account Type</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep4.accountType || '-' }}</span>
                 </div>
-
-                <!-- Clean Dropdown Selection -->
-                <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-4 sm:p-5 space-y-3">
-                  <div>
-                    <label class="block text-xs font-bold text-[#0B3558] mb-1">
-                      Choose Officer In-Charge (Name) *
-                    </label>
-                    <p class="text-[11.5px] text-slate-500 mb-2.5">
-                      Select the Officer In-Charge registered under your OTR profile who will be officially designated to manage this MMKVY proposal.
-                    </p>
-                    <div class="relative max-w-xl">
-                      <select
-                        [ngModel]="selectedOicId()"
-                        (ngModelChange)="selectedOicId.set($event)"
-                        class="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-[#0B3558] focus:border-transparent shadow-2xs"
-                      >
-                        @for (oic of editableStep2; track oic.id) {
-                          <option [value]="oic.id">
-                            {{ oic.name }} ({{ oic.designation || 'Officer' }})
-                          </option>
-                        }
-                      </select>
-                    </div>
-                  </div>
-
-                  <!-- Selected Officer Compact Verified Badge/Summary -->
-                  @if (selectedOic(); as currentOic) {
-                    <div class="pt-3 border-t border-slate-200/80 flex flex-wrap items-center gap-x-6 gap-y-1.5 text-xs text-slate-700">
-                      <div class="flex items-center gap-1.5">
-                        <span class="text-slate-400 font-medium">Designation:</span>
-                        <span class="font-semibold text-slate-900">{{ currentOic.designation || 'Officer In-Charge' }}</span>
-                      </div>
-                      <div class="flex items-center gap-1.5">
-                        <span class="text-slate-400 font-medium">Mobile:</span>
-                        <span class="font-mono font-semibold text-slate-900">{{ currentOic.mobileNo || '-' }}</span>
-                      </div>
-                      <div class="flex items-center gap-1.5">
-                        <span class="text-slate-400 font-medium">Email:</span>
-                        <span class="text-slate-900">{{ currentOic.emailId || '-' }}</span>
-                      </div>
-                      <div class="flex items-center gap-1.5">
-                        <span class="text-slate-400 font-medium">PAN:</span>
-                        <span class="font-mono text-slate-900">{{ currentOic.pan || '-' }}</span>
-                      </div>
-                    </div>
-                  }
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Account Holder Name</span>
+                  <span class="font-bold text-slate-800 text-xs sm:text-[13px] block mt-0.5">{{ editableStep4.accountHolderName || editableStep1.fullName || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Account Number</span>
+                  <span class="font-mono font-bold text-slate-800 block mt-0.5">{{ editableStep4.accountNo || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">IFSC Code</span>
+                  <span class="font-mono font-bold text-slate-800 block mt-0.5">{{ editableStep4.ifscCode || '-' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Transfer Mode</span>
+                  <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep4.transferMode || 'NEFT / RTGS' }}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Cancelled Cheque / Passbook</span>
+                  <span class="font-semibold text-emerald-700 block mt-0.5 truncate">{{ editableStep4.cancelledChequeDoc?.fileName || 'Cancelled_Cheque_Passbook.pdf' }}</span>
                 </div>
               </div>
+            </div>
 
-              <!-- 4. Bank Account Details -->
-              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div class="flex items-center gap-2">
-                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-semibold">4</span>
-                    <h3 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide">Step 4 – Bank Account Details</h3>
-                  </div>
-                  <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">&check; Verified</span>
-                </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs">
-                  <div><span class="text-slate-400 block text-[10.5px]">Name of the Bank</span><span class="font-semibold text-slate-800">{{ editableStep4.bankName || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Branch Name</span><span class="text-slate-800">{{ editableStep4.branchName || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Type of Account</span><span class="text-slate-800">{{ editableStep4.accountType || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Account Holder Name</span><span class="font-semibold text-slate-800">{{ editableStep4.accountHolderName || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Account No.</span><span class="font-mono font-semibold text-slate-800">{{ editableStep4.accountNo || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">IFSC Code</span><span class="font-mono font-semibold text-slate-800">{{ editableStep4.ifscCode || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Mode of Transfer</span><span class="text-slate-800">{{ editableStep4.transferMode || '-' }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Cancelled Cheque</span><span class="text-emerald-700 font-semibold">{{ editableStep4.cancelledChequeDoc?.fileName || 'Attached' }}</span></div>
-                </div>
-              </div>
-            }
-
-            <!-- MODE B: EDITABLE FORM INPUTS (WHEN isEditingOtr() IS TRUE) -->
-            @if (isEditingOtr()) {
-              <!-- Step 1 Org Editable -->
-              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div class="flex items-center gap-2">
-                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-semibold">1</span>
-                    <h3 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide">Edit Organization Details</h3>
-                  </div>
-                  <span class="text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-semibold">Editing</span>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6 text-xs">
-                  <div>
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">TP/PIA Short Name</label>
-                    <input type="text" [(ngModel)]="editableStep1.shortName" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#0B3558]" />
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">TP/PIA Full Name</label>
-                    <input type="text" [(ngModel)]="editableStep1.fullName" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#0B3558]" />
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Nature of Entity</label>
-                    <select [(ngModel)]="editableStep1.natureOfEntity" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800">
-                      <option value="PUBLIC LIMITED">PUBLIC LIMITED</option>
-                      <option value="PRIVATE LIMITED">PRIVATE LIMITED</option>
-                      <option value="SOCIETY">SOCIETY</option>
-                      <option value="TRUST">TRUST</option>
-                      <option value="PROPRIETORSHIP">PROPRIETORSHIP</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Registration Number (CIN)</label>
-                    <input type="text" [(ngModel)]="editableStep1.registrationNumber" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800 font-mono" />
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Date of Registration</label>
-                    <input type="text" [(ngModel)]="editableStep1.dateOfRegistration" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800" />
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Company PAN</label>
-                    <input type="text" [(ngModel)]="editableStep1.companyPan" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800 font-mono" />
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">GST Registered</label>
-                    <select [(ngModel)]="editableStep1.gstRegistered" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800">
-                      <option value="Yes">Yes</option>
-                      <option value="No">No</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">GSTIN</label>
-                    <input type="text" [(ngModel)]="editableStep1.gstin" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800 font-mono" />
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">MSME Registered</label>
-                    <select [(ngModel)]="editableStep1.msmeRegistered" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800">
-                      <option value="Yes">Yes</option>
-                      <option value="No">No</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Company Contact No.</label>
-                    <input type="text" [(ngModel)]="editableStep1.contactNo" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800 font-mono" />
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Company Email-ID</label>
-                    <input type="text" [(ngModel)]="editableStep1.emailId" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800" />
-                  </div>
-                  <div class="sm:col-span-2 md:col-span-3">
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Registered Address</label>
-                    <textarea rows="2" [(ngModel)]="editableStep1.registeredAddress" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800"></textarea>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Officer In-Charge in Edit Mode (Dropdown Only) -->
-              <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div class="flex items-center gap-2">
-                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-semibold">3</span>
-                    <h3 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide">Officer In-Charge Selection</h3>
-                  </div>
-                </div>
-
-                <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-4 sm:p-5">
-                  <label class="block text-xs font-bold text-[#0B3558] mb-1">Choose Officer In-Charge (Name) *</label>
-                  <select
-                    [ngModel]="selectedOicId()"
-                    (ngModelChange)="selectedOicId.set($event)"
-                    class="w-full sm:w-auto min-w-[320px] bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-[#0B3558]"
-                  >
-                    @for (oic of editableStep2; track oic.id) {
-                      <option [value]="oic.id">{{ oic.name }} ({{ oic.designation || 'Officer' }})</option>
-                    }
-                  </select>
-                </div>
-              </div>
-            }
-
-            <!-- Footer Action Button for Step 1 -->
+            <!-- Footer Action: Proceed to Proposal Form (Text Only, No Icons) -->
             <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
               <button
                 type="button"
                 (click)="saveAndProceedToStep2()"
-                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer"
               >
-                <span>Save &amp; Proceed to Proposal Form</span>
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
+                Proceed to Proposal Form
               </button>
             </div>
 
@@ -641,358 +622,214 @@ export interface EoiDocumentItem {
         <!-- ====================================================================
              STEP 2: EOI PROPOSAL FORM
              ==================================================================== -->
+        <!-- ====================================================================
+             STEP 2: EOI PROPOSAL FORM
+             ==================================================================== -->
         @if (currentStep() === 2) {
-          <div class="space-y-6">
+          <div class="space-y-5">
             
             <!-- Notice -->
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start sm:items-center gap-3 text-xs text-amber-900 shadow-2xs">
-              <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5 sm:mt-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex items-start sm:items-center gap-3 text-xs text-amber-900 shadow-2xs">
+              <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0 mt-1 sm:mt-0"></span>
               <span>
-                <strong>Proposal Form Parameters:</strong> Review and select from your existing training centres or propose new centres, add past placement track records, annual action plan, and attach mandatory statutory annexures.
+                <strong>Proposal Form Parameters:</strong> Review and select training centres, past placement track records, annual action plan, and attach mandatory statutory annexures.
               </span>
             </div>
 
             <!-- ================================================================
-                 1. TRAINING CENTRES SECTION (Existing Centres + Optional New Proposal)
+                 1. TRAINING CENTRES SECTION (Existing Infrastructure & Proposal Centres)
                  ================================================================ -->
-            <div id="training-centres-section" class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-5 shadow-xs">
-              <div class="pb-3 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+            <div id="training-centres-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
+              <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <h3 class="text-sm sm:text-base font-bold text-[#0B3558] flex items-center gap-2">
                     <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">1</span>
                     Training Centres (Existing Infrastructure &amp; Proposal Centres)
                   </h3>
-                  <p class="text-xs text-slate-500 mt-1">
-                    Select existing verified centres to deploy for this scheme, or optionally create/propose new centres for MMKVY.
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    Select existing verified centres to deploy for this scheme, or optionally propose new centres for MMKVY.
                   </p>
                 </div>
-                <span class="px-2.5 py-1 rounded bg-sky-50 text-[#0B3558] text-xs font-bold border border-sky-200">
-                  {{ selectedCentresForScheme().length }} Centre(s) Deployed for Scheme
-                </span>
-              </div>
-
-              <!-- PART A: EXISTING CENTRES -->
-              <div class="space-y-3">
-                <div class="flex items-center justify-between flex-wrap gap-2">
-                  <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                    <svg class="w-4 h-4 text-[#0B3558]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    <span>Existing Registered Training Centres ({{ existingCentres.length }})</span>
-                  </h4>
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 rounded bg-sky-50 text-[#0B3558] text-xs font-bold border border-sky-200">
+                    {{ selectedCentresForScheme().length }} Centre(s) Deployed
+                  </span>
                   <button
                     type="button"
                     (click)="showAddExistingForm.set(!showAddExistingForm())"
-                    class="text-xs text-[#0483AC] hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+                    class="px-3 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1 cursor-pointer"
                   >
-                    <span>{{ showAddExistingForm() ? '✕ Close Form' : '+ Add / Register Another Existing Centre' }}</span>
+                    <span>{{ showAddExistingForm() ? '✕ Close Form' : '+ Add Training Centre' }}</span>
                   </button>
                 </div>
-
-                <!-- If NO existing centres filled in past: prompt to enter first centre -->
-                @if (existingCentres.length === 0) {
-                  <div class="p-5 border-2 border-dashed border-amber-300 rounded-xl bg-amber-50/50 text-center space-y-3">
-                    <div class="w-10 h-10 mx-auto rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
-                      !
-                    </div>
-                    <div>
-                      <h5 class="text-xs sm:text-sm font-bold text-slate-800">No Existing Training Centres Found</h5>
-                      <p class="text-xs text-slate-600 mt-1 max-w-lg mx-auto">
-                        You have not filled any training centre details in the past. Please enter your primary/first centre details below to register it.
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      (click)="showAddExistingForm.set(true)"
-                      class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer"
-                    >
-                      + Enter First Training Centre Details
-                    </button>
-                  </div>
-                }
-
-                <!-- Inline Form to Add Existing Centre (if user has none or wants to register more) -->
-                @if (showAddExistingForm() || existingCentres.length === 0) {
-                  <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-5 space-y-3">
-                    <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-                      <span class="text-xs font-bold text-[#0B3558]">
-                        {{ existingCentres.length === 0 ? 'Enter Primary / First Centre Details' : 'Register New Existing Centre' }}
-                      </span>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                      <div>
-                        <label class="block text-slate-600 mb-1 font-medium">District / City *</label>
-                        <input
-                          type="text"
-                          [(ngModel)]="newExistingCentre.district"
-                          placeholder="e.g. Jaipur / Alwar / Kota"
-                          class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                        />
-                      </div>
-                      <div>
-                        <label class="block text-slate-600 mb-1 font-medium">Centre Name *</label>
-                        <input
-                          type="text"
-                          [(ngModel)]="newExistingCentre.centerName"
-                          placeholder="e.g. RSLDC Main Skill Centre"
-                          class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                        />
-                      </div>
-                      <div>
-                        <label class="block text-slate-600 mb-1 font-medium">Classrooms</label>
-                        <input
-                          type="number"
-                          [(ngModel)]="newExistingCentre.classrooms"
-                          min="1"
-                          class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                        />
-                      </div>
-                      <div>
-                        <label class="block text-slate-600 mb-1 font-medium">Practical Labs</label>
-                        <input
-                          type="number"
-                          [(ngModel)]="newExistingCentre.practicalRooms"
-                          min="1"
-                          class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                        />
-                      </div>
-                      <div>
-                        <label class="block text-slate-600 mb-1 font-medium">Separate Washrooms</label>
-                        <select
-                          [(ngModel)]="newExistingCentre.washrooms"
-                          class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                        >
-                          <option value="Yes">Yes</option>
-                          <option value="No">No</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label class="block text-slate-600 mb-1 font-medium">Lab Infrastructure</label>
-                        <select
-                          [(ngModel)]="newExistingCentre.labInfra"
-                          class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                        >
-                          <option value="Available">Available</option>
-                          <option value="Under Setup">Under Setup</option>
-                        </select>
-                      </div>
-                      <div class="sm:col-span-2">
-                        <label class="block text-slate-600 mb-1 font-medium">Full Postal Address *</label>
-                        <input
-                          type="text"
-                          [(ngModel)]="newExistingCentre.fullAddress"
-                          placeholder="Plot number, industrial area, landmark, pincode"
-                          class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                        />
-                      </div>
-                    </div>
-
-                    <div class="flex justify-end gap-2 pt-2">
-                      <button
-                        type="button"
-                        (click)="saveNewExistingCentre()"
-                        class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-semibold shadow-xs cursor-pointer"
-                      >
-                        Save &amp; Add Existing Centre
-                      </button>
-                    </div>
-                  </div>
-                }
-
-                <!-- Existing Centres Listing with Select-for-Scheme Option -->
-                @if (existingCentres.length > 0) {
-                  <div class="overflow-x-auto border border-slate-200 rounded-xl">
-                    <table class="w-full text-left border-collapse text-xs">
-                      <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
-                        <tr>
-                          <th class="py-2.5 px-3 text-center w-28">Deploy for MMKVY</th>
-                          <th class="py-2.5 px-3">District</th>
-                          <th class="py-2.5 px-3">Centre Name</th>
-                          <th class="py-2.5 px-2 text-center">Classrooms</th>
-                          <th class="py-2.5 px-2 text-center">Labs</th>
-                          <th class="py-2.5 px-2 text-center">Washrooms</th>
-                          <th class="py-2.5 px-2 text-center">Lab Infra</th>
-                          <th class="py-2.5 px-3">Full Address</th>
-                        </tr>
-                      </thead>
-                      <tbody class="divide-y divide-slate-100 font-normal text-slate-700">
-                        @for (c of existingCentres; track c.id) {
-                          <tr class="hover:bg-slate-50/70" [class.bg-sky-50/30]="isCentreSelectedForScheme(c.id)">
-                            <td class="py-2.5 px-3 text-center">
-                              <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  [checked]="isCentreSelectedForScheme(c.id)"
-                                  (change)="toggleCentreForScheme(c.id)"
-                                  class="w-4 h-4 rounded text-[#0B3558] focus:ring-[#0B3558] cursor-pointer"
-                                />
-                                <span class="text-[11px] font-semibold" [class.text-[#0B3558]]="isCentreSelectedForScheme(c.id)">
-                                  {{ isCentreSelectedForScheme(c.id) ? 'Selected' : 'Select' }}
-                                </span>
-                              </label>
-                            </td>
-                            <td class="py-2.5 px-3 font-semibold text-slate-900">{{ c.district }}</td>
-                            <td class="py-2.5 px-3 font-medium">{{ c.centerName }}</td>
-                            <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ c.classrooms }}</td>
-                            <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ c.practicalRooms }}</td>
-                            <td class="py-2.5 px-2 text-center text-emerald-700">{{ c.washrooms }}</td>
-                            <td class="py-2.5 px-2 text-center">
-                              <span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-semibold">
-                                {{ c.labInfra }}
-                              </span>
-                            </td>
-                            <td class="py-2.5 px-3 text-slate-500 max-w-xs truncate">{{ c.fullAddress }}</td>
-                          </tr>
-                        }
-                      </tbody>
-                    </table>
-                  </div>
-                }
               </div>
 
-              <!-- PART B: OPTIONAL PROPOSAL CENTRES (NEW CENTRES FOR SCHEME) -->
-              <div class="pt-4 border-t border-slate-200 space-y-3">
-                <div class="flex items-center justify-between flex-wrap gap-2">
-                  <div>
-                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                      <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200 uppercase">Optional</span>
-                      <span>Propose New Training Centre specifically for MMKVY</span>
-                    </h4>
-                    <p class="text-[11.5px] text-slate-500 mt-0.5">
-                      If required under this scheme, you can propose new centres to establish in addition to or instead of existing ones.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    (click)="showNewCentreForm.set(!showNewCentreForm())"
-                    class="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-[#0B3558] rounded-lg text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>{{ showNewCentreForm() ? '✕ Close Form' : '+ Add New Proposed Centre' }}</span>
-                  </button>
-                </div>
-
-                @if (showNewCentreForm()) {
-                  <div class="bg-sky-50/40 border border-sky-200 rounded-xl p-4 sm:p-5 space-y-3">
-                    <div class="text-xs font-bold text-[#0B3558] flex items-center gap-1.5 pb-2 border-b border-sky-100">
-                      <span>Enter Details of New Proposed Centre</span>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                      <div>
-                        <label class="block text-slate-600 mb-1 font-medium">District / City *</label>
-                        <input
-                          type="text"
-                          [(ngModel)]="newCentre.district"
-                          placeholder="e.g. Udaipur / Bikaner"
-                          class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                        />
-                      </div>
-                      <div>
-                        <label class="block text-slate-600 mb-1 font-medium">Centre Name *</label>
-                        <input
-                          type="text"
-                          [(ngModel)]="newCentre.centerName"
-                          placeholder="e.g. Proposed MMKVY SDC Hub"
-                          class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                        />
-                      </div>
-                      <div>
-                        <label class="block text-slate-600 mb-1 font-medium">Classrooms</label>
-                        <input
-                          type="number"
-                          [(ngModel)]="newCentre.classrooms"
-                          min="1"
-                          class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                        />
-                      </div>
-                      <div>
-                        <label class="block text-slate-600 mb-1 font-medium">Practical Labs</label>
-                        <input
-                          type="number"
-                          [(ngModel)]="newCentre.practicalRooms"
-                          min="1"
-                          class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                        />
-                      </div>
-                      <div>
-                        <label class="block text-slate-600 mb-1 font-medium">Separate Washrooms</label>
-                        <select
-                          [(ngModel)]="newCentre.washrooms"
-                          class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                        >
-                          <option value="Yes">Yes</option>
-                          <option value="No">No</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label class="block text-slate-600 mb-1 font-medium">Lab Infrastructure</label>
-                        <select
-                          [(ngModel)]="newCentre.labInfra"
-                          class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                        >
-                          <option value="Available">Available</option>
-                          <option value="Under Setup">Under Setup</option>
-                        </select>
-                      </div>
-                      <div class="sm:col-span-2">
-                        <label class="block text-slate-600 mb-1 font-medium">Full Postal Address *</label>
-                        <input
-                          type="text"
-                          [(ngModel)]="newCentre.fullAddress"
-                          placeholder="Complete address of proposed premises"
-                          class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                        />
-                      </div>
-                    </div>
-
-                    <div class="flex justify-end gap-2 pt-2">
-                      <button
-                        type="button"
-                        (click)="saveNewCentre()"
-                        class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-semibold shadow-xs cursor-pointer"
-                      >
-                        Add Proposed Centre to Scheme
-                      </button>
-                    </div>
-                  </div>
-                }
-
-                <!-- Combined Summary of Scheme Centres -->
-                @if (selectedCentresForScheme().length > 0) {
-                  <div class="pt-3">
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
-                      Centres Included in this MMKVY Proposal ({{ selectedCentresForScheme().length }})
+              <!-- Inline Form to Add / Register Centre -->
+              @if (showAddExistingForm()) {
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                  <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                    <span class="text-xs font-bold text-[#0B3558]">
+                      Enter Training Centre Details
                     </span>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                      @for (c of selectedCentresForScheme(); track c.id) {
-                        <div class="p-3 rounded-xl border border-slate-200 bg-slate-50/70 text-xs space-y-1.5 relative">
-                          <div class="flex items-center justify-between">
-                            <span class="font-bold text-slate-900">{{ c.centerName }}</span>
-                            <span
-                              class="px-2 py-0.5 rounded text-[10px] font-bold"
-                              [ngClass]="c.isExisting ? 'bg-sky-100 text-sky-800' : 'bg-emerald-100 text-emerald-800'"
-                            >
-                              {{ c.isExisting ? 'Existing Centre' : 'New Proposed' }}
-                            </span>
-                          </div>
-                          <div class="text-slate-600 text-[11px]">{{ c.district }} &bull; {{ c.classrooms }} Classrooms &bull; {{ c.practicalRooms }} Labs</div>
-                          <div class="text-slate-400 text-[10.5px] truncate">{{ c.fullAddress }}</div>
-                        </div>
-                      }
+                    <button
+                      type="button"
+                      (click)="showAddExistingForm.set(false)"
+                      class="text-xs text-slate-500 hover:text-slate-800 cursor-pointer"
+                    >
+                      ✕ Close
+                    </button>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">District / City *</label>
+                      <input
+                        type="text"
+                        [(ngModel)]="newExistingCentre.district"
+                        placeholder="e.g. Jaipur / Alwar / Kota"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Centre Name *</label>
+                      <input
+                        type="text"
+                        [(ngModel)]="newExistingCentre.centerName"
+                        placeholder="e.g. Jaipur Skill Centre"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Classrooms</label>
+                      <input
+                        type="number"
+                        [(ngModel)]="newExistingCentre.classrooms"
+                        min="1"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Practical Labs</label>
+                      <input
+                        type="number"
+                        [(ngModel)]="newExistingCentre.practicalRooms"
+                        min="1"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Separate Washrooms</label>
+                      <select
+                        [(ngModel)]="newExistingCentre.washrooms"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      >
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Lab Infrastructure</label>
+                      <select
+                        [(ngModel)]="newExistingCentre.labInfra"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      >
+                        <option value="Available">Available</option>
+                        <option value="Under Setup">Under Setup</option>
+                      </select>
+                    </div>
+                    <div class="sm:col-span-2">
+                      <label class="block text-slate-600 mb-1 font-medium">Full Postal Address *</label>
+                      <input
+                        type="text"
+                        [(ngModel)]="newExistingCentre.fullAddress"
+                        placeholder="Plot number, industrial area, landmark, pincode"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
                     </div>
                   </div>
-                }
+
+                  <div class="flex justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      (click)="showAddExistingForm.set(false)"
+                      class="px-3.5 py-1.5 border border-slate-300 hover:bg-slate-100 rounded text-xs font-semibold text-slate-700 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      (click)="saveNewExistingCentre()"
+                      class="px-4 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-semibold shadow-xs cursor-pointer"
+                    >
+                      Save &amp; Add Centre
+                    </button>
+                  </div>
+                </div>
+              }
+
+              <!-- Unified Centres Listing Table -->
+              <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th class="py-2.5 px-3 text-center w-28">Deploy for Scheme</th>
+                      <th class="py-2.5 px-3">District</th>
+                      <th class="py-2.5 px-3">Centre Name</th>
+                      <th class="py-2.5 px-2 text-center">Classrooms</th>
+                      <th class="py-2.5 px-2 text-center">Labs</th>
+                      <th class="py-2.5 px-2 text-center">Washrooms</th>
+                      <th class="py-2.5 px-2 text-center">Lab Infra</th>
+                      <th class="py-2.5 px-3">Full Address</th>
+                      <th class="py-2.5 px-2 text-center">Type</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 font-normal text-slate-700">
+                    @for (c of allCentres(); track c.id) {
+                      <tr class="hover:bg-slate-50/70" [class.bg-sky-50/30]="isCentreSelectedForScheme(c.id)">
+                        <td class="py-2.5 px-3 text-center">
+                          <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              [checked]="isCentreSelectedForScheme(c.id)"
+                              (change)="toggleCentreForScheme(c.id)"
+                              class="w-4 h-4 rounded text-[#0B3558] focus:ring-[#0B3558] cursor-pointer"
+                            />
+                            <span class="text-[11px] font-semibold" [class.text-[#0B3558]]="isCentreSelectedForScheme(c.id)">
+                              {{ isCentreSelectedForScheme(c.id) ? 'Selected' : 'Select' }}
+                            </span>
+                          </label>
+                        </td>
+                        <td class="py-2.5 px-3 font-semibold text-slate-900">{{ c.district }}</td>
+                        <td class="py-2.5 px-3 font-medium">{{ c.centerName }}</td>
+                        <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ c.classrooms }}</td>
+                        <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ c.practicalRooms }}</td>
+                        <td class="py-2.5 px-2 text-center text-emerald-700">{{ c.washrooms }}</td>
+                        <td class="py-2.5 px-2 text-center">
+                          <span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-semibold">
+                            {{ c.labInfra }}
+                          </span>
+                        </td>
+                        <td class="py-2.5 px-3 text-slate-500 max-w-xs truncate">{{ c.fullAddress }}</td>
+                        <td class="py-2.5 px-2 text-center">
+                          <span
+                            class="px-1.5 py-0.5 rounded text-[10px] font-bold"
+                            [ngClass]="c.isExisting ? 'bg-sky-50 text-sky-800 border border-sky-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'"
+                          >
+                            {{ c.isExisting ? 'Existing' : 'Proposed' }}
+                          </span>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
               </div>
             </div>
 
             <!-- ================================================================
                  2. PAST SKILL TRAINING & PLACEMENT TRACK RECORD
                  ================================================================ -->
-            <div id="placement-section" class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-4 shadow-xs">
-              <div class="pb-2 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+            <div id="placement-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
+              <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <h3 class="text-sm sm:text-base font-bold text-[#0B3558] flex items-center gap-2">
                     <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">2</span>
@@ -1002,306 +839,361 @@ export interface EoiDocumentItem {
                     Sector-wise candidate training and verified wage placement performance.
                   </p>
                 </div>
-              </div>
-
-              <!-- Inline Entry Form -->
-              <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-4 space-y-3 text-xs">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                  <div class="lg:col-span-2">
-                    <label class="block text-slate-600 mb-1 font-medium">Sector Name *</label>
-                    <input
-                      type="text"
-                      [(ngModel)]="newPlacement.sector"
-                      placeholder="e.g. Healthcare / IT / Apparel"
-                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-slate-600 mb-1 font-medium">Financial Year</label>
-                    <select
-                      [(ngModel)]="newPlacement.year"
-                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                    >
-                      <option value="2023 - 2024">2023 - 2024</option>
-                      <option value="2022 - 2023">2022 - 2023</option>
-                      <option value="2021 - 2022">2021 - 2022</option>
-                      <option value="2020 - 2021">2020 - 2021</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-slate-600 mb-1 font-medium">Trained (Nos) *</label>
-                    <input
-                      type="number"
-                      [(ngModel)]="newPlacement.trained"
-                      placeholder="500"
-                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-slate-600 mb-1 font-medium">Placed (Nos) *</label>
-                    <input
-                      type="number"
-                      [(ngModel)]="newPlacement.placed"
-                      placeholder="350"
-                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                    />
-                  </div>
-                </div>
-
-                <div class="flex items-center justify-between pt-1 gap-2 flex-wrap">
-                  <div class="flex-1 min-w-[220px]">
-                    <input
-                      type="text"
-                      [(ngModel)]="newPlacement.proofDoc"
-                      placeholder="Proof Document reference: e.g. placement_proof_certified.pdf"
-                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                    />
-                  </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
+                    {{ placementRecords.length }} Records Added
+                  </span>
                   <button
                     type="button"
-                    (click)="saveNewPlacement()"
-                    class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer shrink-0 shadow-2xs"
+                    (click)="showAddPlacementForm.set(!showAddPlacementForm())"
+                    class="px-3 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1 cursor-pointer"
                   >
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span>Add Placement Record</span>
+                    <span>{{ showAddPlacementForm() ? '✕ Close Form' : '+ Add Placement Record' }}</span>
                   </button>
                 </div>
               </div>
 
-              @if (placementRecords.length === 0) {
-                <div class="p-4 border border-slate-200 rounded-lg text-center bg-slate-50 text-xs text-slate-500">
-                  No past placement records added yet. Fill the fields above to add records.
-                </div>
-              } @else {
-                <div class="overflow-x-auto border border-slate-200 rounded-xl">
-                  <table class="w-full text-left border-collapse text-xs">
-                    <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
-                      <tr>
-                        <th class="py-2.5 px-3">Sector</th>
-                        <th class="py-2.5 px-2">FY</th>
-                        <th class="py-2.5 px-2 text-center">Trained</th>
-                        <th class="py-2.5 px-2 text-center">Placed</th>
-                        <th class="py-2.5 px-2 text-right">Proof</th>
-                        <th class="py-2.5 px-2 text-center">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 font-normal">
-                      @for (p of placementRecords; track p.sector; let idx = $index) {
-                        <tr>
-                          <td class="py-2.5 px-3 font-semibold text-slate-800">{{ p.sector }}</td>
-                          <td class="py-2.5 px-2 text-slate-600 font-mono text-[11px]">{{ p.year }}</td>
-                          <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ p.trained }}</td>
-                          <td class="py-2.5 px-2 text-center font-bold text-emerald-700">{{ p.placed }}</td>
-                          <td class="py-2.5 px-2 text-right text-[11px] text-slate-500 font-mono">{{ p.proofDoc }}</td>
-                          <td class="py-2.5 px-2 text-center">
-                            <button
-                              type="button"
-                              (click)="removePlacement(idx)"
-                              class="text-rose-500 hover:text-rose-700 text-sm font-semibold cursor-pointer p-1"
-                              title="Remove Record"
-                            >
-                              &times;
-                            </button>
-                          </td>
-                        </tr>
-                      }
-                    </tbody>
-                  </table>
+              <!-- Inline Entry Form -->
+              @if (showAddPlacementForm()) {
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 text-xs">
+                  <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                    <span class="font-bold text-[#0B3558]">New Placement Record Entry</span>
+                    <button
+                      type="button"
+                      (click)="showAddPlacementForm.set(false)"
+                      class="text-slate-500 hover:text-slate-800 cursor-pointer"
+                    >
+                      ✕ Close
+                    </button>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                    <div class="lg:col-span-2">
+                      <label class="block text-slate-600 mb-1 font-medium">Sector Name *</label>
+                      <input
+                        type="text"
+                        [(ngModel)]="newPlacement.sector"
+                        placeholder="e.g. Healthcare / IT-ITeS / Apparel"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Financial Year</label>
+                      <select
+                        [(ngModel)]="newPlacement.year"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      >
+                        <option value="2024 - 2025">2024 - 2025</option>
+                        <option value="2023 - 2024">2023 - 2024</option>
+                        <option value="2022 - 2023">2022 - 2023</option>
+                        <option value="2021 - 2022">2021 - 2022</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Trained (Nos) *</label>
+                      <input
+                        type="number"
+                        [(ngModel)]="newPlacement.trained"
+                        placeholder="500"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Placed (Nos) *</label>
+                      <input
+                        type="number"
+                        [(ngModel)]="newPlacement.placed"
+                        placeholder="350"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="flex items-center justify-between pt-1 gap-2 flex-wrap">
+                    <div class="flex-1 min-w-55">
+                      <input
+                        type="text"
+                        [(ngModel)]="newPlacement.proofDoc"
+                        placeholder="Proof Document: e.g. Healthcare_Placement_Report_Certified.pdf"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                    <div class="flex gap-2">
+                      <button
+                        type="button"
+                        (click)="showAddPlacementForm.set(false)"
+                        class="px-3.5 py-1.5 border border-slate-300 hover:bg-slate-100 rounded text-xs font-semibold text-slate-700 cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        (click)="saveNewPlacement()"
+                        class="px-4 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-semibold transition-colors cursor-pointer shrink-0 shadow-2xs"
+                      >
+                        Save Placement Record
+                      </button>
+                    </div>
+                  </div>
                 </div>
               }
+
+              <!-- Table -->
+              <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th class="py-2.5 px-3">Sector</th>
+                      <th class="py-2.5 px-2">FY</th>
+                      <th class="py-2.5 px-2 text-center">Trained</th>
+                      <th class="py-2.5 px-2 text-center">Placed</th>
+                      <th class="py-2.5 px-2 text-center">Placement Rate</th>
+                      <th class="py-2.5 px-2 text-right">Proof Document</th>
+                      <th class="py-2.5 px-2 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 font-normal">
+                    @for (p of placementRecords; track p.sector; let idx = $index) {
+                      <tr class="hover:bg-slate-50/70">
+                        <td class="py-2.5 px-3 font-semibold text-slate-800">{{ p.sector }}</td>
+                        <td class="py-2.5 px-2 text-slate-600 font-mono text-[11px]">{{ p.year }}</td>
+                        <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ p.trained }}</td>
+                        <td class="py-2.5 px-2 text-center font-bold text-emerald-700">{{ p.placed }}</td>
+                        <td class="py-2.5 px-2 text-center font-bold text-emerald-800">
+                          {{ (p.trained && p.trained > 0) ? ((p.placed / p.trained) * 100).toFixed(1) + '%' : '-' }}
+                        </td>
+                        <td class="py-2.5 px-2 text-right text-[11px] text-slate-500 font-mono">{{ p.proofDoc }}</td>
+                        <td class="py-2.5 px-2 text-center">
+                          <button
+                            type="button"
+                            (click)="removePlacement(idx)"
+                            class="text-rose-500 hover:text-rose-700 text-sm font-semibold cursor-pointer p-1"
+                            title="Remove Record"
+                          >
+                            &times;
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             <!-- ================================================================
                  3. ANNUAL ACTION PLAN (TARGET DISTRICTS & BATCHES)
                  ================================================================ -->
-            <div id="action-plan-section" class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-4 shadow-xs">
-              <div class="pb-2 border-b border-slate-100">
-                <h3 class="text-sm sm:text-base font-bold text-[#0B3558] flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">3</span>
-                  Proposed Annual Action Plan (Target Districts &amp; Batches)
-                </h3>
-                <p class="text-xs text-slate-500 mt-0.5">
-                  Proposed Skill Development Centres (SDCs), sectors, course trades, and committed batches.
-                </p>
-              </div>
-
-              <!-- Inline Entry Form -->
-              <div class="bg-slate-50/80 border border-slate-200 rounded-xl p-4 space-y-3 text-xs">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                  <div>
-                    <label class="block text-slate-600 mb-1 font-medium">Target District *</label>
-                    <input
-                      type="text"
-                      [(ngModel)]="newActionPlan.district"
-                      placeholder="e.g. Alwar / Jaipur / Udaipur"
-                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-slate-600 mb-1 font-medium">Year</label>
-                    <input
-                      type="text"
-                      [(ngModel)]="newActionPlan.year"
-                      placeholder="2025-2026"
-                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-slate-600 mb-1 font-medium">Proposed SDCs Count</label>
-                    <input
-                      type="number"
-                      [(ngModel)]="newActionPlan.sdcCount"
-                      min="1"
-                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-slate-600 mb-1 font-medium">SDC Location / Block</label>
-                    <input
-                      type="text"
-                      [(ngModel)]="newActionPlan.location"
-                      placeholder="e.g. Tehsil / Block name"
-                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                    />
-                  </div>
-                  <div class="lg:col-span-2">
-                    <label class="block text-slate-600 mb-1 font-medium">Proposed Sectors</label>
-                    <input
-                      type="text"
-                      [(ngModel)]="newActionPlan.sectors"
-                      placeholder="e.g. IT, Healthcare, Apparel, Electronics"
-                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-slate-600 mb-1 font-medium">Training Mode</label>
-                    <select
-                      [(ngModel)]="newActionPlan.mode"
-                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                    >
-                      <option value="Both">Both (Residential &amp; Non-Res)</option>
-                      <option value="Residential">Residential</option>
-                      <option value="Non-Residential">Non-Residential</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-slate-600 mb-1 font-medium">Committed Batches</label>
-                    <input
-                      type="number"
-                      [(ngModel)]="newActionPlan.batches"
-                      min="1"
-                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                    />
-                  </div>
+            <div id="action-plan-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
+              <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558] flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">3</span>
+                    Proposed Annual Action Plan (Target Districts &amp; Batches)
+                  </h3>
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    Proposed Skill Development Centres (SDCs), sectors, course trades, and committed batches.
+                  </p>
                 </div>
-
-                <div class="flex items-center justify-between pt-1 gap-2 flex-wrap">
-                  <div class="flex-1 min-w-[220px]">
-                    <input
-                      type="text"
-                      [(ngModel)]="newActionPlan.courses"
-                      placeholder="Course / Trade: Assistant Technician Computer Hardware cum DEO"
-                      class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
-                    />
-                  </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 rounded bg-sky-50 text-[#0B3558] text-xs font-semibold border border-sky-200">
+                    {{ actionPlan.length }} District Plan(s)
+                  </span>
                   <button
                     type="button"
-                    (click)="saveNewActionPlan()"
-                    class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 shadow-2xs"
+                    (click)="showAddActionPlanForm.set(!showAddActionPlanForm())"
+                    class="px-3 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1 cursor-pointer"
                   >
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span>Add District Action Plan</span>
+                    <span>{{ showAddActionPlanForm() ? '✕ Close Form' : '+ Add District / Centre Plan' }}</span>
                   </button>
                 </div>
               </div>
 
-              @if (actionPlan.length === 0) {
-                <div class="p-4 border border-slate-200 rounded-lg text-center bg-slate-50 text-xs text-slate-500">
-                  No annual district action plan added yet. Fill the fields above to commit target districts.
-                </div>
-              } @else {
-                <div class="overflow-x-auto border border-slate-200 rounded-xl">
-                  <table class="w-full text-left border-collapse text-xs">
-                    <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
-                      <tr>
-                        <th class="py-2.5 px-2 w-10 text-center">S.No</th>
-                        <th class="py-2.5 px-3">Year</th>
-                        <th class="py-2.5 px-3">Proposed District</th>
-                        <th class="py-2.5 px-2 text-center">SDCs</th>
-                        <th class="py-2.5 px-3">SDC Location</th>
-                        <th class="py-2.5 px-3">Proposed Sectors</th>
-                        <th class="py-2.5 px-3">Course / Trade</th>
-                        <th class="py-2.5 px-2 text-center">Mode</th>
-                        <th class="py-2.5 px-2 text-center">Batches</th>
-                        <th class="py-2.5 px-2 text-center">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 font-normal">
-                      @for (ap of actionPlan; track ap.id; let idx = $index) {
-                        <tr>
-                          <td class="py-2.5 px-2 text-center text-slate-400 font-bold">{{ idx + 1 }}</td>
-                          <td class="py-2.5 px-3 font-mono text-[11px]">{{ ap.year }}</td>
-                          <td class="py-2.5 px-3 font-semibold text-slate-800">{{ ap.district }}</td>
-                          <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ ap.sdcCount }}</td>
-                          <td class="py-2.5 px-3 text-slate-600">{{ ap.location }}</td>
-                          <td class="py-2.5 px-3 text-slate-700">{{ ap.sectors }}</td>
-                          <td class="py-2.5 px-3 text-slate-700 max-w-xs truncate">{{ ap.courses }}</td>
-                          <td class="py-2.5 px-2 text-center text-emerald-700 font-medium">{{ ap.mode }}</td>
-                          <td class="py-2.5 px-2 text-center font-bold text-slate-900">{{ ap.batches }}</td>
-                          <td class="py-2.5 px-2 text-center">
-                            <button
-                              type="button"
-                              (click)="removeActionPlan(idx)"
-                              class="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer p-1"
-                              title="Remove Plan"
-                            >
-                              &times;
-                            </button>
-                          </td>
-                        </tr>
-                      }
-                    </tbody>
-                  </table>
+              <!-- Inline Entry Form -->
+              @if (showAddActionPlanForm()) {
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 text-xs">
+                  <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                    <span class="font-bold text-[#0B3558]">New District / Centre Action Plan Entry</span>
+                    <button
+                      type="button"
+                      (click)="showAddActionPlanForm.set(false)"
+                      class="text-slate-500 hover:text-slate-800 cursor-pointer"
+                    >
+                      ✕ Close
+                    </button>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Target District *</label>
+                      <input
+                        type="text"
+                        [(ngModel)]="newActionPlan.district"
+                        placeholder="e.g. Alwar / Jaipur / Kota"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Year</label>
+                      <input
+                        type="text"
+                        [(ngModel)]="newActionPlan.year"
+                        placeholder="2025-2026"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Proposed SDCs Count</label>
+                      <input
+                        type="number"
+                        [(ngModel)]="newActionPlan.sdcCount"
+                        min="1"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">SDC Locations / Centre Names</label>
+                      <input
+                        type="text"
+                        [(ngModel)]="newActionPlan.location"
+                        placeholder="e.g. Main SDC Hub & Rural Centre"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                    <div class="lg:col-span-2">
+                      <label class="block text-slate-600 mb-1 font-medium">Proposed Sectors</label>
+                      <input
+                        type="text"
+                        [(ngModel)]="newActionPlan.sectors"
+                        placeholder="e.g. IT, Healthcare, Apparel, Electronics"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Training Mode</label>
+                      <select
+                        [(ngModel)]="newActionPlan.mode"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      >
+                        <option value="Both">Both (Residential &amp; Non-Res)</option>
+                        <option value="Residential">Residential</option>
+                        <option value="Non-Residential">Non-Residential</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-slate-600 mb-1 font-medium">Committed Batches</label>
+                      <input
+                        type="number"
+                        [(ngModel)]="newActionPlan.batches"
+                        min="1"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="flex items-center justify-between pt-1 gap-2 flex-wrap">
+                    <div class="flex-1 min-w-55">
+                      <input
+                        type="text"
+                        [(ngModel)]="newActionPlan.courses"
+                        placeholder="Course / Trade: e.g. Data Entry Operator, General Duty Assistant"
+                        class="w-full p-2 border border-slate-300 rounded bg-white text-xs focus:ring-1 focus:ring-[#0B3558]"
+                      />
+                    </div>
+                    <div class="flex gap-2">
+                      <button
+                        type="button"
+                        (click)="showAddActionPlanForm.set(false)"
+                        class="px-3.5 py-1.5 border border-slate-300 hover:bg-slate-100 rounded text-xs font-semibold text-slate-700 cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        (click)="saveNewActionPlan()"
+                        class="px-4 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-semibold transition-colors cursor-pointer shrink-0 shadow-2xs"
+                      >
+                        Save Action Plan
+                      </button>
+                    </div>
+                  </div>
                 </div>
               }
+
+              <!-- Table -->
+              <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th class="py-2.5 px-2 w-10 text-center">S.No</th>
+                      <th class="py-2.5 px-3">Year</th>
+                      <th class="py-2.5 px-3">Proposed District</th>
+                      <th class="py-2.5 px-2 text-center">SDCs</th>
+                      <th class="py-2.5 px-3">SDC Location / Centres</th>
+                      <th class="py-2.5 px-3">Proposed Sectors</th>
+                      <th class="py-2.5 px-3">Course / Trade</th>
+                      <th class="py-2.5 px-2 text-center">Mode</th>
+                      <th class="py-2.5 px-2 text-center">Batches</th>
+                      <th class="py-2.5 px-2 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 font-normal">
+                    @for (ap of actionPlan; track ap.id; let idx = $index) {
+                      <tr class="hover:bg-slate-50/70">
+                        <td class="py-2.5 px-2 text-center text-slate-400 font-bold">{{ idx + 1 }}</td>
+                        <td class="py-2.5 px-3 font-mono text-[11px]">{{ ap.year }}</td>
+                        <td class="py-2.5 px-3 font-semibold text-slate-800">{{ ap.district }}</td>
+                        <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ ap.sdcCount }}</td>
+                        <td class="py-2.5 px-3 text-slate-600">{{ ap.location }}</td>
+                        <td class="py-2.5 px-3 text-slate-700">{{ ap.sectors }}</td>
+                        <td class="py-2.5 px-3 text-slate-700 max-w-xs truncate">{{ ap.courses }}</td>
+                        <td class="py-2.5 px-2 text-center text-emerald-700 font-medium">{{ ap.mode }}</td>
+                        <td class="py-2.5 px-2 text-center font-bold text-slate-900">{{ ap.batches }}</td>
+                        <td class="py-2.5 px-2 text-center">
+                          <button
+                            type="button"
+                            (click)="removeActionPlan(idx)"
+                            class="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer p-1"
+                            title="Remove Plan"
+                          >
+                            &times;
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             <!-- ================================================================
                  4. EOI DOCUMENTS CHECKLIST (Categorized: Mandatory, Annexures, Remaining)
                  ================================================================ -->
-            <div id="documents-section" class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-4 shadow-xs">
-              <div class="pb-2 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+            <div id="documents-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
+              <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <h3 class="text-sm sm:text-base font-bold text-[#0B3558] flex items-center gap-2">
                     <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">4</span>
-                    Mandatory EOI Proposal Documents Checklist ({{ eoiDocuments.length }} Documents)
+                    Mandatory EOI Proposal Documents Checklist ({{ eoiDocuments().length }} Documents)
                   </h3>
                   <p class="text-xs text-slate-500 mt-0.5">
-                    Separated into Mandatory Statutory Documents, Official Scheme Annexures, and Remaining Supporting Documents.
+                    Separated into Mandatory Statutory Documents, Official Scheme Annexures, and Supporting Documents.
                   </p>
                 </div>
                 <div class="flex items-center gap-2">
                   <span class="px-2.5 py-1 rounded bg-blue-50 text-[#0B3558] text-xs font-semibold border border-blue-200">
-                    {{ attachedDocsCount() }} / {{ eoiDocuments.length }} Attached
+                    {{ attachedDocsCount() }} / {{ eoiDocuments().length }} Attached
                   </span>
                   <button
                     type="button"
                     (click)="attachAllSampleDocs()"
                     class="px-3 py-1 bg-white hover:bg-slate-50 text-[#0B3558] text-xs font-semibold border border-slate-300 rounded cursor-pointer transition-colors shadow-2xs flex items-center gap-1.5"
                   >
-                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                    </svg>
                     <span>Attach All Mandated Annexures</span>
                   </button>
                 </div>
               </div>
 
-              <!-- 3 Filter Tabs for Separately Showing Documents -->
+              <!-- Filter Tabs for Documents -->
               <div class="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto text-xs">
                 <button
                   type="button"
@@ -1309,7 +1201,7 @@ export interface EoiDocumentItem {
                   class="px-3 py-1.5 rounded-lg font-semibold cursor-pointer transition-colors"
                   [ngClass]="selectedDocTab() === 'all' ? 'bg-[#0B3558] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
                 >
-                  All Documents ({{ eoiDocuments.length }})
+                  All Documents ({{ eoiDocuments().length }})
                 </button>
                 <button
                   type="button"
@@ -1346,10 +1238,10 @@ export interface EoiDocumentItem {
                 </button>
               </div>
 
-              <!-- Documents List -->
-              <div class="space-y-2.5">
+              <!-- Compact 2-Column Documents Grid for Minimum Scrolling -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                 @for (doc of filteredDocuments(); track doc.id) {
-                  <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                  <div class="p-3 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between gap-2.5 text-xs">
                     <input
                       #fileInput
                       type="file"
@@ -1357,9 +1249,9 @@ export interface EoiDocumentItem {
                       class="hidden"
                       (change)="onFileSelected($event, doc)"
                     />
-                    <div class="flex items-start gap-3">
+                    <div class="flex items-start gap-2.5 min-w-0">
                       <span
-                        class="w-6 h-6 rounded-full font-bold text-[11px] flex items-center justify-center shrink-0 mt-0.5"
+                        class="w-5 h-5 rounded-full font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5"
                         [ngClass]="{
                           'bg-rose-100 text-rose-700': doc.category === 'mandatory',
                           'bg-sky-100 text-sky-800': doc.category === 'annexure',
@@ -1368,54 +1260,47 @@ export interface EoiDocumentItem {
                       >
                         {{ doc.id }}
                       </span>
-                      <div>
-                        <div class="flex items-center gap-2 flex-wrap">
-                          <span class="font-semibold text-slate-900 text-xs sm:text-[13px]">{{ doc.name }}</span>
+                      <div class="min-w-0">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                          <span class="font-semibold text-slate-900 text-xs truncate max-w-xs sm:max-w-md">{{ doc.name }}</span>
                           <span
-                            class="px-1.5 py-0.2 rounded text-[10px] font-bold"
+                            class="px-1.5 py-0.2 rounded text-[9.5px] font-bold shrink-0"
                             [ngClass]="{
                               'bg-rose-50 text-rose-700 border border-rose-200': doc.category === 'mandatory',
                               'bg-sky-50 text-sky-700 border border-sky-200': doc.category === 'annexure',
                               'bg-slate-100 text-slate-600 border border-slate-300': doc.category === 'remaining'
                             }"
                           >
-                            {{ doc.category === 'mandatory' ? 'Mandatory' : (doc.category === 'annexure' ? 'Annexure' : 'Remaining') }}
+                            {{ doc.category === 'mandatory' ? 'Mandatory' : (doc.category === 'annexure' ? 'Annexure' : 'Supporting') }}
                           </span>
                         </div>
-                        <p class="text-[11px] text-slate-500 mt-0.5">{{ doc.description }}</p>
 
                         @if (doc.status === 'uploaded') {
-                          <div class="flex items-center gap-2 mt-1.5 text-[11px] text-slate-500 font-mono">
-                            <div class="w-4 h-4 rounded bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
-                              <svg class="w-3 h-3 text-rose-600" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v-1h2c.28 0 .5-.22.5-.5s-.22-.5-.5-.5h-3v5h1v-1.5h1.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5zm5 2c0 .28-.22.5-.5.5h-2.5v-5h2.5c.28 0 .5.22.5.5v4zm-1-3.5h-1v3h1v-3zm5-.5h-2v1h1.5c.28 0 .5.22.5.5s-.22.5-.5.5H19v1.5h-1v-5h2.5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
-                              </svg>
-                            </div>
-                            <span class="text-slate-800 font-medium">{{ doc.fileName }}</span>
-                            <span>({{ doc.fileSize }})</span>
-                            <span class="text-slate-400">&bull; {{ doc.uploadedDate }}</span>
+                          <div class="flex items-center gap-1.5 mt-1 text-[11px] text-emerald-700 font-mono truncate">
+                            <span class="font-medium truncate">{{ doc.fileName }}</span>
+                            <span class="text-slate-400 shrink-0">({{ doc.fileSize }})</span>
                           </div>
                         } @else {
-                          <div class="mt-1 text-[11px] text-amber-700 font-medium">
-                            Status: Pending upload (Required for scrutiny)
+                          <div class="mt-0.5 text-[10.5px] text-amber-700 font-medium">
+                            Pending upload
                           </div>
                         }
                       </div>
                     </div>
 
-                    <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                    <div class="flex items-center gap-1.5 shrink-0">
                       @if (doc.status === 'uploaded') {
                         <button
                           type="button"
                           (click)="previewDoc(doc)"
-                          class="px-3 py-1 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded text-xs font-semibold cursor-pointer shadow-2xs"
+                          class="px-2.5 py-1 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded text-xs font-semibold cursor-pointer shadow-2xs"
                         >
                           View
                         </button>
                         <button
                           type="button"
                           (click)="removeDoc(doc)"
-                          class="px-3 py-1 bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 rounded text-xs font-semibold cursor-pointer shadow-2xs"
+                          class="px-2.5 py-1 bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 rounded text-xs font-semibold cursor-pointer shadow-2xs"
                         >
                           Remove
                         </button>
@@ -1423,12 +1308,9 @@ export interface EoiDocumentItem {
                         <button
                           type="button"
                           (click)="fileInput.click()"
-                          class="px-3.5 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold cursor-pointer shadow-2xs flex items-center gap-1.5"
+                          class="px-3 py-1 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold cursor-pointer shadow-2xs"
                         >
-                          <svg class="w-3.5 h-3.5 text-rose-300" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v-1h2c.28 0 .5-.22.5-.5s-.22-.5-.5-.5h-3v5h1v-1.5h1.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5zm5 2c0 .28-.22.5-.5.5h-2.5v-5h2.5c.28 0 .5.22.5.5v4zm-1-3.5h-1v3h1v-3zm5-.5h-2v1h1.5c.28 0 .5.22.5.5s-.22.5-.5.5H19v1.5h-1v-5h2.5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
-                          </svg>
-                          <span>Upload PDF</span>
+                          Upload PDF
                         </button>
                       }
                     </div>
@@ -1444,7 +1326,7 @@ export interface EoiDocumentItem {
                 (click)="goToStep(1)"
                 class="px-5 py-2.5 border border-slate-300 hover:bg-slate-100 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 cursor-pointer transition-colors"
               >
-                &larr; Back to OTR Profile
+                &larr; Back to Company Profile
               </button>
 
               <button
@@ -1721,7 +1603,7 @@ export interface EoiDocumentItem {
                 <div class="flex items-center gap-2">
                   <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">F</span>
                   <h3 class="text-sm font-bold text-[#0B3558]">
-                    EOI Proposal Documents Checklist ({{ attachedDocsCount() }} / {{ eoiDocuments.length }} Attached)
+                    EOI Proposal Documents Checklist ({{ attachedDocsCount() }} / {{ eoiDocuments().length }} Attached)
                   </h3>
                 </div>
                 <button
@@ -1737,7 +1619,7 @@ export interface EoiDocumentItem {
               </div>
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                @for (d of eoiDocuments; track d.id) {
+                @for (d of eoiDocuments(); track d.id) {
                   <div class="p-2.5 rounded-lg border border-slate-200 flex items-center justify-between bg-slate-50/60">
                     <div class="flex items-center gap-2 max-w-[72%]">
                       <div class="w-4 h-4 rounded bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
@@ -1788,7 +1670,9 @@ export interface EoiDocumentItem {
                 type="button"
                 [disabled]="!declarationAgreed()"
                 (click)="openSubmitConfirm()"
-                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2"
+                [class.cursor-pointer]="declarationAgreed()"
+                [class.cursor-not-allowed]="!declarationAgreed()"
               >
                 <span>Submit EOI Proposal &amp; Pay Fees</span>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -2049,7 +1933,7 @@ export interface EoiDocumentItem {
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">Attached Documents</span>
-                  <span class="font-bold text-slate-800">{{ attachedDocsCount() }} / {{ eoiDocuments.length }} Documents</span>
+                  <span class="font-bold text-slate-800">{{ attachedDocsCount() }} / {{ eoiDocuments().length }} Documents</span>
                 </div>
               </div>
 
@@ -2199,6 +2083,30 @@ export class SchemeFormComponent {
 
   isEditingOtr = signal<boolean>(false);
 
+  get registeredAddressText(): string {
+    const s = this.editableStep1;
+    if (!s) return '-';
+    const parts = [s.registeredAddress, s.registeredDistrict, s.registeredState];
+    let str = parts.filter(p => !!p && p.trim().length > 0).join(', ');
+    if (s.registeredPincode?.trim()) str += (str ? ' - ' : '') + s.registeredPincode.trim();
+    return str || s.registeredAddress || '-';
+  }
+
+  get officeAddressText(): string {
+    const s = this.editableStep1;
+    if (!s) return '-';
+    if (s.sameAsRegistered) return 'Same as Registered Address';
+    const parts = [s.officeAddress, s.officeDistrict, s.officeState];
+    let str = parts.filter(p => !!p && p.trim().length > 0).join(', ');
+    if (s.officePincode?.trim()) str += (str ? ' - ' : '') + s.officePincode.trim();
+    return str || s.officeAddress || '-';
+  }
+
+  get residenceAddressText(): string {
+    const s = this.editableStep3;
+    return s?.residenceAddress || '-';
+  }
+
   goBack(): void {
     this.location.back();
   }
@@ -2309,6 +2217,11 @@ export class SchemeFormComponent {
     return [...selectedExisting, ...this.newProposedCentres];
   });
 
+  /** All available centres (existing from profile + newly proposed) */
+  readonly allCentres = computed<TrainingCenterItem[]>(() => {
+    return [...this.existingCentres, ...this.newProposedCentres];
+  });
+
   isCentreSelectedForScheme(id: string): boolean {
     return this.selectedExistingCentreIds().includes(id);
   }
@@ -2375,6 +2288,7 @@ export class SchemeFormComponent {
     };
 
     this.newProposedCentres.push(item);
+    this.selectedExistingCentreIds.set([...this.selectedExistingCentreIds(), item.id]);
     this.showNewCentreForm.set(false);
     this.newCentre = {
       district: '',
@@ -2392,14 +2306,37 @@ export class SchemeFormComponent {
   }
 
   // Training & Placement
+  showAddPlacementForm = signal<boolean>(false);
   newPlacement = {
     sector: '',
-    year: '2023 - 2024',
+    year: '2024 - 2025',
     trained: null as number | null,
     placed: null as number | null,
     proofDoc: ''
   };
-  placementRecords: TrainingPlacementRecord[] = [];
+  placementRecords: TrainingPlacementRecord[] = [
+    {
+      sector: 'Healthcare & Paramedics',
+      year: '2024 - 2025',
+      trained: 450,
+      placed: 340,
+      proofDoc: 'Healthcare_Placement_Audit_2024-25.pdf'
+    },
+    {
+      sector: 'IT-ITeS & Digital Services',
+      year: '2023 - 2024',
+      trained: 600,
+      placed: 465,
+      proofDoc: 'IT_Placement_Certified_2023-24.pdf'
+    },
+    {
+      sector: 'Apparel & Made-ups',
+      year: '2022 - 2023',
+      trained: 380,
+      placed: 285,
+      proofDoc: 'Apparel_Placement_Report_2022-23.pdf'
+    }
+  ];
 
   saveNewPlacement(): void {
     if (!this.newPlacement.sector) {
@@ -2408,15 +2345,16 @@ export class SchemeFormComponent {
     }
     const item: TrainingPlacementRecord = {
       sector: this.newPlacement.sector,
-      year: this.newPlacement.year || '2023 - 2024',
+      year: this.newPlacement.year || '2024 - 2025',
       trained: Number(this.newPlacement.trained) || 0,
       placed: Number(this.newPlacement.placed) || 0,
-      proofDoc: this.newPlacement.proofDoc || 'placement_proof.pdf'
+      proofDoc: this.newPlacement.proofDoc || 'Placement_Proof_Certified.pdf'
     };
     this.placementRecords.push(item);
+    this.showAddPlacementForm.set(false);
     this.newPlacement = {
       sector: '',
-      year: '2023 - 2024',
+      year: '2024 - 2025',
       trained: null,
       placed: null,
       proofDoc: ''
@@ -2428,6 +2366,7 @@ export class SchemeFormComponent {
   }
 
   // Annual Action Plan
+  showAddActionPlanForm = signal<boolean>(false);
   newActionPlan = {
     year: '2025-2026',
     district: '',
@@ -2438,11 +2377,45 @@ export class SchemeFormComponent {
     mode: 'Both' as 'Residential' | 'Non-Residential' | 'Both',
     batches: 10 as number | null
   };
-  actionPlan: ActionPlanDistrict[] = [];
+  actionPlan: ActionPlanDistrict[] = [
+    {
+      id: 'ap-1',
+      year: '2025-2026',
+      district: 'Jaipur',
+      sdcCount: 2,
+      location: 'Jaipur City SDC & Sanganer SDC Hub',
+      sectors: 'IT-ITeS, Healthcare & Apparel',
+      courses: 'Data Entry Operator, General Duty Assistant',
+      mode: 'Both',
+      batches: 15
+    },
+    {
+      id: 'ap-2',
+      year: '2025-2026',
+      district: 'Alwar',
+      sdcCount: 2,
+      location: 'Alwar Central SDC & Bhiwadi Technical SDC',
+      sectors: 'Automotive & Electronics',
+      courses: 'Automotive Assembly Technician, Electrician',
+      mode: 'Both',
+      batches: 10
+    },
+    {
+      id: 'ap-3',
+      year: '2025-2026',
+      district: 'Jodhpur',
+      sdcCount: 1,
+      location: 'Jodhpur Industrial SDC Hub',
+      sectors: 'Multi-Skills & Digital Services',
+      courses: 'Solar Panel Installation, Digital Office Associate',
+      mode: 'Residential',
+      batches: 8
+    }
+  ];
 
   saveNewActionPlan(): void {
     if (!this.newActionPlan.district) {
-      alert('Please enter Proposed District');
+      alert('Please enter Target District');
       return;
     }
     const item: ActionPlanDistrict = {
@@ -2450,13 +2423,14 @@ export class SchemeFormComponent {
       year: this.newActionPlan.year || '2025-2026',
       district: this.newActionPlan.district,
       sdcCount: Number(this.newActionPlan.sdcCount) || 1,
-      location: this.newActionPlan.location || this.newActionPlan.district,
-      sectors: this.newActionPlan.sectors || 'Multi-Skills',
-      courses: this.newActionPlan.courses || 'Skill Development Trade',
+      location: this.newActionPlan.location || (this.newActionPlan.district + ' SDC Centre'),
+      sectors: this.newActionPlan.sectors || 'Multi-Skills & Vocational Trades',
+      courses: this.newActionPlan.courses || 'Skill Training Course',
       mode: this.newActionPlan.mode || 'Both',
-      batches: Number(this.newActionPlan.batches) || 1
+      batches: Number(this.newActionPlan.batches) || 5
     };
     this.actionPlan.push(item);
+    this.showAddActionPlanForm.set(false);
     this.newActionPlan = {
       year: '2025-2026',
       district: '',
@@ -2476,13 +2450,24 @@ export class SchemeFormComponent {
   // Documents Tab Filter
   selectedDocTab = signal<'all' | 'mandatory' | 'annexure' | 'remaining'>('all');
 
-  /** 16 Proposal Documents categorized into Mandatory, Annexures, and Remaining */
-  eoiDocuments: EoiDocumentItem[] = [
+  /** 16 Proposal Documents with clean wording (no duplicate Annexure mentions) */
+  eoiDocuments = signal<EoiDocumentItem[]>([
     // 1. Mandatory Statutory Documents
     {
+      id: 1,
+      name: 'Covering Letter (Annexure 1)',
+      description: 'Official proposal submission covering letter on organization letterhead',
+      fileName: '',
+      fileSize: '',
+      uploadedDate: '',
+      isMandatory: true,
+      status: 'pending',
+      category: 'mandatory'
+    },
+    {
       id: 2,
-      name: 'Annexure-1: Covering Letter as per Annexure-1',
-      description: 'Official proposal submission covering letter on letterhead',
+      name: 'Audited Financial Statements (Annexure 3)',
+      description: 'CA certified balance sheet and P&L accounts for last 3 consecutive financial years',
       fileName: '',
       fileSize: '',
       uploadedDate: '',
@@ -2492,18 +2477,7 @@ export class SchemeFormComponent {
     },
     {
       id: 3,
-      name: 'Annexure-3: Audited Financial Statements for last 3 consecutive financial years',
-      description: 'CA certified balance sheet and P&L accounts',
-      fileName: '',
-      fileSize: '',
-      uploadedDate: '',
-      isMandatory: true,
-      status: 'pending',
-      category: 'mandatory'
-    },
-    {
-      id: 5,
-      name: 'Annexure-6: An affidavit for not being blacklisted',
+      name: 'Anti-Blacklisting Notarized Affidavit (Annexure 6)',
       description: 'Non-judicial notary stamped anti-blacklisting undertaking',
       fileName: '',
       fileSize: '',
@@ -2513,31 +2487,31 @@ export class SchemeFormComponent {
       category: 'mandatory'
     },
     {
+      id: 4,
+      name: 'Statutory Compliance Self-Declaration (Annexure 7)',
+      description: 'Statutory compliance self-declaration on corporate letterhead',
+      fileName: '',
+      fileSize: '',
+      uploadedDate: '',
+      isMandatory: true,
+      status: 'pending',
+      category: 'mandatory'
+    },
+    {
+      id: 5,
+      name: 'Signed & Sealed EOI Document',
+      description: 'Complete downloaded RFP document signed and sealed on all pages',
+      fileName: '',
+      fileSize: '',
+      uploadedDate: '',
+      isMandatory: true,
+      status: 'pending',
+      category: 'mandatory'
+    },
+    {
       id: 6,
-      name: 'Annexure-7: Self-certificate / declaration as per Annexure-7',
-      description: 'Statutory compliance self-declaration',
-      fileName: '',
-      fileSize: '',
-      uploadedDate: '',
-      isMandatory: true,
-      status: 'pending',
-      category: 'mandatory'
-    },
-    {
-      id: 7,
-      name: 'Copy of EOI Document with sign and seal on each page',
-      description: 'Complete downloaded RFP document signed on all pages',
-      fileName: '',
-      fileSize: '',
-      uploadedDate: '',
-      isMandatory: true,
-      status: 'pending',
-      category: 'mandatory'
-    },
-    {
-      id: 16,
-      name: 'Not Blacklisted Proof / Anti-Blacklisting Notarized Affidavit',
-      description: 'Affidavit affirming entity is not debarred by any Govt agency',
+      name: 'Debarment Undertaking Document',
+      description: 'Affidavit affirming entity is not debarred by any Central or State Govt agency',
       fileName: '',
       fileSize: '',
       uploadedDate: '',
@@ -2548,9 +2522,9 @@ export class SchemeFormComponent {
 
     // 2. Official Scheme Annexures
     {
-      id: 4,
-      name: 'Annexure-5: Training and Placement details as per Annexure-5',
-      description: 'Detailed candidate-level wage placement track record',
+      id: 7,
+      name: 'Training & Placement Track Record (Annexure 5)',
+      description: 'Candidate-level wage placement track record and audit certificates',
       fileName: '',
       fileSize: '',
       uploadedDate: '',
@@ -2560,8 +2534,8 @@ export class SchemeFormComponent {
     },
     {
       id: 8,
-      name: 'Details of Active skill development centre as per Annexure-4',
-      description: 'Geotagged infrastructure layout and classroom proofs',
+      name: 'Active Skill Development Centres (Annexure 4)',
+      description: 'Geotagged infrastructure layout and classroom verification proofs',
       fileName: '',
       fileSize: '',
       uploadedDate: '',
@@ -2571,8 +2545,8 @@ export class SchemeFormComponent {
     },
     {
       id: 9,
-      name: 'Details of Board of directors as per Annexure-8',
-      description: 'Board member listing, DIN, and KYC profiles',
+      name: 'Board of Directors Details (Annexure 8)',
+      description: 'Board member listing, DIN, and KYC registration profiles',
       fileName: '',
       fileSize: '',
       uploadedDate: '',
@@ -2582,7 +2556,7 @@ export class SchemeFormComponent {
     },
     {
       id: 10,
-      name: 'Details of Placement partnership/Tie-ups with Industry as per Annexure-9',
+      name: 'Industry Placement Tie-ups & MOUs (Annexure 9)',
       description: 'Active corporate MOUs and employer placement commitments',
       fileName: '',
       fileSize: '',
@@ -2593,7 +2567,7 @@ export class SchemeFormComponent {
     },
     {
       id: 11,
-      name: 'Details of working experience in relevant sector as per Annexure-10',
+      name: 'Relevant Sector Experience Proof (Annexure 10)',
       description: 'Sector specific past training delivery completion certificates',
       fileName: '',
       fileSize: '',
@@ -2604,8 +2578,8 @@ export class SchemeFormComponent {
     },
     {
       id: 12,
-      name: 'List of divisions and group of district as per annexure 11',
-      description: 'District cluster prioritization and outreach methodology',
+      name: 'District Cluster Mobilization Plan (Annexure 11)',
+      description: 'District cluster prioritization and candidate outreach methodology',
       fileName: '',
       fileSize: '',
       uploadedDate: '',
@@ -2615,8 +2589,8 @@ export class SchemeFormComponent {
     },
     {
       id: 13,
-      name: 'Proposed evaluation matrix annexure 12',
-      description: 'Technical scoring and qualification criteria response',
+      name: 'Technical Evaluation Matrix (Annexure 12)',
+      description: 'Technical scoring self-assessment and qualification criteria response',
       fileName: '',
       fileSize: '',
       uploadedDate: '',
@@ -2626,8 +2600,8 @@ export class SchemeFormComponent {
     },
     {
       id: 14,
-      name: 'Supporting documents as per annexure 13',
-      description: 'Additional credentials, awards, and accreditations',
+      name: 'Supporting Credentials & Accreditations (Annexure 13)',
+      description: 'Additional credentials, excellence awards, and ISO accreditations',
       fileName: '',
       fileSize: '',
       uploadedDate: '',
@@ -2638,9 +2612,9 @@ export class SchemeFormComponent {
 
     // 3. Remaining Documents
     {
-      id: 1,
-      name: 'A certificate of NSDC partner, where NSDC has stake',
-      description: 'NSDC equity or loan participation certificate',
+      id: 15,
+      name: 'NSDC Stake Partner Certificate',
+      description: 'NSDC equity or funded partner participation certificate',
       fileName: '',
       fileSize: '',
       uploadedDate: '',
@@ -2649,9 +2623,9 @@ export class SchemeFormComponent {
       category: 'remaining'
     },
     {
-      id: 15,
-      name: 'Turnover Proof Document / CA Turnover Certificate with UDIN',
-      description: 'CA certified balance sheet and turnover certificate with UDIN',
+      id: 16,
+      name: 'CA Turnover Certificate with UDIN (Annexure 14)',
+      description: 'Chartered Accountant certified turnover certificate with valid UDIN',
       fileName: '',
       fileSize: '',
       uploadedDate: '',
@@ -2659,11 +2633,11 @@ export class SchemeFormComponent {
       status: 'pending',
       category: 'remaining'
     }
-  ];
+  ]);
 
-  readonly mandatoryDocs = computed(() => this.eoiDocuments.filter(d => d.category === 'mandatory'));
-  readonly annexureDocs = computed(() => this.eoiDocuments.filter(d => d.category === 'annexure'));
-  readonly remainingDocs = computed(() => this.eoiDocuments.filter(d => d.category === 'remaining'));
+  readonly mandatoryDocs = computed(() => this.eoiDocuments().filter(d => d.category === 'mandatory'));
+  readonly annexureDocs = computed(() => this.eoiDocuments().filter(d => d.category === 'annexure'));
+  readonly remainingDocs = computed(() => this.eoiDocuments().filter(d => d.category === 'remaining'));
 
   readonly mandatoryAttachedCount = computed(() => this.mandatoryDocs().filter(d => d.status === 'uploaded').length);
   readonly annexureAttachedCount = computed(() => this.annexureDocs().filter(d => d.status === 'uploaded').length);
@@ -2671,11 +2645,11 @@ export class SchemeFormComponent {
 
   readonly filteredDocuments = computed(() => {
     const tab = this.selectedDocTab();
-    if (tab === 'all') return this.eoiDocuments;
-    return this.eoiDocuments.filter(d => d.category === tab);
+    if (tab === 'all') return this.eoiDocuments();
+    return this.eoiDocuments().filter(d => d.category === tab);
   });
 
-  readonly attachedDocsCount = computed(() => this.eoiDocuments.filter(d => d.status === 'uploaded').length);
+  readonly attachedDocsCount = computed(() => this.eoiDocuments().filter(d => d.status === 'uploaded').length);
 
   constructor() {
     this.route.queryParams.subscribe(params => {
@@ -2766,31 +2740,40 @@ export class SchemeFormComponent {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      doc.fileName = file.name;
       const sizeMb = file.size / (1024 * 1024);
-      doc.fileSize = sizeMb >= 1 ? `${sizeMb.toFixed(1)} MB` : `${Math.max(1, Math.round(file.size / 1024))} KB`;
+      const fileSize = sizeMb >= 1 ? `${sizeMb.toFixed(1)} MB` : `${Math.max(1, Math.round(file.size / 1024))} KB`;
       const now = new Date();
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      doc.uploadedDate = `${now.getDate()}-${months[now.getMonth()]}-${now.getFullYear()}`;
-      doc.status = 'uploaded';
+      const uploadedDate = `${now.getDate()}-${months[now.getMonth()]}-${now.getFullYear()}`;
+      this.eoiDocuments.update(docs => docs.map(d => d.id === doc.id ? {
+        ...d,
+        fileName: file.name,
+        fileSize,
+        uploadedDate,
+        status: 'uploaded'
+      } : d));
       input.value = '';
     }
   }
 
   attachAllSampleDocs(): void {
-    this.eoiDocuments.forEach((doc, idx) => {
-      doc.status = 'uploaded';
-      doc.fileName = `Scan_Annexure_${doc.id}_Signed.pdf`;
-      doc.fileSize = `${(1.2 + (idx % 3) * 0.8).toFixed(1)} MB`;
-      doc.uploadedDate = '24-Sep-2026';
-    });
+    this.eoiDocuments.update(docs => docs.map((doc, idx) => ({
+      ...doc,
+      status: 'uploaded',
+      fileName: `Scan_Annexure_${doc.id}_Signed.pdf`,
+      fileSize: `${(1.2 + (idx % 3) * 0.8).toFixed(1)} MB`,
+      uploadedDate: '24-Sep-2026'
+    })));
   }
 
   removeDoc(doc: EoiDocumentItem): void {
-    doc.status = 'pending';
-    doc.fileName = '';
-    doc.fileSize = '';
-    doc.uploadedDate = '';
+    this.eoiDocuments.update(docs => docs.map(d => d.id === doc.id ? {
+      ...d,
+      status: 'pending',
+      fileName: '',
+      fileSize: '',
+      uploadedDate: ''
+    } : d));
   }
 
   previewDoc(doc: EoiDocumentItem): void {
@@ -2815,7 +2798,7 @@ Category                     : ALL
 Designated Officer In-Charge : ${this.selectedOic()?.name || '-'} (${this.selectedOic()?.designation || '-'})
 Fee Payment Reference        : TXN-ISMS-2026-345678 (₹52,000 Paid)
 Proposed SDC Training Centres: ${this.selectedCentresForScheme().length} Centres Deployed
-Attached Statutory Documents : ${this.attachedDocsCount()} / ${this.eoiDocuments.length} Mandatory Documents Verified
+Attached Statutory Documents : ${this.attachedDocsCount()} / ${this.eoiDocuments().length} Mandatory Documents Verified
 ================================================================================
 Digitally Verified & Sealed by Government of Rajasthan (RSLDC ISMS 2.0)
 ================================================================================`

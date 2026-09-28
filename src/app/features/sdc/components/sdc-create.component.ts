@@ -83,54 +83,32 @@ export class SdcCreateComponent implements OnInit {
   /** Exact 22 fields configured in user sequence */
   formFields: any[] = [];
 
-  /** Form data populated with the exact fields requested by user */
+  /** Form data starts empty — only state is pre-set to Rajasthan */
   formData: SdcNewRegistrationData = {
-    sdcName: 'Jaipur Skill Development Center',
-    tpName: 'SkillMasters Rajasthan',
-    sector: 'Aerospace and Aviation',
-    scheme: 'SAMARTH',
-    schemeCategory: 'RAJKVIK',
+    sdcName: '',
+    tpName: '',
+    sector: '',
+    scheme: '' as SdcScheme,
+    schemeCategory: '',
     state: 'Rajasthan',
     district: 'Jaipur',
-    assemblyConstituency: 'Sanganer',
-    parliamentConstituency: 'Jaipur Rural',
-    division: 'Jaipur',
-    block: 'Sanganer',
-    proposedStartDate: '2026-01-10',
-    sdcCapacity: 100,
-    centerEmail: 'center@example.com',
-    fullAddress: 'Plot 42, Skill Industrial Area, Sanganer, Jaipur',
-    pincode: '302029',
-    remarks: 'Ready for auditor inspection',
-    totalTrainedAspirants: 500,
-    totalPlacedAspirants: 400,
-    hostelCategory: 'Residential (Both Boys & Girls)',
-    latitude: 26.9124,
-    longitude: 75.7873,
-    tpRemarks: 'Ready for auditor inspection',
-    centerPhotos: [
-      {
-        id: 'photo-1',
-        name: 'Center_Front_Building.jpg',
-        url: '/center-photos/center-building.jpg',
-        size: '2.4 MB',
-        tag: 'Photo 1'
-      },
-      {
-        id: 'photo-2',
-        name: 'IT_Computer_Lab.jpg',
-        url: '/center-photos/computer-lab.jpg',
-        size: '2.8 MB',
-        tag: 'Photo 2'
-      },
-      {
-        id: 'photo-3',
-        name: 'Practical_Training_Classroom.jpg',
-        url: '/center-photos/practical-training.jpg',
-        size: '3.1 MB',
-        tag: 'Photo 3'
-      }
-    ]
+    assemblyConstituency: '',
+    parliamentConstituency: '',
+    division: '',
+    block: '',
+    proposedStartDate: '',
+    sdcCapacity: 0,
+    centerEmail: '',
+    fullAddress: '',
+    pincode: '',
+    remarks: '',
+    totalTrainedAspirants: 0,
+    totalPlacedAspirants: 0,
+    hostelCategory: '',
+    latitude: 0,
+    longitude: 0,
+    tpRemarks: '',
+    centerPhotos: []
   };
 
   ngOnInit(): void {

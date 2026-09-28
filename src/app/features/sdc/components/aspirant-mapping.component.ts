@@ -44,9 +44,14 @@ import {
             @if (formData.aadhaarDocName) {
               <div class="h-[38px] flex items-center justify-between px-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs gap-2 shadow-2xs hover:border-slate-400 transition-colors">
                 <div class="flex items-center gap-1.5 min-w-0 flex-1 truncate">
-                  <svg class="w-4 h-4 shrink-0 text-[#174A6E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
+                  <!-- PDF Badge or Image icon based on file type -->
+                  @if (formData.aadhaarDocName?.toLowerCase()?.endsWith('.pdf')) {
+                    <span class="w-5 h-5 rounded bg-rose-600 text-white text-[7.5px] font-extrabold flex items-center justify-center tracking-tight shrink-0">PDF</span>
+                  } @else {
+                    <svg class="w-4 h-4 shrink-0 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  }
                   <span class="font-semibold text-slate-800 truncate text-xs" [title]="formData.aadhaarDocName">
                     {{ formData.aadhaarDocName }}
                   </span>
@@ -79,11 +84,10 @@ import {
                 </div>
               </div>
             } @else {
-              <label class="h-[38px] flex items-center justify-between px-3 border border-dashed border-slate-300 rounded-lg cursor-pointer transition-all bg-slate-50/50 hover:bg-slate-100/70 hover:border-slate-400 shadow-2xs">
+              <label class="h-[38px] flex items-center justify-between px-3 border border-dashed border-slate-300 rounded-lg cursor-pointer transition-all bg-slate-50/50 hover:bg-slate-100/70 hover:border-rose-400 shadow-2xs group">
                 <div class="flex items-center gap-2 text-slate-600 truncate">
-                  <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                  </svg>
+                  <!-- Red PDF icon in empty state -->
+                  <span class="w-5 h-5 rounded bg-rose-600 text-white text-[7.5px] font-extrabold flex items-center justify-center tracking-tight shrink-0 group-hover:bg-rose-700 transition-colors">PDF</span>
                   <span class="text-xs truncate text-slate-500">Upload Aadhaar Card (PDF / JPG)</span>
                 </div>
                 <span class="px-2.5 py-1 bg-white text-slate-700 text-[11px] font-semibold rounded border border-slate-200 shadow-2xs shrink-0">
@@ -850,74 +854,74 @@ export class AspirantMappingComponent implements OnInit {
   step3Fields: FormFieldConfig[] = [];
 
   formData: AspirantFormData = {
-    // Step 1: Main / Personal Details
-    aadhaarNo: '789456123012',
-    confirmAadhaarNo: '789456123012',
-    janaadhaarId: '2026894123',
-    otherIdType: 'PAN Card',
-    otherIdNo: 'ABCDE1234F',
-    aadhaarDocName: 'Aadhaar_Candidate_Card.pdf',
-    aadhaarDocSize: '1.4 MB',
+    // Step 1: Identity & Personal Details — starts empty
+    aadhaarNo: '',
+    confirmAadhaarNo: '',
+    janaadhaarId: '',
+    otherIdType: 'None',
+    otherIdNo: '',
+    aadhaarDocName: '',
+    aadhaarDocSize: '',
     aadhaarDocUrl: '',
 
-    aspirantName: 'Rahul Sharma',
-    gender: 'Male',
-    relationType: 'Father',
-    relationName: 'Manoj Sharma',
-    motherName: 'Sunita Sharma',
-    dob: '2002-05-15',
-    age: 24,
-    educationalQualification: '12th Pass',
-    religion: 'Hindu',
-    category: 'OBC',
+    aspirantName: '',
+    gender: '',
+    relationType: '',
+    relationName: '',
+    motherName: '',
+    dob: '',
+    age: '',
+    educationalQualification: '',
+    religion: '',
+    category: '',
     minority: 'No',
     specialAbility: 'No',
     disabilityType: '',
-    areaType: 'Rural',
+    areaType: '',
 
-    // Step 2: Address Details
-    permHouseNo: '45-B',
-    permStreet: 'Kisan Colony, Sanganer',
-    permWard: 'Ward 12',
-    permCity: 'Jaipur',
-    permDistrict: 'Jaipur',
-    permBlock: 'Sanganer',
-    permTehsil: 'Sanganer',
-    permMunicipality: 'Sanganer Panchayat Samiti',
-    permPincode: '302029',
-    permAssembly: 'Sanganer',
-    permParliament: 'Jaipur Rural',
+    // Step 2: Address Details — starts empty
+    permHouseNo: '',
+    permStreet: '',
+    permWard: '',
+    permCity: '',
+    permDistrict: '',
+    permBlock: '',
+    permTehsil: '',
+    permMunicipality: '',
+    permPincode: '',
+    permAssembly: '',
+    permParliament: '',
 
-    isAddressSame: true,
+    isAddressSame: false,
 
-    commHouseNo: '45-B',
-    commStreet: 'Kisan Colony, Sanganer',
-    commWard: 'Ward 12',
-    commCity: 'Jaipur',
-    commDistrict: 'Jaipur',
-    commBlock: 'Sanganer',
-    commTehsil: 'Sanganer',
-    commMunicipality: 'Sanganer Panchayat Samiti',
-    commPincode: '302029',
+    commHouseNo: '',
+    commStreet: '',
+    commWard: '',
+    commCity: '',
+    commDistrict: '',
+    commBlock: '',
+    commTehsil: '',
+    commMunicipality: '',
+    commPincode: '',
 
-    mobileNo: '9876543210',
-    altMobileNo: '9829012345',
+    mobileNo: '',
+    altMobileNo: '',
     landlineNo: '',
-    email: 'rahul.sharma@example.com',
+    email: '',
 
-    // Step 3: Bank & Worker Details
-    bankAccountNo: '312456789012',
-    bankAccountName: 'Rahul Sharma',
+    // Step 3: Bank & Worker Details — starts empty
+    bankAccountNo: '',
+    bankAccountName: '',
     bankAccountType: 'Savings',
-    bankName: 'State Bank of India',
-    bankBranch: 'Sanganer Branch, Jaipur',
-    ifscCode: 'SBIN0001234',
-    micrCode: '302002015',
+    bankName: '',
+    bankBranch: '',
+    ifscCode: '',
+    micrCode: '',
 
-    annualFamilyIncome: 120000,
-    incomeSlab: '1L-2.5L',
-    economicStatus: 'APL',
-    economicCardNo: 'RAT-JP-2026-9812',
+    annualFamilyIncome: '',
+    incomeSlab: '',
+    economicStatus: '',
+    economicCardNo: '',
 
     bocwWorker: 'No',
     bocwNo: '',
@@ -929,12 +933,12 @@ export class AspirantMappingComponent implements OnInit {
     nrlmMember: 'No',
     nrlmNo: '',
 
-    epicNo: 'RJ/01/042/981234',
+    epicNo: '',
 
-    // Step 4: Sector Preference, Photo & Documents
-    preferredSectors: ['Aerospace and Aviation', 'Electronics'],
-    candidatePhotoUrl: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23f1f5f9"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%230b3558"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%23174a6e"/%3E%3Ctext x="60" y="145" text-anchor="middle" font-family="sans-serif" font-size="9" fill="%2364748b"%3EPASSPORT PHOTO%3C/text%3E%3C/svg%3E',
-    candidatePhotoName: 'Rahul_Sharma_Passport_Photo.jpg',
+    // Step 4: Sector Preference, Photo & Documents — starts empty
+    preferredSectors: [],
+    candidatePhotoUrl: '',
+    candidatePhotoName: '',
     documents: getDefaultAspirantDocuments()
   };
 
@@ -998,13 +1002,63 @@ export class AspirantMappingComponent implements OnInit {
         this.errorMessage.set('Aadhaar number is mandatory.');
         return;
       }
+      if (!/^[0-9]{12}$/.test(this.formData.aadhaarNo)) {
+        this.errorMessage.set('Aadhaar number must be exactly 12 digits (numbers only, no spaces).');
+        return;
+      }
+      if (this.formData.janaadhaarId && !/^[0-9]{10}$/.test(this.formData.janaadhaarId)) {
+        this.errorMessage.set('Jan Aadhaar ID must be exactly 10 digits.');
+        return;
+      }
+      // Validate Other ID number based on selected type
+      if (this.formData.otherIdNo && this.formData.otherIdType && this.formData.otherIdType !== 'None') {
+        const idVal = this.formData.otherIdNo.trim().toUpperCase();
+        const idType = this.formData.otherIdType;
+        if (idType === 'PAN Card') {
+          if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(idVal)) {
+            this.errorMessage.set('PAN must be 10 characters: 5 letters, 4 digits, 1 letter (e.g. ABCDE1234F).');
+            return;
+          }
+        } else if (idType === 'Voter ID') {
+          if (!/^[A-Z]{3}[0-9]{7}$/.test(idVal)) {
+            this.errorMessage.set('Voter ID (EPIC) must be 10 characters: 3 letters followed by 7 digits (e.g. ABC1234567).');
+            return;
+          }
+        } else if (idType === 'Passport') {
+          if (!/^[A-Z]{1}[0-9]{7}$/.test(idVal)) {
+            this.errorMessage.set('Passport No. must be 8 characters: 1 letter followed by 7 digits (e.g. A1234567).');
+            return;
+          }
+        } else if (idType === 'Driving License') {
+          if (idVal.length < 10 || idVal.length > 16 || !/^[A-Z]{2}[0-9]{2}[0-9A-Z]{0,12}$/.test(idVal)) {
+            this.errorMessage.set('Driving License must be 10–16 alphanumeric characters (e.g. RJ0120110012345).');
+            return;
+          }
+        }
+      }
     } else if (this.currentStep() === 2) {
       if (!this.formData.mobileNo) {
         this.errorMessage.set('Mobile number is mandatory.');
         return;
       }
+      if (!/^[6-9][0-9]{9}$/.test(this.formData.mobileNo)) {
+        this.errorMessage.set('Mobile number must be 10 digits starting with 6, 7, 8, or 9.');
+        return;
+      }
+      if (this.formData.altMobileNo && !/^[6-9][0-9]{9}$/.test(this.formData.altMobileNo)) {
+        this.errorMessage.set('Alternate mobile number must be 10 digits starting with 6, 7, 8, or 9.');
+        return;
+      }
       if (!this.formData.permCity || !this.formData.permPincode) {
         this.errorMessage.set('Please provide complete permanent address (Village/City and Pincode).');
+        return;
+      }
+      if (!/^[1-9][0-9]{5}$/.test(this.formData.permPincode)) {
+        this.errorMessage.set('Permanent address Pincode must be a valid 6-digit code.');
+        return;
+      }
+      if (this.formData.commPincode && !/^[1-9][0-9]{5}$/.test(this.formData.commPincode)) {
+        this.errorMessage.set('Communication address Pincode must be a valid 6-digit code.');
         return;
       }
     }
@@ -1113,9 +1167,24 @@ export class AspirantMappingComponent implements OnInit {
       this.currentStep.set(1);
       return;
     }
-    if (!this.formData.mobileNo) {
-      this.errorMessage.set('Mobile number is mandatory.');
+    if (!this.formData.aadhaarNo || !/^[0-9]{12}$/.test(this.formData.aadhaarNo)) {
+      this.errorMessage.set('Aadhaar number must be exactly 12 digits.');
+      this.currentStep.set(1);
+      return;
+    }
+    if (!this.formData.mobileNo || !/^[6-9][0-9]{9}$/.test(this.formData.mobileNo)) {
+      this.errorMessage.set('Mobile number must be 10 digits starting with 6, 7, 8, or 9.');
       this.currentStep.set(2);
+      return;
+    }
+    if (this.formData.ifscCode && !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(this.formData.ifscCode.toUpperCase())) {
+      this.errorMessage.set('IFSC Code must be 11 characters: 4 letters, 0, then 6 alphanumerics (e.g. SBIN0001234).');
+      this.currentStep.set(3);
+      return;
+    }
+    if (this.formData.bankAccountNo && !/^[0-9]{9,18}$/.test(this.formData.bankAccountNo)) {
+      this.errorMessage.set('Bank account number must be 9 to 18 digits.');
+      this.currentStep.set(3);
       return;
     }
 

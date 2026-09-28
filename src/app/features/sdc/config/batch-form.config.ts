@@ -77,7 +77,13 @@ export function getBatchPsdFormFields(): FormFieldConfig[] {
       key: 'psdPaymentRef',
       label: 'Transaction / Challan Ref No.',
       type: 'text',
+      minLength: 8,
+      maxLength: 40,
+      pattern: '^[A-Z0-9][A-Z0-9\\-\\/]{7,39}$',
+      patternMessage: 'Reference No. must be 8–40 alphanumeric characters (hyphens/slashes allowed, e.g. PSD-TXN-2026-89412)',
+      uppercase: true,
       placeholder: 'e.g. PSD-TXN-2026-89412',
+      hint: '8–40 chars: letters, digits, hyphens (e.g. PSD-TXN-2026-89412)',
       colSpan: 1
     },
     {

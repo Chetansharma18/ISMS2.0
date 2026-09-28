@@ -266,8 +266,10 @@ import {
                 <input
                   type="text"
                   maxlength="6"
+                  pattern="[1-9][0-9]{5}"
+                  title="6-digit pincode (not starting with 0)"
                   [(ngModel)]="data.step2.pincode"
-                  placeholder="302029"
+                  placeholder="e.g. 302029"
                   class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                 />
               </div>

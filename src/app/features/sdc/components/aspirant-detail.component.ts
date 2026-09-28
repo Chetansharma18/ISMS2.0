@@ -685,6 +685,10 @@ import { PageHeaderComponent } from '../../../shared/components';
                       type="text"
                       [(ngModel)]="editForm.mobileNo"
                       name="mobileNo"
+                      maxlength="10"
+                      pattern="[6-9][0-9]{9}"
+                      title="10 digits starting with 6, 7, 8 or 9"
+                      placeholder="10-digit mobile"
                       class="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-lg font-mono font-medium text-slate-900 focus:outline-none focus:border-[#174A6E]"
                       required
                     />
@@ -696,6 +700,10 @@ import { PageHeaderComponent } from '../../../shared/components';
                       type="text"
                       [(ngModel)]="editForm.altMobileNo"
                       name="altMobileNo"
+                      maxlength="10"
+                      pattern="[6-9][0-9]{9}"
+                      title="10 digits starting with 6, 7, 8 or 9"
+                      placeholder="10-digit alternate mobile"
                       class="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-lg font-mono font-medium text-slate-900 focus:outline-none focus:border-[#174A6E]"
                     />
                   </div>
@@ -775,6 +783,10 @@ import { PageHeaderComponent } from '../../../shared/components';
                         type="text"
                         [(ngModel)]="editForm.permPincode"
                         name="permPincode"
+                        maxlength="6"
+                        pattern="[1-9][0-9]{5}"
+                        title="6-digit pincode (not starting with 0)"
+                        placeholder="6-digit pincode"
                         class="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-lg font-mono text-slate-900 focus:outline-none focus:border-[#174A6E]"
                       />
                     </div>
@@ -808,6 +820,10 @@ import { PageHeaderComponent } from '../../../shared/components';
                       type="text"
                       [(ngModel)]="editForm.bankAccountNo"
                       name="bankAccountNo"
+                      maxlength="18"
+                      pattern="[0-9]{9,18}"
+                      title="9 to 18 digit bank account number"
+                      placeholder="9 to 18 digit account number"
                       class="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-lg font-mono font-medium text-slate-900 focus:outline-none focus:border-[#174A6E]"
                     />
                   </div>
@@ -818,7 +834,12 @@ import { PageHeaderComponent } from '../../../shared/components';
                       type="text"
                       [(ngModel)]="editForm.ifscCode"
                       name="ifscCode"
-                      class="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-lg font-mono font-medium text-slate-900 focus:outline-none focus:border-[#174A6E] uppercase"
+                      maxlength="11"
+                      pattern="[A-Z]{4}0[A-Z0-9]{6}"
+                      title="11-char IFSC: 4 letters, 0, then 6 alphanumerics (e.g. SBIN0001234)"
+                      placeholder="e.g. SBIN0001234"
+                      style="text-transform: uppercase;"
+                      class="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-lg font-mono font-medium text-slate-900 focus:outline-none focus:border-[#174A6E]"
                     />
                   </div>
 

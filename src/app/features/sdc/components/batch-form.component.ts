@@ -934,38 +934,38 @@ export class BatchFormComponent implements OnInit {
     // Step 1: PSD Payment
     psdFee: 500,
     psdPaymentStatus: 'PENDING',
-    psdPaymentMode: 'UPI',
+    psdPaymentMode: '',
     psdPaymentRef: '',
-    psdPaymentDate: new Date().toISOString().split('T')[0],
+    psdPaymentDate: '',
 
-    // Step 2: Pre-filled Sector + 8 Batch parameters
+    // Step 2: Pre-filled Sector (from SDC context) + empty batch parameters
     sector: 'Aerospace and Aviation',
-    course: 'Drone Operator - Multi Rotor',
-    batchDurationHours: 490,
-    startDate: '2026-10-01',
-    endDate: '2026-12-31',
-    startTime: '09:00',
-    endTime: '17:00',
+    course: '',
+    batchDurationHours: 0,
+    startDate: '',
+    endDate: '',
+    startTime: '',
+    endTime: '',
     approvedBatchStrength: 30,
-    remarks: 'Standard training batch configured as per NSQF v2.0 norms.'
+    remarks: ''
   };
 
-  /** Faculty Details List (matching PDF page 6) */
+  /** Faculty Details List — starts empty, user adds faculty */
   facultyList: FacultyItem[] = [
     {
-      facultyName: 'Vikas Purohit',
+      facultyName: '',
       trainerType: 'Primary Trainer',
       qualification: 'Graduate (B.A / B.Sc / B.Com / B.Tech)'
     }
   ];
 
-  /** Hostel Details List (matching PDF page 7) */
+  /** Hostel Details List — starts empty, user adds hostel */
   hostelList: HostelItem[] = [
     {
-      hostelAddress: 'Plot 42, Institutional Area, Jhalana Doongri, Jaipur',
-      hostelCode: 'HST-JP-001',
+      hostelAddress: '',
+      hostelCode: '',
       type: 'Boys',
-      capacity: 50
+      capacity: 0
     }
   ];
 

@@ -826,13 +826,108 @@ export interface EoiDocumentItem {
             </div>
 
             <!-- ================================================================
-                 2. PAST SKILL TRAINING & PLACEMENT TRACK RECORD
+                 2. PAST 3 FINANCIAL YEARS TURNOVER (FINANCIAL ELIGIBILITY)
+                 ================================================================ -->
+            <div id="financial-turnover-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
+              <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558] flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">2</span>
+                    Past 3 Financial Years Turnover (Financial Eligibility Criteria)
+                  </h3>
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    Enter audited annual turnover figures in ₹ Lacs. Certified as per CA Turnover Certificate (Annexure 3 &amp; 14).
+                  </p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
+                    &check; Min Eligible Threshold: ₹50.00 Lacs
+                  </span>
+                </div>
+              </div>
+
+              <!-- Editable Turnover Table -->
+              <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                    <tr>
+                      <th class="py-2.5 px-3 w-44">Financial Year</th>
+                      <th class="py-2.5 px-3">Total Entity Turnover (₹ in Lacs) *</th>
+                      <th class="py-2.5 px-3">Skill Training Turnover (₹ in Lacs) *</th>
+                      <th class="py-2.5 px-3 text-center w-36">Scrutiny Status</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 font-normal">
+                    @for (fy of editableStep1.financialYears; track fy.year) {
+                      <tr class="hover:bg-slate-50/70">
+                        <td class="py-2.5 px-3 font-semibold text-slate-800 font-mono text-xs">
+                          {{ fy.year }}
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <div class="relative max-w-xs">
+                            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-slate-400 font-bold text-xs pointer-events-none">₹</span>
+                            <input
+                              type="number"
+                              step="0.01"
+                              [(ngModel)]="fy.totalTurnover"
+                              (input)="onTurnoverChange()"
+                              placeholder="0.00"
+                              class="w-full pl-6 pr-12 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 bg-white focus:ring-1 focus:ring-[#0B3558]"
+                            />
+                            <span class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 text-[11px] pointer-events-none">Lacs</span>
+                          </div>
+                        </td>
+                        <td class="py-2.5 px-3">
+                          <div class="relative max-w-xs">
+                            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-slate-400 font-bold text-xs pointer-events-none">₹</span>
+                            <input
+                              type="number"
+                              step="0.01"
+                              [(ngModel)]="fy.skillTurnover"
+                              (input)="onTurnoverChange()"
+                              placeholder="0.00"
+                              class="w-full pl-6 pr-12 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 bg-white focus:ring-1 focus:ring-[#0B3558]"
+                            />
+                            <span class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 text-[11px] pointer-events-none">Lacs</span>
+                          </div>
+                        </td>
+                        <td class="py-2.5 px-3 text-center">
+                          <span class="px-2 py-0.5 rounded text-[10.5px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            Valid Entry
+                          </span>
+                        </td>
+                      </tr>
+                    }
+                    <!-- 3-Year Average Row -->
+                    <tr class="bg-sky-50/50 font-bold border-t border-slate-200 text-slate-900">
+                      <td class="py-3 px-3 uppercase text-[11px] tracking-wider text-[#0B3558]">
+                        3-Year Average
+                      </td>
+                      <td class="py-3 px-3 text-sm text-[#0B3558]">
+                        ₹ {{ avgTotalTurnover() }} Lacs
+                      </td>
+                      <td class="py-3 px-3 text-sm text-emerald-800">
+                        ₹ {{ avgSkillTurnover() }} Lacs
+                      </td>
+                      <td class="py-3 px-3 text-center">
+                        <span class="px-2.5 py-1 rounded-full text-[10.5px] font-bold bg-emerald-100 text-emerald-900">
+                          &check; Meets Criteria
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- ================================================================
+                 3. PAST SKILL TRAINING & PLACEMENT TRACK RECORD
                  ================================================================ -->
             <div id="placement-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
               <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <h3 class="text-sm sm:text-base font-bold text-[#0B3558] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">2</span>
+                    <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">3</span>
                     Training &amp; Placement Track Record
                   </h3>
                   <p class="text-xs text-slate-500 mt-0.5">
@@ -981,13 +1076,13 @@ export interface EoiDocumentItem {
             </div>
 
             <!-- ================================================================
-                 3. ANNUAL ACTION PLAN (TARGET DISTRICTS & BATCHES)
+                 4. ANNUAL ACTION PLAN (TARGET DISTRICTS & BATCHES)
                  ================================================================ -->
             <div id="action-plan-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
               <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <h3 class="text-sm sm:text-base font-bold text-[#0B3558] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">3</span>
+                    <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">4</span>
                     Proposed Annual Action Plan (Target Districts &amp; Batches)
                   </h3>
                   <p class="text-xs text-slate-500 mt-0.5">
@@ -1166,13 +1261,13 @@ export interface EoiDocumentItem {
             </div>
 
             <!-- ================================================================
-                 4. EOI DOCUMENTS CHECKLIST (Categorized: Mandatory, Annexures, Remaining)
+                 5. EOI DOCUMENTS CHECKLIST (Categorized: Mandatory, Annexures, Remaining)
                  ================================================================ -->
             <div id="documents-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
               <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <h3 class="text-sm sm:text-base font-bold text-[#0B3558] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">4</span>
+                    <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">5</span>
                     Mandatory EOI Proposal Documents Checklist ({{ eoiDocuments().length }} Documents)
                   </h3>
                   <p class="text-xs text-slate-500 mt-0.5">
@@ -1347,300 +1442,365 @@ export interface EoiDocumentItem {
         <!-- ====================================================================
              STEP 3: COMPLETE PREVIEW (WITH DEDICATED EDIT BUTTONS FOR EVERY SECTION)
              ==================================================================== -->
+        <!-- ====================================================================
+             STEP 3: COMPLETE PREVIEW (UNIFIED APPLICATION DOSSIER)
+             ==================================================================== -->
         @if (currentStep() === 3) {
           <div class="space-y-6">
             
             <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between text-xs text-[#0B3558] shadow-2xs">
               <div class="flex items-center gap-2.5">
-                <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0"></span>
                 <span class="font-normal text-xs sm:text-[13px]">
-                  <strong class="font-bold">Comprehensive Application Preview:</strong> Review all verified OTR institutional particulars and scheme proposal details below. Use the <strong>Edit</strong> buttons beside any section if you wish to adjust particulars before submission.
+                  <strong class="font-bold">Comprehensive Proposal Dossier:</strong> Review your verified OTR profile, financial turnover qualification, deployed centres, placement performance, annual action plan, and attached statutory annexures before final submission.
                 </span>
               </div>
             </div>
 
-            <!-- Preview Part A: OTR Institutional Profile -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3.5 shadow-xs">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <!-- Single Unified Application Dossier Card -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-7 space-y-6 shadow-xs">
+              
+              <!-- Dossier Header -->
+              <div class="flex items-center justify-between pb-4 border-b border-slate-200 flex-wrap gap-2">
+                <div>
+                  <h3 class="text-base sm:text-lg font-bold text-[#0B3558]">
+                    Expression of Interest (EOI) Proposal Submission Dossier
+                  </h3>
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    {{ schemeTitle() }} &bull; {{ schemeRefNo() }}
+                  </p>
+                </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">A</span>
-                  <h3 class="text-sm font-bold text-[#0B3558]">TP/PIA One Time Registration (OTR) Particulars</h3>
-                </div>
-                <button
-                  type="button"
-                  (click)="editSection('otr-step1')"
-                  class="px-3 py-1 bg-sky-50 hover:bg-sky-100 text-[#0483AC] border border-sky-200 rounded-md text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                  <span>Edit OTR Details</span>
-                </button>
-              </div>
-
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                <div>
-                  <span class="text-slate-400 block text-[10.5px]">TP/PIA Short Name</span>
-                  <span class="font-bold text-slate-800">{{ editableStep1.shortName || 'RSLDC-PARTNER' }}</span>
-                </div>
-                <div class="sm:col-span-2">
-                  <span class="text-slate-400 block text-[10.5px]">TP/PIA Full Name</span>
-                  <span class="font-bold text-slate-800">{{ editableStep1.fullName || 'Rajasthan Skill & Livelihoods Development Council Partner Ltd.' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-400 block text-[10.5px]">Nature of Entity</span>
-                  <span class="font-semibold text-slate-800">{{ editableStep1.natureOfEntity || 'PUBLIC LIMITED' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-400 block text-[10.5px]">CIN / Registration No</span>
-                  <span class="font-mono text-slate-800">{{ editableStep1.registrationNumber || '-' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-400 block text-[10.5px]">Company PAN</span>
-                  <span class="font-mono font-bold text-slate-800">{{ editableStep1.companyPan || '-' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-400 block text-[10.5px]">GSTIN</span>
-                  <span class="font-mono text-slate-800">{{ editableStep1.gstin || 'N/A' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-400 block text-[10.5px]">Bank Account</span>
-                  <span class="text-slate-800">{{ editableStep4.bankName || '-' }} ({{ editableStep4.accountNo || '-' }})</span>
-                </div>
-                <div>
-                  <span class="text-slate-400 block text-[10.5px]">Authorized Person</span>
-                  <span class="font-bold text-slate-800">{{ editableStep3.name || '-' }} ({{ editableStep3.designation || '-' }})</span>
-                </div>
-                <div class="sm:col-span-3">
-                  <span class="text-slate-400 block text-[10.5px]">Registered Address</span>
-                  <span class="text-slate-800">{{ editableStep1.registeredAddress || '-' }}</span>
+                  <span class="px-2.5 py-1 rounded bg-sky-50 text-[#0B3558] text-xs font-bold border border-sky-200">
+                    Application Ref: ISMS-EOI-2026-9871
+                  </span>
+                  <span class="px-2.5 py-1 rounded bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200">
+                    Pending Fee Payment &amp; Submission
+                  </span>
                 </div>
               </div>
-            </div>
 
-            <!-- Preview Part B: Designated Officer In-Charge -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3.5 shadow-xs">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">B</span>
-                  <h3 class="text-sm font-bold text-[#0B3558]">Designated Officer In-Charge for MMKVY</h3>
+              <!-- Section 1: Verified Company Registration & OTR Particulars -->
+              <div class="space-y-3 pb-6 border-b border-slate-200">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <h4 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-[10.5px] font-bold">1</span>
+                    <span>Company Profile &amp; Statutory Registration Particulars</span>
+                  </h4>
+                  <button
+                    type="button"
+                    (click)="editSection('otr-step1')"
+                    class="px-3 py-1 bg-sky-50 hover:bg-sky-100 text-[#0483AC] border border-sky-200 rounded-md text-xs font-semibold cursor-pointer shadow-2xs transition-colors"
+                  >
+                    Edit Company Profile &rarr;
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  (click)="editSection('oic-dropdown')"
-                  class="px-3 py-1 bg-sky-50 hover:bg-sky-100 text-[#0483AC] border border-sky-200 rounded-md text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                  <span>Change Officer</span>
-                </button>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <div>
+                    <span class="text-slate-400 block text-[10.5px]">Organization Short Name</span>
+                    <span class="font-bold text-slate-800 text-[12.5px]">{{ editableStep1.shortName || 'SkillTech Solutions' }}</span>
+                  </div>
+                  <div class="sm:col-span-2">
+                    <span class="text-slate-400 block text-[10.5px]">Organization Full Legal Name</span>
+                    <span class="font-bold text-slate-800 text-[12.5px]">{{ editableStep1.fullName || 'SkillTech Solutions Private Limited' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[10.5px]">Nature of Entity</span>
+                    <span class="font-semibold text-slate-800">{{ editableStep1.natureOfEntity || 'PUBLIC LIMITED' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[10.5px]">CIN / Registration No</span>
+                    <span class="font-mono text-slate-800 font-semibold">{{ editableStep1.registrationNumber || '-' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[10.5px]">Company PAN</span>
+                    <span class="font-mono font-bold text-slate-800">{{ editableStep1.companyPan || '-' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[10.5px]">GSTIN</span>
+                    <span class="font-mono text-slate-800">{{ editableStep1.gstin || 'N/A' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[10.5px]">Bank Account</span>
+                    <span class="text-slate-800 font-medium">{{ editableStep4.bankName || '-' }} ({{ editableStep4.accountNo || '-' }})</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[10.5px]">Authorized Person Signatory</span>
+                    <span class="font-bold text-slate-800">{{ editableStep3.name || '-' }} ({{ editableStep3.designation || '-' }})</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[10.5px]">Designated Officer In-Charge</span>
+                    <span class="font-bold text-slate-800">{{ selectedOic()?.name || '-' }} ({{ selectedOic()?.designation || '-' }})</span>
+                  </div>
+                  <div class="sm:col-span-2">
+                    <span class="text-slate-400 block text-[10.5px]">Registered Address</span>
+                    <span class="text-slate-800">{{ registeredAddressText }}</span>
+                  </div>
+                </div>
               </div>
 
-              @if (selectedOic(); as oic) {
-                <div class="p-3.5 rounded-xl border border-sky-200 bg-sky-50/30 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  <div><span class="text-slate-400 block text-[10.5px]">Officer Name</span><span class="font-bold text-slate-900">{{ oic.name }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Designation</span><span class="font-semibold text-slate-800">{{ oic.designation }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Mobile No.</span><span class="font-mono text-slate-800">{{ oic.mobileNo }}</span></div>
-                  <div><span class="text-slate-400 block text-[10.5px]">Email ID</span><span class="text-slate-800">{{ oic.emailId }}</span></div>
+              <!-- Section 2: Financial Eligibility & Turnover Qualification -->
+              <div class="space-y-3 pb-6 border-b border-slate-200">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <h4 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-[10.5px] font-bold">2</span>
+                    <span>Past 3 Financial Years Turnover &amp; Eligibility Qualification</span>
+                  </h4>
+                  <button
+                    type="button"
+                    (click)="editSection('financial-turnover-section')"
+                    class="px-3 py-1 bg-sky-50 hover:bg-sky-100 text-[#0483AC] border border-sky-200 rounded-md text-xs font-semibold cursor-pointer shadow-2xs transition-colors"
+                  >
+                    Edit Financials &rarr;
+                  </button>
                 </div>
-              }
-            </div>
 
-            <!-- Preview Part C: Proposed Training Centres for Scheme -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3.5 shadow-xs">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">C</span>
-                  <h3 class="text-sm font-bold text-[#0B3558]">Proposed Training Centres for Scheme ({{ selectedCentresForScheme().length }} Centres)</h3>
-                </div>
-                <button
-                  type="button"
-                  (click)="editSection('training-centres-section')"
-                  class="px-3 py-1 bg-sky-50 hover:bg-sky-100 text-[#0483AC] border border-sky-200 rounded-md text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                  <span>Edit Centres</span>
-                </button>
-              </div>
-
-              @if (selectedCentresForScheme().length === 0) {
-                <div class="p-3.5 bg-amber-50 rounded-lg text-xs text-amber-800 font-medium">
-                  No centres selected or proposed for this scheme yet.
-                </div>
-              } @else {
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
-                  @for (c of selectedCentresForScheme(); track c.id) {
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                      <div class="flex items-center justify-between">
-                        <span class="font-bold text-slate-800">{{ c.centerName }}</span>
-                        <span
-                          class="px-2 py-0.5 rounded text-[10px] font-bold"
-                          [ngClass]="c.isExisting ? 'bg-sky-100 text-sky-800' : 'bg-emerald-100 text-emerald-800'"
-                        >
-                          {{ c.isExisting ? 'Existing' : 'New Proposed' }}
-                        </span>
-                      </div>
-                      <span class="text-[11px] text-slate-600 block">{{ c.district }}</span>
-                      <span class="text-[10.5px] text-emerald-700 block">
-                        {{ c.classrooms }} Classrooms &bull; {{ c.practicalRooms }} Practical Labs &bull; Washrooms: {{ c.washrooms }}
-                      </span>
-                      <span class="text-[10px] text-slate-400 block truncate">{{ c.fullAddress }}</span>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-
-            <!-- Preview Part D: 3-Year Turnover Summary (Retrieved from OTR Registration) -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3.5 shadow-xs">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">D</span>
-                  <h3 class="text-sm font-bold text-[#0B3558]">Financial Turnover Summary (From OTR Registration)</h3>
-                </div>
-                <button
-                  type="button"
-                  (click)="editSection('otr-step1')"
-                  class="px-3 py-1 bg-sky-50 hover:bg-sky-100 text-[#0483AC] border border-sky-200 rounded-md text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                  <span>Edit in Step 1</span>
-                </button>
-              </div>
-
-              @if (editableStep1.financialYears && editableStep1.financialYears.length > 0) {
                 <div class="overflow-x-auto border border-slate-200 rounded-xl">
                   <table class="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr class="bg-slate-50 text-slate-700 font-semibold text-[11px] border-b border-slate-200">
-                        <th class="py-2 px-3 border-r border-slate-200">Financial Year</th>
-                        <th class="py-2 px-3 border-r border-slate-200">Total Turnover (₹ Lacs)</th>
-                        <th class="py-2 px-3">Skill Turnover (₹ Lacs)</th>
+                    <thead class="bg-slate-50 text-slate-700 font-semibold text-[10.5px] uppercase tracking-wider border-b border-slate-200">
+                      <tr>
+                        <th class="py-2.5 px-3">Financial Year</th>
+                        <th class="py-2.5 px-3">Total Turnover (₹ in Lacs)</th>
+                        <th class="py-2.5 px-3">Skill Training Turnover (₹ in Lacs)</th>
+                        <th class="py-2.5 px-3 text-center">Status</th>
                       </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                       @for (fy of editableStep1.financialYears; track fy.year) {
                         <tr>
-                          <td class="py-2 px-3 text-slate-700 border-r border-slate-100">{{ fy.year }}</td>
-                          <td class="py-2 px-3 text-slate-700 border-r border-slate-100">{{ fy.totalTurnover || '-' }}</td>
-                          <td class="py-2 px-3 text-slate-700">{{ fy.skillTurnover || '-' }}</td>
+                          <td class="py-2.5 px-3 text-slate-800 font-mono font-semibold">{{ fy.year }}</td>
+                          <td class="py-2.5 px-3 text-slate-700 font-mono">₹ {{ fy.totalTurnover || '0.00' }} Lacs</td>
+                          <td class="py-2.5 px-3 text-slate-700 font-mono">₹ {{ fy.skillTurnover || '0.00' }} Lacs</td>
+                          <td class="py-2.5 px-3 text-center">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                              Verified Entry
+                            </span>
+                          </td>
                         </tr>
                       }
-                      <tr class="bg-slate-50 font-semibold border-t border-slate-200">
-                        <td class="py-2 px-3 text-slate-700 border-r border-slate-100">3-Year Average</td>
-                        <td class="py-2 px-3 text-[#0483AC] font-bold border-r border-slate-100">{{ avgTotalTurnover() }} Lacs</td>
-                        <td class="py-2 px-3 text-[#0483AC] font-bold">{{ avgSkillTurnover() }} Lacs</td>
+                      <tr class="bg-sky-50/60 font-bold border-t border-slate-200">
+                        <td class="py-2.5 px-3 uppercase text-[11px] text-[#0B3558]">3-Year Average</td>
+                        <td class="py-2.5 px-3 text-[#0B3558] font-mono text-sm">₹ {{ avgTotalTurnover() }} Lacs</td>
+                        <td class="py-2.5 px-3 text-emerald-800 font-mono text-sm">₹ {{ avgSkillTurnover() }} Lacs</td>
+                        <td class="py-2.5 px-3 text-center">
+                          <span class="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-emerald-100 text-emerald-900">
+                            &check; Meets Eligibility Criteria
+                          </span>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-              }
-            </div>
+              </div>
 
-            <!-- Preview Part E: Placement & Action Plan -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-xs">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                  <h4 class="text-xs font-bold text-[#0B3558] uppercase">Training &amp; Placement Track Record</h4>
+              <!-- Section 3: Training Centres Deployed for Scheme -->
+              <div class="space-y-3 pb-6 border-b border-slate-200">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <h4 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-[10.5px] font-bold">3</span>
+                    <span>Training Centres Deployed for Scheme ({{ selectedCentresForScheme().length }} Centres)</span>
+                  </h4>
                   <button
                     type="button"
-                    (click)="editSection('placement-section')"
-                    class="text-xs text-[#0483AC] hover:underline font-semibold cursor-pointer"
+                    (click)="editSection('training-centres-section')"
+                    class="px-3 py-1 bg-sky-50 hover:bg-sky-100 text-[#0483AC] border border-sky-200 rounded-md text-xs font-semibold cursor-pointer shadow-2xs transition-colors"
                   >
-                    Edit
+                    Edit Centres &rarr;
                   </button>
                 </div>
-                <div class="space-y-1.5 text-xs">
-                  @if (placementRecords.length === 0) {
-                    <p class="text-xs text-slate-400 py-1">No placement records committed.</p>
-                  } @else {
-                    @for (p of placementRecords; track p.sector) {
-                      <div class="flex justify-between py-1 border-b border-slate-100">
-                        <span class="text-slate-700 font-medium">{{ p.sector }} ({{ p.year }}):</span>
-                        <span class="text-emerald-700 font-semibold">{{ p.trained }} Trained / {{ p.placed }} Placed</span>
-                      </div>
-                    }
-                  }
-                </div>
-              </div>
 
-              <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-xs">
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                  <h4 class="text-xs font-bold text-[#0B3558] uppercase">Proposed Annual Action Plan</h4>
-                  <button
-                    type="button"
-                    (click)="editSection('action-plan-section')"
-                    class="text-xs text-[#0483AC] hover:underline font-semibold cursor-pointer"
-                  >
-                    Edit
-                  </button>
-                </div>
-                <div class="space-y-1.5 text-xs">
-                  @if (actionPlan.length === 0) {
-                    <p class="text-xs text-slate-400 py-1">No action plans committed.</p>
-                  } @else {
-                    @for (ap of actionPlan; track ap.id) {
-                      <div class="flex justify-between py-1 border-b border-slate-100">
-                        <span class="text-slate-700 font-medium">{{ ap.district }} ({{ ap.year }}):</span>
-                        <span class="text-slate-900 font-semibold">{{ ap.sdcCount }} SDCs, {{ ap.batches }} Batches ({{ ap.mode }})</span>
-                      </div>
-                    }
-                  }
-                </div>
-              </div>
-            </div>
-
-            <!-- Preview Part F: EOI Documents Checklist -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 space-y-3.5 shadow-xs">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
-                <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">F</span>
-                  <h3 class="text-sm font-bold text-[#0B3558]">
-                    EOI Proposal Documents Checklist ({{ attachedDocsCount() }} / {{ eoiDocuments().length }} Attached)
-                  </h3>
-                </div>
-                <button
-                  type="button"
-                  (click)="editSection('documents-section')"
-                  class="px-3 py-1 bg-sky-50 hover:bg-sky-100 text-[#0483AC] border border-sky-200 rounded-md text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                  <span>Edit Documents</span>
-                </button>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                @for (d of eoiDocuments(); track d.id) {
-                  <div class="p-2.5 rounded-lg border border-slate-200 flex items-center justify-between bg-slate-50/60">
-                    <div class="flex items-center gap-2 max-w-[72%]">
-                      <div class="w-4 h-4 rounded bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
-                        <svg class="w-3 h-3 text-rose-600" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v-1h2c.28 0 .5-.22.5-.5s-.22-.5-.5-.5h-3v5h1v-1.5h1.5c.28 0 .5-.22.5-.5s-.22-.5-.5-.5zm5 2c0 .28-.22.5-.5.5h-2.5v-5h2.5c.28 0 .5.22.5.5v4zm-1-3.5h-1v3h1v-3zm5-.5h-2v1h1.5c.28 0 .5.22.5.5s-.22.5-.5.5H19v1.5h-1v-5h2.5c.28 0 .5.22.5.5s-.22.5-.5.5z"/>
-                        </svg>
-                      </div>
-                      <span class="font-medium text-slate-800 truncate">{{ d.name }}</span>
-                    </div>
-                    @if (d.status === 'uploaded') {
-                      <span class="text-emerald-700 font-semibold text-[10px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
-                        &check; Attached
-                      </span>
-                    } @else {
-                      <span class="text-amber-700 font-semibold text-[10px] bg-amber-50 px-2 py-0.5 rounded border border-amber-200 shrink-0">
-                        Pending
-                      </span>
-                    }
+                @if (selectedCentresForScheme().length === 0) {
+                  <div class="p-3.5 bg-amber-50 rounded-lg text-xs text-amber-800 font-medium">
+                    No centres selected or proposed for this scheme yet.
+                  </div>
+                } @else {
+                  <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left border-collapse text-xs">
+                      <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                        <tr>
+                          <th class="py-2.5 px-3">District</th>
+                          <th class="py-2.5 px-3">Centre Name</th>
+                          <th class="py-2.5 px-2 text-center">Classrooms</th>
+                          <th class="py-2.5 px-2 text-center">Labs</th>
+                          <th class="py-2.5 px-2 text-center">Washrooms</th>
+                          <th class="py-2.5 px-2 text-center">Lab Infra</th>
+                          <th class="py-2.5 px-3">Full Address</th>
+                          <th class="py-2.5 px-2 text-center">Type</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100 font-normal">
+                        @for (c of selectedCentresForScheme(); track c.id) {
+                          <tr class="hover:bg-slate-50/70">
+                            <td class="py-2.5 px-3 font-semibold text-slate-900">{{ c.district }}</td>
+                            <td class="py-2.5 px-3 font-medium text-slate-800">{{ c.centerName }}</td>
+                            <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ c.classrooms }}</td>
+                            <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ c.practicalRooms }}</td>
+                            <td class="py-2.5 px-2 text-center text-emerald-700">{{ c.washrooms }}</td>
+                            <td class="py-2.5 px-2 text-center">
+                              <span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-semibold">
+                                {{ c.labInfra }}
+                              </span>
+                            </td>
+                            <td class="py-2.5 px-3 text-slate-500 max-w-xs truncate">{{ c.fullAddress }}</td>
+                            <td class="py-2.5 px-2 text-center">
+                              <span
+                                class="px-2 py-0.5 rounded text-[10px] font-bold"
+                                [ngClass]="c.isExisting ? 'bg-sky-50 text-sky-800 border border-sky-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'"
+                              >
+                                {{ c.isExisting ? 'Existing' : 'Proposed' }}
+                              </span>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
                   </div>
                 }
               </div>
+
+              <!-- Section 4: Training & Placement Track Record -->
+              <div class="space-y-3 pb-6 border-b border-slate-200">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <h4 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-[10.5px] font-bold">4</span>
+                    <span>Past Skill Training &amp; Placement Performance ({{ placementRecords.length }} Sectors)</span>
+                  </h4>
+                  <button
+                    type="button"
+                    (click)="editSection('placement-section')"
+                    class="px-3 py-1 bg-sky-50 hover:bg-sky-100 text-[#0483AC] border border-sky-200 rounded-md text-xs font-semibold cursor-pointer shadow-2xs transition-colors"
+                  >
+                    Edit Placement &rarr;
+                  </button>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                  <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                      <tr>
+                        <th class="py-2.5 px-3">Sector</th>
+                        <th class="py-2.5 px-2">Financial Year</th>
+                        <th class="py-2.5 px-2 text-center">Trained</th>
+                        <th class="py-2.5 px-2 text-center">Placed</th>
+                        <th class="py-2.5 px-2 text-center">Placement Rate</th>
+                        <th class="py-2.5 px-3 text-right">Proof Document</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-normal">
+                      @for (p of placementRecords; track p.sector) {
+                        <tr>
+                          <td class="py-2.5 px-3 font-semibold text-slate-800">{{ p.sector }}</td>
+                          <td class="py-2.5 px-2 text-slate-600 font-mono text-[11px]">{{ p.year }}</td>
+                          <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ p.trained }}</td>
+                          <td class="py-2.5 px-2 text-center font-bold text-emerald-700">{{ p.placed }}</td>
+                          <td class="py-2.5 px-2 text-center font-bold text-emerald-800">
+                            {{ (p.trained && p.trained > 0) ? ((p.placed / p.trained) * 100).toFixed(1) + '%' : '-' }}
+                          </td>
+                          <td class="py-2.5 px-3 text-right text-[11px] text-slate-500 font-mono">{{ p.proofDoc }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Section 5: Proposed Annual Action Plan -->
+              <div class="space-y-3 pb-6 border-b border-slate-200">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <h4 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-[10.5px] font-bold">5</span>
+                    <span>State-wide Proposed Annual Action Plan ({{ actionPlan.length }} Districts)</span>
+                  </h4>
+                  <button
+                    type="button"
+                    (click)="editSection('action-plan-section')"
+                    class="px-3 py-1 bg-sky-50 hover:bg-sky-100 text-[#0483AC] border border-sky-200 rounded-md text-xs font-semibold cursor-pointer shadow-2xs transition-colors"
+                  >
+                    Edit Action Plan &rarr;
+                  </button>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                  <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-slate-50 text-slate-700 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                      <tr>
+                        <th class="py-2.5 px-2 w-10 text-center">S.No</th>
+                        <th class="py-2.5 px-3">Year</th>
+                        <th class="py-2.5 px-3">Proposed District</th>
+                        <th class="py-2.5 px-2 text-center">SDCs</th>
+                        <th class="py-2.5 px-3">SDC Location / Centres</th>
+                        <th class="py-2.5 px-3">Proposed Sectors</th>
+                        <th class="py-2.5 px-3">Course / Trade</th>
+                        <th class="py-2.5 px-2 text-center">Mode</th>
+                        <th class="py-2.5 px-2 text-center">Batches</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-normal">
+                      @for (ap of actionPlan; track ap.id; let idx = $index) {
+                        <tr>
+                          <td class="py-2.5 px-2 text-center text-slate-400 font-bold">{{ idx + 1 }}</td>
+                          <td class="py-2.5 px-3 font-mono text-[11px]">{{ ap.year }}</td>
+                          <td class="py-2.5 px-3 font-semibold text-slate-800">{{ ap.district }}</td>
+                          <td class="py-2.5 px-2 text-center font-bold text-[#0B3558]">{{ ap.sdcCount }}</td>
+                          <td class="py-2.5 px-3 text-slate-600">{{ ap.location }}</td>
+                          <td class="py-2.5 px-3 text-slate-700">{{ ap.sectors }}</td>
+                          <td class="py-2.5 px-3 text-slate-700 max-w-xs truncate">{{ ap.courses }}</td>
+                          <td class="py-2.5 px-2 text-center text-emerald-700 font-medium">{{ ap.mode }}</td>
+                          <td class="py-2.5 px-2 text-center font-bold text-slate-900">{{ ap.batches }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Section 6: Mandatory EOI Proposal Documents Checklist -->
+              <div class="space-y-3 pb-2">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <h4 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-[10.5px] font-bold">6</span>
+                    <span>Mandatory Statutory Documents &amp; Annexures ({{ attachedDocsCount() }} / {{ eoiDocuments().length }} Attached)</span>
+                  </h4>
+                  <button
+                    type="button"
+                    (click)="editSection('documents-section')"
+                    class="px-3 py-1 bg-sky-50 hover:bg-sky-100 text-[#0483AC] border border-sky-200 rounded-md text-xs font-semibold cursor-pointer shadow-2xs transition-colors"
+                  >
+                    Edit Documents &rarr;
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs">
+                  @for (d of eoiDocuments(); track d.id) {
+                    <div class="p-2.5 rounded-lg border border-slate-200 flex items-center justify-between bg-slate-50/70">
+                      <div class="flex items-center gap-2 min-w-0 max-w-[75%]">
+                        <span class="w-5 h-5 rounded-full font-bold text-[10px] bg-slate-200 text-slate-700 flex items-center justify-center shrink-0">
+                          {{ d.id }}
+                        </span>
+                        <div class="min-w-0">
+                          <span class="font-medium text-slate-800 truncate block">{{ d.name }}</span>
+                          @if (d.status === 'uploaded') {
+                            <span class="text-[10.5px] text-emerald-700 font-mono truncate block">{{ d.fileName }} ({{ d.fileSize }})</span>
+                          }
+                        </div>
+                      </div>
+                      <div class="shrink-0">
+                        @if (d.status === 'uploaded') {
+                          <span class="text-emerald-700 font-bold text-[10.5px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                            &check; Attached
+                          </span>
+                        } @else {
+                          <span class="text-amber-700 font-semibold text-[10.5px] bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                            Pending
+                          </span>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
             </div>
 
             <!-- Declaration Checkbox -->
@@ -1882,88 +2042,307 @@ export interface EoiDocumentItem {
              STEP 5: SUBMISSION RECEIPTS & ACKNOWLEDGEMENT
              ==================================================================== -->
         @if (currentStep() === 5) {
-          <div class="space-y-5">
-            <div class="bg-emerald-700 text-white rounded-xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-5">
-              <div class="flex items-center gap-4 text-center sm:text-left">
-                <div class="w-11 h-11 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-xl text-white shrink-0 mx-auto">
+          <div class="space-y-6">
+
+            <!-- Executive Submission Success Banner (Project Theme #0B3558 Navy) -->
+            <div class="bg-gradient-to-r from-[#0B3558] via-[#0E436E] to-[#0483AC] text-white rounded-2xl p-6 sm:p-7 shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-[#0B3558]">
+              <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xs flex items-center justify-center text-2xl text-emerald-400 shrink-0 shadow-inner">
                   &check;
                 </div>
                 <div>
-                  <span class="px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[10.5px] font-medium uppercase tracking-wider">
-                    Application Successfully Submitted &amp; Verified
-                  </span>
-                  <h2 class="text-lg sm:text-xl font-bold mt-1">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-bold uppercase tracking-wider">
+                      Application Successfully Submitted &amp; Verified
+                    </span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-white/15 text-white/90 text-[10px] font-semibold">
+                      Ref: ISMS-EOI-2026-9871
+                    </span>
+                  </div>
+                  <h2 class="text-xl sm:text-2xl font-bold mt-1.5 tracking-tight">
                     EOI Proposal Submitted for {{ schemeCode() }}
                   </h2>
-                  <p class="text-xs text-emerald-100 mt-0.5 max-w-xl font-normal">
-                    Your Expression of Interest application has been recorded in the ISMS 2.0 repository and routed to the RSLDC scrutiny committee.
+                  <p class="text-xs text-blue-100/90 mt-1 max-w-2xl leading-relaxed">
+                    Your Expression of Interest application has been formally recorded in the ISMS 2.0 repository and routed to the RSLDC Technical Scrutiny Committee. A digital confirmation has been dispatched to your registered email and mobile number.
                   </p>
                 </div>
               </div>
 
-              <div class="flex items-center gap-2 shrink-0">
+              <div class="flex items-center gap-2.5 shrink-0 w-full md:w-auto">
                 <button
                   type="button"
                   (click)="goToTenderStatus()"
-                  class="px-4 py-2 bg-white text-[#0B3558] hover:bg-slate-50 rounded-lg text-xs font-bold shadow-xs transition-colors cursor-pointer whitespace-nowrap"
+                  class="w-full md:w-auto px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2 hover:shadow-md"
                 >
-                  View in Tender Status &rarr;
+                  <span>Track in Tender Status &rarr;</span>
                 </button>
               </div>
             </div>
 
-            <!-- Application Summary Card -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4 text-xs">
-              <h3 class="text-sm font-bold text-[#0B3558] pb-2 border-b border-slate-100">
-                Submission Summary &amp; Digital Receipts
-              </h3>
+            <!-- Formal Digital Submission & Fee Acknowledgment Certificate Card -->
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden print:border-none print:shadow-none">
 
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div>
-                  <span class="text-slate-400 block text-[10.5px]">Application Ref No</span>
-                  <span class="font-mono font-bold text-slate-800 text-sm">ISMS-EOI-2026-9871</span>
+              <!-- Certificate Header / Emblems -->
+              <div class="p-6 bg-slate-50/80 border-b border-slate-200/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-11 h-11 rounded-xl bg-[#0B3558] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs tracking-wider">
+                    ISMS
+                  </div>
+                  <div>
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                      Government of Rajasthan &bull; Department of Skill &amp; Livelihoods
+                    </div>
+                    <div class="text-sm sm:text-base font-extrabold text-[#0B3558] tracking-tight">
+                      Rajasthan Skill &amp; Livelihoods Development Corporation (RSLDC)
+                    </div>
+                    <div class="text-[11px] text-slate-500 font-medium">
+                      Official EOI Proposal Submission &amp; Cyber Treasury Fee Acknowledgment Receipt
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <span class="text-slate-400 block text-[10.5px]">Fee Payment Status</span>
-                  <span class="font-bold text-emerald-700">₹52,000 Paid (TXN-ISMS-345678)</span>
-                </div>
-                <div>
-                  <span class="text-slate-400 block text-[10.5px]">Centres Deployed</span>
-                  <span class="font-bold text-slate-800">{{ selectedCentresForScheme().length }} Centres</span>
-                </div>
-                <div>
-                  <span class="text-slate-400 block text-[10.5px]">Attached Documents</span>
-                  <span class="font-bold text-slate-800">{{ attachedDocsCount() }} / {{ eoiDocuments().length }} Documents</span>
+
+                <!-- Digital Verification Badge -->
+                <div class="flex items-center gap-2 self-end md:self-auto bg-white border border-emerald-200 rounded-xl px-3.5 py-2 shadow-2xs">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <div class="text-right">
+                    <div class="text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider">Digitally Verified &amp; Signed</div>
+                    <div class="text-[9.5px] font-mono text-slate-500">28-Sep-2026 14:45 IST</div>
+                  </div>
                 </div>
               </div>
 
-              <div class="pt-4 border-t border-slate-100 flex items-center justify-between flex-wrap gap-3">
-                <div class="flex items-center gap-3">
+              <!-- Quick Meta Highlight Strip -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 border-b border-slate-100 bg-white">
+                <div class="p-4">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Application Ref No.</span>
+                  <span class="font-mono font-extrabold text-sm text-[#0B3558]">ISMS-EOI-2026-9871</span>
+                </div>
+                <div class="p-4">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Cyber Treasury Ref</span>
+                  <span class="font-mono font-bold text-xs text-slate-800">TXN-ISMS-2026-345678</span>
+                </div>
+                <div class="p-4">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Fee Paid</span>
+                  <span class="font-extrabold text-sm text-emerald-700">₹52,000 <span class="text-[10.5px] font-normal text-slate-500">(EMD + RFP)</span></span>
+                </div>
+                <div class="p-4">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Current Status</span>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    Under Technical Scrutiny
+                  </span>
+                </div>
+              </div>
+
+              <!-- Structured Receipt Body Sections -->
+              <div class="p-6 sm:p-7 space-y-6 text-xs">
+
+                <!-- 1. Applicant Organization Particulars -->
+                <div class="space-y-2.5">
+                  <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
+                    <h4 class="text-xs font-bold text-[#0B3558] uppercase tracking-wider flex items-center gap-2">
+                      <span class="w-4 h-4 rounded bg-[#0B3558]/10 text-[#0B3558] flex items-center justify-center text-[10px]">1</span>
+                      Applicant Training Partner Organization
+                    </h4>
+                    <span class="text-[10.5px] text-slate-500 font-medium">OTR ID: <strong class="text-slate-800">OTR-2026-RAJ-88421</strong></span>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 bg-slate-50/60 p-4 rounded-xl border border-slate-100">
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Legal Entity Name</span>
+                      <span class="font-bold text-slate-800">{{ editableStep1.fullName || 'Apex Skill Development & Vocational Training Pvt. Ltd.' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Entity Type &bull; Registration / CIN</span>
+                      <span class="font-medium text-slate-800">{{ editableStep1.companyType || 'Private Limited' }} &bull; {{ editableStep1.registrationNumber || 'U80302RJ2022NPL079811' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">PAN &bull; GSTIN</span>
+                      <span class="font-mono font-medium text-slate-800">{{ editableStep1.companyPan || 'AAACR1234F' }} &bull; {{ editableStep1.gstin || '08AAACR1234F1Z5' }}</span>
+                    </div>
+                    <div class="md:col-span-2">
+                      <span class="text-slate-400 block text-[10.5px]">Registered Office Address</span>
+                      <span class="text-slate-700">{{ registeredAddressText }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Designated Officer In-Charge</span>
+                      <span class="font-semibold text-slate-800">{{ selectedOic()?.name || editableStep3.name || 'Dr. Rajesh Sharma' }} ({{ selectedOic()?.designation || editableStep3.designation || 'Director' }})</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 2. Scheme & Proposal Details -->
+                <div class="space-y-2.5">
+                  <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
+                    <h4 class="text-xs font-bold text-[#0B3558] uppercase tracking-wider flex items-center gap-2">
+                      <span class="w-4 h-4 rounded bg-[#0B3558]/10 text-[#0B3558] flex items-center justify-center text-[10px]">2</span>
+                      Scheme Application &amp; Infrastructure Commitments
+                    </h4>
+                    <span class="text-[10.5px] text-slate-500 font-medium">Scheme: <strong class="text-slate-800">{{ schemeCode() }}</strong></span>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 bg-slate-50/60 p-4 rounded-xl border border-slate-100">
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Scheme Title</span>
+                      <span class="font-bold text-slate-800">{{ schemeTitle() }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">EOI Reference Number</span>
+                      <span class="font-mono text-slate-800 font-medium text-[11px]">{{ schemeRefNo() }}</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">EOI Category &bull; Submission Window</span>
+                      <span class="font-medium text-slate-800">{{ schemeEoiCategory() }} &bull; Open (Closes {{ schemeClosingDate() }})</span>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Training Centres Deployed</span>
+                      <span class="font-bold text-[#0B3558] text-sm">{{ selectedCentresForScheme().length }} Verified Centre(s)</span>
+                      <div class="text-[10.5px] text-slate-500 truncate mt-0.5">
+                        @for (c of selectedCentresForScheme(); track c.id; let last = $last) {
+                          {{ c.name }}{{ !last ? ', ' : '' }}
+                        }
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Annual Trainee Target Commitment</span>
+                      <span class="font-bold text-slate-800 text-sm">{{ totalTraineesTarget() }} Candidates</span>
+                      <div class="text-[10.5px] text-slate-500 mt-0.5">
+                        Planned across {{ actionPlan().length }} target district(s)
+                      </div>
+                    </div>
+                    <div>
+                      <span class="text-slate-400 block text-[10.5px]">Statutory Annexures &amp; Documents</span>
+                      <span class="font-bold text-emerald-700 text-sm">{{ attachedDocsCount() }} of {{ eoiDocuments().length }} Attached</span>
+                      <div class="text-[10.5px] text-emerald-600 mt-0.5">All mandatory files digitally verified</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. Cyber Treasury Fee Payment & Receipt Breakdown -->
+                <div class="space-y-2.5">
+                  <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
+                    <h4 class="text-xs font-bold text-[#0B3558] uppercase tracking-wider flex items-center gap-2">
+                      <span class="w-4 h-4 rounded bg-[#0B3558]/10 text-[#0B3558] flex items-center justify-center text-[10px]">3</span>
+                      Cyber Treasury Fee Payment &amp; e-Challan Particulars
+                    </h4>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                      &check; Payment Reconciled &amp; Settled
+                    </span>
+                  </div>
+
+                  <div class="border border-slate-200 rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-xs">
+                      <thead class="bg-slate-100/80 text-slate-600 font-bold text-[10.5px] uppercase tracking-wider border-b border-slate-200">
+                        <tr>
+                          <th class="p-3">Fee Component</th>
+                          <th class="p-3">Classification</th>
+                          <th class="p-3">Cyber Treasury Head</th>
+                          <th class="p-3 text-right">Amount (₹)</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100 text-slate-700">
+                        <tr>
+                          <td class="p-3 font-semibold text-slate-800">EOI RFP Tender Processing Fee</td>
+                          <td class="p-3"><span class="text-[10px] px-2 py-0.5 bg-slate-100 text-slate-600 rounded">Non-Refundable</span></td>
+                          <td class="p-3 font-mono text-[11px] text-slate-500">0070-60-800-01-00 (Admin Charges)</td>
+                          <td class="p-3 text-right font-mono font-bold text-slate-900">₹2,000.00</td>
+                        </tr>
+                        <tr>
+                          <td class="p-3 font-semibold text-slate-800">Earnest Money Deposit (EMD)</td>
+                          <td class="p-3"><span class="text-[10px] px-2 py-0.5 bg-blue-50 text-blue-700 rounded">Refundable / BG Adjustable</span></td>
+                          <td class="p-3 font-mono text-[11px] text-slate-500">8443-00-103-00-00 (Security Deposits)</td>
+                          <td class="p-3 text-right font-mono font-bold text-slate-900">₹50,000.00</td>
+                        </tr>
+                        <tr class="bg-slate-50 font-bold">
+                          <td colspan="3" class="p-3 text-right text-slate-700 uppercase tracking-wider text-[11px]">
+                            Total Amount Transferred (Rupees Fifty-Two Thousand Only):
+                          </td>
+                          <td class="p-3 text-right text-base text-[#0B3558] font-black">
+                            ₹52,000.00
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <div class="p-3 bg-slate-50/50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-[11px] text-slate-600">
+                      <div>Mode: <strong class="text-slate-800 font-semibold">{{ paymentMethod() }} (Cyber Treasury Gateway)</strong></div>
+                      <div>Challan GRN: <strong class="font-mono text-slate-800">GRN-RAJ-2026-99182348</strong></div>
+                      <div>Bank Ref / CIN: <strong class="font-mono text-slate-800">CIN-HDFC-9912081</strong></div>
+                      <div>Timestamp: <strong class="text-slate-800">28-Sep-2026 14:42:15 IST</strong></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 4. Next Steps & Statutory Advisory -->
+                <div class="p-4 rounded-xl bg-blue-50/60 border border-blue-100 flex items-start gap-3 text-[11.5px] text-slate-700">
+                  <div class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    i
+                  </div>
+                  <div class="space-y-1">
+                    <div class="font-bold text-[#0B3558]">Next Steps in Proposal Scrutiny Lifecycle:</div>
+                    <p class="leading-relaxed text-slate-600">
+                      1. The RSLDC Scrutiny Committee will verify your institutional credentials, turnover eligibility, and training center infrastructure.<br>
+                      2. If clarifications are required, a deficiency notice will be raised directly in your ISMS 2.0 dashboard.<br>
+                      3. Shortlisted applicant partners will be invited for technical presentation and letter of award (LoA) allocation.
+                    </p>
+                    <div class="text-[10px] text-slate-400 font-mono pt-1">
+                      Security Hash: SHA256: 7B9E-48A1-D992-MMKVY-2026-RSLDC-GOV &bull; Electronically generated under IT Act 2000
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Action Toolbar Footer -->
+              <div class="p-5 sm:p-6 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3 flex-wrap w-full sm:w-auto">
                   <button
                     type="button"
                     (click)="downloadReceipt('acknowledgment')"
-                    class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg font-semibold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    class="flex-1 sm:flex-none px-4 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-colors"
                   >
-                    <span>Download Official Acknowledgment Receipt</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <span>Download Official Acknowledgment (PDF)</span>
                   </button>
+
                   <button
                     type="button"
                     (click)="downloadReceipt('payment')"
-                    class="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg font-semibold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                    class="flex-1 sm:flex-none px-4 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-2xs transition-colors"
                   >
-                    <span>Download Payment Receipt</span>
+                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <span>Download Payment e-Challan</span>
                   </button>
                 </div>
 
-                <button
-                  type="button"
-                  (click)="printReceipt()"
-                  class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-xs flex items-center gap-1.5 cursor-pointer"
-                >
-                  <span>Print Receipt</span>
-                </button>
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                  <button
+                    type="button"
+                    (click)="printReceipt()"
+                    class="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl font-semibold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
+                  >
+                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                    </svg>
+                    <span>Print Formal Receipt</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    (click)="goToTenderStatus()"
+                    class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>View in Tender Status &rarr;</span>
+                  </button>
+                </div>
               </div>
+
             </div>
+
           </div>
         }
 
@@ -2118,7 +2497,14 @@ export class SchemeFormComponent {
     return this.editableStep2?.find(o => o.id === id) || (this.editableStep2?.[0] ?? null);
   });
 
+  turnoverChanged = signal<number>(0);
+
+  onTurnoverChange(): void {
+    this.turnoverChanged.update(v => v + 1);
+  }
+
   readonly avgTotalTurnover = computed(() => {
+    this.turnoverChanged();
     const rows = this.editableStep1?.financialYears;
     if (!rows || !rows.length) return '0.00';
     const sum = rows.reduce((acc, r) => acc + (parseFloat(r.totalTurnover) || 0), 0);
@@ -2126,6 +2512,7 @@ export class SchemeFormComponent {
   });
 
   readonly avgSkillTurnover = computed(() => {
+    this.turnoverChanged();
     const rows = this.editableStep1?.financialYears;
     if (!rows || !rows.length) return '0.00';
     const sum = rows.reduce((acc, r) => acc + (parseFloat(r.skillTurnover) || 0), 0);
@@ -2675,6 +3062,14 @@ export class SchemeFormComponent {
     if (!this.selectedOicId() && this.editableStep2?.length > 0) {
       this.selectedOicId.set(this.editableStep2[0].id);
     }
+
+    if (!this.editableStep1?.financialYears || this.editableStep1.financialYears.length === 0) {
+      this.editableStep1.financialYears = [
+        { year: '2025-26', totalTurnover: '180.00', skillTurnover: '72.00' },
+        { year: '2024-25', totalTurnover: '150.00', skillTurnover: '60.00' },
+        { year: '2023-24', totalTurnover: '120.00', skillTurnover: '48.00' }
+      ];
+    }
   }
 
   saveAndProceedToStep2(): void {
@@ -2695,7 +3090,7 @@ export class SchemeFormComponent {
   }
 
   /** Edit facility from Step 3: navigates directly to the target step and section */
-  editSection(target: 'otr-step1' | 'oic-dropdown' | 'training-centres-section' | 'placement-section' | 'action-plan-section' | 'documents-section'): void {
+  editSection(target: 'otr-step1' | 'oic-dropdown' | 'training-centres-section' | 'financial-turnover-section' | 'placement-section' | 'action-plan-section' | 'documents-section'): void {
     if (target === 'otr-step1') {
       this.isEditingOtr.set(true);
       this.goToStep(1);

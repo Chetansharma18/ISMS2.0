@@ -103,6 +103,7 @@ import {
             capacity: capacityTemplate,
             duration: durationTemplate,
             status: statusTemplate,
+            cameraConfig: cameraConfigTemplate,
             actions: actionsTemplate
           }"
         >
@@ -127,7 +128,7 @@ import {
               {{ b.courseName }}
             </div>
             <div class="mt-1">
-              <span class="inline-block px-2 py-0.5 rounded text-[10.5px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+              <span class="text-[11px] font-semibold text-slate-600 block">
                 {{ b.scheme }}
               </span>
             </div>
@@ -173,14 +174,27 @@ import {
         <!-- Template: Status Badge -->
         <ng-template #statusTemplate let-b>
           @if (b.status === 'ONGOING') {
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold bg-[#E6F9F0] text-[#15803D] border border-[#86EFAC] tracking-wider uppercase">
+            <span class="text-[11px] font-bold text-[#15803D] tracking-wider uppercase">
               ONGOING
             </span>
           } @else {
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-300 tracking-wider uppercase">
+            <span class="text-[11px] font-bold text-sky-700 tracking-wider uppercase">
               APPROVED
             </span>
           }
+        </ng-template>
+
+        <!-- Template: Camera Config -->
+        <ng-template #cameraConfigTemplate let-b>
+          <app-button
+            variant="primary"
+            size="sm"
+            (btnClick)="addCameraConfig(b)"
+            title="Add Camera Configuration"
+          >
+            <span class="text-sm font-bold leading-none">+</span>
+            <span class="whitespace-nowrap">Add Camera Configuration</span>
+          </app-button>
         </ng-template>
 
         <!-- Template: Actions -->
@@ -209,14 +223,15 @@ export class BatchListComponent {
   readonly pageSize = 10;
 
   readonly batchColumns: TableColumn<BatchRecord>[] = [
-    { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
-    { key: 'batchInfo', label: 'Batch Info', type: 'custom', width: 'min-w-[160px]' },
-    { key: 'courseScheme', label: 'Course & Scheme', type: 'custom' },
-    { key: 'center', label: 'Center (SDC)', type: 'custom' },
-    { key: 'capacity', label: 'Capacity & Mapped', type: 'custom', width: 'min-w-[160px]' },
-    { key: 'duration', label: 'Batch Duration', type: 'custom', width: 'w-36' },
-    { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'w-28' },
-    { key: 'actions', label: 'Actions', align: 'right', type: 'custom', width: 'w-52' }
+    { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-10' },
+    { key: 'batchInfo', label: 'Batch Info', type: 'custom', width: 'min-w-[130px]' },
+    { key: 'courseScheme', label: 'Course & Scheme', type: 'custom', width: 'min-w-[200px]' },
+    { key: 'center', label: 'Center (SDC)', type: 'custom', width: 'min-w-[200px]' },
+    { key: 'capacity', label: 'Capacity & Mapped', type: 'custom', width: 'min-w-[140px]' },
+    { key: 'duration', label: 'Batch Duration', type: 'custom', width: 'w-32' },
+    { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'w-24' },
+    { key: 'cameraConfig', label: 'Camera Config', align: 'center', type: 'custom', width: 'w-56' },
+    { key: 'actions', label: 'Actions', align: 'right', type: 'custom', width: 'w-44' }
   ];
 
   readonly filterOptions = computed(() => {
@@ -265,5 +280,10 @@ export class BatchListComponent {
   selectAndMap(b: BatchRecord): void {
     // Navigate to aspirant registration and batch mapping form
     this.router.navigate(['/batches', b.id, 'map-aspirant']);
+  }
+
+  addCameraConfig(b: BatchRecord): void {
+    // Handle adding camera configuration
+    console.log('Add camera configuration for batch:', b.id);
   }
 }

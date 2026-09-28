@@ -2130,7 +2130,7 @@ export interface EoiDocumentItem {
               <div class="w-12 h-12 mx-auto rounded-full bg-white text-[#15803d] flex items-center justify-center shadow-md mb-2 font-bold text-xl">
                 &check;
               </div>
-              <h3 class="text-lg font-bold tracking-tight">Payment Successful</h3>
+              <h3 class="text-lg font-bold tracking-tight text-white" style="color: #ffffff !important;">Payment Successful</h3>
               <p class="text-xs text-emerald-100 font-normal">
                 Payment of ₹52,000 completed successfully via {{ paymentMethod() }}
               </p>

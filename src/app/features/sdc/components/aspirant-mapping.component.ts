@@ -169,7 +169,6 @@ import {
               </span>
               <div class="truncate">
                 <span class="block leading-tight font-bold text-slate-900 truncate">1. Personal &amp; Identity</span>
-                <span class="text-[10px] text-slate-500 font-normal truncate">Aadhaar &amp; Bio Data</span>
               </div>
             </button>
 
@@ -196,7 +195,6 @@ import {
               </span>
               <div class="truncate">
                 <span class="block leading-tight font-bold text-slate-900 truncate">2. Address &amp; Contact</span>
-                <span class="text-[10px] text-slate-500 font-normal truncate">Permanent &amp; Comm.</span>
               </div>
             </button>
 
@@ -223,7 +221,6 @@ import {
               </span>
               <div class="truncate">
                 <span class="block leading-tight font-bold text-slate-900 truncate">3. Bank &amp; Worker</span>
-                <span class="text-[10px] text-slate-500 font-normal truncate">DBT, BoCW, MGNREGA</span>
               </div>
             </button>
 
@@ -244,7 +241,6 @@ import {
               </span>
               <div class="truncate">
                 <span class="block leading-tight font-bold text-slate-900 truncate">4. Photo &amp; Documents</span>
-                <span class="text-[10px] text-slate-500 font-normal truncate">Uploads &amp; Map Batch</span>
               </div>
             </button>
 
@@ -1000,10 +996,6 @@ export class AspirantMappingComponent implements OnInit {
       }
       if (!this.formData.aadhaarNo) {
         this.errorMessage.set('Aadhaar number is mandatory.');
-        return;
-      }
-      if (this.formData.aadhaarNo !== this.formData.confirmAadhaarNo) {
-        this.errorMessage.set('Aadhaar number and Confirm Aadhaar number do not match.');
         return;
       }
     } else if (this.currentStep() === 2) {

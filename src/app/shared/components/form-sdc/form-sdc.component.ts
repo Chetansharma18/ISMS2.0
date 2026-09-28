@@ -314,7 +314,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
           @if (field.type === 'heading') {
             <div class="pt-2 pb-0.5 border-b border-slate-100 col-span-full">
               <h4 class="text-[11px] font-bold text-slate-800 tracking-wider uppercase m-0">
-                {{ field.label }}
+                {{ getFieldLabel(field) }}
               </h4>
               @if (field.hint) {
                 <p class="text-[10px] text-slate-500 mt-0.5 m-0">{{ field.hint }}</p>
@@ -335,7 +335,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
                 />
                 <div>
                   <span class="text-xs font-semibold text-slate-800 leading-tight block">
-                    {{ field.label }}
+                    {{ getFieldLabel(field) }}
                     @if (field.required) {
                       <span class="text-rose-500 font-bold ml-0.5">*</span>
                     }
@@ -356,7 +356,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
             <div class="flex items-center justify-between py-1">
               <div>
                 <span class="text-xs font-semibold text-slate-800">
-                  {{ field.label }}
+                  {{ getFieldLabel(field) }}
                   @if (field.required) {
                     <span class="text-rose-500 font-bold ml-0.5">*</span>
                   }
@@ -388,7 +388,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
             <!-- STANDARD FORM INPUT LABEL ROW -->
             <div class="flex items-center justify-between gap-1">
               <label [for]="'input-' + field.key" class="block text-xs font-medium text-slate-700 leading-tight select-none truncate">
-                {{ field.label }}
+                {{ getFieldLabel(field) }}
                 @if (field.required) {
                   <span class="text-rose-500 font-bold ml-0.5">*</span>
                 }
@@ -417,7 +417,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
                   }"
                 >
                   <option value="" disabled [selected]="!getValue(field.key)">
-                    {{ field.placeholder || 'Please select' }}
+                    {{ getFieldPlaceholder(field) || 'Please select' }}
                   </option>
                   @for (opt of field.options; track opt.value) {
                     <option [value]="opt.value" [disabled]="opt.disabled">
@@ -440,7 +440,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
                 [id]="'input-' + field.key"
                 [ngModel]="getValue(field.key)"
                 (ngModelChange)="onValueChange(field, $event)"
-                [placeholder]="field.placeholder || ''"
+                [placeholder]="getFieldPlaceholder(field) || ''"
                 [rows]="field.rows || 2"
                 [disabled]="isFieldDisabled(field)"
                 [readonly]="field.readonly"
@@ -664,7 +664,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
                   [type]="field.type || 'text'"
                   [value]="getValue(field.key)"
                   (input)="onNativeInput(field, $event)"
-                  [placeholder]="field.placeholder || ''"
+                  [placeholder]="getFieldPlaceholder(field) || ''"
                   [disabled]="isFieldDisabled(field)"
                   [readonly]="field.readonly"
                   [attr.min]="field.min != null ? field.min : null"
@@ -955,7 +955,7 @@ export class FormSdcComponent {
     const fileSize = typeof fileVal === 'object' && fileVal.fileSize ? fileVal.fileSize : '2.40 MB';
     const fileUrl = typeof fileVal === 'object' && fileVal.fileUrl ? fileVal.fileUrl : undefined;
 
-    this.previewTitle = field.label || 'Document Preview';
+    this.previewTitle = this.getFieldLabel(field) || 'Document Preview';
     this.activePreviewDoc = {
       fileName,
       fileSize,
@@ -1046,6 +1046,24 @@ export class FormSdcComponent {
       uploadDate: new Date().toLocaleDateString('en-GB')
     };
     this.isPreviewOpen = true;
+  }
+
+  /** Retrieves label as string, evaluating dynamic function if provided */
+  getFieldLabel(field: FormFieldConfig): string {
+    if (!field) return '';
+    if (typeof field.label === 'function') {
+      return (field.label as any)(this.model);
+    }
+    return field.label || '';
+  }
+
+  /** Retrieves placeholder as string, evaluating dynamic function if provided */
+  getFieldPlaceholder(field: FormFieldConfig): string {
+    if (!field) return '';
+    if (typeof field.placeholder === 'function') {
+      return (field.placeholder as any)(this.model);
+    }
+    return field.placeholder || '';
   }
 
   /** Determines the grid CSS layout for a container */
@@ -1143,7 +1161,7 @@ export class FormSdcComponent {
           if (field.type === 'photos' && Array.isArray(val) && val.length < (field.minPhotos || 3)) {
             this.internalErrors[field.key] = `Please upload at least ${field.minPhotos || 3} photos of the center`;
           } else {
-            this.internalErrors[field.key] = field.requiredMessage || `${field.label} is required`;
+            this.internalErrors[field.key] = field.requiredMessage || `${this.getFieldLabel(field)} is required`;
           }
           if (!firstErrorFieldKey) firstErrorFieldKey = field.key;
           continue;
@@ -1202,7 +1220,7 @@ export class FormSdcComponent {
       if (field.pattern && typeof val === 'string') {
         const regex = typeof field.pattern === 'string' ? new RegExp(field.pattern) : field.pattern;
         if (!regex.test(val)) {
-          this.internalErrors[field.key] = field.patternMessage || `Invalid format for ${field.label}`;
+          this.internalErrors[field.key] = field.patternMessage || `Invalid format for ${this.getFieldLabel(field)}`;
           if (!firstErrorFieldKey) firstErrorFieldKey = field.key;
           continue;
         }

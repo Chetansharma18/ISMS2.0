@@ -208,7 +208,7 @@ export function getDefaultAspirantDocuments(): AspirantDocumentItem[] {
 export interface AspirantFormData {
   // Step 1: Main / Personal Details
   aadhaarNo: string;
-  confirmAadhaarNo: string;
+  confirmAadhaarNo?: string;
   janaadhaarId: string;
   otherIdType: string;
   otherIdNo: string;
@@ -330,17 +330,7 @@ export function getStep1PersonalFields(
       requiredMessage: 'Aadhaar number is mandatory',
       maxLength: 12,
       placeholder: '12 digit Aadhaar number',
-      colSpan: 1
-    },
-    {
-      key: 'confirmAadhaarNo',
-      label: 'Confirm Aadhaar No.',
-      type: 'text',
-      required: true,
-      requiredMessage: 'Please confirm Aadhaar number',
-      maxLength: 12,
-      placeholder: 'Re-enter 12 digit Aadhaar',
-      colSpan: 1
+      colSpan: 2
     },
     {
       key: 'aadhaarDocProof',
@@ -373,9 +363,26 @@ export function getStep1PersonalFields(
     },
     {
       key: 'otherIdNo',
-      label: 'Other ID Nos.',
+      label: (m: any) => {
+        const type = m?.otherIdType;
+        if (!type || type === 'None') return 'Other ID Nos.';
+        if (type === 'PAN Card' || type.toLowerCase().includes('pan')) return 'PAN';
+        if (type.toLowerCase().includes('voter')) return 'Voter ID';
+        if (type.toLowerCase().includes('driving')) return 'Driving License';
+        if (type.toLowerCase().includes('passport')) return 'Passport';
+        if (type.toLowerCase().includes('ration')) return 'Ration Card';
+        return `${type}`;
+      },
+      placeholder: (m: any) => {
+        const type = m?.otherIdType;
+        if (type === 'PAN Card' || type?.toLowerCase().includes('pan')) return 'Enter 10-digit PAN (e.g. ABCDE1234F)';
+        if (type === 'Voter ID') return 'Enter Voter ID number';
+        if (type === 'Driving License') return 'Enter Driving License number';
+        if (type === 'Passport') return 'Enter Passport number';
+        if (type === 'Ration Card') return 'Enter Ration Card number';
+        return 'Enter document number';
+      },
       type: 'text',
-      placeholder: 'Enter document number',
       colSpan: 2,
       visible: (m) => m.otherIdType && m.otherIdType !== 'None'
     },

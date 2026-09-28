@@ -92,10 +92,7 @@ interface HostelItem {
                 }
               </span>
               <div class="text-left">
-                <span class="block leading-tight">Step 1: PSD Payment</span>
-                <span class="text-[10px] font-normal" [class.text-emerald-600]="isPaymentCompleted()" [class.text-slate-400]="!isPaymentCompleted()">
-                  {{ isPaymentCompleted() ? '₹500 Paid ✓' : 'Fees: ₹500' }}
-                </span>
+                <span class="block leading-tight font-bold text-slate-900">1. PSD Payment Receipt</span>
               </div>
             </button>
 
@@ -122,8 +119,7 @@ interface HostelItem {
                 <span [style.color]="currentStep() === 2 ? '#ffffff !important' : '#475569 !important'" style="font-weight: 700; font-size: 11px; line-height: 1;">2</span>
               </span>
               <div class="text-left">
-                <span class="block leading-tight">Step 2: Batch Details</span>
-                <span class="text-[10px] text-slate-400 font-normal">Sector, Course, Faculty &amp; Hostel</span>
+                <span class="block leading-tight font-bold text-slate-900">2. Batch Details</span>
               </div>
             </button>
 
@@ -159,14 +155,34 @@ interface HostelItem {
                 </p>
               </div>
 
-              @if (isPaymentCompleted()) {
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-300">
-                  <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Fee Verified: ₹500.00 Paid</span>
-                </div>
-              }
+              <div class="flex items-center gap-2">
+                @if (isPaymentCompleted()) {
+                  <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#174A6E] text-xs font-bold border border-blue-200">
+                    <svg class="w-3.5 h-3.5 text-[#174A6E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Fee Verified: ₹500.00 Paid</span>
+                  </div>
+                  <button
+                    type="button"
+                    (click)="isPaymentCompleted.set(false)"
+                    class="text-[11px] text-slate-500 hover:text-slate-800 underline cursor-pointer"
+                  >
+                    View Payment Options
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    (click)="isPaymentCompleted.set(true)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs text-[#174A6E] font-semibold shadow-2xs transition-all cursor-pointer"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>View Official Receipt</span>
+                  </button>
+                }
+              </div>
             </div>
 
             <!-- =================================================================
@@ -362,18 +378,18 @@ interface HostelItem {
                 <!-- Official Digital Payment Receipt Card -->
                 <div class="bg-white border-2 border-slate-200 rounded-2xl shadow-sm overflow-hidden text-xs">
                   
-                  <!-- Top Decorative State Bar -->
-                  <div class="bg-emerald-600 text-white px-5 py-3 flex flex-wrap items-center justify-between gap-3">
+                  <!-- Top Decorative State Bar (Official ISMS Blue) -->
+                  <div class="bg-[#174A6E] text-white px-5 py-3 flex flex-wrap items-center justify-between gap-3" style="background-color: #174A6E !important;">
                     <div class="flex items-center gap-2.5">
-                      <div class="w-6 h-6 rounded-full bg-white text-emerald-700 flex items-center justify-center font-bold text-xs">
+                      <div class="w-6 h-6 rounded-full bg-white text-[#174A6E] flex items-center justify-center font-bold text-xs" style="color: #174A6E !important;">
                         &check;
                       </div>
                       <div>
-                        <div class="font-bold text-xs sm:text-sm tracking-wide">GOVERNMENT OF RAJASTHAN &bull; RSLDC ISMS 2.0</div>
-                        <div class="text-[10.5px] text-emerald-100 font-normal">Official Batch PSD Verification Fee Payment Receipt</div>
+                        <div class="font-bold text-xs sm:text-sm tracking-wide text-white" style="color: #ffffff !important;">GOVERNMENT OF RAJASTHAN &bull; RSLDC ISMS 2.0</div>
+                        <div class="text-[10.5px] text-sky-100 font-normal" style="color: #e0f2fe !important;">Official Batch PSD Verification Fee Payment Receipt</div>
                       </div>
                     </div>
-                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white tracking-wider uppercase border border-white/30">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white tracking-wider uppercase border border-white/30" style="color: #ffffff !important;">
                       PAID &amp; VERIFIED
                     </span>
                   </div>
@@ -793,12 +809,25 @@ interface HostelItem {
       @if (showPaymentSuccessModal()) {
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-200" role="dialog" aria-modal="true">
           <div class="relative max-w-md w-full bg-white rounded-2xl shadow-2xl overflow-hidden text-center font-sans animate-in zoom-in-95 duration-200">
+            <!-- Close Cross Button (X) on Top Right -->
+            <button
+              type="button"
+              (click)="closePaymentSuccessModal()"
+              class="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center transition-all cursor-pointer z-30 shadow-xs"
+              title="Close and View Receipt"
+              aria-label="Close"
+            >
+              <svg class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
             <div class="bg-[#15803d] text-white py-6 px-6 space-y-2">
               <div class="w-12 h-12 mx-auto rounded-full bg-white text-[#15803d] flex items-center justify-center shadow-md mb-2 font-bold text-xl">
                 &check;
               </div>
-              <h3 class="text-lg font-bold tracking-tight m-0">Payment Successful</h3>
-              <p class="text-xs text-emerald-100 font-normal m-0">
+              <h3 class="text-lg font-bold tracking-tight m-0 text-white" style="color: #ffffff !important;">Payment Successful</h3>
+              <p class="text-xs text-emerald-100 font-normal m-0" style="color: #d1fae5 !important;">
                 Batch PSD Fee of ₹500.00 completed successfully via {{ selectedPaymentMethod() }}
               </p>
             </div>
@@ -957,6 +986,9 @@ export class BatchFormComponent implements OnInit {
           this.currentStep.set(stepNum);
         }
       }
+      if (params['paid'] === 'true' || params['receipt'] === 'true') {
+        this.isPaymentCompleted.set(true);
+      }
     });
 
     // Lookup SDC from SdcService to prefill sector and capacity
@@ -979,7 +1011,13 @@ export class BatchFormComponent implements OnInit {
       }
     }
 
-    // Default payment timestamp
+    // Default payment timestamp and IDs
+    if (!this.transactionId()) {
+      this.transactionId.set(`TXN-PSD-2026-${Math.floor(100000 + Math.random() * 900000)}`);
+    }
+    if (!this.receiptNumber()) {
+      this.receiptNumber.set(`RCP-PSD-${Math.floor(100000 + Math.random() * 900000)}`);
+    }
     this.paymentTimestamp.set(new Date().toLocaleString('en-IN', {
       day: '2-digit',
       month: 'short',
@@ -1078,6 +1116,12 @@ export class BatchFormComponent implements OnInit {
   continueToBatchDetailsFromModal(): void {
     this.showPaymentSuccessModal.set(false);
     this.currentStep.set(2);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  closePaymentSuccessModal(): void {
+    this.showPaymentSuccessModal.set(false);
+    this.currentStep.set(1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 

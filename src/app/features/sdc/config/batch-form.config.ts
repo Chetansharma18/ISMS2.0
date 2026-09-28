@@ -207,18 +207,16 @@ export function getBatchDetailsFormFields(options: BatchFormConfigOptions = {}):
       label: 'Approved Batch Strength',
       type: 'number',
       readonly: true,
-      colSpan: 1,
-      hint: 'Allocated SDC batch capacity'
+      colSpan: 1
     },
 
-    // 8 Remarks (Textarea)
+    // 8 Remarks (Text input aligned at the same level as End Time & Strength)
     {
       key: 'remarks',
       label: 'Remarks',
-      type: 'textarea',
-      rows: 2,
+      type: 'text',
       placeholder: 'Enter batch remarks, training prerequisites, or special instructions...',
-      colSpan: 'full'
+      colSpan: 2
     }
   ];
 }

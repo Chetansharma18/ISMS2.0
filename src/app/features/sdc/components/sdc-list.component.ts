@@ -124,31 +124,31 @@ import {
           </span>
         </ng-template>
 
-        <!-- Template: Status (Colored text only, no box) -->
+        <!-- Template: Status (Black text only, no box) -->
         <ng-template #statusTemplate let-sdc>
           <div class="flex items-center justify-center">
             @if (sdc.status === 'APPROVED') {
-              <span class="whitespace-nowrap font-bold text-xs text-sky-700 tracking-wider uppercase">
+              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-black" style="color: #000000 !important;">
                 APPROVED
               </span>
             } @else if (sdc.status === 'PENDING_INSPECTION') {
-              <span class="whitespace-nowrap font-bold text-xs text-amber-700 tracking-wider uppercase">
+              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-black" style="color: #000000 !important;">
                 PENDING INSPECTION
               </span>
             } @else if (sdc.status === 'PENDING_APPROVAL') {
-              <span class="whitespace-nowrap font-bold text-xs text-purple-700 tracking-wider uppercase">
+              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-black" style="color: #000000 !important;">
                 PENDING APPROVAL
               </span>
             } @else if (sdc.status === 'REJECTED') {
-              <span class="whitespace-nowrap font-bold text-xs text-rose-700 tracking-wider uppercase">
+              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-black" style="color: #000000 !important;">
                 REJECTED
               </span>
             } @else if (sdc.status === 'RETURNED_TO_TP') {
-              <span class="whitespace-nowrap font-bold text-xs text-orange-700 tracking-wider uppercase">
+              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-black" style="color: #000000 !important;">
                 RETURNED TO TP
               </span>
             } @else {
-              <span class="whitespace-nowrap font-bold text-xs text-slate-600 tracking-wider uppercase">
+              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-black" style="color: #000000 !important;">
                 {{ sdc.status || 'DRAFT' }}
               </span>
             }

@@ -55,61 +55,6 @@ import { TableColumn } from '../../../shared/components/table/table.types';
           </div>
         }
 
-        <!-- Top Statistics Cards (No icon emojis, clean labels and figures) -->
-        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          
-          <!-- Card 1: Total Aspirants -->
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Total Aspirants</span>
-            <div class="mt-2 flex items-baseline gap-2">
-              <span class="text-2xl font-bold text-slate-900 font-mono">{{ stats().total }}</span>
-              <span class="text-[11px] text-slate-500">Enrolled</span>
-            </div>
-            <div class="mt-1 text-[11px] text-slate-500 flex items-center gap-1.5">
-              <span>{{ stats().maleCount }} Male</span>
-              <span>•</span>
-              <span>{{ stats().femaleCount }} Female</span>
-            </div>
-          </div>
-
-          <!-- Card 2: SDC Centers Covered -->
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">SDC Centers</span>
-            <div class="mt-2 flex items-baseline gap-2">
-              <span class="text-2xl font-bold text-slate-900 font-mono">{{ stats().sdcCount }}</span>
-              <span class="text-[11px] text-slate-500">Centers</span>
-            </div>
-            <div class="mt-1 text-[11px] text-slate-500 truncate">
-              Jaipur, Ajmer, Kota, Jodhpur
-            </div>
-          </div>
-
-          <!-- Card 3: Batches Active -->
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Batches Active</span>
-            <div class="mt-2 flex items-baseline gap-2">
-              <span class="text-2xl font-bold text-slate-900 font-mono">{{ stats().batchCount }}</span>
-              <span class="text-[11px] text-slate-500">Active Batches</span>
-            </div>
-            <div class="mt-1 text-[11px] text-emerald-700 font-semibold">
-              {{ stats().inTraining }} In Training • {{ stats().enrolled }} Enrolled
-            </div>
-          </div>
-
-          <!-- Card 4: Schemes -->
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Govt Schemes</span>
-            <div class="mt-2 flex items-baseline gap-2">
-              <span class="text-2xl font-bold text-slate-900 font-mono">{{ stats().schemeCount }}</span>
-              <span class="text-[11px] text-slate-500">Schemes</span>
-            </div>
-            <div class="mt-1 text-[11px] text-slate-500 truncate">
-              SAMARTH, MMKVY, RAJKViK
-            </div>
-          </div>
-
-        </div>
-
         <!-- Filter & Search Controls (Matching ISMS 2.0 Toolbar) -->
         <div class="bg-slate-50/70 border border-slate-200 rounded-xl p-3.5 space-y-3 shadow-2xs">
           
@@ -284,32 +229,28 @@ import { TableColumn } from '../../../shared/components/table/table.types';
 
         <!-- Template: Aspirant ID & Reg Date -->
         <ng-template #aspirantInfoTemplate let-a>
-          <div class="font-mono text-xs">
-            <a [routerLink]="['/aspirants', a.id]" class="font-bold text-[#174A6E] hover:underline block cursor-pointer" title="View details of {{ a.aspirantName }}">{{ a.id }}</a>
-            <span class="text-[11px] text-slate-500 font-normal block mt-0.5">Enrolled: {{ a.enrollmentDate }}</span>
+          <div class="font-mono text-xs whitespace-nowrap">
+            <a [routerLink]="['/aspirants', a.id]" class="font-bold text-[#174A6E] hover:underline block cursor-pointer whitespace-nowrap" title="View details of {{ a.aspirantName }}">{{ a.id }}</a>
+            <span class="text-[11px] text-slate-500 font-normal block mt-0.5 whitespace-nowrap">Enrolled: {{ a.enrollmentDate }}</span>
           </div>
         </ng-template>
 
-        <!-- Template: Candidate Details (Avatar, Name, Father Name, Age/Gender, Category) -->
+        <!-- Template: Candidate Details (Name, Father/Relation Name, Age/Gender, Category) -->
         <ng-template #candidateTemplate let-a>
-          <div class="flex items-center gap-3 py-1">
-            <a [routerLink]="['/aspirants', a.id]" class="w-9 h-11 rounded border border-slate-200 bg-slate-100 overflow-hidden shrink-0 shadow-2xs block cursor-pointer hover:opacity-85 transition-opacity" title="View & Edit {{ a.aspirantName }}">
-              <img [src]="a.candidatePhotoUrl || defaultAvatar" alt="Photo" class="w-full h-full object-cover" />
+          <div class="py-1 min-w-0">
+            <a [routerLink]="['/aspirants', a.id]" class="font-bold text-slate-900 hover:text-[#174A6E] hover:underline text-[13px] leading-snug block cursor-pointer" title="View details of {{ a.aspirantName }}">
+              {{ a.aspirantName }}
             </a>
-            <div>
-              <a [routerLink]="['/aspirants', a.id]" class="font-bold text-slate-900 hover:text-[#174A6E] hover:underline text-xs leading-snug block cursor-pointer" title="View & Edit {{ a.aspirantName }}">
-                {{ a.aspirantName }}
-              </a>
-              <div class="text-[11px] text-slate-500 leading-tight">
-                {{ a.relationType }}: {{ a.relationName }}
-              </div>
-              <div class="flex items-center gap-1.5 mt-1">
-                <span class="text-[10px] text-slate-600 font-medium">{{ a.gender }}, {{ a.age }} yrs</span>
-                <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-                <span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                  {{ a.category }}
-                </span>
-              </div>
+            <div class="text-[11px] text-slate-500 leading-tight mt-0.5">
+              <span class="text-slate-400 font-medium">{{ a.relationType || 'Father' }}:</span>
+              <span class="text-slate-700 font-normal ml-1">{{ a.relationName }}</span>
+            </div>
+            <div class="flex items-center gap-1.5 mt-1">
+              <span class="text-[10.5px] text-slate-500 font-medium">{{ a.gender }}, {{ a.age }} yrs</span>
+              <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+              <span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                {{ a.category }}
+              </span>
             </div>
           </div>
         </ng-template>
@@ -444,8 +385,8 @@ export class AspirantListComponent {
 
   readonly aspirantColumns: TableColumn<AspirantRecord>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
-    { key: 'aspirantInfo', label: 'Aspirant ID', type: 'custom', width: 'w-36' },
-    { key: 'candidate', label: 'Candidate Profile', type: 'custom', width: 'min-w-[200px]' },
+    { key: 'aspirantInfo', label: 'Aspirant ID', type: 'custom', width: 'min-w-[170px] whitespace-nowrap' },
+    { key: 'candidate', label: 'Candidate Profile', type: 'custom', width: 'min-w-[210px]' },
     { key: 'identity', label: 'Aadhaar & Contact', type: 'custom', width: 'min-w-[150px]' },
     { key: 'sdcCenter', label: 'Center (SDC)', type: 'custom', width: 'min-w-[170px]' },
     { key: 'batchCourse', label: 'Batch & Course', type: 'custom', width: 'min-w-[170px]' },
@@ -593,35 +534,189 @@ export class AspirantListComponent {
   }
 
   exportToCsv(): void {
-    const data = this.filteredAspirants();
-    if (!data.length) return;
+    const data: AspirantRecord[] = this.filteredAspirants().length > 0
+      ? this.filteredAspirants()
+      : this.aspirantService.aspirants();
+    if (!data.length) {
+      return;
+    }
 
-    const headers = ['Aspirant ID', 'Name', 'Gender', 'Age', 'Aadhaar (Masked)', 'Mobile', 'SDC Code', 'SDC Name', 'District', 'Batch Code', 'Course', 'Scheme', 'Status', 'Biometric Verified'];
-    const rows = data.map(a => [
-      a.id,
-      `"${a.aspirantName}"`,
-      a.gender,
-      a.age,
-      a.aadhaarMasked,
-      a.mobileNo,
-      a.sdcCode,
-      `"${a.sdcName}"`,
-      a.sdcDistrict,
-      a.batchCode,
-      `"${a.courseName}"`,
-      a.scheme,
-      a.trainingStatus,
-      a.biometricVerified ? 'YES' : 'NO'
-    ]);
+    const headers = [
+      'Aspirant ID',
+      'Candidate Name',
+      'Gender',
+      'Date of Birth',
+      'Age',
+      'Aadhaar No (Masked)',
+      'Jan Aadhaar ID',
+      'Other ID Type',
+      'Other ID Number',
+      'Father / Husband Name',
+      'Relationship',
+      'Mother Name',
+      'Educational Qualification',
+      'Category',
+      'Religion',
+      'Minority',
+      'Special Ability (PwD)',
+      'Disability Type',
+      'Area Type',
+      'Interested Out of Rajasthan',
+      'Mobile Number',
+      'Alt Mobile Number',
+      'Email Address',
+      'Permanent Address',
+      'Permanent District',
+      'Permanent Pincode',
+      'Communication Address',
+      'SDC Code',
+      'SDC Center Name',
+      'SDC District',
+      'Batch Code',
+      'Batch Name',
+      'Course Name',
+      'Sector',
+      'Government Scheme',
+      'Enrollment Date',
+      'Training Status',
+      'Biometric Verified',
+      'Attendance Percentage',
+      'Bank Name',
+      'Account Number',
+      'Account Holder Name',
+      'Account Type',
+      'Bank Branch',
+      'IFSC Code',
+      'MICR Code',
+      'Annual Family Income (INR)',
+      'Income Slab',
+      'Economic Status',
+      'Economic Card / Ration No',
+      'BoCW Worker',
+      'BoCW Registration No',
+      'MGNREGA Worker',
+      'MGNREGA Job Card No',
+      'RSBY Beneficiary',
+      'Gram Sabha PIP Listed',
+      'NRLM SHG Member',
+      'Voter ID (EPIC)',
+      'Preferred Sectors',
+      'Attached Documents Count'
+    ];
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    const escapeCsv = (val: any): string => {
+      if (val === null || val === undefined) return '""';
+      const str = String(val).trim();
+      return `"${str.replace(/"/g, '""')}"`;
+    };
+
+    const rows: string[][] = data.map((a: AspirantRecord) => {
+      const permAddress = [
+        a.permHouseNo,
+        a.permStreet,
+        a.permWard,
+        a.permCity,
+        a.permBlock,
+        a.permDistrict,
+        a.permPincode
+      ].filter(Boolean).join(', ');
+
+      const commAddress = a.isAddressSame
+        ? (permAddress || 'Same as Permanent Address')
+        : [
+            a.commHouseNo,
+            a.commStreet,
+            a.commWard,
+            a.commCity,
+            a.commBlock,
+            a.commDistrict,
+            a.commPincode
+          ].filter(Boolean).join(', ');
+
+      const docCount = Array.isArray(a.documents)
+        ? a.documents.filter((d: any) => d.status === 'UPLOADED').length
+        : 0;
+
+      return [
+        a.id || '',
+        a.aspirantName || '',
+        a.gender || '',
+        a.dob || '',
+        a.age != null ? String(a.age) : '',
+        a.aadhaarMasked || (a.aadhaarNo ? `XXXX-XXXX-${a.aadhaarNo.slice(-4)}` : ''),
+        a.janaadhaarId || '',
+        a.otherIdType || '',
+        a.otherIdNo || '',
+        a.relationName || '',
+        a.relationType || '',
+        a.motherName || '',
+        a.educationalQualification || '',
+        a.category || '',
+        a.religion || '',
+        a.minority || '',
+        a.specialAbility || 'No',
+        a.disabilityType || '',
+        a.areaType || '',
+        a.interestedOutOfRajasthan || 'No',
+        a.mobileNo || '',
+        a.altMobileNo || '',
+        a.email || '',
+        permAddress,
+        a.permDistrict || '',
+        a.permPincode || '',
+        commAddress,
+        a.sdcCode || '',
+        a.sdcName || '',
+        a.sdcDistrict || '',
+        a.batchCode || '',
+        a.batchName || '',
+        a.courseName || '',
+        a.sector || '',
+        a.scheme || '',
+        a.enrollmentDate || '',
+        a.trainingStatus || '',
+        a.biometricVerified ? 'Yes' : 'No',
+        a.attendancePercent != null ? `${a.attendancePercent}%` : '0%',
+        a.bankName || '',
+        a.bankAccountNo || '',
+        a.bankAccountName || '',
+        a.bankAccountType || '',
+        a.bankBranch || '',
+        a.ifscCode || '',
+        a.micrCode || '',
+        a.annualFamilyIncome != null ? String(a.annualFamilyIncome) : '',
+        a.incomeSlab || '',
+        a.economicStatus || '',
+        a.economicCardNo || '',
+        a.bocwWorker || 'No',
+        a.bocwNo || '',
+        a.mgnregaWorker || 'No',
+        a.mgnregaNo || '',
+        a.isRsby || 'No',
+        a.gramsabhaPip || 'No',
+        a.nrlmMember || 'No',
+        a.epicNo || '',
+        Array.isArray(a.preferredSectors) ? a.preferredSectors.join('; ') : '',
+        String(docCount)
+      ];
+    });
+
+    const csvContent = '\uFEFF' + [
+      headers.map(escapeCsv).join(','),
+      ...rows.map((row: string[]) => row.map(escapeCsv).join(','))
+    ].join('\r\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
+    link.href = url;
     link.setAttribute('download', `Aspirants_Roster_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 500);
+
+    this.successMessage.set(`Exported ${data.length} candidate record${data.length === 1 ? '' : 's'} to CSV successfully.`);
   }
 
   printDossier(aspirant: AspirantRecord): void {

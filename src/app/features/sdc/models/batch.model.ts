@@ -1,4 +1,6 @@
-export type BatchStatus = 'APPROVED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED';
+export type BatchStatus = 'APPROVED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED' | 'PENDING_APPROVAL' | 'INSPECTION_PENDING' | 'REJECTED';
+export type BatchApprovalStatus = 'PENDING' | 'INSPECTION_PENDING' | 'APPROVED' | 'REJECTED';
+export type BatchInspectionStatus = 'NOT_SCHEDULED' | 'SCHEDULED' | 'PASSED' | 'FAILED';
 
 export type FacultyType = 'Primary Trainer' | 'Assistant Trainer' | 'Domain Trainer' | 'Master Trainer' | string;
 
@@ -97,6 +99,27 @@ export interface BatchRecord {
   biometricAttendanceRate: number;
   trainees: BatchTrainee[];
   createdAt: string;
+
+  // Approval & Inspection
+  approvalStatus?: BatchApprovalStatus;
+  approvedAt?: string;
+  approvedBy?: string;
+  approvalRemarks?: string;
+  rejectionReason?: string;
+  inspectionStatus?: BatchInspectionStatus;
+  inspectionDate?: string;
+  inspectorName?: string;
+  inspectionRemarks?: string;
+  inspectionScore?: number;
+  sdcDistrict?: string;
+  checklist?: {
+    classroomNormsMet: boolean;
+    equipmentAndToolsVerified: boolean;
+    cctvAndBiometricActive: boolean;
+    trainerTotCertified: boolean;
+    safetyAndHygieneCompliant: boolean;
+    candidateDossiersVerified: boolean;
+  };
 }
 
 export interface CreateBatchDto {

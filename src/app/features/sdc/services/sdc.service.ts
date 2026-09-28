@@ -109,35 +109,35 @@ export const INITIAL_SDC_RECORDS: SdcRecord[] = [
     {
       id: 'sdc-102',
       sdcCode: 'SDC-0002',
-      sdcName: 'Ajmer Training Inst.',
-      scheme: 'SAMARTH',
+      sdcName: 'Jodhpur Commerce & Retail Academy',
+      scheme: 'MMKVY',
       schemeCategory: 'SAMARTH',
-      sector: 'Green Jobs',
-      tpName: 'ARNOLD SAMARTH',
+      sector: 'Retail',
+      tpName: 'Apex Skill Works',
       mouRefNo: 'MOU/2026/002',
       proposedStartDate: '2026-11-01',
       totalTrainedAspirants: 320,
       totalPlacedAspirants: 260,
       state: 'Rajasthan',
-      district: 'Ajmer District',
-      assemblyConstituency: 'Sardarshahar',
+      district: 'Jodhpur',
+      assemblyConstituency: 'Sardarpura',
       parliamentConstituency: 'Jodhpur',
       division: 'Jodhpur Division',
       block: 'Mandore',
       sdcCapacity: 90,
-      centerEmail: 'sdc.jodhpur@skillmasters.in',
+      centerEmail: 'sdc.jodhpur@apexskill.in',
       pincode: '342001',
       fullAddress: 'Mandore Industrial Area, Near RIICO Phase II, Jodhpur, Rajasthan',
       latitude: 26.3424,
       longitude: 73.0473,
-      remarks: 'Solar PV rooftop installation lab available',
+      remarks: 'Modern retail mockup store and POS lab available',
       allocatedCourses: [
         {
-          sector: 'Green Energy',
-          courseName: 'Solar Panel Installation Tech',
-          qpCode: 'ELE/Q5901',
+          sector: 'Retail',
+          courseName: 'Retail Sales Associate',
+          qpCode: 'RAS/Q0104',
           nsqfLevel: 4,
-          durationHours: 300
+          durationHours: 280
         }
       ],
       documents: {
@@ -147,20 +147,41 @@ export const INITIAL_SDC_RECORDS: SdcRecord[] = [
         layoutDiagramDoc: { fileName: 'Lab_Layout_Diagram.pdf', fileSize: '1.9 MB', uploadedAt: '2026-09-12' }
       },
       declarationAccepted: true,
-      status: 'PENDING_INSPECTION',
+      status: 'APPROVED',
       createdAt: '2026-09-12T11:20:00.000Z',
       submittedAt: '2026-09-12T16:00:00.000Z',
-      activeBatchesCount: 0,
+      inspection: {
+        auditorName: 'Smt. Kavita Gehlot',
+        auditorPhone: '+91 94140 77889',
+        inspectionDate: '2026-09-18',
+        physicalExistenceVerified: true,
+        signboardVerified: true,
+        classroomsLabsVerified: true,
+        biometricAebasVerified: true,
+        auditorLatitude: 26.3426,
+        auditorLongitude: 73.0475,
+        geoDistanceMeters: 22,
+        geoMatched: true,
+        auditorRemarks: 'Center verified for retail training programs.',
+        recommendation: 'RECOMMENDED'
+      },
+      approval: {
+        approvedTargetCapacity: 90,
+        approvalRemarks: 'Approved for MMKVY retail sector training.',
+        approvedDate: '2026-09-20',
+        approvedBy: 'Director (Operations), RSLDC'
+      },
+      activeBatchesCount: 1,
       enrolledTraineesCount: 0
     },
     {
       id: 'sdc-103',
-      sdcCode: 'SDC-003',
-      sdcName: 'Kota Precision Engineering & IT Hub',
-      scheme: 'RAJKViK',
-      schemeCategory: 'RAJKVIK',
-      sector: 'Capital Goods',
-      tpName: 'SkillMasters Rajasthan Pvt Ltd',
+      sdcCode: 'SDC-0003',
+      sdcName: 'Kota Technical Training Center',
+      scheme: 'SAMARTH',
+      schemeCategory: 'SAMARTH',
+      sector: 'Automotive',
+      tpName: 'TechSkill India',
       mouRefNo: 'MOU/2026/003',
       proposedStartDate: '2026-11-15',
       totalTrainedAspirants: 450,
@@ -172,26 +193,19 @@ export const INITIAL_SDC_RECORDS: SdcRecord[] = [
       division: 'Kota Division',
       block: 'Ladpura',
       sdcCapacity: 100,
-      centerEmail: 'sdc.kota@skillmasters.in',
+      centerEmail: 'sdc.kota@techskillindia.in',
       pincode: '324005',
       fullAddress: 'Plot 18, Road No. 2, Indraprastha Industrial Area, Kota, Rajasthan',
       latitude: 25.1324,
       longitude: 75.8473,
-      remarks: 'CNC machine installed with 3-phase power backup',
+      remarks: 'EV workshop setup installed with diagnostic equipment',
       allocatedCourses: [
         {
-          sector: 'Capital Goods',
-          courseName: 'CNC Milling',
-          qpCode: 'CSC/Q0417',
+          sector: 'Automotive',
+          courseName: 'Electric Vehicle Service Technician',
+          qpCode: 'ASC/Q1424',
           nsqfLevel: 4,
-          durationHours: 670
-        },
-        {
-          sector: 'Construction',
-          courseName: 'Assistant Electrician',
-          qpCode: 'CON/Q0602',
-          nsqfLevel: 3,
-          durationHours: 460
+          durationHours: 350
         }
       ],
       documents: {
@@ -201,7 +215,7 @@ export const INITIAL_SDC_RECORDS: SdcRecord[] = [
         layoutDiagramDoc: { fileName: 'Kota_Floor_Plan.pdf', fileSize: '3.0 MB', uploadedAt: '2026-09-14' }
       },
       declarationAccepted: true,
-      status: 'PENDING_APPROVAL',
+      status: 'APPROVED',
       createdAt: '2026-09-14T09:15:00.000Z',
       submittedAt: '2026-09-14T12:00:00.000Z',
       inspection: {
@@ -216,55 +230,61 @@ export const INITIAL_SDC_RECORDS: SdcRecord[] = [
         auditorLongitude: 75.8475,
         geoDistanceMeters: 31,
         geoMatched: true,
-        auditorRemarks: 'Physical labs and CNC machine verified. Location matches GPS within 31 meters.',
+        auditorRemarks: 'Physical labs and automotive equipment verified. Location matches GPS within 31 meters.',
         recommendation: 'RECOMMENDED'
       },
-      activeBatchesCount: 0,
+      approval: {
+        approvedTargetCapacity: 100,
+        approvalRemarks: 'Approved for SAMARTH EV training.',
+        approvedDate: '2026-09-22',
+        approvedBy: 'Joint Director, RSLDC'
+      },
+      activeBatchesCount: 1,
       enrolledTraineesCount: 0
     },
     {
       id: 'sdc-104',
       sdcCode: 'SDC-0004',
-      sdcName: 'Jodhpur Renewable & Green Skills Hub',
+      sdcName: 'Udaipur Healthcare Institute',
       scheme: 'MMKVY',
-      schemeCategory: 'SAMARTH',
-      sector: 'Green Jobs',
-      tpName: 'Apex Vocational Solutions',
+      schemeCategory: 'RAJKVIK',
+      sector: 'Healthcare',
+      tpName: 'CareFirst Foundation',
       mouRefNo: 'MOU/2026/004',
       proposedStartDate: '2026-11-20',
       totalTrainedAspirants: 620,
       totalPlacedAspirants: 510,
       state: 'Rajasthan',
-      district: 'Jodhpur',
-      assemblyConstituency: 'Sardarpura',
-      parliamentConstituency: 'Jodhpur',
-      division: 'Jodhpur',
-      block: 'Mandor',
+      district: 'Udaipur',
+      assemblyConstituency: 'Udaipur Rural',
+      parliamentConstituency: 'Udaipur',
+      division: 'Udaipur',
+      block: 'Girwa',
       sdcCapacity: 150,
-      centerEmail: 'jodhpur@apexvocational.com',
-      pincode: '342003',
-      fullAddress: 'Industrial Estate, Heavy Industrial Area, Jodhpur, Rajasthan',
-      latitude: 26.2734,
-      longitude: 73.0125,
+      centerEmail: 'sdc.udaipur@carefirst.org',
+      pincode: '313002',
+      fullAddress: 'Plot 22, Sector 5, Hiran Magri, Udaipur, Rajasthan',
+      latitude: 24.5854,
+      longitude: 73.7125,
       hostelCategory: 'Residential (Both Boys & Girls)',
-      remarks: 'Equipped with solar array training laboratory and smart audio-visual aids',
+      remarks: 'Simulated hospital ward setup with nursing demo manikins',
       allocatedCourses: [
         {
-          sector: 'Green Energy',
-          courseName: 'Solar PV Site Surveyor',
-          qpCode: 'SGJ/Q0101',
+          sector: 'Healthcare',
+          courseName: 'General Duty Assistant (GDA)',
+          qpCode: 'HSS/Q5101',
           nsqfLevel: 4,
-          durationHours: 350
+          durationHours: 360
         }
       ],
       documents: {
-        rentalAgreementDoc: { fileName: 'Apex_Jodhpur_Lease.pdf', fileSize: '2.9 MB', uploadedAt: '2026-09-18' },
-        fireNocDoc: { fileName: 'Apex_Fire_Certificate.pdf', fileSize: '1.1 MB', uploadedAt: '2026-09-18' },
-        signboardPhotoDoc: { fileName: 'Apex_Front_Signboard.jpg', fileSize: '3.6 MB', uploadedAt: '2026-09-18' },
-        layoutDiagramDoc: { fileName: 'Apex_Lab_Floor_Plan.pdf', fileSize: '2.7 MB', uploadedAt: '2026-09-18' }
+        rentalAgreementDoc: { fileName: 'CareFirst_Udaipur_Lease.pdf', fileSize: '2.9 MB', uploadedAt: '2026-09-18' },
+        fireNocDoc: { fileName: 'CareFirst_Fire_Certificate.pdf', fileSize: '1.1 MB', uploadedAt: '2026-09-18' },
+        signboardPhotoDoc: { fileName: 'CareFirst_Front_Signboard.jpg', fileSize: '3.6 MB', uploadedAt: '2026-09-18' },
+        layoutDiagramDoc: { fileName: 'CareFirst_Lab_Floor_Plan.pdf', fileSize: '2.7 MB', uploadedAt: '2026-09-18' }
       },
       declarationAccepted: true,
-      status: 'PENDING_APPROVAL',
+      status: 'APPROVED',
       createdAt: '2026-09-18T08:30:00.000Z',
       submittedAt: '2026-09-18T11:00:00.000Z',
       inspection: {
@@ -275,14 +295,20 @@ export const INITIAL_SDC_RECORDS: SdcRecord[] = [
         signboardVerified: true,
         classroomsLabsVerified: true,
         biometricAebasVerified: true,
-        auditorLatitude: 26.2736,
-        auditorLongitude: 73.0127,
+        auditorLatitude: 24.5856,
+        auditorLongitude: 73.7127,
         geoDistanceMeters: 26,
         geoMatched: true,
-        auditorRemarks: 'Full verification completed. Training facility ready for candidate onboarding.',
+        auditorRemarks: 'Healthcare practical lab verified and AEBAS active.',
         recommendation: 'RECOMMENDED'
       },
-      activeBatchesCount: 0,
+      approval: {
+        approvedTargetCapacity: 150,
+        approvalRemarks: 'Approved for Healthcare GDA program.',
+        approvedDate: '2026-09-24',
+        approvedBy: 'Director (Operations), RSLDC'
+      },
+      activeBatchesCount: 1,
       enrolledTraineesCount: 0
     },
     {
@@ -399,8 +425,8 @@ export const INITIAL_SDC_RECORDS: SdcRecord[] = [
         approvedDate: '2026-09-18',
         approvedBy: 'Director (Training Operations), RSLDC'
       },
-      activeBatchesCount: 1,
-      enrolledTraineesCount: 30
+      activeBatchesCount: 2,
+      enrolledTraineesCount: 2
     }
 ];
 
@@ -438,18 +464,38 @@ export class SdcService {
         if (stored) {
           const parsed: SdcRecord[] = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            // Replace any old SVG placeholders with real center photos
             const realPhotos = [
               { id: 'p1', name: 'Center_Front_Building.jpg', url: '/center-photos/center-building.jpg', size: '2.4 MB', tag: 'Photo 1' },
               { id: 'p2', name: 'IT_Computer_Lab.jpg', url: '/center-photos/computer-lab.jpg', size: '2.8 MB', tag: 'Photo 2' },
               { id: 'p3', name: 'Practical_Training_Classroom.jpg', url: '/center-photos/practical-training.jpg', size: '3.1 MB', tag: 'Photo 3' }
             ];
+
+            // Canonical mapping to sanitize stale localStorage items
+            const canonicalMap = new Map(INITIAL_SDC_RECORDS.map(s => [s.id, s]));
+
             const updated = parsed.map(sdc => {
+              const canonical = canonicalMap.get(sdc.id);
+              if (canonical) {
+                return {
+                  ...sdc,
+                  sdcCode: canonical.sdcCode,
+                  sdcName: canonical.sdcName,
+                  district: canonical.district,
+                  tpName: canonical.tpName,
+                  scheme: canonical.scheme,
+                  sector: canonical.sector,
+                  status: sdc.status || canonical.status,
+                  centerPhotos: (sdc.centerPhotos && sdc.centerPhotos.some(p => p.url && p.url.startsWith('data:image/svg+xml')))
+                    ? realPhotos
+                    : (sdc.centerPhotos || realPhotos)
+                };
+              }
               if (sdc.centerPhotos && sdc.centerPhotos.some(p => p.url && p.url.startsWith('data:image/svg+xml'))) {
                 return { ...sdc, centerPhotos: realPhotos };
               }
               return sdc;
             });
+
             // Keep user updates, but if any seed records are missing, append them
             const existingIds = new Set(updated.map(p => p.id));
             const missing = INITIAL_SDC_RECORDS.filter(s => !existingIds.has(s.id));

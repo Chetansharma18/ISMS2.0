@@ -52,19 +52,23 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                   class="h-11 px-3.5 select-none"
                   [ngClass]="[
                     col.width || '',
-                    col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left',
+                    (col.headerAlign || col.align) === 'center' ? 'text-center' : (col.headerAlign || col.align) === 'right' ? 'text-right' : 'text-left',
                     !last ? 'border-r border-theme/70' : '',
                     col.headerClass || ''
                   ]"
                 >
                   <div
-                    class="inline-flex items-center gap-1.5"
+                    class="flex items-center gap-1.5 w-full"
+                    [class.justify-center]="(col.headerAlign || col.align) === 'center'"
+                    [class.text-center]="(col.headerAlign || col.align) === 'center'"
+                    [class.justify-end]="(col.headerAlign || col.align) === 'right'"
+                    [class.text-right]="(col.headerAlign || col.align) === 'right'"
                     [class.cursor-pointer]="col.sortable"
                     (click)="col.sortable && toggleSort(col.key)"
                   >
-                    <span>{{ col.label }}</span>
+                    <span [class.text-center]="(col.headerAlign || col.align) === 'center'" class="inline-block">{{ col.label }}</span>
                     @if (col.sortable && sortKey() === col.key) {
-                      <span class="text-[11px] text-brand">
+                      <span class="text-[11px] text-brand shrink-0">
                         {{ sortAsc() ? '▲' : '▼' }}
                       </span>
                     }

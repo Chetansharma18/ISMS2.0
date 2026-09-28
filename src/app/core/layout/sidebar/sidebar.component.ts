@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { AspirantService } from '../../../features/sdc/services/aspirant.service';
+import { BatchService } from '../../../features/sdc/services/batch.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -32,7 +33,7 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
           <!-- ================================================================
                ROLE: DEPARTMENT ADMIN (Scrutiny Officer)
                ================================================================ -->
-          @if (isDeptAdmin()) {
+          @if (isDeptAdmin() || isSuperAdmin()) {
             <!-- 1. EOI Responses -->
             <a
               routerLink="/admin/eoi-view"
@@ -49,7 +50,7 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
             </a>
 
 
-            <!-- 3. SDC Approvals & Inspection -->
+            <!-- 2. SDC Approvals & Inspection -->
             <a
               routerLink="/sdc"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
@@ -61,6 +62,21 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 <span class="tracking-tight">SDC Approvals & Inspection</span>
+              </div>
+            </a>
+
+            <!-- 3. Batch Approvals & Inspection -->
+            <a
+              routerLink="/admin/batch-approvals"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7] active-nav"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+                <span class="tracking-tight">Batch Approvals</span>
               </div>
             </a>
 
@@ -170,9 +186,6 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
                 </svg>
                 <span class="tracking-tight">Aspirants</span>
               </div>
-              <span class="px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-[#EAF2F6] text-[#174A6E] border border-[#D9E1E7]">
-                {{ aspirantCount() }}
-              </span>
             </a>
 
             <!-- 7. Grievance -->
@@ -253,9 +266,13 @@ import { AspirantService } from '../../../features/sdc/services/aspirant.service
 export class SidebarComponent {
   authService = inject(AuthService);
   aspirantService = inject(AspirantService);
+  batchService = inject(BatchService);
 
   readonly currentUser = this.authService.currentUser;
   readonly aspirantCount = computed(() => this.aspirantService.aspirants().length);
+  readonly pendingBatchApprovalsCount = computed(() => {
+    return this.batchService.batches().filter(b => b.approvalStatus === 'PENDING' || b.status === 'PENDING_APPROVAL').length;
+  });
 
   readonly isExistingUser = computed(() => {
     const user = this.currentUser();

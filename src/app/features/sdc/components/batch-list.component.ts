@@ -71,14 +71,15 @@ import {
             </svg>
             <input
               type="text"
-              [(ngModel)]="searchQuery"
+              [ngModel]="searchQuery()"
+              (ngModelChange)="searchQuery.set($event)"
               placeholder="Search Batch Code, Course, Center, Scheme..."
               class="w-full pl-8 pr-7 py-1.5 text-[13px] bg-white border border-border rounded-sm placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-primary transition-colors font-normal"
             />
-            @if (searchQuery) {
+            @if (searchQuery()) {
               <button
                 type="button"
-                (click)="searchQuery = ''"
+                (click)="searchQuery.set('')"
                 class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs"
               >
                 &times;
@@ -110,11 +111,11 @@ import {
 
         <!-- Template: Batch Info -->
         <ng-template #batchInfoTemplate let-b>
-          <div class="font-mono">
-            <div class="font-bold text-slate-900 leading-snug">
+          <div>
+            <div class="font-medium text-primary text-[13px] font-mono leading-snug">
               {{ b.batchCode }}
             </div>
-            <div class="text-[11.5px] text-slate-500 mt-0.5 font-normal">
+            <div class="text-[11px] text-secondary mt-0.5 font-normal">
               {{ b.batchName || 'General Batch' }}
             </div>
           </div>
@@ -123,11 +124,11 @@ import {
         <!-- Template: Course & Scheme -->
         <ng-template #courseSchemeTemplate let-b>
           <div>
-            <div class="font-semibold text-slate-900 leading-snug">
+            <div class="font-medium text-primary text-[13px] leading-snug">
               {{ b.courseName }}
             </div>
-            <div class="mt-1">
-              <span class="font-bold text-xs tracking-wider uppercase text-slate-900 inline-block">
+            <div class="mt-0.5">
+              <span class="font-normal text-[11.5px] text-secondary inline-block">
                 {{ b.scheme }}
               </span>
             </div>
@@ -137,10 +138,10 @@ import {
         <!-- Template: Center (SDC) -->
         <ng-template #centerTemplate let-b>
           <div>
-            <div class="font-semibold text-slate-900 leading-snug">
+            <div class="font-medium text-primary text-[13px] leading-snug">
               {{ b.sdcName }}
             </div>
-            <div class="text-[11.5px] text-slate-500 mt-0.5 font-mono">
+            <div class="text-[11px] text-secondary mt-0.5 font-mono">
               {{ b.sdcCode }}
             </div>
           </div>
@@ -170,30 +171,67 @@ import {
           </div>
         </ng-template>
 
-        <!-- Template: Status (Colored text only, no box) -->
+        <!-- Template: Status (APPROVED in green, inspection all types in red) -->
         <ng-template #statusTemplate let-b>
-          @if (b.status === 'ONGOING') {
-            <span class="font-bold text-xs text-emerald-700 tracking-wider uppercase">
-              ONGOING
+          @if (b.status === 'APPROVED' || b.approvalStatus === 'APPROVED' || b.status === 'ONGOING') {
+            <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-emerald-700">
+              APPROVED
+            </span>
+          } @else if (b.status === 'INSPECTION_PENDING' || b.approvalStatus === 'INSPECTION_PENDING' || b.status?.includes('INSPECTION')) {
+            <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-red-600">
+              PENDING INSPECTION
+            </span>
+          } @else if (b.status === 'REJECTED' || b.approvalStatus === 'REJECTED') {
+            <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-red-600">
+              REJECTED
             </span>
           } @else {
-            <span class="font-bold text-xs text-sky-700 tracking-wider uppercase">
-              APPROVED
+            <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-amber-700">
+              PENDING
             </span>
           }
         </ng-template>
 
         <!-- Template: Actions -->
         <ng-template #actionsTemplate let-b>
-          <app-button
-            variant="primary"
-            size="sm"
-            (btnClick)="selectAndMap(b)"
-            title="Register Aspirant"
-          >
-            <span class="text-sm font-bold leading-none">+</span>
-            <span>Register Aspirant</span>
-          </app-button>
+          <div class="flex items-center justify-center gap-2">
+            <!-- View Details Button -->
+            <button
+              type="button"
+              (click)="viewDetails(b)"
+              class="whitespace-nowrap inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
+              title="View Batch Details"
+            >
+              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <span>View Details</span>
+            </button>
+
+            @if (b.status === 'ONGOING' || b.status === 'APPROVED' || b.approvalStatus === 'APPROVED') {
+              <app-button
+                variant="primary"
+                size="sm"
+                (btnClick)="selectAndMap(b)"
+                title="Register Aspirant"
+              >
+                <span class="text-sm font-bold leading-none">+</span>
+                <span>Register</span>
+              </app-button>
+            } @else if (b.status === 'REJECTED' || b.approvalStatus === 'REJECTED') {
+              <span class="text-xs text-slate-400 font-medium italic">
+                Rejected
+              </span>
+            } @else {
+              <span class="text-xs text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-[4px] font-medium inline-flex items-center gap-1">
+                <svg class="w-3 h-3 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Awaiting Approval
+              </span>
+            }
+          </div>
         </ng-template>
 
       </div>
@@ -204,7 +242,7 @@ export class BatchListComponent {
   readonly batchService = inject(BatchService);
   readonly router = inject(Router);
 
-  searchQuery = '';
+  searchQuery = signal<string>('');
   activeFilter = signal<string>('All');
   readonly pageSize = 10;
 
@@ -216,15 +254,16 @@ export class BatchListComponent {
     { key: 'capacity', label: 'Capacity & Mapped', type: 'custom', width: 'min-w-[160px]' },
     { key: 'duration', label: 'Batch Duration', type: 'custom', width: 'w-36' },
     { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'w-28' },
-    { key: 'actions', label: 'Actions', align: 'right', type: 'custom', width: 'w-52' }
+    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-56' }
   ];
 
   readonly filterOptions = computed(() => {
     const all = this.batchService.batches();
     return [
       { id: 'All', label: 'All Batches', count: all.length },
-      { id: 'ONGOING', label: 'Ongoing', count: all.filter(b => b.status === 'ONGOING').length },
-      { id: 'APPROVED', label: 'Approved', count: all.filter(b => b.status === 'APPROVED').length }
+      { id: 'APPROVED', label: 'Approved', count: all.filter(b => b.status === 'APPROVED' || b.approvalStatus === 'APPROVED' || b.status === 'ONGOING').length },
+      { id: 'PENDING', label: 'Pending Approval', count: all.filter(b => b.status === 'PENDING_APPROVAL' || b.approvalStatus === 'PENDING' || b.status === 'INSPECTION_PENDING').length },
+      { id: 'REJECTED', label: 'Rejected', count: all.filter(b => b.status === 'REJECTED' || b.approvalStatus === 'REJECTED').length }
     ];
   });
 
@@ -232,13 +271,15 @@ export class BatchListComponent {
     let list = this.batchService.batches();
     const filter = this.activeFilter();
 
-    if (filter === 'ONGOING') {
-      list = list.filter(b => b.status === 'ONGOING');
-    } else if (filter === 'APPROVED') {
-      list = list.filter(b => b.status === 'APPROVED');
+    if (filter === 'APPROVED') {
+      list = list.filter(b => b.status === 'APPROVED' || b.approvalStatus === 'APPROVED' || b.status === 'ONGOING');
+    } else if (filter === 'PENDING') {
+      list = list.filter(b => b.status === 'PENDING_APPROVAL' || b.approvalStatus === 'PENDING' || b.status === 'INSPECTION_PENDING');
+    } else if (filter === 'REJECTED') {
+      list = list.filter(b => b.status === 'REJECTED' || b.approvalStatus === 'REJECTED');
     }
 
-    const query = this.searchQuery.toLowerCase().trim();
+    const query = this.searchQuery().toLowerCase().trim();
     if (query) {
       list = list.filter(
         b =>
@@ -246,7 +287,9 @@ export class BatchListComponent {
           (b.batchName && b.batchName.toLowerCase().includes(query)) ||
           b.courseName.toLowerCase().includes(query) ||
           b.sdcName.toLowerCase().includes(query) ||
-          b.scheme.toLowerCase().includes(query)
+          b.scheme.toLowerCase().includes(query) ||
+          (b.sector && b.sector.toLowerCase().includes(query)) ||
+          (b.sdcDistrict && b.sdcDistrict.toLowerCase().includes(query))
       );
     }
 
@@ -265,5 +308,9 @@ export class BatchListComponent {
   selectAndMap(b: BatchRecord): void {
     // Navigate to aspirant registration and batch mapping form
     this.router.navigate(['/batches', b.id, 'map-aspirant']);
+  }
+
+  viewDetails(b: BatchRecord): void {
+    this.router.navigate(['/batches', b.id]);
   }
 }

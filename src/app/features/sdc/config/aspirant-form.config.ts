@@ -308,7 +308,7 @@ export function calculateAgeFromDob(dobString: string): number {
 }
 
 /**
- * Step 1: Personal & Identity Details Form Fields
+ * Step 1: IDENTITY DETAILS  Form Fields
  */
 export function getStep1PersonalFields(
   onDobChange?: (dob: string, model: any) => void,
@@ -333,8 +333,28 @@ export function getStep1PersonalFields(
       pattern: '^[0-9]{12}$',
       patternMessage: 'Aadhaar must be exactly 12 digits (numbers only)',
       placeholder: '12 digit Aadhaar number',
-      hint: 'Enter 12-digit Aadhaar number without spaces',
-      colSpan: 2
+    
+      colSpan: 1
+    },
+    {
+      key: 'confirmAadhaarNo',
+      label: 'Confirm Aadhaar No.',
+      type: 'text',
+      required: true,
+      requiredMessage: 'Please confirm the Aadhaar number',
+      minLength: 12,
+      maxLength: 12,
+      pattern: '^[0-9]{12}$',
+      patternMessage: 'Confirm Aadhaar must be exactly 12 digits',
+      placeholder: 'Re-enter 12 digit Aadhaar number',
+      validator: (value: string, model: any) => {
+        if (!value) return null;
+        if (value !== model?.aadhaarNo) {
+          return 'Aadhaar numbers do not match';
+        }
+        return null;
+      },
+      colSpan: 1
     },
     {
       key: 'aadhaarDocProof',
@@ -352,7 +372,7 @@ export function getStep1PersonalFields(
       pattern: '^[0-9]{10}$',
       patternMessage: 'Jan Aadhaar ID must be exactly 10 digits',
       placeholder: '10 digit Jan Aadhaar ID',
-      hint: 'Enter 10-digit Jan Aadhaar / Bhamashah number',
+      hint: '',
       colSpan: 1
     },
     {
@@ -417,12 +437,7 @@ export function getStep1PersonalFields(
     },
 
     // Aspirant Details Header
-    {
-      key: 'aspirantHeading',
-      label: 'ASPIRANT DEMOGRAPHIC PARTICULARS',
-      type: 'heading',
-      colSpan: 'full'
-    },
+  
     {
       key: 'aspirantName',
       label: 'Name of Aspirant',
@@ -452,18 +467,32 @@ export function getStep1PersonalFields(
       required: true,
       colSpan: 1,
       options: [
-        { label: 'Father (S/o, D/o)', value: 'Father' },
-        { label: 'Husband (W/o)', value: 'Husband' },
+        { label: 'Father', value: 'Father' },
+        { label: 'Husband', value: 'Husband' },
         { label: 'Guardian', value: 'Guardian' }
       ]
     },
     {
       key: 'relationName',
-      label: "Father's / Husband's / Guardian Name",
+      label: (model: any) => {
+        const rel = (model?.relationType || '').trim();
+        if (rel === 'Father') return "Father's Name";
+        if (rel === 'Husband') return "Husband's Name";
+        if (rel === 'Mother') return "Mother's Name";
+        if (rel === 'Guardian') return "Guardian's Name";
+        return "Father's / Husband's / Guardian Name";
+      },
+      placeholder: (model: any) => {
+        const rel = (model?.relationType || '').trim();
+        if (rel === 'Father') return "Father's full name";
+        if (rel === 'Husband') return "Husband's full name";
+        if (rel === 'Mother') return "Mother's full name";
+        if (rel === 'Guardian') return "Guardian's full name";
+        return "Relative full name";
+      },
       type: 'text',
       required: true,
       requiredMessage: 'Relative name is mandatory',
-      placeholder: 'Relative full name',
       colSpan: 2
     },
     {
@@ -491,7 +520,6 @@ export function getStep1PersonalFields(
       type: 'number',
       readonly: true,
       suffixText: 'Yrs',
-      hint: 'Auto-calculated from DOB',
       colSpan: 1
     },
     {
@@ -864,7 +892,7 @@ export function getStep3EconomicWorkerFields(): FormFieldConfig[] {
     // Bank Details Header
     {
       key: 'bankHeading',
-      label: 'BANK ACCOUNT DETAILS (FOR DBT & STIPEND)',
+      label: 'Bank Details',
       type: 'heading',
       colSpan: 'full'
     },
@@ -877,7 +905,6 @@ export function getStep3EconomicWorkerFields(): FormFieldConfig[] {
       pattern: '^[0-9]{9,18}$',
       patternMessage: 'Bank account number must be 9–18 digits (numbers only)',
       placeholder: 'Bank savings account number',
-      hint: '9 to 18 digit bank account number',
       colSpan: 1
     },
     {
@@ -933,7 +960,7 @@ export function getStep3EconomicWorkerFields(): FormFieldConfig[] {
       pattern: '^[A-Z]{4}0[A-Z0-9]{6}$',
       patternMessage: 'IFSC must be 11 chars: 4 letters, 0, then 6 alphanumerics (e.g. SBIN0001234)',
       placeholder: 'e.g. SBIN0001234',
-      hint: '11-character IFSC code',
+      
       colSpan: 1
     },
     {
@@ -945,17 +972,12 @@ export function getStep3EconomicWorkerFields(): FormFieldConfig[] {
       pattern: '^[0-9]{9}$',
       patternMessage: 'MICR Code must be exactly 9 digits',
       placeholder: '9 digit MICR',
-      hint: 'Enter 9-digit MICR code from cheque',
+     
       colSpan: 1
     },
 
     // Family / Economic Details Header
-    {
-      key: 'economicHeading',
-      label: 'FAMILY / ECONOMIC PARTICULARS',
-      type: 'heading',
-      colSpan: 'full'
-    },
+   
     {
       key: 'annualFamilyIncome',
       label: 'Annual Family Income',
@@ -1004,7 +1026,7 @@ export function getStep3EconomicWorkerFields(): FormFieldConfig[] {
     // Government / Worker Details Header
     {
       key: 'workerHeading',
-      label: 'GOVERNMENT / WORKER PARTICULARS',
+      label: 'Government & Employment Details',
       type: 'heading',
       colSpan: 'full'
     },
@@ -1112,7 +1134,6 @@ export function getStep3EconomicWorkerFields(): FormFieldConfig[] {
       pattern: '^[A-Z]{3}[0-9]{7}$',
       patternMessage: 'EPIC / Voter ID must be 10 chars: 3 letters followed by 7 digits (e.g. RJA0001234)',
       placeholder: 'e.g. RJA0001234  (10 chars)',
-      hint: '3 letters + 7 digits as on Voter ID card',
       colSpan: 2
     }
   ];

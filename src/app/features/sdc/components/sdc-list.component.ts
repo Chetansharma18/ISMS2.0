@@ -181,11 +181,11 @@ import {
 
         <!-- Template: TP Name (First Column for Admin) -->
         <ng-template #tpNameTemplate let-sdc>
-          <div class="py-1">
-            <div class="font-semibold text-slate-900 text-xs tracking-tight">
+          <div class="py-1 text-center flex flex-col items-center justify-center">
+            <div class="font-medium text-primary text-[13px] leading-snug">
               {{ sdc.tpName }}
             </div>
-            <div class="text-[11px] text-slate-500 font-mono mt-0.5 flex items-center gap-1.5">
+            <div class="text-[11px] text-secondary font-mono mt-0.5 flex items-center justify-center gap-1.5">
               <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#174A6E]"></span>
               <span>{{ sdc.mouRefNo || 'TP Verified' }}</span>
             </div>
@@ -194,17 +194,17 @@ import {
 
         <!-- Template: Center Name + District + Code -->
         <ng-template #centerNameTemplate let-sdc>
-          <div class="py-0.5">
-            <div class="font-semibold text-slate-900 leading-snug text-xs flex items-center gap-1.5 flex-wrap">
+          <div class="py-0.5 text-center flex flex-col items-center justify-center">
+            <div class="font-medium text-primary leading-snug text-[13px] flex items-center justify-center gap-1.5 flex-wrap">
               <span>{{ sdc.sdcName }}</span>
               @if (isAdmin()) {
-                <span class="font-mono text-[10.5px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-normal">
+                <span class="font-mono text-[11px] px-1.5 py-0.2 rounded bg-slate-100 text-secondary font-normal">
                   {{ sdc.sdcCode }}
                 </span>
               }
             </div>
-            <div class="text-[11px] text-slate-500 mt-0.5 font-normal flex items-center gap-1">
-              <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="text-[11px] text-secondary mt-0.5 font-normal flex items-center justify-center gap-1">
+              <svg class="w-3 h-3 text-muted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -215,47 +215,61 @@ import {
 
         <!-- Template: Capacity (For Admin Table) -->
         <ng-template #capacityTemplate let-sdc>
-          <div class="text-center font-medium text-slate-800 text-[12.5px]">
-            {{ sdc.approval?.approvedTargetCapacity || sdc.sdcCapacity }} <span class="text-[10.5px] text-slate-500">Trainees</span>
+          <div class="text-center font-medium text-primary text-[13px]">
+            {{ sdc.approval?.approvedTargetCapacity || sdc.sdcCapacity }} <span class="text-[11px] text-secondary font-normal">Trainees</span>
           </div>
         </ng-template>
 
         <!-- Template: Sector -->
         <ng-template #sectorTemplate let-sdc>
-          <span class="font-normal text-slate-800 text-[13px]">
+          <div class="text-center font-normal text-primary text-[13px]">
             {{ sdc.sector || '—' }}
-          </span>
+          </div>
         </ng-template>
 
         <!-- Template: Scheme -->
         <ng-template #schemeTemplate let-sdc>
-          <span class="font-normal text-slate-800 text-[13px]">
+          <div class="text-center font-normal text-primary text-[13px]">
             {{ sdc.scheme || '—' }}
-          </span>
+          </div>
         </ng-template>
 
         <!-- Template: Scheme Category -->
         <ng-template #schemeCategoryTemplate let-sdc>
-          <span class="font-normal text-slate-800 text-[13px]">
+          <div class="text-center font-normal text-primary text-[13px]">
             {{ sdc.schemeCategory || '—' }}
-          </span>
+          </div>
         </ng-template>
 
-        <!-- Template: Status (Strictly bold black uppercase text, no box) -->
+        <!-- Template: Status (APPROVED in green, inspection all types in red) -->
         <ng-template #statusTemplate let-sdc>
           <div class="flex items-center justify-center">
-            <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-black" style="color: #000000 !important; font-weight: bold;">
-              {{ formatStatus(sdc.status).toUpperCase() }}
-            </span>
+            @if (sdc.status === 'APPROVED' || sdc.status === 'Approved') {
+              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-emerald-700">
+                APPROVED
+              </span>
+            } @else if (sdc.status === 'PENDING_INSPECTION' || sdc.status?.includes('INSPECTION')) {
+              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-red-600">
+                {{ formatStatus(sdc.status).toUpperCase() }}
+              </span>
+            } @else if (sdc.status === 'REJECTED' || sdc.status === 'Rejected') {
+              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-red-600">
+                REJECTED
+              </span>
+            } @else {
+              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-amber-700">
+                {{ formatStatus(sdc.status).toUpperCase() }}
+              </span>
+            }
           </div>
         </ng-template>
 
         <!-- Template: Actions (View Details in the exact same vertical column line) -->
         <ng-template #actionsTemplate let-sdc>
-          <div class="flex items-center justify-end gap-2 whitespace-nowrap py-0.5">
+          <div class="flex items-center justify-center gap-2 whitespace-nowrap py-0.5">
             
-            <!-- Slot 1 (116px fixed container): Either '+ Create Batch' (TP) or 'Approve SDC' (Admin), or empty placeholder -->
-            <div class="w-[116px] flex justify-end shrink-0">
+            <!-- Slot 1 (116px fixed container): Either '+ Create Batch' (TP) or 'Approve SDC' (Admin, only when inspection is completed) -->
+            <div class="w-[116px] flex justify-center shrink-0">
               <!-- 1. For TP (SDC Management): If center is APPROVED, show "+ Create Batch" (NOT for Admin) -->
               @if (!isAdmin() && (sdc.status === 'APPROVED' || sdc.status === 'Approved')) {
                 <button
@@ -269,8 +283,8 @@ import {
                 </button>
               }
 
-              <!-- 2. For Admin and unapproved centers: Show "Approve SDC" button -->
-              @if (isAdmin() && sdc.status !== 'APPROVED' && sdc.status !== 'Approved') {
+              <!-- 2. For Admin: Only show "Approve SDC" button when inspection is completed (PENDING_APPROVAL) - NEVER for PENDING_INSPECTION -->
+              @if (isAdmin() && sdc.status === 'PENDING_APPROVAL') {
                 <button
                   type="button"
                   (click)="openApproveModal(sdc)"
@@ -337,9 +351,9 @@ import {
                 <span class="font-mono text-[11px] font-bold text-[#174A6E]">{{ targetCenter.sdcCode }}</span>
               </div>
               <div class="font-bold text-slate-900 text-sm">{{ targetCenter.tpName }}</div>
-              <div class="text-slate-700 font-medium pt-1 border-t border-[#D9E1E7]/70 flex items-center justify-between">
+              <div class="text-slate-900 font-bold pt-1 border-t border-[#D9E1E7]/70 flex items-center justify-between">
                 <span>{{ targetCenter.sdcName }}</span>
-                <span class="text-slate-500">{{ targetCenter.district }}</span>
+                <span class="text-slate-500 font-medium">{{ targetCenter.district }}</span>
               </div>
               <div class="text-[11px] text-slate-500">
                 Scheme: <strong class="text-slate-800">{{ targetCenter.scheme }}</strong> • Sector: <strong class="text-slate-800">{{ targetCenter.sector }}</strong>
@@ -441,25 +455,25 @@ export class SdcListComponent {
     if (this.isAdmin()) {
       return [
         { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-14' },
-        { key: 'tpName', label: 'TP Name', type: 'custom', width: 'min-w-[190px]' },
-        { key: 'centerName', label: 'SDC Center', type: 'custom', width: 'min-w-[210px]' },
-        { key: 'scheme', label: 'Scheme', type: 'custom' },
+        { key: 'tpName', label: 'TP Name', align: 'center', type: 'custom', width: 'min-w-[190px]' },
+        { key: 'centerName', label: 'SDC Center', align: 'center', type: 'custom', width: 'min-w-[210px]' },
+        { key: 'scheme', label: 'Scheme', align: 'center', type: 'custom' },
         { key: 'schemeCategory', label: 'Scheme Category', align: 'center', type: 'custom', width: 'w-36' },
-        { key: 'sector', label: 'Sector', type: 'custom' },
+        { key: 'sector', label: 'Sector', align: 'center', type: 'custom' },
         { key: 'capacity', label: 'Capacity', align: 'center', type: 'custom', width: 'w-28' },
         { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[170px]' },
-        { key: 'actions', label: 'Actions', align: 'right', type: 'custom', width: 'min-w-[270px]' }
+        { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[270px]' }
       ];
     } else {
       return [
         { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-14' },
-        { key: 'sdcCode', label: 'SDC Code', width: 'w-28', cellClass: 'whitespace-nowrap font-mono font-medium text-slate-800' },
-        { key: 'centerName', label: 'Center Name', type: 'custom' },
-        { key: 'scheme', label: 'Scheme', type: 'custom' },
+        { key: 'sdcCode', label: 'SDC Code', align: 'center', width: 'w-28', cellClass: 'whitespace-nowrap font-mono font-medium text-slate-800 text-center' },
+        { key: 'centerName', label: 'Center Name', align: 'center', type: 'custom' },
+        { key: 'scheme', label: 'Scheme', align: 'center', type: 'custom' },
         { key: 'schemeCategory', label: 'Scheme Category', align: 'center', type: 'custom', width: 'w-36' },
-        { key: 'sector', label: 'Sector', type: 'custom' },
+        { key: 'sector', label: 'Sector', align: 'center', type: 'custom' },
         { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[170px]' },
-        { key: 'actions', label: 'Actions', align: 'right', type: 'custom', width: 'min-w-[270px]' }
+        { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[270px]' }
       ];
     }
   });

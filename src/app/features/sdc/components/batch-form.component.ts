@@ -51,9 +51,7 @@ interface HostelItem {
               <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-snug m-0">
                 Create Batch
               </h1>
-              <p class="text-[11px] text-slate-500 m-0">
-                Configure batch parameters, schedule, trainer assignments, and hostel facilities.
-              </p>
+              
             </div>
           </div>
 
@@ -92,7 +90,7 @@ interface HostelItem {
                 }
               </span>
               <div class="text-left">
-                <span class="block leading-tight font-bold text-slate-900">1. PSD Payment Receipt</span>
+                <span class="block leading-tight font-bold text-slate-900">1. PSD Payment</span>
               </div>
             </button>
 
@@ -169,17 +167,6 @@ interface HostelItem {
                     class="text-[11px] text-slate-500 hover:text-slate-800 underline cursor-pointer"
                   >
                     View Payment Options
-                  </button>
-                } @else {
-                  <button
-                    type="button"
-                    (click)="isPaymentCompleted.set(true)"
-                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs text-[#174A6E] font-semibold shadow-2xs transition-all cursor-pointer"
-                  >
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <span>View Official Receipt</span>
                   </button>
                 }
               </div>
@@ -555,6 +542,8 @@ interface HostelItem {
               <app-form-sdc
                 [fields]="batchDetailsFormFields"
                 [(model)]="batchData"
+                [errors]="formErrors"
+                (fieldChange)="onFieldChanged($event)"
                 density="compact"
                 layout="plain"
                 [card]="false"
@@ -612,9 +601,14 @@ interface HostelItem {
                             type="text"
                             [(ngModel)]="faculty.facultyName"
                             [name]="'faculty_name_' + i"
+                            (input)="facultyErrors[i] = false"
                             placeholder="e.g. Vikas Purohit"
-                            class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
+                            class="w-full px-2.5 py-1.5 text-xs bg-white border rounded-md text-slate-800 focus:outline-none transition-all"
+                            [ngClass]="facultyErrors[i] ? 'border-red-500 bg-red-50/20 focus:border-red-600 focus:ring-1 focus:ring-red-200' : 'border-slate-300 focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]'"
                           />
+                          @if (facultyErrors[i]) {
+                            <span class="text-[10.5px] text-red-600 font-medium block mt-0.5">Faculty Name is required</span>
+                          }
                         </td>
 
                         <!-- Trainer Type -->
@@ -868,10 +862,10 @@ interface HostelItem {
                 <button
                   type="button"
                   (click)="downloadPaymentReceipt()"
-                  class="flex-1 py-2.5 px-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg font-semibold text-xs transition-colors cursor-pointer shadow-2xs inline-flex items-center justify-center gap-1.5"
+                  class="whitespace-nowrap py-2.5 px-4 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg font-semibold text-xs transition-colors cursor-pointer shadow-2xs inline-flex items-center justify-center gap-1.5"
                   title="Download Official PDF Receipt"
                 >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
                   <span>Download Receipt (PDF)</span>
@@ -924,6 +918,15 @@ export class BatchFormComponent implements OnInit {
 
   /** Field configurations for Step 2 */
   batchDetailsFormFields: FormFieldConfig[] = [];
+  formErrors: Record<string, string> = {};
+  facultyErrors: boolean[] = [false];
+
+  onFieldChanged(event: any): void {
+    if (this.formErrors[event.key]) {
+      delete this.formErrors[event.key];
+      this.formErrors = { ...this.formErrors };
+    }
+  }
 
   /**
    * Unified Batch Form Data Model containing:
@@ -1523,7 +1526,7 @@ export class BatchFormComponent implements OnInit {
     if (!this.isPaymentCompleted()) {
       this.errorMessage.set('Please make the PSD verification payment before proceeding to batch details.');
       return;
-    }    this.errorMessage.set('');
+    } this.errorMessage.set('');
     this.currentStep.set(2);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -1565,23 +1568,41 @@ export class BatchFormComponent implements OnInit {
 
   submitBatchForm(): void {
     this.errorMessage.set('');
+    this.formErrors = {};
+    let hasError = false;
 
-    // Validation
-    if (!this.batchData.course) {
-      this.errorMessage.set('Course selection is mandatory.');
-      return;
+    // Validation for compulsory fields - highlights empty fields in red
+    if (!this.batchData.course || this.batchData.course.trim() === '') {
+      this.formErrors['course'] = 'Course selection is mandatory.';
+      hasError = true;
     }
-    if (!this.batchData.startDate) {
-      this.errorMessage.set('Batch Start Date is mandatory.');
-      return;
+    if (!this.batchData.batchDurationHours || Number(this.batchData.batchDurationHours) <= 0) {
+      this.formErrors['batchDurationHours'] = 'Batch Duration in hours is mandatory.';
+      hasError = true;
     }
-    if (!this.batchData.startTime || !this.batchData.endTime) {
-      this.errorMessage.set('Batch Start Time and End Time are mandatory.');
-      return;
+    if (!this.batchData.startDate || this.batchData.startDate.trim() === '') {
+      this.formErrors['startDate'] = 'Batch Start Date is mandatory.';
+      hasError = true;
     }
-    const hasValidFaculty = this.facultyList.some(f => f.facultyName && f.facultyName.trim().length > 0);
-    if (!hasValidFaculty) {
-      this.errorMessage.set('At least one Faculty Name must be provided.');
+    if (!this.batchData.startTime || this.batchData.startTime.trim() === '') {
+      this.formErrors['startTime'] = 'Batch Start Time is mandatory.';
+      hasError = true;
+    }
+    if (!this.batchData.endTime || this.batchData.endTime.trim() === '') {
+      this.formErrors['endTime'] = 'Batch End Time is mandatory.';
+      hasError = true;
+    }
+
+    // Check each trainer in faculty list
+    this.facultyErrors = this.facultyList.map(f => !f.facultyName || f.facultyName.trim().length === 0);
+    if (this.facultyErrors.some(err => err)) {
+      hasError = true;
+    }
+
+    if (hasError) {
+      this.formErrors = { ...this.formErrors };
+      this.errorMessage.set('Please fill all mandatory highlighted fields before submitting.');
+      window.scrollTo({ top: 150, behavior: 'smooth' });
       return;
     }
 

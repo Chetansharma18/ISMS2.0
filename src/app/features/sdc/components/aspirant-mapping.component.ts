@@ -45,7 +45,7 @@ import {
               <div class="h-[38px] flex items-center justify-between px-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs gap-2 shadow-2xs hover:border-slate-400 transition-colors">
                 <div class="flex items-center gap-1.5 min-w-0 flex-1 truncate">
                   <!-- PDF Badge or Image icon based on file type -->
-                  @if (formData.aadhaarDocName?.toLowerCase()?.endsWith('.pdf')) {
+                  @if (formData.aadhaarDocName.toLowerCase().endsWith('.pdf')) {
                     <span class="w-5 h-5 rounded bg-rose-600 text-white text-[7.5px] font-extrabold flex items-center justify-center tracking-tight shrink-0">PDF</span>
                   } @else {
                     <svg class="w-4 h-4 shrink-0 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -224,7 +224,7 @@ import {
                 }
               </span>
               <div class="truncate">
-                <span class="block leading-tight font-bold text-slate-900 truncate">3. Bank &amp; Worker</span>
+                <span class="block leading-tight font-bold text-slate-900 truncate">3. Bank</span>
               </div>
             </button>
 
@@ -265,7 +265,7 @@ import {
         }
 
         <!-- ========================================================================= -->
-        <!-- STEP 1: MAIN / PERSONAL & IDENTITY DETAILS                                -->
+        <!-- STEP 1: MAIN / IDENTITY DETAILS                                -->
         <!-- ========================================================================= -->
         @if (currentStep() === 1) {
           <div class="space-y-4 animate-in fade-in duration-150">
@@ -368,7 +368,7 @@ import {
                 (click)="proceedToStep(3)"
                 class="px-6 py-2.5 bg-[#174A6E] hover:bg-[#123B59] text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-colors inline-flex items-center gap-2 cursor-pointer"
               >
-                <span>Proceed to Bank &amp; Worker Details</span>
+                <span>Proceed to Bank Details</span>
                 <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
@@ -463,9 +463,33 @@ import {
                     <p class="text-[11px] text-slate-500 m-0">
                       Standard passport size photograph with plain background. Double-click the photo frame or click the button below.
                     </p>
+                    @if (formData.candidatePhotoUrl) {
+                      <div class="text-[11px] font-semibold text-emerald-700 pt-0.5 flex items-center gap-1.5 justify-center sm:justify-start">
+                        <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Uploaded • {{ formData.candidatePhotoName || 'Candidate_Photo.jpg' }}</span>
+                      </div>
+                    }
                   </div>
 
                   <div class="flex items-center gap-2 justify-center sm:justify-start">
+                    @if (formData.candidatePhotoUrl) {
+                      <!-- View Option (only when photo is uploaded) -->
+                      <button
+                        type="button"
+                        (click)="viewCandidatePhoto()"
+                        class="px-3.5 py-2 bg-white hover:bg-slate-50 text-[#174A6E] border border-slate-300 rounded-lg font-semibold text-xs shadow-2xs transition-all cursor-pointer inline-flex items-center gap-1.5 active:scale-95"
+                        title="View candidate photograph"
+                      >
+                        <svg class="w-3.5 h-3.5 text-[#174A6E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span>View</span>
+                      </button>
+                    }
+
                     <button
                       type="button"
                       (click)="photoInput.click()"
@@ -474,7 +498,7 @@ import {
                       <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                       </svg>
-                      <span>Choose Image</span>
+                      <span>{{ formData.candidatePhotoUrl ? 'Change Image' : 'Choose Image' }}</span>
                     </button>
                     <input
                       #photoInput
@@ -788,6 +812,35 @@ export class AspirantMappingComponent implements OnInit {
       uploadDate: 'Today',
       status: 'uploaded',
       fileUrl: this.formData.aadhaarDocUrl || this.defaultAadhaarCardDataUrl
+    });
+    this.isDocViewerOpen.set(true);
+  }
+
+  readonly defaultCandidatePhotoUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="400" height="500" viewBox="0 0 400 500">
+      <defs>
+        <linearGradient id="photoBg" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#f8fafc"/>
+          <stop offset="100%" stop-color="#e2e8f0"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="500" fill="url(#photoBg)" stroke="#cbd5e1" stroke-width="2"/>
+      <rect x="15" y="15" width="370" height="470" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+      <circle cx="200" cy="180" r="75" fill="#1e293b"/>
+      <path d="M70 420 C 70 280, 330 280, 330 420 Z" fill="#334155"/>
+      <rect x="50" y="430" width="300" height="40" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+      <text x="200" y="455" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0f172a" letter-spacing="1">CANDIDATE PASSPORT PHOTO</text>
+    </svg>
+  `);
+
+  viewCandidatePhoto(): void {
+    this.activeViewerTitle.set('Candidate Photograph');
+    this.activeViewerDoc.set({
+      fileName: this.formData.candidatePhotoName || 'Candidate_Photograph.jpg',
+      fileSize: '350 KB',
+      uploadDate: 'Today',
+      status: 'uploaded',
+      fileUrl: this.formData.candidatePhotoUrl || this.defaultCandidatePhotoUrl
     });
     this.isDocViewerOpen.set(true);
   }

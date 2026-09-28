@@ -34,12 +34,12 @@ export interface FormOption {
 export interface FormFieldConfig<T = any> {
   /** Property key on model or dot-notation path (e.g. 'scheme', 'sdcName', 'step1.mouRefNo') */
   key: string;
-  /** Display label for the field */
-  label: string;
+  /** Display label for the field (static string or dynamic function of model) */
+  label: string | ((model: T) => string);
   /** Input type (default: 'text') */
   type?: FormFieldType;
-  /** Placeholder text */
-  placeholder?: string;
+  /** Placeholder text (static string or dynamic function of model) */
+  placeholder?: string | ((model: T) => string);
   /** Whether the field is mandatory */
   required?: boolean;
   /** Custom error message when required */

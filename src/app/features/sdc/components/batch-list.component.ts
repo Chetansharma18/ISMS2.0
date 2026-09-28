@@ -127,7 +127,7 @@ import {
               {{ b.courseName }}
             </div>
             <div class="mt-1">
-              <span class="inline-block px-2 py-0.5 rounded text-[10.5px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+              <span class="font-bold text-xs tracking-wider uppercase text-slate-900 inline-block">
                 {{ b.scheme }}
               </span>
             </div>
@@ -170,14 +170,14 @@ import {
           </div>
         </ng-template>
 
-        <!-- Template: Status Badge -->
+        <!-- Template: Status (Colored text only, no box) -->
         <ng-template #statusTemplate let-b>
           @if (b.status === 'ONGOING') {
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold bg-[#E6F9F0] text-[#15803D] border border-[#86EFAC] tracking-wider uppercase">
+            <span class="font-bold text-xs text-emerald-700 tracking-wider uppercase">
               ONGOING
             </span>
           } @else {
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-300 tracking-wider uppercase">
+            <span class="font-bold text-xs text-sky-700 tracking-wider uppercase">
               APPROVED
             </span>
           }

@@ -46,7 +46,7 @@ import {
               </label>
               <select
                 [(ngModel)]="data.step1.sector"
-                class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] transition-colors"
+                class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-colors"
               >
                 <option value="" disabled>Select Sector</option>
                 @for (opt of sectorOptions; track opt) {
@@ -64,7 +64,7 @@ import {
                 type="text"
                 [(ngModel)]="data.step1.sdcName"
                 placeholder="Jaipur Excellence Center"
-                class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] transition-colors"
+                class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-colors"
               />
             </div>
 
@@ -77,7 +77,7 @@ import {
                 type="text"
                 [(ngModel)]="data.step1.mouRefNo"
                 placeholder="MOU/2026/001"
-                class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] transition-colors"
+                class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-colors"
               />
             </div>
 
@@ -90,7 +90,7 @@ import {
                 type="text"
                 [(ngModel)]="data.step1.tpName"
                 placeholder="SkillMasters Rajasthan"
-                class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] transition-colors"
+                class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-colors"
               />
             </div>
 
@@ -103,7 +103,7 @@ import {
                 type="text"
                 [(ngModel)]="data.step1.sdcCode"
                 placeholder="SDC-001"
-                class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] transition-colors"
+                class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-colors"
               />
             </div>
 
@@ -116,7 +116,7 @@ import {
                 <input
                   type="date"
                   [(ngModel)]="data.step1.proposedStartDate"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] transition-colors"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-colors"
                 />
               </div>
             </div>
@@ -130,7 +130,7 @@ import {
                 type="number"
                 [(ngModel)]="data.step1.totalTrainedAspirants"
                 placeholder="500"
-                class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] transition-colors"
+                class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-colors"
               />
             </div>
 
@@ -143,7 +143,7 @@ import {
                 type="number"
                 [(ngModel)]="data.step1.totalPlacedAspirants"
                 placeholder="400"
-                class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] transition-colors"
+                class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-colors"
               />
             </div>
 
@@ -186,7 +186,7 @@ import {
                 <label class="block text-xs font-semibold text-slate-700 mb-1.5">District <span class="text-rose-500">*</span></label>
                 <select
                   [(ngModel)]="data.step2.district"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                 >
                   @for (d of districts; track d) {
                     <option [value]="d">{{ d }}</option>
@@ -201,7 +201,7 @@ import {
                   type="text"
                   [(ngModel)]="data.step2.assemblyConstituency"
                   placeholder="Sanganer"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                 />
               </div>
 
@@ -212,7 +212,7 @@ import {
                   type="text"
                   [(ngModel)]="data.step2.parliamentConstituency"
                   placeholder="Jaipur Rural"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                 />
               </div>
 
@@ -223,7 +223,7 @@ import {
                   type="text"
                   [(ngModel)]="data.step2.division"
                   placeholder="Jaipur"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                 />
               </div>
 
@@ -234,7 +234,7 @@ import {
                   type="text"
                   [(ngModel)]="data.step2.block"
                   placeholder="Jaipur"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                 />
               </div>
 
@@ -245,7 +245,7 @@ import {
                   type="number"
                   [(ngModel)]="data.step2.sdcCapacity"
                   placeholder="100"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                 />
               </div>
 
@@ -256,7 +256,7 @@ import {
                   type="email"
                   [(ngModel)]="data.step2.centerEmail"
                   placeholder="center@example.com"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                 />
               </div>
 
@@ -268,7 +268,7 @@ import {
                   maxlength="6"
                   [(ngModel)]="data.step2.pincode"
                   placeholder="302029"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                 />
               </div>
 
@@ -279,25 +279,14 @@ import {
                   rows="2"
                   [(ngModel)]="data.step2.fullAddress"
                   placeholder="Plot 42, Skill Industrial Area, Sanganer, Jaipur"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
-                ></textarea>
-              </div>
-
-              <!-- Remarks (Span 3) -->
-              <div class="sm:col-span-3">
-                <label class="block text-xs font-semibold text-slate-700 mb-1.5">Remarks</label>
-                <textarea
-                  rows="2"
-                  [(ngModel)]="data.step2.remarks"
-                  placeholder="Ready for auditor inspection"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                 ></textarea>
               </div>
 
             </div>
           </div>
 
-          <!-- Card 2: Center Geo-Location -->
+          <!-- Card 2: Center Geo-Location & Remarks -->
           <div class="border border-slate-200/90 rounded-xl p-5 sm:p-7 bg-white space-y-4 shadow-2xs">
             <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
               <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
@@ -307,7 +296,7 @@ import {
               </div>
               <div>
                 <h2 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-snug">
-                  Center Geo-Location <span class="text-rose-500">*</span>
+                  Center Geo-Location &amp; Remarks <span class="text-rose-500">*</span>
                 </h2>
                 <p class="text-[11px] text-slate-500 m-0">
                   Mandatory for Auditor Verification.
@@ -315,14 +304,14 @@ import {
               </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
               <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1.5">Latitude <span class="text-rose-500">*</span></label>
                 <input
                   type="text"
                   [(ngModel)]="data.step2.latitude"
                   placeholder="26.9124"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                 />
               </div>
 
@@ -332,7 +321,17 @@ import {
                   type="text"
                   [(ngModel)]="data.step2.longitude"
                   placeholder="75.7873"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
+                />
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">Remarks</label>
+                <input
+                  type="text"
+                  [(ngModel)]="data.step2.remarks"
+                  placeholder="Ready for auditor inspection"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                 />
               </div>
             </div>
@@ -383,7 +382,7 @@ import {
                 <select
                   [(ngModel)]="selectedSector"
                   (ngModelChange)="onSectorSelect()"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A]"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E]"
                 >
                   <option value="" disabled>-- Choose Sector --</option>
                   @for (sec of availableSectors(); track sec) {
@@ -402,7 +401,7 @@ import {
                   [(ngModel)]="selectedCourseQp"
                   (ngModelChange)="onCourseSelectAutoAdd()"
                   [disabled]="!selectedSector"
-                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] disabled:bg-slate-50 disabled:text-slate-400"
+                  class="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] disabled:bg-slate-50 disabled:text-slate-400"
                 >
                   <option value="" disabled>{{ selectedSector ? '-- Select Course --' : '-- Select Sector First --' }}</option>
                   @for (c of availableCoursesForSector(); track c.qpCode) {

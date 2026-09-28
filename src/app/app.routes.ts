@@ -207,10 +207,22 @@ export const routes: Routes = [
   },
   {
     path: 'aspirants',
-    loadComponent: () =>
-      import('./features/sdc/components/aspirant-list.component').then(
-        (m) => m.AspirantListComponent
-      )
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/sdc/components/aspirant-list.component').then(
+            (m) => m.AspirantListComponent
+          )
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/sdc/components/aspirant-detail.component').then(
+            (m) => m.AspirantDetailComponent
+          )
+      }
+    ]
   },
   {
     path: 'tp/aspirants',

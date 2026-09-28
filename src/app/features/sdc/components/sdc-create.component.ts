@@ -12,7 +12,7 @@ import { getSdcFormFields } from '../config/sdc-form.config';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, FormSdcComponent],
   template: `
-    <div class="min-h-full bg-white py-4 sm:py-6 px-4 sm:px-8 font-sans selection:bg-slate-900 selection:text-white" style="font-family: 'Inter', sans-serif;">
+    <div class="min-h-full bg-white py-4 sm:py-6 px-4 sm:px-8 font-sans selection:bg-[#174A6E] selection:text-white" style="font-family: 'Inter', sans-serif;">
       
       <!-- Direct-on-Page Container (No card wrapper, directly on the page) -->
       <div class="max-w-7xl mx-auto space-y-4">
@@ -32,7 +32,7 @@ import { getSdcFormFields } from '../config/sdc-form.config';
               <span>Back</span>
             </button>
             
-            <h1 class="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight leading-snug m-0">
+            <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-snug m-0">
               Register New SDC
             </h1>
           </div>
@@ -111,23 +111,23 @@ export class SdcCreateComponent implements OnInit {
     centerPhotos: [
       {
         id: 'photo-1',
-        name: 'Center_Photo_1.jpg',
-        url: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"%3E%3Crect width="300" height="200" fill="%230b3558"/%3E%3Ccircle cx="150" cy="80" r="30" fill="%23174a6e"/%3E%3Cpath d="M135 85 L150 70 L165 85" stroke="%23ffffff" stroke-width="3" fill="none"/%3E%3Crect x="142" y="85" width="16" height="20" fill="%23ffffff"/%3E%3Ctext x="50%25" y="140" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="13" font-weight="bold"%3ECENTER PHOTO 1%3C/text%3E%3Ctext x="50%25" y="160" dominant-baseline="middle" text-anchor="middle" fill="%2393c5fd" font-family="sans-serif" font-size="10"%3EHigh Resolution JPG%3C/text%3E%3C/svg%3E',
-        size: '1.8 MB',
+        name: 'Center_Front_Building.jpg',
+        url: '/center-photos/center-building.jpg',
+        size: '2.4 MB',
         tag: 'Photo 1'
       },
       {
         id: 'photo-2',
-        name: 'Center_Photo_2.jpg',
-        url: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"%3E%3Crect width="300" height="200" fill="%230483ac"/%3E%3Crect x="80" y="40" width="140" height="70" rx="4" fill="%230b3558" stroke="%23ffffff" stroke-width="2"/%3E%3Ctext x="150" y="80" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="11"%3EPHOTO 2%3C/text%3E%3Ctext x="50%25" y="145" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="13" font-weight="bold"%3ECENTER PHOTO 2%3C/text%3E%3Ctext x="50%25" y="165" dominant-baseline="middle" text-anchor="middle" fill="%23e0f2fe" font-family="sans-serif" font-size="10"%3EHigh Resolution JPG%3C/text%3E%3C/svg%3E',
-        size: '2.1 MB',
+        name: 'IT_Computer_Lab.jpg',
+        url: '/center-photos/computer-lab.jpg',
+        size: '2.8 MB',
         tag: 'Photo 2'
       },
       {
         id: 'photo-3',
-        name: 'Center_Photo_3.jpg',
-        url: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"%3E%3Crect width="300" height="200" fill="%231e3a5f"/%3E%3Crect x="110" y="45" width="80" height="50" rx="3" fill="%230b3558" stroke="%2338bdf8" stroke-width="2"/%3E%3Cpath d="M140 95 L140 110 M125 110 L155 110" stroke="%2338bdf8" stroke-width="3"/%3E%3Ctext x="50%25" y="145" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="13" font-weight="bold"%3ECENTER PHOTO 3%3C/text%3E%3Ctext x="50%25" y="165" dominant-baseline="middle" text-anchor="middle" fill="%23bae6fd" font-family="sans-serif" font-size="10"%3EHigh Resolution JPG%3C/text%3E%3C/svg%3E',
-        size: '2.4 MB',
+        name: 'Practical_Training_Classroom.jpg',
+        url: '/center-photos/practical-training.jpg',
+        size: '3.1 MB',
         tag: 'Photo 3'
       }
     ]

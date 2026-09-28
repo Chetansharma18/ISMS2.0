@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +17,8 @@ import {
   getStep2ContactFields,
   getStep2AddressFields,
   getStep3EconomicWorkerFields,
-  calculateAgeFromDob
+  calculateAgeFromDob,
+  getDefaultAspirantDocuments
 } from '../config/aspirant-form.config';
 
 @Component({
@@ -25,11 +26,75 @@ import {
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, FormSdcComponent, DocumentViewerModalComponent],
   template: `
-    <div class="min-h-full bg-white py-4 sm:py-6 px-4 sm:px-8 font-sans selection:bg-slate-900 selection:text-white" style="font-family: 'Inter', sans-serif;">
+    <div class="min-h-full bg-white py-4 sm:py-6 px-4 sm:px-8 font-sans selection:bg-[#174A6E] selection:text-white" style="font-family: 'Inter', sans-serif;">
       
       <!-- Direct-on-Page Container (matching SDC & Batch forms) -->
       <div class="max-w-7xl mx-auto space-y-4">
         
+        <!-- Aadhaar Card Upload Control Template for Identity Details in Step 1 -->
+        <ng-template #aadhaarUploadTemplate>
+          <div class="space-y-1">
+            <div class="flex items-center justify-between gap-1">
+              <label class="block text-xs font-medium text-slate-700 leading-tight select-none truncate">
+                Aadhaar Card Document Proof <span class="text-rose-500 font-bold">*</span>
+              </label>
+              <span class="text-[10px] text-slate-400 font-mono shrink-0">PDF/JPG • Max 5MB</span>
+            </div>
+
+            @if (formData.aadhaarDocName) {
+              <div class="h-[38px] flex items-center justify-between px-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs gap-2 shadow-2xs hover:border-slate-400 transition-colors">
+                <div class="flex items-center gap-1.5 min-w-0 flex-1 truncate">
+                  <svg class="w-4 h-4 shrink-0 text-[#174A6E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span class="font-semibold text-slate-800 truncate text-xs" [title]="formData.aadhaarDocName">
+                    {{ formData.aadhaarDocName }}
+                  </span>
+                  <span class="text-[10px] text-slate-400 shrink-0">({{ formData.aadhaarDocSize || '1.4 MB' }})</span>
+                </div>
+
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <!-- View Option -->
+                  <button
+                    type="button"
+                    (click)="viewAadhaarDoc()"
+                    class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#174A6E] hover:text-[#0B3558] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                    title="View Aadhaar Card"
+                  >
+                    <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>View</span>
+                  </button>
+
+                  <!-- Change Option -->
+                  <label class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer shadow-2xs">
+                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    <span>Change</span>
+                    <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onAadhaarUploaded($event)" class="hidden" />
+                  </label>
+                </div>
+              </div>
+            } @else {
+              <label class="h-[38px] flex items-center justify-between px-3 border border-dashed border-slate-300 rounded-lg cursor-pointer transition-all bg-slate-50/50 hover:bg-slate-100/70 hover:border-slate-400 shadow-2xs">
+                <div class="flex items-center gap-2 text-slate-600 truncate">
+                  <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  <span class="text-xs truncate text-slate-500">Upload Aadhaar Card (PDF / JPG)</span>
+                </div>
+                <span class="px-2.5 py-1 bg-white text-slate-700 text-[11px] font-semibold rounded border border-slate-200 shadow-2xs shrink-0">
+                  Browse
+                </span>
+                <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onAadhaarUploaded($event)" class="hidden" />
+              </label>
+            }
+          </div>
+        </ng-template>
+
         <!-- Header: Back Button + Title + Batch Context -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
           <div class="flex items-center gap-3">
@@ -47,7 +112,7 @@ import {
             
             <div>
               <div class="flex items-center gap-2">
-                <h1 class="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight leading-snug m-0">
+                <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-snug m-0">
                   Register Aspirant
                 </h1>
                
@@ -91,7 +156,7 @@ import {
             >
               <span
                 class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all"
-                [style.background-color]="currentStep() > 1 ? '#16a34a' : currentStep() === 1 ? '#0F172A' : '#cbd5e1'"
+                [style.background-color]="currentStep() > 1 ? '#16a34a' : currentStep() === 1 ? '#174A6E' : '#cbd5e1'"
                 style="color: #ffffff !important;"
               >
                 @if (currentStep() > 1) {
@@ -104,7 +169,6 @@ import {
               </span>
               <div class="truncate">
                 <span class="block leading-tight font-bold text-slate-900 truncate">1. Personal &amp; Identity</span>
-                <span class="text-[10px] text-slate-500 font-normal truncate">Aadhaar &amp; Bio Data</span>
               </div>
             </button>
 
@@ -118,7 +182,7 @@ import {
             >
               <span
                 class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all"
-                [style.background-color]="currentStep() > 2 ? '#16a34a' : currentStep() === 2 ? '#0F172A' : '#cbd5e1'"
+                [style.background-color]="currentStep() > 2 ? '#16a34a' : currentStep() === 2 ? '#174A6E' : '#cbd5e1'"
                 style="color: #ffffff !important;"
               >
                 @if (currentStep() > 2) {
@@ -131,7 +195,6 @@ import {
               </span>
               <div class="truncate">
                 <span class="block leading-tight font-bold text-slate-900 truncate">2. Address &amp; Contact</span>
-                <span class="text-[10px] text-slate-500 font-normal truncate">Permanent &amp; Comm.</span>
               </div>
             </button>
 
@@ -145,7 +208,7 @@ import {
             >
               <span
                 class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all"
-                [style.background-color]="currentStep() > 3 ? '#16a34a' : currentStep() === 3 ? '#0F172A' : '#cbd5e1'"
+                [style.background-color]="currentStep() > 3 ? '#16a34a' : currentStep() === 3 ? '#174A6E' : '#cbd5e1'"
                 style="color: #ffffff !important;"
               >
                 @if (currentStep() > 3) {
@@ -158,7 +221,6 @@ import {
               </span>
               <div class="truncate">
                 <span class="block leading-tight font-bold text-slate-900 truncate">3. Bank &amp; Worker</span>
-                <span class="text-[10px] text-slate-500 font-normal truncate">DBT, BoCW, MGNREGA</span>
               </div>
             </button>
 
@@ -172,14 +234,13 @@ import {
             >
               <span
                 class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all"
-                [style.background-color]="currentStep() === 4 ? '#0F172A' : '#cbd5e1'"
+                [style.background-color]="currentStep() === 4 ? '#174A6E' : '#cbd5e1'"
                 style="color: #ffffff !important;"
               >
                 <span style="color: #ffffff !important; font-weight: 700; font-size: 11px;">4</span>
               </span>
               <div class="truncate">
                 <span class="block leading-tight font-bold text-slate-900 truncate">4. Photo &amp; Documents</span>
-                <span class="text-[10px] text-slate-500 font-normal truncate">Uploads &amp; Map Batch</span>
               </div>
             </button>
 
@@ -205,76 +266,6 @@ import {
         @if (currentStep() === 1) {
           <div class="space-y-4 animate-in fade-in duration-150">
             
-            <!-- Dedicated Prominent Aadhaar Card Upload (As explicitly requested by user) -->
-            <div class="p-4 bg-gradient-to-r from-blue-50/70 via-slate-50 to-emerald-50/50 border border-blue-200 rounded-xl shadow-2xs space-y-3">
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div class="flex items-center gap-2">
-                  <div class="w-7 h-7 rounded-lg bg-blue-700 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0 flex items-center gap-1.5">
-                      <span>Aadhaar Card Document</span>
-                      <span class="text-rose-500">*</span>
-                    </h3>
-                    <p class="text-[11px] text-slate-600 m-0">
-                      Upload your official Aadhaar card for statutory identity and biometric verification.
-                    </p>
-                  </div>
-                </div>
-
-                <span class="text-[10px] font-semibold text-slate-500 bg-white px-2.5 py-1 rounded-md border border-slate-200 self-start sm:self-auto">
-                  PDF / JPG / PNG • Max 5 MB
-                </span>
-              </div>
-
-              <!-- Upload Drag/Drop Box -->
-              <div class="flex flex-col sm:flex-row items-center gap-3 bg-white p-3 border border-slate-200 rounded-lg">
-                <div class="flex-1 flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 shrink-0">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                    </svg>
-                  </div>
-                  <div>
-                    <span class="text-xs font-bold text-slate-800 block">
-                      {{ formData.aadhaarDocName || 'Aadhaar_Document_Proof.pdf' }}
-                    </span>
-                    <span class="text-[10.5px] text-slate-400">
-                      {{ formData.aadhaarDocSize || '1.8 MB • Ready for biometric verification' }}
-                    </span>
-                  </div>
-                </div>
-
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                  <label class="px-4 py-2 bg-[#0F172A] hover:bg-slate-800 text-white rounded-lg font-bold text-xs shadow-2xs transition-all cursor-pointer inline-flex items-center justify-center gap-1.5">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                    </svg>
-                    <span>{{ formData.aadhaarDocName ? 'Change Aadhaar' : 'Upload Aadhaar' }}</span>
-                    <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onAadhaarUploaded($event)" class="hidden" />
-                  </label>
-                  
-                  @if (formData.aadhaarDocName) {
-                    <button
-                      type="button"
-                      (click)="viewAadhaarDoc()"
-                      class="px-3.5 py-2 bg-white hover:bg-slate-100 text-[#174A6E] border border-slate-300 rounded-lg font-semibold text-xs shadow-2xs transition-all cursor-pointer inline-flex items-center gap-1.5 active:scale-95"
-                      title="View uploaded Aadhaar card"
-                    >
-                      <svg class="w-3.5 h-3.5 text-[#174A6E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      <span>View</span>
-                    </button>
-                  }
-                </div>
-              </div>
-            </div>
-
             <!-- Main Personal & Demographic Fields via FormSdcComponent -->
             <app-form-sdc
               [fields]="step1Fields"
@@ -292,7 +283,7 @@ import {
               <button
                 type="button"
                 (click)="proceedToStep(2)"
-                class="px-6 py-2.5 bg-[#0F172A] hover:bg-slate-800 text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-colors inline-flex items-center gap-2 cursor-pointer"
+                class="px-6 py-2.5 bg-[#174A6E] hover:bg-[#123B59] text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-colors inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Proceed to Address Details</span>
                 <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -325,7 +316,7 @@ import {
             <!-- Communication Address Header with Small Checkbox on Top Right -->
             <div class="pt-3 pb-1 border-b border-slate-200 flex items-center justify-between gap-2">
               <div class="flex items-center gap-2">
-                <span class="w-1.5 h-4 bg-[#0F172A] rounded-full"></span>
+                <span class="w-1.5 h-4 bg-[#174A6E] rounded-full"></span>
                 <h4 class="text-xs font-bold text-slate-900 tracking-wider uppercase m-0">
                   COMMUNICATION ADDRESS
                 </h4>
@@ -371,7 +362,7 @@ import {
               <button
                 type="button"
                 (click)="proceedToStep(3)"
-                class="px-6 py-2.5 bg-[#0F172A] hover:bg-slate-800 text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-colors inline-flex items-center gap-2 cursor-pointer"
+                class="px-6 py-2.5 bg-[#174A6E] hover:bg-[#123B59] text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-colors inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Proceed to Bank &amp; Worker Details</span>
                 <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -406,7 +397,7 @@ import {
               <button
                 type="button"
                 (click)="proceedToStep(4)"
-                class="px-6 py-2.5 bg-[#0F172A] hover:bg-slate-800 text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-colors inline-flex items-center gap-2 cursor-pointer"
+                class="px-6 py-2.5 bg-[#174A6E] hover:bg-[#123B59] text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-colors inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Proceed to Photo &amp; Documents</span>
                 <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -429,7 +420,7 @@ import {
             <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
               <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-4 bg-[#0F172A] rounded-full"></span>
+                  <span class="w-1.5 h-4 bg-[#174A6E] rounded-full"></span>
                   <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0 flex items-center gap-1.5">
                     <span>Candidate Photograph</span>
                     <span class="text-rose-500">*</span>
@@ -493,121 +484,105 @@ import {
               </div>
             </div>
 
-            <!-- Section 10: Attachment / Documents Table -->
+            <!-- Section 10: Attachment / Documents (Matching screenshot card style) -->
             <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
-              <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-200">
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-4 bg-[#0F172A] rounded-full"></span>
+                  <span class="w-1.5 h-4 bg-[#174A6E] rounded-full"></span>
                   <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">
                     Attachment / Documents
                   </h3>
-                  <span class="text-[11px] text-slate-500">({{ formData.documents.length }} documents configured)</span>
+                  <span class="text-[11px] text-slate-500 font-medium">({{ formData.documents.length }} Documents Configured)</span>
                 </div>
-
-                <button
-                  type="button"
-                  (click)="addDocumentRow()"
-                  class="px-3 py-1.5 bg-[#16A34A] hover:bg-emerald-700 text-white rounded-lg font-bold text-xs shadow-2xs transition-all cursor-pointer inline-flex items-center gap-1"
-                >
-                  <span class="text-sm leading-none font-bold">+</span>
-                  <span>Add Document</span>
-                </button>
               </div>
 
-              <!-- Documents Table -->
-              <div class="overflow-x-auto bg-white border border-slate-200 rounded-lg">
-                <table class="w-full text-xs text-left">
-                  <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10.5px]">
-                    <tr>
-                      <th class="py-2.5 px-3 w-10 text-center">#</th>
-                      <th class="py-2.5 px-3 w-48">Document Type</th>
-                      <th class="py-2.5 px-3 min-w-[200px]">Document Name *</th>
-                      <th class="py-2.5 px-3 min-w-[220px]">Upload / Attach</th>
-                      <th class="py-2.5 px-3 w-28 text-center">Status</th>
-                      <th class="py-2.5 px-3 w-16 text-center">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-100">
-                    @for (doc of formData.documents; track doc.id; let idx = $index) {
-                      <tr class="hover:bg-slate-50/50">
-                        <td class="py-2 px-3 text-center text-slate-400 font-mono">{{ idx + 1 }}</td>
-                        
-                        <!-- Document Type Dropdown -->
-                        <td class="py-2 px-3">
-                          <select
-                            [(ngModel)]="doc.docType"
-                            class="w-full h-8 px-2.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-blue-600"
-                          >
-                            @for (type of documentTypeOptions; track type) {
-                              <option [value]="type">{{ type }}</option>
-                            }
-                          </select>
-                        </td>
+              <!-- Documents Card List (Items 3 through 15) -->
+              <div class="space-y-2.5">
+                @for (doc of formData.documents; track doc.id; let idx = $index) {
+                  <div class="border border-slate-200 rounded-xl bg-white p-3 sm:p-4 shadow-2xs hover:border-slate-300 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    
+                    <!-- Left: Circle Number + Title, Badges, Subtitle & Status -->
+                    <div class="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+                      <!-- Circle Number Badge (Red / Rose outlined circle) -->
+                      <div class="w-8 h-8 rounded-full bg-rose-50 border border-rose-200 text-rose-600 font-bold flex items-center justify-center shrink-0 text-xs sm:text-sm shadow-2xs">
+                        {{ doc.itemNumber || (idx + 1) }}
+                      </div>
 
-                        <!-- Document Name Input -->
-                        <td class="py-2 px-3">
-                          <input
-                            type="text"
-                            [(ngModel)]="doc.docName"
-                            placeholder="Enter document title"
-                            class="w-full h-8 px-2.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-blue-600"
-                          />
-                        </td>
-
-                        <!-- Upload File Input -->
-                        <td class="py-2 px-3">
-                          <div class="flex items-center gap-2">
-                            <label class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 rounded text-xs font-semibold cursor-pointer shrink-0">
-                              <span>Choose File</span>
-                              <input
-                                type="file"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                (change)="onDocumentFileSelected(doc, $event)"
-                                class="hidden"
-                              />
-                            </label>
-                            <span class="text-[11px] text-slate-600 truncate max-w-[150px]" [title]="doc.fileName || 'No file chosen'">
-                              {{ doc.fileName || 'No file chosen' }}
-                            </span>
-                          </div>
-                        </td>
-
-                        <!-- Status Badge -->
-                        <td class="py-2 px-3 text-center">
-                          @if (doc.status === 'UPLOADED') {
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                              ✓ Uploaded
-                            </span>
-                          } @else {
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                              Pending
+                      <!-- Document Information -->
+                      <div class="min-w-0 flex-1 space-y-0.5">
+                        <!-- Line 1: Title & Mandatory Asterisk / Condition Note -->
+                        <div class="flex flex-wrap items-center gap-1.5">
+                          <h4 class="font-bold text-xs sm:text-sm text-slate-900 tracking-tight leading-snug m-0">
+                            {{ doc.docName }}
+                          </h4>
+                          @if (doc.badgeType === 'mandatory') {
+                            <span class="text-rose-500 font-bold text-base leading-none" title="Mandatory">*</span>
+                          } @else if (doc.conditionNote) {
+                            <span class="text-xs text-slate-500 font-normal">
+                              ({{ doc.conditionNote }})
                             </span>
                           }
-                        </td>
+                        </div>
 
-                        <!-- Delete Row Action -->
-                        <td class="py-2 px-3 text-center">
-                          <button
-                            type="button"
-                            (click)="removeDocumentRow(idx)"
-                            class="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors cursor-pointer"
-                            title="Remove Document Row"
-                            [disabled]="formData.documents.length <= 1"
-                          >
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <!-- Line 2: Subtitle Description -->
+                        <p class="text-[11.5px] text-slate-500 m-0 leading-normal">
+                          {{ doc.description || 'Statutory proof document for applicant eligibility verification' }}
+                        </p>
+
+                        @if (doc.status === 'UPLOADED') {
+                          <div class="text-[11px] font-semibold text-emerald-700 mt-1 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                             </svg>
-                          </button>
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
+                            <span>Uploaded • {{ doc.fileName }} ({{ doc.fileSize }})</span>
+                          </div>
+                        }
+                      </div>
+                    </div>
+
+                    <!-- Right: Action Button(s) -->
+                    <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+                      @if (doc.status === 'UPLOADED') {
+                        <!-- View Option -->
+                        <button
+                          type="button"
+                          (click)="viewAspirantDoc(doc)"
+                          class="px-3.5 py-1.5 bg-white hover:bg-slate-50 text-[#174A6E] border border-slate-300 rounded-lg font-semibold text-xs shadow-2xs transition-all cursor-pointer inline-flex items-center gap-1.5 active:scale-95"
+                          title="View uploaded document"
+                        >
+                          <svg class="w-3.5 h-3.5 text-[#174A6E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          <span>View</span>
+                        </button>
+
+                        <!-- Change Option -->
+                        <label class="px-3.5 py-1.5 bg-[#174A6E] hover:bg-[#123B59] text-white rounded-lg font-semibold text-xs shadow-2xs transition-all cursor-pointer inline-flex items-center gap-1.5 active:scale-95">
+                          <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                          </svg>
+                          <span>Change</span>
+                          <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onAspirantDocSelected(doc, $event)" class="hidden" />
+                        </label>
+                      } @else {
+                        <!-- Upload PDF Button (Matching Screenshot) -->
+                        <label class="px-4 py-2 bg-[#174A6E] hover:bg-[#123B59] active:scale-95 text-white rounded-lg font-semibold text-xs shadow-2xs transition-all cursor-pointer inline-flex items-center gap-2">
+                          <span class="w-4 h-4 rounded bg-rose-500 text-white text-[8px] font-extrabold flex items-center justify-center tracking-tighter">PDF</span>
+                          <span>Upload PDF</span>
+                          <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onAspirantDocSelected(doc, $event)" class="hidden" />
+                        </label>
+                      }
+                    </div>
+
+                  </div>
+                }
               </div>
+
             </div>
 
             <!-- Batch Mapping Confirmation Bar -->
-            <div class="p-4 bg-slate-900 text-white rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+            <div class="p-4 bg-gradient-to-r from-[#0B3558] to-[#174A6E] text-white rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
               <div class="space-y-1 text-center sm:text-left">
                 <span class="text-[11px] text-blue-300 font-bold uppercase tracking-wider block">
                   Mapping Target Batch: {{ batch().batchCode }}
@@ -706,7 +681,7 @@ import {
                 <button
                   type="button"
                   (click)="goToAspirantsList()"
-                  class="w-full sm:w-auto flex-1 py-2.5 px-3 bg-[#0F172A] hover:bg-slate-800 text-white rounded-lg font-bold text-xs shadow-xs transition-colors text-center cursor-pointer"
+                  class="w-full sm:w-auto flex-1 py-2.5 px-3 bg-[#174A6E] hover:bg-[#123B59] text-white rounded-lg font-bold text-xs shadow-xs transition-colors text-center cursor-pointer"
                 >
                   Aspirants Roster &rarr;
                 </button>
@@ -716,12 +691,12 @@ import {
         </div>
       }
 
-      <!-- Aadhaar Document Viewer Modal -->
+      <!-- Universal Document Viewer Modal (Supports Aadhaar and all Attachments) -->
       <app-document-viewer-modal
-        [isOpen]="isAadhaarViewerOpen()"
-        [doc]="aadhaarViewerDoc()"
-        title="Aadhaar Card Document Proof"
-        (close)="isAadhaarViewerOpen.set(false)"
+        [isOpen]="isDocViewerOpen()"
+        [doc]="activeViewerDoc()"
+        [title]="activeViewerTitle()"
+        (close)="isDocViewerOpen.set(false)"
       ></app-document-viewer-modal>
 
     </div>
@@ -741,7 +716,26 @@ export class AspirantMappingComponent implements OnInit {
   showSuccessModal = signal<boolean>(false);
   createdAspirantId = signal<string>('ASP-RJ-2026-98412');
 
-  isAadhaarViewerOpen = signal<boolean>(false);
+  @ViewChild('aadhaarUploadTemplate', { static: true }) aadhaarUploadTemplate!: TemplateRef<any>;
+
+  isDocViewerOpen = signal<boolean>(false);
+  activeViewerTitle = signal<string>('Aadhaar Card Document Proof');
+  activeViewerDoc = signal<{
+    fileName: string;
+    fileSize: string;
+    uploadDate: string;
+    status: 'uploaded' | 'empty' | 'uploading';
+    fileUrl: string;
+  }>({
+    fileName: 'Aadhaar_Candidate_Card.pdf',
+    fileSize: '1.4 MB',
+    uploadDate: 'Today',
+    status: 'uploaded',
+    fileUrl: ''
+  });
+
+  isAadhaarViewerOpen = computed(() => this.isDocViewerOpen());
+  aadhaarViewerDoc = computed(() => this.activeViewerDoc());
 
   readonly defaultAadhaarCardDataUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" width="600" height="380" viewBox="0 0 600 380">
@@ -782,16 +776,54 @@ export class AspirantMappingComponent implements OnInit {
     </svg>
   `);
 
-  readonly aadhaarViewerDoc = computed(() => ({
-    fileName: this.formData.aadhaarDocName || 'Aadhaar_Candidate_Card.pdf',
-    fileSize: this.formData.aadhaarDocSize || '1.4 MB',
-    uploadDate: 'Today',
-    status: 'uploaded' as const,
-    fileUrl: this.formData.aadhaarDocUrl || this.defaultAadhaarCardDataUrl
-  }));
-
   viewAadhaarDoc(): void {
-    this.isAadhaarViewerOpen.set(true);
+    this.activeViewerTitle.set('Aadhaar Card Document Proof');
+    this.activeViewerDoc.set({
+      fileName: this.formData.aadhaarDocName || 'Aadhaar_Candidate_Card.pdf',
+      fileSize: this.formData.aadhaarDocSize || '1.4 MB',
+      uploadDate: 'Today',
+      status: 'uploaded',
+      fileUrl: this.formData.aadhaarDocUrl || this.defaultAadhaarCardDataUrl
+    });
+    this.isDocViewerOpen.set(true);
+  }
+
+  viewAspirantDoc(doc: AspirantDocumentItem): void {
+    this.activeViewerTitle.set(`${doc.itemNumber ? doc.itemNumber + '. ' : ''}${doc.docName}`);
+    this.activeViewerDoc.set({
+      fileName: doc.fileName || `${doc.docName}.pdf`,
+      fileSize: doc.fileSize || '1.2 MB',
+      uploadDate: doc.uploadedAt || 'Today',
+      status: 'uploaded',
+      fileUrl: doc.fileUrl || this.generateDocumentPreviewSvg(doc.docName, doc.description || '')
+    });
+    this.isDocViewerOpen.set(true);
+  }
+
+  generateDocumentPreviewSvg(title: string, sub: string): string {
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="600" height="750" viewBox="0 0 600 750">
+        <rect width="600" height="750" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+        <rect x="0" y="0" width="600" height="12" fill="#174a6e"/>
+        <circle cx="300" cy="70" r="28" fill="#f1f5f9" stroke="#cbd5e1"/>
+        <text x="300" y="75" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#174a6e">GOVT OF RAJASTHAN</text>
+        <text x="300" y="130" text-anchor="middle" font-family="sans-serif" font-size="15" font-weight="bold" fill="#0f172a">${title.toUpperCase()}</text>
+        <text x="300" y="155" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#64748b">${sub}</text>
+        <line x1="60" y1="175" x2="540" y2="175" stroke="#e2e8f0" stroke-width="1.5"/>
+        <rect x="60" y="200" width="480" height="360" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+        <text x="90" y="240" font-family="sans-serif" font-size="12" font-weight="bold" fill="#334155">CANDIDATE INFORMATION</text>
+        <text x="90" y="280" font-family="sans-serif" font-size="12" fill="#64748b">Candidate Name: <tspan font-weight="bold" fill="#0f172a">${this.formData.aspirantName || 'Rahul Sharma'}</tspan></text>
+        <text x="90" y="310" font-family="sans-serif" font-size="12" fill="#64748b">Aadhaar (Masked): <tspan font-weight="bold" fill="#0f172a">XXXX-XXXX-${this.formData.aadhaarNo ? this.formData.aadhaarNo.slice(-4) : '3012'}</tspan></text>
+        <text x="90" y="340" font-family="sans-serif" font-size="12" fill="#64748b">Application ID: <tspan font-weight="bold" fill="#0f172a">ASP-RJ-2026-9812</tspan></text>
+        <text x="90" y="370" font-family="sans-serif" font-size="12" fill="#64748b">Verification Status: <tspan font-weight="bold" fill="#16a34a">VERIFIED &amp; ATTESTED</tspan></text>
+        <rect x="90" y="410" width="420" height="100" rx="6" fill="#ffffff" stroke="#cbd5e1"/>
+        <text x="110" y="445" font-family="sans-serif" font-size="11" fill="#475569">Certified that this document has been scanned and verified against</text>
+        <text x="110" y="465" font-family="sans-serif" font-size="11" fill="#475569">official records for ISMS Skill Development Registration.</text>
+        <rect x="380" y="590" width="160" height="70" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="4 2"/>
+        <text x="460" y="630" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#64748b">OFFICIAL SEAL</text>
+      </svg>
+    `;
+    return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
   }
 
   batchId = signal<string>('');
@@ -903,43 +935,7 @@ export class AspirantMappingComponent implements OnInit {
     preferredSectors: ['Aerospace and Aviation', 'Electronics'],
     candidatePhotoUrl: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23f1f5f9"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%230b3558"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%23174a6e"/%3E%3Ctext x="60" y="145" text-anchor="middle" font-family="sans-serif" font-size="9" fill="%2364748b"%3EPASSPORT PHOTO%3C/text%3E%3C/svg%3E',
     candidatePhotoName: 'Rahul_Sharma_Passport_Photo.jpg',
-    documents: [
-      {
-        id: 'doc-1',
-        docType: 'Aadhaar Card',
-        docName: 'Aadhaar Card Copy',
-        fileName: 'Aadhaar_Rahul_Sharma.pdf',
-        fileSize: '1.4 MB',
-        uploadedAt: 'Today',
-        status: 'UPLOADED'
-      },
-      {
-        id: 'doc-2',
-        docType: 'Educational Certificate',
-        docName: '12th Senior Secondary Marksheet',
-        fileName: 'Class_12_Marksheet.pdf',
-        fileSize: '2.1 MB',
-        uploadedAt: 'Today',
-        status: 'UPLOADED'
-      },
-      {
-        id: 'doc-3',
-        docType: 'Domicile Certificate',
-        docName: 'Rajasthan Bonafide Certificate',
-        fileName: 'Bonafide_Certificate.pdf',
-        fileSize: '950 KB',
-        uploadedAt: 'Today',
-        status: 'UPLOADED'
-      },
-      {
-        id: 'doc-4',
-        docType: 'Caste Certificate',
-        docName: 'OBC Category Certificate',
-        fileName: '',
-        fileSize: '',
-        status: 'PENDING'
-      }
-    ]
+    documents: getDefaultAspirantDocuments()
   };
 
   ngOnInit(): void {
@@ -971,7 +967,7 @@ export class AspirantMappingComponent implements OnInit {
     // Initialize Form Fields for Steps 1, 2, and 3
     this.step1Fields = getStep1PersonalFields((dob, model) => {
       model.age = calculateAgeFromDob(dob);
-    });
+    }, this.aadhaarUploadTemplate);
     this.step2PermanentFields = getStep2PermanentAddressFields();
     this.step2CommFields = getStep2CommAddressFields();
     this.step2ContactFields = getStep2ContactFields();
@@ -1002,10 +998,6 @@ export class AspirantMappingComponent implements OnInit {
         this.errorMessage.set('Aadhaar number is mandatory.');
         return;
       }
-      if (this.formData.aadhaarNo !== this.formData.confirmAadhaarNo) {
-        this.errorMessage.set('Aadhaar number and Confirm Aadhaar number do not match.');
-        return;
-      }
     } else if (this.currentStep() === 2) {
       if (!this.formData.mobileNo) {
         this.errorMessage.set('Mobile number is mandatory.');
@@ -1033,14 +1025,6 @@ export class AspirantMappingComponent implements OnInit {
         this.formData.aadhaarDocUrl = e.target?.result as string;
       };
       reader.readAsDataURL(file);
-
-      // Also update the Aadhaar Card item in the Step 4 documents table
-      const aadhaarDoc = this.formData.documents.find(d => d.docType === 'Aadhaar Card');
-      if (aadhaarDoc) {
-        aadhaarDoc.fileName = file.name;
-        aadhaarDoc.fileSize = this.formData.aadhaarDocSize;
-        aadhaarDoc.status = 'UPLOADED';
-      }
     }
   }
 
@@ -1077,10 +1061,18 @@ export class AspirantMappingComponent implements OnInit {
   }
 
   addDocumentRow(): void {
+    const nextNumber = this.formData.documents.length > 0 
+      ? Math.max(...this.formData.documents.map(d => d.itemNumber || 0)) + 1 
+      : 14;
     this.formData.documents.push({
       id: `doc-${Date.now()}`,
-      docType: 'Other',
-      docName: '',
+      itemNumber: nextNumber,
+      docType: 'Other Document',
+      docName: 'Additional Supporting Document',
+      badgeLabel: 'Optional',
+      badgeType: 'optional',
+      description: 'Additional statutory, academic, or vocational certificate',
+      conditionNote: 'Optional',
       fileName: '',
       fileSize: '',
       status: 'PENDING'
@@ -1093,17 +1085,25 @@ export class AspirantMappingComponent implements OnInit {
     }
   }
 
-  onDocumentFileSelected(doc: AspirantDocumentItem, event: Event): void {
+  onAspirantDocSelected(doc: AspirantDocumentItem, event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       doc.fileName = file.name;
       doc.fileSize = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
       doc.status = 'UPLOADED';
-      if (!doc.docName) {
-        doc.docName = doc.docType;
-      }
+      doc.uploadedAt = 'Just now';
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        doc.fileUrl = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
     }
+  }
+
+  onDocumentFileSelected(doc: AspirantDocumentItem, event: Event): void {
+    this.onAspirantDocSelected(doc, event);
   }
 
   submitAndMapAspirant(): void {

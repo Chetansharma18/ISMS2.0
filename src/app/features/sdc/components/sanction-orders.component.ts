@@ -60,10 +60,11 @@ import {
           <button
             type="button"
             (click)="navigateToAddSdc(so.schemeName || so.scheme, so.category)"
-            class="text-[#0284c7] hover:text-[#0369a1] hover:underline font-semibold text-[13px] cursor-pointer inline-flex items-center gap-1 select-none transition-colors"
+            class="whitespace-nowrap inline-flex items-center gap-1 px-3 py-1.5 rounded-[4px] bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
             title="Register SDC for {{ so.schemeName || so.scheme }}"
           >
-            Add SDC
+            <span class="text-sm font-bold leading-none">+</span>
+            <span>Add SDC</span>
           </button>
         </ng-template>
 
@@ -79,7 +80,7 @@ export class SanctionOrdersComponent {
   successMessage = signal<string>('');
 
   readonly orderColumns: TableColumn<SanctionOrder>[] = [
-    { key: 'ipaNumber', label: 'IPA Number', width: 'w-36', cellClass: 'whitespace-nowrap font-mono font-medium text-slate-700' },
+    { key: 'ipaNumber', label: 'MoU Number', width: 'w-36', cellClass: 'whitespace-nowrap font-mono font-medium text-slate-700' },
     { key: 'schemeName', label: 'Scheme Name', type: 'custom', cellClass: 'whitespace-nowrap font-bold text-slate-900' },
     { key: 'category', label: 'Category', align: 'center', cellClass: 'whitespace-nowrap font-medium text-slate-700' },
     { key: 'mouStartDate', label: 'MoU Start Date', align: 'center', cellClass: 'whitespace-nowrap text-slate-600' },

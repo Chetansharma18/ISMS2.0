@@ -7,12 +7,7 @@ import {
   SCHEME_COURSE_CATALOG
 } from '../models/sdc.model';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class SdcService {
-  /** Reactive list of all SDC records */
-  private readonly _sdcs = signal<SdcRecord[]>([
+export const INITIAL_SDC_RECORDS: SdcRecord[] = [
     {
       id: 'sdc-101',
       sdcCode: 'SDC-0001',
@@ -64,21 +59,21 @@ export class SdcService {
         {
           id: 'p1',
           name: 'Center_Front_Building.jpg',
-          url: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260"%3E%3Crect width="400" height="260" fill="%230b3558"/%3E%3Crect x="60" y="50" width="280" height="150" fill="%23174a6e" rx="6"/%3E%3Crect x="90" y="80" width="50" height="40" fill="%23ffffff" opacity="0.9" rx="3"/%3E%3Crect x="175" y="80" width="50" height="40" fill="%23ffffff" opacity="0.9" rx="3"/%3E%3Crect x="260" y="80" width="50" height="40" fill="%23ffffff" opacity="0.9" rx="3"/%3E%3Crect x="170" y="140" width="60" height="60" fill="%2338bdf8" rx="2"/%3E%3Ctext x="200" y="235" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="13" font-weight="bold"%3ECENTER FRONT VIEW &amp; SIGNBOARD%3C/text%3E%3C/svg%3E',
-          size: '2.1 MB',
+          url: '/center-photos/center-building.jpg',
+          size: '2.4 MB',
           tag: 'Photo 1'
         },
         {
           id: 'p2',
           name: 'IT_Computer_Lab.jpg',
-          url: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260"%3E%3Crect width="400" height="260" fill="%230483ac"/%3E%3Crect x="70" y="60" width="70" height="45" rx="4" fill="%230b3558" stroke="%23ffffff" stroke-width="2"/%3E%3Crect x="165" y="60" width="70" height="45" rx="4" fill="%230b3558" stroke="%23ffffff" stroke-width="2"/%3E%3Crect x="260" y="60" width="70" height="45" rx="4" fill="%230b3558" stroke="%23ffffff" stroke-width="2"/%3E%3Cline x1="50" y1="130" x2="350" y2="130" stroke="%23ffffff" stroke-width="3"/%3E%3Ctext x="200" y="235" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="13" font-weight="bold"%3ECOMPUTER LAB &amp; IT FACILITY%3C/text%3E%3C/svg%3E',
+          url: '/center-photos/computer-lab.jpg',
           size: '2.8 MB',
           tag: 'Photo 2'
         },
         {
           id: 'p3',
           name: 'Practical_Training_Classroom.jpg',
-          url: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260"%3E%3Crect width="400" height="260" fill="%231e3a5f"/%3E%3Crect x="60" y="45" width="280" height="80" rx="4" fill="%230b3558" stroke="%2338bdf8" stroke-width="2"/%3E%3Ctext x="200" y="85" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="11"%3ESMART CLASSROOM BENCHES%3C/text%3E%3Ctext x="200" y="235" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-family="sans-serif" font-size="13" font-weight="bold"%3EPRACTICAL CLASSROOM%3C/text%3E%3C/svg%3E',
+          url: '/center-photos/practical-training.jpg',
           size: '3.1 MB',
           tag: 'Photo 3'
         }
@@ -226,10 +221,261 @@ export class SdcService {
       },
       activeBatchesCount: 0,
       enrolledTraineesCount: 0
+    },
+    {
+      id: 'sdc-104',
+      sdcCode: 'SDC-0004',
+      sdcName: 'Jodhpur Renewable & Green Skills Hub',
+      scheme: 'MMKVY',
+      schemeCategory: 'SAMARTH',
+      sector: 'Green Jobs',
+      tpName: 'Apex Vocational Solutions',
+      mouRefNo: 'MOU/2026/004',
+      proposedStartDate: '2026-11-20',
+      totalTrainedAspirants: 620,
+      totalPlacedAspirants: 510,
+      state: 'Rajasthan',
+      district: 'Jodhpur',
+      assemblyConstituency: 'Sardarpura',
+      parliamentConstituency: 'Jodhpur',
+      division: 'Jodhpur',
+      block: 'Mandor',
+      sdcCapacity: 150,
+      centerEmail: 'jodhpur@apexvocational.com',
+      pincode: '342003',
+      fullAddress: 'Industrial Estate, Heavy Industrial Area, Jodhpur, Rajasthan',
+      latitude: 26.2734,
+      longitude: 73.0125,
+      hostelCategory: 'Residential (Both Boys & Girls)',
+      remarks: 'Equipped with solar array training laboratory and smart audio-visual aids',
+      allocatedCourses: [
+        {
+          sector: 'Green Energy',
+          courseName: 'Solar PV Site Surveyor',
+          qpCode: 'SGJ/Q0101',
+          nsqfLevel: 4,
+          durationHours: 350
+        }
+      ],
+      documents: {
+        rentalAgreementDoc: { fileName: 'Apex_Jodhpur_Lease.pdf', fileSize: '2.9 MB', uploadedAt: '2026-09-18' },
+        fireNocDoc: { fileName: 'Apex_Fire_Certificate.pdf', fileSize: '1.1 MB', uploadedAt: '2026-09-18' },
+        signboardPhotoDoc: { fileName: 'Apex_Front_Signboard.jpg', fileSize: '3.6 MB', uploadedAt: '2026-09-18' },
+        layoutDiagramDoc: { fileName: 'Apex_Lab_Floor_Plan.pdf', fileSize: '2.7 MB', uploadedAt: '2026-09-18' }
+      },
+      declarationAccepted: true,
+      status: 'PENDING_APPROVAL',
+      createdAt: '2026-09-18T08:30:00.000Z',
+      submittedAt: '2026-09-18T11:00:00.000Z',
+      inspection: {
+        auditorName: 'Shri Vikram Singh (RSLDC Inspection Officer)',
+        auditorPhone: '+91 94141 88990',
+        inspectionDate: '2026-09-22',
+        physicalExistenceVerified: true,
+        signboardVerified: true,
+        classroomsLabsVerified: true,
+        biometricAebasVerified: true,
+        auditorLatitude: 26.2736,
+        auditorLongitude: 73.0127,
+        geoDistanceMeters: 26,
+        geoMatched: true,
+        auditorRemarks: 'Full verification completed. Training facility ready for candidate onboarding.',
+        recommendation: 'RECOMMENDED'
+      },
+      activeBatchesCount: 0,
+      enrolledTraineesCount: 0
+    },
+    {
+      id: 'sdc-105',
+      sdcCode: 'SDC-0005',
+      sdcName: 'Udaipur Aviation & Hospitality Institute',
+      scheme: 'SAMARTH',
+      schemeCategory: 'RAJKVIK',
+      sector: 'Aerospace and Aviation',
+      tpName: 'Marwar Livelihoods Foundation',
+      mouRefNo: 'MOU/2026/005',
+      proposedStartDate: '2026-12-01',
+      totalTrainedAspirants: 280,
+      totalPlacedAspirants: 230,
+      state: 'Rajasthan',
+      district: 'Udaipur',
+      assemblyConstituency: 'Udaipur',
+      parliamentConstituency: 'Udaipur',
+      division: 'Udaipur',
+      block: 'Girwa',
+      sdcCapacity: 90,
+      centerEmail: 'udaipur.center@marwarlivelihoods.org',
+      pincode: '313001',
+      fullAddress: 'Sector 14, Hiran Magri, Udaipur, Rajasthan',
+      latitude: 24.5854,
+      longitude: 73.7125,
+      hostelCategory: 'Residential (Girls Only)',
+      remarks: 'Mock aircraft cabin and passenger terminal setup installed',
+      allocatedCourses: [
+        {
+          sector: 'Aerospace and Aviation',
+          courseName: 'Airline Customer Service Executive',
+          qpCode: 'AAS/Q0301',
+          nsqfLevel: 4,
+          durationHours: 360
+        }
+      ],
+      documents: {
+        rentalAgreementDoc: { fileName: 'Marwar_Udaipur_Rent_Deed.pdf', fileSize: '1.8 MB', uploadedAt: '2026-09-20' },
+        fireNocDoc: { fileName: 'Udaipur_Fire_NOC.pdf', fileSize: '850 KB', uploadedAt: '2026-09-20' },
+        signboardPhotoDoc: { fileName: 'Center_Signboard_Udaipur.jpg', fileSize: '2.1 MB', uploadedAt: '2026-09-20' },
+        layoutDiagramDoc: { fileName: 'Udaipur_Campus_Layout.pdf', fileSize: '3.4 MB', uploadedAt: '2026-09-20' }
+      },
+      declarationAccepted: true,
+      status: 'PENDING_INSPECTION',
+      createdAt: '2026-09-20T10:00:00.000Z',
+      submittedAt: '2026-09-20T14:45:00.000Z',
+      activeBatchesCount: 0,
+      enrolledTraineesCount: 0
+    },
+    {
+      id: 'sdc-106',
+      sdcCode: 'SDC-0006',
+      sdcName: 'Bikaner Automotive & Capital Goods Center',
+      scheme: 'RAJKViK',
+      schemeCategory: 'RAJKVIK',
+      sector: 'Automotive',
+      tpName: 'Apex Vocational Solutions',
+      mouRefNo: 'MOU/2026/006',
+      proposedStartDate: '2026-10-15',
+      totalTrainedAspirants: 400,
+      totalPlacedAspirants: 340,
+      state: 'Rajasthan',
+      district: 'Bikaner',
+      assemblyConstituency: 'Bikaner West',
+      parliamentConstituency: 'Bikaner',
+      division: 'Bikaner',
+      block: 'Bikaner',
+      sdcCapacity: 100,
+      centerEmail: 'bikaner@apexvocational.com',
+      pincode: '334001',
+      fullAddress: 'Plot 55, Karni Industrial Area, Bikaner, Rajasthan',
+      latitude: 28.0229,
+      longitude: 73.3119,
+      hostelCategory: 'Residential (Boys Only)',
+      remarks: 'Multi-brand diagnostic testing bay and modern hydraulic lifts',
+      allocatedCourses: [
+        {
+          sector: 'Automotive',
+          courseName: 'Four Wheeler Service Technician',
+          qpCode: 'ASC/Q1402',
+          nsqfLevel: 4,
+          durationHours: 450
+        }
+      ],
+      documents: {
+        rentalAgreementDoc: { fileName: 'Bikaner_Karni_Lease.pdf', fileSize: '3.3 MB', uploadedAt: '2026-09-05' },
+        fireNocDoc: { fileName: 'Bikaner_Fire_NOC.pdf', fileSize: '1.4 MB', uploadedAt: '2026-09-05' },
+        signboardPhotoDoc: { fileName: 'Bikaner_Center_Front.jpg', fileSize: '4.0 MB', uploadedAt: '2026-09-05' },
+        layoutDiagramDoc: { fileName: 'Bikaner_Workshop_Blueprint.pdf', fileSize: '2.5 MB', uploadedAt: '2026-09-05' }
+      },
+      declarationAccepted: true,
+      status: 'APPROVED',
+      createdAt: '2026-09-05T09:00:00.000Z',
+      submittedAt: '2026-09-05T12:30:00.000Z',
+      inspection: {
+        auditorName: 'Er. Mahendra Rathore',
+        auditorPhone: '+91 94142 33221',
+        inspectionDate: '2026-09-12',
+        physicalExistenceVerified: true,
+        signboardVerified: true,
+        classroomsLabsVerified: true,
+        biometricAebasVerified: true,
+        auditorLatitude: 28.0231,
+        auditorLongitude: 73.3121,
+        geoDistanceMeters: 30,
+        geoMatched: true,
+        auditorRemarks: 'Workshop tools and safety measures fully compliant with NSQF standards.',
+        recommendation: 'RECOMMENDED'
+      },
+      approval: {
+        approvedTargetCapacity: 100,
+        approvalRemarks: 'Approved for full capacity batch mobilization.',
+        approvedDate: '2026-09-18',
+        approvedBy: 'Director (Training Operations), RSLDC'
+      },
+      activeBatchesCount: 1,
+      enrolledTraineesCount: 30
     }
-  ]);
+];
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SdcService {
+  private readonly STORAGE_KEY = 'isms_sdc_records';
+
+  /** Reactive list of all SDC records initialized from localStorage with seed fallback */
+  private readonly _sdcs = signal<SdcRecord[]>(this.loadInitialRecords());
 
   readonly sdcs = this._sdcs.asReadonly();
+
+  constructor() {
+    // Cross-tab and window storage synchronization
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (event: StorageEvent) => {
+        if (event.key === this.STORAGE_KEY && event.newValue) {
+          try {
+            const records: SdcRecord[] = JSON.parse(event.newValue);
+            if (Array.isArray(records) && records.length > 0) {
+              this._sdcs.set(records);
+            }
+          } catch { }
+        }
+      });
+    }
+  }
+
+  private loadInitialRecords(): SdcRecord[] {
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(this.STORAGE_KEY);
+        if (stored) {
+          const parsed: SdcRecord[] = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            // Replace any old SVG placeholders with real center photos
+            const realPhotos = [
+              { id: 'p1', name: 'Center_Front_Building.jpg', url: '/center-photos/center-building.jpg', size: '2.4 MB', tag: 'Photo 1' },
+              { id: 'p2', name: 'IT_Computer_Lab.jpg', url: '/center-photos/computer-lab.jpg', size: '2.8 MB', tag: 'Photo 2' },
+              { id: 'p3', name: 'Practical_Training_Classroom.jpg', url: '/center-photos/practical-training.jpg', size: '3.1 MB', tag: 'Photo 3' }
+            ];
+            const updated = parsed.map(sdc => {
+              if (sdc.centerPhotos && sdc.centerPhotos.some(p => p.url && p.url.startsWith('data:image/svg+xml'))) {
+                return { ...sdc, centerPhotos: realPhotos };
+              }
+              return sdc;
+            });
+            // Keep user updates, but if any seed records are missing, append them
+            const existingIds = new Set(updated.map(p => p.id));
+            const missing = INITIAL_SDC_RECORDS.filter(s => !existingIds.has(s.id));
+            const merged = [...updated, ...missing];
+            this.persist(merged);
+            return merged;
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load SDC records from localStorage', e);
+      }
+    }
+    this.persist(INITIAL_SDC_RECORDS);
+    return INITIAL_SDC_RECORDS;
+  }
+
+  private persist(records?: SdcRecord[]): void {
+    const list = records || this._sdcs();
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {
+        console.error('Failed to persist SDC records to localStorage', e);
+      }
+    }
+  }
 
   /** Stats computed across all SDCs */
   readonly stats = computed(() => {
@@ -253,15 +499,17 @@ export class SdcService {
   /** Update an existing SDC record with edited creation details */
   updateSdc(id: string, updates: Partial<SdcRecord>): SdcRecord | undefined {
     let updatedRecord: SdcRecord | undefined;
-    this._sdcs.update(list =>
-      list.map(item => {
+    this._sdcs.update(list => {
+      const updated = list.map(item => {
         if (item.id === id) {
           updatedRecord = { ...item, ...updates };
           return updatedRecord;
         }
         return item;
-      })
-    );
+      });
+      this.persist(updated);
+      return updated;
+    });
     return updatedRecord;
   }
 
@@ -323,7 +571,11 @@ export class SdcService {
       enrolledTraineesCount: 0
     };
 
-    this._sdcs.update(list => [newRecord, ...list]);
+    this._sdcs.update(list => {
+      const updated = [newRecord, ...list];
+      this.persist(updated);
+      return updated;
+    });
     return newRecord;
   }
 
@@ -363,29 +615,31 @@ export class SdcService {
       recommendation: inspection.recommendation || 'RECOMMENDED'
     };
 
-    this._sdcs.update(list =>
-      list.map(item =>
+    this._sdcs.update(list => {
+      const updated: SdcRecord[] = list.map((item): SdcRecord =>
         item.id === id
           ? {
               ...item,
               inspection: completeInspection,
-              status: 'PENDING_APPROVAL'
+              status: 'PENDING_APPROVAL' as SdcStatus
             }
           : item
-      )
-    );
+      );
+      this.persist(updated);
+      return updated;
+    });
   }
 
   /**
    * STAGE 4: Department Approval
    */
   approveSdc(id: string, targetCapacity: number, remarks: string): void {
-    this._sdcs.update(list =>
-      list.map(item =>
+    this._sdcs.update(list => {
+      const updated: SdcRecord[] = list.map((item): SdcRecord =>
         item.id === id
           ? {
               ...item,
-              status: 'APPROVED',
+              status: 'APPROVED' as SdcStatus,
               approval: {
                 approvedTargetCapacity: targetCapacity,
                 approvalRemarks: remarks,
@@ -394,20 +648,22 @@ export class SdcService {
               }
             }
           : item
-      )
-    );
+      );
+      this.persist(updated);
+      return updated;
+    });
   }
 
   /**
    * STAGE 4: Department Rejection
    */
   rejectSdc(id: string, remarks: string): void {
-    this._sdcs.update(list =>
-      list.map(item =>
+    this._sdcs.update(list => {
+      const updated: SdcRecord[] = list.map((item): SdcRecord =>
         item.id === id
           ? {
               ...item,
-              status: 'REJECTED',
+              status: 'REJECTED' as SdcStatus,
               approval: {
                 approvedTargetCapacity: 0,
                 approvalRemarks: remarks,
@@ -416,25 +672,44 @@ export class SdcService {
               }
             }
           : item
-      )
-    );
+      );
+      this.persist(updated);
+      return updated;
+    });
   }
 
   /**
    * STAGE 4: Return to TP for corrections
    */
   returnToTp(id: string, remarks: string): void {
-    this._sdcs.update(list =>
-      list.map(item =>
+    this._sdcs.update(list => {
+      const updated: SdcRecord[] = list.map((item): SdcRecord =>
         item.id === id
           ? {
               ...item,
-              status: 'RETURNED_TO_TP',
+              status: 'RETURNED_TO_TP' as SdcStatus,
               remarks: `Returned by Department: ${remarks}`
             }
           : item
-      )
-    );
+      );
+      this.persist(updated);
+      return updated;
+    });
+  }
+
+  /**
+   * Increment active batches count for SDC upon new batch creation
+   */
+  incrementBatchesCount(id: string): void {
+    this._sdcs.update(list => {
+      const updated = list.map(item =>
+        item.id === id
+          ? { ...item, activeBatchesCount: (item.activeBatchesCount || 0) + 1 }
+          : item
+      );
+      this.persist(updated);
+      return updated;
+    });
   }
 
   /**

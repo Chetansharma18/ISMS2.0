@@ -96,7 +96,7 @@ export class AspirantService {
       epicNo: 'RJ/01/042/981234',
 
       preferredSectors: ['Green Energy', 'Electronics'],
-      candidatePhotoUrl: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23e2e8f0"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%230f172a"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%231e293b"/%3E%3Ctext x="60" y="145" text-anchor="middle" font-family="sans-serif" font-size="9" fill="%23ffffff"%3ERAHUL S.%3C/text%3E%3C/svg%3E',
+      candidatePhotoUrl: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23e2e8f0"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%230f172a"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%231e293b"/%3E%3C/svg%3E',
       candidatePhotoName: 'Rahul_Sharma_Photo.jpg',
       documents: [
         { id: 'd1', docType: 'Aadhaar Card', docName: 'Aadhaar Card Copy', fileName: 'Aadhaar_Rahul.pdf', fileSize: '1.4 MB', status: 'UPLOADED' },
@@ -206,7 +206,7 @@ export class AspirantService {
       epicNo: 'RJ/01/033/881234',
 
       preferredSectors: ['Green Energy', 'Automotive'],
-      candidatePhotoUrl: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23f1f5f9"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%23174a6e"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%230b3558"/%3E%3Ctext x="60" y="145" text-anchor="middle" font-family="sans-serif" font-size="9" fill="%23ffffff"%3ESUNIL K.%3C/text%3E%3C/svg%3E',
+      candidatePhotoUrl: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23e2e8f0"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%230f172a"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%231e293b"/%3E%3C/svg%3E',
       candidatePhotoName: 'Sunil_Kumar_Photo.jpg',
       documents: [
         { id: 'd1', docType: 'Aadhaar Card', docName: 'Aadhaar Card Proof', fileName: 'Aadhaar_Sunil.pdf', fileSize: '1.2 MB', status: 'UPLOADED' },
@@ -315,7 +315,7 @@ export class AspirantService {
       epicNo: 'RJ/01/049/223411',
 
       preferredSectors: ['IT & ITeS', 'Electronics'],
-      candidatePhotoUrl: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23fdf2f8"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%23be185d"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%239d174d"/%3E%3Ctext x="60" y="145" text-anchor="middle" font-family="sans-serif" font-size="9" fill="%23ffffff"%3EPRIYA M.%3C/text%3E%3C/svg%3E',
+      candidatePhotoUrl: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23e2e8f0"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%230f172a"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%231e293b"/%3E%3C/svg%3E',
       candidatePhotoName: 'Priya_Meena_Passport.jpg',
       documents: [
         { id: 'd1', docType: 'Aadhaar Card', docName: 'Aadhaar Card Copy', fileName: 'Aadhaar_Priya.pdf', fileSize: '1.6 MB', status: 'UPLOADED' },
@@ -424,7 +424,7 @@ export class AspirantService {
       epicNo: 'RJ/02/012/556789',
 
       preferredSectors: ['Automotive', 'Capital Goods'],
-      candidatePhotoUrl: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23ecfdf5"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%23047857"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%23065f46"/%3E%3Ctext x="60" y="145" text-anchor="middle" font-family="sans-serif" font-size="9" fill="%23ffffff"%3EAMIT C.%3C/text%3E%3C/svg%3E',
+      candidatePhotoUrl: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23e2e8f0"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%230f172a"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%231e293b"/%3E%3C/svg%3E',
       candidatePhotoName: 'Amit_Photo.jpg',
       documents: [
         { id: 'd1', docType: 'Aadhaar Card', docName: 'Aadhaar Card Proof', fileName: 'Aadhaar_Amit.pdf', fileSize: '1.1 MB', status: 'UPLOADED' },
@@ -533,7 +533,7 @@ export class AspirantService {
       epicNo: 'RJ/03/019/331902',
 
       preferredSectors: ['Capital Goods', 'Construction'],
-      candidatePhotoUrl: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23fffbeb"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%23d97706"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%23b45309"/%3E%3Ctext x="60" y="145" text-anchor="middle" font-family="sans-serif" font-size="9" fill="%23ffffff"%3ERAMESHWAR%3C/text%3E%3C/svg%3E',
+      candidatePhotoUrl: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23e2e8f0"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%230f172a"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%231e293b"/%3E%3C/svg%3E',
       candidatePhotoName: 'Rameshwar_Photo.jpg',
       documents: [
         { id: 'd1', docType: 'Aadhaar Card', docName: 'Aadhaar Card Copy', fileName: 'Aadhaar_Rameshwar.pdf', fileSize: '1.3 MB', status: 'UPLOADED' },
@@ -642,7 +642,7 @@ export class AspirantService {
       epicNo: 'RJ/04/008/119934',
 
       preferredSectors: ['Apparel', 'IT & ITeS'],
-      candidatePhotoUrl: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23f5f3ff"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%237c3aed"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%236d28d9"/%3E%3Ctext x="60" y="145" text-anchor="middle" font-family="sans-serif" font-size="9" fill="%23ffffff"%3EKAVITA B.%3C/text%3E%3C/svg%3E',
+      candidatePhotoUrl: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23e2e8f0"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%230f172a"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%231e293b"/%3E%3C/svg%3E',
       candidatePhotoName: 'Kavita_Bhati.jpg',
       documents: [
         { id: 'd1', docType: 'Aadhaar Card', docName: 'Aadhaar Card Copy', fileName: 'Aadhaar_Kavita.pdf', fileSize: '1.5 MB', status: 'UPLOADED' },
@@ -724,6 +724,11 @@ export class AspirantService {
 
     const newRecord: AspirantRecord = {
       ...formData,
+      documents: (formData.documents && formData.documents.length > 0) ? formData.documents : [
+        { id: 'doc-1', docType: 'Aadhaar Card', docName: 'Aadhaar Card Copy', fileName: formData.aadhaarDocName || 'Aadhaar_Document.pdf', fileSize: formData.aadhaarDocSize || '1.4 MB', status: 'UPLOADED' },
+        { id: 'doc-2', docType: 'Educational Qualification Certificate', docName: 'Educational Qualification Certificate', fileName: '12th_Pass_Certificate.pdf', fileSize: '2.1 MB', status: 'UPLOADED' },
+        { id: 'doc-3', docType: 'Bank Passbook / Cancelled Cheque', docName: 'Bank Passbook / Cancelled Cheque', fileName: 'Bank_Passbook.jpg', fileSize: '850 KB', status: 'UPLOADED' }
+      ],
       id: newId,
       aadhaarMasked,
       sdcId,

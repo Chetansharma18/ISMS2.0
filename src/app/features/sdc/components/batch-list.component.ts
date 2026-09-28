@@ -210,6 +210,70 @@ import {
           </app-button>
         </ng-template>
 
+        <!-- Camera Config Modal -->
+        @if (isCameraModalOpen()) {
+          <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+              <!-- Header -->
+              <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between" style="background-color: var(--color-primary, #174A6E);">
+                <h3 class="font-bold text-lg" style="color: #ffffff;">Add Camera Configuration</h3>
+                <button (click)="closeCameraModal()" class="transition-colors cursor-pointer" style="color: #ffffff;">
+                  <svg class="w-5 h-5 opacity-80 hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <!-- Body -->
+              <div class="p-5 space-y-4">
+                <p class="text-sm text-slate-500 mb-2">
+                  Configure live feed for batch: <span class="font-bold text-slate-700">{{ selectedBatchForCamera()?.batchCode }}</span>
+                </p>
+                
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-700">Camera Feed URL (RTSP / HTTP) <span class="text-red-500">*</span></label>
+                  <input type="text" [(ngModel)]="cameraUrl" placeholder="rtsp://camera-ip:port/stream" 
+                         class="w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
+                         [class.border-red-500]="showCameraValidation() && !cameraUrl()"
+                         [class.border-slate-300]="!(showCameraValidation() && !cameraUrl())"
+                         [class.focus:border-red-500]="showCameraValidation() && !cameraUrl()"
+                         [class.focus:border-primary]="!(showCameraValidation() && !cameraUrl())" />
+                </div>
+                
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-700">Username <span class="text-red-500">*</span></label>
+                  <input type="text" [(ngModel)]="cameraUsername" placeholder="admin" 
+                         class="w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
+                         [class.border-red-500]="showCameraValidation() && !cameraUsername()"
+                         [class.border-slate-300]="!(showCameraValidation() && !cameraUsername())"
+                         [class.focus:border-red-500]="showCameraValidation() && !cameraUsername()"
+                         [class.focus:border-primary]="!(showCameraValidation() && !cameraUsername())" />
+                </div>
+                
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-700">Password <span class="text-red-500">*</span></label>
+                  <input type="password" [(ngModel)]="cameraPassword" placeholder="••••••••" 
+                         class="w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
+                         [class.border-red-500]="showCameraValidation() && !cameraPassword()"
+                         [class.border-slate-300]="!(showCameraValidation() && !cameraPassword())"
+                         [class.focus:border-red-500]="showCameraValidation() && !cameraPassword()"
+                         [class.focus:border-primary]="!(showCameraValidation() && !cameraPassword())" />
+                </div>
+              </div>
+              
+              <!-- Footer -->
+              <div class="px-5 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-3">
+                <button (click)="closeCameraModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer">
+                  Cancel
+                </button>
+                <button (click)="saveCameraConfig()" class="px-4 py-2 text-sm font-semibold text-white bg-primary rounded-lg hover:bg-[#123B59] transition-colors shadow-sm cursor-pointer" style="background-color: var(--color-primary, #174A6E);">
+                  Save Configuration
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+
       </div>
     </div>
   `
@@ -230,7 +294,7 @@ export class BatchListComponent {
     { key: 'capacity', label: 'Capacity & Mapped', type: 'custom', width: 'min-w-[140px]' },
     { key: 'duration', label: 'Batch Duration', type: 'custom', width: 'w-32' },
     { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'w-24' },
-    { key: 'cameraConfig', label: 'Camera Config', align: 'center', type: 'custom', width: 'w-56' },
+    { key: 'cameraConfig', label: 'Camera Configuration', align: 'center', type: 'custom', width: 'w-56' },
     { key: 'actions', label: 'Actions', align: 'right', type: 'custom', width: 'w-44' }
   ];
 
@@ -277,13 +341,45 @@ export class BatchListComponent {
     return Math.round((b.mappedAspirantsCount / b.maxStrength) * 100);
   }
 
+  isCameraModalOpen = signal<boolean>(false);
+  selectedBatchForCamera = signal<BatchRecord | null>(null);
+
+  // Camera config form state
+  cameraUrl = signal<string>('');
+  cameraUsername = signal<string>('');
+  cameraPassword = signal<string>('');
+  showCameraValidation = signal<boolean>(false);
+
   selectAndMap(b: BatchRecord): void {
     // Navigate to aspirant registration and batch mapping form
     this.router.navigate(['/batches', b.id, 'map-aspirant']);
   }
 
   addCameraConfig(b: BatchRecord): void {
-    // Handle adding camera configuration
-    console.log('Add camera configuration for batch:', b.id);
+    this.selectedBatchForCamera.set(b);
+    this.cameraUrl.set('');
+    this.cameraUsername.set('');
+    this.cameraPassword.set('');
+    this.showCameraValidation.set(false);
+    this.isCameraModalOpen.set(true);
+  }
+
+  closeCameraModal(): void {
+    this.isCameraModalOpen.set(false);
+    this.selectedBatchForCamera.set(null);
+  }
+
+  saveCameraConfig(): void {
+    if (!this.cameraUrl() || !this.cameraUsername() || !this.cameraPassword()) {
+      this.showCameraValidation.set(true);
+      return; // Stop if validation fails
+    }
+
+    // Implement actual save logic (e.g. API call) here
+    console.log('Saved camera config for:', this.selectedBatchForCamera()?.batchCode);
+    console.log('URL:', this.cameraUrl(), 'User:', this.cameraUsername());
+    
+    this.closeCameraModal();
+    // Normally you'd trigger a success toast message here
   }
 }

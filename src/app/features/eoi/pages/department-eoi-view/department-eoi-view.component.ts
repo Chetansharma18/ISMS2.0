@@ -59,7 +59,7 @@ import {
           @if (scheme.status === 'Closed') {
             <a
               [routerLink]="['/admin/responses', scheme.id]"
-              class="btn btn-secondary btn-sm"
+              class="btn btn-primary btn-sm"
             >
               <span>View List</span>
             </a>

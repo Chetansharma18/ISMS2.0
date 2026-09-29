@@ -10,204 +10,202 @@ import { OtrFormService } from '../../../registration/services/otr-form.service'
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   host: {
-    class: 'block w-full flex-1 min-h-[calc(100vh-60px)] md:min-h-[calc(100vh-68px)] bg-white'
+    class: 'block w-full h-full flex flex-col bg-white overflow-hidden'
   },
   template: `
-    <div class="w-full min-h-[calc(100vh-68px)] flex flex-col justify-between bg-white text-slate-800 font-sans selection:bg-sso-blue selection:text-white relative">
+    <div class="w-full h-full flex flex-col justify-between bg-white text-slate-800 font-sans selection:bg-[#131862] selection:text-white overflow-hidden">
       
       <!-- Top Notice Banner -->
       <div class="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center shrink-0">
-        <div class="max-w-8xl mx-auto flex items-center justify-center gap-2 text-[13.5px] font-semibold text-amber-900">
+        <div class="max-w-8xl mx-auto flex items-center justify-center gap-2 text-xs sm:text-[16px] font-semibold text-amber-900">
           <span>
-            <strong>PROTOTYPE NOTICE:</strong> This is a dummy login screen for testing and demonstration purposes. It will be replaced by the official Rajasthan SSO (sso.rajasthan.gov.in) portal integration.
+            <strong class="font-bold">PROTOTYPE NOTICE:</strong> This is a dummy login screen for testing and demonstration purposes. It will be replaced by the official Rajasthan SSO (sso.rajasthan.gov.in) portal integration.
           </span>
         </div>
       </div>
 
-      <!-- Main Two-Column Layout (Centered Perfectly in the Middle of Screen) -->
-      <main class="flex-1 w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-        <div class="max-w-240 w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+      <!-- Main Two-Column Layout (Generous spacing between left & right, direct-on-screen right form, no scrolling) -->
+      <main class="flex-1 w-full flex items-center justify-center px-6 sm:px-10 lg:px-16 py-3 sm:py-6 overflow-hidden">
+        <div class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 xl:gap-32 items-center">
           
-          <!-- Left Column: Official Statistics (G2G, G2C/G2B, IDENTITIES) -->
-          <div class="space-y-6">
+          <!-- Left Column: Official Statistics (G2G, G2C/G2B, IDENTITIES) with enlarged typography -->
+          <div class="space-y-6 lg:space-y-8">
             
             <!-- G2G APPS -->
             <div>
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-sso-blue tracking-tight mb-2">
+              <div class="text-3xl sm:text-4xl lg:text-[44px] font-black text-[#131862] tracking-tight leading-none mb-3">
                 G2G APPS
-              </h2>
-              <div class="inline-block px-3.5 py-1 rounded bg-slate-100 border border-slate-200 text-sm font-bold text-slate-700 shadow-2xs">
+              </div>
+              <div class="inline-block px-4.5 py-1.5 rounded-lg bg-slate-100 border border-slate-300 text-lg sm:text-xl font-bold text-slate-800 shadow-2xs">
                 421
               </div>
-              <div class="w-full h-px bg-slate-300 mt-5"></div>
+              <div class="w-full h-px bg-slate-200 mt-6"></div>
             </div>
 
             <!-- G2C/ G2B APPS -->
             <div>
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-sso-blue tracking-tight mb-2">
+              <div class="text-3xl sm:text-4xl lg:text-[44px] font-black text-[#131862] tracking-tight leading-none mb-3">
                 G2C/ G2B APPS
-              </h2>
-              <div class="inline-block px-3.5 py-1 rounded bg-slate-100 border border-slate-200 text-sm font-bold text-slate-700 shadow-2xs">
+              </div>
+              <div class="inline-block px-4.5 py-1.5 rounded-lg bg-slate-100 border border-slate-300 text-lg sm:text-xl font-bold text-slate-800 shadow-2xs">
                 263
               </div>
-              <div class="w-full h-px bg-slate-300 mt-5"></div>
+              <div class="w-full h-px bg-slate-200 mt-6"></div>
             </div>
 
             <!-- IDENTITIES -->
             <div>
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-sso-blue tracking-tight mb-2">
+              <div class="text-3xl sm:text-4xl lg:text-[44px] font-black text-[#131862] tracking-tight leading-none mb-3">
                 IDENTITIES
-              </h2>
-              <div class="inline-block px-3.5 py-1 rounded bg-slate-100 border border-slate-200 text-sm font-bold text-slate-700 shadow-2xs">
+              </div>
+              <div class="inline-block px-4.5 py-1.5 rounded-lg bg-slate-100 border border-slate-300 text-lg sm:text-xl font-bold text-slate-800 shadow-2xs">
                 34, 204, 388
               </div>
             </div>
 
           </div>
 
-          <!-- Right Column: Rajasthan SSO Login Card -->
-          <div class="w-full">
-            <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden w-full max-w-112.5 mx-auto lg:mx-0">
+          <!-- Right Column: Rajasthan SSO Login Form (Direct on screen, NO CARD) -->
+          <div class="w-full max-w-[460px] mx-auto lg:mx-0">
+            
+            <!-- Direct Title Heading -->
+            <div class="pb-3 border-b-2 border-slate-200 mb-5">
+              <div class="text-base sm:text-lg lg:text-xl font-black text-[#131862] uppercase tracking-wider">
+                RAJASTHAN SSO LOGIN - SIGN IN
+              </div>
+            </div>
+
+            <!-- Direct Form Body -->
+            <form (ngSubmit)="handleLogin()" class="space-y-4">
               
-              <!-- Card Header -->
-              <div class="px-5 py-3.5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  RAJASTHAN SSO LOGIN - SIGN IN
-                </h3>
+              <!-- Email ID / SSOID Field (Underline style) -->
+              <div>
+                <label for="emailOrSsoIdInput" class="block text-sm sm:text-[14.5px] font-bold text-slate-700 mb-1">
+                  SSOID / Email ID
+                </label>
+                <input
+                  id="emailOrSsoIdInput"
+                  name="emailOrSsoId"
+                  type="text"
+                  [(ngModel)]="emailOrSsoId"
+                  placeholder="Enter SSOID or Email ID"
+                  class="sso-input w-full border-b-2 border-slate-300 py-2 text-base sm:text-lg text-slate-900 focus:outline-none transition-colors bg-transparent font-medium"
+                  required
+                />
               </div>
 
-              <!-- Card Body -->
-              <form (ngSubmit)="handleLogin()" class="p-6 space-y-4">
-                
-                <!-- Role Selector Toolbar -->
-                <div>
-                  <span class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                    Select Test Persona Role:
-                  </span>
-                  <div class="grid grid-cols-2 gap-1.5">
-                    @for (r of availableRoles; track r.role) {
-                      <button
-                        type="button"
-                        (click)="selectRole(r.role)"
-                        class="px-2.5 py-1.5 rounded-md text-xs font-semibold border transition-all text-left flex items-center justify-between cursor-pointer"
-                        [class.bg-[#0B3558]]="selectedRole() === r.role"
-                        [class.text-white]="selectedRole() === r.role"
-                        [class.border-[#0B3558]]="selectedRole() === r.role"
-                        [class.bg-slate-50]="selectedRole() !== r.role"
-                        [class.text-slate-700]="selectedRole() !== r.role"
-                        [class.border-slate-200]="selectedRole() !== r.role"
-                        [class.hover:bg-slate-100]="selectedRole() !== r.role"
-                      >
-                        <span class="truncate">{{ r.label }}</span>
-                        @if (selectedRole() === r.role) {
-                          <span class="text-[10px] font-bold">&check;</span>
-                        }
-                      </button>
-                    }
-                  </div>
-                </div>
+              <!-- Password Field (Underline style) -->
+              <div>
+                <label for="passwordInput" class="block text-sm sm:text-[14.5px] font-bold text-slate-700 mb-1">
+                  Password
+                </label>
+                <input
+                  id="passwordInput"
+                  name="password"
+                  type="password"
+                  [(ngModel)]="password"
+                  placeholder="Enter Password"
+                  class="sso-input w-full border-b-2 border-slate-300 py-2 text-base sm:text-lg text-slate-800 tracking-widest focus:outline-none transition-colors bg-transparent"
+                  required
+                />
+              </div>
 
-                <!-- Email ID / SSOID Field (Underline style) -->
-                <div>
-                  <label for="emailOrSsoIdInput" class="block text-xs font-semibold text-slate-600 mb-1">
-                    SSOID / Email ID
-                  </label>
-                  <input
-                    id="emailOrSsoIdInput"
-                    name="emailOrSsoId"
-                    type="text"
-                    [(ngModel)]="emailOrSsoId"
-                    placeholder="SSOID or Email ID"
-                    class="sso-input w-full border-b border-slate-300 py-1.5 text-sm text-slate-800 focus:outline-none transition-colors bg-transparent font-medium"
-                    required
-                  />
-                </div>
-
-                <!-- Password Field (Underline style) -->
-                <div>
-                  <label for="passwordInput" class="block text-xs font-semibold text-slate-600 mb-1">
-                    Password
-                  </label>
-                  <input
-                    id="passwordInput"
-                    name="password"
-                    type="password"
-                    [(ngModel)]="password"
-                    placeholder="Password"
-                    class="sso-input w-full border-b border-slate-300 py-1.5 text-sm text-slate-800 tracking-widest focus:outline-none transition-colors bg-transparent"
-                    required
-                  />
-                </div>
-
-                <!-- Captcha Row -->
-                <div class="pt-1">
-                  <label class="block text-xs font-semibold text-slate-600 mb-1">
-                    Security Verification
-                  </label>
-                  <div class="flex items-center gap-2.5">
-                    <!-- Dotted pattern captcha display -->
-                    <div
-                      class="px-3 py-1.5 border border-slate-300 bg-slate-100 rounded select-none font-mono text-sm sm:text-base font-extrabold text-slate-800 tracking-[0.25em] flex items-center justify-center min-w-27.5"
-                      style="background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 6px 6px;"
-                      aria-label="Captcha code"
-                    >
-                      {{ captchaCode() }}
-                    </div>
-
-                    <!-- Captcha Input Box -->
-                    <input
-                      name="enteredCaptcha"
-                      type="text"
-                      [(ngModel)]="enteredCaptcha"
-                      placeholder="Captcha"
-                      class="sso-input w-28 px-2.5 py-1.5 border border-slate-300 rounded text-xs text-slate-800 focus:outline-none"
-                      required
-                    />
-
-                    <!-- Refresh captcha icon -->
-                    <button
-                      type="button"
-                      (click)="refreshCaptcha()"
-                      class="p-1.5 text-sso-blue hover:bg-slate-100 rounded transition-colors cursor-pointer"
-                      title="Refresh Captcha"
-                      aria-label="Refresh Captcha"
-                    >
-                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Submit Button: Verify & Continue -->
-                <div class="pt-3">
-                  <button
-                    type="submit"
-                    [disabled]="isLoading()"
-                    class="w-full bg-[#0B3558] hover:bg-[#07233B] text-white font-bold text-sm py-2.5 px-4 rounded-md transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 shadow-xs"
+              <!-- Captcha Row (Security Verification) -->
+              <div>
+                <label class="block text-sm sm:text-[14.5px] font-bold text-slate-700 mb-1.5">
+                  Security Verification
+                </label>
+                <div class="flex items-center gap-3">
+                  <!-- Dotted pattern captcha display -->
+                  <div
+                    class="px-4 py-2 border border-slate-300 bg-slate-100 rounded-md select-none font-mono text-base sm:text-lg font-black text-slate-800 tracking-[0.25em] flex items-center justify-center min-w-[120px]"
+                    style="background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 6px 6px;"
+                    aria-label="Captcha code"
                   >
-                    @if (isLoading()) {
-                      <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      <span>Verifying with RajSSO...</span>
-                    } @else {
-                      <span>Verify &amp; Continue &rarr;</span>
-                    }
+                    {{ captchaCode() }}
+                  </div>
+
+                  <!-- Captcha Input Box -->
+                  <input
+                    name="enteredCaptcha"
+                    type="text"
+                    [(ngModel)]="enteredCaptcha"
+                    placeholder="Captcha"
+                    class="sso-input w-32 sm:w-36 px-3 py-2 border border-slate-300 rounded-md text-sm sm:text-base font-semibold text-slate-800 focus:outline-none"
+                    required
+                  />
+
+                  <!-- Refresh captcha icon -->
+                  <button
+                    type="button"
+                    (click)="refreshCaptcha()"
+                    class="p-2 text-[#131862] hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+                    title="Refresh Captcha"
+                    aria-label="Refresh Captcha"
+                  >
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
                   </button>
                 </div>
+              </div>
 
-              </form>
+              <!-- Role Selector Toolbar (Positioned below Security Verification) -->
+              <div class="pt-3 border-t border-slate-200">
+                <span class="block text-xs sm:text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  Select Test Persona Role:
+                </span>
+                <div class="grid grid-cols-2 gap-2">
+                  @for (r of availableRoles; track r.role) {
+                    <button
+                      type="button"
+                      (click)="selectRole(r.role)"
+                      class="px-3 py-2 rounded-md text-xs sm:text-sm font-bold border transition-all text-left flex items-center justify-between cursor-pointer"
+                      [class.bg-[#0B3558]]="selectedRole() === r.role"
+                      [class.text-white]="selectedRole() === r.role"
+                      [class.border-[#0B3558]]="selectedRole() === r.role"
+                      [class.bg-slate-50]="selectedRole() !== r.role"
+                      [class.text-slate-700]="selectedRole() !== r.role"
+                      [class.border-slate-300]="selectedRole() !== r.role"
+                      [class.hover:bg-slate-100]="selectedRole() !== r.role"
+                    >
+                      <span class="truncate">{{ r.label }}</span>
+                      @if (selectedRole() === r.role) {
+                        <span class="text-xs font-bold">&check;</span>
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
 
-            </div>
+              <!-- Submit Button: Verify & Continue -->
+              <div class="pt-2">
+                <button
+                  type="submit"
+                  [disabled]="isLoading()"
+                  class="w-full bg-[#0B3558] hover:bg-[#07233B] text-white font-bold text-sm sm:text-base py-3 px-5 rounded-md transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 shadow-sm"
+                >
+                  @if (isLoading()) {
+                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Verifying with RajSSO...</span>
+                  } @else {
+                    <span>Verify &amp; Continue &rarr;</span>
+                  }
+                </button>
+              </div>
+
+            </form>
+
           </div>
 
         </div>
       </main>
 
-      <!-- Bottom Spacer to keep layout balanced -->
-      <div class="h-6"></div>
+      <!-- Bottom Spacer to keep layout balanced without scrolling -->
+      <div class="shrink-0 h-2"></div>
 
     </div>
   `,

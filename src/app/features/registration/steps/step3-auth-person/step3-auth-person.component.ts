@@ -112,6 +112,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             [value]="data().emailId"
             (valueChange)="update('emailId', $event)"
             placeholder="e.g. signatory@organisation.com"
+            [required]="true"
             [error]="getFieldError('emailId')"
           ></app-form-input>
         </div>
@@ -129,7 +130,6 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
           ></app-form-input>
         </div>
 
-        <!-- Secondary IDs: Bhamashah (4 cols), Voter ID (4 cols), Passport (4 cols) -->
         <div class="lg:col-span-4 sm:col-span-1">
           <app-form-input
             label="Bhamashah No."
@@ -237,7 +237,8 @@ export class Step3AuthPersonComponent {
         if (!REGEX.INDIAN_MOBILE.test(d.mobileNo)) return 'Invalid 10-digit Mobile Number';
         return undefined;
       case 'emailId':
-        if (d.emailId?.trim() && !REGEX.EMAIL.test(d.emailId)) return 'Invalid Email ID format';
+        if (!d.emailId?.trim()) return 'Email-ID is required';
+        if (!REGEX.EMAIL.test(d.emailId)) return 'Invalid Email ID format';
         return undefined;
       case 'aadhaarNo':
         if (d.aadhaarNo?.trim() && !REGEX.AADHAAR.test(d.aadhaarNo)) return 'Invalid 12-digit Aadhaar Number';

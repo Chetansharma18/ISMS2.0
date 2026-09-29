@@ -36,8 +36,8 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white text-xs font-bold flex items-center justify-center shrink-0">
                 {{ idx + 1 }}
               </span>
-              <h3 class="text-xs sm:text-sm font-bold text-[#0B3558] tracking-tight">
-                {{ first ? 'Officer In-Charge (Primary)' : 'Additional Officer In-Charge #' + (idx + 1) }}
+              <h3 class="text-sm sm:text-base font-extrabold text-[#0B3558] tracking-tight">
+                {{ first ? 'Officer In-Charge' : 'Additional Officer In-Charge #' + (idx + 1) }}
               </h3>
               @if (first && sameAsAuthPerson()) {
                 <span class="text-[10.5px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 ml-1">

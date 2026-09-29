@@ -18,31 +18,23 @@ import { ImportantLinksComponent } from './components/important-links/important-
     AboutSectionComponent,
     ServicesSectionComponent
   ],
+  styleUrls: ['./landing.component.css'],
   host: {
     class: 'block w-full'
   },
   template: `
-    <div class="w-full flex flex-col" style="zoom: 1.25;">
-      <!-- 1. Government Circulars & News Ticker -->
+    <div class="w-full flex flex-col min-h-screen">
+      <!-- 1. Government Circulars & News Ticker (Single Source of Truth) -->
       <app-news-ticker></app-news-ticker>
 
       <!-- 2. Flagship Hero Banner with RSLDC Branding -->
       <app-hero-section></app-hero-section>
 
-      <!-- 3. Key Impact & Transparent Governance Metrics -->
-      <!-- <app-stats-section></app-stats-section> -->
-
-      <!-- 4. About ISMS 2.0 & Stats -->
+      <!-- 3. About ISMS 2.0 & Stats -->
       <app-about-section></app-about-section>
 
-      <!-- 5. Active Schemes & Open EOI Opportunities -->
-      <!-- <app-schemes-section></app-schemes-section> -->
-
-      <!-- 6. Mobile App & Support -->
+      <!-- 4. Mobile App & Support -->
       <app-services-section></app-services-section>
-
-      <!-- 7. Important Links -->
-      <!-- <app-important-links></app-important-links> -->
     </div>
   `
 })

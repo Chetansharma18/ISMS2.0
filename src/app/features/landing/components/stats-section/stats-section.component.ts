@@ -26,10 +26,10 @@ interface StatMetric {
           <span class="text-xs font-bold text-[#EA580C] uppercase tracking-wider bg-orange-50 px-3 py-1 rounded-full border border-orange-200/60">
             Real-Time Governance Metrics
           </span>
-          <h2 class="text-3xl sm:text-4xl md:text-5xl !font-black text-[#0B3558] mt-2.5 tracking-tight font-sans" style="font-family: var(--font-family-base, 'Inter', sans-serif);">
+          <div style="font-size: 2.4rem; line-height: 1.15; font-weight: 900; color: #0B3558; margin-top: 10px; letter-spacing: -0.025em; font-family: 'Inter', sans-serif;">
             Impact Across Rajasthan
-          </h2>
-          <p class="text-sm sm:text-base text-slate-500 mt-1.5 mx-auto max-w-2xl text-justify hyphens-auto">
+          </div>
+          <p class="text-[14px] sm:text-[15px] text-slate-500 mt-2 mx-auto max-w-2xl">
             Transparent reporting of candidate mobilization, training infrastructure, and scheme disbursements.
           </p>
         </div>
@@ -50,12 +50,12 @@ interface StatMetric {
                   </div>
                 </div>
 
-                <div class="text-3xl sm:text-4xl font-extrabold text-[#0B3558] tracking-tight">
+                <div style="font-size: 2.4rem; line-height: 1.05; font-weight: 800; color: #0B3558; font-family: 'Inter', sans-serif; letter-spacing: -0.02em;" class="tabular-nums mt-1">
                   {{ stat.count }}
                 </div>
-                <h3 class="text-sm font-bold text-slate-800 mt-1">
+                <p class="text-[13px] sm:text-[14px] font-bold text-slate-700 mt-1.5 leading-snug">
                   {{ stat.label }}
-                </h3>
+                </p>
               </div>
 
               <p class="text-xs text-slate-500 mt-3 pt-3 border-t border-slate-200/60">

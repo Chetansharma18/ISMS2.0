@@ -16,7 +16,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
            ==================================================================== -->
       <div class="flex items-center justify-between pb-3 border-b border-slate-200">
         <div>
-          <h1 class="text-base sm:text-lg font-bold text-[#0B3558] m-0">
+          <h1 class="text-lg sm:text-xl font-extrabold text-[#0B3558] m-0">
             Preview &amp; Submit
           </h1>
           <p class="text-[11px] sm:text-xs text-slate-500 m-0 mt-0.5">
@@ -32,7 +32,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
         <div class="bg-slate-50/80 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold shrink-0">1</span>
-            <h2 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wide m-0">
+            <h2 class="text-sm sm:text-base font-extrabold text-[#0B3558] uppercase tracking-wide m-0">
               Organization Details
             </h2>
           </div>
@@ -50,14 +50,13 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
         </div>
 
         <div class="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-3.5 text-xs">
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Name', value: step1().shortName, highlight: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Full Name', value: step1().fullName, span: 'sm:col-span-2', highlight: true }"></ng-container>
+          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Organization Name', value: step1().fullName, span: 'sm:col-span-2 lg:col-span-3', highlight: true }"></ng-container>
           <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Nature of Entity', value: step1().natureOfEntity }"></ng-container>
           <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Registration Number', value: step1().registrationNumber, mono: true }"></ng-container>
           <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Date of Registration', value: step1().dateOfRegistration }"></ng-container>
 
           <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'State of Legal Reg.', value: step1().stateOfLegalReg }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Company PAN', value: step1().companyPan, mono: true, highlight: true }"></ng-container>
+          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Organization PAN', value: step1().companyPan, mono: true, highlight: true }"></ng-container>
           <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'GST Registered', value: step1().gstRegistered }"></ng-container>
           <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'GSTIN', value: step1().gstRegistered === 'Yes' ? (step1().gstin || '-') : 'Not Applicable', mono: true }"></ng-container>
           <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'MSME Registered', value: step1().msmeRegistered }"></ng-container>
@@ -65,15 +64,8 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
             <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Udyam Registration No.', value: step1().udyamNumber, mono: true }"></ng-container>
           }
           <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'NSDC Partner Status', value: step1().nsdcPartner || 'Not Applicable' }"></ng-container>
-
-          <div>
-            <span class="text-slate-400 block text-[11px] font-medium">Blacklisted by Govt / PSU</span>
-            <span class="font-semibold text-xs" [class.text-rose-600]="step1().blackListed === 'Yes'" [class.text-emerald-700]="step1().blackListed === 'No'">
-              {{ step1().blackListed }}
-            </span>
-          </div>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Contact Number', value: step1().contactNo }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Email ID', value: step1().emailId }"></ng-container>
+          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Organization Contact No.', value: step1().contactNo }"></ng-container>
+          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Organization Email-ID', value: step1().emailId }"></ng-container>
           <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Official Website', value: step1().website, span: 'sm:col-span-3' }"></ng-container>
 
           <div class="col-span-2 sm:col-span-3">
@@ -94,7 +86,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
         <div class="bg-slate-50/80 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold shrink-0">2</span>
-            <h2 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wide m-0">
+            <h2 class="text-sm sm:text-base font-extrabold text-[#0B3558] uppercase tracking-wide m-0">
               Authorized Person Details
             </h2>
           </div>
@@ -140,7 +132,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
         <div class="bg-slate-50/80 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold shrink-0">3</span>
-            <h2 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wide m-0">
+            <h2 class="text-sm sm:text-base font-extrabold text-[#0B3558] uppercase tracking-wide m-0">
               Officer(s) In-Charge Details
             </h2>
           </div>
@@ -189,7 +181,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
                       <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold"
                             [class.bg-sky-50]="idx === 0" [class.text-sky-800]="idx === 0" [class.border]="idx === 0" [class.border-sky-200]="idx === 0"
                             [class.bg-slate-100]="idx > 0" [class.text-slate-600]="idx > 0">
-                        {{ idx === 0 ? 'Primary Nodal Officer' : 'Additional Officer' }}
+                        {{ idx === 0 ? 'Officer In-Charge' : 'Additional Officer' }}
                       </span>
                     </td>
                     <td class="py-2.5 px-3">
@@ -238,7 +230,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
         <div class="bg-slate-50/80 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold shrink-0">4</span>
-            <h2 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wide m-0">
+            <h2 class="text-sm sm:text-base font-extrabold text-[#0B3558] uppercase tracking-wide m-0">
               Bank Account Details
             </h2>
           </div>
@@ -280,7 +272,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
         <div class="bg-slate-50/80 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
           <div class="flex items-center gap-2.5">
             <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold shrink-0">5</span>
-            <h2 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wide m-0">
+            <h2 class="text-sm sm:text-base font-extrabold text-[#0B3558] uppercase tracking-wide m-0">
               Attached Verification Documents
             </h2>
           </div>
@@ -288,7 +280,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
 
         <div class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <ng-container *ngTemplateOutlet="docCardTpl; context: { title: 'Certificate of Registration', doc: step1().registrationCertDoc }"></ng-container>
-          <ng-container *ngTemplateOutlet="docCardTpl; context: { title: 'Company PAN Card', doc: step1().panCardDoc }"></ng-container>
+          <ng-container *ngTemplateOutlet="docCardTpl; context: { title: 'Organization PAN Card', doc: step1().panCardDoc }"></ng-container>
 
           @if (step1().gstRegistered === 'Yes') {
             <ng-container *ngTemplateOutlet="docCardTpl; context: { title: 'GST Registration Certificate', doc: step1().gstCertDoc }"></ng-container>

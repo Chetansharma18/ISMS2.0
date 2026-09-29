@@ -18,42 +18,51 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
     class: 'block w-full'
   },
   template: `
-    <section #sectionRef class="py-2 sm:py-6 lg:py-8 bg-white border-b border-slate-100">
+    <section #sectionRef class="py-12 sm:py-16 lg:py-20 bg-white border-b border-slate-100">
       <div class="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
         
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
-          <!-- Left Column: About Text (Aligned parallel with right side video) -->
-          <div class="lg:col-span-7 flex flex-col justify-start ">
-            <h2 class="landing-section-title text-5xl sm:text-6xl lg:text-[72px] font-extrabold text-[#0B3558] mb-12 sm:mb-20 tracking-tight font-sans" style="color: var(--color-primary, #174A6E); font-family: var(--font-family-base, 'Inter', sans-serif);">
+          <!-- Left Column: About Text (Aligned in parallel with right side video) -->
+          <div class="lg:col-span-7 flex flex-col justify-start">
+            <h2 class="text-3xl sm:text-4xl lg:text-[38px] font-extrabold text-[#0B3558] tracking-tight leading-tight mb-6 sm:mb-8">
               About ISMS 2.0
             </h2>
 
-            <!-- Core Content -->
-            <div class="landing-body-text space-y-6 text-xl sm:text-2xl text-slate-700 leading-relaxed sm:leading-[1.8] text-left font-medium mt-[15px]">
-              <p>
+            <!-- Core Content: 3 Clean Justified Paragraphs -->
+            <div class="space-y-5 sm:space-y-6">
+
+              <p class="text-[16.5px] sm:text-[17.5px] lg:text-[18px] text-slate-700 font-normal leading-[1.8] text-justify">
                 Integrated Scheme Management System (ISMS 2.0) is a comprehensive
-                e-Governance and Management Information System (MIS) designed to digitally transform, 
-                integrate, and streamline the processes involved in the planning, implementation, monitoring, and management of skill development 
-                schemes across Rajasthan.
+                e-Governance and Management Information System (MIS) designed to digitally
+                transform, integrate, and streamline the processes involved in the planning,
+                implementation, monitoring, and management of skill development schemes
+                across Rajasthan.
               </p>
-              <p>
+
+              <p class="text-[16.5px] sm:text-[17.5px] lg:text-[18px] text-slate-700 font-normal leading-[1.8] text-justify">
                 The platform provides a centralized and secure digital ecosystem that unites
-                youth, training providers, government departments, empaneled agencies, and certification bodies
-                on a single, high-transparency platform.
+                youth, training providers, government departments, empaneled agencies, and
+                certification bodies on a single, high-transparency platform — ensuring
+                accountability, real-time visibility, and data-driven decision making at
+                every stage.
               </p>
-              <p>
-                ISMS 2.0 enables end-to-end scheme management, from scheme launching and candidate enrollment 
-                through bio-metric attendance, quality inspections, assessment, certification, and direct benefit/fund disbursements.
+
+              <p class="text-[16.5px] sm:text-[17.5px] lg:text-[18px] text-slate-700 font-normal leading-[1.8] text-justify">
+                ISMS 2.0 enables end-to-end scheme management — from scheme launching and
+                candidate enrollment through bio-metric attendance, quality inspections,
+                assessment, certification, and direct benefit and fund disbursements — all
+                within one unified, auditable platform.
               </p>
+
             </div>
           </div>
 
-          <!-- Right Column: Video Showcase & Quote -->
-          <div class="lg:col-span-5 order-1 lg:order-2 w-full mt-2.5">
+          <!-- RightColumn: Video Showcase & Quote (Restored Natural Previous Video Height & Parallel) -->
+          <div class="lg:col-span-5 w-full">
             <div class="rounded-2xl overflow-hidden bg-slate-900 border border-[#0B3558]/30 shadow-[0_0_25px_rgba(11,53,88,0.25)] relative group transition-shadow duration-500 hover:shadow-[0_0_40px_rgba(11,53,88,0.4)]">
               
-              <!-- Video Player with Lazy-Load & Controls -->
+              <!-- Video Player with Lazy-Load & Controls (Previous Natural Video Height) -->
               <div class="relative w-full aspect-video sm:h-80 lg:h-90 bg-slate-950 overflow-hidden flex items-center justify-center">
                 
                 <!-- Video Element (Sound Off by Default, Playsinline, Lazy loaded) -->
@@ -127,11 +136,11 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
               </div>
               
               <!-- Quote Block Overlayed on Video -->
-              <div class="absolute bottom-0 inset-x-0 z-10 pointer-events-none bg-linear-to-t from-[#0B3558]/95 via-[#0B3558]/60 to-transparent pt-20 pb-5 sm:pb-6 px-4 sm:px-6">
-                <p class="text-[12px] sm:text-[13px] text-white leading-relaxed px-2 font-medium drop-shadow-md min-h-13.75 sm:min-h-15 text-justify">
-                  <span class="text-2xl text-orange-400 font-serif leading-none relative top-1.5 opacity-90">“</span>
-                  <span class="px-1">{{ displayedQuote() }}</span><span class="animate-pulse text-orange-400 font-bold" [class.hidden]="hasFinishedTyping()">|</span>
-                  <span class="text-2xl text-orange-400 font-serif leading-none relative top-1.5 opacity-90" [class.hidden]="!hasFinishedTyping()">”</span>
+              <div class="absolute bottom-0 inset-x-0 z-10 pointer-events-none bg-linear-to-t from-[#0B3558]/95 via-[#0B3558]/60 to-transparent pt-16 pb-4 sm:pb-5 px-4 sm:px-5">
+                <p class="text-[12px] sm:text-[13px] text-white leading-relaxed px-1 font-medium drop-shadow-md min-h-12 sm:min-h-14 text-justify">
+                  <span class="text-xl text-orange-400 font-serif leading-none relative top-1 opacity-90">“</span>
+                  <span class="px-0.5">{{ displayedQuote() }}</span><span class="animate-pulse text-orange-400 font-bold" [class.hidden]="hasFinishedTyping()">|</span>
+                  <span class="text-xl text-orange-400 font-serif leading-none relative top-1 opacity-90" [class.hidden]="!hasFinishedTyping()">”</span>
                 </p>
               </div>
 

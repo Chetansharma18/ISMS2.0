@@ -17,11 +17,11 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
   standalone: true,
   imports: [CommonModule, FormsModule, StatusBadgeComponent],
   template: `
-    <div class="card overflow-hidden font-sans">
+    <div class="bg-white border border-slate-200 rounded-lg overflow-hidden font-sans" style="box-shadow: 0 1px 4px rgba(0,0,0,0.06);">
       
       <!-- Optional Search & Toolbar -->
       @if (searchable) {
-        <div class="p-3 bg-surface border-b border-theme flex items-center justify-between gap-3">
+        <div class="p-3 bg-white border-b border-slate-200 flex items-center justify-between gap-3">
           <div class="relative w-full max-w-xs">
             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -32,7 +32,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
               type="text"
               [(ngModel)]="searchQuery"
               [placeholder]="searchPlaceholder"
-              class="form-control pl-9 text-[13px]"
+              class="form-control pl-9 text-[13px] bg-white"
             />
           </div>
           <div class="flex items-center gap-2">
@@ -42,27 +42,27 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
       }
 
       <!-- Main Responsive Table Container -->
-      <div class="overflow-x-auto">
-        <table class="table w-full text-left border-collapse text-[13px]">
+      <div class="overflow-x-auto bg-white">
+        <table class="table w-full text-left border-collapse text-[13px] bg-white">
           <!-- Themed Table Header -->
           <thead>
-            <tr class="bg-primary-light text-primary text-[13px] font-semibold select-none border-b border-theme">
+            <tr class="bg-gray-50 text-slate-700 text-[13px] font-semibold select-none border-b border-slate-200">
               @for (col of columns; track col.key; let last = $last) {
                 <th
-                  class="h-11 px-3.5 select-none"
+                  class="h-11 px-3.5 select-none whitespace-nowrap"
                   [ngClass]="[
                     col.width || '',
                     col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left',
-                    !last ? 'border-r border-theme/70' : '',
+                    !last ? 'border-r border-gray-200' : '',
                     col.headerClass || ''
                   ]"
                 >
                   <div
-                    class="inline-flex items-center gap-1.5"
+                    class="inline-flex items-center gap-1.5 whitespace-nowrap"
                     [class.cursor-pointer]="col.sortable"
                     (click)="col.sortable && toggleSort(col.key)"
                   >
-                    <span>{{ col.label }}</span>
+                    <span class="whitespace-nowrap">{{ col.label }}</span>
                     @if (col.sortable && sortKey() === col.key) {
                       <span class="text-[11px] text-brand">
                         {{ sortAsc() ? '▲' : '▼' }}
@@ -74,11 +74,11 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
             </tr>
           </thead>
 
-          <!-- Table Body -->
-          <tbody class="divide-y divide-border bg-surface font-normal text-primary">
+          <!-- Table Body (Pure White background, gray hover) -->
+          <tbody class="divide-y divide-gray-100 bg-white font-normal text-slate-800">
             @if (loading) {
-              <tr>
-                <td [attr.colspan]="columns.length" class="py-12 text-center text-secondary">
+              <tr class="bg-white">
+                <td [attr.colspan]="columns.length" class="py-12 text-center text-secondary bg-white">
                   <div class="inline-flex items-center gap-2 text-[13px] font-normal">
                     <svg class="animate-spin h-5 w-5 text-brand" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -91,8 +91,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
             } @else {
               @for (item of paginatedData(); track getTrackBy(item, $index); let idx = $index) {
                 <tr
-                  class="h-11.5 transition-colors"
-                  [class.hover:bg-primary-light]="!rowClass"
+                  class="h-11 bg-white transition-colors duration-100 hover:bg-gray-50"
                   [ngClass]="rowClass ? rowClass(item, idx) : ''"
                   (click)="rowClick.emit(item)"
                 >
@@ -101,7 +100,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                       class="px-3.5 text-[13px]"
                       [ngClass]="[
                         col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left',
-                        !last ? 'border-r border-theme/50' : '',
+                        !last ? 'border-r border-gray-100' : '',
                         getCellClass(col, item)
                       ]"
                     >
@@ -117,7 +116,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                         </app-status-badge>
                       } @else if (col.type === 'number' && col.key === '$index') {
                         <!-- 3. Auto Sequential S. No. -->
-                        <span class="font-medium text-text-secondary">{{ (currentPage() - 1) * pageSize + idx + 1 }}</span>
+                        <span class="font-medium text-slate-700 whitespace-nowrap">{{ (currentPage() - 1) * pageSize + idx + 1 }}</span>
                       } @else {
                         <!-- 4. Default Text Output -->
                         <span>{{ getFormattedValue(item, col, idx) }}</span>
@@ -126,8 +125,8 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                   }
                 </tr>
               } @empty {
-                <tr>
-                  <td [attr.colspan]="columns.length" class="py-12 text-center text-text-secondary">
+                <tr class="bg-white">
+                  <td [attr.colspan]="columns.length" class="py-12 text-center text-text-secondary bg-white">
                     <div class="max-w-sm mx-auto text-center space-y-2">
                       <svg class="w-9 h-9 text-text-muted/60 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -144,9 +143,9 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 
       <!-- Table Pagination Bar -->
       @if (pagination && filteredData().length > 0) {
-        <div class="px-4 py-2.5 bg-background border-t border-theme flex flex-col sm:flex-row items-center justify-between gap-3 text-[13px] text-secondary select-none font-sans">
+        <div class="px-4 py-2.5 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-[13px] text-slate-600 select-none font-sans">
           <span>
-            Showing <strong class="text-primary font-semibold">{{ (currentPage() - 1) * pageSize + 1 }}</strong> to <strong class="text-primary font-semibold">{{ Math.min(currentPage() * pageSize, filteredData().length) }}</strong> of <strong class="text-primary font-semibold">{{ filteredData().length }}</strong> {{ itemUnit }}
+            Showing <strong class="text-slate-800 font-semibold">{{ (currentPage() - 1) * pageSize + 1 }}</strong> to <strong class="text-slate-800 font-semibold">{{ Math.min(currentPage() * pageSize, filteredData().length) }}</strong> of <strong class="text-slate-800 font-semibold">{{ filteredData().length }}</strong> {{ itemUnit }}
           </span>
 
           <div class="flex items-center gap-1.5">
@@ -154,7 +153,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
               type="button"
               (click)="setPage(currentPage() - 1)"
               [disabled]="currentPage() === 1"
-              class="h-7.5 px-2.5 rounded-sm border border-theme bg-surface text-[12px] font-medium transition-colors disabled:opacity-40 disabled:pointer-events-none hover:bg-primary-light cursor-pointer"
+              class="h-7.5 px-2.5 rounded-sm border border-slate-300 bg-white text-[12px] font-medium transition-colors disabled:opacity-40 disabled:pointer-events-none hover:bg-slate-100 cursor-pointer"
             >
               Previous
             </button>
@@ -164,13 +163,13 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                 type="button"
                 (click)="setPage(p)"
                 class="min-w-7.5 h-7.5 px-1.5 rounded-sm flex items-center justify-center text-[12px] font-medium transition-colors cursor-pointer border"
-                [class.bg-primary]="currentPage() === p"
+                [class.bg-[#174A6E]]="currentPage() === p"
                 [class.text-white]="currentPage() === p"
-                [class.border-primary]="currentPage() === p"
-                [class.bg-surface]="currentPage() !== p"
-                [class.text-primary]="currentPage() !== p"
-                [class.border-theme]="currentPage() !== p"
-                [class.hover:bg-primary-light]="currentPage() !== p"
+                [class.border-[#174A6E]]="currentPage() === p"
+                [class.bg-white]="currentPage() !== p"
+                [class.text-slate-700]="currentPage() !== p"
+                [class.border-slate-300]="currentPage() !== p"
+                [class.hover:bg-slate-100]="currentPage() !== p"
               >
                 {{ p }}
               </button>
@@ -180,7 +179,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
               type="button"
               (click)="setPage(currentPage() + 1)"
               [disabled]="currentPage() === totalPages()"
-              class="h-7.5 px-2.5 rounded-sm border border-theme bg-surface text-[12px] font-medium transition-colors disabled:opacity-40 disabled:pointer-events-none hover:bg-primary-light cursor-pointer"
+              class="h-7.5 px-2.5 rounded-sm border border-slate-300 bg-white text-[12px] font-medium transition-colors disabled:opacity-40 disabled:pointer-events-none hover:bg-slate-100 cursor-pointer"
             >
               Next
             </button>

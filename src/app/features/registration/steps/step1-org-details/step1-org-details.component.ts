@@ -33,23 +33,10 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
       
       <!-- Organization, Compliance & Contact Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-3.5 gap-y-2.5">
-        <!-- Name -> 3 cols -->
-        <div class="lg:col-span-3 sm:col-span-1">
+        <!-- Organization Name -> 9 cols -->
+        <div class="lg:col-span-9 sm:col-span-2">
           <app-form-input
-            label="Name"
-            [value]="data().shortName"
-            (valueChange)="update('shortName', $event)"
-            placeholder="e.g. SkillTech Solutions"
-            [required]="true"
-            [maxLength]="50"
-            [error]="getFieldError('shortName')"
-          ></app-form-input>
-        </div>
-
-        <!-- Full Corporate Name -> 6 cols -->
-        <div class="lg:col-span-6 sm:col-span-1">
-          <app-form-input
-            label="Full Name"
+            label="Organization Name"
             [value]="data().fullName"
             (valueChange)="update('fullName', $event)"
             placeholder="e.g. SkillTech Solutions Private Limited"
@@ -66,7 +53,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             [value]="data().natureOfEntity"
             (valueChange)="update('natureOfEntity', $event)"
             [options]="natureOfEntitiesList"
-            placeholder="Select Nature"
+            placeholder="Select Nature of Entity"
             [required]="true"
             [error]="getFieldError('natureOfEntity')"
           ></app-form-select>
@@ -121,10 +108,10 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
           ></app-form-file-upload>
         </div>
 
-        <!-- Company PAN -> 3 cols -->
+        <!-- Organization PAN -> 3 cols -->
         <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
-            label="Company PAN"
+            label="Organization PAN"
             [value]="data().companyPan"
             (valueChange)="update('companyPan', $event)"
             placeholder="e.g. ABCDE1234F"
@@ -235,7 +222,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
 
         <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
-            label="Company Contact No."
+            label="Organization Contact No."
             type="tel"
             [value]="data().contactNo"
             (valueChange)="update('contactNo', $event)"
@@ -248,7 +235,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
 
         <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
-            label="Company Email-ID"
+            label="Organization Email-ID"
             type="email"
             [value]="data().emailId"
             (valueChange)="update('emailId', $event)"
@@ -418,11 +405,8 @@ export class Step1OrgDetailsComponent {
     if (!this.isSubmitted()) return undefined;
     const d = this.data();
     switch (field) {
-      case 'shortName':
-        if (!d.shortName?.trim()) return 'Name is required';
-        return undefined;
       case 'fullName':
-        if (!d.fullName?.trim()) return 'Full Name is required';
+        if (!d.fullName?.trim()) return 'Organization Name is required';
         return undefined;
       case 'natureOfEntity':
         if (!d.natureOfEntity?.trim()) return 'Nature of Entity is required';
@@ -514,7 +498,11 @@ export class Step1OrgDetailsComponent {
   }
 
   update(field: string, value: any): void {
-    this.otrFormService.updateStep1({ [field]: value });
+    if (field === 'fullName') {
+      this.otrFormService.updateStep1({ fullName: value, shortName: value });
+    } else {
+      this.otrFormService.updateStep1({ [field]: value });
+    }
   }
 
   updateDoc(field: string, file: FileDoc | null): void {

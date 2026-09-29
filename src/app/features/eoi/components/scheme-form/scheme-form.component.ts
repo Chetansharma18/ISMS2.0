@@ -305,23 +305,12 @@ export interface EoiDocumentItem {
         @if (currentStep() === 1) {
           <div class="space-y-5 font-sans">
 
-            <!-- Section Title Strip (Text Only - No Icons) -->
-            <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs flex items-center justify-between flex-wrap gap-3">
-              <div>
-                <h3 class="text-base sm:text-lg font-bold text-[#0B3558] tracking-tight m-0">Company Profile Information</h3>
-                <p class="text-xs text-slate-500 mt-1 m-0">
-                  Complete verified registration, statutory particulars, and banking details retrieved from your company profile.
-                </p>
-              </div>
-              <span class="text-xs font-semibold text-[#0B3558] bg-[#EAF2F6] px-3 py-1 rounded border border-[#D9E1E7]">
-                Step 1 of 5
-              </span>
-            </div>
+
 
             <!-- 1. Company Particulars & Registration Details -->
             <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
               <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h4 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide m-0">
+                <h4 class="text-base font-bold text-[#0B3558] uppercase tracking-wide m-0">
                   1. Company Particulars &amp; Registration Details
                 </h4>
                 <span class="text-xs text-slate-500 font-mono font-semibold">CIN: {{ editableStep1.registrationNumber || '-' }}</span>
@@ -448,7 +437,7 @@ export interface EoiDocumentItem {
             <!-- 2. Authorized Signatory / Person Details -->
             <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
               <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h4 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide m-0">
+                <h4 class="text-base font-bold text-[#0B3558] uppercase tracking-wide m-0">
                   2. Authorized Signatory / Person Details
                 </h4>
                 <span class="text-xs text-slate-500 font-semibold">Designated Signatory</span>
@@ -518,7 +507,7 @@ export interface EoiDocumentItem {
             <!-- 3. Officer(s) In-Charge Details -->
             <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
               <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h4 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide m-0">
+                <h4 class="text-base font-bold text-[#0B3558] uppercase tracking-wide m-0">
                   3. Details of Officer(s) In-Charge
                 </h4>
                 <span class="text-xs text-slate-500 font-semibold">{{ editableStep2.length }} Registered Officer(s)</span>
@@ -563,7 +552,7 @@ export interface EoiDocumentItem {
             <!-- 4. Bank Account Details -->
             <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
               <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h4 class="text-sm font-bold text-[#0B3558] uppercase tracking-wide m-0">
+                <h4 class="text-base font-bold text-[#0B3558] uppercase tracking-wide m-0">
                   4. Bank Account Details
                 </h4>
                 <span class="text-xs text-slate-500 font-mono font-semibold">IFSC: {{ editableStep4.ifscCode || '-' }}</span>
@@ -642,12 +631,11 @@ export interface EoiDocumentItem {
             <div id="training-centres-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
               <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
-                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">1</span>
-                    Training Centres (Existing Infrastructure &amp; Proposal Centres)
+                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
+                    Training Centres
                   </h3>
                   <p class="text-xs text-slate-500 mt-0.5">
-                    Select existing verified centres to deploy for this scheme, or optionally propose new centres for MMKVY.
+                    Select centres to deploy for this scheme.
                   </p>
                 </div>
                 <div class="flex items-center gap-2">
@@ -780,7 +768,6 @@ export interface EoiDocumentItem {
                       <th class="py-2.5 px-2 text-center">Washrooms</th>
                       <th class="py-2.5 px-2 text-center">Lab Infra</th>
                       <th class="py-2.5 px-3">Full Address</th>
-                      <th class="py-2.5 px-2 text-center">Type</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-slate-100 font-normal text-slate-700">
@@ -810,14 +797,6 @@ export interface EoiDocumentItem {
                           </span>
                         </td>
                         <td class="py-2.5 px-3 text-slate-500 max-w-xs truncate">{{ c.fullAddress }}</td>
-                        <td class="py-2.5 px-2 text-center">
-                          <span
-                            class="px-1.5 py-0.5 rounded text-[10px] font-bold"
-                            [ngClass]="c.isExisting ? 'bg-sky-50 text-sky-800 border border-sky-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'"
-                          >
-                            {{ c.isExisting ? 'Existing' : 'Proposed' }}
-                          </span>
-                        </td>
                       </tr>
                     }
                   </tbody>
@@ -831,8 +810,7 @@ export interface EoiDocumentItem {
             <div id="financial-turnover-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
               <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
-                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">2</span>
+                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
                     Past 3 Financial Years Turnover (Financial Eligibility Criteria)
                   </h3>
                   <p class="text-xs text-slate-500 mt-0.5">
@@ -937,8 +915,7 @@ export interface EoiDocumentItem {
             <div id="placement-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
               <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
-                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">3</span>
+                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
                     Training &amp; Placement Track Record
                   </h3>
                   <p class="text-xs text-slate-500 mt-0.5">
@@ -1092,8 +1069,7 @@ export interface EoiDocumentItem {
             <div id="action-plan-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
               <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
-                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">4</span>
+                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
                     Proposed Annual Action Plan (Target Districts &amp; Batches)
                   </h3>
                   <p class="text-xs text-slate-500 mt-0.5">
@@ -1277,8 +1253,7 @@ export interface EoiDocumentItem {
             <div id="documents-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
               <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
-                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558] flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold">5</span>
+                  <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
                     Mandatory EOI Proposal Documents Checklist ({{ eoiDocuments().length }} Documents)
                   </h3>
                   <p class="text-xs text-slate-500 mt-0.5">
@@ -1782,8 +1757,7 @@ export interface EoiDocumentItem {
               <!-- Section 3: Training Centres Deployed for Scheme -->
               <div class="space-y-3 pb-6 border-b border-slate-200">
                 <div class="flex items-center justify-between flex-wrap gap-2">
-                  <h4 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wider flex items-center gap-2">
-                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-[10.5px] font-bold">3</span>
+                  <h4 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wider">
                     <span>Training Centres Deployed for Scheme ({{ selectedCentresForScheme().length }} Centres)</span>
                   </h4>
                   <button
@@ -1811,7 +1785,6 @@ export interface EoiDocumentItem {
                           <th class="py-2.5 px-2 text-center">Washrooms</th>
                           <th class="py-2.5 px-2 text-center">Lab Infra</th>
                           <th class="py-2.5 px-3">Full Address</th>
-                          <th class="py-2.5 px-2 text-center">Type</th>
                         </tr>
                       </thead>
                       <tbody class="divide-y divide-slate-100 font-normal">
@@ -1828,14 +1801,6 @@ export interface EoiDocumentItem {
                               </span>
                             </td>
                             <td class="py-2.5 px-3 text-slate-500 max-w-xs truncate">{{ c.fullAddress }}</td>
-                            <td class="py-2.5 px-2 text-center">
-                              <span
-                                class="px-2 py-0.5 rounded text-[10px] font-bold"
-                                [ngClass]="c.isExisting ? 'bg-sky-50 text-sky-800 border border-sky-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'"
-                              >
-                                {{ c.isExisting ? 'Existing' : 'Proposed' }}
-                              </span>
-                            </td>
                           </tr>
                         }
                       </tbody>
@@ -1847,8 +1812,7 @@ export interface EoiDocumentItem {
               <!-- Section 4: Training & Placement Track Record -->
               <div class="space-y-3 pb-6 border-b border-slate-200">
                 <div class="flex items-center justify-between flex-wrap gap-2">
-                  <h4 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wider flex items-center gap-2">
-                    <span class="w-5 h-5 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-[10.5px] font-bold">4</span>
+                  <h4 class="text-xs sm:text-sm font-bold text-[#0B3558] uppercase tracking-wider">
                     <span>Past Skill Training &amp; Placement Performance ({{ placementRecords.length }} Sectors)</span>
                   </h4>
                   <button

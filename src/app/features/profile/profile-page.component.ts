@@ -6,87 +6,93 @@ import { OtrFormService } from '../registration/services/otr-form.service';
 import { OtrValidationService } from '../registration/services/otr-validation.service';
 import { FileDoc } from '../registration/models/otr-form.model';
 import { DocumentViewerModalComponent } from '../../shared/components/document-viewer-modal/document-viewer-modal.component';
+import { PageHeaderComponent } from '../../shared';
 
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, DocumentViewerModalComponent],
+  imports: [CommonModule, RouterModule, DocumentViewerModalComponent, PageHeaderComponent],
   template: `
-    <div class="w-full min-h-full bg-white text-text-primary font-sans pb-10">
+    <div class="w-full min-h-full font-sans" style="background-color: #ffffff; font-family: 'Inter', sans-serif;">
       
       <!-- ====================================================================
            CASE 1: INCOMPLETE PROFILE
            ==================================================================== -->
       @if (isProfileIncomplete()) {
-        <div class="p-4 sm:p-5 space-y-4 font-sans">
-          
-          <!-- Single Page Heading -->
-          <div class="pb-1 border-b border-slate-200/80">
-            <h1 class="font-bold tracking-tight m-0" style="color: #0B3558 !important; font-size: 18px !important; font-weight: 700 !important;">Profile Summary</h1>
-          </div>
+        <div class="p-4 sm:p-5 space-y-4 font-sans" style="background-color: #ffffff;">
 
-          <!-- Overview & Action Card -->
-          <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs">
+          <!-- Page Header with Heritage Banner -->
+          <app-page-header
+            title="Profile Summary"
+            [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Profile Summary' }]"
+          >
+            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[12px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+              <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
+              Profile Incomplete
+            </span>
+          </app-page-header>
+
+          <!-- OTR Progress Card -->
+          <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6" style="box-shadow: 0 1px 4px rgba(0,0,0,0.05);">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-              
-              <!-- Context & Progress -->
+
+              <!-- Left: Title + Description + Progress -->
               <div class="flex-1 space-y-3">
                 <div>
-                  <h2 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight m-0">
-                    One Time Registration (OTR)
-                  </h2>
-                  <p class="text-xs sm:text-[13px] text-slate-600 mt-1 leading-relaxed max-w-2xl m-0 font-normal">
-                    Complete all 4 mandatory registration steps to become eligible for scheme proposals.
+                  <h2 class="m-0 text-slate-900" style="font-size: 16px; font-weight: 700;">One Time Registration (OTR)</h2>
+                  <p class="text-slate-500 mt-1.5 leading-relaxed m-0 font-normal" style="font-size: 13px; max-width: 540px;">
+                    Complete all mandatory registration steps to become eligible for scheme proposals under RSLDC. Once complete, you can apply for all open EOI opportunities.
                   </p>
                 </div>
 
                 <!-- Progress Bar -->
-                <div class="pt-1 max-w-md">
-                  <div class="flex items-center justify-between text-xs font-medium mb-1.5">
-                    <span class="text-slate-700 font-semibold">{{ completedSectionsCount() }} of 4 Steps Completed</span>
-                    <span class="text-primary font-bold">{{ completionPercentage() }}%</span>
+                <div class="max-w-sm">
+                  <div class="flex items-center justify-between text-xs font-semibold mb-1.5">
+                    <span class="text-slate-700">{{ completedSectionsCount() }} of 4 Steps Completed</span>
+                    <span style="color: #0B3558;">{{ completionPercentage() }}%</span>
                   </div>
-                  <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                     <div
-                      class="h-full bg-primary rounded-full transition-all duration-500 ease-out"
+                      class="h-full rounded-full transition-all duration-500"
+                      style="background-color: #0B3558;"
                       [style.width.%]="completionPercentage()"
                     ></div>
                   </div>
                 </div>
               </div>
 
-              <!-- Direct CTA Button -->
-              <div class="shrink-0 flex items-center">
+              <!-- Right: CTA -->
+              <div class="shrink-0">
                 <a
                   [routerLink]="['/registration']"
                   [queryParams]="ctaQueryParams()"
-                  class="px-6 py-2.5 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap active:brightness-90"
-                  style="color: #ffffff !important;"
+                  class="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white text-sm font-semibold cursor-pointer whitespace-nowrap transition-all"
+                  style="background-color: #0B3558; color: #ffffff !important;"
+                  onmouseover="this.style.backgroundColor='#07233B'"
+                  onmouseout="this.style.backgroundColor='#0B3558'"
                 >
-                  <span class="text-white font-semibold" style="color: #ffffff !important;">{{ ctaText() }}</span>
-                  <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <span style="color: #ffffff !important;">{{ ctaText() }}</span>
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#fff;">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
                 </a>
               </div>
-
             </div>
           </div>
 
-          <!-- Registration Steps Cards -->
+          <!-- Registration Steps -->
           <div class="space-y-3">
-            <div class="flex items-center justify-between px-0.5">
-              <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider m-0">
-                Registration Steps
-              </h3>
+            <div class="flex items-center justify-between">
+              <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest m-0">Registration Steps</h3>
+              <span class="text-[11.5px] text-slate-400 font-medium">All steps are mandatory</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
               @for (section of sections(); track section.id; let i = $index) {
                 <div
-                  class="bg-white border rounded-xl p-4 sm:p-5 flex flex-col justify-between gap-4 transition-all hover:border-slate-300 hover:shadow-xs"
-                  [class.border-emerald-300]="section.isCompleted"
-                  [class.bg-emerald-50/15]="section.isCompleted"
+                  class="bg-white border rounded-xl p-5 flex flex-col justify-between gap-4 transition-all"
+                  style="box-shadow: 0 1px 3px rgba(0,0,0,0.04);"
+                  [class.border-emerald-200]="section.isCompleted"
                   [class.border-slate-200]="!section.isCompleted"
                 >
                   <div class="flex items-start justify-between gap-3">
@@ -111,19 +117,17 @@ import { DocumentViewerModalComponent } from '../../shared/components/document-v
                       </div>
 
                       <div>
-                        <h4 class="text-sm font-bold text-slate-900 m-0">
-                          Step {{ section.stepNumber }}: {{ section.title }}
-                        </h4>
+                        <p class="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider m-0">Step {{ section.stepNumber }}</p>
+                        <h4 class="text-[14px] font-bold text-slate-800 m-0 mt-0.5">{{ section.title }}</h4>
                       </div>
                     </div>
 
-                    <!-- Status Pill -->
                     <span
                       class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold shrink-0"
-                      [class.bg-emerald-100]="section.isCompleted"
-                      [class.text-emerald-800]="section.isCompleted"
-                      [class.bg-slate-100]="!section.isCompleted"
-                      [class.text-slate-600]="!section.isCompleted"
+                      [class.bg-emerald-50]="section.isCompleted"
+                      [class.text-emerald-700]="section.isCompleted"
+                      [class.bg-amber-50]="!section.isCompleted"
+                      [class.text-amber-700]="!section.isCompleted"
                     >
                       {{ section.isCompleted ? 'Completed' : 'Pending' }}
                     </span>

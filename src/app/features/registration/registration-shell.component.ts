@@ -51,15 +51,16 @@ export interface StepMeta {
                 <button
                   type="button"
                   (click)="goToStep(step.number)"
-                  class="flex-1 min-w-[90px] sm:min-w-0 py-1 px-1.5 sm:px-2 flex items-center justify-center gap-1.5 transition-all text-xs cursor-pointer relative group bg-transparent"
+                  class="flex-1 min-w-[100px] sm:min-w-0 py-2 px-2 sm:px-3 flex items-center justify-center gap-2 transition-all cursor-pointer relative group bg-transparent"
                   [class.text-[#0B3558]]="activeStep() === step.number"
-                  [class.font-bold]="activeStep() === step.number"
-                  [class.text-slate-500]="activeStep() !== step.number"
+                  [class.font-extrabold]="activeStep() === step.number"
+                  [class.text-slate-600]="activeStep() !== step.number"
+                  [class.font-semibold]="activeStep() !== step.number"
                   [class.hover:text-[#0B3558]]="activeStep() !== step.number"
                 >
                   <!-- Number Badge / Status Icon -->
                   <span
-                    class="w-5 h-5 sm:w-5.5 sm:h-5.5 rounded-full flex items-center justify-center text-[10.5px] sm:text-xs font-semibold shrink-0 transition-colors"
+                    class="w-6 h-6 sm:w-6.5 sm:h-6.5 rounded-full flex items-center justify-center text-xs sm:text-[12.5px] font-bold shrink-0 transition-colors"
                     [class.bg-[#0B3558]]="activeStep() === step.number"
                     [class.text-white]="activeStep() === step.number"
                     [class.bg-emerald-600]="isStepCompleted(step.number) && activeStep() !== step.number"
@@ -72,7 +73,7 @@ export interface StepMeta {
                     [class.border-slate-300]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
                   >
                     @if (isStepCompleted(step.number) && activeStep() !== step.number) {
-                      <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                       </svg>
                     } @else if (isStepError(step.number) && activeStep() !== step.number) {
@@ -85,23 +86,11 @@ export interface StepMeta {
                   </span>
 
                   <!-- Step Label -->
-                  <span class="truncate tracking-tight font-medium text-[11px] sm:text-xs">
+                  <span class="truncate tracking-tight font-bold text-xs sm:text-[13.5px]">
                     {{ step.label }}
                   </span>
                 </button>
               }
-            </div>
-
-            <!-- Horizontal Progress Bar Line -->
-            <div class="w-full bg-slate-100 h-1 relative overflow-hidden rounded-full mb-1" title="Overall Form Completion Progress">
-              <div
-                class="h-full bg-emerald-500 transition-all duration-500 ease-out rounded-full"
-                [style.width.%]="otrFormService.completionPercentage()"
-                role="progressbar"
-                [attr.aria-valuenow]="otrFormService.completionPercentage()"
-                aria-valuemin="0"
-                aria-valuemax="100"
-              ></div>
             </div>
           </div>
         </nav>

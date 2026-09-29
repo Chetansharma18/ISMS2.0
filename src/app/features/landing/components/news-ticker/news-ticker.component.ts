@@ -19,7 +19,7 @@ import { PressReleasesModalComponent } from '../press-releases-modal/press-relea
     class: 'block w-full'
   },
   template: `
-    <div #tickerSection class="bg-[#0B3558] text-white border-b border-[#07233B] py-2 sm:py-2.5 px-3 sm:px-6 shadow-inner relative z-40 overflow-hidden select-none">
+    <div #tickerSection class="bg-[#0B3558] text-white border-b border-[#07233B] py-2 sm:py-2.5 px-3 sm:px-6 shadow-inner relative z-10 overflow-hidden select-none">
       <div class="max-w-[95%] mx-auto flex items-center gap-2 sm:gap-4 text-xs sm:text-[13px] relative h-6">
         
         <!-- Left: Static Badge (Fixed Position with subtle gradient separator) -->

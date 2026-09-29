@@ -53,19 +53,40 @@ export interface EoiDocumentItem {
     SchemeDetailViewComponent
   ],
   template: `
-    <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
+    <div class="w-full min-h-full text-slate-800 font-sans" style="background-color: #ffffff; font-family: 'Inter', sans-serif;">
       
       <!-- ====================================================================
            VIEW 1: ACTIVE EOI TABLE (Using Reusable PageHeader & DataTable)
            ==================================================================== -->
       @if (!selectedScheme()) {
-        <div class="p-4 sm:p-5 space-y-3 font-sans">
+        <div class="p-4 sm:p-5 space-y-4 font-sans" style="background-color: #ffffff;">
           
-          <!-- Themed Header Bar via Reusable PageHeaderComponent -->
+          <!-- Themed Header Bar via Reusable PageHeaderComponent with Rajasthan Banner -->
           <app-page-header
             title="Active Schemes"
-            bgColor="#0B3558"
+            [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Active Schemes' }]"
           >
+            <!-- Integrated Search Bar (Matching User Screenshot) -->
+            <div class="w-full sm:w-auto min-w-[280px] sm:min-w-[360px] md:min-w-[420px]">
+              <div class="relative flex items-center bg-white rounded-lg border border-slate-300 shadow-2xs overflow-hidden focus-within:border-[#174A6E] focus-within:ring-2 focus-within:ring-[#174A6E]/20 transition-all">
+                <input
+                  type="text"
+                  [ngModel]="searchQuery()"
+                  (ngModelChange)="onSearchChange($event)"
+                  placeholder="Search schemes by name, reference no. or keyword..."
+                  class="w-full px-3.5 py-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none bg-transparent"
+                />
+                <button
+                  type="button"
+                  class="px-3.5 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                  title="Search"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </app-page-header>
 
           <!-- Incomplete Profile Notice Banner (if applicable) -->
@@ -83,11 +104,11 @@ export interface EoiDocumentItem {
               <div class="flex items-center gap-2">
                 <a
                   routerLink="/profile"
-                  class="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-xs font-semibold rounded-md shadow-xs whitespace-nowrap transition-all flex items-center gap-1.5 justify-center shrink-0 cursor-pointer active:scale-95"
+                  class="px-5 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-lg shadow-md whitespace-nowrap transition-all flex items-center gap-2 justify-center shrink-0 cursor-pointer active:scale-95"
                   style="color: #ffffff !important;"
                 >
-                  <span class="text-white font-semibold" style="color: #ffffff !important;">Complete Registration</span>
-                  <svg class="w-3.5 h-3.5 text-white" style="stroke: #ffffff !important; color: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <span class="text-white font-bold" style="color: #ffffff !important;">Complete Registration</span>
+                  <svg class="w-4 h-4 text-white" style="stroke: #ffffff !important; color: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
                 </a>
@@ -98,7 +119,7 @@ export interface EoiDocumentItem {
           <!-- Schemes Table via Reusable TableComponent -->
           <app-table
             [columns]="schemeColumns"
-            [data]="schemes"
+            [data]="filteredSchemes()"
             [pagination]="true"
             [pageSize]="pageSize"
             [rowClass]="getRowClass"
@@ -140,15 +161,18 @@ export interface EoiDocumentItem {
 
           <ng-template #viewActionTemplate let-item>
             @if (isSchemeClosed(item)) {
-              <span
-                class="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-medium bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none"
-                title="Scheme closed - Viewing is disabled"
+              <button
+                type="button"
+                (click)="$event.stopPropagation(); viewSchemeDetails(item)"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-semibold text-[#0483AC] hover:text-white hover:bg-[#0483AC] border border-[#0483AC]/40 hover:border-[#0483AC] bg-white cursor-pointer transition-all select-none"
+                title="View scheme details (closed)"
               >
-                <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                <svg class="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
-                <span>Closed</span>
-              </span>
+                <span>View</span>
+              </button>
             } @else {
               <app-button
                 variant="pdf-view"
@@ -188,29 +212,14 @@ export interface EoiDocumentItem {
       <app-action-modal
         [isOpen]="showOtrPromptModal()"
         [showCloseButton]="false"
-        title="Complete Profile to be Eligible for EOI"
-        description="To be eligible to participate and submit Expression of Interest (EOI) proposals under RSLDC schemes, please complete your One-Time Registration (OTR) and organization profile first."
+        title="Complete Your Profile to Apply for EOI"
+        description="To participate in RSLDC schemes and submit an Expression of Interest (EOI), please complete your One-Time Registration (OTR) and organization profile."
         primaryLabel="Complete Registration"
         secondaryLabel="Skip for Now"
         (primaryAction)="goToProfile()"
         (secondaryAction)="dismissOtrPrompt()"
         (close)="dismissOtrPrompt()"
       >
-        <!-- Information Highlights Box -->
-        <div class="w-full mt-4 p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-left text-xs text-slate-700 space-y-2">
-          <div class="flex items-start gap-2">
-            <svg class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
-            <span><strong>Verified Partner Status:</strong> Upload PAN, GST, and legal incorporation documents.</span>
-          </div>
-          <div class="flex items-start gap-2">
-            <svg class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
-            <span><strong>Scheme EOI Access:</strong> Unlocks direct online application for all open flagship tenders.</span>
-          </div>
-        </div>
       </app-action-modal>
 
     </div>
@@ -232,6 +241,24 @@ export class TendersPageComponent {
   selectedScheme = signal<SchemeTender | null>(null);
   readonly showOtrPromptModal = signal<boolean>(false);
   private promptDismissed = false;
+
+  pageSize = 10;
+  searchQuery = signal<string>('');
+
+  readonly filteredSchemes = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    if (!q) return this.schemes;
+    return this.schemes.filter(s =>
+      s.schemeName.toLowerCase().includes(q) ||
+      s.refNo.toLowerCase().includes(q) ||
+      s.eoiDescription.toLowerCase().includes(q) ||
+      (s.schemeTitle && s.schemeTitle.toLowerCase().includes(q))
+    );
+  });
+
+  onSearchChange(val: string): void {
+    this.searchQuery.set(val);
+  }
 
   constructor() {
     this.route.queryParams.subscribe(params => {
@@ -284,7 +311,7 @@ export class TendersPageComponent {
 
   // Section B: Official Prescribed Annexure Formats & Templates (Download to fill & execute)
   readonly annexureDocuments: EoiDocumentItem[] = [
-    { sNo: 1, name: 'Annexure-1: Covering Letter Format as per Annexure-1', size: '245 KB' },
+    { sNo: 1, name: 'Annexure-1: Covering Letter  ', size: '245 KB' },
     { sNo: 2, name: 'Annexure-3: Audited Financial Statements Format for Last Three Consecutive Financial Years', size: '1.2 MB' },
     { sNo: 3, name: 'Annexure-4: Details of Active Skill Development Centre Format', size: '380 KB' },
     { sNo: 4, name: 'Annexure-5: Training and Placement Details Format', size: '520 KB' },
@@ -295,7 +322,7 @@ export class TendersPageComponent {
     { sNo: 9, name: 'Annexure-10: Details of Working Experience in Relevant Sector Format', size: '610 KB' },
     { sNo: 10, name: 'Annexure-11: List of Divisions and Group of District', size: '310 KB' },
     { sNo: 11, name: 'Annexure-12: Proposed Evaluation Matrix Template', size: '420 KB' },
-    { sNo: 12, name: 'Annexure-13: Supporting Documents Checklist & Format as per Annexure-13', size: '850 KB' }
+    { sNo: 12, name: 'Annexure-13: Supporting Documents Checklist', size: '850 KB' }
   ];
 
   // Informational requirements — what the applicant must have ready before filling the online EOI form
@@ -319,7 +346,7 @@ export class TendersPageComponent {
 
 
   readonly schemeColumns: TableColumn<SchemeTender>[] = [
-    { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
+    { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-20 min-w-[75px]' },
     {
       key: 'refNo',
       label: 'EOI Reference No.',
@@ -363,7 +390,7 @@ export class TendersPageComponent {
     },
     {
       key: 'viewAction',
-      label: 'View',
+      label: 'Action',
       align: 'center',
       width: 'w-24',
       type: 'custom'
@@ -393,15 +420,12 @@ export class TendersPageComponent {
 
   getRowClass = (item: SchemeTender): string => {
     if (this.isSchemeClosed(item)) {
-      return 'opacity-65 bg-slate-50/80 cursor-not-allowed select-none hover:bg-slate-100/60';
+      return 'opacity-65 bg-white cursor-pointer hover:bg-slate-50 transition-colors';
     }
-    return 'cursor-pointer hover:bg-sky-50/70 transition-colors';
+    return 'bg-white cursor-pointer hover:bg-slate-100/90 transition-colors';
   };
 
   onRowClick(scheme: SchemeTender): void {
-    if (this.isSchemeClosed(scheme)) {
-      return; // Disabled: cannot view closed / expired schemes
-    }
     this.viewSchemeDetails(scheme);
   }
 
@@ -610,30 +634,11 @@ export class TendersPageComponent {
   ];
 
   viewSchemeDetails(scheme: SchemeTender): void {
-    if (this.isSchemeClosed(scheme)) {
-      return; // Disabled: Cannot view expired / closed schemes
-    }
     this.selectedScheme.set(scheme);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   readonly Math = Math;
-  readonly currentPage = signal<number>(1);
-  readonly pageSize = 10;
-
-  readonly totalPages = computed(() => Math.ceil(this.schemes.length / this.pageSize));
-  readonly totalPagesArray = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
-
-  readonly paginatedSchemes = computed(() => {
-    const start = (this.currentPage() - 1) * this.pageSize;
-    return this.schemes.slice(start, start + this.pageSize);
-  });
-
-  setPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.currentPage.set(page);
-    }
-  }
 
 
   backToList(): void {

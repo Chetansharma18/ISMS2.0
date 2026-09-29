@@ -135,10 +135,10 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
         <!-- Branch Address (12 cols) -->
         <div class="lg:col-span-12">
           <app-form-textarea
-            label="Branch Full Address"
+            label="Branch Address"
             [value]="data().branchAddress"
             (valueChange)="update('branchAddress', $event)"
-            placeholder="Branch building, street, landmark, city"
+            placeholder="e.g. SBI Main Branch, Ashok Marg, C-Scheme, Jaipur - 302001"
             [required]="true"
             [error]="getFieldError('branchAddress')"
           ></app-form-textarea>

@@ -41,7 +41,7 @@ export class OtrPdfService {
           <td>${o.emailId || '-'}</td>
           <td style="font-family:monospace;">${o.pan || '-'}</td>
           <td style="font-family:monospace;">${o.aadhaarNo || '-'}</td>
-          <td>${idx === 0 ? 'Primary Nodal Officer' : 'Additional Officer'}</td>
+          <td>${idx === 0 ? 'Nodal Officer' : 'Additional Officer'}</td>
         </tr>
       `).join('')
       : '<tr><td colspan="8" style="text-align:center;color:#64748b;padding:8px;">No Officer Details Provided</td></tr>';
@@ -49,7 +49,7 @@ export class OtrPdfService {
     // Document checklist
     const docs = [
       { name: 'Certificate of Registration', doc: s1.registrationCertDoc },
-      { name: 'Company PAN Card', doc: s1.panCardDoc },
+      { name: 'Organization PAN Card', doc: s1.panCardDoc },
       ...(s1.gstRegistered === 'Yes' ? [{ name: 'GST Registration Certificate', doc: s1.gstCertDoc }] : []),
       ...(s1.msmeRegistered === 'Yes' ? [{ name: 'MSME Udyam Certificate', doc: s1.msmeCertDoc }] : []),
       { name: 'Authorization Letter / Board Resolution', doc: s3.authorizationLetterDoc },
@@ -201,43 +201,37 @@ export class OtrPdfService {
           <div class="sec-header">1. Organization &amp; Legal Particulars</div>
           <table class="tbl">
             <tr>
-              <td class="lbl">Full Name:</td>
+              <td class="lbl">Organization Name:</td>
               <td class="val" colspan="3" style="font-weight:700;">${s1.fullName || '-'}</td>
             </tr>
             <tr>
-              <td class="lbl">Name:</td>
-              <td class="val">${s1.shortName || '-'}</td>
               <td class="lbl">Nature of Entity:</td>
               <td class="val">${s1.natureOfEntity || '-'}</td>
-            </tr>
-            <tr>
               <td class="lbl">Registration Number:</td>
               <td class="val" style="font-family:monospace;">${s1.registrationNumber || '-'}</td>
+            </tr>
+            <tr>
               <td class="lbl">Date of Registration:</td>
               <td class="val">${s1.dateOfRegistration || '-'}</td>
-            </tr>
-            <tr>
               <td class="lbl">State of Legal Reg.:</td>
               <td class="val">${s1.stateOfLegalReg || '-'}</td>
-              <td class="lbl">Company PAN:</td>
-              <td class="val" style="font-family:monospace;font-weight:700;">${s1.companyPan || '-'}</td>
             </tr>
             <tr>
+              <td class="lbl">Organization PAN:</td>
+              <td class="val" style="font-family:monospace;font-weight:700;">${s1.companyPan || '-'}</td>
               <td class="lbl">GST Registered:</td>
               <td class="val">${s1.gstRegistered} ${s1.gstRegistered === 'Yes' ? '(' + (s1.gstin || '-') + ')' : ''}</td>
+            </tr>
+            <tr>
               <td class="lbl">MSME Registered:</td>
               <td class="val">${s1.msmeRegistered} ${s1.msmeRegistered === 'Yes' ? '(' + (s1.udyamNumber || '-') + ')' : ''}</td>
-            </tr>
-            <tr>
               <td class="lbl">NSDC Partner Status:</td>
               <td class="val">${s1.nsdcPartner || 'Not Applicable'}</td>
-              <td class="lbl">Blacklisted by Govt/PSU:</td>
-              <td class="val">${s1.blackListed}</td>
             </tr>
             <tr>
-              <td class="lbl">Official Contact No.:</td>
+              <td class="lbl">Organization Contact No.:</td>
               <td class="val">${s1.contactNo || '-'}</td>
-              <td class="lbl">Official Email ID:</td>
+              <td class="lbl">Organization Email-ID:</td>
               <td class="val">${s1.emailId || '-'}</td>
             </tr>
             <tr>

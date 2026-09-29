@@ -15,83 +15,83 @@ export interface BreadcrumbItem {
     :host {
       display: block;
     }
-    :host h1,
-    :host .header-title {
-      color: #ffffff !important;
-      font-size: 16px !important;
-      line-height: 22px !important;
-      font-weight: 600 !important;
-    }
-    :host nav,
-    :host nav a,
-    :host nav span {
-      color: #ffffff !important;
-    }
-    :host .breadcrumb-separator {
-      color: rgba(255, 255, 255, 0.75) !important;
-    }
   `],
   template: `
     <div
-      class="text-white px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-sm flex items-center justify-between gap-3 shadow-xs"
-      [style.backgroundColor]="bgColor"
+      class="relative w-full rounded-lg overflow-hidden border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 px-6 py-4 sm:px-8 sm:py-5 bg-[#edf4fa]"
+      style="min-height: 76px;"
     >
-      <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-        <!-- Circular Back Button -->
+      <!-- Background Panoramic Fort Image with soft fade to the left -->
+      <div
+        class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none"
+        style="background-image: url('/hero-bg.png'); background-position: right 18%; opacity: 0.95;"
+      ></div>
+      <!-- Soft Gradient Overlay: blends fort image into light sky/white background on the left -->
+      <div
+        class="absolute inset-0 pointer-events-none"
+        style="background: linear-gradient(90deg, #edf4fa 0%, #edf4fa 28%, rgba(237, 244, 250, 0.88) 52%, rgba(237, 244, 250, 0.28) 72%, transparent 100%);"
+      ></div>
+
+      <!-- Left: Title & Breadcrumbs -->
+      <div class="relative z-10 flex items-center gap-3.5 min-w-0">
+        <!-- Optional Back Button -->
         @if (backUrl || showBack) {
           <button
             type="button"
             (click)="onBackClick()"
-            class="w-7 h-7 rounded-full border border-white flex items-center justify-center text-white hover:bg-white/20 active:scale-95 transition-all cursor-pointer shrink-0 focus:outline-none"
-            style="border-color: #ffffff !important; color: #ffffff !important;"
+            class="w-9 h-9 rounded-full border border-slate-300 bg-white/90 hover:bg-white flex items-center justify-center text-[#123B59] shadow-sm transition-all cursor-pointer shrink-0"
             [title]="backTitle"
             [attr.aria-label]="backTitle"
           >
-            <svg class="w-3.5 h-3.5 stroke-[2.5]" style="stroke: #ffffff !important; color: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
         }
 
-        <!-- Title & Breadcrumb Block -->
         <div class="flex flex-col justify-center leading-tight min-w-0">
-          <div class="flex items-center gap-2 flex-wrap">
+          <div class="flex items-center gap-3 flex-wrap">
             <h1
-              class="header-title text-[15px] sm:text-[16px] font-semibold text-white leading-snug m-0 truncate tracking-tight"
-              style="color: #ffffff !important; font-size: 16px !important; line-height: 22px !important;"
+              class="header-title m-0 truncate"
+              style="color: #0c2d4e !important; font-size: 28px !important; line-height: 34px !important; font-weight: 900 !important; letter-spacing: -0.01em;"
             >
               {{ title }}
             </h1>
             @if (badge) {
-              <span class="px-1.5 py-0.5 text-[10.5px] font-medium rounded-[3px] bg-white/20 text-white select-none" style="color: #ffffff !important;">
+              <span class="px-2.5 py-0.5 text-xs font-bold rounded-md bg-[#174A6E] text-white select-none tracking-wide">
                 {{ badge }}
               </span>
             }
           </div>
 
           <!-- Breadcrumbs -->
-          @if (breadcrumbs && breadcrumbs.length > 0) {
-            <nav class="flex items-center gap-1.5 text-[11px] sm:text-[11.5px] leading-tight text-white/90 font-normal mt-0.5 select-none" aria-label="Breadcrumb">
+          <nav class="flex items-center gap-2 text-[13px] sm:text-sm text-slate-600 font-medium mt-1.5 select-none" aria-label="Breadcrumb">
+            @if (breadcrumbs && breadcrumbs.length > 0) {
               @for (item of breadcrumbs; track item.label; let last = $last) {
                 @if (item.url && !last) {
-                  <a [routerLink]="item.url" class="hover:underline transition-colors" style="color: #ffffff !important;">
+                  <a [routerLink]="item.url" class="hover:text-[#174A6E] transition-colors">
                     {{ item.label }}
                   </a>
                 } @else {
-                  <span [class.font-medium]="last" style="color: #ffffff !important;">{{ item.label }}</span>
+                  <span [class.font-semibold]="last" [class.text-slate-800]="last">{{ item.label }}</span>
                 }
 
                 @if (!last) {
-                  <span class="breadcrumb-separator select-none">&gt;</span>
+                  <span class="text-slate-400">&gt;</span>
                 }
               }
-            </nav>
-          }
+            } @else {
+              <!-- Default breadcrumb -->
+              <a routerLink="/" class="hover:text-[#174A6E] transition-colors">Home</a>
+              <span class="text-slate-400">&gt;</span>
+              <span class="font-semibold text-slate-800">{{ title }}</span>
+            }
+          </nav>
         </div>
       </div>
 
-      <!-- Right Action / Metadata Slot -->
-      <div class="flex items-center gap-2 shrink-0">
+      <!-- Right Action / Search Slot -->
+      <div class="relative z-10 flex items-center gap-3 shrink-0">
         <ng-content></ng-content>
       </div>
     </div>

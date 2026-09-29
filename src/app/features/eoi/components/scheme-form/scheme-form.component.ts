@@ -307,8 +307,11 @@ export interface EoiDocumentItem {
 
 
 
-            <!-- 1. Company Particulars & Registration Details -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
+            <!-- Single Page Container for OTR Profile -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-8 shadow-xs font-sans space-y-10">
+
+              <!-- 1. Company Particulars & Registration Details -->
+              <div class="space-y-4">
               <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <h4 class="text-base font-bold text-[#0B3558] uppercase tracking-wide m-0">
                   1. Company Particulars &amp; Registration Details
@@ -365,12 +368,7 @@ export interface EoiDocumentItem {
                   <span class="text-slate-400 block text-[10.5px] uppercase font-medium">NSDC Partner Status</span>
                   <span class="font-semibold text-slate-800 block mt-0.5">{{ editableStep1.nsdcPartner || 'Not Applicable' }}</span>
                 </div>
-                <div>
-                  <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Blacklisted Status</span>
-                  <span class="font-semibold block mt-0.5" [class.text-rose-600]="editableStep1.blackListed === 'Yes'" [class.text-slate-800]="editableStep1.blackListed !== 'Yes'">
-                    {{ editableStep1.blackListed || 'No' }}
-                  </span>
-                </div>
+
                 <div>
                   <span class="text-slate-400 block text-[10.5px] uppercase font-medium">Company Contact No.</span>
                   <span class="font-mono font-semibold text-slate-800 block mt-0.5">{{ editableStep1.contactNo || '-' }}</span>
@@ -434,8 +432,8 @@ export interface EoiDocumentItem {
               </div>
             </div>
 
-            <!-- 2. Authorized Signatory / Person Details -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
+              <!-- 2. Authorized Signatory / Person Details -->
+              <div class="space-y-4">
               <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <h4 class="text-base font-bold text-[#0B3558] uppercase tracking-wide m-0">
                   2. Authorized Signatory / Person Details
@@ -504,8 +502,8 @@ export interface EoiDocumentItem {
               </div>
             </div>
 
-            <!-- 3. Officer(s) In-Charge Details -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
+              <!-- 3. Officer(s) In-Charge Details -->
+              <div class="space-y-4">
               <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <h4 class="text-base font-bold text-[#0B3558] uppercase tracking-wide m-0">
                   3. Details of Officer(s) In-Charge
@@ -549,8 +547,8 @@ export interface EoiDocumentItem {
               </div>
             </div>
 
-            <!-- 4. Bank Account Details -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
+              <!-- 4. Bank Account Details -->
+              <div class="space-y-4">
               <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <h4 class="text-base font-bold text-[#0B3558] uppercase tracking-wide m-0">
                   4. Bank Account Details
@@ -592,6 +590,7 @@ export interface EoiDocumentItem {
                   <span class="font-semibold text-emerald-700 block mt-0.5 truncate">{{ editableStep4.cancelledChequeDoc?.fileName || 'Cancelled_Cheque_Passbook.pdf' }}</span>
                 </div>
               </div>
+              </div>
             </div>
 
             <!-- Footer Action: Proceed to Proposal Form (Text Only, No Icons) -->
@@ -615,20 +614,11 @@ export interface EoiDocumentItem {
              STEP 2: EOI PROPOSAL FORM
              ==================================================================== -->
         @if (currentStep() === 2) {
-          <div class="space-y-5">
-            
-            <!-- Notice -->
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex items-start sm:items-center gap-3 text-xs text-amber-900 shadow-2xs">
-              <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0 mt-1 sm:mt-0"></span>
-              <span>
-                <strong>Proposal Form Parameters:</strong> Review and select training centres, past placement track records, annual action plan, and attach mandatory statutory annexures.
-              </span>
-            </div>
-
-            <!-- ================================================================
+          <!-- Single Page Container for Proposal Form -->
+          <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-8 shadow-xs font-sans space-y-10">            <!-- ================================================================
                  1. TRAINING CENTRES SECTION (Existing Infrastructure & Proposal Centres)
                  ================================================================ -->
-            <div id="training-centres-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
+            <div id="training-centres-section" class="space-y-4">
               <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
@@ -639,9 +629,6 @@ export interface EoiDocumentItem {
                   </p>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="px-2.5 py-1 rounded bg-sky-50 text-[#0B3558] text-xs font-bold border border-sky-200">
-                    {{ selectedCentresForScheme().length }} Centre(s) Deployed
-                  </span>
                   <button
                     type="button"
                     (click)="showAddExistingForm.set(!showAddExistingForm())"
@@ -807,7 +794,7 @@ export interface EoiDocumentItem {
             <!-- ================================================================
                  2. PAST 3 FINANCIAL YEARS TURNOVER (FINANCIAL ELIGIBILITY)
                  ================================================================ -->
-            <div id="financial-turnover-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
+            <div id="financial-turnover-section" class="space-y-4">
               <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
@@ -818,9 +805,6 @@ export interface EoiDocumentItem {
                   </p>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
-                    &check; Min Eligible Threshold: ₹50.00 Lacs
-                  </span>
                 </div>
               </div>
 
@@ -832,7 +816,6 @@ export interface EoiDocumentItem {
                       <th class="py-2.5 px-3 w-44">Financial Year</th>
                       <th class="py-2.5 px-3">Total Entity Turnover (₹ in Lacs) *</th>
                       <th class="py-2.5 px-3">Skill Training Turnover (₹ in Lacs) *</th>
-                      <th class="py-2.5 px-3 text-center w-36">Scrutiny Status</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-slate-100 font-normal">
@@ -880,11 +863,6 @@ export interface EoiDocumentItem {
                             <span class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 text-[11px] pointer-events-none">Lacs</span>
                           </div>
                         </td>
-                        <td class="py-2.5 px-3 text-center">
-                          <span class="px-2 py-0.5 rounded text-[10.5px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                            Valid Entry
-                          </span>
-                        </td>
                       </tr>
                     }
                     <!-- 3-Year Average Row -->
@@ -898,11 +876,6 @@ export interface EoiDocumentItem {
                       <td class="py-3 px-3 text-sm text-emerald-800">
                         ₹ {{ avgSkillTurnover() }} Lacs
                       </td>
-                      <td class="py-3 px-3 text-center">
-                        <span class="px-2.5 py-1 rounded-full text-[10.5px] font-bold bg-emerald-100 text-emerald-900">
-                          &check; Meets Criteria
-                        </span>
-                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -912,7 +885,7 @@ export interface EoiDocumentItem {
             <!-- ================================================================
                  3. PAST SKILL TRAINING & PLACEMENT TRACK RECORD
                  ================================================================ -->
-            <div id="placement-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
+            <div id="placement-section" class="space-y-4">
               <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
@@ -923,9 +896,6 @@ export interface EoiDocumentItem {
                   </p>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
-                    {{ placementRecords.length }} Records Added
-                  </span>
                   <button
                     type="button"
                     (click)="showAddPlacementForm.set(!showAddPlacementForm())"
@@ -1047,14 +1017,23 @@ export interface EoiDocumentItem {
                         </td>
                         <td class="py-2.5 px-2 text-right text-[11px] text-slate-500 font-mono">{{ p.proofDoc }}</td>
                         <td class="py-2.5 px-2 text-center">
-                          <button
-                            type="button"
-                            (click)="removePlacement(idx)"
-                            class="text-rose-500 hover:text-rose-700 text-sm font-semibold cursor-pointer p-1"
-                            title="Remove Record"
-                          >
-                            &times;
-                          </button>
+                          <div class="flex items-center justify-center gap-2">
+                            <button
+                              type="button"
+                              class="text-[#0483AC] hover:text-[#036B8C] text-xs font-semibold cursor-pointer"
+                              title="Edit Record"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              (click)="removePlacement(idx)"
+                              class="text-rose-500 hover:text-rose-700 text-sm font-semibold cursor-pointer"
+                              title="Remove Record"
+                            >
+                              &times;
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     }
@@ -1066,7 +1045,7 @@ export interface EoiDocumentItem {
             <!-- ================================================================
                  4. ANNUAL ACTION PLAN (TARGET DISTRICTS & BATCHES)
                  ================================================================ -->
-            <div id="action-plan-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
+            <div id="action-plan-section" class="space-y-4">
               <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
@@ -1077,9 +1056,6 @@ export interface EoiDocumentItem {
                   </p>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="px-2.5 py-1 rounded bg-sky-50 text-[#0B3558] text-xs font-semibold border border-sky-200">
-                    {{ actionPlan.length }} District Plan(s)
-                  </span>
                   <button
                     type="button"
                     (click)="showAddActionPlanForm.set(!showAddActionPlanForm())"
@@ -1231,14 +1207,23 @@ export interface EoiDocumentItem {
                         <td class="py-2.5 px-2 text-center text-emerald-700 font-medium">{{ ap.mode }}</td>
                         <td class="py-2.5 px-2 text-center font-bold text-slate-900">{{ ap.batches }}</td>
                         <td class="py-2.5 px-2 text-center">
-                          <button
-                            type="button"
-                            (click)="removeActionPlan(idx)"
-                            class="text-rose-500 hover:text-rose-700 text-xs font-semibold cursor-pointer p-1"
-                            title="Remove Plan"
-                          >
-                            &times;
-                          </button>
+                          <div class="flex items-center justify-center gap-2">
+                            <button
+                              type="button"
+                              class="text-[#0483AC] hover:text-[#036B8C] text-xs font-semibold cursor-pointer"
+                              title="Edit Plan"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              (click)="removeActionPlan(idx)"
+                              class="text-rose-500 hover:text-rose-700 text-sm font-semibold cursor-pointer"
+                              title="Remove Plan"
+                            >
+                              &times;
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     }
@@ -1250,7 +1235,7 @@ export interface EoiDocumentItem {
             <!-- ================================================================
                  5. EOI DOCUMENTS CHECKLIST (Categorized: Mandatory, Annexures, Remaining)
                  ================================================================ -->
-            <div id="documents-section" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 space-y-4 shadow-xs">
+            <div id="documents-section" class="space-y-4">
               <div class="pb-2.5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
                 <div>
                   <h3 class="text-sm sm:text-base font-bold text-[#0B3558]">
@@ -1261,9 +1246,6 @@ export interface EoiDocumentItem {
                   </p>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="px-2.5 py-1 rounded bg-blue-50 text-[#0B3558] text-xs font-semibold border border-blue-200">
-                    {{ attachedDocsCount() }} / {{ eoiDocuments().length }} Attached
-                  </span>
                   <button
                     type="button"
                     (click)="attachAllSampleDocs()"
@@ -1433,18 +1415,8 @@ export interface EoiDocumentItem {
              ==================================================================== -->
         @if (currentStep() === 3) {
           <div class="space-y-6">
-            
-            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between text-xs text-[#0B3558] shadow-2xs">
-              <div class="flex items-center gap-2.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0"></span>
-                <span class="font-normal text-xs sm:text-[13px]">
-                  <strong class="font-bold">Comprehensive Proposal Dossier:</strong> Review your verified OTR profile, financial turnover qualification, deployed centres, placement performance, annual action plan, and attached statutory annexures before final submission.
-                </span>
-              </div>
-            </div>
-
-            <!-- Single Unified Application Dossier Card -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-7 space-y-6 shadow-xs">
+          <!-- Single Page Container for Proposal Form -->
+          <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-8 shadow-xs font-sans space-y-10">
               
               <!-- Dossier Header -->
               <div class="flex items-center justify-between pb-4 border-b border-slate-200 flex-wrap gap-3">
@@ -1460,19 +1432,13 @@ export interface EoiDocumentItem {
                   <button
                     type="button"
                     (click)="downloadCompleteProposalDossier()"
-                    class="px-3.5 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                    class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
                   >
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                     </svg>
-                    <span>Download Full Proposal Dossier (PDF / Print)</span>
+                    <span>Download</span>
                   </button>
-                  <span class="px-2.5 py-1 rounded bg-sky-50 text-[#0B3558] text-xs font-bold border border-sky-200">
-                    Ref: ISMS-EOI-2026-9871
-                  </span>
-                  <span class="px-2.5 py-1 rounded bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200">
-                    Ready for Submission
-                  </span>
                 </div>
               </div>
 
@@ -1493,7 +1459,7 @@ export interface EoiDocumentItem {
                 </div>
 
                 <!-- 1.A Organization & Statutory Details -->
-                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <div class="space-y-3">
                   <div class="text-[11px] font-bold text-[#0B3558] uppercase tracking-wider pb-1.5 border-b border-slate-200">
                     Organization &amp; Statutory Particulars
                   </div>
@@ -1531,10 +1497,7 @@ export interface EoiDocumentItem {
                       <span class="text-slate-400 block text-[10.5px]">MSME Registered &bull; Udyam No</span>
                       <span class="text-slate-800 font-medium">{{ editableStep1.msmeRegistered || 'No' }} &bull; {{ editableStep1.udyamNumber || 'N/A' }}</span>
                     </div>
-                    <div>
-                      <span class="text-slate-400 block text-[10.5px]">Blacklisted Status</span>
-                      <span class="font-semibold" [class.text-rose-600]="editableStep1.blackListed === 'Yes'" [class.text-slate-800]="editableStep1.blackListed !== 'Yes'">{{ editableStep1.blackListed || 'No' }}</span>
-                    </div>
+
                     <div>
                       <span class="text-slate-400 block text-[10.5px]">Company Contact No &bull; Email</span>
                       <span class="text-slate-800">{{ editableStep1.contactNo || '-' }} &bull; {{ editableStep1.emailId || '-' }}</span>
@@ -1578,7 +1541,7 @@ export interface EoiDocumentItem {
                 </div>
 
                 <!-- 1.B Authorized Signatory / Person Details -->
-                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <div class="space-y-3">
                   <div class="text-[11px] font-bold text-[#0B3558] uppercase tracking-wider pb-1.5 border-b border-slate-200">
                     Authorized Signatory / Person Particulars
                   </div>
@@ -1628,7 +1591,7 @@ export interface EoiDocumentItem {
                 </div>
 
                 <!-- 1.C Officer(s) In-Charge Details -->
-                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <div class="space-y-3">
                   <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
                     <span class="text-[11px] font-bold text-[#0B3558] uppercase tracking-wider">
                       Designated Officer(s) In-Charge ({{ editableStep2.length }} Registered)
@@ -1665,7 +1628,7 @@ export interface EoiDocumentItem {
                 </div>
 
                 <!-- 1.D Bank Account Details -->
-                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <div class="space-y-3">
                   <div class="text-[11px] font-bold text-[#0B3558] uppercase tracking-wider pb-1.5 border-b border-slate-200">
                     Bank Account &amp; Treasury Settlement Particulars
                   </div>
@@ -2764,7 +2727,7 @@ export class SchemeFormComponent {
   ];
 
   /** IDs of existing centres that are selected for MMKVY */
-  selectedExistingCentreIds = signal<string[]>(['tc-exist-1']);
+  selectedExistingCentreIds = signal<string[]>([]);
 
   /** New training centres proposed specifically for MMKVY */
   newProposedCentres: TrainingCenterItem[] = [];

@@ -5,15 +5,7 @@ import { BatchRecord } from '../models/batch.model';
 import { SdcRecord } from '../models/sdc.model';
 import { BatchService } from './batch.service';
 import { SdcService } from './sdc.service';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class AspirantService {
-  private batchService = inject(BatchService);
-  private sdcService = inject(SdcService);
-
-  private readonly _aspirants = signal<AspirantRecord[]>([
+export const INITIAL_ASPIRANTS: AspirantRecord[] = [
     {
       id: 'ASP-RJ-2026-98412',
       aadhaarNo: '789456123012',
@@ -114,9 +106,9 @@ export class AspirantService {
       batchId: 'batch-201',
       batchCode: 'B-26-0001',
       batchName: 'Solar Tech Batch 01',
-      courseName: 'Solar Panel Installation Technician',
-      scheme: 'MMKVY',
-      sector: 'Green Energy',
+      courseName: 'Domestic Data Entry Operator',
+      scheme: 'SAMARTH',
+      sector: 'Aerospace and Aviation',
 
       // Status
       enrollmentDate: '2026-09-02',
@@ -223,9 +215,9 @@ export class AspirantService {
       batchId: 'batch-201',
       batchCode: 'B-26-0001',
       batchName: 'Solar Tech Batch 01',
-      courseName: 'Solar Panel Installation Technician',
-      scheme: 'MMKVY',
-      sector: 'Green Energy',
+      courseName: 'Domestic Data Entry Operator',
+      scheme: 'SAMARTH',
+      sector: 'Aerospace and Aviation',
 
       // Status
       enrollmentDate: '2026-09-01',
@@ -334,7 +326,7 @@ export class AspirantService {
       batchName: 'Data Entry Batch A',
       courseName: 'Domestic Data Entry Operator',
       scheme: 'SAMARTH',
-      sector: 'IT & ITeS',
+      sector: 'Aerospace and Aviation',
 
       // Status
       enrollmentDate: '2026-09-16',
@@ -432,17 +424,17 @@ export class AspirantService {
       ],
 
       // SDC Center Info
-      sdcId: 'sdc-102',
-      sdcCode: 'SDC-0002',
-      sdcName: 'Ajmer Training Inst.',
-      sdcDistrict: 'Ajmer District',
+      sdcId: 'sdc-106',
+      sdcCode: 'SDC-0006',
+      sdcName: 'Bikaner Automotive & Capital Goods Center',
+      sdcDistrict: 'Bikaner',
 
       // Batch Info
       batchId: 'batch-203',
       batchCode: 'B-26-0003',
       batchName: 'Auto Service Batch 01',
-      courseName: 'Automotive Service Technician',
-      scheme: 'MNSKSY',
+      courseName: 'Four Wheeler Service Technician',
+      scheme: 'RAJKViK',
       sector: 'Automotive',
 
       // Status
@@ -541,18 +533,18 @@ export class AspirantService {
       ],
 
       // SDC Center Info
-      sdcId: 'sdc-103',
-      sdcCode: 'SDC-003',
-      sdcName: 'Kota Precision Engineering & IT Hub',
-      sdcDistrict: 'Kota',
+      sdcId: 'sdc-101',
+      sdcCode: 'SDC-0001',
+      sdcName: 'Jaipur Skill Center',
+      sdcDistrict: 'Jaipur',
 
       // Batch Info
-      batchId: 'batch-204',
-      batchCode: 'B-26-0004',
-      batchName: 'CNC Milling Master Batch',
-      courseName: 'CNC Milling',
-      scheme: 'RAJKViK',
-      sector: 'Capital Goods',
+      batchId: 'batch-201',
+      batchCode: 'B-26-0001',
+      batchName: 'Solar Tech Batch 01',
+      courseName: 'Domestic Data Entry Operator',
+      scheme: 'SAMARTH',
+      sector: 'Aerospace and Aviation',
 
       // Status
       enrollmentDate: '2026-09-20',
@@ -650,17 +642,17 @@ export class AspirantService {
       ],
 
       // SDC Center Info
-      sdcId: 'sdc-102',
-      sdcCode: 'SDC-0002',
-      sdcName: 'Ajmer Training Inst.',
-      sdcDistrict: 'Ajmer District',
+      sdcId: 'sdc-106',
+      sdcCode: 'SDC-0006',
+      sdcName: 'Bikaner Automotive & Capital Goods Center',
+      sdcDistrict: 'Bikaner',
 
       // Batch Info
       batchId: 'batch-203',
       batchCode: 'B-26-0003',
       batchName: 'Auto Service Batch 01',
-      courseName: 'Automotive Service Technician',
-      scheme: 'MNSKSY',
+      courseName: 'Four Wheeler Service Technician',
+      scheme: 'RAJKViK',
       sector: 'Automotive',
 
       // Status
@@ -669,9 +661,90 @@ export class AspirantService {
       biometricVerified: true,
       attendancePercent: 100
     }
-  ]);
+];
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AspirantService {
+  private batchService = inject(BatchService);
+  private sdcService = inject(SdcService);
+  private readonly STORAGE_KEY = 'isms_aspirant_records';
+
+  private readonly _aspirants = signal<AspirantRecord[]>(this.loadInitialAspirants());
 
   readonly aspirants = this._aspirants.asReadonly();
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (event: StorageEvent) => {
+        if (event.key === this.STORAGE_KEY && event.newValue) {
+          try {
+            const records: AspirantRecord[] = JSON.parse(event.newValue);
+            if (Array.isArray(records) && records.length > 0) {
+              this._aspirants.set(records);
+            }
+          } catch { }
+        }
+      });
+    }
+  }
+
+  private loadInitialAspirants(): AspirantRecord[] {
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(this.STORAGE_KEY);
+        if (stored) {
+          const parsed: AspirantRecord[] = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const canonicalMap = new Map(INITIAL_ASPIRANTS.map(a => [a.id, a]));
+
+            const updated = parsed.map(a => {
+              const canonical = canonicalMap.get(a.id);
+              if (canonical) {
+                return {
+                  ...a,
+                  aspirantName: canonical.aspirantName,
+                  sdcId: canonical.sdcId,
+                  sdcCode: canonical.sdcCode,
+                  sdcName: canonical.sdcName,
+                  sdcDistrict: canonical.sdcDistrict,
+                  batchId: canonical.batchId,
+                  batchCode: canonical.batchCode,
+                  batchName: canonical.batchName,
+                  courseName: canonical.courseName,
+                  scheme: canonical.scheme,
+                  sector: canonical.sector
+                };
+              }
+              return a;
+            });
+
+            const existingIds = new Set(updated.map(p => p.id));
+            const missing = INITIAL_ASPIRANTS.filter(a => !existingIds.has(a.id));
+            const combined = [...updated, ...missing];
+            this.persist(combined);
+            return combined;
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load aspirants from localStorage', e);
+      }
+    }
+    this.persist(INITIAL_ASPIRANTS);
+    return INITIAL_ASPIRANTS;
+  }
+
+  private persist(records?: AspirantRecord[]): void {
+    const list = records || this._aspirants();
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {
+        console.error('Failed to persist aspirants to localStorage', e);
+      }
+    }
+  }
 
   /** Stats computed across all aspirants */
   readonly stats = computed(() => {
@@ -749,6 +822,7 @@ export class AspirantService {
 
     // Prepend to reactive signal
     this._aspirants.update(list => [newRecord, ...list]);
+    this.persist();
 
     return newRecord;
   }
@@ -765,6 +839,7 @@ export class AspirantService {
         return item;
       })
     );
+    this.persist();
     return updated;
   }
 
@@ -777,6 +852,7 @@ export class AspirantService {
           : item
       )
     );
+    this.persist();
   }
 
   /** Update candidate training status */
@@ -788,10 +864,12 @@ export class AspirantService {
           : item
       )
     );
+    this.persist();
   }
 
   /** Delete aspirant */
   deleteAspirant(id: string): void {
     this._aspirants.update(list => list.filter(a => a.id !== id));
+    this.persist();
   }
 }

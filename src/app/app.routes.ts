@@ -74,6 +74,29 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/batch-approvals',
+    loadComponent: () =>
+      import('./features/sdc/components/batch-approvals.component').then(
+        (m) => m.BatchApprovalsComponent
+      )
+  },
+  {
+    path: 'admin/batch-detail/:id',
+    loadComponent: () =>
+      import('./features/sdc/components/batch-detail.component').then(
+        (m) => m.BatchDetailComponent
+      )
+  },
+  {
+    path: 'admin/batches/:id',
+    redirectTo: 'batches/:id'
+  },
+  {
+    path: 'batch-approvals',
+    redirectTo: 'admin/batch-approvals',
+    pathMatch: 'full'
+  },
+  {
     path: 'admin/eoi-view',
     loadComponent: () =>
       import('./features/eoi/pages/department-eoi-view/department-eoi-view.component').then(
@@ -210,6 +233,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/sdc/components/aspirant-mapping.component').then(
             (m) => m.AspirantMappingComponent
+          )
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/sdc/components/batch-detail.component').then(
+            (m) => m.BatchDetailComponent
           )
       }
     ]

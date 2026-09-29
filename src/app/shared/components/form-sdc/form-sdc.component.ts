@@ -411,7 +411,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
                   [disabled]="isFieldDisabled(field)"
                   class="w-full h-[38px] px-3 text-xs bg-white border rounded-lg text-slate-800 transition-all focus:outline-none appearance-none cursor-pointer pr-8 hover:border-slate-400"
                   [ngClass]="{
-                    'border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-100': !!getFieldError(field.key),
+                    'border-red-500 bg-red-50/20 focus:border-red-600 focus:ring-2 focus:ring-red-100': !!getFieldError(field.key),
                     'border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-100': !getFieldError(field.key),
                     'bg-slate-50 cursor-not-allowed text-slate-500 border-slate-200': isFieldDisabled(field)
                   }"
@@ -425,12 +425,6 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
                     </option>
                   }
                 </select>
-                <!-- Select Chevron Icon -->
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
-                  <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
               </div>
             }
 
@@ -447,7 +441,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
                 [attr.maxlength]="field.maxLength || null"
                 class="w-full px-3 py-2 text-xs bg-white border rounded-lg text-slate-800 placeholder:text-slate-400 transition-all focus:outline-none resize-none hover:border-slate-400 leading-relaxed"
                 [ngClass]="{
-                  'border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-100': !!getFieldError(field.key),
+                  'border-red-500 bg-red-50/20 focus:border-red-600 focus:ring-2 focus:ring-red-100': !!getFieldError(field.key),
                   'border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-100': !getFieldError(field.key),
                   'bg-slate-50 cursor-not-allowed text-slate-500 border-slate-200': isFieldDisabled(field)
                 }"
@@ -646,7 +640,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
               <div
                 class="h-[38px] flex items-center border rounded-lg bg-white transition-all overflow-hidden hover:border-slate-400"
                 [ngClass]="{
-                  'border-rose-400 focus-within:border-rose-500 focus-within:ring-2 focus-within:ring-rose-100': !!getFieldError(field.key),
+                  'border-red-500 bg-red-50/20 focus-within:border-red-600 focus-within:ring-2 focus-within:ring-red-100': !!getFieldError(field.key),
                   'border-slate-300 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-100': !getFieldError(field.key),
                   'bg-slate-50 cursor-not-allowed border-slate-200': isFieldDisabled(field)
                 }"

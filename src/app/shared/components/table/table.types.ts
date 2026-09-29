@@ -21,6 +21,8 @@ export interface TableColumn<T = any> {
   type?: ColumnType;
   /** Column alignment: 'left' | 'center' | 'right' */
   align?: 'left' | 'center' | 'right';
+  /** Optional specific header alignment override: 'left' | 'center' | 'right' */
+  headerAlign?: 'left' | 'center' | 'right';
   /** Tailwind width class (e.g. 'w-12', 'w-24', 'min-w-[220px]') */
   width?: string;
   /** Whether column can be sorted */

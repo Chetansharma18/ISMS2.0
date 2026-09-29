@@ -60,10 +60,10 @@ import {
           <button
             type="button"
             (click)="navigateToAddSdc(so.schemeName || so.scheme, so.category)"
-            class="whitespace-nowrap inline-flex items-center gap-1 px-3 py-1.5 rounded-[4px] bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
+            class="whitespace-nowrap inline-flex items-center justify-center gap-2 px-8 py-2 rounded-lg bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-sm transition-all cursor-pointer active:scale-95 w-full"
             title="Register SDC for {{ so.schemeName || so.scheme }}"
           >
-            <span class="text-sm font-bold leading-none">+</span>
+            <span class="text-base font-bold leading-none">+</span>
             <span>Add SDC</span>
           </button>
         </ng-template>
@@ -80,14 +80,14 @@ export class SanctionOrdersComponent {
   successMessage = signal<string>('');
 
   readonly orderColumns: TableColumn<SanctionOrder>[] = [
-    { key: 'ipaNumber', label: 'MoU Number', width: 'w-36', cellClass: 'whitespace-nowrap font-mono font-medium text-slate-700' },
-    { key: 'schemeName', label: 'Scheme Name', type: 'custom', cellClass: 'whitespace-nowrap font-bold text-slate-900' },
-    { key: 'category', label: 'Category', align: 'center', cellClass: 'whitespace-nowrap font-medium text-slate-700' },
-    { key: 'mouStartDate', label: 'MoU Start Date', align: 'center', cellClass: 'whitespace-nowrap text-slate-600' },
-    { key: 'mouExpiryDate', label: 'MoU Expiry', align: 'center', cellClass: 'whitespace-nowrap text-slate-600' },
-    { key: 'totalSdc', label: 'Total no. of SDC', align: 'center', cellClass: 'whitespace-nowrap font-medium text-slate-800' },
-    { key: 'approvedSdcCount', label: "No. of Approved SDC's", align: 'center', cellClass: 'whitespace-nowrap font-medium text-slate-800' },
-    { key: 'actions', label: '', align: 'center', type: 'custom', width: 'w-28' }
+    { key: 'ipaNumber',        label: 'IPA Number',           align: 'center', width: 'w-36',  cellClass: 'whitespace-nowrap font-mono font-medium text-slate-700 text-center' },
+    { key: 'schemeName',       label: 'Scheme Name',          align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-bold text-slate-900 text-center' },
+    { key: 'category',         label: 'Category',             align: 'center',                 cellClass: 'whitespace-nowrap font-medium text-slate-700 text-center' },
+    { key: 'mouStartDate',     label: 'MoU Start Date',       align: 'center',                 cellClass: 'whitespace-nowrap text-slate-600 text-center' },
+    { key: 'mouExpiryDate',    label: 'MoU Expiry',           align: 'center',                 cellClass: 'whitespace-nowrap text-slate-600 text-center' },
+    { key: 'totalSdc',         label: 'Total no. of SDC',     align: 'center',                 cellClass: 'whitespace-nowrap font-medium text-slate-800 text-center' },
+    { key: 'approvedSdcCount', label: "No. of Approved SDC's", align: 'center', width: 'w-48', headerClass: 'whitespace-nowrap', cellClass: 'whitespace-nowrap font-medium text-slate-800 text-center' },
+    { key: 'actions',          label: 'Action',               align: 'center', type: 'custom', width: 'w-56' }
   ];
 
   navigateToAddSdc(scheme: string, category?: string): void {

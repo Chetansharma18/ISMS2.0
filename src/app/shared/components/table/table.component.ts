@@ -52,19 +52,23 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                   class="h-11 px-3.5 select-none whitespace-nowrap"
                   [ngClass]="[
                     col.width || '',
-                    col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left',
-                    !last ? 'border-r border-gray-200' : '',
+                    (col.headerAlign || col.align) === 'center' ? 'text-center' : (col.headerAlign || col.align) === 'right' ? 'text-right' : 'text-left',
+                    !last ? 'border-r border-theme/70' : '',
                     col.headerClass || ''
                   ]"
                 >
                   <div
-                    class="inline-flex items-center gap-1.5 whitespace-nowrap"
+                    class="flex items-center gap-1.5 w-full"
+                    [class.justify-center]="(col.headerAlign || col.align) === 'center'"
+                    [class.text-center]="(col.headerAlign || col.align) === 'center'"
+                    [class.justify-end]="(col.headerAlign || col.align) === 'right'"
+                    [class.text-right]="(col.headerAlign || col.align) === 'right'"
                     [class.cursor-pointer]="col.sortable"
                     (click)="col.sortable && toggleSort(col.key)"
                   >
-                    <span class="whitespace-nowrap">{{ col.label }}</span>
+                    <span [class.text-center]="(col.headerAlign || col.align) === 'center'" class="inline-block">{{ col.label }}</span>
                     @if (col.sortable && sortKey() === col.key) {
-                      <span class="text-[11px] text-brand">
+                      <span class="text-[11px] text-brand shrink-0">
                         {{ sortAsc() ? '▲' : '▼' }}
                       </span>
                     }
@@ -194,7 +198,7 @@ export class TableComponent {
   readonly Math = Math;
 
   @Input({ required: true }) columns: TableColumn[] = [];
-  
+
   // Use a setter to update an internal signal so computed properties re-evaluate when data changes
   private _dataSignal = signal<any[]>([]);
   @Input() set data(value: any[]) {

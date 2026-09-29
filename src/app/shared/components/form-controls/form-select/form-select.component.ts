@@ -149,7 +149,7 @@ export class FormSelectComponent {
   isOpen = signal<boolean>(false);
   searchQuery = '';
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(private elementRef: ElementRef) { }
 
   shouldShowSearch(): boolean {
     return (this.options?.length || 0) > 6;

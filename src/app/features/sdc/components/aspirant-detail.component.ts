@@ -17,10 +17,10 @@ import { PageHeaderComponent } from '../../../shared/components';
     PageHeaderComponent
   ],
   template: `
-    <div class="w-full min-h-full bg-slate-50 text-slate-800 font-sans pb-16" style="font-family: 'Inter', sans-serif;">
+    <div class="w-full min-h-full bg-white text-slate-800 font-sans pb-16" style="font-family: 'Inter', sans-serif;">
       
       @if (aspirant(); as cand) {
-        <div class="p-4 sm:p-6 lg:p-7 space-y-5 max-w-7xl mx-auto">
+        <div class="p-4 sm:p-6 space-y-5 w-full">
           
           <!-- Top Page Header -->
           <app-page-header
@@ -29,22 +29,7 @@ import { PageHeaderComponent } from '../../../shared/components';
             [showBack]="true"
             backUrl="/aspirants"
             backTitle="Back to Aspirants Roster"
-          >
-            <div class="flex items-center gap-2">
-              <button
-                type="button"
-                (click)="printDossier(cand)"
-                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
-                style="color: #ffffff !important;"
-                title="Print Official Candidate Dossier"
-              >
-                <svg class="w-3.5 h-3.5" style="color: #ffffff !important; stroke: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                <span style="color: #ffffff !important;">Print Dossier</span>
-              </button>
-            </div>
-          </app-page-header>
+          ></app-page-header>
 
           <!-- Notification / Success Alert Banner -->
           @if (successMessage()) {
@@ -134,7 +119,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                   <h2 class="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wider m-0 flex items-center gap-2">
                     <span class="w-1.5 h-4 bg-[#174A6E] rounded-full"></span>
-                    <span>1. Main / Personal Details &amp; Identity</span>
+                    <span>1. Identity details </span>
                   </h2>
                   <button
                     type="button"
@@ -190,35 +175,36 @@ import { PageHeaderComponent } from '../../../shared/components';
                     <span class="text-slate-400 block text-[11px]">Area Type</span>
                     <span class="font-semibold text-slate-800 mt-0.5 block">{{ cand.areaType }}</span>
                   </div>
+                  <div>
+                    <span class="text-slate-400 block text-[11px]">Relocation / Out of Rajasthan</span>
+                    <span class="font-semibold text-slate-800 mt-0.5 block">{{ cand.interestedOutOfRajasthan || 'No' }}</span>
+                  </div>
+                  @if (cand.disabilityType) {
+                    <div>
+                      <span class="text-slate-400 block text-[11px]">Disability Type</span>
+                      <span class="font-semibold text-slate-800 mt-0.5 block">{{ cand.disabilityType }}</span>
+                    </div>
+                  }
                   
-                  <!-- Aadhaar Document Proof with Direct Preview & Replace Actions -->
-                  <div class="col-span-2 sm:col-span-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                    <span class="text-slate-500 block text-[10.5px] font-semibold uppercase">Aadhaar Proof Document</span>
-                    <span class="font-medium text-slate-800 text-xs mt-0.5 block truncate" [title]="cand.aadhaarDocName || 'Aadhaar_Document.pdf'">
-                      {{ cand.aadhaarDocName || 'Aadhaar_Document.pdf' }}
-                    </span>
-                    <div class="flex items-center gap-2 mt-2">
+                  <!-- Aadhaar Document Proof: Preview only in View mode -->
+                  <div>
+                    <span class="text-slate-400 block text-[11px]">Aadhaar Proof Document</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                      <span class="font-medium text-slate-800 text-xs truncate max-w-[160px]" [title]="cand.aadhaarDocName || 'Aadhaar_Document.pdf'">
+                        {{ cand.aadhaarDocName || 'Aadhaar_Document.pdf' }}
+                      </span>
                       <button
                         type="button"
                         (click)="previewAadhaarProof(cand)"
-                        class="px-2 py-0.5 bg-white border border-slate-300 rounded text-[10.5px] font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer shadow-2xs"
+                        class="px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-300 rounded text-[11px] font-semibold text-[#174A6E] cursor-pointer shadow-2xs inline-flex items-center gap-1 shrink-0"
+                        title="Preview Aadhaar Card"
                       >
-                        Preview
+                        <svg class="w-3.5 h-3.5 text-[#174A6E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span>Preview</span>
                       </button>
-                      <button
-                        type="button"
-                        (click)="aadhaarFileInput.click()"
-                        class="px-2 py-0.5 bg-[#174A6E] text-white rounded text-[10.5px] font-semibold hover:bg-[#123B59] cursor-pointer shadow-2xs"
-                      >
-                        Replace
-                      </button>
-                      <input
-                        #aadhaarFileInput
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        (change)="onAadhaarDocReplaced($event)"
-                        class="hidden"
-                      />
                     </div>
                   </div>
 
@@ -241,38 +227,50 @@ import { PageHeaderComponent } from '../../../shared/components';
                   </button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <!-- Permanent Address -->
-                  <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
-                    <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-1">Permanent Address</span>
-                    <p class="text-slate-800 leading-relaxed m-0 text-xs">
-                      {{ cand.permHouseNo }}, {{ cand.permStreet }}<br />
-                      Ward {{ cand.permWard }}, {{ cand.permCity }} - {{ cand.permPincode }}<br />
-                      District: <strong class="text-slate-900">{{ cand.permDistrict }}</strong>, Block: {{ cand.permBlock || 'Sanganer' }}<br />
-                      Tehsil: {{ cand.permTehsil }}, Assembly: {{ cand.permAssembly || 'Sanganer' }}
-                    </p>
+                  <div class="p-3 bg-slate-50/70 rounded-lg border border-slate-200">
+                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-2">Permanent Address</span>
+                    <div class="space-y-1 text-xs text-slate-800">
+                      <div><span class="text-slate-400">House / Building:</span> <strong>{{ cand.permHouseNo }}</strong>, {{ cand.permStreet }}</div>
+                      <div><span class="text-slate-400">Ward / City:</span> Ward {{ cand.permWard }}, {{ cand.permCity }} - <span class="font-mono font-bold">{{ cand.permPincode }}</span></div>
+                      <div><span class="text-slate-400">District:</span> <strong class="text-slate-900">{{ cand.permDistrict }}</strong></div>
+                      <div><span class="text-slate-400">Block / Tehsil:</span> {{ cand.permBlock || '—' }}, Tehsil: {{ cand.permTehsil || '—' }}</div>
+                      <div><span class="text-slate-400">Municipality / Panchayat:</span> {{ cand.permMunicipality || '—' }}</div>
+                      <div><span class="text-slate-400">Assembly / Parliament:</span> {{ cand.permAssembly || '—' }} / {{ cand.permParliament || '—' }}</div>
+                    </div>
                   </div>
 
                   <!-- Communication Address -->
-                  <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
-                    <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-1">Communication Address</span>
-                    <p class="text-slate-800 leading-relaxed m-0 text-xs">
-                      {{ cand.commHouseNo || cand.permHouseNo }}, {{ cand.commStreet || cand.permStreet }}<br />
-                      Ward {{ cand.commWard || cand.permWard }}, {{ cand.commCity || cand.permCity }} - {{ cand.commPincode || cand.permPincode }}<br />
-                      District: <strong class="text-slate-900">{{ cand.commDistrict || cand.permDistrict }}</strong>, Block: {{ cand.commBlock || 'Sanganer' }}<br />
-                      Tehsil: {{ cand.commTehsil || cand.permTehsil }}, Municipality: {{ cand.commMunicipality || 'Sanganer Panchayat Samiti' }}
-                    </p>
+                  <div class="p-3 bg-slate-50/70 rounded-lg border border-slate-200">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block">Communication Address</span>
+                      @if (cand.isAddressSame) {
+                        <span class="px-2 py-0.2 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">Same as Permanent</span>
+                      }
+                    </div>
+                    <div class="space-y-1 text-xs text-slate-800">
+                      <div><span class="text-slate-400">House / Building:</span> <strong>{{ cand.commHouseNo || cand.permHouseNo }}</strong>, {{ cand.commStreet || cand.permStreet }}</div>
+                      <div><span class="text-slate-400">Ward / City:</span> Ward {{ cand.commWard || cand.permWard }}, {{ cand.commCity || cand.permCity }} - <span class="font-mono font-bold">{{ cand.commPincode || cand.permPincode }}</span></div>
+                      <div><span class="text-slate-400">District:</span> <strong class="text-slate-900">{{ cand.commDistrict || cand.permDistrict }}</strong></div>
+                      <div><span class="text-slate-400">Block / Tehsil:</span> {{ cand.commBlock || cand.permBlock || '—' }}, Tehsil: {{ cand.commTehsil || cand.permTehsil || '—' }}</div>
+                      <div><span class="text-slate-400">Municipality / Panchayat:</span> {{ cand.commMunicipality || cand.permMunicipality || '—' }}</div>
+                    </div>
                   </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100 text-xs">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-100 text-xs">
                   <div>
-                    <span class="text-slate-400 block text-[11px]">Mobile Number</span>
+                    <span class="text-slate-400 block text-[11px]">Primary Mobile Number</span>
                     <span class="font-bold font-mono text-slate-800 text-sm mt-0.5 block">{{ cand.mobileNo }}</span>
                   </div>
                   <div>
-                    <span class="text-slate-400 block text-[11px]">Alt Mobile Number</span>
+                    <span class="text-slate-400 block text-[11px]">Alternate Mobile</span>
                     <span class="font-semibold font-mono text-slate-800 mt-0.5 block">{{ cand.altMobileNo || 'N/A' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[11px]">Landline Number</span>
+                    <span class="font-semibold font-mono text-slate-800 mt-0.5 block">{{ cand.landlineNo || 'N/A' }}</span>
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[11px]">Email Address</span>
@@ -299,6 +297,10 @@ import { PageHeaderComponent } from '../../../shared/components';
 
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                   <div>
+                    <span class="text-slate-400 block text-[11px]">Account Holder Name</span>
+                    <span class="font-bold text-slate-800 mt-0.5 block">{{ cand.bankAccountName || cand.aspirantName }}</span>
+                  </div>
+                  <div>
                     <span class="text-slate-400 block text-[11px]">Bank Name</span>
                     <span class="font-bold text-slate-800 mt-0.5 block">{{ cand.bankName }}</span>
                   </div>
@@ -307,30 +309,92 @@ import { PageHeaderComponent } from '../../../shared/components';
                     <span class="font-mono font-bold text-slate-800 mt-0.5 block">{{ cand.bankAccountNo }}</span>
                   </div>
                   <div>
+                    <span class="text-slate-400 block text-[11px]">Account Type</span>
+                    <span class="font-semibold text-slate-800 mt-0.5 block">{{ cand.bankAccountType || 'Savings' }}</span>
+                  </div>
+                  <div>
                     <span class="text-slate-400 block text-[11px]">IFSC Code</span>
                     <span class="font-mono font-bold text-slate-800 mt-0.5 block">{{ cand.ifscCode }}</span>
                   </div>
                   <div>
-                    <span class="text-slate-400 block text-[11px]">Branch</span>
+                    <span class="text-slate-400 block text-[11px]">Branch Name</span>
                     <span class="font-semibold text-slate-800 mt-0.5 block">{{ cand.bankBranch }}</span>
                   </div>
                   <div>
+                    <span class="text-slate-400 block text-[11px]">MICR Code</span>
+                    <span class="font-mono font-semibold text-slate-800 mt-0.5 block">{{ cand.micrCode || 'N/A' }}</span>
+                  </div>
+                  <div>
                     <span class="text-slate-400 block text-[11px]">Annual Family Income</span>
-                    <span class="font-semibold text-slate-800 mt-0.5 block">₹ {{ cand.annualFamilyIncome | number }}</span>
+                    <span class="font-semibold text-slate-800 mt-0.5 block">₹ {{ cand.annualFamilyIncome | number }} <span class="text-slate-400 text-[10.5px]">({{ cand.incomeSlab || 'N/A' }})</span></span>
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[11px]">Economic Status</span>
                     <span class="font-semibold text-slate-800 mt-0.5 block">{{ cand.economicStatus }}</span>
                   </div>
                   <div>
+                    <span class="text-slate-400 block text-[11px]">Ration / BPL Card No.</span>
+                    <span class="font-mono font-semibold text-slate-800 mt-0.5 block">{{ cand.economicCardNo || 'N/A' }}</span>
+                  </div>
+                  <div>
                     <span class="text-slate-400 block text-[11px]">BoCW Registered</span>
-                    <span class="font-semibold text-slate-800 mt-0.5 block">{{ cand.bocwWorker || 'No' }}</span>
+                    <span class="font-semibold text-slate-800 mt-0.5 block">
+                      {{ cand.bocwWorker || 'No' }}
+                      @if (cand.bocwNo) {
+                        <span class="text-[10.5px] font-mono text-slate-500 block">({{ cand.bocwNo }})</span>
+                      }
+                    </span>
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[11px]">MGNREGA Worker</span>
-                    <span class="font-semibold text-slate-800 mt-0.5 block">{{ cand.mgnregaWorker || 'No' }}</span>
+                    <span class="font-semibold text-slate-800 mt-0.5 block">
+                      {{ cand.mgnregaWorker || 'No' }}
+                      @if (cand.mgnregaNo) {
+                        <span class="text-[10.5px] font-mono text-slate-500 block">({{ cand.mgnregaNo }})</span>
+                      }
+                    </span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[11px]">RSBY Beneficiary</span>
+                    <span class="font-semibold text-slate-800 mt-0.5 block">
+                      {{ cand.isRsby || 'No' }}
+                      @if (cand.rsbyNo) {
+                        <span class="text-[10.5px] font-mono text-slate-500 block">({{ cand.rsbyNo }})</span>
+                      }
+                    </span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[11px]">Gram Sabha PIP Listed</span>
+                    <span class="font-semibold text-slate-800 mt-0.5 block">{{ cand.gramsabhaPip || 'No' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[11px]">NRLM / SHG Member</span>
+                    <span class="font-semibold text-slate-800 mt-0.5 block">
+                      {{ cand.nrlmMember || 'No' }}
+                      @if (cand.nrlmNo) {
+                        <span class="text-[10.5px] font-mono text-slate-500 block">({{ cand.nrlmNo }})</span>
+                      }
+                    </span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[11px]">Voter ID (EPIC No.)</span>
+                    <span class="font-mono font-semibold text-slate-800 mt-0.5 block">{{ cand.epicNo || 'N/A' }}</span>
                   </div>
                 </div>
+
+                <!-- Preferred Sectors -->
+                @if (cand.preferredSectors && cand.preferredSectors.length > 0) {
+                  <div class="pt-3 border-t border-slate-100">
+                    <span class="text-slate-400 block text-[11px] mb-1.5">Sector Preferences</span>
+                    <div class="flex flex-wrap gap-1.5">
+                      @for (sec of cand.preferredSectors; track sec) {
+                        <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-[#EAF2F6] text-[#174A6E] border border-[#c1d9e7]">
+                          {{ sec }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
               </div>
 
               <!-- ========================================================================= -->
@@ -644,8 +708,8 @@ import { PageHeaderComponent } from '../../../shared/components';
                   </div>
 
                   <!-- Edit Aadhaar Document Attachment -->
-                  <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                    <label class="block text-[10.5px] font-bold text-slate-700 uppercase tracking-wider mb-1">Aadhaar Proof File</label>
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Replace Aadhaar Proof Document</label>
                     <div class="flex items-center gap-2">
                       <span class="text-xs font-mono text-slate-700 truncate block flex-1" [title]="editForm.aadhaarDocName || 'Aadhaar_Document.pdf'">
                         {{ editForm.aadhaarDocName || 'Aadhaar_Document.pdf' }}
@@ -653,9 +717,9 @@ import { PageHeaderComponent } from '../../../shared/components';
                       <button
                         type="button"
                         (click)="editAadhaarFileInput.click()"
-                        class="px-2 py-1 bg-white border border-slate-300 rounded text-[10.5px] font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer shadow-2xs shrink-0"
+                        class="px-3 py-1.5 bg-[#174A6E] hover:bg-[#123B59] text-white rounded-lg text-xs font-semibold cursor-pointer shadow-2xs shrink-0"
                       >
-                        Browse
+                        Replace File
                       </button>
                       <input
                         #editAadhaarFileInput

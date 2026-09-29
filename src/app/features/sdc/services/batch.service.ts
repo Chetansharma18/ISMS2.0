@@ -1,5 +1,5 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { BatchRecord, CreateBatchDto, BatchTrainee } from '../models/batch.model';
+import { BatchRecord, CreateBatchDto, BatchTrainee, BatchApprovalStatus, BatchInspectionStatus, BatchStatus } from '../models/batch.model';
 import { SdcService } from './sdc.service';
 
 export const INITIAL_BATCH_RECORDS: BatchRecord[] = [
@@ -10,6 +10,7 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = [
     sdcId: 'sdc-101',
     sdcCode: 'SDC-0001',
     sdcName: 'Jaipur Skill Center',
+    sdcDistrict: 'Jaipur',
     tpName: 'ARNOLD SAMARTH',
     scheme: 'SAMARTH',
     sector: 'Aerospace and Aviation',
@@ -35,12 +36,28 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = [
         id: 'fac-1',
         name: 'Vikas Purohit',
         type: 'Primary Trainer',
-        qualification: 'B.Tech Electrical',
+        qualification: 'B.Tech Electrical (TOT Certified)',
         experienceYears: 6
       }
     ],
-    status: 'ONGOING',
-    mappedAspirantsCount: 1,
+    status: 'APPROVED',
+    approvalStatus: 'APPROVED',
+    approvedAt: '2026-08-25T14:30:00.000Z',
+    approvedBy: 'Sh. Alok Sharma (Joint Director, RSLDC)',
+    approvalRemarks: 'Center facility verified; biometric live feed confirmed.',
+    inspectionStatus: 'PASSED',
+    inspectionDate: '2026-08-22',
+    inspectorName: 'Er. R.K. Mathur (DSO Jaipur)',
+    inspectionScore: 96,
+    checklist: {
+      classroomNormsMet: true,
+      equipmentAndToolsVerified: true,
+      cctvAndBiometricActive: true,
+      trainerTotCertified: true,
+      safetyAndHygieneCompliant: true,
+      candidateDossiersVerified: true
+    },
+    mappedAspirantsCount: 3,
     biometricAttendanceRate: 94.2,
     createdAt: '2026-08-20T10:00:00.000Z',
     trainees: [
@@ -62,6 +79,7 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = [
     sdcId: 'sdc-101',
     sdcCode: 'SDC-0001',
     sdcName: 'Jaipur Skill Center',
+    sdcDistrict: 'Jaipur',
     tpName: 'ARNOLD SAMARTH',
     scheme: 'SAMARTH',
     sector: 'Aerospace and Aviation',
@@ -82,9 +100,33 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = [
     freezeDate: '2026-09-25',
     startTime: '09:00 AM',
     endTime: '05:00 PM',
-    faculty: [],
+    faculty: [
+      {
+        id: 'fac-2',
+        name: 'Pooja Verma',
+        type: 'Primary Trainer',
+        qualification: 'MCA, TOT Certified',
+        experienceYears: 4
+      }
+    ],
     status: 'APPROVED',
-    mappedAspirantsCount: 0,
+    approvalStatus: 'APPROVED',
+    approvedAt: '2026-09-20T11:00:00.000Z',
+    approvedBy: 'Sh. Alok Sharma (Joint Director, RSLDC)',
+    approvalRemarks: 'Sanction order granted. Commencement allowed.',
+    inspectionStatus: 'PASSED',
+    inspectionDate: '2026-09-18',
+    inspectorName: 'Er. R.K. Mathur (DSO Jaipur)',
+    inspectionScore: 92,
+    checklist: {
+      classroomNormsMet: true,
+      equipmentAndToolsVerified: true,
+      cctvAndBiometricActive: true,
+      trainerTotCertified: true,
+      safetyAndHygieneCompliant: true,
+      candidateDossiersVerified: true
+    },
+    mappedAspirantsCount: 1,
     biometricAttendanceRate: 0,
     createdAt: '2026-09-15T11:30:00.000Z',
     trainees: []
@@ -96,6 +138,7 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = [
     sdcId: 'sdc-106',
     sdcCode: 'SDC-0006',
     sdcName: 'Bikaner Automotive & Capital Goods Center',
+    sdcDistrict: 'Bikaner',
     tpName: 'Apex Vocational Solutions',
     scheme: 'RAJKViK',
     sector: 'Automotive',
@@ -116,11 +159,312 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = [
     freezeDate: '2026-10-05',
     startTime: '09:00 AM',
     endTime: '05:00 PM',
-    faculty: [],
+    faculty: [
+      {
+        id: 'fac-3',
+        name: 'Gaurav Bishnoi',
+        type: 'Primary Trainer',
+        qualification: 'Diploma Automobile Engineering',
+        experienceYears: 5
+      }
+    ],
     status: 'APPROVED',
-    mappedAspirantsCount: 0,
+    approvalStatus: 'APPROVED',
+    approvedAt: '2026-09-22T16:15:00.000Z',
+    approvedBy: 'Dr. Vivek Vyas (Inspection Officer)',
+    approvalRemarks: 'Lab hydraulic lifts and diagnostic equipment verified in person.',
+    inspectionStatus: 'PASSED',
+    inspectionDate: '2026-09-21',
+    inspectorName: 'Dr. Vivek Vyas (DSO Bikaner)',
+    inspectionScore: 95,
+    checklist: {
+      classroomNormsMet: true,
+      equipmentAndToolsVerified: true,
+      cctvAndBiometricActive: true,
+      trainerTotCertified: true,
+      safetyAndHygieneCompliant: true,
+      candidateDossiersVerified: true
+    },
+    mappedAspirantsCount: 2,
     biometricAttendanceRate: 0,
     createdAt: '2026-09-18T14:00:00.000Z',
+    trainees: []
+  },
+  {
+    id: 'batch-204',
+    batchCode: 'B-26-0004',
+    batchName: 'Solar PV Installer Batch 01',
+    sdcId: 'sdc-101',
+    sdcCode: 'SDC-0001',
+    sdcName: 'Jaipur Skill Center',
+    sdcDistrict: 'Jaipur',
+    tpName: 'ARNOLD SAMARTH',
+    scheme: 'SAMARTH',
+    sector: 'Green Jobs',
+    courseName: 'Solar PV Rooftop Grid-Tie Installer',
+    qpCode: 'SGJ/Q0101',
+    courseVersion: 'NSQF v2.0',
+    theoryHours: 120,
+    practicalHours: 180,
+    softSkillHours: 50,
+    totalHours: 350,
+    residential: false,
+    minStrength: 15,
+    maxStrength: 30,
+    nipaNo: 'N-IPA/RSLDC/2026/894',
+    psdStatus: 'Active',
+    startDate: '2026-10-15',
+    endDate: '2027-01-15',
+    freezeDate: '2026-10-05',
+    startTime: '09:00 AM',
+    endTime: '05:00 PM',
+    faculty: [
+      {
+        id: 'fac-4',
+        name: 'Rajesh Saini',
+        type: 'Primary Trainer',
+        qualification: 'B.Tech Electrical (TOT Certified)',
+        experienceYears: 5
+      }
+    ],
+    status: 'PENDING_APPROVAL',
+    approvalStatus: 'PENDING',
+    inspectionStatus: 'SCHEDULED',
+    inspectionDate: '2026-10-04',
+    inspectorName: 'Er. Alok Sharma (DSO Jaipur)',
+    inspectionScore: 88,
+    checklist: {
+      classroomNormsMet: true,
+      equipmentAndToolsVerified: true,
+      cctvAndBiometricActive: true,
+      trainerTotCertified: true,
+      safetyAndHygieneCompliant: true,
+      candidateDossiersVerified: true
+    },
+    mappedAspirantsCount: 0,
+    biometricAttendanceRate: 0,
+    createdAt: '2026-09-24T10:15:00.000Z',
+    trainees: []
+  },
+  {
+    id: 'batch-205',
+    batchCode: 'B-26-0005',
+    batchName: 'CNC Turning Operator Batch A',
+    sdcId: 'sdc-106',
+    sdcCode: 'SDC-0006',
+    sdcName: 'Bikaner Automotive & Capital Goods Center',
+    sdcDistrict: 'Bikaner',
+    tpName: 'Apex Vocational Solutions',
+    scheme: 'RAJKViK',
+    sector: 'Capital Goods',
+    courseName: 'CNC Operator Turning',
+    qpCode: 'CSC/Q0115',
+    courseVersion: 'NSQF v1.5',
+    theoryHours: 140,
+    practicalHours: 210,
+    softSkillHours: 50,
+    totalHours: 400,
+    residential: false,
+    minStrength: 15,
+    maxStrength: 25,
+    nipaNo: 'N-IPA/RSLDC/2026/895',
+    psdStatus: 'Active',
+    startDate: '2026-10-20',
+    endDate: '2027-01-30',
+    freezeDate: '2026-10-10',
+    startTime: '09:30 AM',
+    endTime: '05:30 PM',
+    faculty: [
+      {
+        id: 'fac-5',
+        name: 'Sunil Jangid',
+        type: 'Primary Trainer',
+        qualification: 'Diploma Mechanical',
+        experienceYears: 7
+      }
+    ],
+    status: 'PENDING_APPROVAL',
+    approvalStatus: 'PENDING',
+    inspectionStatus: 'NOT_SCHEDULED',
+    checklist: {
+      classroomNormsMet: true,
+      equipmentAndToolsVerified: true,
+      cctvAndBiometricActive: false,
+      trainerTotCertified: true,
+      safetyAndHygieneCompliant: true,
+      candidateDossiersVerified: false
+    },
+    mappedAspirantsCount: 0,
+    biometricAttendanceRate: 0,
+    createdAt: '2026-09-25T14:45:00.000Z',
+    trainees: []
+  },
+  {
+    id: 'batch-206',
+    batchCode: 'B-26-0006',
+    batchName: 'General Duty Assistant (GDA) Batch 02',
+    sdcId: 'sdc-104',
+    sdcCode: 'SDC-0004',
+    sdcName: 'Udaipur Healthcare Institute',
+    sdcDistrict: 'Udaipur',
+    tpName: 'CareFirst Foundation',
+    scheme: 'MMKVY',
+    sector: 'Healthcare',
+    courseName: 'General Duty Assistant (GDA)',
+    qpCode: 'HSS/Q5101',
+    courseVersion: 'NSQF v2.0',
+    theoryHours: 120,
+    practicalHours: 190,
+    softSkillHours: 50,
+    totalHours: 360,
+    residential: true,
+    minStrength: 15,
+    maxStrength: 30,
+    nipaNo: 'N-IPA/RSLDC/2026/896',
+    psdStatus: 'Active',
+    startDate: '2026-11-01',
+    endDate: '2027-02-15',
+    freezeDate: '2026-10-22',
+    startTime: '09:00 AM',
+    endTime: '05:00 PM',
+    faculty: [
+      {
+        id: 'fac-6',
+        name: 'Dr. Pratibha Rathore',
+        type: 'Primary Trainer',
+        qualification: 'B.Sc Nursing (TOT Certified)',
+        experienceYears: 6
+      }
+    ],
+    status: 'INSPECTION_PENDING',
+    approvalStatus: 'INSPECTION_PENDING',
+    inspectionStatus: 'SCHEDULED',
+    inspectionDate: '2026-10-06',
+    inspectorName: 'Dr. Vivek Vyas (Joint Inspection Officer)',
+    inspectionScore: 89,
+    checklist: {
+      classroomNormsMet: true,
+      equipmentAndToolsVerified: true,
+      cctvAndBiometricActive: true,
+      trainerTotCertified: true,
+      safetyAndHygieneCompliant: true,
+      candidateDossiersVerified: true
+    },
+    mappedAspirantsCount: 0,
+    biometricAttendanceRate: 0,
+    createdAt: '2026-09-26T09:30:00.000Z',
+    trainees: []
+  },
+  {
+    id: 'batch-207',
+    batchCode: 'B-26-0007',
+    batchName: 'Electric Vehicle Service Tech Batch 01',
+    sdcId: 'sdc-103',
+    sdcCode: 'SDC-0003',
+    sdcName: 'Kota Technical Training Center',
+    sdcDistrict: 'Kota',
+    tpName: 'TechSkill India',
+    scheme: 'SAMARTH',
+    sector: 'Automotive',
+    courseName: 'Electric Vehicle Service Technician',
+    qpCode: 'ASC/Q1424',
+    courseVersion: 'NSQF v2.0',
+    theoryHours: 120,
+    practicalHours: 180,
+    softSkillHours: 50,
+    totalHours: 350,
+    residential: false,
+    minStrength: 15,
+    maxStrength: 25,
+    nipaNo: 'N-IPA/RSLDC/2026/897',
+    psdStatus: 'Active',
+    startDate: '2026-10-25',
+    endDate: '2027-01-25',
+    freezeDate: '2026-10-15',
+    startTime: '09:00 AM',
+    endTime: '05:00 PM',
+    faculty: [
+      {
+        id: 'fac-7',
+        name: 'Praveen Malav',
+        type: 'Primary Trainer',
+        qualification: 'M.Tech Automotive',
+        experienceYears: 4
+      }
+    ],
+    status: 'PENDING_APPROVAL',
+    approvalStatus: 'PENDING',
+    inspectionStatus: 'PASSED',
+    inspectorName: 'Er. M.K. Sharma (Technical Officer)',
+    inspectionScore: 94,
+    checklist: {
+      classroomNormsMet: true,
+      equipmentAndToolsVerified: true,
+      cctvAndBiometricActive: true,
+      trainerTotCertified: true,
+      safetyAndHygieneCompliant: true,
+      candidateDossiersVerified: true
+    },
+    mappedAspirantsCount: 0,
+    biometricAttendanceRate: 0,
+    createdAt: '2026-09-26T16:20:00.000Z',
+    trainees: []
+  },
+  {
+    id: 'batch-208',
+    batchCode: 'B-26-0008',
+    batchName: 'Retail Sales Associate Batch 03',
+    sdcId: 'sdc-102',
+    sdcCode: 'SDC-0002',
+    sdcName: 'Jodhpur Commerce & Retail Academy',
+    sdcDistrict: 'Jodhpur',
+    tpName: 'Apex Skill Works',
+    scheme: 'MMKVY',
+    sector: 'Retail',
+    courseName: 'Retail Sales Associate',
+    qpCode: 'RAS/Q0104',
+    courseVersion: 'NSQF v1.0',
+    theoryHours: 100,
+    practicalHours: 130,
+    softSkillHours: 50,
+    totalHours: 280,
+    residential: false,
+    minStrength: 15,
+    maxStrength: 30,
+    nipaNo: 'N-IPA/RSLDC/2026/898',
+    psdStatus: 'Active',
+    startDate: '2026-10-10',
+    endDate: '2026-12-31',
+    freezeDate: '2026-09-30',
+    startTime: '10:00 AM',
+    endTime: '06:00 PM',
+    faculty: [
+      {
+        id: 'fac-8',
+        name: 'Meena Bhati',
+        type: 'Primary Trainer',
+        qualification: 'MBA Marketing',
+        experienceYears: 3
+      }
+    ],
+    status: 'REJECTED',
+    approvalStatus: 'REJECTED',
+    rejectionReason: 'Biometric AEBAS attendance machine not configured; CCTV cloud storage link expired and lab POS terminal missing.',
+    inspectionStatus: 'FAILED',
+    inspectorName: 'Smt. Kavita Gehlot (Inspection Officer)',
+    inspectionRemarks: 'Failed on IT compliance and CCTV live streaming verification.',
+    inspectionScore: 54,
+    checklist: {
+      classroomNormsMet: true,
+      equipmentAndToolsVerified: false,
+      cctvAndBiometricActive: false,
+      trainerTotCertified: true,
+      safetyAndHygieneCompliant: true,
+      candidateDossiersVerified: true
+    },
+    mappedAspirantsCount: 0,
+    biometricAttendanceRate: 0,
+    createdAt: '2026-09-22T11:00:00.000Z',
     trainees: []
   }
 ];
@@ -159,9 +503,67 @@ export class BatchService {
         if (stored) {
           const parsed: BatchRecord[] = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            const existingIds = new Set(parsed.map(p => p.id));
+            const canonicalMap = new Map(INITIAL_BATCH_RECORDS.map(b => [b.id, b]));
+
+            // Sanitize existing items with canonical data
+            const updated = parsed.map(b => {
+              const canonical = canonicalMap.get(b.id);
+              if (canonical) {
+                return {
+                  ...b,
+                  batchCode: canonical.batchCode,
+                  batchName: canonical.batchName,
+                  sdcId: canonical.sdcId,
+                  sdcCode: canonical.sdcCode,
+                  sdcName: canonical.sdcName,
+                  sdcDistrict: canonical.sdcDistrict,
+                  tpName: canonical.tpName,
+                  scheme: canonical.scheme,
+                  sector: canonical.sector,
+                  courseName: canonical.courseName,
+                  maxStrength: canonical.maxStrength,
+                  mappedAspirantsCount: canonical.mappedAspirantsCount,
+                  status: (b.status === 'ONGOING' ? 'APPROVED' : b.status) || canonical.status,
+                  approvalStatus: b.approvalStatus || canonical.approvalStatus,
+                  inspectionStatus: b.inspectionStatus || canonical.inspectionStatus
+                };
+              }
+              if (b.status === 'ONGOING') {
+                b.status = 'APPROVED';
+              }
+              if (!b.approvalStatus) {
+                b.approvalStatus = (b.status === 'APPROVED' || b.status === 'COMPLETED') ? 'APPROVED' : 'PENDING';
+              }
+              if (!b.inspectionStatus) {
+                b.inspectionStatus = b.approvalStatus === 'APPROVED' ? 'PASSED' : 'SCHEDULED';
+              }
+              return b;
+            });
+
+            // Ensure unique batch codes across all items
+            const seenCodes = new Set<string>();
+            let maxCodeSeq = 0;
+            updated.forEach(b => {
+              const m = b.batchCode?.match(/B-26-(\d+)/);
+              if (m) {
+                const seq = parseInt(m[1], 10);
+                if (seq > maxCodeSeq) maxCodeSeq = seq;
+              }
+            });
+
+            updated.forEach(b => {
+              if (seenCodes.has(b.batchCode)) {
+                maxCodeSeq++;
+                b.batchCode = `B-26-${String(maxCodeSeq).padStart(4, '0')}`;
+              }
+              seenCodes.add(b.batchCode);
+            });
+
+            const existingIds = new Set(updated.map(p => p.id));
             const missing = INITIAL_BATCH_RECORDS.filter(b => !existingIds.has(b.id));
-            return [...parsed, ...missing];
+            const combined = [...updated, ...missing];
+            this.persist(combined);
+            return combined;
           }
         }
       } catch (e) {
@@ -186,14 +588,138 @@ export class BatchService {
   /** Stats */
   readonly stats = computed(() => {
     const list = this._batches();
+    const pending = list.filter(b => b.approvalStatus === 'PENDING' || b.status === 'PENDING_APPROVAL').length;
+    const inspectionPending = list.filter(b => b.approvalStatus === 'INSPECTION_PENDING' || b.inspectionStatus === 'SCHEDULED').length;
+    const approved = list.filter(b => b.approvalStatus === 'APPROVED' || b.status === 'APPROVED' || b.status === 'ONGOING').length;
+    const rejected = list.filter(b => b.approvalStatus === 'REJECTED' || b.status === 'CANCELLED' || b.status === 'REJECTED').length;
     return {
       total: list.length,
+      pending,
+      inspectionPending,
+      approved,
+      rejected,
       ongoing: list.filter(b => b.status === 'ONGOING').length,
-      approved: list.filter(b => b.status === 'APPROVED').length,
       completed: list.filter(b => b.status === 'COMPLETED').length,
       totalTrainees: list.reduce((sum, b) => sum + (b.trainees?.length || b.mappedAspirantsCount || 0), 0)
     };
   });
+
+  /** Approve Batch */
+  approveBatch(batchId: string, remarks?: string, officerName?: string): boolean {
+    let success = false;
+    this._batches.update(list => {
+      const updated = list.map(b => {
+        if (b.id === batchId) {
+          success = true;
+          return {
+            ...b,
+            approvalStatus: 'APPROVED' as BatchApprovalStatus,
+            status: (b.status === 'PENDING_APPROVAL' || b.status === 'INSPECTION_PENDING' || b.status === 'REJECTED') ? 'APPROVED' as BatchStatus : b.status,
+            approvedAt: new Date().toISOString(),
+            approvedBy: officerName || 'Department Scrutiny Officer',
+            approvalRemarks: remarks || 'Batch approved after infrastructure & inspection verification.'
+          };
+        }
+        return b;
+      });
+      if (success) this.persist(updated);
+      return updated;
+    });
+    return success;
+  }
+
+  /** Reject Batch */
+  rejectBatch(batchId: string, reason: string): boolean {
+    let success = false;
+    this._batches.update(list => {
+      const updated = list.map(b => {
+        if (b.id === batchId) {
+          success = true;
+          return {
+            ...b,
+            approvalStatus: 'REJECTED' as BatchApprovalStatus,
+            status: 'REJECTED' as BatchStatus,
+            rejectionReason: reason
+          };
+        }
+        return b;
+      });
+      if (success) this.persist(updated);
+      return updated;
+    });
+    return success;
+  }
+
+  /** Schedule Inspection */
+  scheduleInspection(batchId: string, date: string, inspector: string): boolean {
+    let success = false;
+    this._batches.update(list => {
+      const updated = list.map(b => {
+        if (b.id === batchId) {
+          success = true;
+          return {
+            ...b,
+            approvalStatus: 'INSPECTION_PENDING' as BatchApprovalStatus,
+            status: 'INSPECTION_PENDING' as BatchStatus,
+            inspectionStatus: 'SCHEDULED' as BatchInspectionStatus,
+            inspectionDate: date,
+            inspectorName: inspector
+          };
+        }
+        return b;
+      });
+      if (success) this.persist(updated);
+      return updated;
+    });
+    return success;
+  }
+
+  /** Record Inspection Result */
+  recordInspectionResult(batchId: string, passed: boolean, remarks: string, score: number = 90, checklist?: any): boolean {
+    let success = false;
+    this._batches.update(list => {
+      const updated = list.map(b => {
+        if (b.id === batchId) {
+          success = true;
+          return {
+            ...b,
+            inspectionStatus: (passed ? 'PASSED' : 'FAILED') as BatchInspectionStatus,
+            inspectionRemarks: remarks,
+            inspectionScore: score,
+            checklist: checklist || b.checklist
+          };
+        }
+        return b;
+      });
+      if (success) this.persist(updated);
+      return updated;
+    });
+    return success;
+  }
+
+  /** Revert / Revoke Approval */
+  revertApproval(batchId: string): boolean {
+    let success = false;
+    this._batches.update(list => {
+      const updated = list.map(b => {
+        if (b.id === batchId) {
+          success = true;
+          return {
+            ...b,
+            approvalStatus: 'PENDING' as BatchApprovalStatus,
+            status: 'PENDING_APPROVAL' as BatchStatus,
+            approvedAt: undefined,
+            approvedBy: undefined,
+            approvalRemarks: undefined
+          };
+        }
+        return b;
+      });
+      if (success) this.persist(updated);
+      return updated;
+    });
+    return success;
+  }
 
   /** Get batch by ID */
   getBatchById(id: string): BatchRecord | undefined {
@@ -209,8 +735,13 @@ export class BatchService {
    * STAGE 5: Create Batch with PSD Payment Receipt & SDC sync
    */
   createBatch(dto: CreateBatchDto): BatchRecord {
-    const nextNum = this._batches().length + 1;
-    const batchCode = `B-26-00${nextNum < 10 ? '0' + nextNum : nextNum}`;
+    const existingNums = this._batches().map(b => {
+      const match = b.batchCode?.match(/B-26-(\d+)/);
+      return match ? parseInt(match[1], 10) : 0;
+    });
+    const maxNum = Math.max(0, ...existingNums);
+    const nextNum = maxNum + 1;
+    const batchCode = `B-26-${String(nextNum).padStart(4, '0')}`;
     const newId = `batch-${Date.now()}`;
 
     const duration = dto.totalHours || dto.batchDurationHours || 300;
@@ -302,10 +833,10 @@ export class BatchService {
       const updated = list.map(b =>
         b.id === batchId
           ? {
-              ...b,
-              mappedAspirantsCount: b.mappedAspirantsCount + 1,
-              trainees: [newTrainee, ...b.trainees]
-            }
+            ...b,
+            mappedAspirantsCount: b.mappedAspirantsCount + 1,
+            trainees: [newTrainee, ...b.trainees]
+          }
           : b
       );
       this.persist(updated);

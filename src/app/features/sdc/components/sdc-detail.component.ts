@@ -419,58 +419,6 @@ import { PageHeaderComponent } from '../../../shared/components';
               </div>
 
             </div>
-
-            <!-- Uploaded Verification Documents Card -->
-            @if (center.documents) {
-              <div class="border border-slate-200 rounded-xl p-5 sm:p-6 bg-white shadow-2xs space-y-4">
-                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-[#174A6E]"></span>
-                  <span>Uploaded Center Documents</span>
-                </h3>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                  @if (center.documents.rentalAgreementDoc) {
-                    <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 font-bold text-[10px]">PDF</div>
-                      <div class="truncate">
-                        <div class="font-semibold text-slate-800 text-xs truncate">Rental / Lease Deed</div>
-                        <div class="text-[10.5px] text-slate-500 font-mono">{{ center.documents.rentalAgreementDoc.fileSize }}</div>
-                      </div>
-                    </div>
-                  }
-
-                  @if (center.documents.fireNocDoc) {
-                    <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 font-bold text-[10px]">PDF</div>
-                      <div class="truncate">
-                        <div class="font-semibold text-slate-800 text-xs truncate">Fire Safety NOC</div>
-                        <div class="text-[10.5px] text-slate-500 font-mono">{{ center.documents.fireNocDoc.fileSize }}</div>
-                      </div>
-                    </div>
-                  }
-
-                  @if (center.documents.signboardPhotoDoc) {
-                    <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 font-bold text-[10px]">IMG</div>
-                      <div class="truncate">
-                        <div class="font-semibold text-slate-800 text-xs truncate">Signboard Verification</div>
-                        <div class="text-[10.5px] text-slate-500 font-mono">{{ center.documents.signboardPhotoDoc.fileSize }}</div>
-                      </div>
-                    </div>
-                  }
-
-                  @if (center.documents.layoutDiagramDoc) {
-                    <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 font-bold text-[10px]">PDF</div>
-                      <div class="truncate">
-                        <div class="font-semibold text-slate-800 text-xs truncate">Classroom Blueprint</div>
-                        <div class="text-[10.5px] text-slate-500 font-mono">{{ center.documents.layoutDiagramDoc.fileSize }}</div>
-                      </div>
-                    </div>
-                  }
-                </div>
-              </div>
-            }
           }
 
           <!-- ========================================================================= -->

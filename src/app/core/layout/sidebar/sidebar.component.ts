@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { AspirantService } from '../../../features/sdc/services/aspirant.service';
-import { BatchService } from '../../../features/sdc/services/batch.service';
+import { BatchService, isBatchApproved, isBatchRejected } from '../../../features/sdc/services/batch.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -391,7 +391,7 @@ export class SidebarComponent {
   readonly currentUser = this.authService.currentUser;
   readonly aspirantCount = computed(() => this.aspirantService.aspirants().length);
   readonly pendingBatchApprovalsCount = computed(() => {
-    return this.batchService.batches().filter(b => b.approvalStatus === 'PENDING' || b.status === 'PENDING_APPROVAL').length;
+    return this.batchService.batches().filter(b => !isBatchApproved(b) && !isBatchRejected(b)).length;
   });
 
   readonly isExistingUser = computed(() => {

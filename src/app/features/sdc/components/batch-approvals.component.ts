@@ -26,7 +26,7 @@ import {
 
         <!-- Page Header via Reusable PageHeaderComponent -->
         <app-page-header
-          title="Batch Approvals & Inspection"
+          title="Batch Approvals"
         ></app-page-header>
 
         <!-- Success Alert Notification -->
@@ -168,7 +168,6 @@ import {
             scheme: schemeTemplate,
             sector: sectorTemplate,
             capacity: capacityTemplate,
-            status: statusTemplate,
             actions: actionsTemplate
           }"
         >
@@ -224,29 +223,6 @@ import {
           </div>
         </ng-template>
 
-        <!-- Template: Status (APPROVED in green, inspection all types in red) -->
-        <ng-template #statusTemplate let-batch>
-          <div class="flex items-center justify-center">
-            @if (batch.approvalStatus === 'APPROVED' || batch.status === 'APPROVED' || batch.status === 'ONGOING') {
-              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-emerald-700">
-                APPROVED
-              </span>
-            } @else if (batch.status === 'INSPECTION_PENDING' || batch.approvalStatus === 'INSPECTION_PENDING' || batch.status?.includes('INSPECTION')) {
-              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-red-600">
-                PENDING INSPECTION
-              </span>
-            } @else if (batch.approvalStatus === 'REJECTED' || batch.status === 'REJECTED') {
-              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-red-600">
-                REJECTED
-              </span>
-            } @else {
-              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-amber-700">
-                PENDING
-              </span>
-            }
-          </div>
-        </ng-template>
-
         <!-- Template: Actions (Approve Batch + View Details) -->
         <ng-template #actionsTemplate let-batch>
           <div class="flex items-center justify-center gap-2 whitespace-nowrap py-0.5">
@@ -267,8 +243,6 @@ import {
                   </svg>
                   <span>Rejected</span>
                 </span>
-              } @else if (batch.status === 'INSPECTION_PENDING' || batch.approvalStatus === 'INSPECTION_PENDING' || batch.status?.includes('INSPECTION')) {
-                <span class="text-xs text-slate-400 italic">Under Inspection</span>
               } @else {
                 <button
                   type="button"
@@ -436,7 +410,6 @@ export class BatchApprovalsComponent {
     { key: 'scheme', label: 'Scheme', align: 'center', type: 'custom' },
     { key: 'sector', label: 'Sector', align: 'center', type: 'custom' },
     { key: 'capacity', label: 'Capacity', align: 'center', type: 'custom', width: 'w-28' },
-    { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[150px]' },
     { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[240px]' }
   ];
 
@@ -457,7 +430,7 @@ export class BatchApprovalsComponent {
 
   readonly filterOptions = computed(() => {
     const all = this.batchService.batches();
-    const pending = all.filter(b => b.approvalStatus === 'PENDING' || b.status === 'PENDING_APPROVAL' || b.approvalStatus === 'INSPECTION_PENDING' || b.status === 'INSPECTION_PENDING');
+    const pending = all.filter(b => b.approvalStatus === 'PENDING' || b.status === 'PENDING_APPROVAL');
     const approved = all.filter(b => b.approvalStatus === 'APPROVED' || b.status === 'APPROVED' || b.status === 'ONGOING');
     const rejected = all.filter(b => b.approvalStatus === 'REJECTED' || b.status === 'REJECTED');
     return [
@@ -473,7 +446,7 @@ export class BatchApprovalsComponent {
     const filter = this.activeFilter();
 
     if (filter === 'Pending') {
-      list = list.filter(b => b.approvalStatus === 'PENDING' || b.status === 'PENDING_APPROVAL' || b.approvalStatus === 'INSPECTION_PENDING' || b.status === 'INSPECTION_PENDING');
+      list = list.filter(b => b.approvalStatus === 'PENDING' || b.status === 'PENDING_APPROVAL');
     } else if (filter === 'Approved') {
       list = list.filter(b => b.approvalStatus === 'APPROVED' || b.status === 'APPROVED' || b.status === 'ONGOING');
     } else if (filter === 'Rejected') {

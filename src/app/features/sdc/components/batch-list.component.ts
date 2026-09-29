@@ -171,15 +171,11 @@ import {
           </div>
         </ng-template>
 
-        <!-- Template: Status (APPROVED in green, inspection all types in red) -->
+        <!-- Template: Status -->
         <ng-template #statusTemplate let-b>
           @if (b.status === 'APPROVED' || b.approvalStatus === 'APPROVED' || b.status === 'ONGOING') {
             <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-emerald-700">
               APPROVED
-            </span>
-          } @else if (b.status === 'INSPECTION_PENDING' || b.approvalStatus === 'INSPECTION_PENDING' || b.status?.includes('INSPECTION')) {
-            <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-red-600">
-              PENDING INSPECTION
             </span>
           } @else if (b.status === 'REJECTED' || b.approvalStatus === 'REJECTED') {
             <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-red-600">
@@ -211,28 +207,16 @@ import {
               <span>View Details</span>
             </button>
 
-            @if (b.status === 'ONGOING' || b.status === 'APPROVED' || b.approvalStatus === 'APPROVED') {
-              <app-button
-                variant="primary"
-                size="sm"
-                (btnClick)="selectAndMap(b)"
-                title="Register Aspirant"
-              >
-                <span class="text-sm font-bold leading-none">+</span>
-                <span>Register</span>
-              </app-button>
-            } @else if (b.status === 'REJECTED' || b.approvalStatus === 'REJECTED') {
-              <span class="text-xs text-slate-400 font-medium italic">
-                Rejected
-              </span>
-            } @else {
-              <span class="text-xs text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-[4px] font-medium inline-flex items-center gap-1">
-                <svg class="w-3 h-3 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Awaiting Approval
-              </span>
-            }
+            <!-- Register Button shown for all batches -->
+            <app-button
+              variant="primary"
+              size="sm"
+              (btnClick)="selectAndMap(b)"
+              title="Register Aspirant"
+            >
+              <span class="text-sm font-bold leading-none">+</span>
+              <span>Register</span>
+            </app-button>
           </div>
         </ng-template>
 
@@ -266,7 +250,7 @@ export class BatchListComponent {
     return [
       { id: 'All', label: 'All Batches', count: all.length },
       { id: 'APPROVED', label: 'Approved', count: all.filter(b => b.status === 'APPROVED' || b.approvalStatus === 'APPROVED' || b.status === 'ONGOING').length },
-      { id: 'PENDING', label: 'Pending Approval', count: all.filter(b => b.status === 'PENDING_APPROVAL' || b.approvalStatus === 'PENDING' || b.status === 'INSPECTION_PENDING').length },
+      { id: 'PENDING', label: 'Pending Approval', count: all.filter(b => b.status === 'PENDING_APPROVAL' || b.approvalStatus === 'PENDING').length },
       { id: 'REJECTED', label: 'Rejected', count: all.filter(b => b.status === 'REJECTED' || b.approvalStatus === 'REJECTED').length }
     ];
   });
@@ -278,7 +262,7 @@ export class BatchListComponent {
     if (filter === 'APPROVED') {
       list = list.filter(b => b.status === 'APPROVED' || b.approvalStatus === 'APPROVED' || b.status === 'ONGOING');
     } else if (filter === 'PENDING') {
-      list = list.filter(b => b.status === 'PENDING_APPROVAL' || b.approvalStatus === 'PENDING' || b.status === 'INSPECTION_PENDING');
+      list = list.filter(b => b.status === 'PENDING_APPROVAL' || b.approvalStatus === 'PENDING');
     } else if (filter === 'REJECTED') {
       list = list.filter(b => b.status === 'REJECTED' || b.approvalStatus === 'REJECTED');
     }

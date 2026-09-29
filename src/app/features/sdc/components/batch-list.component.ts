@@ -173,11 +173,11 @@ import {
 
         <!-- Template: Status -->
         <ng-template #statusTemplate let-b>
-          @if (b.status === 'APPROVED' || b.approvalStatus === 'APPROVED' || b.status === 'ONGOING') {
+          @if (isApproved(b)) {
             <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-emerald-700">
               APPROVED
             </span>
-          } @else if (b.status === 'REJECTED' || b.approvalStatus === 'REJECTED') {
+          } @else if (isRejected(b)) {
             <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-red-600">
               REJECTED
             </span>
@@ -245,13 +245,26 @@ export class BatchListComponent {
     { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-56' }
   ];
 
+  isApproved(b: BatchRecord): boolean {
+    if (!b) return false;
+    if (b.status === 'REJECTED' || b.approvalStatus === 'REJECTED') return false;
+    const count = b.mappedAspirantsCount ?? b.trainees?.length ?? 0;
+    const max = b.approvedBatchStrength || b.maxStrength || 30;
+    return count >= 25 && count <= max;
+  }
+
+  isRejected(b: BatchRecord): boolean {
+    if (!b) return false;
+    return b.status === 'REJECTED' || b.approvalStatus === 'REJECTED';
+  }
+
   readonly filterOptions = computed(() => {
     const all = this.batchService.batches();
     return [
       { id: 'All', label: 'All Batches', count: all.length },
-      { id: 'APPROVED', label: 'Approved', count: all.filter(b => b.status === 'APPROVED' || b.approvalStatus === 'APPROVED' || b.status === 'ONGOING').length },
-      { id: 'PENDING', label: 'Pending Approval', count: all.filter(b => b.status === 'PENDING_APPROVAL' || b.approvalStatus === 'PENDING').length },
-      { id: 'REJECTED', label: 'Rejected', count: all.filter(b => b.status === 'REJECTED' || b.approvalStatus === 'REJECTED').length }
+      { id: 'APPROVED', label: 'Approved', count: all.filter(b => this.isApproved(b)).length },
+      { id: 'PENDING', label: 'Pending Approval', count: all.filter(b => !this.isApproved(b) && !this.isRejected(b)).length },
+      { id: 'REJECTED', label: 'Rejected', count: all.filter(b => this.isRejected(b)).length }
     ];
   });
 
@@ -260,11 +273,11 @@ export class BatchListComponent {
     const filter = this.activeFilter();
 
     if (filter === 'APPROVED') {
-      list = list.filter(b => b.status === 'APPROVED' || b.approvalStatus === 'APPROVED' || b.status === 'ONGOING');
+      list = list.filter(b => this.isApproved(b));
     } else if (filter === 'PENDING') {
-      list = list.filter(b => b.status === 'PENDING_APPROVAL' || b.approvalStatus === 'PENDING');
+      list = list.filter(b => !this.isApproved(b) && !this.isRejected(b));
     } else if (filter === 'REJECTED') {
-      list = list.filter(b => b.status === 'REJECTED' || b.approvalStatus === 'REJECTED');
+      list = list.filter(b => this.isRejected(b));
     }
 
     const query = this.searchQuery().toLowerCase().trim();

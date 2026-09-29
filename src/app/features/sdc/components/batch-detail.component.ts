@@ -117,7 +117,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
               <div class="text-right border-l border-[#D9E1E7] pl-4 sm:pl-6">
                 <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">CURRENT STATUS</span>
                 <span class="font-bold text-sm tracking-wide uppercase text-black" style="color: #000000 !important; font-weight: bold;">
-                  {{ formatStatus(b.approvalStatus || b.status).toUpperCase() }}
+                  {{ formatStatus(b).toUpperCase() }}
                 </span>
               </div>
 
@@ -130,7 +130,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
           <!-- ========================================================================= -->
           @if (isAdmin() && !isEditing()) {
             
-            @if (b.status === 'APPROVED' || b.approvalStatus === 'APPROVED') {
+            @if (isApproved(b)) {
               <!-- Approved Notice Card -->
               <div class="rounded-xl border border-emerald-300 bg-emerald-50/80 p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-start gap-3">
@@ -810,11 +810,23 @@ export class BatchDetailComponent implements OnInit {
     });
   }
 
-  formatStatus(status?: string): string {
-    if (!status) return 'APPROVED';
-    if (status === 'ONGOING') return 'APPROVED';
-    if (status === 'PENDING_APPROVAL' || status === 'INSPECTION_PENDING') return 'PENDING';
-    return status;
+  isApproved(b: BatchRecord): boolean {
+    if (!b) return false;
+    if (b.status === 'REJECTED' || b.approvalStatus === 'REJECTED') return false;
+    const count = b.mappedAspirantsCount ?? b.trainees?.length ?? 0;
+    const max = b.approvedBatchStrength || b.maxStrength || 30;
+    return count >= 25 && count <= max;
+  }
+
+  isRejected(b: BatchRecord): boolean {
+    if (!b) return false;
+    return b.status === 'REJECTED' || b.approvalStatus === 'REJECTED';
+  }
+
+  formatStatus(b: BatchRecord): string {
+    if (this.isRejected(b)) return 'REJECTED';
+    if (this.isApproved(b)) return 'APPROVED';
+    return 'PENDING';
   }
 
   getFacultyList(b: BatchRecord): any[] {

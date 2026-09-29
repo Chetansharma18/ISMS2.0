@@ -216,10 +216,22 @@ import {
           </div>
         </ng-template>
 
-        <!-- Template: Capacity -->
+        <!-- Template: Capacity & Mapped Aspirants -->
         <ng-template #capacityTemplate let-batch>
-          <div class="text-center font-medium text-primary text-[13px]">
-            {{ batch.maxStrength || 30 }} <span class="text-[11px] text-secondary font-normal">Trainees</span>
+          <div class="min-w-35 text-left px-1">
+            <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1">
+              <span>{{ batch.mappedAspirantsCount || 0 }}/{{ batch.maxStrength || 30 }} Aspirants</span>
+              <span class="text-slate-400 font-normal text-[11px]">{{ getMappedPercent(batch) }}%</span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <div
+                class="h-full rounded-full transition-all duration-300"
+                [class.bg-emerald-500]="isApproved(batch)"
+                [class.bg-amber-500]="!isApproved(batch) && !isRejected(batch)"
+                [class.bg-rose-500]="isRejected(batch)"
+                [style.width]="getMappedPercent(batch) + '%'"
+              ></div>
+            </div>
           </div>
         </ng-template>
 
@@ -229,14 +241,14 @@ import {
             
             <!-- Slot 1: Action button or status badge -->
             <div class="w-[120px] flex justify-center shrink-0">
-              @if (batch.approvalStatus === 'APPROVED' || batch.status === 'APPROVED' || batch.status === 'ONGOING') {
+              @if (isApproved(batch)) {
                 <span class="inline-flex items-center gap-1 text-emerald-700 font-semibold text-xs py-1">
                   <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                   </svg>
                   <span>Approved</span>
                 </span>
-              } @else if (batch.approvalStatus === 'REJECTED' || batch.status === 'REJECTED') {
+              } @else if (isRejected(batch)) {
                 <span class="inline-flex items-center gap-1 text-rose-700 font-semibold text-xs py-1">
                   <svg class="w-3.5 h-3.5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
@@ -314,8 +326,9 @@ import {
                 <span>{{ targetBatch.sdcName }}</span>
                 <span class="text-slate-500 font-medium">{{ targetBatch.sdcDistrict }}</span>
               </div>
-              <div class="text-[11px] text-slate-500">
-                Scheme: <strong class="text-slate-800">{{ targetBatch.scheme }}</strong> • Sector: <strong class="text-slate-800">{{ targetBatch.sector }}</strong>
+              <div class="text-[11px] text-slate-500 flex items-center justify-between flex-wrap gap-2">
+                <span>Scheme: <strong class="text-slate-800">{{ targetBatch.scheme }}</strong> • Sector: <strong class="text-slate-800">{{ targetBatch.sector }}</strong></span>
+                <span class="font-semibold text-slate-700">Mapped: <strong class="text-[#174A6E]">{{ targetBatch.mappedAspirantsCount || 0 }}/{{ targetBatch.maxStrength || 30 }} Aspirants</strong></span>
               </div>
             </div>
 
@@ -405,13 +418,20 @@ export class BatchApprovalsComponent {
   readonly batchColumns: TableColumn<BatchRecord>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-14' },
     { key: 'batchCode', label: 'Batch Code', align: 'center', type: 'custom', width: 'w-32' },
-    { key: 'batchName', label: 'Batch & Course', align: 'center', type: 'custom', width: 'min-w-[200px]' },
-    { key: 'centerName', label: 'SDC Center', align: 'center', type: 'custom', width: 'min-w-[190px]' },
+    { key: 'batchName', label: 'Batch & Course', align: 'center', type: 'custom', width: 'min-w-[190px]' },
+    { key: 'centerName', label: 'SDC Center', align: 'center', type: 'custom', width: 'min-w-[180px]' },
     { key: 'scheme', label: 'Scheme', align: 'center', type: 'custom' },
     { key: 'sector', label: 'Sector', align: 'center', type: 'custom' },
-    { key: 'capacity', label: 'Capacity', align: 'center', type: 'custom', width: 'w-28' },
+    { key: 'capacity', label: 'Capacity & Mapped', align: 'center', type: 'custom', width: 'min-w-[170px]' },
     { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[240px]' }
   ];
+
+  getMappedPercent(b: BatchRecord): number {
+    const max = b.approvedBatchStrength || b.maxStrength || 30;
+    if (!max) return 0;
+    const count = b.mappedAspirantsCount ?? b.trainees?.length ?? 0;
+    return Math.min(100, Math.round((count / max) * 100));
+  }
 
   readonly centerList = computed(() => {
     const list = this.batchService.batches();
@@ -428,11 +448,24 @@ export class BatchApprovalsComponent {
     return Array.from(new Set(list.map(b => b.sdcDistrict).filter(Boolean)));
   });
 
+  isApproved(b: BatchRecord): boolean {
+    if (!b) return false;
+    if (b.status === 'REJECTED' || b.approvalStatus === 'REJECTED') return false;
+    const count = b.mappedAspirantsCount ?? b.trainees?.length ?? 0;
+    const max = b.approvedBatchStrength || b.maxStrength || 30;
+    return count >= 25 && count <= max;
+  }
+
+  isRejected(b: BatchRecord): boolean {
+    if (!b) return false;
+    return b.status === 'REJECTED' || b.approvalStatus === 'REJECTED';
+  }
+
   readonly filterOptions = computed(() => {
     const all = this.batchService.batches();
-    const pending = all.filter(b => b.approvalStatus === 'PENDING' || b.status === 'PENDING_APPROVAL');
-    const approved = all.filter(b => b.approvalStatus === 'APPROVED' || b.status === 'APPROVED' || b.status === 'ONGOING');
-    const rejected = all.filter(b => b.approvalStatus === 'REJECTED' || b.status === 'REJECTED');
+    const pending = all.filter(b => !this.isApproved(b) && !this.isRejected(b));
+    const approved = all.filter(b => this.isApproved(b));
+    const rejected = all.filter(b => this.isRejected(b));
     return [
       { id: 'All', label: 'All', count: all.length },
       { id: 'Pending', label: 'Pending', count: pending.length },
@@ -446,11 +479,11 @@ export class BatchApprovalsComponent {
     const filter = this.activeFilter();
 
     if (filter === 'Pending') {
-      list = list.filter(b => b.approvalStatus === 'PENDING' || b.status === 'PENDING_APPROVAL');
+      list = list.filter(b => !this.isApproved(b) && !this.isRejected(b));
     } else if (filter === 'Approved') {
-      list = list.filter(b => b.approvalStatus === 'APPROVED' || b.status === 'APPROVED' || b.status === 'ONGOING');
+      list = list.filter(b => this.isApproved(b));
     } else if (filter === 'Rejected') {
-      list = list.filter(b => b.approvalStatus === 'REJECTED' || b.status === 'REJECTED');
+      list = list.filter(b => this.isRejected(b));
     }
 
     if (this.selectedCenter() !== 'ALL') {

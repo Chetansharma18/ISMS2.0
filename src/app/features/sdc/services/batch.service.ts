@@ -57,7 +57,7 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = [
       safetyAndHygieneCompliant: true,
       candidateDossiersVerified: true
     },
-    mappedAspirantsCount: 3,
+    mappedAspirantsCount: 28,
     biometricAttendanceRate: 94.2,
     createdAt: '2026-08-20T10:00:00.000Z',
     trainees: [
@@ -109,8 +109,8 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = [
         experienceYears: 4
       }
     ],
-    status: 'APPROVED',
-    approvalStatus: 'APPROVED',
+    status: 'PENDING_APPROVAL',
+    approvalStatus: 'PENDING',
     approvedAt: '2026-09-20T11:00:00.000Z',
     approvedBy: 'Sh. Alok Sharma (Joint Director, RSLDC)',
     approvalRemarks: 'Sanction order granted. Commencement allowed.',
@@ -168,8 +168,8 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = [
         experienceYears: 5
       }
     ],
-    status: 'APPROVED',
-    approvalStatus: 'APPROVED',
+    status: 'PENDING_APPROVAL',
+    approvalStatus: 'PENDING',
     approvedAt: '2026-09-22T16:15:00.000Z',
     approvedBy: 'Dr. Vivek Vyas (Inspection Officer)',
     approvalRemarks: 'Lab hydraulic lifts and diagnostic equipment verified in person.',
@@ -497,6 +497,14 @@ export class BatchService {
             // Sanitize existing items with canonical data
             const updated = parsed.map(b => {
               const canonical = canonicalMap.get(b.id);
+              const mappedCount = canonical ? canonical.mappedAspirantsCount : (b.mappedAspirantsCount ?? b.trainees?.length ?? 0);
+              const maxStr = canonical?.maxStrength || b.maxStrength || 30;
+              const isApproved = mappedCount >= 25 && mappedCount <= maxStr;
+              const isRejected = b.status === 'REJECTED' || b.approvalStatus === 'REJECTED' || canonical?.status === 'REJECTED';
+
+              const computedStatus: BatchStatus = isRejected ? 'REJECTED' : (isApproved ? 'APPROVED' : 'PENDING_APPROVAL');
+              const computedApprovalStatus: BatchApprovalStatus = isRejected ? 'REJECTED' : (isApproved ? 'APPROVED' : 'PENDING');
+
               if (canonical) {
                 return {
                   ...b,
@@ -512,24 +520,18 @@ export class BatchService {
                   courseName: canonical.courseName,
                   maxStrength: canonical.maxStrength,
                   mappedAspirantsCount: canonical.mappedAspirantsCount,
-                  status: (b.status === 'ONGOING' ? 'APPROVED' : (b.status === 'INSPECTION_PENDING' ? 'PENDING_APPROVAL' : b.status)) || canonical.status,
-                  approvalStatus: (b.approvalStatus === 'INSPECTION_PENDING' ? 'PENDING' : b.approvalStatus) || canonical.approvalStatus,
+                  status: computedStatus,
+                  approvalStatus: computedApprovalStatus,
                   inspectionStatus: b.inspectionStatus || canonical.inspectionStatus
                 };
               }
-              if (b.status === 'ONGOING') {
-                b.status = 'APPROVED';
-              }
-              if (b.status === 'INSPECTION_PENDING') {
-                b.status = 'PENDING_APPROVAL';
-              }
-              if (b.approvalStatus === 'INSPECTION_PENDING') {
-                b.approvalStatus = 'PENDING';
-              }
-              if (!b.approvalStatus) {
-                b.approvalStatus = (b.status === 'APPROVED' || b.status === 'COMPLETED') ? 'APPROVED' : 'PENDING';
-              }
-              return b;
+              
+              return {
+                ...b,
+                mappedAspirantsCount: mappedCount,
+                status: computedStatus,
+                approvalStatus: computedApprovalStatus
+              };
             });
 
             // Ensure unique batch codes across all items
@@ -580,14 +582,22 @@ export class BatchService {
   /** Stats */
   readonly stats = computed(() => {
     const list = this._batches();
-    const pending = list.filter(b => b.approvalStatus === 'PENDING' || b.status === 'PENDING_APPROVAL').length;
-    const inspectionPending = list.filter(b => b.approvalStatus === 'INSPECTION_PENDING' || b.inspectionStatus === 'SCHEDULED').length;
-    const approved = list.filter(b => b.approvalStatus === 'APPROVED' || b.status === 'APPROVED' || b.status === 'ONGOING').length;
-    const rejected = list.filter(b => b.approvalStatus === 'REJECTED' || b.status === 'CANCELLED' || b.status === 'REJECTED').length;
+    const isApproved = (b: BatchRecord) => {
+      if (b.status === 'REJECTED' || b.approvalStatus === 'REJECTED') return false;
+      const count = b.mappedAspirantsCount ?? b.trainees?.length ?? 0;
+      const max = b.approvedBatchStrength || b.maxStrength || 30;
+      return count >= 25 && count <= max;
+    };
+    const isRejected = (b: BatchRecord) => b.status === 'REJECTED' || b.approvalStatus === 'REJECTED';
+
+    const approved = list.filter(b => isApproved(b)).length;
+    const rejected = list.filter(b => isRejected(b)).length;
+    const pending = list.filter(b => !isApproved(b) && !isRejected(b)).length;
+
     return {
       total: list.length,
       pending,
-      inspectionPending,
+      inspectionPending: 0,
       approved,
       rejected,
       ongoing: list.filter(b => b.status === 'ONGOING').length,
@@ -801,7 +811,8 @@ export class BatchService {
       faculty: [...(dto.faculty || [])],
       hostels: dto.hostels || (dto.hostel ? [dto.hostel] : []),
       hostel: dto.hostel || (dto.hostels && dto.hostels.length > 0 ? dto.hostels[0] : undefined),
-      status: 'APPROVED',
+      status: 'PENDING_APPROVAL',
+      approvalStatus: 'PENDING',
       mappedAspirantsCount: 0,
       biometricAttendanceRate: 0,
       trainees: [],
@@ -842,19 +853,49 @@ export class BatchService {
     };
 
     this._batches.update(list => {
-      const updated = list.map(b =>
-        b.id === batchId
-          ? {
+      const updated = list.map(b => {
+        if (b.id === batchId) {
+          const newCount = (b.mappedAspirantsCount || 0) + 1;
+          const maxStr = b.approvedBatchStrength || b.maxStrength || 30;
+          const isApproved = newCount >= 25 && newCount <= maxStr;
+          const isRejected = b.status === 'REJECTED' || b.approvalStatus === 'REJECTED';
+
+          return {
             ...b,
-            mappedAspirantsCount: b.mappedAspirantsCount + 1,
-            trainees: [newTrainee, ...b.trainees]
-          }
-          : b
-      );
+            mappedAspirantsCount: newCount,
+            status: (isRejected ? 'REJECTED' : (isApproved ? 'APPROVED' : 'PENDING_APPROVAL')) as BatchStatus,
+            approvalStatus: (isRejected ? 'REJECTED' : (isApproved ? 'APPROVED' : 'PENDING')) as BatchApprovalStatus,
+            trainees: [newTrainee, ...(b.trainees || [])]
+          };
+        }
+        return b;
+      });
       this.persist(updated);
       return updated;
     });
 
     return true;
   }
+}
+
+/** Helper to check if a batch qualifies as APPROVED (25 to 30 mapped aspirants and not rejected) */
+export function isBatchApproved(b: BatchRecord): boolean {
+  if (!b) return false;
+  if (b.status === 'REJECTED' || b.approvalStatus === 'REJECTED') return false;
+  const count = b.mappedAspirantsCount ?? b.trainees?.length ?? 0;
+  const max = b.approvedBatchStrength || b.maxStrength || 30;
+  return count >= 25 && count <= max;
+}
+
+/** Helper to check if a batch is REJECTED */
+export function isBatchRejected(b: BatchRecord): boolean {
+  if (!b) return false;
+  return b.status === 'REJECTED' || b.approvalStatus === 'REJECTED';
+}
+
+/** Helper to get canonical display status: APPROVED, REJECTED, or PENDING */
+export function getBatchDisplayStatus(b: BatchRecord): 'APPROVED' | 'PENDING' | 'REJECTED' {
+  if (isBatchRejected(b)) return 'REJECTED';
+  if (isBatchApproved(b)) return 'APPROVED';
+  return 'PENDING';
 }

@@ -336,20 +336,9 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = [
         experienceYears: 6
       }
     ],
-    status: 'INSPECTION_PENDING',
-    approvalStatus: 'INSPECTION_PENDING',
-    inspectionStatus: 'SCHEDULED',
-    inspectionDate: '2026-10-06',
-    inspectorName: 'Dr. Vivek Vyas (Joint Inspection Officer)',
-    inspectionScore: 89,
-    checklist: {
-      classroomNormsMet: true,
-      equipmentAndToolsVerified: true,
-      cctvAndBiometricActive: true,
-      trainerTotCertified: true,
-      safetyAndHygieneCompliant: true,
-      candidateDossiersVerified: true
-    },
+    status: 'PENDING_APPROVAL',
+    approvalStatus: 'PENDING',
+    inspectionStatus: 'PASSED',
     mappedAspirantsCount: 0,
     biometricAttendanceRate: 0,
     createdAt: '2026-09-26T09:30:00.000Z',
@@ -523,19 +512,22 @@ export class BatchService {
                   courseName: canonical.courseName,
                   maxStrength: canonical.maxStrength,
                   mappedAspirantsCount: canonical.mappedAspirantsCount,
-                  status: (b.status === 'ONGOING' ? 'APPROVED' : b.status) || canonical.status,
-                  approvalStatus: b.approvalStatus || canonical.approvalStatus,
+                  status: (b.status === 'ONGOING' ? 'APPROVED' : (b.status === 'INSPECTION_PENDING' ? 'PENDING_APPROVAL' : b.status)) || canonical.status,
+                  approvalStatus: (b.approvalStatus === 'INSPECTION_PENDING' ? 'PENDING' : b.approvalStatus) || canonical.approvalStatus,
                   inspectionStatus: b.inspectionStatus || canonical.inspectionStatus
                 };
               }
               if (b.status === 'ONGOING') {
                 b.status = 'APPROVED';
               }
+              if (b.status === 'INSPECTION_PENDING') {
+                b.status = 'PENDING_APPROVAL';
+              }
+              if (b.approvalStatus === 'INSPECTION_PENDING') {
+                b.approvalStatus = 'PENDING';
+              }
               if (!b.approvalStatus) {
                 b.approvalStatus = (b.status === 'APPROVED' || b.status === 'COMPLETED') ? 'APPROVED' : 'PENDING';
-              }
-              if (!b.inspectionStatus) {
-                b.inspectionStatus = b.approvalStatus === 'APPROVED' ? 'PASSED' : 'SCHEDULED';
               }
               return b;
             });
@@ -640,6 +632,26 @@ export class BatchService {
             approvalStatus: 'REJECTED' as BatchApprovalStatus,
             status: 'REJECTED' as BatchStatus,
             rejectionReason: reason
+          };
+        }
+        return b;
+      });
+      if (success) this.persist(updated);
+      return updated;
+    });
+    return success;
+  }
+
+  /** Update Batch Record */
+  updateBatch(batchId: string, updates: Partial<BatchRecord>): boolean {
+    let success = false;
+    this._batches.update(list => {
+      const updated = list.map(b => {
+        if (b.id === batchId) {
+          success = true;
+          return {
+            ...b,
+            ...updates
           };
         }
         return b;

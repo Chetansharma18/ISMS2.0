@@ -308,6 +308,19 @@ import { BatchService } from '../../../features/sdc/services/batch.service';
               </svg>
               <span class="tracking-tight">Profile</span>
             </a>
+
+            <!-- 9. Camera Monitoring -->
+            <a
+              routerLink="/admin/camera-monitoring"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center gap-2.5 px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <span class="tracking-tight">Camera Monitoring</span>
+            </a>
           } @else {
             <!-- ================================================================
                  ROLE: NEW USER / STANDARD

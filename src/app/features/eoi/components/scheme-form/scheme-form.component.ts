@@ -898,7 +898,7 @@ export interface EoiDocumentItem {
                 <div class="flex items-center gap-2">
                   <button
                     type="button"
-                    (click)="showAddPlacementForm.set(!showAddPlacementForm())"
+                    (click)="openAddPlacement()"
                     class="px-3 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1 cursor-pointer"
                   >
                     <span>{{ showAddPlacementForm() ? '✕ Close Form' : '+ Add Placement Record' }}</span>
@@ -910,7 +910,9 @@ export interface EoiDocumentItem {
               @if (showAddPlacementForm()) {
                 <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 text-xs">
                   <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-                    <span class="font-bold text-[#0B3558]">New Placement Record Entry</span>
+                    <span class="font-bold text-[#0B3558]">
+                      {{ editingPlacementIndex !== null ? 'Edit Placement Record' : 'New Placement Record Entry' }}
+                    </span>
                     <button
                       type="button"
                       (click)="showAddPlacementForm.set(false)"
@@ -1020,6 +1022,7 @@ export interface EoiDocumentItem {
                           <div class="flex items-center justify-center gap-2">
                             <button
                               type="button"
+                              (click)="editPlacement(idx)"
                               class="text-[#0483AC] hover:text-[#036B8C] text-xs font-semibold cursor-pointer"
                               title="Edit Record"
                             >
@@ -1058,7 +1061,7 @@ export interface EoiDocumentItem {
                 <div class="flex items-center gap-2">
                   <button
                     type="button"
-                    (click)="showAddActionPlanForm.set(!showAddActionPlanForm())"
+                    (click)="openAddActionPlan()"
                     class="px-3 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1 cursor-pointer"
                   >
                     <span>{{ showAddActionPlanForm() ? '✕ Close Form' : '+ Add District / Centre Plan' }}</span>
@@ -1070,7 +1073,9 @@ export interface EoiDocumentItem {
               @if (showAddActionPlanForm()) {
                 <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 text-xs">
                   <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-                    <span class="font-bold text-[#0B3558]">New District / Centre Action Plan Entry</span>
+                    <span class="font-bold text-[#0B3558]">
+                      {{ editingActionPlanIndex !== null ? 'Edit District / Centre Action Plan' : 'New District / Centre Action Plan Entry' }}
+                    </span>
                     <button
                       type="button"
                       (click)="showAddActionPlanForm.set(false)"
@@ -1210,6 +1215,7 @@ export interface EoiDocumentItem {
                           <div class="flex items-center justify-center gap-2">
                             <button
                               type="button"
+                              (click)="editActionPlan(idx)"
                               class="text-[#0483AC] hover:text-[#036B8C] text-xs font-semibold cursor-pointer"
                               title="Edit Plan"
                             >
@@ -2850,6 +2856,7 @@ export class SchemeFormComponent {
 
   // Training & Placement
   showAddPlacementForm = signal<boolean>(false);
+  editingPlacementIndex: number | null = null;
   newPlacement = {
     sector: '',
     year: '2024 - 2025',
@@ -2893,7 +2900,13 @@ export class SchemeFormComponent {
       placed: Number(this.newPlacement.placed) || 0,
       proofDoc: this.newPlacement.proofDoc || 'Placement_Proof_Certified.pdf'
     };
-    this.placementRecords.push(item);
+    
+    if (this.editingPlacementIndex !== null) {
+      this.placementRecords[this.editingPlacementIndex] = item;
+      this.editingPlacementIndex = null;
+    } else {
+      this.placementRecords.push(item);
+    }
     this.showAddPlacementForm.set(false);
     this.newPlacement = {
       sector: '',
@@ -2908,8 +2921,32 @@ export class SchemeFormComponent {
     this.placementRecords.splice(index, 1);
   }
 
+  editPlacement(index: number): void {
+    const item = this.placementRecords[index];
+    this.newPlacement = { ...item };
+    this.editingPlacementIndex = index;
+    this.showAddPlacementForm.set(true);
+  }
+
+  openAddPlacement(): void {
+    if (this.showAddPlacementForm() && this.editingPlacementIndex === null) {
+      this.showAddPlacementForm.set(false);
+      return;
+    }
+    this.editingPlacementIndex = null;
+    this.newPlacement = {
+      sector: '',
+      year: '2024 - 2025',
+      trained: null,
+      placed: null,
+      proofDoc: ''
+    };
+    this.showAddPlacementForm.set(true);
+  }
+
   // Annual Action Plan
   showAddActionPlanForm = signal<boolean>(false);
+  editingActionPlanIndex: number | null = null;
   newActionPlan = {
     year: '2025-2026',
     district: '',
@@ -2962,7 +2999,7 @@ export class SchemeFormComponent {
       return;
     }
     const item: ActionPlanDistrict = {
-      id: `ap-${Date.now()}`,
+      id: this.editingActionPlanIndex !== null ? this.actionPlan[this.editingActionPlanIndex].id : `ap-${Date.now()}`,
       year: this.newActionPlan.year || '2025-2026',
       district: this.newActionPlan.district,
       sdcCount: Number(this.newActionPlan.sdcCount) || 1,
@@ -2972,7 +3009,13 @@ export class SchemeFormComponent {
       mode: this.newActionPlan.mode || 'Both',
       batches: Number(this.newActionPlan.batches) || 5
     };
-    this.actionPlan.push(item);
+
+    if (this.editingActionPlanIndex !== null) {
+      this.actionPlan[this.editingActionPlanIndex] = item;
+      this.editingActionPlanIndex = null;
+    } else {
+      this.actionPlan.push(item);
+    }
     this.showAddActionPlanForm.set(false);
     this.newActionPlan = {
       year: '2025-2026',
@@ -2988,6 +3031,35 @@ export class SchemeFormComponent {
 
   removeActionPlan(index: number): void {
     this.actionPlan.splice(index, 1);
+  }
+
+  editActionPlan(index: number): void {
+    const item = this.actionPlan[index];
+    this.newActionPlan = { 
+      ...item, 
+      mode: item.mode as 'Residential' | 'Non-Residential' | 'Both' 
+    };
+    this.editingActionPlanIndex = index;
+    this.showAddActionPlanForm.set(true);
+  }
+
+  openAddActionPlan(): void {
+    if (this.showAddActionPlanForm() && this.editingActionPlanIndex === null) {
+      this.showAddActionPlanForm.set(false);
+      return;
+    }
+    this.editingActionPlanIndex = null;
+    this.newActionPlan = {
+      year: '2025-2026',
+      district: '',
+      sdcCount: 2,
+      location: '',
+      sectors: '',
+      courses: '',
+      mode: 'Both',
+      batches: 10
+    };
+    this.showAddActionPlanForm.set(true);
   }
 
   // Documents Tab Filter

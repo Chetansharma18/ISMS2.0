@@ -22,13 +22,13 @@ export interface RoleConfig {
 export const USER_ROLES: RoleConfig[] = [
   {
     role: 'new_user',
-    label: 'New Applicant',
+    label: 'New Usert',
     badge: 'First Time User',
     description: 'First time applicant with incomplete OTR profile'
   },
   {
     role: 'existing_user',
-    label: 'Existing Partner',
+    label: 'Existing User',
     badge: 'Registered TP/PIA',
     description: 'Registered agency with verified  profile'
   },

@@ -32,29 +32,22 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
             <!-- Core Content: 3 Clean Justified Paragraphs -->
             <div class="space-y-5 sm:space-y-6">
 
-              <p class="text-[16.5px] sm:text-[17.5px] lg:text-[18px] text-slate-700 font-normal leading-[1.8] text font-semibold">
+              <p class="text-[18.5px] sm:text-[18.5px] lg:text-[20px] text-slate-700 font-semibold leading-[1.8]">
                 Integrated Scheme Management System (ISMS 2.0) is a comprehensive
                 e-Governance and Management Information System (MIS) designed to digitally
                 transform, integrate, and streamline the processes involved in the planning,
                 implementation, monitoring, and management of skill development schemes
                 across Rajasthan.
-              </p>
-
-              <p class="text-[16.5px] sm:text-[17.5px] lg:text-[18px] text-slate-700 font-normal leading-[1.8] text-justify">
-                The platform provides a centralized and secure digital ecosystem that unites
+                 The platform provides a centralized and secure digital ecosystem that unites
                 youth, training providers, government departments, empaneled agencies, and
                 certification bodies on a single, high-transparency platform — ensuring
                 accountability, real-time visibility, and data-driven decision making at
                 every stage.
-              </p>
-
-              <p class="text-[16.5px] sm:text-[17.5px] lg:text-[18px] text-slate-700 font-normal leading-[1.8] text-justify">
-                ISMS 2.0 enables end-to-end scheme management — from scheme launching and
+                 ISMS 2.0 enables end-to-end scheme management — from scheme launching and
                 candidate enrollment through bio-metric attendance, quality inspections,
                 assessment, certification, and direct benefit and fund disbursements — all
                 within one unified, auditable platform.
               </p>
-
             </div>
           </div>
 

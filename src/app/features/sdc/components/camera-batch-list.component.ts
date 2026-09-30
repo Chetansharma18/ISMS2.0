@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { PageHeaderComponent, TableComponent, TableColumn } from '../../../shared';
@@ -166,15 +166,15 @@ interface CameraBatchItem {
                     </div>
                   } @else {
                     <div class="grid gap-3 sm:gap-4 h-full" [ngClass]="getGridClass()">
-                      @for (b of multiSelectedBatches(); track b.id) {
-                        <ng-container *ngTemplateOutlet="videoPlayerTpl; context: { $implicit: b }"></ng-container>
+                      @for (b of multiSelectedBatches(); track b.id; let idx = $index) {
+                        <ng-container *ngTemplateOutlet="videoPlayerTpl; context: { $implicit: b, itemClass: getItemClass(multiSelectedBatches().length, idx) }"></ng-container>
                       }
                     </div>
                   }
                 } @else {
                   <!-- Single View -->
                   <div class="w-full h-full max-w-6xl mx-auto flex flex-col">
-                    <ng-container *ngTemplateOutlet="videoPlayerTpl; context: { $implicit: selectedFeed() }"></ng-container>
+                    <ng-container *ngTemplateOutlet="videoPlayerTpl; context: { $implicit: selectedFeed(), itemClass: '' }"></ng-container>
                   </div>
                 }
               </div>
@@ -184,8 +184,8 @@ interface CameraBatchItem {
       }
 
       <!-- Reusable Video Player Template -->
-      <ng-template #videoPlayerTpl let-feed>
-        <div class="relative w-full h-full min-h-[250px] bg-black rounded-xl overflow-hidden shadow-lg border border-slate-800 flex flex-col group">
+      <ng-template #videoPlayerTpl let-feed let-itemClass="itemClass">
+        <div #videoContainer [ngClass]="itemClass" class="relative w-full h-full min-h-[250px] bg-black rounded-xl overflow-hidden shadow-lg border border-slate-800 flex flex-col group">
           
           <!-- Video Header Overlay -->
           <div class="absolute top-0 left-0 right-0 p-3 bg-gradient-to-b from-black/80 to-transparent z-10 flex items-start justify-between pointer-events-none">
@@ -229,7 +229,7 @@ interface CameraBatchItem {
                (mouseup)="endPan(feed.id)"
                (mouseleave)="endPan(feed.id)">
             <video 
-              src="https://www.w3schools.com/html/mov_bbb.mp4" 
+              src="/video.mp4" 
               autoplay 
               loop 
               muted 
@@ -240,11 +240,20 @@ interface CameraBatchItem {
             
             <!-- Recording indicator on video -->
             @if (recordingStates()[feed.id]) {
-              <div class="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-red-500/30 text-white text-xs shadow-lg animate-in slide-in-from-bottom-2">
+              <div class="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-red-500/30 text-white text-xs shadow-lg animate-in slide-in-from-bottom-2 z-30">
                 <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
                 <span class="font-mono font-semibold tracking-wider">REC</span>
               </div>
             }
+
+            <!-- Fullscreen Toggle Button -->
+            <button (click)="toggleFullScreen(videoContainer)" class="absolute bottom-4 right-4 w-8 h-8 rounded bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white flex items-center justify-center transition-colors border border-white/20 cursor-pointer shadow-lg opacity-100 sm:opacity-0 sm:group-hover:opacity-100 z-30" title="Toggle Full Screen">
+              @if (isFullscreen()) {
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9L4 4m0 0v4m0-4h4m6 5l5-5m0 0v4m0-4h-4m-5 6l-5 5m0 0v-4m0 4h4m6-5l5 5m0 0v-4m0 4h-4"/></svg>
+              } @else {
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+              }
+            </button>
           </div>
         </div>
       </ng-template>
@@ -304,6 +313,24 @@ export class CameraBatchListComponent {
   recordingStates = signal<Record<string, boolean>>({});
   zoomedStates = signal<Record<string, boolean>>({});
   panStates = signal<Record<string, {x: number, y: number, isDragging: boolean, startX: number, startY: number}>>({});
+  isFullscreen = signal<boolean>(false);
+
+  @HostListener('document:fullscreenchange')
+  onFullScreenChange() {
+    this.isFullscreen.set(!!document.fullscreenElement);
+  }
+
+  toggleFullScreen(element: HTMLElement) {
+    if (!document.fullscreenElement) {
+      if (element.requestFullscreen) {
+        element.requestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  }
 
   openFeed(item: CameraBatchItem) {
     this.selectedFeed.set(item);
@@ -350,10 +377,17 @@ export class CameraBatchListComponent {
 
   getGridClass() {
     const count = this.multiSelectedBatches().length;
-    if (count === 1) return 'grid-cols-1';
-    if (count === 2) return 'grid-cols-1 md:grid-cols-2';
-    if (count === 3) return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
-    return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+    if (count === 1) return 'grid-cols-1 grid-rows-1';
+    if (count === 2) return 'grid-cols-1 grid-rows-2';
+    if (count === 3) return 'grid-cols-2 grid-rows-2';
+    return 'grid-cols-2';
+  }
+
+  getItemClass(count: number, index: number) {
+    if (count === 3 && index === 0) {
+      return 'col-span-2 row-span-1';
+    }
+    return 'col-span-1';
   }
 
   toggleRecord(batchId: string) {

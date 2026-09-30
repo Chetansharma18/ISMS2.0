@@ -229,7 +229,7 @@ interface CameraBatchItem {
                (mouseup)="endPan(feed.id)"
                (mouseleave)="endPan(feed.id)">
             <video 
-              src="/video.mp4" 
+              src="https://www.w3schools.com/html/mov_bbb.mp4" 
               autoplay 
               loop 
               muted 

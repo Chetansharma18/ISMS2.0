@@ -53,7 +53,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                   [ngClass]="[
                     col.width || '',
                     (col.headerAlign || col.align) === 'center' ? 'text-center' : (col.headerAlign || col.align) === 'right' ? 'text-right' : 'text-left',
-                    !last ? 'border-r border-theme/70' : '',
+                    !last ? 'border-r border-slate-200' : '',
                     col.headerClass || ''
                   ]"
                 >
@@ -104,7 +104,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                       class="px-3.5 text-[13px]"
                       [ngClass]="[
                         col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left',
-                        !last ? 'border-r border-gray-100' : '',
+                        !last ? 'border-r border-slate-200' : '',
                         getCellClass(col, item)
                       ]"
                     >

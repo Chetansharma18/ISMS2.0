@@ -31,7 +31,7 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
 
         <!-- Navigation Links -->
         <nav class="flex flex-col gap-1 px-2.5" aria-label="Main Navigation">
-          
+
           <!-- ================================================================
                ROLE: DEPARTMENT ADMIN (Scrutiny Officer)
                ================================================================ -->
@@ -168,7 +168,7 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
                 <svg class="nav-icon w-[18px] h-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
                 </svg>
-                <span class="text-[13.5px] font-semibold">Aspirants</span>
+                <span class="text-[13.5px] font-semibold">Aspirants Management</span>
               </div>
               @if (aspirantCount() > 0) {
                 <span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-[#0B3558] text-white leading-none">

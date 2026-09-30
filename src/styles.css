@@ -58,21 +58,21 @@
   --font-family-base: var(--font-sans);
 
   /* Enterprise Portal Header & Content Tokens (Compact & Standardized) */
-  --portal-font-size-title: 16px;
-  --portal-font-size-body: 13px;
-  --portal-font-size-label: 12.5px;
-  --portal-font-size-table: 12.5px;
-  --portal-font-size-small: 11.5px;
+  --portal-font-size-title: 18px;
+  --portal-font-size-body: 15px;
+  --portal-font-size-label: 14px;
+  --portal-font-size-table: 14px;
+  --portal-font-size-small: 13px;
 
   /* Standardized Global Heading & Body Sizing */
-  --font-size-page-title: 18px;
-  --font-size-section-title: 16px;
-  --font-size-card-title: 14px;
-  --font-size-body: 13px;
-  --font-size-label: 12.5px;
-  --font-size-table: 12.5px;
-  --font-size-small: 11.5px;
-  --font-size-caption: 10.5px;
+  --font-size-page-title: 22px;
+  --font-size-section-title: 18px;
+  --font-size-card-title: 16px;
+  --font-size-body: 15px;
+  --font-size-label: 14px;
+  --font-size-table: 14px;
+  --font-size-small: 13px;
+  --font-size-caption: 12px;
 
   /* Font Weights */
   --font-weight-regular: 400;
@@ -122,7 +122,7 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: 17px;
   scroll-behavior: smooth;
 }
 
@@ -135,9 +135,9 @@ body {
   background-color: #ffffff !important;
   color: var(--color-text-primary);
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-body);
+  line-height: 22px;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -168,32 +168,32 @@ textarea {
   }
 
   :where(h1) {
-    font-size: 18px;
-    line-height: 24px;
+    font-size: 22px;
+    line-height: 30px;
     font-weight: 700;
   }
 
   :where(h2) {
-    font-size: 16px;
-    line-height: 22px;
+    font-size: 20px;
+    line-height: 28px;
     font-weight: 600;
   }
 
   :where(h3) {
-    font-size: 14px;
-    line-height: 20px;
+    font-size: 17px;
+    line-height: 24px;
     font-weight: 600;
   }
 
   :where(h4) {
-    font-size: 13px;
-    line-height: 18px;
+    font-size: 15px;
+    line-height: 22px;
     font-weight: 600;
   }
 
   :where(h5, h6) {
-    font-size: 12px;
-    line-height: 16px;
+    font-size: 14px;
+    line-height: 20px;
     font-weight: 600;
   }
 }
@@ -203,8 +203,8 @@ textarea {
    --------------------------------------------------------- */
 :where(p) {
   margin: 0;
-  font-size: 13px;
-  line-height: var(--line-height-body);
+  font-size: 15px;
+  line-height: 24px;
 }
 
 :where(small) {

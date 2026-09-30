@@ -1475,7 +1475,7 @@ export interface EoiDocumentItem {
                     </div>
                     <div>
                       <span class="text-slate-400 block text-[10.5px]">Nature of Entity</span>
-                      <span class="font-semibold text-slate-800">{{ editableStep1.natureOfEntity || 'PUBLIC LIMITED' }}</span>
+                      <span class="font-semibold text-slate-800">{{ editableStep1.natureOfEntity || 'PRIVATE LIMITED' }}</span>
                     </div>
                     <div>
                       <span class="text-slate-400 block text-[10.5px]">CIN / Registration No</span>
@@ -1686,7 +1686,6 @@ export interface EoiDocumentItem {
                         <th class="py-2.5 px-3">Financial Year</th>
                         <th class="py-2.5 px-3">Total Turnover (₹ in Lacs)</th>
                         <th class="py-2.5 px-3">Skill Training Turnover (₹ in Lacs)</th>
-                        <th class="py-2.5 px-3 text-center">Status</th>
                       </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -1695,21 +1694,14 @@ export interface EoiDocumentItem {
                           <td class="py-2.5 px-3 text-slate-800 font-mono font-semibold">{{ fy.year }}</td>
                           <td class="py-2.5 px-3 text-slate-700 font-mono">₹ {{ fy.totalTurnover || '0.00' }} Lacs</td>
                           <td class="py-2.5 px-3 text-slate-700 font-mono">₹ {{ fy.skillTurnover || '0.00' }} Lacs</td>
-                          <td class="py-2.5 px-3 text-center">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                              Verified Entry
-                            </span>
-                          </td>
                         </tr>
                       }
                       <tr class="bg-sky-50/60 font-bold border-t border-slate-200">
                         <td class="py-2.5 px-3 uppercase text-[11px] text-[#0B3558]">3-Year Average</td>
                         <td class="py-2.5 px-3 text-[#0B3558] font-mono text-sm">₹ {{ avgTotalTurnover() }} Lacs</td>
-                        <td class="py-2.5 px-3 text-emerald-800 font-mono text-sm">₹ {{ avgSkillTurnover() }} Lacs</td>
-                        <td class="py-2.5 px-3 text-center">
-                          <span class="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-emerald-100 text-emerald-900">
-                            &check; Meets Eligibility Criteria
-                          </span>
+                        <td class="py-2.5 px-3 text-emerald-800 font-mono text-sm">
+                          ₹ {{ avgSkillTurnover() }} Lacs
+                          <span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900">&check; Meets Eligibility Criteria</span>
                         </td>
                       </tr>
                     </tbody>
@@ -1967,19 +1959,34 @@ export interface EoiDocumentItem {
                 &larr; Back to Proposal Form
               </button>
 
-              <button
-                type="button"
-                [disabled]="!declarationAgreed()"
-                (click)="openSubmitConfirm()"
-                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2"
-                [class.cursor-pointer]="declarationAgreed()"
-                [class.cursor-not-allowed]="!declarationAgreed()"
-              >
-                <span>Submit EOI Proposal &amp; Pay Fees</span>
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </button>
+              <div class="flex items-center gap-3">
+                <!-- Download PDF -->
+                <button
+                  type="button"
+                  (click)="downloadCompleteProposalDossier()"
+                  class="px-5 py-2.5 border border-slate-300 hover:bg-slate-50 rounded-lg text-xs sm:text-sm font-semibold text-slate-700 cursor-pointer transition-colors flex items-center gap-2"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                  </svg>
+                  <span>Download PDF</span>
+                </button>
+
+                <!-- Submit -->
+                <button
+                  type="button"
+                  [disabled]="!declarationAgreed()"
+                  (click)="openSubmitConfirm()"
+                  class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2"
+                  [class.cursor-pointer]="declarationAgreed()"
+                  [class.cursor-not-allowed]="!declarationAgreed()"
+                >
+                  <span>Submit EOI Proposal &amp; Pay Fees</span>
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </button>
+              </div>
             </div>
 
           </div>
@@ -3501,7 +3508,7 @@ export class SchemeFormComponent {
   downloadReceipt(type: 'acknowledgment' | 'payment'): void {
     const isAck = type === 'acknowledgment';
     const filename = isAck ? 'EOI_Submission_Acknowledgment_Receipt.html' : 'EOI_Cyber_Treasury_Payment_Receipt.html';
-    
+
     const htmlContent = isAck
       ? `<!DOCTYPE html>
 <html lang="en">

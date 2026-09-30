@@ -5,7 +5,6 @@ import { RouterModule } from '@angular/router';
 import {
   PageHeaderComponent,
   TableComponent,
-  ButtonComponent,
   TableColumn
 } from '../../shared';
 
@@ -32,8 +31,8 @@ export interface SubmittedTender {
     FormsModule,
     RouterModule,
     PageHeaderComponent,
-    TableComponent,
-    ButtonComponent
+    TableComponent
+
   ],
   template: `
     <div class="w-full min-h-full bg-white text-text-primary font-sans">
@@ -136,223 +135,21 @@ export interface SubmittedTender {
         </ng-template>
 
         <ng-template #viewTemplate let-tender>
-          <app-button
-            variant="pdf-view"
-            size="sm"
-            (btnClick)="openReceipt(tender)"
-            title="View Receipt PDF"
+          <button
+            type="button"
+            (click)="downloadReceipt(tender)"
+            title="Download / Print Receipt PDF"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-md text-xs font-semibold cursor-pointer shadow-sm transition-colors"
           >
-            View
-          </app-button>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span>View</span>
+          </button>
         </ng-template>
 
       </div>
 
-      <!-- Receipt Preview Modal -->
-      @if (selectedReceiptTender(); as receipt) {
-        <div
-          class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-200 font-sans"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div class="relative max-w-3xl w-full bg-white rounded-lg shadow-xl border border-slate-300 overflow-hidden my-auto max-h-[95vh] flex flex-col">
-            
-            <!-- Top Controls Bar -->
-            <div class="bg-slate-100 px-4 py-2 border-b border-slate-200 flex items-center justify-between shrink-0">
-              <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                <span class="text-xs font-medium text-slate-700">Official Submission Receipt &bull; {{ receipt.appRef }}</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <button
-                  type="button"
-                  (click)="downloadReceipt(receipt)"
-                  class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-normal cursor-pointer shadow-2xs transition-colors"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  <span>Download PDF</span>
-                </button>
-                <button
-                  type="button"
-                  (click)="downloadReceipt(receipt)"
-                  class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 rounded text-xs font-normal cursor-pointer shadow-2xs transition-colors"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                  </svg>
-                  <span>Print</span>
-                </button>
-                <button
-                  type="button"
-                  (click)="selectedReceiptTender.set(null)"
-                  class="w-7 h-7 flex items-center justify-center rounded text-slate-500 hover:text-slate-800 hover:bg-slate-200 cursor-pointer text-lg leading-none transition-colors ml-1"
-                  title="Close Preview"
-                >
-                  &times;
-                </button>
-              </div>
-            </div>
-
-            <!-- Scrollable Receipt Content -->
-            <div class="overflow-y-auto p-4 sm:p-5 space-y-3.5 text-xs font-sans bg-white">
-              
-              <!-- 1. Government Header Banner (Navy Blue with Orange Border) -->
-              <div class="bg-[#0d2342] text-white p-4 sm:p-5 rounded-t-lg border-b-4 border-amber-500">
-                <div class="text-[#f59e0b] font-medium text-xs uppercase tracking-wider">
-                  GOVERNMENT OF RAJASTHAN
-                </div>
-                <div class="text-xs text-slate-300 font-normal mt-0.5">
-                  Rajasthan Skill &amp; Livelihoods Development Corporation (RSLDC)
-                </div>
-                <h2 class="text-base sm:text-lg font-semibold text-white tracking-wide mt-1">
-                  ISMS 2.0 - INTEGRATED SCHEME MANAGEMENT SYSTEM
-                </h2>
-                <div class="text-[11px] text-slate-200 uppercase tracking-widest mt-0.5 font-normal">
-                  EOI APPLICATION SUBMISSION RECEIPT &amp; ACKNOWLEDGEMENT
-                </div>
-              </div>
-
-              <!-- 2. Blue Details Box -->
-              <div class="bg-[#f0f7ff] border border-[#bfdbfe] rounded-md p-3 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                <div>
-                  <span class="text-[#0B3558] font-medium block text-[11px]">Application Reference No:</span>
-                  <span class="text-xs sm:text-sm font-semibold text-[#0B3558] font-mono">{{ receipt.appRef }}</span>
-                </div>
-                <div>
-                  <span class="text-[#0B3558] font-medium block text-[11px]">Acknowledgement No:</span>
-                  <span class="text-xs font-normal text-slate-800 font-mono">ACK-RSLDC-{{ receipt.appRef.replace('ISMS-EOI-', '') }}</span>
-                </div>
-                <div>
-                  <span class="text-[#0B3558] font-medium block text-[11px]">Submission Timestamp:</span>
-                  <span class="text-xs text-slate-800">{{ receipt.appliedDate }}, 03:45 PM IST</span>
-                </div>
-              </div>
-
-              <!-- 3. Section 1: APPLICANT & TRAINING PROVIDER INFORMATION -->
-              <div class="border border-slate-200 rounded overflow-hidden">
-                <div class="bg-[#e8f1fd] border-b border-[#bfdbfe] px-3 py-1.5 text-xs font-medium text-[#0B3558] uppercase">
-                  1. APPLICANT &amp; TRAINING PROVIDER INFORMATION
-                </div>
-                <div class="p-3 space-y-1.5 text-xs font-normal bg-white">
-                  <div class="flex flex-col sm:flex-row">
-                    <span class="text-slate-500 font-normal sm:w-48 shrink-0">Organization Full Name:</span>
-                    <span class="text-slate-900 font-normal">Apex Skill Development Foundation</span>
-                  </div>
-                  <div class="flex flex-col sm:flex-row">
-                    <span class="text-slate-500 font-normal sm:w-48 shrink-0">Registration / Trust No:</span>
-                    <span class="text-slate-900 font-normal flex-1">
-                      REG/RAJ/2018/88921 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                      <span class="text-slate-500 font-normal">Entity PAN:</span>
-                      <span class="font-mono text-slate-900 ml-1">AAACA1234C</span>
-                    </span>
-                  </div>
-                  <div class="flex flex-col sm:flex-row">
-                    <span class="text-slate-500 font-normal sm:w-48 shrink-0">Authorized Signatory:</span>
-                    <span class="text-slate-900 font-normal">Rajesh Kumar Sharma (Managing Director &amp; CEO)</span>
-                  </div>
-                  <div class="flex flex-col sm:flex-row">
-                    <span class="text-slate-500 font-normal sm:w-48 shrink-0">Official Contact:</span>
-                    <span class="text-slate-900 font-normal">9829012345 &nbsp;|&nbsp; contact&#64;apexskills.org</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 4. Section 2: MANDATORY FEE PAYMENT & TRANSACTION DETAILS -->
-              <div class="border border-slate-200 rounded overflow-hidden">
-                <div class="bg-[#e8f1fd] border-b border-[#bfdbfe] px-3 py-1.5 text-xs font-medium text-[#0B3558] uppercase">
-                  2. MANDATORY FEE PAYMENT &amp; TRANSACTION DETAILS
-                </div>
-                <div class="overflow-x-auto">
-                  <table class="w-full text-xs text-left">
-                    <thead class="bg-slate-50 border-b border-slate-200 text-[11px] font-medium text-slate-700">
-                      <tr>
-                        <th class="py-1.5 px-3">Fee Description</th>
-                        <th class="py-1.5 px-2.5">Accounting Head</th>
-                        <th class="py-1.5 px-2.5">Payment Status</th>
-                        <th class="py-1.5 px-3 text-right">Amount (INR)</th>
-                      </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 font-normal text-slate-700">
-                      <tr>
-                        <td class="py-1.5 px-3">EOI Proposal Processing Fee (Non-Refundable)</td>
-                        <td class="py-1.5 px-2.5 font-mono text-[11px]">RSLDC-FEE-PROC-2026</td>
-                        <td class="py-1.5 px-2.5 text-emerald-600 font-normal">SUCCESSFUL / PAID</td>
-                        <td class="py-1.5 px-3 text-right">Rs. 2,000</td>
-                      </tr>
-                      <tr>
-                        <td class="py-1.5 px-3">Earnest Money Deposit (EMD)</td>
-                        <td class="py-1.5 px-2.5 font-mono text-[11px]">RSLDC-EMD-SEC-2026</td>
-                        <td class="py-1.5 px-2.5 text-emerald-600 font-normal">SUCCESSFUL / PAID</td>
-                        <td class="py-1.5 px-3 text-right">Rs. 50,000</td>
-                      </tr>
-                      <tr class="bg-blue-50/60 font-medium text-[#0B3558]">
-                        <td colspan="3" class="py-2 px-3">Total Amount Received &amp; Realized in RSLDC Account:</td>
-                        <td class="py-2 px-3 text-right text-xs font-semibold">Rs. 52,000</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div class="p-2.5 border-t border-slate-200 bg-slate-50/60 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2">
-                  <div>
-                    <span class="text-slate-500">Gateway Transaction ID:</span>
-                    <span class="font-normal text-slate-800 font-mono ml-1">{{ receipt.transactionRef || 'TXN-ISMS-884920482' }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-500">Payment Method:</span>
-                    <span class="font-normal text-slate-800 ml-1">Net Banking</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 5. Section 3: VERIFIED PROPOSAL DOCUMENTS & SUBMISSION CHECKLIST -->
-              <div class="border border-slate-200 rounded overflow-hidden">
-                <div class="bg-[#e8f1fd] border-b border-[#bfdbfe] px-3 py-1.5 text-xs font-medium text-[#0B3558] uppercase">
-                  3. VERIFIED PROPOSAL DOCUMENTS &amp; SUBMISSION CHECKLIST
-                </div>
-                <div class="p-3 space-y-1.5 text-xs bg-white font-normal">
-                  <div class="flex items-center justify-between">
-                    <span class="text-emerald-700 font-normal">[✓] 1. Company / Entity Registration Certificate</span>
-                    <span class="text-slate-500 font-mono text-[11px]">company_registration_incorporation_proof.pdf</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-emerald-700 font-normal">[✓] 2. Past Skill Training Experience Certificates</span>
-                    <span class="text-slate-500 font-mono text-[11px]">previous_training_experience_certificates.pdf</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-emerald-700 font-normal">[✓] 3. CA Certified Annual Turnover (Last 3 FY)</span>
-                    <span class="text-slate-500 font-mono text-[11px]">ca_certified_turnover_certificate_last_3_fy.pdf</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-emerald-700 font-normal">[✓] 4. Technical Proposal &amp; Action Plan 2025-26</span>
-                    <span class="text-slate-500 font-mono text-[11px]">technical_proposal_methodology_2025_26.pdf</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 6. Footer Modification Window & Portal Box -->
-              <div class="border border-slate-200 rounded p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs bg-slate-50/50">
-                <div class="space-y-0.5 max-w-md font-normal">
-                  <div class="font-medium text-slate-800">Post-Submission Online Modification Window:</div>
-                  <p class="text-[11px] text-slate-600 leading-normal">
-                    Applicants can modify their submitted EOI online up to 3 times before the official tender deadline: 30 September 2026, 23:59:59 IST.
-                  </p>
-                  <div class="font-medium text-slate-800 text-[11px]">
-                    EOI Reference: EOI-MMKVY-2026-01
-                  </div>
-                </div>
-                <div class="border border-[#0B3558] px-4 py-2 rounded text-center shrink-0">
-                  <div class="font-medium text-[#0B3558] text-xs tracking-wider">
-                    RSLDC ISMS 2.0 PORTAL
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      }
 
     </div>
   `
@@ -559,7 +356,7 @@ export class TenderStatusComponent {
   }
 
   openReceipt(tender: SubmittedTender): void {
-    this.selectedReceiptTender.set(tender);
+    this.downloadReceipt(tender);
   }
 
   /**

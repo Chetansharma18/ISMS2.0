@@ -22,7 +22,7 @@ export interface RoleConfig {
 export const USER_ROLES: RoleConfig[] = [
   {
     role: 'new_user',
-    label: 'New Usert',
+    label: 'New User',
     badge: 'First Time User',
     description: 'First time applicant with incomplete OTR profile'
   },

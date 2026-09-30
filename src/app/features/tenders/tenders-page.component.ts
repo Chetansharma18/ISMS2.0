@@ -164,7 +164,7 @@ export interface EoiDocumentItem {
               <button
                 type="button"
                 (click)="$event.stopPropagation(); viewSchemeDetails(item)"
-                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-semibold text-[#0483AC] hover:text-white hover:bg-[#0483AC] border border-[#0483AC]/40 hover:border-[#0483AC] bg-white cursor-pointer transition-all select-none"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-semibold text-[#0483AC] border border-[#0483AC]/40 bg-white cursor-pointer select-none"
                 title="View scheme details (closed)"
               >
                 <svg class="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -174,14 +174,18 @@ export interface EoiDocumentItem {
                 <span>View</span>
               </button>
             } @else {
-              <app-button
-                variant="pdf-view"
-                size="sm"
-                (btnClick)="$event.stopPropagation(); viewSchemeDetails(item)"
+              <button
+                type="button"
+                (click)="$event.stopPropagation(); viewSchemeDetails(item)"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-semibold text-[#0483AC] border border-[#0483AC]/40 bg-white cursor-pointer select-none"
                 title="View EOI Details"
               >
-                View
-              </app-button>
+                <svg class="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <span>View</span>
+              </button>
             }
           </ng-template>
 
@@ -381,12 +385,6 @@ export class TendersPageComponent {
       label: 'EOI Category',
       align: 'center',
       cellClass: (_val, item) => `whitespace-nowrap font-normal ${this.isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-700'}`
-    },
-    {
-      key: 'eoiDescription',
-      label: 'EOI Description',
-      width: 'min-w-[200px] max-w-sm',
-      type: 'custom'
     },
     {
       key: 'viewAction',

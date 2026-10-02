@@ -90,6 +90,7 @@ export interface EoiDocumentItem {
               @if (isSuperAdmin()) {
                 <button
                   type="button"
+                  (click)="openConfigureEoiModal()"
                   class="px-4 py-2.5 bg-[#174A6E] hover:bg-[#0B3558] text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center gap-2"
                 >
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -238,6 +239,83 @@ export interface EoiDocumentItem {
       >
       </app-action-modal>
 
+      <!-- ====================================================================
+           MODAL: CONFIGURE NEW EOI
+           ==================================================================== -->
+      <app-action-modal
+        [isOpen]="showConfigureEoiModal()"
+        [showCloseButton]="true"
+        [closeOnBackdrop]="false"
+        [reverseButtons]="true"
+        [showAccentBar]="false"
+        primaryLabel="Submit"
+        secondaryLabel="Cancel"
+        maxWidthClass="max-w-[650px]"
+        (primaryAction)="submitNewEoi()"
+        (secondaryAction)="closeConfigureEoiModal()"
+        (close)="closeConfigureEoiModal()"
+      >
+        <h2 class="m-0 text-[#0B3558]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+          Configure New EOI
+        </h2>
+        <div class="mt-4 font-sans text-[13px]">
+          <div class="grid grid-cols-[200px_1fr] items-center gap-y-3 gap-x-4">
+            <label class="text-slate-700 font-medium">EOI Reference No.*</label>
+            <input type="text" maxlength="100" [(ngModel)]="newEoiData.refNo" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.refNo, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.refNo)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
+            
+            <label class="text-slate-700 font-medium">Scheme*</label>
+            <select [(ngModel)]="newEoiData.scheme" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.scheme, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.scheme)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white">
+              <option value="MMKVY">MMKVY</option>
+              <option value="RAJKVIK">RAJKVIK</option>
+            </select>
+
+            <label class="text-slate-700 font-medium">Scheme Category</label>
+            <input type="text" value="ALL" disabled class="w-full px-2.5 py-1.5 border border-[#e2e8f0] bg-[#f8fafc] rounded text-slate-500" />
+
+            <label class="text-slate-700 font-medium">Date of Eol Published*</label>
+            <input type="date" [(ngModel)]="newEoiData.publishedDate" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.publishedDate, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.publishedDate)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
+
+            <label class="text-slate-700 font-medium">Last Date of Eol Submission*</label>
+            <input type="date" [(ngModel)]="newEoiData.submissionDate" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.submissionDate, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.submissionDate)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
+
+            <label class="text-slate-700 font-medium">EOI Category*</label>
+            <select [(ngModel)]="newEoiData.eoiCategory" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.eoiCategory, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.eoiCategory)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white">
+              <option value="General">General</option>
+              <option value="Special">Special</option>
+            </select>
+
+            <label class="text-slate-700 font-medium">EOI Description</label>
+            <input type="text" maxlength="100" [(ngModel)]="newEoiData.description" class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
+
+            <label class="text-slate-700 font-medium">EMD Fee*</label>
+            <input type="text" maxlength="100" [(ngModel)]="newEoiData.emdFee" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.emdFee, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.emdFee)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
+
+            <label class="text-slate-700 font-medium">Process Fee*</label>
+            <input type="text" maxlength="100" [(ngModel)]="newEoiData.processFee" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.processFee, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.processFee)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
+
+            <label class="text-slate-700 font-medium">Attach File*</label>
+            <div class="flex items-center h-full gap-2">
+              <label class="cursor-pointer text-[#174A6E] hover:text-[#0B3558] flex items-center justify-center">
+                <svg class="w-5 h-5 transform -rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+                <input type="file" class="hidden" accept=".pdf,.txt,.jpeg,.jpg,.png,.doc,.docx,.xls,.xlsx" (change)="onFileSelected($event)" />
+              </label>
+              @if (newEoiData.fileName) {
+                <span class="text-xs text-slate-600 truncate max-w-[200px]" title="{{newEoiData.fileName}}">{{newEoiData.fileName}}</span>
+              }
+              @if (newEoiSubmitted() && !newEoiData.file) {
+                <span class="text-xs text-red-500">Required</span>
+              }
+            </div>
+            
+            @if (fileError()) {
+              <div class="col-span-2 text-xs text-red-500 font-medium mt-[-4px]">{{ fileError() }}</div>
+            }
+          </div>
+        </div>
+      </app-action-modal>
+
     </div>
   `
 })
@@ -261,7 +339,23 @@ export class TendersPageComponent {
 
   selectedScheme = signal<SchemeTender | null>(null);
   readonly showOtrPromptModal = signal<boolean>(false);
+  readonly showConfigureEoiModal = signal<boolean>(false);
   private promptDismissed = false;
+
+  newEoiData = {
+    refNo: '',
+    scheme: 'MMKVY',
+    publishedDate: '',
+    submissionDate: '',
+    eoiCategory: 'General',
+    description: '',
+    emdFee: '',
+    processFee: '',
+    file: null as File | null,
+    fileName: ''
+  };
+  newEoiSubmitted = signal<boolean>(false);
+  fileError = signal<string>('');
 
   pageSize = 10;
   searchQuery = signal<string>('');
@@ -704,6 +798,69 @@ export class TendersPageComponent {
     if (!scheme) return '';
     if (scheme.eoiDescription) return scheme.eoiDescription;
     return `Expression of Interest for Empanelment of Training Providers / PIAs to implement state skill development initiatives under ${scheme.schemeTitle || scheme.schemeName}.`;
+  }
+
+  openConfigureEoiModal(): void {
+    this.newEoiSubmitted.set(false);
+    this.fileError.set('');
+    this.newEoiData = {
+      refNo: '',
+      scheme: 'MMKVY',
+      publishedDate: '',
+      submissionDate: '',
+      eoiCategory: 'General',
+      description: '',
+      emdFee: '',
+      processFee: '',
+      file: null,
+      fileName: ''
+    };
+    this.showConfigureEoiModal.set(true);
+  }
+
+  closeConfigureEoiModal(): void {
+    this.showConfigureEoiModal.set(false);
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      const validExtensions = ['pdf', 'txt', 'jpeg', 'jpg', 'png', 'doc', 'docx', 'xls', 'xlsx'];
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || '';
+      
+      if (!validExtensions.includes(fileExt)) {
+        this.fileError.set('Invalid file type. Supported: PDF, TXT, JPEG, PNG, WORD, EXCEL.');
+        this.newEoiData.file = null;
+        this.newEoiData.fileName = '';
+        return;
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        this.fileError.set('File size exceeds the 10MB limit.');
+        this.newEoiData.file = null;
+        this.newEoiData.fileName = '';
+        return;
+      }
+
+      this.fileError.set('');
+      this.newEoiData.file = file;
+      this.newEoiData.fileName = file.name;
+    }
+  }
+
+  submitNewEoi(): void {
+    this.newEoiSubmitted.set(true);
+    
+    // Validate mandatory fields
+    const d = this.newEoiData;
+    if (!d.refNo || !d.scheme || !d.publishedDate || !d.submissionDate || !d.eoiCategory || !d.emdFee || !d.processFee || !d.file) {
+      return; // Invalid, fields will turn red
+    }
+
+    // In a real app, form values would be collected and sent to a service here.
+    console.log('Submitted New EOI Configuration', this.newEoiData);
+    this.showConfigureEoiModal.set(false);
   }
 }
 

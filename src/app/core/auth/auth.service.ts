@@ -1,7 +1,7 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
-export type UserRole = 'new_user' | 'existing_user' | 'dept_admin' | 'super_admin';
+export type UserRole = 'new_user' | 'existing_user' | 'dept_admin';
 
 export interface UserPersona {
   id: string;
@@ -37,12 +37,6 @@ export const USER_ROLES: RoleConfig[] = [
     label: 'Department Admin',
     badge: 'Officer Portal',
     description: 'Departmental scheme officer and scrutiny incharge'
-  },
-  {
-    role: 'super_admin',
-    label: 'Super Admin',
-    badge: 'System Admin',
-    description: 'State system master manager and portal controller'
   }
 ];
 

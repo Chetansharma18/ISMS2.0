@@ -13,100 +13,99 @@ import { RouterModule } from '@angular/router';
 import { TendersModalComponent } from '../tenders-modal/tenders-modal.component';
 import { AuthService } from '../../../../core/auth/auth.service';
 
+interface TenderItem {
+  date: string;
+  id: string;
+  category: string;
+  isNew: boolean;
+  status: string;
+  title: string;
+}
+
 @Component({
   selector: 'app-hero-tenders',
   standalone: true,
   imports: [CommonModule, RouterModule, TendersModalComponent],
   template: `
-    <!-- Expanded Width Container with Perfect Fixed Height -->
-    <div #tendersContainer class="w-full max-w-[520px] sm:max-w-[550px] lg:max-w-[580px] mx-auto lg:ml-auto relative">
-      <div class="w-full h-[480px] sm:h-[520px] lg:h-[540px] bg-white rounded-2xl shadow-2xl border border-white/60 flex flex-col overflow-hidden relative z-20">
+    <!-- Right Column Panel: 540–600px desktop width, 410–430px height, clean official government card -->
+    <div class="w-full max-w-[540px] lg:max-w-[580px] xl:max-w-[600px] mx-auto lg:ml-auto">
+      <div class="w-full h-[410px] sm:h-[425px] lg:h-[430px] bg-white rounded-[12px] shadow-[0_10px_25px_rgba(0,0,0,0.18)] border border-[#DCE4ED] flex flex-col overflow-hidden relative">
         
-        <!-- Header -->
-        <div class="bg-primary px-5 sm:px-6 py-4 flex items-center justify-between z-10 shrink-0 shadow-sm border-b border-[#07233B]" style="background-color: var(--color-primary, #174A6E);">
-          <div class="flex items-center gap-2.5 text-white font-bold tracking-wide text-sm sm:text-base">
-            <span>TENDER</span>
+        <!-- PANEL HEADER (Height 58–66px, clean white background, dark navy text with orange accent) -->
+        <div class="h-[60px] px-5 sm:px-6 bg-white border-b border-[#DCE4ED] flex items-center justify-between shrink-0 z-10">
+          <div class="flex items-center gap-2.5">
+            <!-- Small Orange Accent Bar -->
+            <span class="w-[4px] h-[18px] bg-[#F28C28] rounded-full inline-block" aria-hidden="true"></span>
+            <h2 class="text-[17px] font-bold text-[#12365A] tracking-wide m-0">TENDER</h2>
           </div>
+          
+          <!-- View All Action -->
           <button 
             type="button"
-            (click)="isTendersModalOpen.set(true)" 
-            class="bg-[#F6A820] hover:bg-[#d89218] text-slate-950 text-[11px] font-bold px-3.5 py-1.5 rounded-full transition-colors cursor-pointer focus:outline-none shadow-xs"
+            (click)="openModal()" 
+            class="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#12365A] hover:text-[#F28C28] bg-[#F5F8FC] hover:bg-[#EAF2F6] border border-[#DCE4ED] px-3.5 py-1.5 rounded-full transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F28C28]"
             aria-label="View all tenders in modal">
-            View All &gt;
+            <span>View All</span>
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         </div>
 
-        <!-- Tenders List (Hardware-Accelerated Infinite Vertical Marquee) -->
+        <!-- TENDER LIST: Clean readable rows, subtle dividers, internally scrollable -->
         <div 
-          class="flex-1 overflow-hidden relative cursor-pointer" 
-          (mouseenter)="isHoveringTenders.set(true)" 
-          (mouseleave)="isHoveringTenders.set(false)"
-          (touchstart)="isHoveringTenders.set(true)"
-          (touchend)="isHoveringTenders.set(false)">
+          #scrollList
+          class="flex-1 overflow-y-auto divide-y divide-[#DCE4ED] bg-white tender-custom-scroll" 
+          (mouseenter)="pauseScroll()" 
+          (mouseleave)="resumeScrollWithDelay()"
+          (touchstart)="pauseScroll()"
+          (touchend)="resumeScrollWithDelay()">
           
-          <div 
-            class="absolute w-full animate-marquee-vertical" 
-            [style.animation-play-state]="shouldAnimate() ? 'running' : 'paused'">
-            
-            <!-- Loop 1 -->
-            <div class="flex flex-col gap-2.5 p-3">
-              @for (item of tenders; track item.id) {
-                <div 
-                  (click)="openLoginPrompt(item)" 
-                  class="relative p-3.5 sm:p-4 bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-xl hover:shadow-lg hover:border-blue-400 hover:bg-blue-50/70 hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer">
+          @for (item of tenders; track item.id) {
+            <div 
+              (click)="openLoginPrompt(item)" 
+              class="p-3.5 sm:p-4 hover:bg-[#F5F8FC] transition-colors duration-150 cursor-pointer group flex flex-col gap-1.5 text-left focus:outline-none focus:bg-[#F5F8FC]"
+              tabindex="0"
+              (keydown.enter)="openLoginPrompt(item)"
+              (keydown.space)="openLoginPrompt(item)"
+              role="button"
+              [attr.aria-label]="'Tender: ' + item.title">
+              
+              <!-- Top Row: Date & Category Badge -->
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-[12px] sm:text-[12.5px] text-[#556987] font-medium">{{ item.date }}</span>
                   @if (item.isNew) {
-                    <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-xl" />
-                  }
-                  <div class="flex justify-between items-center mb-1.5">
-                    <span class="text-[10.5px] sm:text-[11.5px] text-slate-500 font-medium">{{ item.date }}</span>
-                    <span class="text-[10px] font-semibold text-[#174A6E] bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">{{ item.category }}</span>
-                  </div>
-                  <h4 class="text-xs sm:text-[13.5px] font-bold text-slate-800 leading-snug mb-1.5 group-hover:text-blue-700 group-hover:underline group-hover:underline-offset-2 transition-all line-clamp-2">
-                    {{ item.title }}
-                  </h4>
-                  <div class="flex items-center justify-between">
-                    <p class="text-[10px] text-slate-400 font-mono truncate max-w-[70%]">{{ item.id }}</p>
-                    <span class="text-[11px] font-semibold text-amber-700 group-hover:text-amber-800 flex items-center gap-1">
-                      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      Login Required
+                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-1.5 py-0.2 rounded font-sans tracking-wide">
+                      NEW
                     </span>
-                  </div>
-                </div>
-              }
-            </div>
-            
-            <!-- Loop 2 (Duplicate for Seamless Scroll) -->
-            <div class="flex flex-col gap-2.5 p-3 mt-2.5" aria-hidden="true">
-              @for (item of tenders; track item.id + '-dup') {
-                <div 
-                  (click)="openLoginPrompt(item)" 
-                  class="relative p-3.5 sm:p-4 bg-white border border-[#0B3558]/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-xl hover:shadow-lg hover:border-blue-400 hover:bg-blue-50/70 hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer">
-                  @if (item.isNew) {
-                    <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-11 h-11 object-cover z-10 pointer-events-none drop-shadow-sm rounded-tl-xl" />
                   }
-                  <div class="flex justify-between items-center mb-1.5">
-                    <span class="text-[10.5px] sm:text-[11.5px] text-slate-500 font-medium">{{ item.date }}</span>
-                    <span class="text-[10px] font-semibold text-[#174A6E] bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">{{ item.category }}</span>
-                  </div>
-                  <h4 class="text-xs sm:text-[13.5px] font-bold text-slate-800 leading-snug mb-1.5 group-hover:text-blue-700 group-hover:underline group-hover:underline-offset-2 transition-all line-clamp-2">
-                    {{ item.title }}
-                  </h4>
-                  <div class="flex items-center justify-between">
-                    <p class="text-[10px] text-slate-400 font-mono truncate max-w-[70%]">{{ item.id }}</p>
-                    <span class="text-[11px] font-semibold text-amber-700 group-hover:text-amber-800 flex items-center gap-1">
-                      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      Login Required
-                    </span>
-                  </div>
                 </div>
-              }
-            </div>
+                <span class="text-[11px] font-semibold text-[#12365A] bg-[#EAF2F6] border border-[#D9E1E7] rounded px-2 py-0.5 shrink-0">
+                  {{ item.category }}
+                </span>
+              </div>
 
-          </div>
+              <!-- Middle Row: Tender Title -->
+              <h4 class="text-[13px] sm:text-[13.5px] font-semibold text-[#12365A] leading-snug group-hover:text-[#F28C28] transition-colors line-clamp-2 m-0">
+                {{ item.title }}
+              </h4>
+
+              <!-- Bottom Row: Reference Number & Login Required Indicator -->
+              <div class="flex items-center justify-between gap-3 pt-0.5">
+                <p class="text-[11.5px] font-mono text-[#64748B] truncate max-w-[62%]" [title]="item.id">
+                  {{ item.id }}
+                </p>
+                <span class="text-[11.5px] sm:text-[12px] font-semibold text-[#F28C28] group-hover:text-[#d9771e] flex items-center gap-1 shrink-0">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <span>Login Required</span>
+                </span>
+              </div>
+
+            </div>
+          }
 
         </div>
 
@@ -141,16 +140,16 @@ import { AuthService } from '../../../../core/auth/auth.service';
           </div>
 
           <!-- Selected Tender Summary -->
-          @if (selectedTender()) {
+          @if (selectedTender(); as tender) {
             <div class="mt-4 p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 text-left">
               <span class="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-[#174A6E]/10 text-[#174A6E] mb-1">
-                {{ selectedTender().category }}
+                {{ tender.category }}
               </span>
               <p class="text-xs font-semibold text-slate-800 line-clamp-2 leading-snug">
-                {{ selectedTender().title }}
+                {{ tender.title }}
               </p>
               <p class="text-[10px] text-slate-400 font-mono mt-1">
-                {{ selectedTender().id }}
+                {{ tender.id }}
               </p>
             </div>
           }
@@ -168,7 +167,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
             <button
               type="button"
               (click)="proceedToLogin()"
-              class="inline-flex items-center gap-2 bg-[#174A6E] hover:bg-[#123B59] text-white px-5 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-sm"
+              class="inline-flex items-center gap-2 bg-[#12365A] hover:bg-[#0B2440] text-white px-5 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-sm"
             >
               <span>Login to Continue</span>
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -187,18 +186,22 @@ import { AuthService } from '../../../../core/auth/auth.service';
     }
   `,
   styles: [`
-    @keyframes marquee-vertical {
-      0% {
-        transform: translate3d(0, 0, 0);
-      }
-      100% {
-        transform: translate3d(0, -50%, 0);
-      }
+    .tender-custom-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: #CBD5E1 #F8FAFC;
     }
-    .animate-marquee-vertical {
-      animation: marquee-vertical 28s linear infinite;
-      will-change: transform;
-      backface-visibility: hidden;
+    .tender-custom-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+    .tender-custom-scroll::-webkit-scrollbar-track {
+      background: #F8FAFC;
+    }
+    .tender-custom-scroll::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 4px;
+    }
+    .tender-custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
     }
   `]
 })
@@ -206,20 +209,33 @@ export class HeroTendersComponent implements AfterViewInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   private authService = inject(AuthService);
 
-  @ViewChild('tendersContainer') tendersContainerRef?: ElementRef<HTMLElement>;
+  @ViewChild('scrollList') scrollListRef?: ElementRef<HTMLElement>;
 
   readonly isTendersModalOpen = signal(false);
   readonly showLoginModal = signal(false);
-  readonly selectedTender = signal<any | null>(null);
+  readonly selectedTender = signal<TenderItem | null>(null);
 
-  openLoginPrompt(tender: any): void {
+  private animationFrameId?: number;
+  private isInteracting = false;
+  private resumeTimeout?: any;
+  private isSectionVisible = true;
+  private observer?: IntersectionObserver;
+  private visibilityHandler?: () => void;
+
+  openModal(): void {
+    this.isTendersModalOpen.set(true);
+  }
+
+  openLoginPrompt(tender: TenderItem): void {
     this.selectedTender.set(tender);
     this.showLoginModal.set(true);
+    this.pauseScroll();
   }
 
   closeLoginPrompt(): void {
     this.showLoginModal.set(false);
     this.selectedTender.set(null);
+    this.resumeScrollWithDelay();
   }
 
   proceedToLogin(): void {
@@ -227,18 +243,23 @@ export class HeroTendersComponent implements AfterViewInit, OnDestroy {
     this.authService.triggerSsoRedirect();
   }
 
-  readonly isHoveringTenders = signal(false);
-  readonly isSectionVisible = signal(true);
-  readonly isTabActive = signal(true);
+  pauseScroll(): void {
+    this.isInteracting = true;
+    if (this.resumeTimeout) {
+      clearTimeout(this.resumeTimeout);
+    }
+  }
 
-  private observer?: IntersectionObserver;
-  private visibilityHandler?: () => void;
+  resumeScrollWithDelay(): void {
+    if (this.resumeTimeout) {
+      clearTimeout(this.resumeTimeout);
+    }
+    this.resumeTimeout = setTimeout(() => {
+      this.isInteracting = false;
+    }, 2000);
+  }
 
-  readonly shouldAnimate = () => {
-    return this.isSectionVisible() && this.isTabActive() && !this.isHoveringTenders() && !this.showLoginModal();
-  };
-
-  tenders = [
+  tenders: TenderItem[] = [
     {
       date: '23/01/2026',
       id: 'RSLDC/EOI/MMKVY Cat I II III/2026-27/01',
@@ -324,26 +345,65 @@ export class HeroTendersComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    const el = this.tendersContainerRef?.nativeElement;
+    const el = this.scrollListRef?.nativeElement;
     if (el) {
       this.observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            this.isSectionVisible.set(entry.isIntersecting);
+            this.isSectionVisible = entry.isIntersecting;
           });
         },
-        { threshold: 0.05 }
+        { threshold: 0.1 }
       );
       this.observer.observe(el);
+
+      this.startGentleAutoScroll(el);
     }
 
     this.visibilityHandler = () => {
-      this.isTabActive.set(!document.hidden);
+      if (document.hidden) {
+        this.pauseScroll();
+      } else {
+        this.resumeScrollWithDelay();
+      }
     };
     document.addEventListener('visibilitychange', this.visibilityHandler);
   }
 
+  private startGentleAutoScroll(el: HTMLElement): void {
+    let lastTime = performance.now();
+    const scrollSpeed = 0.035; // px per millisecond (approx 21px per second - gentle and readable)
+
+    const step = (now: number) => {
+      const delta = now - lastTime;
+      lastTime = now;
+
+      if (
+        this.isSectionVisible &&
+        !this.isInteracting &&
+        !this.showLoginModal() &&
+        !this.isTendersModalOpen()
+      ) {
+        el.scrollTop += delta * scrollSpeed;
+        // Loop back smoothly if reached bottom
+        if (el.scrollTop >= el.scrollHeight - el.clientHeight - 2) {
+          el.scrollTop = 0;
+        }
+      }
+
+      this.animationFrameId = requestAnimationFrame(step);
+    };
+
+    this.animationFrameId = requestAnimationFrame(step);
+  }
+
   ngOnDestroy(): void {
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+    }
+    if (this.resumeTimeout) {
+      clearTimeout(this.resumeTimeout);
+    }
     if (this.observer) {
       this.observer.disconnect();
     }

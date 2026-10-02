@@ -40,8 +40,7 @@ export class HasRoleDirective {
 
     const isAuthorized =
       !this.requiredRoles.length ||
-      (currentRole && this.requiredRoles.includes(currentRole)) ||
-      currentRole === 'super_admin'; // super_admin has master access
+      (currentRole && this.requiredRoles.includes(currentRole));
 
     if (isAuthorized && !this.hasView) {
       this.viewContainer.createEmbeddedView(this.templateRef);

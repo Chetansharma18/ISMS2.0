@@ -18,45 +18,29 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
     class: 'block w-full'
   },
   template: `
-    <section #sectionRef class="py-12 sm:py-16 lg:py-20 bg-white border-b border-slate-100">
-      <div class="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
+    <section #sectionRef class="py-10 sm:py-14 lg:py-16 bg-white border-b border-slate-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
 
-          <!-- Left Column: About Text (Aligned in parallel with right side video) -->
-          <div class="lg:col-span-7 flex flex-col justify-start">
-            <h2 class="text-3xl sm:text-4xl lg:text-[38px] font-extrabold text-[#0B3558] tracking-tight leading-tight mb-6 sm:mb-8">
+          <!-- Left Column: About Text (Evenly balanced and matched in height with video) -->
+          <div class="lg:col-span-7 flex flex-col justify-center">
+            <h2 class="text-2xl sm:text-3xl lg:text-[32px] font-black text-[#0B3558] tracking-tight leading-none mb-4 sm:mb-5">
               About ISMS 2.0
             </h2>
 
-            <!-- Core Content: 3 Clean Justified Paragraphs -->
-            <div class="space-y-5 sm:space-y-6">
-
-              <p class="text-[18.5px] sm:text-[18.5px] lg:text-[20px] text-slate-700 font-semibold leading-[1.8]">
-                Integrated Scheme Management System (ISMS 2.0) is a comprehensive
-                e-Governance and Management Information System (MIS) designed to digitally
-                transform, integrate, and streamline the processes involved in the planning,
-                implementation, monitoring, and management of skill development schemes
-                across Rajasthan.
-                 The platform provides a centralized and secure digital ecosystem that unites
-                youth, training providers, government departments, empaneled agencies, and
-                certification bodies on a single, high-transparency platform — ensuring
-                accountability, real-time visibility, and data-driven decision making at
-                every stage.
-                 ISMS 2.0 enables end-to-end scheme management — from scheme launching and
-                candidate enrollment through bio-metric attendance, quality inspections,
-                assessment, certification, and direct benefit and fund disbursements — all
-                within one unified, auditable platform.
-              </p>
-            </div>
+            <!-- Core Content: Compact, clean justified text matching reference image -->
+            <p class="text-[13px] sm:text-[13.5px] text-slate-700 font-normal leading-[1.65] text-justify">
+              Integrated Scheme Management System (ISMS 2.0) is a comprehensive e-Governance and Management Information System (MIS) designed to digitally transform, integrate, and streamline the processes involved in the planning, implementation, monitoring, and management of skill development schemes across Rajasthan. The platform provides a centralized and secure digital ecosystem that unites youth, training providers, government departments, empaneled agencies, and certification bodies on a single, high-transparency platform — ensuring accountability, real-time visibility, and data-driven decision making at every stage. ISMS 2.0 enables end-to-end scheme management — from scheme launching and candidate enrollment through bio-metric attendance, quality inspections, assessment, certification, and direct benefit and fund disbursements — all within one unified, auditable platform.
+            </p>
           </div>
 
-          <!-- RightColumn: Video Showcase & Quote (Restored Natural Previous Video Height & Parallel) -->
-          <div class="lg:col-span-5 w-full">
-            <div class="rounded-2xl overflow-hidden bg-slate-900 border border-[#0B3558]/30 shadow-[0_0_25px_rgba(11,53,88,0.25)] relative group transition-shadow duration-500 hover:shadow-[0_0_40px_rgba(11,53,88,0.4)]">
+          <!-- Right Column: Video Showcase & Quote Overlay -->
+          <div class="lg:col-span-5 w-full flex items-center justify-center">
+            <div class="w-full rounded-2xl overflow-hidden bg-slate-950 border border-slate-200/90 shadow-lg relative group transition-all duration-300">
               
-              <!-- Video Player with Lazy-Load & Controls (Previous Natural Video Height) -->
-              <div class="relative w-full aspect-video sm:h-80 lg:h-90 bg-slate-950 overflow-hidden flex items-center justify-center">
+              <!-- Video Player with Natural Aspect Ratio -->
+              <div class="relative w-full aspect-[16/9.8] bg-slate-950 overflow-hidden flex items-center justify-center">
                 
                 <!-- Video Element (Sound Off by Default, Playsinline, Lazy loaded) -->
                 <video 
@@ -73,53 +57,53 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 
                 <!-- Poster / Loading Placeholder Before Video Plays -->
                 @if (!isVideoLoaded()) {
-                  <div class="absolute inset-0 bg-linear-to-br from-slate-900 via-[#0B3558] to-slate-900 flex flex-col items-center justify-center p-6 text-center">
-                    <div class="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center mb-3 text-white">
-                      <svg class="w-6 h-6 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0B3558] to-slate-900 flex flex-col items-center justify-center p-6 text-center">
+                    <div class="w-11 h-11 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center mb-2.5 text-white">
+                      <svg class="w-5 h-5 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                       </svg>
                     </div>
-                    <p class="text-xs font-semibold text-slate-300 tracking-wide uppercase">RSLDC Skill Training in Action</p>
-                    <p class="text-[11px] text-slate-400 mt-1">Scroll into view to play video</p>
+                    <p class="text-[11px] font-semibold text-slate-300 tracking-wide uppercase">RSLDC Skill Training in Action</p>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Scroll into view to play video</p>
                   </div>
                 }
 
                 <!-- Sound Off / Sound Toggle Badge (Top Right) -->
-                <div class="absolute top-3 right-3 z-20 flex items-center gap-2">
+                <div class="absolute top-2.5 right-2.5 z-20 flex items-center gap-2">
                   <button 
                     type="button"
                     (click)="toggleSound()"
-                    class="bg-black/60 hover:bg-black/80 backdrop-blur-md text-white text-xs px-2.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all shadow cursor-pointer border border-white/20"
+                    class="bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white text-[10.5px] px-2.5 py-1 rounded-full flex items-center gap-1.5 transition-all shadow-xs cursor-pointer border border-white/20"
                     [attr.aria-label]="isMuted() ? 'Unmute video audio' : 'Mute video audio'">
                     @if (isMuted()) {
-                      <svg class="w-3.5 h-3.5 text-orange-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg class="w-3 h-3 text-orange-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
                       </svg>
-                      <span class="text-[11px] font-medium">Sound Off</span>
+                      <span class="font-medium">Sound Off</span>
                     } @else {
-                      <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg class="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                       </svg>
-                      <span class="text-[11px] font-medium">Sound On</span>
+                      <span class="font-medium">Sound On</span>
                     }
                   </button>
                 </div>
 
                 <!-- Play / Pause Overlay Control (Top Left) -->
-                <div class="absolute top-3 left-3 z-20">
+                <div class="absolute top-2.5 left-2.5 z-20">
                   <button 
                     type="button"
                     (click)="togglePlayPause()"
-                    class="bg-black/60 hover:bg-black/80 backdrop-blur-md text-white w-8 h-8 rounded-full flex items-center justify-center transition-all shadow cursor-pointer border border-white/20"
+                    class="bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white w-7 h-7 rounded-full flex items-center justify-center transition-all shadow-xs cursor-pointer border border-white/20"
                     [attr.aria-label]="isPlaying() ? 'Pause video' : 'Play video'">
                     @if (isPlaying()) {
-                      <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
                       </svg>
                     } @else {
-                      <svg class="w-3.5 h-3.5 translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-3 h-3 translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z"/>
                       </svg>
                     }
@@ -129,11 +113,11 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
               </div>
               
               <!-- Quote Block Overlayed on Video -->
-              <div class="absolute bottom-0 inset-x-0 z-10 pointer-events-none bg-linear-to-t from-[#0B3558]/95 via-[#0B3558]/60 to-transparent pt-16 pb-4 sm:pb-5 px-4 sm:px-5">
-                <p class="text-[12px] sm:text-[13px] text-white leading-relaxed px-1 font-medium drop-shadow-md min-h-12 sm:min-h-14 text-justify">
-                  <span class="text-xl text-orange-400 font-serif leading-none relative top-1 opacity-90">“</span>
-                  <span class="px-0.5">{{ displayedQuote() }}</span><span class="animate-pulse text-orange-400 font-bold" [class.hidden]="hasFinishedTyping()">|</span>
-                  <span class="text-xl text-orange-400 font-serif leading-none relative top-1 opacity-90" [class.hidden]="!hasFinishedTyping()">”</span>
+              <div class="absolute bottom-0 inset-x-0 z-10 pointer-events-none bg-gradient-to-t from-black/90 via-black/60 to-transparent pt-10 pb-3 px-3.5 sm:px-4">
+                <p class="text-[11px] sm:text-[11.5px] text-white leading-relaxed font-medium drop-shadow-sm min-h-10">
+                  <span class="text-orange-400 font-bold mr-0.5">“</span>
+                  <span>{{ displayedQuote() }}</span><span class="animate-pulse text-orange-400 font-bold ml-0.5" [class.hidden]="hasFinishedTyping()">|</span>
+                  <span class="text-orange-400 font-bold ml-0.5" [class.hidden]="!hasFinishedTyping()">”</span>
                 </p>
               </div>
 

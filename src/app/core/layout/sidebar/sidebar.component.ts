@@ -33,9 +33,23 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
         <nav class="flex flex-col gap-1 px-2.5" aria-label="Main Navigation">
 
           <!-- ================================================================
-               ROLE: DEPARTMENT ADMIN (Scrutiny Officer)
+               ROLE: SUPER ADMIN
                ================================================================ -->
-          @if (isDeptAdmin()) {
+          @if (isSuperAdmin()) {
+            <!-- 1. EOI Configuration -->
+            <a
+              routerLink="/admin/eoi-configuration"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center gap-2.5 px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span class="tracking-tight">EOI Configuration</span>
+            </a>
+          } @else if (isDeptAdmin()) {
             <!-- 1. EOI Responses -->
             <a
               routerLink="/admin/eoi-view"
@@ -280,5 +294,10 @@ export class SidebarComponent {
   readonly isDeptAdmin = computed(() => {
     const user = this.currentUser();
     return user?.role === 'dept_admin';
+  });
+
+  readonly isSuperAdmin = computed(() => {
+    const user = this.currentUser();
+    return user?.role === 'super_admin';
   });
 }

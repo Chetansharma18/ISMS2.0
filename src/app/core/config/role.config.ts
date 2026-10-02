@@ -18,6 +18,12 @@ export const USER_ROLES_CONFIG: RoleConfig[] = [
     label: 'Department Admin',
     badge: 'Officer Portal',
     description: 'Departmental scheme officer and scrutiny incharge'
+  },
+  {
+    role: 'super_admin',
+    label: 'Super Admin',
+    badge: 'System Admin',
+    description: 'System administrator with full access'
   }
 ];
 

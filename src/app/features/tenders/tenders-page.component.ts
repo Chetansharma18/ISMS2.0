@@ -64,26 +64,40 @@ export interface EoiDocumentItem {
             title="Active Schemes"
             [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Active Schemes' }]"
           >
-            <!-- Integrated Search Bar (Matching User Screenshot) -->
-            <div class="w-full sm:w-auto min-w-[280px] sm:min-w-[360px] md:min-w-[420px]">
-              <div class="relative flex items-center bg-white rounded-lg border border-slate-300 shadow-2xs overflow-hidden focus-within:border-[#174A6E] focus-within:ring-2 focus-within:ring-[#174A6E]/20 transition-all">
-                <input
-                  type="text"
-                  [ngModel]="searchQuery()"
-                  (ngModelChange)="onSearchChange($event)"
-                  placeholder="Search schemes by name, reference no. or keyword..."
-                  class="w-full px-3.5 py-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none bg-transparent"
-                />
+            <div class="flex items-center gap-3">
+              <!-- Integrated Search Bar (Matching User Screenshot) -->
+              <div class="w-full sm:w-auto min-w-[280px] sm:min-w-[360px] md:min-w-[420px]">
+                <div class="relative flex items-center bg-white rounded-lg border border-slate-300 shadow-2xs overflow-hidden focus-within:border-[#174A6E] focus-within:ring-2 focus-within:ring-[#174A6E]/20 transition-all">
+                  <input
+                    type="text"
+                    [ngModel]="searchQuery()"
+                    (ngModelChange)="onSearchChange($event)"
+                    placeholder="Search schemes by name, reference no. or keyword..."
+                    class="w-full px-3.5 py-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none bg-transparent"
+                  />
+                  <button
+                    type="button"
+                    class="px-3.5 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                    title="Search"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              @if (isSuperAdmin()) {
                 <button
                   type="button"
-                  class="px-3.5 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
-                  title="Search"
+                  class="px-4 py-2.5 bg-[#174A6E] hover:bg-[#0B3558] text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center gap-2"
                 >
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                   </svg>
+                  Configure New EOI
                 </button>
-              </div>
+              }
             </div>
           </app-page-header>
 
@@ -238,6 +252,11 @@ export class TendersPageComponent {
     const user = this.currentUser();
     if (!user) return false;
     return user.role === 'new_user';
+  });
+
+  readonly isSuperAdmin = computed(() => {
+    const user = this.currentUser();
+    return user?.role === 'super_admin';
   });
 
   selectedScheme = signal<SchemeTender | null>(null);

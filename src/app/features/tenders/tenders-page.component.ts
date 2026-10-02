@@ -258,7 +258,7 @@ export interface EoiDocumentItem {
         <h2 class="m-0 text-[#0B3558]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
           Configure New EOI
         </h2>
-        <div class="mt-4 font-sans text-[13px]">
+        <div class="mt-4 font-sans text-[13px] max-h-[60vh] overflow-y-auto pr-4">
           <div class="grid grid-cols-[200px_1fr] items-center gap-y-3 gap-x-4">
             <label class="text-slate-700 font-medium">EOI Reference No.*</label>
             <input type="text" maxlength="100" [(ngModel)]="newEoiData.refNo" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.refNo, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.refNo)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
@@ -295,12 +295,11 @@ export interface EoiDocumentItem {
 
             <label class="text-slate-700 font-medium">Attach File*</label>
             <div class="flex items-center h-full gap-2">
-              <label class="cursor-pointer text-[#174A6E] hover:text-[#0B3558] flex items-center justify-center">
+              <button type="button" (click)="openAttachmentModal()" class="cursor-pointer text-[#174A6E] hover:text-[#0B3558] flex items-center justify-center p-1 rounded hover:bg-slate-100 transition-colors">
                 <svg class="w-5 h-5 transform -rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                 </svg>
-                <input type="file" class="hidden" accept=".pdf,.txt,.jpeg,.jpg,.png,.doc,.docx,.xls,.xlsx" (change)="onFileSelected($event)" />
-              </label>
+              </button>
               @if (newEoiData.fileName) {
                 <span class="text-xs text-slate-600 truncate max-w-[200px]" title="{{newEoiData.fileName}}">{{newEoiData.fileName}}</span>
               }
@@ -312,7 +311,77 @@ export interface EoiDocumentItem {
             @if (fileError()) {
               <div class="col-span-2 text-xs text-red-500 font-medium mt-[-4px]">{{ fileError() }}</div>
             }
+
+            <!-- EOI Documents Section -->
+            <div class="col-span-2 mt-1 pt-2 border-t border-slate-200">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-[#0B3558] font-bold text-[13px] uppercase tracking-wide">EOI DOCUMENTS</h3>
+                <button type="button" (click)="addEoiDocument()" class="w-6 h-6 rounded-full bg-[#174A6E] text-white flex items-center justify-center hover:bg-[#0B3558] transition-colors shadow-sm cursor-pointer" title="Add Document">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+              </div>
+              
+              @for (doc of newEoiData.documents; track $index) {
+                <div class="flex items-center gap-3 mb-2">
+                  <select [(ngModel)]="newEoiData.documents[$index]" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.documents[$index], 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.documents[$index])}" class="flex-1 px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white shadow-sm">
+                    <option value="">-- Select Document Required --</option>
+                    @for (req of eoiRequiredInfo; track req.sNo) {
+                      <option [value]="req.name">{{ req.name }}</option>
+                    }
+                  </select>
+                  <button type="button" (click)="removeEoiDocument($index)" class="text-slate-400 hover:text-red-600 p-1.5 rounded hover:bg-red-50 transition-colors cursor-pointer" title="Remove">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              }
+              @if (newEoiData.documents.length === 0) {
+                <div class="text-[12px] text-slate-500 italic py-3 text-center border border-dashed border-slate-300 rounded bg-slate-50/50">
+                  No documents added. Click the + button to require a document.
+                </div>
+              }
+            </div>
           </div>
+        </div>
+      </app-action-modal>
+
+      <!-- ====================================================================
+           MODAL: UPLOAD ATTACHMENT
+           ==================================================================== -->
+      <app-action-modal
+        [isOpen]="showAttachmentModal()"
+        [showCloseButton]="true"
+        [closeOnBackdrop]="false"
+        [reverseButtons]="true"
+        [showAccentBar]="false"
+        primaryLabel="Submit"
+        secondaryLabel="Cancel"
+        maxWidthClass="max-w-[500px]"
+        (primaryAction)="submitAttachment()"
+        (secondaryAction)="closeAttachmentModal()"
+        (close)="closeAttachmentModal()"
+      >
+        <h2 class="m-0 text-[#0B3558]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+          Upload Attachment
+        </h2>
+        <div class="mt-4 font-sans text-[13px] space-y-4">
+          <div>
+            <label class="block text-slate-700 font-medium mb-1">File Title*</label>
+            <input type="text" maxlength="100" [(ngModel)]="attachmentFormData.title" [ngClass]="{'border-red-500': attachmentSubmitted() && !attachmentFormData.title, 'border-[#8FA3B6]': !(attachmentSubmitted() && !attachmentFormData.title)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
+          </div>
+          <div>
+            <label class="block text-slate-700 font-medium mb-1">Upload Document*</label>
+            <input type="file" accept=".pdf,.txt,.jpeg,.jpg,.png,.doc,.docx,.xls,.xlsx" (change)="onAttachmentFileSelected($event)" class="w-full text-slate-800 file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-[#174A6E] file:text-white hover:file:bg-[#0B3558] cursor-pointer" />
+            @if (attachmentSubmitted() && !attachmentFormData.file) {
+              <div class="text-xs text-red-500 mt-1">Required</div>
+            }
+          </div>
+          @if (attachmentFileError()) {
+            <div class="text-xs text-red-500 font-medium">{{ attachmentFileError() }}</div>
+          }
         </div>
       </app-action-modal>
 
@@ -352,18 +421,29 @@ export class TendersPageComponent {
     emdFee: '',
     processFee: '',
     file: null as File | null,
-    fileName: ''
+    fileName: '',
+    documents: [] as string[]
   };
   newEoiSubmitted = signal<boolean>(false);
   fileError = signal<string>('');
+
+  readonly showAttachmentModal = signal<boolean>(false);
+  attachmentFormData = {
+    title: '',
+    file: null as File | null,
+    fileName: ''
+  };
+  attachmentSubmitted = signal<boolean>(false);
+  attachmentFileError = signal<string>('');
 
   pageSize = 10;
   searchQuery = signal<string>('');
 
   readonly filteredSchemes = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    if (!q) return this.schemes;
-    return this.schemes.filter(s =>
+    const all = this.schemes();
+    if (!q) return all;
+    return all.filter(s =>
       s.schemeName.toLowerCase().includes(q) ||
       s.refNo.toLowerCase().includes(q) ||
       s.eoiDescription.toLowerCase().includes(q) ||
@@ -539,7 +619,7 @@ export class TendersPageComponent {
   }
 
   // 10 Schemes for demo: 8 active with current/latest dates (2026/2027) & 2 closed past date schemes
-  schemes: SchemeTender[] = [
+  schemes = signal<SchemeTender[]>([
     {
       sNo: 1,
       refNo: 'RSLDC/EOI/MMKVY Cat I II III/2026-27/01',
@@ -740,7 +820,7 @@ export class TendersPageComponent {
       emdFee: '₹50,000',
       processFee: '₹2,000'
     }
-  ];
+  ]);
 
   viewSchemeDetails(scheme: SchemeTender): void {
     this.selectedScheme.set(scheme);
@@ -813,7 +893,8 @@ export class TendersPageComponent {
       emdFee: '',
       processFee: '',
       file: null,
-      fileName: ''
+      fileName: '',
+      documents: []
     };
     this.showConfigureEoiModal.set(true);
   }
@@ -822,7 +903,15 @@ export class TendersPageComponent {
     this.showConfigureEoiModal.set(false);
   }
 
-  onFileSelected(event: Event): void {
+  addEoiDocument(): void {
+    this.newEoiData.documents.push('');
+  }
+
+  removeEoiDocument(index: number): void {
+    this.newEoiData.documents.splice(index, 1);
+  }
+
+  onAttachmentFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
@@ -830,23 +919,48 @@ export class TendersPageComponent {
       const fileExt = file.name.split('.').pop()?.toLowerCase() || '';
       
       if (!validExtensions.includes(fileExt)) {
-        this.fileError.set('Invalid file type. Supported: PDF, TXT, JPEG, PNG, WORD, EXCEL.');
-        this.newEoiData.file = null;
-        this.newEoiData.fileName = '';
+        this.attachmentFileError.set('Invalid file type. Supported: PDF, TXT, JPEG, PNG, WORD, EXCEL.');
+        this.attachmentFormData.file = null;
+        this.attachmentFormData.fileName = '';
         return;
       }
 
       if (file.size > 10 * 1024 * 1024) {
-        this.fileError.set('File size exceeds the 10MB limit.');
-        this.newEoiData.file = null;
-        this.newEoiData.fileName = '';
+        this.attachmentFileError.set('File size exceeds the 10MB limit.');
+        this.attachmentFormData.file = null;
+        this.attachmentFormData.fileName = '';
         return;
       }
 
-      this.fileError.set('');
-      this.newEoiData.file = file;
-      this.newEoiData.fileName = file.name;
+      this.attachmentFileError.set('');
+      this.attachmentFormData.file = file;
+      this.attachmentFormData.fileName = file.name;
+    } else {
+      this.attachmentFormData.file = null;
+      this.attachmentFormData.fileName = '';
     }
+  }
+
+  submitAttachment(): void {
+    this.attachmentSubmitted.set(true);
+    if (!this.attachmentFormData.title || !this.attachmentFormData.file) {
+      return; // Invalid
+    }
+    // Copy the uploaded file data into the main EOI form state
+    this.newEoiData.file = this.attachmentFormData.file;
+    this.newEoiData.fileName = `${this.attachmentFormData.title} (${this.attachmentFormData.fileName})`;
+    this.showAttachmentModal.set(false);
+  }
+
+  openAttachmentModal(): void {
+    this.attachmentSubmitted.set(false);
+    this.attachmentFileError.set('');
+    this.attachmentFormData = { title: '', file: null, fileName: '' };
+    this.showAttachmentModal.set(true);
+  }
+
+  closeAttachmentModal(): void {
+    this.showAttachmentModal.set(false);
   }
 
   submitNewEoi(): void {
@@ -857,6 +971,33 @@ export class TendersPageComponent {
     if (!d.refNo || !d.scheme || !d.publishedDate || !d.submissionDate || !d.eoiCategory || !d.emdFee || !d.processFee || !d.file) {
       return; // Invalid, fields will turn red
     }
+    
+    // Validate that if there are any required documents added, they are actually selected
+    if (d.documents.some(doc => !doc)) {
+      return; 
+    }
+
+    const formatDt = (dt: string) => dt ? dt.split('-').reverse().join('/') : '';
+    const newScheme: SchemeTender = {
+      sNo: 1,
+      refNo: d.refNo,
+      schemeName: d.scheme,
+      schemeTitle: d.scheme,
+      schemeCategory: 'ALL',
+      category: 'ALL',
+      datePublished: formatDt(d.publishedDate),
+      closingDate: formatDt(d.submissionDate),
+      eoiCategory: d.eoiCategory,
+      eoiDescription: d.description || '',
+      status: 'Open',
+      emdFee: d.emdFee,
+      processFee: d.processFee
+    };
+
+    this.schemes.update(current => {
+      const updated = [newScheme, ...current];
+      return updated.map((item, index) => ({ ...item, sNo: index + 1 }));
+    });
 
     // In a real app, form values would be collected and sent to a service here.
     console.log('Submitted New EOI Configuration', this.newEoiData);

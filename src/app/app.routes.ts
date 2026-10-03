@@ -188,6 +188,20 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/master/district-block',
+    loadComponent: () =>
+      import('./features/admin-master/district-block-master.component').then(
+        (m) => m.DistrictBlockMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/designation',
+    loadComponent: () =>
+      import('./features/admin-master/designation-master.component').then(
+        (m) => m.DesignationMasterComponent
+      )
+  },
+  {
     path: 'admin/master/:type',
     loadComponent: () =>
       import('./features/tenders/tenders-page.component').then(

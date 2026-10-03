@@ -14,8 +14,14 @@ export interface UserManagementItem {
   userId: string;
   username: string;
   ssoId: string;
+  userType: 'Admin' | 'Super Admin';
   roleType: string;
+  designation?: string;
+  schemeDepartment?: string;
   districtName: string;
+  blockName?: string;
+  email?: string;
+  mobileNo?: string;
   schemeStatus: 'Active' | 'Inactive';
 }
 
@@ -100,9 +106,56 @@ export interface UserManagementItem {
         }
       </ng-template>
 
-      <!-- Custom Template for Action Column -->
+      <!-- Custom Template for Action Column (View, Edit, Mark Inactive, Delete) -->
       <ng-template #actionTemplate let-item>
-        <div class="flex items-center justify-center whitespace-nowrap">
+        <div class="flex items-center justify-center gap-2 whitespace-nowrap">
+          <!-- View -->
+          <button
+            type="button"
+            (click)="$event.stopPropagation(); openViewModal(item)"
+            class="inline-flex items-center gap-1 text-[#174A6E] hover:text-[#0B3558] font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
+            title="View Details"
+          >
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span>View</span>
+          </button>
+
+          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
+
+          <!-- Edit -->
+          <button
+            type="button"
+            (click)="$event.stopPropagation(); openEditModal(item)"
+            class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
+            title="Edit User"
+          >
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <span>Edit</span>
+          </button>
+
+          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
+
+          <!-- Mark Inactive / Mark Active -->
+          <button
+            type="button"
+            (click)="$event.stopPropagation(); toggleUserStatus(item)"
+            class="inline-flex items-center gap-1 text-slate-600 hover:text-slate-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
+            [title]="item.schemeStatus === 'Active' ? 'Mark Inactive' : 'Mark Active'"
+          >
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+            </svg>
+            <span>{{ item.schemeStatus === 'Active' ? 'Mark Inactive' : 'Mark Active' }}</span>
+          </button>
+
+          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
+
+          <!-- Delete -->
           <button
             type="button"
             (click)="$event.stopPropagation(); deleteUser(item)"
@@ -117,105 +170,315 @@ export interface UserManagementItem {
         </div>
       </ng-template>
 
-      <!-- Modal: Add New User -->
+      <!-- Modal: View User Details -->
+      <app-action-modal
+        [isOpen]="showViewModal()"
+        [showCloseButton]="true"
+        [closeOnBackdrop]="true"
+        [showAccentBar]="false"
+        secondaryLabel="Close"
+        maxWidthClass="max-w-[580px]"
+        (secondaryAction)="closeViewModal()"
+        (close)="closeViewModal()"
+      >
+        <h2 class="m-0 text-[#0B3558]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+          User Details - {{ selectedViewUser()?.username }}
+        </h2>
+        @if (selectedViewUser(); as u) {
+          <div class="mt-4 font-sans text-[13px] grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <div>
+              <span class="text-slate-500 font-medium block text-xs">User ID</span>
+              <span class="font-mono font-semibold text-slate-800">{{ u.userId }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 font-medium block text-xs">Username</span>
+              <span class="font-semibold text-slate-800">{{ u.username }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 font-medium block text-xs">SSO ID</span>
+              <span class="font-mono text-slate-800">{{ u.ssoId }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 font-medium block text-xs">User Type</span>
+              <span class="font-medium text-slate-800">{{ u.userType }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 font-medium block text-xs">Role Type</span>
+              <span class="font-semibold text-[#174A6E]">{{ u.roleType }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 font-medium block text-xs">Designation</span>
+              <span class="text-slate-800">{{ u.designation || 'N/A' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 font-medium block text-xs">Scheme Department</span>
+              <span class="text-slate-800">{{ u.schemeDepartment || 'RSLDC' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 font-medium block text-xs">District</span>
+              <span class="text-slate-800">{{ u.districtName }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 font-medium block text-xs">Block Name</span>
+              <span class="text-slate-800">{{ u.blockName || 'All Blocks' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 font-medium block text-xs">Status</span>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
+                [ngClass]="u.schemeStatus === 'Active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'">
+                {{ u.schemeStatus }}
+              </span>
+            </div>
+          </div>
+        }
+      </app-action-modal>
+
+      <!-- Modal: Add / Edit User -->
       <app-action-modal
         [isOpen]="showModal()"
         [showCloseButton]="true"
         [closeOnBackdrop]="false"
         [reverseButtons]="true"
         [showAccentBar]="false"
-        primaryLabel="Submit"
+        [primaryLabel]="editingId() ? 'Save Changes' : 'Submit'"
         secondaryLabel="Cancel"
-        maxWidthClass="max-w-[540px]"
+        maxWidthClass="max-w-[780px]"
         (primaryAction)="submitUser()"
         (secondaryAction)="closeModal()"
         (close)="closeModal()"
       >
         <h2 class="m-0 text-[#0B3558]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
-          Add New User
+          {{ editingId() ? 'Edit User' : 'Add New User' }}
         </h2>
-        <div class="mt-4 font-sans text-[13px] space-y-4">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Username -->
-            <div>
-              <label class="block text-slate-700 font-medium mb-1">Username*</label>
-              <input
-                type="text"
-                maxlength="100"
-                placeholder="e.g. tp 4 or admin 3"
-                [(ngModel)]="formData.username"
-                [ngClass]="{'border-red-500': submitted() && !formData.username, 'border-[#8FA3B6]': !(submitted() && !formData.username)}"
-                class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
-              />
-              @if (submitted() && !formData.username) {
-                <div class="text-xs text-red-500 mt-1 font-medium">Username is required</div>
-              }
+        
+        <div class="mt-4 font-sans text-[13px] space-y-4 max-h-[75vh] overflow-y-auto pr-1">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+            
+            <!-- LEFT COLUMN -->
+            <div class="space-y-3">
+              <!-- User ID -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">User ID*</label>
+                <input
+                  type="text"
+                  placeholder="e.g. USR-1008"
+                  [(ngModel)]="formData.userId"
+                  [ngClass]="{'border-red-500': submitted() && !formData.userId, 'border-[#8FA3B6]': !(submitted() && !formData.userId)}"
+                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 font-mono text-xs"
+                />
+                @if (submitted() && !formData.userId) {
+                  <div class="text-xs text-red-500 mt-0.5 font-medium">User ID is required</div>
+                }
+              </div>
+
+              <!-- User Name -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">User Name*</label>
+                <input
+                  type="text"
+                  placeholder="e.g. admin 3 or super admin 3"
+                  [(ngModel)]="formData.username"
+                  [ngClass]="{'border-red-500': submitted() && !formData.username, 'border-[#8FA3B6]': !(submitted() && !formData.username)}"
+                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                />
+                @if (submitted() && !formData.username) {
+                  <div class="text-xs text-red-500 mt-0.5 font-medium">User Name is required</div>
+                }
+              </div>
+
+              <!-- Password -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">Password*</label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  [(ngModel)]="formData.password"
+                  [ngClass]="{'border-red-500': submitted() && !formData.password, 'border-[#8FA3B6]': !(submitted() && !formData.password)}"
+                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                />
+                @if (submitted() && !formData.password) {
+                  <div class="text-xs text-red-500 mt-0.5 font-medium">Password is required</div>
+                }
+              </div>
+
+              <!-- Date Of Birth -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">Date Of Birth</label>
+                <input
+                  type="date"
+                  [(ngModel)]="formData.dateOfBirth"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                />
+              </div>
+
+              <!-- E-Mail -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">E-Mail*</label>
+                <input
+                  type="email"
+                  placeholder="name@example.com"
+                  [(ngModel)]="formData.email"
+                  [ngClass]="{'border-red-500': submitted() && !formData.email, 'border-[#8FA3B6]': !(submitted() && !formData.email)}"
+                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                />
+                @if (submitted() && !formData.email) {
+                  <div class="text-xs text-red-500 mt-0.5 font-medium">E-Mail is required</div>
+                }
+              </div>
+
+              <!-- Mobile No. -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">Mobile No.*</label>
+                <input
+                  type="text"
+                  maxlength="10"
+                  placeholder="10-digit mobile number"
+                  [(ngModel)]="formData.mobileNo"
+                  [ngClass]="{'border-red-500': submitted() && !formData.mobileNo, 'border-[#8FA3B6]': !(submitted() && !formData.mobileNo)}"
+                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                />
+                @if (submitted() && !formData.mobileNo) {
+                  <div class="text-xs text-red-500 mt-0.5 font-medium">Mobile No. is required</div>
+                }
+              </div>
+
+              <!-- Alternate Mobile No. -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">Alternate Mobile No.</label>
+                <input
+                  type="text"
+                  maxlength="10"
+                  placeholder="Optional alternate mobile"
+                  [(ngModel)]="formData.alternateMobileNo"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                />
+              </div>
+
+              <!-- Alternate E-Mail -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">Alternate E-Mail</label>
+                <input
+                  type="email"
+                  placeholder="Optional alternate email"
+                  [(ngModel)]="formData.alternateEmail"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                />
+              </div>
             </div>
 
-            <!-- SSO ID -->
-            <div>
-              <label class="block text-slate-700 font-medium mb-1">SSO ID*</label>
-              <input
-                type="text"
-                maxlength="80"
-                placeholder="e.g. SSO_TP_04"
-                [(ngModel)]="formData.ssoId"
-                [ngClass]="{'border-red-500': submitted() && !formData.ssoId, 'border-[#8FA3B6]': !(submitted() && !formData.ssoId)}"
-                class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 font-mono text-xs"
-              />
-              @if (submitted() && !formData.ssoId) {
-                <div class="text-xs text-red-500 mt-1 font-medium">SSO ID is required</div>
-              }
-            </div>
-          </div>
+            <!-- RIGHT COLUMN -->
+            <div class="space-y-3">
+              <!-- User Type -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">User Type*</label>
+                <select
+                  [(ngModel)]="formData.userType"
+                  [ngClass]="{'border-red-500': submitted() && !formData.userType, 'border-[#8FA3B6]': !(submitted() && !formData.userType)}"
+                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
+                >
+                  <option value="Admin">Admin</option>
+                  <option value="Super Admin">Super Admin</option>
+                </select>
+                <div class="text-[11px] text-slate-500 mt-0.5">Only Admin and Super Admin users can be created here.</div>
+              </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Role Type -->
-            <div>
-              <label class="block text-slate-700 font-medium mb-1">Role Type*</label>
-              <select
-                [(ngModel)]="formData.roleType"
-                [ngClass]="{'border-red-500': submitted() && !formData.roleType, 'border-[#8FA3B6]': !(submitted() && !formData.roleType)}"
-                class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
-              >
-                <option value="" disabled selected>Select Role Type</option>
-                <option value="Super Admin">Super Admin</option>
-                <option value="Department Officer">Department Officer</option>
-                <option value="Scrutiny Officer">Scrutiny Officer</option>
-                <option value="Training Partner">Training Partner</option>
-              </select>
-              @if (submitted() && !formData.roleType) {
-                <div class="text-xs text-red-500 mt-1 font-medium">Role Type is required</div>
-              }
+              <!-- Role Type -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">Role Type*</label>
+                <select
+                  [(ngModel)]="formData.roleType"
+                  [ngClass]="{'border-red-500': submitted() && !formData.roleType, 'border-[#8FA3B6]': !(submitted() && !formData.roleType)}"
+                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
+                >
+                  <option value="" disabled selected>Select Role Type</option>
+                  <option value="scheme oc">scheme oc</option>
+                  <option value="mis manager">mis manager</option>
+                  <option value="programmer">programmer</option>
+                  <option value="gm">gm</option>
+                  <option value="zc">zc</option>
+                  <option value="md">md</option>
+                  <option value="super admin">super admin</option>
+                </select>
+                @if (submitted() && !formData.roleType) {
+                  <div class="text-xs text-red-500 mt-0.5 font-medium">Role Type is required</div>
+                }
+              </div>
+
+              <!-- Designation -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">Designation</label>
+                <select
+                  [(ngModel)]="formData.designation"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
+                >
+                  <option value="Managing Director">Managing Director</option>
+                  <option value="Joint Director">Joint Director</option>
+                  <option value="General Manager">General Manager</option>
+                  <option value="Zone Coordinator">Zone Coordinator</option>
+                  <option value="Programmer">Programmer</option>
+                  <option value="MIS Manager">MIS Manager</option>
+                  <option value="Scheme Nodal Officer">Scheme Nodal Officer</option>
+                </select>
+              </div>
+
+              <!-- Scheme Department -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">Scheme Department</label>
+                <select
+                  [(ngModel)]="formData.schemeDepartment"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
+                >
+                  <option value="RSLDC">RSLDC</option>
+                  <option value="Skill & Entrepreneurship">Skill & Entrepreneurship</option>
+                  <option value="Planning Department">Planning Department</option>
+                </select>
+              </div>
+
+              <!-- District -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">District</label>
+                <select
+                  [(ngModel)]="formData.district"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
+                >
+                  <option value="All Districts">All Districts</option>
+                  <option value="Jaipur">Jaipur</option>
+                  <option value="Jodhpur">Jodhpur</option>
+                  <option value="Udaipur">Udaipur</option>
+                  <option value="Ajmer">Ajmer</option>
+                  <option value="Kota">Kota</option>
+                </select>
+              </div>
+
+              <!-- Block Name -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">Block Name</label>
+                <select
+                  [(ngModel)]="formData.blockName"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
+                >
+                  <option value="All Blocks">All Blocks</option>
+                  <option value="Amber">Amber</option>
+                  <option value="Sanganer">Sanganer</option>
+                  <option value="Mandore">Mandore</option>
+                  <option value="Girwa">Girwa</option>
+                </select>
+              </div>
+
+              <!-- Aadhaar Id -->
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">Aadhaar Id</label>
+                <input
+                  type="text"
+                  maxlength="12"
+                  placeholder="12-digit Aadhaar number"
+                  [(ngModel)]="formData.aadhaarId"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 font-mono text-xs"
+                />
+              </div>
+
             </div>
 
-            <!-- District Name -->
-            <div>
-              <label class="block text-slate-700 font-medium mb-1">District Name</label>
-              <select
-                [(ngModel)]="formData.districtName"
-                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
-              >
-                <option value="All Districts">All Districts</option>
-                <option value="Jaipur">Jaipur</option>
-                <option value="Jodhpur">Jodhpur</option>
-                <option value="Udaipur">Udaipur</option>
-                <option value="Ajmer">Ajmer</option>
-                <option value="Kota">Kota</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Scheme Status -->
-          <div>
-            <label class="block text-slate-700 font-medium mb-1">Scheme Status</label>
-            <select
-              [(ngModel)]="formData.schemeStatus"
-              class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
-            >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
           </div>
         </div>
       </app-action-modal>
@@ -226,14 +489,27 @@ export interface UserManagementItem {
 export class UserManagementComponent {
   searchQuery = signal<string>('');
   showModal = signal<boolean>(false);
+  showViewModal = signal<boolean>(false);
+  editingId = signal<string | null>(null);
+  selectedViewUser = signal<UserManagementItem | null>(null);
   submitted = signal<boolean>(false);
 
   formData = {
+    userId: '',
     username: '',
-    ssoId: '',
+    password: '',
+    dateOfBirth: '',
+    email: '',
+    mobileNo: '',
+    alternateMobileNo: '',
+    alternateEmail: '',
+    userType: 'Admin' as 'Admin' | 'Super Admin',
     roleType: '',
-    districtName: 'Jaipur',
-    schemeStatus: 'Active' as 'Active' | 'Inactive'
+    designation: 'Joint Director',
+    schemeDepartment: 'RSLDC',
+    district: 'Jaipur',
+    blockName: 'All Blocks',
+    aadhaarId: ''
   };
 
   users = signal<UserManagementItem[]>([
@@ -243,8 +519,14 @@ export class UserManagementComponent {
       userId: 'USR-1001',
       username: 'super admin 1',
       ssoId: 'SSO_SUPER_01',
-      roleType: 'Super Admin',
+      userType: 'Super Admin',
+      roleType: 'super admin',
+      designation: 'Managing Director',
+      schemeDepartment: 'RSLDC',
       districtName: 'All Districts',
+      blockName: 'All Blocks',
+      email: 'superadmin1@isms.gov.in',
+      mobileNo: '9829012345',
       schemeStatus: 'Active'
     },
     {
@@ -253,8 +535,14 @@ export class UserManagementComponent {
       userId: 'USR-1002',
       username: 'super admin 2',
       ssoId: 'SSO_SUPER_02',
-      roleType: 'Super Admin',
+      userType: 'Super Admin',
+      roleType: 'super admin',
+      designation: 'Managing Director',
+      schemeDepartment: 'RSLDC',
       districtName: 'All Districts',
+      blockName: 'All Blocks',
+      email: 'superadmin2@isms.gov.in',
+      mobileNo: '9829012346',
       schemeStatus: 'Active'
     },
     {
@@ -263,8 +551,14 @@ export class UserManagementComponent {
       userId: 'USR-1003',
       username: 'admin 1',
       ssoId: 'SSO_ADM_01',
-      roleType: 'Department Officer',
+      userType: 'Admin',
+      roleType: 'scheme oc',
+      designation: 'Joint Director',
+      schemeDepartment: 'RSLDC',
       districtName: 'Jaipur',
+      blockName: 'Amber',
+      email: 'admin1@isms.gov.in',
+      mobileNo: '9414098765',
       schemeStatus: 'Active'
     },
     {
@@ -273,38 +567,62 @@ export class UserManagementComponent {
       userId: 'USR-1004',
       username: 'admin 2',
       ssoId: 'SSO_ADM_02',
-      roleType: 'Scrutiny Officer',
+      userType: 'Admin',
+      roleType: 'mis manager',
+      designation: 'MIS Manager',
+      schemeDepartment: 'Skill & Entrepreneurship',
       districtName: 'Jodhpur',
+      blockName: 'Mandore',
+      email: 'admin2@isms.gov.in',
+      mobileNo: '9783011223',
       schemeStatus: 'Active'
     },
     {
       sNo: 5,
       id: 'usr-5',
       userId: 'USR-1005',
-      username: 'tp 1',
-      ssoId: 'SSO_TP_01',
-      roleType: 'Training Partner',
+      username: 'admin 3',
+      ssoId: 'SSO_ADM_03',
+      userType: 'Admin',
+      roleType: 'programmer',
+      designation: 'Programmer',
+      schemeDepartment: 'RSLDC',
       districtName: 'Udaipur',
+      blockName: 'Girwa',
+      email: 'admin3@isms.gov.in',
+      mobileNo: '9828055443',
       schemeStatus: 'Active'
     },
     {
       sNo: 6,
       id: 'usr-6',
       userId: 'USR-1006',
-      username: 'tp 2',
-      ssoId: 'SSO_TP_02',
-      roleType: 'Training Partner',
+      username: 'admin 4',
+      ssoId: 'SSO_ADM_04',
+      userType: 'Admin',
+      roleType: 'gm',
+      designation: 'General Manager',
+      schemeDepartment: 'RSLDC',
       districtName: 'Ajmer',
+      blockName: 'Kishangarh',
+      email: 'admin4@isms.gov.in',
+      mobileNo: '9828011224',
       schemeStatus: 'Active'
     },
     {
       sNo: 7,
       id: 'usr-7',
       userId: 'USR-1007',
-      username: 'tp 3',
-      ssoId: 'SSO_TP_03',
-      roleType: 'Training Partner',
+      username: 'admin 5',
+      ssoId: 'SSO_ADM_05',
+      userType: 'Admin',
+      roleType: 'zc',
+      designation: 'Zone Coordinator',
+      schemeDepartment: 'Planning Department',
       districtName: 'Kota',
+      blockName: 'Ladpura',
+      email: 'admin5@isms.gov.in',
+      mobileNo: '9828011225',
       schemeStatus: 'Active'
     }
   ]);
@@ -362,7 +680,7 @@ export class UserManagementComponent {
       label: 'Actions',
       align: 'center',
       type: 'custom',
-      width: 'min-w-[100px]'
+      width: 'min-w-[310px]'
     }
   ];
 
@@ -371,44 +689,121 @@ export class UserManagementComponent {
   }
 
   openAddModal(): void {
+    this.editingId.set(null);
     this.submitted.set(false);
+    const nextIdNum = 1000 + this.users().length + 1;
     this.formData = {
+      userId: `USR-${nextIdNum}`,
       username: '',
-      ssoId: '',
+      password: '',
+      dateOfBirth: '',
+      email: '',
+      mobileNo: '',
+      alternateMobileNo: '',
+      alternateEmail: '',
+      userType: 'Admin',
       roleType: '',
-      districtName: 'Jaipur',
-      schemeStatus: 'Active'
+      designation: 'Joint Director',
+      schemeDepartment: 'RSLDC',
+      district: 'Jaipur',
+      blockName: 'All Blocks',
+      aadhaarId: ''
     };
     this.showModal.set(true);
+  }
+
+  openEditModal(item: UserManagementItem): void {
+    this.editingId.set(item.id);
+    this.submitted.set(false);
+    this.formData = {
+      userId: item.userId,
+      username: item.username,
+      password: 'password123',
+      dateOfBirth: '1990-01-01',
+      email: item.email || `${item.username.replace(/\s+/g, '')}@isms.gov.in`,
+      mobileNo: item.mobileNo || '9829012345',
+      alternateMobileNo: '',
+      alternateEmail: '',
+      userType: item.userType,
+      roleType: item.roleType,
+      designation: item.designation || 'Joint Director',
+      schemeDepartment: item.schemeDepartment || 'RSLDC',
+      district: item.districtName,
+      blockName: item.blockName || 'All Blocks',
+      aadhaarId: ''
+    };
+    this.showModal.set(true);
+  }
+
+  openViewModal(item: UserManagementItem): void {
+    this.selectedViewUser.set(item);
+    this.showViewModal.set(true);
+  }
+
+  closeViewModal(): void {
+    this.showViewModal.set(false);
   }
 
   closeModal(): void {
     this.showModal.set(false);
   }
 
+  toggleUserStatus(item: UserManagementItem): void {
+    const newStatus = item.schemeStatus === 'Active' ? 'Inactive' : 'Active';
+    this.users.update(current =>
+      current.map(u => u.id === item.id ? { ...u, schemeStatus: newStatus } : u)
+    );
+  }
+
   submitUser(): void {
     this.submitted.set(true);
-    if (!this.formData.username.trim() || !this.formData.ssoId.trim() || !this.formData.roleType.trim()) {
+    if (!this.formData.userId.trim() || !this.formData.username.trim() || !this.formData.password || !this.formData.email.trim() || !this.formData.mobileNo.trim() || !this.formData.roleType) {
       return; // Required validation
     }
 
-    const nextIdNum = 1000 + this.users().length + 1;
+    const editId = this.editingId();
+    if (editId) {
+      // Edit existing user
+      this.users.update(current =>
+        current.map(u => u.id === editId ? {
+          ...u,
+          userId: this.formData.userId.trim(),
+          username: this.formData.username.trim(),
+          ssoId: `SSO_${this.formData.username.trim().toUpperCase().replace(/\s+/g, '_')}`,
+          userType: this.formData.userType,
+          roleType: this.formData.roleType,
+          designation: this.formData.designation,
+          schemeDepartment: this.formData.schemeDepartment,
+          districtName: this.formData.district,
+          blockName: this.formData.blockName,
+          email: this.formData.email.trim(),
+          mobileNo: this.formData.mobileNo.trim()
+        } : u)
+      );
+    } else {
+      // Add new user
+      const newItem: UserManagementItem = {
+        sNo: 1,
+        id: 'usr-' + Date.now(),
+        userId: this.formData.userId.trim(),
+        username: this.formData.username.trim(),
+        ssoId: `SSO_${this.formData.username.trim().toUpperCase().replace(/\s+/g, '_')}`,
+        userType: this.formData.userType,
+        roleType: this.formData.roleType,
+        designation: this.formData.designation,
+        schemeDepartment: this.formData.schemeDepartment,
+        districtName: this.formData.district,
+        blockName: this.formData.blockName,
+        email: this.formData.email.trim(),
+        mobileNo: this.formData.mobileNo.trim(),
+        schemeStatus: 'Active'
+      };
 
-    const newItem: UserManagementItem = {
-      sNo: 1,
-      id: 'usr-' + Date.now(),
-      userId: `USR-${nextIdNum}`,
-      username: this.formData.username.trim(),
-      ssoId: this.formData.ssoId.trim(),
-      roleType: this.formData.roleType.trim(),
-      districtName: this.formData.districtName,
-      schemeStatus: this.formData.schemeStatus
-    };
-
-    this.users.update(current => {
-      const updated = [newItem, ...current];
-      return updated.map((item, index) => ({ ...item, sNo: index + 1 }));
-    });
+      this.users.update(current => {
+        const updated = [newItem, ...current];
+        return updated.map((item, index) => ({ ...item, sNo: index + 1 }));
+      });
+    }
 
     this.showModal.set(false);
   }

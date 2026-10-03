@@ -11,13 +11,12 @@ import {
 export interface UserManagementItem {
   sNo: number;
   id: string;
-  fullName: string;
-  email: string;
-  mobileNumber: string;
+  userId: string;
+  username: string;
+  ssoId: string;
   roleType: string;
-  designation: string;
-  district: string;
-  status: 'Active' | 'Inactive';
+  districtName: string;
+  schemeStatus: 'Active' | 'Inactive';
 }
 
 @Component({
@@ -41,7 +40,7 @@ export interface UserManagementItem {
             <div class="relative w-full">
               <input
                 type="text"
-                placeholder="Search by name, email, role, or district..."
+                placeholder="Search by User ID, Username, SSO ID, Role, or District..."
                 [ngModel]="searchQuery()"
                 (ngModelChange)="onSearchChange($event)"
                 class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-all"
@@ -75,7 +74,7 @@ export interface UserManagementItem {
         itemUnit="users"
         [customTemplates]="{
           roleType: roleTypeTemplate,
-          status: statusTemplate,
+          schemeStatus: schemeStatusTemplate,
           action: actionTemplate
         }"
       >
@@ -88,11 +87,17 @@ export interface UserManagementItem {
         </span>
       </ng-template>
 
-      <!-- Custom Template for Status -->
-      <ng-template #statusTemplate let-item>
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 select-none">
-          {{ item.status }}
-        </span>
+      <!-- Custom Template for Scheme Status -->
+      <ng-template #schemeStatusTemplate let-item>
+        @if (item.schemeStatus === 'Active') {
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 select-none">
+            Active
+          </span>
+        } @else {
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 select-none">
+            Inactive
+          </span>
+        }
       </ng-template>
 
       <!-- Custom Template for Action Column -->
@@ -121,7 +126,7 @@ export interface UserManagementItem {
         [showAccentBar]="false"
         primaryLabel="Submit"
         secondaryLabel="Cancel"
-        maxWidthClass="max-w-[560px]"
+        maxWidthClass="max-w-[540px]"
         (primaryAction)="submitUser()"
         (secondaryAction)="closeModal()"
         (close)="closeModal()"
@@ -131,56 +136,40 @@ export interface UserManagementItem {
         </h2>
         <div class="mt-4 font-sans text-[13px] space-y-4">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Full Name -->
+            <!-- Username -->
             <div>
-              <label class="block text-slate-700 font-medium mb-1">Full Name*</label>
+              <label class="block text-slate-700 font-medium mb-1">Username*</label>
               <input
                 type="text"
                 maxlength="100"
-                placeholder="Enter full name"
-                [(ngModel)]="formData.fullName"
-                [ngClass]="{'border-red-500': submitted() && !formData.fullName, 'border-[#8FA3B6]': !(submitted() && !formData.fullName)}"
+                placeholder="e.g. tp 4 or admin 3"
+                [(ngModel)]="formData.username"
+                [ngClass]="{'border-red-500': submitted() && !formData.username, 'border-[#8FA3B6]': !(submitted() && !formData.username)}"
                 class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
               />
-              @if (submitted() && !formData.fullName) {
-                <div class="text-xs text-red-500 mt-1 font-medium">Full Name is required</div>
+              @if (submitted() && !formData.username) {
+                <div class="text-xs text-red-500 mt-1 font-medium">Username is required</div>
               }
             </div>
 
-            <!-- Email -->
+            <!-- SSO ID -->
             <div>
-              <label class="block text-slate-700 font-medium mb-1">Email Address*</label>
+              <label class="block text-slate-700 font-medium mb-1">SSO ID*</label>
               <input
-                type="email"
-                maxlength="100"
-                placeholder="name@example.com"
-                [(ngModel)]="formData.email"
-                [ngClass]="{'border-red-500': submitted() && !formData.email, 'border-[#8FA3B6]': !(submitted() && !formData.email)}"
-                class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                type="text"
+                maxlength="80"
+                placeholder="e.g. SSO_TP_04"
+                [(ngModel)]="formData.ssoId"
+                [ngClass]="{'border-red-500': submitted() && !formData.ssoId, 'border-[#8FA3B6]': !(submitted() && !formData.ssoId)}"
+                class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 font-mono text-xs"
               />
-              @if (submitted() && !formData.email) {
-                <div class="text-xs text-red-500 mt-1 font-medium">Valid email is required</div>
+              @if (submitted() && !formData.ssoId) {
+                <div class="text-xs text-red-500 mt-1 font-medium">SSO ID is required</div>
               }
             </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Mobile Number -->
-            <div>
-              <label class="block text-slate-700 font-medium mb-1">Mobile Number*</label>
-              <input
-                type="text"
-                maxlength="10"
-                placeholder="10-digit mobile number"
-                [(ngModel)]="formData.mobileNumber"
-                [ngClass]="{'border-red-500': submitted() && !formData.mobileNumber, 'border-[#8FA3B6]': !(submitted() && !formData.mobileNumber)}"
-                class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
-              />
-              @if (submitted() && !formData.mobileNumber) {
-                <div class="text-xs text-red-500 mt-1 font-medium">Mobile Number is required</div>
-              }
-            </div>
-
             <!-- Role Type -->
             <div>
               <label class="block text-slate-700 font-medium mb-1">Role Type*</label>
@@ -199,32 +188,15 @@ export interface UserManagementItem {
                 <div class="text-xs text-red-500 mt-1 font-medium">Role Type is required</div>
               }
             </div>
-          </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Designation -->
+            <!-- District Name -->
             <div>
-              <label class="block text-slate-700 font-medium mb-1">Designation</label>
+              <label class="block text-slate-700 font-medium mb-1">District Name</label>
               <select
-                [(ngModel)]="formData.designation"
+                [(ngModel)]="formData.districtName"
                 class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
               >
-                <option value="Managing Director">Managing Director</option>
-                <option value="Joint Director">Joint Director</option>
-                <option value="Deputy Director">Deputy Director</option>
-                <option value="District Nodal Officer">District Nodal Officer</option>
-                <option value="System Administrator">System Administrator</option>
-              </select>
-            </div>
-
-            <!-- District -->
-            <div>
-              <label class="block text-slate-700 font-medium mb-1">District</label>
-              <select
-                [(ngModel)]="formData.district"
-                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
-              >
-                <option value="All Districts">All Districts (State Level)</option>
+                <option value="All Districts">All Districts</option>
                 <option value="Jaipur">Jaipur</option>
                 <option value="Jodhpur">Jodhpur</option>
                 <option value="Udaipur">Udaipur</option>
@@ -232,6 +204,18 @@ export interface UserManagementItem {
                 <option value="Kota">Kota</option>
               </select>
             </div>
+          </div>
+
+          <!-- Scheme Status -->
+          <div>
+            <label class="block text-slate-700 font-medium mb-1">Scheme Status</label>
+            <select
+              [(ngModel)]="formData.schemeStatus"
+              class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
+            >
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
           </div>
         </div>
       </app-action-modal>
@@ -245,58 +229,83 @@ export class UserManagementComponent {
   submitted = signal<boolean>(false);
 
   formData = {
-    fullName: '',
-    email: '',
-    mobileNumber: '',
+    username: '',
+    ssoId: '',
     roleType: '',
-    designation: 'Joint Director',
-    district: 'Jaipur'
+    districtName: 'Jaipur',
+    schemeStatus: 'Active' as 'Active' | 'Inactive'
   };
 
   users = signal<UserManagementItem[]>([
     {
       sNo: 1,
       id: 'usr-1',
-      fullName: 'Rajesh Sharma',
-      email: 'rajesh.sharma@isms.gov.in',
-      mobileNumber: '9829012345',
+      userId: 'USR-1001',
+      username: 'super admin 1',
+      ssoId: 'SSO_SUPER_01',
       roleType: 'Super Admin',
-      designation: 'Managing Director',
-      district: 'All Districts',
-      status: 'Active'
+      districtName: 'All Districts',
+      schemeStatus: 'Active'
     },
     {
       sNo: 2,
       id: 'usr-2',
-      fullName: 'Priya Verma',
-      email: 'priya.verma@isms.gov.in',
-      mobileNumber: '9414098765',
-      roleType: 'Department Officer',
-      designation: 'Joint Director',
-      district: 'Jaipur',
-      status: 'Active'
+      userId: 'USR-1002',
+      username: 'super admin 2',
+      ssoId: 'SSO_SUPER_02',
+      roleType: 'Super Admin',
+      districtName: 'All Districts',
+      schemeStatus: 'Active'
     },
     {
       sNo: 3,
       id: 'usr-3',
-      fullName: 'Amitabh Sen',
-      email: 'amitabh.sen@isms.gov.in',
-      mobileNumber: '9783011223',
-      roleType: 'Scrutiny Officer',
-      designation: 'Deputy Director',
-      district: 'Jodhpur',
-      status: 'Active'
+      userId: 'USR-1003',
+      username: 'admin 1',
+      ssoId: 'SSO_ADM_01',
+      roleType: 'Department Officer',
+      districtName: 'Jaipur',
+      schemeStatus: 'Active'
     },
     {
       sNo: 4,
       id: 'usr-4',
-      fullName: 'Sunil Kumar',
-      email: 'sunil.kumar@tp.org',
-      mobileNumber: '9828055443',
+      userId: 'USR-1004',
+      username: 'admin 2',
+      ssoId: 'SSO_ADM_02',
+      roleType: 'Scrutiny Officer',
+      districtName: 'Jodhpur',
+      schemeStatus: 'Active'
+    },
+    {
+      sNo: 5,
+      id: 'usr-5',
+      userId: 'USR-1005',
+      username: 'tp 1',
+      ssoId: 'SSO_TP_01',
       roleType: 'Training Partner',
-      designation: 'Project Nodal Officer',
-      district: 'Udaipur',
-      status: 'Active'
+      districtName: 'Udaipur',
+      schemeStatus: 'Active'
+    },
+    {
+      sNo: 6,
+      id: 'usr-6',
+      userId: 'USR-1006',
+      username: 'tp 2',
+      ssoId: 'SSO_TP_02',
+      roleType: 'Training Partner',
+      districtName: 'Ajmer',
+      schemeStatus: 'Active'
+    },
+    {
+      sNo: 7,
+      id: 'usr-7',
+      userId: 'USR-1007',
+      username: 'tp 3',
+      ssoId: 'SSO_TP_03',
+      roleType: 'Training Partner',
+      districtName: 'Kota',
+      schemeStatus: 'Active'
     }
   ]);
 
@@ -305,28 +314,29 @@ export class UserManagementComponent {
     const all = this.users();
     if (!q) return all;
     return all.filter(u =>
-      u.fullName.toLowerCase().includes(q) ||
-      u.email.toLowerCase().includes(q) ||
+      u.userId.toLowerCase().includes(q) ||
+      u.username.toLowerCase().includes(q) ||
+      u.ssoId.toLowerCase().includes(q) ||
       u.roleType.toLowerCase().includes(q) ||
-      u.district.toLowerCase().includes(q)
+      u.districtName.toLowerCase().includes(q)
     );
   });
 
   readonly columns: TableColumn<UserManagementItem>[] = [
     { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
     {
-      key: 'fullName',
-      label: 'Full Name',
+      key: 'userId',
+      label: 'User ID',
+      cellClass: 'whitespace-nowrap font-mono text-xs text-slate-700'
+    },
+    {
+      key: 'username',
+      label: 'Username',
       cellClass: 'whitespace-nowrap font-semibold text-slate-800'
     },
     {
-      key: 'email',
-      label: 'Email Address',
-      cellClass: 'whitespace-nowrap text-slate-700'
-    },
-    {
-      key: 'mobileNumber',
-      label: 'Mobile No.',
+      key: 'ssoId',
+      label: 'SSO ID',
       cellClass: 'whitespace-nowrap font-mono text-xs text-slate-700'
     },
     {
@@ -336,25 +346,20 @@ export class UserManagementComponent {
       cellClass: 'whitespace-nowrap'
     },
     {
-      key: 'designation',
-      label: 'Designation',
+      key: 'districtName',
+      label: 'District Name',
       cellClass: 'whitespace-nowrap text-slate-700'
     },
     {
-      key: 'district',
-      label: 'District',
-      cellClass: 'whitespace-nowrap text-slate-700'
-    },
-    {
-      key: 'status',
-      label: 'Status',
+      key: 'schemeStatus',
+      label: 'Scheme Status',
       align: 'center',
       type: 'custom',
-      width: 'w-28'
+      width: 'w-32'
     },
     {
       key: 'action',
-      label: 'Action',
+      label: 'Actions',
       align: 'center',
       type: 'custom',
       width: 'min-w-[100px]'
@@ -368,12 +373,11 @@ export class UserManagementComponent {
   openAddModal(): void {
     this.submitted.set(false);
     this.formData = {
-      fullName: '',
-      email: '',
-      mobileNumber: '',
+      username: '',
+      ssoId: '',
       roleType: '',
-      designation: 'Joint Director',
-      district: 'Jaipur'
+      districtName: 'Jaipur',
+      schemeStatus: 'Active'
     };
     this.showModal.set(true);
   }
@@ -384,20 +388,21 @@ export class UserManagementComponent {
 
   submitUser(): void {
     this.submitted.set(true);
-    if (!this.formData.fullName.trim() || !this.formData.email.trim() || !this.formData.mobileNumber.trim() || !this.formData.roleType.trim()) {
+    if (!this.formData.username.trim() || !this.formData.ssoId.trim() || !this.formData.roleType.trim()) {
       return; // Required validation
     }
+
+    const nextIdNum = 1000 + this.users().length + 1;
 
     const newItem: UserManagementItem = {
       sNo: 1,
       id: 'usr-' + Date.now(),
-      fullName: this.formData.fullName.trim(),
-      email: this.formData.email.trim(),
-      mobileNumber: this.formData.mobileNumber.trim(),
+      userId: `USR-${nextIdNum}`,
+      username: this.formData.username.trim(),
+      ssoId: this.formData.ssoId.trim(),
       roleType: this.formData.roleType.trim(),
-      designation: this.formData.designation,
-      district: this.formData.district,
-      status: 'Active'
+      districtName: this.formData.districtName,
+      schemeStatus: this.formData.schemeStatus
     };
 
     this.users.update(current => {
@@ -409,7 +414,7 @@ export class UserManagementComponent {
   }
 
   deleteUser(item: UserManagementItem): void {
-    if (confirm(`Are you sure you want to delete user "${item.fullName}"?`)) {
+    if (confirm(`Are you sure you want to delete user "${item.username}" (${item.userId})?`)) {
       this.users.update(current => {
         const updated = current.filter(u => u.id !== item.id);
         return updated.map((u, index) => ({ ...u, sNo: index + 1 }));

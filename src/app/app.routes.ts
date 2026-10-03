@@ -174,6 +174,20 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/master/permission',
+    loadComponent: () =>
+      import('./features/admin-master/permission-master.component').then(
+        (m) => m.PermissionMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/user-role',
+    loadComponent: () =>
+      import('./features/admin-master/user-role-master.component').then(
+        (m) => m.UserRoleMasterComponent
+      )
+  },
+  {
     path: 'admin/master/:type',
     loadComponent: () =>
       import('./features/tenders/tenders-page.component').then(

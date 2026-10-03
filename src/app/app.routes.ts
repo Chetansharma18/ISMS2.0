@@ -160,6 +160,20 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/master/sector',
+    loadComponent: () =>
+      import('./features/admin-master/sector-master.component').then(
+        (m) => m.SectorMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/course',
+    loadComponent: () =>
+      import('./features/admin-master/course-master.component').then(
+        (m) => m.CourseMasterComponent
+      )
+  },
+  {
     path: 'admin/master/:type',
     loadComponent: () =>
       import('./features/tenders/tenders-page.component').then(

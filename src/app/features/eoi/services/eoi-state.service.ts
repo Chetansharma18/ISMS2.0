@@ -241,12 +241,12 @@ export class EoiStateService {
     }
   ];
 
-  // Initial 4 Applicant Responses matching Screenshot 2
+  // Initial 4 Applicant Responses matching dummy specification (Company 1, Company 2, Company 3, Company 4)
   private initialResponses: ApplicantResponse[] = [
     {
       id: 'APP-004661',
       anonymousLabel: 'Company 1',
-      actualLegalName: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
+      actualLegalName: 'Company 1',
       regNumber: 'ISMS-REG-2026-8819',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
@@ -260,8 +260,8 @@ export class EoiStateService {
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
-        tradeName: 'Apex Tech Skills',
+        legalName: 'Company 1',
+        tradeName: 'Company 1 Trade',
         entityType: 'Company registered under Companies Act, 2013',
         registrationNumber: 'U74999DL2018PTC334512',
         dateOfRegistration: '14/03/2018',
@@ -269,19 +269,19 @@ export class EoiStateService {
         panNumber: 'AAECD8566H',
         gstin: '07AAECD8566H1ZC',
         turnover: '₹12,03,35,010',
-        registeredAddress: 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi, 110042',
-        operationalAddress: 'Plot No. 44, Institutional Area, Jhalana Doongri, Jaipur, Rajasthan 302004',
-        website: 'apextechskills.org',
-        email: 'info@apextechskills.org',
+        registeredAddress: '123, Block A, Industrial Area, Sector 1, Jaipur, Rajasthan 302001',
+        operationalAddress: '123, Block A, Industrial Area, Sector 1, Jaipur, Rajasthan 302001',
+        website: 'company1.com',
+        email: 'info@company1.com',
         contactNumber: '0141-2705600'
       },
 
       authorizedSignatory: {
         name: 'SUMAN GUPTA',
         designation: 'Director',
-        email: 'compliance@nsmark.in',
+        email: 'compliance@company1.com',
         contactNumber: '9968009648',
-        residenceAddress: '45-B, Civil Lines, Jaipur',
+        residenceAddress: '123, Sector 1, Jaipur, Rajasthan',
         state: 'Rajasthan',
         pan: 'BGPPS4512K',
         aadhaarNo: 'XXXX-XXXX-4512',
@@ -296,7 +296,7 @@ export class EoiStateService {
       bankDetails: {
         bankName: 'State Bank of India',
         branchName: 'Specialized Commercial Branch, Jaipur',
-        accountHolderName: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
+        accountHolderName: 'Company 1',
         accountNumber: '38920194821',
         ifscCode: 'SBIN0004128',
         accountType: 'Current Account'
@@ -305,43 +305,43 @@ export class EoiStateService {
       trainingCentres: [
         {
           district: 'Alwar',
-          centreName: 'Apex Tech Skills Centre Alwar',
+          centreName: 'Company 1 Skill Centre Alwar',
           classrooms: 3,
           practicalRooms: 2,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '0144-2345678',
-          fullAddress: 'Near Navratan Hotel, Bhugor Bypass, Alwar, Rajasthan'
+          fullAddress: '123, Industrial Area, Alwar, Rajasthan'
         },
         {
           district: 'Jaipur',
-          centreName: 'Apex Regional Skill Academy',
+          centreName: 'Company 1 Skill Academy Jaipur',
           classrooms: 4,
           practicalRooms: 3,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '0141-4098765',
-          fullAddress: 'Parshwnath Narayan City, Mansarovar Extension, Jaipur'
+          fullAddress: '456, Industrial Area, Mansarovar, Jaipur, Rajasthan'
         },
         {
           district: 'Udaipur',
-          centreName: 'Apex Tribal Skill Training Hub',
+          centreName: 'Company 1 Skill Hub Udaipur',
           classrooms: 3,
           practicalRooms: 2,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '0294-2456789',
-          fullAddress: 'Plot No 5A, Main Road, Near Police Chowki, Aayad, Udaipur'
+          fullAddress: '789, Industrial Area, Aayad, Udaipur, Rajasthan'
         },
         {
           district: 'Sikar',
-          centreName: 'Apex Skill Development Centre Sikar',
+          centreName: 'Company 1 Skill Centre Sikar',
           classrooms: 3,
           practicalRooms: 2,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '01572-234510',
-          fullAddress: 'Near Bus Stand, Sikar Main Road, Fatehpur, Sikar'
+          fullAddress: '101, Industrial Area, Sikar, Rajasthan'
         }
       ],
 
@@ -377,7 +377,7 @@ export class EoiStateService {
     {
       id: 'APP-004662',
       anonymousLabel: 'Company 2',
-      actualLegalName: 'Marwar Skill Foundation',
+      actualLegalName: 'Company 2',
       regNumber: 'ISMS-REG-2026-3391',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
@@ -391,8 +391,8 @@ export class EoiStateService {
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'Marwar Skill Foundation',
-        tradeName: 'MSF Vocational Hub',
+        legalName: 'Company 2',
+        tradeName: 'Company 2 Trade',
         entityType: 'Registered Society under Rajasthan Societies Act',
         registrationNumber: 'RS-JOD-2016-891',
         dateOfRegistration: '11/08/2016',
@@ -400,19 +400,19 @@ export class EoiStateService {
         panNumber: 'AAATM1122K',
         gstin: '08AAATM1122K1Z9',
         turnover: '₹8,45,00,000',
-        registeredAddress: '12, Heavy Industrial Area, Jodhpur, Rajasthan 342003',
-        operationalAddress: '12, Heavy Industrial Area, Jodhpur, Rajasthan 342003',
-        website: 'marwarskills.org',
-        email: 'director@marwarskills.org',
+        registeredAddress: '456, Block B, Industrial Area, Sector 2, Jodhpur, Rajasthan 342001',
+        operationalAddress: '456, Block B, Industrial Area, Sector 2, Jodhpur, Rajasthan 342001',
+        website: 'company2.com',
+        email: 'info@company2.com',
         contactNumber: '0291-2741000'
       },
 
       authorizedSignatory: {
         name: 'RAJENDRA SINGH RATHORE',
         designation: 'Managing Trustee',
-        email: 'trustee@marwarskills.org',
+        email: 'trustee@company2.com',
         contactNumber: '9414123456',
-        residenceAddress: 'Plot 18, Paota C Road, Jodhpur, Rajasthan',
+        residenceAddress: '456, Sector 2, Jodhpur, Rajasthan',
         state: 'Rajasthan',
         pan: 'AETPR9912L',
         aadhaarNo: 'XXXX-XXXX-9912',
@@ -427,7 +427,7 @@ export class EoiStateService {
       bankDetails: {
         bankName: 'Punjab National Bank',
         branchName: 'Heavy Industrial Area Branch, Jodhpur',
-        accountHolderName: 'Marwar Skill Foundation',
+        accountHolderName: 'Company 2',
         accountNumber: '1129002100045812',
         ifscCode: 'PUNB0112900',
         accountType: 'Current Account'
@@ -436,23 +436,23 @@ export class EoiStateService {
       trainingCentres: [
         {
           district: 'Jodhpur',
-          centreName: 'Marwar Heritage Skill Centre',
+          centreName: 'Company 2 Skill Centre Jodhpur',
           classrooms: 4,
           practicalRooms: 3,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '0291-2741001',
-          fullAddress: 'Heavy Industrial Area, Jodhpur'
+          fullAddress: '456, Industrial Area, Jodhpur, Rajasthan'
         },
         {
           district: 'Pali',
-          centreName: 'Pali Textile & Stitching Centre',
+          centreName: 'Company 2 Skill Centre Pali',
           classrooms: 3,
           practicalRooms: 2,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '02932-224455',
-          fullAddress: 'Near Mandia Road, Pali, Rajasthan'
+          fullAddress: '789, Industrial Area, Pali, Rajasthan'
         }
       ],
 
@@ -505,7 +505,7 @@ export class EoiStateService {
     {
       id: 'APP-004663',
       anonymousLabel: 'Company 3',
-      actualLegalName: 'Singhania Vocational Institute',
+      actualLegalName: 'Company 3',
       regNumber: 'ISMS-REG-2026-1104',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
@@ -519,8 +519,8 @@ export class EoiStateService {
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'Singhania Vocational Institute',
-        tradeName: 'Singhania Skills',
+        legalName: 'Company 3',
+        tradeName: 'Company 3 Trade',
         entityType: 'Trust registered under Indian Trusts Act',
         registrationNumber: 'TR-UDR-2019-440',
         dateOfRegistration: '22/05/2019',
@@ -528,19 +528,19 @@ export class EoiStateService {
         panNumber: 'AACTS3344M',
         gstin: '08AACTS3344M1Z2',
         turnover: '₹1,20,00,000',
-        registeredAddress: 'Plot 7, Chetak Circle, Udaipur, Rajasthan 313001',
-        operationalAddress: 'Plot 7, Chetak Circle, Udaipur, Rajasthan 313001',
-        website: 'singhaniaskills.edu.in',
-        email: 'admin@singhaniaskills.edu.in',
+        registeredAddress: '789, Block C, Industrial Area, Sector 3, Udaipur, Rajasthan 313001',
+        operationalAddress: '789, Block C, Industrial Area, Sector 3, Udaipur, Rajasthan 313001',
+        website: 'company3.com',
+        email: 'info@company3.com',
         contactNumber: '0294-2567890'
       },
 
       authorizedSignatory: {
         name: 'MANISH SINGHANIA',
         designation: 'Chief Trustee',
-        email: 'manish@singhaniaskills.edu.in',
+        email: 'contact@company3.com',
         contactNumber: '9829012345',
-        residenceAddress: '15, Madhuban, Udaipur, Rajasthan',
+        residenceAddress: '789, Sector 3, Udaipur, Rajasthan',
         state: 'Rajasthan',
         pan: 'AFGPS1123P',
         aadhaarNo: 'XXXX-XXXX-1123',
@@ -555,7 +555,7 @@ export class EoiStateService {
       bankDetails: {
         bankName: 'HDFC Bank',
         branchName: 'Chetak Circle Branch, Udaipur',
-        accountHolderName: 'Singhania Vocational & Technical Trust',
+        accountHolderName: 'Company 3',
         accountNumber: '50200034891240',
         ifscCode: 'HDFC0000281',
         accountType: 'Current Account'
@@ -564,13 +564,13 @@ export class EoiStateService {
       trainingCentres: [
         {
           district: 'Udaipur',
-          centreName: 'Singhania Tech Hub',
+          centreName: 'Company 3 Skill Centre Udaipur',
           classrooms: 1,
           practicalRooms: 1,
           separateWashrooms: false,
           labInfrastructure: false,
           telephone: '0294-2567891',
-          fullAddress: 'Chetak Circle, Udaipur'
+          fullAddress: '789, Industrial Area, Udaipur, Rajasthan'
         }
       ],
 
@@ -611,7 +611,7 @@ export class EoiStateService {
     {
       id: 'APP-004664',
       anonymousLabel: 'Company 4',
-      actualLegalName: 'DMR Enterprises Private Limited',
+      actualLegalName: 'Company 4',
       regNumber: 'ISMS-REG-2026-9871',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
@@ -625,8 +625,8 @@ export class EoiStateService {
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'DMR Enterprises Private Limited',
-        tradeName: 'DMR SAKSHAM',
+        legalName: 'Company 4',
+        tradeName: 'Company 4 Trade',
         entityType: 'Company registered under Companies Act, 1956',
         registrationNumber: '07AAECD8566H1ZC',
         dateOfRegistration: '07/01/2017',
@@ -634,20 +634,20 @@ export class EoiStateService {
         panNumber: 'AAECD8566H',
         gstin: '07AAECD8566H1ZC',
         turnover: '₹12,03,35,010',
-        registeredAddress: 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi, 110042',
-        operationalAddress: 'Plot 89, RIICO Industrial Area, Mansarovar, Jaipur, Rajasthan 302020',
-        website: 'dmrenterprises.com',
-        email: 'vijaydtm1960@gmail.com',
+        registeredAddress: '101, Block D, Industrial Area, Sector 4, Kota, Rajasthan 324001',
+        operationalAddress: '101, Block D, Industrial Area, Sector 4, Kota, Rajasthan 324001',
+        website: 'company4.com',
+        email: 'info@company4.com',
         contactNumber: '7849954552'
       },
 
       authorizedSignatory: {
         name: 'SUMAN GUPTA',
         designation: 'Director',
-        email: 'compliance@nsmark.in',
+        email: 'compliance@company4.com',
         contactNumber: '9968009648',
-        residenceAddress: 'B298 GF AND FF, LOK VIHAR PITAMPURA, Pitampura, North West Delhi, 110034',
-        state: 'Delhi',
+        residenceAddress: '101, Sector 4, Kota, Rajasthan',
+        state: 'Rajasthan',
         pan: 'AAECD8566H',
         aadhaarNo: 'XXXX-XXXX-6814',
         typeIdProof: 'Aadhaar Card',
@@ -660,53 +660,53 @@ export class EoiStateService {
 
       bankDetails: {
         bankName: 'Bank of Baroda',
-        branchName: 'Bhugor Bypass Branch, Alwar',
-        accountHolderName: 'DMR Enterprises Pvt Ltd',
+        branchName: 'Industrial Area Branch, Kota',
+        accountHolderName: 'Company 4',
         accountNumber: '08420200001923',
-        ifscCode: 'BARB0ALWARX',
+        ifscCode: 'BARB0KOTAX',
         accountType: 'Current Account'
       },
 
       trainingCentres: [
         {
           district: 'Alwar',
-          centreName: 'DMR Enterprises Pvt Ltd Alwar',
+          centreName: 'Company 4 Skill Centre Alwar',
           classrooms: 2,
           practicalRooms: 2,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '0144-223344',
-          fullAddress: 'Near By Navratan Hotel Bhugor, Byepass, Alwar'
+          fullAddress: '101, Industrial Area, Alwar, Rajasthan'
         },
         {
           district: 'Khairthal-Tijara',
-          centreName: 'DMR Training Centre Khairthal',
+          centreName: 'Company 4 Skill Centre Khairthal',
           classrooms: 3,
           practicalRooms: 3,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '01493-255667',
-          fullAddress: 'Ward No 12, Behind LIC Office, Khairthal, Alwar'
+          fullAddress: '202, Industrial Area, Khairthal, Rajasthan'
         },
         {
           district: 'Udaipur',
-          centreName: 'DMR Skills Centre Udaipur',
+          centreName: 'Company 4 Skill Centre Udaipur',
           classrooms: 3,
           practicalRooms: 3,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '0294-266778',
-          fullAddress: 'P.N. 5A, Main Road, Near Police Chowki, Aayad, Udaipur'
+          fullAddress: '303, Industrial Area, Udaipur, Rajasthan'
         },
         {
           district: 'Jaipur',
-          centreName: 'DMR Centre Jaipur',
+          centreName: 'Company 4 Skill Centre Jaipur',
           classrooms: 3,
           practicalRooms: 3,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '0141-288990',
-          fullAddress: 'Parshwnath Narayan City, Mansarovar Ext, Jaipur'
+          fullAddress: '404, Industrial Area, Jaipur, Rajasthan'
         }
       ],
 
@@ -780,11 +780,10 @@ export class EoiStateService {
             if (!match) return init;
             return {
               ...init,
-              ...match,
-              annualActionPlan: (match.annualActionPlan && match.annualActionPlan.length > 0) ? match.annualActionPlan : init.annualActionPlan,
-              bankDetails: match.bankDetails || init.bankDetails,
-              organisation: { ...init.organisation, ...match.organisation },
-              authorizedSignatory: { ...init.authorizedSignatory, ...match.authorizedSignatory }
+              status: match.status || init.status,
+              statusDisplay: match.statusDisplay || init.statusDisplay,
+              emdStatus: match.emdStatus || init.emdStatus,
+              scrutinyDetails: match.scrutinyDetails || init.scrutinyDetails
             };
           });
           this.responsesSubject.next(merged);

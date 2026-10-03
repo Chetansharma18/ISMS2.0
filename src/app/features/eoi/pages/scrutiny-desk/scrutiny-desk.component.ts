@@ -631,7 +631,7 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
                     Accept &amp; Empanel Application
                   </h3>
                   <p class="text-[11px] text-slate-500 font-normal">
-                    {{ applicant()?.anonymousLabel }} ({{ applicant()?.actualLegalName }}) &bull; {{ applicant()?.id }}
+                    {{ applicant()?.anonymousLabel }} &bull; {{ applicant()?.id }}
                   </p>
                 </div>
               </div>
@@ -665,9 +665,9 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
                       [(ngModel)]="technicalScore"
                       (ngModelChange)="onScoreChange($event)"
                       placeholder="e.g. 88"
-                      class="w-full px-3 py-1.5 border border-slate-200 rounded text-xs font-normal text-slate-900 focus:outline-none focus:border-emerald-600 shadow-2xs"
+                      class="w-full pl-3 pr-14 py-1.5 border border-slate-200 rounded text-xs font-normal text-slate-900 focus:outline-none focus:border-emerald-600 shadow-2xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
-                    <span class="absolute right-3 top-1.5 text-slate-400 font-normal text-xs">
+                    <span class="absolute right-3 top-2 text-slate-400 font-normal text-xs pointer-events-none select-none">
                       / 100
                     </span>
                   </div>
@@ -721,20 +721,6 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
                     <span>{{ resolutionFileName() }} ({{ resolutionFileSize() }})</span>
                   </div>
                 }
-              </div>
-
-              <!-- 3. Empanelment Remarks -->
-              <div>
-                <label for="modalApprovalRemarks" class="block text-xs font-normal text-slate-700 mb-1">
-                  Empanelment Recommendation Remarks
-                </label>
-                <textarea
-                  id="modalApprovalRemarks"
-                  rows="3"
-                  [(ngModel)]="decisionRemarks"
-                  placeholder="Specify official empanelment recommendation, batch allocation, or special conditions..."
-                  class="w-full p-2.5 border border-slate-200 rounded text-xs font-normal text-slate-800 focus:outline-none focus:border-emerald-600 bg-white shadow-2xs"
-                ></textarea>
               </div>
 
             </div>
@@ -1098,7 +1084,7 @@ export class ScrutinyDeskComponent {
       status: 'APPROVED',
       technicalScore: this.technicalScore,
       grade: this.selectedGrade as any,
-      remarks: this.decisionRemarks,
+      remarks: 'Empanelled based on verified technical score, assigned grade, and attached committee approval resolution.',
       approvalDocument: {
         id: `RES-${app.id}-2026`,
         documentName: this.resolutionFileName(),

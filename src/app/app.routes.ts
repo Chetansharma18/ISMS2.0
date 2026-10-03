@@ -153,6 +153,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/master/scheme',
+    loadComponent: () =>
+      import('./features/admin-master/scheme-master.component').then(
+        (m) => m.SchemeMasterComponent
+      )
+  },
+  {
     path: 'admin/master/:type',
     loadComponent: () =>
       import('./features/tenders/tenders-page.component').then(

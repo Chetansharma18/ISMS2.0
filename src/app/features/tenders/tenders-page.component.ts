@@ -124,12 +124,38 @@ export interface EoiDocumentItem {
             (rowClick)="onRowClick($event)"
             itemUnit="schemes"
             [customTemplates]="{
+              refNo: refNoTemplate,
+              schemeName: schemeNameTemplate,
               closingDate: closingDateTemplate,
               eoiDescription: descTemplate,
               viewAction: viewActionTemplate
             }"
           >
           </app-table>
+
+          <!-- Custom Template for EOI Reference No. with hover underline -->
+          <ng-template #refNoTemplate let-item>
+            <span
+              (click)="$event.stopPropagation(); viewSchemeDetails(item)"
+              class="hover:underline cursor-pointer transition-colors"
+              [ngClass]="isSchemeClosed(item) ? 'text-slate-400 hover:text-slate-600' : 'text-slate-800 hover:text-[#0B3558] font-normal'"
+              title="View {{ item.refNo }} details"
+            >
+              {{ item.refNo }}
+            </span>
+          </ng-template>
+
+          <!-- Custom Template for Scheme Name with hover underline -->
+          <ng-template #schemeNameTemplate let-item>
+            <span
+              (click)="$event.stopPropagation(); viewSchemeDetails(item)"
+              class="hover:underline cursor-pointer transition-colors"
+              [ngClass]="isSchemeClosed(item) ? 'text-slate-400 hover:text-slate-600' : 'text-slate-800 hover:text-[#0B3558] font-medium'"
+              title="View {{ item.schemeName }} details"
+            >
+              {{ item.schemeName }}
+            </span>
+          </ng-template>
 
           <!-- Custom Template for Closing Date (with prominent highlight for Closed / Expired schemes) -->
           <ng-template #closingDateTemplate let-item>
@@ -352,11 +378,13 @@ export class TendersPageComponent {
     {
       key: 'refNo',
       label: 'EOI Reference No.',
+      type: 'custom',
       cellClass: (_val, item) => `whitespace-nowrap font-normal ${this.isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-800'}`
     },
     {
       key: 'schemeName',
       label: 'Scheme Name',
+      type: 'custom',
       cellClass: (_val, item) => `whitespace-nowrap font-medium ${this.isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-800'}`
     },
     {

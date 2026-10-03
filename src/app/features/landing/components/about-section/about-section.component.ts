@@ -15,37 +15,52 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   host: {
-    class: 'block w-full'
+    class: 'block w-full bg-[#FFFFFF]'
   },
   template: `
-    <section #sectionRef class="py-10 sm:py-14 lg:py-16 bg-white border-b border-slate-100">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section Wrapper: 64–80px desktop, 36–44px mobile, plain white background, official government feel -->
+    <section #sectionRef class="w-full bg-[#FFFFFF] py-9 sm:py-12 md:py-16 xl:py-20 border-b border-[#DCE4ED]" aria-labelledby="about-isms-heading">
+      
+      <!-- Centered Container: Max width 1440px with responsive padding (20px mobile) -->
+      <div class="w-full max-w-[1440px] mx-auto px-5 sm:px-8 xl:px-12 box-border">
         
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+        <!-- Two-Column Layout: Stacks on mobile, ~55% left & ~45% right on desktop with 40–48px gap, vertically centered -->
+        <div class="flex flex-col lg:grid lg:grid-cols-[55fr_45fr] items-center gap-6 md:gap-8 lg:gap-12 w-full">
 
-          <!-- Left Column: About Text (Evenly balanced and matched in height with video) -->
-          <div class="lg:col-span-7 flex flex-col justify-center">
-            <h2 class="text-2xl sm:text-3xl lg:text-[32px] font-black text-[#0B3558] tracking-tight leading-none mb-4 sm:mb-5">
+          <!-- Left Column: About Content (~55% width) -->
+          <div class="w-full flex flex-col justify-center text-left">
+            
+            <!-- Section Heading: Inter 700, 36px Desktop / 32px Tablet / 28px Mobile, #12365A -->
+            <h2 id="about-isms-heading" class="font-['Inter',sans-serif] text-[28px] sm:text-[32px] xl:text-[36px] font-bold leading-[1.2] text-[#12365A] m-0 tracking-tight">
               About ISMS 2.0
             </h2>
 
-            <!-- Core Content: Compact, clean justified text matching reference image -->
-            <p class="text-[13px] sm:text-[13.5px] text-slate-700 font-normal leading-[1.65] text-justify">
-              Integrated Scheme Management System (ISMS 2.0) is a comprehensive e-Governance and Management Information System (MIS) designed to digitally transform, integrate, and streamline the processes involved in the planning, implementation, monitoring, and management of skill development schemes across Rajasthan. The platform provides a centralized and secure digital ecosystem that unites youth, training providers, government departments, empaneled agencies, and certification bodies on a single, high-transparency platform — ensuring accountability, real-time visibility, and data-driven decision making at every stage. ISMS 2.0 enables end-to-end scheme management — from scheme launching and candidate enrollment through bio-metric attendance, quality inspections, assessment, certification, and direct benefit and fund disbursements — all within one unified, auditable platform.
+            <!-- Small Orange Underline: 42px width, 4px height, #F28C28, 2px radius, 14–16px bottom spacing -->
+            <div class="w-[42px] h-[4px] bg-[#F28C28] rounded-[2px] mt-2.5 mb-4 sm:mb-[16px]" aria-hidden="true"></div>
+
+            <!-- Existing Description Paragraph 1: 100% original text, natural wrapping, left-aligned -->
+            <p class="font-['Inter',sans-serif] text-[15px] xl:text-[16px] font-normal leading-[1.65] text-[#344256] text-left max-w-[700px] m-0 mb-4">
+              Integrated Scheme Management System (ISMS 2.0) is a comprehensive e-Governance and Management Information System (MIS) designed to digitally transform, integrate, and streamline the processes involved in the planning, implementation, monitoring, and management of skill development schemes across Rajasthan. The platform provides a centralized and secure digital ecosystem that unites youth, training providers, government departments, empaneled agencies, and certification bodies on a single, high-transparency platform — ensuring accountability, real-time visibility, and data-driven decision making at every stage.
+            </p>
+
+            <!-- Existing Description Paragraph 2: Divided at natural sentence boundary, 100% original text -->
+            <p class="font-['Inter',sans-serif] text-[15px] xl:text-[16px] font-normal leading-[1.65] text-[#344256] text-left max-w-[700px] m-0">
+              ISMS 2.0 enables end-to-end scheme management — from scheme launching and candidate enrollment through bio-metric attendance, quality inspections, assessment, certification, and direct benefit and fund disbursements — all within one unified, auditable platform.
             </p>
           </div>
 
-          <!-- Right Column: Video Showcase & Quote Overlay -->
-          <div class="lg:col-span-5 w-full flex items-center justify-center">
-            <div class="w-full rounded-2xl overflow-hidden bg-slate-950 border border-slate-200/90 shadow-lg relative group transition-all duration-300">
+          <!-- Right Column: Video Panel (~45% width, 16:9 Aspect Ratio) -->
+          <div class="w-full flex items-center justify-center">
+            
+            <!-- Video Container Card: 16:9, rounded 12px, border 1px solid #DCE4ED, subtle shadow -->
+            <div class="w-full rounded-[12px] overflow-hidden bg-[#0B2440] border border-[#DCE4ED] shadow-[0_4px_16px_rgba(18,54,90,0.08)] relative">
               
-              <!-- Video Player with Natural Aspect Ratio -->
-              <div class="relative w-full aspect-[16/9.8] bg-slate-950 overflow-hidden flex items-center justify-center">
+              <div class="relative w-full aspect-video bg-[#0B2440] overflow-hidden flex items-center justify-center">
                 
-                <!-- Video Element (Sound Off by Default, Playsinline, Lazy loaded) -->
+                <!-- Actual Video Element -->
                 <video 
                   #videoRef
-                  class="w-full h-full object-cover object-center transition-opacity duration-500"
+                  class="w-full h-full object-cover object-center transition-opacity duration-300"
                   [class.opacity-0]="!isVideoLoaded()"
                   [class.opacity-100]="isVideoLoaded()"
                   playsinline
@@ -55,70 +70,70 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
                   aria-label="ISMS 2.0 Skill Development Overview Video">
                 </video>
 
-                <!-- Poster / Loading Placeholder Before Video Plays -->
+                <!-- Poster / Loading Placeholder Before Video Loads -->
                 @if (!isVideoLoaded()) {
-                  <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0B3558] to-slate-900 flex flex-col items-center justify-center p-6 text-center">
-                    <div class="w-11 h-11 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center mb-2.5 text-white">
+                  <div class="absolute inset-0 bg-gradient-to-br from-[#0B2440] to-[#12365A] flex flex-col items-center justify-center p-5 text-center z-5">
+                    <div class="w-11 h-11 rounded-full bg-white/12 flex items-center justify-center mb-2.5 text-white">
                       <svg class="w-5 h-5 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                       </svg>
                     </div>
-                    <p class="text-[11px] font-semibold text-slate-300 tracking-wide uppercase">RSLDC Skill Training in Action</p>
-                    <p class="text-[10px] text-slate-400 mt-0.5">Scroll into view to play video</p>
+                    <p class="text-[12px] font-semibold text-slate-100 uppercase tracking-wider m-0">RSLDC Skill Training in Action</p>
+                    <p class="text-[11px] text-slate-300 mt-1 mb-0">Scroll into view to play video</p>
                   </div>
                 }
 
-                <!-- Sound Off / Sound Toggle Badge (Top Right) -->
-                <div class="absolute top-2.5 right-2.5 z-20 flex items-center gap-2">
-                  <button 
-                    type="button"
-                    (click)="toggleSound()"
-                    class="bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white text-[10.5px] px-2.5 py-1 rounded-full flex items-center gap-1.5 transition-all shadow-xs cursor-pointer border border-white/20"
-                    [attr.aria-label]="isMuted() ? 'Unmute video audio' : 'Mute video audio'">
-                    @if (isMuted()) {
-                      <svg class="w-3 h-3 text-orange-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-                      </svg>
-                      <span class="font-medium">Sound Off</span>
-                    } @else {
-                      <svg class="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                      </svg>
-                      <span class="font-medium">Sound On</span>
-                    }
-                  </button>
-                </div>
-
                 <!-- Play / Pause Overlay Control (Top Left) -->
-                <div class="absolute top-2.5 left-2.5 z-20">
+                <div class="absolute top-3 left-3 z-20">
                   <button 
                     type="button"
                     (click)="togglePlayPause()"
-                    class="bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white w-7 h-7 rounded-full flex items-center justify-center transition-all shadow-xs cursor-pointer border border-white/20"
-                    [attr.aria-label]="isPlaying() ? 'Pause video' : 'Play video'">
+                    class="w-8 h-8 rounded-full bg-[#0B2440]/80 hover:bg-[#0B2440] text-white flex items-center justify-center border border-[#DCE4ED]/35 shadow-sm cursor-pointer transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#F28C28]"
+                    [attr.aria-label]="isPlaying() ? 'Pause video' : 'Play video'"
+                    title="{{ isPlaying() ? 'Pause video' : 'Play video' }}">
                     @if (isPlaying()) {
-                      <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
                       </svg>
                     } @else {
-                      <svg class="w-3 h-3 translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-3.5 h-3.5 translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z"/>
                       </svg>
                     }
                   </button>
                 </div>
 
-              </div>
-              
-              <!-- Quote Block Overlayed on Video -->
-              <div class="absolute bottom-0 inset-x-0 z-10 pointer-events-none bg-gradient-to-t from-black/90 via-black/60 to-transparent pt-10 pb-3 px-3.5 sm:px-4">
-                <p class="text-[11px] sm:text-[11.5px] text-white leading-relaxed font-medium drop-shadow-sm min-h-10">
-                  <span class="text-orange-400 font-bold mr-0.5">“</span>
-                  <span>{{ displayedQuote() }}</span><span class="animate-pulse text-orange-400 font-bold ml-0.5" [class.hidden]="hasFinishedTyping()">|</span>
-                  <span class="text-orange-400 font-bold ml-0.5" [class.hidden]="!hasFinishedTyping()">”</span>
-                </p>
+                <!-- Sound Off / Sound On Toggle Control (Top Right) -->
+                <div class="absolute top-3 right-3 z-20">
+                  <button 
+                    type="button"
+                    (click)="toggleSound()"
+                    class="px-2.5 py-1 rounded-full bg-[#0B2440]/80 hover:bg-[#0B2440] text-white text-[11px] sm:text-[11.5px] font-semibold flex items-center gap-1.5 border border-[#DCE4ED]/35 shadow-sm cursor-pointer transition-all hover:scale-103 focus:outline-none focus:ring-2 focus:ring-[#F28C28]"
+                    [attr.aria-label]="isMuted() ? 'Unmute video audio' : 'Mute video audio'"
+                    title="{{ isMuted() ? 'Unmute video audio' : 'Mute video audio' }}">
+                    @if (isMuted()) {
+                      <svg class="w-3.5 h-3.5 text-[#F28C28]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                      </svg>
+                      <span>Sound Off</span>
+                    } @else {
+                      <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                      </svg>
+                      <span>Sound On</span>
+                    }
+                  </button>
+                </div>
+
+                <!-- Video Caption Overlay (Positioned in lower portion, subtle dark navy gradient, 14–18px padding) -->
+                <div class="absolute bottom-0 inset-x-0 z-10 pointer-events-none bg-gradient-to-t from-[#0B2440]/95 via-[#0B2440]/65 to-transparent pt-7 pb-3.5 px-4 sm:pt-8 sm:pb-4 sm:px-4.5 box-border">
+                  <p class="font-['Inter',sans-serif] text-[13px] sm:text-[14px] lg:text-[14.5px] text-white leading-normal sm:leading-relaxed font-normal m-0 drop-shadow-sm">
+                    “{{ fullQuote }}”
+                  </p>
+                </div>
+
               </div>
 
             </div>
@@ -141,10 +156,6 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
   readonly isMuted = signal<boolean>(true); // Strictly sound off by default
 
   readonly fullQuote = 'ISMS 2.0 is an integrated MIS system of RSLDC to provide a single platform to Youths, Training providers, Govt. Departments, Convergence Departments, and Certification agencies for Skill Development Schemes.';
-  readonly displayedQuote = signal<string>('');
-  readonly hasFinishedTyping = signal<boolean>(false);
-  private typewriterInterval: any;
-  private hasTyped = false;
 
   private observer?: IntersectionObserver;
   private isVisible = false;
@@ -176,7 +187,7 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
       },
       {
         root: null,
-        rootMargin: '100px 0px', // Preload just slightly before user reaches it
+        rootMargin: '120px 0px', // Preload just slightly before reaching it
         threshold: 0.15
       }
     );
@@ -198,11 +209,7 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
     const video = this.videoRef?.nativeElement;
     if (!video) return;
 
-    // Start typewriter effect when video enters viewport
-    this.startTypewriter();
-
     if (!this.isVideoLoaded()) {
-      // Lazy attach the MP4 source only when needed
       video.src = '/video.mp4';
       video.load();
       video.onloadeddata = () => {
@@ -219,25 +226,6 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
     } else {
       this.playVideo();
     }
-  }
-
-  private startTypewriter(): void {
-    if (this.hasTyped) return;
-    this.hasTyped = true;
-    let i = 0;
-    this.displayedQuote.set('');
-
-    this.typewriterInterval = setInterval(() => {
-      if (i < this.fullQuote.length) {
-        this.displayedQuote.update(q => q + this.fullQuote.charAt(i));
-        i++;
-      } else {
-        this.hasFinishedTyping.set(true);
-        if (this.typewriterInterval) {
-          clearInterval(this.typewriterInterval);
-        }
-      }
-    }, 25);
   }
 
   private handleExitViewport(): void {
@@ -288,9 +276,6 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
     }
     if (this.visibilityHandler) {
       document.removeEventListener('visibilitychange', this.visibilityHandler);
-    }
-    if (this.typewriterInterval) {
-      clearInterval(this.typewriterInterval);
     }
     const video = this.videoRef?.nativeElement;
     if (video) {

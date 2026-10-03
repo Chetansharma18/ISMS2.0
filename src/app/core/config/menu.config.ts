@@ -19,7 +19,7 @@ export const MAIN_NAV_ITEMS: MenuItem[] = [
     label: 'Registration (OTR)',
     route: '/registration',
     icon: 'assignment',
-    roles: ['new_user', 'existing_user', 'super_admin']
+    roles: ['new_user', 'existing_user']
   },
   {
     label: 'Active Schemes',
@@ -30,13 +30,13 @@ export const MAIN_NAV_ITEMS: MenuItem[] = [
     label: 'Tender Status',
     route: '/tender-status',
     icon: 'fact_check',
-    roles: ['existing_user', 'super_admin']
+    roles: ['existing_user']
   },
   {
     label: 'Department EOI View',
     route: '/admin/eoi-view',
     icon: 'admin_panel_settings',
-    roles: ['dept_admin', 'super_admin']
+    roles: ['dept_admin']
   },
   {
     label: 'My Profile',

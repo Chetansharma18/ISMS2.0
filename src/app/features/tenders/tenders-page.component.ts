@@ -6,7 +6,6 @@ import { AuthService } from '../../core/auth/auth.service';
 import {
   PageHeaderComponent,
   TableComponent,
-  ButtonComponent,
   ActionModalComponent,
   TableColumn
 } from '../../shared';
@@ -48,7 +47,6 @@ export interface EoiDocumentItem {
     FormsModule,
     PageHeaderComponent,
     TableComponent,
-    ButtonComponent,
     ActionModalComponent,
     SchemeDetailViewComponent
   ],

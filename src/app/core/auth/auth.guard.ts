@@ -31,7 +31,7 @@ export const roleGuard = (allowedRoles: UserRole[]): CanActivateFn => {
       return false;
     }
 
-    if (allowedRoles.includes(user.role) || user.role === 'super_admin') {
+    if (allowedRoles.includes(user.role)) {
       return true;
     }
 
@@ -42,6 +42,6 @@ export const roleGuard = (allowedRoles: UserRole[]): CanActivateFn => {
 };
 
 /**
- * Convenience guard for department admin / super admin routes.
+ * Convenience guard for department admin routes.
  */
-export const adminGuard: CanActivateFn = roleGuard(['dept_admin', 'super_admin']);
+export const adminGuard: CanActivateFn = roleGuard(['dept_admin']);

@@ -13,16 +13,7 @@ export type AppPermission =
 const ROLE_PERMISSIONS: Record<UserRole, AppPermission[]> = {
   new_user: ['view_eoi'],
   existing_user: ['view_eoi', 'submit_eoi'],
-  dept_admin: ['view_eoi', 'scrutinize_eoi', 'manage_schemes', 'view_reports'],
-  super_admin: [
-    'view_eoi',
-    'submit_eoi',
-    'scrutinize_eoi',
-    'manage_schemes',
-    'manage_users',
-    'view_reports',
-    'manage_system'
-  ]
+  dept_admin: ['view_eoi', 'scrutinize_eoi', 'manage_schemes', 'view_reports']
 };
 
 @Injectable({
@@ -41,7 +32,6 @@ export class PermissionService {
   hasPermission(permission: AppPermission): boolean {
     const role = this.userRole();
     if (!role) return false;
-    if (role === 'super_admin') return true;
     return this.userPermissions().includes(permission);
   }
 
@@ -52,7 +42,6 @@ export class PermissionService {
   hasRole(role: UserRole | UserRole[]): boolean {
     const current = this.userRole();
     if (!current) return false;
-    if (current === 'super_admin') return true;
     return Array.isArray(role) ? role.includes(current) : current === role;
   }
 }

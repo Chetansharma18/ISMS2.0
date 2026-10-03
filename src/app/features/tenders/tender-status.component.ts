@@ -169,7 +169,7 @@ export class TenderStatusComponent {
     { key: 'department', label: 'Department', width: 'min-w-[200px] max-w-sm', type: 'custom' },
     { key: 'appliedDate', label: 'Applied Date', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'submittedStatus', label: 'Submitted Status', align: 'center', type: 'status' },
-    { key: 'eoiStatus', label: 'EOI Status', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: 'eoiStatus', label: 'EOI Stage', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'view', label: 'View', align: 'center', width: 'w-20', type: 'custom' }
   ];
 

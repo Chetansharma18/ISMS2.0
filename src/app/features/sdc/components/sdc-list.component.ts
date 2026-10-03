@@ -433,7 +433,7 @@ export class SdcListComponent {
   /** Detect Admin vs TP mode */
   readonly isAdmin = computed(() => {
     const role = this.authService.currentUser()?.role;
-    return role === 'dept_admin' || role === 'super_admin' || (this.router.url.startsWith('/sdc') && !this.router.url.startsWith('/sdcs'));
+    return role === 'dept_admin' || (this.router.url.startsWith('/sdc') && !this.router.url.startsWith('/sdcs'));
   });
 
   activeFilter = signal<string>('All');

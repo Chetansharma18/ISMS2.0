@@ -146,6 +146,20 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/master/:type',
+    loadComponent: () =>
+      import('./features/tenders/tenders-page.component').then(
+        (m) => m.TendersPageComponent
+      )
+  },
+  {
+    path: 'admin/master',
+    loadComponent: () =>
+      import('./features/tenders/tenders-page.component').then(
+        (m) => m.TendersPageComponent
+      )
+  },
+  {
     path: 'admin/camera-monitoring',
     loadComponent: () =>
       import('./features/sdc/components/camera-monitoring.component').then(

@@ -49,6 +49,110 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
               </svg>
               <span class="tracking-tight">EOI Configuration</span>
             </a>
+
+            <!-- 2. Master Dropdown Slider Section -->
+            <div class="flex flex-col">
+              <!-- Master Header Toggle -->
+              <button
+                type="button"
+                (click)="toggleMaster()"
+                class="flex items-center justify-between w-full px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+              >
+                <div class="flex items-center gap-2.5">
+                  <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  </svg>
+                  <span class="tracking-tight font-medium">Master</span>
+                </div>
+                <svg
+                  class="w-3.5 h-3.5 text-slate-400 group-hover:text-[#174A6E] transition-transform duration-200"
+                  [ngClass]="{'transform rotate-180': isMasterOpen()}"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              <!-- Dropdown Slider Sub-items -->
+              @if (isMasterOpen()) {
+                <div class="flex flex-col gap-0.5 pl-7 pr-1 pt-1 pb-1 transition-all duration-300">
+                  <a
+                    routerLink="/admin/master/eoi-category"
+                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">EOI Category Master</span>
+                  </a>
+
+                  <a
+                    routerLink="/admin/master/scheme"
+                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">Scheme Master</span>
+                  </a>
+
+                  <a
+                    routerLink="/admin/master/sector"
+                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">Sector Master</span>
+                  </a>
+
+                  <a
+                    routerLink="/admin/master/course"
+                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">Course Master</span>
+                  </a>
+
+                  <a
+                    routerLink="/admin/master/permission"
+                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">Permission Master</span>
+                  </a>
+
+                  <a
+                    routerLink="/admin/master/user-role"
+                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">User Role Type</span>
+                  </a>
+
+                  <a
+                    routerLink="/admin/master/district-block"
+                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">District &amp; Block Master</span>
+                  </a>
+
+                  <a
+                    routerLink="/admin/master/designation"
+                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">Designation</span>
+                  </a>
+                </div>
+              }
+            </div>
           } @else if (isDeptAdmin()) {
             <!-- 1. EOI Responses -->
             <a
@@ -300,4 +404,10 @@ export class SidebarComponent {
     const user = this.currentUser();
     return user?.role === 'super_admin';
   });
+
+  readonly isMasterOpen = signal<boolean>(true);
+
+  toggleMaster(): void {
+    this.isMasterOpen.update(v => !v);
+  }
 }

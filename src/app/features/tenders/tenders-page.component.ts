@@ -30,6 +30,7 @@ export interface SchemeTender {
   techBidDate?: string;
   emdFee?: string;
   processFee?: string;
+  attachedDocs?: EoiDocumentItem[];
 }
 
 export interface EoiDocumentItem {
@@ -173,33 +174,50 @@ export interface EoiDocumentItem {
           </ng-template>
 
           <ng-template #viewActionTemplate let-item>
-            @if (isSchemeClosed(item)) {
+            <div class="flex items-center justify-center gap-2 whitespace-nowrap">
               <button
                 type="button"
                 (click)="$event.stopPropagation(); viewSchemeDetails(item)"
-                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-semibold text-[#0483AC] border border-[#0483AC]/40 bg-white cursor-pointer select-none"
-                title="View scheme details (closed)"
-              >
-                <svg class="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                <span>View</span>
-              </button>
-            } @else {
-              <button
-                type="button"
-                (click)="$event.stopPropagation(); viewSchemeDetails(item)"
-                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-semibold text-[#0483AC] border border-[#0483AC]/40 bg-white cursor-pointer select-none"
+                class="inline-flex items-center gap-1 text-[#0483AC] hover:text-[#03607E] font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
                 title="View EOI Details"
               >
-                <svg class="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
                 <span>View</span>
               </button>
-            }
+
+              @if (isSuperAdmin()) {
+                <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
+
+                <button
+                  type="button"
+                  (click)="$event.stopPropagation(); editScheme(item)"
+                  class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
+                  title="Edit EOI Configuration"
+                >
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  <span>Edit</span>
+                </button>
+
+                <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
+
+                <button
+                  type="button"
+                  (click)="$event.stopPropagation(); deleteScheme(item)"
+                  class="inline-flex items-center gap-1 text-rose-600 hover:text-rose-700 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
+                  title="Delete EOI Configuration"
+                >
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span>Delete</span>
+                </button>
+              }
+            </div>
           </ng-template>
 
         </div>
@@ -217,6 +235,7 @@ export interface EoiDocumentItem {
           [rfpDocs]="rfpDocuments"
           [annexures]="annexureDocuments"
           [requiredInfo]="eoiRequiredInfo"
+          [hideApplyButton]="isSuperAdmin()"
           (back)="backToList()"
           (apply)="handleApplyForScheme()"
           (download)="downloadDoc($event)"
@@ -242,6 +261,9 @@ export interface EoiDocumentItem {
       <!-- ====================================================================
            MODAL: CONFIGURE NEW EOI
            ==================================================================== -->
+      <!-- ====================================================================
+           MODAL: CONFIGURE NEW EOI / EDIT EOI
+           ==================================================================== -->
       <app-action-modal
         [isOpen]="showConfigureEoiModal()"
         [showCloseButton]="true"
@@ -256,9 +278,9 @@ export interface EoiDocumentItem {
         (close)="closeConfigureEoiModal()"
       >
         <h2 class="m-0 text-[#0B3558]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
-          Configure New EOI
+          {{ editingSchemeRefNo() ? 'Edit EOI Configuration' : 'Configure New EOI' }}
         </h2>
-        <div class="mt-4 font-sans text-[13px] max-h-[60vh] overflow-y-auto pr-4">
+        <div class="mt-4 font-sans text-[13px] max-h-[60vh] overflow-y-auto overflow-x-hidden pr-3">
           <div class="grid grid-cols-[200px_1fr] items-center gap-y-3 gap-x-4">
             <label class="text-slate-700 font-medium">EOI Reference No.*</label>
             <input type="text" maxlength="100" [(ngModel)]="newEoiData.refNo" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.refNo, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.refNo)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
@@ -293,18 +315,49 @@ export interface EoiDocumentItem {
             <label class="text-slate-700 font-medium">Process Fee*</label>
             <input type="text" maxlength="100" [(ngModel)]="newEoiData.processFee" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.processFee, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.processFee)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
 
-            <label class="text-slate-700 font-medium">Attach File*</label>
-            <div class="flex items-center h-full gap-2">
-              <button type="button" (click)="openAttachmentModal()" class="cursor-pointer text-[#174A6E] hover:text-[#0B3558] flex items-center justify-center p-1 rounded hover:bg-slate-100 transition-colors">
-                <svg class="w-5 h-5 transform -rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                </svg>
-              </button>
-              @if (newEoiData.fileName) {
-                <span class="text-xs text-slate-600 truncate max-w-[200px]" title="{{newEoiData.fileName}}">{{newEoiData.fileName}}</span>
-              }
-              @if (newEoiSubmitted() && !newEoiData.file) {
-                <span class="text-xs text-red-500">Required</span>
+            <label class="text-slate-700 font-medium self-start pt-1">Attach File*</label>
+            <div class="space-y-2 overflow-hidden">
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  (click)="openAttachmentModal()"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-[#174A6E] text-[#174A6E] hover:bg-[#174A6E]/5 text-xs font-semibold cursor-pointer transition-colors"
+                >
+                  <svg class="w-4 h-4 transform -rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                  </svg>
+                  <span>+ Attach Document</span>
+                </button>
+                @if (newEoiSubmitted() && newEoiData.attachments.length === 0) {
+                  <span class="text-xs text-red-500 font-medium">At least 1 attachment is required</span>
+                }
+              </div>
+
+              <!-- List of added attachments -->
+              @if (newEoiData.attachments.length > 0) {
+                <div class="space-y-1.5 pt-1 max-w-full overflow-hidden">
+                  @for (att of newEoiData.attachments; track att.id; let idx = $index) {
+                    <div class="flex items-center justify-between px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs max-w-full overflow-hidden">
+                      <div class="flex items-center gap-1.5 min-w-0 flex-1 pr-2 overflow-hidden">
+                        <svg class="w-4 h-4 text-[#174A6E] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span class="font-medium text-slate-800 truncate shrink-0 max-w-[140px]" [title]="att.title">{{ att.title }}</span>
+                        <span class="text-[11px] text-slate-500 truncate min-w-0">({{ att.fileName }})</span>
+                      </div>
+                      <button
+                        type="button"
+                        (click)="removeAttachment(idx)"
+                        class="text-slate-400 hover:text-red-600 p-0.5 rounded hover:bg-red-50 transition-colors cursor-pointer shrink-0 ml-1"
+                        title="Remove attachment"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  }
+                </div>
               }
             </div>
             
@@ -385,6 +438,51 @@ export interface EoiDocumentItem {
         </div>
       </app-action-modal>
 
+      <!-- ====================================================================
+           MODAL: UPLOAD CORRIGENDUM (OPTIONAL FOR EDIT EOI)
+           ==================================================================== -->
+      <app-action-modal
+        [isOpen]="showCorrigendumModal()"
+        [showCloseButton]="true"
+        [closeOnBackdrop]="false"
+        [reverseButtons]="true"
+        [showAccentBar]="false"
+        primaryLabel="Submit"
+        secondaryLabel="Cancel"
+        maxWidthClass="max-w-[540px]"
+        (primaryAction)="submitCorrigendumAndSave()"
+        (secondaryAction)="closeCorrigendumModal()"
+        (close)="closeCorrigendumModal()"
+      >
+        <h2 class="m-0 text-[#0B3558]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+          Upload Corrigendum (Optional)
+        </h2>
+        <div class="mt-4 space-y-4 font-sans text-[13px]">
+          <div>
+            <label class="block text-slate-700 font-medium mb-1">Corrigendum Title</label>
+            <input
+              type="text"
+              maxlength="100"
+              placeholder="e.g. Corrigendum-1: Extension of Submission Date"
+              [(ngModel)]="corrigendumFormData.title"
+              class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+            />
+          </div>
+          <div>
+            <label class="block text-slate-700 font-medium mb-1">Upload Corrigendum Document</label>
+            <input
+              type="file"
+              accept=".pdf,.txt,.jpeg,.jpg,.png,.doc,.docx,.xls,.xlsx"
+              (change)="onCorrigendumFileSelected($event)"
+              class="w-full text-slate-800 file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-[#174A6E] file:text-white hover:file:bg-[#0B3558] cursor-pointer"
+            />
+          </div>
+          @if (corrigendumFileError()) {
+            <div class="text-xs text-red-500 font-medium">{{ corrigendumFileError() }}</div>
+          }
+        </div>
+      </app-action-modal>
+
     </div>
   `
 })
@@ -420,8 +518,7 @@ export class TendersPageComponent {
     description: '',
     emdFee: '',
     processFee: '',
-    file: null as File | null,
-    fileName: '',
+    attachments: [] as Array<{ id: string; title: string; fileName: string; size: string; file: File }>,
     documents: [] as string[]
   };
   newEoiSubmitted = signal<boolean>(false);
@@ -435,6 +532,15 @@ export class TendersPageComponent {
   };
   attachmentSubmitted = signal<boolean>(false);
   attachmentFileError = signal<string>('');
+
+  readonly showCorrigendumModal = signal<boolean>(false);
+  corrigendumFormData = {
+    title: '',
+    file: null as File | null,
+    fileName: ''
+  };
+  corrigendumFileError = signal<string>('');
+  private pendingEditScheme: SchemeTender | null = null;
 
   pageSize = 10;
   searchQuery = signal<string>('');
@@ -581,7 +687,7 @@ export class TendersPageComponent {
       key: 'viewAction',
       label: 'Action',
       align: 'center',
-      width: 'w-24',
+      width: 'min-w-[200px]',
       type: 'custom'
     }
   ];
@@ -880,7 +986,10 @@ export class TendersPageComponent {
     return `Expression of Interest for Empanelment of Training Providers / PIAs to implement state skill development initiatives under ${scheme.schemeTitle || scheme.schemeName}.`;
   }
 
+  editingSchemeRefNo = signal<string | null>(null);
+
   openConfigureEoiModal(): void {
+    this.editingSchemeRefNo.set(null);
     this.newEoiSubmitted.set(false);
     this.fileError.set('');
     this.newEoiData = {
@@ -892,11 +1001,59 @@ export class TendersPageComponent {
       description: '',
       emdFee: '',
       processFee: '',
-      file: null,
-      fileName: '',
+      attachments: [],
       documents: []
     };
     this.showConfigureEoiModal.set(true);
+  }
+
+  editScheme(scheme: SchemeTender): void {
+    this.editingSchemeRefNo.set(scheme.refNo);
+    this.newEoiSubmitted.set(false);
+    this.fileError.set('');
+    
+    const parseDate = (dStr?: string) => {
+      if (!dStr) return '';
+      const parts = dStr.includes('/') ? dStr.split('/') : dStr.split('-');
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+      return dStr;
+    };
+
+    const initialDocs: EoiDocumentItem[] = scheme.attachedDocs || [
+      { sNo: 1, name: 'Request for Proposal (RFP)', size: scheme.rfpDocSize || '2.4 MB' },
+      { sNo: 2, name: 'Standard Operating Procedure (SOP) for Training Partners', size: scheme.sopDocSize || '1.8 MB' }
+    ];
+
+    this.newEoiData = {
+      refNo: scheme.refNo,
+      scheme: scheme.schemeName,
+      publishedDate: parseDate(scheme.datePublished),
+      submissionDate: parseDate(scheme.closingDate),
+      eoiCategory: scheme.eoiCategory || 'General',
+      description: scheme.eoiDescription || '',
+      emdFee: scheme.emdFee || '',
+      processFee: scheme.processFee || '',
+      attachments: initialDocs.map((doc, i) => ({
+        id: 'att_' + i + '_' + Date.now(),
+        title: doc.name,
+        fileName: doc.name.toLowerCase().replace(/[^a-z0-9]/gi, '_') + '.pdf',
+        size: doc.size,
+        file: new File([], doc.name)
+      })),
+      documents: []
+    };
+    this.showConfigureEoiModal.set(true);
+  }
+
+  deleteScheme(scheme: SchemeTender): void {
+    if (confirm(`Are you sure you want to delete EOI Configuration for "${scheme.schemeName}" (${scheme.refNo})?`)) {
+      this.schemes.update(current => {
+        const updated = current.filter(s => s.refNo !== scheme.refNo);
+        return updated.map((item, index) => ({ ...item, sNo: index + 1 }));
+      });
+    }
   }
 
   closeConfigureEoiModal(): void {
@@ -946,10 +1103,30 @@ export class TendersPageComponent {
     if (!this.attachmentFormData.title || !this.attachmentFormData.file) {
       return; // Invalid
     }
-    // Copy the uploaded file data into the main EOI form state
-    this.newEoiData.file = this.attachmentFormData.file;
-    this.newEoiData.fileName = `${this.attachmentFormData.title} (${this.attachmentFormData.fileName})`;
+
+    const file = this.attachmentFormData.file;
+    const formatBytes = (bytes: number) => {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    };
+
+    const newAtt = {
+      id: Date.now().toString() + Math.random().toString().slice(2, 6),
+      title: this.attachmentFormData.title,
+      fileName: file.name,
+      size: formatBytes(file.size),
+      file: file
+    };
+
+    this.newEoiData.attachments.push(newAtt);
     this.showAttachmentModal.set(false);
+  }
+
+  removeAttachment(index: number): void {
+    this.newEoiData.attachments.splice(index, 1);
   }
 
   openAttachmentModal(): void {
@@ -963,13 +1140,84 @@ export class TendersPageComponent {
     this.showAttachmentModal.set(false);
   }
 
+  onCorrigendumFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      const validExtensions = ['pdf', 'txt', 'jpeg', 'jpg', 'png', 'doc', 'docx', 'xls', 'xlsx'];
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || '';
+      
+      if (!validExtensions.includes(fileExt)) {
+        this.corrigendumFileError.set('Invalid file type. Supported: PDF, TXT, JPEG, PNG, WORD, EXCEL.');
+        this.corrigendumFormData.file = null;
+        this.corrigendumFormData.fileName = '';
+        return;
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        this.corrigendumFileError.set('File size exceeds the 10MB limit.');
+        this.corrigendumFormData.file = null;
+        this.corrigendumFormData.fileName = '';
+        return;
+      }
+
+      this.corrigendumFileError.set('');
+      this.corrigendumFormData.file = file;
+      this.corrigendumFormData.fileName = file.name;
+    } else {
+      this.corrigendumFormData.file = null;
+      this.corrigendumFormData.fileName = '';
+    }
+  }
+
+  submitCorrigendumAndSave(): void {
+    if (!this.pendingEditScheme) return;
+    
+    const targetScheme = { ...this.pendingEditScheme };
+    if (this.corrigendumFormData.file) {
+      const formatBytes = (bytes: number) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+      };
+
+      const rawTitle = this.corrigendumFormData.title.trim() || 'Corrigendum Document';
+      const file = this.corrigendumFormData.file;
+      const docTitle = rawTitle.toLowerCase().startsWith('corrigendum') ? rawTitle : `Corrigendum: ${rawTitle}`;
+
+      const corrigendumDoc: EoiDocumentItem = {
+        sNo: (targetScheme.attachedDocs?.length || 0) + 1,
+        name: docTitle,
+        size: formatBytes(file.size)
+      };
+
+      targetScheme.attachedDocs = [...(targetScheme.attachedDocs || []), corrigendumDoc];
+    }
+
+    const targetRef = this.editingSchemeRefNo();
+    this.schemes.update(current => {
+      const updated = current.map(item => item.refNo === targetRef ? { ...item, ...targetScheme } : item);
+      return updated.map((item, index) => ({ ...item, sNo: index + 1 }));
+    });
+
+    this.pendingEditScheme = null;
+    this.showCorrigendumModal.set(false);
+  }
+
+  closeCorrigendumModal(): void {
+    this.pendingEditScheme = null;
+    this.showCorrigendumModal.set(false);
+  }
+
   submitNewEoi(): void {
     this.newEoiSubmitted.set(true);
     
     // Validate mandatory fields
     const d = this.newEoiData;
-    if (!d.refNo || !d.scheme || !d.publishedDate || !d.submissionDate || !d.eoiCategory || !d.emdFee || !d.processFee || !d.file) {
-      return; // Invalid, fields will turn red
+    if (!d.refNo || !d.scheme || !d.publishedDate || !d.submissionDate || !d.eoiCategory || !d.emdFee || !d.processFee || d.attachments.length === 0) {
+      return; // Invalid, fields will turn red / show required error
     }
     
     // Validate that if there are any required documents added, they are actually selected
@@ -978,6 +1226,12 @@ export class TendersPageComponent {
     }
 
     const formatDt = (dt: string) => dt ? dt.split('-').reverse().join('/') : '';
+    const attachedDocsList: EoiDocumentItem[] = d.attachments.map((att, idx) => ({
+      sNo: idx + 1,
+      name: att.title,
+      size: att.size
+    }));
+
     const newScheme: SchemeTender = {
       sNo: 1,
       refNo: d.refNo,
@@ -991,17 +1245,26 @@ export class TendersPageComponent {
       eoiDescription: d.description || '',
       status: 'Open',
       emdFee: d.emdFee,
-      processFee: d.processFee
+      processFee: d.processFee,
+      attachedDocs: attachedDocsList
     };
 
-    this.schemes.update(current => {
-      const updated = [newScheme, ...current];
-      return updated.map((item, index) => ({ ...item, sNo: index + 1 }));
-    });
-
-    // In a real app, form values would be collected and sent to a service here.
-    console.log('Submitted New EOI Configuration', this.newEoiData);
-    this.showConfigureEoiModal.set(false);
+    const targetRef = this.editingSchemeRefNo();
+    if (targetRef) {
+      // Edit mode: save updated scheme object into pendingEditScheme & open optional Corrigendum modal
+      this.pendingEditScheme = newScheme;
+      this.corrigendumFormData = { title: '', file: null, fileName: '' };
+      this.corrigendumFileError.set('');
+      this.showConfigureEoiModal.set(false);
+      this.showCorrigendumModal.set(true);
+    } else {
+      // New EOI mode: save directly to list
+      this.schemes.update(current => {
+        const updated = [newScheme, ...current];
+        return updated.map((item, index) => ({ ...item, sNo: index + 1 }));
+      });
+      this.showConfigureEoiModal.set(false);
+    }
   }
 }
 

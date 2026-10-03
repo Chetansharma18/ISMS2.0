@@ -659,8 +659,68 @@ export class SanctionOrderComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    const sId = this.route.snapshot.params['schemeId'] || 'ALL';
-    this.fetchAcceptedResponses(sId);
+    const loaded = this.loadDraft();
+    if (!loaded) {
+      const sId = this.route.snapshot.params['schemeId'] || 'ALL';
+      this.fetchAcceptedResponses(sId);
+    }
+  }
+
+  autoSaveDraft(): void {
+    const draft = {
+      headerTitle: this.headerTitle,
+      headerSubtitle: this.headerSubtitle,
+      headerAddress: this.headerAddress,
+      fileNo: this.fileNo,
+      sanctionDate: this.sanctionDate,
+      documentTitle: this.documentTitle,
+      subjectText: this.subjectText,
+      referenceText: this.referenceText,
+      preambleText: this.preambleText,
+      signatoryName: this.signatoryName,
+      signatoryTitle: this.signatoryTitle,
+      signatoryOrg: this.signatoryOrg,
+      tableRows: this.tableRows,
+      termsAndConditions: this.termsAndConditions,
+      copyToList: this.copyToList,
+      leftLogoUrl: this.leftLogoUrl(),
+      rightLogoUrl: this.rightLogoUrl()
+    };
+    try {
+      localStorage.setItem('isms_sanction_order_draft', JSON.stringify(draft));
+    } catch (e) {
+      console.warn('Auto-save error:', e);
+    }
+  }
+
+  loadDraft(): boolean {
+    try {
+      const saved = localStorage.getItem('isms_sanction_order_draft');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed) {
+          this.headerTitle = parsed.headerTitle ?? this.headerTitle;
+          this.headerSubtitle = parsed.headerSubtitle ?? this.headerSubtitle;
+          this.headerAddress = parsed.headerAddress ?? this.headerAddress;
+          this.fileNo = parsed.fileNo ?? this.fileNo;
+          this.sanctionDate = parsed.sanctionDate ?? this.sanctionDate;
+          this.documentTitle = parsed.documentTitle ?? this.documentTitle;
+          this.subjectText = parsed.subjectText ?? this.subjectText;
+          this.referenceText = parsed.referenceText ?? this.referenceText;
+          this.preambleText = parsed.preambleText ?? this.preambleText;
+          this.signatoryName = parsed.signatoryName ?? this.signatoryName;
+          this.signatoryTitle = parsed.signatoryTitle ?? this.signatoryTitle;
+          this.signatoryOrg = parsed.signatoryOrg ?? this.signatoryOrg;
+          if (parsed.tableRows?.length) this.tableRows = parsed.tableRows;
+          if (parsed.termsAndConditions?.length) this.termsAndConditions = parsed.termsAndConditions;
+          if (parsed.copyToList?.length) this.copyToList = parsed.copyToList;
+          if (parsed.leftLogoUrl) this.leftLogoUrl.set(parsed.leftLogoUrl);
+          if (parsed.rightLogoUrl) this.rightLogoUrl.set(parsed.rightLogoUrl);
+          return true;
+        }
+      }
+    } catch (e) {}
+    return false;
   }
 
   fetchAcceptedResponses(schemeId: string): void {
@@ -678,6 +738,7 @@ export class SanctionOrderComponent implements OnInit {
           grade: resp.scrutinyDetails?.grade === 'Grade A' ? 'A' : (resp.scrutinyDetails?.grade === 'Grade B' ? 'B' : 'A'),
           target: 150
         }));
+        this.autoSaveDraft();
       }
     });
   }
@@ -694,28 +755,34 @@ export class SanctionOrderComponent implements OnInit {
       grade: 'A',
       target: 150
     });
+    this.autoSaveDraft();
   }
 
   removeRow(index: number): void {
     if (this.tableRows.length > 1) {
       this.tableRows.splice(index, 1);
+      this.autoSaveDraft();
     }
   }
 
   addClause(): void {
     this.termsAndConditions.push('New terms and conditions clause inserted by administrator.');
+    this.autoSaveDraft();
   }
 
   removeClause(index: number): void {
     if (this.termsAndConditions.length > 1) {
       this.termsAndConditions.splice(index, 1);
+      this.autoSaveDraft();
     }
   }
 
   resetToDefaults(): void {
+    localStorage.removeItem('isms_sanction_order_draft');
     this.leftLogoUrl.set(null);
     this.rightLogoUrl.set(null);
-    this.ngOnInit();
+    const sId = this.route.snapshot.params['schemeId'] || 'ALL';
+    this.fetchAcceptedResponses(sId);
   }
 
   onLeftLogoUpload(event: any): void {
@@ -724,6 +791,7 @@ export class SanctionOrderComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.leftLogoUrl.set(e.target.result);
+        this.autoSaveDraft();
       };
       reader.readAsDataURL(file);
     }
@@ -731,19 +799,34 @@ export class SanctionOrderComponent implements OnInit {
 
   removeLeftLogo(): void {
     this.leftLogoUrl.set(null);
+    this.autoSaveDraft();
+  }
+
+  onRightLogoUpload(event: any): void {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.rightLogoUrl.set(e.target.result);
+        this.autoSaveDraft();
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   removeRightLogo(): void {
     this.rightLogoUrl.set(null);
+    this.autoSaveDraft();
   }
 
   isSaved = signal<boolean>(false);
 
   saveSanctionOrder(): void {
+    this.autoSaveDraft();
     this.isSaved.set(true);
     setTimeout(() => {
-      this.isSaved.set(false);
-    }, 4000);
+      this.router.navigate(['/admin/eoi-view']);
+    }, 600);
   }
 
   printSanctionOrder(): void {

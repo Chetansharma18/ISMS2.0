@@ -202,6 +202,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/user-management',
+    loadComponent: () =>
+      import('./features/user-management/user-management.component').then(
+        (m) => m.UserManagementComponent
+      )
+  },
+  {
     path: 'admin/master/:type',
     loadComponent: () =>
       import('./features/tenders/tenders-page.component').then(

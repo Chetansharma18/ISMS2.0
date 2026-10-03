@@ -153,6 +153,19 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
                 </div>
               }
             </div>
+
+            <!-- 3. User Management Section -->
+            <a
+              routerLink="/admin/user-management"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center gap-2.5 px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              <span class="tracking-tight font-medium">User Management</span>
+            </a>
           } @else if (isDeptAdmin()) {
             <!-- 1. EOI Responses -->
             <a

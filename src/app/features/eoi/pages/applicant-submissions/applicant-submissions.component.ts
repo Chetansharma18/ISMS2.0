@@ -14,7 +14,7 @@ import {
   imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent],
   template: `
     <div class="w-full min-h-full bg-white text-[#1F2933] font-sans">
-      <div class="p-4 sm:p-5 space-y-3 font-sans">
+      <div class="p-4 sm:p-5 space-y-4 font-sans">
         
         <!-- Header via Reusable PageHeaderComponent -->
         <app-page-header
@@ -33,116 +33,58 @@ import {
           </div>
         </app-page-header>
 
-        <!-- Filter Buttons Bar (Pills matching user side) -->
-        <div class="flex items-center gap-1.5 flex-wrap pt-1">
-          <button
-            type="button"
-            (click)="setFilter('ALL')"
-            class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-            [class.bg-[#174A6E]]="selectedFilter() === 'ALL'"
-            [class.text-white]="selectedFilter() === 'ALL'"
-            [class.border-[#174A6E]]="selectedFilter() === 'ALL'"
-            [class.bg-white]="selectedFilter() !== 'ALL'"
-            [class.text-[#5F6B76]]="selectedFilter() !== 'ALL'"
-            [class.border-[#D9E1E7]]="selectedFilter() !== 'ALL'"
-            [class.hover:bg-[#EAF2F6]]="selectedFilter() !== 'ALL'"
-            [class.hover:text-[#174A6E]]="selectedFilter() !== 'ALL'"
-          >
-            <span>All</span>
-            <span
-              class="px-1.5 py-0.2 rounded-full text-[10px]"
-              [class.bg-white/20]="selectedFilter() === 'ALL'"
-              [class.text-white]="selectedFilter() === 'ALL'"
-              [class.bg-[#F5F7F9]]="selectedFilter() !== 'ALL'"
-              [class.text-[#5F6B76]]="selectedFilter() !== 'ALL'"
-            >
-              {{ totalSubmissionsCount() }}
+        <!-- Top Toolbar: Status summary & Sanction Order Action Button -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-1 border-b border-slate-200 pb-3">
+          <div class="flex items-center gap-2 text-xs text-slate-700">
+            <span class="flex h-2.5 w-2.5 relative">
+              <span [class.animate-ping]="allReviewed()" class="absolute inline-flex h-full w-full rounded-full opacity-75" [class.bg-emerald-400]="allReviewed()" [class.bg-amber-400]="!allReviewed()"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5" [class.bg-emerald-600]="allReviewed()" [class.bg-amber-500]="!allReviewed()"></span>
             </span>
-          </button>
+            <span class="font-medium text-slate-600">Review Status:</span>
+            <span class="font-semibold text-slate-900">
+              {{ countReviewed() }} of {{ totalSubmissionsCount() }} Applications Processed
+            </span>
+          </div>
 
-          <button
-            type="button"
-            (click)="setFilter('UNDER_SCRUTINY')"
-            class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-            [class.bg-[#174A6E]]="selectedFilter() === 'UNDER_SCRUTINY'"
-            [class.text-white]="selectedFilter() === 'UNDER_SCRUTINY'"
-            [class.border-[#174A6E]]="selectedFilter() === 'UNDER_SCRUTINY'"
-            [class.bg-white]="selectedFilter() !== 'UNDER_SCRUTINY'"
-            [class.text-[#5F6B76]]="selectedFilter() !== 'UNDER_SCRUTINY'"
-            [class.border-[#D9E1E7]]="selectedFilter() !== 'UNDER_SCRUTINY'"
-            [class.hover:bg-[#EAF2F6]]="selectedFilter() !== 'UNDER_SCRUTINY'"
-            [class.hover:text-[#174A6E]]="selectedFilter() !== 'UNDER_SCRUTINY'"
-          >
-            <span>Under Scrutiny</span>
-            <span
-              class="px-1.5 py-0.2 rounded-full text-[10px]"
-              [class.bg-white/20]="selectedFilter() === 'UNDER_SCRUTINY'"
-              [class.text-white]="selectedFilter() === 'UNDER_SCRUTINY'"
-              [class.bg-[#F5F7F9]]="selectedFilter() !== 'UNDER_SCRUTINY'"
-              [class.text-[#5F6B76]]="selectedFilter() !== 'UNDER_SCRUTINY'"
-            >
-              {{ countPending() }}
-            </span>
-          </button>
+          <div class="flex items-center gap-2.5">
+            @if (!allReviewed()) {
+              <span class="text-[11px] text-slate-500 bg-amber-50 text-amber-800 px-2.5 py-1 rounded border border-amber-200 font-normal">
+                Requires all applications to be Reviewed (Accepted or Rejected) to activate Sanction Order
+              </span>
+            } @else {
+              <span class="text-[11px] text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200 font-medium">
+                &check; All Applications Scrutinized ({{ countApproved() }} Accepted, {{ countRejected() }} Rejected) &bull; Sanction Ready
+              </span>
+            }
 
-          <button
-            type="button"
-            (click)="setFilter('APPROVED')"
-            class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-            [class.bg-[#174A6E]]="selectedFilter() === 'APPROVED'"
-            [class.text-white]="selectedFilter() === 'APPROVED'"
-            [class.border-[#174A6E]]="selectedFilter() === 'APPROVED'"
-            [class.bg-white]="selectedFilter() !== 'APPROVED'"
-            [class.text-[#5F6B76]]="selectedFilter() !== 'APPROVED'"
-            [class.border-[#D9E1E7]]="selectedFilter() !== 'APPROVED'"
-            [class.hover:bg-[#EAF2F6]]="selectedFilter() !== 'APPROVED'"
-            [class.hover:text-[#174A6E]]="selectedFilter() !== 'APPROVED'"
-          >
-            <span>Accepted</span>
-            <span
-              class="px-1.5 py-0.2 rounded-full text-[10px]"
-              [class.bg-white/20]="selectedFilter() === 'APPROVED'"
-              [class.text-white]="selectedFilter() === 'APPROVED'"
-              [class.bg-[#F5F7F9]]="selectedFilter() !== 'APPROVED'"
-              [class.text-[#5F6B76]]="selectedFilter() !== 'APPROVED'"
+            <button
+              type="button"
+              (click)="openSanctionModal()"
+              [disabled]="!allReviewed()"
+              class="px-3.5 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-2 border shadow-2xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              [class.bg-emerald-700]="allReviewed()"
+              [class.text-white]="allReviewed()"
+              [class.border-emerald-800]="allReviewed()"
+              [class.hover:bg-emerald-800]="allReviewed()"
+              [class.bg-slate-100]="!allReviewed()"
+              [class.text-slate-400]="!allReviewed()"
+              [class.border-slate-200]="!allReviewed()"
             >
-              {{ countApproved() }}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            (click)="setFilter('REJECTED')"
-            class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-            [class.bg-[#174A6E]]="selectedFilter() === 'REJECTED'"
-            [class.text-white]="selectedFilter() === 'REJECTED'"
-            [class.border-[#174A6E]]="selectedFilter() === 'REJECTED'"
-            [class.bg-white]="selectedFilter() !== 'REJECTED'"
-            [class.text-[#5F6B76]]="selectedFilter() !== 'REJECTED'"
-            [class.border-[#D9E1E7]]="selectedFilter() !== 'REJECTED'"
-            [class.hover:bg-[#EAF2F6]]="selectedFilter() !== 'REJECTED'"
-            [class.hover:text-[#174A6E]]="selectedFilter() !== 'REJECTED'"
-          >
-            <span>Rejected</span>
-            <span
-              class="px-1.5 py-0.2 rounded-full text-[10px]"
-              [class.bg-white/20]="selectedFilter() === 'REJECTED'"
-              [class.text-white]="selectedFilter() === 'REJECTED'"
-              [class.bg-[#F5F7F9]]="selectedFilter() !== 'REJECTED'"
-              [class.text-[#5F6B76]]="selectedFilter() !== 'REJECTED'"
-            >
-              {{ countRejected() }}
-            </span>
-          </button>
+              <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>Sanction Order</span>
+            </button>
+          </div>
         </div>
 
         <!-- Main Submissions Table via Reusable TableComponent -->
         <app-table
           [columns]="submissionColumns"
-          [data]="filteredResponses()"
+          [data]="responses()"
           [pagination]="true"
           [pageSize]="10"
-          emptyMessage="No submissions found matching the selected filter."
+          emptyMessage="No applicant submissions found."
           [customTemplates]="{
             anonymousLabel: applicantTemplate,
             action: actionTemplate
@@ -170,6 +112,76 @@ import {
 
       </div>
     </div>
+
+    <!-- Sanction Order Modal -->
+    @if (showSanctionModal()) {
+      <div
+        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150 font-sans"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full border border-slate-300 overflow-hidden animate-in zoom-in-95 duration-150">
+          <div class="h-1 bg-emerald-600"></div>
+
+          <div class="px-5 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-medium text-xs">
+                &check;
+              </div>
+              <h3 class="text-sm font-semibold text-slate-800">
+                Official Sanction Order Generation
+              </h3>
+            </div>
+
+            <button
+              type="button"
+              (click)="closeSanctionModal()"
+              class="text-slate-400 hover:text-slate-700 text-lg leading-none cursor-pointer p-1"
+              aria-label="Close modal"
+            >
+              &times;
+            </button>
+          </div>
+
+          <div class="p-5 space-y-3.5 text-xs">
+            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded text-emerald-900 leading-relaxed font-normal">
+              All <strong>{{ totalSubmissionsCount() }} applications</strong> under this scheme have completed scrutiny:
+              <strong>{{ countApproved() }} Accepted</strong> and <strong>{{ countRejected() }} Rejected</strong>.
+            </div>
+
+            <div class="space-y-1.5 text-slate-700">
+              <p><span class="font-semibold text-slate-800">Sanction Order Ref:</span> <span class="font-mono">RSLDC/SANCTION/2026/MMKVY-01</span></p>
+              <p><span class="font-semibold text-slate-800">Sanctioned Training Partners (Accepted):</span> {{ countApproved() }} Entities</p>
+              <p><span class="font-semibold text-slate-800">Date of Issuance:</span> {{ currentDate }}</p>
+            </div>
+
+            <div class="p-3 rounded bg-slate-50 border border-slate-200 text-slate-600 font-normal">
+              Clicking below will issue the official Sanction Order document for accepted entities and notify training partners.
+            </div>
+          </div>
+
+          <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs">
+            <button
+              type="button"
+              (click)="closeSanctionModal()"
+              class="px-3 py-1.5 border border-slate-200 rounded text-slate-700 hover:bg-white transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              (click)="downloadSanctionOrder()"
+              class="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded font-medium transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>Issue &amp; Download Sanction Order</span>
+              <span>&darr;</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    }
   `
 })
 export class ApplicantSubmissionsComponent {
@@ -177,8 +189,9 @@ export class ApplicantSubmissionsComponent {
   private route = inject(ActivatedRoute);
 
   responses = signal<ApplicantResponse[]>([]);
-  selectedFilter = signal<'ALL' | 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED'>('ALL');
   schemeId = signal<string>('');
+  showSanctionModal = signal<boolean>(false);
+  currentDate = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   readonly submissionColumns: TableColumn<ApplicantResponse>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
@@ -208,20 +221,28 @@ export class ApplicantSubmissionsComponent {
     });
   }
 
-  setFilter(filter: 'ALL' | 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED'): void {
-    this.selectedFilter.set(filter);
-  }
-
   totalSubmissionsCount = computed(() => this.responses().length);
-
-  countPending = computed(() => this.responses().filter(r => r.status === 'UNDER_SCRUTINY').length);
   countApproved = computed(() => this.responses().filter(r => r.status === 'APPROVED').length);
   countRejected = computed(() => this.responses().filter(r => r.status === 'REJECTED').length);
+  countPending = computed(() => this.responses().filter(r => r.status === 'UNDER_SCRUTINY').length);
+  countReviewed = computed(() => this.responses().filter(r => r.status === 'APPROVED' || r.status === 'REJECTED').length);
 
-  filteredResponses = computed(() => {
-    const filter = this.selectedFilter();
-    const list = this.responses();
-    if (filter === 'ALL') return list;
-    return list.filter(r => r.status === filter);
-  });
+  allReviewed = computed(() => this.responses().length > 0 && this.responses().every(r => r.status === 'APPROVED' || r.status === 'REJECTED'));
+
+  openSanctionModal(): void {
+    if (this.allReviewed()) {
+      this.showSanctionModal.set(true);
+    }
+  }
+
+  closeSanctionModal(): void {
+    this.showSanctionModal.set(false);
+  }
+
+  downloadSanctionOrder(): void {
+    alert(`Sanction Order RSLDC/SANCTION/2026/MMKVY-01 generated and downloaded successfully!`);
+    this.closeSanctionModal();
+  }
 }
+
+

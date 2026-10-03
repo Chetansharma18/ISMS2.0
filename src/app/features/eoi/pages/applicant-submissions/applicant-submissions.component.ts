@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { EoiStateService, ApplicantResponse } from '../../services/eoi-state.service';
 import {
   PageHeaderComponent,
@@ -59,7 +59,7 @@ import {
 
             <button
               type="button"
-              (click)="openSanctionModal()"
+              (click)="openSanctionOrder()"
               [disabled]="!allReviewed()"
               class="px-3.5 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-2 border shadow-2xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               [class.bg-emerald-700]="allReviewed()"
@@ -112,86 +112,15 @@ import {
 
       </div>
     </div>
-
-    <!-- Sanction Order Modal -->
-    @if (showSanctionModal()) {
-      <div
-        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150 font-sans"
-        role="dialog"
-        aria-modal="true"
-      >
-        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full border border-slate-300 overflow-hidden animate-in zoom-in-95 duration-150">
-          <div class="h-1 bg-emerald-600"></div>
-
-          <div class="px-5 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-            <div class="flex items-center gap-2">
-              <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-medium text-xs">
-                &check;
-              </div>
-              <h3 class="text-sm font-semibold text-slate-800">
-                Official Sanction Order Generation
-              </h3>
-            </div>
-
-            <button
-              type="button"
-              (click)="closeSanctionModal()"
-              class="text-slate-400 hover:text-slate-700 text-lg leading-none cursor-pointer p-1"
-              aria-label="Close modal"
-            >
-              &times;
-            </button>
-          </div>
-
-          <div class="p-5 space-y-3.5 text-xs">
-            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded text-emerald-900 leading-relaxed font-normal">
-              All <strong>{{ totalSubmissionsCount() }} applications</strong> under this scheme have completed scrutiny:
-              <strong>{{ countApproved() }} Accepted</strong> and <strong>{{ countRejected() }} Rejected</strong>.
-            </div>
-
-            <div class="space-y-1.5 text-slate-700">
-              <p><span class="font-semibold text-slate-800">Sanction Order Ref:</span> <span class="font-mono">RSLDC/SANCTION/2026/MMKVY-01</span></p>
-              <p><span class="font-semibold text-slate-800">Sanctioned Training Partners (Accepted):</span> {{ countApproved() }} Entities</p>
-              <p><span class="font-semibold text-slate-800">Date of Issuance:</span> {{ currentDate }}</p>
-            </div>
-
-            <div class="p-3 rounded bg-slate-50 border border-slate-200 text-slate-600 font-normal">
-              Clicking below will issue the official Sanction Order document for accepted entities and notify training partners.
-            </div>
-          </div>
-
-          <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs">
-            <button
-              type="button"
-              (click)="closeSanctionModal()"
-              class="px-3 py-1.5 border border-slate-200 rounded text-slate-700 hover:bg-white transition-colors cursor-pointer"
-            >
-              Cancel
-            </button>
-
-            <button
-              type="button"
-              (click)="downloadSanctionOrder()"
-              class="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded font-medium transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer"
-            >
-              <span>Issue &amp; Download Sanction Order</span>
-              <span>&darr;</span>
-            </button>
-          </div>
-
-        </div>
-      </div>
-    }
   `
 })
 export class ApplicantSubmissionsComponent {
   private eoiStateService = inject(EoiStateService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   responses = signal<ApplicantResponse[]>([]);
   schemeId = signal<string>('');
-  showSanctionModal = signal<boolean>(false);
-  currentDate = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   readonly submissionColumns: TableColumn<ApplicantResponse>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
@@ -229,19 +158,10 @@ export class ApplicantSubmissionsComponent {
 
   allReviewed = computed(() => this.responses().length > 0 && this.responses().every(r => r.status === 'APPROVED' || r.status === 'REJECTED'));
 
-  openSanctionModal(): void {
+  openSanctionOrder(): void {
     if (this.allReviewed()) {
-      this.showSanctionModal.set(true);
+      this.router.navigate(['/admin/sanction-order', this.schemeId()]);
     }
-  }
-
-  closeSanctionModal(): void {
-    this.showSanctionModal.set(false);
-  }
-
-  downloadSanctionOrder(): void {
-    alert(`Sanction Order RSLDC/SANCTION/2026/MMKVY-01 generated and downloaded successfully!`);
-    this.closeSanctionModal();
   }
 }
 

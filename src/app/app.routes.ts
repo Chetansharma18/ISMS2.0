@@ -118,6 +118,20 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/sanction-order/:schemeId',
+    loadComponent: () =>
+      import('./features/eoi/pages/sanction-order/sanction-order.component').then(
+        (m) => m.SanctionOrderComponent
+      )
+  },
+  {
+    path: 'admin/sanction-order',
+    loadComponent: () =>
+      import('./features/eoi/pages/sanction-order/sanction-order.component').then(
+        (m) => m.SanctionOrderComponent
+      )
+  },
+  {
     path: 'admin/review/:applicationId',
     loadComponent: () =>
       import('./features/eoi/pages/scrutiny-desk/scrutiny-desk.component').then(

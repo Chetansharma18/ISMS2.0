@@ -146,6 +146,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/master/eoi-category',
+    loadComponent: () =>
+      import('./features/admin-master/eoi-category-master.component').then(
+        (m) => m.EoiCategoryMasterComponent
+      )
+  },
+  {
     path: 'admin/master/:type',
     loadComponent: () =>
       import('./features/tenders/tenders-page.component').then(
@@ -155,8 +162,8 @@ export const routes: Routes = [
   {
     path: 'admin/master',
     loadComponent: () =>
-      import('./features/tenders/tenders-page.component').then(
-        (m) => m.TendersPageComponent
+      import('./features/admin-master/eoi-category-master.component').then(
+        (m) => m.EoiCategoryMasterComponent
       )
   },
   {

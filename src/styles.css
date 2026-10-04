@@ -658,65 +658,46 @@ textarea:disabled {
    17. GLOBAL PRINT STYLESHEET (@media print)
    Ensures ONLY the document page content is printed cleanly
    (hides outer app header, sidebar, footer, buttons, action bars,
-   and handles detached top-level print sheets for Safari/Chrome modals).
+   and strips input borders, outlines, & select dropdown arrows).
    --------------------------------------------------------- */
-#ipa-print-section {
-  display: none;
-}
-
 @media print {
-  /* 1. When a top-level print section exists, hide app-root completely */
-  body.has-print-section app-root,
-  body:has(#ipa-print-section) app-root {
-    display: none !important;
-  }
-
-  /* 2. Display ONLY the top-level print section in full page flow */
-  body.has-print-section #ipa-print-section,
-  body:has(#ipa-print-section) #ipa-print-section {
-    display: block !important;
-    position: static !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #ffffff !important;
-    color: #000000 !important;
-    overflow: visible !important;
-    height: auto !important;
-  }
-
-  /* 3. Hide external app shell and non-printable controls */
+  /* 1. Hide external app shell and non-printable controls */
   app-header,
   app-sidebar,
   app-footer,
   app-page-header,
   .print\:hidden,
   button,
-  .no-print,
-  input[type="file"] {
+  .no-print {
     display: none !important;
   }
 
-  /* 4. Reset html/body/root containers for clean page flow */
+  /* 2. Reset html/body/root containers for clean page flow */
   html,
   body,
   app-root,
-  div,
-  main,
-  section {
+  .h-screen,
+  main {
+    height: auto !important;
+    min-height: 0 !important;
     overflow: visible !important;
     background: #ffffff !important;
     color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    position: static !important;
+    display: block !important;
     box-shadow: none !important;
   }
 
-  /* 5. Standard A4 Page Print Margins */
+  /* 3. Standard A4 Page Print Margins */
   @page {
     size: A4 portrait;
-    margin: 10mm 12mm 10mm 12mm;
+    margin: 12mm 12mm 12mm 12mm;
   }
 
-  /* 6. Strip borders, outlines, backgrounds, and dropdown chevrons from all inputs */
+  /* 4. Strip borders, outlines, backgrounds, and dropdown chevrons from all inputs */
   input,
   textarea,
   select {
@@ -744,7 +725,18 @@ textarea:disabled {
     -moz-appearance: textfield !important;
   }
 
-  /* 7. Clean Table Print Layout */
+  /* 5. Document Container Formatting */
+  .sanction-document-page {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+
+  /* 6. Clean Table Print Layout */
   table {
     border-collapse: collapse !important;
     width: 100% !important;
@@ -761,7 +753,7 @@ textarea:disabled {
   }
 
   th, td {
-    border: 1px solid #000000 !important;
+    border: 1px solid #111827 !important;
     color: #000000 !important;
   }
 }

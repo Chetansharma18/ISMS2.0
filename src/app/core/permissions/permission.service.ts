@@ -13,7 +13,8 @@ export type AppPermission =
 const ROLE_PERMISSIONS: Record<UserRole, AppPermission[]> = {
   new_user: ['view_eoi'],
   existing_user: ['view_eoi', 'submit_eoi'],
-  dept_admin: ['view_eoi', 'scrutinize_eoi', 'manage_schemes', 'view_reports']
+  dept_admin: ['view_eoi', 'scrutinize_eoi', 'manage_schemes', 'view_reports'],
+  super_admin: ['view_eoi', 'submit_eoi', 'scrutinize_eoi', 'manage_schemes', 'manage_users', 'view_reports', 'manage_system']
 };
 
 @Injectable({

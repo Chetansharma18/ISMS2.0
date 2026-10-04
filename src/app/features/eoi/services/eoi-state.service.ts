@@ -793,6 +793,21 @@ export class EoiStateService {
         console.error('Error loading stored responses', e);
       }
     }
+    // Default fallback: ensure Company 1 is UNDER_SCRUTINY
+    const defaultList = this.initialResponses.map(resp => {
+      const isCompany1 = resp.anonymousLabel === 'Company 1' || resp.id === 'APP-004661' || resp.id === 'APP-005001';
+      if (isCompany1) {
+        return {
+          ...resp,
+          status: 'UNDER_SCRUTINY' as const,
+          statusDisplay: 'Pending Review',
+          scrutinyDetails: undefined
+        };
+      }
+      return resp;
+    });
+    this.responsesSubject.next(defaultList);
+    this.saveToStorage(defaultList);
   }
 
   private saveToStorage(responses: ApplicantResponse[]): void {
@@ -890,5 +905,30 @@ export class EoiStateService {
     this.responsesSubject.next(updatedList);
     this.saveToStorage(updatedList);
     return true;
+  }
+
+  markSanctionSubmitted(schemeId: string): void {
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(`isms_sanction_submitted_${schemeId}`, 'true');
+        localStorage.setItem(`isms_sanction_submitted_latest`, 'true');
+      } catch (e) {}
+    }
+  }
+
+  isSanctionSubmitted(schemeId: string): boolean {
+    const currentResponses = this.responsesSubject.getValue();
+    const hasPending = currentResponses.some(r => r.status === 'UNDER_SCRUTINY');
+    if (hasPending) return false;
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const val = localStorage.getItem(`isms_sanction_submitted_${schemeId}`);
+        if (val === 'true') return true;
+        const globalVal = localStorage.getItem(`isms_sanction_submitted_latest`);
+        return globalVal === 'true';
+      } catch (e) {}
+    }
+    return false;
   }
 }

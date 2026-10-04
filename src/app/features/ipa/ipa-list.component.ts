@@ -69,18 +69,15 @@ import {
         >
         </app-table>
 
-        <!-- Template: IPA Number (Clickable badge to view IPA form) -->
+        <!-- Template: IPA Number (Clickable plain blue text to view IPA form) -->
         <ng-template #ipaNumberTemplate let-ipa>
           <button
             type="button"
             (click)="viewIpaForm(ipa)"
-            class="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-[#174A6E] hover:text-[#0B3558] hover:underline cursor-pointer bg-sky-50 px-2.5 py-1 rounded border border-sky-200 transition-colors"
+            class="font-mono text-xs font-bold text-[#174A6E] hover:text-[#0B3558] hover:underline cursor-pointer bg-transparent border-0 p-0 transition-colors"
             title="Click to view In-Principle Approval (IPA) document"
           >
-            <svg class="w-3.5 h-3.5 text-[#174A6E] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span>{{ ipa.ipaNumber }}</span>
+            {{ ipa.ipaNumber }}
           </button>
         </ng-template>
 
@@ -101,18 +98,14 @@ import {
 
         <!-- Template: Sectors -->
         <ng-template #sectorsTemplate let-ipa>
-          <div class="flex flex-wrap gap-1 max-w-xs">
-            @for (sector of (ipa.sectors || ['Skill Training']); track sector) {
-              <span class="inline-block px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px] font-medium border border-slate-200">
-                {{ sector }}
-              </span>
-            }
+          <div class="text-xs text-slate-700 font-medium">
+            {{ (ipa.sectors || ['Skill Training']).join(', ') }}
           </div>
         </ng-template>
 
         <!-- Template: Grade -->
         <ng-template #gradeTemplate let-ipa>
-          <span class="inline-flex items-center justify-center px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs">
+          <span class="font-bold text-xs text-emerald-700">
             {{ ipa.grade || 'A' }}
           </span>
         </ng-template>

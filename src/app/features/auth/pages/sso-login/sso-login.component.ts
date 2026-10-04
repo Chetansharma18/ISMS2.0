@@ -275,6 +275,9 @@ export class SsoLoginComponent {
       if (role === 'dept_admin') {
         // Department Admin navigates directly to EOI Requests desk
         this.router.navigate(['/admin/eoi-view']);
+      } else if (role === 'super_admin') {
+        // Super Admin navigates directly to EOI Configuration / Masters
+        this.router.navigate(['/admin/eoi-configuration']);
       } else {
         // Directly show tenders with fromLogin query param
         this.router.navigate(['/tenders'], { queryParams: { fromLogin: 'true' } });

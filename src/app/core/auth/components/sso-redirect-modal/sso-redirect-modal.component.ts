@@ -30,8 +30,9 @@ import { LoaderComponent } from '../../../../shared/components/loader/loader.com
 
         <!-- Direct Bottom Text -->
         <p class="mt-4 text-[16px] sm:text-[17px] font-semibold text-white tracking-wide drop-shadow-lg m-0 select-none">
-          Redirecting SSO Login Screen...
+          Redirecting to SSO Login Screen.
         </p>
+      
       </div>
     </div>
   `

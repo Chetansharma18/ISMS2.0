@@ -101,8 +101,8 @@ export class OtrValidationService {
     // Contact Details
     if (!step1.contactNo?.trim()) {
       errors.push('Company Contact Number is mandatory.');
-    } else if (!REGEX.INDIAN_MOBILE.test(step1.contactNo)) {
-      errors.push('Invalid Company Contact Number (Must be 10 digits starting with 6-9).');
+    } else if (!REGEX.INDIAN_MOBILE.test(step1.contactNo) && !/^[0-9]{7,12}$/.test(step1.contactNo.replace(/[-\s]/g, ''))) {
+      errors.push('Invalid Company Contact Number (Enter 10-digit mobile or landline number).');
     }
     if (!step1.emailId?.trim()) {
       errors.push('Official Company Email-ID is mandatory.');

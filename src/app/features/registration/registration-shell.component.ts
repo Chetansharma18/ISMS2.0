@@ -391,94 +391,47 @@ export interface StepMeta {
       }
 
       <!-- ====================================================================
-           5. Submission Success Modal Popup with Instant PDF Download
+           5. Submission Success Popup (Clean, Minimal, Professional)
            ==================================================================== -->
       @if (submittedRegId()) {
-        <div class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
-          <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 text-center space-y-6 animate-in zoom-in-95 duration-200">
-            
-            <div class="w-16 h-16 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-inner">
-              <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
+        <div class="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
+          <div class="absolute inset-0" (click)="navigateToHome()"></div>
+          
+          <div class="relative bg-white rounded-lg max-w-sm sm:max-w-md w-full p-6 sm:p-7 shadow-xl border border-slate-200 text-center space-y-4 z-10 animate-in fade-in zoom-in-95 duration-150">
+            <button
+              type="button"
+              (click)="navigateToHome()"
+              class="absolute top-3.5 right-3.5 text-slate-400 hover:text-slate-700 w-7 h-7 flex items-center justify-center rounded-md hover:bg-slate-100 transition-colors cursor-pointer text-xl leading-none"
+              aria-label="Close"
+            >
+              &times;
+            </button>
 
-            <div class="space-y-2">
-              <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 m-0">
-                Profile Successfully Submitted!
+            <div class="pt-2">
+              <h3 class="text-base sm:text-lg font-bold text-slate-900 m-0">
+                Profile created successfully.
               </h3>
-              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
-                Your One Time Registration (OTR) profile has been successfully submitted and recorded in the ISMS 2.0 portal for Department verification.
+              <p class="text-xs sm:text-sm text-slate-600 mt-2 font-mono">
+                Reference ID: <span class="font-bold text-[#0B3558]">{{ submittedRegId() }}</span>
               </p>
             </div>
 
-            <!-- Reference Number Highlight Box -->
-            <div class="p-4 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl space-y-1.5">
-              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                Permanent Registration Reference Number
-              </span>
-              <div class="flex items-center justify-center gap-2">
-                <span class="text-lg sm:text-xl font-mono font-extrabold text-[#0B3558] tracking-wider">
-                  {{ submittedRegId() }}
-                </span>
-                <button
-                  type="button"
-                  (click)="copyRegId()"
-                  title="Copy Registration ID"
-                  class="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition-colors cursor-pointer"
-                >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <!-- Profile Summary Badges -->
-            <div class="grid grid-cols-2 gap-2 text-left bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
-              <div>
-                <span class="text-slate-400 block text-[11px]">Organization:</span>
-                <span class="font-bold text-slate-800 truncate block">{{ otrFormService.step1().fullName || '-' }}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[11px]">Authorized Person:</span>
-                <span class="font-bold text-slate-800 truncate block">{{ otrFormService.step3().name || '-' }}</span>
-              </div>
-            </div>
-
-            <!-- Modal Action Buttons -->
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-2">
               <button
                 type="button"
                 (click)="downloadOtrPdf()"
-                class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#0483AC] hover:bg-[#036c8f] text-white text-xs sm:text-sm font-bold shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                class="w-full sm:w-auto px-5 py-2 rounded-md bg-[#0B3558] hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-xs"
               >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span>Download Profile PDF</span>
+                Download PDF
               </button>
-
-              <button
-                type="button"
-                (click)="printAcknowledgement()"
-                class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs sm:text-sm font-semibold active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                <span>Print</span>
-              </button>
-
               <button
                 type="button"
                 (click)="navigateToHome()"
-                class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold shadow-md active:scale-95 transition-all cursor-pointer"
+                class="w-full sm:w-auto px-5 py-2 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
               >
-                Return to Home
+                OK
               </button>
             </div>
-
           </div>
         </div>
       }

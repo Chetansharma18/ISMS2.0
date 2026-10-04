@@ -93,14 +93,14 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
         </div>
 
         <!-- Recorded Decision Banner (When already evaluated) -->
-        @if (applicant()?.scrutinyDetails && applicant()?.status !== 'UNDER_SCRUTINY') {
+        @if (applicant()?.scrutinyDetails) {
           <div class="p-3.5 sm:p-4 rounded-lg border text-xs"
             [class.bg-emerald-50/70]="applicant()?.status === 'APPROVED'"
             [class.border-emerald-200]="applicant()?.status === 'APPROVED'"
             [class.bg-rose-50/70]="applicant()?.status === 'REJECTED'"
             [class.border-rose-200]="applicant()?.status === 'REJECTED'"
           >
-            <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center justify-between mb-2.5">
               <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full"
                   [class.bg-emerald-600]="applicant()?.status === 'APPROVED'"
@@ -110,7 +110,7 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
                   [class.text-emerald-900]="applicant()?.status === 'APPROVED'"
                   [class.text-rose-900]="applicant()?.status === 'REJECTED'"
                 >
-                  Official Decision Recorded: {{ applicant()?.statusDisplay }}
+                  Official Scrutiny Order Recorded: {{ applicant()?.statusDisplay }}
                 </h3>
               </div>
 
@@ -119,44 +119,43 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
               </span>
             </div>
 
-            @if (applicant()?.status === 'APPROVED') {
-              <!-- Information taken when Accepted: Score, Grade, Committee Document, Remarks -->
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs my-2">
-                <div>
-                  <span class="text-slate-500 block text-[11px]">Technical Score</span>
-                  <span class="font-medium text-slate-800">{{ applicant()?.scrutinyDetails?.technicalScore }} / 100</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px]">Assigned Grade</span>
-                  <span class="font-medium text-slate-800">{{ applicant()?.scrutinyDetails?.grade }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px]">Committee Resolution</span>
-                  @if (applicant()?.scrutinyDetails?.approvalDocument) {
-                    <span class="font-medium text-slate-800 flex items-center gap-1">
-                      <span class="text-emerald-600">&check;</span> {{ applicant()?.scrutinyDetails?.approvalDocument?.documentName }}
-                    </span>
-                  } @else {
-                    <span class="text-slate-400">-</span>
-                  }
-                </div>
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 text-xs mb-2.5">
+              <div>
+                <span class="text-slate-500 block text-[11px]">Technical Score</span>
+                <span class="font-medium text-slate-800">{{ applicant()?.scrutinyDetails?.technicalScore }} / 100</span>
               </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">Assigned Grade</span>
+                <span class="font-medium text-slate-800">{{ applicant()?.scrutinyDetails?.grade }}</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">Scrutiny Officer</span>
+                <span class="font-normal text-slate-800">{{ applicant()?.scrutinyDetails?.scrutinyOfficer }}</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[11px]">Committee Resolution</span>
+                @if (applicant()?.scrutinyDetails?.approvalDocument) {
+                  <span class="font-medium text-slate-800 flex items-center gap-1">
+                    <span class="text-emerald-600">&check;</span> {{ applicant()?.scrutinyDetails?.approvalDocument?.documentName }}
+                  </span>
+                } @else {
+                  <span class="text-slate-400">-</span>
+                }
+              </div>
+            </div>
 
-              @if (applicant()?.scrutinyDetails?.remarks) {
-                <div class="pt-2 border-t border-slate-200/60 text-xs">
-                  <span class="text-slate-500 font-medium block mb-0.5">Empanelment Remarks:</span>
-                  <p class="text-slate-700 italic leading-relaxed font-normal">
-                    "{{ applicant()?.scrutinyDetails?.remarks }}"
-                  </p>
-                </div>
-              }
-            } @else if (applicant()?.status === 'REJECTED') {
-              <!-- Information taken when Rejected: Rejection Remarks -->
-              <div class="pt-1 text-xs">
-                <span class="text-slate-500 font-medium block mb-1">Rejection Remarks:</span>
-                <p class="text-rose-900 bg-white/70 p-2.5 rounded border border-rose-200 leading-relaxed font-normal text-xs">
-                  "{{ applicant()?.scrutinyDetails?.remarks || applicant()?.scrutinyDetails?.disqualificationReason }}"
+            @if (applicant()?.scrutinyDetails?.remarks) {
+              <div class="pt-2 border-t border-slate-200/60 text-xs">
+                <span class="text-slate-500 font-medium block mb-0.5">Scrutiny Remarks:</span>
+                <p class="text-slate-700 italic leading-relaxed font-normal">
+                  "{{ applicant()?.scrutinyDetails?.remarks }}"
                 </p>
+              </div>
+            }
+
+            @if (applicant()?.scrutinyDetails?.disqualificationReason) {
+              <div class="mt-2 text-xs text-rose-800 font-medium">
+                Disqualification Ground: {{ applicant()?.scrutinyDetails?.disqualificationReason }}
               </div>
             }
           </div>
@@ -577,39 +576,27 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
               &larr; Return to Submissions List
             </a>
 
-            <!-- Decision Action Triggers or Status Display -->
+            <!-- Decision Action Triggers -->
             <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-              @if (applicant()?.status === 'UNDER_SCRUTINY') {
-                <!-- Reject Button -->
-                <button
-                  type="button"
-                  (click)="openRejectModal()"
-                  class="px-3.5 py-1.5 rounded border border-rose-300 text-rose-700 bg-white hover:bg-rose-50 text-xs font-normal transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                >
-                  <span>&times;</span>
-                  <span>Reject Application</span>
-                </button>
+              <!-- Reject Button -->
+              <button
+                type="button"
+                (click)="openRejectModal()"
+                class="px-3.5 py-1.5 rounded border border-rose-300 text-rose-700 bg-white hover:bg-rose-50 text-xs font-normal transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              >
+                <span>&times;</span>
+                <span>Reject Application</span>
+              </button>
 
-                <!-- Accept Button -->
-                <button
-                  type="button"
-                  (click)="openAcceptModal()"
-                  class="px-3.5 py-1.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-normal transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                >
-                  <span>&check;</span>
-                  <span>Accept Application</span>
-                </button>
-              } @else if (applicant()?.status === 'APPROVED') {
-                <div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300 text-xs font-medium shadow-2xs">
-                  <span class="text-emerald-700 font-bold">&check;</span>
-                  <span>Accepted (Empanelled)</span>
-                </div>
-              } @else if (applicant()?.status === 'REJECTED') {
-                <div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded bg-rose-50 text-rose-800 border border-rose-300 text-xs font-medium shadow-2xs">
-                  <span class="text-rose-700 font-bold">&times;</span>
-                  <span>Rejected</span>
-                </div>
-              }
+              <!-- Accept Button -->
+              <button
+                type="button"
+                (click)="openAcceptModal()"
+                class="px-3.5 py-1.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-normal transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              >
+                <span>&check;</span>
+                <span>Accept Application</span>
+              </button>
             </div>
           </div>
 
@@ -644,7 +631,7 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
                     Accept &amp; Empanel Application
                   </h3>
                   <p class="text-[11px] text-slate-500 font-normal">
-                    {{ applicant()?.anonymousLabel }} &bull; {{ applicant()?.id }}
+                    {{ applicant()?.anonymousLabel }} ({{ applicant()?.actualLegalName }}) &bull; {{ applicant()?.id }}
                   </p>
                 </div>
               </div>
@@ -678,9 +665,9 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
                       [(ngModel)]="technicalScore"
                       (ngModelChange)="onScoreChange($event)"
                       placeholder="e.g. 88"
-                      class="w-full pl-3 pr-14 py-1.5 border border-slate-200 rounded text-xs font-normal text-slate-900 focus:outline-none focus:border-emerald-600 shadow-2xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      class="w-full px-3 py-1.5 border border-slate-200 rounded text-xs font-normal text-slate-900 focus:outline-none focus:border-emerald-600 shadow-2xs"
                     />
-                    <span class="absolute right-3 top-2 text-slate-400 font-normal text-xs pointer-events-none select-none">
+                    <span class="absolute right-3 top-1.5 text-slate-400 font-normal text-xs">
                       / 100
                     </span>
                   </div>
@@ -736,16 +723,16 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
                 }
               </div>
 
-              <!-- 3. Empanelment Remarks (Optional) -->
+              <!-- 3. Empanelment Remarks -->
               <div>
-                <label for="modalAcceptRemarks" class="block text-xs font-normal text-slate-700 mb-1">
-                  Empanelment Remarks <span class="text-slate-400 font-normal">(Optional)</span>
+                <label for="modalApprovalRemarks" class="block text-xs font-normal text-slate-700 mb-1">
+                  Empanelment Recommendation Remarks
                 </label>
                 <textarea
-                  id="modalAcceptRemarks"
-                  rows="2"
-                  [(ngModel)]="acceptRemarks"
-                  placeholder="Enter optional empanelment notes or committee observations..."
+                  id="modalApprovalRemarks"
+                  rows="3"
+                  [(ngModel)]="decisionRemarks"
+                  placeholder="Specify official empanelment recommendation, batch allocation, or special conditions..."
                   class="w-full p-2.5 border border-slate-200 rounded text-xs font-normal text-slate-800 focus:outline-none focus:border-emerald-600 bg-white shadow-2xs"
                 ></textarea>
               </div>
@@ -822,16 +809,66 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
             <!-- Modal Body Form -->
             <div class="p-5 space-y-3.5 max-h-[75vh] overflow-y-auto text-xs">
               
-              <!-- Mandatory Rejection Remarks Textarea -->
+              <!-- 1. Disqualification Grounds Dropdown -->
+              <div>
+                <label for="modalDisqualificationReason" class="block text-xs font-normal text-slate-700 mb-1">
+                  Primary Statutory Ground for Rejection *
+                </label>
+                <select
+                  id="modalDisqualificationReason"
+                  [(ngModel)]="disqualificationReason"
+                  class="w-full px-2.5 py-1.5 border border-slate-200 rounded text-xs font-normal text-slate-800 bg-white focus:outline-none focus:border-rose-600 cursor-pointer shadow-2xs"
+                >
+                  <option value="" disabled>-- Select Disqualification Ground --</option>
+                  <option value="Deficiency in Audited Turnover (< ₹10 Cr)">Deficiency in Audited Turnover (&lt; ₹10 Cr mandatory)</option>
+                  <option value="Non-compliant Training Infrastructure">Non-compliant Training Centre Infrastructure (Classrooms / Labs deficit)</option>
+                  <option value="Incomplete Annexures / Statutory Documentation">Incomplete Annexures / Statutory Documentation Missing</option>
+                  <option value="Blacklisted / Disqualified Entity">Blacklisted / Disqualified Entity or Adverse Vigilance Report</option>
+                  <option value="Negative Placement Track Record (< 70%)">Negative Placement Track Record (&lt; 70% threshold)</option>
+                  <option value="Other Statutory Non-Compliance">Other Statutory Non-Compliance under EOI Guidelines</option>
+                </select>
+              </div>
+
+              <!-- 2. Mandatory Committee Empanelment / Disqualification Resolution Attachment -->
+              <div class="p-3 rounded bg-slate-50 border border-slate-200 space-y-2">
+                <div class="flex items-center justify-between">
+                  <label class="block text-xs font-normal text-slate-800">
+                    Committee Empanelment Resolution (PDF) *
+                  </label>
+                  <span class="text-[10px] text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">
+                    Mandatory Attachment
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    (change)="onRejectResolutionFileSelected($event)"
+                    class="text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-xs file:font-normal file:bg-[#0B3558] file:text-white hover:file:bg-[#07233B] file:cursor-pointer cursor-pointer"
+                  />
+                </div>
+
+                @if (rejectResolutionFileName()) {
+                  <div class="flex items-center gap-1.5 p-1.5 bg-white border border-slate-200 rounded text-xs text-slate-700 font-normal">
+                    <svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                    </svg>
+                    <span>{{ rejectResolutionFileName() }} ({{ rejectResolutionFileSize() }})</span>
+                  </div>
+                }
+              </div>
+
+              <!-- 3. Mandatory Detailed Remarks Textarea -->
               <div>
                 <label for="modalRejectionRemarks" class="block text-xs font-normal text-slate-700 mb-1">
-                  Rejection Remarks *
+                  Detailed Scrutiny Remarks &amp; Clause Citations *
                 </label>
                 <textarea
                   id="modalRejectionRemarks"
-                  rows="4"
+                  rows="3"
                   [(ngModel)]="decisionRemarks"
-                  placeholder="Enter mandatory rejection remarks..."
+                  placeholder="Specify the exact clauses, deficiency details, and committee finding..."
                   class="w-full p-2.5 border border-slate-200 rounded text-xs font-normal text-slate-800 focus:outline-none focus:border-rose-600 bg-white shadow-2xs"
                 ></textarea>
               </div>
@@ -953,7 +990,6 @@ export class ScrutinyDeskComponent {
   // Form inputs
   technicalScore: number | null = 88;
   selectedGrade = 'Grade A';
-  acceptRemarks = '';
   decisionRemarks = '';
   disqualificationReason = '';
 
@@ -983,7 +1019,6 @@ export class ScrutinyDeskComponent {
       if (data?.scrutinyDetails?.technicalScore) {
         this.technicalScore = data.scrutinyDetails.technicalScore;
         this.selectedGrade = data.scrutinyDetails.grade || 'Grade A';
-        this.acceptRemarks = data.scrutinyDetails.remarks || '';
         this.decisionRemarks = data.scrutinyDetails.remarks || '';
       }
       if (data?.scrutinyDetails?.disqualificationReason) {
@@ -1010,7 +1045,8 @@ export class ScrutinyDeskComponent {
   }
 
   openAcceptModal(): void {
-    this.acceptRemarks = this.applicant()?.scrutinyDetails?.remarks || '';
+    this.decisionRemarks = this.applicant()?.scrutinyDetails?.remarks ||
+      'Bidder satisfies all technical thresholds, infrastructure capacity, and statutory documentation requirements for Category I empanelment.';
     this.showAcceptModal.set(true);
   }
 
@@ -1049,7 +1085,9 @@ export class ScrutinyDeskComponent {
   }
 
   isRejectFormValid(): boolean {
-    return this.decisionRemarks.trim().length > 0;
+    return !!this.disqualificationReason &&
+      this.decisionRemarks.trim().length > 5 &&
+      !!this.rejectResolutionFileName();
   }
 
   confirmAcceptApplication(): void {
@@ -1060,7 +1098,7 @@ export class ScrutinyDeskComponent {
       status: 'APPROVED',
       technicalScore: this.technicalScore,
       grade: this.selectedGrade as any,
-      remarks: this.acceptRemarks.trim() || 'Empanelled based on verified technical score, assigned grade, and attached committee approval resolution.',
+      remarks: this.decisionRemarks,
       approvalDocument: {
         id: `RES-${app.id}-2026`,
         documentName: this.resolutionFileName(),
@@ -1080,14 +1118,20 @@ export class ScrutinyDeskComponent {
 
   confirmRejectApplication(): void {
     const app = this.applicant();
-    if (!app || !this.decisionRemarks.trim()) return;
+    if (!app || !this.disqualificationReason || !this.rejectResolutionFileName()) return;
 
     this.eoiStateService.updateScrutinyDecision(app.id, {
       status: 'REJECTED',
-      technicalScore: 0,
-      grade: 'Grade E',
-      remarks: this.decisionRemarks.trim(),
-      disqualificationReason: this.decisionRemarks.trim()
+      technicalScore: this.technicalScore || 35,
+      grade: (this.selectedGrade || 'Grade E') as any,
+      remarks: this.decisionRemarks,
+      disqualificationReason: this.disqualificationReason,
+      approvalDocument: {
+        id: `RES-REJ-${app.id}-2026`,
+        documentName: this.rejectResolutionFileName(),
+        uploadDate: new Date().toLocaleDateString('en-GB'),
+        fileSize: this.rejectResolutionFileSize()
+      }
     });
 
     this.closeModals();

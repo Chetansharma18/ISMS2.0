@@ -79,7 +79,7 @@ import { CommonModule } from '@angular/common';
             <div class="mt-6 mb-5 border-t border-slate-100"></div>
 
             <!-- Action Buttons -->
-            <div class="flex items-center gap-3" [ngClass]="{'flex-row-reverse': reverseButtons || !secondaryLabel}">
+            <div class="flex items-center gap-3" [class.flex-row-reverse]="!secondaryLabel">
               @if (primaryLabel) {
                 <button
                   type="button"

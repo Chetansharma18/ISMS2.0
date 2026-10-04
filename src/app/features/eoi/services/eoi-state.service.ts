@@ -241,12 +241,12 @@ export class EoiStateService {
     }
   ];
 
-  // Initial 4 Applicant Responses matching dummy specification (Company 1, Company 2, Company 3, Company 4)
+  // Initial 4 Applicant Responses matching Screenshot 2
   private initialResponses: ApplicantResponse[] = [
     {
       id: 'APP-004661',
       anonymousLabel: 'Company 1',
-      actualLegalName: 'Company 1',
+      actualLegalName: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
       regNumber: 'ISMS-REG-2026-8819',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
@@ -260,8 +260,8 @@ export class EoiStateService {
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'Company 1',
-        tradeName: 'Company 1 Trade',
+        legalName: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
+        tradeName: 'Apex Tech Skills',
         entityType: 'Company registered under Companies Act, 2013',
         registrationNumber: 'U74999DL2018PTC334512',
         dateOfRegistration: '14/03/2018',
@@ -269,19 +269,19 @@ export class EoiStateService {
         panNumber: 'AAECD8566H',
         gstin: '07AAECD8566H1ZC',
         turnover: '₹12,03,35,010',
-        registeredAddress: '123, Block A, Industrial Area, Sector 1, Jaipur, Rajasthan 302001',
-        operationalAddress: '123, Block A, Industrial Area, Sector 1, Jaipur, Rajasthan 302001',
-        website: 'company1.com',
-        email: 'info@company1.com',
+        registeredAddress: 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi, 110042',
+        operationalAddress: 'Plot No. 44, Institutional Area, Jhalana Doongri, Jaipur, Rajasthan 302004',
+        website: 'apextechskills.org',
+        email: 'info@apextechskills.org',
         contactNumber: '0141-2705600'
       },
 
       authorizedSignatory: {
         name: 'SUMAN GUPTA',
         designation: 'Director',
-        email: 'compliance@company1.com',
+        email: 'compliance@nsmark.in',
         contactNumber: '9968009648',
-        residenceAddress: '123, Sector 1, Jaipur, Rajasthan',
+        residenceAddress: '45-B, Civil Lines, Jaipur',
         state: 'Rajasthan',
         pan: 'BGPPS4512K',
         aadhaarNo: 'XXXX-XXXX-4512',
@@ -296,7 +296,7 @@ export class EoiStateService {
       bankDetails: {
         bankName: 'State Bank of India',
         branchName: 'Specialized Commercial Branch, Jaipur',
-        accountHolderName: 'Company 1',
+        accountHolderName: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
         accountNumber: '38920194821',
         ifscCode: 'SBIN0004128',
         accountType: 'Current Account'
@@ -305,43 +305,43 @@ export class EoiStateService {
       trainingCentres: [
         {
           district: 'Alwar',
-          centreName: 'Company 1 Skill Centre Alwar',
+          centreName: 'Apex Tech Skills Centre Alwar',
           classrooms: 3,
           practicalRooms: 2,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '0144-2345678',
-          fullAddress: '123, Industrial Area, Alwar, Rajasthan'
+          fullAddress: 'Near Navratan Hotel, Bhugor Bypass, Alwar, Rajasthan'
         },
         {
           district: 'Jaipur',
-          centreName: 'Company 1 Skill Academy Jaipur',
+          centreName: 'Apex Regional Skill Academy',
           classrooms: 4,
           practicalRooms: 3,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '0141-4098765',
-          fullAddress: '456, Industrial Area, Mansarovar, Jaipur, Rajasthan'
+          fullAddress: 'Parshwnath Narayan City, Mansarovar Extension, Jaipur'
         },
         {
           district: 'Udaipur',
-          centreName: 'Company 1 Skill Hub Udaipur',
+          centreName: 'Apex Tribal Skill Training Hub',
           classrooms: 3,
           practicalRooms: 2,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '0294-2456789',
-          fullAddress: '789, Industrial Area, Aayad, Udaipur, Rajasthan'
+          fullAddress: 'Plot No 5A, Main Road, Near Police Chowki, Aayad, Udaipur'
         },
         {
           district: 'Sikar',
-          centreName: 'Company 1 Skill Centre Sikar',
+          centreName: 'Apex Skill Development Centre Sikar',
           classrooms: 3,
           practicalRooms: 2,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '01572-234510',
-          fullAddress: '101, Industrial Area, Sikar, Rajasthan'
+          fullAddress: 'Near Bus Stand, Sikar Main Road, Fatehpur, Sikar'
         }
       ],
 
@@ -377,7 +377,7 @@ export class EoiStateService {
     {
       id: 'APP-004662',
       anonymousLabel: 'Company 2',
-      actualLegalName: 'Company 2',
+      actualLegalName: 'Marwar Skill Foundation',
       regNumber: 'ISMS-REG-2026-3391',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
@@ -391,8 +391,8 @@ export class EoiStateService {
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'Company 2',
-        tradeName: 'Company 2 Trade',
+        legalName: 'Marwar Skill Foundation',
+        tradeName: 'MSF Vocational Hub',
         entityType: 'Registered Society under Rajasthan Societies Act',
         registrationNumber: 'RS-JOD-2016-891',
         dateOfRegistration: '11/08/2016',
@@ -400,19 +400,19 @@ export class EoiStateService {
         panNumber: 'AAATM1122K',
         gstin: '08AAATM1122K1Z9',
         turnover: '₹8,45,00,000',
-        registeredAddress: '456, Block B, Industrial Area, Sector 2, Jodhpur, Rajasthan 342001',
-        operationalAddress: '456, Block B, Industrial Area, Sector 2, Jodhpur, Rajasthan 342001',
-        website: 'company2.com',
-        email: 'info@company2.com',
+        registeredAddress: '12, Heavy Industrial Area, Jodhpur, Rajasthan 342003',
+        operationalAddress: '12, Heavy Industrial Area, Jodhpur, Rajasthan 342003',
+        website: 'marwarskills.org',
+        email: 'director@marwarskills.org',
         contactNumber: '0291-2741000'
       },
 
       authorizedSignatory: {
         name: 'RAJENDRA SINGH RATHORE',
         designation: 'Managing Trustee',
-        email: 'trustee@company2.com',
+        email: 'trustee@marwarskills.org',
         contactNumber: '9414123456',
-        residenceAddress: '456, Sector 2, Jodhpur, Rajasthan',
+        residenceAddress: 'Plot 18, Paota C Road, Jodhpur, Rajasthan',
         state: 'Rajasthan',
         pan: 'AETPR9912L',
         aadhaarNo: 'XXXX-XXXX-9912',
@@ -427,7 +427,7 @@ export class EoiStateService {
       bankDetails: {
         bankName: 'Punjab National Bank',
         branchName: 'Heavy Industrial Area Branch, Jodhpur',
-        accountHolderName: 'Company 2',
+        accountHolderName: 'Marwar Skill Foundation',
         accountNumber: '1129002100045812',
         ifscCode: 'PUNB0112900',
         accountType: 'Current Account'
@@ -436,23 +436,23 @@ export class EoiStateService {
       trainingCentres: [
         {
           district: 'Jodhpur',
-          centreName: 'Company 2 Skill Centre Jodhpur',
+          centreName: 'Marwar Heritage Skill Centre',
           classrooms: 4,
           practicalRooms: 3,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '0291-2741001',
-          fullAddress: '456, Industrial Area, Jodhpur, Rajasthan'
+          fullAddress: 'Heavy Industrial Area, Jodhpur'
         },
         {
           district: 'Pali',
-          centreName: 'Company 2 Skill Centre Pali',
+          centreName: 'Pali Textile & Stitching Centre',
           classrooms: 3,
           practicalRooms: 2,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '02932-224455',
-          fullAddress: '789, Industrial Area, Pali, Rajasthan'
+          fullAddress: 'Near Mandia Road, Pali, Rajasthan'
         }
       ],
 
@@ -505,7 +505,7 @@ export class EoiStateService {
     {
       id: 'APP-004663',
       anonymousLabel: 'Company 3',
-      actualLegalName: 'Company 3',
+      actualLegalName: 'Singhania Vocational Institute',
       regNumber: 'ISMS-REG-2026-1104',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
@@ -519,8 +519,8 @@ export class EoiStateService {
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'Company 3',
-        tradeName: 'Company 3 Trade',
+        legalName: 'Singhania Vocational Institute',
+        tradeName: 'Singhania Skills',
         entityType: 'Trust registered under Indian Trusts Act',
         registrationNumber: 'TR-UDR-2019-440',
         dateOfRegistration: '22/05/2019',
@@ -528,19 +528,19 @@ export class EoiStateService {
         panNumber: 'AACTS3344M',
         gstin: '08AACTS3344M1Z2',
         turnover: '₹1,20,00,000',
-        registeredAddress: '789, Block C, Industrial Area, Sector 3, Udaipur, Rajasthan 313001',
-        operationalAddress: '789, Block C, Industrial Area, Sector 3, Udaipur, Rajasthan 313001',
-        website: 'company3.com',
-        email: 'info@company3.com',
+        registeredAddress: 'Plot 7, Chetak Circle, Udaipur, Rajasthan 313001',
+        operationalAddress: 'Plot 7, Chetak Circle, Udaipur, Rajasthan 313001',
+        website: 'singhaniaskills.edu.in',
+        email: 'admin@singhaniaskills.edu.in',
         contactNumber: '0294-2567890'
       },
 
       authorizedSignatory: {
         name: 'MANISH SINGHANIA',
         designation: 'Chief Trustee',
-        email: 'contact@company3.com',
+        email: 'manish@singhaniaskills.edu.in',
         contactNumber: '9829012345',
-        residenceAddress: '789, Sector 3, Udaipur, Rajasthan',
+        residenceAddress: '15, Madhuban, Udaipur, Rajasthan',
         state: 'Rajasthan',
         pan: 'AFGPS1123P',
         aadhaarNo: 'XXXX-XXXX-1123',
@@ -555,7 +555,7 @@ export class EoiStateService {
       bankDetails: {
         bankName: 'HDFC Bank',
         branchName: 'Chetak Circle Branch, Udaipur',
-        accountHolderName: 'Company 3',
+        accountHolderName: 'Singhania Vocational & Technical Trust',
         accountNumber: '50200034891240',
         ifscCode: 'HDFC0000281',
         accountType: 'Current Account'
@@ -564,13 +564,13 @@ export class EoiStateService {
       trainingCentres: [
         {
           district: 'Udaipur',
-          centreName: 'Company 3 Skill Centre Udaipur',
+          centreName: 'Singhania Tech Hub',
           classrooms: 1,
           practicalRooms: 1,
           separateWashrooms: false,
           labInfrastructure: false,
           telephone: '0294-2567891',
-          fullAddress: '789, Industrial Area, Udaipur, Rajasthan'
+          fullAddress: 'Chetak Circle, Udaipur'
         }
       ],
 
@@ -611,7 +611,7 @@ export class EoiStateService {
     {
       id: 'APP-004664',
       anonymousLabel: 'Company 4',
-      actualLegalName: 'Company 4',
+      actualLegalName: 'DMR Enterprises Private Limited',
       regNumber: 'ISMS-REG-2026-9871',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
@@ -625,8 +625,8 @@ export class EoiStateService {
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'Company 4',
-        tradeName: 'Company 4 Trade',
+        legalName: 'DMR Enterprises Private Limited',
+        tradeName: 'DMR SAKSHAM',
         entityType: 'Company registered under Companies Act, 1956',
         registrationNumber: '07AAECD8566H1ZC',
         dateOfRegistration: '07/01/2017',
@@ -634,20 +634,20 @@ export class EoiStateService {
         panNumber: 'AAECD8566H',
         gstin: '07AAECD8566H1ZC',
         turnover: '₹12,03,35,010',
-        registeredAddress: '101, Block D, Industrial Area, Sector 4, Kota, Rajasthan 324001',
-        operationalAddress: '101, Block D, Industrial Area, Sector 4, Kota, Rajasthan 324001',
-        website: 'company4.com',
-        email: 'info@company4.com',
+        registeredAddress: 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi, 110042',
+        operationalAddress: 'Plot 89, RIICO Industrial Area, Mansarovar, Jaipur, Rajasthan 302020',
+        website: 'dmrenterprises.com',
+        email: 'vijaydtm1960@gmail.com',
         contactNumber: '7849954552'
       },
 
       authorizedSignatory: {
         name: 'SUMAN GUPTA',
         designation: 'Director',
-        email: 'compliance@company4.com',
+        email: 'compliance@nsmark.in',
         contactNumber: '9968009648',
-        residenceAddress: '101, Sector 4, Kota, Rajasthan',
-        state: 'Rajasthan',
+        residenceAddress: 'B298 GF AND FF, LOK VIHAR PITAMPURA, Pitampura, North West Delhi, 110034',
+        state: 'Delhi',
         pan: 'AAECD8566H',
         aadhaarNo: 'XXXX-XXXX-6814',
         typeIdProof: 'Aadhaar Card',
@@ -660,53 +660,53 @@ export class EoiStateService {
 
       bankDetails: {
         bankName: 'Bank of Baroda',
-        branchName: 'Industrial Area Branch, Kota',
-        accountHolderName: 'Company 4',
+        branchName: 'Bhugor Bypass Branch, Alwar',
+        accountHolderName: 'DMR Enterprises Pvt Ltd',
         accountNumber: '08420200001923',
-        ifscCode: 'BARB0KOTAX',
+        ifscCode: 'BARB0ALWARX',
         accountType: 'Current Account'
       },
 
       trainingCentres: [
         {
           district: 'Alwar',
-          centreName: 'Company 4 Skill Centre Alwar',
+          centreName: 'DMR Enterprises Pvt Ltd Alwar',
           classrooms: 2,
           practicalRooms: 2,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '0144-223344',
-          fullAddress: '101, Industrial Area, Alwar, Rajasthan'
+          fullAddress: 'Near By Navratan Hotel Bhugor, Byepass, Alwar'
         },
         {
           district: 'Khairthal-Tijara',
-          centreName: 'Company 4 Skill Centre Khairthal',
+          centreName: 'DMR Training Centre Khairthal',
           classrooms: 3,
           practicalRooms: 3,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '01493-255667',
-          fullAddress: '202, Industrial Area, Khairthal, Rajasthan'
+          fullAddress: 'Ward No 12, Behind LIC Office, Khairthal, Alwar'
         },
         {
           district: 'Udaipur',
-          centreName: 'Company 4 Skill Centre Udaipur',
+          centreName: 'DMR Skills Centre Udaipur',
           classrooms: 3,
           practicalRooms: 3,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '0294-266778',
-          fullAddress: '303, Industrial Area, Udaipur, Rajasthan'
+          fullAddress: 'P.N. 5A, Main Road, Near Police Chowki, Aayad, Udaipur'
         },
         {
           district: 'Jaipur',
-          centreName: 'Company 4 Skill Centre Jaipur',
+          centreName: 'DMR Centre Jaipur',
           classrooms: 3,
           practicalRooms: 3,
           separateWashrooms: true,
           labInfrastructure: true,
           telephone: '0141-288990',
-          fullAddress: '404, Industrial Area, Jaipur, Rajasthan'
+          fullAddress: 'Parshwnath Narayan City, Mansarovar Ext, Jaipur'
         }
       ],
 
@@ -756,369 +756,6 @@ export class EoiStateService {
           ]
         }
       }
-    },
-
-    // 4 Applicant Responses for SAMARTH-02 (SAMARTH Skill Development Scheme)
-    {
-      id: 'APP-005001',
-      anonymousLabel: 'Company 1',
-      actualLegalName: 'Company 1',
-      regNumber: 'ISMS-REG-2026-9011',
-      schemeId: 'SAMARTH-02',
-      schemeName: 'SAMARTH Skill Development Scheme',
-      eoiRefNo: 'RSLDC/EOI/2026/SAMARTH-02',
-      submissionDate: '10/09/2026 11:30 AM',
-      status: 'UNDER_SCRUTINY',
-      statusDisplay: 'Pending Review',
-      emdFee: 75000,
-      emdStatus: 'PAID',
-      processingFee: 2500,
-      processingFeeStatus: 'PAID',
-
-      organisation: {
-        legalName: 'Company 1',
-        tradeName: 'Company 1 Trade',
-        entityType: 'Company registered under Companies Act, 2013',
-        registrationNumber: 'U74999DL2018PTC334512',
-        dateOfRegistration: '14/03/2018',
-        stateOfRegistration: 'DELHI',
-        panNumber: 'AAECD8566H',
-        gstin: '07AAECD8566H1ZC',
-        turnover: '₹14,50,00,000',
-        registeredAddress: '123, Block A, Industrial Area, Sector 1, Jaipur, Rajasthan 302001',
-        operationalAddress: '123, Block A, Industrial Area, Sector 1, Jaipur, Rajasthan 302001',
-        website: 'company1.com',
-        email: 'info@company1.com',
-        contactNumber: '0141-2705600'
-      },
-
-      authorizedSignatory: {
-        name: 'SUMAN GUPTA',
-        designation: 'Director',
-        email: 'compliance@company1.com',
-        contactNumber: '9968009648',
-        residenceAddress: '123, Sector 1, Jaipur, Rajasthan',
-        state: 'Rajasthan',
-        pan: 'BGPPS4512K',
-        aadhaarNo: 'XXXX-XXXX-4512',
-        typeIdProof: 'Aadhaar Card',
-        idNo: 'XXXX-XXXX-4512',
-        bhamashahNo: 'Not Provided',
-        voterIdNo: 'RJP1245789',
-        passportNo: 'Z8945123',
-        serviceTaxNo: 'Not Provided'
-      },
-
-      bankDetails: {
-        bankName: 'State Bank of India',
-        branchName: 'Specialized Commercial Branch, Jaipur',
-        accountHolderName: 'Company 1',
-        accountNumber: '38920194821',
-        ifscCode: 'SBIN0004128',
-        accountType: 'Current Account'
-      },
-
-      trainingCentres: [
-        {
-          district: 'Jaipur',
-          centreName: 'SAMARTH Skill Hub Jaipur',
-          classrooms: 4,
-          practicalRooms: 3,
-          separateWashrooms: true,
-          labInfrastructure: true,
-          telephone: '0141-4098765',
-          fullAddress: '456, Industrial Area, Mansarovar, Jaipur, Rajasthan'
-        }
-      ],
-
-      financialYears: [
-        { year: '2021 - 2022', totalTurnover: '10,21,00,536', skillTurnover: '10,21,00,536' },
-        { year: '2022 - 2023', totalTurnover: '12,39,94,320', skillTurnover: '12,39,94,320' },
-        { year: '2023 - 2024', totalTurnover: '14,50,00,000', skillTurnover: '14,50,00,000' }
-      ],
-
-      placementTrackRecord: [
-        { sector: 'Technical Trades', year: '2023 - 2024', trained: 400, placed: 340, proofDetails: '340 offer letters attached' }
-      ],
-
-      annualActionPlan: [
-        { district: 'Jaipur', proposedSDCs: 2, location: 'MANSAROVAR', sectors: 'Technical Trades', courses: 'Industrial Automation', residential: 'Both', batches: 8 }
-      ],
-
-      uploadedDocuments: [
-        { id: 'doc-s1', title: 'Organisation Registration Certificate', fileSize: '1.4 MB PDF', category: 'Statutory', verified: true }
-      ]
-    },
-
-    {
-      id: 'APP-005002',
-      anonymousLabel: 'Company 2',
-      actualLegalName: 'Company 2',
-      regNumber: 'ISMS-REG-2026-9012',
-      schemeId: 'SAMARTH-02',
-      schemeName: 'SAMARTH Skill Development Scheme',
-      eoiRefNo: 'RSLDC/EOI/2026/SAMARTH-02',
-      submissionDate: '11/09/2026 02:15 PM',
-      status: 'APPROVED',
-      statusDisplay: 'Accepted',
-      emdFee: 75000,
-      emdStatus: 'PAID',
-      processingFee: 2500,
-      processingFeeStatus: 'PAID',
-
-      organisation: {
-        legalName: 'Company 2',
-        tradeName: 'Company 2 Trade',
-        entityType: 'Registered Society',
-        registrationNumber: 'RS-JOD-2016-891',
-        dateOfRegistration: '11/08/2016',
-        stateOfRegistration: 'RAJASTHAN',
-        panNumber: 'AAATM1122K',
-        gstin: '08AAATM1122K1Z9',
-        turnover: '₹9,80,00,000',
-        registeredAddress: '456, Sector 2, Jodhpur, Rajasthan 342001',
-        operationalAddress: '456, Sector 2, Jodhpur, Rajasthan 342001',
-        website: 'company2.com',
-        email: 'info@company2.com',
-        contactNumber: '0291-2741000'
-      },
-
-      authorizedSignatory: {
-        name: 'RAJENDRA SINGH RATHORE',
-        designation: 'Managing Trustee',
-        email: 'trustee@company2.com',
-        contactNumber: '9414123456',
-        residenceAddress: '456, Sector 2, Jodhpur',
-        state: 'Rajasthan',
-        pan: 'AETPR9912L',
-        aadhaarNo: 'XXXX-XXXX-9912',
-        typeIdProof: 'Aadhaar Card',
-        idNo: 'XXXX-XXXX-9912',
-        bhamashahNo: 'BHM-881273',
-        voterIdNo: 'JOD9912345',
-        passportNo: 'Not Provided',
-        serviceTaxNo: 'Not Provided'
-      },
-
-      trainingCentres: [
-        {
-          district: 'Jodhpur',
-          centreName: 'SAMARTH Centre Jodhpur',
-          classrooms: 3,
-          practicalRooms: 2,
-          separateWashrooms: true,
-          labInfrastructure: true,
-          telephone: '0291-2741001',
-          fullAddress: '456, Industrial Area, Jodhpur, Rajasthan'
-        }
-      ],
-
-      financialYears: [
-        { year: '2021 - 2022', totalTurnover: '7,50,00,000', skillTurnover: '7,10,00,000' },
-        { year: '2022 - 2023', totalTurnover: '8,80,00,000', skillTurnover: '8,50,00,000' },
-        { year: '2023 - 2024', totalTurnover: '9,80,00,000', skillTurnover: '9,20,00,000' }
-      ],
-
-      placementTrackRecord: [
-        { sector: 'Artisan & Craft', year: '2023 - 2024', trained: 350, placed: 295, proofDetails: '295 wage proofs' }
-      ],
-
-      annualActionPlan: [
-        { district: 'Jodhpur', proposedSDCs: 1, location: 'BORANADA', sectors: 'Artisan', courses: 'Handicrafts', residential: 'Non-Residential', batches: 6 }
-      ],
-
-      uploadedDocuments: [
-        { id: 'doc-s2', title: 'Organisation Registration Certificate', fileSize: '1.2 MB PDF', category: 'Statutory', verified: true }
-      ],
-
-      scrutinyDetails: {
-        technicalScore: 86,
-        grade: 'Grade A',
-        remarks: 'Approved under SAMARTH guidelines.',
-        scrutinyOfficer: 'Shri R. K. Sharma',
-        decisionTimestamp: '13/09/2026 15:30 PM'
-      }
-    },
-
-    {
-      id: 'APP-005003',
-      anonymousLabel: 'Company 3',
-      actualLegalName: 'Company 3',
-      regNumber: 'ISMS-REG-2026-9013',
-      schemeId: 'SAMARTH-02',
-      schemeName: 'SAMARTH Skill Development Scheme',
-      eoiRefNo: 'RSLDC/EOI/2026/SAMARTH-02',
-      submissionDate: '12/09/2026 04:40 PM',
-      status: 'REJECTED',
-      statusDisplay: 'Rejected',
-      emdFee: 75000,
-      emdStatus: 'REFUNDED',
-      processingFee: 2500,
-      processingFeeStatus: 'PAID',
-
-      organisation: {
-        legalName: 'Company 3',
-        tradeName: 'Company 3 Trade',
-        entityType: 'Trust',
-        registrationNumber: 'TR-UDR-2019-440',
-        dateOfRegistration: '22/05/2019',
-        stateOfRegistration: 'RAJASTHAN',
-        panNumber: 'AACTS3344M',
-        gstin: '08AACTS3344M1Z2',
-        turnover: '₹1,50,00,000',
-        registeredAddress: '789, Sector 3, Udaipur, Rajasthan',
-        operationalAddress: '789, Sector 3, Udaipur, Rajasthan',
-        website: 'company3.com',
-        email: 'info@company3.com',
-        contactNumber: '0294-2567890'
-      },
-
-      authorizedSignatory: {
-        name: 'MANISH SINGHANIA',
-        designation: 'Chief Trustee',
-        email: 'contact@company3.com',
-        contactNumber: '9829012345',
-        residenceAddress: '789, Sector 3, Udaipur',
-        state: 'Rajasthan',
-        pan: 'AFGPS1123P',
-        aadhaarNo: 'XXXX-XXXX-1123',
-        typeIdProof: 'Aadhaar Card',
-        idNo: 'XXXX-XXXX-1123',
-        bhamashahNo: 'Not Provided',
-        voterIdNo: 'UDR1123456',
-        passportNo: 'Not Provided',
-        serviceTaxNo: 'Not Provided'
-      },
-
-      trainingCentres: [
-        {
-          district: 'Udaipur',
-          centreName: 'SAMARTH Centre Udaipur',
-          classrooms: 1,
-          practicalRooms: 1,
-          separateWashrooms: false,
-          labInfrastructure: false,
-          telephone: '0294-2567891',
-          fullAddress: '789, Industrial Area, Udaipur, Rajasthan'
-        }
-      ],
-
-      financialYears: [
-        { year: '2021 - 2022', totalTurnover: '90,00,000', skillTurnover: '70,00,000' },
-        { year: '2022 - 2023', totalTurnover: '1,10,00,000', skillTurnover: '85,00,000' },
-        { year: '2023 - 2024', totalTurnover: '1,50,00,000', skillTurnover: '1,10,00,000' }
-      ],
-
-      placementTrackRecord: [
-        { sector: 'General Skills', year: '2023 - 2024', trained: 100, placed: 35, proofDetails: 'Insufficient proofs' }
-      ],
-
-      annualActionPlan: [
-        { district: 'Udaipur', proposedSDCs: 1, location: 'UDAIPUR CITY', sectors: 'General Skills', courses: 'Craft Assistant', residential: 'Non-Residential', batches: 4 }
-      ],
-
-      uploadedDocuments: [
-        { id: 'doc-s3', title: 'Organisation Registration Certificate', fileSize: '1.1 MB PDF', category: 'Statutory', verified: true }
-      ],
-
-      scrutinyDetails: {
-        technicalScore: 42,
-        grade: 'Grade E',
-        disqualificationReason: 'Financial turnover below SAMARTH threshold',
-        remarks: 'Inadequate financial turnover and lab equipment.',
-        scrutinyOfficer: 'Shri R. K. Sharma',
-        decisionTimestamp: '14/09/2026 10:20 AM'
-      }
-    },
-
-    {
-      id: 'APP-005004',
-      anonymousLabel: 'Company 4',
-      actualLegalName: 'Company 4',
-      regNumber: 'ISMS-REG-2026-9014',
-      schemeId: 'SAMARTH-02',
-      schemeName: 'SAMARTH Skill Development Scheme',
-      eoiRefNo: 'RSLDC/EOI/2026/SAMARTH-02',
-      submissionDate: '13/09/2026 01:10 PM',
-      status: 'APPROVED',
-      statusDisplay: 'Accepted',
-      emdFee: 75000,
-      emdStatus: 'PAID',
-      processingFee: 2500,
-      processingFeeStatus: 'PAID',
-
-      organisation: {
-        legalName: 'Company 4',
-        tradeName: 'Company 4 Trade',
-        entityType: 'Company registered under Companies Act',
-        registrationNumber: '07AAECD8566H1ZC',
-        dateOfRegistration: '07/01/2017',
-        stateOfRegistration: 'RAJASTHAN',
-        panNumber: 'AAECD8566H',
-        gstin: '07AAECD8566H1ZC',
-        turnover: '₹15,10,00,000',
-        registeredAddress: '101, Sector 4, Kota, Rajasthan 324001',
-        operationalAddress: '101, Sector 4, Kota, Rajasthan 324001',
-        website: 'company4.com',
-        email: 'info@company4.com',
-        contactNumber: '7849954552'
-      },
-
-      authorizedSignatory: {
-        name: 'SUMAN GUPTA',
-        designation: 'Director',
-        email: 'compliance@company4.com',
-        contactNumber: '9968009648',
-        residenceAddress: '101, Sector 4, Kota',
-        state: 'Rajasthan',
-        pan: 'AAECD8566H',
-        aadhaarNo: 'XXXX-XXXX-6814',
-        typeIdProof: 'Aadhaar Card',
-        idNo: '542510326814',
-        bhamashahNo: 'Not Provided',
-        voterIdNo: 'DLH6814990',
-        passportNo: 'Not Provided',
-        serviceTaxNo: 'Not Provided'
-      },
-
-      trainingCentres: [
-        {
-          district: 'Kota',
-          centreName: 'SAMARTH Centre Kota',
-          classrooms: 4,
-          practicalRooms: 3,
-          separateWashrooms: true,
-          labInfrastructure: true,
-          telephone: '0141-288990',
-          fullAddress: '101, Industrial Area, Kota, Rajasthan'
-        }
-      ],
-
-      financialYears: [
-        { year: '2021 - 2022', totalTurnover: '11,21,00,536', skillTurnover: '11,21,00,536' },
-        { year: '2022 - 2023', totalTurnover: '13,39,94,320', skillTurnover: '13,39,94,320' },
-        { year: '2023 - 2024', totalTurnover: '15,10,00,000', skillTurnover: '15,10,00,000' }
-      ],
-
-      placementTrackRecord: [
-        { sector: 'Industrial Trades', year: '2023 - 2024', trained: 500, placed: 440, proofDetails: '440 wage proof slips' }
-      ],
-
-      annualActionPlan: [
-        { district: 'Kota', proposedSDCs: 2, location: 'KOTA INDUSTRIAL BELT', sectors: 'Industrial Trades', courses: 'Industrial Fabrication', residential: 'Both', batches: 8 }
-      ],
-
-      uploadedDocuments: [
-        { id: 'doc-s4', title: 'Organisation Registration Certificate', fileSize: '1.4 MB PDF', category: 'Statutory', verified: true }
-      ],
-
-      scrutinyDetails: {
-        technicalScore: 94,
-        grade: 'Grade A',
-        remarks: 'Fully approved for SAMARTH empanelment.',
-        scrutinyOfficer: 'Shri R. K. Sharma',
-        decisionTimestamp: '15/09/2026 14:00 PM'
-      }
     }
   ];
 
@@ -1138,28 +775,19 @@ export class EoiStateService {
         const savedResponses = localStorage.getItem('isms_dept_admin_responses');
         if (savedResponses) {
           const parsed: ApplicantResponse[] = JSON.parse(savedResponses);
-          const mergedMap = new Map<string, ApplicantResponse>();
-          this.initialResponses.forEach(init => mergedMap.set(init.id, init));
-          parsed.forEach(p => {
-            if (mergedMap.has(p.id)) {
-              const init = mergedMap.get(p.id)!;
-              const isCompany1 = init.anonymousLabel === 'Company 1' || init.id === 'APP-004661' || init.id === 'APP-005001';
-              // Force Company 1 to UNDER_SCRUTINY / Pending Review for user evaluation testing
-              const shouldForcePending = isCompany1 && (!p.scrutinyDetails || !p.scrutinyDetails.decisionTimestamp || p.status === 'REJECTED');
-              mergedMap.set(p.id, {
-                ...init,
-                status: shouldForcePending ? 'UNDER_SCRUTINY' : (p.status || init.status),
-                statusDisplay: shouldForcePending ? 'Pending Review' : (p.statusDisplay || init.statusDisplay),
-                emdStatus: p.emdStatus || init.emdStatus,
-                scrutinyDetails: shouldForcePending ? undefined : (p.scrutinyDetails || init.scrutinyDetails)
-              });
-            } else {
-              mergedMap.set(p.id, p);
-            }
+          const merged = this.initialResponses.map(init => {
+            const match = parsed.find(p => p.id === init.id);
+            if (!match) return init;
+            return {
+              ...init,
+              ...match,
+              annualActionPlan: (match.annualActionPlan && match.annualActionPlan.length > 0) ? match.annualActionPlan : init.annualActionPlan,
+              bankDetails: match.bankDetails || init.bankDetails,
+              organisation: { ...init.organisation, ...match.organisation },
+              authorizedSignatory: { ...init.authorizedSignatory, ...match.authorizedSignatory }
+            };
           });
-          this.responsesSubject.next(Array.from(mergedMap.values()));
-          this.saveToStorage(Array.from(mergedMap.values()));
-          return;
+          this.responsesSubject.next(merged);
         }
       } catch (e) {
         console.error('Error loading stored responses', e);
@@ -1191,16 +819,7 @@ export class EoiStateService {
     return this.responses$.pipe(
       map(responses => {
         if (!schemeId || schemeId === 'ALL') return responses;
-        if (schemeId === '2' || schemeId === 'SAMARTH-02' || schemeId.includes('SAMARTH-02')) {
-          const samarth = responses.filter(r => r.schemeId === 'SAMARTH-02');
-          if (samarth.length > 0) return samarth;
-        }
-        if (schemeId === '1' || schemeId === 'MMKVY-01' || schemeId.includes('MMKVY-01')) {
-          const mmkvy = responses.filter(r => r.schemeId === 'MMKVY-01');
-          if (mmkvy.length > 0) return mmkvy;
-        }
-        const filtered = responses.filter(r => r.schemeId === schemeId || r.eoiRefNo.includes(schemeId));
-        return filtered.length > 0 ? filtered : responses.filter(r => r.schemeId === 'SAMARTH-02');
+        return responses.filter(r => r.schemeId === schemeId || r.eoiRefNo.includes(schemeId));
       })
     );
   }

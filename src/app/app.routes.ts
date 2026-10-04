@@ -67,6 +67,18 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'ipa',
+    loadComponent: () =>
+      import('./features/ipa/ipa-list.component').then(
+        (m) => m.IpaListComponent
+      )
+  },
+  {
+    path: 'tp/ipa',
+    redirectTo: 'ipa',
+    pathMatch: 'full'
+  },
+  {
     path: 'admin/grievance',
     loadComponent: () =>
       import('./features/admin-grievance/admin-grievance-list.component').then(
@@ -104,13 +116,6 @@ export const routes: Routes = [
       )
   },
   {
-    path: 'admin/sanction-orders',
-    loadComponent: () =>
-      import('./features/eoi/pages/sanction-order-list/sanction-order-list.component').then(
-        (m) => m.SanctionOrderListComponent
-      )
-  },
-  {
     path: 'admin/responses/:schemeId',
     loadComponent: () =>
       import('./features/eoi/pages/applicant-submissions/applicant-submissions.component').then(
@@ -122,20 +127,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/eoi/pages/applicant-submissions/applicant-submissions.component').then(
         (m) => m.ApplicantSubmissionsComponent
-      )
-  },
-  {
-    path: 'admin/sanction-order/:schemeId',
-    loadComponent: () =>
-      import('./features/eoi/pages/sanction-order/sanction-order.component').then(
-        (m) => m.SanctionOrderComponent
-      )
-  },
-  {
-    path: 'admin/sanction-order',
-    loadComponent: () =>
-      import('./features/eoi/pages/sanction-order/sanction-order.component').then(
-        (m) => m.SanctionOrderComponent
       )
   },
   {
@@ -157,90 +148,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/sdc/components/camera-sdc-list.component').then(
         (m) => m.CameraSdcListComponent
-      )
-  },
-  {
-    path: 'admin/eoi-configuration',
-    loadComponent: () =>
-      import('./features/tenders/tenders-page.component').then(
-        (m) => m.TendersPageComponent
-      )
-  },
-  {
-    path: 'admin/master/eoi-category',
-    loadComponent: () =>
-      import('./features/admin-master/eoi-category-master.component').then(
-        (m) => m.EoiCategoryMasterComponent
-      )
-  },
-  {
-    path: 'admin/master/scheme',
-    loadComponent: () =>
-      import('./features/admin-master/scheme-master.component').then(
-        (m) => m.SchemeMasterComponent
-      )
-  },
-  {
-    path: 'admin/master/sector',
-    loadComponent: () =>
-      import('./features/admin-master/sector-master.component').then(
-        (m) => m.SectorMasterComponent
-      )
-  },
-  {
-    path: 'admin/master/course',
-    loadComponent: () =>
-      import('./features/admin-master/course-master.component').then(
-        (m) => m.CourseMasterComponent
-      )
-  },
-  {
-    path: 'admin/master/permission',
-    loadComponent: () =>
-      import('./features/admin-master/permission-master.component').then(
-        (m) => m.PermissionMasterComponent
-      )
-  },
-  {
-    path: 'admin/master/user-role',
-    loadComponent: () =>
-      import('./features/admin-master/user-role-master.component').then(
-        (m) => m.UserRoleMasterComponent
-      )
-  },
-  {
-    path: 'admin/master/district-block',
-    loadComponent: () =>
-      import('./features/admin-master/district-block-master.component').then(
-        (m) => m.DistrictBlockMasterComponent
-      )
-  },
-  {
-    path: 'admin/master/designation',
-    loadComponent: () =>
-      import('./features/admin-master/designation-master.component').then(
-        (m) => m.DesignationMasterComponent
-      )
-  },
-  {
-    path: 'admin/user-management',
-    loadComponent: () =>
-      import('./features/user-management/user-management.component').then(
-        (m) => m.UserManagementComponent
-      )
-  },
-  {
-    path: 'admin/master/:type',
-    loadComponent: () =>
-      import('./features/tenders/tenders-page.component').then(
-        (m) => m.TendersPageComponent
-      )
-  },
-  {
-    path: 'admin/master',
-    loadComponent: () =>
-      import('./features/admin-master/eoi-category-master.component').then(
-        (m) => m.EoiCategoryMasterComponent
       )
   },
   {
@@ -348,20 +255,6 @@ export const routes: Routes = [
           )
       }
     ]
-  },
-  {
-    path: 'ipa',
-    loadComponent: () =>
-      import('./features/ipa/ipa-list.component').then(
-        (m) => m.IpaListComponent
-      )
-  },
-  {
-    path: 'tp/ipa',
-    loadComponent: () =>
-      import('./features/ipa/ipa-list.component').then(
-        (m) => m.IpaListComponent
-      )
   },
   {
     path: 'tp/sanction-orders',

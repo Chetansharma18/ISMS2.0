@@ -98,7 +98,7 @@ export class SanctionOrdersComponent {
   readonly orders: SanctionOrder[] = MOCK_SANCTION_ORDERS;
 
   readonly orderColumns: TableColumn<SanctionOrder>[] = [
-    { key: '$index',           label: 'S. No.',               align: 'center', width: 'w-14' },
+    { key: '$index',           label: 'S. No.',               type: 'number', align: 'center', width: 'w-14' },
     { key: 'schemeName',       label: 'Scheme Name',          align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-bold text-slate-900 text-center' },
     { key: 'category',         label: 'Category',             align: 'center',                 cellClass: 'whitespace-nowrap font-medium text-slate-700 text-center' },
     { key: 'mouStartDate',     label: 'MoU Start Date',       align: 'center',                 cellClass: 'whitespace-nowrap text-slate-600 text-center' },

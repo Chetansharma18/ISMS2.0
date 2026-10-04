@@ -320,7 +320,7 @@ export class IpaListComponent {
   selectedIpa = signal<SanctionOrder | null>(null);
 
   readonly ipaColumns: TableColumn<SanctionOrder>[] = [
-    { key: '$index',           label: 'S. No.',               align: 'center', width: 'w-14' },
+    { key: '$index',           label: 'S. No.',               type: 'number', align: 'center', width: 'w-14' },
     { key: 'ipaNumber',        label: 'IPA Number',           align: 'center', width: 'w-44',  type: 'custom' },
     { key: 'appId',            label: 'Application ID',       align: 'center', width: 'w-32',  cellClass: 'whitespace-nowrap font-mono font-bold text-slate-700 text-center' },
     { key: 'schemeName',       label: 'Scheme Name',          type: 'custom', cellClass: 'whitespace-nowrap font-bold text-slate-900' },

@@ -1144,14 +1144,13 @@ export class EoiStateService {
             if (mergedMap.has(p.id)) {
               const init = mergedMap.get(p.id)!;
               const isCompany1 = init.anonymousLabel === 'Company 1' || init.id === 'APP-004661' || init.id === 'APP-005001';
-              // Force Company 1 to UNDER_SCRUTINY / Pending Review for user evaluation testing
-              const shouldForcePending = isCompany1 && (!p.scrutinyDetails || !p.scrutinyDetails.decisionTimestamp || p.status === 'REJECTED');
+              // Always reset Company 1 to UNDER_SCRUTINY (Pending Review) as requested by user
               mergedMap.set(p.id, {
                 ...init,
-                status: shouldForcePending ? 'UNDER_SCRUTINY' : (p.status || init.status),
-                statusDisplay: shouldForcePending ? 'Pending Review' : (p.statusDisplay || init.statusDisplay),
-                emdStatus: p.emdStatus || init.emdStatus,
-                scrutinyDetails: shouldForcePending ? undefined : (p.scrutinyDetails || init.scrutinyDetails)
+                status: isCompany1 ? 'UNDER_SCRUTINY' : (p.status || init.status),
+                statusDisplay: isCompany1 ? 'Pending Review' : (p.statusDisplay || init.statusDisplay),
+                emdStatus: isCompany1 ? 'PAID' : (p.emdStatus || init.emdStatus),
+                scrutinyDetails: isCompany1 ? undefined : (p.scrutinyDetails || init.scrutinyDetails)
               });
             } else {
               mergedMap.set(p.id, p);
@@ -1165,6 +1164,21 @@ export class EoiStateService {
         console.error('Error loading stored responses', e);
       }
     }
+    // Default fallback: ensure Company 1 is UNDER_SCRUTINY
+    const defaultList = this.initialResponses.map(resp => {
+      const isCompany1 = resp.anonymousLabel === 'Company 1' || resp.id === 'APP-004661' || resp.id === 'APP-005001';
+      if (isCompany1) {
+        return {
+          ...resp,
+          status: 'UNDER_SCRUTINY' as const,
+          statusDisplay: 'Pending Review',
+          scrutinyDetails: undefined
+        };
+      }
+      return resp;
+    });
+    this.responsesSubject.next(defaultList);
+    this.saveToStorage(defaultList);
   }
 
   private saveToStorage(responses: ApplicantResponse[]): void {
@@ -1271,5 +1285,30 @@ export class EoiStateService {
     this.responsesSubject.next(updatedList);
     this.saveToStorage(updatedList);
     return true;
+  }
+
+  markSanctionSubmitted(schemeId: string): void {
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(`isms_sanction_submitted_${schemeId}`, 'true');
+        localStorage.setItem(`isms_sanction_submitted_latest`, 'true');
+      } catch (e) {}
+    }
+  }
+
+  isSanctionSubmitted(schemeId: string): boolean {
+    const currentResponses = this.responsesSubject.getValue();
+    const hasPending = currentResponses.some(r => r.status === 'UNDER_SCRUTINY');
+    if (hasPending) return false;
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const val = localStorage.getItem(`isms_sanction_submitted_${schemeId}`);
+        if (val === 'true') return true;
+        const globalVal = localStorage.getItem(`isms_sanction_submitted_latest`);
+        return globalVal === 'true';
+      } catch (e) {}
+    }
+    return false;
   }
 }

@@ -111,6 +111,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/eoi-sanction-editor/:schemeId',
+    loadComponent: () =>
+      import('./features/eoi/pages/eoi-sanction-editor/eoi-sanction-editor.component').then(
+        (m) => m.EoiSanctionEditorComponent
+      )
+  },
+  {
     path: 'admin/responses/:schemeId',
     loadComponent: () =>
       import('./features/eoi/pages/applicant-submissions/applicant-submissions.component').then(
@@ -122,6 +129,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/eoi/pages/applicant-submissions/applicant-submissions.component').then(
         (m) => m.ApplicantSubmissionsComponent
+      )
+  },
+  {
+    path: 'admin/ipa-editor/:schemeId/:appId',
+    loadComponent: () =>
+      import('./features/eoi/pages/ipa-editor/ipa-editor.component').then(
+        (m) => m.IpaEditorComponent
       )
   },
   {

@@ -79,7 +79,7 @@ import { CommonModule } from '@angular/common';
             <div class="mt-6 mb-5 border-t border-slate-100"></div>
 
             <!-- Action Buttons -->
-            <div class="flex items-center gap-3" [class.flex-row-reverse]="!secondaryLabel">
+            <div class="flex items-center gap-3" [ngClass]="{'flex-row-reverse': reverseButtons || !secondaryLabel}">
               @if (primaryLabel) {
                 <button
                   type="button"
@@ -124,6 +124,7 @@ export class ActionModalComponent {
   @Input() maxWidthClass = 'max-w-[490px]';
   @Input() closeOnBackdrop = true;
   @Input() disablePrimary = false;
+  @Input() reverseButtons = false;
 
   @Output() primaryAction = new EventEmitter<void>();
   @Output() secondaryAction = new EventEmitter<void>();

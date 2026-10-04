@@ -266,10 +266,18 @@ export class SchemeDetailViewComponent {
   @Input() rfpDocs: EoiDocumentItem[] = [];
   @Input() annexures: EoiDocumentItem[] = [];
   @Input() requiredInfo: Array<{ sNo: number; name: string; note?: string }> = [];
+  @Input() hideApplyButton = false;
 
   @Output() back = new EventEmitter<void>();
   @Output() apply = new EventEmitter<SchemeTender>();
   @Output() download = new EventEmitter<string>();
+
+  get activeRfpDocs(): EoiDocumentItem[] {
+    if (this.scheme?.attachedDocs && this.scheme.attachedDocs.length > 0) {
+      return this.scheme.attachedDocs;
+    }
+    return this.rfpDocs;
+  }
 
   get isClosed(): boolean {
     if (!this.scheme) return false;

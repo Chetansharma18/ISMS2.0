@@ -8,13 +8,21 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="w-full flex flex-col font-sans">
-      <!-- Label Row with Required Star and Character Count -->
+      <!-- Label Row with Required Star, optional infoTooltip, and Character Count -->
       @if (label) {
         <div class="flex items-center justify-between gap-2 mb-1">
-          <label [for]="id" class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#1F2933] select-none">
-            {{ label }}
+          <label [for]="id" class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#1F2933] select-none inline-flex items-center gap-1">
+            <span>{{ label }}</span>
             @if (required) {
-              <span class="text-rose-600 font-bold ml-0.5">*</span>
+              <span class="text-rose-600 font-bold">*</span>
+            }
+            @if (infoTooltip) {
+              <span
+                class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full border border-slate-400 text-slate-500 text-[10px] font-bold cursor-help hover:text-slate-800 hover:border-slate-600 transition-colors ml-0.5"
+                [title]="infoTooltip"
+              >
+                i
+              </span>
             }
           </label>
 
@@ -106,6 +114,7 @@ export class FormInputComponent {
   @Input() suffixText?: string;
   @Input() hint?: string;
   @Input() error?: string;
+  @Input() infoTooltip?: string;
   @Input() showCharCount: boolean = false;
 
   @Output() valueChange = new EventEmitter<string>();

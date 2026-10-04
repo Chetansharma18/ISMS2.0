@@ -172,6 +172,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
                 [value]="oic.bhamashahNo"
                 (valueChange)="updateField(idx, 'bhamashahNo', $event)"
                 placeholder="Optional"
+                [uppercase]="true"
                 [maxLength]="20"
                 [disabled]="first && sameAsAuthPerson()"
               ></app-form-input>

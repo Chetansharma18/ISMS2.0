@@ -330,13 +330,11 @@ export class OtrValidationService {
       case 1:
         return this.validateStep1(formData.step1);
       case 2:
-        return this.validateStep3(formData.step3); // Step 2 is Authorized Person
+        return this.validateStep3(formData.step3); // Step 2: Authorized Person Details
       case 3:
-        return this.validateStep2(formData.step2); // Step 3 is Officer In-Charge
+        return this.validateStep4(formData.step4); // Step 3: Bank Details
       case 4:
-        return this.validateStep4(formData.step4);
-      case 5:
-        return [];
+        return []; // Step 4: Preview & Submit
       default:
         return [];
     }
@@ -347,7 +345,7 @@ export class OtrValidationService {
   }
 
   getFirstInvalidStep(formData: OtrFormData): number | null {
-    for (let step = 1; step <= 4; step++) {
+    for (let step = 1; step <= 3; step++) {
       if (!this.isStepValid(step, formData)) {
         return step;
       }

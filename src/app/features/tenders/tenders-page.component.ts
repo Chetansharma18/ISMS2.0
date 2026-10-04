@@ -51,32 +51,35 @@ export interface EoiDocumentItem {
     SchemeDetailViewComponent
   ],
   template: `
-    <div class="w-full min-h-full text-slate-800 font-sans" style="background-color: #ffffff; font-family: 'Inter', sans-serif;">
+    <div class="w-full min-h-full text-slate-800 font-sans" style="background-color: #FEFEFD; font-family: 'Inter', sans-serif;">
       
       <!-- ====================================================================
            VIEW 1: ACTIVE EOI TABLE (Using Reusable PageHeader & DataTable)
            ==================================================================== -->
       @if (!selectedScheme()) {
-        <div class="p-4 sm:p-5 space-y-4 font-sans" style="background-color: #ffffff;">
+        <div class="p-4 sm:p-5 space-y-4 font-sans" style="background-color: #FEFEFD;">
           
           <!-- Themed Header Bar via Reusable PageHeaderComponent with Rajasthan Banner -->
           <app-page-header
-            title="Active Schemes"
-            [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Active Schemes' }]"
+            title="Active Scheme"
+            [showBreadcrumbs]="false"
           >
             <!-- Integrated Search Bar (Matching User Screenshot) -->
             <div class="w-full sm:w-auto min-w-[280px] sm:min-w-[360px] md:min-w-[420px]">
               <div class="relative flex items-center bg-white rounded-lg border border-slate-300 shadow-2xs overflow-hidden focus-within:border-[#174A6E] focus-within:ring-2 focus-within:ring-[#174A6E]/20 transition-all">
+                <svg class="w-4 h-4 text-slate-400 shrink-0 ml-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
                 <input
                   type="text"
                   [ngModel]="searchQuery()"
                   (ngModelChange)="onSearchChange($event)"
                   placeholder="Search schemes by name, reference no. or keyword..."
-                  class="w-full px-3.5 py-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none bg-transparent"
+                  class="w-full pl-2.5 pr-3 py-1.5 sm:py-2 text-xs sm:text-[13px] text-slate-800 placeholder-slate-400 focus:outline-none bg-transparent"
                 />
                 <button
                   type="button"
-                  class="px-3.5 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                  class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
                   title="Search"
                 >
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -87,33 +90,6 @@ export interface EoiDocumentItem {
             </div>
           </app-page-header>
 
-          <!-- Incomplete Profile Notice Banner (if applicable) -->
-          @if (isProfileIncomplete()) {
-            <div class="bg-amber-50/90 border border-amber-300/80 rounded-md p-3 sm:p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div>
-                <h4 class="text-xs sm:text-[13px] font-medium text-amber-900">
-                  Please complete your profile first
-                </h4>
-                <p class="text-[11px] sm:text-xs text-amber-800 mt-0.5 font-normal">
-                  Your profile is currently incomplete. Please complete your profile to submit EOI.
-                </p>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <a
-                  routerLink="/profile"
-                  class="px-5 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-lg shadow-md whitespace-nowrap transition-all flex items-center gap-2 justify-center shrink-0 cursor-pointer active:scale-95"
-                  style="color: #ffffff !important;"
-                >
-                  <span class="text-white font-bold" style="color: #ffffff !important;">Complete Registration</span>
-                  <svg class="w-4 h-4 text-white" style="stroke: #ffffff !important; color: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          }
-
           <!-- Schemes Table via Reusable TableComponent -->
           <app-table
             [columns]="schemeColumns"
@@ -121,15 +97,27 @@ export interface EoiDocumentItem {
             [pagination]="true"
             [pageSize]="pageSize"
             [rowClass]="getRowClass"
-            (rowClick)="onRowClick($event)"
             itemUnit="schemes"
             [customTemplates]="{
+              refNo: refNoTemplate,
               closingDate: closingDateTemplate,
               eoiDescription: descTemplate,
               viewAction: viewActionTemplate
             }"
           >
           </app-table>
+
+          <!-- Custom Template for EOI Reference No. (Clickable Underline Link to View Page) -->
+          <ng-template #refNoTemplate let-item>
+            <button
+              type="button"
+              (click)="viewSchemeDetails(item)"
+              class="text-left text-[#0B3558] hover:text-[#174A6E] underline hover:no-underline font-normal cursor-pointer transition-colors"
+              title="Click to view scheme details"
+            >
+              {{ item.refNo }}
+            </button>
+          </ng-template>
 
           <!-- Custom Template for Closing Date (with prominent highlight for Closed / Expired schemes) -->
           <ng-template #closingDateTemplate let-item>
@@ -311,20 +299,21 @@ export class TendersPageComponent {
     { sNo: 2, name: 'Standard Operating Procedure (SOP) for Training Partners', size: '1.8 MB' }
   ];
 
-  // Section B: Official Prescribed Annexure Formats & Templates (Download to fill & execute)
+  // Prescribed Annexures List matching official tender requirements
   readonly annexureDocuments: EoiDocumentItem[] = [
-    { sNo: 1, name: 'Annexure-1: Covering Letter  ', size: '245 KB' },
-    { sNo: 2, name: 'Annexure-3: Audited Financial Statements Format for Last Three Consecutive Financial Years', size: '1.2 MB' },
-    { sNo: 3, name: 'Annexure-4: Details of Active Skill Development Centre Format', size: '380 KB' },
-    { sNo: 4, name: 'Annexure-5: Training and Placement Details Format', size: '520 KB' },
-    { sNo: 5, name: 'Annexure-6: Affidavit Format for Not Being Blacklisted by Govt. / PSU', size: '180 KB' },
-    { sNo: 6, name: 'Annexure-7: Self-Certificate / Declaration Format as per Annexure-7', size: '195 KB' },
-    { sNo: 7, name: 'Annexure-8: Details of Board of Directors Format', size: '290 KB' },
-    { sNo: 8, name: 'Annexure-9: Details of Placement Partnership / Industry Tie-ups Format', size: '440 KB' },
-    { sNo: 9, name: 'Annexure-10: Details of Working Experience in Relevant Sector Format', size: '610 KB' },
-    { sNo: 10, name: 'Annexure-11: List of Divisions and Group of District', size: '310 KB' },
-    { sNo: 11, name: 'Annexure-12: Proposed Evaluation Matrix Template', size: '420 KB' },
-    { sNo: 12, name: 'Annexure-13: Supporting Documents Checklist', size: '850 KB' }
+    { sNo: 1, name: 'Annexure-1: Covering Letter', size: '245 KB' },
+    { sNo: 2, name: 'Annexure-2: Format for Declaration', size: '185 KB' },
+    { sNo: 3, name: 'Annexure-3: Audited Financial Statements Format for Last Three Consecutive Years', size: '1.2 MB' },
+    { sNo: 4, name: 'Annexure-4: Details of Active Skill Development Centre Format', size: '380 KB' },
+    { sNo: 5, name: 'Annexure-5: Training and Placement Details Format', size: '520 KB' },
+    { sNo: 6, name: 'Annexure-6: Detailed Project Report (DPR) Format', size: '410 KB' },
+    { sNo: 7, name: 'Annexure-7: Details of Trainers/Faculty', size: '260 KB' },
+    { sNo: 8, name: 'Annexure-8: Annexure of Details of Board of Directors Format', size: '290 KB' },
+    { sNo: 9, name: 'Annexure-9: Details of Placement Partnership / Industry Tie-ups Format', size: '440 KB' },
+    { sNo: 10, name: 'Annexure-10: Details of Working Experience in Relevant Sector Format', size: '610 KB' },
+    { sNo: 11, name: 'Annexure-11: List of Divisions and Group of District', size: '310 KB' },
+    { sNo: 12, name: 'Annexure-12: Proposed Evaluation Matrix Template', size: '420 KB' },
+    { sNo: 13, name: 'Annexure-13: Supporting Documents Checklist', size: '850 KB' }
   ];
 
   // Informational requirements — what the applicant must have ready before filling the online EOI form
@@ -352,6 +341,7 @@ export class TendersPageComponent {
     {
       key: 'refNo',
       label: 'EOI Reference No.',
+      type: 'custom',
       cellClass: (_val, item) => `whitespace-nowrap font-normal ${this.isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-800'}`
     },
     {
@@ -416,9 +406,9 @@ export class TendersPageComponent {
 
   getRowClass = (item: SchemeTender): string => {
     if (this.isSchemeClosed(item)) {
-      return 'opacity-65 bg-white cursor-pointer hover:bg-slate-50 transition-colors';
+      return 'opacity-65 bg-white transition-colors';
     }
-    return 'bg-white cursor-pointer hover:bg-slate-100/90 transition-colors';
+    return 'bg-white hover:bg-slate-50 transition-colors';
   };
 
   onRowClick(scheme: SchemeTender): void {

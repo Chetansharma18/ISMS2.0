@@ -50,7 +50,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             label="Branch Name"
             [value]="data().branchName"
             (valueChange)="update('branchName', $event)"
-            placeholder="e.g. C-Scheme Branch, Jaipur"
+            placeholder="Enter branch name"
             [required]="true"
             [maxLength]="150"
             [error]="getFieldError('branchName')"
@@ -63,7 +63,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             [value]="data().transferMode"
             (valueChange)="update('transferMode', $event)"
             [options]="transferModes"
-            placeholder="Select Mode"
+            placeholder="Select mode"
             [required]="true"
             [error]="getFieldError('transferMode')"
           ></app-form-select>
@@ -75,7 +75,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             [value]="data().accountType"
             (valueChange)="update('accountType', $event)"
             [options]="accountTypes"
-            placeholder="Select Type"
+            placeholder="Select account type"
             [required]="true"
             [error]="getFieldError('accountType')"
           ></app-form-select>
@@ -87,7 +87,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             label="Account Holder Name"
             [value]="data().accountHolderName"
             (valueChange)="update('accountHolderName', $event)"
-            placeholder="e.g. Rajasthan Skill Development Solutions Pvt Ltd"
+            placeholder="Enter account holder name"
             [required]="true"
             [maxLength]="200"
             [error]="getFieldError('accountHolderName')"
@@ -100,7 +100,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             type="tel"
             [value]="data().accountNo"
             (valueChange)="update('accountNo', $event)"
-            placeholder="e.g. 50200012345678"
+            placeholder="Enter account number"
             [required]="true"
             [maxLength]="30"
             [error]="getFieldError('accountNo')"
@@ -112,21 +112,22 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             label="IFSC Code"
             [value]="data().ifscCode"
             (valueChange)="update('ifscCode', $event)"
-            placeholder="e.g. SBIN0031804"
+            placeholder="Enter IFSC code"
             [required]="true"
             [uppercase]="true"
             [maxLength]="11"
+            [infoTooltip]="'11-character alphanumeric code (e.g. SBIN0031804)'"
             [error]="getFieldError('ifscCode')"
           ></app-form-input>
         </div>
 
         <div class="lg:col-span-2">
           <app-form-input
-            label="MICR Code"
+            label="MICR Code (Optional)"
             type="tel"
             [value]="data().micrCode"
             (valueChange)="update('micrCode', $event)"
-            placeholder="9 digit code"
+            placeholder="Enter MICR code (9 digits)"
             [maxLength]="9"
             [error]="getFieldError('micrCode')"
           ></app-form-input>
@@ -138,7 +139,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             label="Branch Address"
             [value]="data().branchAddress"
             (valueChange)="update('branchAddress', $event)"
-            placeholder="e.g. SBI Main Branch, Ashok Marg, C-Scheme, Jaipur - 302001"
+            placeholder="Enter branch address, street, locality, city, PIN code"
             [required]="true"
             [error]="getFieldError('branchAddress')"
           ></app-form-textarea>
@@ -168,7 +169,7 @@ export class Step4BankDetailsComponent {
   readonly transferModes = TRANSFER_MODES;
   readonly accountTypes = ACCOUNT_TYPES;
   readonly data = computed(() => this.otrFormService.step4());
-  readonly isSubmitted = computed(() => this.validationService.submittedSteps().has(4));
+  readonly isSubmitted = computed(() => this.validationService.submittedSteps().has(3));
 
   getFieldError(field: string): string | undefined {
     if (!this.isSubmitted()) return undefined;

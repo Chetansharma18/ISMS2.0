@@ -18,8 +18,8 @@ export interface BreadcrumbItem {
   `],
   template: `
     <div
-      class="relative w-full rounded-lg overflow-hidden border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 px-6 py-4 sm:px-8 sm:py-5 bg-[#edf4fa]"
-      style="min-height: 76px;"
+      class="relative w-full rounded-lg overflow-hidden border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 px-5 py-2.5 sm:px-7 sm:py-3 bg-[#edf4fa]"
+      style="min-height: 56px;"
     >
       <!-- Background Panoramic Fort Image with soft fade to the left -->
       <div
@@ -33,13 +33,13 @@ export interface BreadcrumbItem {
       ></div>
 
       <!-- Left: Title & Breadcrumbs -->
-      <div class="relative z-10 flex items-center gap-3.5 min-w-0">
+      <div class="relative z-10 flex items-center gap-3 min-w-0">
         <!-- Optional Back Button -->
         @if (backUrl || showBack) {
           <button
             type="button"
             (click)="onBackClick()"
-            class="w-9 h-9 rounded-full border border-slate-300 bg-white/90 hover:bg-white flex items-center justify-center text-[#123B59] shadow-sm transition-all cursor-pointer shrink-0"
+            class="w-8 h-8 rounded-full border border-slate-300 bg-white/90 hover:bg-white flex items-center justify-center text-[#123B59] shadow-sm transition-all cursor-pointer shrink-0"
             [title]="backTitle"
             [attr.aria-label]="backTitle"
           >
@@ -53,40 +53,16 @@ export interface BreadcrumbItem {
           <div class="flex items-center gap-3 flex-wrap">
             <h1
               class="header-title m-0 truncate"
-              style="color: #0c2d4e !important; font-size: 28px !important; line-height: 34px !important; font-weight: 900 !important; letter-spacing: -0.01em;"
+              style="color: #0c2d4e !important; font-size: 24px !important; line-height: 28px !important; font-weight: 800 !important; letter-spacing: -0.01em;"
             >
               {{ title }}
             </h1>
             @if (badge) {
-              <span class="px-2.5 py-0.5 text-xs font-bold rounded-md bg-[#174A6E] text-white select-none tracking-wide">
+              <span class="px-2 py-0.5 text-xs font-bold rounded-md bg-[#174A6E] text-white select-none tracking-wide">
                 {{ badge }}
               </span>
             }
           </div>
-
-          <!-- Breadcrumbs -->
-          <nav class="flex items-center gap-2 text-[13px] sm:text-sm text-slate-600 font-medium mt-1.5 select-none" aria-label="Breadcrumb">
-            @if (breadcrumbs && breadcrumbs.length > 0) {
-              @for (item of breadcrumbs; track item.label; let last = $last) {
-                @if (item.url && !last) {
-                  <a [routerLink]="item.url" class="hover:text-[#174A6E] transition-colors">
-                    {{ item.label }}
-                  </a>
-                } @else {
-                  <span [class.font-semibold]="last" [class.text-slate-800]="last">{{ item.label }}</span>
-                }
-
-                @if (!last) {
-                  <span class="text-slate-400">&gt;</span>
-                }
-              }
-            } @else {
-              <!-- Default breadcrumb -->
-              <a routerLink="/" class="hover:text-[#174A6E] transition-colors">Home</a>
-              <span class="text-slate-400">&gt;</span>
-              <span class="font-semibold text-slate-800">{{ title }}</span>
-            }
-          </nav>
         </div>
       </div>
 
@@ -100,6 +76,7 @@ export interface BreadcrumbItem {
 export class PageHeaderComponent {
   @Input({ required: true }) title = '';
   @Input() breadcrumbs: BreadcrumbItem[] = [];
+  @Input() showBreadcrumbs = false;
   @Input() backUrl?: string;
   @Input() showBack = false;
   @Input() backTitle = 'Go Back';

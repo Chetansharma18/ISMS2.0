@@ -22,7 +22,7 @@ import { Component } from '@angular/core';
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="p-5 rounded-lg border border-slate-200 bg-slate-50/50">
-            <h2 class="text-sm font-semibold text-slate-600 uppercase tracking-wider">Active Schemes</h2>
+            <h2 class="text-sm font-semibold text-slate-600 uppercase tracking-wider">Active Scheme</h2>
             <p class="text-3xl font-extrabold text-[#0B3558] mt-2">--</p>
             <p class="text-xs text-slate-400 mt-1">Schemes open for application</p>
           </div>

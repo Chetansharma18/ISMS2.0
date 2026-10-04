@@ -25,39 +25,30 @@ export class OtrFormService {
   readonly step4 = computed(() => this._formData().step4);
   readonly step5DeclarationAgreed = computed(() => this._formData().step5DeclarationAgreed);
 
-  /** Profile / OTR Form completion percentage (0 - 100) */
+  /** Profile / OTR Form completion percentage (0 - 100) across the 3 input steps */
   readonly completionPercentage = computed(() => {
     const data = this._formData();
     if (data.status === 'Submitted') return 100;
 
     let score = 0;
 
-    // Step 1: Organization Details (Max 30%)
+    // Step 1: Organization Details (Max 40%)
     const s1 = data.step1;
     const s1Fields = [s1.shortName, s1.fullName, s1.natureOfEntity, s1.registrationNumber, s1.companyPan, s1.contactNo, s1.emailId, s1.registeredAddress];
     const s1Filled = s1Fields.filter(f => !!f && f.trim().length > 0).length;
-    score += Math.round((s1Filled / s1Fields.length) * 30);
+    score += Math.round((s1Filled / s1Fields.length) * 40);
 
-    // Step 2: Officer In-Charge (Max 25%)
-    const s2 = data.step2;
-    if (s2 && s2.length > 0) {
-      const o1 = s2[0];
-      const s2Fields = [o1.name, o1.designation, o1.mobileNo, o1.emailId, o1.pan, o1.aadhaarNo];
-      const s2Filled = s2Fields.filter(f => !!f && f.trim().length > 0).length;
-      score += Math.round((s2Filled / s2Fields.length) * 25);
-    }
-
-    // Step 3: Authorized Signatory (Max 20%)
+    // Step 2: Authorized Signatory (Max 30%)
     const s3 = data.step3;
-    const s3Fields = [s3.name, s3.dob, s3.pan, s3.mobileNo];
+    const s3Fields = [s3.name, s3.dob, s3.pan, s3.mobileNo, s3.residenceAddress];
     const s3Filled = s3Fields.filter(f => !!f && f.trim().length > 0).length;
-    score += Math.round((s3Filled / s3Fields.length) * 20);
+    score += Math.round((s3Filled / s3Fields.length) * 30);
 
-    // Step 4: Bank Details (Max 25%)
+    // Step 3: Bank Details (Max 30%)
     const s4 = data.step4;
-    const s4Fields = [s4.bankName, s4.branchName, s4.accountNo, s4.ifscCode];
+    const s4Fields = [s4.bankName, s4.branchName, s4.accountNo, s4.ifscCode, s4.branchAddress];
     const s4Filled = s4Fields.filter(f => !!f && f.trim().length > 0).length;
-    score += Math.round((s4Filled / s4Fields.length) * 25);
+    score += Math.round((s4Filled / s4Fields.length) * 30);
 
     return Math.min(100, Math.max(0, score));
   });

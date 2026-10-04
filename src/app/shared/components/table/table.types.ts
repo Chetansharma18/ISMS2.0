@@ -37,6 +37,10 @@ export interface TableColumn<T = any> {
   headerClass?: string;
   /** Optional custom cell template */
   template?: TemplateRef<any>;
+  /** Optional router link or URL generator for link column type */
+  link?: (item: T) => string | any[];
+  /** Optional action buttons for action column type */
+  actions?: TableAction<T>[];
 }
 
 export interface TableAction<T = any> {

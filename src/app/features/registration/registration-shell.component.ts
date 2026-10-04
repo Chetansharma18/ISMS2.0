@@ -6,7 +6,6 @@ import { OtrValidationService } from './services/otr-validation.service';
 import { OtrPdfService } from './services/otr-pdf.service';
 
 import { Step1OrgDetailsComponent } from './steps/step1-org-details/step1-org-details.component';
-import { Step2OicDetailsComponent } from './steps/step2-oic-details/step2-oic-details.component';
 import { Step3AuthPersonComponent } from './steps/step3-auth-person/step3-auth-person.component';
 import { Step4BankDetailsComponent } from './steps/step4-bank-details/step4-bank-details.component';
 import { Step5PreviewComponent } from './steps/step5-preview/step5-preview.component';
@@ -22,85 +21,327 @@ export interface StepMeta {
   imports: [
     CommonModule,
     Step1OrgDetailsComponent,
-    Step2OicDetailsComponent,
     Step3AuthPersonComponent,
     Step4BankDetailsComponent,
     Step5PreviewComponent
   ],
   template: `
-    <div class="min-h-screen bg-white flex flex-col justify-between selection:bg-slate-900 selection:text-white font-sans" style="font-family: 'Inter', sans-serif;">
+    <div class="min-h-screen bg-[#FEFEFD] flex flex-col justify-between selection:bg-[#0B3558] selection:text-white font-sans" style="font-family: 'Inter', sans-serif;">
 
       <!-- ====================================================================
-           Sticky Registration Header (Heading & Stepper combined so heading never hides on scroll)
+           Main Content Area
            ==================================================================== -->
-      <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-2xs">
-        <!-- 1. Form Heading (Professional & Clean in Theme Blue) -->
-        <div class="w-full border-b border-slate-100 py-2.5 px-4 sm:px-6 lg:px-8 bg-white">
-          <div class="max-w-[1380px] mx-auto flex items-center justify-between">
-            <h1 class="font-bold tracking-tight m-0" style="font-size: 17px !important; line-height: 24px !important; color: #0B3558 !important;">
+      <main class="flex-1 max-w-[1380px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+
+        <!-- 1. Top Header Row (Back Button, Page Title, Mandatory Indicator, Subtitle) -->
+        <div class="mb-5 space-y-3">
+          <!-- Back button -->
+          <div>
+            <button
+              type="button"
+              (click)="goBack()"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
+            >
+              <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span>Back</span>
+            </button>
+          </div>
+
+          <!-- Title and Subtitle Row -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">
               Company Registration Form
             </h1>
+            <span class="text-xs text-slate-500 font-medium select-none">
+              Fields marked with <span class="text-rose-500 font-bold">*</span> are mandatory
+            </span>
           </div>
+
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
+            @if (activeStep() === 1) {
+              Please provide your organisation details to complete the registration process.
+            } @else if (activeStep() === 2) {
+              Please provide the required details to complete the registration process.
+            } @else if (activeStep() === 3) {
+              Please provide the required details to complete the registration process.
+            } @else {
+              Review all the details before submitting your registration.
+            }
+          </p>
         </div>
 
-        <!-- 2. Horizontal Tabs Stepper (Clean & Purely Responsive) -->
-        <nav class="w-full bg-white" aria-label="Registration Steps">
-          <div class="max-w-[1380px] mx-auto px-2 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between overflow-x-auto no-scrollbar py-2 gap-1 sm:gap-2">
-              @for (step of steps; track step.number) {
+        <!-- 2. Step Progress Indicator (Card with 4 Evenly Distributed Steps) -->
+        <nav aria-label="Registration Steps" class="bg-white rounded-xl border border-slate-200/90 shadow-2xs px-4 sm:px-8 py-3.5 sm:py-4.5 mb-5">
+          <div class="flex items-center justify-between w-full">
+            @for (step of steps; track step.number; let last = $last) {
+              <!-- Step Item Button -->
+              <button
+                type="button"
+                (click)="goToStep(step.number)"
+                class="flex items-center gap-2 sm:gap-2.5 transition-all cursor-pointer group bg-transparent border-0 p-0 text-left shrink-0"
+              >
+                <!-- Number Badge / Checkmark -->
+                <span
+                  class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 transition-colors shadow-2xs"
+                  [style.background-color]="(activeStep() === step.number || isStepCompleted(step.number)) ? '#0B3558' : '#ffffff'"
+                  [style.color]="(activeStep() === step.number || isStepCompleted(step.number)) ? '#ffffff' : '#64748b'"
+                  [style.border]="(activeStep() === step.number || isStepCompleted(step.number)) ? '2px solid #0B3558' : '2px solid #cbd5e1'"
+                >
+                  @if (isStepCompleted(step.number) && activeStep() !== step.number) {
+                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="stroke: #ffffff;">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                  } @else if (isStepError(step.number) && activeStep() !== step.number) {
+                    <span style="color: #ffffff !important; font-weight: bold;">!</span>
+                  } @else {
+                    <span [style.color]="(activeStep() === step.number || isStepCompleted(step.number)) ? '#ffffff' : '#64748b'" style="font-weight: 700; font-size: 13px;">
+                      {{ step.number }}
+                    </span>
+                  }
+                </span>
+
+                <!-- Step Label -->
+                <span
+                  class="text-xs sm:text-[13.5px] tracking-tight whitespace-nowrap"
+                  [class.font-extrabold]="activeStep() === step.number"
+                  [class.text-[#0B3558]]="activeStep() === step.number"
+                  [class.text-slate-800]="isStepCompleted(step.number) && activeStep() !== step.number"
+                  [class.font-semibold]="activeStep() !== step.number"
+                  [class.text-slate-600]="!isStepCompleted(step.number) && activeStep() !== step.number"
+                >
+                  {{ step.label }}
+                </span>
+              </button>
+
+              <!-- Connector Line -->
+              @if (!last) {
+                <div
+                  class="flex-1 h-[2px] mx-2.5 sm:mx-6 transition-colors duration-200"
+                  [class.bg-[#0B3558]]="isStepCompleted(step.number)"
+                  [class.bg-slate-200]="!isStepCompleted(step.number)"
+                ></div>
+              }
+            }
+          </div>
+        </nav>
+
+        <!-- 3. Main Form Card Container -->
+        <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-7 space-y-6">
+
+          <!-- Step 1 Container: Organization Details -->
+          <div [class.hidden]="activeStep() !== 1" class="space-y-4">
+            <!-- Step 1 Card Header -->
+            <div class="flex items-center gap-3 pb-3.5 border-b border-slate-100">
+              <span class="w-7 h-7 rounded-full bg-[#0B3558] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
+                1
+              </span>
+              <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">
+                Organisation Details
+              </h2>
+            </div>
+            <app-step1-org-details></app-step1-org-details>
+          </div>
+
+          <!-- Step 2 Container: Authorized Person Details -->
+          <div [class.hidden]="activeStep() !== 2" class="space-y-4">
+            <!-- Step 2 Card Header -->
+            <div class="pb-3.5 border-b border-slate-100 space-y-1">
+              <div class="flex items-center gap-3">
+                <span class="w-7 h-7 rounded-full bg-[#0B3558] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
+                  2
+                </span>
+                <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">
+                  Authorized Person Details
+                </h2>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-500 pl-10 m-0">
+                Provide details of the person authorized to sign and represent the organization.
+              </p>
+            </div>
+            <app-step3-auth-person></app-step3-auth-person>
+          </div>
+
+          <!-- Step 3 Container: Bank Details (Now Step 3!) -->
+          <div [class.hidden]="activeStep() !== 3" class="space-y-4">
+            <!-- Step 3 Card Header -->
+            <div class="pb-3.5 border-b border-slate-100 space-y-1">
+              <div class="flex items-center gap-3">
+                <span class="w-7 h-7 rounded-full bg-[#0B3558] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
+                  3
+                </span>
+                <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">
+                  Bank Details
+                </h2>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-500 pl-10 m-0">
+                Provide bank account details for receiving payments under the scheme.
+              </p>
+            </div>
+            <app-step4-bank-details></app-step4-bank-details>
+          </div>
+
+          <!-- Step 4 Container: Preview & Submit (Now Step 4!) -->
+          <div [class.hidden]="activeStep() !== 4" class="space-y-4">
+            <!-- Step 4 Card Header -->
+            <div class="pb-3.5 border-b border-slate-100 space-y-1">
+              <div class="flex items-center gap-3">
+                <span class="w-7 h-7 rounded-full bg-[#0B3558] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
+                  4
+                </span>
+                <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">
+                  Review &amp; Submit
+                </h2>
+              </div>
+              <p class="text-xs sm:text-sm text-slate-500 pl-10 m-0">
+                Please verify the information provided below. You can edit any section if required.
+              </p>
+            </div>
+            <app-step5-preview (editStep)="goToStep($event)"></app-step5-preview>
+          </div>
+
+          <!-- Inline Error Message Banner (if submission attempted with errors) -->
+          @if (submitErrorMessage()) {
+            <div class="text-xs sm:text-sm text-rose-700 bg-rose-50 border border-rose-300 px-4 py-2.5 rounded-lg flex items-center gap-2.5 font-medium shadow-2xs animate-in fade-in duration-200">
+              <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{{ submitErrorMessage() }}</span>
+            </div>
+          }
+
+          <!-- 4. Form Action Buttons (Per Step Navigation) -->
+          <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <!-- Left Side: Previous Button (Steps 2, 3, 4) -->
+            <div>
+              @if (activeStep() > 1) {
                 <button
                   type="button"
-                  (click)="goToStep(step.number)"
-                  class="flex-1 min-w-[100px] sm:min-w-0 py-2 px-2 sm:px-3 flex items-center justify-center gap-2 transition-all cursor-pointer relative group bg-transparent"
-                  [class.text-[#0B3558]]="activeStep() === step.number"
-                  [class.font-extrabold]="activeStep() === step.number"
-                  [class.text-slate-600]="activeStep() !== step.number"
-                  [class.font-semibold]="activeStep() !== step.number"
-                  [class.hover:text-[#0B3558]]="activeStep() !== step.number"
+                  (click)="previousStep()"
+                  class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
                 >
-                  <!-- Number Badge / Status Icon -->
-                  <span
-                    class="w-6 h-6 sm:w-6.5 sm:h-6.5 rounded-full flex items-center justify-center text-xs sm:text-[12.5px] font-bold shrink-0 transition-colors"
-                    [class.bg-[#0B3558]]="activeStep() === step.number"
-                    [class.text-white]="activeStep() === step.number"
-                    [class.bg-emerald-600]="isStepCompleted(step.number) && activeStep() !== step.number"
-                    [class.text-white]="isStepCompleted(step.number) && activeStep() !== step.number"
-                    [class.bg-rose-500]="isStepError(step.number) && activeStep() !== step.number"
-                    [class.text-white]="isStepError(step.number) && activeStep() !== step.number"
-                    [class.bg-slate-100]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
-                    [class.text-slate-600]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
-                    [class.border]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
-                    [class.border-slate-300]="!isStepCompleted(step.number) && !isStepError(step.number) && activeStep() !== step.number"
-                  >
-                    @if (isStepCompleted(step.number) && activeStep() !== step.number) {
-                      <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                      </svg>
-                    } @else if (isStepError(step.number) && activeStep() !== step.number) {
-                      <span class="text-white font-bold">!</span>
-                    } @else {
-                      <span [class.text-white]="activeStep() === step.number" [class.text-slate-600]="activeStep() !== step.number">
-                        {{ step.number }}
-                      </span>
-                    }
-                  </span>
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span>Previous</span>
+                </button>
+              }
+            </div>
 
-                  <!-- Step Label -->
-                  <span class="truncate tracking-tight font-bold text-xs sm:text-[13.5px]">
-                    {{ step.label }}
-                  </span>
+            <!-- Right Side: Action Buttons -->
+            <div class="flex items-center gap-2.5 sm:gap-3 ml-auto justify-end">
+              <!-- STEP 1 NAVIGATION: [Save as Draft] [Next Step ->] -->
+              @if (activeStep() === 1) {
+                <button
+                  type="button"
+                  (click)="saveDraft()"
+                  class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                >
+                  Save as Draft
+                </button>
+
+                <button
+                  type="button"
+                  (click)="nextStep()"
+                  class="px-6 sm:px-7 py-2.5 rounded-lg bg-[#0B3558] hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <span>Next Step</span>
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              }
+
+              <!-- STEP 2 NAVIGATION: [Previous (left)] [Save as Draft] [Next Step ->] -->
+              @if (activeStep() === 2) {
+                <button
+                  type="button"
+                  (click)="saveDraft()"
+                  class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                >
+                  Save as Draft
+                </button>
+
+                <button
+                  type="button"
+                  (click)="nextStep()"
+                  class="px-6 sm:px-7 py-2.5 rounded-lg bg-[#0B3558] hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <span>Next Step</span>
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              }
+
+              <!-- STEP 3 NAVIGATION: [Previous (left)] [Save as Draft] [Next Step ->] -->
+              @if (activeStep() === 3) {
+                <button
+                  type="button"
+                  (click)="saveDraft()"
+                  class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                >
+                  Save as Draft
+                </button>
+
+                <button
+                  type="button"
+                  (click)="nextStep()"
+                  class="px-6 sm:px-7 py-2.5 rounded-lg bg-[#0B3558] hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <span>Next Step</span>
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              }
+
+              <!-- STEP 4 NAVIGATION: [Previous (left)] [Download PDF] [Save as Draft] [Submit Application] -->
+              @if (activeStep() === 4) {
+                <button
+                  type="button"
+                  (click)="downloadOtrPdf()"
+                  class="px-4 sm:px-5 py-2.5 rounded-lg border border-[#0483AC] text-[#0483AC] bg-white hover:bg-sky-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
+                  title="Download complete details in PDF"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>Download PDF</span>
+                </button>
+
+                <button
+                  type="button"
+                  (click)="saveDraft()"
+                  class="px-4 sm:px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                >
+                  Save as Draft
+                </button>
+
+                <button
+                  type="button"
+                  (click)="submitApplication()"
+                  class="px-6 sm:px-8 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Submit Application</span>
                 </button>
               }
             </div>
           </div>
-        </nav>
-      </header>
+
+        </div>
+
+      </main>
 
       <!-- ====================================================================
-           Floating Feedback Toast (Themed in Signature #0B3558 Blue)
+           Floating Feedback Toast
            ==================================================================== -->
       @if (validationService.toast(); as toast) {
-        <div class="fixed top-24 right-4 sm:right-8 z-50 max-w-md w-full animate-in fade-in slide-in-from-top-3 duration-300 pointer-events-auto">
+        <div class="fixed top-20 right-4 sm:right-8 z-50 max-w-md w-full animate-in fade-in slide-in-from-top-3 duration-300 pointer-events-auto">
           <div
             class="p-4 rounded-xl shadow-xl border flex items-start gap-3 backdrop-blur-md"
             [class.bg-emerald-900/95]="toast.type === 'success'"
@@ -125,12 +366,8 @@ export interface StepMeta {
                 <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-              } @else if (toast.type === 'info') {
-                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
               } @else {
-                <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               }
@@ -154,111 +391,7 @@ export interface StepMeta {
       }
 
       <!-- ====================================================================
-           3. Main Form Container (Single Unified White Background, Optimized Height)
-           ==================================================================== -->
-      <main class="flex-1 max-w-[1380px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-white">
-        
-        <!-- Step 1 Container -->
-        <div [class.hidden]="activeStep() !== 1">
-          <app-step1-org-details></app-step1-org-details>
-        </div>
-
-        <!-- Step 2 Container (NOW: Authorized Person) -->
-        <div [class.hidden]="activeStep() !== 2">
-          <app-step3-auth-person></app-step3-auth-person>
-        </div>
-
-        <!-- Step 3 Container (NOW: Officer In-Charge) -->
-        <div [class.hidden]="activeStep() !== 3">
-          <app-step2-oic-details></app-step2-oic-details>
-        </div>
-
-        <!-- Step 4 Container -->
-        <div [class.hidden]="activeStep() !== 4">
-          <app-step4-bank-details></app-step4-bank-details>
-        </div>
-
-        <!-- Step 5 Container -->
-        <div [class.hidden]="activeStep() !== 5">
-          <app-step5-preview (editStep)="goToStep($event)"></app-step5-preview>
-        </div>
-
-      </main>
-
-      <!-- ====================================================================
-           4. Sticky Bottom Action Bar (Neat Side-by-Side Previous & Next Buttons)
-           ==================================================================== -->
-      <footer class="w-full bg-white border-t border-slate-200 py-2.5 px-4 sm:px-6 lg:px-8 sticky bottom-0 z-30 shadow-md">
-        <div class="max-w-[1380px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <!-- Step indicator / Auto-saved status -->
-         
-
-          <!-- Inline Error Message near Submit Button -->
-          @if (submitErrorMessage()) {
-            <div class="text-xs text-rose-700 bg-rose-50 border border-rose-300 px-3.5 py-1.5 rounded-lg flex items-center gap-2 font-medium shadow-2xs animate-in fade-in duration-200 max-w-xl">
-              <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{{ submitErrorMessage() }}</span>
-            </div>
-          }
-
-          <!-- Previous and Next buttons neatly set together (aligned to bottom-right) -->
-          <div class="flex items-center gap-2.5 sm:gap-3 ml-auto justify-end">
-            @if (activeStep() > 1) {
-              <button
-                type="button"
-                (click)="previousStep()"
-                class="px-4 sm:px-5 py-2 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                </svg>
-                Previous
-              </button>
-            }
-
-            @if (activeStep() < 5) {
-              <button
-                type="button"
-                (click)="nextStep()"
-                class="px-5 sm:px-7 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer focus:ring-2 focus:ring-slate-900/30"
-              >
-                <span>Next Step</span>
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            } @else {
-              <button
-                type="button"
-                (click)="downloadOtrPdf()"
-                class="px-4 sm:px-5 py-2 rounded-lg border border-[#0483AC] text-[#0483AC] hover:bg-sky-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                title="Download complete details in tabular PDF"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span>Download PDF</span>
-              </button>
-
-              <button
-                type="button"
-                (click)="submitApplication()"
-                class="px-6 sm:px-8 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                </svg>
-                Submit Application
-              </button>
-            }
-          </div>
-        </div>
-      </footer>
-
-      <!-- ====================================================================
-           5. Submission Success Modal
+           5. Submission Success Modal Popup with Instant PDF Download
            ==================================================================== -->
       @if (submittedRegId()) {
         <div class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
@@ -271,20 +404,21 @@ export interface StepMeta {
             </div>
 
             <div class="space-y-2">
-              <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">
-                OTR Registration Submitted!
+              <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 m-0">
+                Profile Successfully Submitted!
               </h3>
-              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Your One Time Registration application has been securely recorded and queued for Department verification under ISMS 2.0.
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
+                Your One Time Registration (OTR) profile has been successfully submitted and recorded in the ISMS 2.0 portal for Department verification.
               </p>
             </div>
 
-            <div class="p-4 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl space-y-2">
+            <!-- Reference Number Highlight Box -->
+            <div class="p-4 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl space-y-1.5">
               <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
                 Permanent Registration Reference Number
               </span>
               <div class="flex items-center justify-center gap-2">
-                <span class="text-lg sm:text-xl font-mono font-extrabold text-slate-900 tracking-wider">
+                <span class="text-lg sm:text-xl font-mono font-extrabold text-[#0B3558] tracking-wider">
                   {{ submittedRegId() }}
                 </span>
                 <button
@@ -300,6 +434,19 @@ export interface StepMeta {
               </div>
             </div>
 
+            <!-- Profile Summary Badges -->
+            <div class="grid grid-cols-2 gap-2 text-left bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
+              <div>
+                <span class="text-slate-400 block text-[11px]">Organization:</span>
+                <span class="font-bold text-slate-800 truncate block">{{ otrFormService.step1().fullName || '-' }}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block text-[11px]">Authorized Person:</span>
+                <span class="font-bold text-slate-800 truncate block">{{ otrFormService.step3().name || '-' }}</span>
+              </div>
+            </div>
+
+            <!-- Modal Action Buttons -->
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <button
                 type="button"
@@ -309,18 +456,18 @@ export interface StepMeta {
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                Download PDF
+                <span>Download Profile PDF</span>
               </button>
 
               <button
                 type="button"
                 (click)="printAcknowledgement()"
-                class="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs sm:text-sm font-semibold active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs sm:text-sm font-semibold active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
-                Print Acknowledgement
+                <span>Print</span>
               </button>
 
               <button
@@ -353,22 +500,21 @@ export class RegistrationShellComponent {
   constructor() {
     this.route.queryParams.subscribe(params => {
       const step = parseInt(params['step'], 10);
-      if (step >= 1 && step <= 5) {
+      if (step >= 1 && step <= 4) {
         this.activeStep.set(step);
       }
     });
   }
 
   readonly steps: StepMeta[] = [
-    { number: 1, label: 'Organization Details' },
+    { number: 1, label: 'Organisation Details' },
     { number: 2, label: 'Authorized Person' },
-    { number: 3, label: 'Officer In-Charge' },
-    { number: 4, label: 'Bank Details' },
-    { number: 5, label: 'Preview & Submit' }
+    { number: 3, label: 'Bank Details' },
+    { number: 4, label: 'Preview & Submit' }
   ];
 
   isStepCompleted(stepNumber: number): boolean {
-    if (stepNumber === 5) {
+    if (stepNumber === 4) {
       return this.submittedRegId() !== null;
     }
     const data = this.otrFormService.formData();
@@ -376,7 +522,7 @@ export class RegistrationShellComponent {
   }
 
   isStepError(stepNumber: number): boolean {
-    if (stepNumber === 5) {
+    if (stepNumber === 4) {
       return false;
     }
     const isSubmitted = this.validationService.submittedSteps().has(stepNumber);
@@ -386,11 +532,11 @@ export class RegistrationShellComponent {
 
   canSubmit(): boolean {
     const data = this.otrFormService.formData();
-    return [1, 2, 3, 4].every(s => this.validationService.isStepValid(s, data));
+    return [1, 2, 3].every(s => this.validationService.isStepValid(s, data));
   }
 
   goToStep(stepNumber: number): void {
-    if (stepNumber < 1 || stepNumber > 5) return;
+    if (stepNumber < 1 || stepNumber > 4) return;
     this.submitErrorMessage.set(null);
     this.activeStep.set(stepNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -410,7 +556,7 @@ export class RegistrationShellComponent {
       return;
     }
 
-    if (current < 5) {
+    if (current < 4) {
       this.activeStep.set(current + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -425,21 +571,27 @@ export class RegistrationShellComponent {
     }
   }
 
+  saveDraft(): void {
+    this.otrFormService.saveDraft();
+    this.validationService.showToast('Registration progress saved as draft successfully!', 'info');
+  }
+
   submitApplication(): void {
     this.submitErrorMessage.set(null);
     const data = this.otrFormService.formData();
 
-    for (let s = 1; s <= 4; s++) {
+    for (let s = 1; s <= 3; s++) {
       this.validationService.markStepSubmitted(s);
       const errors = this.validationService.getStepErrors(s, data);
       if (errors.length > 0) {
         const stepLabels: Record<number, string> = {
           1: 'Step 1 (Organization Details)',
           2: 'Step 2 (Authorized Person Details)',
-          3: 'Step 3 (Details of Officer In-Charge)',
-          4: 'Step 4 (Bank Details)'
+          3: 'Step 3 (Bank Details)'
         };
-        this.submitErrorMessage.set(`Form is not filled, some entries are missing in ${stepLabels[s]}. Please fill all mandatory fields (${errors[0]}).`);
+        this.submitErrorMessage.set(`Form is not completely filled, entries are missing in ${stepLabels[s]}. Please fill all mandatory fields (${errors[0]}).`);
+        this.validationService.showToast(errors[0], 'error', s);
+        this.goToStep(s);
         return;
       }
     }
@@ -448,6 +600,13 @@ export class RegistrationShellComponent {
     const regId = this.otrFormService.submitForm();
     this.submittedRegId.set(regId);
     this.validationService.showToast(`Application successfully submitted! Ref: ${regId}`, 'success');
+
+    // Automatically download filled profile PDF
+    try {
+      this.downloadOtrPdf();
+    } catch (e) {
+      console.warn('Auto download error:', e);
+    }
   }
 
   copyRegId(): void {
@@ -460,14 +619,20 @@ export class RegistrationShellComponent {
   }
 
   printAcknowledgement(): void {
-    window.print();
+    this.pdfService.printOtrProfile(this.otrFormService.formData(), this.submittedRegId());
   }
 
   downloadOtrPdf(): void {
     this.pdfService.generateOtrPdf(this.otrFormService.formData(), this.submittedRegId());
   }
 
-
+  goBack(): void {
+    if (this.activeStep() > 1) {
+      this.previousStep();
+    } else {
+      this.router.navigate(['/tenders']);
+    }
+  }
 
   navigateToHome(): void {
     this.submittedRegId.set(null);

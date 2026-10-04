@@ -20,7 +20,7 @@ import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-m
     SsoRedirectModalComponent
   ],
   template: `
-    <div class="h-screen overflow-hidden flex flex-col bg-white text-slate-900 antialiased relative">
+    <div class="h-screen overflow-hidden flex flex-col text-slate-900 antialiased relative" style="background-color: #FEFEFD;">
       <!-- Theme-Based Blurred SSO Redirection Popup -->
       @if (authService.isRedirecting()) {
         <app-sso-redirect-modal></app-sso-redirect-modal>
@@ -37,12 +37,12 @@ import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-m
       @if (showSidebar()) {
         <div class="flex-1 flex w-full overflow-hidden">
           <app-sidebar class="h-full shrink-0"></app-sidebar>
-          <main class="flex-1 min-w-0 h-full overflow-y-auto flex flex-col" style="background-color: #ffffff;">
+          <main class="flex-1 min-w-0 h-full overflow-y-auto flex flex-col" style="background-color: #FEFEFD;">
             <router-outlet></router-outlet>
           </main>
         </div>
       } @else {
-        <main class="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden flex flex-col" style="background-color: #ffffff;">
+        <main class="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden flex flex-col" style="background-color: #FEFEFD;">
           <router-outlet></router-outlet>
           <!-- Main Portal Footer (Displayed on landing page) -->
           @if (showFooter()) {

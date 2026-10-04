@@ -9,13 +9,14 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { TableColumn, TableAction, BadgeVariant } from './table.types';
 import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 
 @Component({
   selector: 'app-table',
   standalone: true,
-  imports: [CommonModule, FormsModule, StatusBadgeComponent],
+  imports: [CommonModule, FormsModule, RouterModule, StatusBadgeComponent],
   template: `
     <div class="bg-white border border-slate-200 rounded-lg overflow-hidden font-sans" style="box-shadow: 0 1px 4px rgba(0,0,0,0.06);">
       
@@ -121,8 +122,75 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                       } @else if (col.type === 'number' && col.key === '$index') {
                         <!-- 3. Auto Sequential S. No. -->
                         <span class="font-medium text-slate-700 whitespace-nowrap">{{ (currentPage() - 1) * pageSize + idx + 1 }}</span>
+                      } @else if (col.type === 'link') {
+                        <!-- 4. Direct Reusable Link -->
+                        @if (col.link) {
+                          <a
+                            [routerLink]="getColLink(col, item)"
+                            class="text-[#174A6E] hover:text-[#0B3558] hover:underline font-medium inline-flex items-center gap-1 cursor-pointer transition-colors"
+                          >
+                            <span>{{ getFormattedValue(item, col, idx) }}</span>
+                            <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </a>
+                        } @else {
+                          <button
+                            type="button"
+                            (click)="onLinkClick(col, item, $event)"
+                            class="text-[#174A6E] hover:text-[#0B3558] hover:underline font-medium inline-flex items-center gap-1 cursor-pointer transition-colors text-left"
+                          >
+                            <span>{{ getFormattedValue(item, col, idx) }}</span>
+                            <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </button>
+                        }
+                      } @else if (col.type === 'action' && col.actions && col.actions.length > 0) {
+                        <!-- 5. Direct Action Buttons -->
+                        <div
+                          class="flex items-center gap-1.5 flex-wrap"
+                          [class.justify-center]="(col.headerAlign || col.align) === 'center'"
+                          [class.justify-end]="(col.headerAlign || col.align) === 'right'"
+                        >
+                          @for (act of col.actions; track act.id) {
+                            @if (!act.visible || act.visible(item)) {
+                              <button
+                                type="button"
+                                (click)="handleAction(act, item, $event)"
+                                [title]="act.title || act.label"
+                                [ngClass]="getActionBtnClass(act)"
+                              >
+                                @switch (act.icon) {
+                                  @case ('view') {
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                  }
+                                  @case ('pdf') {
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                  }
+                                  @case ('edit') {
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                  }
+                                  @case ('delete') {
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  }
+                                }
+                                <span>{{ act.label }}</span>
+                              </button>
+                            }
+                          }
+                        </div>
                       } @else {
-                        <!-- 4. Default Text Output -->
+                        <!-- 6. Default Text Output -->
                         <span>{{ getFormattedValue(item, col, idx) }}</span>
                       }
                     </td>
@@ -162,21 +230,25 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
               Previous
             </button>
 
-            @for (p of totalPagesArray(); track p) {
-              <button
-                type="button"
-                (click)="setPage(p)"
-                class="min-w-7.5 h-7.5 px-1.5 rounded-sm flex items-center justify-center text-[12px] font-medium transition-colors cursor-pointer border"
-                [class.bg-[#174A6E]]="currentPage() === p"
-                [class.text-white]="currentPage() === p"
-                [class.border-[#174A6E]]="currentPage() === p"
-                [class.bg-white]="currentPage() !== p"
-                [class.text-slate-700]="currentPage() !== p"
-                [class.border-slate-300]="currentPage() !== p"
-                [class.hover:bg-slate-100]="currentPage() !== p"
-              >
-                {{ p }}
-              </button>
+            @for (p of visiblePages(); track $index) {
+              @if (p === '...') {
+                <span class="min-w-7.5 h-7.5 px-1.5 flex items-center justify-center text-[12px] text-slate-400 select-none">...</span>
+              } @else {
+                <button
+                  type="button"
+                  (click)="setPage(+p)"
+                  class="min-w-7.5 h-7.5 px-1.5 rounded-sm flex items-center justify-center text-[12px] font-medium transition-colors cursor-pointer border"
+                  [class.bg-[#174A6E]]="currentPage() === p"
+                  [class.text-white]="currentPage() === p"
+                  [class.border-[#174A6E]]="currentPage() === p"
+                  [class.bg-white]="currentPage() !== p"
+                  [class.text-slate-700]="currentPage() !== p"
+                  [class.border-slate-300]="currentPage() !== p"
+                  [class.hover:bg-slate-100]="currentPage() !== p"
+                >
+                  {{ p }}
+                </button>
+              }
             }
 
             <button
@@ -221,6 +293,7 @@ export class TableComponent {
 
   @Output() rowClick = new EventEmitter<any>();
   @Output() actionClick = new EventEmitter<{ action: string; row: any }>();
+  @Output() linkClick = new EventEmitter<{ column: TableColumn; row: any; event: MouseEvent }>();
 
   searchQuery = '';
   sortKey = signal<string | null>(null);
@@ -276,6 +349,33 @@ export class TableComponent {
 
   totalPagesArray = computed(() => {
     return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
+  });
+
+  visiblePages = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+    const pages: (number | string)[] = [];
+    if (current <= 4) {
+      for (let i = 1; i <= 5; i++) pages.push(i);
+      pages.push('...');
+      pages.push(total);
+    } else if (current >= total - 3) {
+      pages.push(1);
+      pages.push('...');
+      for (let i = total - 4; i <= total; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      pages.push('...');
+      pages.push(current - 1);
+      pages.push(current);
+      pages.push(current + 1);
+      pages.push('...');
+      pages.push(total);
+    }
+    return pages;
   });
 
   paginatedData = computed(() => {
@@ -354,5 +454,44 @@ export class TableComponent {
 
   getTrackBy(item: any, index: number): any {
     return item?.id ?? item?.referenceNo ?? item?.eoiRefNo ?? index;
+  }
+
+  onLinkClick(col: TableColumn, item: any, event: MouseEvent): void {
+    event.stopPropagation();
+    this.linkClick.emit({ column: col, row: item, event });
+  }
+
+  getColLink(col: TableColumn, item: any): string | any[] {
+    if (typeof col.link === 'function') {
+      return col.link(item);
+    }
+    return [];
+  }
+
+  handleAction(act: TableAction, item: any, event: MouseEvent): void {
+    event.stopPropagation();
+    if (act.action) {
+      act.action(item);
+    }
+    this.actionClick.emit({ action: act.id, row: item });
+  }
+
+  getActionBtnClass(act: TableAction): string {
+    const base = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold cursor-pointer transition-colors shadow-2xs ';
+    switch (act.variant) {
+      case 'primary':
+      case 'pdf-view':
+        return base + 'bg-[#0B3558] hover:bg-[#07233B] text-white';
+      case 'secondary':
+        return base + 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300';
+      case 'outline':
+        return base + 'border border-[#174A6E] text-[#174A6E] hover:bg-[#EAF2F6]';
+      case 'danger':
+        return base + 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200';
+      case 'ghost':
+        return 'p-1 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded transition-colors';
+      default:
+        return base + 'bg-[#0B3558] hover:bg-[#07233B] text-white';
+    }
   }
 }

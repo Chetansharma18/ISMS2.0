@@ -36,7 +36,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             label="Full Name"
             [value]="data().name"
             (valueChange)="update('name', $event)"
-            placeholder="e.g. Vikramaditya Singh"
+            placeholder="Enter full name"
             [required]="true"
             [maxLength]="100"
             [error]="getFieldError('name')"
@@ -50,7 +50,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             [value]="data().designation"
             (valueChange)="update('designation', $event)"
             [options]="designations"
-            placeholder="Select Designation"
+            placeholder="Select designation"
             [required]="false"
           ></app-form-select>
         </div>
@@ -71,7 +71,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
         <div class="lg:col-span-2 sm:col-span-1">
           <app-form-input
             label="Age"
-            [value]="data().age ? data().age + ' Years' : 'Auto-calculated'"
+            [value]="data().age ? data().age : 'Auto-calculated'"
             [disabled]="true"
           ></app-form-input>
         </div>
@@ -82,7 +82,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             label="PAN"
             [value]="data().pan"
             (valueChange)="update('pan', $event)"
-            placeholder="e.g. ABCDE1234F"
+            placeholder="Enter PAN number"
             [required]="true"
             [uppercase]="true"
             [maxLength]="10"
@@ -97,7 +97,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             type="tel"
             [value]="data().mobileNo"
             (valueChange)="update('mobileNo', $event)"
-            placeholder="e.g. 9829012345"
+            placeholder="Enter mobile number"
             [required]="true"
             [maxLength]="10"
             [error]="getFieldError('mobileNo')"
@@ -107,11 +107,11 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
         <!-- Email -> 3 cols -->
         <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
-            label="Email-ID"
+            label="Email Address"
             type="email"
             [value]="data().emailId"
             (valueChange)="update('emailId', $event)"
-            placeholder="e.g. signatory@organisation.com"
+            placeholder="Enter email address"
             [required]="true"
             [error]="getFieldError('emailId')"
           ></app-form-input>
@@ -120,11 +120,11 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
         <!-- Aadhaar -> 3 cols -->
         <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
-            label="Aadhaar No."
+            label="Aadhaar No. (Optional)"
             type="tel"
             [value]="data().aadhaarNo"
             (valueChange)="update('aadhaarNo', $event)"
-            placeholder="e.g. 123456789012"
+            placeholder="Enter Aadhaar number"
             [maxLength]="12"
             [error]="getFieldError('aadhaarNo')"
           ></app-form-input>
@@ -132,20 +132,20 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
 
         <div class="lg:col-span-4 sm:col-span-1">
           <app-form-input
-            label="Bhamashah No."
+            label="Bhamashah No. (Optional)"
             [value]="data().bhamashahNo"
             (valueChange)="update('bhamashahNo', $event)"
-            placeholder="Optional"
+            placeholder="Enter Bhamashah number"
             [maxLength]="20"
           ></app-form-input>
         </div>
 
         <div class="lg:col-span-4 sm:col-span-1">
           <app-form-input
-            label="Voter ID No."
+            label="Voter ID No. (Optional)"
             [value]="data().voterIdNo"
             (valueChange)="update('voterIdNo', $event)"
-            placeholder="Optional"
+            placeholder="Enter voter ID number"
             [uppercase]="true"
             [maxLength]="20"
           ></app-form-input>
@@ -153,10 +153,10 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
 
         <div class="lg:col-span-4 sm:col-span-1">
           <app-form-input
-            label="Passport No."
+            label="Passport No. (Optional)"
             [value]="data().passportNo"
             (valueChange)="update('passportNo', $event)"
-            placeholder="Optional"
+            placeholder="Enter passport number"
             [uppercase]="true"
             [maxLength]="8"
           ></app-form-input>
@@ -169,17 +169,17 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             [value]="data().state"
             (valueChange)="update('state', $event)"
             [options]="states"
-            placeholder="Select State"
+            placeholder="Select state"
           ></app-form-select>
         </div>
 
         <!-- Residence Address -> 9 cols -->
         <div class="lg:col-span-9 sm:col-span-1">
           <app-form-textarea
-            label="Residence Address"
+            label="Residential Address"
             [value]="data().residenceAddress"
             (valueChange)="update('residenceAddress', $event)"
-            placeholder="House/Flat No., Street, Locality, City, PIN code"
+            placeholder="Enter house/flat no., street, locality, city, PIN code"
             [rows]="1"
             [maxLength]="500"
           ></app-form-textarea>

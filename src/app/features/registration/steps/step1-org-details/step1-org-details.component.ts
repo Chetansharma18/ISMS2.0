@@ -33,13 +33,13 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
       
       <!-- Organization, Compliance & Contact Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-3.5 gap-y-2.5">
-        <!-- Organization Name -> 9 cols -->
+        <!-- Organisation Name -> 9 cols -->
         <div class="lg:col-span-9 sm:col-span-2">
           <app-form-input
-            label="Organization Name"
+            label="Organisation Name"
             [value]="data().fullName"
             (valueChange)="update('fullName', $event)"
-            placeholder="e.g. SkillTech Solutions Private Limited"
+            placeholder="Enter organisation name"
             [required]="true"
             [maxLength]="200"
             [error]="getFieldError('fullName')"
@@ -53,7 +53,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             [value]="data().natureOfEntity"
             (valueChange)="update('natureOfEntity', $event)"
             [options]="natureOfEntitiesList"
-            placeholder="Select Nature of Entity"
+            placeholder="Select nature of entity"
             [required]="true"
             [error]="getFieldError('natureOfEntity')"
           ></app-form-select>
@@ -62,10 +62,10 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
         <!-- Registration Number -> 4 cols -->
         <div class="lg:col-span-4 sm:col-span-1">
           <app-form-input
-            label="Registration No. (CIN / Reg No.)"
+            label="Registration No. (CIN / Reg. No.)"
             [value]="data().registrationNumber"
             (valueChange)="update('registrationNumber', $event)"
-            placeholder="e.g. U74999RJ2010PTC032456"
+            placeholder="Enter registration number"
             [required]="true"
             [uppercase]="true"
             [maxLength]="50"
@@ -88,10 +88,11 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
         <!-- State/UT of Legal Registration -> 5 cols -->
         <div class="lg:col-span-5 sm:col-span-1">
           <app-form-select
-            label="State/UT of Registration"
+            label="State / UT of Registration"
             [value]="data().stateOfLegalReg"
             (valueChange)="update('stateOfLegalReg', $event)"
             [options]="statesList"
+            placeholder="Select state / UT"
             [required]="true"
             [error]="getFieldError('stateOfLegalReg')"
           ></app-form-select>
@@ -108,13 +109,13 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
           ></app-form-file-upload>
         </div>
 
-        <!-- Organization PAN -> 3 cols -->
+        <!-- Organisation PAN -> 3 cols -->
         <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
-            label="Organization PAN"
+            label="Organisation PAN"
             [value]="data().companyPan"
             (valueChange)="update('companyPan', $event)"
-            placeholder="e.g. ABCDE1234F"
+            placeholder="Enter organisation PAN"
             [required]="true"
             [uppercase]="true"
             [maxLength]="10"
@@ -122,10 +123,10 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
           ></app-form-input>
         </div>
 
-        <!-- Organization PAN Card Upload -> 5 cols -->
+        <!-- Organisation PAN Card Upload -> 5 cols -->
         <div class="lg:col-span-5 sm:col-span-1">
           <app-form-file-upload
-            label="Organization PAN Card"
+            label="Organisation PAN Card"
             [fileDoc]="data().panCardDoc"
             (fileChange)="updateDoc('panCardDoc', $event)"
             [required]="true"
@@ -148,7 +149,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
         <!-- MSME Registered -> 2 cols -->
         <div class="lg:col-span-2 sm:col-span-1">
           <app-form-select
-            label="MSME Registered"
+            label="MSME / Udyam Registered"
             [value]="data().msmeRegistered"
             (valueChange)="onMsmeRegisteredChange($event)"
             [options]="['Yes', 'No']"
@@ -164,7 +165,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               label="GSTIN"
               [value]="data().gstin"
               (valueChange)="update('gstin', $event)"
-              placeholder="e.g. 08ABCDE1234F1Z5"
+              placeholder="Enter GSTIN"
               [required]="true"
               [uppercase]="true"
               [maxLength]="15"
@@ -190,7 +191,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               label="Udyam Number"
               [value]="data().udyamNumber"
               (valueChange)="update('udyamNumber', $event)"
-              placeholder="e.g. UDYAM-RJ-14-0012345"
+              placeholder="Enter Udyam registration number"
               [required]="true"
               [uppercase]="true"
               [maxLength]="19"
@@ -216,17 +217,18 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             [value]="data().nsdcPartner"
             (valueChange)="update('nsdcPartner', $event)"
             [options]="nsdcPartnersList"
+            placeholder="Select"
             [required]="false"
           ></app-form-select>
         </div>
 
         <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
-            label="Organization Contact No."
+            label="Organisation Contact No."
             type="tel"
             [value]="data().contactNo"
             (valueChange)="update('contactNo', $event)"
-            placeholder="e.g. 9829012345"
+            placeholder="Enter mobile number"
             [required]="true"
             [maxLength]="15"
             [error]="getFieldError('contactNo')"
@@ -235,11 +237,11 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
 
         <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
-            label="Organization Email-ID"
+            label="Organisation Email ID"
             type="email"
             [value]="data().emailId"
             (valueChange)="update('emailId', $event)"
-            placeholder="e.g. info@organisation.com"
+            placeholder="Enter email address"
             [required]="true"
             [error]="getFieldError('emailId')"
           ></app-form-input>
@@ -250,7 +252,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             label="Website"
             [value]="data().website"
             (valueChange)="update('website', $event)"
-            placeholder="e.g. https://www.organisation.com"
+            placeholder="Enter website (https://www.example.com)"
           ></app-form-input>
         </div>
       </div>
@@ -265,7 +267,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
                 label="Registered Address"
                 [value]="data().registeredAddress"
                 (valueChange)="update('registeredAddress', $event)"
-                placeholder="Street, locality, building name and number"
+                placeholder="Enter address, locality, building name and number"
                 [required]="true"
                 [error]="getFieldError('registeredAddress')"
               ></app-form-textarea>
@@ -277,6 +279,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
                 [value]="data().registeredState"
                 (valueChange)="onRegisteredStateChange($event)"
                 [options]="statesList"
+                placeholder="Select state / UT"
                 [required]="true"
                 [error]="getFieldError('registeredState')"
               ></app-form-select>
@@ -289,6 +292,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
                 (valueChange)="update('registeredDistrict', $event)"
                 [options]="registeredDistricts()"
                 [disabled]="!data().registeredState"
+                placeholder="Select district"
                 [required]="true"
                 [error]="getFieldError('registeredDistrict')"
               ></app-form-select>
@@ -300,7 +304,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
                 type="tel"
                 [value]="data().registeredPincode"
                 (valueChange)="update('registeredPincode', $event)"
-                placeholder="e.g. 302001"
+                placeholder="Enter PIN code"
                 [required]="true"
                 [maxLength]="6"
                 [error]="getFieldError('registeredPincode')"
@@ -318,7 +322,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               (ngModelChange)="toggleSameAsRegistered($event)"
               class="w-4 h-4 text-[#0B3558] border-slate-300 rounded focus:ring-[#0B3558] accent-[#0B3558]"
             />
-            <span>Office Address is the same as Registered Address</span>
+            <span>Office Address is same as Registered Address</span>
           </label>
         </div>
 
@@ -331,7 +335,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
                   label="Office Address"
                   [value]="data().officeAddress"
                   (valueChange)="update('officeAddress', $event)"
-                  placeholder="Street, locality, building name and number"
+                  placeholder="Enter office address, locality, building name and number"
                   [required]="true"
                   [error]="getFieldError('officeAddress')"
                 ></app-form-textarea>
@@ -343,6 +347,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
                   [value]="data().officeState"
                   (valueChange)="onOfficeStateChange($event)"
                   [options]="statesList"
+                  placeholder="Select state / UT"
                   [required]="true"
                   [error]="getFieldError('officeState')"
                 ></app-form-select>
@@ -355,6 +360,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
                   (valueChange)="update('officeDistrict', $event)"
                   [options]="officeDistricts()"
                   [disabled]="!data().officeState"
+                  placeholder="Select district"
                   [required]="true"
                   [error]="getFieldError('officeDistrict')"
                 ></app-form-select>
@@ -366,7 +372,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
                   type="tel"
                   [value]="data().officePincode"
                   (valueChange)="update('officePincode', $event)"
-                  placeholder="e.g. 302001"
+                  placeholder="Enter PIN code"
                   [required]="true"
                   [maxLength]="6"
                   [error]="getFieldError('officePincode')"

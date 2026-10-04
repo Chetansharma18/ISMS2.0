@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
@@ -13,24 +13,17 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
     class: 'block shrink-0 h-full'
   },
   template: `
-    <!-- Premium Sidebar -->
+    <!-- Unified Reusable Sidebar -->
     <aside
       class="shrink-0 bg-white border-r border-slate-200 h-full flex flex-col justify-between select-none overflow-y-auto font-sans"
       style="width: 228px;"
       aria-label="Portal Navigation Sidebar"
     >
-      <!-- Top: Brand + Nav -->
+      <!-- Top: Nav Links -->
       <div class="flex flex-col">
 
-        <!-- Brand Header -->
-        <div class="px-5 py-4 border-b border-slate-100">
-          <span class="text-[12.5px] font-bold text-[#0B3558] uppercase" style="letter-spacing: 0.07em;">
-            ISMS 2.0
-          </span>
-        </div>
-
         <!-- Navigation Links -->
-        <nav class="flex flex-col gap-1 px-2.5" aria-label="Main Navigation">
+        <nav class="flex flex-col gap-1 px-2.5 py-3" aria-label="Main Navigation">
 
           <!-- ================================================================
                ROLE: SUPER ADMIN
@@ -193,7 +186,7 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
               <span class="tracking-tight font-medium">Sanction Order</span>
             </a>
 
-            <!-- 2. SDC Approvals -->
+            <!-- 3. SDC Approvals -->
             <a
               routerLink="/sdc"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"
@@ -206,20 +199,27 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
               <span class="tracking-tight">SDC Approvals</span>
             </a>
 
-            <!-- 3. Batch Approvals -->
+            <!-- 4. Batch Approvals -->
             <a
               routerLink="/admin/batch-approvals"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"
               [routerLinkActiveOptions]="{ exact: false }"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+              class="flex items-center justify-between px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
             >
-              <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-              <span class="tracking-tight">Batch Approvals</span>
+              <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+                <span class="tracking-tight">Batch Approvals</span>
+              </div>
+              @if (pendingBatchApprovalsCount() > 0) {
+                <span class="px-2 py-0.5 rounded-full text-[11px] leading-tight shrink-0 bg-[#F28C28] text-white font-semibold">
+                  {{ pendingBatchApprovalsCount() }}
+                </span>
+              }
             </a>
 
-            <!-- 4. Grievance Management -->
+            <!-- 5. Grievance Management -->
             <a
               routerLink="/admin/grievance"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"
@@ -232,7 +232,7 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
               <span class="tracking-tight">Grievance Management</span>
             </a>
 
-            <!-- 5. Camera Monitoring -->
+            <!-- 6. Camera Monitoring -->
             <a
               routerLink="/admin/camera-monitoring"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"
@@ -319,12 +319,14 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
                [routerLinkActiveOptions]="{ exact: false }"
                class="nav-item group flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-[#0B3558] transition-all cursor-pointer"
             >
-              <svg class="nav-icon w-[18px] h-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-              </svg>
-              <span class="text-[13.5px] font-semibold flex-1 whitespace-nowrap">Aspirants Management</span>
+              <div class="flex items-center gap-3 min-w-0">
+                <svg class="nav-icon w-[18px] h-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                </svg>
+                <span class="text-[13.5px] font-semibold truncate">Aspirants Management</span>
+              </div>
               @if (aspirantCount() > 0) {
-                <span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-[#0B3558] text-white leading-none shrink-0">
+                <span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-[#0B3558] text-white leading-none shrink-0 ml-1">
                   {{ aspirantCount() }}
                 </span>
               }
@@ -392,7 +394,7 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
         </nav>
       </div>
 
-      </aside>
+    </aside>
   `,
   styles: [`
     .nav-icon {

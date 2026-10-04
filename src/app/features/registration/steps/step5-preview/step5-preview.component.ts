@@ -9,351 +9,302 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
   standalone: true,
   imports: [CommonModule, DocumentViewerModalComponent],
   template: `
-    <div class="w-full space-y-6 font-sans bg-white pb-6">
+    <div class="w-full space-y-4 font-sans bg-white pb-4">
 
       <!-- ====================================================================
-           PREVIEW HEADER: Clean Top Bar
-           ==================================================================== -->
-      <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-        <div>
-          <h1 class="text-lg sm:text-xl font-extrabold text-[#0B3558] m-0">
-            Preview &amp; Submit
-          </h1>
-          <p class="text-[11px] sm:text-xs text-slate-500 m-0 mt-0.5">
-            Review all details filled in the form from beginning to end before submitting.
-          </p>
-        </div>
-      </div>
-
-      <!-- ====================================================================
-           SECTION 1: ORGANIZATION DETAILS (STEP 1)
+           SECTION 1: ORGANISATION DETAILS (STEP 1)
            ==================================================================== -->
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
-        <div class="bg-slate-50/80 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold shrink-0">1</span>
-            <h2 class="text-sm sm:text-base font-extrabold text-[#0B3558] uppercase tracking-wide m-0">
-              Organization Details
+        <!-- Section Header Bar with Expand / Collapse & Edit -->
+        <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5 cursor-pointer select-none" (click)="toggleSection(1)">
+            <span class="w-5 h-5 rounded-full border border-sky-400 text-[#0B3558] flex items-center justify-center text-xs font-bold shrink-0">1</span>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">
+              Organisation Details
             </h2>
           </div>
-          <button
-            type="button"
-            (click)="onEditStep(1)"
-            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-[#0B3558]/30 text-[#0B3558] hover:bg-white font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
-            title="Edit Organization Details"
-          >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
-            <span>Edit Details</span>
-          </button>
-        </div>
 
-        <div class="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-3.5 text-xs">
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Organization Name', value: step1().fullName, span: 'sm:col-span-2 lg:col-span-3', highlight: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Nature of Entity', value: step1().natureOfEntity }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Registration Number', value: step1().registrationNumber, mono: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Date of Registration', value: step1().dateOfRegistration }"></ng-container>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              (click)="onEditStep(1)"
+              class="inline-flex items-center px-3 py-1 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
+              title="Edit Organisation Details"
+            >
+              <span>Edit Details</span>
+            </button>
 
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'State of Legal Reg.', value: step1().stateOfLegalReg }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Organization PAN', value: step1().companyPan, mono: true, highlight: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'GST Registered', value: step1().gstRegistered }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'GSTIN', value: step1().gstRegistered === 'Yes' ? (step1().gstin || '-') : 'Not Applicable', mono: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'MSME Registered', value: step1().msmeRegistered }"></ng-container>
-          @if (step1().msmeRegistered === 'Yes') {
-            <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Udyam Registration No.', value: step1().udyamNumber, mono: true }"></ng-container>
-          }
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'NSDC Partner Status', value: step1().nsdcPartner || 'Not Applicable' }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Organization Contact No.', value: step1().contactNo }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Organization Email-ID', value: step1().emailId }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Official Website', value: step1().website, span: 'sm:col-span-3' }"></ng-container>
-
-          <div class="col-span-2 sm:col-span-3">
-            <span class="text-slate-400 block text-[11px] font-medium">Registered Office Address</span>
-            <span class="font-medium text-slate-800 text-xs leading-relaxed">{{ registeredAddressDisplay() }}</span>
-          </div>
-          <div class="col-span-2 sm:col-span-3">
-            <span class="text-slate-400 block text-[11px] font-medium">Corporate / Branch Office Address</span>
-            <span class="font-medium text-slate-800 text-xs leading-relaxed">{{ officeAddressDisplay() }}</span>
+            <button
+              type="button"
+              (click)="toggleSection(1)"
+              class="p-1 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition-colors cursor-pointer"
+              [attr.aria-expanded]="isSection1Open()"
+              title="Toggle Section"
+            >
+              <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="!isSection1Open()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
           </div>
         </div>
+
+        @if (isSection1Open()) {
+          <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
+            <!-- Row 1 -->
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Organisation Name</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().fullName || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Nature of Entity</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().natureOfEntity || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Registration No. (CIN / Reg. No.)</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step1().registrationNumber || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Date of Registration</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().dateOfRegistration || '-' }}</span>
+            </div>
+
+            <!-- Row 2 -->
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">State / UT of Registration</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().stateOfLegalReg || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Organisation PAN</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step1().companyPan || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">GST Registered</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().gstRegistered || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">MSME / Udyam Registered</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().msmeRegistered || '-' }}</span>
+            </div>
+
+            <!-- Row 3 -->
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">NSDC Partner</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().nsdcPartner || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Contact No.</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().contactNo || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Email ID</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().emailId || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Website</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 break-all">{{ step1().website || '-' }}</span>
+            </div>
+
+            <!-- Row 4 Addresses -->
+            <div class="sm:col-span-2">
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Registered Address</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ registeredAddressDisplay() }}</span>
+            </div>
+            <div class="sm:col-span-2">
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Office Address</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ officeAddressDisplay() }}</span>
+            </div>
+          </div>
+        }
       </section>
 
       <!-- ====================================================================
            SECTION 2: AUTHORIZED PERSON DETAILS (STEP 2)
            ==================================================================== -->
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
-        <div class="bg-slate-50/80 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold shrink-0">2</span>
-            <h2 class="text-sm sm:text-base font-extrabold text-[#0B3558] uppercase tracking-wide m-0">
+        <!-- Section Header Bar with Expand / Collapse & Edit -->
+        <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5 cursor-pointer select-none" (click)="toggleSection(2)">
+            <span class="w-5 h-5 rounded-full border border-sky-400 text-[#0B3558] flex items-center justify-center text-xs font-bold shrink-0">2</span>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">
               Authorized Person Details
             </h2>
           </div>
-          <button
-            type="button"
-            (click)="onEditStep(2)"
-            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-[#0B3558]/30 text-[#0B3558] hover:bg-white font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
-            title="Edit Authorized Person Details"
-          >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
-            <span>Edit Details</span>
-          </button>
-        </div>
 
-        <div class="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-3.5 text-xs">
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Authorized Person Name', value: step3().name, highlight: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Authorized Designation', value: step3().designation }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Date of Birth', value: step3().dob }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Age', value: step3().age ? (step3().age + ' Years') : '-' }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Mobile No.', value: step3().mobileNo }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Email ID', value: step3().emailId }"></ng-container>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              (click)="onEditStep(2)"
+              class="inline-flex items-center px-3 py-1 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
+              title="Edit Authorized Person Details"
+            >
+              <span>Edit Details</span>
+            </button>
 
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'PAN', value: step3().pan, mono: true, highlight: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Aadhaar No.', value: step3().aadhaarNo, mono: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Bhamashah No.', value: step3().bhamashahNo }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Voter ID No.', value: step3().voterIdNo }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Passport No.', value: step3().passportNo }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'State / Domicile', value: step3().state }"></ng-container>
-
-          <div class="col-span-2 sm:col-span-3 lg:col-span-6">
-            <span class="text-slate-400 block text-[11px] font-medium">Residence Address</span>
-            <span class="font-medium text-slate-800 text-xs leading-relaxed">{{ step3().residenceAddress || '-' }}</span>
+            <button
+              type="button"
+              (click)="toggleSection(2)"
+              class="p-1 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition-colors cursor-pointer"
+              [attr.aria-expanded]="isSection2Open()"
+              title="Toggle Section"
+            >
+              <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="!isSection2Open()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
           </div>
         </div>
+
+        @if (isSection2Open()) {
+          <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
+            <!-- Row 1 -->
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Full Name</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().name || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Designation</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().designation || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Date of Birth</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().dob || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Age</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().age ? (step3().age + ' Years') : (step3().dob ? 'Calculated' : '-') }}</span>
+            </div>
+
+            <!-- Row 2 -->
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">PAN</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step3().pan || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Aadhaar No.</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step3().aadhaarNo || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Mobile No.</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().mobileNo || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Email Address</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().emailId || '-' }}</span>
+            </div>
+
+            <!-- Row 3 -->
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Bhamashah No.</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().bhamashahNo || 'Not Provided' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Voter ID No.</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().voterIdNo || 'Not Provided' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Passport No.</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().passportNo || 'Not Provided' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">State</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().state || '-' }}</span>
+            </div>
+
+            <!-- Row 4 Address -->
+            <div class="sm:col-span-4">
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Residential Address</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ step3().residenceAddress || '-' }}</span>
+            </div>
+          </div>
+        }
       </section>
 
       <!-- ====================================================================
-           SECTION 3: OFFICER(S) IN-CHARGE DETAILS (STEP 3)
+           SECTION 3: BANK DETAILS (STEP 3)
            ==================================================================== -->
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
-        <div class="bg-slate-50/80 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold shrink-0">3</span>
-            <h2 class="text-sm sm:text-base font-extrabold text-[#0B3558] uppercase tracking-wide m-0">
-              Officer(s) In-Charge Details
+        <!-- Section Header Bar with Expand / Collapse & Edit -->
+        <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5 cursor-pointer select-none" (click)="toggleSection(3)">
+            <span class="w-5 h-5 rounded-full border border-sky-400 text-[#0B3558] flex items-center justify-center text-xs font-bold shrink-0">3</span>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">
+              Bank Details
             </h2>
           </div>
-          <button
-            type="button"
-            (click)="onEditStep(3)"
-            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-[#0B3558]/30 text-[#0B3558] hover:bg-white font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
-            title="Edit Officer(s) In-Charge"
-          >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
-            <span>Edit Details</span>
-          </button>
-        </div>
 
-        <div class="p-4">
-          <div class="overflow-x-auto border border-slate-200 rounded-lg">
-            <table class="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr class="bg-slate-50 border-b border-slate-200 text-[#0B3558] font-semibold text-[11px]">
-                  <th class="py-2.5 px-3 w-10">#</th>
-                  <th class="py-2.5 px-3">Officer Name</th>
-                  <th class="py-2.5 px-3">Designation</th>
-                  <th class="py-2.5 px-3">Contact Details</th>
-                  <th class="py-2.5 px-3">Identity Numbers</th>
-                  <th class="py-2.5 px-3">Role</th>
-                  <th class="py-2.5 px-3">Attached Documents</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100">
-                @for (oic of step2(); track oic.id; let idx = $index) {
-                  <tr class="hover:bg-slate-50/50">
-                    <td class="py-2.5 px-3 font-semibold text-slate-500">{{ idx + 1 }}</td>
-                    <td class="py-2.5 px-3 font-bold text-slate-800">{{ oic.name || '-' }}</td>
-                    <td class="py-2.5 px-3 text-slate-700">{{ oic.designation || '-' }}</td>
-                    <td class="py-2.5 px-3 text-slate-700 space-y-0.5">
-                      <div><span class="text-slate-400">Mob:</span> {{ oic.mobileNo || '-' }}</div>
-                      <div><span class="text-slate-400">Email:</span> {{ oic.emailId || '-' }}</div>
-                    </td>
-                    <td class="py-2.5 px-3 text-slate-700 font-mono text-[11px] space-y-0.5">
-                      <div><span class="text-slate-400 font-sans">PAN:</span> {{ oic.pan || '-' }}</div>
-                      <div><span class="text-slate-400 font-sans">Aadhaar:</span> {{ oic.aadhaarNo || '-' }}</div>
-                    </td>
-                    <td class="py-2.5 px-3">
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold"
-                            [class.bg-sky-50]="idx === 0" [class.text-sky-800]="idx === 0" [class.border]="idx === 0" [class.border-sky-200]="idx === 0"
-                            [class.bg-slate-100]="idx > 0" [class.text-slate-600]="idx > 0">
-                        {{ idx === 0 ? 'Officer In-Charge' : 'Additional Officer' }}
-                      </span>
-                    </td>
-                    <td class="py-2.5 px-3">
-                      <div class="flex flex-col gap-1">
-                        @if (oic.appointmentLetterDoc) {
-                          <button
-                            type="button"
-                            (click)="previewDoc(oic.appointmentLetterDoc, 'OIC Appointment Letter')"
-                            class="text-[11px] text-[#0483AC] hover:underline font-medium text-left cursor-pointer flex items-center gap-1"
-                          >
-                            <svg class="w-3 h-3 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                              <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
-                            </svg>
-                            <span>Appt. Letter</span>
-                          </button>
-                        }
-                        @if (oic.idProofDoc) {
-                          <button
-                            type="button"
-                            (click)="previewDoc(oic.idProofDoc, 'OIC Identity Proof')"
-                            class="text-[11px] text-[#0483AC] hover:underline font-medium text-left cursor-pointer flex items-center gap-1"
-                          >
-                            <svg class="w-3 h-3 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                              <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
-                            </svg>
-                            <span>ID Proof</span>
-                          </button>
-                        }
-                        @if (!oic.appointmentLetterDoc && !oic.idProofDoc) {
-                          <span class="text-slate-400 text-[11px]">-</span>
-                        }
-                      </div>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              (click)="onEditStep(3)"
+              class="inline-flex items-center px-3 py-1 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
+              title="Edit Bank Details"
+            >
+              <span>Edit Details</span>
+            </button>
+
+            <button
+              type="button"
+              (click)="toggleSection(3)"
+              class="p-1 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition-colors cursor-pointer"
+              [attr.aria-expanded]="isSection3Open()"
+              title="Toggle Section"
+            >
+              <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="!isSection3Open()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
           </div>
         </div>
+
+
+        @if (isSection3Open()) {
+          <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
+            <!-- Row 1 -->
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Bank Name</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step4().bankName || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Branch Name</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step4().branchName || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Account Holder Name</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step4().accountHolderName || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Account Number</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step4().accountNo || '-' }}</span>
+            </div>
+
+            <!-- Row 2 -->
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Account Type</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step4().accountType || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">IFSC Code</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step4().ifscCode || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">MICR Code</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step4().micrCode || 'Optional / -' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Transfer Mode</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step4().transferMode || 'NEFT' }}</span>
+            </div>
+
+            <!-- Row 3 Address -->
+            <div class="sm:col-span-4">
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Branch Address</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ step4().branchAddress || '-' }}</span>
+            </div>
+          </div>
+        }
       </section>
 
-      <!-- ====================================================================
-           SECTION 4: BANK ACCOUNT DETAILS (STEP 4)
-           ==================================================================== -->
-      <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
-        <div class="bg-slate-50/80 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold shrink-0">4</span>
-            <h2 class="text-sm sm:text-base font-extrabold text-[#0B3558] uppercase tracking-wide m-0">
-              Bank Account Details
-            </h2>
-          </div>
-          <button
-            type="button"
-            (click)="onEditStep(4)"
-            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-[#0B3558]/30 text-[#0B3558] hover:bg-white font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
-            title="Edit Bank Account Details"
-          >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
-            <span>Edit Details</span>
-          </button>
-        </div>
-
-        <div class="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-3.5 text-xs">
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Name of the Bank', value: step4().bankName, highlight: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Branch Name', value: step4().branchName }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Account Type', value: step4().accountType }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Mode of Transfer', value: step4().transferMode }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Account Holder Name', value: step4().accountHolderName, span: 'sm:col-span-2', highlight: true }"></ng-container>
-
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'Account Number', value: step4().accountNo, mono: true, highlight: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'IFSC Code', value: step4().ifscCode, mono: true, highlight: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="fieldTpl; context: { label: 'MICR Code', value: step4().micrCode, mono: true }"></ng-container>
-
-          <div class="col-span-2 sm:col-span-3">
-            <span class="text-slate-400 block text-[11px] font-medium">Branch Address</span>
-            <span class="font-medium text-slate-800 text-xs leading-relaxed">{{ step4().branchAddress || '-' }}</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- ====================================================================
-           SECTION 5: ATTACHED VERIFICATION DOCUMENTS
-           ==================================================================== -->
-      <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
-        <div class="bg-slate-50/80 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white flex items-center justify-center text-xs font-bold shrink-0">5</span>
-            <h2 class="text-sm sm:text-base font-extrabold text-[#0B3558] uppercase tracking-wide m-0">
-              Attached Verification Documents
-            </h2>
-          </div>
-        </div>
-
-        <div class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          <ng-container *ngTemplateOutlet="docCardTpl; context: { title: 'Certificate of Registration', doc: step1().registrationCertDoc }"></ng-container>
-          <ng-container *ngTemplateOutlet="docCardTpl; context: { title: 'Organization PAN Card', doc: step1().panCardDoc }"></ng-container>
-
-          @if (step1().gstRegistered === 'Yes') {
-            <ng-container *ngTemplateOutlet="docCardTpl; context: { title: 'GST Registration Certificate', doc: step1().gstCertDoc }"></ng-container>
-          }
-
-          @if (step1().msmeRegistered === 'Yes') {
-            <ng-container *ngTemplateOutlet="docCardTpl; context: { title: 'MSME Udyam Certificate', doc: step1().msmeCertDoc }"></ng-container>
-          }
-
-          <ng-container *ngTemplateOutlet="docCardTpl; context: { title: 'Authorization Letter', doc: step3().authorizationLetterDoc }"></ng-container>
-          <ng-container *ngTemplateOutlet="docCardTpl; context: { title: 'Auth Signatory ID Proof', doc: step3().idProofDoc }"></ng-container>
-          <ng-container *ngTemplateOutlet="docCardTpl; context: { title: 'Bank Cheque / Passbook', doc: step4().cancelledChequeDoc }"></ng-container>
-        </div>
-      </section>
-
-      <!-- ====================================================================
-           REUSABLE TEMPLATES: FIELD DISPLAY & DOCUMENT BADGE
-           ==================================================================== -->
-      <ng-template #fieldTpl let-label="label" let-value="value" let-mono="mono" let-highlight="highlight" let-span="span">
-        <div [class]="span ? span : ''">
-          <span class="text-slate-400 block text-[11px] font-medium">{{ label }}</span>
-          <span
-            class="text-xs text-slate-800 break-words"
-            [class.font-mono]="mono"
-            [class.font-bold]="highlight"
-            [class.font-semibold]="!highlight"
-          >
-            {{ value || '-' }}
-          </span>
-        </div>
-      </ng-template>
-
-      <ng-template #docCardTpl let-title="title" let-doc="doc">
-        <div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50/60 flex items-center justify-between gap-2.5">
-          <div class="min-w-0 flex-1">
-            <span class="text-[11px] text-slate-500 font-medium block truncate" [title]="title">{{ title }}</span>
-            @if (doc && doc.status === 'uploaded') {
-              <div class="flex items-center gap-1.5 mt-0.5">
-                <svg class="w-3.5 h-3.5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-xs font-semibold text-slate-800 truncate" [title]="doc.fileName">{{ doc.fileName }}</span>
-                <span class="text-[10px] text-slate-400 shrink-0">({{ doc.fileSize }})</span>
-              </div>
-            } @else {
-              <span class="text-xs text-slate-400 font-normal">Not Provided</span>
-            }
-          </div>
-
-          <div class="shrink-0">
-            @if (doc && doc.status === 'uploaded') {
-              <button
-                type="button"
-                (click)="previewDoc(doc, title)"
-                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-md transition-colors cursor-pointer shadow-2xs"
-                title="Preview {{ title }}"
-              >
-                <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                <span>View</span>
-              </button>
-            } @else {
-              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-400 border border-slate-200">
-                Not Uploaded
-              </span>
-            }
-          </div>
-        </div>
-      </ng-template>
-
-      <!-- Document Preview Modal Dialog -->
+      <!-- Document Preview Modal Dialog (if needed) -->
       <app-document-viewer-modal
         [isOpen]="isViewerOpen()"
         [doc]="activeDoc()"
@@ -368,9 +319,18 @@ export class Step5PreviewComponent {
   private otrFormService = inject(OtrFormService);
 
   readonly step1 = computed(() => this.otrFormService.step1());
-  readonly step2 = computed(() => this.otrFormService.step2()); // OIC list
-  readonly step3 = computed(() => this.otrFormService.step3()); // Authorized Person
+  readonly step3 = computed(() => this.otrFormService.step3()); // Authorized Person Details
   readonly step4 = computed(() => this.otrFormService.step4()); // Bank Details
+
+  isSection1Open = signal<boolean>(true);
+  isSection2Open = signal<boolean>(true);
+  isSection3Open = signal<boolean>(true);
+
+  toggleSection(section: number): void {
+    if (section === 1) this.isSection1Open.set(!this.isSection1Open());
+    if (section === 2) this.isSection2Open.set(!this.isSection2Open());
+    if (section === 3) this.isSection3Open.set(!this.isSection3Open());
+  }
 
   readonly registeredAddressDisplay = computed(() => {
     const s = this.step1();
@@ -386,7 +346,7 @@ export class Step5PreviewComponent {
   readonly officeAddressDisplay = computed(() => {
     const s = this.step1();
     if (s.sameAsRegistered) {
-      return 'Same as Registered Office Address';
+      return 'Same as registered address';
     }
     const parts: string[] = [];
     if (s.officeAddress?.trim()) parts.push(s.officeAddress.trim());

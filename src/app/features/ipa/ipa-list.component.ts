@@ -224,7 +224,7 @@ import {
               <!-- Preamble text -->
               <div class="text-justify leading-relaxed text-slate-800 space-y-2">
                 <p>
-                  With reference to your Expression of Interest (EOI) submitted under Application ID <strong>{{ ipa.appId || 'APP-004661' }}</strong> for the <strong>{{ ipa.schemeName }}</strong> scheme, the competent authority of RSLDC is pleased to accord <strong>In-Principle Approval (IPA)</strong> for the allocation of training targets as detailed below:
+                  With reference to your Expression of Interest (EOI) submitted under Application ID <strong>{{ ipa.appId || 'APP-2024-001' }}</strong> for the <strong>{{ ipa.schemeName }}</strong> scheme, the competent authority of RSLDC is pleased to accord <strong>In-Principle Approval (IPA)</strong> for the allocation of training targets as detailed below:
                 </p>
               </div>
 
@@ -246,7 +246,7 @@ import {
                   <tbody>
                     <tr class="border-b border-slate-200">
                       <td class="p-2 border-r border-slate-200 text-center font-bold">1</td>
-                      <td class="p-2 border-r border-slate-200 font-mono font-bold text-[#174A6E]">{{ ipa.appId || 'APP-004661' }}</td>
+                      <td class="p-2 border-r border-slate-200 font-mono font-bold text-[#174A6E]">{{ ipa.appId || 'APP-2024-001' }}</td>
                       <td class="p-2 border-r border-slate-200 font-medium">{{ ipa.agencyName || 'Apex Skill Development Foundation' }}</td>
                       <td class="p-2 border-r border-slate-200">{{ ipa.district || 'Alwar' }}</td>
                       <td class="p-2 border-r border-slate-200">{{ (ipa.sectors || ['Healthcare & Paramedical']).join(', ') }}</td>

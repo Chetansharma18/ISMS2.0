@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { EoiStateService, Scheme } from '../../services/eoi-state.service';
-import { PageHeaderComponent } from '../../../../shared';
+import { PageHeaderComponent, TableComponent, TableColumn } from '../../../../shared';
 
 export interface AcceptedCompanyRow {
   srNo: number;
@@ -18,7 +18,7 @@ export interface AcceptedCompanyRow {
 @Component({
   selector: 'app-sanction-order',
   standalone: true,
-  imports: [CommonModule, RouterModule, PageHeaderComponent],
+  imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent],
   template: `
     <div class="w-full min-h-full bg-white text-[#1F2933] font-sans pb-12">
       <div class="p-4 sm:p-5 max-w-7xl mx-auto space-y-4 font-sans">
@@ -56,85 +56,46 @@ export interface AcceptedCompanyRow {
           </div>
         }
 
-        <!-- Allocated Physical Targets Table (Non-Editable Format with Get IPA Action) -->
-        <div class="bg-white border border-slate-300 rounded-lg shadow-2xs overflow-hidden">
-          <div class="px-4 py-3 bg-[#EAF2F6] border-b border-slate-300 flex items-center justify-between">
-            <h3 class="font-bold text-[#174A6E] text-sm tracking-tight">
-              Allocated Physical Targets Table (Approved PIAs &amp; Agencies)
-            </h3>
-            <span class="text-xs text-slate-500 font-medium">ReadOnly Official Sanction Format</span>
-          </div>
+        <!-- Allocated Physical Targets Table (Using Reusable TableComponent) -->
+        <app-table
+          [columns]="companyColumns"
+          [data]="acceptedRows()"
+          [pagination]="true"
+          [pageSize]="10"
+          itemUnit="companies"
+          emptyMessage="No accepted companies / approved tenders found for this scheme."
+          [customTemplates]="{
+            category: categoryTemplate,
+            grade: gradeTemplate,
+            action: actionTemplate
+          }"
+        >
+        </app-table>
 
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse font-sans text-xs">
-              <thead>
-                <tr class="bg-slate-100 text-[#1F2933] border-b border-slate-300 font-semibold">
-                  <th class="p-3 text-center border-r border-slate-300 w-16">Sr. No</th>
-                  <th class="p-3 border-r border-slate-300 min-w-[130px]">Application ID</th>
-                  <th class="p-3 border-r border-slate-300 min-w-[220px]">Name Of the Agency/PIA</th>
-                  <th class="p-3 border-r border-slate-300 min-w-[140px]">Sanction District</th>
-                  <th class="p-3 border-r border-slate-300 min-w-[180px]">Sanction Sector(s)</th>
-                  <th class="p-3 border-r border-slate-300 text-center min-w-[130px]">Application Category</th>
-                  <th class="p-3 border-r border-slate-300 text-center w-20">Grade</th>
-                  <th class="p-3 border-r border-slate-300 text-center min-w-[120px]">Sanction Target</th>
-                  <th class="p-3 text-center min-w-[110px]">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (row of acceptedRows(); track row.appId; let i = $index) {
-                  <tr class="border-b border-slate-200 hover:bg-slate-50/80 transition-colors">
-                    <td class="p-3 text-center border-r border-slate-200 font-bold text-slate-700">
-                      {{ i + 1 }}
-                    </td>
-                    <td class="p-3 border-r border-slate-200 font-mono font-medium text-slate-900">
-                      {{ row.appId }}
-                    </td>
-                    <td class="p-3 border-r border-slate-200 font-bold text-slate-900 text-[13px]">
-                      {{ row.agencyName }}
-                    </td>
-                    <td class="p-3 border-r border-slate-200 text-slate-700 font-medium">
-                      {{ row.district }}
-                    </td>
-                    <td class="p-3 border-r border-slate-200 text-slate-700">
-                      {{ row.sector }}
-                    </td>
-                    <td class="p-3 border-r border-slate-200 text-center">
-                      <span class="inline-block px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200 font-medium text-[11px]">
-                        {{ row.category }}
-                      </span>
-                    </td>
-                    <td class="p-3 border-r border-slate-200 text-center">
-                      <span class="inline-block px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 font-bold border border-emerald-200 text-[11px]">
-                        {{ row.grade }}
-                      </span>
-                    </td>
-                    <td class="p-3 border-r border-slate-200 text-center font-bold text-slate-900 text-sm">
-                      {{ row.target }}
-                    </td>
-                    <td class="p-3 text-center">
-                      <button
-                        type="button"
-                        (click)="openIpaModal(row)"
-                        class="px-3 py-1 bg-[#174A6E] hover:bg-[#0E324D] text-white rounded text-xs font-medium transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1.5"
-                      >
-                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <span>Get IPA</span>
-                      </button>
-                    </td>
-                  </tr>
-                } @empty {
-                  <tr>
-                    <td colspan="9" class="p-8 text-center text-slate-500 font-normal">
-                      No accepted companies / approved tenders found for this scheme.
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <ng-template #categoryTemplate let-row>
+          <span class="inline-block px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200 font-medium text-[11px]">
+            {{ row.category }}
+          </span>
+        </ng-template>
+
+        <ng-template #gradeTemplate let-row>
+          <span class="inline-block px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 font-bold border border-emerald-200 text-[11px]">
+            {{ row.grade }}
+          </span>
+        </ng-template>
+
+        <ng-template #actionTemplate let-row>
+          <button
+            type="button"
+            (click)="openIpaModal(row)"
+            class="px-3 py-1 bg-[#174A6E] hover:bg-[#0E324D] text-white rounded text-xs font-medium transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1.5"
+          >
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>Get IPA</span>
+          </button>
+        </ng-template>
 
       </div>
     </div>
@@ -293,6 +254,18 @@ export class SanctionOrderComponent implements OnInit {
     'Textile & Handloom', 'Apparel, Agriculture', 'Healthcare & Paramedical', 'IT-ITeS & Multi-Skills'
   ];
 
+  readonly companyColumns: TableColumn<AcceptedCompanyRow>[] = [
+    { key: '$index', label: 'Sr. No', type: 'number', align: 'center', width: 'w-16' },
+    { key: 'appId', label: 'Application ID', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap font-mono font-medium text-slate-900 text-center' },
+    { key: 'agencyName', label: 'Name Of the Agency/PIA', width: 'min-w-[220px]', cellClass: 'whitespace-nowrap font-bold text-slate-900' },
+    { key: 'district', label: 'Sanction District', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap text-slate-700 font-medium text-center' },
+    { key: 'sector', label: 'Sanction Sector(s)', width: 'min-w-[180px]', cellClass: 'whitespace-nowrap text-slate-700' },
+    { key: 'category', label: 'Application Category', align: 'center', type: 'custom', width: 'w-36' },
+    { key: 'grade', label: 'Grade', align: 'center', type: 'custom', width: 'w-20' },
+    { key: 'target', label: 'Sanction Target', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-bold text-slate-900 text-center text-sm' },
+    { key: 'action', label: 'Action', align: 'center', type: 'custom', width: 'w-32' }
+  ];
+
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const sId = params['schemeId'] || 'MMKVY-01';
@@ -325,33 +298,43 @@ export class SanctionOrderComponent implements OnInit {
         this.acceptedRows.set([
           {
             srNo: 1,
-            appId: 'APP-004661',
-            agencyName: 'Company 1',
-            district: 'Alwar',
-            sector: 'Healthcare & Paramedical',
+            appId: 'APP-2024-001',
+            agencyName: 'Apex Skill Development Foundation',
+            district: 'Jaipur',
+            sector: 'Electronics & IT',
             category: 'A-1 (Skill)',
             grade: 'A',
-            target: 150
+            target: 300
           },
           {
             srNo: 2,
-            appId: 'APP-004662',
-            agencyName: 'Company 2',
+            appId: 'APP-2024-002',
+            agencyName: 'Shri Ram Educational Trust',
             district: 'Jodhpur',
-            sector: 'Textile & Handloom',
+            sector: 'Apparel & Automotive',
             category: 'A-1 (Skill)',
             grade: 'A',
-            target: 150
+            target: 240
           },
           {
             srNo: 3,
-            appId: 'APP-004664',
-            agencyName: 'Company 4',
-            district: 'Alwar',
-            sector: 'Healthcare',
+            appId: 'APP-2024-003',
+            agencyName: 'Maharana Skill Institute',
+            district: 'Udaipur',
+            sector: 'Tourism & Hospitality',
             category: 'A-1 (Skill)',
             grade: 'A',
-            target: 150
+            target: 300
+          },
+          {
+            srNo: 4,
+            appId: 'APP-2024-004',
+            agencyName: 'Marwar Skill Solutions Ltd',
+            district: 'Bikaner',
+            sector: 'Beauty & Wellness',
+            category: 'A-1 (Skill)',
+            grade: 'A',
+            target: 480
           }
         ]);
       } else {

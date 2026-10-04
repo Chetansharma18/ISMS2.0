@@ -172,30 +172,40 @@ import {
                 <thead class="bg-slate-100 border-b border-slate-300 text-slate-700 font-bold">
                   <tr>
                     <th class="p-2 border-r border-slate-300 text-center">Sr. No</th>
+                    <th class="p-2 border-r border-slate-300">Application ID</th>
+                    <th class="p-2 border-r border-slate-300">Name of PIA</th>
                     <th class="p-2 border-r border-slate-300">IPA Number</th>
-                    <th class="p-2 border-r border-slate-300">Scheme Name</th>
+                    <th class="p-2 border-r border-slate-300">District</th>
+                    <th class="p-2 border-r border-slate-300">Sector(s)</th>
                     <th class="p-2 border-r border-slate-300 text-center">Category</th>
-                    <th class="p-2 border-r border-slate-300 text-center">Sanction Status</th>
-                    <th class="p-2 text-center">Validity</th>
+                    <th class="p-2 border-r border-slate-300 text-center">Grade</th>
+                    <th class="p-2 border-r border-slate-300 text-center">Sanction Target</th>
+                    <th class="p-2 text-center">Sanction Status</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200">
                   <tr class="hover:bg-slate-50">
                     <td class="p-2 border-r border-slate-300 text-center font-bold">1</td>
+                    <td class="p-2 border-r border-slate-300 font-mono font-bold text-[#174A6E]">{{ selectedOrder()?.appId || 'APP-2024-001' }}</td>
+                    <td class="p-2 border-r border-slate-300 font-medium">{{ selectedOrder()?.agencyName || 'Apex Skill Development Foundation' }}</td>
                     <td class="p-2 border-r border-slate-300 font-mono font-semibold text-slate-800">{{ selectedOrder()?.ipaNumber }}</td>
-                    <td class="p-2 border-r border-slate-300 font-bold text-[#0B3558]">{{ selectedOrder()?.schemeName || selectedOrder()?.scheme }}</td>
+                    <td class="p-2 border-r border-slate-300">{{ selectedOrder()?.district || 'Jaipur' }}</td>
+                    <td class="p-2 border-r border-slate-300">{{ (selectedOrder()?.sectors || ['Electronics', 'IT']).join(', ') }}</td>
                     <td class="p-2 border-r border-slate-300 text-center">
                       <span class="px-2 py-0.5 rounded bg-blue-50 text-[#0B3558] border border-blue-200 font-bold text-[11px]">
                         {{ selectedOrder()?.category }}
                       </span>
                     </td>
-                    <td class="p-2 border-r border-slate-300 text-center">
+                    <td class="p-2 border-r border-slate-300 text-center font-bold text-emerald-700">
+                      {{ selectedOrder()?.grade || 'A' }}
+                    </td>
+                    <td class="p-2 border-r border-slate-300 text-center font-bold text-[#0B3558]">
+                      {{ selectedOrder()?.sanctionTarget || 300 }}
+                    </td>
+                    <td class="p-2 text-center">
                       <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[11px]">
                         Approved &amp; Issued
                       </span>
-                    </td>
-                    <td class="p-2 text-center font-mono text-slate-700">
-                      {{ selectedOrder()?.mouExpiryDate || '3 Years' }}
                     </td>
                   </tr>
                 </tbody>

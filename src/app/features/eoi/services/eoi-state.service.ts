@@ -244,23 +244,23 @@ export class EoiStateService {
   // Initial 4 Applicant Responses matching Screenshot 2
   private initialResponses: ApplicantResponse[] = [
     {
-      id: 'APP-004661',
+      id: 'APP-2024-001',
       anonymousLabel: 'Company 1',
-      actualLegalName: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
+      actualLegalName: 'Apex Skill Development Foundation',
       regNumber: 'ISMS-REG-2026-8819',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
       eoiRefNo: 'RSLDC/EOI/2026/MMKVY-01',
       submissionDate: '08/09/2026 14:30 PM',
-      status: 'UNDER_SCRUTINY',
-      statusDisplay: 'Pending Review',
+      status: 'APPROVED',
+      statusDisplay: 'Accepted',
       emdFee: 50000,
       emdStatus: 'PAID',
       processingFee: 2000,
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
+        legalName: 'Apex Skill Development Foundation',
         tradeName: 'Apex Tech Skills',
         entityType: 'Company registered under Companies Act, 2013',
         registrationNumber: 'U74999DL2018PTC334512',
@@ -269,17 +269,17 @@ export class EoiStateService {
         panNumber: 'AAECD8566H',
         gstin: '07AAECD8566H1ZC',
         turnover: '₹12,03,35,010',
-        registeredAddress: 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi, 110042',
+        registeredAddress: 'Plot No. 44, Institutional Area, Jhalana Doongri, Jaipur, Rajasthan 302004',
         operationalAddress: 'Plot No. 44, Institutional Area, Jhalana Doongri, Jaipur, Rajasthan 302004',
-        website: 'apextechskills.org',
-        email: 'info@apextechskills.org',
+        website: 'apexskills.org',
+        email: 'info@apexskills.org',
         contactNumber: '0141-2705600'
       },
 
       authorizedSignatory: {
         name: 'SUMAN GUPTA',
         designation: 'Director',
-        email: 'compliance@nsmark.in',
+        email: 'compliance@apexskills.org',
         contactNumber: '9968009648',
         residenceAddress: '45-B, Civil Lines, Jaipur',
         state: 'Rajasthan',
@@ -296,7 +296,7 @@ export class EoiStateService {
       bankDetails: {
         bankName: 'State Bank of India',
         branchName: 'Specialized Commercial Branch, Jaipur',
-        accountHolderName: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
+        accountHolderName: 'Apex Skill Development Foundation',
         accountNumber: '38920194821',
         ifscCode: 'SBIN0004128',
         accountType: 'Current Account'
@@ -371,13 +371,32 @@ export class EoiStateService {
         { id: 'doc-5', title: 'Board Resolution / Power of Attorney', fileSize: '2.1 MB PDF', category: 'Legal', verified: true },
         { id: 'doc-6', title: 'NSDC Partner Certificate', fileSize: '1.9 MB PDF', category: 'Affiliation', verified: true },
         { id: 'doc-7', title: 'Additional Supporting Document', fileSize: '4.5 MB PDF', category: 'Annexures', verified: true }
-      ]
+      ],
+
+      scrutinyDetails: {
+        technicalScore: 92,
+        grade: 'Grade A',
+        remarks: 'All statutory parameters, training infrastructure, and past audited placement thresholds meet Category I empanelment guidelines.',
+        scrutinyOfficer: 'Shri R. K. Sharma (Joint Director, RSLDC)',
+        decisionTimestamp: '10/09/2026 16:40 PM',
+        approvalDocument: {
+          id: 'RES-MMKVY-2026-088',
+          documentName: 'Committee_Empanelment_Resolution_088.pdf',
+          uploadDate: '10/09/2026',
+          fileSize: '3.4 MB',
+          signatories: [
+            { name: 'Dr. Alok Verma, IAS', designation: 'Managing Director, RSLDC', signedAt: '10/09/2026 15:30', verified: true },
+            { name: 'Shri R. K. Sharma', designation: 'Joint Director (Scrutiny In-charge)', signedAt: '10/09/2026 15:45', verified: true },
+            { name: 'Smt. Neeta Mathur', designation: 'Senior Accounts Officer (Finance)', signedAt: '10/09/2026 16:00', verified: true }
+          ]
+        }
+      }
     },
 
     {
-      id: 'APP-004662',
+      id: 'APP-2024-002',
       anonymousLabel: 'Company 2',
-      actualLegalName: 'Marwar Skill Foundation',
+      actualLegalName: 'Shri Ram Educational Trust',
       regNumber: 'ISMS-REG-2026-3391',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
@@ -391,8 +410,8 @@ export class EoiStateService {
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'Marwar Skill Foundation',
-        tradeName: 'MSF Vocational Hub',
+        legalName: 'Shri Ram Educational Trust',
+        tradeName: 'Shri Ram Vocational Academy',
         entityType: 'Registered Society under Rajasthan Societies Act',
         registrationNumber: 'RS-JOD-2016-891',
         dateOfRegistration: '11/08/2016',
@@ -402,15 +421,15 @@ export class EoiStateService {
         turnover: '₹8,45,00,000',
         registeredAddress: '12, Heavy Industrial Area, Jodhpur, Rajasthan 342003',
         operationalAddress: '12, Heavy Industrial Area, Jodhpur, Rajasthan 342003',
-        website: 'marwarskills.org',
-        email: 'director@marwarskills.org',
+        website: 'shriramtrust.org',
+        email: 'director@shriramtrust.org',
         contactNumber: '0291-2741000'
       },
 
       authorizedSignatory: {
         name: 'RAJENDRA SINGH RATHORE',
         designation: 'Managing Trustee',
-        email: 'trustee@marwarskills.org',
+        email: 'trustee@shriramtrust.org',
         contactNumber: '9414123456',
         residenceAddress: 'Plot 18, Paota C Road, Jodhpur, Rajasthan',
         state: 'Rajasthan',
@@ -427,7 +446,7 @@ export class EoiStateService {
       bankDetails: {
         bankName: 'Punjab National Bank',
         branchName: 'Heavy Industrial Area Branch, Jodhpur',
-        accountHolderName: 'Marwar Skill Foundation',
+        accountHolderName: 'Shri Ram Educational Trust',
         accountNumber: '1129002100045812',
         ifscCode: 'PUNB0112900',
         accountType: 'Current Account'
@@ -436,7 +455,7 @@ export class EoiStateService {
       trainingCentres: [
         {
           district: 'Jodhpur',
-          centreName: 'Marwar Heritage Skill Centre',
+          centreName: 'Shri Ram Skill Hub',
           classrooms: 4,
           practicalRooms: 3,
           separateWashrooms: true,
@@ -503,42 +522,42 @@ export class EoiStateService {
     },
 
     {
-      id: 'APP-004663',
+      id: 'APP-2024-003',
       anonymousLabel: 'Company 3',
-      actualLegalName: 'Singhania Vocational Institute',
+      actualLegalName: 'Maharana Skill Institute',
       regNumber: 'ISMS-REG-2026-1104',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
       eoiRefNo: 'RSLDC/EOI/2026/MMKVY-01',
       submissionDate: '05/09/2026 16:45 PM',
-      status: 'REJECTED',
-      statusDisplay: 'Rejected',
+      status: 'APPROVED',
+      statusDisplay: 'Accepted',
       emdFee: 50000,
-      emdStatus: 'REFUNDED',
+      emdStatus: 'PAID',
       processingFee: 2000,
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'Singhania Vocational Institute',
-        tradeName: 'Singhania Skills',
+        legalName: 'Maharana Skill Institute',
+        tradeName: 'Maharana Skills Hub',
         entityType: 'Trust registered under Indian Trusts Act',
         registrationNumber: 'TR-UDR-2019-440',
         dateOfRegistration: '22/05/2019',
         stateOfRegistration: 'RAJASTHAN',
         panNumber: 'AACTS3344M',
         gstin: '08AACTS3344M1Z2',
-        turnover: '₹1,20,00,000',
+        turnover: '₹5,20,00,000',
         registeredAddress: 'Plot 7, Chetak Circle, Udaipur, Rajasthan 313001',
         operationalAddress: 'Plot 7, Chetak Circle, Udaipur, Rajasthan 313001',
-        website: 'singhaniaskills.edu.in',
-        email: 'admin@singhaniaskills.edu.in',
+        website: 'maharanaskill.org',
+        email: 'admin@maharanaskill.org',
         contactNumber: '0294-2567890'
       },
 
       authorizedSignatory: {
         name: 'MANISH SINGHANIA',
         designation: 'Chief Trustee',
-        email: 'manish@singhaniaskills.edu.in',
+        email: 'manish@maharanaskill.org',
         contactNumber: '9829012345',
         residenceAddress: '15, Madhuban, Udaipur, Rajasthan',
         state: 'Rajasthan',
@@ -555,7 +574,7 @@ export class EoiStateService {
       bankDetails: {
         bankName: 'HDFC Bank',
         branchName: 'Chetak Circle Branch, Udaipur',
-        accountHolderName: 'Singhania Vocational & Technical Trust',
+        accountHolderName: 'Maharana Skill Institute',
         accountNumber: '50200034891240',
         ifscCode: 'HDFC0000281',
         accountType: 'Current Account'
@@ -564,28 +583,28 @@ export class EoiStateService {
       trainingCentres: [
         {
           district: 'Udaipur',
-          centreName: 'Singhania Tech Hub',
-          classrooms: 1,
-          practicalRooms: 1,
-          separateWashrooms: false,
-          labInfrastructure: false,
+          centreName: 'Maharana Tech Hub',
+          classrooms: 3,
+          practicalRooms: 2,
+          separateWashrooms: true,
+          labInfrastructure: true,
           telephone: '0294-2567891',
           fullAddress: 'Chetak Circle, Udaipur'
         }
       ],
 
       financialYears: [
-        { year: '2021 - 2022', totalTurnover: '80,00,000', skillTurnover: '60,00,000' },
-        { year: '2022 - 2023', totalTurnover: '95,00,000', skillTurnover: '75,00,000' },
-        { year: '2023 - 2024', totalTurnover: '1,20,00,000', skillTurnover: '90,00,000' }
+        { year: '2021 - 2022', totalTurnover: '3,80,00,000', skillTurnover: '3,60,00,000' },
+        { year: '2022 - 2023', totalTurnover: '4,95,00,000', skillTurnover: '4,75,00,000' },
+        { year: '2023 - 2024', totalTurnover: '5,20,00,000', skillTurnover: '5,00,00,000' }
       ],
 
       placementTrackRecord: [
-        { sector: 'Data Entry & Retail', year: '2023 - 2024', trained: 120, placed: 42, proofDetails: 'Incomplete placement documentation' }
+        { sector: 'Tourism & Hospitality', year: '2023 - 2024', trained: 320, placed: 270, proofDetails: '270 verified employment letters' }
       ],
 
       annualActionPlan: [
-        { district: 'Udaipur', proposedSDCs: 1, location: 'UDAIPUR CITY', sectors: 'IT-ITeS', courses: 'Data Entry Operator', residential: 'Non-Residential', batches: 4 }
+        { district: 'Udaipur', proposedSDCs: 2, location: 'UDAIPUR CITY', sectors: 'Tourism & Hospitality', courses: 'Front Office Executive, F&B Service', residential: 'Non-Residential', batches: 6 }
       ],
 
       uploadedDocuments: [
@@ -599,19 +618,18 @@ export class EoiStateService {
       ],
 
       scrutinyDetails: {
-        technicalScore: 38,
-        grade: 'Grade E',
-        disqualificationReason: 'Deficiency in Audited Turnover (< ₹10 Cr)',
-        remarks: 'Entity fails to satisfy mandatory financial turnover criteria (minimum ₹10 Crore required under MMKVY Cat I). Centre lacks dedicated practical lab and separate washroom infrastructure.',
+        technicalScore: 84,
+        grade: 'Grade A',
+        remarks: 'Documentation verified successfully. Excellent infrastructure and past placement record.',
         scrutinyOfficer: 'Shri R. K. Sharma (Joint Director, RSLDC)',
         decisionTimestamp: '09/09/2026 11:20 AM'
       }
     },
 
     {
-      id: 'APP-004664',
+      id: 'APP-2024-004',
       anonymousLabel: 'Company 4',
-      actualLegalName: 'DMR Enterprises Private Limited',
+      actualLegalName: 'Marwar Skill Solutions Ltd',
       regNumber: 'ISMS-REG-2026-9871',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
@@ -625,7 +643,7 @@ export class EoiStateService {
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'DMR Enterprises Private Limited',
+        legalName: 'Marwar Skill Solutions Ltd',
         tradeName: 'DMR SAKSHAM',
         entityType: 'Company registered under Companies Act, 1956',
         registrationNumber: '07AAECD8566H1ZC',
@@ -775,19 +793,22 @@ export class EoiStateService {
         const savedResponses = localStorage.getItem('isms_dept_admin_responses');
         if (savedResponses) {
           const parsed: ApplicantResponse[] = JSON.parse(savedResponses);
-          const merged = this.initialResponses.map(init => {
-            const match = parsed.find(p => p.id === init.id);
-            if (!match) return init;
-            return {
-              ...init,
-              ...match,
-              annualActionPlan: (match.annualActionPlan && match.annualActionPlan.length > 0) ? match.annualActionPlan : init.annualActionPlan,
-              bankDetails: match.bankDetails || init.bankDetails,
-              organisation: { ...init.organisation, ...match.organisation },
-              authorizedSignatory: { ...init.authorizedSignatory, ...match.authorizedSignatory }
-            };
-          });
-          this.responsesSubject.next(merged);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const merged = this.initialResponses.map(init => {
+              const match = parsed.find(p => p.id === init.id || p.regNumber === init.regNumber || (p.id === 'APP-004661' && init.id === 'APP-2024-001'));
+              if (!match) return init;
+              return {
+                ...init,
+                ...match,
+                annualActionPlan: (match.annualActionPlan && match.annualActionPlan.length > 0) ? match.annualActionPlan : init.annualActionPlan,
+                bankDetails: match.bankDetails || init.bankDetails,
+                organisation: { ...init.organisation, ...match.organisation },
+                authorizedSignatory: { ...init.authorizedSignatory, ...match.authorizedSignatory }
+              };
+            });
+            this.responsesSubject.next(merged);
+            return;
+          }
         }
       } catch (e) {
         console.error('Error loading stored responses', e);
@@ -795,7 +816,7 @@ export class EoiStateService {
     }
     // Default fallback: ensure Company 1 is UNDER_SCRUTINY
     const defaultList = this.initialResponses.map(resp => {
-      const isCompany1 = resp.anonymousLabel === 'Company 1' || resp.id === 'APP-004661' || resp.id === 'APP-005001';
+      const isCompany1 = resp.anonymousLabel === 'Company 1' || resp.id === 'APP-2024-001' || resp.id === 'APP-004661' || resp.id === 'APP-005001';
       if (isCompany1) {
         return {
           ...resp,
@@ -841,7 +862,18 @@ export class EoiStateService {
 
   getResponseById(applicationId: string): Observable<ApplicantResponse | undefined> {
     return this.responses$.pipe(
-      map(responses => responses.find(r => r.id === applicationId || r.regNumber === applicationId))
+      map(responses => responses.find(r => 
+        r.id === applicationId || 
+        r.regNumber === applicationId ||
+        (applicationId === 'APP-004661' && (r.id === 'APP-2024-001' || r.anonymousLabel === 'Company 1')) ||
+        (applicationId === 'APP-004662' && (r.id === 'APP-2024-002' || r.anonymousLabel === 'Company 2')) ||
+        (applicationId === 'APP-004663' && (r.id === 'APP-2024-003' || r.anonymousLabel === 'Company 3')) ||
+        (applicationId === 'APP-004664' && (r.id === 'APP-2024-004' || r.anonymousLabel === 'Company 4')) ||
+        (applicationId === 'APP-2024-001' && (r.id === 'APP-004661' || r.anonymousLabel === 'Company 1')) ||
+        (applicationId === 'APP-2024-002' && (r.id === 'APP-004662' || r.anonymousLabel === 'Company 2')) ||
+        (applicationId === 'APP-2024-003' && (r.id === 'APP-004663' || r.anonymousLabel === 'Company 3')) ||
+        (applicationId === 'APP-2024-004' && (r.id === 'APP-004664' || r.anonymousLabel === 'Company 4'))
+      ))
     );
   }
 
@@ -865,7 +897,15 @@ export class EoiStateService {
     }
   ): boolean {
     const currentList = this.responsesSubject.getValue();
-    const targetIndex = currentList.findIndex(r => r.id === applicationId || r.regNumber === applicationId);
+    const targetIndex = currentList.findIndex(r => 
+      r.id === applicationId || 
+      r.regNumber === applicationId ||
+      (applicationId === 'APP-004661' && r.id === 'APP-2024-001') ||
+      (applicationId === 'APP-004662' && r.id === 'APP-2024-002') ||
+      (applicationId === 'APP-004663' && r.id === 'APP-2024-003') ||
+      (applicationId === 'APP-004664' && r.id === 'APP-2024-004') ||
+      (applicationId === 'APP-2024-001' && r.id === 'APP-004661')
+    );
 
     if (targetIndex === -1) {
       return false;

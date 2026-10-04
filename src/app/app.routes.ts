@@ -350,21 +350,25 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'ipa',
+    loadComponent: () =>
+      import('./features/ipa/ipa-list.component').then(
+        (m) => m.IpaListComponent
+      )
+  },
+  {
+    path: 'tp/ipa',
+    loadComponent: () =>
+      import('./features/ipa/ipa-list.component').then(
+        (m) => m.IpaListComponent
+      )
+  },
+  {
     path: 'tp/sanction-orders',
     loadComponent: () =>
       import('./features/sdc/components/sanction-orders.component').then(
         (m) => m.SanctionOrdersComponent
       )
-  },
-  {
-    path: 'tp/ipa',
-    redirectTo: 'tp/sanction-orders',
-    pathMatch: 'full'
-  },
-  {
-    path: 'ipa',
-    redirectTo: 'tp/sanction-orders',
-    pathMatch: 'full'
   },
   {
     path: 'sanction-orders',

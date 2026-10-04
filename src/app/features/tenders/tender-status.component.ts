@@ -17,8 +17,8 @@ export interface SubmittedTender {
   emdAmount: string;
   processingFee: string;
   transactionRef: string;
-  submittedStatus: 'Under Review' | 'Reviewed';
-  eoiStatus: string;
+  submittedStatus: 'Submitted' | 'Under Review' | 'Accepted' | 'Rejected';
+  eoiStatus: '-' | 'Under Review' | 'Reviewed' | string;
   receiptPdfUrl?: string;
   scrutinyRemarks?: string;
 }
@@ -76,6 +76,7 @@ export interface SubmittedTender {
             appRef: appRefTemplate,
             schemeTitle: schemeTitleTemplate,
             department: deptTemplate,
+            eoiStatus: eoiStatusTemplate,
             view: viewTemplate
           }"
         >
@@ -107,6 +108,17 @@ export interface SubmittedTender {
 
         <ng-template #deptTemplate let-tender>
           <span class="line-clamp-2 text-slate-600 text-[11px] leading-relaxed">{{ tender.department }}</span>
+        </ng-template>
+
+        <!-- Custom EOI Stage Template -->
+        <ng-template #eoiStatusTemplate let-tender>
+          @if (tender.eoiStatus === 'Reviewed') {
+            <span class="text-slate-800 font-medium text-[12.5px]">{{ tender.eoiStatus }}</span>
+          } @else if (tender.eoiStatus === 'Under Review') {
+            <span class="text-amber-800 font-medium text-[12.5px]">{{ tender.eoiStatus }}</span>
+          } @else {
+            <span class="text-slate-500 font-normal text-[12.5px]">-</span>
+          }
         </ng-template>
 
         <ng-template #viewTemplate let-tender>
@@ -146,18 +158,22 @@ export class TenderStatusComponent {
       align: 'center',
       type: 'status',
       badgeVariantMap: {
+        'Submitted': 'info',
         'Under Review': 'warning',
-        'Reviewed': 'success'
+        'Accepted': 'success',
+        'Rejected': 'danger'
       }
     },
-    { key: 'eoiStatus', label: 'EOI Stage', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: 'eoiStatus', label: 'EOI Stage', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'view', label: 'View', align: 'center', width: 'w-20', type: 'custom' }
   ];
 
   /**
-   * Sample submitted applications:
-   * - Under Review => EOI Stage is '-'
-   * - Reviewed (Accepted / Evaluated) => Respective EOI Stage
+   * Sample submitted applications mapped strictly to:
+   * Submitted    -> '-'
+   * Under Review -> 'Under Review'
+   * Accepted     -> 'Reviewed'
+   * Rejected     -> 'Reviewed'
    */
   readonly tenders: SubmittedTender[] = [
     {
@@ -169,7 +185,7 @@ export class TenderStatusComponent {
       emdAmount: '₹50,000',
       processingFee: '₹2,000',
       transactionRef: 'TXN-ISMS-884920482',
-      submittedStatus: 'Under Review',
+      submittedStatus: 'Submitted',
       eoiStatus: '-'
     },
     {
@@ -181,8 +197,8 @@ export class TenderStatusComponent {
       emdAmount: '₹50,000',
       processingFee: '₹2,000',
       transactionRef: 'TXN-ACC-994182914',
-      submittedStatus: 'Reviewed',
-      eoiStatus: 'AOC'
+      submittedStatus: 'Accepted',
+      eoiStatus: 'Reviewed'
     },
     {
       id: 't-3',
@@ -194,7 +210,7 @@ export class TenderStatusComponent {
       processingFee: '₹2,000',
       transactionRef: 'TXN-UPI-771520031',
       submittedStatus: 'Under Review',
-      eoiStatus: '-'
+      eoiStatus: 'Under Review'
     },
     {
       id: 't-4',
@@ -205,8 +221,8 @@ export class TenderStatusComponent {
       emdAmount: '₹25,000',
       processingFee: '₹2,000',
       transactionRef: 'TXN-ISMS-330102749',
-      submittedStatus: 'Reviewed',
-      eoiStatus: 'AOC'
+      submittedStatus: 'Rejected',
+      eoiStatus: 'Reviewed'
     },
     {
       id: 't-5',
@@ -217,7 +233,7 @@ export class TenderStatusComponent {
       emdAmount: '₹40,000',
       processingFee: '₹2,000',
       transactionRef: 'TXN-NET-661520410',
-      submittedStatus: 'Under Review',
+      submittedStatus: 'Submitted',
       eoiStatus: '-'
     },
     {
@@ -229,8 +245,8 @@ export class TenderStatusComponent {
       emdAmount: '₹50,000',
       processingFee: '₹2,000',
       transactionRef: 'TXN-UPI-992144510',
-      submittedStatus: 'Reviewed',
-      eoiStatus: 'Technical Evaluation'
+      submittedStatus: 'Accepted',
+      eoiStatus: 'Reviewed'
     },
     {
       id: 't-7',
@@ -242,7 +258,7 @@ export class TenderStatusComponent {
       processingFee: '₹2,000',
       transactionRef: 'TXN-NET-441029381',
       submittedStatus: 'Under Review',
-      eoiStatus: '-'
+      eoiStatus: 'Under Review'
     },
     {
       id: 't-8',
@@ -253,8 +269,8 @@ export class TenderStatusComponent {
       emdAmount: '₹20,000',
       processingFee: '₹2,000',
       transactionRef: 'TXN-ISMS-110293847',
-      submittedStatus: 'Reviewed',
-      eoiStatus: 'AOC'
+      submittedStatus: 'Accepted',
+      eoiStatus: 'Reviewed'
     }
   ];
 

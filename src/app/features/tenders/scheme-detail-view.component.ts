@@ -39,8 +39,8 @@ import { SchemeTender, EoiDocumentItem } from './tenders-page.component';
             <span>Download Scheme Details</span>
           </button>
 
-          <!-- Apply for this Scheme Button (hidden when scheme is closed) -->
-          @if (!isClosed) {
+          <!-- Apply for this Scheme Button (hidden when scheme is closed or hideApplyButton is true) -->
+          @if (!isClosed && !hideApplyButton) {
             <button
               type="button"
               (click)="onApply()"
@@ -51,7 +51,7 @@ import { SchemeTender, EoiDocumentItem } from './tenders-page.component';
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </button>
-          } @else {
+          } @else if (isClosed && !hideApplyButton) {
             <!-- Closed badge shown when scheme is not accepting applications -->
             <span class="inline-flex items-center gap-1.5 px-4 py-1.5 h-8.5 rounded-md bg-rose-50 border border-rose-300 text-rose-700 text-xs font-semibold select-none">
               <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -133,7 +133,7 @@ import { SchemeTender, EoiDocumentItem } from './tenders-page.component';
           Section A: Request for Proposal (RFP) &amp; SOP Documents
         </h3>
         <div class="space-y-2">
-          @for (doc of rfpDocs; track doc.sNo) {
+          @for (doc of activeRfpDocs; track $index) {
             <div class="flex items-center justify-between py-2.5 border-b border-slate-100 last:border-0">
               <div class="flex items-center gap-2.5 min-w-0">
                 <!-- PDF icon -->
@@ -237,10 +237,18 @@ export class SchemeDetailViewComponent {
   @Input() rfpDocs: EoiDocumentItem[] = [];
   @Input() annexures: EoiDocumentItem[] = [];
   @Input() requiredInfo: Array<{ sNo: number; name: string; note?: string }> = [];
+  @Input() hideApplyButton = false;
 
   @Output() back = new EventEmitter<void>();
   @Output() apply = new EventEmitter<SchemeTender>();
   @Output() download = new EventEmitter<string>();
+
+  get activeRfpDocs(): EoiDocumentItem[] {
+    if (this.scheme?.attachedDocs && this.scheme.attachedDocs.length > 0) {
+      return this.scheme.attachedDocs;
+    }
+    return this.rfpDocs;
+  }
 
   get isClosed(): boolean {
     if (!this.scheme) return false;

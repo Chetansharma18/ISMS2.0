@@ -653,3 +653,115 @@ textarea:disabled {
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 #f1f5f9;
 }
+
+/* ---------------------------------------------------------
+   17. GLOBAL PRINT STYLESHEET (@media print)
+   Ensures ONLY the document page content is printed cleanly
+   (hides outer app header, sidebar, footer, buttons, action bars,
+   and handles detached top-level print sheets for Safari/Chrome modals).
+   --------------------------------------------------------- */
+#ipa-print-section {
+  display: none;
+}
+
+@media print {
+  /* 1. When a top-level print section exists, hide app-root completely */
+  body.has-print-section app-root,
+  body:has(#ipa-print-section) app-root {
+    display: none !important;
+  }
+
+  /* 2. Display ONLY the top-level print section in full page flow */
+  body.has-print-section #ipa-print-section,
+  body:has(#ipa-print-section) #ipa-print-section {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* 3. Hide external app shell and non-printable controls */
+  app-header,
+  app-sidebar,
+  app-footer,
+  app-page-header,
+  .print\:hidden,
+  button,
+  .no-print,
+  input[type="file"] {
+    display: none !important;
+  }
+
+  /* 4. Reset html/body/root containers for clean page flow */
+  html,
+  body,
+  app-root,
+  div,
+  main,
+  section {
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+  }
+
+  /* 5. Standard A4 Page Print Margins */
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm 10mm 12mm;
+  }
+
+  /* 6. Strip borders, outlines, backgrounds, and dropdown chevrons from all inputs */
+  input,
+  textarea,
+  select {
+    border: none !important;
+    border-bottom: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    background-image: none !important; /* Removes dropdown chevron SVG arrows */
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    color: #000000 !important;
+    resize: none !important;
+    font-family: inherit !important;
+  }
+
+  /* Remove number input spin buttons in print */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield !important;
+  }
+
+  /* 7. Clean Table Print Layout */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  th, td {
+    border: 1px solid #000000 !important;
+    color: #000000 !important;
+  }
+}

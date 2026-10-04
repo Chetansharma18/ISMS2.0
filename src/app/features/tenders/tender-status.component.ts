@@ -126,12 +126,9 @@ export interface SubmittedTender {
         <!-- Custom Rejection Reason Template (Shown only when Rejected) -->
         <ng-template #rejectionReasonTemplate let-tender>
           @if (tender.submittedStatus === 'Rejected') {
-            <div class="inline-flex items-start gap-1.5 p-1.5 rounded bg-rose-50 text-rose-800 border border-rose-200 text-[11.5px] leading-tight max-w-xs">
-              <svg class="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-              <span class="font-normal">{{ tender.rejectionReason || 'Technical qualification criteria not met.' }}</span>
-            </div>
+            <span class="text-red-600 text-xs leading-relaxed font-normal block max-w-sm text-left">
+              {{ tender.rejectionReason || 'Technical qualification criteria not met.' }}
+            </span>
           } @else {
             <span class="text-slate-400 font-normal text-center block">-</span>
           }

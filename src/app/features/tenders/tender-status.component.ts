@@ -19,6 +19,7 @@ export interface SubmittedTender {
   transactionRef: string;
   submittedStatus: 'Submitted' | 'Under Review' | 'Accepted' | 'Rejected';
   eoiStatus: '-' | 'Under Review' | 'Reviewed' | string;
+  rejectionReason?: string;
   receiptPdfUrl?: string;
   scrutinyRemarks?: string;
 }
@@ -77,6 +78,7 @@ export interface SubmittedTender {
             schemeTitle: schemeTitleTemplate,
             department: deptTemplate,
             eoiStatus: eoiStatusTemplate,
+            rejectionReason: rejectionReasonTemplate,
             view: viewTemplate
           }"
         >
@@ -121,6 +123,20 @@ export interface SubmittedTender {
           }
         </ng-template>
 
+        <!-- Custom Rejection Reason Template (Shown only when Rejected) -->
+        <ng-template #rejectionReasonTemplate let-tender>
+          @if (tender.submittedStatus === 'Rejected') {
+            <div class="inline-flex items-start gap-1.5 p-1.5 rounded bg-rose-50 text-rose-800 border border-rose-200 text-[11.5px] leading-tight max-w-xs">
+              <svg class="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span class="font-normal">{{ tender.rejectionReason || 'Technical qualification criteria not met.' }}</span>
+            </div>
+          } @else {
+            <span class="text-slate-400 font-normal text-center block">-</span>
+          }
+        </ng-template>
+
         <ng-template #viewTemplate let-tender>
           <button
             type="button"
@@ -147,11 +163,11 @@ export class TenderStatusComponent {
   selectedReceiptTender = signal<SubmittedTender | null>(null);
 
   readonly tenderColumns: TableColumn<SubmittedTender>[] = [
-    { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
-    { key: 'appRef', label: 'Application Ref. No.', cellClass: 'whitespace-nowrap font-normal text-slate-800', type: 'custom' },
-    { key: 'schemeTitle', label: 'Scheme Name', cellClass: 'whitespace-nowrap font-medium text-slate-800', type: 'custom' },
-    { key: 'department', label: 'Department', width: 'min-w-[200px] max-w-sm', type: 'custom' },
-    { key: 'appliedDate', label: 'Applied Date', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: '$index',           label: 'S. No.',               type: 'number', align: 'center', width: 'w-12' },
+    { key: 'appRef',           label: 'Application Ref. No.', cellClass: 'whitespace-nowrap font-normal text-slate-800', type: 'custom' },
+    { key: 'schemeTitle',      label: 'Scheme Name',          cellClass: 'whitespace-nowrap font-medium text-slate-800', type: 'custom' },
+    { key: 'department',       label: 'Department',           width: 'min-w-[180px] max-w-sm', type: 'custom' },
+    { key: 'appliedDate',      label: 'Applied Date',         align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     {
       key: 'submittedStatus',
       label: 'Submitted Status',
@@ -164,8 +180,9 @@ export class TenderStatusComponent {
         'Rejected': 'danger'
       }
     },
-    { key: 'eoiStatus', label: 'EOI Stage', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
-    { key: 'view', label: 'View', align: 'center', width: 'w-20', type: 'custom' }
+    { key: 'eoiStatus',        label: 'EOI Stage',            align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: 'rejectionReason',  label: 'Reason for Rejection', align: 'center', type: 'custom', cellClass: 'min-w-[200px]' },
+    { key: 'view',             label: 'View',                 align: 'center', width: 'w-20', type: 'custom' }
   ];
 
   /**
@@ -173,7 +190,7 @@ export class TenderStatusComponent {
    * Submitted    -> '-'
    * Under Review -> 'Under Review'
    * Accepted     -> 'Reviewed'
-   * Rejected     -> 'Reviewed'
+   * Rejected     -> 'Reviewed' (with Reason for Rejection)
    */
   readonly tenders: SubmittedTender[] = [
     {
@@ -222,7 +239,8 @@ export class TenderStatusComponent {
       processingFee: '₹2,000',
       transactionRef: 'TXN-ISMS-330102749',
       submittedStatus: 'Rejected',
-      eoiStatus: 'Reviewed'
+      eoiStatus: 'Reviewed',
+      rejectionReason: 'Annual turnover criteria not met for last 3 financial years (CA certificate missing valid UDIN).'
     },
     {
       id: 't-5',
@@ -284,6 +302,7 @@ export class TenderStatusComponent {
       t.department.toLowerCase().includes(query) ||
       t.submittedStatus.toLowerCase().includes(query) ||
       t.eoiStatus.toLowerCase().includes(query) ||
+      (t.rejectionReason && t.rejectionReason.toLowerCase().includes(query)) ||
       t.transactionRef.toLowerCase().includes(query)
     );
   });
@@ -411,6 +430,12 @@ export class TenderStatusComponent {
                     <div class="grid-label">EOI Stage:</div>
                     <div class="grid-value">${currentTender.eoiStatus}</div>
                   </div>
+                  ${currentTender.rejectionReason ? `
+                  <div class="grid-row">
+                    <div class="grid-label" style="color: #b91c1c;">Rejection Reason:</div>
+                    <div class="grid-value" style="color: #b91c1c; font-weight: 500;">${currentTender.rejectionReason}</div>
+                  </div>
+                  ` : ''}
                 </div>
               </div>
 

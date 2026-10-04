@@ -357,6 +357,16 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'tp/ipa',
+    redirectTo: 'tp/sanction-orders',
+    pathMatch: 'full'
+  },
+  {
+    path: 'ipa',
+    redirectTo: 'tp/sanction-orders',
+    pathMatch: 'full'
+  },
+  {
     path: 'sanction-orders',
     redirectTo: 'tp/sanction-orders',
     pathMatch: 'full'

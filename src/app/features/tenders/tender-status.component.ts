@@ -17,8 +17,8 @@ export interface SubmittedTender {
   emdAmount: string;
   processingFee: string;
   transactionRef: string;
-  submittedStatus: 'Submitted' | 'Accepted' | 'Technical Evaluation' | 'Rejected';
-  eoiStatus: 'Technical Opening' | 'Technical Evaluation' | 'AOC';
+  submittedStatus: 'Under Review' | 'Reviewed';
+  eoiStatus: string;
   receiptPdfUrl?: string;
   scrutinyRemarks?: string;
 }
@@ -32,7 +32,6 @@ export interface SubmittedTender {
     RouterModule,
     PageHeaderComponent,
     TableComponent
-
   ],
   template: `
     <div class="w-full min-h-full bg-white text-text-primary font-sans">
@@ -41,65 +40,30 @@ export interface SubmittedTender {
         <!-- Page Header via Reusable PageHeaderComponent -->
         <app-page-header
           title="Tender Status"
-        ></app-page-header>
-
-        <!-- Filter Controls & Search Toolbar -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-1">
-          
-          <!-- Status Filter Badges / Pills -->
-          <div class="flex items-center gap-1.5 flex-wrap">
-            @for (f of filterOptions(); track f.id) {
-              <button
-                type="button"
-                (click)="setFilter(f.id)"
-                class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-                [class.bg-primary]="activeFilter() === f.id"
-                [class.text-white]="activeFilter() === f.id"
-                [class.border-primary]="activeFilter() === f.id"
-                [class.bg-white]="activeFilter() !== f.id"
-                [class.text-text-secondary]="activeFilter() !== f.id"
-                [class.border-border]="activeFilter() !== f.id"
-                [class.hover:bg-primary-light]="activeFilter() !== f.id"
-                [class.hover:text-primary]="activeFilter() !== f.id"
-              >
-                <span>{{ f.label }}</span>
-                <span
-                  class="px-1.5 py-0.2 rounded-full text-[10px]"
-                  [class.bg-white/20]="activeFilter() === f.id"
-                  [class.text-white]="activeFilter() === f.id"
-                  [class.bg-[#F5F7F9]]="activeFilter() !== f.id"
-                  [class.text-text-secondary]="activeFilter() !== f.id"
-                >
-                  {{ f.count }}
-                </span>
-              </button>
-            }
-          </div>
-
-          <!-- Search Input with Search Icon -->
-          <div class="relative w-full sm:w-64">
-            <svg class="w-3.5 h-3.5 text-text-muted absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Tender Status' }]"
+        >
+          <!-- Search Input inside Header or Toolbar -->
+          <div class="relative w-full sm:w-80">
+            <svg class="w-3.5 h-3.5 text-text-muted absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
               type="text"
               [(ngModel)]="searchQuery"
-              (ngModelChange)="onSearchChange()"
               placeholder="Search Ref, Scheme, Department..."
-              class="w-full pl-8 pr-7 py-1.5 text-[13px] bg-white border border-border rounded-sm placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-primary transition-colors font-normal"
+              class="w-full pl-9 pr-7 py-2 text-[13px] bg-white border border-slate-300 rounded-md placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors font-normal shadow-2xs"
             />
             @if (searchQuery) {
               <button
                 type="button"
-                (click)="searchQuery = ''; onSearchChange()"
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs"
+                (click)="searchQuery = ''"
+                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs"
               >
-                &times;
+                ✕
               </button>
             }
           </div>
-
-        </div>
+        </app-page-header>
 
         <!-- Main Status Table via Reusable TableComponent -->
         <app-table
@@ -107,9 +71,10 @@ export interface SubmittedTender {
           [data]="filteredTenders()"
           [pagination]="true"
           [pageSize]="pageSize"
-          emptyMessage="No applications match your filter criteria."
+          emptyMessage="No tender applications match your search query."
           [customTemplates]="{
             appRef: appRefTemplate,
+            schemeTitle: schemeTitleTemplate,
             department: deptTemplate,
             view: viewTemplate
           }"
@@ -130,6 +95,16 @@ export interface SubmittedTender {
           </button>
         </ng-template>
 
+        <ng-template #schemeTitleTemplate let-tender>
+          <span
+            (click)="openReceipt(tender)"
+            class="font-medium text-slate-800 hover:text-[#0B3558] hover:underline cursor-pointer transition-colors"
+            title="View {{ tender.schemeTitle }}"
+          >
+            {{ tender.schemeTitle }}
+          </span>
+        </ng-template>
+
         <ng-template #deptTemplate let-tender>
           <span class="line-clamp-2 text-slate-600 text-[11px] leading-relaxed">{{ tender.department }}</span>
         </ng-template>
@@ -142,39 +117,47 @@ export interface SubmittedTender {
             class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-md text-xs font-semibold cursor-pointer shadow-sm transition-colors"
           >
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
             <span>View</span>
           </button>
         </ng-template>
 
       </div>
-
-
     </div>
   `
 })
 export class TenderStatusComponent {
   readonly Math = Math;
   searchQuery = '';
-  activeFilter = signal<string>('All');
-  currentPage = signal<number>(1);
   readonly pageSize = 6;
   selectedReceiptTender = signal<SubmittedTender | null>(null);
 
   readonly tenderColumns: TableColumn<SubmittedTender>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
     { key: 'appRef', label: 'Application Ref. No.', cellClass: 'whitespace-nowrap font-normal text-slate-800', type: 'custom' },
-    { key: 'schemeTitle', label: 'Scheme Name', cellClass: 'whitespace-nowrap font-medium text-slate-800' },
+    { key: 'schemeTitle', label: 'Scheme Name', cellClass: 'whitespace-nowrap font-medium text-slate-800', type: 'custom' },
     { key: 'department', label: 'Department', width: 'min-w-[200px] max-w-sm', type: 'custom' },
     { key: 'appliedDate', label: 'Applied Date', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
-    { key: 'submittedStatus', label: 'Submitted Status', align: 'center', type: 'status' },
+    {
+      key: 'submittedStatus',
+      label: 'Submitted Status',
+      align: 'center',
+      type: 'status',
+      badgeVariantMap: {
+        'Under Review': 'warning',
+        'Reviewed': 'success'
+      }
+    },
     { key: 'eoiStatus', label: 'EOI Stage', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'view', label: 'View', align: 'center', width: 'w-20', type: 'custom' }
   ];
 
   /**
-   * Sample submitted applications
+   * Sample submitted applications:
+   * - Under Review => EOI Stage is '-'
+   * - Reviewed (Accepted / Evaluated) => Respective EOI Stage
    */
   readonly tenders: SubmittedTender[] = [
     {
@@ -186,8 +169,8 @@ export class TenderStatusComponent {
       emdAmount: '₹50,000',
       processingFee: '₹2,000',
       transactionRef: 'TXN-ISMS-884920482',
-      submittedStatus: 'Submitted',
-      eoiStatus: 'Technical Opening'
+      submittedStatus: 'Under Review',
+      eoiStatus: '-'
     },
     {
       id: 't-2',
@@ -198,7 +181,7 @@ export class TenderStatusComponent {
       emdAmount: '₹50,000',
       processingFee: '₹2,000',
       transactionRef: 'TXN-ACC-994182914',
-      submittedStatus: 'Accepted',
+      submittedStatus: 'Reviewed',
       eoiStatus: 'AOC'
     },
     {
@@ -210,8 +193,8 @@ export class TenderStatusComponent {
       emdAmount: '₹35,000',
       processingFee: '₹2,000',
       transactionRef: 'TXN-UPI-771520031',
-      submittedStatus: 'Technical Evaluation',
-      eoiStatus: 'Technical Evaluation'
+      submittedStatus: 'Under Review',
+      eoiStatus: '-'
     },
     {
       id: 't-4',
@@ -222,7 +205,7 @@ export class TenderStatusComponent {
       emdAmount: '₹25,000',
       processingFee: '₹2,000',
       transactionRef: 'TXN-ISMS-330102749',
-      submittedStatus: 'Rejected',
+      submittedStatus: 'Reviewed',
       eoiStatus: 'AOC'
     },
     {
@@ -234,8 +217,8 @@ export class TenderStatusComponent {
       emdAmount: '₹40,000',
       processingFee: '₹2,000',
       transactionRef: 'TXN-NET-661520410',
-      submittedStatus: 'Submitted',
-      eoiStatus: 'Technical Opening'
+      submittedStatus: 'Under Review',
+      eoiStatus: '-'
     },
     {
       id: 't-6',
@@ -246,7 +229,7 @@ export class TenderStatusComponent {
       emdAmount: '₹50,000',
       processingFee: '₹2,000',
       transactionRef: 'TXN-UPI-992144510',
-      submittedStatus: 'Accepted',
+      submittedStatus: 'Reviewed',
       eoiStatus: 'Technical Evaluation'
     },
     {
@@ -258,8 +241,8 @@ export class TenderStatusComponent {
       emdAmount: '₹30,000',
       processingFee: '₹2,000',
       transactionRef: 'TXN-NET-441029381',
-      submittedStatus: 'Technical Evaluation',
-      eoiStatus: 'Technical Opening'
+      submittedStatus: 'Under Review',
+      eoiStatus: '-'
     },
     {
       id: 't-8',
@@ -270,90 +253,24 @@ export class TenderStatusComponent {
       emdAmount: '₹20,000',
       processingFee: '₹2,000',
       transactionRef: 'TXN-ISMS-110293847',
-      submittedStatus: 'Accepted',
+      submittedStatus: 'Reviewed',
       eoiStatus: 'AOC'
     }
   ];
 
-  readonly filterOptions = computed(() => [
-    { id: 'All', label: 'All', count: this.tenders.length },
-    { id: 'Submitted', label: 'Submitted', count: this.countBySubmitted('Submitted') },
-    { id: 'Accepted', label: 'Accepted', count: this.countBySubmitted('Accepted') },
-    { id: 'Technical Opening', label: 'Technical Opening', count: this.countByEoi('Technical Opening') },
-    { id: 'Technical Evaluation', label: 'Technical Evaluation', count: this.countByEoi('Technical Evaluation') },
-    { id: 'AOC', label: 'AOC', count: this.countByEoi('AOC') },
-    { id: 'Rejected', label: 'Rejected', count: this.countBySubmitted('Rejected') }
-  ]);
-
   readonly filteredTenders = computed(() => {
-    const filter = this.activeFilter();
     const query = this.searchQuery.trim().toLowerCase();
+    if (!query) return this.tenders;
 
-    return this.tenders.filter(t => {
-      let matchFilter = false;
-      if (filter === 'All') {
-        matchFilter = true;
-      } else if (['Submitted', 'Accepted', 'Rejected'].includes(filter)) {
-        matchFilter = t.submittedStatus === filter;
-      } else if (['Technical Opening', 'Technical Evaluation', 'AOC'].includes(filter)) {
-        matchFilter = t.eoiStatus === filter;
-      } else {
-        matchFilter = t.submittedStatus === filter || t.eoiStatus === filter;
-      }
-
-      const matchQuery = !query ||
-        t.appRef.toLowerCase().includes(query) ||
-        t.schemeTitle.toLowerCase().includes(query) ||
-        t.department.toLowerCase().includes(query) ||
-        t.submittedStatus.toLowerCase().includes(query) ||
-        t.eoiStatus.toLowerCase().includes(query) ||
-        t.transactionRef.toLowerCase().includes(query);
-
-      return matchFilter && matchQuery;
-    });
+    return this.tenders.filter(t =>
+      t.appRef.toLowerCase().includes(query) ||
+      t.schemeTitle.toLowerCase().includes(query) ||
+      t.department.toLowerCase().includes(query) ||
+      t.submittedStatus.toLowerCase().includes(query) ||
+      t.eoiStatus.toLowerCase().includes(query) ||
+      t.transactionRef.toLowerCase().includes(query)
+    );
   });
-
-  readonly totalPages = computed(() => {
-    return Math.max(1, Math.ceil(this.filteredTenders().length / this.pageSize));
-  });
-
-  readonly totalPagesArray = computed(() => {
-    return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
-  });
-
-  readonly paginatedTenders = computed(() => {
-    const startIndex = (this.currentPage() - 1) * this.pageSize;
-    return this.filteredTenders().slice(startIndex, startIndex + this.pageSize);
-  });
-
-  setFilter(filter: string): void {
-    this.activeFilter.set(filter);
-    this.currentPage.set(1);
-  }
-
-  onSearchChange(): void {
-    this.currentPage.set(1);
-  }
-
-  setPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.currentPage.set(page);
-    }
-  }
-
-  countBySubmitted(status: string): number {
-    return this.tenders.filter(t => t.submittedStatus === status).length;
-  }
-
-  countByEoi(status: string): number {
-    return this.tenders.filter(t => t.eoiStatus === status).length;
-  }
-
-  getSubmittedStatusClass(status: string): string {
-    if (status === 'Accepted') return 'text-emerald-700 font-normal';
-    if (status === 'Rejected') return 'text-rose-600 font-normal';
-    return 'text-slate-700 font-normal';
-  }
 
   openReceipt(tender: SubmittedTender): void {
     this.downloadReceipt(tender);
@@ -450,89 +367,87 @@ export class TenderStatusComponent {
                   </div>
                   <div class="grid-row">
                     <div class="grid-label">Authorized Signatory:</div>
-                    <div class="grid-value">Rajesh Kumar Sharma (Managing Director &amp; CEO)</div>
+                    <div class="grid-value">Dr. Rajeshwar Sharma (Director)</div>
                   </div>
-                  <div class="grid-row" style="margin-bottom: 0;">
-                    <div class="grid-label">Official Contact:</div>
-                    <div class="grid-value">9829012345 &nbsp;|&nbsp; contact@apexskills.org</div>
+                  <div class="grid-row">
+                    <div class="grid-label">Registered Office:</div>
+                    <div class="grid-value">Plot No. 42, Malviya Nagar Industrial Area, Jaipur, Rajasthan - 302017</div>
                   </div>
                 </div>
               </div>
 
               <div class="section">
-                <div class="section-header">2. MANDATORY FEE PAYMENT &amp; TRANSACTION DETAILS</div>
-                <div class="section-body" style="padding: 0;">
+                <div class="section-header">2. SCHEME &amp; EOI APPLICATION PARTICULARS</div>
+                <div class="section-body">
+                  <div class="grid-row">
+                    <div class="grid-label">Scheme Name:</div>
+                    <div class="grid-value font-bold" style="color: #0b3558;">${currentTender.schemeTitle}</div>
+                  </div>
+                  <div class="grid-row">
+                    <div class="grid-label">Nodal Department:</div>
+                    <div class="grid-value">${currentTender.department}</div>
+                  </div>
+                  <div class="grid-row">
+                    <div class="grid-label">Submitted Status:</div>
+                    <div class="grid-value"><strong style="color: #0b3558;">${currentTender.submittedStatus}</strong></div>
+                  </div>
+                  <div class="grid-row">
+                    <div class="grid-label">EOI Stage:</div>
+                    <div class="grid-value">${currentTender.eoiStatus}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="section-header">3. PAYMENT &amp; TRANSACTION ACKNOWLEDGEMENT</div>
+                <div class="section-body">
                   <table>
                     <thead>
                       <tr>
-                        <th>Fee Description</th>
-                        <th>Accounting Head</th>
-                        <th>Payment Status</th>
+                        <th>Fee Head</th>
+                        <th>Transaction / Reference ID</th>
+                        <th>Payment Mode</th>
                         <th style="text-align: right;">Amount (INR)</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
-                        <td>EOI Proposal Processing Fee (Non-Refundable)</td>
-                        <td style="font-family: monospace; font-size: 11px;">RSLDC-FEE-PROC-2026</td>
-                        <td style="color: #16a34a; font-weight: 500;">SUCCESSFUL / PAID</td>
-                        <td style="text-align: right; font-weight: 500;">Rs. 2,000</td>
+                        <td>Processing / Tender Document Fee</td>
+                        <td>${currentTender.transactionRef}</td>
+                        <td>Razorpay / Online NetBanking</td>
+                        <td style="text-align: right;">${currentTender.processingFee}</td>
                       </tr>
                       <tr>
-                        <td>Earnest Money Deposit (EMD)</td>
-                        <td style="font-family: monospace; font-size: 11px;">RSLDC-EMD-SEC-2026</td>
-                        <td style="color: #16a34a; font-weight: 500;">SUCCESSFUL / PAID</td>
-                        <td style="text-align: right; font-weight: 500;">Rs. 50,000</td>
+                        <td>Earnest Money Deposit (EMD) / Exemption</td>
+                        <td>EMD-${currentTender.transactionRef.replace('TXN-', '')}</td>
+                        <td>Online EMD Transfer</td>
+                        <td style="text-align: right;">${currentTender.emdAmount}</td>
                       </tr>
                       <tr class="total-row">
-                        <td colspan="3">Total Amount Received &amp; Realized in RSLDC Account:</td>
-                        <td style="text-align: right; font-size: 13px;">Rs. 52,000</td>
+                        <td colspan="3">Total Fees Paid</td>
+                        <td style="text-align: right;">₹52,000.00</td>
                       </tr>
                     </tbody>
                   </table>
-                  <div style="padding: 8px 12px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; font-size: 11.5px;">
-                    <div><span style="color: #64748b;">Gateway Transaction ID:</span> <span style="font-family: monospace; font-weight: 500;">${currentTender.transactionRef || 'TXN-ISMS-884920482'}</span></div>
-                    <div><span style="color: #64748b;">Payment Method:</span> <span style="font-weight: 500;">Net Banking</span></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="section">
-                <div class="section-header">3. VERIFIED PROPOSAL DOCUMENTS &amp; SUBMISSION CHECKLIST</div>
-                <div class="section-body">
-                  <div class="doc-item">
-                    <span class="check-green">[✓] 1. Company / Entity Registration Certificate</span>
-                    <span style="color: #64748b; font-family: monospace; font-size: 11px;">company_registration_incorporation_proof.pdf</span>
-                  </div>
-                  <div class="doc-item">
-                    <span class="check-green">[✓] 2. Past Skill Training Experience Certificates</span>
-                    <span style="color: #64748b; font-family: monospace; font-size: 11px;">previous_training_experience_certificates.pdf</span>
-                  </div>
-                  <div class="doc-item">
-                    <span class="check-green">[✓] 3. CA Certified Annual Turnover (Last 3 FY)</span>
-                    <span style="color: #64748b; font-family: monospace; font-size: 11px;">ca_certified_turnover_certificate_last_3_fy.pdf</span>
-                  </div>
-                  <div class="doc-item" style="padding-bottom: 0;">
-                    <span class="check-green">[✓] 4. Technical Proposal &amp; Action Plan 2025-26</span>
-                    <span style="color: #64748b; font-family: monospace; font-size: 11px;">technical_proposal_methodology_2025_26.pdf</span>
-                  </div>
                 </div>
               </div>
 
               <div class="footer-box">
-                <div style="max-width: 500px;">
-                  <div style="font-weight: 600; color: #1e293b; margin-bottom: 2px;">Post-Submission Online Modification Window:</div>
-                  <div style="color: #64748b; font-size: 11px; margin-bottom: 4px;">Applicants can modify their submitted EOI online up to 3 times before the official tender deadline: 30 September 2026, 23:59:59 IST.</div>
-                  <div style="font-weight: 600; color: #0b3558; font-size: 11px;">EOI Reference: EOI-MMKVY-2026-01</div>
+                <div>
+                  <div style="font-weight: 700; color: #0b3558; font-size: 12px;">SYSTEM GENERATED ACKNOWLEDGEMENT</div>
+                  <div style="font-size: 11px; color: #64748b; margin-top: 2px;">This is an authentic system-generated receipt. No physical signature required.</div>
                 </div>
                 <div class="stamp-box">
-                  RSLDC ISMS 2.0 PORTAL
+                  RSLDC eProcurement<br>VERIFIED RECEIPT
                 </div>
               </div>
+
             </div>
           </div>
           <script>
-            window.onload = function() { window.print(); };
+            window.onload = function() {
+              window.print();
+            };
           </script>
         </body>
       </html>

@@ -180,6 +180,19 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
               <span class="tracking-tight">EOI Responses</span>
             </a>
 
+            <!-- 2. Sanction Order Section -->
+            <a
+              routerLink="/admin/sanction-orders"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center gap-2.5 px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span class="tracking-tight font-medium">Sanction Order</span>
+            </a>
+
             <!-- 2. SDC Approvals -->
             <a
               routerLink="/sdc"

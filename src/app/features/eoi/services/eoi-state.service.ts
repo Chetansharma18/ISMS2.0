@@ -768,8 +768,8 @@ export class EoiStateService {
       schemeName: 'SAMARTH Skill Development Scheme',
       eoiRefNo: 'RSLDC/EOI/2026/SAMARTH-02',
       submissionDate: '10/09/2026 11:30 AM',
-      status: 'APPROVED',
-      statusDisplay: 'Accepted',
+      status: 'UNDER_SCRUTINY',
+      statusDisplay: 'Pending Review',
       emdFee: 75000,
       emdStatus: 'PAID',
       processingFee: 2500,
@@ -847,15 +847,7 @@ export class EoiStateService {
 
       uploadedDocuments: [
         { id: 'doc-s1', title: 'Organisation Registration Certificate', fileSize: '1.4 MB PDF', category: 'Statutory', verified: true }
-      ],
-
-      scrutinyDetails: {
-        technicalScore: 90,
-        grade: 'Grade A',
-        remarks: 'Meets all SAMARTH technical criteria.',
-        scrutinyOfficer: 'Shri R. K. Sharma',
-        decisionTimestamp: '12/09/2026 11:00 AM'
-      }
+      ]
     },
 
     {
@@ -1151,18 +1143,23 @@ export class EoiStateService {
           parsed.forEach(p => {
             if (mergedMap.has(p.id)) {
               const init = mergedMap.get(p.id)!;
+              const isCompany1 = init.anonymousLabel === 'Company 1' || init.id === 'APP-004661' || init.id === 'APP-005001';
+              // Force Company 1 to UNDER_SCRUTINY / Pending Review for user evaluation testing
+              const shouldForcePending = isCompany1 && (!p.scrutinyDetails || !p.scrutinyDetails.decisionTimestamp || p.status === 'REJECTED');
               mergedMap.set(p.id, {
                 ...init,
-                status: p.status || init.status,
-                statusDisplay: p.statusDisplay || init.statusDisplay,
+                status: shouldForcePending ? 'UNDER_SCRUTINY' : (p.status || init.status),
+                statusDisplay: shouldForcePending ? 'Pending Review' : (p.statusDisplay || init.statusDisplay),
                 emdStatus: p.emdStatus || init.emdStatus,
-                scrutinyDetails: p.scrutinyDetails || init.scrutinyDetails
+                scrutinyDetails: shouldForcePending ? undefined : (p.scrutinyDetails || init.scrutinyDetails)
               });
             } else {
               mergedMap.set(p.id, p);
             }
           });
           this.responsesSubject.next(Array.from(mergedMap.values()));
+          this.saveToStorage(Array.from(mergedMap.values()));
+          return;
         }
       } catch (e) {
         console.error('Error loading stored responses', e);

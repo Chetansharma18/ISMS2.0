@@ -104,6 +104,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/sanction-orders',
+    loadComponent: () =>
+      import('./features/eoi/pages/sanction-order-list/sanction-order-list.component').then(
+        (m) => m.SanctionOrderListComponent
+      )
+  },
+  {
     path: 'admin/responses/:schemeId',
     loadComponent: () =>
       import('./features/eoi/pages/applicant-submissions/applicant-submissions.component').then(

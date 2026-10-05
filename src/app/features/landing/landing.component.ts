@@ -23,7 +23,7 @@ import { ImportantLinksComponent } from './components/important-links/important-
     class: 'block w-full'
   },
   template: `
-    <div class="w-full flex flex-col min-h-screen">
+    <div class="w-full flex flex-col flex-1">
       <!-- 1. Government Circulars & News Ticker (Single Source of Truth) -->
       <app-news-ticker></app-news-ticker>
 

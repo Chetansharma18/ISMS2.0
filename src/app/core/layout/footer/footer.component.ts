@@ -16,7 +16,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
   standalone: true,
   imports: [CommonModule],
   host: {
-    class: 'block w-full'
+    class: 'block w-full bg-[#070e18]'
   },
   styles: [`
     @keyframes scroll {
@@ -538,7 +538,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
         </div>
 
         <!-- Tier 3: Bottom Copyright Bar -->
-        <div class="border-t border-slate-700/50 bg-[#070e18]/90">
+        <div class="border-t border-slate-700/50 bg-[#070e18]">
           <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex justify-center items-center">
               <div class="text-[0.8125rem] text-slate-400 text-center font-['Inter',sans-serif]">

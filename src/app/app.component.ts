@@ -37,13 +37,18 @@ import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-m
       @if (showSidebar()) {
         <div class="flex-1 flex w-full overflow-hidden">
           <app-sidebar class="h-full shrink-0"></app-sidebar>
-          <main class="flex-1 min-w-0 h-full overflow-y-auto flex flex-col" style="background-color: #FEFEFD;">
+          <main class="flex-1 min-w-0 overflow-y-auto flex flex-col [overscroll-behavior-y:none] [-webkit-overflow-scrolling:touch]" style="background-color: #FEFEFD;">
             <router-outlet></router-outlet>
           </main>
         </div>
       } @else {
-        <main class="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden flex flex-col" style="background-color: #FEFEFD;">
-          <router-outlet></router-outlet>
+        <main 
+          class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col [overscroll-behavior-y:none] [-webkit-overflow-scrolling:touch] relative" 
+          [style.background-color]="isLandingRoute() ? '#070e18' : '#FEFEFD'"
+        >
+          <div class="w-full flex-1 flex flex-col bg-[#FEFEFD]">
+            <router-outlet></router-outlet>
+          </div>
           <!-- Main Portal Footer (Displayed on landing page) -->
           @if (showFooter()) {
             <app-footer class="shrink-0"></app-footer>

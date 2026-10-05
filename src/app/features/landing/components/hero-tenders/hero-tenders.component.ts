@@ -55,7 +55,7 @@ interface TenderItem {
         <!-- TENDER LIST: Clean readable rows, subtle dividers, internally scrollable -->
         <div 
           #scrollList
-          class="flex-1 overflow-y-auto divide-y divide-[#DCE4ED] bg-white tender-custom-scroll" 
+          class="flex-1 overflow-y-auto divide-y divide-[#DCE4ED] bg-white tender-custom-scroll overscroll-contain" 
           (mouseenter)="pauseScroll()" 
           (mouseleave)="resumeScrollWithDelay()"
           (touchstart)="pauseScroll()"
@@ -327,11 +327,19 @@ export class HeroTendersComponent implements AfterViewInit, OnDestroy {
 
   private startGentleAutoScroll(el: HTMLElement): void {
     let lastTime = performance.now();
+    let maxScroll = Math.max(0, el.scrollHeight - el.clientHeight - 2);
+    let lastRecalcTime = lastTime;
     const scrollSpeed = 0.035; // px per millisecond (approx 21px per second - gentle and readable)
 
     const step = (now: number) => {
       const delta = now - lastTime;
       lastTime = now;
+
+      // Recalculate max scroll bounds only once every 3 seconds to avoid forced reflows on every frame
+      if (now - lastRecalcTime > 3000) {
+        maxScroll = Math.max(0, el.scrollHeight - el.clientHeight - 2);
+        lastRecalcTime = now;
+      }
 
       if (
         this.isSectionVisible &&
@@ -341,7 +349,7 @@ export class HeroTendersComponent implements AfterViewInit, OnDestroy {
       ) {
         el.scrollTop += delta * scrollSpeed;
         // Loop back smoothly if reached bottom
-        if (el.scrollTop >= el.scrollHeight - el.clientHeight - 2) {
+        if (el.scrollTop >= maxScroll) {
           el.scrollTop = 0;
         }
       }

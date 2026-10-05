@@ -187,7 +187,7 @@ import {
                   <tr class="hover:bg-slate-50">
                     <td class="p-2 border-r border-slate-300 text-center font-bold">1</td>
                     <td class="p-2 border-r border-slate-300 font-mono font-bold text-[#174A6E]">{{ selectedOrder()?.appId || 'APP-2024-001' }}</td>
-                    <td class="p-2 border-r border-slate-300 font-medium">{{ selectedOrder()?.agencyName || 'Apex Skill Development Foundation' }}</td>
+                    <td class="p-2 border-r border-slate-300 font-medium">{{ selectedOrder()?.agencyName || 'Company 1' }}</td>
                     <td class="p-2 border-r border-slate-300 font-mono font-semibold text-slate-800">{{ selectedOrder()?.ipaNumber }}</td>
                     <td class="p-2 border-r border-slate-300">{{ selectedOrder()?.district || 'Jaipur' }}</td>
                     <td class="p-2 border-r border-slate-300">{{ (selectedOrder()?.sectors || ['Electronics', 'IT']).join(', ') }}</td>

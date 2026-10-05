@@ -50,7 +50,7 @@ import { EoiStateService, ApplicantResponse, DossierDocument } from '../../servi
             </div>
 
             <h1 class="text-base sm:text-lg font-semibold tracking-tight text-white" style="color: #ffffff !important;">
-              {{ applicant()?.actualLegalName }}
+              {{ applicant()?.anonymousLabel || 'Company 1' }}
             </h1>
             <p class="text-xs text-slate-200 mt-0.5 font-normal">
               Applying under: <span class="text-white font-medium">{{ applicant()?.schemeName }}</span>

@@ -208,7 +208,7 @@ import {
               <div class="space-y-0.5 font-sans text-xs pt-2">
                 <p class="font-bold text-slate-900">To,</p>
                 <div class="pl-4 space-y-0.5 text-slate-800">
-                  <p class="font-bold text-[#0B3558]">{{ ipa.agencyName || 'Apex Skill Development Foundation' }}</p>
+                  <p class="font-bold text-[#0B3558]">{{ ipa.agencyName || 'Company 1' }}</p>
                   <p>Training Partner Code: <strong class="font-mono">{{ ipa.tpCode || 'MoU-001658' }}</strong></p>
                   <p>Address: Plot No. 42, Malviya Nagar Industrial Area, Jaipur, Rajasthan - 302017</p>
                 </div>
@@ -247,7 +247,7 @@ import {
                     <tr class="border-b border-slate-200">
                       <td class="p-2 border-r border-slate-200 text-center font-bold">1</td>
                       <td class="p-2 border-r border-slate-200 font-mono font-bold text-[#174A6E]">{{ ipa.appId || 'APP-2024-001' }}</td>
-                      <td class="p-2 border-r border-slate-200 font-medium">{{ ipa.agencyName || 'Apex Skill Development Foundation' }}</td>
+                      <td class="p-2 border-r border-slate-200 font-medium">{{ ipa.agencyName || 'Company 1' }}</td>
                       <td class="p-2 border-r border-slate-200">{{ ipa.district || 'Alwar' }}</td>
                       <td class="p-2 border-r border-slate-200">{{ (ipa.sectors || ['Healthcare & Paramedical']).join(', ') }}</td>
                       <td class="p-2 border-r border-slate-200 text-center">

@@ -755,13 +755,51 @@ export class IpaEditorComponent implements OnInit {
       const aId = params['appId'] || 'APP-004661';
       this.schemeId.set(sId);
       this.appId.set(aId);
-      this.loadCompanyDetails(aId);
+      this.loadIpaDetails(sId, aId);
     });
   }
 
-  private loadCompanyDetails(aId: string): void {
+  private loadIpaDetails(sId: string, aId: string): void {
+    const savedData = this.eoiStateService.getIpaData(sId, aId);
+    if (savedData) {
+      this.headerTitle = savedData.headerTitle || this.headerTitle;
+      this.headerSubtitle = savedData.headerSubtitle || this.headerSubtitle;
+      this.headerAddress = savedData.headerAddress || this.headerAddress;
+      this.fileNo = savedData.fileNo || this.fileNo;
+      this.ipaDate = savedData.ipaDate || this.ipaDate;
+      this.recipientName = savedData.recipientName || this.recipientName;
+      this.recipientAddress1 = savedData.recipientAddress1 || this.recipientAddress1;
+      this.recipientAddress2 = savedData.recipientAddress2 || this.recipientAddress2;
+      this.recipientSar = savedData.sarNumber || this.recipientSar;
+      this.referenceNo = savedData.referenceNo || this.referenceNo;
+      this.subjectText = savedData.subjectText || this.subjectText;
+      this.preambleText = savedData.preambleText || this.preambleText;
+      this.piaName = savedData.piaName || this.piaName;
+      this.sdcAddress = savedData.sdcAddress || this.sdcAddress;
+      if (savedData.courseRows && savedData.courseRows.length > 0) {
+        this.courseRows = [...savedData.courseRows];
+      }
+      if (savedData.targetSummary && savedData.targetSummary.length > 0) {
+        this.targetSummary = [...savedData.targetSummary];
+      }
+      if (savedData.termsAndConditions && savedData.termsAndConditions.length > 0) {
+        this.termsAndConditions = [...savedData.termsAndConditions];
+      }
+      if (savedData.ccList && savedData.ccList.length > 0) {
+        this.copyToList = [...savedData.ccList];
+      }
+      this.signatoryTitle = savedData.signatoryTitle || this.signatoryTitle;
+      this.signatorySub = savedData.signatorySub || this.signatorySub;
+      if (savedData.leftLogoUrl) {
+        this.leftLogoUrl.set(savedData.leftLogoUrl);
+      }
+      if (savedData.rightLogoUrl) {
+        this.rightLogoUrl.set(savedData.rightLogoUrl);
+      }
+    }
+
     this.eoiStateService.getResponseById(aId).subscribe(resp => {
-      if (resp) {
+      if (resp && !savedData) {
         this.recipientName = resp.actualLegalName || resp.anonymousLabel;
         this.piaName = resp.actualLegalName || resp.anonymousLabel;
         if (resp.organisation?.registeredAddress) {
@@ -871,6 +909,35 @@ export class IpaEditorComponent implements OnInit {
   }
 
   saveIpaAndNotify(): void {
+    const sId = this.schemeId() || 'MMKVY-01';
+    const aId = this.appId() || 'APP-004661';
+    const data = {
+      schemeId: sId,
+      appId: aId,
+      headerTitle: this.headerTitle,
+      headerSubtitle: this.headerSubtitle,
+      headerAddress: this.headerAddress,
+      fileNo: this.fileNo,
+      ipaDate: this.ipaDate,
+      recipientName: this.recipientName,
+      recipientAddress1: this.recipientAddress1,
+      recipientAddress2: this.recipientAddress2,
+      sarNumber: this.recipientSar,
+      referenceNo: this.referenceNo,
+      subjectText: this.subjectText,
+      preambleText: this.preambleText,
+      piaName: this.piaName,
+      sdcAddress: this.sdcAddress,
+      courseRows: this.courseRows,
+      targetSummary: this.targetSummary,
+      termsAndConditions: this.termsAndConditions,
+      ccList: this.copyToList,
+      signatoryTitle: this.signatoryTitle,
+      signatorySub: this.signatorySub,
+      leftLogoUrl: this.leftLogoUrl(),
+      rightLogoUrl: this.rightLogoUrl()
+    };
+    this.eoiStateService.saveIpaData(sId, aId, data);
     this.savedNotification.set(true);
     this.isSaved.set(true);
     setTimeout(() => {

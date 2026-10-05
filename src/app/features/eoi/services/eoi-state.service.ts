@@ -971,4 +971,313 @@ export class EoiStateService {
     }
     return false;
   }
+
+  // ==========================================================================
+  // SANCTION ORDER DOCUMENT STATE (PERSISTENT & SHARED ACROSS ADMIN & USER)
+  // ==========================================================================
+  getDefaultSanctionOrderData(schemeId: string = 'MMKVY-01'): SanctionOrderDocumentData {
+    return {
+      schemeId,
+      headerTitle: 'RAJASTHAN SKILL AND LIVELIHOODS DEVELOPMENT CORPORATION',
+      headerSubtitle: '(A Government of Rajasthan Enterprise)',
+      headerAddress: 'EMI Campus, J-8-A, Jhalana Institutional Area, Jaipur - 302004 (Rajasthan)',
+      fileNo: 'File No: F () RSLDC/Skills/MMKVY/RAJKViK/SO/2026-2027/ 1358',
+      sanctionDate: '30/07/2026',
+      documentTitle: 'SANCTION ORDER',
+      subjectText: 'Sanction order for allocation of physical targets for Financial Year 2026-27 to PIAs under "Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)".',
+      referenceText: 'No. RSLDC/EOI/MMKVY, Cat. I, II, III /2026-27/01, dated 22nd January 2026.',
+      preambleText: 'Based on the approved selection criteria of PIA\'s, Sanction Order is accorded to the following empanelled eligible PIAs for FY 2026-27 along with allocation of physical targets under Mukhya Mantri Kaushal Vikas Yojna" (MMKVY), Category. I- RAJKViK as per the details given below:',
+      tableRows: [
+        { id: '1', appId: 'APP-004661', agencyName: 'Apex Technical & Infrastructure Solutions Pvt Ltd', district: 'Alwar', sector: 'Apparel, Agriculture', category: 'A-1 (Skill)', grade: 'A', target: 150 },
+        { id: '2', appId: 'APP-004662', agencyName: 'Marwar Skill Foundation', district: 'Jodhpur', sector: 'Textile & Handloom', category: 'A-1 (Skill)', grade: 'A', target: 150 },
+        { id: '3', appId: 'APP-004663', agencyName: 'Singhania Vocational Institute', district: 'Udaipur', sector: 'Automotive', category: 'A-1 (Skill)', grade: 'A', target: 150 },
+        { id: '4', appId: 'APP-004664', agencyName: 'DMR Enterprises Private Limited', district: 'Alwar', sector: 'Healthcare', category: 'A-1 (Skill)', grade: 'A', target: 150 }
+      ],
+      termsAndConditions: [
+        'PIA shall be allowed to conduct training in any one of the given two sectors or in both sectors, but PIA cannot exceed the ceiling given as above.',
+        'PIA Shall be allowed to conduct residential training of 45 candidates only against the sanctioned target of 150, and 30 candidates only against the sanctioned target of 105.',
+        'PIA shall ensure that only job roles with a duration of 1060 hours or less are selected. Job roles exceeding 1060 hours shall not be allotted under any case.',
+        'All PIAs are required to sign the MoU within 10 (ten) working days from the date of issuance of this Sanction Order, failing which the sanction may be liable for cancellation.',
+        'PIA will submit a Demand Draft (DD) of Rs. 10,000/- (Ten thousand) issued in the favor of Managing Director, Rajasthan Skill and Livelihoods Development Corporation (RSLDC) at the time of MoU signing.',
+        'The PIA shall comply to Mukhya Mantri Kaushal Vikash Yojana- Cat.I, RAJKViK guidelines applicable from 01 April 2021 (as amended from time to time or revised guideline), branding guidelines and office orders, circulars & directions issued by RSLDC.',
+        'PIA will enroll only targeted beneficiaries as mentioned in scheme guidelines, "Mukhya Mantri Kaushal Vikash Yojana- Cat.I, RAJKViK", and with reference to the course module.',
+        'All PIAs will strictly comply the directives for the Aadhaar enabled Biometric Attendance System (AEBAS) for using the newly developed AEBAS process for marking the attendance of SDCs daily on the ISMS portal (Ref. No. : RSLDC/AEBAS/2026).',
+        'The following are mandatory for the issuance of In-Principle Approval (IPA) from RSLDC (per batch):- Installation of IP camera-based face recognition system in classrooms and domain labs of SDC.',
+        'To install IRIS / latest version of Aadhar Enabled Biometric Attendance System (AEBAS) for daily attendance (in & out) at the SDC and Hostel, as applicable, which has to be integrated with ISMS system of RSLDC.',
+        'Mandatory Use of Masked Aadhaar: In compliance with UIDAI Regulations 2021, it is mandatory for all TPs to use masked Aadhaar displaying only the last four digits in all official documentation.'
+      ],
+      dispatchRef: 'RSLDC/Skills/MMKVY/RAJKViK/SO/2026-2027',
+      signatoryName: 'RISHAV MANDAL',
+      signatoryTitle: 'Managing Director',
+      signatoryOrg: 'RSLDC, Jaipur (GoR)',
+      copyToList: [
+        'PS to Hon\'ble Minister, DSEE, GoR',
+        'PS to ACS, DSEE, GoR',
+        'PS to Managing Director, RSLDC',
+        'CAO, RSLDC',
+        'GM-I (Admin.)',
+        'OIC-MIS to upload on RSLDC website',
+        'PM, PMCA',
+        'Respective (Project Implementing Agencies) via mail'
+      ],
+      leftLogoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/84/Government_of_Rajasthan_Logo.svg',
+      rightLogoUrl: '',
+      rightLogoText: 'RSLDC\nJAIPUR'
+    };
+  }
+
+  getSanctionOrderData(schemeId?: string): SanctionOrderDocumentData {
+    const sId = schemeId || 'MMKVY-01';
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(`isms_sanction_doc_${sId}`) || localStorage.getItem('isms_sanction_doc_latest');
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch (e) {}
+    }
+    return this.getDefaultSanctionOrderData(sId);
+  }
+
+  saveSanctionOrderData(schemeId: string, data: SanctionOrderDocumentData): void {
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const json = JSON.stringify(data);
+        localStorage.setItem(`isms_sanction_doc_${schemeId}`, json);
+        localStorage.setItem('isms_sanction_doc_latest', json);
+        this.markSanctionSubmitted(schemeId);
+      } catch (e) {}
+    }
+  }
+
+  // ==========================================================================
+  // IN-PRINCIPLE APPROVAL (IPA) DOCUMENT STATE (PERSISTENT & SHARED)
+  // ==========================================================================
+  getDefaultIpaData(schemeId: string = 'MMKVY-01', appId: string = 'APP-004661'): IpaDocumentData {
+    return {
+      schemeId,
+      appId,
+      headerTitle: 'RAJASTHAN SKILL AND LIVELIHOODS DEVELOPMENT CORPORATION',
+      headerSubtitle: '(A Government of Rajasthan Enterprise)',
+      headerAddress: 'EMI Campus, J-8-A, Jhalana Institutional Area, Jaipur- 302004 (Rajasthan)',
+      fileNo: 'FORSLDC/Skills/MMKVY-Cat.II: SAKSHM/2026-27/2895-97',
+      ipaDate: '15/9/26',
+      recipientName: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
+      recipientAddress1: 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi, 110042',
+      recipientAddress2: 'Sri Ganganagar, Rajasthan, Pin Code-335001',
+      sarNumber: 'SAR: 2200-099-001',
+      referenceNo: 'F () RSLDC/SKILL/MMKVY-Cat.-II: SAKSHM/2026-27/535, Dated: 15/07/2026',
+      subjectText: 'In-Principal Approval (IPA-1)- MMKVY-Cat. II / SAKSHM sponsored by RSLDC for F.Y. 2026-27.',
+      preambleText: 'In reference to your request and based on the recommendation from inspection team, in-principal approval is hereby accorded for conducting cycles (as detailed below) for following courses during financial year 2026-27, as per the terms and conditions stipulated in relevant guidelines.',
+      piaName: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
+      sdcAddress: 'Near Panchayati Mandir, Opposite Government Hospital, Kesisinghpur, Sriganganagar, 335027',
+      courseRows: [
+        {
+          id: '1',
+          sector: 'Handicraft & Local Resource Based',
+          courseName: 'Phad Painting',
+          courseCode: 'RSLDC/HRS-001',
+          durationDays: 139,
+          durationHours: 1110,
+          mandatoryOjt: 'No',
+          minEdu: 'Minimum 8th Pass',
+          minAge: 'Minimum 15 Year',
+          rnr: 'R',
+          rCat: 'Z',
+          costC: 25530,
+          costH: 31600,
+          costToolkit: 'NA',
+          totalCostPerTrainee: 57130,
+          approvedTrainees: 30,
+          costPerBatch: 1713900,
+          cycles: 1,
+          totalBudget: 1713900,
+          perDayHours: 8
+        },
+        {
+          id: '2',
+          sector: 'Handicraft & Local Resource Based',
+          courseName: 'Phad Painting',
+          courseCode: 'RSLDC/HRS-001',
+          durationDays: 185,
+          durationHours: 1110,
+          mandatoryOjt: 'No',
+          minEdu: 'Minimum 8th Pass',
+          minAge: 'Minimum 15 Year',
+          rnr: 'NR',
+          rCat: 'NA',
+          costC: 25530,
+          costH: 0,
+          costToolkit: 'NA',
+          totalCostPerTrainee: 25530,
+          approvedTrainees: 30,
+          costPerBatch: 765900,
+          cycles: 1,
+          totalBudget: 765900,
+          perDayHours: 6
+        },
+        {
+          id: '3',
+          sector: 'Handicraft & Local Resource Based',
+          courseName: 'Phad Painting',
+          courseCode: 'RSLDC/HRS-001',
+          durationDays: 185,
+          durationHours: 1110,
+          mandatoryOjt: 'No',
+          minEdu: 'Minimum 8th Pass',
+          minAge: 'Minimum 15 Year',
+          rnr: 'NR',
+          rCat: 'NA',
+          costC: 25530,
+          costH: 0,
+          costToolkit: 'NA',
+          totalCostPerTrainee: 25530,
+          approvedTrainees: 30,
+          costPerBatch: 765900,
+          cycles: 1,
+          totalBudget: 765900,
+          perDayHours: 6
+        }
+      ],
+      targetSummary: [
+        { sNo: 1, particular: "Total Training Target/District/SDC's as per SO", value: '90/01/01' },
+        { sNo: 2, particular: 'Target allocation in previous IPA', value: 'First IPA' },
+        { sNo: 3, particular: 'Target Allocation in this First IPA', value: '90' },
+        { sNo: 4, particular: 'Remaining Targets', value: '00' }
+      ],
+      termsAndConditions: [
+        'TP shall ensure to initiation of batches within 15 days from the date issuance the IPA.',
+        'TP shall ensure to work in accordance with the (MMKVY-Cat-II-SAKSHM) guideline issued on 1st April 2021 and further direction given by RSLDC.',
+        'TP shall ensure to functional IP cameras at SDC before the commencement of batches.',
+        'TP shall Submit Performance Security Deposit (PSD) to RSLDC A/C on or before batch Commencement (In case of new SDC).',
+        'TP will have to maintain video footage of complete skill training in Lab/classroom from IP Camera for each batch until the payment for the batch.',
+        'TP shall ensure installation of Aadhaar linked Biometric for daily attendance of trainees & trainers (In & Out) at the SDC & Hostel (if applicable), which must be compatible with ISMS system of RSLDC.',
+        'PIA must ensure compliance of the condition mentioned in the MoU, Sanction Order, Scheme Guideline and other applicable directives.',
+        'The IEC & branding should be available as per the scheme guidelines.'
+      ],
+      ccList: [
+        'CAO, RSLDC',
+        'District Skill Coordinator'
+      ],
+      signatoryTitle: 'Scheme OIC',
+      signatorySub: 'RSLDC',
+      leftLogoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/84/Government_of_Rajasthan_Logo.svg',
+      rightLogoUrl: ''
+    };
+  }
+
+  getIpaData(schemeId?: string, appId?: string): IpaDocumentData {
+    const sId = schemeId || 'MMKVY-01';
+    const aId = appId || 'APP-004661';
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(`isms_ipa_doc_${sId}_${aId}`) || localStorage.getItem(`isms_ipa_doc_${sId}`) || localStorage.getItem('isms_ipa_doc_latest');
+        if (stored) {
+          return JSON.parse(stored);
+        }
+      } catch (e) {}
+    }
+    return this.getDefaultIpaData(sId, aId);
+  }
+
+  saveIpaData(schemeId: string, appId: string, data: IpaDocumentData): void {
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const json = JSON.stringify(data);
+        localStorage.setItem(`isms_ipa_doc_${schemeId}_${appId}`, json);
+        localStorage.setItem(`isms_ipa_doc_${schemeId}`, json);
+        localStorage.setItem('isms_ipa_doc_latest', json);
+      } catch (e) {}
+    }
+  }
+}
+
+export interface SanctionTableRow {
+  id: string;
+  appId: string;
+  agencyName: string;
+  district: string;
+  sector: string;
+  category: string;
+  grade: string;
+  target: number;
+}
+
+export interface SanctionOrderDocumentData {
+  schemeId: string;
+  headerTitle: string;
+  headerSubtitle: string;
+  headerAddress: string;
+  fileNo: string;
+  sanctionDate: string;
+  documentTitle: string;
+  subjectText: string;
+  referenceText: string;
+  preambleText: string;
+  tableRows: SanctionTableRow[];
+  termsAndConditions: string[];
+  dispatchRef: string;
+  signatoryName: string;
+  signatoryTitle: string;
+  signatoryOrg: string;
+  copyToList: string[];
+  leftLogoUrl?: string;
+  rightLogoUrl?: string;
+  rightLogoText?: string;
+}
+
+export interface IpaCourseRow {
+  id: string;
+  sector: string;
+  courseName: string;
+  courseCode: string;
+  durationDays: number;
+  durationHours: number;
+  mandatoryOjt: string;
+  minEdu: string;
+  minAge: string;
+  rnr: string;
+  rCat: string;
+  costC: number;
+  costH: number;
+  costToolkit: string;
+  totalCostPerTrainee: number;
+  approvedTrainees: number;
+  costPerBatch: number;
+  cycles: number;
+  totalBudget: number;
+  perDayHours: number;
+}
+
+export interface TargetSummaryRow {
+  sNo: number;
+  particular: string;
+  value: string;
+}
+
+export interface IpaDocumentData {
+  schemeId: string;
+  appId: string;
+  headerTitle: string;
+  headerSubtitle: string;
+  headerAddress: string;
+  fileNo: string;
+  ipaDate: string;
+  recipientName: string;
+  recipientAddress1: string;
+  recipientAddress2: string;
+  sarNumber: string;
+  referenceNo: string;
+  subjectText: string;
+  preambleText: string;
+  piaName: string;
+  sdcAddress: string;
+  courseRows: IpaCourseRow[];
+  targetSummary: TargetSummaryRow[];
+  termsAndConditions: string[];
+  ccList: string[];
+  signatoryTitle: string;
+  signatorySub: string;
+  leftLogoUrl?: string;
+  rightLogoUrl?: string;
 }

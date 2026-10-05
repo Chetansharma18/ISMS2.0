@@ -501,35 +501,72 @@ export class EoiSanctionEditorComponent implements OnInit {
   }
 
   private loadSchemeDetails(sId: string): void {
+    const savedData = this.eoiStateService.getSanctionOrderData(sId);
+    if (savedData) {
+      this.headerTitle = savedData.headerTitle || this.headerTitle;
+      this.headerSubtitle = savedData.headerSubtitle || this.headerSubtitle;
+      this.headerAddress = savedData.headerAddress || this.headerAddress;
+      this.fileNo = savedData.fileNo || this.fileNo;
+      this.sanctionDate = savedData.sanctionDate || this.sanctionDate;
+      this.documentTitle = savedData.documentTitle || this.documentTitle;
+      this.subjectText = savedData.subjectText || this.subjectText;
+      this.referenceText = savedData.referenceText || this.referenceText;
+      this.preambleText = savedData.preambleText || this.preambleText;
+      if (savedData.tableRows && savedData.tableRows.length > 0) {
+        this.tableRows = [...savedData.tableRows];
+      }
+      if (savedData.termsAndConditions && savedData.termsAndConditions.length > 0) {
+        this.termsAndConditions = [...savedData.termsAndConditions];
+      }
+      this.dispatchRef = savedData.dispatchRef || this.dispatchRef;
+      this.signatoryName = savedData.signatoryName || this.signatoryName;
+      this.signatoryTitle = savedData.signatoryTitle || this.signatoryTitle;
+      this.signatoryOrg = savedData.signatoryOrg || this.signatoryOrg;
+      if (savedData.copyToList && savedData.copyToList.length > 0) {
+        this.copyToList = [...savedData.copyToList];
+      }
+      if (savedData.leftLogoUrl) {
+        this.leftLogoUrl.set(savedData.leftLogoUrl);
+      }
+      if (savedData.rightLogoUrl) {
+        this.rightLogoUrl.set(savedData.rightLogoUrl);
+      }
+    }
+
     this.eoiStateService.getSchemeById(sId).subscribe(scheme => {
       if (scheme) {
         this.currentScheme.set(scheme);
-        this.subjectText = `Sanction order for allocation of physical targets for Financial Year 2026-27 to PIAs under "${scheme.schemeTitle}".`;
+        if (!savedData) {
+          this.subjectText = `Sanction order for allocation of physical targets for Financial Year 2026-27 to PIAs under "${scheme.schemeTitle}".`;
+        }
       }
     });
 
-    this.eoiStateService.getResponses(sId).subscribe(responses => {
-      const approved = responses.filter(r => r.status === 'APPROVED');
-      if (approved.length > 0) {
-        this.tableRows = approved.map((resp, idx) => ({
-          id: resp.id,
-          appId: resp.id,
-          agencyName: resp.actualLegalName || resp.anonymousLabel,
-          district: resp.trainingCentres?.[0]?.district || this.availableDistricts[idx % this.availableDistricts.length],
-          sector: resp.placementTrackRecord?.[0]?.sector || this.availableSectors[idx % this.availableSectors.length],
-          category: 'A-1 (Skill)',
-          grade: resp.scrutinyDetails?.grade === 'Grade A' ? 'A' : (resp.scrutinyDetails?.grade === 'Grade B' ? 'B' : 'A'),
-          target: 150
-        }));
-      } else {
-        // Fallback sample target rows from sanctionorder2.pdf
-        this.tableRows = [
-          { id: '1', appId: 'APP-004752', agencyName: 'Aariya Enterprises', district: 'Jaipur', sector: 'Apparel, Agriculture', category: 'A-1 (Skill)', grade: 'A', target: 150 },
-          { id: '2', appId: 'APP-003003', agencyName: 'Aayushi Contractors Company', district: 'Jodhpur', sector: 'Media & Entertainment, IT-ITeS', category: 'A-2', grade: 'B', target: 150 },
-          { id: '3', appId: 'APP-003773', agencyName: 'All India Computer Saksharta Mission', district: 'Kota', sector: 'Healthcare, Life Sciences', category: 'A-1 (Skill)', grade: 'A', target: 150 }
-        ];
-      }
-    });
+    if (!savedData || !savedData.tableRows || savedData.tableRows.length === 0) {
+      this.eoiStateService.getResponses(sId).subscribe(responses => {
+        const approved = responses.filter(r => r.status === 'APPROVED');
+        if (approved.length > 0) {
+          this.tableRows = approved.map((resp, idx) => ({
+            id: resp.id,
+            appId: resp.id,
+            agencyName: resp.actualLegalName || resp.anonymousLabel,
+            district: resp.trainingCentres?.[0]?.district || this.availableDistricts[idx % this.availableDistricts.length],
+            sector: resp.placementTrackRecord?.[0]?.sector || this.availableSectors[idx % this.availableSectors.length],
+            category: 'A-1 (Skill)',
+            grade: resp.scrutinyDetails?.grade === 'Grade A' ? 'A' : (resp.scrutinyDetails?.grade === 'Grade B' ? 'B' : 'A'),
+            target: 150
+          }));
+        } else {
+          // Fallback sample target rows from sanctionorder2.pdf
+          this.tableRows = [
+            { id: '1', appId: 'APP-004661', agencyName: 'Apex Technical & Infrastructure Solutions Pvt Ltd', district: 'Alwar', sector: 'Apparel, Agriculture', category: 'A-1 (Skill)', grade: 'A', target: 150 },
+            { id: '2', appId: 'APP-004662', agencyName: 'Marwar Skill Foundation', district: 'Jodhpur', sector: 'Textile & Handloom', category: 'A-1 (Skill)', grade: 'A', target: 150 },
+            { id: '3', appId: 'APP-004663', agencyName: 'Singhania Vocational Institute', district: 'Udaipur', sector: 'Automotive', category: 'A-1 (Skill)', grade: 'A', target: 150 },
+            { id: '4', appId: 'APP-004664', agencyName: 'DMR Enterprises Private Limited', district: 'Alwar', sector: 'Healthcare', category: 'A-1 (Skill)', grade: 'A', target: 150 }
+          ];
+        }
+      });
+    }
   }
 
   addRow(): void {
@@ -593,10 +630,30 @@ export class EoiSanctionEditorComponent implements OnInit {
   }
 
   saveDraftAndNotify(): void {
-    const sId = this.schemeId();
-    if (sId) {
-      this.eoiStateService.markSanctionSubmitted(sId);
-    }
+    const sId = this.schemeId() || 'MMKVY-01';
+    const data = {
+      schemeId: sId,
+      headerTitle: this.headerTitle,
+      headerSubtitle: this.headerSubtitle,
+      headerAddress: this.headerAddress,
+      fileNo: this.fileNo,
+      sanctionDate: this.sanctionDate,
+      documentTitle: this.documentTitle,
+      subjectText: this.subjectText,
+      referenceText: this.referenceText,
+      preambleText: this.preambleText,
+      tableRows: this.tableRows,
+      termsAndConditions: this.termsAndConditions,
+      dispatchRef: this.dispatchRef,
+      signatoryName: this.signatoryName,
+      signatoryTitle: this.signatoryTitle,
+      signatoryOrg: this.signatoryOrg,
+      copyToList: this.copyToList,
+      leftLogoUrl: this.leftLogoUrl(),
+      rightLogoUrl: this.rightLogoUrl(),
+      rightLogoText: this.rightLogoText
+    };
+    this.eoiStateService.saveSanctionOrderData(sId, data);
     this.savedNotification.set(true);
     setTimeout(() => {
       this.savedNotification.set(false);

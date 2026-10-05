@@ -59,6 +59,9 @@ export class AuthService {
   /** Active logged in user persona */
   currentUser = signal<UserPersona | null>(null);
 
+  /** Flag indicating whether the current department admin session has verified OTP */
+  isDeptAdminOtpVerified = signal<boolean>(false);
+
   constructor() {
     this.initUser();
   }
@@ -81,6 +84,12 @@ export class AuthService {
         }
       } catch {
         // Fallback gracefully
+      }
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      const isVerified = sessionStorage.getItem('isms_dept_admin_otp_verified');
+      if (isVerified === 'true') {
+        this.isDeptAdminOtpVerified.set(true);
       }
     }
   }
@@ -129,8 +138,20 @@ export class AuthService {
     this.login(persona, redirectUrl);
   }
 
+  setDeptAdminOtpVerified(verified: boolean): void {
+    this.isDeptAdminOtpVerified.set(verified);
+    if (typeof sessionStorage !== 'undefined') {
+      if (verified) {
+        sessionStorage.setItem('isms_dept_admin_otp_verified', 'true');
+      } else {
+        sessionStorage.removeItem('isms_dept_admin_otp_verified');
+      }
+    }
+  }
+
   logout(): void {
     this.currentUser.set(null);
+    this.setDeptAdminOtpVerified(false);
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.removeItem(this.STORAGE_KEY);

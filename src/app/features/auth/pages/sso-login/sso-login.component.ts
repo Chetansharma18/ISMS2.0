@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService, UserRole, USER_ROLES } from '../../../../core/auth/auth.service';
 import { OtrFormService } from '../../../registration/services/otr-form.service';
+import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dept-admin-otp-modal/dept-admin-otp-modal.component';
 
 @Component({
   selector: 'app-sso-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, DeptAdminOtpModalComponent],
   host: {
     class: 'block w-full h-full flex flex-col bg-white overflow-hidden'
   },
@@ -207,6 +208,14 @@ import { OtrFormService } from '../../../registration/services/otr-form.service'
       <!-- Bottom Spacer to keep layout balanced without scrolling -->
       <div class="shrink-0 h-2"></div>
 
+      <!-- Department Admin 6-Digit OTP Modal -->
+      <app-dept-admin-otp-modal
+        [isOpen]="showDeptAdminOtp()"
+        [ssoId]="emailOrSsoId"
+        (verified)="onDeptAdminOtpVerified($event)"
+        (cancelled)="onDeptAdminOtpCancelled()"
+      ></app-dept-admin-otp-modal>
+
     </div>
   `,
   styles: [`
@@ -228,6 +237,7 @@ export class SsoLoginComponent {
   enteredCaptcha = '313198';
   captchaCode = signal<string>('3 1 3 1 9 8');
   isLoading = signal<boolean>(false);
+  showDeptAdminOtp = signal<boolean>(false);
 
   selectRole(role: UserRole): void {
     this.selectedRole.set(role);
@@ -254,6 +264,12 @@ export class SsoLoginComponent {
       const identifier = this.emailOrSsoId.trim() || 'new_user';
       const role = this.selectedRole();
 
+      if (role === 'dept_admin') {
+        // Department Admin requires 6-digit OTP verification first
+        this.showDeptAdminOtp.set(true);
+        return;
+      }
+
       // Seed prefilled data for existing_user or clean draft for new_user
       if (role === 'existing_user') {
         this.otrFormService.loadExistingUserData();
@@ -272,10 +288,7 @@ export class SsoLoginComponent {
         localStorage.removeItem('isms_eoi_prompt_shown_new_user');
       }
 
-      if (role === 'dept_admin') {
-        // Department Admin navigates directly to EOI Requests desk
-        this.router.navigate(['/admin/eoi-view']);
-      } else if (role === 'super_admin') {
+      if (role === 'super_admin') {
         // Super Admin navigates directly to EOI Configuration / Masters
         this.router.navigate(['/admin/eoi-configuration']);
       } else {
@@ -283,5 +296,18 @@ export class SsoLoginComponent {
         this.router.navigate(['/tenders'], { queryParams: { fromLogin: 'true' } });
       }
     }, 600);
+  }
+
+  onDeptAdminOtpVerified(otp: string): void {
+    this.showDeptAdminOtp.set(false);
+    const identifier = this.emailOrSsoId.trim() || 'dept_admin';
+    this.authService.loginWithCredentials(identifier, 'dept_admin', null);
+    this.authService.setDeptAdminOtpVerified(true);
+    this.router.navigate(['/admin/eoi-view']);
+  }
+
+  onDeptAdminOtpCancelled(): void {
+    this.showDeptAdminOtp.set(false);
+    this.isLoading.set(false);
   }
 }

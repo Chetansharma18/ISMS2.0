@@ -44,21 +44,23 @@ import { jsPDF } from 'jspdf';
           </button>
 
           <!-- Apply for EOI Button -->
-          @if (!isClosed) {
-            <button
-              type="button"
-              (click)="onApply()"
-              class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-md bg-[#0B3558] hover:bg-[#07243c] text-white text-xs sm:text-[13px] font-medium transition-all cursor-pointer shadow-2xs active:scale-95"
-            >
-              <span>Apply for EOI</span>
-              <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </button>
-          } @else {
-            <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-rose-50 border border-rose-300 text-rose-700 text-xs font-semibold select-none">
-              Submission Closed
-            </span>
+          @if (!hideApplyButton) {
+            @if (!isClosed) {
+              <button
+                type="button"
+                (click)="onApply()"
+                class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-md bg-[#0B3558] hover:bg-[#07243c] text-white text-xs sm:text-[13px] font-medium transition-all cursor-pointer shadow-2xs active:scale-95"
+              >
+                <span>Apply for EOI</span>
+                <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+            } @else {
+              <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-rose-50 border border-rose-300 text-rose-700 text-xs font-semibold select-none">
+                Submission Closed
+              </span>
+            }
           }
         </div>
 
@@ -266,6 +268,7 @@ export class SchemeDetailViewComponent {
   @Input() rfpDocs: EoiDocumentItem[] = [];
   @Input() annexures: EoiDocumentItem[] = [];
   @Input() requiredInfo: Array<{ sNo: number; name: string; note?: string }> = [];
+  @Input() hideApplyButton = false;
 
   @Output() back = new EventEmitter<void>();
   @Output() apply = new EventEmitter<SchemeTender>();

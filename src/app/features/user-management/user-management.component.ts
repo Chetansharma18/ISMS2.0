@@ -14,7 +14,7 @@ export interface UserManagementItem {
   userId: string;
   username: string;
   ssoId: string;
-  userType: 'Admin' | 'Super Admin';
+  userType: 'Admin' | 'Super Admin' | 'TP';
   roleType: string;
   designation?: string;
   schemeDepartment?: string;
@@ -88,7 +88,13 @@ export interface UserManagementItem {
 
       <!-- Custom Template for Role Type -->
       <ng-template #roleTypeTemplate let-item>
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-sky-50 text-[#174A6E] border border-sky-200">
+        <span
+          class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold border"
+          [ngClass]="{
+            'bg-purple-50 text-purple-700 border-purple-200': item.roleType === 'tp' || item.userType === 'TP',
+            'bg-sky-50 text-[#174A6E] border-sky-200': item.roleType !== 'tp' && item.userType !== 'TP'
+          }"
+        >
           {{ item.roleType }}
         </span>
       </ng-template>
@@ -99,6 +105,10 @@ export interface UserManagementItem {
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 select-none">
             Active
           </span>
+        } @else if (item.userType === 'TP' || item.roleType === 'tp') {
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 select-none">
+            Blacklisted
+          </span>
         } @else {
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 select-none">
             Inactive
@@ -106,7 +116,7 @@ export interface UserManagementItem {
         }
       </ng-template>
 
-      <!-- Custom Template for Action Column (View, Edit, Mark Inactive, Delete) -->
+      <!-- Custom Template for Action Column (View, Edit, Mark Inactive/Blacklisted, Delete) -->
       <ng-template #actionTemplate let-item>
         <div class="flex items-center justify-center gap-2 whitespace-nowrap">
           <!-- View -->
@@ -128,7 +138,7 @@ export interface UserManagementItem {
           <!-- Edit -->
           <button
             type="button"
-            (click)="$event.stopPropagation(); openEditModal(item)"
+            (click)="$event.stopPropagation(); requestEditUser(item)"
             class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
             title="Edit User"
           >
@@ -140,17 +150,17 @@ export interface UserManagementItem {
 
           <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
 
-          <!-- Mark Inactive / Mark Active -->
+          <!-- Mark Inactive / Mark Blacklisted / Mark Active -->
           <button
             type="button"
-            (click)="$event.stopPropagation(); toggleUserStatus(item)"
+            (click)="$event.stopPropagation(); requestToggleUserStatus(item)"
             class="inline-flex items-center gap-1 text-slate-600 hover:text-slate-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
-            [title]="item.schemeStatus === 'Active' ? 'Mark Inactive' : 'Mark Active'"
+            [title]="(item.userType === 'TP' || item.roleType === 'tp') ? (item.schemeStatus === 'Active' ? 'Mark Blacklisted' : 'Mark Active') : (item.schemeStatus === 'Active' ? 'Mark Inactive' : 'Mark Active')"
           >
             <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
             </svg>
-            <span>{{ item.schemeStatus === 'Active' ? 'Mark Inactive' : 'Mark Active' }}</span>
+            <span>{{ (item.userType === 'TP' || item.roleType === 'tp') ? (item.schemeStatus === 'Active' ? 'Mark Blacklisted' : 'Mark Active') : (item.schemeStatus === 'Active' ? 'Mark Inactive' : 'Mark Active') }}</span>
           </button>
 
           <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
@@ -158,7 +168,7 @@ export interface UserManagementItem {
           <!-- Delete -->
           <button
             type="button"
-            (click)="$event.stopPropagation(); deleteUser(item)"
+            (click)="$event.stopPropagation(); requestDeleteUser(item)"
             class="inline-flex items-center gap-1 text-rose-600 hover:text-rose-700 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
             title="Delete User"
           >
@@ -378,8 +388,9 @@ export interface UserManagementItem {
                 >
                   <option value="Admin">Admin</option>
                   <option value="Super Admin">Super Admin</option>
+                  <option value="TP">Training Partner (TP)</option>
                 </select>
-                <div class="text-[11px] text-slate-500 mt-0.5">Only Admin and Super Admin users can be created here.</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Select user classification (Admin, Super Admin, or TP).</div>
               </div>
 
               <!-- Role Type -->
@@ -391,6 +402,7 @@ export interface UserManagementItem {
                   class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
                 >
                   <option value="" disabled selected>Select Role Type</option>
+                  <option value="tp">tp</option>
                   <option value="scheme oc">scheme oc</option>
                   <option value="mis manager">mis manager</option>
                   <option value="programmer">programmer</option>
@@ -483,6 +495,26 @@ export interface UserManagementItem {
         </div>
       </app-action-modal>
 
+      <!-- Centered Confirmation Modal (Edit / Status Change / Delete) -->
+      <app-action-modal
+        [isOpen]="showConfirmModal()"
+        [showCloseButton]="true"
+        [closeOnBackdrop]="true"
+        [showAccentBar]="true"
+        [accentBarClass]="confirmModalData()?.accentBarClass || 'bg-[#174A6E]'"
+        [title]="confirmModalData()?.title || 'Confirmation'"
+        [primaryLabel]="confirmModalData()?.confirmLabel || 'Confirm'"
+        secondaryLabel="Cancel"
+        maxWidthClass="max-w-[460px]"
+        (primaryAction)="onConfirmAction()"
+        (secondaryAction)="closeConfirmModal()"
+        (close)="closeConfirmModal()"
+      >
+        <p class="text-sm text-slate-600 mt-2 mb-0 leading-relaxed font-sans">
+          {{ confirmModalData()?.message }}
+        </p>
+      </app-action-modal>
+
     </div>
   `
 })
@@ -490,6 +522,16 @@ export class UserManagementComponent {
   searchQuery = signal<string>('');
   showModal = signal<boolean>(false);
   showViewModal = signal<boolean>(false);
+  showConfirmModal = signal<boolean>(false);
+  confirmModalData = signal<{
+    type: 'edit' | 'status' | 'delete';
+    user: UserManagementItem;
+    title: string;
+    message: string;
+    confirmLabel: string;
+    accentBarClass?: string;
+  } | null>(null);
+
   editingId = signal<string | null>(null);
   selectedViewUser = signal<UserManagementItem | null>(null);
   submitted = signal<boolean>(false);
@@ -503,7 +545,7 @@ export class UserManagementComponent {
     mobileNo: '',
     alternateMobileNo: '',
     alternateEmail: '',
-    userType: 'Admin' as 'Admin' | 'Super Admin',
+    userType: 'Admin' as 'Admin' | 'Super Admin' | 'TP',
     roleType: '',
     designation: 'Joint Director',
     schemeDepartment: 'RSLDC',
@@ -623,6 +665,54 @@ export class UserManagementComponent {
       blockName: 'Ladpura',
       email: 'admin5@isms.gov.in',
       mobileNo: '9828011225',
+      schemeStatus: 'Active'
+    },
+    {
+      sNo: 8,
+      id: 'usr-8',
+      userId: 'USR-1008',
+      username: 'tp 1',
+      ssoId: 'SSO_TP_01',
+      userType: 'TP',
+      roleType: 'tp',
+      designation: 'Training Partner / PIA',
+      schemeDepartment: 'RSLDC',
+      districtName: 'Jaipur',
+      blockName: 'Amber',
+      email: 'tp1@isms.gov.in',
+      mobileNo: '9828099881',
+      schemeStatus: 'Active'
+    },
+    {
+      sNo: 9,
+      id: 'usr-9',
+      userId: 'USR-1009',
+      username: 'tp 2',
+      ssoId: 'SSO_TP_02',
+      userType: 'TP',
+      roleType: 'tp',
+      designation: 'Training Partner / PIA',
+      schemeDepartment: 'RSLDC',
+      districtName: 'Jodhpur',
+      blockName: 'Mandore',
+      email: 'tp2@isms.gov.in',
+      mobileNo: '9828099882',
+      schemeStatus: 'Active'
+    },
+    {
+      sNo: 10,
+      id: 'usr-10',
+      userId: 'USR-1010',
+      username: 'tp 3',
+      ssoId: 'SSO_TP_03',
+      userType: 'TP',
+      roleType: 'tp',
+      designation: 'Training Partner / PIA',
+      schemeDepartment: 'RSLDC',
+      districtName: 'Udaipur',
+      blockName: 'Girwa',
+      email: 'tp3@isms.gov.in',
+      mobileNo: '9828099883',
       schemeStatus: 'Active'
     }
   ]);
@@ -808,12 +898,81 @@ export class UserManagementComponent {
     this.showModal.set(false);
   }
 
-  deleteUser(item: UserManagementItem): void {
-    if (confirm(`Are you sure you want to delete user "${item.username}" (${item.userId})?`)) {
-      this.users.update(current => {
-        const updated = current.filter(u => u.id !== item.id);
-        return updated.map((u, index) => ({ ...u, sNo: index + 1 }));
-      });
+  requestEditUser(item: UserManagementItem): void {
+    this.confirmModalData.set({
+      type: 'edit',
+      user: item,
+      title: 'Confirm Edit User',
+      message: `Are you sure you want to edit details for user "${item.username}" (${item.userId})?`,
+      confirmLabel: 'Proceed to Edit',
+      accentBarClass: 'bg-[#174A6E]'
+    });
+    this.showConfirmModal.set(true);
+  }
+
+  requestToggleUserStatus(item: UserManagementItem): void {
+    const isTp = item.userType === 'TP' || item.roleType === 'tp';
+    const isCurrentlyActive = item.schemeStatus === 'Active';
+
+    let actionLabel = '';
+    let targetStatusLabel = '';
+
+    if (isTp) {
+      actionLabel = isCurrentlyActive ? 'Mark Blacklisted' : 'Mark Active';
+      targetStatusLabel = isCurrentlyActive ? 'Blacklisted' : 'Active';
+    } else {
+      actionLabel = isCurrentlyActive ? 'Mark Inactive' : 'Mark Active';
+      targetStatusLabel = isCurrentlyActive ? 'Inactive' : 'Active';
     }
+
+    this.confirmModalData.set({
+      type: 'status',
+      user: item,
+      title: `Confirm Action: ${actionLabel}`,
+      message: `Are you sure you want to change the status of user "${item.username}" (${item.userId}) to ${targetStatusLabel}?`,
+      confirmLabel: actionLabel,
+      accentBarClass: isCurrentlyActive ? 'bg-amber-500' : 'bg-emerald-600'
+    });
+    this.showConfirmModal.set(true);
+  }
+
+  requestDeleteUser(item: UserManagementItem): void {
+    this.confirmModalData.set({
+      type: 'delete',
+      user: item,
+      title: 'Confirm Delete User',
+      message: `Are you sure you want to permanently delete user "${item.username}" (${item.userId})? This action cannot be undone.`,
+      confirmLabel: 'Delete User',
+      accentBarClass: 'bg-rose-600'
+    });
+    this.showConfirmModal.set(true);
+  }
+
+  onConfirmAction(): void {
+    const data = this.confirmModalData();
+    if (!data) return;
+
+    this.showConfirmModal.set(false);
+    this.confirmModalData.set(null);
+
+    if (data.type === 'edit') {
+      this.openEditModal(data.user);
+    } else if (data.type === 'status') {
+      this.toggleUserStatus(data.user);
+    } else if (data.type === 'delete') {
+      this.deleteUser(data.user);
+    }
+  }
+
+  closeConfirmModal(): void {
+    this.showConfirmModal.set(false);
+    this.confirmModalData.set(null);
+  }
+
+  deleteUser(item: UserManagementItem): void {
+    this.users.update(current => {
+      const updated = current.filter(u => u.id !== item.id);
+      return updated.map((u, index) => ({ ...u, sNo: index + 1 }));
+    });
   }
 }

@@ -207,9 +207,11 @@ import {
         <ng-template #actionTemplate let-item>
           <a
             [routerLink]="['/admin/review', item.id]"
-            class="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-[4px] bg-[#EAF2F6] hover:bg-[#d5e6f0] text-[#174A6E] border border-[#D9E1E7] transition-colors font-medium text-[13px] cursor-pointer"
+            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-md bg-[#0B3558] hover:bg-[#07243c] !text-white shadow-2xs transition-colors font-semibold text-xs whitespace-nowrap cursor-pointer"
+            style="color: #ffffff !important;"
           >
-            <span>Review &rarr;</span>
+            <span style="color: #ffffff !important;">Review</span>
+            <span style="color: #ffffff !important;">&rarr;</span>
           </a>
         </ng-template>
 
@@ -237,7 +239,7 @@ export class ApplicantSubmissionsComponent {
       type: 'status',
       format: (val) => val === 'UNDER_SCRUTINY' ? 'Pending Review' : val === 'APPROVED' ? 'Accepted' : 'Rejected'
     },
-    { key: 'action', label: 'Action', align: 'center', width: 'w-24', type: 'custom' }
+    { key: 'action', label: 'Action', align: 'center', width: 'w-32', type: 'custom' }
   ];
 
   constructor() {

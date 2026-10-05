@@ -74,14 +74,15 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
           <span class="text-slate-500 text-[11px] ml-1">EOIs</span>
         </ng-template>
 
-        <!-- Custom Action Template: Changed button text to 'View' without hover scrollbar -->
+        <!-- Custom Action Template: Changed button text to 'View' with guaranteed white text -->
         <ng-template #actionTemplate let-scheme>
           @if (scheme.status === 'Closed') {
             <a
               [routerLink]="['/admin/responses', scheme.id]"
-              class="inline-flex items-center justify-center px-4 py-1.5 rounded-md text-xs font-semibold bg-[#0B3558] hover:bg-[#07243c] text-white shadow-2xs transition-colors cursor-pointer min-w-[64px]"
+              class="inline-flex items-center justify-center px-4 py-1.5 rounded-md text-xs font-semibold bg-[#0B3558] hover:bg-[#07243c] !text-white shadow-2xs transition-colors cursor-pointer min-w-[64px]"
+              style="color: #ffffff !important;"
             >
-              <span>View</span>
+              <span style="color: #ffffff !important; font-weight: 600;">View</span>
             </a>
           } @else {
             <div class="relative group inline-block">

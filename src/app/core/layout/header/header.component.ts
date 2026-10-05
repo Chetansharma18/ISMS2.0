@@ -27,52 +27,52 @@ import { AuthService } from '../../auth/auth.service';
       [class.top-0]="isSticky"
       role="banner"
     >
-      <div class="w-full h-[70px] sm:h-[76px] lg:h-[80px] px-4 sm:px-8 lg:px-12 flex items-center justify-between gap-3 sm:gap-6 font-['Inter',sans-serif]">
+      <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-['Inter',sans-serif]">
 
         <!-- LEFT SIDE: Emblem + ISMS Logo + Separator + Identity (Name above Subtitle) -->
-        <a routerLink="/" class="flex items-center gap-3.5 sm:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
+        <a routerLink="/" class="flex items-center gap-2 sm:gap-3.5 md:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
           
           <!-- Logos Group -->
-          <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             <!-- Government of Rajasthan Emblem -->
             <img
               src="/Rajasthan-Sarkar.png"
               alt="Government of Rajasthan"
-              class="h-8 sm:h-9 lg:h-[38px] w-auto object-contain shrink-0"
+              class="h-7 sm:h-9 lg:h-[38px] w-auto object-contain shrink-0"
             />
             <!-- ISMS Logo -->
             <img
               src="/rsldc-logo.png"
               alt="ISMS"
-              class="h-8 sm:h-9 lg:h-[38px] w-auto object-contain shrink-0"
+              class="h-7 sm:h-9 lg:h-[38px] w-auto object-contain shrink-0"
               onerror="this.src='/Rajasthan-Sarkar.png'"
             />
           </div>
 
           <!-- Thin Vertical Separator -->
-          <div class="w-px h-7 sm:h-8 bg-[#DCE4ED] shrink-0"></div>
+          <div class="w-px h-6 sm:h-8 bg-[#DCE4ED] shrink-0"></div>
 
           <!-- System Identity: Name above Subtitle -->
           <div class="flex flex-col justify-center leading-none">
-            <div class="text-[19px] sm:text-[21px] lg:text-[24px] font-bold text-[#12365A] tracking-tight leading-none">
+            <div class="text-[17px] sm:text-[21px] lg:text-[24px] font-bold text-[#12365A] tracking-tight leading-none">
               ISMS <span class="text-[#F28C28]">2.0</span>
             </div>
-            <div class="text-[11px] sm:text-[12px] lg:text-[14px] font-normal text-[#344256] tracking-normal leading-tight mt-1 whitespace-nowrap">
+            <div class="hidden md:block text-[11px] sm:text-[12px] lg:text-[14px] font-normal text-[#344256] tracking-normal leading-tight mt-1 whitespace-nowrap">
               Integrated Scheme Management System
             </div>
           </div>
         </a>
 
         <!-- RIGHT SIDE: Language Controls + Divider + Login / User Pill -->
-        <div class="flex items-center gap-3 sm:gap-4 lg:gap-5 shrink-0">
+        <div class="flex items-center gap-2 sm:gap-4 lg:gap-5 shrink-0">
 
           <!-- Language Controls -->
-          <div class="flex items-center gap-2 sm:gap-2.5 text-[14px]" aria-label="Language selection">
+          <div class="flex items-center gap-1.5 sm:gap-2.5 text-xs sm:text-[14px]" aria-label="Language selection">
             <!-- English -->
             <button
               type="button"
               (click)="onLanguageChange('en')"
-              class="border-0 bg-transparent cursor-pointer p-0 text-[14px] transition-colors leading-none font-['Inter',sans-serif]"
+              class="border-0 bg-transparent cursor-pointer p-0 text-xs sm:text-[14px] transition-colors leading-none font-['Inter',sans-serif]"
               [class.text-[#12365A]]="selectedLanguage() === 'en'"
               [class.font-bold]="selectedLanguage() === 'en'"
               [class.text-[#344256]]="selectedLanguage() !== 'en'"
@@ -83,13 +83,13 @@ import { AuthService } from '../../auth/auth.service';
             </button>
 
             <!-- Thin Vertical Divider -->
-            <div class="w-px h-3.5 sm:h-4 bg-[#DCE4ED] shrink-0"></div>
+            <div class="w-px h-3 sm:h-4 bg-[#DCE4ED] shrink-0"></div>
 
             <!-- हिंदी -->
             <button
               type="button"
               (click)="onLanguageChange('hi')"
-              class="border-0 bg-transparent cursor-pointer p-0 text-[14px] transition-colors leading-none font-['Noto_Sans_Devanagari','Inter',sans-serif]"
+              class="border-0 bg-transparent cursor-pointer p-0 text-xs sm:text-[14px] transition-colors leading-none font-['Noto_Sans_Devanagari','Inter',sans-serif]"
               [class.text-[#12365A]]="selectedLanguage() === 'hi'"
               [class.font-bold]="selectedLanguage() === 'hi'"
               [class.text-[#344256]]="selectedLanguage() !== 'hi'"
@@ -107,18 +107,18 @@ import { AuthService } from '../../auth/auth.service';
                 type="button"
                 id="user-menu-btn"
                 (click)="toggleDropdown()"
-                class="inline-flex items-center gap-2 sm:gap-2.5 bg-white hover:bg-[#F5F8FA] border border-[#DCE4ED] rounded-full py-1.5 pl-2 pr-3.5 sm:pr-4 transition-all cursor-pointer h-[38px] sm:h-[42px]"
+                class="inline-flex items-center gap-2 sm:gap-2.5 bg-white hover:bg-[#F5F8FA] border border-[#DCE4ED] rounded-full py-1 pl-1.5 pr-2.5 sm:py-1.5 sm:pl-2 sm:pr-4 transition-all cursor-pointer h-[34px] sm:h-[42px]"
                 [attr.aria-expanded]="dropdownOpen()"
                 aria-haspopup="true"
                 aria-label="User menu"
               >
                 <!-- Avatar -->
-                <div class="w-6.5 h-6.5 rounded-full bg-[#12365A] text-white flex items-center justify-center font-bold text-[11px] sm:text-xs uppercase shrink-0 select-none">
+                <div class="w-6 h-6 sm:w-6.5 sm:h-6.5 rounded-full bg-[#12365A] text-white flex items-center justify-center font-bold text-[11px] sm:text-xs uppercase shrink-0 select-none">
                   {{ avatarChar() }}
                 </div>
 
                 <!-- Username -->
-                <span class="text-xs sm:text-[13px] font-semibold text-[#12365A] max-w-28 sm:max-w-40 truncate">
+                <span class="text-xs sm:text-[13px] font-semibold text-[#12365A] max-w-20 sm:max-w-40 truncate">
                   {{ displayName() }}
                 </span>
 
@@ -170,23 +170,23 @@ import { AuthService } from '../../auth/auth.service';
                 </div>
               }
             </div>
-          } @else {
+          } @else if (!isSsoPage()) {
             <!-- Login Button with user icon and right-arrow icon -->
             <button
               type="button"
               (click)="onLoginClick()"
-              class="inline-flex items-center justify-center gap-2 sm:gap-2.5 bg-[#12365A] hover:bg-[#0B2440] text-white text-[14px] font-semibold h-[42px] px-4.5 sm:px-5 rounded-[6px] transition-colors cursor-pointer shadow-xs border-0 select-none"
+              class="inline-flex items-center justify-center gap-1.5 sm:gap-2.5 bg-[#12365A] hover:bg-[#0B2440] text-white text-xs sm:text-[14px] font-semibold h-[36px] sm:h-[42px] px-3 sm:px-5 rounded-[6px] transition-colors cursor-pointer shadow-xs border-0 select-none"
               aria-label="Sign in to ISMS 2.0 Portal"
             >
               <!-- User Icon -->
-              <svg class="w-4 h-4 shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
 
               <span>Login</span>
 
               <!-- Right Arrow Icon -->
-              <svg class="w-4 h-4 shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </button>
@@ -216,6 +216,7 @@ export class HeaderComponent {
 
   readonly selectedLanguage = signal<'en' | 'hi'>('en');
   readonly isLandingPage = signal<boolean>(true);
+  readonly isSsoPage = signal<boolean>(false);
   readonly dropdownOpen = signal<boolean>(false);
 
   readonly currentUser = this.authService.currentUser;
@@ -235,6 +236,7 @@ export class HeaderComponent {
     const checkUrl = (url: string) => {
       const cleanUrl = url.split('?')[0].split('#')[0];
       this.isLandingPage.set(cleanUrl === '/' || cleanUrl === '');
+      this.isSsoPage.set(cleanUrl.includes('/sso-login'));
     };
 
     checkUrl(this.router.url);

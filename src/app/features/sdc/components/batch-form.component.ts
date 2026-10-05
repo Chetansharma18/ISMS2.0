@@ -1143,7 +1143,7 @@ export class BatchFormComponent implements OnInit {
     const txnId = this.transactionId() || 'TXN-PSD-2026-89412';
     const timeStamp = this.paymentTimestamp() || new Date().toLocaleString('en-IN');
     const paymentMode = this.selectedPaymentMethod() || 'Online';
-    const tp = this.tpName() || 'Apex Skill Development Foundation';
+    const tp = this.tpName() || 'Company 1';
     const sdcCode = this.sdcCode() || 'SDC-RJ-2026-0042';
     const sdcName = this.sdcName() || 'Apex Aviation & Skill Institute, Jaipur';
     const scheme = this.scheme() || 'MMSSY (Mukhya Mantri Sarvjan Skill Yojana)';

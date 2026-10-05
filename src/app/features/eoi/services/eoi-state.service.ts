@@ -154,7 +154,7 @@ export class EoiStateService {
       refNo: 'RSLDC/EOI/2026/MMKVY-01',
       schemeTitle: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
       code: 'MMKVY-RAJKVIK',
-      category: 'Category I: RAJKVIK',
+      category: 'Rajvik',
       dateOfOpening: '31-Aug-2026 01:00 PM',
       dateOfClosing: '05-Oct-2026 02:00 PM',
       status: 'Closed',
@@ -162,7 +162,7 @@ export class EoiStateService {
       issuingAuthority: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
       emdFee: '₹50,000',
       processFee: '₹2,000',
-      description: 'Expression of Interest for Empanelment of Training Partners (TPs) to impart skill training under MMKVY (Category I: RAJKVIK) across Rajasthan districts with guaranteed minimum 70% wage & corporate placement support for eligible youth.'
+      description: 'Expression of Interest for Empanelment of Training Partners (TPs) to impart skill training under MMKVY (Rajvik) across Rajasthan districts with guaranteed minimum 70% wage & corporate placement support for eligible youth.'
     },
     {
       id: 'SAMARTH-02',
@@ -184,7 +184,7 @@ export class EoiStateService {
       refNo: 'RSLDC/EOI/2026/MMKVY-03',
       schemeTitle: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
       code: 'MMKVY-SAMARTH',
-      category: 'Category III: SAMARTH',
+      category: 'Samarth',
       dateOfOpening: '03-Sep-2026 02:30 PM',
       dateOfClosing: '20-Oct-2026 05:00 PM',
       status: 'Open',
@@ -192,7 +192,7 @@ export class EoiStateService {
       issuingAuthority: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
       emdFee: '₹50,000',
       processFee: '₹2,000',
-      description: 'Skill empanelment proposal for Category III target segments across designated tribal and scheduled caste sub-plan tehsils in Rajasthan.'
+      description: 'Skill empanelment proposal for Samarth target segments across designated tribal and scheduled caste sub-plan tehsils in Rajasthan.'
     },
     {
       id: 'ELSTP-01',
@@ -214,7 +214,7 @@ export class EoiStateService {
       refNo: 'DSEE/EOI/2026/RYSY-02',
       schemeTitle: 'Rajasthan Yuva Sambal Yojana (RYSY)',
       code: 'RYSY-SAKSHM',
-      category: 'Category II: SAKSHM',
+      category: 'Saksham',
       dateOfOpening: '08-Sep-2026 01:00 PM',
       dateOfClosing: '28-Oct-2026 03:00 PM',
       status: 'Open',
@@ -246,7 +246,7 @@ export class EoiStateService {
     {
       id: 'APP-2024-001',
       anonymousLabel: 'Company 1',
-      actualLegalName: 'Apex Skill Development Foundation',
+      actualLegalName: 'Company 1',
       regNumber: 'ISMS-REG-2026-8819',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
@@ -260,8 +260,8 @@ export class EoiStateService {
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'Apex Skill Development Foundation',
-        tradeName: 'Apex Tech Skills',
+        legalName: 'Company 1',
+        tradeName: 'Company 1',
         entityType: 'Company registered under Companies Act, 2013',
         registrationNumber: 'U74999DL2018PTC334512',
         dateOfRegistration: '14/03/2018',
@@ -271,15 +271,15 @@ export class EoiStateService {
         turnover: '₹12,03,35,010',
         registeredAddress: 'Plot No. 44, Institutional Area, Jhalana Doongri, Jaipur, Rajasthan 302004',
         operationalAddress: 'Plot No. 44, Institutional Area, Jhalana Doongri, Jaipur, Rajasthan 302004',
-        website: 'apexskills.org',
-        email: 'info@apexskills.org',
+        website: 'www.company1.org',
+        email: 'info@company1.org',
         contactNumber: '0141-2705600'
       },
 
       authorizedSignatory: {
         name: 'SUMAN GUPTA',
         designation: 'Director',
-        email: 'compliance@apexskills.org',
+        email: 'compliance@company1.org',
         contactNumber: '9968009648',
         residenceAddress: '45-B, Civil Lines, Jaipur',
         state: 'Rajasthan',
@@ -296,7 +296,7 @@ export class EoiStateService {
       bankDetails: {
         bankName: 'State Bank of India',
         branchName: 'Specialized Commercial Branch, Jaipur',
-        accountHolderName: 'Apex Skill Development Foundation',
+        accountHolderName: 'Company 1',
         accountNumber: '38920194821',
         ifscCode: 'SBIN0004128',
         accountType: 'Current Account'
@@ -305,7 +305,7 @@ export class EoiStateService {
       trainingCentres: [
         {
           district: 'Alwar',
-          centreName: 'Apex Tech Skills Centre Alwar',
+          centreName: 'Company 1 Skill Centre Alwar',
           classrooms: 3,
           practicalRooms: 2,
           separateWashrooms: true,
@@ -315,7 +315,7 @@ export class EoiStateService {
         },
         {
           district: 'Jaipur',
-          centreName: 'Apex Regional Skill Academy',
+          centreName: 'Company 1 Regional Skill Academy',
           classrooms: 4,
           practicalRooms: 3,
           separateWashrooms: true,
@@ -325,7 +325,7 @@ export class EoiStateService {
         },
         {
           district: 'Udaipur',
-          centreName: 'Apex Tribal Skill Training Hub',
+          centreName: 'Company 1 Tribal Skill Training Hub',
           classrooms: 3,
           practicalRooms: 2,
           separateWashrooms: true,
@@ -335,7 +335,7 @@ export class EoiStateService {
         },
         {
           district: 'Sikar',
-          centreName: 'Apex Skill Development Centre Sikar',
+          centreName: 'Company 1 Skill Development Centre Sikar',
           classrooms: 3,
           practicalRooms: 2,
           separateWashrooms: true,
@@ -396,7 +396,7 @@ export class EoiStateService {
     {
       id: 'APP-2024-002',
       anonymousLabel: 'Company 2',
-      actualLegalName: 'Shri Ram Educational Trust',
+      actualLegalName: 'Company 2',
       regNumber: 'ISMS-REG-2026-3391',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
@@ -410,8 +410,8 @@ export class EoiStateService {
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'Shri Ram Educational Trust',
-        tradeName: 'Shri Ram Vocational Academy',
+        legalName: 'Company 2',
+        tradeName: 'Company 2',
         entityType: 'Registered Society under Rajasthan Societies Act',
         registrationNumber: 'RS-JOD-2016-891',
         dateOfRegistration: '11/08/2016',
@@ -421,15 +421,15 @@ export class EoiStateService {
         turnover: '₹8,45,00,000',
         registeredAddress: '12, Heavy Industrial Area, Jodhpur, Rajasthan 342003',
         operationalAddress: '12, Heavy Industrial Area, Jodhpur, Rajasthan 342003',
-        website: 'shriramtrust.org',
-        email: 'director@shriramtrust.org',
+        website: 'www.company2.org',
+        email: 'info@company2.org',
         contactNumber: '0291-2741000'
       },
 
       authorizedSignatory: {
         name: 'RAJENDRA SINGH RATHORE',
         designation: 'Managing Trustee',
-        email: 'trustee@shriramtrust.org',
+        email: 'compliance@company2.org',
         contactNumber: '9414123456',
         residenceAddress: 'Plot 18, Paota C Road, Jodhpur, Rajasthan',
         state: 'Rajasthan',
@@ -446,7 +446,7 @@ export class EoiStateService {
       bankDetails: {
         bankName: 'Punjab National Bank',
         branchName: 'Heavy Industrial Area Branch, Jodhpur',
-        accountHolderName: 'Shri Ram Educational Trust',
+        accountHolderName: 'Company 2',
         accountNumber: '1129002100045812',
         ifscCode: 'PUNB0112900',
         accountType: 'Current Account'
@@ -455,7 +455,7 @@ export class EoiStateService {
       trainingCentres: [
         {
           district: 'Jodhpur',
-          centreName: 'Shri Ram Skill Hub',
+          centreName: 'Company 2 Skill Hub',
           classrooms: 4,
           practicalRooms: 3,
           separateWashrooms: true,
@@ -465,7 +465,7 @@ export class EoiStateService {
         },
         {
           district: 'Pali',
-          centreName: 'Pali Textile & Stitching Centre',
+          centreName: 'Company 2 Textile & Stitching Centre',
           classrooms: 3,
           practicalRooms: 2,
           separateWashrooms: true,
@@ -524,7 +524,7 @@ export class EoiStateService {
     {
       id: 'APP-2024-003',
       anonymousLabel: 'Company 3',
-      actualLegalName: 'Maharana Skill Institute',
+      actualLegalName: 'Company 3',
       regNumber: 'ISMS-REG-2026-1104',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
@@ -538,8 +538,8 @@ export class EoiStateService {
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'Maharana Skill Institute',
-        tradeName: 'Maharana Skills Hub',
+        legalName: 'Company 3',
+        tradeName: 'Company 3',
         entityType: 'Trust registered under Indian Trusts Act',
         registrationNumber: 'TR-UDR-2019-440',
         dateOfRegistration: '22/05/2019',
@@ -549,15 +549,15 @@ export class EoiStateService {
         turnover: '₹5,20,00,000',
         registeredAddress: 'Plot 7, Chetak Circle, Udaipur, Rajasthan 313001',
         operationalAddress: 'Plot 7, Chetak Circle, Udaipur, Rajasthan 313001',
-        website: 'maharanaskill.org',
-        email: 'admin@maharanaskill.org',
+        website: 'www.company3.org',
+        email: 'info@company3.org',
         contactNumber: '0294-2567890'
       },
 
       authorizedSignatory: {
         name: 'MANISH SINGHANIA',
         designation: 'Chief Trustee',
-        email: 'manish@maharanaskill.org',
+        email: 'compliance@company3.org',
         contactNumber: '9829012345',
         residenceAddress: '15, Madhuban, Udaipur, Rajasthan',
         state: 'Rajasthan',
@@ -574,7 +574,7 @@ export class EoiStateService {
       bankDetails: {
         bankName: 'HDFC Bank',
         branchName: 'Chetak Circle Branch, Udaipur',
-        accountHolderName: 'Maharana Skill Institute',
+        accountHolderName: 'Company 3',
         accountNumber: '50200034891240',
         ifscCode: 'HDFC0000281',
         accountType: 'Current Account'
@@ -583,7 +583,7 @@ export class EoiStateService {
       trainingCentres: [
         {
           district: 'Udaipur',
-          centreName: 'Maharana Tech Hub',
+          centreName: 'Company 3 Tech Hub',
           classrooms: 3,
           practicalRooms: 2,
           separateWashrooms: true,
@@ -629,7 +629,7 @@ export class EoiStateService {
     {
       id: 'APP-2024-004',
       anonymousLabel: 'Company 4',
-      actualLegalName: 'Marwar Skill Solutions Ltd',
+      actualLegalName: 'Company 4',
       regNumber: 'ISMS-REG-2026-9871',
       schemeId: 'MMKVY-01',
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
@@ -643,8 +643,8 @@ export class EoiStateService {
       processingFeeStatus: 'PAID',
 
       organisation: {
-        legalName: 'Marwar Skill Solutions Ltd',
-        tradeName: 'DMR SAKSHAM',
+        legalName: 'Company 4',
+        tradeName: 'Company 4',
         entityType: 'Company registered under Companies Act, 1956',
         registrationNumber: '07AAECD8566H1ZC',
         dateOfRegistration: '07/01/2017',
@@ -654,15 +654,15 @@ export class EoiStateService {
         turnover: '₹12,03,35,010',
         registeredAddress: 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi, 110042',
         operationalAddress: 'Plot 89, RIICO Industrial Area, Mansarovar, Jaipur, Rajasthan 302020',
-        website: 'dmrenterprises.com',
-        email: 'vijaydtm1960@gmail.com',
+        website: 'www.company4.org',
+        email: 'info@company4.org',
         contactNumber: '7849954552'
       },
 
       authorizedSignatory: {
         name: 'SUMAN GUPTA',
         designation: 'Director',
-        email: 'compliance@nsmark.in',
+        email: 'compliance@company4.org',
         contactNumber: '9968009648',
         residenceAddress: 'B298 GF AND FF, LOK VIHAR PITAMPURA, Pitampura, North West Delhi, 110034',
         state: 'Delhi',
@@ -679,7 +679,7 @@ export class EoiStateService {
       bankDetails: {
         bankName: 'Bank of Baroda',
         branchName: 'Bhugor Bypass Branch, Alwar',
-        accountHolderName: 'DMR Enterprises Pvt Ltd',
+        accountHolderName: 'Company 4',
         accountNumber: '08420200001923',
         ifscCode: 'BARB0ALWARX',
         accountType: 'Current Account'
@@ -688,7 +688,7 @@ export class EoiStateService {
       trainingCentres: [
         {
           district: 'Alwar',
-          centreName: 'DMR Enterprises Pvt Ltd Alwar',
+          centreName: 'Company 4 Skill Centre Alwar',
           classrooms: 2,
           practicalRooms: 2,
           separateWashrooms: true,
@@ -698,7 +698,7 @@ export class EoiStateService {
         },
         {
           district: 'Khairthal-Tijara',
-          centreName: 'DMR Training Centre Khairthal',
+          centreName: 'Company 4 Training Centre Khairthal',
           classrooms: 3,
           practicalRooms: 3,
           separateWashrooms: true,
@@ -708,7 +708,7 @@ export class EoiStateService {
         },
         {
           district: 'Udaipur',
-          centreName: 'DMR Skills Centre Udaipur',
+          centreName: 'Company 4 Skills Centre Udaipur',
           classrooms: 3,
           practicalRooms: 3,
           separateWashrooms: true,
@@ -718,7 +718,7 @@ export class EoiStateService {
         },
         {
           district: 'Jaipur',
-          centreName: 'DMR Centre Jaipur',
+          centreName: 'Company 4 Centre Jaipur',
           classrooms: 3,
           practicalRooms: 3,
           separateWashrooms: true,

@@ -53,14 +53,14 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
           <div class="w-full flex items-center justify-center">
             
             <!-- Video Container Card: 16:9, rounded 12px, border 1px solid #DCE4ED, subtle shadow -->
-            <div class="w-full rounded-[12px] overflow-hidden bg-[#0B2440] border border-[#DCE4ED] shadow-[0_4px_16px_rgba(18,54,90,0.08)] relative">
+            <div class="w-full rounded-[12px] overflow-hidden bg-[#0B2440] border border-[#DCE4ED] shadow-[0_4px_16px_rgba(18,54,90,0.08)] relative [transform:translateZ(0)] will-change-transform">
               
               <div class="relative w-full aspect-video bg-[#0B2440] overflow-hidden flex items-center justify-center">
                 
                 <!-- Actual Video Element -->
                 <video 
                   #videoRef
-                  class="w-full h-full object-cover object-center transition-opacity duration-300"
+                  class="w-full h-full object-cover object-center transition-opacity duration-300 [transform:translateZ(0)]"
                   [class.opacity-0]="!isVideoLoaded()"
                   [class.opacity-100]="isVideoLoaded()"
                   playsinline

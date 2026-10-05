@@ -105,32 +105,32 @@ import { CommonModule } from '@angular/common';
               <div class="grid grid-cols-3 divide-x divide-[#E1E7EE] text-center">
                 
                 <!-- Stat 1: 1K+ Downloads -->
-                <div class="px-2 sm:px-4 flex flex-col items-center justify-center">
-                  <div class="font-['Inter',sans-serif] text-[28px] sm:text-[34px] lg:text-[40px] font-bold text-[#12365A] leading-none tabular-nums tracking-tight">
+                <div class="px-1.5 sm:px-4 flex flex-col items-center justify-center">
+                  <div class="font-['Inter',sans-serif] text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#12365A] leading-none tabular-nums tracking-tight">
                     1K+
                   </div>
-                  <div class="font-['Inter',sans-serif] text-[13px] sm:text-[15px] font-normal text-[#52647A] mt-2">
+                  <div class="font-['Inter',sans-serif] text-[11px] sm:text-[14px] lg:text-[15px] font-normal text-[#52647A] mt-1.5 sm:mt-2">
                     Downloads
                   </div>
                 </div>
 
                 <!-- Stat 2: 4.8 User Rating (with Orange Star) -->
-                <div class="px-2 sm:px-4 flex flex-col items-center justify-center">
-                  <div class="font-['Inter',sans-serif] text-[28px] sm:text-[34px] lg:text-[40px] font-bold text-[#12365A] leading-none tabular-nums tracking-tight flex items-center justify-center gap-1">
+                <div class="px-1.5 sm:px-4 flex flex-col items-center justify-center">
+                  <div class="font-['Inter',sans-serif] text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#12365A] leading-none tabular-nums tracking-tight flex items-center justify-center gap-0.5 sm:gap-1">
                     <span>4.8</span>
-                    <span class="text-[#F28C28] text-[20px] sm:text-[24px] lg:text-[26px] leading-none -mt-1" aria-hidden="true">★</span>
+                    <span class="text-[#F28C28] text-[16px] sm:text-[22px] lg:text-[26px] leading-none -mt-0.5" aria-hidden="true">★</span>
                   </div>
-                  <div class="font-['Inter',sans-serif] text-[13px] sm:text-[15px] font-normal text-[#52647A] mt-2">
+                  <div class="font-['Inter',sans-serif] text-[11px] sm:text-[14px] lg:text-[15px] font-normal text-[#52647A] mt-1.5 sm:mt-2">
                     User Rating
                   </div>
                 </div>
 
                 <!-- Stat 3: 200+ Active Users -->
-                <div class="px-2 sm:px-4 flex flex-col items-center justify-center">
-                  <div class="font-['Inter',sans-serif] text-[28px] sm:text-[34px] lg:text-[40px] font-bold text-[#12365A] leading-none tabular-nums tracking-tight">
+                <div class="px-1.5 sm:px-4 flex flex-col items-center justify-center">
+                  <div class="font-['Inter',sans-serif] text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#12365A] leading-none tabular-nums tracking-tight">
                     200+
                   </div>
-                  <div class="font-['Inter',sans-serif] text-[13px] sm:text-[15px] font-normal text-[#52647A] mt-2">
+                  <div class="font-['Inter',sans-serif] text-[11px] sm:text-[14px] lg:text-[15px] font-normal text-[#52647A] mt-1.5 sm:mt-2">
                     Active Users
                   </div>
                 </div>

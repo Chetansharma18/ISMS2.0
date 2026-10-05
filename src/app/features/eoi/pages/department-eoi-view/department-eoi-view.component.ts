@@ -98,7 +98,14 @@ export class DepartmentEoiViewComponent {
       label: 'Category',
       align: 'center',
       cellClass: 'whitespace-nowrap font-normal text-slate-700',
-      format: (val) => (!val || val === 'NA' || val === '-') ? '-' : val
+      format: (val) => {
+        if (!val || val === 'NA' || val === '-') return '-';
+        const cleaned = val.replace(/^Category\s+[I|V|X|0-9]+:\s*/i, '').trim();
+        if (cleaned.toUpperCase() === 'RAJKVIK') return 'Rajvik';
+        if (cleaned.toUpperCase() === 'SAMARTH') return 'Samarth';
+        if (cleaned.toUpperCase() === 'SAKSHM' || cleaned.toUpperCase() === 'SAKSHAM') return 'Saksham';
+        return cleaned || '-';
+      }
     },
     { key: 'dateOfOpening', label: 'Date of Opening', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'dateOfClosing', label: 'Date of Closing', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },

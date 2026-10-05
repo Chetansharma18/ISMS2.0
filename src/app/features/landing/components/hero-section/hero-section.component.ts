@@ -51,13 +51,13 @@ import { AuthService } from '../../../../core/auth/auth.service';
             </p>
 
             <!-- Hero CTA Buttons -->
-            <div class="flex flex-wrap sm:flex-nowrap items-center gap-3.5 mt-7 sm:mt-8">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-3.5 mt-6 sm:mt-8">
               
               <!-- Primary: Login to Portal -->
               <button
                 type="button"
                 (click)="onLoginClick()"
-                class="inline-flex items-center justify-center h-[44px] px-6 rounded-[6px] bg-[#F28C28] hover:bg-[#d9771e] active:bg-[#c46917] text-white text-[15px] font-semibold transition-colors duration-200 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F28C28] focus:ring-offset-2 focus:ring-offset-[#0B2440]"
+                class="inline-flex items-center justify-center h-[42px] sm:h-[44px] px-5 sm:px-6 rounded-[6px] bg-[#F28C28] hover:bg-[#d9771e] active:bg-[#c46917] text-white text-sm sm:text-[15px] font-semibold transition-colors duration-200 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F28C28] focus:ring-offset-2 focus:ring-offset-[#0B2440]"
                 aria-label="Login to Portal"
               >
                 <span>Login to Portal</span>
@@ -70,7 +70,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
               <button
                 type="button"
                 (click)="onViewTendersClick()"
-                class="inline-flex items-center justify-center h-[44px] px-6 rounded-[6px] bg-transparent border border-white hover:bg-white/10 active:bg-white/20 text-white text-[15px] font-semibold transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#0B2440]"
+                class="inline-flex items-center justify-center h-[42px] sm:h-[44px] px-5 sm:px-6 rounded-[6px] bg-transparent border border-white hover:bg-white/10 active:bg-white/20 text-white text-sm sm:text-[15px] font-semibold transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#0B2440]"
                 aria-label="View Tenders"
               >
                 <span>View Tenders</span>
@@ -96,8 +96,13 @@ import { AuthService } from '../../../../core/auth/auth.service';
   styles: [`
     .hero-title {
       font-family: var(--font-sans, 'Inter', sans-serif);
-      font-size: 32px;
+      font-size: 24px;
       max-width: 650px;
+    }
+    @media (min-width: 480px) {
+      .hero-title {
+        font-size: 30px;
+      }
     }
     @media (min-width: 640px) {
       .hero-title {

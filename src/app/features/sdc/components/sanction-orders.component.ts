@@ -334,10 +334,10 @@ export class SanctionOrdersComponent {
   });
 
   readonly orderColumns: TableColumn<SanctionOrder>[] = [
-    { key: 'ipaNumber',        label: 'IPA Number',           align: 'center', width: 'w-36',  cellClass: 'whitespace-nowrap font-mono font-medium text-slate-700 text-center' },
-    { key: 'schemeName',       label: 'Scheme Name',          align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-bold text-slate-900 text-center' },
-    { key: 'category',         label: 'Category',             align: 'center',                 cellClass: 'whitespace-nowrap font-medium text-slate-700 text-center' },
-    { key: 'actions',          label: 'Action',               align: 'center', type: 'custom', width: 'w-56' }
+    { key: 'ipaNumber', label: 'IPA Number', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap font-mono font-medium text-slate-700 text-center' },
+    { key: 'schemeName', label: 'Scheme Name', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-bold text-slate-900 text-center' },
+    { key: 'category', label: 'Category', align: 'center', cellClass: 'whitespace-nowrap font-medium text-slate-700 text-center' },
+    { key: 'actions', label: 'Action', align: 'center', type: 'custom', width: 'w-56' }
   ];
 
   openSanctionOrderModal(so: SanctionOrder): void {

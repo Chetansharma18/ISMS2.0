@@ -64,29 +64,32 @@ export interface EoiDocumentItem {
             title="Active Scheme"
             [showBreadcrumbs]="false"
           >
-            <!-- Integrated Search Bar (Matching User Screenshot) -->
-            <div class="w-full sm:w-auto min-w-[280px] sm:min-w-[360px] md:min-w-[420px]">
-              <div class="relative flex items-center bg-white rounded-lg border border-slate-300 shadow-2xs overflow-hidden focus-within:border-[#174A6E] focus-within:ring-2 focus-within:ring-[#174A6E]/20 transition-all">
-                <svg class="w-4 h-4 text-slate-400 shrink-0 ml-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input
-                  type="text"
-                  [ngModel]="searchQuery()"
-                  (ngModelChange)="onSearchChange($event)"
-                  placeholder="Search schemes by name, reference no. or keyword..."
-                  class="w-full pl-2.5 pr-3 py-1.5 sm:py-2 text-xs sm:text-[13px] text-slate-800 placeholder-slate-400 focus:outline-none bg-transparent"
-                />
-                <button
-                  type="button"
-                  class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
-                  title="Search"
-                >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <div class="flex flex-wrap items-center gap-3">
+              <!-- Integrated Search Bar (Matching User Screenshot) -->
+              <div class="w-full sm:w-auto min-w-[280px] sm:min-w-[360px] md:min-w-[420px]">
+                <div class="relative flex items-center bg-white rounded-lg border border-slate-300 shadow-2xs overflow-hidden focus-within:border-[#174A6E] focus-within:ring-2 focus-within:ring-[#174A6E]/20 transition-all">
+                  <svg class="w-4 h-4 text-slate-400 shrink-0 ml-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
-                </button>
+                  <input
+                    type="text"
+                    [ngModel]="searchQuery()"
+                    (ngModelChange)="onSearchChange($event)"
+                    placeholder="Search schemes by name, reference no. or keyword..."
+                    class="w-full pl-2.5 pr-3 py-1.5 sm:py-2 text-xs sm:text-[13px] text-slate-800 placeholder-slate-400 focus:outline-none bg-transparent"
+                  />
+                  <button
+                    type="button"
+                    class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                    title="Search"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </button>
+                </div>
               </div>
+
             </div>
           </app-page-header>
 
@@ -677,4 +680,3 @@ export class TendersPageComponent {
     return `Expression of Interest for Empanelment of Training Providers / PIAs to implement state skill development initiatives under ${scheme.schemeTitle || scheme.schemeName}.`;
   }
 }
-

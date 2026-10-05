@@ -299,7 +299,7 @@ export class SanctionOrderComponent implements OnInit {
           {
             srNo: 1,
             appId: 'APP-2024-001',
-            agencyName: 'Apex Skill Development Foundation',
+            agencyName: 'Company 1',
             district: 'Jaipur',
             sector: 'Electronics & IT',
             category: 'A-1 (Skill)',
@@ -309,7 +309,7 @@ export class SanctionOrderComponent implements OnInit {
           {
             srNo: 2,
             appId: 'APP-2024-002',
-            agencyName: 'Shri Ram Educational Trust',
+            agencyName: 'Company 2',
             district: 'Jodhpur',
             sector: 'Apparel & Automotive',
             category: 'A-1 (Skill)',
@@ -319,7 +319,7 @@ export class SanctionOrderComponent implements OnInit {
           {
             srNo: 3,
             appId: 'APP-2024-003',
-            agencyName: 'Maharana Skill Institute',
+            agencyName: 'Company 3',
             district: 'Udaipur',
             sector: 'Tourism & Hospitality',
             category: 'A-1 (Skill)',
@@ -329,7 +329,7 @@ export class SanctionOrderComponent implements OnInit {
           {
             srNo: 4,
             appId: 'APP-2024-004',
-            agencyName: 'Marwar Skill Solutions Ltd',
+            agencyName: 'Company 4',
             district: 'Bikaner',
             sector: 'Beauty & Wellness',
             category: 'A-1 (Skill)',

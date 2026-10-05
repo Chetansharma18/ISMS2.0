@@ -359,8 +359,8 @@ export function createInitialOtrFormData(): OtrFormData {
 export function createExistingUserOtrData(): OtrFormData {
   return {
     step1: {
-      shortName: 'SkillTech Solutions',
-      fullName: 'SkillTech Solutions Private Limited',
+      shortName: 'Company 1',
+      fullName: 'Company 1',
       natureOfEntity: 'Private Limited',
       registrationNumber: 'U80302RJ2022NPL079811',
       dateOfRegistration: '2022-04-15',
@@ -407,7 +407,7 @@ export function createExistingUserOtrData(): OtrFormData {
         status: 'uploaded'
       },
       blackListed: 'No',
-      nsdcPartner: 'Funded Partner',
+      nsdcPartner: 'Non-Funded Partner',
       contactNo: '0141-2700891',
       emailId: 'contact@skilltech.org',
       website: 'https://www.skilltech.org',
@@ -498,9 +498,9 @@ export function createExistingUserOtrData(): OtrFormData {
     step4: {
       bankName: 'State Bank of India',
       branchName: 'Secretariat Branch, Jaipur',
-      transferMode: 'RTGS / NEFT',
+      transferMode: 'NEFT',
       accountType: 'Current',
-      accountHolderName: 'Rajasthan Skill & Livelihoods Development Council Partner Ltd.',
+      accountHolderName: 'Company 1',
       accountNo: '3948201948201',
       ifscCode: 'SBIN0001234',
       micrCode: '302002011',

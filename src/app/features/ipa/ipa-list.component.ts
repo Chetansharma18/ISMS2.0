@@ -521,15 +521,15 @@ export class IpaListComponent {
   });
 
   readonly ipaColumns: TableColumn<SanctionOrder>[] = [
-    { key: '$index',           label: 'S. No.',               type: 'number', align: 'center', width: 'w-14' },
-    { key: 'ipaNumber',        label: 'IPA Number',           align: 'center', width: 'w-44',  type: 'custom' },
-    { key: 'appId',            label: 'Application ID',       align: 'center', width: 'w-32',  cellClass: 'whitespace-nowrap font-mono font-bold text-slate-700 text-center' },
-    { key: 'schemeName',       label: 'Scheme Name',          type: 'custom', cellClass: 'whitespace-nowrap font-bold text-slate-900' },
-    { key: 'district',         label: 'Sanction District',    align: 'center', cellClass: 'whitespace-nowrap font-medium text-slate-800 text-center' },
-    { key: 'sectors',          label: 'Sanction Sector(s)',   type: 'custom' },
-    { key: 'sanctionTarget',   label: 'Sanction Target',      align: 'center', width: 'w-32',  cellClass: 'whitespace-nowrap font-bold text-[#174A6E] text-center' },
-    { key: 'grade',            label: 'Grade',                align: 'center', type: 'custom', width: 'w-20' },
-    { key: 'actions',          label: 'Action',               align: 'center', type: 'custom', width: 'w-24' }
+    { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-14' },
+    { key: 'ipaNumber', label: 'IPA Number', align: 'center', width: 'w-44', type: 'custom' },
+    { key: 'appId', label: 'Application ID', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-mono font-bold text-slate-700 text-center' },
+    { key: 'schemeName', label: 'Scheme Name', type: 'custom', cellClass: 'whitespace-nowrap font-bold text-slate-900' },
+    { key: 'district', label: 'Sanction District', align: 'center', cellClass: 'whitespace-nowrap font-medium text-slate-800 text-center' },
+    { key: 'sectors', label: 'Sanction Sector(s)', type: 'custom' },
+    { key: 'sanctionTarget', label: 'Sanction Target', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-bold text-[#174A6E] text-center' },
+    { key: 'grade', label: 'Grade', align: 'center', type: 'custom', width: 'w-20' },
+    { key: 'actions', label: 'Action', align: 'center', type: 'custom', width: 'w-24' }
   ];
 
   get filteredIpaList(): SanctionOrder[] {

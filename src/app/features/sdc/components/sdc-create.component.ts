@@ -15,7 +15,7 @@ import { getSdcFormFields } from '../config/sdc-form.config';
     <div class="min-h-full bg-white py-4 sm:py-6 px-4 sm:px-8 font-sans selection:bg-[#174A6E] selection:text-white" style="font-family: 'Inter', sans-serif;">
       
       <!-- Direct-on-Page Container (No card wrapper, directly on the page) -->
-      <div class="max-w-7xl mx-auto space-y-4">
+      <div class="w-full space-y-4">
         
         <!-- Header: Back Button (with arrow + 'Back' label) + Title -->
         <div class="flex items-center justify-between pb-3 border-b border-slate-200">

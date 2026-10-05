@@ -22,29 +22,29 @@ export interface RegistrationStepItem {
   standalone: true,
   imports: [CommonModule, RouterModule, DocumentViewerModalComponent],
   template: `
-    <div class="w-full min-h-full font-sans bg-white p-4 sm:p-6 lg:p-7 space-y-5 max-w-[1400px] mx-auto select-none" style="font-family: 'Inter', sans-serif;">
+    <div class="w-full min-h-full font-sans p-4 sm:p-5 space-y-4 select-none" style="background-color: #FEFEFD; font-family: 'Inter', sans-serif;">
 
       <!-- ====================================================================
            1. HERO BANNER: Profile Summary with Heritage Backdrop & Alert Box
            ==================================================================== -->
-      <div class="relative w-full rounded-2xl overflow-hidden border border-slate-200/90 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4 px-6 py-5 bg-[#f4f8fb]">
+      <div class="relative w-full rounded-xl overflow-hidden border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-3.5 sm:px-7 sm:py-4 bg-[#edf4fa]">
         <!-- Panoramic Fort Heritage Image -->
         <div
           class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none"
-          style="background-image: url('/hero-bg.png'); background-position: right 25%; opacity: 0.95;"
+          style="background-image: url('/hero-bg.png'); background-position: right 20%; opacity: 0.95;"
         ></div>
         <!-- Soft Gradient Overlay: seamlessly fades fort into left background -->
         <div
           class="absolute inset-0 pointer-events-none"
-          style="background: linear-gradient(90deg, #f4f8fb 0%, #f4f8fb 32%, rgba(244, 248, 251, 0.88) 55%, rgba(244, 248, 251, 0.3) 78%, transparent 100%);"
+          style="background: linear-gradient(90deg, #edf4fa 0%, #edf4fa 28%, rgba(237, 244, 250, 0.88) 52%, rgba(237, 244, 250, 0.28) 72%, transparent 100%);"
         ></div>
 
         <!-- Left: Title & Subtitle -->
         <div class="relative z-10">
-          <h1 class="text-2xl sm:text-[26px] font-extrabold tracking-tight text-[#0B3558] m-0">
+          <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#0c2d4e] m-0">
             Profile Summary
           </h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-1 m-0 font-normal">
+          <p class="text-xs sm:text-[13px] text-slate-500 mt-1 m-0 font-normal">
             Complete your registration steps to become eligible for scheme proposals under RSLDC.
           </p>
         </div>
@@ -52,26 +52,26 @@ export interface RegistrationStepItem {
         <!-- Right: Status Badge Alert Card -->
         <div class="relative z-10 shrink-0">
           @if (isProfileIncomplete()) {
-            <div class="flex items-center gap-3 bg-[#FFFDF5] border border-[#FDE68A] rounded-xl px-4 py-3 shadow-xs">
+            <div class="flex items-center gap-3 bg-[#FFFDF5] border border-[#FDE68A] rounded-xl px-4 py-2.5 shadow-2xs">
               <!-- Amber Exclamation Circle -->
-              <div class="w-7 h-7 rounded-full bg-[#D97706] text-white flex items-center justify-center shrink-0">
-                <span class="font-bold text-sm">!</span>
+              <div class="w-6 h-6 rounded-full bg-[#D97706] text-white flex items-center justify-center shrink-0">
+                <span class="font-bold text-xs">!</span>
               </div>
               <div>
-                <div class="text-[13px] font-bold text-[#92400E] leading-tight">Profile Incomplete</div>
+                <div class="text-[12px] font-bold text-[#92400E] leading-tight">Profile Incomplete</div>
                 <div class="text-[11px] text-[#A16207] mt-0.5 leading-tight">Complete all steps to apply for EOI opportunities.</div>
               </div>
             </div>
           } @else {
-            <div class="flex items-center gap-3 bg-[#F0FDF4] border border-[#86EFAC] rounded-xl px-4 py-3 shadow-xs">
+            <div class="flex items-center gap-3 bg-[#F0FDF4] border border-[#86EFAC] rounded-xl px-4 py-2.5 shadow-2xs">
               <!-- Green Checkmark Circle -->
-              <div class="w-7 h-7 rounded-full bg-[#15803D] text-white flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div class="w-6 h-6 rounded-full bg-[#15803D] text-white flex items-center justify-center shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
               <div>
-                <div class="text-[13px] font-bold text-[#166534] leading-tight">Profile Complete</div>
+                <div class="text-[12px] font-bold text-[#166534] leading-tight">Profile Complete</div>
                 <div class="text-[11px] text-[#15803D] mt-0.5 leading-tight">All registration steps verified and active.</div>
               </div>
             </div>
@@ -82,7 +82,7 @@ export interface RegistrationStepItem {
       <!-- ====================================================================
            2. OTR PROGRESS CARD: Circular Donut Chart + Details + CTA
            ==================================================================== -->
-      <div class="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div class="w-full bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
         <!-- Left: Donut Chart + Information + Progress Bar -->
         <div class="flex items-center gap-5 sm:gap-6 flex-1 min-w-0">
           
@@ -123,7 +123,7 @@ export interface RegistrationStepItem {
           <!-- Text Details -->
           <div class="flex-1 min-w-0 space-y-2">
             <h2 class="text-base sm:text-[17px] font-bold text-slate-900 m-0">One Time Registration (OTR)</h2>
-            <p class="text-xs sm:text-[13px] text-slate-500 leading-relaxed m-0 max-w-xl">
+            <p class="text-xs sm:text-[13px] text-slate-500 leading-relaxed m-0 max-w-3xl">
               Complete all mandatory registration steps to become eligible for scheme proposals under RSLDC. Once complete, you can apply for all open EOI opportunities.
             </p>
 

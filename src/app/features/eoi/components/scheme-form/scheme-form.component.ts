@@ -36,7 +36,7 @@ export interface EoiDocumentItem {
            1. TOP NAVIGATION BAR: 6-STEP PROGRESS STEPPER
            ==================================================================== -->
       <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs font-sans">
-        <div class="w-full max-w-355 mx-auto px-3 sm:px-6 lg:px-8 py-3">
+        <div class="w-full px-3 sm:px-5 lg:px-6 py-3">
           <nav class="w-full flex items-center justify-between overflow-x-auto no-scrollbar py-0.5 gap-1 sm:gap-2" aria-label="EOI Application Steps">
             
             <!-- Step 1: Processing Fee (₹500 / ₹2,000) -->
@@ -209,7 +209,7 @@ export interface EoiDocumentItem {
       </header>
 
       <!-- Main Container -->
-      <main class="w-full max-w-355 mx-auto px-3 sm:px-6 lg:px-8 pt-5 space-y-6 font-sans">
+      <main class="w-full px-3 sm:px-5 lg:px-6 pt-5 space-y-6 font-sans">
         
         <!-- Back Button -->
         <div class="flex items-center -mt-1 mb-2">

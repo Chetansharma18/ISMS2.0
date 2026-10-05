@@ -21,7 +21,7 @@ export interface AcceptedCompanyRow {
   imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent],
   template: `
     <div class="w-full min-h-full bg-white text-[#1F2933] font-sans pb-12">
-      <div class="p-4 sm:p-5 max-w-7xl mx-auto space-y-4 font-sans">
+      <div class="p-4 sm:p-5 w-full space-y-4 font-sans">
         
         <!-- Top Action Header -->
         <app-page-header

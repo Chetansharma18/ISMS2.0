@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-dashboard',
   standalone: true,
   template: `
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="w-full p-4 sm:p-5 lg:p-6">
       <div class="bg-white rounded-lg border border-slate-200 shadow-xs p-6">
         <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
           <div>

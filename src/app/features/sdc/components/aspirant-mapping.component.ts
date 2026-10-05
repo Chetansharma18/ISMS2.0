@@ -29,7 +29,7 @@ import {
     <div class="min-h-full bg-white py-4 sm:py-6 px-4 sm:px-8 font-sans selection:bg-[#174A6E] selection:text-white" style="font-family: 'Inter', sans-serif;">
       
       <!-- Direct-on-Page Container (matching SDC & Batch forms) -->
-      <div class="max-w-7xl mx-auto space-y-4">
+      <div class="w-full space-y-4">
         
         <!-- Aadhaar Card Upload Control Template for Identity Details in Step 1 -->
         <ng-template #aadhaarUploadTemplate>

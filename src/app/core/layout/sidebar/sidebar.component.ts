@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
@@ -15,8 +15,8 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
   template: `
     <!-- Premium Sidebar -->
     <aside
-      class="shrink-0 bg-white border-r border-slate-200 h-full flex flex-col justify-between select-none overflow-y-auto font-sans"
-      style="width: 228px;"
+      class="shrink-0 bg-white border-r border-slate-200 h-full flex flex-col justify-between select-none overflow-y-auto font-sans w-[228px] max-w-full"
+      (click)="onNavClick($event)"
       aria-label="Portal Navigation Sidebar"
     >
       <!-- Top: Brand + Nav -->
@@ -460,7 +460,16 @@ export class SidebarComponent {
 
   readonly isMasterOpen = signal<boolean>(true);
 
+  @Output() linkClicked = new EventEmitter<void>();
+
   toggleMaster(): void {
     this.isMasterOpen.update((v: boolean) => !v);
+  }
+
+  onNavClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target.closest('a')) {
+      this.linkClicked.emit();
+    }
   }
 }

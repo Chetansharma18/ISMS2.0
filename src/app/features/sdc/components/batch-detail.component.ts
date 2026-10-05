@@ -21,7 +21,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
     <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
       
       @if (batch(); as b) {
-        <div class="p-4 sm:p-6 lg:p-7 space-y-5 max-w-7xl mx-auto">
+        <div class="p-4 sm:p-6 lg:p-7 space-y-5 w-full">
           
           <!-- Top Page Header (Matching SDC Detail Top Bar) -->
           <app-page-header

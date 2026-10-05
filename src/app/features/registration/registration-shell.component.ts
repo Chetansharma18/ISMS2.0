@@ -31,7 +31,7 @@ export interface StepMeta {
       <!-- ====================================================================
            Main Content Area
            ==================================================================== -->
-      <main class="flex-1 max-w-[1380px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <main class="flex-1 w-full px-4 sm:px-5 lg:px-6 py-4 sm:py-5">
 
         <!-- 1. Top Header Row (Back Button, Page Title, Mandatory Indicator, Subtitle) -->
         <div class="mb-5 space-y-3">
@@ -73,8 +73,8 @@ export interface StepMeta {
         </div>
 
         <!-- 2. Step Progress Indicator (Card with 4 Evenly Distributed Steps) -->
-        <nav aria-label="Registration Steps" class="bg-white rounded-xl border border-slate-200/90 shadow-2xs px-4 sm:px-8 py-3.5 sm:py-4.5 mb-5">
-          <div class="flex items-center justify-between w-full">
+        <nav aria-label="Registration Steps" class="bg-white rounded-xl border border-slate-200/90 shadow-2xs px-4 sm:px-8 py-3.5 sm:py-4.5 mb-5 overflow-x-auto no-scrollbar">
+          <div class="flex items-center justify-between w-full min-w-[540px] sm:min-w-0">
             @for (step of steps; track step.number; let last = $last) {
               <!-- Step Item Button -->
               <button
@@ -233,13 +233,7 @@ export interface StepMeta {
             <div class="flex items-center gap-2.5 sm:gap-3 ml-auto justify-end">
               <!-- STEP 1 NAVIGATION: [Save as Draft] [Next Step ->] -->
               @if (activeStep() === 1) {
-                <button
-                  type="button"
-                  (click)="saveDraft()"
-                  class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                >
-                  Save as Draft
-                </button>
+          
 
                 <button
                   type="button"
@@ -255,13 +249,7 @@ export interface StepMeta {
 
               <!-- STEP 2 NAVIGATION: [Previous (left)] [Save as Draft] [Next Step ->] -->
               @if (activeStep() === 2) {
-                <button
-                  type="button"
-                  (click)="saveDraft()"
-                  class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                >
-                  Save as Draft
-                </button>
+              
 
                 <button
                   type="button"
@@ -313,21 +301,11 @@ export interface StepMeta {
 
                 <button
                   type="button"
-                  (click)="saveDraft()"
-                  class="px-4 sm:px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                >
-                  Save as Draft
-                </button>
-
-                <button
-                  type="button"
                   (click)="submitApplication()"
-                  class="px-6 sm:px-8 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  class="px-6 sm:px-8 py-2.5 rounded-lg bg-[#0B3558] hover:bg-[#07243c] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Submit Application</span>
+                
+                  <span>Register</span>
                 </button>
               }
             </div>

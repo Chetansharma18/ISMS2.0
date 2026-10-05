@@ -29,8 +29,23 @@ import { AuthService } from '../../auth/auth.service';
     >
       <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-['Inter',sans-serif]">
 
-        <!-- LEFT SIDE: Emblem + ISMS Logo + Separator + Identity (Name above Subtitle) -->
-        <a routerLink="/" class="flex items-center gap-2 sm:gap-3.5 md:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
+        <!-- LEFT SIDE: Mobile Menu Toggle + Emblem + ISMS Logo + Separator + Identity -->
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+          @if (currentUser() && !isLandingPage() && !isSsoPage()) {
+            <button
+              type="button"
+              (click)="toggleMobileMenu.emit()"
+              class="md:hidden p-1.5 -ml-1 text-slate-700 hover:text-[#0B3558] hover:bg-slate-100 rounded-lg transition-colors cursor-pointer shrink-0"
+              aria-label="Toggle navigation menu"
+              title="Open Navigation Menu"
+            >
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          }
+
+          <a routerLink="/" class="flex items-center gap-2 sm:gap-3.5 md:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
           
           <!-- Logos Group -->
           <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
@@ -62,6 +77,7 @@ import { AuthService } from '../../auth/auth.service';
             </div>
           </div>
         </a>
+        </div>
 
         <!-- RIGHT SIDE: Language Controls + Divider + Login / User Pill -->
         <div class="flex items-center gap-2 sm:gap-4 lg:gap-5 shrink-0">
@@ -213,6 +229,7 @@ export class HeaderComponent {
 
   @Output() languageChanged = new EventEmitter<'en' | 'hi'>();
   @Output() loginClicked = new EventEmitter<void>();
+  @Output() toggleMobileMenu = new EventEmitter<void>();
 
   readonly selectedLanguage = signal<'en' | 'hi'>('en');
   readonly isLandingPage = signal<boolean>(true);

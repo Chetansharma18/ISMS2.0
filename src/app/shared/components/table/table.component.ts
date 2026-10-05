@@ -119,7 +119,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                         <app-status-badge [variant]="getBadgeVariant(getRawValue(item, col.key), col)">
                           {{ getFormattedValue(item, col, idx) }}
                         </app-status-badge>
-                      } @else if (col.type === 'number' && col.key === '$index') {
+                      } @else if (col.key === '$index' || (col.type === 'number' && (col.key === '$index' || col.key === 'sNo' || col.key === 'sno'))) {
                         <!-- 3. Auto Sequential S. No. -->
                         <span class="font-medium text-slate-700 whitespace-nowrap">{{ (currentPage() - 1) * pageSize + idx + 1 }}</span>
                       } @else if (col.type === 'link') {

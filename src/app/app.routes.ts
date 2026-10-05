@@ -67,6 +67,18 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'ipa',
+    loadComponent: () =>
+      import('./features/ipa/ipa-list.component').then(
+        (m) => m.IpaListComponent
+      )
+  },
+  {
+    path: 'tp/ipa',
+    redirectTo: 'ipa',
+    pathMatch: 'full'
+  },
+  {
     path: 'admin/grievance',
     loadComponent: () =>
       import('./features/admin-grievance/admin-grievance-list.component').then(
@@ -174,6 +186,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/camera-monitoring',
+    loadComponent: () =>
+      import('./features/sdc/components/camera-monitoring.component').then(
+        (m) => m.CameraMonitoringComponent
+      )
+  },
+  {
     path: 'admin/eoi-configuration',
     loadComponent: () =>
       import('./features/tenders/tenders-page.component').then(
@@ -255,13 +274,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/admin-master/eoi-category-master.component').then(
         (m) => m.EoiCategoryMasterComponent
-      )
-  },
-  {
-    path: 'admin/camera-monitoring',
-    loadComponent: () =>
-      import('./features/sdc/components/camera-monitoring.component').then(
-        (m) => m.CameraMonitoringComponent
       )
   },
   {

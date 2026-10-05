@@ -42,6 +42,8 @@ export const roleGuard = (allowedRoles: UserRole[]): CanActivateFn => {
 };
 
 /**
- * Convenience guard for department admin routes.
+ * Convenience guard for department admin and super admin routes.
  */
-export const adminGuard: CanActivateFn = roleGuard(['dept_admin']);
+export const adminGuard: CanActivateFn = roleGuard(['dept_admin', 'super_admin']);
+export const superAdminGuard: CanActivateFn = roleGuard(['super_admin']);
+

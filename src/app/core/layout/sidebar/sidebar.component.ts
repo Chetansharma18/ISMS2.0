@@ -13,13 +13,13 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
     class: 'block shrink-0 h-full'
   },
   template: `
-    <!-- Unified Reusable Sidebar -->
+    <!-- Premium Sidebar -->
     <aside
       class="shrink-0 bg-white border-r border-slate-200 h-full flex flex-col justify-between select-none overflow-y-auto font-sans"
       style="width: 228px;"
       aria-label="Portal Navigation Sidebar"
     >
-      <!-- Top: Nav Links -->
+      <!-- Top: Brand + Nav -->
       <div class="flex flex-col">
 
         <!-- Navigation Links -->
@@ -277,7 +277,20 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
               <span class="tracking-tight">Tender Status</span>
             </a>
 
-            <!-- 3. Sanction Order -->
+            <!-- 3. IPA Number -->
+            <a
+              routerLink="/ipa"
+              routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center gap-2.5 px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-all cursor-pointer group"
+            >
+              <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-[#174A6E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span class="tracking-tight">IPA Number</span>
+            </a>
+
+            <!-- 4. Sanction Order -->
             <a
               routerLink="/tp/sanction-orders"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"
@@ -290,7 +303,7 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
               <span class="tracking-tight">Sanction Order</span>
             </a>
 
-            <!-- 4. SDC Management -->
+            <!-- 5. SDC Management -->
             <a
               routerLink="/sdcs"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"
@@ -303,7 +316,7 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
               <span class="tracking-tight">SDC Management</span>
             </a>
 
-            <!-- 5. Batch Management -->
+            <!-- 6. Batch Management -->
             <a
               routerLink="/batches"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"
@@ -316,7 +329,7 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
               <span class="tracking-tight">Batch Management</span>
             </a>
 
-            <!-- 6. Aspirants Management -->
+            <!-- 7. Aspirants Management -->
             <a
               routerLink="/aspirants"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"
@@ -336,7 +349,7 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
               }
             </a>
 
-            <!-- 7. Grievance -->
+            <!-- 8. Grievance -->
             <a
               routerLink="/grievance"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"
@@ -349,7 +362,7 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
               <span class="tracking-tight">Grievance</span>
             </a>
 
-            <!-- 8. Profile -->
+            <!-- 9. Profile -->
             <a
               routerLink="/profile"
               routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-medium border border-[#D9E1E7]"

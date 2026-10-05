@@ -127,22 +127,8 @@ export interface RegistrationStepItem {
               Complete all mandatory registration steps to become eligible for scheme proposals under RSLDC. Once complete, you can apply for all open EOI opportunities.
             </p>
 
-            <!-- Horizontal Progress Bar Row -->
-            <div class="pt-1">
-              <div class="text-xs font-bold text-slate-800 mb-1.5">
-                {{ completedSectionsCount() }} of 4 Steps Completed
-              </div>
-              <div class="flex items-center gap-3 max-w-md">
-                <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div
-                    class="h-full rounded-full transition-all duration-500"
-                    [style.background-color]="isProfileIncomplete() ? '#0B3558' : '#15803D'"
-                    [style.width.%]="completionPercentage()"
-                  ></div>
-                </div>
-                <span class="text-xs font-bold text-slate-600 shrink-0">{{ completionPercentage() }}%</span>
-              </div>
-            </div>
+        
+           
           </div>
         </div>
 
@@ -159,14 +145,8 @@ export interface RegistrationStepItem {
             </svg>
           </button>
 
-          <!-- Mandatory Notice -->
-          <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#EFF6FF] border border-[#BFDBFE] text-slate-600 text-[11.5px]">
-            <svg class="w-4 h-4 text-[#2563EB] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <circle cx="12" cy="12" r="9" stroke-width="2"/>
-              <path stroke-linecap="round" stroke-width="2" d="M12 8v4m0 4h.01"/>
-            </svg>
-            <span>All steps are mandatory to complete your profile.</span>
-          </div>
+       
+      
         </div>
       </div>
 
@@ -316,40 +296,7 @@ export interface RegistrationStepItem {
         </div>
       </div>
 
-      <!-- ====================================================================
-           4. BOTTOM CARD: Important Note + Need Help? Assistance
-           ==================================================================== -->
-      <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-5">
-        <!-- Left: Important Note -->
-        <div class="flex items-center gap-3.5 flex-1 min-w-0">
-          <div class="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center shrink-0">
-            <span class="font-bold text-sm">i</span>
-          </div>
-          <div>
-            <h4 class="text-sm font-bold text-slate-900 m-0">Important Note</h4>
-            <p class="text-xs text-slate-600 mt-0.5 m-0 leading-relaxed">
-              You must complete all the registration steps to become eligible for scheme proposals under RSLDC. After successful profile completion, you can apply for all open EOI opportunities.
-            </p>
-          </div>
-        </div>
-
-        <!-- Vertical Divider -->
-        <div class="hidden md:block w-px h-10 bg-slate-200 shrink-0"></div>
-
-        <!-- Right: Need Help? -->
-        <div class="flex items-center gap-3 shrink-0">
-          <div class="w-9 h-9 rounded-full bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center shrink-0">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-            </svg>
-          </div>
-          <div>
-            <h4 class="text-sm font-bold text-slate-900 m-0">Need Help?</h4>
-            <p class="text-xs text-slate-500 mt-0.5 m-0">For any assistance, contact RSLDC support.</p>
-          </div>
-        </div>
-      </div>
-
+     
       <!-- Reusable Document Preview Modal (preserved for document review) -->
       <app-document-viewer-modal
         [isOpen]="isDocViewerOpen"

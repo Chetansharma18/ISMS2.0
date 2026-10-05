@@ -1,8 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MOCK_SANCTION_ORDERS, SanctionOrder } from '../sdc/models/sdc.model';
+import { EoiStateService, IpaDocumentData, IpaCourseRow } from '../eoi/services/eoi-state.service';
 import {
   PageHeaderComponent,
   TableComponent,
@@ -25,8 +26,8 @@ import {
         
         <!-- Page Header via Reusable PageHeaderComponent -->
         <app-page-header
-          title="IPA Number"
-          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'IPA Number' }]"
+          title="IPA"
+          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'IPA' }]"
         >
           <!-- Search input -->
           <div class="relative w-full sm:w-80">
@@ -36,7 +37,7 @@ import {
             <input
               type="text"
               [(ngModel)]="searchQuery"
-              placeholder="Search IPA Number, Scheme, District..."
+              placeholder="Search IPA, Scheme, District..."
               class="w-full pl-9 pr-7 py-1.5 text-[13px] bg-white border border-slate-300 rounded-md placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#174A6E] focus:border-[#174A6E] transition-colors font-normal shadow-2xs"
             />
             @if (searchQuery) {
@@ -129,199 +130,406 @@ import {
       </div>
 
       <!-- ====================================================================
-           OFFICIAL IN-PRINCIPLE APPROVAL (IPA) FORM DOCUMENT MODAL
+           OFFICIAL IN-PRINCIPLE APPROVAL (IPA) FORM DOCUMENT MODAL (PDF 2 FORMAT, NON-EDITABLE)
            ==================================================================== -->
       @if (selectedIpa(); as ipa) {
-        <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 font-sans overflow-y-auto print:p-0 print:static print:bg-white print:z-auto">
-          <div class="bg-white rounded-lg shadow-2xl border border-slate-300 w-full max-w-5xl overflow-hidden flex flex-col max-h-[96vh] print:max-h-none print:shadow-none print:border-none print:rounded-none">
-            
-            <!-- Modal Top Toolbar Header (Hidden during Print) -->
-            <div class="px-5 py-3 bg-[#0B3558] text-white flex items-center justify-between shrink-0 print:hidden font-sans">
-              <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <div>
-                  <h3 class="font-bold text-sm leading-tight">In-Principle Approval (IPA) Form</h3>
-                  <p class="text-[11px] text-slate-300">Official Sanction Letter &amp; Target Allocation Document</p>
+        @if (activeIpaDoc(); as doc) {
+          <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 font-sans overflow-y-auto print:p-0 print:static print:bg-white print:z-auto">
+            <div class="bg-white rounded-lg shadow-2xl border border-slate-300 w-full max-w-6xl overflow-hidden flex flex-col max-h-[96vh] print:max-h-none print:shadow-none print:border-none print:rounded-none">
+              
+              <!-- Modal Top Toolbar Header (Hidden during Print) -->
+              <div class="px-5 py-3 bg-[#0B3558] text-white flex items-center justify-between shrink-0 print:hidden font-sans">
+                <div class="flex items-center gap-2">
+                  <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <div>
+                    <h3 class="font-bold text-sm leading-tight">In-Principle Approval (IPA) Form</h3>
+                    <p class="text-[11px] text-slate-300">Official Sanction Letter &amp; Target Allocation Document</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    (click)="printIpaDocument()"
+                    class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-semibold rounded transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    <span>Print / Download PDF</span>
+                  </button>
+                  <button
+                    type="button"
+                    (click)="closeIpaModal()"
+                    class="text-slate-300 hover:text-white p-1 rounded hover:bg-white/10 transition-colors cursor-pointer"
+                  >
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
               </div>
-              
-              <div class="flex items-center gap-2">
+
+              <!-- OFFICIAL IPA DOCUMENT CONTENT (Matches PDF 2 Exactly, Read-Only) -->
+              <div id="ipa-document-sheet" class="p-6 sm:p-10 overflow-y-auto space-y-4 text-[#111827] font-serif leading-relaxed text-xs sm:text-sm bg-white print:p-0 print:overflow-visible">
+                
+                <!-- Letterhead Header with Logos -->
+                <div class="border-b-2 border-slate-800 pb-3 mb-4 text-center font-sans">
+                  <div class="flex items-center justify-between gap-4 mb-2">
+                    <!-- Left Emblem Logo -->
+                    <div class="w-20 h-20 shrink-0 flex items-center justify-center p-1 bg-transparent">
+                      <img [src]="doc.leftLogoUrl || defaultEmblemSvg" alt="Emblem Logo" class="max-w-full max-h-full object-contain" />
+                    </div>
+
+                    <!-- Header Titles -->
+                    <div class="flex-1 space-y-1">
+                      <div class="font-bold text-slate-900 text-base sm:text-lg uppercase">
+                        {{ doc.headerTitle }}
+                      </div>
+                      <div class="font-medium text-slate-700 text-xs">
+                        {{ doc.headerSubtitle }}
+                      </div>
+                      <div class="text-[11px] text-slate-600">
+                        {{ doc.headerAddress }}
+                      </div>
+                    </div>
+
+                    <!-- Right Organization Logo -->
+                    <div class="w-20 h-20 shrink-0 flex items-center justify-center p-1 bg-transparent">
+                      @if (doc.rightLogoUrl) {
+                        <img [src]="doc.rightLogoUrl" alt="Right Logo" class="max-w-full max-h-full object-contain" />
+                      } @else {
+                        <div class="text-center font-bold text-[#0B3558] leading-tight text-[11px] font-sans px-1">
+                          RSLDC<br>JAIPUR
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <!-- File No & Date Row -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 font-sans text-xs font-semibold mb-3 border-b border-slate-200 pb-2">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-slate-600">File No:</span>
+                    <span class="font-mono text-slate-900">{{ doc.fileNo }}</span>
+                  </div>
+
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-slate-600">Date:</span>
+                    <span class="font-mono text-slate-900">{{ doc.ipaDate }}</span>
+                  </div>
+                </div>
+
+                <!-- Recipient Details Block (To, PIA Name, Address, SAR) -->
+                <div class="space-y-0.5 mb-3 font-sans text-xs">
+                  <p class="font-bold text-slate-900 m-0">To,</p>
+                  <div class="pl-2 space-y-0.5">
+                    <p class="font-bold text-slate-900 m-0">{{ doc.recipientName }}</p>
+                    <p class="text-slate-700 m-0">{{ doc.recipientAddress1 }}</p>
+                    <p class="text-slate-700 m-0">{{ doc.recipientAddress2 }}</p>
+                    <p class="font-mono text-slate-800 text-[11px] font-semibold m-0 mt-0.5">{{ doc.sarNumber }}</p>
+                  </div>
+                </div>
+
+                <!-- Reference & Subject Section -->
+                <div class="space-y-1.5 mb-3 font-sans text-xs bg-slate-50/70 p-2.5 border border-slate-200 rounded">
+                  <div class="flex items-start gap-2">
+                    <span class="font-bold text-slate-900 shrink-0">Ref:</span>
+                    <p class="text-slate-700 m-0 leading-relaxed">{{ doc.referenceNo }}</p>
+                  </div>
+
+                  <div class="flex items-start gap-2">
+                    <span class="font-bold text-slate-900 shrink-0">Sub:</span>
+                    <p class="font-bold text-slate-900 m-0 leading-relaxed">{{ doc.subjectText }}</p>
+                  </div>
+                </div>
+
+                <!-- Preamble Paragraph -->
+                <div class="mb-3 text-justify font-serif text-xs sm:text-sm leading-relaxed text-slate-800">
+                  <p class="m-0">{{ doc.preambleText }}</p>
+                </div>
+
+                <!-- Name of PIA & SDC Address Block -->
+                <div class="mb-4 font-sans text-xs bg-slate-50 p-2.5 border border-slate-300 rounded space-y-1">
+                  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <span class="font-bold text-slate-900 shrink-0 w-32">Name of PIA -</span>
+                    <span class="font-bold text-slate-900">{{ doc.piaName }}</span>
+                  </div>
+                  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <span class="font-bold text-slate-900 shrink-0 w-32">SDC Address -</span>
+                    <span class="text-slate-800">{{ doc.sdcAddress }}</span>
+                  </div>
+                </div>
+
+                <!-- MAIN COURSE APPROVAL TABLE (Matching PDF 2 Exactly) -->
+                <div class="my-5">
+                  <h4 class="font-bold text-slate-900 text-xs uppercase tracking-tight mb-1.5 font-sans">
+                    APPROVED COURSE &amp; CYCLES DETAILS:
+                  </h4>
+
+                  <div class="w-full overflow-hidden">
+                    <table class="w-full table-fixed text-center border-collapse font-sans text-[8.5px] border border-slate-900 leading-tight">
+                      <thead>
+                        <tr class="bg-slate-100 text-slate-900 border-b border-slate-900 font-bold">
+                          <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[2.5%]">S. No.</th>
+                          <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[12%]">Sector</th>
+                          <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[9%]">Course Name</th>
+                          <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[8%]">Course Code</th>
+                          <th colspan="2" class="p-0.5 border-r border-b border-slate-900">Duration</th>
+                          <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[6%]">Mandatory Provision of OJT in Job Role (Yes/No)</th>
+                          <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[7%]">Minimum Edu. Qualification of trainee</th>
+                          <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[6%]">Minimum Job Entry Age of Trainee</th>
+                          <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[3%]">R/NR</th>
+                          <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[3%]">R. Cat.</th>
+                          <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[9.5%]">Cost Per Trainee</th>
+                          <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[5.5%]">Approved Trainees/ batch</th>
+                          <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[6.5%]">Cost Per Batch</th>
+                          <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[4.5%]">Possible Cycles for FY 26-27</th>
+                          <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[6.5%]">Total Budget</th>
+                          <th rowspan="2" class="p-0.5 border-b border-slate-900 w-[4%]">Per Day Training Hours</th>
+                        </tr>
+                        <tr class="bg-slate-100 text-slate-900 border-b border-slate-900 font-bold">
+                          <th class="p-0.5 border-r border-b border-slate-900 w-[3.5%]">Days</th>
+                          <th class="p-0.5 border-r border-b border-slate-900 w-[3.5%]">Hrs</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (row of doc.courseRows; track row.id; let i = $index) {
+                          <tr class="border-b border-slate-900 hover:bg-slate-50 transition-colors">
+                            <td class="p-0.5 border-r border-slate-900 text-center font-bold">
+                              {{ i + 1 }}
+                            </td>
+                            <td class="p-0.5 border-r border-slate-900 text-left">
+                              {{ row.sector }}
+                            </td>
+                            <td class="p-0.5 border-r border-slate-900 text-left font-bold">
+                              {{ row.courseName }}
+                            </td>
+                            <td class="p-0.5 border-r border-slate-900 font-mono text-center">
+                              {{ row.courseCode }}
+                            </td>
+                            <td class="p-0.5 border-r border-slate-900 text-center">
+                              {{ row.durationDays }}
+                            </td>
+                            <td class="p-0.5 border-r border-slate-900 text-center">
+                              {{ row.durationHours }}
+                            </td>
+                            <td class="p-0.5 border-r border-slate-900 text-center">
+                              {{ row.mandatoryOjt }}
+                            </td>
+                            <td class="p-0.5 border-r border-slate-900 text-center">
+                              {{ row.minEdu }}
+                            </td>
+                            <td class="p-0.5 border-r border-slate-900 text-center">
+                              {{ row.minAge }}
+                            </td>
+                            <td class="p-0.5 border-r border-slate-900 text-center font-bold">
+                              {{ row.rnr }}
+                            </td>
+                            <td class="p-0.5 border-r border-slate-900 text-center font-bold">
+                              {{ row.rCat }}
+                            </td>
+                            <!-- Cost Per Trainee Stacked Cell -->
+                            <td class="p-0 border-r border-slate-900 align-top">
+                              <table class="w-full text-[8px] border-collapse">
+                                <tr class="border-b border-slate-300">
+                                  <td class="p-0.2 border-r border-slate-300 font-semibold w-5 text-center">C</td>
+                                  <td class="p-0.2 text-right font-medium pr-0.5">{{ row.costC }}</td>
+                                </tr>
+                                <tr class="border-b border-slate-300">
+                                  <td class="p-0.2 border-r border-slate-300 font-semibold text-center">H</td>
+                                  <td class="p-0.2 text-right font-medium pr-0.5">{{ row.costH }}</td>
+                                </tr>
+                                <tr class="border-b border-slate-300">
+                                  <td class="p-0.2 border-r border-slate-300 font-semibold text-center">Toolkit</td>
+                                  <td class="p-0.2 text-right font-medium pr-0.5">{{ row.costToolkit }}</td>
+                                </tr>
+                                <tr class="bg-slate-50 font-bold">
+                                  <td class="p-0.2 border-r border-slate-300 text-center">Total</td>
+                                  <td class="p-0.2 text-right font-bold pr-0.5">{{ row.totalCostPerTrainee }}</td>
+                                </tr>
+                              </table>
+                            </td>
+                            <td class="p-0.5 border-r border-slate-900 text-center font-bold">
+                              {{ row.approvedTrainees }}
+                            </td>
+                            <td class="p-0.5 border-r border-slate-900 text-center font-bold text-slate-900">
+                              {{ row.costPerBatch }}
+                            </td>
+                            <td class="p-0.5 border-r border-slate-900 text-center font-bold">
+                              {{ row.cycles }}
+                            </td>
+                            <td class="p-0.5 border-r border-slate-900 text-center font-bold text-slate-900">
+                              {{ row.totalBudget }}
+                            </td>
+                            <td class="p-0.5 text-center font-bold">
+                              {{ row.perDayHours }}
+                            </td>
+                          </tr>
+                        }
+                        <!-- TOTAL SUMMARY FOOTER ROW -->
+                        <tr class="bg-slate-100 font-bold border-b border-slate-900 text-center">
+                          <td colspan="12" class="p-1 border-r border-slate-900 text-right pr-2 font-bold uppercase tracking-wider text-[8.5px]">
+                            TOTAL
+                          </td>
+                          <td class="p-1 border-r border-slate-900 text-center font-bold text-slate-950 text-[8.5px]">
+                            {{ totalTraineesCount() }}
+                          </td>
+                          <td class="p-1 border-r border-slate-900 text-center font-bold text-slate-950 text-[8.5px]">
+                            {{ totalCostPerBatchSum() }}
+                          </td>
+                          <td class="p-1 border-r border-slate-900 text-center font-bold text-slate-950 text-[8.5px]">
+                            {{ totalCyclesCount() }}
+                          </td>
+                          <td class="p-1 border-r border-slate-900 text-center font-bold text-slate-950 text-[8.5px]">
+                            {{ totalBudgetSum() }}
+                          </td>
+                          <td class="p-1 border-slate-900"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- TARGET ALLOCATION SUMMARY TABLE -->
+                <div class="my-5">
+                  <h4 class="font-bold text-slate-900 text-xs uppercase tracking-tight mb-1.5 font-sans">
+                    TARGET ALLOCATION SUMMARY TABLE:
+                  </h4>
+                  <table class="w-full sm:w-8/12 text-left border-collapse font-sans text-xs border border-slate-900">
+                    <thead>
+                      <tr class="bg-slate-100 text-slate-900 border-b border-slate-900 font-bold">
+                        <th class="p-1.5 border-r border-slate-900 w-14 text-center">S.No.</th>
+                        <th class="p-1.5 border-r border-slate-900">Particular</th>
+                        <th class="p-1.5 text-center w-48">Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (sumRow of doc.targetSummary; track sumRow.sNo; let i = $index) {
+                        <tr class="border-b border-slate-900">
+                          <td class="p-1.5 border-r border-slate-900 text-center font-bold">{{ i + 1 }}</td>
+                          <td class="p-1.5 border-r border-slate-900 font-medium text-slate-800">{{ sumRow.particular }}</td>
+                          <td class="p-1.5 text-center font-bold">{{ sumRow.value }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- TERMS AND CONDITIONS CLAUSES (a to h) -->
+                <div class="mt-6 mb-4 font-sans text-xs">
+                  <p class="font-bold text-slate-900 mb-2">
+                    IPA is issued subject to following terms and conditions: -
+                  </p>
+                  <ol class="list-alpha pl-5 space-y-2 text-slate-800 leading-relaxed text-[11px] sm:text-xs">
+                    @for (clause of doc.termsAndConditions; track i; let i = $index) {
+                      <li class="flex items-start gap-2">
+                        <span class="font-bold shrink-0 text-slate-800">{{ getClauseLabel(i) }})</span>
+                        <span class="font-serif leading-relaxed text-slate-800">{{ clause }}</span>
+                      </li>
+                    }
+                  </ol>
+                </div>
+
+                <!-- SIGNATORY & DISTRIBUTION BLOCK -->
+                <div class="mt-8 pt-4 flex items-end justify-between font-sans text-xs border-t border-slate-300">
+                  <div class="space-y-1">
+                    <p class="font-bold text-slate-800 m-0">CC:</p>
+                    <ol class="list-decimal pl-5 space-y-1 text-slate-700 text-[11px] m-0">
+                      @for (item of doc.ccList; track i; let i = $index) {
+                        <li>
+                          <span class="font-semibold">{{ i + 1 }}-</span> {{ item }}
+                        </li>
+                      }
+                    </ol>
+                  </div>
+
+                  <div class="text-right space-y-0.5">
+                    <div class="font-bold text-slate-900 text-xs">{{ doc.signatoryTitle }}</div>
+                    <div class="font-medium text-slate-700 text-xs">{{ doc.signatorySub }}</div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Modal Footer -->
+              <div class="px-5 py-3 bg-slate-100 border-t border-slate-200 flex items-center justify-end gap-2 shrink-0 print:hidden font-sans">
+                <button
+                  type="button"
+                  (click)="closeIpaModal()"
+                  class="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
                 <button
                   type="button"
                   (click)="printIpaDocument()"
-                  class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-semibold rounded transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                  class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white text-xs font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                   </svg>
                   <span>Print / Download PDF</span>
                 </button>
-                <button
-                  type="button"
-                  (click)="closeIpaModal()"
-                  class="text-slate-300 hover:text-white p-1 rounded hover:bg-white/10 transition-colors cursor-pointer"
-                >
-                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <!-- OFFICIAL IPA DOCUMENT CONTENT -->
-            <div id="ipa-document-sheet" class="p-6 sm:p-10 overflow-y-auto space-y-4 text-slate-900 text-xs leading-normal bg-white print:p-0 print:overflow-visible">
-              
-              <!-- Letterhead Header -->
-              <div class="relative border-b-2 border-slate-900 pb-3 font-sans pt-1 text-center space-y-1">
-                <div class="text-[11px] font-bold text-amber-700 tracking-wider uppercase">GOVERNMENT OF RAJASTHAN</div>
-                <div class="font-extrabold text-slate-900 text-base sm:text-lg tracking-tight uppercase">
-                  RAJASTHAN SKILL AND LIVELIHOODS DEVELOPMENT CORPORATION
-                </div>
-                <div class="text-slate-700 text-xs font-medium">
-                  (A Government of Rajasthan Undertaking)
-                </div>
-                <div class="text-slate-600 text-[11px]">
-                  EMI Campus, J-8-B, Jhalana Institutional Area, Jaipur - 302004
-                </div>
-              </div>
-
-              <!-- Reference Row -->
-              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 font-sans pt-2 border-b border-slate-200 pb-2">
-                <div>
-                  <span class="font-semibold text-slate-700">File No: </span>
-                  <span class="font-mono font-bold text-slate-900">RSLDC/EOI/2026-27/IPA/{{ ipa.ipaNumber }}</span>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="border border-slate-300 bg-slate-50 px-2.5 py-0.5 rounded text-xs font-mono font-bold text-slate-800">
-                    IPA Ref: {{ ipa.ipaNumber }}
-                  </span>
-                  <div>
-                    <span class="font-semibold text-slate-700">Date: </span>
-                    <span class="font-mono font-bold text-slate-900">{{ ipa.mouStartDate }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Recipient Address -->
-              <div class="space-y-0.5 font-sans text-xs pt-2">
-                <p class="font-bold text-slate-900">To,</p>
-                <div class="pl-4 space-y-0.5 text-slate-800">
-                  <p class="font-bold text-[#0B3558]">{{ ipa.agencyName || 'Company 1' }}</p>
-                  <p>Training Partner Code: <strong class="font-mono">{{ ipa.tpCode || 'MoU-001658' }}</strong></p>
-                  <p>Address: Plot No. 42, Malviya Nagar Industrial Area, Jaipur, Rajasthan - 302017</p>
-                </div>
-              </div>
-
-              <!-- Subject -->
-              <div class="bg-amber-50/80 border-l-4 border-amber-500 p-2.5 rounded-r font-sans text-xs">
-                <p class="font-bold text-slate-900">
-                  Subject: In-Principle Approval (IPA) for execution of skill training under {{ ipa.schemeName }} (Category: {{ ipa.category }}) Scheme.
-                </p>
-              </div>
-
-              <!-- Preamble text -->
-              <div class="text-justify leading-relaxed text-slate-800 space-y-2">
-                <p>
-                  With reference to your Expression of Interest (EOI) submitted under Application ID <strong>{{ ipa.appId || 'APP-2024-001' }}</strong> for the <strong>{{ ipa.schemeName }}</strong> scheme, the competent authority of RSLDC is pleased to accord <strong>In-Principle Approval (IPA)</strong> for the allocation of training targets as detailed below:
-                </p>
-              </div>
-
-              <!-- Allocated Target Table -->
-              <div class="border border-slate-300 rounded overflow-hidden">
-                <table class="w-full text-left border-collapse text-xs">
-                  <thead class="bg-slate-100 border-b border-slate-300 text-slate-700 font-bold">
-                    <tr>
-                      <th class="p-2 border-r border-slate-300 text-center">Sr. No</th>
-                      <th class="p-2 border-r border-slate-300">Application ID</th>
-                      <th class="p-2 border-r border-slate-300">Name of PIA</th>
-                      <th class="p-2 border-r border-slate-300">Sanction District</th>
-                      <th class="p-2 border-r border-slate-300">Sanction Sector(s)</th>
-                      <th class="p-2 border-r border-slate-300 text-center">Category</th>
-                      <th class="p-2 border-r border-slate-300 text-center">Grade</th>
-                      <th class="p-2 text-center">Sanction Target</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr class="border-b border-slate-200">
-                      <td class="p-2 border-r border-slate-200 text-center font-bold">1</td>
-                      <td class="p-2 border-r border-slate-200 font-mono font-bold text-[#174A6E]">{{ ipa.appId || 'APP-2024-001' }}</td>
-                      <td class="p-2 border-r border-slate-200 font-medium">{{ ipa.agencyName || 'Company 1' }}</td>
-                      <td class="p-2 border-r border-slate-200">{{ ipa.district || 'Alwar' }}</td>
-                      <td class="p-2 border-r border-slate-200">{{ (ipa.sectors || ['Healthcare & Paramedical']).join(', ') }}</td>
-                      <td class="p-2 border-r border-slate-200 text-center">
-                        <span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-bold text-[10.5px]">
-                          {{ ipa.category }}
-                        </span>
-                      </td>
-                      <td class="p-2 border-r border-slate-200 text-center">
-                        <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10.5px]">
-                          {{ ipa.grade || 'A' }}
-                        </span>
-                      </td>
-                      <td class="p-2 text-center font-bold text-base text-[#174A6E]">
-                        {{ ipa.sanctionTarget || 150 }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- General Terms & Directives -->
-              <div class="space-y-1.5 pt-2">
-                <p class="font-bold text-slate-900 uppercase text-[11px] tracking-wide">Terms &amp; Directives of In-Principle Approval:</p>
-                <ol class="list-decimal pl-5 space-y-1 text-slate-700 text-[11.5px] leading-relaxed">
-                  <li>The PIA shall set up the Skill Development Centre (SDC) in accordance with the specified infrastructure norms within 45 days of IPA issuance.</li>
-                  <li>Physical and Geo-tagged center inspection will be conducted by RSLDC inspection officers before batch commencement.</li>
-                  <li>Candidate enrollment must comply with the target demographic criteria with mandatory AEBAS biometric registration.</li>
-                  <li>Assessment and certification shall be carried out strictly through approved Sector Skill Councils / Awarding Bodies.</li>
-                  <li>Payment disbursements will be governed by milestone achievements as per the official scheme guidelines and MoU.</li>
-                </ol>
-              </div>
-
-              <!-- Signatures & Official Stamp -->
-              <div class="flex justify-between items-end pt-8 border-t border-slate-200 mt-6 font-sans">
-                <div class="text-center space-y-1">
-                  <div class="w-24 h-24 border-2 border-dashed border-slate-300 rounded-full flex items-center justify-center text-slate-400 text-[10px] font-bold uppercase mx-auto">
-                    RSLDC SEAL
-                  </div>
-                  <p class="text-[10px] text-slate-500">Official Corporation Stamp</p>
-                </div>
-
-                <div class="text-right space-y-1">
-                  <div class="font-bold text-slate-900 text-xs">For Rajasthan Skill &amp; Livelihoods Development Corporation</div>
-                  <div class="pt-6 font-serif italic text-slate-700">Authorized Officer</div>
-                  <div class="text-[11px] font-bold text-[#0B3558]">General Manager (Operations &amp; Projects)</div>
-                  <div class="text-[10.5px] text-slate-500">RSLDC, Government of Rajasthan</div>
-                </div>
               </div>
 
             </div>
-
           </div>
-        </div>
+        }
       }
 
     </div>
   `
 })
 export class IpaListComponent {
+  private eoiStateService = inject(EoiStateService);
+
   readonly pageSize = 10;
   searchQuery = '';
   readonly ipaList: SanctionOrder[] = MOCK_SANCTION_ORDERS;
   selectedIpa = signal<SanctionOrder | null>(null);
 
+  defaultEmblemSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 16 L54 28 L67 28 L56 36 L60 48 L50 40 L40 48 L44 36 L33 28 L46 28 Z" fill="%230b3558"/><path d="M25 65 Q50 55 75 65 Q50 72 25 65 Z" fill="%23b91c1c"/><text x="50" y="83" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" fill="%230b3558">GOVT OF RAJASTHAN</text></svg>`;
+
+  activeIpaDoc = computed<IpaDocumentData>(() => {
+    const item = this.selectedIpa();
+    const schemeId = item?.scheme || 'MMKVY-01';
+    const appId = item?.appId || 'APP-004661';
+    return this.eoiStateService.getIpaData(schemeId, appId);
+  });
+
+  totalTraineesCount = computed(() => {
+    const doc = this.activeIpaDoc();
+    return (doc?.courseRows || []).reduce((sum, r) => sum + (Number(r.approvedTrainees) || 0), 0);
+  });
+
+  totalCostPerBatchSum = computed(() => {
+    const doc = this.activeIpaDoc();
+    return (doc?.courseRows || []).reduce((sum, r) => sum + (Number(r.costPerBatch) || 0), 0);
+  });
+
+  totalCyclesCount = computed(() => {
+    const doc = this.activeIpaDoc();
+    return (doc?.courseRows || []).reduce((sum, r) => sum + (Number(r.cycles) || 0), 0);
+  });
+
+  totalBudgetSum = computed(() => {
+    const doc = this.activeIpaDoc();
+    return (doc?.courseRows || []).reduce((sum, r) => sum + (Number(r.totalBudget) || 0), 0);
+  });
+
   readonly ipaColumns: TableColumn<SanctionOrder>[] = [
-    { key: '$index',           label: 'S. No.',               type: 'number', align: 'center', width: 'w-14' },
-    { key: 'ipaNumber',        label: 'IPA Number',           align: 'center', width: 'w-44',  type: 'custom' },
-    { key: 'appId',            label: 'Application ID',       align: 'center', width: 'w-32',  cellClass: 'whitespace-nowrap font-mono font-bold text-slate-700 text-center' },
-    { key: 'schemeName',       label: 'Scheme Name',          type: 'custom', cellClass: 'whitespace-nowrap font-bold text-slate-900' },
-    { key: 'district',         label: 'Sanction District',    align: 'center', cellClass: 'whitespace-nowrap font-medium text-slate-800 text-center' },
-    { key: 'sectors',          label: 'Sanction Sector(s)',   type: 'custom' },
-    { key: 'sanctionTarget',   label: 'Sanction Target',      align: 'center', width: 'w-32',  cellClass: 'whitespace-nowrap font-bold text-[#174A6E] text-center' },
-    { key: 'grade',            label: 'Grade',                align: 'center', type: 'custom', width: 'w-20' },
-    { key: 'actions',          label: 'Action',               align: 'center', type: 'custom', width: 'w-24' }
+    { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-14' },
+    { key: 'ipaNumber', label: 'IPA Number', align: 'center', width: 'w-44', type: 'custom' },
+    { key: 'appId', label: 'Application ID', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-mono font-bold text-slate-700 text-center' },
+    { key: 'schemeName', label: 'Scheme Name', type: 'custom', cellClass: 'whitespace-nowrap font-bold text-slate-900' },
+    { key: 'district', label: 'Sanction District', align: 'center', cellClass: 'whitespace-nowrap font-medium text-slate-800 text-center' },
+    { key: 'sectors', label: 'Sanction Sector(s)', type: 'custom' },
+    { key: 'sanctionTarget', label: 'Sanction Target', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-bold text-[#174A6E] text-center' },
+    { key: 'grade', label: 'Grade', align: 'center', type: 'custom', width: 'w-20' },
+    { key: 'actions', label: 'Action', align: 'center', type: 'custom', width: 'w-24' }
   ];
 
   get filteredIpaList(): SanctionOrder[] {
@@ -337,6 +545,10 @@ export class IpaListComponent {
     );
   }
 
+  getClauseLabel(index: number): string {
+    return String.fromCharCode(97 + index); // a, b, c, d...
+  }
+
   viewIpaForm(ipa: SanctionOrder): void {
     this.selectedIpa.set(ipa);
   }
@@ -346,6 +558,8 @@ export class IpaListComponent {
   }
 
   printIpaDocument(): void {
-    window.print();
+    if (typeof window !== 'undefined') {
+      window.print();
+    }
   }
 }

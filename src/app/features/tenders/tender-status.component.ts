@@ -319,51 +319,34 @@ export interface SubmittedTender {
 
           </div>
 
-          <!-- Application Overview & Edit Rules Strip -->
-          <div class="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-3 text-xs">
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div>
-                <span class="text-slate-400 block text-[10px] uppercase font-bold">Applied Date</span>
-                <strong class="text-slate-800 text-xs">{{ selectedTender()!.appliedDate }}</strong>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[10px] uppercase font-bold">Submission Last Date</span>
-                <div class="flex items-center gap-1.5 mt-0.5">
-                  <strong class="text-slate-800 text-xs">{{ selectedTender()!.closingDate }}</strong>
-                  @if (isBeforeClosingDate(selectedTender()!.closingDate)) {
-                    <span class="text-[9.5px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">Open</span>
-                  } @else {
-                    <span class="text-[9.5px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-200">Closed</span>
-                  }
-                </div>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[10px] uppercase font-bold">Edits Allowed</span>
-                <div class="flex items-center gap-1 mt-0.5">
-                  <strong class="text-xs" [ngClass]="selectedTender()!.editCount >= 3 ? 'text-rose-700' : 'text-[#0B3558]'">
-                    {{ selectedTender()!.editCount }} of 3 Used
-                  </strong>
-                  <span class="text-slate-400">({{ remainingEdits(selectedTender()!) }} Remaining)</span>
-                </div>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[10px] uppercase font-bold">Total Fees Remitted</span>
-                <strong class="text-[#0B3558] text-xs font-black">₹ 52,000.00</strong>
+          <!-- Top 3 Edits Status Strip -->
+          <div class="p-3 sm:p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-3 text-xs font-sans">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="w-2 h-2 rounded-full" [ngClass]="selectedTender()!.editCount >= 3 ? 'bg-rose-500' : 'bg-emerald-500'"></span>
+              <span class="text-slate-400 uppercase font-bold text-[10.5px]">Edits Allowed:</span>
+              <span class="font-bold text-slate-800">3 Edits Only</span>
+              <span class="text-slate-400">&bull;</span>
+              <span class="text-slate-500">Max 3 edit attempts allowed before closing date ({{ selectedTender()!.closingDate }})</span>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <strong class="text-xs" [ngClass]="selectedTender()!.editCount >= 3 ? 'text-rose-700' : 'text-[#0B3558]'">
+                {{ selectedTender()!.editCount }} of 3 Used
+              </strong>
+              <span class="text-slate-500">({{ remainingEdits(selectedTender()!) }} Remaining)</span>
+            </div>
+          </div>
+
+          @if (isEditing()) {
+            <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 flex items-start gap-2 text-xs font-sans">
+              <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div class="leading-relaxed">
+                <strong class="block font-bold">You are currently editing this application:</strong>
+                <span>Saving your changes will consume 1 edit attempt ({{ remainingEdits(selectedTender()!) }} remaining). You can edit up to 3 times before the closing date (<strong>{{ selectedTender()!.closingDate }}</strong>).</span>
               </div>
             </div>
-
-            @if (isEditing()) {
-              <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 flex items-start gap-2">
-                <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <div class="leading-relaxed">
-                  <strong class="block font-bold">You are currently editing this application:</strong>
-                  <span>Saving your changes will consume 1 edit attempt ({{ remainingEdits(selectedTender()!) }} remaining). You can edit up to 3 times before the closing date (<strong>{{ selectedTender()!.closingDate }}</strong>).</span>
-                </div>
-              </div>
-            }
-          </div>
+          }
 
           <!-- Fee Verification Summary Card -->
           <div class="p-4 sm:p-5 rounded-xl bg-blue-50/60 border border-blue-200 text-xs space-y-3">
@@ -880,29 +863,11 @@ export interface SubmittedTender {
               </div>
             </div>
 
-            <!-- SECTION 5: Statutory Self-Declaration & Legal Undertaking -->
-            <div class="p-4 sm:p-5 rounded-xl bg-amber-50/70 border border-amber-200 space-y-2 text-xs text-amber-900">
-              <div class="flex items-start gap-2.5">
-                <svg class="w-5 h-5 text-amber-700 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                <div class="space-y-1">
-                  <strong class="font-bold text-slate-900 block text-xs">Statutory Self-Declaration &amp; Undertaking (Digitally Accepted)</strong>
-                  <p class="text-slate-700 leading-relaxed text-[11.5px]">
-                    I/We hereby declare that all information furnished and documents submitted in this EOI Application are true, authentic, and correct to the best of my knowledge and belief. I understand that any deliberate misrepresentation shall lead to immediate disqualification of the EOI application and forfeiture of the Earnest Money Deposit (EMD).
-                  </p>
-                  <div class="text-[11px] font-bold text-emerald-800 pt-1">
-                    ✓ Digitally Signed &amp; Accepted by Authorized Signatory on {{ currentApplication().appliedDate }}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- SECTION 6: Official Dual Receipts & e-Challan Acknowledgement -->
+            <!-- SECTION 5: Official Payment Receipts & e-Challan Acknowledgement -->
             <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-5">
               <div class="flex items-center justify-between pb-3 border-b border-slate-200">
                 <h4 class="font-bold text-[#0B3558] text-sm uppercase tracking-wide flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-[#0B3558]/10 text-[#0B3558] flex items-center justify-center text-xs font-bold">6</span>
+                  <span class="w-6 h-6 rounded-full bg-[#0B3558]/10 text-[#0B3558] flex items-center justify-center text-xs font-bold">5</span>
                   <span>Official Payment Receipts &amp; e-Challan Acknowledgement</span>
                 </h4>
               </div>
@@ -1042,7 +1007,7 @@ export class TenderStatusComponent {
       }
     },
     { key: 'eoiStatus',        label: 'EOI Stage',            align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
-    { key: 'rejectionReason',  label: 'Reason for Rejection', align: 'center', type: 'custom', cellClass: 'min-w-[200px]' },
+    { key: 'rejectionReason',  label: 'Remarks', align: 'center', type: 'custom', cellClass: 'min-w-[200px]' },
     { key: 'view',             label: 'View',                 align: 'center', width: 'w-20', type: 'custom' }
   ];
 

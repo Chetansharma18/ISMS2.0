@@ -665,7 +665,7 @@ import { DocumentViewerModalComponent } from '../document-viewer-modal/document-
                   [attr.max]="field.max != null ? field.max : null"
                   [attr.step]="field.step != null ? field.step : null"
                   [attr.maxlength]="field.maxLength || null"
-                  class="flex-1 w-full h-full px-3 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none bg-transparent"
+                  class="flex-1 w-full h-full px-3 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none bg-transparent placeholder:normal-case"
                   [class.uppercase]="field.uppercase"
                   [class.cursor-not-allowed]="isFieldDisabled(field)"
                 />

@@ -156,6 +156,11 @@ textarea {
   font-family: inherit;
 }
 
+input::placeholder,
+textarea::placeholder {
+  text-transform: none !important;
+}
+
 /* ---------------------------------------------------------
    5. STANDARDIZED NORMAL HEADINGS (PORTAL TYPOGRAPHY)
    --------------------------------------------------------- */

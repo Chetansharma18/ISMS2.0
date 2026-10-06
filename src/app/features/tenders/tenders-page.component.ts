@@ -104,36 +104,9 @@ export interface EoiDocumentItem {
             </div>
           </app-page-header>
 
-          <!-- Incomplete Profile Notice Banner (if applicable) -->
-          @if (isProfileIncomplete()) {
-            <div class="bg-amber-50/90 border border-amber-300/80 rounded-md p-3 sm:p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div>
-                <h4 class="text-xs sm:text-[13px] font-medium text-amber-900">
-                  Please complete your profile first
-                </h4>
-                <p class="text-[11px] sm:text-xs text-amber-800 mt-0.5 font-normal">
-                  Your profile is currently incomplete. Please complete your profile to submit EOI.
-                </p>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <a
-                  routerLink="/profile"
-                  class="px-5 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-lg shadow-md whitespace-nowrap transition-all flex items-center gap-2 justify-center shrink-0 cursor-pointer active:scale-95"
-                  style="color: #ffffff !important;"
-                >
-                  <span class="text-white font-bold" style="color: #ffffff !important;">Complete Registration</span>
-                  <svg class="w-4 h-4 text-white" style="stroke: #ffffff !important; color: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          }
-
           <!-- Schemes Table via Reusable TableComponent -->
           <app-table
-            [columns]="schemeColumns"
+            [columns]="schemeColumns()"
             [data]="filteredSchemes()"
             [pagination]="true"
             [pageSize]="pageSize"
@@ -189,27 +162,27 @@ export interface EoiDocumentItem {
                 <span>View</span>
               </button>
 
-              <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
-
-              <!-- Add Committee Button -->
-              <button
-                type="button"
-                (click)="$event.stopPropagation(); openAddCommitteeModal(item)"
-                class="inline-flex items-center gap-1 text-purple-700 hover:text-purple-900 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
-                title="Add / Manage Committee Members"
-              >
-                <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5 5 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <span>Add Committee</span>
-                @if (item.committeeMembers && item.committeeMembers.length > 0) {
-                  <span class="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-300">
-                    {{ item.committeeMembers.length }}
-                  </span>
-                }
-              </button>
-
               @if (isSuperAdmin()) {
+                <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
+
+                <!-- Add Committee Button (Super Admin Only) -->
+                <button
+                  type="button"
+                  (click)="$event.stopPropagation(); openAddCommitteeModal(item)"
+                  class="inline-flex items-center gap-1 text-purple-700 hover:text-purple-900 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
+                  title="Add / Manage Committee Members"
+                >
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5 5 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  <span>Add Committee</span>
+                  @if (item.committeeMembers && item.committeeMembers.length > 0) {
+                    <span class="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-300">
+                      {{ item.committeeMembers.length }}
+                    </span>
+                  }
+                </button>
+
                 <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
 
                 <button
@@ -796,7 +769,7 @@ export class TendersPageComponent {
 
 
 
-  readonly schemeColumns: TableColumn<SchemeTender>[] = [
+  readonly schemeColumns = computed<TableColumn<SchemeTender>[]>(() => [
     { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-20 min-w-[75px]' },
     {
       key: 'refNo',
@@ -837,10 +810,10 @@ export class TendersPageComponent {
       key: 'viewAction',
       label: 'Action',
       align: 'center',
-      width: 'min-w-[200px]',
+      width: this.isSuperAdmin() ? 'min-w-[280px]' : 'min-w-[100px]',
       type: 'custom'
     }
-  ];
+  ]);
 
   isSchemeClosed(scheme: SchemeTender | null | undefined): boolean {
     if (!scheme) return false;
@@ -1207,6 +1180,7 @@ export class TendersPageComponent {
   }
 
   openAddCommitteeModal(scheme: SchemeTender): void {
+    if (!this.isSuperAdmin()) return;
     this.selectedSchemeForCommittee.set(scheme);
     this.selectedAdminIds.set(scheme.committeeMembers ? [...scheme.committeeMembers] : []);
     this.isAdminDropdownOpen.set(false);

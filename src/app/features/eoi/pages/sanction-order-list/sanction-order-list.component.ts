@@ -21,9 +21,9 @@ import {
           title="Sanction Order"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Sanction Order' }]"
         >
-          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-white/15 text-white border border-white/20 text-xs font-normal">
-            <span>Closed Schemes (Sanction Ready):</span>
-            <span class="font-semibold">{{ schemes().length }}</span>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[#0c2d4e] border border-slate-300 text-xs font-medium shadow-xs">
+            <span class="text-slate-600">Closed Schemes (Sanction Ready):</span>
+            <span class="font-bold text-[#0c2d4e]">{{ schemes().length }}</span>
           </div>
         </app-page-header>
 

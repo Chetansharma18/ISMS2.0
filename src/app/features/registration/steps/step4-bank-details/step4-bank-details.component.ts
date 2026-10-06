@@ -39,7 +39,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             [value]="data().bankName"
             (valueChange)="update('bankName', $event)"
             [options]="banks"
-            placeholder="Select Bank"
+            placeholder="Select bank"
             [required]="true"
             [error]="getFieldError('bankName')"
           ></app-form-select>

@@ -640,115 +640,283 @@ export interface EoiDocumentItem {
                     ATTACHED REGISTRATION DOCUMENTS
                   </span>
                   
-                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                     
                     <!-- Doc 1: Certificate of Incorporation -->
-                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex flex-col justify-between gap-2.5">
-                      <div>
-                        <span class="text-slate-400 block text-[10px] uppercase font-medium">Certificate of Incorporation</span>
-                        <span class="font-semibold text-slate-800 block truncate text-[11.5px]" title="{{ editableStep1.registrationCertDoc?.fileName || 'CIN_Incorporation_Cert_2022.pdf' }}">
-                          {{ editableStep1.registrationCertDoc?.fileName || 'CIN_Incorporation_Cert_2022.pdf' }}
-                        </span>
-                        <span class="text-[10px] text-slate-500 block">{{ editableStep1.registrationCertDoc?.fileSize || '1.4 MB PDF' }}</span>
-                      </div>
-                      <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
-                        <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Attached</span>
-                        <div class="flex items-center gap-1">
+                    @if (editableStep1.registrationCertDoc && editableStep1.registrationCertDoc.status === 'uploaded') {
+                      <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                          <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                            <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                            <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                          </svg>
+                          <div class="flex flex-col min-w-0">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Certificate of Incorporation</span>
+                            <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep1.registrationCertDoc.fileName }}">
+                              {{ editableStep1.registrationCertDoc.fileName }}
+                            </span>
+                            <div class="mt-0.5">
+                              <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                {{ editableStep1.registrationCertDoc.fileSize || '1.4 MB' }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
                           <button
                             type="button"
-                            (click)="viewDoc(editableStep1.registrationCertDoc?.fileName || 'CIN_Incorporation_Cert_2022.pdf', 'Certificate of Incorporation', '1.4 MB')"
-                            class="px-2 py-0.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px] font-medium cursor-pointer"
+                            (click)="viewDoc(editableStep1.registrationCertDoc.fileName, 'Certificate of Incorporation', editableStep1.registrationCertDoc.fileSize || '1.4 MB')"
+                            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                            title="Preview Document"
                           >
-                            View
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <span>View</span>
                           </button>
-                          <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] font-medium cursor-pointer">
-                            Replace
+                          <label
+                            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                            title="Change Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            <span>Change</span>
                             <input type="file" (change)="replaceOtrDoc($event, 'regCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
                           </label>
+                          <button
+                            type="button"
+                            (click)="removeOtrDoc('regCert')"
+                            class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                            title="Remove Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span>Remove</span>
+                          </button>
                         </div>
                       </div>
-                    </div>
+                    } @else {
+                      <div class="flex items-center justify-between gap-2.5 p-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
+                        <span class="text-xs text-slate-500 font-medium">Certificate of Incorporation</span>
+                        <label class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer shadow-2xs shrink-0 flex items-center gap-1.5">
+                          <svg class="w-3.5 h-3.5 text-slate-600 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                          </svg>
+                          <span>Upload Document</span>
+                          <input type="file" (change)="replaceOtrDoc($event, 'regCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                        </label>
+                      </div>
+                    }
 
                     <!-- Doc 2: Organization PAN Card -->
-                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex flex-col justify-between gap-2.5">
-                      <div>
-                        <span class="text-slate-400 block text-[10px] uppercase font-medium">Organization PAN Card</span>
-                        <span class="font-semibold text-slate-800 block truncate text-[11.5px]" title="{{ editableStep1.panCardDoc?.fileName || 'Company_PAN_Verified.pdf' }}">
-                          {{ editableStep1.panCardDoc?.fileName || 'Company_PAN_Verified.pdf' }}
-                        </span>
-                        <span class="text-[10px] text-slate-500 block">{{ editableStep1.panCardDoc?.fileSize || '840 KB PDF' }}</span>
-                      </div>
-                      <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
-                        <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Attached</span>
-                        <div class="flex items-center gap-1">
+                    @if (editableStep1.panCardDoc && editableStep1.panCardDoc.status === 'uploaded') {
+                      <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                          <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                            <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                            <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                          </svg>
+                          <div class="flex flex-col min-w-0">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Organization PAN Card</span>
+                            <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep1.panCardDoc.fileName }}">
+                              {{ editableStep1.panCardDoc.fileName }}
+                            </span>
+                            <div class="mt-0.5">
+                              <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                {{ editableStep1.panCardDoc.fileSize || '840 KB' }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
                           <button
                             type="button"
-                            (click)="viewDoc(editableStep1.panCardDoc?.fileName || 'Company_PAN_Verified.pdf', 'Organization PAN Card', '840 KB')"
-                            class="px-2 py-0.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px] font-medium cursor-pointer"
+                            (click)="viewDoc(editableStep1.panCardDoc.fileName, 'Organization PAN Card', editableStep1.panCardDoc.fileSize || '840 KB')"
+                            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                            title="Preview Document"
                           >
-                            View
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <span>View</span>
                           </button>
-                          <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] font-medium cursor-pointer">
-                            Replace
+                          <label
+                            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                            title="Change Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            <span>Change</span>
                             <input type="file" (change)="replaceOtrDoc($event, 'panCard')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
                           </label>
+                          <button
+                            type="button"
+                            (click)="removeOtrDoc('panCard')"
+                            class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                            title="Remove Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span>Remove</span>
+                          </button>
                         </div>
                       </div>
-                    </div>
+                    } @else {
+                      <div class="flex items-center justify-between gap-2.5 p-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
+                        <span class="text-xs text-slate-500 font-medium">Organization PAN Card</span>
+                        <label class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer shadow-2xs shrink-0 flex items-center gap-1.5">
+                          <svg class="w-3.5 h-3.5 text-slate-600 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                          </svg>
+                          <span>Upload Document</span>
+                          <input type="file" (change)="replaceOtrDoc($event, 'panCard')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                        </label>
+                      </div>
+                    }
 
                     <!-- Doc 3: GST Certificate -->
-                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex flex-col justify-between gap-2.5">
-                      <div>
-                        <span class="text-slate-400 block text-[10px] uppercase font-medium">GST Certificate</span>
-                        <span class="font-semibold text-slate-800 block truncate text-[11.5px]" title="{{ editableStep1.gstCertDoc?.fileName || 'GST_Registration_Certificate.pdf' }}">
-                          {{ editableStep1.gstCertDoc?.fileName || 'GST_Registration_Certificate.pdf' }}
-                        </span>
-                        <span class="text-[10px] text-slate-500 block">{{ editableStep1.gstCertDoc?.fileSize || '920 KB PDF' }}</span>
-                      </div>
-                      <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
-                        <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Attached</span>
-                        <div class="flex items-center gap-1">
+                    @if (editableStep1.gstCertDoc && editableStep1.gstCertDoc.status === 'uploaded') {
+                      <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                          <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                            <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                            <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                          </svg>
+                          <div class="flex flex-col min-w-0">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">GST Certificate</span>
+                            <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep1.gstCertDoc.fileName }}">
+                              {{ editableStep1.gstCertDoc.fileName }}
+                            </span>
+                            <div class="mt-0.5">
+                              <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                {{ editableStep1.gstCertDoc.fileSize || '920 KB' }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
                           <button
                             type="button"
-                            (click)="viewDoc(editableStep1.gstCertDoc?.fileName || 'GST_Registration_Certificate.pdf', 'GST Certificate', '920 KB')"
-                            class="px-2 py-0.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px] font-medium cursor-pointer"
+                            (click)="viewDoc(editableStep1.gstCertDoc.fileName, 'GST Certificate', editableStep1.gstCertDoc.fileSize || '920 KB')"
+                            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                            title="Preview Document"
                           >
-                            View
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <span>View</span>
                           </button>
-                          <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] font-medium cursor-pointer">
-                            Replace
+                          <label
+                            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                            title="Change Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            <span>Change</span>
                             <input type="file" (change)="replaceOtrDoc($event, 'gstCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
                           </label>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Doc 4: Udyam Certificate -->
-                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex flex-col justify-between gap-2.5">
-                      <div>
-                        <span class="text-slate-400 block text-[10px] uppercase font-medium">Udyam Certificate</span>
-                        <span class="font-semibold text-slate-800 block truncate text-[11.5px]" title="{{ editableStep1.msmeCertDoc?.fileName || 'Udyam_Certificate.pdf' }}">
-                          {{ editableStep1.msmeCertDoc?.fileName || 'Udyam_Certificate.pdf' }}
-                        </span>
-                        <span class="text-[10px] text-slate-500 block">{{ editableStep1.msmeCertDoc?.fileSize || '650 KB PDF' }}</span>
-                      </div>
-                      <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
-                        <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Attached</span>
-                        <div class="flex items-center gap-1">
                           <button
                             type="button"
-                            (click)="viewDoc(editableStep1.msmeCertDoc?.fileName || 'Udyam_Certificate.pdf', 'Udyam Certificate', '650 KB')"
-                            class="px-2 py-0.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px] font-medium cursor-pointer"
+                            (click)="removeOtrDoc('gstCert')"
+                            class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                            title="Remove Document"
                           >
-                            View
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span>Remove</span>
                           </button>
-                          <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] font-medium cursor-pointer">
-                            Replace
-                            <input type="file" (change)="replaceOtrDoc($event, 'msmeCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-                          </label>
                         </div>
                       </div>
-                    </div>
+                    } @else {
+                      <div class="flex items-center justify-between gap-2.5 p-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
+                        <span class="text-xs text-slate-500 font-medium">GST Certificate</span>
+                        <label class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer shadow-2xs shrink-0 flex items-center gap-1.5">
+                          <svg class="w-3.5 h-3.5 text-slate-600 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                          </svg>
+                          <span>Upload Document</span>
+                          <input type="file" (change)="replaceOtrDoc($event, 'gstCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                        </label>
+                      </div>
+                    }
+
+                    <!-- Doc 4: Udyam Certificate -->
+                    @if (editableStep1.msmeCertDoc && editableStep1.msmeCertDoc.status === 'uploaded') {
+                      <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                          <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                            <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                            <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                          </svg>
+                          <div class="flex flex-col min-w-0">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Udyam Certificate</span>
+                            <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep1.msmeCertDoc.fileName }}">
+                              {{ editableStep1.msmeCertDoc.fileName }}
+                            </span>
+                            <div class="mt-0.5">
+                              <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                {{ editableStep1.msmeCertDoc.fileSize || '650 KB' }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            (click)="viewDoc(editableStep1.msmeCertDoc.fileName, 'Udyam Certificate', editableStep1.msmeCertDoc.fileSize || '650 KB')"
+                            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                            title="Preview Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <span>View</span>
+                          </button>
+                          <label
+                            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                            title="Change Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            <span>Change</span>
+                            <input type="file" (change)="replaceOtrDoc($event, 'msmeCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                          </label>
+                          <button
+                            type="button"
+                            (click)="removeOtrDoc('msmeCert')"
+                            class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                            title="Remove Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span>Remove</span>
+                          </button>
+                        </div>
+                      </div>
+                    } @else {
+                      <div class="flex items-center justify-between gap-2.5 p-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
+                        <span class="text-xs text-slate-500 font-medium">Udyam Certificate</span>
+                        <label class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer shadow-2xs shrink-0 flex items-center gap-1.5">
+                          <svg class="w-3.5 h-3.5 text-slate-600 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                          </svg>
+                          <span>Upload Document</span>
+                          <input type="file" (change)="replaceOtrDoc($event, 'msmeCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                        </label>
+                      </div>
+                    }
 
                   </div>
                 </div>
@@ -819,59 +987,145 @@ export interface EoiDocumentItem {
                     ATTACHED SIGNATORY DOCUMENTS
                   </span>
                   
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                     
-                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex flex-col justify-between gap-2.5">
-                      <div>
-                        <span class="text-slate-400 block text-[10px] uppercase font-medium">Authorization Letter / Board Resolution</span>
-                        <span class="font-semibold text-slate-800 block truncate text-[11.5px]">
-                          {{ editableStep3.authorizationLetterDoc?.fileName || 'Board_Resolution_Auth.pdf' }}
-                        </span>
-                        <span class="text-[10px] text-slate-500 block">{{ editableStep3.authorizationLetterDoc?.fileSize || '1.1 MB PDF' }}</span>
-                      </div>
-                      <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
-                        <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Attached</span>
-                        <div class="flex items-center gap-1">
+                    <!-- Doc 1: Authorization Letter / Resolution -->
+                    @if (editableStep3.authorizationLetterDoc && editableStep3.authorizationLetterDoc.status === 'uploaded') {
+                      <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                          <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                            <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                            <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                          </svg>
+                          <div class="flex flex-col min-w-0">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Authorization Letter / Board Resolution</span>
+                            <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep3.authorizationLetterDoc.fileName }}">
+                              {{ editableStep3.authorizationLetterDoc.fileName }}
+                            </span>
+                            <div class="mt-0.5">
+                              <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                {{ editableStep3.authorizationLetterDoc.fileSize || '1.1 MB' }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
                           <button
                             type="button"
-                            (click)="viewDoc(editableStep3.authorizationLetterDoc?.fileName || 'Board_Resolution_Auth.pdf', 'Authorization Letter / Resolution', '1.1 MB')"
-                            class="px-2 py-0.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px] font-medium cursor-pointer"
+                            (click)="viewDoc(editableStep3.authorizationLetterDoc.fileName, 'Authorization Letter / Resolution', editableStep3.authorizationLetterDoc.fileSize || '1.1 MB')"
+                            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                            title="Preview Document"
                           >
-                            View
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <span>View</span>
                           </button>
-                          <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] font-medium cursor-pointer">
-                            Replace
+                          <label
+                            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                            title="Change Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            <span>Change</span>
                             <input type="file" (change)="replaceOtrDoc($event, 'authLetter')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
                           </label>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex flex-col justify-between gap-2.5">
-                      <div>
-                        <span class="text-slate-400 block text-[10px] uppercase font-medium">Identity Proof</span>
-                        <span class="font-semibold text-slate-800 block truncate text-[11.5px]">
-                          {{ editableStep3.idProofDoc?.fileName || 'Signatory_Identity_Proof.pdf' }}
-                        </span>
-                        <span class="text-[10px] text-slate-500 block">{{ editableStep3.idProofDoc?.fileSize || '780 KB PDF' }}</span>
-                      </div>
-                      <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60">
-                        <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Attached</span>
-                        <div class="flex items-center gap-1">
                           <button
                             type="button"
-                            (click)="viewDoc(editableStep3.idProofDoc?.fileName || 'Signatory_Identity_Proof.pdf', 'Signatory Identity Proof', '780 KB')"
-                            class="px-2 py-0.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px] font-medium cursor-pointer"
+                            (click)="removeOtrDoc('authLetter')"
+                            class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                            title="Remove Document"
                           >
-                            View
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span>Remove</span>
                           </button>
-                          <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] font-medium cursor-pointer">
-                            Replace
-                            <input type="file" (change)="replaceOtrDoc($event, 'authIdProof')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-                          </label>
                         </div>
                       </div>
-                    </div>
+                    } @else {
+                      <div class="flex items-center justify-between gap-2.5 p-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
+                        <span class="text-xs text-slate-500 font-medium">Authorization Letter / Board Resolution</span>
+                        <label class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer shadow-2xs shrink-0 flex items-center gap-1.5">
+                          <svg class="w-3.5 h-3.5 text-slate-600 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                          </svg>
+                          <span>Upload Document</span>
+                          <input type="file" (change)="replaceOtrDoc($event, 'authLetter')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                        </label>
+                      </div>
+                    }
+
+                    <!-- Doc 2: Identity Proof -->
+                    @if (editableStep3.idProofDoc && editableStep3.idProofDoc.status === 'uploaded') {
+                      <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                          <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                            <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                            <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                          </svg>
+                          <div class="flex flex-col min-w-0">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Signatory Identity Proof</span>
+                            <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep3.idProofDoc.fileName }}">
+                              {{ editableStep3.idProofDoc.fileName }}
+                            </span>
+                            <div class="mt-0.5">
+                              <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                {{ editableStep3.idProofDoc.fileSize || '780 KB' }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            (click)="viewDoc(editableStep3.idProofDoc.fileName, 'Signatory Identity Proof', editableStep3.idProofDoc.fileSize || '780 KB')"
+                            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                            title="Preview Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <span>View</span>
+                          </button>
+                          <label
+                            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                            title="Change Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            <span>Change</span>
+                            <input type="file" (change)="replaceOtrDoc($event, 'authIdProof')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                          </label>
+                          <button
+                            type="button"
+                            (click)="removeOtrDoc('authIdProof')"
+                            class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                            title="Remove Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span>Remove</span>
+                          </button>
+                        </div>
+                      </div>
+                    } @else {
+                      <div class="flex items-center justify-between gap-2.5 p-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
+                        <span class="text-xs text-slate-500 font-medium">Signatory Identity Proof</span>
+                        <label class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer shadow-2xs shrink-0 flex items-center gap-1.5">
+                          <svg class="w-3.5 h-3.5 text-slate-600 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                          </svg>
+                          <span>Upload Document</span>
+                          <input type="file" (change)="replaceOtrDoc($event, 'authIdProof')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                        </label>
+                      </div>
+                    }
 
                   </div>
                 </div>
@@ -929,29 +1183,74 @@ export interface EoiDocumentItem {
                   </div>
 
                   <!-- Cancelled Cheque Attached Doc -->
-                  <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg flex flex-col justify-between gap-1.5">
-                    <div>
-                      <span class="text-slate-400 block text-[10px] uppercase font-medium">Cancelled Cheque / Passbook</span>
-                      <span class="font-semibold text-slate-800 block truncate text-[11px]">
-                        {{ editableStep4.cancelledChequeDoc?.fileName || 'Cancelled_Cheque_Passbook.pdf' }}
-                      </span>
-                    </div>
-                    <div class="flex items-center justify-between gap-1">
-                      <span class="text-[10px] font-semibold text-emerald-700">Attached (890 KB)</span>
-                      <div class="flex items-center gap-1">
-                        <button
-                          type="button"
-                          (click)="viewDoc(editableStep4.cancelledChequeDoc?.fileName || 'Cancelled_Cheque_Passbook.pdf', 'Cancelled Cheque', '890 KB')"
-                          class="px-2 py-0.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px] font-medium cursor-pointer"
-                        >
-                          View
-                        </button>
-                        <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] font-medium cursor-pointer">
-                          Replace
+                  <div class="sm:col-span-2 lg:col-span-4 pt-1">
+                    @if (editableStep4.cancelledChequeDoc && editableStep4.cancelledChequeDoc.status === 'uploaded') {
+                      <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs max-w-xl">
+                        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                          <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                            <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                            <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                          </svg>
+                          <div class="flex flex-col min-w-0">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Cancelled Cheque / Passbook</span>
+                            <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep4.cancelledChequeDoc.fileName }}">
+                              {{ editableStep4.cancelledChequeDoc.fileName }}
+                            </span>
+                            <div class="mt-0.5">
+                              <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                {{ editableStep4.cancelledChequeDoc.fileSize || '890 KB' }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            (click)="viewDoc(editableStep4.cancelledChequeDoc.fileName, 'Cancelled Cheque', editableStep4.cancelledChequeDoc.fileSize || '890 KB')"
+                            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                            title="Preview Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <span>View</span>
+                          </button>
+                          <label
+                            class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                            title="Change Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            <span>Change</span>
+                            <input type="file" (change)="replaceOtrDoc($event, 'bankDoc')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                          </label>
+                          <button
+                            type="button"
+                            (click)="removeOtrDoc('bankDoc')"
+                            class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                            title="Remove Document"
+                          >
+                            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span>Remove</span>
+                          </button>
+                        </div>
+                      </div>
+                    } @else {
+                      <div class="flex items-center justify-between gap-2.5 p-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl max-w-xl">
+                        <span class="text-xs text-slate-500 font-medium">Cancelled Cheque / Passbook</span>
+                        <label class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer shadow-2xs shrink-0 flex items-center gap-1.5">
+                          <svg class="w-3.5 h-3.5 text-slate-600 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                          </svg>
+                          <span>Upload Document</span>
                           <input type="file" (change)="replaceOtrDoc($event, 'bankDoc')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
                         </label>
                       </div>
-                    </div>
+                    }
                   </div>
 
                 </div>
@@ -1376,70 +1675,248 @@ export interface EoiDocumentItem {
                   <!-- Attached Registration Documents in Preview -->
                   <div class="pt-2 border-t border-slate-200/80">
                     <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Attached Registration Documents</span>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-xs">
-                      <div class="p-2 bg-white border border-slate-200 rounded-md flex items-center justify-between gap-1.5">
-                        <div class="min-w-0">
-                          <span class="text-[9.5px] text-slate-400 block uppercase">Inc. Certificate</span>
-                          <span class="font-semibold text-slate-800 truncate block text-[10.5px]">{{ editableStep1.registrationCertDoc?.fileName || 'Incorporation_Cert.pdf' }}</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs">
+                      
+                      <!-- Inc. Certificate -->
+                      @if (editableStep1.registrationCertDoc && editableStep1.registrationCertDoc.status === 'uploaded') {
+                        <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                              <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                              <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                            </svg>
+                            <div class="flex flex-col min-w-0">
+                              <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Certificate of Incorporation</span>
+                              <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep1.registrationCertDoc.fileName }}">
+                                {{ editableStep1.registrationCertDoc.fileName }}
+                              </span>
+                              <div class="mt-0.5">
+                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                  {{ editableStep1.registrationCertDoc.fileSize || '1.4 MB' }}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              (click)="viewDoc(editableStep1.registrationCertDoc.fileName, 'Certificate of Incorporation', editableStep1.registrationCertDoc.fileSize || '1.4 MB')"
+                              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                              title="Preview Document"
+                            >
+                              <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              <span>View</span>
+                            </button>
+                            @if (isEditingOtrInPreview()) {
+                              <label
+                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                                title="Change Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <span>Change</span>
+                                <input type="file" (change)="replaceOtrDoc($event, 'regCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                              </label>
+                              <button
+                                type="button"
+                                (click)="removeOtrDoc('regCert')"
+                                class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                                title="Remove Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                <span>Remove</span>
+                              </button>
+                            }
+                          </div>
                         </div>
-                        <div class="flex items-center gap-1">
-                          <button type="button" (click)="viewDoc(editableStep1.registrationCertDoc?.fileName || 'Incorporation_Cert.pdf', 'Certificate of Incorporation', '1.4 MB')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] cursor-pointer">View</button>
-                          @if (isEditingOtrInPreview()) {
-                            <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] cursor-pointer">
-                              Replace
-                              <input type="file" (change)="replaceOtrDoc($event, 'regCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-                            </label>
-                          }
-                        </div>
-                      </div>
+                      }
 
-                      <div class="p-2 bg-white border border-slate-200 rounded-md flex items-center justify-between gap-1.5">
-                        <div class="min-w-0">
-                          <span class="text-[9.5px] text-slate-400 block uppercase">Company PAN</span>
-                          <span class="font-semibold text-slate-800 truncate block text-[10.5px]">{{ editableStep1.panCardDoc?.fileName || 'Company_PAN.pdf' }}</span>
+                      <!-- Company PAN -->
+                      @if (editableStep1.panCardDoc && editableStep1.panCardDoc.status === 'uploaded') {
+                        <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                              <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                              <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                            </svg>
+                            <div class="flex flex-col min-w-0">
+                              <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Organization PAN Card</span>
+                              <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep1.panCardDoc.fileName }}">
+                                {{ editableStep1.panCardDoc.fileName }}
+                              </span>
+                              <div class="mt-0.5">
+                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                  {{ editableStep1.panCardDoc.fileSize || '840 KB' }}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              (click)="viewDoc(editableStep1.panCardDoc.fileName, 'Organization PAN Card', editableStep1.panCardDoc.fileSize || '840 KB')"
+                              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                              title="Preview Document"
+                            >
+                              <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              <span>View</span>
+                            </button>
+                            @if (isEditingOtrInPreview()) {
+                              <label
+                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                                title="Change Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <span>Change</span>
+                                <input type="file" (change)="replaceOtrDoc($event, 'panCard')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                              </label>
+                              <button
+                                type="button"
+                                (click)="removeOtrDoc('panCard')"
+                                class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                                title="Remove Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                <span>Remove</span>
+                              </button>
+                            }
+                          </div>
                         </div>
-                        <div class="flex items-center gap-1">
-                          <button type="button" (click)="viewDoc(editableStep1.panCardDoc?.fileName || 'Company_PAN.pdf', 'Company PAN Card', '840 KB')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] cursor-pointer">View</button>
-                          @if (isEditingOtrInPreview()) {
-                            <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] cursor-pointer">
-                              Replace
-                              <input type="file" (change)="replaceOtrDoc($event, 'panCard')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-                            </label>
-                          }
-                        </div>
-                      </div>
+                      }
 
-                      <div class="p-2 bg-white border border-slate-200 rounded-md flex items-center justify-between gap-1.5">
-                        <div class="min-w-0">
-                          <span class="text-[9.5px] text-slate-400 block uppercase">GST Certificate</span>
-                          <span class="font-semibold text-slate-800 truncate block text-[10.5px]">{{ editableStep1.gstCertDoc?.fileName || 'GST_Cert.pdf' }}</span>
+                      <!-- GST Certificate -->
+                      @if (editableStep1.gstCertDoc && editableStep1.gstCertDoc.status === 'uploaded') {
+                        <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                              <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                              <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                            </svg>
+                            <div class="flex flex-col min-w-0">
+                              <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">GST Certificate</span>
+                              <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep1.gstCertDoc.fileName }}">
+                                {{ editableStep1.gstCertDoc.fileName }}
+                              </span>
+                              <div class="mt-0.5">
+                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                  {{ editableStep1.gstCertDoc.fileSize || '920 KB' }}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              (click)="viewDoc(editableStep1.gstCertDoc.fileName, 'GST Certificate', editableStep1.gstCertDoc.fileSize || '920 KB')"
+                              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                              title="Preview Document"
+                            >
+                              <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              <span>View</span>
+                            </button>
+                            @if (isEditingOtrInPreview()) {
+                              <label
+                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                                title="Change Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <span>Change</span>
+                                <input type="file" (change)="replaceOtrDoc($event, 'gstCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                              </label>
+                              <button
+                                type="button"
+                                (click)="removeOtrDoc('gstCert')"
+                                class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                                title="Remove Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                <span>Remove</span>
+                              </button>
+                            }
+                          </div>
                         </div>
-                        <div class="flex items-center gap-1">
-                          <button type="button" (click)="viewDoc(editableStep1.gstCertDoc?.fileName || 'GST_Cert.pdf', 'GST Certificate', '920 KB')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] cursor-pointer">View</button>
-                          @if (isEditingOtrInPreview()) {
-                            <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] cursor-pointer">
-                              Replace
-                              <input type="file" (change)="replaceOtrDoc($event, 'gstCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-                            </label>
-                          }
-                        </div>
-                      </div>
+                      }
 
-                      <div class="p-2 bg-white border border-slate-200 rounded-md flex items-center justify-between gap-1.5">
-                        <div class="min-w-0">
-                          <span class="text-[9.5px] text-slate-400 block uppercase">Udyam Cert</span>
-                          <span class="font-semibold text-slate-800 truncate block text-[10.5px]">{{ editableStep1.msmeCertDoc?.fileName || 'Udyam_Cert.pdf' }}</span>
+                      <!-- Udyam Cert -->
+                      @if (editableStep1.msmeCertDoc && editableStep1.msmeCertDoc.status === 'uploaded') {
+                        <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                              <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                              <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                            </svg>
+                            <div class="flex flex-col min-w-0">
+                              <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Udyam Certificate</span>
+                              <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep1.msmeCertDoc.fileName }}">
+                                {{ editableStep1.msmeCertDoc.fileName }}
+                              </span>
+                              <div class="mt-0.5">
+                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                  {{ editableStep1.msmeCertDoc.fileSize || '650 KB' }}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              (click)="viewDoc(editableStep1.msmeCertDoc.fileName, 'Udyam Certificate', editableStep1.msmeCertDoc.fileSize || '650 KB')"
+                              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                              title="Preview Document"
+                            >
+                              <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              <span>View</span>
+                            </button>
+                            @if (isEditingOtrInPreview()) {
+                              <label
+                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                                title="Change Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <span>Change</span>
+                                <input type="file" (change)="replaceOtrDoc($event, 'msmeCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                              </label>
+                              <button
+                                type="button"
+                                (click)="removeOtrDoc('msmeCert')"
+                                class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                                title="Remove Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                <span>Remove</span>
+                              </button>
+                            }
+                          </div>
                         </div>
-                        <div class="flex items-center gap-1">
-                          <button type="button" (click)="viewDoc(editableStep1.msmeCertDoc?.fileName || 'Udyam_Cert.pdf', 'Udyam Certificate', '650 KB')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] cursor-pointer">View</button>
-                          @if (isEditingOtrInPreview()) {
-                            <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] cursor-pointer">
-                              Replace
-                              <input type="file" (change)="replaceOtrDoc($event, 'msmeCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-                            </label>
-                          }
-                        </div>
-                      </div>
+                      }
+
                     </div>
                   </div>
                 </div>
@@ -1527,37 +2004,126 @@ export interface EoiDocumentItem {
 
                   <div class="pt-2 border-t border-slate-200/80">
                     <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Attached Signatory Documents</span>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                      <div class="p-2 bg-white border border-slate-200 rounded-md flex items-center justify-between gap-1.5">
-                        <div class="min-w-0">
-                          <span class="text-[9.5px] text-slate-400 block uppercase">Authorization Letter / Resolution</span>
-                          <span class="font-semibold text-slate-800 truncate block text-[10.5px]">{{ editableStep3.authorizationLetterDoc?.fileName || 'Board_Resolution.pdf' }}</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs">
+                      <!-- Authorization Letter -->
+                      @if (editableStep3.authorizationLetterDoc && editableStep3.authorizationLetterDoc.status === 'uploaded') {
+                        <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                              <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                              <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                            </svg>
+                            <div class="flex flex-col min-w-0">
+                              <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Authorization Letter / Resolution</span>
+                              <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep3.authorizationLetterDoc.fileName }}">
+                                {{ editableStep3.authorizationLetterDoc.fileName }}
+                              </span>
+                              <div class="mt-0.5">
+                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                  {{ editableStep3.authorizationLetterDoc.fileSize || '1.1 MB' }}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              (click)="viewDoc(editableStep3.authorizationLetterDoc.fileName, 'Authorization Letter', editableStep3.authorizationLetterDoc.fileSize || '1.1 MB')"
+                              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                              title="Preview Document"
+                            >
+                              <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              <span>View</span>
+                            </button>
+                            @if (isEditingOtrInPreview()) {
+                              <label
+                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                                title="Change Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <span>Change</span>
+                                <input type="file" (change)="replaceOtrDoc($event, 'authLetter')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                              </label>
+                              <button
+                                type="button"
+                                (click)="removeOtrDoc('authLetter')"
+                                class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                                title="Remove Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                <span>Remove</span>
+                              </button>
+                            }
+                          </div>
                         </div>
-                        <div class="flex items-center gap-1">
-                          <button type="button" (click)="viewDoc(editableStep3.authorizationLetterDoc?.fileName || 'Board_Resolution.pdf', 'Authorization Letter', '1.1 MB')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] cursor-pointer">View</button>
-                          @if (isEditingOtrInPreview()) {
-                            <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] cursor-pointer">
-                              Replace
-                              <input type="file" (change)="replaceOtrDoc($event, 'authLetter')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-                            </label>
-                          }
+                      }
+
+                      <!-- Identity Proof -->
+                      @if (editableStep3.idProofDoc && editableStep3.idProofDoc.status === 'uploaded') {
+                        <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
+                          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                            <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                              <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                              <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                            </svg>
+                            <div class="flex flex-col min-w-0">
+                              <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Signatory Identity Proof</span>
+                              <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep3.idProofDoc.fileName }}">
+                                {{ editableStep3.idProofDoc.fileName }}
+                              </span>
+                              <div class="mt-0.5">
+                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                  {{ editableStep3.idProofDoc.fileSize || '780 KB' }}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              (click)="viewDoc(editableStep3.idProofDoc.fileName, 'Signatory Identity Proof', editableStep3.idProofDoc.fileSize || '780 KB')"
+                              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                              title="Preview Document"
+                            >
+                              <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              <span>View</span>
+                            </button>
+                            @if (isEditingOtrInPreview()) {
+                              <label
+                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                                title="Change Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <span>Change</span>
+                                <input type="file" (change)="replaceOtrDoc($event, 'authIdProof')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                              </label>
+                              <button
+                                type="button"
+                                (click)="removeOtrDoc('authIdProof')"
+                                class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                                title="Remove Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                <span>Remove</span>
+                              </button>
+                            }
+                          </div>
                         </div>
-                      </div>
-                      <div class="p-2 bg-white border border-slate-200 rounded-md flex items-center justify-between gap-1.5">
-                        <div class="min-w-0">
-                          <span class="text-[9.5px] text-slate-400 block uppercase">Identity Proof</span>
-                          <span class="font-semibold text-slate-800 truncate block text-[10.5px]">{{ editableStep3.idProofDoc?.fileName || 'Signatory_ID.pdf' }}</span>
-                        </div>
-                        <div class="flex items-center gap-1">
-                          <button type="button" (click)="viewDoc(editableStep3.idProofDoc?.fileName || 'Signatory_ID.pdf', 'Signatory Identity Proof', '780 KB')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] cursor-pointer">View</button>
-                          @if (isEditingOtrInPreview()) {
-                            <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] cursor-pointer">
-                              Replace
-                              <input type="file" (change)="replaceOtrDoc($event, 'authIdProof')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-                            </label>
-                          }
-                        </div>
-                      </div>
+                      }
                     </div>
                   </div>
                 </div>
@@ -1612,18 +2178,63 @@ export interface EoiDocumentItem {
                         <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Transfer Mode</label>
                         <input type="text" [(ngModel)]="editableStep4.transferMode" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
                       </div>
-                      <div class="p-2 bg-white border border-slate-200 rounded-md flex items-center justify-between gap-1.5">
-                        <div class="min-w-0">
-                          <span class="text-[9.5px] text-slate-400 block uppercase">Cancelled Cheque</span>
-                          <span class="font-semibold text-slate-800 truncate block text-[10.5px]">{{ editableStep4.cancelledChequeDoc?.fileName || 'Cancelled_Cheque.pdf' }}</span>
-                        </div>
-                        <div class="flex items-center gap-1">
-                          <button type="button" (click)="viewDoc(editableStep4.cancelledChequeDoc?.fileName || 'Cancelled_Cheque.pdf', 'Cancelled Cheque', '890 KB')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] cursor-pointer">View</button>
-                          <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] cursor-pointer">
-                            Replace
-                            <input type="file" (change)="replaceOtrDoc($event, 'bankDoc')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-                          </label>
-                        </div>
+                      <div class="sm:col-span-2 lg:col-span-4 pt-1">
+                        @if (editableStep4.cancelledChequeDoc && editableStep4.cancelledChequeDoc.status === 'uploaded') {
+                          <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs max-w-xl">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                              <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                                <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                                <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                              </svg>
+                              <div class="flex flex-col min-w-0">
+                                <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Cancelled Cheque / Passbook</span>
+                                <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep4.cancelledChequeDoc.fileName }}">
+                                  {{ editableStep4.cancelledChequeDoc.fileName }}
+                                </span>
+                                <div class="mt-0.5">
+                                  <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                    {{ editableStep4.cancelledChequeDoc.fileSize || '890 KB' }}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                              <button
+                                type="button"
+                                (click)="viewDoc(editableStep4.cancelledChequeDoc.fileName, 'Cancelled Cheque', editableStep4.cancelledChequeDoc.fileSize || '890 KB')"
+                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                                title="Preview Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                <span>View</span>
+                              </button>
+                              <label
+                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                                title="Change Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <span>Change</span>
+                                <input type="file" (change)="replaceOtrDoc($event, 'bankDoc')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
+                              </label>
+                              <button
+                                type="button"
+                                (click)="removeOtrDoc('bankDoc')"
+                                class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                                title="Remove Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                <span>Remove</span>
+                              </button>
+                            </div>
+                          </div>
+                        }
                       </div>
                     </div>
                   } @else {
@@ -1656,18 +2267,42 @@ export interface EoiDocumentItem {
                         <span class="text-slate-400 block text-[10px] uppercase font-medium">Transfer Mode</span>
                         <span class="font-semibold text-slate-800 text-xs">{{ editableStep4.transferMode || 'NEFT / RTGS' }}</span>
                       </div>
-                      <div class="p-2 bg-white border border-slate-200 rounded-md flex items-center justify-between gap-1.5">
-                        <div class="min-w-0">
-                          <span class="text-[9.5px] text-slate-400 block uppercase">Cancelled Cheque</span>
-                          <span class="font-semibold text-slate-800 truncate block text-[10.5px]">{{ editableStep4.cancelledChequeDoc?.fileName || 'Cancelled_Cheque.pdf' }}</span>
-                        </div>
-                        <div class="flex items-center gap-1">
-                          <button type="button" (click)="viewDoc(editableStep4.cancelledChequeDoc?.fileName || 'Cancelled_Cheque.pdf', 'Cancelled Cheque', '890 KB')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] cursor-pointer">View</button>
-                          <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-[10px] cursor-pointer">
-                            Replace
-                            <input type="file" (change)="replaceOtrDoc($event, 'bankDoc')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-                          </label>
-                        </div>
+                      <div class="sm:col-span-2 lg:col-span-4 pt-1">
+                        @if (editableStep4.cancelledChequeDoc && editableStep4.cancelledChequeDoc.status === 'uploaded') {
+                          <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs max-w-xl">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                              <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
+                                <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
+                                <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                              </svg>
+                              <div class="flex flex-col min-w-0">
+                                <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Cancelled Cheque / Passbook</span>
+                                <span class="font-medium text-slate-800 truncate text-xs" title="{{ editableStep4.cancelledChequeDoc.fileName }}">
+                                  {{ editableStep4.cancelledChequeDoc.fileName }}
+                                </span>
+                                <div class="mt-0.5">
+                                  <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                                    {{ editableStep4.cancelledChequeDoc.fileSize || '890 KB' }}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                              <button
+                                type="button"
+                                (click)="viewDoc(editableStep4.cancelledChequeDoc.fileName, 'Cancelled Cheque', editableStep4.cancelledChequeDoc.fileSize || '890 KB')"
+                                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+                                title="Preview Document"
+                              >
+                                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                <span>View</span>
+                              </button>
+                            </div>
+                          </div>
+                        }
                       </div>
                     </div>
                   }
@@ -2083,9 +2718,9 @@ export interface EoiDocumentItem {
                 </div>
 
                 <!-- 2. Earnest Money Deposit (EMD) Fee Receipt -->
-                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 hover:border-emerald-500/50 bg-emerald-50/20 hover:bg-emerald-50/30 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 hover:border-[#0B3558]/50 bg-slate-50/50 hover:bg-slate-50 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <div class="w-12 h-12 rounded-xl bg-[#0B3558] text-white flex items-center justify-center shrink-0 shadow-xs">
                       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                       </svg>
@@ -2095,7 +2730,7 @@ export interface EoiDocumentItem {
                         <h4 class="text-sm sm:text-base font-bold text-slate-900">
                           Earnest Money Deposit (EMD) Fee Receipt
                         </h4>
-                        <span class="px-2 py-0.5 rounded text-[10.5px] font-bold bg-emerald-100 text-emerald-800">
+                        <span class="px-2 py-0.5 rounded text-[10.5px] font-bold bg-blue-100 text-[#0B3558]">
                           e-GRAS &bull; FORM GA-57
                         </span>
                       </div>
@@ -2116,7 +2751,7 @@ export interface EoiDocumentItem {
                     <button
                       type="button"
                       (click)="downloadEmdReceipt()"
-                      class="w-full md:w-auto px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-bold text-xs cursor-pointer flex items-center justify-center gap-2 shadow-xs transition-colors"
+                      class="w-full md:w-auto px-5 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg font-bold text-xs cursor-pointer flex items-center justify-center gap-2 shadow-xs transition-colors"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
@@ -2127,9 +2762,9 @@ export interface EoiDocumentItem {
                 </div>
 
                 <!-- 3. Tender Processing Fee Receipt -->
-                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 hover:border-[#0483AC]/50 bg-sky-50/20 hover:bg-sky-50/30 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="p-5 sm:p-6 rounded-xl border border-slate-200 hover:border-[#0B3558]/50 bg-slate-50/50 hover:bg-slate-50 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-[#0483AC] text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <div class="w-12 h-12 rounded-xl bg-[#0B3558] text-white flex items-center justify-center shrink-0 shadow-xs">
                       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
                       </svg>
@@ -2139,7 +2774,7 @@ export interface EoiDocumentItem {
                         <h4 class="text-sm sm:text-base font-bold text-slate-900">
                           Tender Processing Fee Receipt
                         </h4>
-                        <span class="px-2 py-0.5 rounded text-[10.5px] font-bold bg-sky-100 text-[#0483AC]">
+                        <span class="px-2 py-0.5 rounded text-[10.5px] font-bold bg-blue-100 text-[#0B3558]">
                           e-GRAS &bull; FORM GA-57
                         </span>
                       </div>
@@ -2160,7 +2795,7 @@ export interface EoiDocumentItem {
                     <button
                       type="button"
                       (click)="downloadProcessingFeeReceipt()"
-                      class="w-full md:w-auto px-5 py-2.5 bg-[#0483AC] hover:bg-[#036c8f] text-white rounded-lg font-bold text-xs cursor-pointer flex items-center justify-center gap-2 shadow-xs transition-colors"
+                      class="w-full md:w-auto px-5 py-2.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg font-bold text-xs cursor-pointer flex items-center justify-center gap-2 shadow-xs transition-colors"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
@@ -2173,24 +2808,13 @@ export interface EoiDocumentItem {
               </div>
 
               <!-- Footer Navigation Bar -->
-              <div class="flex items-center justify-between pt-4 border-t border-slate-200 flex-wrap gap-3">
-                <button
-                  type="button"
-                  (click)="printReceipt()"
-                  class="px-4 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold cursor-pointer flex items-center gap-1.5"
-                >
-                  <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                  </svg>
-                  <span>Print Receipt Page</span>
-                </button>
-
+              <div class="flex items-center justify-end pt-4 border-t border-slate-200">
                 <button
                   type="button"
                   (click)="goToTenderStatus()"
                   class="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-bold text-xs sm:text-sm flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
                 >
-                  <span>Track in Tender Status &rarr;</span>
+                  <span>Track in Tender Status</span>
                 </button>
               </div>
 
@@ -2854,6 +3478,22 @@ export class SchemeFormComponent {
 
       input.value = '';
     }
+  }
+
+  removeOtrDoc(type: 'regCert' | 'panCard' | 'gstCert' | 'msmeCert' | 'authLetter' | 'authIdProof' | 'bankDoc'): void {
+    if (type === 'regCert') this.editableStep1.registrationCertDoc = null;
+    if (type === 'panCard') this.editableStep1.panCardDoc = null;
+    if (type === 'gstCert') this.editableStep1.gstCertDoc = null;
+    if (type === 'msmeCert') this.editableStep1.msmeCertDoc = null;
+    if (type === 'authLetter') this.editableStep3.authorizationLetterDoc = null;
+    if (type === 'authIdProof') this.editableStep3.idProofDoc = null;
+    if (type === 'bankDoc') this.editableStep4.cancelledChequeDoc = null;
+  }
+
+  removeSchemeDoc(doc: EoiDocumentItem): void {
+    doc.status = 'pending';
+    doc.fileName = '';
+    doc.fileSize = '';
   }
 
   replaceOicDoc(event: Event, index: number): void {

@@ -27,9 +27,9 @@ import {
           backUrl="/admin/eoi-view"
           backTitle="Back to EOI Responses"
         >
-          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] bg-white/15 text-white border border-white/20 text-xs font-normal">
-            <span>Total Submissions:</span>
-            <span class="font-semibold">{{ totalSubmissionsCount() }}</span>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[#0c2d4e] border border-slate-300 text-xs font-medium shadow-xs">
+            <span class="text-slate-600">Total Submissions:</span>
+            <span class="font-bold text-[#0c2d4e]">{{ totalSubmissionsCount() }}</span>
           </div>
         </app-page-header>
 
@@ -52,9 +52,16 @@ import {
                 Requires all applications to be Reviewed (Accepted or Rejected) to activate Sanction Order
               </span>
             } @else {
-              <span class="text-[11px] text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200 font-medium">
-                &check; All Applications Scrutinized ({{ countApproved() }} Accepted, {{ countRejected() }} Rejected) &bull; Sanction Ready
-              </span>
+              <label
+                class="px-3.5 py-1.5 rounded text-xs font-semibold bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                title="Upload signed Sanction Order Document (PDF)"
+              >
+                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <span>{{ uploadedSanctionFileName() ? uploadedSanctionFileName() : 'Upload Sanction Order' }}</span>
+                <input type="file" (change)="onUploadSanctionOrder($event)" class="hidden" accept=".pdf" />
+              </label>
             }
 
             <button
@@ -70,10 +77,14 @@ import {
               [class.text-slate-400]="!allReviewed()"
               [class.border-slate-200]="!allReviewed()"
             >
-              <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <span>{{ isSubmitted() ? '✓ Submitted' : 'Sanction Order' }}</span>
+              @if (!isSubmitted()) {
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Sanction Order</span>
+              } @else {
+                <span>Generated IPA</span>
+              }
             </button>
           </div>
         </div>
@@ -269,6 +280,17 @@ export class ApplicantSubmissionsComponent {
 
   allReviewed = computed(() => this.responses().length > 0 && this.responses().every(r => r.status === 'APPROVED' || r.status === 'REJECTED'));
   isSubmitted = computed(() => this.eoiStateService.isSanctionSubmitted(this.schemeId()));
+  uploadedSanctionFileName = signal<string>('');
+
+  onUploadSanctionOrder(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      this.uploadedSanctionFileName.set(file.name);
+      this.eoiStateService.markSanctionSubmitted(this.schemeId());
+      input.value = '';
+    }
+  }
 
   openSanctionOrder(): void {
     if (this.allReviewed()) {

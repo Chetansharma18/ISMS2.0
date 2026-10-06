@@ -64,7 +64,7 @@ import { FormsModule } from '@angular/forms';
           [disabled]="disabled"
           [readOnly]="readonly"
           [attr.maxlength]="maxLength || null"
-          class="flex-1 min-w-0 w-full h-full px-2.5 text-xs sm:text-[13px] leading-[20px] text-[#1F2933] placeholder:text-[#7A8792] focus:outline-none bg-transparent"
+          class="flex-1 min-w-0 w-full h-full px-2.5 text-xs sm:text-[13px] leading-[20px] text-[#1F2933] placeholder:text-[#7A8792] focus:outline-none bg-transparent placeholder:normal-case"
           [class.uppercase]="uppercase"
           [class.cursor-not-allowed]="disabled"
           [class.text-[#7A8792]]="disabled"
@@ -95,7 +95,12 @@ import { FormsModule } from '@angular/forms';
         </p>
       }
     </div>
-  `
+  `,
+  styles: [`
+    input::placeholder {
+      text-transform: none !important;
+    }
+  `]
 })
 export class FormInputComponent {
   private static nextId = 0;

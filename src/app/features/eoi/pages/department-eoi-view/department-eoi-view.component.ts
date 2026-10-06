@@ -38,9 +38,9 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
           title="EOI Responses"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'EOI Responses' }]"
         >
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-white/15 text-white border border-white/20 text-xs font-normal shadow-2xs">
-            <span>Published Schemes:</span>
-            <span class="font-bold text-white">{{ schemes().length }}</span>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[#0c2d4e] border border-slate-300 text-xs font-medium shadow-xs">
+            <span class="text-slate-600">Published Schemes:</span>
+            <span class="font-bold text-[#0c2d4e]">{{ schemes().length }}</span>
           </div>
         </app-page-header>
 

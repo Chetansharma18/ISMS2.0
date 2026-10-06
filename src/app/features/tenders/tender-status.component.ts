@@ -213,11 +213,8 @@ export interface SubmittedTender {
         </div>
       }
 
-      <!-- ====================================================================
-           VIEW 2: FULL-PAGE APPLICATION VIEW & EDIT (ONE SINGLE PAGE)
-           ==================================================================== -->
       @if (selectedTender()) {
-        <div class="p-4 sm:p-6 lg:p-8 space-y-6 font-sans animate-in fade-in duration-150">
+        <div class="p-4 sm:p-6 lg:p-8 space-y-5 font-sans animate-in fade-in duration-150">
           
           <!-- Top Navigation Header with Back Button -->
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
@@ -226,7 +223,7 @@ export interface SubmittedTender {
               <button
                 type="button"
                 (click)="backToTenderList()"
-                class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-[13px] font-bold transition-all cursor-pointer shadow-2xs"
+                class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-[13px] font-semibold transition-all cursor-pointer shadow-2xs"
               >
                 <svg class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -236,27 +233,27 @@ export interface SubmittedTender {
 
               <div class="space-y-0.5">
                 <div class="flex items-center gap-2">
-                  <span class="font-mono text-sm sm:text-base font-black text-[#0B3558]">
+                  <span class="font-mono text-sm sm:text-base font-bold text-[#174A6E]">
                     {{ selectedTender()!.appRef }}
                   </span>
                   <span
-                    class="text-[11px] font-bold px-2.5 py-0.5 rounded-full"
+                    class="text-[11px] font-medium px-2.5 py-0.5 rounded"
                     [ngClass]="{
-                      'bg-emerald-100 text-emerald-800 border border-emerald-300': selectedTender()!.submittedStatus === 'Accepted',
-                      'bg-amber-100 text-amber-800 border border-amber-300': selectedTender()!.submittedStatus === 'Under Review',
-                      'bg-sky-100 text-sky-800 border border-sky-300': selectedTender()!.submittedStatus === 'Submitted',
-                      'bg-rose-100 text-rose-800 border border-rose-300': selectedTender()!.submittedStatus === 'Rejected'
+                      'bg-emerald-50 text-emerald-800 border border-emerald-200': selectedTender()!.submittedStatus === 'Accepted',
+                      'bg-amber-50 text-amber-800 border border-amber-200': selectedTender()!.submittedStatus === 'Under Review',
+                      'bg-sky-50 text-sky-800 border border-sky-200': selectedTender()!.submittedStatus === 'Submitted',
+                      'bg-rose-50 text-rose-800 border border-rose-200': selectedTender()!.submittedStatus === 'Rejected'
                     }"
                   >
                     {{ selectedTender()!.submittedStatus }}
                   </span>
                   @if (isEditing()) {
-                    <span class="bg-amber-500 text-slate-950 text-[11px] font-black px-2.5 py-0.5 rounded uppercase tracking-wide">
+                    <span class="bg-amber-100 text-amber-900 border border-amber-300 text-[11px] font-semibold px-2 py-0.5 rounded">
                       Edit Mode Active
                     </span>
                   }
                 </div>
-                <h2 class="text-sm sm:text-base font-bold text-slate-800">
+                <h2 class="text-sm sm:text-base font-semibold text-slate-800">
                   {{ selectedTender()!.schemeTitle }}
                 </h2>
               </div>
@@ -268,7 +265,7 @@ export interface SubmittedTender {
                 <button
                   type="button"
                   (click)="saveEdits()"
-                  class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs cursor-pointer shadow-xs flex items-center gap-1.5"
+                  class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg font-semibold text-xs cursor-pointer shadow-xs flex items-center gap-1.5"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -278,7 +275,7 @@ export interface SubmittedTender {
                 <button
                   type="button"
                   (click)="cancelEditing()"
-                  class="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg font-semibold text-xs cursor-pointer"
+                  class="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg font-medium text-xs cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -287,7 +284,7 @@ export interface SubmittedTender {
                   <button
                     type="button"
                     (click)="startEditing()"
-                    class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg font-bold text-xs cursor-pointer shadow-xs flex items-center gap-1.5"
+                    class="px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg font-semibold text-xs cursor-pointer shadow-xs flex items-center gap-1.5"
                   >
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -295,19 +292,19 @@ export interface SubmittedTender {
                     <span>Edit Application</span>
                   </button>
                 } @else if (selectedTender()!.editCount >= 3) {
-                  <span class="px-3.5 py-2 bg-amber-50 border border-amber-300 text-amber-800 rounded-lg text-xs font-bold select-none">
+                  <span class="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-xs font-medium select-none">
                     Max 3/3 Edits Used (Locked)
                   </span>
                 } @else {
-                  <span class="px-3.5 py-2 bg-rose-50 border border-rose-300 text-rose-800 rounded-lg text-xs font-bold select-none">
-                    Submission Closed (Editing Disabled)
+                  <span class="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-xs font-medium select-none">
+                    Submission Closed
                   </span>
                 }
 
                 <button
                   type="button"
                   (click)="printApplication()"
-                  class="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                  class="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-medium cursor-pointer flex items-center gap-1.5 shadow-2xs"
                 >
                   <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -319,73 +316,71 @@ export interface SubmittedTender {
 
           </div>
 
-          <!-- Top 3 Edits Status Strip -->
-          <div class="p-3 sm:p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-3 text-xs font-sans">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="w-2 h-2 rounded-full" [ngClass]="selectedTender()!.editCount >= 3 ? 'bg-rose-500' : 'bg-emerald-500'"></span>
-              <span class="text-slate-400 uppercase font-bold text-[10.5px]">Edits Allowed:</span>
-              <span class="font-bold text-slate-800">3 Edits Only</span>
-              <span class="text-slate-400">&bull;</span>
+          <!-- Top Edits Status Strip -->
+          <div class="p-3 bg-white border border-slate-200 rounded-lg flex items-center justify-between gap-3 text-xs font-sans">
+            <div class="flex items-center gap-2 flex-wrap text-slate-600">
+              <span class="font-semibold text-slate-800">Edits Allowed:</span>
+              <span>3 Edits Only</span>
+              <span class="text-slate-300">&bull;</span>
               <span class="text-slate-500">Max 3 edit attempts allowed before closing date ({{ selectedTender()!.closingDate }})</span>
             </div>
-            <div class="flex items-center gap-1.5 shrink-0">
-              <strong class="text-xs" [ngClass]="selectedTender()!.editCount >= 3 ? 'text-rose-700' : 'text-[#0B3558]'">
+            <div class="flex items-center gap-1.5 shrink-0 text-slate-700 font-medium">
+              <span [ngClass]="selectedTender()!.editCount >= 3 ? 'text-rose-700 font-semibold' : 'text-slate-900 font-semibold'">
                 {{ selectedTender()!.editCount }} of 3 Used
-              </strong>
+              </span>
               <span class="text-slate-500">({{ remainingEdits(selectedTender()!) }} Remaining)</span>
             </div>
           </div>
 
           @if (isEditing()) {
-            <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 flex items-start gap-2 text-xs font-sans">
+            <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 flex items-start gap-2 text-xs font-sans">
               <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <div class="leading-relaxed">
-                <strong class="block font-bold">You are currently editing this application:</strong>
-                <span>Saving your changes will consume 1 edit attempt ({{ remainingEdits(selectedTender()!) }} remaining). You can edit up to 3 times before the closing date (<strong>{{ selectedTender()!.closingDate }}</strong>).</span>
+                <span class="font-semibold block">You are currently editing this application:</span>
+                <span class="text-slate-700">Saving changes will consume 1 edit attempt ({{ remainingEdits(selectedTender()!) }} remaining). You can edit up to 3 times before the closing date (<strong>{{ selectedTender()!.closingDate }}</strong>).</span>
               </div>
             </div>
           }
 
           <!-- Fee Verification Summary Card -->
-          <div class="p-4 sm:p-5 rounded-xl bg-blue-50/60 border border-blue-200 text-xs space-y-3">
-            <div class="flex items-center justify-between pb-2 border-b border-blue-200 flex-wrap gap-2">
-              <span class="font-bold text-[#0B3558] uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+          <div class="p-4 sm:p-5 rounded-lg bg-white border border-slate-200 text-xs space-y-3">
+            <div class="flex items-center justify-between pb-2.5 border-b border-slate-200 flex-wrap gap-2">
+              <span class="font-semibold text-[#174A6E] text-xs">
                 Fee Payments &amp; Treasury Verification Status (Settled)
               </span>
-              <span class="font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-300 text-[11px]">
-                ✓ Total Fees Settled: ₹ 52,000.00
+              <span class="font-medium text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded border border-slate-200 text-[11px]">
+                Total Fees Settled: ₹ 52,000.00
               </span>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <!-- Processing Fee Block -->
-              <div class="p-3 bg-white border border-blue-200/80 rounded-lg space-y-1.5">
-                <div class="flex items-center justify-between pb-1 border-b border-slate-100">
-                  <span class="font-bold text-[#0B3558] text-[11.5px]">1. EOI RFP Processing Fee</span>
-                  <span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.2 rounded border border-emerald-200 text-[10.5px]">✓ Paid</span>
+              <div class="p-3 bg-[#F5F7F9] border border-slate-200 rounded-lg space-y-2">
+                <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
+                  <span class="font-medium text-slate-800 text-xs">1. EOI RFP Processing Fee</span>
+                  <span class="font-medium text-emerald-700 text-[11px]">Paid</span>
                 </div>
-                <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-700 pt-0.5">
-                  <div>Amount: <strong class="text-slate-900 font-bold">{{ currentApplication().processingFee }}</strong></div>
-                  <div>Payment Mode: <strong>Cyber Treasury e-GRAS</strong></div>
-                  <div>Challan GRN: <strong class="font-mono text-slate-900">{{ currentApplication().transactionRef }}</strong></div>
-                  <div>Settled On: <strong>{{ currentApplication().appliedDate }}</strong></div>
+                <div class="grid grid-cols-2 gap-y-1.5 gap-x-2 text-xs text-slate-600">
+                  <div><span class="text-slate-500 text-[11px] block">Amount</span><span class="font-medium text-slate-900">{{ currentApplication().processingFee }}</span></div>
+                  <div><span class="text-slate-500 text-[11px] block">Payment Mode</span><span class="font-medium text-slate-900">Cyber Treasury e-GRAS</span></div>
+                  <div><span class="text-slate-500 text-[11px] block">Challan GRN</span><span class="font-mono text-slate-900">{{ currentApplication().transactionRef }}</span></div>
+                  <div><span class="text-slate-500 text-[11px] block">Settled On</span><span class="font-medium text-slate-900">{{ currentApplication().appliedDate }}</span></div>
                 </div>
               </div>
 
               <!-- EMD Fee Block -->
-              <div class="p-3 bg-white border border-blue-200/80 rounded-lg space-y-1.5">
-                <div class="flex items-center justify-between pb-1 border-b border-slate-100">
-                  <span class="font-bold text-[#0B3558] text-[11.5px]">2. Earnest Money Deposit (EMD)</span>
-                  <span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.2 rounded border border-emerald-200 text-[10.5px]">✓ Deposited</span>
+              <div class="p-3 bg-[#F5F7F9] border border-slate-200 rounded-lg space-y-2">
+                <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
+                  <span class="font-medium text-slate-800 text-xs">2. Earnest Money Deposit (EMD)</span>
+                  <span class="font-medium text-emerald-700 text-[11px]">Deposited</span>
                 </div>
-                <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-700 pt-0.5">
-                  <div>Amount: <strong class="text-slate-900 font-bold">{{ currentApplication().emdAmount }}</strong></div>
-                  <div>Payment Mode: <strong>Cyber Treasury e-GRAS</strong></div>
-                  <div>Challan GRN: <strong class="font-mono text-slate-900">{{ currentApplication().emdTransactionRef }}</strong></div>
-                  <div>Settled On: <strong>{{ currentApplication().appliedDate }}</strong></div>
+                <div class="grid grid-cols-2 gap-y-1.5 gap-x-2 text-xs text-slate-600">
+                  <div><span class="text-slate-500 text-[11px] block">Amount</span><span class="font-medium text-slate-900">{{ currentApplication().emdAmount }}</span></div>
+                  <div><span class="text-slate-500 text-[11px] block">Payment Mode</span><span class="font-medium text-slate-900">Cyber Treasury e-GRAS</span></div>
+                  <div><span class="text-slate-500 text-[11px] block">Challan GRN</span><span class="font-mono text-slate-900">{{ currentApplication().emdTransactionRef }}</span></div>
+                  <div><span class="text-slate-500 text-[11px] block">Settled On</span><span class="font-medium text-slate-900">{{ currentApplication().appliedDate }}</span></div>
                 </div>
               </div>
             </div>
@@ -394,129 +389,133 @@ export interface SubmittedTender {
           <!-- ================================================================
                ALL APPLICATION SECTIONS IN ONE CONTINUOUS PAGE
                ================================================================ -->
-          <div class="space-y-6 text-xs">
+          <div class="space-y-5 text-xs">
             
             <!-- SECTION 1: Organisation Details & Legal Registration -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
+            <div class="bg-white border border-slate-200 rounded-lg p-5 space-y-4 shadow-2xs">
               <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-                <h4 class="font-bold text-[#0B3558] text-sm uppercase tracking-wide flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-[#0B3558]/10 text-[#0B3558] flex items-center justify-center text-xs font-bold">1</span>
-                  <span>Organisation Details &amp; Legal Registration</span>
-                </h4>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  1. Organisation Details &amp; Legal Registration
+                </h3>
                 @if (isEditing()) {
-                  <span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-semibold text-[11px]">Editing Active</span>
+                  <span class="text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-medium text-[11px]">Editing Active</span>
                 }
               </div>
 
               @if (isEditing()) {
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                   <div class="sm:col-span-2">
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Organisation Name *</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.fullName" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Organisation Name *</label>
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.fullName" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Nature of Entity *</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.natureOfEntity" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Nature of Entity *</label>
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.natureOfEntity" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Registration No. (CIN / Reg. No.) *</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.registrationNumber" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Registration No. (CIN / Reg. No.) *</label>
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.registrationNumber" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Date of Registration *</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.dateOfRegistration" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Date of Registration *</label>
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.dateOfRegistration" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">State / UT of Registration *</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.stateOfLegalReg" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">State / UT of Registration *</label>
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.stateOfLegalReg" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Organisation PAN *</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.companyPan" class="w-full px-2.5 py-1.5 text-xs font-mono font-bold border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Organisation PAN *</label>
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.companyPan" class="w-full px-2.5 py-1.5 text-xs font-mono font-medium border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">GST Registered *</label>
-                    <select [(ngModel)]="editableTender!.orgDetails.gstRegistered" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">GST Registered *</label>
+                    <select [(ngModel)]="editableTender!.orgDetails.gstRegistered" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]">
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">GSTIN</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.gstin" [disabled]="editableTender!.orgDetails.gstRegistered !== 'Yes'" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white disabled:bg-slate-100" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">GSTIN</label>
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.gstin" [disabled]="editableTender!.orgDetails.gstRegistered !== 'Yes'" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white disabled:bg-slate-100" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">MSME / Udyam Registered *</label>
-                    <select [(ngModel)]="editableTender!.orgDetails.msmeRegistered" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">MSME / Udyam Registered *</label>
+                    <select [(ngModel)]="editableTender!.orgDetails.msmeRegistered" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]">
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Udyam Registration Number</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.udyamNumber" [disabled]="editableTender!.orgDetails.msmeRegistered !== 'Yes'" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white disabled:bg-slate-100" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Udyam Registration Number</label>
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.udyamNumber" [disabled]="editableTender!.orgDetails.msmeRegistered !== 'Yes'" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white disabled:bg-slate-100" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">NSDC Partner</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.nsdcPartner" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">NSDC Partner</label>
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.nsdcPartner" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Organisation Contact No. *</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.contactNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Organisation Contact No. *</label>
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.contactNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Organisation Email ID *</label>
-                    <input type="email" [(ngModel)]="editableTender!.orgDetails.emailId" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Organisation Email ID *</label>
+                    <input type="email" [(ngModel)]="editableTender!.orgDetails.emailId" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Website</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.website" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Website</label>
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.website" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div class="sm:col-span-2 lg:col-span-3">
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Registered Address *</label>
-                    <textarea [(ngModel)]="editableTender!.orgDetails.registeredAddress" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"></textarea>
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Registered Address *</label>
+                    <textarea [(ngModel)]="editableTender!.orgDetails.registeredAddress" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]"></textarea>
                   </div>
                   <div class="sm:col-span-2 lg:col-span-3">
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Office Address *</label>
-                    <textarea [(ngModel)]="editableTender!.orgDetails.officeAddress" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"></textarea>
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Office Address *</label>
+                    <textarea [(ngModel)]="editableTender!.orgDetails.officeAddress" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]"></textarea>
                   </div>
                 </div>
               } @else {
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                  <div class="sm:col-span-2"><span class="text-slate-400 block uppercase text-[10px] font-medium">Organisation Name</span><strong class="text-slate-900 text-xs">{{ currentApplication().orgDetails.fullName || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Nature of Entity</span><strong class="text-slate-900 text-xs">{{ currentApplication().orgDetails.natureOfEntity || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">CIN / Reg No</span><strong class="font-mono text-slate-900 text-xs">{{ currentApplication().orgDetails.registrationNumber || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Date of Registration</span><strong class="text-slate-900 text-xs">{{ currentApplication().orgDetails.dateOfRegistration || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">State / UT of Registration</span><strong class="text-slate-900 text-xs">{{ currentApplication().orgDetails.stateOfLegalReg || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Organisation PAN</span><strong class="font-mono text-slate-900 text-xs">{{ currentApplication().orgDetails.companyPan || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">GST Registered</span><strong class="font-mono text-slate-900 text-xs">{{ currentApplication().orgDetails.gstRegistered === 'Yes' ? (currentApplication().orgDetails.gstin || 'Yes') : 'No' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">MSME / Udyam Registered</span><strong class="font-mono text-slate-900 text-xs">{{ currentApplication().orgDetails.msmeRegistered === 'Yes' ? (currentApplication().orgDetails.udyamNumber || 'Yes') : 'No' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">NSDC Partner</span><strong class="text-slate-900 text-xs">{{ currentApplication().orgDetails.nsdcPartner || 'Not Applicable' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Organisation Contact No.</span><strong class="font-mono text-slate-900 text-xs">{{ currentApplication().orgDetails.contactNo || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Organisation Email ID</span><strong class="text-slate-900 text-xs">{{ currentApplication().orgDetails.emailId || '-' }}</strong></div>
-                  <div class="sm:col-span-2"><span class="text-slate-400 block uppercase text-[10px] font-medium">Website</span><strong class="text-sky-800 text-xs">{{ currentApplication().orgDetails.website || '-' }}</strong></div>
-                  <div class="col-span-2 sm:col-span-4"><span class="text-slate-400 block uppercase text-[10px] font-medium">Registered Address</span><span class="text-slate-900 leading-tight block text-xs">{{ currentApplication().orgDetails.registeredAddress || '-' }}</span></div>
-                  <div class="col-span-2 sm:col-span-4"><span class="text-slate-400 block uppercase text-[10px] font-medium">Office Address</span><span class="text-slate-900 leading-tight block text-xs">{{ currentApplication().orgDetails.officeAddress || '-' }}</span></div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-y-3.5 gap-x-6 text-xs">
+                  <div class="sm:col-span-2"><span class="text-slate-500 block text-[11px] mb-0.5">Organisation Name</span><span class="font-medium text-slate-900">{{ currentApplication().orgDetails.fullName || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Nature of Entity</span><span class="font-medium text-slate-900">{{ currentApplication().orgDetails.natureOfEntity || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">CIN / Reg No</span><span class="font-mono text-slate-900 font-medium">{{ currentApplication().orgDetails.registrationNumber || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Date of Registration</span><span class="font-medium text-slate-900">{{ currentApplication().orgDetails.dateOfRegistration || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">State / UT of Registration</span><span class="font-medium text-slate-900">{{ currentApplication().orgDetails.stateOfLegalReg || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Organisation PAN</span><span class="font-mono text-slate-900 font-medium">{{ currentApplication().orgDetails.companyPan || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">GST Registered</span><span class="font-mono text-slate-900">{{ currentApplication().orgDetails.gstRegistered === 'Yes' ? (currentApplication().orgDetails.gstin || 'Yes') : 'No' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">MSME / Udyam Registered</span><span class="font-mono text-slate-900">{{ currentApplication().orgDetails.msmeRegistered === 'Yes' ? (currentApplication().orgDetails.udyamNumber || 'Yes') : 'No' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">NSDC Partner</span><span class="font-medium text-slate-900">{{ currentApplication().orgDetails.nsdcPartner || 'Not Applicable' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Organisation Contact No.</span><span class="font-mono text-slate-900">{{ currentApplication().orgDetails.contactNo || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Organisation Email ID</span><span class="font-medium text-slate-900">{{ currentApplication().orgDetails.emailId || '-' }}</span></div>
+                  <div class="sm:col-span-2"><span class="text-slate-500 block text-[11px] mb-0.5">Website</span><span class="font-medium text-[#174A6E]">{{ currentApplication().orgDetails.website || '-' }}</span></div>
+                  <div class="col-span-2 sm:col-span-4"><span class="text-slate-500 block text-[11px] mb-0.5">Registered Address</span><span class="text-slate-900 leading-relaxed">{{ currentApplication().orgDetails.registeredAddress || '-' }}</span></div>
+                  <div class="col-span-2 sm:col-span-4"><span class="text-slate-500 block text-[11px] mb-0.5">Office Address</span><span class="text-slate-900 leading-relaxed">{{ currentApplication().orgDetails.officeAddress || '-' }}</span></div>
                 </div>
               }
 
-              <!-- Attached Registration Certificates Grid -->
-              <div class="pt-2 border-t border-slate-200 space-y-2">
-                <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
+              <!-- Attached Registration Documents -->
+              <div class="pt-3 border-t border-slate-200 space-y-2.5">
+                <span class="text-xs font-semibold text-slate-700 block">
                   Attached Registration Documents
                 </span>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                   <!-- Incorporation Certificate -->
-                  <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-2">
-                    <div class="min-w-0">
-                      <span class="text-[9.5px] font-bold uppercase text-slate-400 block">Certificate of Registration</span>
-                      <span class="font-semibold text-slate-800 truncate block text-[11px]">{{ currentApplication().orgDetails.registrationCertDoc?.fileName || 'Incorporation_Cert.pdf' }}</span>
-                      <span class="text-[10px] text-slate-400">{{ currentApplication().orgDetails.registrationCertDoc?.fileSize || '1.4 MB' }}</span>
+                  <div class="p-3 bg-white border border-slate-200 rounded-lg flex items-center justify-between gap-2 shadow-2xs">
+                    <div class="min-w-0 flex items-center gap-2">
+                      <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                        <rect width="24" height="24" rx="3" fill="#E5252A"/>
+                        <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                      </svg>
+                      <div class="min-w-0">
+                        <span class="font-medium text-slate-800 truncate block text-[11.5px]">{{ currentApplication().orgDetails.registrationCertDoc?.fileName || 'Incorporation_Cert.pdf' }}</span>
+                        <span class="text-[10px] text-slate-500">{{ currentApplication().orgDetails.registrationCertDoc?.fileSize || '1.4 MB' }}</span>
+                      </div>
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
-                      <button type="button" (click)="viewDoc(currentApplication().orgDetails.registrationCertDoc?.fileName || 'Incorporation_Cert.pdf', 'Certificate of Registration', '1.4 MB')" class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-semibold cursor-pointer">View</button>
+                      <button type="button" (click)="viewDoc(currentApplication().orgDetails.registrationCertDoc?.fileName || 'Incorporation_Cert.pdf', 'Certificate of Registration', '1.4 MB')" class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-medium cursor-pointer">View</button>
                       @if (isEditing()) {
-                        <label class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-xs font-semibold cursor-pointer">
+                        <label class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-[#174A6E] rounded text-xs font-medium cursor-pointer">
                           Replace
                           <input type="file" (change)="replaceOtrDoc($event, 'regCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
                         </label>
@@ -525,16 +524,21 @@ export interface SubmittedTender {
                   </div>
 
                   <!-- Organisation PAN Card -->
-                  <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-2">
-                    <div class="min-w-0">
-                      <span class="text-[9.5px] font-bold uppercase text-slate-400 block">Organisation PAN Card</span>
-                      <span class="font-semibold text-slate-800 truncate block text-[11px]">{{ currentApplication().orgDetails.panCardDoc?.fileName || 'Company_PAN.pdf' }}</span>
-                      <span class="text-[10px] text-slate-400">{{ currentApplication().orgDetails.panCardDoc?.fileSize || '820 KB' }}</span>
+                  <div class="p-3 bg-white border border-slate-200 rounded-lg flex items-center justify-between gap-2 shadow-2xs">
+                    <div class="min-w-0 flex items-center gap-2">
+                      <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                        <rect width="24" height="24" rx="3" fill="#E5252A"/>
+                        <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                      </svg>
+                      <div class="min-w-0">
+                        <span class="font-medium text-slate-800 truncate block text-[11.5px]">{{ currentApplication().orgDetails.panCardDoc?.fileName || 'Company_PAN.pdf' }}</span>
+                        <span class="text-[10px] text-slate-500">{{ currentApplication().orgDetails.panCardDoc?.fileSize || '820 KB' }}</span>
+                      </div>
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
-                      <button type="button" (click)="viewDoc(currentApplication().orgDetails.panCardDoc?.fileName || 'Company_PAN.pdf', 'Organisation PAN Card', '820 KB')" class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-semibold cursor-pointer">View</button>
+                      <button type="button" (click)="viewDoc(currentApplication().orgDetails.panCardDoc?.fileName || 'Company_PAN.pdf', 'Organisation PAN Card', '820 KB')" class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-medium cursor-pointer">View</button>
                       @if (isEditing()) {
-                        <label class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-xs font-semibold cursor-pointer">
+                        <label class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-[#174A6E] rounded text-xs font-medium cursor-pointer">
                           Replace
                           <input type="file" (change)="replaceOtrDoc($event, 'panCard')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
                         </label>
@@ -543,16 +547,21 @@ export interface SubmittedTender {
                   </div>
 
                   <!-- GST Certificate -->
-                  <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-2">
-                    <div class="min-w-0">
-                      <span class="text-[9.5px] font-bold uppercase text-slate-400 block">GST Certificate</span>
-                      <span class="font-semibold text-slate-800 truncate block text-[11px]">{{ currentApplication().orgDetails.gstCertDoc?.fileName || 'GST_Cert.pdf' }}</span>
-                      <span class="text-[10px] text-slate-400">{{ currentApplication().orgDetails.gstCertDoc?.fileSize || '910 KB' }}</span>
+                  <div class="p-3 bg-white border border-slate-200 rounded-lg flex items-center justify-between gap-2 shadow-2xs">
+                    <div class="min-w-0 flex items-center gap-2">
+                      <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                        <rect width="24" height="24" rx="3" fill="#E5252A"/>
+                        <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                      </svg>
+                      <div class="min-w-0">
+                        <span class="font-medium text-slate-800 truncate block text-[11.5px]">{{ currentApplication().orgDetails.gstCertDoc?.fileName || 'GST_Cert.pdf' }}</span>
+                        <span class="text-[10px] text-slate-500">{{ currentApplication().orgDetails.gstCertDoc?.fileSize || '910 KB' }}</span>
+                      </div>
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
-                      <button type="button" (click)="viewDoc(currentApplication().orgDetails.gstCertDoc?.fileName || 'GST_Cert.pdf', 'GST Certificate', '910 KB')" class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-semibold cursor-pointer">View</button>
+                      <button type="button" (click)="viewDoc(currentApplication().orgDetails.gstCertDoc?.fileName || 'GST_Cert.pdf', 'GST Certificate', '910 KB')" class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-medium cursor-pointer">View</button>
                       @if (isEditing()) {
-                        <label class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-xs font-semibold cursor-pointer">
+                        <label class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-[#174A6E] rounded text-xs font-medium cursor-pointer">
                           Replace
                           <input type="file" (change)="replaceOtrDoc($event, 'gstCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
                         </label>
@@ -561,16 +570,21 @@ export interface SubmittedTender {
                   </div>
 
                   <!-- Udyam MSME Certificate -->
-                  <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-2">
-                    <div class="min-w-0">
-                      <span class="text-[9.5px] font-bold uppercase text-slate-400 block">Udyam Certificate</span>
-                      <span class="font-semibold text-slate-800 truncate block text-[11px]">{{ currentApplication().orgDetails.msmeCertDoc?.fileName || 'Udyam_Cert.pdf' }}</span>
-                      <span class="text-[10px] text-slate-400">{{ currentApplication().orgDetails.msmeCertDoc?.fileSize || '650 KB' }}</span>
+                  <div class="p-3 bg-white border border-slate-200 rounded-lg flex items-center justify-between gap-2 shadow-2xs">
+                    <div class="min-w-0 flex items-center gap-2">
+                      <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                        <rect width="24" height="24" rx="3" fill="#E5252A"/>
+                        <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                      </svg>
+                      <div class="min-w-0">
+                        <span class="font-medium text-slate-800 truncate block text-[11.5px]">{{ currentApplication().orgDetails.msmeCertDoc?.fileName || 'Udyam_Cert.pdf' }}</span>
+                        <span class="text-[10px] text-slate-500">{{ currentApplication().orgDetails.msmeCertDoc?.fileSize || '650 KB' }}</span>
+                      </div>
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
-                      <button type="button" (click)="viewDoc(currentApplication().orgDetails.msmeCertDoc?.fileName || 'Udyam_Cert.pdf', 'Udyam Certificate', '650 KB')" class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-semibold cursor-pointer">View</button>
+                      <button type="button" (click)="viewDoc(currentApplication().orgDetails.msmeCertDoc?.fileName || 'Udyam_Cert.pdf', 'Udyam Certificate', '650 KB')" class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-medium cursor-pointer">View</button>
                       @if (isEditing()) {
-                        <label class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-xs font-semibold cursor-pointer">
+                        <label class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-[#174A6E] rounded text-xs font-medium cursor-pointer">
                           Replace
                           <input type="file" (change)="replaceOtrDoc($event, 'msmeCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
                         </label>
@@ -582,103 +596,107 @@ export interface SubmittedTender {
             </div>
 
             <!-- SECTION 2: Authorized Person Details -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
+            <div class="bg-white border border-slate-200 rounded-lg p-5 space-y-4 shadow-2xs">
               <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-                <h4 class="font-bold text-[#0B3558] text-sm uppercase tracking-wide flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-[#0B3558]/10 text-[#0B3558] flex items-center justify-center text-xs font-bold">2</span>
-                  <span>Authorized Person Details</span>
-                </h4>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  2. Authorized Person Details
+                </h3>
                 @if (isEditing()) {
-                  <span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-semibold text-[11px]">Editing Active</span>
+                  <span class="text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-medium text-[11px]">Editing Active</span>
                 }
               </div>
 
               @if (isEditing()) {
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Full Name *</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.name" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Full Name *</label>
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.name" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Designation</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.designation" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Designation</label>
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.designation" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Date of Birth *</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.dob" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Date of Birth *</label>
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.dob" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Age</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.age" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Age</label>
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.age" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">PAN *</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.pan" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">PAN *</label>
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.pan" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Mobile No. *</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.mobileNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Mobile No. *</label>
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.mobileNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Email Address *</label>
-                    <input type="email" [(ngModel)]="editableTender!.signatoryDetails.emailId" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Email Address *</label>
+                    <input type="email" [(ngModel)]="editableTender!.signatoryDetails.emailId" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Aadhaar No. (Optional)</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.aadhaarNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Aadhaar No. (Optional)</label>
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.aadhaarNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Bhamashah No. (Optional)</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.bhamashahNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Bhamashah No. (Optional)</label>
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.bhamashahNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Voter ID No. (Optional)</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.voterIdNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Voter ID No. (Optional)</label>
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.voterIdNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Passport No. (Optional)</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.passportNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Passport No. (Optional)</label>
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.passportNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">State</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.state" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">State</label>
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.state" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div class="sm:col-span-2 lg:col-span-4">
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Residential Address</label>
-                    <textarea [(ngModel)]="editableTender!.signatoryDetails.residenceAddress" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"></textarea>
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Residential Address</label>
+                    <textarea [(ngModel)]="editableTender!.signatoryDetails.residenceAddress" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]"></textarea>
                   </div>
                 </div>
               } @else {
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Full Name</span><strong class="text-slate-900 text-xs">{{ currentApplication().signatoryDetails.name || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Designation</span><strong class="text-slate-900 text-xs">{{ currentApplication().signatoryDetails.designation || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Date of Birth / Age</span><strong class="text-slate-900 text-xs">{{ currentApplication().signatoryDetails.dob || '-' }} ({{ currentApplication().signatoryDetails.age || '42' }} Yrs)</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">PAN</span><strong class="font-mono text-slate-900 text-xs">{{ currentApplication().signatoryDetails.pan || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Mobile No.</span><strong class="font-mono text-slate-900 text-xs">{{ currentApplication().signatoryDetails.mobileNo || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Email Address</span><strong class="text-slate-900 text-xs">{{ currentApplication().signatoryDetails.emailId || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Aadhaar No.</span><strong class="font-mono text-slate-900 text-xs">{{ currentApplication().signatoryDetails.aadhaarNo || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">State</span><strong class="text-slate-900 text-xs">{{ currentApplication().signatoryDetails.state || 'Rajasthan' }}</strong></div>
-                  <div class="col-span-2 sm:col-span-4"><span class="text-slate-400 block uppercase text-[10px] font-medium">Residential Address</span><span class="text-slate-900 block leading-tight text-xs">{{ currentApplication().signatoryDetails.residenceAddress || '-' }}</span></div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-3.5 gap-x-6 text-xs">
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Full Name</span><span class="font-medium text-slate-900">{{ currentApplication().signatoryDetails.name || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Designation</span><span class="font-medium text-slate-900">{{ currentApplication().signatoryDetails.designation || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Date of Birth / Age</span><span class="font-medium text-slate-900">{{ currentApplication().signatoryDetails.dob || '-' }} ({{ currentApplication().signatoryDetails.age || '42' }} Yrs)</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">PAN</span><span class="font-mono text-slate-900 font-medium">{{ currentApplication().signatoryDetails.pan || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Mobile No.</span><span class="font-mono text-slate-900">{{ currentApplication().signatoryDetails.mobileNo || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Email Address</span><span class="font-medium text-slate-900">{{ currentApplication().signatoryDetails.emailId || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Aadhaar No.</span><span class="font-mono text-slate-900">{{ currentApplication().signatoryDetails.aadhaarNo || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">State</span><span class="font-medium text-slate-900">{{ currentApplication().signatoryDetails.state || 'Rajasthan' }}</span></div>
+                  <div class="col-span-2 sm:col-span-4"><span class="text-slate-500 block text-[11px] mb-0.5">Residential Address</span><span class="text-slate-900 leading-relaxed">{{ currentApplication().signatoryDetails.residenceAddress || '-' }}</span></div>
                 </div>
               }
 
-              <!-- Attached Signatory Documents Grid -->
-              <div class="pt-2 border-t border-slate-200 space-y-2">
-                <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
+              <!-- Attached Signatory Documents -->
+              <div class="pt-3 border-t border-slate-200 space-y-2.5">
+                <span class="text-xs font-semibold text-slate-700 block">
                   Attached Signatory Documents
                 </span>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <!-- Board Resolution -->
-                  <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-2">
-                    <div class="min-w-0">
-                      <span class="text-[9.5px] font-bold uppercase text-slate-400 block">Authorization Letter / Board Resolution</span>
-                      <span class="font-semibold text-slate-800 truncate block text-[11px]">{{ currentApplication().signatoryDetails.authorizationLetterDoc?.fileName || 'Board_Resolution.pdf' }}</span>
-                      <span class="text-[10px] text-slate-400">{{ currentApplication().signatoryDetails.authorizationLetterDoc?.fileSize || '1.2 MB' }}</span>
+                  <div class="p-3 bg-white border border-slate-200 rounded-lg flex items-center justify-between gap-2 shadow-2xs">
+                    <div class="min-w-0 flex items-center gap-2">
+                      <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                        <rect width="24" height="24" rx="3" fill="#E5252A"/>
+                        <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                      </svg>
+                      <div class="min-w-0">
+                        <span class="font-medium text-slate-800 truncate block text-[11.5px]">{{ currentApplication().signatoryDetails.authorizationLetterDoc?.fileName || 'Board_Resolution.pdf' }}</span>
+                        <span class="text-[10px] text-slate-500">{{ currentApplication().signatoryDetails.authorizationLetterDoc?.fileSize || '1.2 MB' }}</span>
+                      </div>
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
-                      <button type="button" (click)="viewDoc(currentApplication().signatoryDetails.authorizationLetterDoc?.fileName || 'Board_Resolution.pdf', 'Authorization Letter / Board Resolution', '1.2 MB')" class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-semibold cursor-pointer">View</button>
+                      <button type="button" (click)="viewDoc(currentApplication().signatoryDetails.authorizationLetterDoc?.fileName || 'Board_Resolution.pdf', 'Authorization Letter / Board Resolution', '1.2 MB')" class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-medium cursor-pointer">View</button>
                       @if (isEditing()) {
-                        <label class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-xs font-semibold cursor-pointer">
+                        <label class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-[#174A6E] rounded text-xs font-medium cursor-pointer">
                           Replace
                           <input type="file" (change)="replaceOtrDoc($event, 'authLetter')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
                         </label>
@@ -687,16 +705,21 @@ export interface SubmittedTender {
                   </div>
 
                   <!-- Signatory ID Proof -->
-                  <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-2">
-                    <div class="min-w-0">
-                      <span class="text-[9.5px] font-bold uppercase text-slate-400 block">Authorized Person Identity Proof</span>
-                      <span class="font-semibold text-slate-800 truncate block text-[11px]">{{ currentApplication().signatoryDetails.idProofDoc?.fileName || 'Signatory_Aadhaar.pdf' }}</span>
-                      <span class="text-[10px] text-slate-400">{{ currentApplication().signatoryDetails.idProofDoc?.fileSize || '750 KB' }}</span>
+                  <div class="p-3 bg-white border border-slate-200 rounded-lg flex items-center justify-between gap-2 shadow-2xs">
+                    <div class="min-w-0 flex items-center gap-2">
+                      <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                        <rect width="24" height="24" rx="3" fill="#E5252A"/>
+                        <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                      </svg>
+                      <div class="min-w-0">
+                        <span class="font-medium text-slate-800 truncate block text-[11.5px]">{{ currentApplication().signatoryDetails.idProofDoc?.fileName || 'Signatory_Aadhaar.pdf' }}</span>
+                        <span class="text-[10px] text-slate-500">{{ currentApplication().signatoryDetails.idProofDoc?.fileSize || '750 KB' }}</span>
+                      </div>
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
-                      <button type="button" (click)="viewDoc(currentApplication().signatoryDetails.idProofDoc?.fileName || 'Signatory_Aadhaar.pdf', 'Authorized Person Identity Proof', '750 KB')" class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-semibold cursor-pointer">View</button>
+                      <button type="button" (click)="viewDoc(currentApplication().signatoryDetails.idProofDoc?.fileName || 'Signatory_Aadhaar.pdf', 'Authorized Person Identity Proof', '750 KB')" class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-medium cursor-pointer">View</button>
                       @if (isEditing()) {
-                        <label class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-xs font-semibold cursor-pointer">
+                        <label class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-[#174A6E] rounded text-xs font-medium cursor-pointer">
                           Replace
                           <input type="file" (change)="replaceOtrDoc($event, 'authIdProof')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
                         </label>
@@ -708,34 +731,33 @@ export interface SubmittedTender {
             </div>
 
             <!-- SECTION 3: Bank Details -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
+            <div class="bg-white border border-slate-200 rounded-lg p-5 space-y-4 shadow-2xs">
               <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-                <h4 class="font-bold text-[#0B3558] text-sm uppercase tracking-wide flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-[#0B3558]/10 text-[#0B3558] flex items-center justify-center text-xs font-bold">3</span>
-                  <span>Bank Details</span>
-                </h4>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  3. Bank Details
+                </h3>
                 @if (isEditing()) {
-                  <span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-semibold text-[11px]">Editing Active</span>
+                  <span class="text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-medium text-[11px]">Editing Active</span>
                 }
               </div>
 
               @if (isEditing()) {
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Name of the Bank *</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.bankName" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Name of the Bank *</label>
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.bankName" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Branch Name *</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.branchName" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Branch Name *</label>
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.branchName" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Transfer Mode *</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.transferMode" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Transfer Mode *</label>
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.transferMode" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Account Type *</label>
-                    <select [(ngModel)]="editableTender!.bankDetails.accountType" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Account Type *</label>
+                    <select [(ngModel)]="editableTender!.bankDetails.accountType" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]">
                       <option value="Current">Current</option>
                       <option value="Savings">Savings</option>
                       <option value="Current Account">Current Account</option>
@@ -743,52 +765,57 @@ export interface SubmittedTender {
                     </select>
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Account Holder Name *</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.accountHolderName" class="w-full px-2.5 py-1.5 text-xs font-bold border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Account Holder Name *</label>
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.accountHolderName" class="w-full px-2.5 py-1.5 text-xs font-medium border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Account Number *</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.accountNo" class="w-full px-2.5 py-1.5 text-xs font-mono font-bold border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Account Number *</label>
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.accountNo" class="w-full px-2.5 py-1.5 text-xs font-mono font-medium border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">IFSC Code *</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.ifscCode" class="w-full px-2.5 py-1.5 text-xs font-mono font-bold border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">IFSC Code *</label>
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.ifscCode" class="w-full px-2.5 py-1.5 text-xs font-mono font-medium border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div>
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">MICR Code (Optional)</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.micrCode" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">MICR Code (Optional)</label>
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.micrCode" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                   <div class="sm:col-span-2 lg:col-span-4">
-                    <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Branch Address *</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.branchAddress" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white" />
+                    <label class="text-slate-600 block text-[11px] font-medium mb-1">Branch Address *</label>
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.branchAddress" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
                   </div>
                 </div>
               } @else {
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Name of the Bank</span><strong class="text-slate-900 text-xs">{{ currentApplication().bankDetails.bankName || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Branch Name</span><strong class="text-slate-900 text-xs">{{ currentApplication().bankDetails.branchName || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Transfer Mode</span><strong class="text-slate-900 text-xs">{{ currentApplication().bankDetails.transferMode || 'NEFT / RTGS' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Account Type</span><strong class="text-slate-900 text-xs">{{ currentApplication().bankDetails.accountType || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Account Holder Name</span><strong class="text-slate-900 text-xs">{{ currentApplication().bankDetails.accountHolderName || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">Account Number</span><strong class="font-mono text-slate-900 text-xs">{{ currentApplication().bankDetails.accountNo || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">IFSC Code</span><strong class="font-mono text-slate-900 text-xs">{{ currentApplication().bankDetails.ifscCode || '-' }}</strong></div>
-                  <div><span class="text-slate-400 block uppercase text-[10px] font-medium">MICR Code</span><strong class="font-mono text-slate-900 text-xs">{{ currentApplication().bankDetails.micrCode || '-' }}</strong></div>
-                  <div class="col-span-2 sm:col-span-4"><span class="text-slate-400 block uppercase text-[10px] font-medium">Branch Address</span><span class="text-slate-900 text-xs block leading-tight">{{ currentApplication().bankDetails.branchAddress || '-' }}</span></div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-3.5 gap-x-6 text-xs">
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Name of the Bank</span><span class="font-medium text-slate-900">{{ currentApplication().bankDetails.bankName || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Branch Name</span><span class="font-medium text-slate-900">{{ currentApplication().bankDetails.branchName || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Transfer Mode</span><span class="font-medium text-slate-900">{{ currentApplication().bankDetails.transferMode || 'NEFT / RTGS' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Account Type</span><span class="font-medium text-slate-900">{{ currentApplication().bankDetails.accountType || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Account Holder Name</span><span class="font-medium text-slate-900">{{ currentApplication().bankDetails.accountHolderName || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">Account Number</span><span class="font-mono text-slate-900 font-medium">{{ currentApplication().bankDetails.accountNo || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">IFSC Code</span><span class="font-mono text-slate-900 font-medium">{{ currentApplication().bankDetails.ifscCode || '-' }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px] mb-0.5">MICR Code</span><span class="font-mono text-slate-900">{{ currentApplication().bankDetails.micrCode || '-' }}</span></div>
+                  <div class="col-span-2 sm:col-span-4"><span class="text-slate-500 block text-[11px] mb-0.5">Branch Address</span><span class="text-slate-900 leading-relaxed">{{ currentApplication().bankDetails.branchAddress || '-' }}</span></div>
                 </div>
               }
 
               <!-- Attached Bank Cheque -->
-              <div class="pt-2 border-t border-slate-200">
-                <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between gap-2">
-                  <div class="min-w-0">
-                    <span class="text-[9.5px] font-bold uppercase text-slate-400 block">Upload Cancelled Cheque / Bank Passbook</span>
-                    <span class="font-semibold text-slate-800 truncate block text-[11px]">{{ currentApplication().bankDetails.cancelledChequeDoc?.fileName || 'Cancelled_Cheque.pdf' }}</span>
-                    <span class="text-[10px] text-slate-400">{{ currentApplication().bankDetails.cancelledChequeDoc?.fileSize || '890 KB' }}</span>
+              <div class="pt-3 border-t border-slate-200">
+                <div class="p-3 bg-white border border-slate-200 rounded-lg flex items-center justify-between gap-2 shadow-2xs max-w-md">
+                  <div class="min-w-0 flex items-center gap-2">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                      <rect width="24" height="24" rx="3" fill="#E5252A"/>
+                      <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
+                    </svg>
+                    <div class="min-w-0">
+                      <span class="font-medium text-slate-800 truncate block text-[11.5px]">{{ currentApplication().bankDetails.cancelledChequeDoc?.fileName || 'Cancelled_Cheque.pdf' }}</span>
+                      <span class="text-[10px] text-slate-500">{{ currentApplication().bankDetails.cancelledChequeDoc?.fileSize || '890 KB' }}</span>
+                    </div>
                   </div>
                   <div class="flex items-center gap-1 shrink-0">
-                    <button type="button" (click)="viewDoc(currentApplication().bankDetails.cancelledChequeDoc?.fileName || 'Cancelled_Cheque.pdf', 'Cancelled Cheque / Bank Passbook', '890 KB')" class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-semibold cursor-pointer">View</button>
+                    <button type="button" (click)="viewDoc(currentApplication().bankDetails.cancelledChequeDoc?.fileName || 'Cancelled_Cheque.pdf', 'Cancelled Cheque / Bank Passbook', '890 KB')" class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-medium cursor-pointer">View</button>
                     @if (isEditing()) {
-                      <label class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-xs font-semibold cursor-pointer">
+                      <label class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-[#174A6E] rounded text-xs font-medium cursor-pointer">
                         Replace
                         <input type="file" (change)="replaceOtrDoc($event, 'bankDoc')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
                       </label>
@@ -798,21 +825,20 @@ export interface SubmittedTender {
               </div>
             </div>
 
-            <!-- SECTION 4: Mandated Proposal Documents (16 Uploaded Files) - WITHOUT STATUS COLUMN -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
+            <!-- SECTION 4: Mandated Proposal Documents (16 Uploaded Files) -->
+            <div class="bg-white border border-slate-200 rounded-lg p-5 space-y-4 shadow-2xs">
               <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-                <h4 class="font-bold text-[#0B3558] text-sm uppercase tracking-wide flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-[#0B3558]/10 text-[#0B3558] flex items-center justify-center text-xs font-bold">4</span>
-                  <span>Mandated Proposal Documents &amp; Annexures (16 Files Attached)</span>
-                </h4>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  4. Mandated Proposal Documents &amp; Annexures (16 Files Attached)
+                </h3>
                 @if (isEditing()) {
-                  <span class="text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-semibold text-[11px]">Editing Active</span>
+                  <span class="text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-medium text-[11px]">Editing Active</span>
                 }
               </div>
 
-              <div class="border border-slate-200 rounded-xl overflow-hidden">
+              <div class="border border-slate-200 rounded-lg overflow-hidden">
                 <table class="w-full text-left text-xs">
-                  <thead class="bg-slate-100 font-bold uppercase text-[10.5px] text-slate-600 border-b border-slate-200">
+                  <thead class="bg-[#F5F7F9] font-semibold text-[11px] text-slate-600 border-b border-slate-200">
                     <tr>
                       <th class="p-2.5 text-center w-10">#</th>
                       <th class="p-2.5">Document Title</th>
@@ -823,20 +849,15 @@ export interface SubmittedTender {
                   </thead>
                   <tbody class="divide-y divide-slate-100 text-slate-700">
                     @for (doc of (isEditing() ? editableTender!.documents : currentApplication().documents); track doc.id) {
-                      <tr class="hover:bg-slate-50/50">
-                        <td class="p-2.5 text-center font-bold text-slate-400">{{ doc.id }}</td>
-                        <td class="p-2.5 font-semibold text-slate-800">{{ doc.name }}</td>
+                      <tr class="hover:bg-slate-50/70">
+                        <td class="p-2.5 text-center font-medium text-slate-400">{{ doc.id }}</td>
+                        <td class="p-2.5 font-medium text-slate-800">{{ doc.name }}</td>
                         <td class="p-2.5">
-                          <span class="text-[10px] px-2 py-0.5 rounded font-bold"
-                            [ngClass]="{
-                              'bg-rose-50 text-rose-700 border border-rose-200': doc.category === 'mandatory',
-                              'bg-sky-50 text-sky-700 border border-sky-200': doc.category === 'annexure',
-                              'bg-slate-100 text-slate-600': doc.category === 'supporting'
-                            }">
+                          <span class="text-[10.5px] font-medium text-slate-600">
                             {{ doc.category === 'mandatory' ? 'Mandatory Statutory' : (doc.category === 'annexure' ? 'Scheme Annexure' : 'Supporting') }}
                           </span>
                         </td>
-                        <td class="p-2.5 font-mono text-[11.5px] text-slate-700">
+                        <td class="p-2.5 font-mono text-[11px] text-slate-600">
                           {{ doc.fileName }} ({{ doc.fileSize }})
                         </td>
                         <td class="p-2.5 text-center">
@@ -844,12 +865,12 @@ export interface SubmittedTender {
                             <button
                               type="button"
                               (click)="viewDoc(doc.fileName, doc.name, doc.fileSize)"
-                              class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-semibold cursor-pointer"
+                              class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-medium cursor-pointer"
                             >
                               View
                             </button>
                             @if (isEditing()) {
-                              <label class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-[#0483AC] rounded text-xs font-semibold cursor-pointer">
+                              <label class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-[#174A6E] rounded text-xs font-medium cursor-pointer">
                                 Replace
                                 <input type="file" (change)="replaceDoc($event, doc)" class="hidden" accept=".pdf" />
                               </label>
@@ -864,29 +885,28 @@ export interface SubmittedTender {
             </div>
 
             <!-- SECTION 5: Official Payment Receipts & e-Challan Acknowledgement -->
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-5">
+            <div class="bg-white border border-slate-200 rounded-lg p-5 space-y-4 shadow-2xs">
               <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-                <h4 class="font-bold text-[#0B3558] text-sm uppercase tracking-wide flex items-center gap-2">
-                  <span class="w-6 h-6 rounded-full bg-[#0B3558]/10 text-[#0B3558] flex items-center justify-center text-xs font-bold">5</span>
-                  <span>Official Payment Receipts &amp; e-Challan Acknowledgement</span>
-                </h4>
+                <h3 class="font-semibold text-slate-900 text-sm">
+                  5. Official Payment Receipts &amp; e-Challan Acknowledgement
+                </h3>
               </div>
 
               <!-- Receipt 1: EOI Proposal Submission Acknowledgment -->
-              <div class="border-2 border-slate-700 rounded-xl p-5 bg-white space-y-4">
-                <div class="flex items-center justify-between pb-2 border-b-2 border-slate-800 flex-wrap gap-2">
+              <div class="border border-slate-200 rounded-lg p-4 bg-white space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200 flex-wrap gap-2">
                   <div>
-                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Government of Rajasthan &bull; RSLDC</div>
-                    <h5 class="text-sm font-bold text-[#0B3558] uppercase">Proposal Submission Acknowledgment Slip (Form RSLDC-EOI-ACK)</h5>
+                    <div class="text-[10.5px] font-medium text-slate-500">Government of Rajasthan &bull; RSLDC</div>
+                    <h4 class="text-xs sm:text-[13px] font-semibold text-slate-800">Proposal Submission Acknowledgment Slip (Form RSLDC-EOI-ACK)</h4>
                   </div>
                   <div class="flex items-center gap-2">
-                    <span class="font-mono text-xs font-bold bg-slate-100 px-2.5 py-1 rounded border border-slate-300">
+                    <span class="font-mono text-xs font-semibold bg-slate-100 px-2.5 py-1 rounded border border-slate-200 text-slate-700">
                       {{ currentApplication().appRef }}
                     </span>
                     <button
                       type="button"
                       (click)="downloadAcknowledgmentReceipt()"
-                      class="px-3 py-1 bg-[#0B3558] hover:bg-[#07233B] text-white rounded font-bold text-xs cursor-pointer flex items-center gap-1 shadow-2xs"
+                      class="px-3 py-1 bg-[#0B3558] hover:bg-[#07233B] text-white rounded font-medium text-xs cursor-pointer flex items-center gap-1 shadow-2xs transition-colors"
                     >
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
@@ -896,29 +916,29 @@ export interface SubmittedTender {
                   </div>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  <div><span class="text-slate-400 block text-[10px]">Applied Date</span><strong>{{ currentApplication().appliedDate }}</strong></div>
-                  <div><span class="text-slate-400 block text-[10px]">Remitter Name</span><strong>{{ currentApplication().orgDetails.fullName }}</strong></div>
-                  <div><span class="text-slate-400 block text-[10px]">CIN / PAN</span><strong class="font-mono">{{ currentApplication().orgDetails.registrationNumber }} / {{ currentApplication().orgDetails.companyPan }}</strong></div>
-                  <div><span class="text-slate-400 block text-[10px]">Submission Status</span><strong class="text-emerald-700">✓ SUBMITTED</strong></div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-slate-600">
+                  <div><span class="text-slate-500 block text-[11px]">Applied Date</span><span class="font-medium text-slate-900">{{ currentApplication().appliedDate }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px]">Remitter Name</span><span class="font-medium text-slate-900">{{ currentApplication().orgDetails.fullName }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px]">CIN / PAN</span><span class="font-mono font-medium text-slate-900">{{ currentApplication().orgDetails.registrationNumber }} / {{ currentApplication().orgDetails.companyPan }}</span></div>
+                  <div><span class="text-slate-500 block text-[11px]">Submission Status</span><span class="font-semibold text-emerald-700">Submitted</span></div>
                 </div>
               </div>
 
               <!-- Receipt 2: Cyber Treasury e-GRAS Challan -->
-              <div class="border-2 border-slate-700 rounded-xl p-5 bg-white space-y-4">
-                <div class="flex items-center justify-between pb-2 border-b-2 border-slate-800 flex-wrap gap-2">
+              <div class="border border-slate-200 rounded-lg p-4 bg-white space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200 flex-wrap gap-2">
                   <div>
-                    <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Finance Department &bull; Cyber Treasury (e-GRAS)</div>
-                    <h5 class="text-sm font-bold text-[#0B3558] uppercase">e-Challan / Treasury Receipt (Form GA-57)</h5>
+                    <div class="text-[10.5px] font-medium text-slate-500">Finance Department &bull; Cyber Treasury (e-GRAS)</div>
+                    <h4 class="text-xs sm:text-[13px] font-semibold text-slate-800">e-Challan / Treasury Receipt (Form GA-57)</h4>
                   </div>
                   <div class="flex items-center gap-2">
-                    <span class="font-mono text-xs font-bold text-slate-900 bg-blue-50 px-2.5 py-1 rounded border border-blue-200">
+                    <span class="font-mono text-xs font-semibold bg-slate-100 px-2.5 py-1 rounded border border-slate-200 text-slate-700">
                       {{ currentApplication().emdTransactionRef }}
                     </span>
                     <button
                       type="button"
                       (click)="downloadChallanReceipt()"
-                      class="px-3 py-1 bg-[#0B3558] hover:bg-[#07233B] text-white rounded font-bold text-xs cursor-pointer flex items-center gap-1 shadow-2xs"
+                      class="px-3 py-1 bg-[#0B3558] hover:bg-[#07233B] text-white rounded font-medium text-xs cursor-pointer flex items-center gap-1 shadow-2xs transition-colors"
                     >
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
@@ -928,31 +948,31 @@ export interface SubmittedTender {
                   </div>
                 </div>
 
-                <table class="w-full text-xs border border-slate-300 border-collapse">
-                  <thead class="bg-slate-100 font-bold uppercase text-[10px] text-slate-700">
+                <table class="w-full text-xs border border-slate-200 border-collapse">
+                  <thead class="bg-[#F5F7F9] font-semibold text-[11px] text-slate-600">
                     <tr>
-                      <th class="p-2 border-r border-slate-300">Fee Particulars</th>
-                      <th class="p-2 border-r border-slate-300">Treasury Head</th>
-                      <th class="p-2 border-r border-slate-300">Challan GRN</th>
+                      <th class="p-2 text-left border-r border-slate-200">Fee Particulars</th>
+                      <th class="p-2 text-left border-r border-slate-200">Treasury Head</th>
+                      <th class="p-2 text-left border-r border-slate-200">Challan GRN</th>
                       <th class="p-2 text-right">Amount (₹)</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-300">
+                  <tbody class="divide-y divide-slate-200 text-slate-700">
                     <tr>
-                      <td class="p-2 font-semibold">EOI RFP Tender Processing Fee</td>
-                      <td class="p-2 font-mono">0070-60-800-01-00</td>
-                      <td class="p-2 font-mono">{{ currentApplication().transactionRef }}</td>
-                      <td class="p-2 text-right font-mono font-bold">{{ currentApplication().processingFee }}</td>
+                      <td class="p-2 font-medium">EOI RFP Tender Processing Fee</td>
+                      <td class="p-2 font-mono text-[11px]">0070-60-800-01-00</td>
+                      <td class="p-2 font-mono text-[11px]">{{ currentApplication().transactionRef }}</td>
+                      <td class="p-2 text-right font-mono font-medium">{{ currentApplication().processingFee }}</td>
                     </tr>
                     <tr>
-                      <td class="p-2 font-semibold">Earnest Money Deposit (EMD)</td>
-                      <td class="p-2 font-mono">8443-00-103-00-00</td>
-                      <td class="p-2 font-mono">{{ currentApplication().emdTransactionRef }}</td>
-                      <td class="p-2 text-right font-mono font-bold">{{ currentApplication().emdAmount }}</td>
+                      <td class="p-2 font-medium">Earnest Money Deposit (EMD)</td>
+                      <td class="p-2 font-mono text-[11px]">8443-00-103-00-00</td>
+                      <td class="p-2 font-mono text-[11px]">{{ currentApplication().emdTransactionRef }}</td>
+                      <td class="p-2 text-right font-mono font-medium">{{ currentApplication().emdAmount }}</td>
                     </tr>
-                    <tr class="bg-slate-50 font-bold">
-                      <td colspan="3" class="p-2 text-right uppercase">Total Amount Deposited:</td>
-                      <td class="p-2 text-right text-[#0B3558] text-sm">₹ 52,000.00</td>
+                    <tr class="bg-slate-50 font-semibold text-slate-800">
+                      <td colspan="3" class="p-2 text-right">Total Amount Deposited:</td>
+                      <td class="p-2 text-right font-mono text-sm text-[#0B3558]">₹ 52,000.00</td>
                     </tr>
                   </tbody>
                 </table>

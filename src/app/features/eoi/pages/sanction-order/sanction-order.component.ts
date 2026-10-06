@@ -34,9 +34,9 @@ export interface AcceptedCompanyRow {
           backUrl="/admin/sanction-orders"
           backTitle="Back to Sanction Order List"
         >
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-white/15 text-white border border-white/20 text-xs font-medium">
-            <span>Accepted Companies:</span>
-            <span class="font-bold text-white">{{ acceptedRows().length }}</span>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[#0c2d4e] border border-slate-300 text-xs font-medium shadow-xs">
+            <span class="text-slate-600">Accepted Companies:</span>
+            <span class="font-bold text-[#0c2d4e]">{{ acceptedRows().length }}</span>
           </div>
         </app-page-header>
 
@@ -88,12 +88,12 @@ export interface AcceptedCompanyRow {
           <button
             type="button"
             (click)="openIpaModal(row)"
-            class="px-3 py-1 bg-[#174A6E] hover:bg-[#0E324D] text-white rounded text-xs font-medium transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1.5"
+            class="px-3 py-1.5 bg-[#174A6E] hover:bg-[#0E324D] text-white rounded text-xs font-medium transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap shrink-0"
           >
             <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <span>Get IPA</span>
+            <span class="whitespace-nowrap">Generated IPA</span>
           </button>
         </ng-template>
 
@@ -263,7 +263,7 @@ export class SanctionOrderComponent implements OnInit {
     { key: 'category', label: 'Application Category', align: 'center', type: 'custom', width: 'w-36' },
     { key: 'grade', label: 'Grade', align: 'center', type: 'custom', width: 'w-20' },
     { key: 'target', label: 'Sanction Target', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-bold text-slate-900 text-center text-sm' },
-    { key: 'action', label: 'Action', align: 'center', type: 'custom', width: 'w-32' }
+    { key: 'action', label: 'Action', align: 'center', type: 'custom', width: 'w-36', cellClass: 'whitespace-nowrap text-center' }
   ];
 
   ngOnInit(): void {

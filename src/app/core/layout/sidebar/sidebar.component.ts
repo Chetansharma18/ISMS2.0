@@ -21,6 +21,25 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
     >
       <!-- Top: Brand + Nav -->
       <div class="flex flex-col">
+        
+        <!-- Mobile Sidebar Close Header (Visible only < md) -->
+        <div class="md:hidden flex items-center justify-between px-3.5 py-3 border-b border-slate-200 bg-[#F5F8FA]">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-sm text-[#12365A]">ISMS 2.0</span>
+            <span class="text-[11px] text-slate-500 font-medium">Menu</span>
+          </div>
+          <button
+            type="button"
+            (click)="closeMobileNav.emit()"
+            class="w-7 h-7 flex items-center justify-center rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition-colors cursor-pointer"
+            aria-label="Close navigation menu"
+            title="Close menu"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
         <!-- Navigation Links -->
         <nav class="flex flex-col gap-1 px-2.5 py-3" aria-label="Main Navigation">
@@ -447,6 +466,7 @@ export class SidebarComponent {
   readonly isMasterOpen = signal<boolean>(true);
 
   @Output() linkClicked = new EventEmitter<void>();
+  @Output() closeMobileNav = new EventEmitter<void>();
 
   toggleMaster(): void {
     this.isMasterOpen.update((v: boolean) => !v);

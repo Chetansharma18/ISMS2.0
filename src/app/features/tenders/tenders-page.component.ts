@@ -66,9 +66,9 @@ export interface EoiDocumentItem {
             title="Active Schemes"
             [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Active Schemes' }]"
           >
-            <div class="flex items-center gap-3">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
               <!-- Integrated Search Bar (Matching User Screenshot) -->
-              <div class="w-full sm:w-auto min-w-[280px] sm:min-w-[360px] md:min-w-[420px]">
+              <div class="w-full sm:w-auto min-w-0 sm:min-w-[300px] md:min-w-[400px]">
                 <div class="relative flex items-center bg-white rounded-lg border border-slate-300 shadow-2xs overflow-hidden focus-within:border-[#174A6E] focus-within:ring-2 focus-within:ring-[#174A6E]/20 transition-all">
                   <input
                     type="text"
@@ -93,12 +93,12 @@ export interface EoiDocumentItem {
                 <button
                   type="button"
                   (click)="openConfigureEoiModal()"
-                  class="px-4 py-2.5 bg-[#174A6E] hover:bg-[#0B3558] text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center gap-2"
+                  class="px-4 py-2.5 bg-[#174A6E] hover:bg-[#0B3558] text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 shrink-0"
                 >
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                   </svg>
-                  Configure New EOI
+                  <span>Configure New EOI</span>
                 </button>
               }
             </div>
@@ -389,8 +389,8 @@ export interface EoiDocumentItem {
         <h2 class="m-0 text-[#0B3558]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
           {{ editingSchemeRefNo() ? 'Edit EOI Configuration' : 'Configure New EOI' }}
         </h2>
-        <div class="mt-4 font-sans text-[13px] max-h-[60vh] overflow-y-auto overflow-x-hidden pr-3">
-          <div class="grid grid-cols-[200px_1fr] items-center gap-y-3 gap-x-4">
+        <div class="mt-4 font-sans text-[13px] max-h-[60vh] overflow-y-auto overflow-x-hidden pr-1 sm:pr-3">
+          <div class="grid grid-cols-1 sm:grid-cols-[180px_1fr] md:grid-cols-[200px_1fr] items-start sm:items-center gap-y-3 gap-x-4">
             <label class="text-slate-700 font-medium">EOI Reference No.*</label>
             <input type="text" maxlength="100" [(ngModel)]="newEoiData.refNo" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.refNo, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.refNo)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
             
@@ -425,7 +425,7 @@ export interface EoiDocumentItem {
             <input type="text" maxlength="100" [(ngModel)]="newEoiData.processFee" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.processFee, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.processFee)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
 
             <label class="text-slate-700 font-medium self-start pt-1">Attach File*</label>
-            <div class="space-y-2 overflow-hidden">
+            <div class="space-y-2 overflow-hidden w-full">
               <div class="flex items-center gap-2">
                 <button
                   type="button"
@@ -471,11 +471,11 @@ export interface EoiDocumentItem {
             </div>
             
             @if (fileError()) {
-              <div class="col-span-2 text-xs text-red-500 font-medium mt-[-4px]">{{ fileError() }}</div>
+              <div class="col-span-1 sm:col-span-2 text-xs text-red-500 font-medium mt-[-4px]">{{ fileError() }}</div>
             }
 
             <!-- EOI Documents Section -->
-            <div class="col-span-2 mt-1 pt-2 border-t border-slate-200">
+            <div class="col-span-1 sm:col-span-2 mt-1 pt-2 border-t border-slate-200">
               <div class="flex items-center justify-between mb-2">
                 <h3 class="text-[#0B3558] font-bold text-[13px] uppercase tracking-wide">EOI DOCUMENTS</h3>
                 <button type="button" (click)="addEoiDocument()" class="w-6 h-6 rounded-full bg-[#174A6E] text-white flex items-center justify-center hover:bg-[#0B3558] transition-colors shadow-sm cursor-pointer" title="Add Document">

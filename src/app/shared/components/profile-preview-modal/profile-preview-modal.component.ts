@@ -76,7 +76,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                 <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Organization Details</h4>
               </div>
               <div class="p-4 space-y-3.5">
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   <div>
                     <span class="text-slate-400 block text-[10.5px]">Short Name</span>
                     <span class="font-medium text-slate-800">{{ step1().shortName || '-' }}</span>
@@ -127,29 +127,31 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                 @if (step1().financialYears && step1().financialYears.length > 0) {
                   <div class="pt-2 border-t border-slate-100">
                     <span class="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Financial Turnover (₹ Lacs)</span>
-                    <table class="w-full text-left border-collapse border border-slate-200 rounded text-xs">
-                      <thead>
-                        <tr class="bg-slate-50 text-slate-700 font-semibold text-[11px] border-b border-slate-200">
-                          <th class="py-1 px-3 border-r border-slate-200">Financial Year</th>
-                          <th class="py-1 px-3 border-r border-slate-200">Total Turnover (₹ Lacs)</th>
-                          <th class="py-1 px-3">Skill Turnover (₹ Lacs)</th>
-                        </tr>
-                      </thead>
-                      <tbody class="divide-y divide-slate-100">
-                        @for (fy of step1().financialYears; track fy.year) {
-                          <tr>
-                            <td class="py-1 px-3 text-slate-700 border-r border-slate-100">{{ fy.year }}</td>
-                            <td class="py-1 px-3 text-slate-700 border-r border-slate-100">{{ fy.totalTurnover || '-' }}</td>
-                            <td class="py-1 px-3 text-slate-700">{{ fy.skillTurnover || '-' }}</td>
+                    <div class="overflow-x-auto w-full">
+                      <table class="w-full text-left border-collapse border border-slate-200 rounded text-xs min-w-[400px]">
+                        <thead>
+                          <tr class="bg-slate-50 text-slate-700 font-semibold text-[11px] border-b border-slate-200">
+                            <th class="py-1 px-3 border-r border-slate-200">Financial Year</th>
+                            <th class="py-1 px-3 border-r border-slate-200">Total Turnover (₹ Lacs)</th>
+                            <th class="py-1 px-3">Skill Turnover (₹ Lacs)</th>
                           </tr>
-                        }
-                        <tr class="bg-slate-50 font-semibold border-t border-slate-200">
-                          <td class="py-1 px-3 text-slate-700 border-r border-slate-100">3-Year Average</td>
-                          <td class="py-1 px-3 text-[#0483AC] border-r border-slate-100">{{ avgTotalTurnover() }} Lacs</td>
-                          <td class="py-1 px-3 text-[#0483AC]">{{ avgSkillTurnover() }} Lacs</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                          @for (fy of step1().financialYears; track fy.year) {
+                            <tr>
+                              <td class="py-1 px-3 text-slate-700 border-r border-slate-100">{{ fy.year }}</td>
+                              <td class="py-1 px-3 text-slate-700 border-r border-slate-100">{{ fy.totalTurnover || '-' }}</td>
+                              <td class="py-1 px-3 text-slate-700">{{ fy.skillTurnover || '-' }}</td>
+                            </tr>
+                          }
+                          <tr class="bg-slate-50 font-semibold border-t border-slate-200">
+                            <td class="py-1 px-3 text-slate-700 border-r border-slate-100">3-Year Average</td>
+                            <td class="py-1 px-3 text-[#0483AC] border-r border-slate-100">{{ avgTotalTurnover() }} Lacs</td>
+                            <td class="py-1 px-3 text-[#0483AC]">{{ avgSkillTurnover() }} Lacs</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 }
 
@@ -173,7 +175,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                 <span class="w-5 h-5 rounded-full bg-slate-800 text-white text-[11px] font-bold flex items-center justify-center">2</span>
                 <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Step 2 – Authorized Person Details</h4>
               </div>
-              <div class="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">Name</span>
                   <span class="font-semibold text-slate-800">{{ step3().name || '-' }}</span>
@@ -271,7 +273,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                 <span class="w-5 h-5 rounded-full bg-slate-800 text-white text-[11px] font-bold flex items-center justify-center">4</span>
                 <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Step 4 – Bank Account Details</h4>
               </div>
-              <div class="p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">Bank Name</span>
                   <span class="font-medium text-slate-800">{{ step4().bankName || '-' }}</span>
@@ -310,11 +312,11 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
           </div>
 
           <!-- Modal Footer Actions -->
-          <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-wrap gap-3 shrink-0">
+          <div class="px-4 sm:px-5 py-3 sm:py-3.5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 shrink-0">
             <button
               type="button"
               (click)="onEditProfile()"
-              class="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
+              class="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5"
             >
               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -322,11 +324,11 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
               <span>Edit Profile Details</span>
             </button>
 
-            <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-2.5 justify-end">
               <button
                 type="button"
                 (click)="onClose()"
-                class="px-4 py-2 text-slate-600 hover:text-slate-800 hover:bg-slate-200/60 rounded-lg text-xs font-medium transition-colors cursor-pointer"
+                class="px-4 py-2 text-slate-600 hover:text-slate-800 hover:bg-slate-200/60 rounded-lg text-xs font-medium transition-colors cursor-pointer flex-1 sm:flex-none text-center"
               >
                 Cancel
               </button>
@@ -334,7 +336,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
               <button
                 type="button"
                 (click)="onProceed()"
-                class="px-5 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
+                class="px-5 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-none"
               >
                 <span>Proceed to Apply</span>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -22,8 +22,8 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
       
       <!-- Optional Search & Toolbar -->
       @if (searchable) {
-        <div class="p-3 bg-white border-b border-slate-200 flex items-center justify-between gap-3">
-          <div class="relative w-full max-w-xs">
+        <div class="p-3 bg-white border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="relative w-full sm:max-w-xs">
             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -33,10 +33,10 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
               type="text"
               [(ngModel)]="searchQuery"
               [placeholder]="searchPlaceholder"
-              class="form-control pl-9 text-[13px] bg-white"
+              class="form-control pl-9 text-[13px] bg-white w-full"
             />
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
             <ng-content select="[table-actions]"></ng-content>
           </div>
         </div>

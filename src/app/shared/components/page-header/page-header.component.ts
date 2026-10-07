@@ -18,7 +18,7 @@ export interface BreadcrumbItem {
   `],
   template: `
     <div
-      class="relative w-full rounded-lg overflow-hidden border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 px-5 py-2.5 sm:px-7 sm:py-3 bg-[#edf4fa]"
+      class="relative w-full rounded-lg overflow-hidden border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 px-3.5 sm:px-6 md:px-7 py-2.5 sm:py-3 bg-[#edf4fa]"
       style="min-height: 56px;"
     >
       <!-- Background Panoramic Fort Image with soft fade to the left -->
@@ -33,7 +33,7 @@ export interface BreadcrumbItem {
       ></div>
 
       <!-- Left: Title & Breadcrumbs -->
-      <div class="relative z-10 flex items-center gap-3 min-w-0">
+      <div class="relative z-10 flex items-center gap-2.5 sm:gap-3 min-w-0 w-full md:w-auto">
         <!-- Optional Back Button -->
         @if (backUrl || showBack) {
           <button
@@ -49,16 +49,15 @@ export interface BreadcrumbItem {
           </button>
         }
 
-        <div class="flex flex-col justify-center leading-tight min-w-0">
-          <div class="flex items-center gap-3 flex-wrap">
+        <div class="flex flex-col justify-center leading-tight min-w-0 flex-1">
+          <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
             <h1
-              class="header-title m-0 truncate"
-              style="color: #0c2d4e !important; font-size: 24px !important; line-height: 28px !important; font-weight: 800 !important; letter-spacing: -0.01em;"
+              class="header-title m-0 text-[18px] sm:text-[21px] md:text-[24px] font-extrabold text-[#0c2d4e] tracking-tight leading-tight"
             >
               {{ title }}
             </h1>
             @if (badge) {
-              <span class="px-2 py-0.5 text-xs font-bold rounded-md bg-[#174A6E] text-white select-none tracking-wide">
+              <span class="px-2 py-0.5 text-xs font-bold rounded-md bg-[#174A6E] text-white select-none tracking-wide shrink-0">
                 {{ badge }}
               </span>
             }
@@ -67,7 +66,7 @@ export interface BreadcrumbItem {
       </div>
 
       <!-- Right Action / Search Slot -->
-      <div class="relative z-10 flex items-center gap-3 shrink-0">
+      <div class="relative z-10 flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto shrink-0">
         <ng-content></ng-content>
       </div>
     </div>

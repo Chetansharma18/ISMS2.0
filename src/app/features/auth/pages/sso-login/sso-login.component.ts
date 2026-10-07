@@ -11,23 +11,23 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, DeptAdminOtpModalComponent],
   host: {
-    class: 'block w-full h-full flex flex-col bg-white overflow-hidden'
+    class: 'block w-full min-h-full flex flex-col bg-white'
   },
   template: `
-    <div class="w-full h-full flex flex-col justify-between bg-white text-slate-800 font-sans selection:bg-[#131862] selection:text-white overflow-hidden">
+    <div class="w-full min-h-full flex flex-col justify-between bg-white text-slate-800 font-sans selection:bg-[#131862] selection:text-white">
       
       <!-- Top Notice Banner -->
-      <div class="bg-amber-50 border-b border-amber-200 px-4 py-2 text-center shrink-0">
-        <div class="max-w-8xl mx-auto flex items-center justify-center gap-2 text-xs sm:text-[16px] font-semibold text-amber-900">
+      <div class="bg-amber-50 border-b border-amber-200 px-3 sm:px-4 py-2 text-center shrink-0">
+        <div class="max-w-8xl mx-auto flex items-center justify-center gap-2 text-xs sm:text-sm md:text-[15px] font-semibold text-amber-900">
           <span>
             <strong class="font-bold">PROTOTYPE NOTICE:</strong> This is a dummy login screen for testing and demonstration purposes. It will be replaced by the official Rajasthan SSO (sso.rajasthan.gov.in) portal integration.
           </span>
         </div>
       </div>
 
-      <!-- Main Two-Column Layout (Generous spacing between left & right, direct-on-screen right form, no scrolling) -->
-      <main class="flex-1 w-full flex items-center justify-center px-6 sm:px-10 lg:px-16 py-3 sm:py-6 overflow-hidden">
-        <div class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 xl:gap-32 items-center">
+      <!-- Main Two-Column Layout (Generous spacing between left & right, direct-on-screen right form) -->
+      <main class="flex-1 w-full flex items-center justify-center px-4 sm:px-8 lg:px-16 py-4 sm:py-6">
+        <div class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-24 xl:gap-32 items-center">
           
           <!-- Left Column: Official Statistics (G2G, G2C/G2B, IDENTITIES) with enlarged typography -->
           <div class="space-y-6 lg:space-y-8">

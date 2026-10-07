@@ -82,12 +82,12 @@ export interface RegistrationStepItem {
       <!-- ====================================================================
            2. OTR PROGRESS CARD: Circular Donut Chart + Details + CTA
            ==================================================================== -->
-      <div class="w-full bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
+      <div class="w-full bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
         <!-- Left: Donut Chart + Information + Progress Bar -->
-        <div class="flex items-center gap-5 sm:gap-6 flex-1 min-w-0">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start md:items-center text-center sm:text-left gap-4 sm:gap-6 flex-1 min-w-0">
           
           <!-- Circular Progress Donut Chart (SVG) -->
-          <div class="relative w-24 h-24 shrink-0 flex items-center justify-center">
+          <div class="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 flex items-center justify-center">
             <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
               <!-- Track Circle -->
               <circle
@@ -114,26 +114,23 @@ export interface RegistrationStepItem {
             </svg>
             <!-- Center Percentage -->
             <div class="absolute inset-0 flex flex-col items-center justify-center">
-              <span class="text-xl font-bold text-slate-800 leading-none">
+              <span class="text-lg sm:text-xl font-bold text-slate-800 leading-none">
                 {{ completionPercentage() }}%
               </span>
             </div>
           </div>
 
           <!-- Text Details -->
-          <div class="flex-1 min-w-0 space-y-2">
+          <div class="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
             <h2 class="text-base sm:text-[17px] font-bold text-slate-900 m-0">One Time Registration (OTR)</h2>
             <p class="text-xs sm:text-[13px] text-slate-500 leading-relaxed m-0 max-w-3xl">
               Complete all mandatory registration steps to become eligible for scheme proposals under RSLDC. Once complete, you can apply for all open EOI opportunities.
             </p>
-
-        
-           
           </div>
         </div>
 
         <!-- Right: Primary Action Button + Mandatory Warning Notice -->
-        <div class="shrink-0 flex flex-col items-start lg:items-end gap-2.5">
+        <div class="shrink-0 flex flex-col items-stretch sm:items-start lg:items-end gap-2.5 w-full sm:w-auto">
           <button
             type="button"
             (click)="goToRegistration()"

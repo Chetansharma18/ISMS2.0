@@ -14,32 +14,32 @@ import { CommonModule } from '@angular/common';
   template: `
     @if (isOpen) {
       <div
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
         style="background: rgba(10,20,40,0.45); backdrop-filter: blur(3px);"
         role="dialog"
         aria-modal="true"
         (click)="onBackdropClick($event)"
       >
         <div
-          class="w-full bg-white rounded-xl border border-slate-200 relative font-sans overflow-hidden"
+          class="w-full bg-white rounded-xl border border-slate-200 relative font-sans overflow-hidden my-auto max-h-[90vh] flex flex-col"
           [ngClass]="maxWidthClass"
           style="box-shadow: 0 20px 60px rgba(0,0,0,0.18);"
           (click)="$event.stopPropagation()"
         >
           <!-- Top Accent Bar -->
           @if (showAccentBar) {
-            <div class="h-1 w-full" [ngClass]="accentBarClass"></div>
+            <div class="h-1 w-full shrink-0" [ngClass]="accentBarClass"></div>
           }
 
           <!-- Modal Body -->
-          <div class="px-7 pt-6 pb-7">
+          <div class="px-4 sm:px-7 pt-5 sm:pt-6 pb-5 sm:pb-7 overflow-y-auto flex-1">
 
             <!-- Close Button -->
             @if (showCloseButton) {
               <button
                 type="button"
                 (click)="onClose()"
-                class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer z-10"
                 title="Close"
                 aria-label="Close"
               >
@@ -58,7 +58,7 @@ import { CommonModule } from '@angular/common';
 
             <!-- Title -->
             @if (title) {
-              <h2 class="m-0 text-[#0B3558]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+              <h2 class="m-0 text-[#0B3558] pr-6" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
                 {{ title }}
               </h2>
             }
@@ -79,27 +79,27 @@ import { CommonModule } from '@angular/common';
             <div class="mt-6 mb-5 border-t border-slate-100"></div>
 
             <!-- Action Buttons -->
-            <div class="flex items-center gap-3" [class.flex-row-reverse]="!secondaryLabel">
+            <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" [class.sm:flex-row-reverse]="!secondaryLabel">
+              @if (secondaryLabel) {
+                <button
+                  type="button"
+                  (click)="onSecondaryAction()"
+                  class="w-full sm:flex-1 py-2.5 px-4 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  {{ secondaryLabel }}
+                </button>
+              }
               @if (primaryLabel) {
                 <button
                   type="button"
                   (click)="onPrimaryAction()"
                   [disabled]="disablePrimary"
-                  class="flex-1 py-2.5 px-4 rounded-lg text-white text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+                  class="w-full sm:flex-1 py-2.5 px-4 rounded-lg text-white text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
                   style="background-color: #0B3558; color: #ffffff !important;"
                   onmouseover="this.style.backgroundColor='#07233B'"
                   onmouseout="this.style.backgroundColor='#0B3558'"
                 >
                   {{ primaryLabel }}
-                </button>
-              }
-              @if (secondaryLabel) {
-                <button
-                  type="button"
-                  (click)="onSecondaryAction()"
-                  class="flex-1 py-2.5 px-4 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors cursor-pointer"
-                >
-                  {{ secondaryLabel }}
                 </button>
               }
             </div>

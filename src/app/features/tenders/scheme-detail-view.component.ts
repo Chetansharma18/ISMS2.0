@@ -13,13 +13,13 @@ import { jsPDF } from 'jspdf';
       <!-- ====================================================================
            1. TOP CONTROLS & NAVIGATION BAR
            ==================================================================== -->
-      <div class="flex items-center justify-between gap-3 pb-1">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-1">
         
         <!-- Back to Active Schemes Button -->
         <button
           type="button"
           (click)="onBack()"
-          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-[13px] font-medium transition-all cursor-pointer shadow-2xs active:scale-95"
+          class="inline-flex items-center justify-center gap-2 px-3.5 py-2 sm:py-1.5 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-[13px] font-medium transition-all cursor-pointer shadow-2xs active:scale-95"
           title="Back to Active Schemes"
         >
           <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -29,12 +29,12 @@ import { jsPDF } from 'jspdf';
         </button>
 
         <!-- Right Action Buttons -->
-        <div class="flex items-center gap-2.5">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5">
           <!-- Download Scheme Details Button -->
           <button
             type="button"
             (click)="handleViewDetailsClick()"
-            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-[#0B3558] text-xs sm:text-[13px] font-medium transition-all cursor-pointer shadow-2xs active:scale-95"
+            class="inline-flex items-center justify-center gap-2 px-3.5 py-2 sm:py-1.5 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-[#0B3558] text-xs sm:text-[13px] font-medium transition-all cursor-pointer shadow-2xs active:scale-95"
             title="Download Scheme Details PDF"
           >
             <svg class="w-4 h-4 text-[#0B3558]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -49,7 +49,7 @@ import { jsPDF } from 'jspdf';
               <button
                 type="button"
                 (click)="onApply()"
-                class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-md bg-[#0B3558] hover:bg-[#07243c] text-white text-xs sm:text-[13px] font-medium transition-all cursor-pointer shadow-2xs active:scale-95"
+                class="inline-flex items-center justify-center gap-1.5 px-4 py-2 sm:py-1.5 rounded-md bg-[#0B3558] hover:bg-[#07243c] text-white text-xs sm:text-[13px] font-medium transition-all cursor-pointer shadow-2xs active:scale-95"
               >
                 <span>Apply for EOI</span>
                 <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -57,7 +57,7 @@ import { jsPDF } from 'jspdf';
                 </svg>
               </button>
             } @else {
-              <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-rose-50 border border-rose-300 text-rose-700 text-xs font-semibold select-none">
+              <span class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-md bg-rose-50 border border-rose-300 text-rose-700 text-xs font-semibold select-none">
                 Submission Closed
               </span>
             }

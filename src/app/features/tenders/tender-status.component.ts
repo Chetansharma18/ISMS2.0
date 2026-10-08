@@ -80,7 +80,7 @@ export type { SubmittedTender, SubmittedTenderDoc };
                 type="text"
                 [(ngModel)]="searchQuery"
                 placeholder="Search Ref, Scheme, Department..."
-                class="w-full pl-9 pr-7 py-2 text-[13px] bg-white border border-slate-300 rounded-md placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0B3558] focus:border-[#0B3558] transition-colors font-normal shadow-2xs"
+                class="w-full pl-9 pr-7 py-2 text-[13px] bg-white border border-slate-300 rounded-md placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0B3558] transition-colors font-normal shadow-2xs"
               />
               @if (searchQuery) {
                 <button
@@ -377,73 +377,73 @@ export type { SubmittedTender, SubmittedTenderDoc };
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                   <div class="sm:col-span-2">
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Organisation Name *</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.fullName" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.fullName" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Nature of Entity *</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.natureOfEntity" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.natureOfEntity" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Registration No. (CIN / Reg. No.) *</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.registrationNumber" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.registrationNumber" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Date of Registration *</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.dateOfRegistration" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.dateOfRegistration" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">State / UT of Registration *</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.stateOfLegalReg" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.stateOfLegalReg" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Organisation PAN *</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.companyPan" class="w-full px-2.5 py-1.5 text-xs font-mono font-medium border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.companyPan" class="w-full px-2.5 py-1.5 text-xs font-mono font-medium border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">GST Registered *</label>
-                    <select [(ngModel)]="editableTender!.orgDetails.gstRegistered" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]">
+                    <select [(ngModel)]="editableTender!.orgDetails.gstRegistered" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]">
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">GSTIN</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.gstin" [disabled]="editableTender!.orgDetails.gstRegistered !== 'Yes'" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white disabled:bg-slate-100" />
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.gstin" [disabled]="editableTender!.orgDetails.gstRegistered !== 'Yes'" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md enabled:bg-white disabled:bg-slate-100 focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">MSME / Udyam Registered *</label>
-                    <select [(ngModel)]="editableTender!.orgDetails.msmeRegistered" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]">
+                    <select [(ngModel)]="editableTender!.orgDetails.msmeRegistered" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]">
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Udyam Registration Number</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.udyamNumber" [disabled]="editableTender!.orgDetails.msmeRegistered !== 'Yes'" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white disabled:bg-slate-100" />
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.udyamNumber" [disabled]="editableTender!.orgDetails.msmeRegistered !== 'Yes'" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md enabled:bg-white disabled:bg-slate-100 focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">NSDC Partner</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.nsdcPartner" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.nsdcPartner" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Organisation Contact No. *</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.contactNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.contactNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Organisation Email ID *</label>
-                    <input type="email" [(ngModel)]="editableTender!.orgDetails.emailId" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="email" [(ngModel)]="editableTender!.orgDetails.emailId" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Website</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.website" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.website" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div class="sm:col-span-2 lg:col-span-3">
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Registered Address *</label>
-                    <textarea [(ngModel)]="editableTender!.orgDetails.registeredAddress" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]"></textarea>
+                    <textarea [(ngModel)]="editableTender!.orgDetails.registeredAddress" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]"></textarea>
                   </div>
                   <div class="sm:col-span-2 lg:col-span-3">
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Office Address *</label>
-                    <textarea [(ngModel)]="editableTender!.orgDetails.officeAddress" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]"></textarea>
+                    <textarea [(ngModel)]="editableTender!.orgDetails.officeAddress" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]"></textarea>
                   </div>
                 </div>
               } @else {
@@ -581,55 +581,55 @@ export type { SubmittedTender, SubmittedTenderDoc };
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Full Name *</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.name" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.name" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Designation</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.designation" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.designation" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Date of Birth *</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.dob" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.dob" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Age</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.age" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.age" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">PAN *</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.pan" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.pan" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Mobile No. *</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.mobileNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.mobileNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Email Address *</label>
-                    <input type="email" [(ngModel)]="editableTender!.signatoryDetails.emailId" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="email" [(ngModel)]="editableTender!.signatoryDetails.emailId" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Aadhaar No. (Optional)</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.aadhaarNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.aadhaarNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Bhamashah No. (Optional)</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.bhamashahNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.bhamashahNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Voter ID No. (Optional)</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.voterIdNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.voterIdNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Passport No. (Optional)</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.passportNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.passportNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">State</label>
-                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.state" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.signatoryDetails.state" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div class="sm:col-span-2 lg:col-span-4">
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Residential Address</label>
-                    <textarea [(ngModel)]="editableTender!.signatoryDetails.residenceAddress" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]"></textarea>
+                    <textarea [(ngModel)]="editableTender!.signatoryDetails.residenceAddress" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]"></textarea>
                   </div>
                 </div>
               } @else {
@@ -716,19 +716,19 @@ export type { SubmittedTender, SubmittedTenderDoc };
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Name of the Bank *</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.bankName" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.bankName" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Branch Name *</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.branchName" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.branchName" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Transfer Mode *</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.transferMode" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.transferMode" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Account Type *</label>
-                    <select [(ngModel)]="editableTender!.bankDetails.accountType" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]">
+                    <select [(ngModel)]="editableTender!.bankDetails.accountType" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]">
                       <option value="Current">Current</option>
                       <option value="Savings">Savings</option>
                       <option value="Current Account">Current Account</option>
@@ -737,23 +737,23 @@ export type { SubmittedTender, SubmittedTenderDoc };
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Account Holder Name *</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.accountHolderName" class="w-full px-2.5 py-1.5 text-xs font-medium border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.accountHolderName" class="w-full px-2.5 py-1.5 text-xs font-medium border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Account Number *</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.accountNo" class="w-full px-2.5 py-1.5 text-xs font-mono font-medium border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.accountNo" class="w-full px-2.5 py-1.5 text-xs font-mono font-medium border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">IFSC Code *</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.ifscCode" class="w-full px-2.5 py-1.5 text-xs font-mono font-medium border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.ifscCode" class="w-full px-2.5 py-1.5 text-xs font-mono font-medium border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">MICR Code (Optional)</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.micrCode" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.micrCode" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div class="sm:col-span-2 lg:col-span-4">
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Branch Address *</label>
-                    <input type="text" [(ngModel)]="editableTender!.bankDetails.branchAddress" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:border-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.bankDetails.branchAddress" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                 </div>
               } @else {

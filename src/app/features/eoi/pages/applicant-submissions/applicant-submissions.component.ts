@@ -2,7 +2,6 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { jsPDF } from 'jspdf';
-import JSZip from 'jszip';
 import { EoiStateService, ApplicantResponse } from '../../services/eoi-state.service';
 import {
   PageHeaderComponent,
@@ -605,6 +604,7 @@ export class ApplicantSubmissionsComponent {
     this.isDownloadingAll.set(true);
 
     try {
+      const { default: JSZip } = await import('jszip');
       const zip = new JSZip();
       const currentSchemeTitle = list[0]?.schemeName || 'RSLDC Skill Development Scheme';
       const currentFilter = this.selectedFilter();

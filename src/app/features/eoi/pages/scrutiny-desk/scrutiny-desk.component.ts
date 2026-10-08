@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { jsPDF } from 'jspdf';
-import JSZip from 'jszip';
 import { EoiStateService, ApplicantResponse, DossierDocument } from '../../services/eoi-state.service';
 
 interface ActivePreviewDocument {
@@ -1266,6 +1265,7 @@ export class ScrutinyDeskComponent {
 
     this.isDownloadingZip.set(true);
     try {
+      const { default: JSZip } = await import('jszip');
       const zip = new JSZip();
       const folderName = `${(app.anonymousLabel || 'Applicant').replace(/[^a-zA-Z0-9]/g, '_')}_${app.id}_Documents`;
       const docFolder = zip.folder(folderName) || zip;

@@ -1,4 +1,4 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 export type UserRole = 'new_user' | 'existing_user' | 'dept_admin' | 'super_admin';
@@ -43,6 +43,58 @@ export const USER_ROLES: RoleConfig[] = [
     label: 'Super Admin',
     badge: 'System Admin',
     description: 'System administrator with full access'
+  }
+];
+
+export interface DeptRole {
+  id: string;
+  name: string;
+  designation: string;
+  department: string;
+  ssoId: string;
+  email: string;
+  initials: string;
+  role: UserRole;
+  badge: string;
+  avatarBg: string;
+}
+
+export const DEPT_ADMIN_ROLES: DeptRole[] = [
+  {
+    id: 'scheme_officer',
+    name: 'Dr. Ashok Sharma',
+    designation: 'Scheme Officer In-Charge',
+    department: 'Skill Schemes & Sanctions',
+    ssoId: 'officer.mmkvy@rajasthan.gov.in',
+    email: 'officer.mmkvy@rajasthan.gov.in',
+    initials: 'AS',
+    role: 'dept_admin',
+    badge: 'Scheme OIC',
+    avatarBg: 'bg-[#0B3558] text-white'
+  },
+  {
+    id: 'scrutiny_officer',
+    name: 'Sh. Mahendra Meena',
+    designation: 'Desk Scrutiny Officer',
+    department: 'EOI Scrutiny & Verification',
+    ssoId: 'scrutiny.officer@rajasthan.gov.in',
+    email: 'scrutiny.officer@rajasthan.gov.in',
+    initials: 'MM',
+    role: 'dept_admin',
+    badge: 'Scrutiny Officer',
+    avatarBg: 'bg-[#0B3558] text-white'
+  },
+  {
+    id: 'super_admin',
+    name: 'Sh. Rajesh Verma (IAS)',
+    designation: 'Super Administrator',
+    department: 'State Directorate (RSLDC HQ)',
+    ssoId: 'super.admin@rajasthan.gov.in',
+    email: 'super.admin@rajasthan.gov.in',
+    initials: 'RV',
+    role: 'super_admin',
+    badge: 'Super Admin',
+    avatarBg: 'bg-[#0B3558] text-white'
   }
 ];
 
@@ -121,6 +173,15 @@ export class AuthService {
   /** Flag indicating whether the current department admin session has verified OTP */
   isDeptAdminOtpVerified = signal<boolean>(false);
 
+  /** Currently selected Department Role ID */
+  currentDeptRoleId = signal<string>('scheme_officer');
+
+  /** Active Department Role object */
+  readonly currentDeptRole = computed<DeptRole>(() => {
+    const id = this.currentDeptRoleId();
+    return DEPT_ADMIN_ROLES.find(r => r.id === id) || DEPT_ADMIN_ROLES[0];
+  });
+
   constructor() {
     this.initUser();
   }
@@ -128,9 +189,22 @@ export class AuthService {
   private initUser(): void {
     if (typeof localStorage !== 'undefined') {
       try {
+        const savedDeptRole = localStorage.getItem('isms_dept_role_id');
+        if (savedDeptRole && DEPT_ADMIN_ROLES.some(r => r.id === savedDeptRole)) {
+          this.currentDeptRoleId.set(savedDeptRole);
+        }
+
         const saved = localStorage.getItem(this.STORAGE_KEY);
         if (saved) {
-          this.currentUser.set(JSON.parse(saved));
+          const parsed: UserPersona = JSON.parse(saved);
+          this.currentUser.set(parsed);
+
+          if (parsed.role === 'dept_admin' || parsed.role === 'super_admin') {
+            const matched = DEPT_ADMIN_ROLES.find(r => r.name === parsed.label || r.ssoId === parsed.ssoId);
+            if (matched) {
+              this.currentDeptRoleId.set(matched.id);
+            }
+          }
         } else {
           this.currentUser.set({
             id: 'Approved Citizen (TP)',
@@ -186,11 +260,28 @@ export class AuthService {
     const ssoId = identifier.trim() || 'new_user';
     const roleConfig = USER_ROLES.find(r => r.role === role) || USER_ROLES[0];
 
+    let label = ssoId;
+    let subLabel = roleConfig.label;
+
+    if (role === 'dept_admin') {
+      const activeDept = this.currentDeptRole();
+      if (!identifier.trim() || identifier.trim() === 'dept_admin') {
+        label = activeDept.name;
+        subLabel = activeDept.designation;
+      }
+    } else if (role === 'super_admin') {
+      const superRole = DEPT_ADMIN_ROLES.find(r => r.role === 'super_admin') || DEPT_ADMIN_ROLES[2];
+      if (!identifier.trim() || identifier.trim() === 'super_admin') {
+        label = superRole.name;
+        subLabel = superRole.designation;
+      }
+    }
+
     const persona: UserPersona = {
       id: ssoId,
       ssoId: ssoId,
-      label: ssoId,
-      subLabel: roleConfig.label,
+      label: label,
+      subLabel: subLabel,
       role: role,
       isProfileComplete: role !== 'new_user'
     };
@@ -226,19 +317,56 @@ export class AuthService {
     return USER_ROLES.find(r => r.role === role) || USER_ROLES[0];
   }
 
+  getDeptAdminRoles(): DeptRole[] {
+    return DEPT_ADMIN_ROLES;
+  }
+
+  /**
+   * Switches department role instantly for Department Admin
+   * Updates display name, designation, and persona across the application
+   */
+  switchDeptRole(roleId: string): void {
+    const target = DEPT_ADMIN_ROLES.find(r => r.id === roleId) || DEPT_ADMIN_ROLES[0];
+    this.currentDeptRoleId.set(target.id);
+    this.setDeptAdminOtpVerified(true);
+
+    const persona: UserPersona = {
+      id: target.name,
+      ssoId: target.ssoId,
+      label: target.name,
+      subLabel: target.designation,
+      role: target.role,
+      isProfileComplete: true
+    };
+
+    this.currentUser.set(persona);
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(persona));
+        localStorage.setItem('isms_dept_role_id', target.id);
+      } catch { }
+    }
+  }
+
   getSwitchableAccounts(): SwitchableAccount[] {
     return SWITCHABLE_ACCOUNTS;
   }
 
   /**
-   * Switches user role instantly without logging out (Google Account-style switcher)
+   * Switches user role instantly without logging out
    */
   switchRole(role: UserRole, targetRoute?: string): void {
-    const account = SWITCHABLE_ACCOUNTS.find(a => a.role === role) || SWITCHABLE_ACCOUNTS[0];
-
     if (role === 'dept_admin') {
-      this.setDeptAdminOtpVerified(true);
+      this.switchDeptRole(this.currentDeptRoleId());
+      if (targetRoute) {
+        this.router.navigate([targetRoute]);
+      } else {
+        this.router.navigate(['/admin/eoi-view']);
+      }
+      return;
     }
+
+    const account = SWITCHABLE_ACCOUNTS.find(a => a.role === role) || SWITCHABLE_ACCOUNTS[0];
 
     const persona: UserPersona = {
       id: account.name,

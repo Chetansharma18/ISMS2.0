@@ -408,7 +408,7 @@ export type { SubmittedTender, SubmittedTenderDoc };
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">GSTIN</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.gstin" [disabled]="editableTender!.orgDetails.gstRegistered !== 'Yes'" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md enabled:bg-white disabled:bg-slate-100 focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.gstin" [disabled]="editableTender!.orgDetails.gstRegistered !== 'Yes'" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">MSME / Udyam Registered *</label>
@@ -419,7 +419,7 @@ export type { SubmittedTender, SubmittedTenderDoc };
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">Udyam Registration Number</label>
-                    <input type="text" [(ngModel)]="editableTender!.orgDetails.udyamNumber" [disabled]="editableTender!.orgDetails.msmeRegistered !== 'Yes'" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md enabled:bg-white disabled:bg-slate-100 focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
+                    <input type="text" [(ngModel)]="editableTender!.orgDetails.udyamNumber" [disabled]="editableTender!.orgDetails.msmeRegistered !== 'Yes'" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus:ring-1 focus:ring-[#174A6E]" />
                   </div>
                   <div>
                     <label class="text-slate-600 block text-[11px] font-medium mb-1">NSDC Partner</label>

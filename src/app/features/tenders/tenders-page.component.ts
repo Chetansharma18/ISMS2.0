@@ -76,7 +76,7 @@ export interface EoiDocumentItem {
                     [ngModel]="searchQuery()"
                     (ngModelChange)="onSearchChange($event)"
                     placeholder="Search schemes by name, reference no. or keyword..."
-                    class="w-full px-3.5 py-2 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none bg-transparent"
+                    class="w-full px-3.5 py-2 text-xs sm:text-sm placeholder:text-slate-400 focus:outline-none bg-transparent"
                   />
                   <button
                     type="button"

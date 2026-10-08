@@ -584,7 +584,7 @@ export interface EoiDocumentItem {
 
                   <div>
                     <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">GSTIN</label>
-                    <input type="text" [(ngModel)]="editableStep1.gstin" [disabled]="editableStep1.gstRegistered !== 'Yes'" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg enabled:bg-white disabled:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0B3558]" placeholder="15-digit GSTIN" />
+                    <input type="text" [(ngModel)]="editableStep1.gstin" [disabled]="editableStep1.gstRegistered !== 'Yes'" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg bg-white disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#0B3558]" placeholder="15-digit GSTIN" />
                   </div>
 
                   <div>
@@ -597,7 +597,7 @@ export interface EoiDocumentItem {
 
                   <div>
                     <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">UDYAM REGISTRATION NO.</label>
-                    <input type="text" [(ngModel)]="editableStep1.udyamNumber" [disabled]="editableStep1.msmeRegistered !== 'Yes'" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg enabled:bg-white disabled:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0B3558]" placeholder="UDYAM-RJ-XX-XXXXXXX" />
+                    <input type="text" [(ngModel)]="editableStep1.udyamNumber" [disabled]="editableStep1.msmeRegistered !== 'Yes'" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg bg-white disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#0B3558]" placeholder="UDYAM-RJ-XX-XXXXXXX" />
                   </div>
 
                   <div>
@@ -1592,7 +1592,7 @@ export interface EoiDocumentItem {
                       </div>
                       <div>
                         <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">GSTIN</label>
-                        <input type="text" [(ngModel)]="editableStep1.gstin" [disabled]="editableStep1.gstRegistered !== 'Yes'" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-lg enabled:bg-white disabled:bg-slate-100" />
+                        <input type="text" [(ngModel)]="editableStep1.gstin" [disabled]="editableStep1.gstRegistered !== 'Yes'" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-lg bg-white disabled:opacity-60 disabled:cursor-not-allowed" />
                       </div>
                       <div>
                         <label class="text-slate-600 block text-[10px] uppercase font-bold mb-1">Udyam Registration</label>
@@ -2414,7 +2414,7 @@ export interface EoiDocumentItem {
                 type="button"
                 (click)="goToStep(5)"
                 [disabled]="!declarationAgreed()"
-                class="px-6 py-2.5 enabled:bg-[#0B3558] hover:bg-[#07233B] disabled:bg-slate-400 text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer"
+                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer"
               >
                 Proceed to EMD Fee Payment ({{ formattedEmdFee() }}) &rarr;
               </button>
@@ -2585,7 +2585,7 @@ export interface EoiDocumentItem {
                   type="button"
                   (click)="triggerEmdPayment()"
                   [disabled]="isPaymentProcessing()"
-                  class="px-8 py-3 enabled:bg-[#0B3558] hover:bg-[#07233B] disabled:bg-slate-400 text-white rounded-lg text-xs sm:text-sm font-bold shadow-sm transition-colors cursor-pointer flex items-center gap-2"
+                  class="px-8 py-3 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs sm:text-sm font-bold shadow-sm transition-colors cursor-pointer flex items-center gap-2"
                 >
                   @if (isPaymentProcessing()) {
                     <span class="animate-spin text-sm">&#9696;</span>

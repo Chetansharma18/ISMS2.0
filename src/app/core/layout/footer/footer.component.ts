@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
+import { UserManualPdfService } from '../../services/user-manual-pdf.service';
 
 @Component({
   selector: 'app-footer',
@@ -435,6 +436,17 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
                       Help &amp; Support
                     </button>
                   </li>
+
+                  <li>
+                    <button
+                      type="button"
+                      (click)="downloadUserManual()"
+                      class="footer-link text-[0.875rem] font-['Inter',sans-serif] cursor-pointer bg-transparent border-0 p-0 text-left flex items-center gap-1.5"
+                      aria-label="Download ISMS 2.0 User Manual">
+                      <span>User Manual</span>
+                      <span class="text-[9.5px] uppercase font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">PDF</span>
+                    </button>
+                  </li>
                 </ul>
 
                 <!-- Dynamic Visitor Counter & Last Updated -->
@@ -532,6 +544,52 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
                 </a>
               </div>
 
+              <!-- User Manual Download Card (Software Guide & How It Works) -->
+              <div class="mt-6 pt-4 border-t border-slate-700/60 w-full max-w-xs">
+                <button
+                  type="button"
+                  (click)="downloadUserManual()"
+                  [disabled]="isGeneratingManual()"
+                  class="group w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-transparent hover:from-amber-500/25 hover:via-amber-500/15 border border-amber-500/30 hover:border-amber-400 text-left transition-all duration-200 cursor-pointer shadow-xs focus:outline-hidden focus:ring-2 focus:ring-amber-400"
+                  aria-label="Download ISMS 2.0 User Manual PDF - Complete software guide"
+                  title="Download ISMS 2.0 User Manual (How the Software Works)">
+                  
+                  <!-- PDF Icon badge -->
+                  <div class="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    @if (isGeneratingManual()) {
+                      <svg class="w-4 h-4 animate-spin text-amber-300" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                      </svg>
+                    } @else {
+                      <svg class="w-5 h-5 text-amber-400 group-hover:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    }
+                  </div>
+
+                  <!-- Text Details -->
+                  <div class="flex flex-col min-w-0">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[0.875rem] font-bold text-white group-hover:text-amber-300 transition-colors">
+                        Download User Manual
+                      </span>
+                      <span class="text-[9px] uppercase font-extrabold tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                        PDF
+                      </span>
+                    </div>
+                    <span class="text-[0.75rem] text-slate-300 leading-tight">
+                      How ISMS 2.0 works &amp; step-by-step guide
+                    </span>
+                  </div>
+
+                  <!-- Arrow indicator -->
+                  <svg class="w-4 h-4 text-slate-400 group-hover:text-amber-300 group-hover:translate-x-0.5 transition-all ml-auto shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+
             </div>
 
           </div>
@@ -555,6 +613,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
 })
 export class FooterComponent implements AfterViewInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
+  private userManualService = inject(UserManualPdfService);
   
   helplineGlobal = HELPLINE_GLOBAL;
 
@@ -564,6 +623,7 @@ export class FooterComponent implements AfterViewInit, OnDestroy {
   readonly isVisible = signal(false);
   readonly isTabActive = signal(true);
   readonly isPausedManually = signal(false);
+  readonly isGeneratingManual = signal(false);
 
   private observer?: IntersectionObserver;
   private visibilityHandler?: () => void;
@@ -607,16 +667,61 @@ export class FooterComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  downloadSamplePdf(fileName: string, title: string): void {
-    const pdfContent = `This is a sample PDF document for ${title}.\n\nISMS 2.0 Official Document.\nGovernment of Rajasthan / RSLDC.`;
-    const blob = new Blob([pdfContent], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+  async downloadUserManual(): Promise<void> {
+    if (this.isGeneratingManual()) return;
+    this.isGeneratingManual.set(true);
+    try {
+      await this.userManualService.generateUserManualPdf();
+    } catch (err) {
+      console.error('Failed to generate user manual PDF:', err);
+    } finally {
+      this.isGeneratingManual.set(false);
+    }
+  }
+
+  async downloadSamplePdf(fileName: string, title: string): Promise<void> {
+    try {
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      // Header
+      doc.setFillColor(11, 53, 88);
+      doc.rect(10, 10, 190, 20, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(255, 255, 255);
+      doc.text('GOVERNMENT OF RAJASTHAN', 105, 18, { align: 'center' });
+      doc.setFontSize(8.5);
+      doc.setTextColor(245, 158, 11);
+      doc.text('RAJASTHAN SKILL AND LIVELIHOODS DEVELOPMENT CORPORATION (RSLDC)', 105, 24, { align: 'center' });
+
+      // Title
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      doc.setTextColor(11, 53, 88);
+      doc.text(title.toUpperCase(), 105, 42, { align: 'center' });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(71, 85, 105);
+      doc.text('Integrated Scheme Management System (ISMS 2.0) - Statutory Document', 105, 48, { align: 'center' });
+
+      doc.setDrawColor(203, 213, 225);
+      doc.line(15, 52, 195, 52);
+
+      // Body text
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(30, 41, 59);
+      const text = `This is the official ${title} documentation for ISMS 2.0 (Integrated Scheme Management System), published by Rajasthan Skill and Livelihoods Development Corporation (RSLDC).\n\n` +
+        `All operations conducted on the portal comply with Rajasthan Transparency in Public Procurement (RTPP) Act and Government of Rajasthan digital security guidelines.\n\n` +
+        `For questions regarding this document or portal compliance, please reach out to the RSLDC Helpdesk at 0141-2716091 or email isms-support@rajasthan.gov.in.`;
+      
+      const splitText = doc.splitTextToSize(text, 180);
+      doc.text(splitText, 15, 62);
+
+      doc.save(fileName);
+    } catch {
+      // fallback
+    }
   }
 }

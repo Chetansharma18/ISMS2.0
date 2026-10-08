@@ -46,6 +46,65 @@ export const USER_ROLES: RoleConfig[] = [
   }
 ];
 
+export interface SwitchableAccount {
+  role: UserRole;
+  title: string;
+  name: string;
+  email: string;
+  subtitle: string;
+  initials: string;
+  badge: string;
+  avatarBg: string;
+  defaultRoute: string;
+}
+
+export const SWITCHABLE_ACCOUNTS: SwitchableAccount[] = [
+  {
+    role: 'dept_admin',
+    title: 'Department Admin',
+    name: 'Dr. Ashok Sharma (RSLDC)',
+    email: 'dept.admin@rajasthan.gov.in',
+    subtitle: 'Officer Portal • Scrutiny & Sanctions',
+    initials: 'DA',
+    badge: 'Officer Portal',
+    avatarBg: 'bg-[#0B3558] text-white',
+    defaultRoute: '/admin/eoi-view'
+  },
+  {
+    role: 'existing_user',
+    title: 'Training Partner (TP / PIA)',
+    name: 'Approved Citizen (TP)',
+    email: 'tp.partner@skillcraft.org',
+    subtitle: 'Registered Agency • Scheme Bidding',
+    initials: 'TP',
+    badge: 'Registered TP',
+    avatarBg: 'bg-emerald-700 text-white',
+    defaultRoute: '/tenders'
+  },
+  {
+    role: 'super_admin',
+    title: 'Super Administrator',
+    name: 'Sh. Rajesh Verma (IAS)',
+    email: 'super.admin@rajasthan.gov.in',
+    subtitle: 'State Admin • Full System & Masters',
+    initials: 'SA',
+    badge: 'System Admin',
+    avatarBg: 'bg-indigo-700 text-white',
+    defaultRoute: '/admin/eoi-configuration'
+  },
+  {
+    role: 'new_user',
+    title: 'New Applicant',
+    name: 'New Applicant User',
+    email: 'new.applicant@enterprise.in',
+    subtitle: 'First Time User • OTR Registration',
+    initials: 'NU',
+    badge: 'First Time User',
+    avatarBg: 'bg-amber-600 text-white',
+    defaultRoute: '/registration'
+  }
+];
+
 @Injectable({
   providedIn: 'root'
 })
@@ -165,5 +224,32 @@ export class AuthService {
 
   getRoleConfig(role: UserRole): RoleConfig {
     return USER_ROLES.find(r => r.role === role) || USER_ROLES[0];
+  }
+
+  getSwitchableAccounts(): SwitchableAccount[] {
+    return SWITCHABLE_ACCOUNTS;
+  }
+
+  /**
+   * Switches user role instantly without logging out (Google Account-style switcher)
+   */
+  switchRole(role: UserRole, targetRoute?: string): void {
+    const account = SWITCHABLE_ACCOUNTS.find(a => a.role === role) || SWITCHABLE_ACCOUNTS[0];
+
+    if (role === 'dept_admin') {
+      this.setDeptAdminOtpVerified(true);
+    }
+
+    const persona: UserPersona = {
+      id: account.name,
+      ssoId: account.name,
+      label: account.name,
+      subLabel: account.subtitle,
+      role: role,
+      isProfileComplete: role !== 'new_user'
+    };
+
+    const dest = targetRoute || account.defaultRoute;
+    this.login(persona, dest);
   }
 }

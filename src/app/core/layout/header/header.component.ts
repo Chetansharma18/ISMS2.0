@@ -11,7 +11,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { AuthService } from '../../auth/auth.service';
+import { AuthService, UserRole } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -116,27 +116,33 @@ import { AuthService } from '../../auth/auth.service';
             </button>
           </div>
 
-          <!-- When Logged In (and on internal portal page): User Profile Menu -->
+          <!-- When Logged In (and on internal portal page): User Profile Menu & Role Switcher -->
           @if (currentUser() && !isLandingPage()) {
             <div class="relative z-[100]" id="user-menu-container">
               <button
                 type="button"
                 id="user-menu-btn"
                 (click)="toggleDropdown()"
-                class="inline-flex items-center gap-2 sm:gap-2.5 bg-white hover:bg-[#F5F8FA] border border-[#DCE4ED] rounded-full py-1 pl-1.5 pr-2.5 sm:py-1.5 sm:pl-2 sm:pr-4 transition-all cursor-pointer h-[34px] sm:h-[42px]"
+                class="inline-flex items-center gap-2 sm:gap-2.5 bg-white hover:bg-[#F5F8FA] border border-[#DCE4ED] hover:border-slate-300 rounded-full py-1 pl-1.5 pr-2.5 sm:py-1.5 sm:pl-2 sm:pr-3.5 transition-all cursor-pointer h-[36px] sm:h-[42px] shadow-2xs"
                 [attr.aria-expanded]="dropdownOpen()"
                 aria-haspopup="true"
-                aria-label="User menu"
+                aria-label="User profile and role switcher"
               >
-                <!-- Avatar -->
-                <div class="w-6 h-6 sm:w-6.5 sm:h-6.5 rounded-full bg-[#12365A] text-white flex items-center justify-center font-bold text-[11px] sm:text-xs uppercase shrink-0 select-none">
+                <!-- Avatar with role-based background -->
+                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-[11px] sm:text-xs uppercase shrink-0 select-none shadow-xs"
+                  [ngClass]="activeAccountAvatarClass()">
                   {{ avatarChar() }}
                 </div>
 
-                <!-- Username -->
-                <span class="text-xs sm:text-[13px] font-semibold text-[#12365A] max-w-20 sm:max-w-40 truncate">
-                  {{ displayName() }}
-                </span>
+                <!-- Username and role badge -->
+                <div class="flex flex-col text-left leading-none max-w-28 sm:max-w-44 truncate">
+                  <span class="text-xs sm:text-[13px] font-bold text-[#12365A] truncate">
+                    {{ displayName() }}
+                  </span>
+                  <span class="text-[9.5px] sm:text-[10px] text-slate-500 font-medium truncate mt-0.5">
+                    {{ activeRoleBadge() }}
+                  </span>
+                </div>
 
                 <!-- Chevron -->
                 <svg
@@ -148,39 +154,124 @@ import { AuthService } from '../../auth/auth.service';
                 </svg>
               </button>
 
-              <!-- Dropdown Menu -->
+              <!-- Dropdown Menu (Google Account Style Role Switcher) -->
               @if (dropdownOpen()) {
                 <div
-                  class="absolute right-0 top-full mt-2 w-56 bg-white border border-[#DCE4ED] rounded-lg shadow-lg z-[100] overflow-hidden py-1 animate-in fade-in slide-in-from-top-2 duration-150"
+                  class="absolute right-0 top-full mt-2 w-80 sm:w-88 bg-white border border-slate-200 rounded-2xl shadow-2xl z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-150 font-sans"
                   role="menu"
                 >
-                  <div class="px-4 py-2.5 border-b border-[#DCE4ED] bg-[#F5F8FA]">
-                    <p class="text-xs font-bold text-[#12365A] truncate">{{ displayName() }}</p>
-                    <p class="text-[11px] text-[#344256] mt-0.5">{{ currentUser()?.subLabel || 'SSOID User' }}</p>
+                  <!-- Current Active Account Banner (Google Account Style) -->
+                  <div class="p-4 bg-gradient-to-b from-slate-50 to-white border-b border-slate-200/80 text-center relative">
+                    <!-- Close button in top-right -->
+                    <button
+                      type="button"
+                      (click)="closeDropdown()"
+                      class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-200/50 transition-colors cursor-pointer text-xs leading-none"
+                      aria-label="Close menu"
+                    >
+                      &times;
+                    </button>
+
+                    <!-- Large Avatar Circle with Active Ring -->
+                    <div class="relative w-13 h-13 mx-auto mb-2">
+                      <div class="w-13 h-13 rounded-full flex items-center justify-center font-black text-base uppercase shadow-inner ring-4 ring-slate-100"
+                        [ngClass]="activeAccountAvatarClass()">
+                        {{ activeAccount().initials }}
+                      </div>
+                      <span class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-[9px] text-white font-bold" title="Active Account">
+                        &check;
+                      </span>
+                    </div>
+
+                    <!-- User Name & Email -->
+                    <h4 class="text-sm font-bold text-slate-900 m-0 truncate">
+                      {{ activeAccount().name }}
+                    </h4>
+                    <p class="text-[11.5px] text-slate-500 m-0 mt-0.5 truncate">
+                      {{ activeAccount().email }}
+                    </p>
+
+                    <!-- Active Role Pill -->
+                    <div class="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#0B3558]/10 text-[#0B3558] border border-[#0B3558]/20">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#0B3558] animate-pulse"></span>
+                      <span>{{ activeAccount().title }} (Active)</span>
+                    </div>
                   </div>
-                  <div class="py-1" role="none">
+
+                  <!-- Switch Role / Account Section Header -->
+                  <div class="px-4 pt-3 pb-1 flex items-center justify-between">
+                    <span class="text-[10.5px] uppercase font-bold tracking-wider text-slate-400 flex items-center gap-1.5">
+                      <svg class="w-3.5 h-3.5 text-[#0483AC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                      </svg>
+                      Switch Role Without Logout
+                    </span>
+                    <span class="text-[10px] text-slate-400 font-medium">Click to switch</span>
+                  </div>
+
+                  <!-- List of Accounts / Roles to Switch -->
+                  <div class="p-2 space-y-1 max-h-64 overflow-y-auto">
+                    @for (acc of switchableAccounts; track acc.role) {
+                      <button
+                        type="button"
+                        (click)="onSwitchRole(acc.role)"
+                        class="w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-all cursor-pointer group"
+                        [ngClass]="currentRole() === acc.role ? 'bg-sky-50/80 border border-sky-200' : 'hover:bg-slate-50 border border-transparent'"
+                      >
+                        <!-- Role Avatar Circle -->
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs uppercase shrink-0 shadow-2xs group-hover:scale-105 transition-transform"
+                          [ngClass]="acc.avatarBg">
+                          {{ acc.initials }}
+                        </div>
+
+                        <!-- Role Text Info -->
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center justify-between gap-1">
+                            <span class="text-xs font-bold text-slate-800 truncate group-hover:text-[#0B3558]"
+                              [class.text-[#0B3558]]="currentRole() === acc.role">
+                              {{ acc.title }}
+                            </span>
+                            @if (currentRole() === acc.role) {
+                              <span class="inline-flex items-center gap-1 text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                                Current
+                              </span>
+                            } @else {
+                              <span class="text-[10px] font-semibold text-sky-700 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                Switch &rarr;
+                              </span>
+                            }
+                          </div>
+                          <p class="text-[11px] text-slate-500 truncate m-0 mt-0.5">
+                            {{ acc.subtitle }}
+                          </p>
+                        </div>
+                      </button>
+                    }
+                  </div>
+
+                  <!-- Footer Actions: Profile & Logout -->
+                  <div class="p-2 border-t border-slate-100 bg-slate-50/70 flex items-center justify-between text-xs">
                     <a
                       routerLink="/profile"
                       (click)="closeDropdown()"
-                      class="flex items-center gap-2.5 px-4 py-2 text-sm text-[#344256] hover:bg-[#F5F8FA] hover:text-[#12365A] transition-colors cursor-pointer"
-                      role="menuitem"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 text-slate-600 hover:text-[#0B3558] hover:bg-white rounded-lg font-medium transition-colors cursor-pointer"
                     >
-                      <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
-                      <span class="font-medium">Profile</span>
+                      <span>View Profile</span>
                     </a>
-                    <div class="h-px bg-[#DCE4ED] mx-3 my-1"></div>
+
                     <button
                       type="button"
                       (click)="onLogout()"
-                      class="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer border-0 bg-transparent text-left font-medium"
-                      role="menuitem"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg font-medium transition-colors cursor-pointer border-0 bg-transparent"
                     >
-                      <svg class="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      <svg class="w-3.5 h-3.5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                       </svg>
-                      <span>Logout</span>
+                      <span>Sign Out</span>
                     </button>
                   </div>
                 </div>
@@ -249,6 +340,25 @@ export class HeaderComponent {
     return name ? name.charAt(0).toUpperCase() : 'U';
   });
 
+  readonly switchableAccounts = this.authService.getSwitchableAccounts();
+
+  readonly currentRole = computed(() => {
+    return this.currentUser()?.role || 'existing_user';
+  });
+
+  readonly activeAccount = computed(() => {
+    const role = this.currentRole();
+    return this.switchableAccounts.find(a => a.role === role) || this.switchableAccounts[0];
+  });
+
+  readonly activeRoleBadge = computed(() => {
+    return this.activeAccount()?.badge || 'User';
+  });
+
+  readonly activeAccountAvatarClass = computed(() => {
+    return this.activeAccount()?.avatarBg || 'bg-[#12365A] text-white';
+  });
+
   constructor() {
     const checkUrl = (url: string) => {
       const cleanUrl = url.split('?')[0].split('#')[0];
@@ -296,5 +406,10 @@ export class HeaderComponent {
   onLogout(): void {
     this.dropdownOpen.set(false);
     this.authService.logout();
+  }
+
+  onSwitchRole(role: UserRole): void {
+    this.dropdownOpen.set(false);
+    this.authService.switchRole(role);
   }
 }

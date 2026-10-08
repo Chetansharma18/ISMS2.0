@@ -1,8 +1,8 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { EoiStateService, Scheme } from '../../services/eoi-state.service';
-import { AuthService } from '../../../../core/auth/auth.service';
+import { AuthService, UserRole } from '../../../../core/auth/auth.service';
 import {
   PageHeaderComponent,
   TableComponent,
@@ -38,9 +38,68 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
           title="EOI Responses"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'EOI Responses' }]"
         >
-          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[#0c2d4e] border border-slate-300 text-xs font-medium shadow-xs">
-            <span class="text-slate-600">Published Schemes:</span>
-            <span class="font-bold text-[#0c2d4e]">{{ schemes().length }}</span>
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[#0c2d4e] border border-slate-300 text-xs font-medium shadow-xs">
+              <span class="text-slate-600">Published Schemes:</span>
+              <span class="font-bold text-[#0c2d4e]">{{ schemes().length }}</span>
+            </div>
+
+            <!-- Department Admin Active Role Switcher Widget -->
+            <div class="relative z-30" id="dept-role-dropdown-container">
+              <button
+                type="button"
+                (click)="toggleRoleDropdown()"
+                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0B3558] hover:bg-[#07243c] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                title="Switch Role without logging out (Google style)"
+              >
+                <div class="w-5 h-5 rounded-full bg-white/20 text-white flex items-center justify-center text-[10px] font-bold">
+                  DA
+                </div>
+                <span>Role: Department Admin</span>
+                <svg class="w-3.5 h-3.5 text-sky-200 transition-transform duration-200" [class.rotate-180]="roleDropdownOpen()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              <!-- Dropdown Menu -->
+              @if (roleDropdownOpen()) {
+                <div
+                  class="absolute right-0 top-full mt-2 w-76 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150 text-left font-sans"
+                >
+                  <div class="px-3.5 py-2.5 border-b border-slate-100 bg-slate-50">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Switch Account / Role</span>
+                    <span class="text-xs text-slate-700 font-bold">Switch without logging out</span>
+                  </div>
+
+                  <div class="p-1.5 space-y-0.5">
+                    @for (acc of switchableAccounts; track acc.role) {
+                      <button
+                        type="button"
+                        (click)="onSwitchRole(acc.role)"
+                        class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-colors cursor-pointer group"
+                        [ngClass]="acc.role === 'dept_admin' ? 'bg-sky-50 text-[#0B3558] font-bold' : 'hover:bg-slate-50 text-slate-700'"
+                      >
+                        <div class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold uppercase shrink-0"
+                          [ngClass]="acc.avatarBg">
+                          {{ acc.initials }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center justify-between gap-1">
+                            <span class="text-xs font-semibold truncate">{{ acc.title }}</span>
+                            @if (acc.role === 'dept_admin') {
+                              <span class="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 font-bold">Active</span>
+                            } @else {
+                              <span class="text-[10px] text-sky-700 opacity-0 group-hover:opacity-100 transition-opacity">Switch &rarr;</span>
+                            }
+                          </div>
+                          <span class="text-[10.5px] text-slate-400 block truncate">{{ acc.name }}</span>
+                        </div>
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
           </div>
         </app-page-header>
 
@@ -169,5 +228,25 @@ export class DepartmentEoiViewComponent implements OnInit {
   onOtpCancelled(): void {
     this.showOtpModal.set(false);
     this.router.navigate(['/sso-login']);
+  }
+
+  roleDropdownOpen = signal<boolean>(false);
+  readonly switchableAccounts = this.authService.getSwitchableAccounts();
+
+  toggleRoleDropdown(): void {
+    this.roleDropdownOpen.update(v => !v);
+  }
+
+  onSwitchRole(role: UserRole): void {
+    this.roleDropdownOpen.set(false);
+    this.authService.switchRole(role);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('#dept-role-dropdown-container')) {
+      this.roleDropdownOpen.set(false);
+    }
   }
 }

@@ -458,7 +458,7 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
                   <div class="w-1 h-1 rounded-full bg-slate-600 hidden sm:block"></div>
                   <div class="flex items-center gap-1.5">
                     <span class="text-[0.8125rem] text-slate-400 font-['Inter',sans-serif]">Last Updated:</span>
-                    <span class="text-[0.875rem] text-white font-semibold font-['Inter',sans-serif]">21 Sep 2026</span>
+                    <span class="text-[0.875rem] text-white font-semibold font-['Inter',sans-serif]">8 Oct 2026</span>
                   </div>
                 </div>
 

@@ -2,41 +2,45 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { FormSdcComponent, FormSectionConfig } from '../../../shared/components/form-sdc';
+import { FormSdcComponent } from '../../../shared/components/form-sdc';
+import { PageHeaderComponent } from '../../../shared';
 import { SdcService } from '../services/sdc.service';
-import { SdcNewRegistrationData, SdcScheme } from '../models/sdc.model';
-import { getSdcFormFields } from '../config/sdc-form.config';
+import { SdcNewRegistrationData, SdcScheme, CenterPhotoItem } from '../models/sdc.model';
+import { getSdcFormFields, RAJASTHAN_LOCATION_DATA } from '../config/sdc-form.config';
 
 @Component({
   selector: 'app-sdc-create',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, FormSdcComponent],
+  imports: [CommonModule, RouterModule, FormsModule, FormSdcComponent, PageHeaderComponent],
   template: `
-    <div class="min-h-full bg-white py-4 sm:py-6 px-4 sm:px-8 font-sans selection:bg-[#174A6E] selection:text-white" style="font-family: 'Inter', sans-serif;">
-      
-      <!-- Direct-on-Page Container (No card wrapper, directly on the page) -->
-      <div class="w-full space-y-4">
+    <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
+      <div class="p-4 sm:p-5 space-y-4 font-sans">
         
-        <!-- Header: Back Button (with arrow + 'Back' label) + Title -->
-        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-          <div class="flex items-center gap-3">
+        <!-- Standard Panoramic Page Header with Back Button and IPA badge -->
+        <app-page-header
+          title="Register New SDC"
+          [showBack]="true"
+          (back)="goBack()"
+          [breadcrumbs]="[
+            { label: 'Home', url: '/' },
+            { label: 'IPA', url: '/ipa' },
+            { label: 'Register SDC' }
+          ]"
+          [badge]="linkedIpaNumber() ? 'Linked IPA: ' + linkedIpaNumber() : undefined"
+        >
+          <div class="flex items-center gap-2">
             <button
               type="button"
               (click)="goBack()"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 active:scale-95 text-xs font-semibold text-slate-700 shadow-2xs transition-all cursor-pointer shrink-0"
-              title="Go Back"
+              class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 active:scale-95 text-xs font-semibold text-slate-700 shadow-2xs transition-all cursor-pointer"
             >
               <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
-              <span>Back</span>
+              <span>Cancel</span>
             </button>
-            
-            <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-snug m-0">
-              Register New SDC
-            </h1>
           </div>
-        </div>
+        </app-page-header>
 
         <!-- Notification Banner -->
         @if (errorMessage()) {
@@ -51,7 +55,7 @@ import { getSdcFormFields } from '../config/sdc-form.config';
           </div>
         }
 
-        <!-- Single Page Dynamic SDC Form Directly on Page (No Card Wrapper) -->
+        <!-- Single Page Dynamic SDC Form Directly on Page (Full Screen, No Modal) -->
         <app-form-sdc
           [fields]="formFields"
           [(model)]="formData"
@@ -67,7 +71,6 @@ import { getSdcFormFields } from '../config/sdc-form.config';
         ></app-form-sdc>
 
       </div>
-
     </div>
   `
 })
@@ -79,14 +82,16 @@ export class SdcCreateComponent implements OnInit {
 
   errorMessage = signal<string>('');
   isSubmitting = signal<boolean>(false);
+  linkedIpaNumber = signal<string>('');
 
   /** Exact 22 fields configured in user sequence */
   formFields: any[] = [];
 
-  /** Form data starts empty — only state is pre-set to Rajasthan */
+  /** Form data */
   formData: SdcNewRegistrationData = {
     sdcName: '',
-    tpName: '',
+    tpName: 'ARNOLD SAMARTH',
+    mouRefNo: '',
     sector: '',
     scheme: '' as SdcScheme,
     schemeCategory: '',
@@ -97,22 +102,32 @@ export class SdcCreateComponent implements OnInit {
     division: '',
     block: '',
     proposedStartDate: '',
-    sdcCapacity: 0,
+    sdcCapacity: 60,
     centerEmail: '',
     fullAddress: '',
-    pincode: '',
-    remarks: '',
-    totalTrainedAspirants: 0,
-    totalPlacedAspirants: 0,
-    hostelCategory: '',
-    latitude: 0,
-    longitude: 0,
-    tpRemarks: '',
+    pincode: '302029',
+    remarks: 'Equipped with dedicated smart labs and biometrics',
+    totalTrainedAspirants: 500,
+    totalPlacedAspirants: 400,
+    hostelCategory: 'Residential (Both Boys & Girls)',
+    latitude: 26.8524,
+    longitude: 75.8073,
+    tpRemarks: 'Equipped with dedicated smart labs and biometrics',
     centerPhotos: []
   };
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
+      const dist = params['district'] || 'Jaipur';
+      const locInfo = RAJASTHAN_LOCATION_DATA[dist] || RAJASTHAN_LOCATION_DATA['Jaipur'];
+
+      if (params['ipaNumber']) {
+        this.linkedIpaNumber.set(params['ipaNumber']);
+        this.formData.mouRefNo = params['ipaNumber'];
+      }
+      if (params['tpName']) {
+        this.formData.tpName = params['tpName'];
+      }
       if (params['sector']) {
         this.formData.sector = params['sector'];
       }
@@ -122,16 +137,40 @@ export class SdcCreateComponent implements OnInit {
       if (params['schemeCategory'] || params['category']) {
         this.formData.schemeCategory = params['schemeCategory'] || params['category'];
       }
-    });
+      if (params['sanctionTarget']) {
+        this.formData.sdcCapacity = Math.min(Number(params['sanctionTarget']), 100) || 60;
+      }
 
-    this.formFields = getSdcFormFields({
-      onSectorChange: (sector: string) => {
-        this.formData.sector = sector;
-      },
-      onSchemeChange: (scheme: SdcScheme) => {
-        this.formData.scheme = scheme;
-      },
-      initialDistrict: this.formData.district
+      this.formData.district = dist;
+      this.formData.state = 'Rajasthan';
+      this.formData.division = locInfo?.division || dist;
+      this.formData.assemblyConstituency = locInfo?.assemblyConstituencies?.[0] || 'Sanganer';
+      this.formData.parliamentConstituency = locInfo?.parliamentConstituencies?.[0] || 'Jaipur Rural';
+      this.formData.block = locInfo?.blocks?.[0] || dist;
+      this.formData.proposedStartDate = new Date().toISOString().split('T')[0];
+      this.formData.centerEmail = `sdc.${dist.toLowerCase().replace(/\s+/g, '')}@skillmasters.in`;
+      this.formData.fullAddress = `Plot No. 42, Institutional Area, Jhalana Doongri, ${dist}, Rajasthan`;
+
+      if (!this.formData.sdcName) {
+        this.formData.sdcName = `${dist} Skill Development Center`;
+      }
+
+      const defaultPhotos: CenterPhotoItem[] = [
+        { id: 'p1', name: 'Center_Front_Building.jpg', url: '/center-photos/center-building.jpg', size: '2.1 MB', tag: 'Photo 1' },
+        { id: 'p2', name: 'IT_Computer_Lab.jpg', url: '/center-photos/computer-lab.jpg', size: '2.8 MB', tag: 'Photo 2' },
+        { id: 'p3', name: 'Practical_Training_Classroom.jpg', url: '/center-photos/practical-training.jpg', size: '3.1 MB', tag: 'Photo 3' }
+      ];
+      this.formData.centerPhotos = defaultPhotos;
+
+      this.formFields = getSdcFormFields({
+        onSectorChange: (sector: string) => {
+          this.formData.sector = sector;
+        },
+        onSchemeChange: (scheme: SdcScheme) => {
+          this.formData.scheme = scheme;
+        },
+        initialDistrict: this.formData.district
+      });
     });
   }
 
@@ -139,14 +178,32 @@ export class SdcCreateComponent implements OnInit {
     if (window.history.length > 1) {
       this.location.back();
     } else {
-      this.router.navigate(['/sdcs']);
+      this.router.navigate(['/ipa']);
     }
   }
 
   submitSdcForm(): void {
+    if (!this.formData.sdcName) {
+      this.errorMessage.set('Center Name is required.');
+      return;
+    }
+
     this.isSubmitting.set(true);
     try {
-      this.sdcService.createSdc(this.formData as any);
+      const defaultPhotos: CenterPhotoItem[] = [
+        { id: 'p1', name: 'Center_Front_Building.jpg', url: '/center-photos/center-building.jpg', size: '2.1 MB', tag: 'Photo 1' },
+        { id: 'p2', name: 'IT_Computer_Lab.jpg', url: '/center-photos/computer-lab.jpg', size: '2.8 MB', tag: 'Photo 2' },
+        { id: 'p3', name: 'Practical_Training_Classroom.jpg', url: '/center-photos/practical-training.jpg', size: '3.1 MB', tag: 'Photo 3' }
+      ];
+
+      const payload = {
+        ...this.formData,
+        centerPhotos: this.formData.centerPhotos && this.formData.centerPhotos.length >= 3
+          ? this.formData.centerPhotos
+          : defaultPhotos
+      };
+
+      this.sdcService.createSdc(payload as any);
       this.router.navigate(['/sdcs']);
     } catch (err: any) {
       this.errorMessage.set(err?.message || 'Failed to submit SDC application.');
@@ -155,3 +212,4 @@ export class SdcCreateComponent implements OnInit {
     }
   }
 }
+

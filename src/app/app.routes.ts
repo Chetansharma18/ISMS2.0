@@ -327,6 +327,13 @@ export const routes: Routes = [
           )
       },
       {
+        path: 'create',
+        loadComponent: () =>
+          import('./features/sdc/components/sdc-create.component').then(
+            (m) => m.SdcCreateComponent
+          )
+      },
+      {
         path: ':id',
         loadComponent: () =>
           import('./features/sdc/components/sdc-detail.component').then(

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { jsPDF } from 'jspdf';
+import JSZip from 'jszip';
 import { EoiStateService, ApplicantResponse, DossierDocument } from '../../services/eoi-state.service';
 
 interface ActivePreviewDocument {
@@ -409,8 +410,8 @@ interface ActivePreviewDocument {
            6. BOTTOM SECTION: UPLOADED PROPOSAL DOCUMENTS (IMAGE 4 SCHEME DOCS STYLE)
            ==================================================================== -->
       <div class="border-t border-slate-200 mt-6 pt-5">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+          <div class="flex items-center gap-2 flex-wrap">
             <h2 class="text-base font-bold text-slate-900 m-0">
               Uploaded Proposal Documents
             </h2>
@@ -418,9 +419,30 @@ interface ActivePreviewDocument {
               ({{ applicant()?.uploadedDocuments?.length || 7 }} Documents Verified)
             </span>
           </div>
-          <span class="text-xs text-slate-500 hidden sm:inline-block">
-            Click 'View Document' to inspect official certificate in full reader view
-          </span>
+
+          <div class="flex items-center gap-3 flex-wrap">
+            <!-- Download All Documents in ZIP format -->
+            <button
+              type="button"
+              (click)="downloadAllZip()"
+              [disabled]="isDownloadingZip() || !applicant()?.uploadedDocuments?.length"
+              class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md border border-[#0B3558] bg-[#0B3558] hover:bg-[#07243c] text-white text-xs font-semibold transition-all cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+              title="Download all verified proposal documents in a single ZIP file"
+            >
+              @if (isDownloadingZip()) {
+                <svg class="w-3.5 h-3.5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Creating ZIP...</span>
+              } @else {
+                <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <span>Download All (ZIP)</span>
+              }
+            </button>
+          </div>
         </div>
 
         <!-- Document Cards Grid (Image 4 Style with Red PDF Icon & Clean Layout) -->
@@ -468,23 +490,6 @@ interface ActivePreviewDocument {
         >
           &larr; Return to Submissions List
         </a>
-
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            (click)="openRejectModal()"
-            class="px-4 py-2 rounded-md border border-rose-300 text-rose-700 bg-white hover:bg-rose-50 text-xs font-medium transition-colors cursor-pointer shadow-2xs"
-          >
-            Reject Application
-          </button>
-          <button
-            type="button"
-            (click)="openAcceptModal()"
-            class="px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition-colors cursor-pointer shadow-2xs"
-          >
-            Accept Application
-          </button>
-        </div>
       </div>
 
     </div>
@@ -1127,8 +1132,24 @@ export class ScrutinyDeskComponent {
    */
   downloadDocPdf(): void {
     const doc = this.activeDoc();
-    const app = this.applicant();
     if (!doc) return;
+    const pdf = this.generateDocPdf({
+      id: doc.id,
+      title: doc.title,
+      fileSize: doc.fileSize,
+      category: doc.category,
+      verified: true
+    });
+    pdf.save(`${doc.fileName}`);
+  }
+
+  /**
+   * Helper to build official PDF document
+   */
+  generateDocPdf(doc: DossierDocument): jsPDF {
+    const app = this.applicant();
+    const refCode = `RSLDC-${app?.id || 'APP'}-${doc.id.toUpperCase()}-2026`;
+    const cleanFileName = doc.title.replace(/[^a-zA-Z0-9]/g, '_') + '.pdf';
 
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
@@ -1168,7 +1189,7 @@ export class ScrutinyDeskComponent {
     pdf.setTextColor(100, 116, 139);
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(8);
-    pdf.text(`Certificate Reference: ${doc.refCode}  |  File: ${doc.fileName} (${doc.fileSize})`, 15, y);
+    pdf.text(`Certificate Reference: ${refCode}  |  File: ${cleanFileName} (${doc.fileSize})`, 15, y);
 
     y += 8;
     pdf.setDrawColor(226, 232, 240);
@@ -1230,6 +1251,44 @@ export class ScrutinyDeskComponent {
     pdf.text(`Timestamp: ${new Date().toLocaleString('en-IN')}`, 15, y);
     pdf.text('Government of Rajasthan', 140, y);
 
-    pdf.save(`${doc.fileName}`);
+    return pdf;
+  }
+
+  isDownloadingZip = signal<boolean>(false);
+
+  /**
+   * Generates and downloads all verified proposal documents in a ZIP file
+   */
+  async downloadAllZip(): Promise<void> {
+    const app = this.applicant();
+    const docs = app?.uploadedDocuments;
+    if (!docs || docs.length === 0) return;
+
+    this.isDownloadingZip.set(true);
+    try {
+      const zip = new JSZip();
+      const folderName = `${(app.anonymousLabel || 'Applicant').replace(/[^a-zA-Z0-9]/g, '_')}_${app.id}_Documents`;
+      const docFolder = zip.folder(folderName) || zip;
+
+      for (let i = 0; i < docs.length; i++) {
+        const doc = docs[i];
+        const pdf = this.generateDocPdf(doc);
+        const arrayBuffer = pdf.output('arraybuffer');
+        const cleanName = `${i + 1}_${doc.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+        docFolder.file(cleanName, arrayBuffer);
+      }
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const downloadUrl = URL.createObjectURL(zipBlob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `${folderName}.zip`;
+      link.click();
+      URL.revokeObjectURL(downloadUrl);
+    } catch (err) {
+      console.error('Error generating zip:', err);
+    } finally {
+      this.isDownloadingZip.set(false);
+    }
   }
 }

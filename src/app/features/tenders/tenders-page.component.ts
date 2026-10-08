@@ -206,19 +206,34 @@ export interface EoiDocumentItem {
                 <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
 
                 <!-- Active / Inactive Toggle -->
-                <button
-                  type="button"
-                  [disabled]="item.isFrozen"
-                  (click)="$event.stopPropagation(); !item.isFrozen ? toggleActiveStatus(item) : null"
-                  [ngClass]="item.isFrozen ? 'text-slate-400 cursor-not-allowed' : (item.isActive === false ? 'text-slate-500 hover:text-slate-700' : 'text-emerald-600 hover:text-emerald-700') + ' hover:underline cursor-pointer'"
-                  class="inline-flex items-center gap-1 font-medium text-[12px] select-none transition-colors"
+                <div
+                  class="inline-flex items-center gap-1.5"
                   [title]="item.isFrozen ? 'Scheme is frozen' : 'Toggle Active/Inactive Status'"
+                  (click)="$event.stopPropagation();"
                 >
-                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>{{ item.isActive === false ? 'Inactive' : 'Active' }}</span>
-                </button>
+                  <button
+                    type="button"
+                    [disabled]="item.isFrozen"
+                    (click)="!item.isFrozen ? toggleActiveStatus(item) : null"
+                    class="relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                    [ngClass]="item.isFrozen ? 'bg-slate-300 cursor-not-allowed' : (item.isActive === false ? 'bg-slate-400 hover:bg-slate-500' : 'bg-emerald-500 hover:bg-emerald-600')"
+                    role="switch"
+                    [attr.aria-checked]="item.isActive !== false"
+                  >
+                    <span class="sr-only">Toggle Active Status</span>
+                    <span
+                      class="pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                      [ngClass]="item.isActive === false ? 'translate-x-0' : 'translate-x-3'"
+                    ></span>
+                  </button>
+                  <span 
+                    class="font-medium text-[12px] select-none transition-colors cursor-pointer"
+                    (click)="!item.isFrozen ? toggleActiveStatus(item) : null"
+                    [ngClass]="item.isFrozen ? 'text-slate-400 cursor-not-allowed' : (item.isActive === false ? 'text-slate-500 hover:text-slate-700' : 'text-emerald-600 hover:text-emerald-700')"
+                  >
+                    {{ item.isActive === false ? 'Inactive' : 'Active' }}
+                  </span>
+                </div>
 
                 <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
 

@@ -1,6 +1,7 @@
 import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { DataEngineService } from '../../core/services/data-engine.service';
 import {
   PageHeaderComponent,
@@ -23,7 +24,7 @@ export interface UserManagementItem {
   blockName?: string;
   email?: string;
   mobileNo?: string;
-  schemeStatus: 'Active' | 'Inactive';
+  schemeStatus: 'Active' | 'Inactive' | 'Blacklisted';
 }
 
 @Component({
@@ -59,21 +60,90 @@ export interface UserManagementItem {
           </div>
 
           <!-- Add User Button -->
-          <button
-            type="button"
-            (click)="openAddModal()"
-            class="px-4 py-2.5 bg-[#174A6E] hover:bg-[#0B3558] text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 shrink-0"
-          >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Add User</span>
-          </button>
+          @if (selectedRoleFilter() !== 'blacklisted') {
+            <button
+              type="button"
+              (click)="openAddModal()"
+              class="px-4 py-2.5 bg-[#174A6E] hover:bg-[#0B3558] text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 shrink-0"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Add User</span>
+            </button>
+          }
         </div>
       </app-page-header>
 
+      <!-- Role Filters -->
+      @if (selectedRoleFilter() !== 'blacklisted') {
+        <div class="w-full flex flex-col sm:flex-row gap-3">
+        <button
+          type="button"
+          (click)="selectedRoleFilter.set('all')"
+          [ngClass]="selectedRoleFilter() === 'all' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
+          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
+        >
+          All
+        </button>
+        <button
+          type="button"
+          (click)="selectedRoleFilter.set('citizen')"
+          [ngClass]="selectedRoleFilter() === 'citizen' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
+          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
+        >
+          Citizen
+        </button>
+        <button
+          type="button"
+          (click)="selectedRoleFilter.set('super admin')"
+          [ngClass]="selectedRoleFilter() === 'super admin' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
+          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
+        >
+          Super Admin
+        </button>
+        <button
+          type="button"
+          (click)="selectedRoleFilter.set('department')"
+          [ngClass]="selectedRoleFilter() === 'department' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
+          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
+        >
+          Department
+        </button>
+        <button
+          type="button"
+          (click)="selectedRoleFilter.set('tp')"
+          [ngClass]="selectedRoleFilter() === 'tp' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
+          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
+        >
+          TP
+        </button>
+      </div>
+      }
+
+      @if (selectedRoleFilter() === 'blacklisted') {
+        <div class="w-full bg-white border border-rose-200 p-4 rounded-xl shadow-sm mt-3 mb-1 flex flex-col md:flex-row gap-4 items-end">
+          <div class="flex-1 w-full">
+            <label class="block text-slate-700 font-semibold mb-1.5 text-sm">Search User to Blacklist (SSO ID or Name)</label>
+            <div class="flex gap-2">
+              <input type="text" [ngModel]="blacklistInput()" (ngModelChange)="blacklistInput.set($event)" placeholder="Enter SSO ID or Name..." class="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:border-rose-500">
+              <button (click)="blacklistUserBySearch()" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm rounded-lg font-semibold shadow-sm transition-colors whitespace-nowrap cursor-pointer">
+                Blacklist User
+              </button>
+            </div>
+            @if (blacklistError()) {
+              <div class="text-xs text-rose-500 mt-1.5 font-medium">{{ blacklistError() }}</div>
+            }
+            @if (blacklistSuccess()) {
+              <div class="text-xs text-emerald-600 mt-1.5 font-medium">{{ blacklistSuccess() }}</div>
+            }
+          </div>
+        </div>
+      }
+
       <!-- Users Table -->
       <app-table
+        [rowClass]="getRowClass"
         [columns]="columns"
         [data]="filteredUsers()"
         [pagination]="true"
@@ -106,7 +176,7 @@ export interface UserManagementItem {
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 select-none">
             Active
           </span>
-        } @else if (item.userType === 'TP' || item.roleType === 'tp') {
+        } @else if (item.schemeStatus === 'Blacklisted') {
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 select-none">
             Blacklisted
           </span>
@@ -151,33 +221,34 @@ export interface UserManagementItem {
 
           <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
 
-          <!-- Mark Inactive / Mark Blacklisted / Mark Active -->
-          <button
-            type="button"
-            (click)="$event.stopPropagation(); requestToggleUserStatus(item)"
-            class="inline-flex items-center gap-1 text-slate-600 hover:text-slate-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
-            [title]="(item.userType === 'TP' || item.roleType === 'tp') ? (item.schemeStatus === 'Active' ? 'Mark Blacklisted' : 'Mark Active') : (item.schemeStatus === 'Active' ? 'Mark Inactive' : 'Mark Active')"
+          <!-- Active / Inactive Toggle -->
+          <div
+            class="inline-flex items-center gap-1.5"
+            title="Toggle Status"
+            (click)="$event.stopPropagation();"
           >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-            </svg>
-            <span>{{ (item.userType === 'TP' || item.roleType === 'tp') ? (item.schemeStatus === 'Active' ? 'Mark Blacklisted' : 'Mark Active') : (item.schemeStatus === 'Active' ? 'Mark Inactive' : 'Mark Active') }}</span>
-          </button>
-
-          <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
-
-          <!-- Delete -->
-          <button
-            type="button"
-            (click)="$event.stopPropagation(); requestDeleteUser(item)"
-            class="inline-flex items-center gap-1 text-rose-600 hover:text-rose-700 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
-            title="Delete User"
-          >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-            <span>Delete</span>
-          </button>
+            <button
+              type="button"
+              (click)="toggleUserStatus(item)"
+              class="relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              [ngClass]="item.schemeStatus !== 'Active' ? 'bg-slate-400 hover:bg-slate-500' : 'bg-emerald-500 hover:bg-emerald-600'"
+              role="switch"
+              [attr.aria-checked]="item.schemeStatus === 'Active'"
+            >
+              <span class="sr-only">Toggle Active Status</span>
+              <span
+                class="pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                [ngClass]="item.schemeStatus !== 'Active' ? 'translate-x-0' : 'translate-x-3'"
+              ></span>
+            </button>
+            <span 
+              class="font-medium text-[12px] select-none transition-colors cursor-pointer"
+              (click)="toggleUserStatus(item)"
+              [ngClass]="item.schemeStatus !== 'Active' ? 'text-slate-500 hover:text-slate-700' : 'text-emerald-600 hover:text-emerald-700'"
+            >
+              {{ item.schemeStatus !== 'Active' ? 'Inactive' : 'Active' }}
+            </span>
+          </div>
         </div>
       </ng-template>
 
@@ -267,48 +338,48 @@ export interface UserManagementItem {
             
             <!-- LEFT COLUMN -->
             <div class="space-y-3">
-              <!-- User ID -->
+              <!-- SSO ID -->
               <div>
-                <label class="block text-slate-700 font-medium mb-1">User ID*</label>
+                <label class="block text-slate-700 font-medium mb-1">SSO ID*</label>
                 <input
                   type="text"
-                  placeholder="e.g. USR-1008"
-                  [(ngModel)]="formData.userId"
-                  [ngClass]="{'border-red-500': submitted() && !formData.userId, 'border-[#8FA3B6]': !(submitted() && !formData.userId)}"
+                  placeholder="e.g. SSO_1008"
+                  [(ngModel)]="formData.ssoId"
+                  [ngClass]="{'border-red-500': submitted() && !formData.ssoId, 'border-[#8FA3B6]': !(submitted() && !formData.ssoId)}"
                   class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 font-mono text-xs"
                 />
-                @if (submitted() && !formData.userId) {
-                  <div class="text-xs text-red-500 mt-0.5 font-medium">User ID is required</div>
+                @if (submitted() && !formData.ssoId) {
+                  <div class="text-xs text-red-500 mt-0.5 font-medium">SSO ID is required</div>
                 }
               </div>
 
-              <!-- User Name -->
+              <!-- First Name -->
               <div>
-                <label class="block text-slate-700 font-medium mb-1">User Name*</label>
+                <label class="block text-slate-700 font-medium mb-1">First Name*</label>
                 <input
                   type="text"
-                  placeholder="e.g. admin 3 or super admin 3"
-                  [(ngModel)]="formData.username"
-                  [ngClass]="{'border-red-500': submitted() && !formData.username, 'border-[#8FA3B6]': !(submitted() && !formData.username)}"
+                  placeholder="e.g. John"
+                  [(ngModel)]="formData.firstName"
+                  [ngClass]="{'border-red-500': submitted() && !formData.firstName, 'border-[#8FA3B6]': !(submitted() && !formData.firstName)}"
                   class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
                 />
-                @if (submitted() && !formData.username) {
-                  <div class="text-xs text-red-500 mt-0.5 font-medium">User Name is required</div>
+                @if (submitted() && !formData.firstName) {
+                  <div class="text-xs text-red-500 mt-0.5 font-medium">First Name is required</div>
                 }
               </div>
 
-              <!-- Password -->
+              <!-- Last Name -->
               <div>
-                <label class="block text-slate-700 font-medium mb-1">Password*</label>
+                <label class="block text-slate-700 font-medium mb-1">Last Name*</label>
                 <input
-                  type="password"
-                  placeholder="••••••••"
-                  [(ngModel)]="formData.password"
-                  [ngClass]="{'border-red-500': submitted() && !formData.password, 'border-[#8FA3B6]': !(submitted() && !formData.password)}"
+                  type="text"
+                  placeholder="e.g. Doe"
+                  [(ngModel)]="formData.lastName"
+                  [ngClass]="{'border-red-500': submitted() && !formData.lastName, 'border-[#8FA3B6]': !(submitted() && !formData.lastName)}"
                   class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
                 />
-                @if (submitted() && !formData.password) {
-                  <div class="text-xs text-red-500 mt-0.5 font-medium">Password is required</div>
+                @if (submitted() && !formData.lastName) {
+                  <div class="text-xs text-red-500 mt-0.5 font-medium">Last Name is required</div>
                 }
               </div>
 
@@ -353,26 +424,16 @@ export interface UserManagementItem {
                 }
               </div>
 
-              <!-- Alternate Mobile No. -->
+
+              <!-- Aadhaar Id -->
               <div>
-                <label class="block text-slate-700 font-medium mb-1">Alternate Mobile No.</label>
+                <label class="block text-slate-700 font-medium mb-1">Aadhaar Id</label>
                 <input
                   type="text"
-                  maxlength="10"
-                  placeholder="Optional alternate mobile"
-                  [(ngModel)]="formData.alternateMobileNo"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
-                />
-              </div>
-
-              <!-- Alternate E-Mail -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">Alternate E-Mail</label>
-                <input
-                  type="email"
-                  placeholder="Optional alternate email"
-                  [(ngModel)]="formData.alternateEmail"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
+                  maxlength="12"
+                  placeholder="12-digit Aadhaar number"
+                  [(ngModel)]="formData.aadhaarId"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 font-mono text-xs"
                 />
               </div>
             </div>
@@ -387,11 +448,11 @@ export interface UserManagementItem {
                   [ngClass]="{'border-red-500': submitted() && !formData.userType, 'border-[#8FA3B6]': !(submitted() && !formData.userType)}"
                   class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
                 >
-                  <option value="Admin">Admin</option>
                   <option value="Super Admin">Super Admin</option>
-                  <option value="TP">Training Partner (TP)</option>
+                  <option value="Department">Department</option>
+                  <option value="Citizen">Citizen</option>
                 </select>
-                <div class="text-[11px] text-slate-500 mt-0.5">Select user classification (Admin, Super Admin, or TP).</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Select user classification (Super Admin, Department, or Citizen).</div>
               </div>
 
               <!-- Role Type -->
@@ -403,14 +464,12 @@ export interface UserManagementItem {
                   class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
                 >
                   <option value="" disabled selected>Select Role Type</option>
-                  <option value="tp">tp</option>
-                  <option value="scheme oc">scheme oc</option>
-                  <option value="mis manager">mis manager</option>
-                  <option value="programmer">programmer</option>
-                  <option value="gm">gm</option>
-                  <option value="zc">zc</option>
-                  <option value="md">md</option>
+                  <option value="OIC">OIC</option>
+                  <option value="manager">manager</option>
                   <option value="super admin">super admin</option>
+                  <option value="S.A">S.A</option>
+                  <option value="Admin">Admin</option>
+                  <option value="ZC">ZC</option>
                 </select>
                 @if (submitted() && !formData.roleType) {
                   <div class="text-xs text-red-500 mt-0.5 font-medium">Role Type is required</div>
@@ -478,17 +537,6 @@ export interface UserManagementItem {
                 </select>
               </div>
 
-              <!-- Aadhaar Id -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">Aadhaar Id</label>
-                <input
-                  type="text"
-                  maxlength="12"
-                  placeholder="12-digit Aadhaar number"
-                  [(ngModel)]="formData.aadhaarId"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800 font-mono text-xs"
-                />
-              </div>
 
             </div>
 
@@ -521,6 +569,7 @@ export interface UserManagementItem {
 })
 export class UserManagementComponent {
   searchQuery = signal<string>('');
+  selectedRoleFilter = signal<string>('all');
   showModal = signal<boolean>(false);
   showViewModal = signal<boolean>(false);
   showConfirmModal = signal<boolean>(false);
@@ -539,8 +588,9 @@ export class UserManagementComponent {
 
   formData = {
     userId: '',
-    username: '',
-    password: '',
+    ssoId: '',
+    firstName: '',
+    lastName: '',
     dateOfBirth: '',
     email: '',
     mobileNo: '',
@@ -557,25 +607,86 @@ export class UserManagementComponent {
 
   private dataEngine = inject(DataEngineService);
   private userRepo = this.dataEngine.for<UserManagementItem>('USERS');
+  private route = inject(ActivatedRoute);
 
   users = signal<UserManagementItem[]>([]);
 
   constructor() {
     this.userRepo.getAll().subscribe(list => this.users.set(list));
+
+    this.route.queryParams.subscribe(params => {
+      if (params['filter'] === 'blacklisted') {
+        this.selectedRoleFilter.set('blacklisted');
+      } else {
+        this.selectedRoleFilter.set('all');
+      }
+    });
   }
 
   readonly filteredUsers = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
+    const filter = this.selectedRoleFilter().toLowerCase();
     const all = this.users();
-    if (!q) return all;
-    return all.filter(u =>
-      u.userId.toLowerCase().includes(q) ||
-      u.username.toLowerCase().includes(q) ||
-      u.ssoId.toLowerCase().includes(q) ||
-      u.roleType.toLowerCase().includes(q) ||
-      u.districtName.toLowerCase().includes(q)
+
+    let filtered = all;
+
+    if (filter === 'blacklisted') {
+      filtered = filtered.filter(u => u.schemeStatus === 'Blacklisted');
+    } else if (filter !== 'all') {
+      filtered = filtered.filter(u =>
+        (u.roleType && u.roleType.toLowerCase().includes(filter)) ||
+        (u.userType && u.userType.toLowerCase().includes(filter)) ||
+        (u.schemeDepartment && u.schemeDepartment.toLowerCase().includes(filter)) ||
+        (filter === 'department' && u.userType === 'Admin')
+      );
+    }
+
+    if (!q) return filtered;
+    return filtered.filter(u =>
+      (u.userId && u.userId.toLowerCase().includes(q)) ||
+      (u.username && u.username.toLowerCase().includes(q)) ||
+      (u.ssoId && u.ssoId.toLowerCase().includes(q)) ||
+      (u.schemeDepartment && u.schemeDepartment.toLowerCase().includes(q))
     );
   });
+
+  blacklistInput = signal('');
+  blacklistError = signal('');
+  blacklistSuccess = signal('');
+
+  blacklistUserBySearch() {
+    this.blacklistError.set('');
+    this.blacklistSuccess.set('');
+    const q = this.blacklistInput().trim().toLowerCase();
+    if (!q) {
+      this.blacklistError.set('Please enter a valid SSO ID or Username');
+      return;
+    }
+
+    const usersList = this.users();
+    const userToBlacklist = usersList.find(u =>
+      (u.ssoId && u.ssoId.toLowerCase() === q) ||
+      (u.username && u.username.toLowerCase() === q) ||
+      (u.userId && u.userId.toLowerCase() === q)
+    );
+
+    if (!userToBlacklist) {
+      this.blacklistError.set('User not found in system.');
+      return;
+    }
+
+    if (userToBlacklist.schemeStatus === 'Blacklisted') {
+      this.blacklistError.set('User is already blacklisted.');
+      return;
+    }
+
+    userToBlacklist.schemeStatus = 'Blacklisted';
+    this.users.set([...usersList]);
+    this.blacklistSuccess.set(`Successfully blacklisted user: ${userToBlacklist.username} (${userToBlacklist.ssoId || userToBlacklist.userId})`);
+    this.blacklistInput.set('');
+
+    setTimeout(() => this.blacklistSuccess.set(''), 3000);
+  }
 
   readonly columns: TableColumn<UserManagementItem>[] = [
     { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
@@ -631,8 +742,9 @@ export class UserManagementComponent {
     const nextIdNum = 1000 + this.users().length + 1;
     this.formData = {
       userId: `USR-${nextIdNum}`,
-      username: '',
-      password: '',
+      ssoId: '',
+      firstName: '',
+      lastName: '',
       dateOfBirth: '',
       email: '',
       mobileNo: '',
@@ -652,10 +764,12 @@ export class UserManagementComponent {
   openEditModal(item: UserManagementItem): void {
     this.editingId.set(item.id);
     this.submitted.set(false);
+    const names = item.username ? item.username.split(' ') : [''];
     this.formData = {
       userId: item.userId,
-      username: item.username,
-      password: 'password123',
+      ssoId: item.ssoId || '',
+      firstName: names[0] || '',
+      lastName: names.slice(1).join(' ') || '',
       dateOfBirth: '1990-01-01',
       email: item.email || `${item.username.replace(/\s+/g, '')}@isms.gov.in`,
       mobileNo: item.mobileNo || '9829012345',
@@ -696,17 +810,18 @@ export class UserManagementComponent {
 
   submitUser(): void {
     this.submitted.set(true);
-    if (!this.formData.userId.trim() || !this.formData.username.trim() || !this.formData.password || !this.formData.email.trim() || !this.formData.mobileNo.trim() || !this.formData.roleType) {
+    if (!this.formData.ssoId.trim() || !this.formData.firstName.trim() || !this.formData.lastName.trim() || !this.formData.email.trim() || !this.formData.mobileNo.trim() || !this.formData.roleType) {
       return; // Required validation
     }
 
+    const fullName = `${this.formData.firstName.trim()} ${this.formData.lastName.trim()}`.trim();
     const editId = this.editingId();
     if (editId) {
       // Edit existing user
       const changes: Partial<UserManagementItem> = {
         userId: this.formData.userId.trim(),
-        username: this.formData.username.trim(),
-        ssoId: `SSO_${this.formData.username.trim().toUpperCase().replace(/\s+/g, '_')}`,
+        username: fullName,
+        ssoId: this.formData.ssoId.trim(),
         userType: this.formData.userType,
         roleType: this.formData.roleType,
         designation: this.formData.designation,
@@ -727,8 +842,8 @@ export class UserManagementComponent {
         sNo: 1,
         id: 'usr-' + Date.now(),
         userId: this.formData.userId.trim(),
-        username: this.formData.username.trim(),
-        ssoId: `SSO_${this.formData.username.trim().toUpperCase().replace(/\s+/g, '_')}`,
+        username: fullName,
+        ssoId: this.formData.ssoId.trim(),
         userType: this.formData.userType,
         roleType: this.formData.roleType,
         designation: this.formData.designation,
@@ -830,4 +945,10 @@ export class UserManagementComponent {
       });
     });
   }
+
+  getRowClass = (item: any): string => {
+    const isInactive = item.status === 'Inactive' || item.schemeStatus === 'Inactive';
+    return isInactive ? 'opacity-50 bg-slate-50 transition-colors' : 'bg-white transition-colors';
+  };
+
 }

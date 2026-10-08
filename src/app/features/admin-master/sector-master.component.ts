@@ -63,6 +63,7 @@ export type { SectorMasterItem };
 
       <!-- Master Table -->
       <app-table
+        [rowClass]="getRowClass"
         [columns]="columns"
         [data]="filteredSectors()"
         [pagination]="true"
@@ -85,17 +86,48 @@ export type { SectorMasterItem };
       <!-- Custom Template for Action Column -->
       <ng-template #actionTemplate let-item>
         <div class="flex items-center justify-center whitespace-nowrap">
+          <!-- Edit -->
           <button
             type="button"
-            (click)="$event.stopPropagation(); deleteSector(item)"
-            class="inline-flex items-center gap-1 text-rose-600 hover:text-rose-700 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
-            title="Delete Sector"
+            (click)="$event.stopPropagation(); openEditModal(item)"
+            class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
+            title="Edit"
           >
             <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-            <span>Delete</span>
+            <span>Edit</span>
           </button>
+          
+          <!-- Active / Inactive Toggle -->
+          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
+          <div
+            class="inline-flex items-center gap-1.5"
+            title="Toggle Status"
+            (click)="$event.stopPropagation();"
+          >
+            <button
+              type="button"
+              (click)="item.status = item.status === 'Active' ? 'Inactive' : 'Active'"
+              class="relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              [ngClass]="item.status === 'Inactive' ? 'bg-slate-400 hover:bg-slate-500' : 'bg-emerald-500 hover:bg-emerald-600'"
+              role="switch"
+              [attr.aria-checked]="item.status === 'Active'"
+            >
+              <span class="sr-only">Toggle Active Status</span>
+              <span
+                class="pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                [ngClass]="item.status === 'Inactive' ? 'translate-x-0' : 'translate-x-3'"
+              ></span>
+            </button>
+            <span 
+              class="font-medium text-[12px] select-none transition-colors cursor-pointer"
+              (click)="item.status = item.status === 'Active' ? 'Inactive' : 'Active'"
+              [ngClass]="item.status === 'Inactive' ? 'text-slate-500 hover:text-slate-700' : 'text-emerald-600 hover:text-emerald-700'"
+            >
+              {{ item.status === 'Inactive' ? 'Inactive' : 'Active' }}
+            </span>
+          </div>
         </div>
       </ng-template>
 
@@ -151,6 +183,7 @@ export type { SectorMasterItem };
 export class SectorMasterComponent {
   searchQuery = signal<string>('');
   showModal = signal<boolean>(false);
+  editingId = signal<string | null>(null);
   submitted = signal<boolean>(false);
 
   formData = {
@@ -202,7 +235,15 @@ export class SectorMasterComponent {
     this.searchQuery.set(val);
   }
 
-  openAddModal(): void {
+  
+  openEditModal(item: any): void {
+    this.editingId.set(item.id);
+    this.submitted.set(false);
+    this.formData = { ...this.formData, ...item };
+    this.showModal.set(true);
+  }
+openAddModal(): void {
+    this.editingId.set(null);
     this.submitted.set(false);
     this.formData = { sectorName: '', sectorCode: '' };
     this.showModal.set(true);
@@ -220,7 +261,14 @@ export class SectorMasterComponent {
 
     const code = this.formData.sectorCode.trim() || `SEC-${Date.now().toString().slice(-4)}`;
 
-    const newItem: SectorMasterItem = {
+    const editId = this.editingId();
+    if (editId) {
+      this.sectors.update(current => {
+      const updated = current.map((item: any) => item.id === editId ? { ...item, ...this.formData } : item);
+      return updated.map((item, index) => ({ ...item, sNo: index + 1 }));
+    });
+    } else {
+      const newItem: SectorMasterItem = {
       sNo: 1,
       id: 'sec-' + Date.now(),
       sectorName: this.formData.sectorName.trim(),
@@ -232,6 +280,7 @@ export class SectorMasterComponent {
       const updated = [newItem, ...current];
       return updated.map((item, index) => ({ ...item, sNo: index + 1 }));
     });
+    }
 
     this.showModal.set(false);
   }
@@ -244,4 +293,10 @@ export class SectorMasterComponent {
       });
     }
   }
+
+  getRowClass = (item: any): string => {
+    const isInactive = item.status === 'Inactive' || item.schemeStatus === 'Inactive';
+    return isInactive ? 'opacity-50 bg-slate-50 transition-colors' : 'bg-white transition-colors';
+  };
+
 }

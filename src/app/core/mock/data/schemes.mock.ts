@@ -22,16 +22,19 @@ export interface SchemeTenderItem {
   processFee?: string;
   attachedDocs?: Array<{ sNo: number; name: string; size: string }>;
   committeeMembers?: string[];
+  createdAt?: number;
+  isActive?: boolean;
+  isFrozen?: boolean;
 }
 
 export const MOCK_AVAILABLE_ADMINS = [
-  { id: 'adm-1', name: 'super admin 1', ssoId: 'SSO_SUPER_01', role: 'Super Admin' },
-  { id: 'adm-2', name: 'super admin 2', ssoId: 'SSO_SUPER_02', role: 'Super Admin' },
-  { id: 'adm-3', name: 'admin 1', ssoId: 'SSO_ADM_01', role: 'Scheme OC' },
-  { id: 'adm-4', name: 'admin 2', ssoId: 'SSO_ADM_02', role: 'MIS Manager' },
-  { id: 'adm-5', name: 'admin 3', ssoId: 'SSO_ADM_03', role: 'Programmer' },
-  { id: 'adm-6', name: 'admin 4', ssoId: 'SSO_ADM_04', role: 'GM' },
-  { id: 'adm-7', name: 'admin 5', ssoId: 'SSO_ADM_05', role: 'ZC' }
+  { id: 'adm-1', name: 'Ramesh Suresh', ssoId: 'SSO_SUPER_01', role: 'Super Admin' },
+  { id: 'adm-2', name: 'Ram Shyaam', ssoId: 'SSO_SUPER_02', role: 'Super Admin' },
+  { id: 'adm-3', name: 'Siddesh', ssoId: 'SSO_ADM_01', role: 'Scheme OC' },
+  { id: 'adm-4', name: 'Rahul Sharma', ssoId: 'SSO_ADM_02', role: 'MIS Manager' },
+  { id: 'adm-5', name: 'Amit Kumar', ssoId: 'SSO_ADM_03', role: 'Programmer' },
+  { id: 'adm-6', name: 'Priya Singh', ssoId: 'SSO_ADM_04', role: 'GM' },
+  { id: 'adm-7', name: 'Vikram Patel', ssoId: 'SSO_ADM_05', role: 'ZC' }
 ];
 
 export const MOCK_RFP_DOCUMENTS = [

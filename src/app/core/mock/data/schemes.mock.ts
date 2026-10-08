@@ -22,6 +22,9 @@ export interface SchemeTenderItem {
   processFee?: string;
   attachedDocs?: Array<{ sNo: number; name: string; size: string }>;
   committeeMembers?: string[];
+  createdAt?: number;
+  isActive?: boolean;
+  isFrozen?: boolean;
 }
 
 export const MOCK_AVAILABLE_ADMINS = [

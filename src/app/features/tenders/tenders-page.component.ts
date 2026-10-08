@@ -33,6 +33,9 @@ export interface SchemeTender {
   processFee?: string;
   attachedDocs?: EoiDocumentItem[];
   committeeMembers?: string[];
+  createdAt?: number;
+  isActive?: boolean;
+  isFrozen?: boolean;
 }
 
 export interface EoiDocumentItem {
@@ -188,9 +191,11 @@ export interface EoiDocumentItem {
 
                 <button
                   type="button"
-                  (click)="$event.stopPropagation(); editScheme(item)"
-                  class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
-                  title="Edit EOI Configuration"
+                  [disabled]="isEditDisabled(item) || item.isFrozen"
+                  (click)="$event.stopPropagation(); (!isEditDisabled(item) && !item.isFrozen) ? editScheme(item) : null"
+                  [ngClass]="(isEditDisabled(item) || item.isFrozen) ? 'text-slate-400 cursor-not-allowed' : 'text-amber-700 hover:text-amber-800 hover:underline cursor-pointer'"
+                  class="inline-flex items-center gap-1 font-medium text-[12px] select-none transition-colors"
+                  [title]="item.isFrozen ? 'Scheme is frozen' : (isEditDisabled(item) ? 'Edit is only available within 24 hours of creation' : 'Edit EOI Configuration')"
                 >
                   <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -200,16 +205,36 @@ export interface EoiDocumentItem {
 
                 <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
 
+                <!-- Active / Inactive Toggle -->
                 <button
                   type="button"
-                  (click)="$event.stopPropagation(); deleteScheme(item)"
-                  class="inline-flex items-center gap-1 text-rose-600 hover:text-rose-700 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
-                  title="Delete EOI Configuration"
+                  [disabled]="item.isFrozen"
+                  (click)="$event.stopPropagation(); !item.isFrozen ? toggleActiveStatus(item) : null"
+                  [ngClass]="item.isFrozen ? 'text-slate-400 cursor-not-allowed' : (item.isActive === false ? 'text-slate-500 hover:text-slate-700' : 'text-emerald-600 hover:text-emerald-700') + ' hover:underline cursor-pointer'"
+                  class="inline-flex items-center gap-1 font-medium text-[12px] select-none transition-colors"
+                  [title]="item.isFrozen ? 'Scheme is frozen' : 'Toggle Active/Inactive Status'"
                 >
                   <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                   </svg>
-                  <span>Delete</span>
+                  <span>{{ item.isActive === false ? 'Inactive' : 'Active' }}</span>
+                </button>
+
+                <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
+
+                <!-- Freeze Button -->
+                <button
+                  type="button"
+                  [disabled]="item.isFrozen"
+                  (click)="$event.stopPropagation(); !item.isFrozen ? freezeScheme(item) : null"
+                  [ngClass]="item.isFrozen ? 'text-slate-400 cursor-not-allowed' : 'text-blue-600 hover:text-blue-800 hover:underline cursor-pointer'"
+                  class="inline-flex items-center gap-1 font-medium text-[12px] select-none transition-colors"
+                  title="Freeze EOI Configuration"
+                >
+                  <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <span>{{ item.isFrozen ? 'Frozen' : 'Freeze' }}</span>
                 </button>
               }
             </div>
@@ -438,6 +463,7 @@ export interface EoiDocumentItem {
                   </svg>
                   <span>+ Attach Document</span>
                 </button>
+                <span class="text-[11px] text-slate-500 font-medium whitespace-nowrap">Under 25 mb</span>
                 @if (newEoiSubmitted() && newEoiData.attachments.length === 0) {
                   <span class="text-xs text-red-500 font-medium">At least 1 attachment is required</span>
                 }
@@ -593,6 +619,22 @@ export interface EoiDocumentItem {
         </div>
       </app-action-modal>
 
+      <!-- ====================================================================
+           MODAL: CONFIRM SUBMIT EOI
+           ==================================================================== -->
+      <app-action-modal
+        [isOpen]="showConfirmSubmitEoiModal()"
+        [showCloseButton]="false"
+        title="Confirm Submission"
+        description="Are you sure you want to submit this EOI configuration?"
+        primaryLabel="Yes, Submit"
+        secondaryLabel="No, Cancel"
+        (primaryAction)="confirmSubmitNewEoi()"
+        (secondaryAction)="closeConfirmSubmitEoiModal()"
+        (close)="closeConfirmSubmitEoiModal()"
+      >
+      </app-action-modal>
+
     </div>
   `
 })
@@ -618,6 +660,7 @@ export class TendersPageComponent {
   selectedScheme = signal<SchemeTender | null>(null);
   readonly showOtrPromptModal = signal<boolean>(false);
   readonly showConfigureEoiModal = signal<boolean>(false);
+  readonly showConfirmSubmitEoiModal = signal<boolean>(false);
   readonly showCommitteeModal = signal<boolean>(false);
   readonly selectedSchemeForCommittee = signal<SchemeTender | null>(null);
   readonly selectedAdminIds = signal<string[]>([]);
@@ -931,10 +974,23 @@ export class TendersPageComponent {
     this.showConfigureEoiModal.set(true);
   }
 
-  deleteScheme(scheme: SchemeTender): void {
-    if (!this.isSuperAdmin()) return;
-    if (confirm(`Are you sure you want to delete EOI Configuration for "${scheme.schemeName}" (${scheme.refNo})?`)) {
-      this.schemeService.deleteScheme(scheme.refNo).subscribe();
+  isEditDisabled(scheme: SchemeTender): boolean {
+    if (!scheme.createdAt) return false;
+    const _24HOURS_IN_MS = 24 * 60 * 60 * 1000;
+    return (Date.now() - scheme.createdAt) > _24HOURS_IN_MS;
+  }
+
+  toggleActiveStatus(scheme: SchemeTender): void {
+    if (!this.isSuperAdmin() || scheme.isFrozen) return;
+    scheme.isActive = scheme.isActive === false ? true : false;
+    this.schemeService.updateScheme(scheme.refNo, scheme).subscribe();
+  }
+
+  freezeScheme(scheme: SchemeTender): void {
+    if (!this.isSuperAdmin() || scheme.isFrozen) return;
+    if (confirm(`Are you sure you want to freeze "${scheme.schemeName}"? This action cannot be undone.`)) {
+      scheme.isFrozen = true;
+      this.schemeService.updateScheme(scheme.refNo, scheme).subscribe();
     }
   }
 
@@ -1009,8 +1065,8 @@ export class TendersPageComponent {
         return;
       }
 
-      if (file.size > 10 * 1024 * 1024) {
-        this.attachmentFileError.set('File size exceeds the 10MB limit.');
+      if (file.size > 25 * 1024 * 1024) {
+        this.attachmentFileError.set('File size exceeds the 25MB limit.');
         this.attachmentFormData.file = null;
         this.attachmentFormData.fileName = '';
         return;
@@ -1081,8 +1137,8 @@ export class TendersPageComponent {
         return;
       }
 
-      if (file.size > 10 * 1024 * 1024) {
-        this.corrigendumFileError.set('File size exceeds the 10MB limit.');
+      if (file.size > 25 * 1024 * 1024) {
+        this.corrigendumFileError.set('File size exceeds the 25MB limit.');
         this.corrigendumFormData.file = null;
         this.corrigendumFormData.fileName = '';
         return;
@@ -1151,6 +1207,11 @@ export class TendersPageComponent {
       return; 
     }
 
+    this.showConfirmSubmitEoiModal.set(true);
+  }
+
+  confirmSubmitNewEoi(): void {
+    const d = this.newEoiData;
     const formatDt = (dt: string) => dt ? dt.split('-').reverse().join('/') : '';
     const attachedDocsList: EoiDocumentItem[] = d.attachments.map((att, idx) => ({
       sNo: idx + 1,
@@ -1158,8 +1219,12 @@ export class TendersPageComponent {
       size: att.size
     }));
 
+    const targetRef = this.editingSchemeRefNo();
+    const existingScheme = targetRef ? this.schemes().find(s => s.refNo === targetRef) : null;
+
     const newScheme: SchemeTender = {
-      sNo: 1,
+      ...(existingScheme || {}),
+      sNo: existingScheme ? existingScheme.sNo : 1,
       refNo: d.refNo,
       schemeName: d.scheme,
       schemeTitle: d.scheme,
@@ -1172,10 +1237,11 @@ export class TendersPageComponent {
       status: 'Open',
       emdFee: d.emdFee,
       processFee: d.processFee,
-      attachedDocs: attachedDocsList
+      attachedDocs: attachedDocsList,
+      createdAt: existingScheme ? existingScheme.createdAt : Date.now(),
+      isActive: existingScheme ? existingScheme.isActive : true,
+      isFrozen: existingScheme ? existingScheme.isFrozen : false
     };
-
-    const targetRef = this.editingSchemeRefNo();
     if (targetRef) {
       // Edit mode: save updated scheme object into pendingEditScheme & open optional Corrigendum modal
       this.pendingEditScheme = newScheme;
@@ -1188,6 +1254,12 @@ export class TendersPageComponent {
       this.schemeService.createScheme(newScheme).subscribe();
       this.showConfigureEoiModal.set(false);
     }
+    
+    this.showConfirmSubmitEoiModal.set(false);
+  }
+
+  closeConfirmSubmitEoiModal(): void {
+    this.showConfirmSubmitEoiModal.set(false);
   }
 }
 

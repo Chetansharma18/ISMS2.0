@@ -1,5 +1,6 @@
 import { INITIAL_ASPIRANTS } from '../../../core/mock/data/aspirants.mock';
 import { Injectable, signal, computed, inject } from '@angular/core';
+import { environment } from '../../../../environments/environment';
 import { AspirantRecord, AspirantTrainingStatus } from '../models/aspirant.model';
 import { AspirantFormData } from '../config/aspirant-form.config';
 import { BatchRecord } from '../models/batch.model';
@@ -23,6 +24,7 @@ export class AspirantService {
   constructor() {
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', (event: StorageEvent) => {
+        if (!environment.useMockData) return;
         if (event.key === this.STORAGE_KEY && event.newValue) {
           try {
             const records: AspirantRecord[] = JSON.parse(event.newValue);
@@ -36,6 +38,9 @@ export class AspirantService {
   }
 
   private loadInitialAspirants(): AspirantRecord[] {
+    if (!environment.useMockData) {
+      return [];
+    }
     if (typeof localStorage !== 'undefined') {
       try {
         const stored = localStorage.getItem(this.STORAGE_KEY);
@@ -81,6 +86,9 @@ export class AspirantService {
   }
 
   private persist(records?: AspirantRecord[]): void {
+    if (!environment.useMockData) {
+      return;
+    }
     const list = records || this._aspirants();
     if (typeof localStorage !== 'undefined') {
       try {

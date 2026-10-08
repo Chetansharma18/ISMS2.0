@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent, TableComponent, TableColumn } from '../../../shared';
+import { environment } from '../../../../environments/environment';
 
 interface CameraUser {
   id: string;
@@ -116,7 +117,7 @@ export class CameraMonitoringComponent {
 
   searchQuery = signal('');
 
-  users = signal<CameraUser[]>([
+  users = signal<CameraUser[]>(environment.useMockData ? [
     {
       id: 'TP-001',
       sdcName: 'SDC 1',
@@ -144,7 +145,7 @@ export class CameraMonitoringComponent {
       totalBatches: 1,
       totalCameras: 1
     }
-  ]);
+  ] : []);
 
   filteredUsers = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();

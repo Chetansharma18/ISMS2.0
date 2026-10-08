@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { PageHeaderComponent, TableComponent, TableColumn } from '../../../shared';
 import { inject } from '@angular/core';
+import { environment } from '../../../../environments/environment';
 
 interface SdcMonitoringItem {
   id: string;
@@ -107,7 +108,7 @@ export class CameraSdcListComponent {
     { key: 'action', label: 'Action', align: 'center', width: 'w-28', type: 'custom' }
   ];
 
-  sdcs = signal<SdcMonitoringItem[]>([
+  sdcs = signal<SdcMonitoringItem[]>(environment.useMockData ? [
     {
       id: 'SDC-001',
       name: 'SDC 1',
@@ -132,5 +133,5 @@ export class CameraSdcListComponent {
       activeBatches: 1,
       configuredFeeds: 2
     }
-  ]);
+  ] : []);
 }

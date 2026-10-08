@@ -92,6 +92,10 @@ export class MockDatabaseService {
    * Initializes or reloads data into memory, attempting storage recovery if enabled.
    */
   private initializeStore(): void {
+    if (!this.isMockActive()) {
+      Object.keys(this.seeds).forEach(key => this.store.set(key, []));
+      return;
+    }
     Object.keys(this.seeds).forEach(key => {
       const stored = this.loadFromStorage(key);
       if (stored && Array.isArray(stored)) {
@@ -295,7 +299,7 @@ export class MockDatabaseService {
   }
 
   private loadFromStorage(resourceKey: string): any[] | null {
-    if (!MOCK_CONFIG.persistInStorage || typeof sessionStorage === 'undefined') return null;
+    if (!this.isMockActive(resourceKey) || !MOCK_CONFIG.persistInStorage || typeof sessionStorage === 'undefined') return null;
     try {
       const val = sessionStorage.getItem(`${MOCK_CONFIG.storagePrefix}${resourceKey}`);
       return val ? JSON.parse(val) : null;

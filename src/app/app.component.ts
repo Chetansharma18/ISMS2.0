@@ -51,7 +51,7 @@ import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-m
 
             <!-- Drawer Slider Panel -->
             <div
-              class="fixed top-0 bottom-0 left-0 z-50 md:hidden flex flex-col bg-white shadow-2xl transition-transform duration-300 w-[260px] max-w-[85vw]"
+              class="fixed top-0 bottom-0 left-0 z-50 md:hidden flex flex-col bg-white shadow-2xl transition-transform duration-300 w-65 max-w-[85vw]"
               role="dialog"
               aria-label="Mobile Navigation Menu"
             >
@@ -77,13 +77,13 @@ import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-m
             </div>
           }
 
-          <main class="flex-1 min-w-0 overflow-y-auto flex flex-col [overscroll-behavior-y:none] [-webkit-overflow-scrolling:touch]" style="background-color: #FEFEFD;">
+          <main class="flex-1 min-w-0 overflow-y-auto flex flex-col overscroll-y-none [-webkit-overflow-scrolling:touch]" style="background-color: #FEFEFD;">
             <router-outlet></router-outlet>
           </main>
         </div>
       } @else {
         <main 
-          class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col [overscroll-behavior-y:none] [-webkit-overflow-scrolling:touch] relative" 
+          class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col overscroll-y-none [-webkit-overflow-scrolling:touch] relative" 
           [style.background-color]="isLandingRoute() ? '#070e18' : '#FEFEFD'"
         >
           <div class="w-full flex-1 flex flex-col bg-[#FEFEFD]">

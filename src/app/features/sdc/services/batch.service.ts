@@ -1,5 +1,6 @@
 import { INITIAL_BATCH_RECORDS } from '../../../core/mock/data/batches.mock';
 import { Injectable, signal, computed, inject } from '@angular/core';
+import { environment } from '../../../../environments/environment';
 import { BatchRecord, CreateBatchDto, BatchTrainee, BatchApprovalStatus, BatchInspectionStatus, BatchStatus } from '../models/batch.model';
 import { SdcService } from './sdc.service';
 
@@ -20,6 +21,7 @@ export class BatchService {
   constructor() {
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', (event: StorageEvent) => {
+        if (!environment.useMockData) return;
         if (event.key === this.STORAGE_KEY && event.newValue) {
           try {
             const records: BatchRecord[] = JSON.parse(event.newValue);
@@ -33,6 +35,9 @@ export class BatchService {
   }
 
   private loadInitialBatches(): BatchRecord[] {
+    if (!environment.useMockData) {
+      return [];
+    }
     if (typeof localStorage !== 'undefined') {
       try {
         const stored = localStorage.getItem(this.STORAGE_KEY);
@@ -116,6 +121,9 @@ export class BatchService {
   }
 
   private persist(records?: BatchRecord[]): void {
+    if (!environment.useMockData) {
+      return;
+    }
     const list = records || this._batches();
     if (typeof localStorage !== 'undefined') {
       try {

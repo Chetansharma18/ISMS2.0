@@ -1,5 +1,6 @@
 import { INITIAL_SDC_RECORDS } from '../../../core/mock/data/sdc.mock';
 import { Injectable, signal, computed } from '@angular/core';
+import { environment } from '../../../../environments/environment';
 import {
   SdcRecord,
   SdcFormData,
@@ -25,6 +26,7 @@ export class SdcService {
     // Cross-tab and window storage synchronization
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', (event: StorageEvent) => {
+        if (!environment.useMockData) return;
         if (event.key === this.STORAGE_KEY && event.newValue) {
           try {
             const records: SdcRecord[] = JSON.parse(event.newValue);
@@ -38,6 +40,9 @@ export class SdcService {
   }
 
   private loadInitialRecords(): SdcRecord[] {
+    if (!environment.useMockData) {
+      return [];
+    }
     if (typeof localStorage !== 'undefined') {
       try {
         const stored = localStorage.getItem(this.STORAGE_KEY);
@@ -93,6 +98,9 @@ export class SdcService {
   }
 
   private persist(records?: SdcRecord[]): void {
+    if (!environment.useMockData) {
+      return;
+    }
     const list = records || this._sdcs();
     if (typeof localStorage !== 'undefined') {
       try {

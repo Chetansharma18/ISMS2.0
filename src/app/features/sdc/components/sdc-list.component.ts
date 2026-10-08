@@ -51,7 +51,7 @@ import {
               <button
                 type="button"
                 (click)="setFilter(f.id)"
-                class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
+                class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
                 [class.bg-[#174A6E]]="activeFilter() === f.id"
                 [class.text-white]="activeFilter() === f.id"
                 [class.border-[#174A6E]]="activeFilter() === f.id"
@@ -83,7 +83,7 @@ import {
 
         <!-- Admin Advanced Filter Bar (TP filter, Scheme filter, District filter, and Search) -->
         @if (isAdmin()) {
-          <div class="bg-[#F8FAFC] border border-[#D9E1E7] rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs">
+          <div class="bg-[#F8FAFC] border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs">
             
             <!-- Filter: TP Name -->
             <div class="flex items-center gap-1.5">
@@ -91,7 +91,7 @@ import {
               <select
                 [ngModel]="selectedTp()"
                 (ngModelChange)="selectedTp.set($event)"
-                class="bg-white border border-[#D9E1E7] rounded-[4px] px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E] max-w-[200px]"
+                class="bg-white border border-border rounded-sm px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E] max-w-50"
               >
                 <option value="ALL">All Training Partners ({{ tpList().length }})</option>
                 @for (tp of tpList(); track tp) {
@@ -106,7 +106,7 @@ import {
               <select
                 [ngModel]="selectedScheme()"
                 (ngModelChange)="selectedScheme.set($event)"
-                class="bg-white border border-[#D9E1E7] rounded-[4px] px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
+                class="bg-white border border-border rounded-sm px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
               >
                 <option value="ALL">All Schemes</option>
                 @for (sch of schemeList(); track sch) {
@@ -121,7 +121,7 @@ import {
               <select
                 [ngModel]="selectedDistrict()"
                 (ngModelChange)="selectedDistrict.set($event)"
-                class="bg-white border border-[#D9E1E7] rounded-[4px] px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
+                class="bg-white border border-border rounded-sm px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
               >
                 <option value="ALL">All Districts</option>
                 @for (dst of districtList(); track dst) {
@@ -131,13 +131,13 @@ import {
             </div>
 
             <!-- Search input -->
-            <div class="flex-1 min-w-[200px] relative">
+            <div class="flex-1 min-w-50 relative">
               <input
                 type="text"
                 [ngModel]="searchQuery()"
                 (ngModelChange)="searchQuery.set($event)"
                 placeholder="Search TP name, SDC, code, sector, district..."
-                class="w-full bg-white border border-[#D9E1E7] rounded-[4px] pl-7 pr-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
+                class="w-full bg-white border border-border rounded-sm pl-7 pr-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
               />
               <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2 top-1.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -268,14 +268,14 @@ import {
         <ng-template #actionsTemplate let-sdc>
           <div class="flex items-center justify-center gap-2 whitespace-nowrap py-0.5">
             
-            <!-- Slot 1 (116px fixed container): Either '+ Create Batch' (TP) or 'Approve SDC' (Admin, only when inspection is completed) -->
-            <div class="w-[116px] flex justify-center shrink-0">
+            <!-- Slot 1 (w-29 fixed container): Either '+ Create Batch' (TP) or 'Approve SDC' (Admin, only when inspection is completed) -->
+            <div class="w-29 flex justify-center shrink-0">
               <!-- 1. For TP (SDC Management): If center is APPROVED, show "+ Create Batch" (NOT for Admin) -->
               @if (!isAdmin() && (sdc.status === 'APPROVED' || sdc.status === 'Approved')) {
                 <button
                   type="button"
                   (click)="createBatch(sdc)"
-                  class="w-full justify-center whitespace-nowrap inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#174A6E] hover:bg-[#123B59] active:bg-[#0E2D44] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
+                  class="w-full justify-center whitespace-nowrap inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
                   title="Create Batch"
                 >
                   <span class="text-sm font-bold leading-none">+</span>
@@ -288,7 +288,7 @@ import {
                 <button
                   type="button"
                   (click)="openApproveModal(sdc)"
-                  class="w-full justify-center whitespace-nowrap inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#174A6E] hover:bg-[#123B59] active:bg-[#0E2D44] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer shrink-0"
+                  class="w-full justify-center whitespace-nowrap inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
                   title="Approve SDC"
                 >
                   <svg class="w-3.5 h-3.5 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -299,11 +299,11 @@ import {
               }
             </div>
 
-            <!-- Slot 2: View Details button (116px fixed width, always in the same vertical line) -->
+            <!-- Slot 2: View Details button (w-29 fixed width, always in the same vertical line) -->
             <button
               type="button"
               (click)="viewDetails(sdc)"
-              class="w-[116px] justify-center whitespace-nowrap inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
+              class="w-29 justify-center whitespace-nowrap inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
               title="View Center Details"
             >
               <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -345,13 +345,13 @@ import {
           <div class="p-5 space-y-4 text-xs">
             
             <!-- Center Summary Box -->
-            <div class="bg-[#EAF2F6] border border-[#D9E1E7] rounded-lg p-3 space-y-1.5">
+            <div class="bg-[#EAF2F6] border border-border rounded-lg p-3 space-y-1.5">
               <div class="flex justify-between items-start">
                 <span class="text-[11px] font-semibold text-slate-500 uppercase">Training Partner</span>
                 <span class="font-mono text-[11px] font-bold text-[#174A6E]">{{ targetCenter.sdcCode }}</span>
               </div>
               <div class="font-bold text-slate-900 text-sm">{{ targetCenter.tpName }}</div>
-              <div class="text-slate-900 font-bold pt-1 border-t border-[#D9E1E7]/70 flex items-center justify-between">
+              <div class="text-slate-900 font-bold pt-1 border-t border-border/70 flex items-center justify-between">
                 <span>{{ targetCenter.sdcName }}</span>
                 <span class="text-slate-500 font-medium">{{ targetCenter.district }}</span>
               </div>

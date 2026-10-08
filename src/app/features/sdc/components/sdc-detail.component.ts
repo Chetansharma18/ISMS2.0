@@ -36,10 +36,10 @@ import { PageHeaderComponent } from '../../../shared/components';
                 <button
                   type="button"
                   (click)="startEditing(center)"
-                  class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/25 text-white border border-white/20 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95"
                   title="Edit SDC Creation Details"
                 >
-                  <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                   <span>Edit Details</span>
@@ -64,7 +64,7 @@ import { PageHeaderComponent } from '../../../shared/components';
           <!-- ========================================================================= -->
           <!-- HERO OVERVIEW STRIP: Training Partner + SDC Identity in ISMS Theme         -->
           <!-- ========================================================================= -->
-          <div class="rounded-xl border border-[#D9E1E7] bg-[#EAF2F6]/60 p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
+          <div class="rounded-xl border border-border bg-[#EAF2F6]/60 p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
             
             <!-- Left: Training Partner & Center Code -->
             <div class="space-y-1">
@@ -100,7 +100,7 @@ import { PageHeaderComponent } from '../../../shared/components';
               </div>
 
               <!-- Status (Bold Black Uppercase Text) -->
-              <div class="text-right border-l border-[#D9E1E7] pl-4 sm:pl-6">
+              <div class="text-right border-l border-border pl-4 sm:pl-6">
                 <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Current Status</span>
                 <span class="font-bold text-sm tracking-wide uppercase text-black" style="color: #000000 !important; font-weight: bold;">
                   {{ formatStatus(center.status).toUpperCase() }}
@@ -246,7 +246,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                     <button
                       type="button"
                       (click)="approveSdc(center)"
-                      class="px-5 py-2 rounded-lg bg-[#174A6E] hover:bg-[#123B59] active:bg-[#0E2D44] text-white text-xs font-semibold shadow-sm cursor-pointer transition-colors flex items-center gap-1.5"
+                      class="px-5 py-2 rounded-lg bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-sm cursor-pointer transition-colors flex items-center gap-1.5 active:scale-95"
                     >
                       <svg class="w-4 h-4 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
@@ -443,7 +443,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <input
                     type="text"
                     [(ngModel)]="editModel.sdcName"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                     placeholder="Enter Center Name"
                   />
                 </div>
@@ -454,7 +454,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   </label>
                   <select
                     [(ngModel)]="editModel.sector"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   >
                     @for (sec of sectors; track sec) {
                       <option [value]="sec">{{ sec }}</option>
@@ -480,7 +480,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <select
                     [ngModel]="editModel.district"
                     (ngModelChange)="onDistrictChange($event)"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   >
                     @for (d of districts; track d) {
                       <option [value]="d">{{ d }}</option>
@@ -494,7 +494,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   </label>
                   <select
                     [(ngModel)]="editModel.assemblyConstituency"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   >
                     @for (a of assemblyConstituencies; track a) {
                       <option [value]="a">{{ a }}</option>
@@ -508,7 +508,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   </label>
                   <select
                     [(ngModel)]="editModel.parliamentConstituency"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   >
                     @for (p of parliamentConstituencies; track p) {
                       <option [value]="p">{{ p }}</option>
@@ -533,7 +533,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   </label>
                   <select
                     [(ngModel)]="editModel.block"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   >
                     @for (b of blocks; track b) {
                       <option [value]="b">{{ b }}</option>
@@ -548,7 +548,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <input
                     type="date"
                     [(ngModel)]="editModel.proposedStartDate"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   />
                 </div>
 
@@ -561,7 +561,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                     [(ngModel)]="editModel.sdcCapacity"
                     min="1"
                     max="1000"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   />
                 </div>
 
@@ -573,7 +573,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <input
                     type="email"
                     [(ngModel)]="editModel.centerEmail"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                     placeholder="center@example.com"
                   />
                 </div>
@@ -585,7 +585,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <input
                     type="text"
                     [(ngModel)]="editModel.fullAddress"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                     placeholder="Street address, building, landmark"
                   />
                 </div>
@@ -598,7 +598,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                     type="text"
                     [(ngModel)]="editModel.pincode"
                     maxlength="6"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                     placeholder="302029"
                   />
                 </div>
@@ -609,7 +609,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <input
                     type="number"
                     [(ngModel)]="editModel.totalTrainedAspirants"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   />
                 </div>
 
@@ -618,7 +618,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <input
                     type="number"
                     [(ngModel)]="editModel.totalPlacedAspirants"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   />
                 </div>
 
@@ -626,7 +626,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <label class="block font-semibold text-slate-700 mb-1">Hostel Category</label>
                   <select
                     [(ngModel)]="editModel.hostelCategory"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   >
                     @for (cat of hostelCategories; track cat) {
                       <option [value]="cat">{{ cat }}</option>
@@ -641,7 +641,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                     type="number"
                     step="0.0001"
                     [(ngModel)]="editModel.latitude"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   />
                 </div>
 
@@ -651,7 +651,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                     type="number"
                     step="0.0001"
                     [(ngModel)]="editModel.longitude"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   />
                 </div>
 
@@ -660,7 +660,7 @@ import { PageHeaderComponent } from '../../../shared/components';
                   <input
                     type="text"
                     [(ngModel)]="editModel.remarks"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                     placeholder="Remarks"
                   />
                 </div>

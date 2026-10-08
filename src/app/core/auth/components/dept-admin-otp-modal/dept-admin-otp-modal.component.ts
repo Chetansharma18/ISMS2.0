@@ -22,14 +22,14 @@ import { FormsModule } from '@angular/forms';
   template: `
     @if (isOpen) {
       <div
-        class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs select-none font-sans animate-in fade-in duration-200"
+        class="fixed inset-0 z-120 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs select-none font-sans animate-in fade-in duration-200"
         role="dialog"
         aria-modal="true"
         aria-labelledby="otp-title"
       >
         <!-- Modal Card -->
         <div
-          class="relative w-full max-w-[440px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200"
+          class="relative w-full max-w-110 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200"
         >
           <!-- Top Accent Bar -->
           <div class="h-1.5 w-full bg-[#0B3558]"></div>
@@ -37,7 +37,7 @@ import { FormsModule } from '@angular/forms';
           <div class="p-6 sm:p-7">
             <!-- Security Shield Icon -->
             <div class="w-12 h-12 rounded-xl bg-[#EAF2F6] text-[#0B3558] flex items-center justify-center mx-auto mb-4 shadow-2xs">
-              <svg class="w-6 h-6 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="w-6 h-6 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
             </div>
@@ -83,7 +83,7 @@ import { FormsModule } from '@angular/forms';
                   [value]="digit"
                   (input)="onDigitInput($event, i)"
                   (keydown)="onKeyDown($event, i)"
-                  class="w-11 h-13 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-black font-mono text-slate-800 bg-slate-50 border-2 rounded-xl focus:bg-white focus:border-[#0B3558] focus:ring-4 focus:ring-[#0B3558]/15 outline-none transition-all shadow-2xs select-none"
+                  class="w-11 h-13 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-black font-mono text-slate-800 bg-white border-2 rounded-xl focus:border-[#0B3558] focus:ring-4 focus:ring-[#0B3558]/15 outline-none transition-all shadow-2xs select-none"
                   [class.border-rose-400]="errorMessage()"
                   [class.border-[#0B3558]]="digit !== '' && !errorMessage()"
                   [class.border-slate-200]="digit === '' && !errorMessage()"
@@ -121,7 +121,7 @@ import { FormsModule } from '@angular/forms';
                 type="button"
                 (click)="submitOtp()"
                 [disabled]="!isComplete() || isSubmitting()"
-                class="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-[#0B3558] hover:bg-[#07243c] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                class="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-[#0B3558] hover:bg-[#07243c] disabled:opacity-50 disabled:cursor-not-allowed enabled:cursor-pointer shadow-sm transition-all flex items-center justify-center gap-2 active:scale-98"
               >
                 @if (isSubmitting()) {
                   <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">

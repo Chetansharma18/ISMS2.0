@@ -85,6 +85,20 @@ export type { DesignationMasterItem };
       <!-- Custom Template for Action Column -->
       <ng-template #actionTemplate let-item>
         <div class="flex items-center justify-center whitespace-nowrap">
+          <!-- Edit -->
+          <button
+            type="button"
+            (click)="$event.stopPropagation(); openEditModal(item)"
+            class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
+            title="Edit"
+          >
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <span>Edit</span>
+          </button>
+          
+          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
           <button
             type="button"
             (click)="$event.stopPropagation(); deleteDesignation(item)"
@@ -169,6 +183,7 @@ export type { DesignationMasterItem };
 export class DesignationMasterComponent {
   searchQuery = signal<string>('');
   showModal = signal<boolean>(false);
+  editingId = signal<string | null>(null);
   submitted = signal<boolean>(false);
 
   formData = {
@@ -227,7 +242,15 @@ export class DesignationMasterComponent {
     this.searchQuery.set(val);
   }
 
-  openAddModal(): void {
+  
+  openEditModal(item: any): void {
+    this.editingId.set(item.id);
+    this.submitted.set(false);
+    this.formData = { ...this.formData, ...item };
+    this.showModal.set(true);
+  }
+openAddModal(): void {
+    this.editingId.set(null);
     this.submitted.set(false);
     this.formData = {
       designationName: '',
@@ -247,7 +270,14 @@ export class DesignationMasterComponent {
       return; // Required validation
     }
 
-    const newItem: DesignationMasterItem = {
+    const editId = this.editingId();
+    if (editId) {
+      this.designations.update(current => {
+      const updated = current.map((item: any) => item.id === editId ? { ...item, ...this.formData } : item);
+      return updated.map((item, index) => ({ ...item, sNo: index + 1 }));
+    });
+    } else {
+      const newItem: DesignationMasterItem = {
       sNo: 1,
       id: 'desig-' + Date.now(),
       designationName: this.formData.designationName.trim(),
@@ -260,6 +290,7 @@ export class DesignationMasterComponent {
       const updated = [newItem, ...current];
       return updated.map((item, index) => ({ ...item, sNo: index + 1 }));
     });
+    }
 
     this.showModal.set(false);
   }

@@ -311,48 +311,48 @@ export interface UserManagementItem {
             
             <!-- LEFT COLUMN -->
             <div class="space-y-3">
-              <!-- User ID -->
+              <!-- SSO ID -->
               <div>
-                <label class="block text-slate-700 font-medium mb-1">User ID*</label>
+                <label class="block text-slate-700 font-medium mb-1">SSO ID*</label>
                 <input
                   type="text"
-                  placeholder="e.g. USR-1008"
-                  [(ngModel)]="formData.userId"
-                  [ngClass]="{'border-red-500': submitted() && !formData.userId, 'border-[#8FA3B6]': !(submitted() && !formData.userId)}"
+                  placeholder="e.g. SSO_1008"
+                  [(ngModel)]="formData.ssoId"
+                  [ngClass]="{'border-red-500': submitted() && !formData.ssoId, 'border-[#8FA3B6]': !(submitted() && !formData.ssoId)}"
                   class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 font-mono text-xs"
                 />
-                @if (submitted() && !formData.userId) {
-                  <div class="text-xs text-red-500 mt-0.5 font-medium">User ID is required</div>
+                @if (submitted() && !formData.ssoId) {
+                  <div class="text-xs text-red-500 mt-0.5 font-medium">SSO ID is required</div>
                 }
               </div>
 
-              <!-- User Name -->
+              <!-- First Name -->
               <div>
-                <label class="block text-slate-700 font-medium mb-1">User Name*</label>
+                <label class="block text-slate-700 font-medium mb-1">First Name*</label>
                 <input
                   type="text"
-                  placeholder="e.g. admin 3 or super admin 3"
-                  [(ngModel)]="formData.username"
-                  [ngClass]="{'border-red-500': submitted() && !formData.username, 'border-[#8FA3B6]': !(submitted() && !formData.username)}"
+                  placeholder="e.g. John"
+                  [(ngModel)]="formData.firstName"
+                  [ngClass]="{'border-red-500': submitted() && !formData.firstName, 'border-[#8FA3B6]': !(submitted() && !formData.firstName)}"
                   class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
                 />
-                @if (submitted() && !formData.username) {
-                  <div class="text-xs text-red-500 mt-0.5 font-medium">User Name is required</div>
+                @if (submitted() && !formData.firstName) {
+                  <div class="text-xs text-red-500 mt-0.5 font-medium">First Name is required</div>
                 }
               </div>
 
-              <!-- Password -->
+              <!-- Last Name -->
               <div>
-                <label class="block text-slate-700 font-medium mb-1">Password*</label>
+                <label class="block text-slate-700 font-medium mb-1">Last Name*</label>
                 <input
-                  type="password"
-                  placeholder="••••••••"
-                  [(ngModel)]="formData.password"
-                  [ngClass]="{'border-red-500': submitted() && !formData.password, 'border-[#8FA3B6]': !(submitted() && !formData.password)}"
+                  type="text"
+                  placeholder="e.g. Doe"
+                  [(ngModel)]="formData.lastName"
+                  [ngClass]="{'border-red-500': submitted() && !formData.lastName, 'border-[#8FA3B6]': !(submitted() && !formData.lastName)}"
                   class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
                 />
-                @if (submitted() && !formData.password) {
-                  <div class="text-xs text-red-500 mt-0.5 font-medium">Password is required</div>
+                @if (submitted() && !formData.lastName) {
+                  <div class="text-xs text-red-500 mt-0.5 font-medium">Last Name is required</div>
                 }
               </div>
 
@@ -584,8 +584,9 @@ export class UserManagementComponent {
 
   formData = {
     userId: '',
-    username: '',
-    password: '',
+    ssoId: '',
+    firstName: '',
+    lastName: '',
     dateOfBirth: '',
     email: '',
     mobileNo: '',
@@ -689,8 +690,9 @@ export class UserManagementComponent {
     const nextIdNum = 1000 + this.users().length + 1;
     this.formData = {
       userId: `USR-${nextIdNum}`,
-      username: '',
-      password: '',
+      ssoId: '',
+      firstName: '',
+      lastName: '',
       dateOfBirth: '',
       email: '',
       mobileNo: '',
@@ -710,10 +712,12 @@ export class UserManagementComponent {
   openEditModal(item: UserManagementItem): void {
     this.editingId.set(item.id);
     this.submitted.set(false);
+    const names = item.username ? item.username.split(' ') : [''];
     this.formData = {
       userId: item.userId,
-      username: item.username,
-      password: 'password123',
+      ssoId: item.ssoId || '',
+      firstName: names[0] || '',
+      lastName: names.slice(1).join(' ') || '',
       dateOfBirth: '1990-01-01',
       email: item.email || `${item.username.replace(/\s+/g, '')}@isms.gov.in`,
       mobileNo: item.mobileNo || '9829012345',
@@ -754,17 +758,18 @@ export class UserManagementComponent {
 
   submitUser(): void {
     this.submitted.set(true);
-    if (!this.formData.userId.trim() || !this.formData.username.trim() || !this.formData.password || !this.formData.email.trim() || !this.formData.mobileNo.trim() || !this.formData.roleType) {
+    if (!this.formData.ssoId.trim() || !this.formData.firstName.trim() || !this.formData.lastName.trim() || !this.formData.email.trim() || !this.formData.mobileNo.trim() || !this.formData.roleType) {
       return; // Required validation
     }
 
+    const fullName = `${this.formData.firstName.trim()} ${this.formData.lastName.trim()}`.trim();
     const editId = this.editingId();
     if (editId) {
       // Edit existing user
       const changes: Partial<UserManagementItem> = {
         userId: this.formData.userId.trim(),
-        username: this.formData.username.trim(),
-        ssoId: `SSO_${this.formData.username.trim().toUpperCase().replace(/\s+/g, '_')}`,
+        username: fullName,
+        ssoId: this.formData.ssoId.trim(),
         userType: this.formData.userType,
         roleType: this.formData.roleType,
         designation: this.formData.designation,
@@ -785,8 +790,8 @@ export class UserManagementComponent {
         sNo: 1,
         id: 'usr-' + Date.now(),
         userId: this.formData.userId.trim(),
-        username: this.formData.username.trim(),
-        ssoId: `SSO_${this.formData.username.trim().toUpperCase().replace(/\s+/g, '_')}`,
+        username: fullName,
+        ssoId: this.formData.ssoId.trim(),
         userType: this.formData.userType,
         roleType: this.formData.roleType,
         designation: this.formData.designation,

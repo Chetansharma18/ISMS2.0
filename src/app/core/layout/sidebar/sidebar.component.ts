@@ -184,7 +184,7 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
                     class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
                   >
                     <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">USERS</span>
+                    <span class="truncate">Users</span>
                   </a>
 
                   <a
@@ -193,7 +193,7 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
                     class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
                   >
                     <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">ROLE MANAGEMENT</span>
+                    <span class="truncate">Role Management</span>
                   </a>
 
                   <a
@@ -202,7 +202,7 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
                     class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
                   >
                     <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">Permission Master</span>
+                    <span class="truncate">Permission Management</span>
                   </a>
                 </div>
               }

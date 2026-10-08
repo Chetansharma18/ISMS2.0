@@ -332,8 +332,24 @@ export interface EoiDocumentItem {
 
                 <!-- Dropdown List Popup -->
                 @if (isAdminDropdownOpen()) {
-                  <div class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-56 overflow-y-auto p-1.5 space-y-1">
-                    @for (adm of availableAdmins; track adm.id) {
+                  <div class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 flex flex-col">
+                    <div class="p-1.5 border-b border-slate-100 shrink-0">
+                      <div class="relative">
+                        <input
+                          type="text"
+                          placeholder="Search admin name..."
+                          [ngModel]="adminSearchQuery()"
+                          (ngModelChange)="adminSearchQuery.set($event)"
+                          (click)="$event.stopPropagation()"
+                          class="w-full pl-7 pr-2 py-1.5 text-[11px] border border-slate-200 rounded focus:outline-none focus:border-[#174A6E] text-slate-700"
+                        />
+                        <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="max-h-56 overflow-y-auto p-1.5 space-y-1">
+                    @for (adm of filteredAvailableAdmins(); track adm.id) {
                       <label
                         class="flex items-center justify-between px-2.5 py-2 rounded-md hover:bg-purple-50/70 cursor-pointer transition-colors text-xs"
                       >
@@ -354,6 +370,7 @@ export interface EoiDocumentItem {
                         </span>
                       </label>
                     }
+                    </div>
                   </div>
                 }
               </div>
@@ -478,7 +495,7 @@ export interface EoiDocumentItem {
                   </svg>
                   <span>+ Attach Document</span>
                 </button>
-                <span class="text-[11px] text-slate-500 font-medium whitespace-nowrap">Under 25 mb</span>
+                <span class="text-[11px] text-slate-500 font-medium whitespace-nowrap">(Max file size: 25 MB)</span>
                 @if (newEoiSubmitted() && newEoiData.attachments.length === 0) {
                   <span class="text-xs text-red-500 font-medium">At least 1 attachment is required</span>
                 }
@@ -682,6 +699,16 @@ export class TendersPageComponent {
   readonly isAdminDropdownOpen = signal<boolean>(false);
 
   readonly availableAdmins = this.schemeService.getAvailableAdmins();
+  adminSearchQuery = signal<string>('');
+  filteredAvailableAdmins = computed(() => {
+    const q = this.adminSearchQuery().toLowerCase().trim();
+    if (!q) return this.availableAdmins;
+    return this.availableAdmins.filter(a => 
+      a.name.toLowerCase().includes(q) || 
+      a.role.toLowerCase().includes(q) || 
+      a.ssoId.toLowerCase().includes(q)
+    );
+  });
   private promptDismissed = false;
 
   newEoiData = {

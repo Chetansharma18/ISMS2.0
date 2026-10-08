@@ -1,6 +1,7 @@
 import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { DataEngineService } from '../../core/services/data-engine.service';
 import {
   PageHeaderComponent,
@@ -23,7 +24,7 @@ export interface UserManagementItem {
   blockName?: string;
   email?: string;
   mobileNo?: string;
-  schemeStatus: 'Active' | 'Inactive';
+  schemeStatus: 'Active' | 'Inactive' | 'Blacklisted';
 }
 
 @Component({
@@ -59,21 +60,24 @@ export interface UserManagementItem {
           </div>
 
           <!-- Add User Button -->
-          <button
-            type="button"
-            (click)="openAddModal()"
-            class="px-4 py-2.5 bg-[#174A6E] hover:bg-[#0B3558] text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 shrink-0"
-          >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Add User</span>
-          </button>
+          @if (selectedRoleFilter() !== 'blacklisted') {
+            <button
+              type="button"
+              (click)="openAddModal()"
+              class="px-4 py-2.5 bg-[#174A6E] hover:bg-[#0B3558] text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 shrink-0"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Add User</span>
+            </button>
+          }
         </div>
       </app-page-header>
 
       <!-- Role Filters -->
-      <div class="w-full flex flex-col sm:flex-row gap-3">
+      @if (selectedRoleFilter() !== 'blacklisted') {
+        <div class="w-full flex flex-col sm:flex-row gap-3">
         <button
           type="button"
           (click)="selectedRoleFilter.set('all')"
@@ -115,6 +119,27 @@ export interface UserManagementItem {
           TP
         </button>
       </div>
+      }
+
+      @if (selectedRoleFilter() === 'blacklisted') {
+        <div class="w-full bg-white border border-rose-200 p-4 rounded-xl shadow-sm mt-3 mb-1 flex flex-col md:flex-row gap-4 items-end">
+          <div class="flex-1 w-full">
+            <label class="block text-slate-700 font-semibold mb-1.5 text-sm">Search User to Blacklist (SSO ID or Name)</label>
+            <div class="flex gap-2">
+              <input type="text" [ngModel]="blacklistInput()" (ngModelChange)="blacklistInput.set($event)" placeholder="Enter SSO ID or Name..." class="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:border-rose-500">
+              <button (click)="blacklistUserBySearch()" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm rounded-lg font-semibold shadow-sm transition-colors whitespace-nowrap cursor-pointer">
+                Blacklist User
+              </button>
+            </div>
+            @if (blacklistError()) {
+              <div class="text-xs text-rose-500 mt-1.5 font-medium">{{ blacklistError() }}</div>
+            }
+            @if (blacklistSuccess()) {
+              <div class="text-xs text-emerald-600 mt-1.5 font-medium">{{ blacklistSuccess() }}</div>
+            }
+          </div>
+        </div>
+      }
 
       <!-- Users Table -->
       <app-table
@@ -151,7 +176,7 @@ export interface UserManagementItem {
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 select-none">
             Active
           </span>
-        } @else if (item.userType === 'TP' || item.roleType === 'tp') {
+        } @else if (item.schemeStatus === 'Blacklisted') {
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 select-none">
             Blacklisted
           </span>
@@ -206,22 +231,22 @@ export interface UserManagementItem {
               type="button"
               (click)="toggleUserStatus(item)"
               class="relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-              [ngClass]="item.schemeStatus === 'Inactive' ? 'bg-slate-400 hover:bg-slate-500' : 'bg-emerald-500 hover:bg-emerald-600'"
+              [ngClass]="item.schemeStatus !== 'Active' ? 'bg-slate-400 hover:bg-slate-500' : 'bg-emerald-500 hover:bg-emerald-600'"
               role="switch"
               [attr.aria-checked]="item.schemeStatus === 'Active'"
             >
               <span class="sr-only">Toggle Active Status</span>
               <span
                 class="pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                [ngClass]="item.schemeStatus === 'Inactive' ? 'translate-x-0' : 'translate-x-3'"
+                [ngClass]="item.schemeStatus !== 'Active' ? 'translate-x-0' : 'translate-x-3'"
               ></span>
             </button>
             <span 
               class="font-medium text-[12px] select-none transition-colors cursor-pointer"
               (click)="toggleUserStatus(item)"
-              [ngClass]="item.schemeStatus === 'Inactive' ? 'text-slate-500 hover:text-slate-700' : 'text-emerald-600 hover:text-emerald-700'"
+              [ngClass]="item.schemeStatus !== 'Active' ? 'text-slate-500 hover:text-slate-700' : 'text-emerald-600 hover:text-emerald-700'"
             >
-              {{ item.schemeStatus === 'Inactive' ? 'Inactive' : 'Active' }}
+              {{ item.schemeStatus !== 'Active' ? 'Inactive' : 'Active' }}
             </span>
           </div>
         </div>
@@ -583,25 +608,36 @@ export class UserManagementComponent {
 
   private dataEngine = inject(DataEngineService);
   private userRepo = this.dataEngine.for<UserManagementItem>('USERS');
+  private route = inject(ActivatedRoute);
 
   users = signal<UserManagementItem[]>([]);
 
   constructor() {
     this.userRepo.getAll().subscribe(list => this.users.set(list));
+    
+    this.route.queryParams.subscribe(params => {
+      if (params['filter'] === 'blacklisted') {
+        this.selectedRoleFilter.set('blacklisted');
+      } else {
+        this.selectedRoleFilter.set('all');
+      }
+    });
   }
 
-  readonly filteredUsers = computed(() => {
+    readonly filteredUsers = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
     const filter = this.selectedRoleFilter().toLowerCase();
     const all = this.users();
     
     let filtered = all;
-    if (filter !== 'all') {
+    
+    if (filter === 'blacklisted') {
+      filtered = filtered.filter(u => u.schemeStatus === 'Blacklisted');
+    } else if (filter !== 'all') {
       filtered = filtered.filter(u => 
         (u.roleType && u.roleType.toLowerCase().includes(filter)) || 
         (u.userType && u.userType.toLowerCase().includes(filter)) ||
         (u.schemeDepartment && u.schemeDepartment.toLowerCase().includes(filter)) ||
-        // Fallback matching logic for specific 'department' and 'citizen' cases that might not exactly map to strings
         (filter === 'department' && u.userType === 'Admin')
       );
     }
@@ -611,10 +647,47 @@ export class UserManagementComponent {
       (u.userId && u.userId.toLowerCase().includes(q)) ||
       (u.username && u.username.toLowerCase().includes(q)) ||
       (u.ssoId && u.ssoId.toLowerCase().includes(q)) ||
-      (u.roleType && u.roleType.toLowerCase().includes(q)) ||
-      (u.districtName && u.districtName.toLowerCase().includes(q))
+      (u.schemeDepartment && u.schemeDepartment.toLowerCase().includes(q))
     );
   });
+
+  blacklistInput = signal('');
+  blacklistError = signal('');
+  blacklistSuccess = signal('');
+
+  blacklistUserBySearch() {
+    this.blacklistError.set('');
+    this.blacklistSuccess.set('');
+    const q = this.blacklistInput().trim().toLowerCase();
+    if (!q) {
+      this.blacklistError.set('Please enter a valid SSO ID or Username');
+      return;
+    }
+    
+    const usersList = this.users();
+    const userToBlacklist = usersList.find(u => 
+      (u.ssoId && u.ssoId.toLowerCase() === q) || 
+      (u.username && u.username.toLowerCase() === q) ||
+      (u.userId && u.userId.toLowerCase() === q)
+    );
+    
+    if (!userToBlacklist) {
+      this.blacklistError.set('User not found in system.');
+      return;
+    }
+    
+    if (userToBlacklist.schemeStatus === 'Blacklisted') {
+      this.blacklistError.set('User is already blacklisted.');
+      return;
+    }
+    
+    userToBlacklist.schemeStatus = 'Blacklisted';
+    this.users.set([...usersList]);
+    this.blacklistSuccess.set(`Successfully blacklisted user: ${userToBlacklist.username} (${userToBlacklist.ssoId || userToBlacklist.userId})`);
+    this.blacklistInput.set('');
+    
+    setTimeout(() => this.blacklistSuccess.set(''), 3000);
+  }
 
   readonly columns: TableColumn<UserManagementItem>[] = [
     { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },

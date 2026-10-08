@@ -99,7 +99,13 @@ export class MockDatabaseService {
     Object.keys(this.seeds).forEach(key => {
       const stored = this.loadFromStorage(key);
       if (stored && Array.isArray(stored)) {
-        this.store.set(key, stored);
+        if (key === 'SCHEMES') {
+          const sanitized = stored.filter(item => item?.status !== 'Closed');
+          this.store.set(key, sanitized);
+          this.saveToStorage(key, sanitized);
+        } else {
+          this.store.set(key, stored);
+        }
       } else {
         this.store.set(key, this.deepClone(this.seeds[key]));
       }

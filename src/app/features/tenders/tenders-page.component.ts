@@ -114,6 +114,7 @@ export interface EoiDocumentItem {
             [rowClass]="getRowClass"
             (rowClick)="onRowClick($event)"
             itemUnit="schemes"
+            emptyMessage="No active schemes available matching your search query."
             [customTemplates]="{
               closingDate: closingDateTemplate,
               eoiDescription: descTemplate,
@@ -122,28 +123,13 @@ export interface EoiDocumentItem {
           >
           </app-table>
 
-          <!-- Custom Template for Closing Date (with prominent highlight for Closed / Expired schemes) -->
+          <!-- Custom Template for Closing Date -->
           <ng-template #closingDateTemplate let-item>
-            @if (isSchemeClosed(item)) {
-              <div
-                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11.5px] font-semibold bg-rose-50 text-rose-700 border border-rose-300 shadow-2xs select-none"
-                title="Application deadline has expired"
-              >
-                <span class="font-semibold text-rose-700">{{ item.closingDate }}</span>
-                <span class="px-1.5 py-0.5 rounded text-[9.5px] font-bold uppercase tracking-wider bg-rose-600 text-white shadow-2xs leading-none">
-                  Closed
-                </span>
-              </div>
-            } @else {
-              <span class="text-slate-800 font-medium text-[12.5px]">{{ item.closingDate }}</span>
-            }
+            <span class="text-slate-800 font-medium text-[12.5px]">{{ item.closingDate }}</span>
           </ng-template>
 
           <ng-template #descTemplate let-item>
-            <span
-              class="line-clamp-2 text-[11px] leading-relaxed"
-              [ngClass]="isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-600'"
-            >
+            <span class="line-clamp-2 text-[11px] leading-relaxed text-slate-600">
               {{ item.eoiDescription }}
             </span>
           </ng-template>
@@ -662,16 +648,26 @@ export class TendersPageComponent {
   pageSize = 10;
   searchQuery = signal<string>('');
 
+  readonly activeSchemes = computed(() => {
+    return this.schemes().filter(s => !this.isSchemeClosed(s));
+  });
+
   readonly filteredSchemes = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    const all = this.schemes();
-    if (!q) return all;
-    return all.filter(s =>
-      s.schemeName.toLowerCase().includes(q) ||
-      s.refNo.toLowerCase().includes(q) ||
-      s.eoiDescription.toLowerCase().includes(q) ||
-      (s.schemeTitle && s.schemeTitle.toLowerCase().includes(q))
-    );
+    const active = this.activeSchemes();
+    const list = !q
+      ? active
+      : active.filter(s =>
+          s.schemeName.toLowerCase().includes(q) ||
+          s.refNo.toLowerCase().includes(q) ||
+          s.eoiDescription.toLowerCase().includes(q) ||
+          (s.schemeTitle && s.schemeTitle.toLowerCase().includes(q))
+        );
+
+    return list.map((item, idx) => ({
+      ...item,
+      sNo: idx + 1
+    }));
   });
 
   onSearchChange(val: string): void {
@@ -728,32 +724,29 @@ export class TendersPageComponent {
   readonly annexureDocuments: EoiDocumentItem[] = this.schemeService.getAnnexures();
   readonly eoiRequiredInfo = this.schemeService.getRequiredInfo();
 
-
-
-
   readonly schemeColumns = computed<TableColumn<SchemeTender>[]>(() => [
     { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-20 min-w-[75px]' },
     {
       key: 'refNo',
       label: 'EOI Reference No.',
-      cellClass: (_val, item) => `whitespace-nowrap font-normal ${this.isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-800'}`
+      cellClass: 'whitespace-nowrap font-normal text-slate-800'
     },
     {
       key: 'schemeName',
       label: 'Scheme Name',
-      cellClass: (_val, item) => `whitespace-nowrap font-medium ${this.isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-800'}`
+      cellClass: 'whitespace-nowrap font-medium text-slate-800'
     },
     {
       key: 'schemeCategory',
       label: 'Scheme Category',
       align: 'center',
-      cellClass: (_val, item) => `whitespace-nowrap font-normal ${this.isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-700'}`
+      cellClass: 'whitespace-nowrap font-normal text-slate-700'
     },
     {
       key: 'datePublished',
       label: 'Date of EOI Published',
       align: 'center',
-      cellClass: (_val, item) => `whitespace-nowrap font-normal ${this.isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-700'}`
+      cellClass: 'whitespace-nowrap font-normal text-slate-700'
     },
     {
       key: 'closingDate',
@@ -766,7 +759,7 @@ export class TendersPageComponent {
       key: 'eoiCategory',
       label: 'EOI Category',
       align: 'center',
-      cellClass: (_val, item) => `whitespace-nowrap font-normal ${this.isSchemeClosed(item) ? 'text-slate-400' : 'text-slate-700'}`
+      cellClass: 'whitespace-nowrap font-normal text-slate-700'
     },
     {
       key: 'viewAction',
@@ -782,14 +775,25 @@ export class TendersPageComponent {
     if (scheme.status === 'Closed') return true;
     if (!scheme.closingDate) return false;
 
-    const parts = scheme.closingDate.includes('/')
-      ? scheme.closingDate.split('/')
-      : scheme.closingDate.split('-');
+    const separator = scheme.closingDate.includes('/') ? '/' : scheme.closingDate.includes('-') ? '-' : null;
+    if (!separator) return false;
 
+    const parts = scheme.closingDate.split(separator);
     if (parts.length === 3) {
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const year = parseInt(parts[2], 10);
+      let year: number;
+      let month: number;
+      let day: number;
+
+      if (parts[0].length === 4) {
+        year = parseInt(parts[0], 10);
+        month = parseInt(parts[1], 10) - 1;
+        day = parseInt(parts[2], 10);
+      } else {
+        day = parseInt(parts[0], 10);
+        month = parseInt(parts[1], 10) - 1;
+        year = parseInt(parts[2], 10);
+      }
+
       const closeDate = new Date(year, month, day, 23, 59, 59);
       if (!isNaN(closeDate.getTime())) {
         return closeDate.getTime() < Date.now();
@@ -798,10 +802,7 @@ export class TendersPageComponent {
     return false;
   }
 
-  getRowClass = (item: SchemeTender): string => {
-    if (this.isSchemeClosed(item)) {
-      return 'opacity-65 bg-white cursor-pointer hover:bg-slate-50 transition-colors';
-    }
+  getRowClass = (_item: SchemeTender): string => {
     return 'bg-white cursor-pointer hover:bg-slate-100/90 transition-colors';
   };
 

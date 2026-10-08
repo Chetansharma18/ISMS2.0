@@ -28,7 +28,19 @@ import {
         <!-- Page Header via Reusable PageHeaderComponent -->
         <app-page-header
           title="Skill Development Centers (SDC)"
-        ></app-page-header>
+          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'SDC Management' }]"
+        >
+          <a
+            routerLink="/sdc/create"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#174A6E] hover:bg-[#0B3558] text-white rounded text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+            title="Register New SDC Center"
+          >
+            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Add SDC</span>
+          </a>
+        </app-page-header>
 
         <!-- Success Alert Notification -->
         @if (successMessage()) {

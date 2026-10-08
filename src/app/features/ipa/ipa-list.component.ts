@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MOCK_SANCTION_ORDERS, SanctionOrder } from '../sdc/models/sdc.model';
-import { EoiStateService, IpaDocumentData, IpaCourseRow } from '../eoi/services/eoi-state.service';
+import { EoiStateService, IpaDocumentData } from '../eoi/services/eoi-state.service';
 import { environment } from '../../../environments/environment';
 import {
   PageHeaderComponent,
@@ -52,6 +52,22 @@ import {
             }
           </div>
         </app-page-header>
+
+        <!-- Success Alert Notification -->
+        @if (successMessage()) {
+          <div class="p-3.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 flex items-center justify-between text-xs animate-in fade-in">
+            <div class="flex items-center gap-2 flex-wrap">
+              <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span class="font-medium">{{ successMessage() }}</span>
+              <a routerLink="/sdcs" class="font-bold text-emerald-900 hover:text-emerald-700 underline cursor-pointer ml-1">
+                View in SDC Management &rarr;
+              </a>
+            </div>
+            <button (click)="successMessage.set('')" class="text-emerald-600 hover:text-emerald-900 cursor-pointer font-bold">✕</button>
+          </div>
+        }
 
         <!-- IPA Details Table via Reusable TableComponent -->
         <app-table
@@ -112,20 +128,36 @@ import {
           </span>
         </ng-template>
 
-        <!-- Template: Actions (View IPA Form) -->
+        <!-- Template: Actions (View IPA Form & Add SDC) -->
         <ng-template #actionsTemplate let-ipa>
-          <button
-            type="button"
-            (click)="viewIpaForm(ipa)"
-            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-md text-xs font-semibold shadow-xs transition-colors cursor-pointer"
-            title="View Official IPA Form"
-          >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-            <span>View</span>
-          </button>
+          <div class="flex items-center justify-center gap-1.5 whitespace-nowrap">
+            <!-- View IPA Document Button -->
+            <button
+              type="button"
+              (click)="viewIpaForm(ipa)"
+              class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-[#0B3558] hover:bg-[#07233B] text-white rounded text-xs font-semibold shadow-2xs transition-colors cursor-pointer shrink-0"
+              title="View Official IPA Form"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <span>View</span>
+            </button>
+
+            <!-- Add SDC Option -->
+            <button
+              type="button"
+              (click)="openAddSdc(ipa)"
+              class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold shadow-2xs transition-colors cursor-pointer shrink-0"
+              title="Register New SDC for {{ ipa.schemeName || ipa.scheme }}"
+            >
+              <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Add SDC</span>
+            </button>
+          </div>
         </ng-template>
 
       </div>
@@ -486,9 +518,11 @@ import {
 })
 export class IpaListComponent {
   private eoiStateService = inject(EoiStateService);
+  private router = inject(Router);
 
   readonly pageSize = 10;
   searchQuery = '';
+  successMessage = signal<string>('');
   readonly ipaList: SanctionOrder[] = environment.useMockData ? MOCK_SANCTION_ORDERS : [];
   selectedIpa = signal<SanctionOrder | null>(null);
 
@@ -522,15 +556,15 @@ export class IpaListComponent {
   });
 
   readonly ipaColumns: TableColumn<SanctionOrder>[] = [
-    { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-14' },
-    { key: 'ipaNumber', label: 'IPA Number', align: 'center', width: 'w-44', type: 'custom' },
+    { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12', cellClass: 'text-center font-medium text-slate-700' },
+    { key: 'ipaNumber', label: 'IPA Number', align: 'center', width: 'w-32', type: 'custom' },
     { key: 'appId', label: 'Application ID', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-mono font-bold text-slate-700 text-center' },
-    { key: 'schemeName', label: 'Scheme Name', type: 'custom', cellClass: 'whitespace-nowrap font-bold text-slate-900' },
-    { key: 'district', label: 'Sanction District', align: 'center', cellClass: 'whitespace-nowrap font-medium text-slate-800 text-center' },
-    { key: 'sectors', label: 'Sanction Sector(s)', type: 'custom' },
-    { key: 'sanctionTarget', label: 'Sanction Target', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-bold text-[#174A6E] text-center' },
-    { key: 'grade', label: 'Grade', align: 'center', type: 'custom', width: 'w-20' },
-    { key: 'actions', label: 'Action', align: 'center', type: 'custom', width: 'w-24' }
+    { key: 'schemeName', label: 'Scheme Name', type: 'custom', width: 'min-w-[140px]', cellClass: 'whitespace-nowrap font-bold text-slate-900' },
+    { key: 'district', label: 'Sanction District', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-medium text-slate-800 text-center' },
+    { key: 'sectors', label: 'Sanction Sector(s)', type: 'custom', width: 'min-w-[160px]' },
+    { key: 'sanctionTarget', label: 'Sanction Target', align: 'center', width: 'w-28', cellClass: 'whitespace-nowrap font-bold text-[#174A6E] text-center' },
+    { key: 'grade', label: 'Grade', align: 'center', type: 'custom', width: 'w-16' },
+    { key: 'actions', label: 'Action', align: 'center', type: 'custom', width: 'w-44' }
   ];
 
   get filteredIpaList(): SanctionOrder[] {
@@ -562,5 +596,21 @@ export class IpaListComponent {
     if (typeof window !== 'undefined') {
       window.print();
     }
+  }
+
+  openAddSdc(ipa: SanctionOrder): void {
+    const chosenSector = (ipa.sectors && ipa.sectors.length > 0) ? ipa.sectors[0] : '';
+    this.router.navigate(['/sdc/create'], {
+      queryParams: {
+        ipaNumber: ipa.ipaNumber,
+        appId: ipa.appId || '',
+        scheme: ipa.scheme || ipa.schemeName || 'SAMARTH',
+        schemeCategory: ipa.category || '',
+        sector: chosenSector,
+        district: ipa.district || 'Jaipur',
+        sanctionTarget: ipa.sanctionTarget || 60,
+        tpName: ipa.agencyName || 'ARNOLD SAMARTH'
+      }
+    });
   }
 }

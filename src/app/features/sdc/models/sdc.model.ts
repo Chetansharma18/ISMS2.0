@@ -169,6 +169,7 @@ export interface SdcNewRegistrationData {
   sdcName?: string;
   sector?: string;
   tpName: string;
+  mouRefNo?: string;
   scheme?: SdcScheme | '';
   schemeCategory?: string;
   sdcCode?: string;

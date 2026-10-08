@@ -1,6 +1,7 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DataEngineService } from '../../core/services/data-engine.service';
 import {
   PageHeaderComponent,
   TableComponent,
@@ -554,168 +555,14 @@ export class UserManagementComponent {
     aadhaarId: ''
   };
 
-  users = signal<UserManagementItem[]>([
-    {
-      sNo: 1,
-      id: 'usr-1',
-      userId: 'USR-1001',
-      username: 'super admin 1',
-      ssoId: 'SSO_SUPER_01',
-      userType: 'Super Admin',
-      roleType: 'super admin',
-      designation: 'Managing Director',
-      schemeDepartment: 'RSLDC',
-      districtName: 'All Districts',
-      blockName: 'All Blocks',
-      email: 'superadmin1@isms.gov.in',
-      mobileNo: '9829012345',
-      schemeStatus: 'Active'
-    },
-    {
-      sNo: 2,
-      id: 'usr-2',
-      userId: 'USR-1002',
-      username: 'super admin 2',
-      ssoId: 'SSO_SUPER_02',
-      userType: 'Super Admin',
-      roleType: 'super admin',
-      designation: 'Managing Director',
-      schemeDepartment: 'RSLDC',
-      districtName: 'All Districts',
-      blockName: 'All Blocks',
-      email: 'superadmin2@isms.gov.in',
-      mobileNo: '9829012346',
-      schemeStatus: 'Active'
-    },
-    {
-      sNo: 3,
-      id: 'usr-3',
-      userId: 'USR-1003',
-      username: 'admin 1',
-      ssoId: 'SSO_ADM_01',
-      userType: 'Admin',
-      roleType: 'scheme oc',
-      designation: 'Joint Director',
-      schemeDepartment: 'RSLDC',
-      districtName: 'Jaipur',
-      blockName: 'Amber',
-      email: 'admin1@isms.gov.in',
-      mobileNo: '9414098765',
-      schemeStatus: 'Active'
-    },
-    {
-      sNo: 4,
-      id: 'usr-4',
-      userId: 'USR-1004',
-      username: 'admin 2',
-      ssoId: 'SSO_ADM_02',
-      userType: 'Admin',
-      roleType: 'mis manager',
-      designation: 'MIS Manager',
-      schemeDepartment: 'Skill & Entrepreneurship',
-      districtName: 'Jodhpur',
-      blockName: 'Mandore',
-      email: 'admin2@isms.gov.in',
-      mobileNo: '9783011223',
-      schemeStatus: 'Active'
-    },
-    {
-      sNo: 5,
-      id: 'usr-5',
-      userId: 'USR-1005',
-      username: 'admin 3',
-      ssoId: 'SSO_ADM_03',
-      userType: 'Admin',
-      roleType: 'programmer',
-      designation: 'Programmer',
-      schemeDepartment: 'RSLDC',
-      districtName: 'Udaipur',
-      blockName: 'Girwa',
-      email: 'admin3@isms.gov.in',
-      mobileNo: '9828055443',
-      schemeStatus: 'Active'
-    },
-    {
-      sNo: 6,
-      id: 'usr-6',
-      userId: 'USR-1006',
-      username: 'admin 4',
-      ssoId: 'SSO_ADM_04',
-      userType: 'Admin',
-      roleType: 'gm',
-      designation: 'General Manager',
-      schemeDepartment: 'RSLDC',
-      districtName: 'Ajmer',
-      blockName: 'Kishangarh',
-      email: 'admin4@isms.gov.in',
-      mobileNo: '9828011224',
-      schemeStatus: 'Active'
-    },
-    {
-      sNo: 7,
-      id: 'usr-7',
-      userId: 'USR-1007',
-      username: 'admin 5',
-      ssoId: 'SSO_ADM_05',
-      userType: 'Admin',
-      roleType: 'zc',
-      designation: 'Zone Coordinator',
-      schemeDepartment: 'Planning Department',
-      districtName: 'Kota',
-      blockName: 'Ladpura',
-      email: 'admin5@isms.gov.in',
-      mobileNo: '9828011225',
-      schemeStatus: 'Active'
-    },
-    {
-      sNo: 8,
-      id: 'usr-8',
-      userId: 'USR-1008',
-      username: 'tp 1',
-      ssoId: 'SSO_TP_01',
-      userType: 'TP',
-      roleType: 'tp',
-      designation: 'Training Partner / PIA',
-      schemeDepartment: 'RSLDC',
-      districtName: 'Jaipur',
-      blockName: 'Amber',
-      email: 'tp1@isms.gov.in',
-      mobileNo: '9828099881',
-      schemeStatus: 'Active'
-    },
-    {
-      sNo: 9,
-      id: 'usr-9',
-      userId: 'USR-1009',
-      username: 'tp 2',
-      ssoId: 'SSO_TP_02',
-      userType: 'TP',
-      roleType: 'tp',
-      designation: 'Training Partner / PIA',
-      schemeDepartment: 'RSLDC',
-      districtName: 'Jodhpur',
-      blockName: 'Mandore',
-      email: 'tp2@isms.gov.in',
-      mobileNo: '9828099882',
-      schemeStatus: 'Active'
-    },
-    {
-      sNo: 10,
-      id: 'usr-10',
-      userId: 'USR-1010',
-      username: 'tp 3',
-      ssoId: 'SSO_TP_03',
-      userType: 'TP',
-      roleType: 'tp',
-      designation: 'Training Partner / PIA',
-      schemeDepartment: 'RSLDC',
-      districtName: 'Udaipur',
-      blockName: 'Girwa',
-      email: 'tp3@isms.gov.in',
-      mobileNo: '9828099883',
-      schemeStatus: 'Active'
-    }
-  ]);
+  private dataEngine = inject(DataEngineService);
+  private userRepo = this.dataEngine.for<UserManagementItem>('USERS');
+
+  users = signal<UserManagementItem[]>([]);
+
+  constructor() {
+    this.userRepo.getAll().subscribe(list => this.users.set(list));
+  }
 
   readonly filteredUsers = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
@@ -840,9 +687,11 @@ export class UserManagementComponent {
 
   toggleUserStatus(item: UserManagementItem): void {
     const newStatus = item.schemeStatus === 'Active' ? 'Inactive' : 'Active';
-    this.users.update(current =>
-      current.map(u => u.id === item.id ? { ...u, schemeStatus: newStatus } : u)
-    );
+    this.userRepo.update(item.id, { schemeStatus: newStatus }).subscribe(updated => {
+      this.users.update(current =>
+        current.map(u => u.id === item.id ? { ...u, schemeStatus: updated?.schemeStatus || newStatus } : u)
+      );
+    });
   }
 
   submitUser(): void {
@@ -854,25 +703,27 @@ export class UserManagementComponent {
     const editId = this.editingId();
     if (editId) {
       // Edit existing user
-      this.users.update(current =>
-        current.map(u => u.id === editId ? {
-          ...u,
-          userId: this.formData.userId.trim(),
-          username: this.formData.username.trim(),
-          ssoId: `SSO_${this.formData.username.trim().toUpperCase().replace(/\s+/g, '_')}`,
-          userType: this.formData.userType,
-          roleType: this.formData.roleType,
-          designation: this.formData.designation,
-          schemeDepartment: this.formData.schemeDepartment,
-          districtName: this.formData.district,
-          blockName: this.formData.blockName,
-          email: this.formData.email.trim(),
-          mobileNo: this.formData.mobileNo.trim()
-        } : u)
-      );
+      const changes: Partial<UserManagementItem> = {
+        userId: this.formData.userId.trim(),
+        username: this.formData.username.trim(),
+        ssoId: `SSO_${this.formData.username.trim().toUpperCase().replace(/\s+/g, '_')}`,
+        userType: this.formData.userType,
+        roleType: this.formData.roleType,
+        designation: this.formData.designation,
+        schemeDepartment: this.formData.schemeDepartment,
+        districtName: this.formData.district,
+        blockName: this.formData.blockName,
+        email: this.formData.email.trim(),
+        mobileNo: this.formData.mobileNo.trim()
+      };
+      this.userRepo.update(editId, changes).subscribe(res => {
+        this.users.update(current =>
+          current.map(u => u.id === editId ? { ...u, ...res } : u)
+        );
+      });
     } else {
       // Add new user
-      const newItem: UserManagementItem = {
+      const newItem: Partial<UserManagementItem> = {
         sNo: 1,
         id: 'usr-' + Date.now(),
         userId: this.formData.userId.trim(),
@@ -889,9 +740,11 @@ export class UserManagementComponent {
         schemeStatus: 'Active'
       };
 
-      this.users.update(current => {
-        const updated = [newItem, ...current];
-        return updated.map((item, index) => ({ ...item, sNo: index + 1 }));
+      this.userRepo.create(newItem).subscribe(created => {
+        this.users.update(current => {
+          const updated = [created, ...current];
+          return updated.map((item, index) => ({ ...item, sNo: index + 1 }));
+        });
       });
     }
 
@@ -970,9 +823,11 @@ export class UserManagementComponent {
   }
 
   deleteUser(item: UserManagementItem): void {
-    this.users.update(current => {
-      const updated = current.filter(u => u.id !== item.id);
-      return updated.map((u, index) => ({ ...u, sNo: index + 1 }));
+    this.userRepo.delete(item.id).subscribe(() => {
+      this.users.update(current => {
+        const updated = current.filter(u => u.id !== item.id);
+        return updated.map((u, index) => ({ ...u, sNo: index + 1 }));
+      });
     });
   }
 }

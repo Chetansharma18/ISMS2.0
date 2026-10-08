@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 
 export interface CommitteeApprovalDocument {
   id: string;
@@ -777,10 +778,10 @@ export class EoiStateService {
     }
   ];
 
-  private schemesSubject = new BehaviorSubject<Scheme[]>(this.initialSchemes);
+  private schemesSubject = new BehaviorSubject<Scheme[]>(environment.useMockData ? this.initialSchemes : []);
   public schemes$ = this.schemesSubject.asObservable();
 
-  private responsesSubject = new BehaviorSubject<ApplicantResponse[]>(this.initialResponses);
+  private responsesSubject = new BehaviorSubject<ApplicantResponse[]>(environment.useMockData ? this.initialResponses : []);
   public responses$ = this.responsesSubject.asObservable();
 
   constructor() {
@@ -788,6 +789,11 @@ export class EoiStateService {
   }
 
   private loadFromStorage(): void {
+    if (!environment.useMockData) {
+      this.schemesSubject.next([]);
+      this.responsesSubject.next([]);
+      return;
+    }
     if (typeof localStorage !== 'undefined') {
       try {
         const savedResponses = localStorage.getItem('isms_dept_admin_responses');

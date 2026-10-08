@@ -1,59 +1,43 @@
-# IsmsUi
+# ISMS 2.0 - Integrated Skill Management System
+> **Government of Rajasthan | RSLDC (Rajasthan Skill and Livelihoods Development Corporation)**
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.24.
+---
 
-## Development server
+## 📖 Complete Master Architecture & Developer Guide
 
-To start a local development server, run:
+The entire end-to-end instructions, working flow, file structure, centralized mock data control, role workflows, and developer tutorials are documented in a single comprehensive master file:
 
+👉 **[PROJECT_ARCHITECTURE_AND_WORKFLOW_GUIDE.md](./PROJECT_ARCHITECTURE_AND_WORKFLOW_GUIDE.md)**
+
+### Quick Reference of What is in the Guide:
+1. **Quick Start & Running the App** (`npm start`, ports, credentials)
+2. **Centralized Mock System (The Master Switch)**: Controlled via `src/environments/environment.ts` (`useMockData: true / false`)
+3. **Application Architecture & Data Flow** (`DataEngineService`, `MockDatabaseService`, `HttpService`)
+4. **User Roles & Workflows**: Super Admin, Dept Admin (6-digit OTP), Training Partner (OTR), New User
+5. **Project File Structure & File Roles**: File-by-file explanation of every directory
+6. **Developer Guide: How to Add a New Scheme**: Code method and Super Admin UI method
+7. **Developer Guide: How to Add a New Table Column**: Plain text, numeric, and custom template columns
+8. **Developer Guide: How to Add a New Screen**: Step-by-step feature component, route, and menu linking
+9. **Document & PDF Viewer System**: Authentic Rajasthan Government statutory certificate & A4 viewer
+10. **Connecting Real Backend REST APIs**: Seamless migration to Spring Boot / Node.js
+11. **Troubleshooting & FAQ**
+
+---
+
+## Development Server
+
+To start the local development server:
 ```bash
-ng serve
+npm start
+# OR
+npx ng serve --port 4200
 ```
+Navigate to `http://localhost:4200/`.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Production Build
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+To verify build integrity:
 ```bash
-ng generate component component-name
+npx ng build
 ```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Builds cleanly with zero TypeScript errors.

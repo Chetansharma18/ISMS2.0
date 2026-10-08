@@ -8,16 +8,12 @@ import {
   TableColumn
 } from '../../shared';
 
-export interface SchemeMasterItem {
-  sNo: number;
-  id: string;
-  schemeName: string;
-  schemeCategory: string;
-  categoryName: string;
-  amount: number;
-  processFees: number;
-  status: 'Active' | 'Inactive';
-}
+import {
+  SchemeMasterItem,
+  MOCK_SCHEME_MASTER_ITEMS
+} from '../../core/mock/data/admin-masters.mock';
+
+export type { SchemeMasterItem };
 
 @Component({
   selector: 'app-scheme-master',
@@ -268,48 +264,7 @@ export class SchemeMasterComponent {
     processFees: null
   };
 
-  schemes = signal<SchemeMasterItem[]>([
-    {
-      sNo: 1,
-      id: 'sch-1',
-      schemeName: 'Chief Minister Skill Development Scheme',
-      schemeCategory: 'SAMARTH',
-      categoryName: 'GENERAL',
-      amount: 5000000,
-      processFees: 10000,
-      status: 'Active'
-    },
-    {
-      sNo: 2,
-      id: 'sch-2',
-      schemeName: 'Mukhyamantri Yuva Swavalamban Yojana',
-      schemeCategory: 'SAKSHM',
-      categoryName: 'GOVERNMENT INSTITUTION/PSU',
-      amount: 7500000,
-      processFees: 15000,
-      status: 'Active'
-    },
-    {
-      sNo: 3,
-      id: 'sch-3',
-      schemeName: 'Empanelment of Assessment Agencies EOI',
-      schemeCategory: 'RAJVIK',
-      categoryName: 'GOVERNMENT INSTITUTION/INSTITUTION',
-      amount: 2500000,
-      processFees: 5000,
-      status: 'Active'
-    },
-    {
-      sNo: 4,
-      id: 'sch-4',
-      schemeName: 'Recruit-Train-Deploy (RTD) Category III',
-      schemeCategory: 'SAMARTH',
-      categoryName: 'SPECIAL TARGET GROUP',
-      amount: 10000000,
-      processFees: 25000,
-      status: 'Active'
-    }
-  ]);
+  schemes = signal<SchemeMasterItem[]>(MOCK_SCHEME_MASTER_ITEMS);
 
   readonly filteredSchemes = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();

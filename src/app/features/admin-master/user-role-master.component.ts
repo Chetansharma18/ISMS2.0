@@ -8,13 +8,12 @@ import {
   TableColumn
 } from '../../shared';
 
-export interface UserRoleMasterItem {
-  sNo: number;
-  id: string;
-  roleTypeName: string;
-  permissions: string[];
-  status: 'Active' | 'Inactive';
-}
+import {
+  UserRoleMasterItem,
+  MOCK_USER_ROLE_MASTER_ITEMS
+} from '../../core/mock/data/admin-masters.mock';
+
+export type { UserRoleMasterItem };
 
 @Component({
   selector: 'app-user-role-master',
@@ -226,36 +225,7 @@ export class UserRoleMasterComponent {
     selectedPermissions: [] as string[]
   };
 
-  roles = signal<UserRoleMasterItem[]>([
-    {
-      sNo: 1,
-      id: 'role-1',
-      roleTypeName: 'Super Admin',
-      permissions: ['View EOI Configuration', 'Create & Edit EOI', 'Delete EOI Proposal', 'Manage Master Records', 'Batch Approval & Scrutiny', 'Camera CCTV Live Monitoring'],
-      status: 'Active'
-    },
-    {
-      sNo: 2,
-      id: 'role-2',
-      roleTypeName: 'Department Officer',
-      permissions: ['View EOI Configuration', 'Create & Edit EOI', 'Batch Approval & Scrutiny'],
-      status: 'Active'
-    },
-    {
-      sNo: 3,
-      id: 'role-3',
-      roleTypeName: 'Scrutiny Officer',
-      permissions: ['View EOI Configuration', 'Batch Approval & Scrutiny'],
-      status: 'Active'
-    },
-    {
-      sNo: 4,
-      id: 'role-4',
-      roleTypeName: 'Training Partner',
-      permissions: ['View EOI Configuration', 'Grievance Redressal Access'],
-      status: 'Active'
-    }
-  ]);
+  roles = signal<UserRoleMasterItem[]>(MOCK_USER_ROLE_MASTER_ITEMS);
 
   readonly filteredRoles = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();

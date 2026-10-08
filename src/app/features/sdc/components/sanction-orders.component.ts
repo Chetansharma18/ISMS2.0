@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MOCK_SANCTION_ORDERS, SanctionOrder } from '../models/sdc.model';
 import { EoiStateService, SanctionOrderDocumentData } from '../../eoi/services/eoi-state.service';
+import { environment } from '../../../../environments/environment';
 import {
   PageHeaderComponent,
   TableComponent,
@@ -321,7 +322,7 @@ export class SanctionOrdersComponent {
   private router = inject(Router);
 
   readonly pageSize = 10;
-  readonly orders: SanctionOrder[] = MOCK_SANCTION_ORDERS;
+  readonly orders: SanctionOrder[] = environment.useMockData ? MOCK_SANCTION_ORDERS : [];
   successMessage = signal<string>('');
   selectedOrder = signal<SanctionOrder | null>(null);
 

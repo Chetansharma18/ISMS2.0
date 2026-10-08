@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MOCK_SANCTION_ORDERS, SanctionOrder } from '../sdc/models/sdc.model';
 import { EoiStateService, IpaDocumentData, IpaCourseRow } from '../eoi/services/eoi-state.service';
+import { environment } from '../../../environments/environment';
 import {
   PageHeaderComponent,
   TableComponent,
@@ -488,7 +489,7 @@ export class IpaListComponent {
 
   readonly pageSize = 10;
   searchQuery = '';
-  readonly ipaList: SanctionOrder[] = MOCK_SANCTION_ORDERS;
+  readonly ipaList: SanctionOrder[] = environment.useMockData ? MOCK_SANCTION_ORDERS : [];
   selectedIpa = signal<SanctionOrder | null>(null);
 
   defaultEmblemSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 16 L54 28 L67 28 L56 36 L60 48 L50 40 L40 48 L44 36 L33 28 L46 28 Z" fill="%230b3558"/><path d="M25 65 Q50 55 75 65 Q50 72 25 65 Z" fill="%23b91c1c"/><text x="50" y="83" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" fill="%230b3558">GOVT OF RAJASTHAN</text></svg>`;

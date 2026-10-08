@@ -8,15 +8,12 @@ import {
   TableColumn
 } from '../../shared';
 
-export interface PermissionMasterItem {
-  sNo: number;
-  id: string;
-  permissionName: string;
-  permissionCode: string;
-  moduleName: string;
-  description: string;
-  status: 'Active' | 'Inactive';
-}
+import {
+  PermissionMasterItem,
+  MOCK_PERMISSION_MASTER_ITEMS
+} from '../../core/mock/data/admin-masters.mock';
+
+export type { PermissionMasterItem };
 
 @Component({
   selector: 'app-permission-master',
@@ -200,62 +197,7 @@ export class PermissionMasterComponent {
     description: ''
   };
 
-  permissions = signal<PermissionMasterItem[]>([
-    {
-      sNo: 1,
-      id: 'perm-1',
-      permissionName: 'View EOI Configuration',
-      permissionCode: 'PERM_EOI_VIEW',
-      moduleName: 'EOI Management',
-      description: 'Allows user to view all active and published EOI configurations and details.',
-      status: 'Active'
-    },
-    {
-      sNo: 2,
-      id: 'perm-2',
-      permissionName: 'Create & Edit EOI',
-      permissionCode: 'PERM_EOI_CREATE_EDIT',
-      moduleName: 'EOI Management',
-      description: 'Grants access to configure new Expression of Interest schemes and upload corrigendum documents.',
-      status: 'Active'
-    },
-    {
-      sNo: 3,
-      id: 'perm-3',
-      permissionName: 'Delete EOI Proposal',
-      permissionCode: 'PERM_EOI_DELETE',
-      moduleName: 'EOI Management',
-      description: 'Allows deletion of EOI proposal configurations from super admin desk.',
-      status: 'Active'
-    },
-    {
-      sNo: 4,
-      id: 'perm-4',
-      permissionName: 'Batch Approval & Scrutiny',
-      permissionCode: 'PERM_BATCH_APPROVE',
-      moduleName: 'Batch Approval',
-      description: 'Allows officer to review, approve, reject, or request clarification on training batches.',
-      status: 'Active'
-    },
-    {
-      sNo: 5,
-      id: 'perm-5',
-      permissionName: 'Manage Master Records',
-      permissionCode: 'PERM_MASTER_MANAGE',
-      moduleName: 'Master Data',
-      description: 'Full administrative access to add, view, and delete EOI, Scheme, Sector, Course, and District master entries.',
-      status: 'Active'
-    },
-    {
-      sNo: 6,
-      id: 'perm-6',
-      permissionName: 'Camera CCTV Live Monitoring',
-      permissionCode: 'PERM_CAMERA_MONITOR',
-      moduleName: 'Camera Monitoring',
-      description: 'View live streaming and camera status of Skill Development Centers across districts.',
-      status: 'Active'
-    }
-  ]);
+  permissions = signal<PermissionMasterItem[]>(MOCK_PERMISSION_MASTER_ITEMS);
 
   readonly filteredPermissions = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();

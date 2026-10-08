@@ -5,15 +5,8 @@ import { PageHeaderComponent, TableComponent, TableColumn } from '../../../share
 import { inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-interface CameraBatchItem {
-  id: string;
-  batchName: string;
-  batchCode: string;
-  sdcName: string;
-  tpName: string;
-  branch: string;
-  cameraStatus: string;
-}
+import { CameraBatchItem, MOCK_CAMERA_BATCHES } from '../../../core/mock/data/batches.mock';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-camera-batch-list',
@@ -273,35 +266,7 @@ export class CameraBatchListComponent {
     { key: 'action', label: 'Action', align: 'center', width: 'w-36', type: 'custom' }
   ];
 
-  batches = signal<CameraBatchItem[]>([
-    {
-      id: 'B-001',
-      batchName: 'Batch 1',
-      batchCode: 'B-26-0001',
-      sdcName: 'SDC 1',
-      tpName: 'TP 1',
-      branch: 'Jaipur',
-      cameraStatus: 'Configured (4 Cameras)'
-    },
-    {
-      id: 'B-002',
-      batchName: 'Batch 2',
-      batchCode: 'B-26-0005',
-      sdcName: 'SDC 1',
-      tpName: 'TP 1',
-      branch: 'Jaipur',
-      cameraStatus: 'Configured (2 Cameras)'
-    },
-    {
-      id: 'B-003',
-      batchName: 'Batch 3',
-      batchCode: 'B-26-0007',
-      sdcName: 'SDC 1',
-      tpName: 'TP 1',
-      branch: 'Jaipur',
-      cameraStatus: 'Configured (1 Camera)'
-    }
-  ]);
+  batches = signal<CameraBatchItem[]>(environment.useMockData ? MOCK_CAMERA_BATCHES : []);
 
   // Modal State
   selectedFeed = signal<CameraBatchItem | null>(null);

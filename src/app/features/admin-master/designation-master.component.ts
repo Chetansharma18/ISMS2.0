@@ -8,14 +8,12 @@ import {
   TableColumn
 } from '../../shared';
 
-export interface DesignationMasterItem {
-  sNo: number;
-  id: string;
-  designationName: string;
-  designationCode: string;
-  departmentWing: string;
-  status: 'Active' | 'Inactive';
-}
+import {
+  DesignationMasterItem,
+  MOCK_DESIGNATION_MASTER_ITEMS
+} from '../../core/mock/data/admin-masters.mock';
+
+export type { DesignationMasterItem };
 
 @Component({
   selector: 'app-designation-master',
@@ -179,56 +177,7 @@ export class DesignationMasterComponent {
     departmentWing: 'Administration'
   };
 
-  designations = signal<DesignationMasterItem[]>([
-    {
-      sNo: 1,
-      id: 'desig-1',
-      designationName: 'Managing Director',
-      designationCode: 'MD',
-      departmentWing: 'Administration',
-      status: 'Active'
-    },
-    {
-      sNo: 2,
-      id: 'desig-2',
-      designationName: 'Joint Director',
-      designationCode: 'JD',
-      departmentWing: 'Operations & Skill Training',
-      status: 'Active'
-    },
-    {
-      sNo: 3,
-      id: 'desig-3',
-      designationName: 'Deputy Director',
-      designationCode: 'DD',
-      departmentWing: 'Scrutiny & Approvals',
-      status: 'Active'
-    },
-    {
-      sNo: 4,
-      id: 'desig-4',
-      designationName: 'District Nodal Officer',
-      designationCode: 'DNO',
-      departmentWing: 'Operations & Skill Training',
-      status: 'Active'
-    },
-    {
-      sNo: 5,
-      id: 'desig-5',
-      designationName: 'Assistant Manager - Accounts',
-      designationCode: 'AM-ACC',
-      departmentWing: 'Finance & Accounts',
-      status: 'Active'
-    },
-    {
-      sNo: 6,
-      id: 'desig-6',
-      designationName: 'System Administrator',
-      designationCode: 'SYS-ADMIN',
-      departmentWing: 'IT & CCTV Monitoring',
-      status: 'Active'
-    }
-  ]);
+  designations = signal<DesignationMasterItem[]>(MOCK_DESIGNATION_MASTER_ITEMS);
 
   readonly filteredDesignations = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();

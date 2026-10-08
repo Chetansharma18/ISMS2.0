@@ -8,15 +8,12 @@ import {
   TableColumn
 } from '../../shared';
 
-export interface DistrictBlockMasterItem {
-  sNo: number;
-  id: string;
-  districtName: string;
-  districtCode: string;
-  blockName: string;
-  blockCode: string;
-  status: 'Active' | 'Inactive';
-}
+import {
+  DistrictBlockMasterItem,
+  MOCK_DISTRICT_BLOCK_MASTER_ITEMS
+} from '../../core/mock/data/admin-masters.mock';
+
+export type { DistrictBlockMasterItem };
 
 @Component({
   selector: 'app-district-block-master',
@@ -201,62 +198,7 @@ export class DistrictBlockMasterComponent {
     blockCode: ''
   };
 
-  districtBlocks = signal<DistrictBlockMasterItem[]>([
-    {
-      sNo: 1,
-      id: 'db-1',
-      districtName: 'Jaipur',
-      districtCode: 'JPR',
-      blockName: 'Amber',
-      blockCode: 'JPR-AMB',
-      status: 'Active'
-    },
-    {
-      sNo: 2,
-      id: 'db-2',
-      districtName: 'Jaipur',
-      districtCode: 'JPR',
-      blockName: 'Sanganer',
-      blockCode: 'JPR-SNG',
-      status: 'Active'
-    },
-    {
-      sNo: 3,
-      id: 'db-3',
-      districtName: 'Jodhpur',
-      districtCode: 'JDH',
-      blockName: 'Mandore',
-      blockCode: 'JDH-MND',
-      status: 'Active'
-    },
-    {
-      sNo: 4,
-      id: 'db-4',
-      districtName: 'Udaipur',
-      districtCode: 'UDP',
-      blockName: 'Girwa',
-      blockCode: 'UDP-GRW',
-      status: 'Active'
-    },
-    {
-      sNo: 5,
-      id: 'db-5',
-      districtName: 'Ajmer',
-      districtCode: 'AJM',
-      blockName: 'Kishangarh',
-      blockCode: 'AJM-KSG',
-      status: 'Active'
-    },
-    {
-      sNo: 6,
-      id: 'db-6',
-      districtName: 'Kota',
-      districtCode: 'KTA',
-      blockName: 'Ladpura',
-      blockCode: 'KTA-LDP',
-      status: 'Active'
-    }
-  ]);
+  districtBlocks = signal<DistrictBlockMasterItem[]>(MOCK_DISTRICT_BLOCK_MASTER_ITEMS);
 
   readonly filteredDistrictBlocks = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();

@@ -8,13 +8,12 @@ import {
   TableColumn
 } from '../../shared';
 
-export interface SectorMasterItem {
-  sNo: number;
-  id: string;
-  sectorName: string;
-  sectorCode: string;
-  status: 'Active' | 'Inactive';
-}
+import {
+  SectorMasterItem,
+  MOCK_SECTOR_MASTER_ITEMS
+} from '../../core/mock/data/admin-masters.mock';
+
+export type { SectorMasterItem };
 
 @Component({
   selector: 'app-sector-master',
@@ -159,64 +158,7 @@ export class SectorMasterComponent {
     sectorCode: ''
   };
 
-  sectors = signal<SectorMasterItem[]>([
-    {
-      sNo: 1,
-      id: 'sec-1',
-      sectorName: 'Aerospace and Aviation',
-      sectorCode: 'SEC-AERO-01',
-      status: 'Active'
-    },
-    {
-      sNo: 2,
-      id: 'sec-2',
-      sectorName: 'Agriculture',
-      sectorCode: 'SEC-AGRI-02',
-      status: 'Active'
-    },
-    {
-      sNo: 3,
-      id: 'sec-3',
-      sectorName: 'Apparel',
-      sectorCode: 'SEC-APP-03',
-      status: 'Active'
-    },
-    {
-      sNo: 4,
-      id: 'sec-4',
-      sectorName: 'Automotive',
-      sectorCode: 'SEC-AUTO-04',
-      status: 'Active'
-    },
-    {
-      sNo: 5,
-      id: 'sec-5',
-      sectorName: 'Beauty & Wellness',
-      sectorCode: 'SEC-BW-05',
-      status: 'Active'
-    },
-    {
-      sNo: 6,
-      id: 'sec-6',
-      sectorName: 'Healthcare',
-      sectorCode: 'SEC-HC-06',
-      status: 'Active'
-    },
-    {
-      sNo: 7,
-      id: 'sec-7',
-      sectorName: 'IT-ITeS',
-      sectorCode: 'SEC-IT-07',
-      status: 'Active'
-    },
-    {
-      sNo: 8,
-      id: 'sec-8',
-      sectorName: 'Logistics',
-      sectorCode: 'SEC-LOG-08',
-      status: 'Active'
-    }
-  ]);
+  sectors = signal<SectorMasterItem[]>(MOCK_SECTOR_MASTER_ITEMS);
 
   readonly filteredSectors = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();

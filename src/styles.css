@@ -145,7 +145,7 @@ body {
 
 /* Ensure all route host elements inherit pure white */
 app-root,
-router-outlet + * {
+router-outlet+* {
   background-color: #ffffff;
 }
 
@@ -660,6 +660,7 @@ textarea:disabled {
     height: 0px !important;
     display: none !important;
   }
+
   * {
     scrollbar-width: none !important;
   }
@@ -672,6 +673,7 @@ textarea:disabled {
    and strips input borders, outlines, & select dropdown arrows).
    --------------------------------------------------------- */
 @media print {
+
   /* 1. Hide external app shell and non-printable controls */
   app-header,
   app-sidebar,
@@ -717,7 +719,8 @@ textarea:disabled {
     outline: none !important;
     box-shadow: none !important;
     background: transparent !important;
-    background-image: none !important; /* Removes dropdown chevron SVG arrows */
+    background-image: none !important;
+    /* Removes dropdown chevron SVG arrows */
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
     appearance: none !important;
@@ -732,6 +735,7 @@ textarea:disabled {
     -webkit-appearance: none !important;
     margin: 0 !important;
   }
+
   input[type="number"] {
     -moz-appearance: textfield !important;
   }
@@ -763,7 +767,8 @@ textarea:disabled {
     display: table-header-group;
   }
 
-  th, td {
+  th,
+  td {
     border: 1px solid #111827 !important;
     color: #000000 !important;
   }

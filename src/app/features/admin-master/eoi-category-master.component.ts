@@ -98,18 +98,35 @@ export type { EoiCategoryItem };
             <span>Edit</span>
           </button>
           
+          <!-- Active / Inactive Toggle -->
           <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
-          <button
-            type="button"
-            (click)="$event.stopPropagation(); deleteCategory(item)"
-            class="inline-flex items-center gap-1 text-rose-600 hover:text-rose-700 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
-            title="Delete EOI Category"
+          <div
+            class="inline-flex items-center gap-1.5"
+            title="Toggle Status"
+            (click)="$event.stopPropagation();"
           >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-            <span>Delete</span>
-          </button>
+            <button
+              type="button"
+              (click)="item.status = item.status === 'Active' ? 'Inactive' : 'Active'"
+              class="relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              [ngClass]="item.status === 'Inactive' ? 'bg-slate-400 hover:bg-slate-500' : 'bg-emerald-500 hover:bg-emerald-600'"
+              role="switch"
+              [attr.aria-checked]="item.status === 'Active'"
+            >
+              <span class="sr-only">Toggle Active Status</span>
+              <span
+                class="pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                [ngClass]="item.status === 'Inactive' ? 'translate-x-0' : 'translate-x-3'"
+              ></span>
+            </button>
+            <span 
+              class="font-medium text-[12px] select-none transition-colors cursor-pointer"
+              (click)="item.status = item.status === 'Active' ? 'Inactive' : 'Active'"
+              [ngClass]="item.status === 'Inactive' ? 'text-slate-500 hover:text-slate-700' : 'text-emerald-600 hover:text-emerald-700'"
+            >
+              {{ item.status === 'Inactive' ? 'Inactive' : 'Active' }}
+            </span>
+          </div>
         </div>
       </ng-template>
 

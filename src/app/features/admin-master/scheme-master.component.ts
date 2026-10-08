@@ -241,7 +241,7 @@ export type { SchemeMasterItem };
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- Amount -->
             <div>
-              <label class="block text-slate-700 font-medium mb-1">Amount (₹)*</label>
+              <label class="block text-slate-700 font-medium mb-1">EMD amount (₹)*</label>
               <input
                 type="number"
                 min="0"
@@ -251,7 +251,7 @@ export type { SchemeMasterItem };
                 class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
               />
               @if (submitted() && (formData.amount === null || formData.amount === undefined || formData.amount < 0)) {
-                <div class="text-xs text-red-500 mt-1 font-medium">Valid Amount is required</div>
+                <div class="text-xs text-red-500 mt-1 font-medium">Valid EMD amount is required</div>
               }
             </div>
 
@@ -331,7 +331,7 @@ export class SchemeMasterComponent {
     },
     {
       key: 'amount',
-      label: 'Amount',
+      label: 'EMD amount',
       type: 'custom',
       align: 'right',
       cellClass: 'whitespace-nowrap'

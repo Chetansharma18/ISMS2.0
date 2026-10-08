@@ -39,7 +39,7 @@ export type { CourseMasterItem };
                 placeholder="Search by sector, job role name, or QP code..."
                 [ngModel]="searchQuery()"
                 (ngModelChange)="onSearchChange($event)"
-                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-all"
+                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#174A6E] transition-all"
               />
               <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -197,7 +197,7 @@ export type { CourseMasterItem };
                 type="text"
                 placeholder="e.g. 1.0, 2.0"
                 [(ngModel)]="formData.version"
-                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
               />
             </div>
 
@@ -208,7 +208,7 @@ export type { CourseMasterItem };
                 type="text"
                 placeholder="e.g. 4, 2.5"
                 [(ngModel)]="formData.nsqfLevel"
-                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
               />
             </div>
           </div>
@@ -219,7 +219,7 @@ export type { CourseMasterItem };
               <label class="block text-slate-700 font-medium mb-1">Common Norms Category</label>
               <select
                 [(ngModel)]="formData.commonNormsCategory"
-                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
+                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800 bg-white"
               >
                 <option value="I">Category I</option>
                 <option value="II">Category II</option>
@@ -235,7 +235,7 @@ export type { CourseMasterItem };
                 min="0"
                 placeholder="e.g. 150"
                 [(ngModel)]="formData.theoryDurationHours"
-                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
               />
             </div>
 
@@ -246,7 +246,7 @@ export type { CourseMasterItem };
                 type="text"
                 placeholder="e.g. 180+60"
                 [(ngModel)]="formData.practicalOjtDurationHours"
-                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
               />
             </div>
           </div>
@@ -260,7 +260,7 @@ export type { CourseMasterItem };
                 min="0"
                 placeholder="e.g. 100"
                 [(ngModel)]="formData.itSoftSkillTrainingHours"
-                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
               />
             </div>
 
@@ -272,7 +272,7 @@ export type { CourseMasterItem };
                 min="0"
                 placeholder="e.g. 490"
                 [(ngModel)]="formData.totalQpHours"
-                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
               />
             </div>
 
@@ -283,7 +283,7 @@ export type { CourseMasterItem };
                 type="text"
                 placeholder="e.g. 28-Apr-25"
                 [(ngModel)]="formData.courseValidUpToDate"
-                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
               />
             </div>
           </div>
@@ -295,7 +295,7 @@ export type { CourseMasterItem };
               type="text"
               placeholder="e.g. Expired, New Version, Not Valid..."
               [(ngModel)]="formData.remark"
-              class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+              class="w-full px-2.5 py-2 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
             />
           </div>
         </div>

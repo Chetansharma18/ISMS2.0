@@ -14,7 +14,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
     class: 'block w-full min-h-full flex flex-col bg-white'
   },
   template: `
-    <div class="w-full min-h-full flex flex-col justify-between bg-white text-slate-800 font-sans selection:bg-[#131862] selection:text-white">
+    <div class="w-full min-h-full flex flex-col justify-between bg-white text-slate-800 font-sans selection:bg-sso-blue selection:text-white">
       
       <!-- Top Notice Banner -->
       <div class="bg-amber-50 border-b border-amber-200 px-3 sm:px-4 py-2 text-center shrink-0">
@@ -34,7 +34,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
             
             <!-- G2G APPS -->
             <div>
-              <div class="text-3xl sm:text-4xl lg:text-[44px] font-black text-[#131862] tracking-tight leading-none mb-3">
+              <div class="text-3xl sm:text-4xl lg:text-[44px] font-black text-sso-blue tracking-tight leading-none mb-3">
                 G2G APPS
               </div>
               <div class="inline-block px-4.5 py-1.5 rounded-lg bg-slate-100 border border-slate-300 text-lg sm:text-xl font-bold text-slate-800 shadow-2xs">
@@ -45,7 +45,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
 
             <!-- G2C/ G2B APPS -->
             <div>
-              <div class="text-3xl sm:text-4xl lg:text-[44px] font-black text-[#131862] tracking-tight leading-none mb-3">
+              <div class="text-3xl sm:text-4xl lg:text-[44px] font-black text-sso-blue tracking-tight leading-none mb-3">
                 G2C/ G2B APPS
               </div>
               <div class="inline-block px-4.5 py-1.5 rounded-lg bg-slate-100 border border-slate-300 text-lg sm:text-xl font-bold text-slate-800 shadow-2xs">
@@ -56,7 +56,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
 
             <!-- IDENTITIES -->
             <div>
-              <div class="text-3xl sm:text-4xl lg:text-[44px] font-black text-[#131862] tracking-tight leading-none mb-3">
+              <div class="text-3xl sm:text-4xl lg:text-[44px] font-black text-sso-blue tracking-tight leading-none mb-3">
                 IDENTITIES
               </div>
               <div class="inline-block px-4.5 py-1.5 rounded-lg bg-slate-100 border border-slate-300 text-lg sm:text-xl font-bold text-slate-800 shadow-2xs">
@@ -67,11 +67,11 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
           </div>
 
           <!-- Right Column: Rajasthan SSO Login Form (Direct on screen, NO CARD) -->
-          <div class="w-full max-w-[460px] mx-auto lg:mx-0">
+          <div class="w-full max-w-115 mx-auto lg:mx-0">
             
             <!-- Direct Title Heading -->
             <div class="pb-3 border-b-2 border-slate-200 mb-5">
-              <div class="text-base sm:text-lg lg:text-xl font-black text-[#131862] uppercase tracking-wider">
+              <div class="text-base sm:text-lg lg:text-xl font-black text-sso-blue uppercase tracking-wider">
                 RAJASTHAN SSO LOGIN - SIGN IN
               </div>
             </div>
@@ -119,7 +119,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
                 <div class="flex items-center gap-3">
                   <!-- Dotted pattern captcha display -->
                   <div
-                    class="px-4 py-2 border border-slate-300 bg-slate-100 rounded-md select-none font-mono text-base sm:text-lg font-black text-slate-800 tracking-[0.25em] flex items-center justify-center min-w-[120px]"
+                    class="px-4 py-2 border border-slate-300 bg-slate-100 rounded-md select-none font-mono text-base sm:text-lg font-black text-slate-800 tracking-[0.25em] flex items-center justify-center min-w-30"
                     style="background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 6px 6px;"
                     aria-label="Captcha code"
                   >
@@ -140,7 +140,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
                   <button
                     type="button"
                     (click)="refreshCaptcha()"
-                    class="p-2 text-[#131862] hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+                    class="p-2 text-sso-blue hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
                     title="Refresh Captcha"
                     aria-label="Refresh Captcha"
                   >

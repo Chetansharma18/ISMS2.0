@@ -11,7 +11,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
     class: 'block w-full'
   },
   template: `
-    <section class="relative w-full overflow-hidden bg-[#0B2440] flex items-center min-h-[480px] sm:min-h-[500px] lg:min-h-[520px]">
+    <section class="relative w-full overflow-hidden bg-[#0B2440] flex items-center min-h-120 sm:min-h-125 lg:min-h-130">
       
       <!-- Authentic Panoramic Rajasthan Heritage Architecture Background -->
       <div 
@@ -28,7 +28,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
       ></div>
 
       <!-- Centered Inner Container (Max-Width ~1440px) -->
-      <div class="max-w-[1440px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-14 relative z-10">
+      <div class="max-w-360 mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-14 relative z-10">
         <div class="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-12 xl:gap-14 w-full">
           
           <!-- LEFT COLUMN (~55% width on desktop) -->
@@ -41,7 +41,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
 
             <!-- Small Orange Underline -->
             <div 
-              class="w-[42px] h-[3.5px] bg-[#F28C28] rounded-full my-4" 
+              class="w-10.5 h-[3.5px] bg-[#F28C28] rounded-full my-4" 
               aria-hidden="true"
             ></div>
 
@@ -57,7 +57,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
               <button
                 type="button"
                 (click)="onLoginClick()"
-                class="inline-flex items-center justify-center h-[42px] sm:h-[44px] px-5 sm:px-6 rounded-[6px] bg-[#F28C28] hover:bg-[#d9771e] active:bg-[#c46917] text-white text-sm sm:text-[15px] font-semibold transition-colors duration-200 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F28C28] focus:ring-offset-2 focus:ring-offset-[#0B2440]"
+                class="inline-flex items-center justify-center h-10.5 sm:h-11 px-5 sm:px-6 rounded-md bg-[#F28C28] hover:bg-[#d9771e] text-white text-sm sm:text-[15px] font-semibold transition-colors duration-200 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F28C28] focus:ring-offset-2 focus:ring-offset-[#0B2440]"
                 aria-label="Login to Portal"
               >
                 <span>Login to Portal</span>
@@ -70,7 +70,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
               <button
                 type="button"
                 (click)="onViewTendersClick()"
-                class="inline-flex items-center justify-center h-[42px] sm:h-[44px] px-5 sm:px-6 rounded-[6px] bg-transparent border border-white hover:bg-white/10 active:bg-white/20 text-white text-sm sm:text-[15px] font-semibold transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#0B2440]"
+                class="inline-flex items-center justify-center h-10.5 sm:h-11 px-5 sm:px-6 rounded-md bg-transparent border border-white hover:bg-white/10 text-white text-sm sm:text-[15px] font-semibold transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#0B2440]"
                 aria-label="View Tenders"
               >
                 <span>View Tenders</span>

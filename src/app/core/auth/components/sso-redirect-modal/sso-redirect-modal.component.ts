@@ -13,7 +13,7 @@ import { LoaderComponent } from '../../../../shared/components/loader/loader.com
   template: `
     <!-- Fullscreen Blurred Backdrop Overlay (No Cards, No Popup Box) -->
     <div
-      class="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4 select-none font-sans"
+      class="fixed inset-0 z-100 flex flex-col items-center justify-center p-4 select-none font-sans"
       style="backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); background-color: rgba(11, 23, 42, 0.55);"
       role="status"
       aria-live="polite"

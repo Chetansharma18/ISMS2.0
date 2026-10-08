@@ -78,22 +78,22 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
           loading="lazy"
         />
         <!-- Soft gradient overlay keeping the skyline vividly visible while preserving text contrast -->
-        <div class="absolute inset-0 bg-gradient-to-b from-[#0c1828]/50 via-transparent to-[#070e18]/65"></div>
+        <div class="absolute inset-0 bg-linear-to-b from-[#0c1828]/50 via-transparent to-[#070e18]/65"></div>
       </div>
 
       <!-- Foreground Content Layer -->
       <div class="relative z-10 w-full">
 
         <!-- Tier 1: Other Important Links -->
-        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div class="max-w-360 mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
           
           <!-- Section Heading with Flanking Saffron/Amber Accents -->
           <div class="flex items-center justify-center gap-3 sm:gap-5 mb-7 sm:mb-9">
-            <div class="h-[1px] flex-1 max-w-[120px] bg-gradient-to-l from-[#F59E0B] to-transparent"></div>
+            <div class="h-px flex-1 max-w-30 bg-linear-to-l from-[#F59E0B] to-transparent"></div>
             <h2 class="text-xl sm:text-2xl font-bold text-white tracking-wide font-['Inter',sans-serif] m-0 whitespace-nowrap">
               Other Important Links
             </h2>
-            <div class="h-[1px] flex-1 max-w-[120px] bg-gradient-to-r from-[#F59E0B] to-transparent"></div>
+            <div class="h-px flex-1 max-w-30 bg-linear-to-r from-[#F59E0B] to-transparent"></div>
           </div>
 
           <!-- Mobile View: Balanced Two-Column Responsive Grid (< 640px) -->
@@ -186,7 +186,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
                   rel="noopener noreferrer"
                   title="BIS Care App"
                   aria-label="Bureau of Indian Standards BIS Care App (opens in a new tab)"
-                  class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer block border border-white/20">
+                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
                   <img
                     src="/footer-images/bis-care.png"
                     alt="BIS Care App"
@@ -202,7 +202,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
                   rel="noopener noreferrer"
                   title="Anti Corruption Bureau"
                   aria-label="Anti Corruption Bureau Government of Rajasthan (opens in a new tab)"
-                  class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer block border border-white/20">
+                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
                   <img
                     src="/footer-images/acb.png"
                     alt="Anti Corruption Bureau"
@@ -217,7 +217,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
                   rel="noopener noreferrer"
                   title="Register for Pledge"
                   aria-label="Register for Pledge MyGov Portal (opens in a new tab)"
-                  class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer block border border-white/20">
+                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
                   <img
                     src="/footer-images/pledge.jpeg"
                     alt="Register for Pledge"
@@ -232,7 +232,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
                   rel="noopener noreferrer"
                   title="Jan Soochna Portal"
                   aria-label="Jan Soochna Portal Government of Rajasthan (opens in a new tab)"
-                  class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer block border border-white/20">
+                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
                   <img
                     src="/footer-images/jansoochna.png"
                     alt="Jan Soochna Portal"
@@ -249,7 +249,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
                   title="BIS Care App"
                   aria-hidden="true"
                   tabindex="-1"
-                  class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer block border border-white/20">
+                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
                   <img
                     src="/footer-images/bis-care.png"
                     alt=""
@@ -266,7 +266,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
                   title="Anti Corruption Bureau"
                   aria-hidden="true"
                   tabindex="-1"
-                  class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer block border border-white/20">
+                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
                   <img
                     src="/footer-images/acb.png"
                     alt=""
@@ -282,7 +282,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
                   title="Register for Pledge"
                   aria-hidden="true"
                   tabindex="-1"
-                  class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer block border border-white/20">
+                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
                   <img
                     src="/footer-images/pledge.jpeg"
                     alt=""
@@ -298,7 +298,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
                   title="Jan Soochna Portal"
                   aria-hidden="true"
                   tabindex="-1"
-                  class="w-[180px] sm:w-[220px] bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer block border border-white/20">
+                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
                   <img
                     src="/footer-images/jansoochna.png"
                     alt=""
@@ -333,7 +333,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
         <div class="w-full h-px bg-slate-700/50"></div>
 
         <!-- Tier 2: Main Footer Columns -->
-        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-8 sm:pt-14 sm:pb-10">
+        <div class="max-w-360 mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-8 sm:pt-14 sm:pb-10">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-10 sm:gap-14 items-start">
 
             <!-- Column 1: Branding & Identity -->
@@ -539,7 +539,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
 
         <!-- Tier 3: Bottom Copyright Bar -->
         <div class="border-t border-slate-700/50 bg-[#070e18]">
-          <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div class="max-w-360 mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex justify-center items-center">
               <div class="text-[0.8125rem] text-slate-400 text-center font-['Inter',sans-serif]">
                 &copy; 2026 Government of Rajasthan. All rights reserved (ISMS 2.0)

@@ -77,7 +77,7 @@ export interface Grievance {
         
         <ng-template #attachmentTemplate let-item>
           @if (item.attachment && item.attachment !== 'None') {
-            <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-medium text-sky-600 hover:text-sky-700 hover:underline break-all max-w-[150px] inline-block">
+            <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-medium text-sky-600 hover:text-sky-700 hover:underline break-all max-w-37.5 inline-block">
               {{ item.attachment }}
             </a>
           } @else {
@@ -129,7 +129,7 @@ export interface Grievance {
                 {{ getWordCount(newTicket.title) }}/100 words
               </span>
             </div>
-            <input type="text" [(ngModel)]="newTicket.title" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all placeholder:text-slate-400" [ngClass]="{'border-rose-300 focus:border-rose-500 focus:ring-rose-500/30': isFieldInvalid('title'), 'border-slate-300 focus:border-sky-500 focus:ring-sky-500/30': !isFieldInvalid('title')}" placeholder="Enter title" />
+            <input type="text" [(ngModel)]="newTicket.title" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all placeholder:text-slate-400" [ngClass]="{'border-rose-300 focus:ring-rose-500/30': isFieldInvalid('title'), 'border-slate-300 focus:ring-sky-500/30': !isFieldInvalid('title')}" placeholder="Enter title" />
           </div>
           <div>
             <div class="flex justify-between items-end mb-1.5">
@@ -138,11 +138,11 @@ export interface Grievance {
                 {{ getWordCount(newTicket.description) }}/500 words
               </span>
             </div>
-            <textarea [(ngModel)]="newTicket.description" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all placeholder:text-slate-400" [ngClass]="{'border-rose-300 focus:border-rose-500 focus:ring-rose-500/30': isFieldInvalid('description'), 'border-slate-300 focus:border-sky-500 focus:ring-sky-500/30': !isFieldInvalid('description')}" rows="4" placeholder="Enter description"></textarea>
+            <textarea [(ngModel)]="newTicket.description" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all placeholder:text-slate-400" [ngClass]="{'border-rose-300 focus:ring-rose-500/30': isFieldInvalid('description'), 'border-slate-300 focus:ring-sky-500/30': !isFieldInvalid('description')}" rows="4" placeholder="Enter description"></textarea>
           </div>
           <div>
             <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Issue Type <span class="text-rose-500">*</span></label>
-            <select [(ngModel)]="newTicket.issueType" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all text-slate-700" [ngClass]="{'border-rose-300 focus:border-rose-500 focus:ring-rose-500/30': isFieldInvalid('issueType'), 'border-slate-300 focus:border-sky-500 focus:ring-sky-500/30': !isFieldInvalid('issueType')}">
+            <select [(ngModel)]="newTicket.issueType" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all text-slate-700" [ngClass]="{'border-rose-300 focus:ring-rose-500/30': isFieldInvalid('issueType'), 'border-slate-300 focus:ring-sky-500/30': !isFieldInvalid('issueType')}">
               <option value="" disabled selected>Select issue type</option>
               <option value="Enquire">Enquire</option>
               <option value="Technical">Technical</option>
@@ -154,7 +154,7 @@ export interface Grievance {
               <label class="block text-[13px] font-semibold text-slate-700">Attachment (PDF, PNG, JPG, TXT)</label>
               <span class="text-[11px] text-slate-400">Max upload 5MB</span>
             </div>
-            <input type="file" accept=".pdf,.png,.jpg,.jpeg,.txt" (change)="onFileSelected($event)" class="w-full text-sm text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[13px] file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 cursor-pointer" />
+            <input type="file" accept=".pdf,.png,.jpg,.jpeg,.txt" (change)="onFileSelected($event)" class="w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[13px] file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 cursor-pointer" />
             @if (attachmentError()) {
               <p class="text-rose-500 text-[11px] font-medium mt-1.5 flex items-center gap-1">
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
@@ -248,7 +248,7 @@ export interface Grievance {
         (primaryAction)="closePreview()"
         (close)="closePreview()"
       >
-        <div class="mt-4 border border-slate-200 rounded-lg overflow-hidden bg-slate-50 flex flex-col items-center justify-center min-h-[400px]">
+        <div class="mt-4 border border-slate-200 rounded-lg overflow-hidden bg-slate-50 flex flex-col items-center justify-center min-h-100">
           @if (previewAttachmentUrl()) {
             <iframe [src]="previewAttachmentUrl()" class="w-full h-full min-h-[70vh] border-0 bg-white"></iframe>
           } @else {

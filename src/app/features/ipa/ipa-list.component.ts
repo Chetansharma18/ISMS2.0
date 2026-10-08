@@ -39,7 +39,7 @@ import {
               type="text"
               [(ngModel)]="searchQuery"
               placeholder="Search IPA, Scheme, District..."
-              class="w-full pl-9 pr-7 py-1.5 text-[13px] bg-white border border-slate-300 rounded-md placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#174A6E] focus:border-[#174A6E] transition-colors font-normal shadow-2xs"
+              class="w-full pl-9 pr-7 py-1.5 text-[13px] bg-white border border-slate-300 rounded-md placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#174A6E] transition-colors font-normal shadow-2xs"
             />
             @if (searchQuery) {
               <button

@@ -583,7 +583,7 @@ interface ActivePreviewDocument {
           <div class="overflow-y-auto flex-1 bg-slate-200/80 p-4 sm:p-6 lg:p-8 flex justify-center">
             
             <!-- Authentic A4 Paper Sheet -->
-            <div class="max-w-[760px] w-full bg-white shadow-2xl rounded-sm border border-slate-300 p-6 sm:p-10 font-sans text-slate-800 space-y-6 relative" id="printCertificateArea">
+            <div class="max-w-190 w-full bg-white shadow-2xl rounded-sm border border-slate-300 p-6 sm:p-10 font-sans text-slate-800 space-y-6 relative" id="printCertificateArea">
               
               <!-- Official Document Header with Ashok Emblem & State Heading -->
               <div class="text-center pb-4 border-b-2 border-slate-800 space-y-1">
@@ -799,7 +799,7 @@ interface ActivePreviewDocument {
                     [(ngModel)]="technicalScore"
                     (ngModelChange)="onScoreChange($event)"
                     placeholder="e.g. 88"
-                    class="w-full px-3 py-2 border border-slate-300 rounded text-xs font-normal text-slate-900 focus:outline-none focus:border-emerald-600 shadow-2xs"
+                    class="w-full px-3 py-2 border border-slate-300 rounded text-xs font-normal text-slate-900 focus:outline-none focus:ring-1 focus:ring-emerald-600 shadow-2xs"
                   />
                   <span class="absolute right-3 top-2 text-slate-400 font-normal text-xs">
                     / 100
@@ -814,7 +814,7 @@ interface ActivePreviewDocument {
                 <select
                   id="modalGradeSelect"
                   [(ngModel)]="selectedGrade"
-                  class="w-full px-2.5 py-2 border border-slate-300 rounded text-xs font-normal text-slate-800 bg-white focus:outline-none focus:border-emerald-600 cursor-pointer shadow-2xs"
+                  class="w-full px-2.5 py-2 border border-slate-300 rounded text-xs font-normal text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-emerald-600 cursor-pointer shadow-2xs"
                 >
                   <option value="" disabled>-- Select Grade --</option>
                   <option value="Grade A">Grade A (Score &gt;= 85) - Outstanding Empanelment</option>
@@ -836,7 +836,7 @@ interface ActivePreviewDocument {
                 rows="4"
                 [(ngModel)]="decisionRemarks"
                 placeholder="Specify official empanelment recommendation, batch allocation, or special conditions..."
-                class="w-full p-2.5 border border-slate-300 rounded text-xs font-normal text-slate-800 focus:outline-none focus:border-emerald-600 bg-white shadow-2xs"
+                class="w-full p-2.5 border border-slate-300 rounded text-xs font-normal text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-600 bg-white shadow-2xs"
               ></textarea>
             </div>
 
@@ -856,7 +856,7 @@ interface ActivePreviewDocument {
               type="button"
               (click)="confirmAcceptApplication()"
               [disabled]="!isAcceptFormValid()"
-              class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-medium transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-medium transition-colors shadow-2xs flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span>Confirm &amp; Issue Empanelment Order</span>
               <span>&rarr;</span>
@@ -920,7 +920,7 @@ interface ActivePreviewDocument {
                 rows="4"
                 [(ngModel)]="decisionRemarks"
                 placeholder="Specify the exact reasons, clause citations, or deficiencies observed during scrutiny..."
-                class="w-full p-2.5 border border-slate-300 rounded text-xs font-normal text-slate-800 focus:outline-none focus:border-rose-600 bg-white shadow-2xs"
+                class="w-full p-2.5 border border-slate-300 rounded text-xs font-normal text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-600 bg-white shadow-2xs"
               ></textarea>
               <span class="text-[11px] text-slate-400 mt-1 block">
                 Please provide clear remarks for the rejection order.
@@ -942,7 +942,7 @@ interface ActivePreviewDocument {
               type="button"
               (click)="confirmRejectApplication()"
               [disabled]="!isRejectFormValid()"
-              class="px-4 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded font-medium transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-4 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded font-medium transition-colors shadow-2xs flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span>Confirm Rejection</span>
               <span>&rarr;</span>

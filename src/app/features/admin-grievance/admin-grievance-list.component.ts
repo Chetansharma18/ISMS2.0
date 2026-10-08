@@ -73,7 +73,7 @@ export interface AdminGrievance {
         
         <ng-template #attachmentTemplate let-item>
           @if (item.attachment && item.attachment !== 'None') {
-            <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-medium text-sky-600 hover:text-sky-700 hover:underline break-all max-w-[150px] inline-block">
+            <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-medium text-sky-600 hover:text-sky-700 hover:underline break-all max-w-37.5 inline-block">
               {{ item.attachment }}
             </a>
           } @else {
@@ -193,7 +193,7 @@ export interface AdminGrievance {
                   <div class="grid grid-cols-2 gap-4">
                     <div>
                       <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Priority <span class="text-rose-500">*</span></label>
-                      <select [(ngModel)]="forwardForm.priority" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all text-slate-700 bg-white">
+                      <select [(ngModel)]="forwardForm.priority" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 transition-all text-slate-700 bg-white">
                         <option value="" disabled selected>Select priority</option>
                         <option value="Low">Low</option>
                         <option value="Medium">Medium</option>
@@ -202,7 +202,7 @@ export interface AdminGrievance {
                     </div>
                     <div>
                       <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Concerned User <span class="text-rose-500">*</span></label>
-                      <select [(ngModel)]="forwardForm.concernedUser" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all text-slate-700 bg-white">
+                      <select [(ngModel)]="forwardForm.concernedUser" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 transition-all text-slate-700 bg-white">
                         <option value="" disabled selected>Select admin user</option>
                         <option value="Admin User 1">Admin User 1</option>
                         <option value="Admin User 2">Admin User 2</option>
@@ -212,7 +212,7 @@ export interface AdminGrievance {
                   </div>
                   <div>
                     <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Comments <span class="text-rose-500">*</span></label>
-                    <textarea [(ngModel)]="forwardForm.comments" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all placeholder:text-slate-400 bg-white" rows="3" placeholder="Enter comments for forwarding"></textarea>
+                    <textarea [(ngModel)]="forwardForm.comments" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 transition-all placeholder:text-slate-400 bg-white" rows="3" placeholder="Enter comments for forwarding"></textarea>
                   </div>
                 </div>
               </div>
@@ -229,7 +229,7 @@ export interface AdminGrievance {
                 </h4>
                 <div>
                   <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Your Comments <span class="text-rose-500">*</span></label>
-                  <textarea [(ngModel)]="commentForm.comments" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all placeholder:text-slate-400 bg-white" rows="4" placeholder="Enter your response or remarks here"></textarea>
+                  <textarea [(ngModel)]="commentForm.comments" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 transition-all placeholder:text-slate-400 bg-white" rows="4" placeholder="Enter your response or remarks here"></textarea>
                 </div>
               </div>
             }
@@ -250,7 +250,7 @@ export interface AdminGrievance {
         (primaryAction)="closePreview()"
         (close)="closePreview()"
       >
-        <div class="mt-4 border border-slate-200 rounded-lg overflow-hidden bg-slate-50 flex flex-col items-center justify-center min-h-[400px]">
+        <div class="mt-4 border border-slate-200 rounded-lg overflow-hidden bg-slate-50 flex flex-col items-center justify-center min-h-100">
           @if (previewAttachmentUrl()) {
             <iframe [src]="previewAttachmentUrl()" class="w-full h-full min-h-[70vh] border-0 bg-white"></iframe>
           } @else {

@@ -69,14 +69,14 @@ export interface EoiDocumentItem {
           >
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
               <!-- Integrated Search Bar (Matching User Screenshot) -->
-              <div class="w-full sm:w-auto min-w-0 sm:min-w-[300px] md:min-w-[400px]">
-                <div class="relative flex items-center bg-white rounded-lg border border-slate-300 shadow-2xs overflow-hidden focus-within:border-[#174A6E] focus-within:ring-2 focus-within:ring-[#174A6E]/20 transition-all">
+              <div class="w-full sm:w-auto min-w-0 sm:min-w-75 md:min-w-100">
+                <div class="relative flex items-center bg-white rounded-lg border border-slate-300 shadow-2xs overflow-hidden focus-within:ring-2 focus-within:ring-[#174A6E]/20 transition-all">
                   <input
                     type="text"
                     [ngModel]="searchQuery()"
                     (ngModelChange)="onSearchChange($event)"
                     placeholder="Search schemes by name, reference no. or keyword..."
-                    class="w-full px-3.5 py-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none bg-transparent"
+                    class="w-full px-3.5 py-2 text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none bg-transparent"
                   />
                   <button
                     type="button"
@@ -164,7 +164,7 @@ export interface EoiDocumentItem {
               </button>
 
               @if (isSuperAdmin()) {
-                <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
+                <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
 
                 <!-- Add Committee Button (Super Admin Only) -->
                 <button
@@ -184,7 +184,7 @@ export interface EoiDocumentItem {
                   }
                 </button>
 
-                <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
+                <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
 
                 <button
                   type="button"
@@ -198,7 +198,7 @@ export interface EoiDocumentItem {
                   <span>Edit</span>
                 </button>
 
-                <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
+                <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
 
                 <button
                   type="button"
@@ -417,13 +417,13 @@ export interface EoiDocumentItem {
             </select>
 
             <label class="text-slate-700 font-medium">EOI Description</label>
-            <input type="text" maxlength="100" [(ngModel)]="newEoiData.description" class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
+            <input type="text" maxlength="100" [(ngModel)]="newEoiData.description" class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800" />
 
             <label class="text-slate-700 font-medium">EMD Fee*</label>
-            <input type="text" maxlength="100" [(ngModel)]="newEoiData.emdFee" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.emdFee, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.emdFee)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
+            <input type="text" maxlength="100" [(ngModel)]="newEoiData.emdFee" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.emdFee, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.emdFee)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800" />
 
             <label class="text-slate-700 font-medium">Process Fee*</label>
-            <input type="text" maxlength="100" [(ngModel)]="newEoiData.processFee" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.processFee, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.processFee)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
+            <input type="text" maxlength="100" [(ngModel)]="newEoiData.processFee" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.processFee, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.processFee)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800" />
 
             <label class="text-slate-700 font-medium self-start pt-1">Attach File*</label>
             <div class="space-y-2 overflow-hidden w-full">
@@ -452,7 +452,7 @@ export interface EoiDocumentItem {
                         <svg class="w-4 h-4 text-[#174A6E] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <span class="font-medium text-slate-800 truncate shrink-0 max-w-[140px]" [title]="att.title">{{ att.title }}</span>
+                        <span class="font-medium text-slate-800 truncate shrink-0 max-w-35" [title]="att.title">{{ att.title }}</span>
                         <span class="text-[11px] text-slate-500 truncate min-w-0">({{ att.fileName }})</span>
                       </div>
                       <button
@@ -472,7 +472,7 @@ export interface EoiDocumentItem {
             </div>
             
             @if (fileError()) {
-              <div class="col-span-1 sm:col-span-2 text-xs text-red-500 font-medium mt-[-4px]">{{ fileError() }}</div>
+              <div class="col-span-1 sm:col-span-2 text-xs text-red-500 font-medium -mt-1">{{ fileError() }}</div>
             }
 
             <!-- EOI Documents Section -->
@@ -537,7 +537,7 @@ export interface EoiDocumentItem {
           </div>
           <div>
             <label class="block text-slate-700 font-medium mb-1">Upload Document*</label>
-            <input type="file" accept=".pdf,.txt,.jpeg,.jpg,.png,.doc,.docx,.xls,.xlsx" (change)="onAttachmentFileSelected($event)" class="w-full text-slate-800 file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-[#174A6E] file:text-white hover:file:bg-[#0B3558] cursor-pointer" />
+            <input type="file" accept=".pdf,.txt,.jpeg,.jpg,.png,.doc,.docx,.xls,.xlsx" (change)="onAttachmentFileSelected($event)" class="w-full file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-[#174A6E] file:text-white hover:file:bg-[#0B3558] cursor-pointer" />
             @if (attachmentSubmitted() && !attachmentFormData.file) {
               <div class="text-xs text-red-500 mt-1">Required</div>
             }
@@ -575,7 +575,7 @@ export interface EoiDocumentItem {
               maxlength="100"
               placeholder="e.g. Corrigendum-1: Extension of Submission Date"
               [(ngModel)]="corrigendumFormData.title"
-              class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+              class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
             />
           </div>
           <div>
@@ -584,7 +584,7 @@ export interface EoiDocumentItem {
               type="file"
               accept=".pdf,.txt,.jpeg,.jpg,.png,.doc,.docx,.xls,.xlsx"
               (change)="onCorrigendumFileSelected($event)"
-              class="w-full text-slate-800 file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-[#174A6E] file:text-white hover:file:bg-[#0B3558] cursor-pointer"
+              class="w-full file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-[#174A6E] file:text-white hover:file:bg-[#0B3558] cursor-pointer"
             />
           </div>
           @if (corrigendumFileError()) {

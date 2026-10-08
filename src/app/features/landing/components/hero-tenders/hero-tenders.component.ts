@@ -28,14 +28,14 @@ interface TenderItem {
   imports: [CommonModule, RouterModule, TendersModalComponent],
   template: `
     <!-- Right Column Panel: 540–600px desktop width, 410–430px height, clean official government card -->
-    <div class="w-full max-w-[540px] lg:max-w-[580px] xl:max-w-[600px] mx-auto lg:ml-auto">
-      <div class="w-full h-[410px] sm:h-[425px] lg:h-[430px] bg-white rounded-[12px] shadow-[0_10px_25px_rgba(0,0,0,0.18)] border border-[#DCE4ED] flex flex-col overflow-hidden relative">
+    <div class="w-full max-w-135 lg:max-w-145 xl:max-w-150 mx-auto lg:ml-auto">
+      <div class="w-full h-102.5 sm:h-106.25 lg:h-107.5 bg-white rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.18)] border border-[#DCE4ED] flex flex-col overflow-hidden relative">
         
         <!-- PANEL HEADER (Height 58–66px, clean white background, dark navy text with orange accent) -->
-        <div class="h-[60px] px-5 sm:px-6 bg-white border-b border-[#DCE4ED] flex items-center justify-between shrink-0 z-10">
+        <div class="h-15 px-5 sm:px-6 bg-white border-b border-[#DCE4ED] flex items-center justify-between shrink-0 z-10">
           <div class="flex items-center gap-2.5">
             <!-- Small Orange Accent Bar -->
-            <span class="w-[4px] h-[18px] bg-[#F28C28] rounded-full inline-block" aria-hidden="true"></span>
+            <span class="w-1 h-4.5 bg-[#F28C28] rounded-full inline-block" aria-hidden="true"></span>
             <h2 class="text-[17px] font-bold text-[#12365A] tracking-wide m-0">TENDER</h2>
           </div>
           
@@ -81,7 +81,7 @@ interface TenderItem {
                     </span>
                   }
                 </div>
-                <span class="text-[11px] font-semibold text-[#12365A] bg-[#EAF2F6] border border-[#D9E1E7] rounded px-2 py-0.5 shrink-0">
+                <span class="text-[11px] font-semibold text-[#12365A] bg-[#EAF2F6] border border-border rounded px-2 py-0.5 shrink-0">
                   {{ item.category }}
                 </span>
               </div>

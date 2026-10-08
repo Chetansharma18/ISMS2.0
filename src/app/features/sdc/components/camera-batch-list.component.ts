@@ -98,7 +98,7 @@ import { environment } from '../../../../environments/environment';
 
       <!-- Live Feed Modal -->
       @if (selectedFeed() || isMultiView()) {
-        <div class="fixed inset-0 z-[100] bg-slate-900/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+        <div class="fixed inset-0 z-100 bg-slate-900/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
           <div class="bg-white rounded-xl shadow-2xl w-full max-w-[95vw] h-[95vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             
             <!-- Modal Header -->
@@ -178,10 +178,10 @@ import { environment } from '../../../../environments/environment';
 
       <!-- Reusable Video Player Template -->
       <ng-template #videoPlayerTpl let-feed let-itemClass="itemClass">
-        <div #videoContainer [ngClass]="itemClass" class="relative w-full h-full min-h-[250px] bg-black rounded-xl overflow-hidden shadow-lg border border-slate-800 flex flex-col group">
+        <div #videoContainer [ngClass]="itemClass" class="relative w-full h-full min-h-62.5 bg-black rounded-xl overflow-hidden shadow-lg border border-slate-800 flex flex-col group">
           
           <!-- Video Header Overlay -->
-          <div class="absolute top-0 left-0 right-0 p-3 bg-gradient-to-b from-black/80 to-transparent z-10 flex items-start justify-between pointer-events-none">
+          <div class="absolute top-0 left-0 right-0 p-3 bg-linear-to-b from-black/80 to-transparent z-10 flex items-start justify-between pointer-events-none">
             <div class="text-white drop-shadow-md">
               <div class="font-semibold text-sm">{{ feed.batchName }}</div>
               <div class="text-[11px] opacity-80 flex items-center gap-1.5 mt-0.5">

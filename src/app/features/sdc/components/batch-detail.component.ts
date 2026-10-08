@@ -36,10 +36,10 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                 <button
                   type="button"
                   (click)="startEditing(b)"
-                  class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/25 text-white border border-white/20 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
                   title="Edit Batch Creation Details"
                 >
-                  <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                   <span>Edit Details</span>
@@ -49,10 +49,10 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
               <button
                 type="button"
                 (click)="printSummary()"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/25 text-white border border-white/20 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
                 title="Print Batch Summary"
               >
-                <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
                 <span>Print</span>
@@ -76,7 +76,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
           <!-- ========================================================================= -->
           <!-- HERO OVERVIEW STRIP: Training Partner + Batch Identity in ISMS Theme       -->
           <!-- ========================================================================= -->
-          <div class="rounded-xl border border-[#D9E1E7] bg-[#EAF2F6]/60 p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
+          <div class="rounded-xl border border-border bg-[#EAF2F6]/60 p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
             
             <!-- Left: Training Partner & Batch / SDC Context -->
             <div class="space-y-1">
@@ -114,7 +114,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
               </div>
 
               <!-- Current Status (Bold Black Uppercase Text matching SDC Detail) -->
-              <div class="text-right border-l border-[#D9E1E7] pl-4 sm:pl-6">
+              <div class="text-right border-l border-border pl-4 sm:pl-6">
                 <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">CURRENT STATUS</span>
                 <span class="font-bold text-sm tracking-wide uppercase text-black" style="color: #000000 !important; font-weight: bold;">
                   {{ formatStatus(b).toUpperCase() }}
@@ -210,7 +210,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                     <button
                       type="button"
                       (click)="approveBatch(b)"
-                      class="px-5 py-2 rounded-lg bg-[#174A6E] hover:bg-[#123B59] active:bg-[#0E2D44] text-white text-xs font-semibold shadow-sm cursor-pointer transition-colors flex items-center gap-1.5"
+                      class="px-5 py-2 rounded-lg bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-sm cursor-pointer transition-colors flex items-center gap-1.5"
                     >
                       <svg class="w-4 h-4 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
@@ -321,9 +321,9 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                   <thead>
                     <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
                       <th class="py-2.5 px-3 w-12 text-center">#</th>
-                      <th class="py-2.5 px-3 min-w-[200px]">Faculty Name</th>
-                      <th class="py-2.5 px-3 min-w-[180px]">Trainer Type</th>
-                      <th class="py-2.5 px-3 min-w-[240px]">Qualification / Experience</th>
+                      <th class="py-2.5 px-3 min-w-50">Faculty Name</th>
+                      <th class="py-2.5 px-3 min-w-45">Trainer Type</th>
+                      <th class="py-2.5 px-3 min-w-60">Qualification / Experience</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-slate-100">
@@ -364,9 +364,9 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                     <thead>
                       <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
                         <th class="py-2.5 px-3 w-12 text-center">#</th>
-                        <th class="py-2.5 px-3 min-w-[260px]">Hostel Address</th>
-                        <th class="py-2.5 px-3 min-w-[140px]">Hostel Code</th>
-                        <th class="py-2.5 px-3 min-w-[140px]">Type</th>
+                        <th class="py-2.5 px-3 min-w-65">Hostel Address</th>
+                        <th class="py-2.5 px-3 min-w-35">Hostel Code</th>
+                        <th class="py-2.5 px-3 min-w-35">Type</th>
                         <th class="py-2.5 px-3 w-28 text-center">Capacity</th>
                       </tr>
                     </thead>
@@ -425,7 +425,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                   <select
                     [(ngModel)]="editModel.sector"
                     (ngModelChange)="onSectorChange($event)"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   >
                     @for (sec of sectorList; track sec) {
                       <option [value]="sec">{{ sec }}</option>
@@ -440,7 +440,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                   <select
                     [(ngModel)]="editModel.courseName"
                     (ngModelChange)="onCourseChange($event)"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   >
                     @for (c of availableCourses; track c.courseName) {
                       <option [value]="c.courseName">{{ c.courseName }}</option>
@@ -458,7 +458,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                     [(ngModel)]="editModel.batchDurationHours"
                     min="10"
                     max="2000"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                     placeholder="e.g. 400"
                   />
                 </div>
@@ -470,7 +470,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                   <input
                     type="date"
                     [(ngModel)]="editModel.startDate"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   />
                 </div>
 
@@ -481,7 +481,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                   <input
                     type="date"
                     [(ngModel)]="editModel.endDate"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   />
                 </div>
 
@@ -492,7 +492,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                   <input
                     type="text"
                     [(ngModel)]="editModel.startTime"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                     placeholder="09:00 AM"
                   />
                 </div>
@@ -505,7 +505,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                   <input
                     type="text"
                     [(ngModel)]="editModel.endTime"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                     placeholder="05:00 PM"
                   />
                 </div>
@@ -519,7 +519,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                     [(ngModel)]="editModel.approvedBatchStrength"
                     min="1"
                     max="500"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                   />
                 </div>
 
@@ -528,7 +528,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                   <input
                     type="text"
                     [(ngModel)]="editModel.remarks"
-                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E] focus:border-transparent"
+                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
                     placeholder="Enter batch remarks or prerequisites..."
                   />
                 </div>
@@ -555,9 +555,9 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                     <thead>
                       <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
                         <th class="py-2 px-3 w-12 text-center">#</th>
-                        <th class="py-2 px-3 min-w-[200px]">Faculty Name <span class="text-rose-500">*</span></th>
-                        <th class="py-2 px-3 min-w-[180px]">Trainer Type <span class="text-rose-500">*</span></th>
-                        <th class="py-2 px-3 min-w-[220px]">Qualification / Experience <span class="text-rose-500">*</span></th>
+                        <th class="py-2 px-3 min-w-50">Faculty Name <span class="text-rose-500">*</span></th>
+                        <th class="py-2 px-3 min-w-45">Trainer Type <span class="text-rose-500">*</span></th>
+                        <th class="py-2 px-3 min-w-55">Qualification / Experience <span class="text-rose-500">*</span></th>
                         <th class="py-2 px-3 w-16 text-center">Action</th>
                       </tr>
                     </thead>
@@ -570,13 +570,13 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                               type="text"
                               [(ngModel)]="fac.facultyName"
                               placeholder="Faculty Name"
-                              class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E]"
+                              class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
                             />
                           </td>
                           <td class="py-2 px-3">
                             <select
                               [(ngModel)]="fac.trainerType"
-                              class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E]"
+                              class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
                             >
                               <option value="Primary Trainer">Primary Trainer</option>
                               <option value="Assistant Trainer">Assistant Trainer</option>
@@ -587,7 +587,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                           <td class="py-2 px-3">
                             <select
                               [(ngModel)]="fac.qualification"
-                              class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E]"
+                              class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
                             >
                               <option value="Graduate (B.A / B.Sc / B.Com / B.Tech)">Graduate (B.A / B.Sc / B.Com / B.Tech)</option>
                               <option value="Post Graduate (M.A / M.Sc / M.Tech)">Post Graduate (M.A / M.Sc / M.Tech)</option>
@@ -599,7 +599,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                               type="button"
                               (click)="removeFacultyRow(i)"
                               [disabled]="editModel.faculty.length <= 1"
-                              class="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                              class="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 disabled:opacity-30 disabled:cursor-not-allowed"
                               title="Remove Trainer"
                             >
                               ✕
@@ -632,9 +632,9 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                     <thead>
                       <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
                         <th class="py-2 px-3 w-12 text-center">#</th>
-                        <th class="py-2 px-3 min-w-[260px]">Hostel Address</th>
-                        <th class="py-2 px-3 min-w-[140px]">Hostel Code</th>
-                        <th class="py-2 px-3 min-w-[140px]">Type</th>
+                        <th class="py-2 px-3 min-w-65">Hostel Address</th>
+                        <th class="py-2 px-3 min-w-35">Hostel Code</th>
+                        <th class="py-2 px-3 min-w-35">Type</th>
                         <th class="py-2 px-3 w-28">Capacity</th>
                         <th class="py-2 px-3 w-16 text-center">Action</th>
                       </tr>
@@ -648,7 +648,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                               type="text"
                               [(ngModel)]="hostel.hostelAddress"
                               placeholder="Plot / Campus Address"
-                              class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E]"
+                              class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
                             />
                           </td>
                           <td class="py-2 px-3">
@@ -656,13 +656,13 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                               type="text"
                               [(ngModel)]="hostel.hostelCode"
                               placeholder="HST-JP-001"
-                              class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E]"
+                              class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
                             />
                           </td>
                           <td class="py-2 px-3">
                             <select
                               [(ngModel)]="hostel.type"
-                              class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E]"
+                              class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
                             >
                               <option value="Boys">Boys</option>
                               <option value="Girls">Girls</option>
@@ -676,7 +676,7 @@ import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catal
                               min="0"
                               max="500"
                               [(ngModel)]="hostel.capacity"
-                              class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-[#174A6E]"
+                              class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
                             />
                           </td>
                           <td class="py-2 px-3 text-center">

@@ -36,7 +36,7 @@ interface CameraUser {
               [ngModel]="searchQuery()"
               (ngModelChange)="searchQuery.set($event)"
               placeholder="Search by TP or SDC Name..."
-              class="w-full pl-8 pr-3 py-1.5 text-sm bg-white border-none rounded-md text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-white/50 transition-colors"
+              class="w-full pl-8 pr-3 py-1.5 text-sm bg-white border-none rounded-md text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white/50 transition-colors"
             />
           </div>
         </app-page-header>

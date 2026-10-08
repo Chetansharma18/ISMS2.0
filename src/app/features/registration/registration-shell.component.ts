@@ -74,7 +74,7 @@ export interface StepMeta {
 
         <!-- 2. Step Progress Indicator (Card with 4 Evenly Distributed Steps) -->
         <nav aria-label="Registration Steps" class="bg-white rounded-xl border border-slate-200/90 shadow-2xs px-4 sm:px-8 py-3.5 sm:py-4.5 mb-5 overflow-x-auto no-scrollbar">
-          <div class="flex items-center justify-between w-full min-w-[540px] sm:min-w-0">
+          <div class="flex items-center justify-between w-full min-w-135 sm:min-w-0">
             @for (step of steps; track step.number; let last = $last) {
               <!-- Step Item Button -->
               <button
@@ -118,7 +118,7 @@ export interface StepMeta {
               <!-- Connector Line -->
               @if (!last) {
                 <div
-                  class="flex-1 h-[2px] mx-2.5 sm:mx-6 transition-colors duration-200"
+                  class="flex-1 h-0.5 mx-2.5 sm:mx-6 transition-colors duration-200"
                   [class.bg-[#0B3558]]="isStepCompleted(step.number)"
                   [class.bg-slate-200]="!isStepCompleted(step.number)"
                 ></div>

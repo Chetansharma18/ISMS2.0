@@ -50,7 +50,7 @@ export interface UserManagementItem {
                 placeholder="Search by User ID, Username, SSO ID, Role, or District..."
                 [ngModel]="searchQuery()"
                 (ngModelChange)="onSearchChange($event)"
-                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-all"
+                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#174A6E] transition-all"
               />
               <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -134,7 +134,7 @@ export interface UserManagementItem {
             <span>View</span>
           </button>
 
-          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
+          <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
 
           <!-- Edit -->
           <button
@@ -149,7 +149,7 @@ export interface UserManagementItem {
             <span>Edit</span>
           </button>
 
-          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
+          <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
 
           <!-- Mark Inactive / Mark Blacklisted / Mark Active -->
           <button
@@ -164,7 +164,7 @@ export interface UserManagementItem {
             <span>{{ (item.userType === 'TP' || item.roleType === 'tp') ? (item.schemeStatus === 'Active' ? 'Mark Blacklisted' : 'Mark Active') : (item.schemeStatus === 'Active' ? 'Mark Inactive' : 'Mark Active') }}</span>
           </button>
 
-          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
+          <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
 
           <!-- Delete -->
           <button
@@ -318,7 +318,7 @@ export interface UserManagementItem {
                 <input
                   type="date"
                   [(ngModel)]="formData.dateOfBirth"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
                 />
               </div>
 
@@ -361,7 +361,7 @@ export interface UserManagementItem {
                   maxlength="10"
                   placeholder="Optional alternate mobile"
                   [(ngModel)]="formData.alternateMobileNo"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
                 />
               </div>
 
@@ -372,7 +372,7 @@ export interface UserManagementItem {
                   type="email"
                   placeholder="Optional alternate email"
                   [(ngModel)]="formData.alternateEmail"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
                 />
               </div>
             </div>
@@ -422,7 +422,7 @@ export interface UserManagementItem {
                 <label class="block text-slate-700 font-medium mb-1">Designation</label>
                 <select
                   [(ngModel)]="formData.designation"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800 bg-white"
                 >
                   <option value="Managing Director">Managing Director</option>
                   <option value="Joint Director">Joint Director</option>
@@ -439,7 +439,7 @@ export interface UserManagementItem {
                 <label class="block text-slate-700 font-medium mb-1">Scheme Department</label>
                 <select
                   [(ngModel)]="formData.schemeDepartment"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800 bg-white"
                 >
                   <option value="RSLDC">RSLDC</option>
                   <option value="Skill & Entrepreneurship">Skill & Entrepreneurship</option>
@@ -452,7 +452,7 @@ export interface UserManagementItem {
                 <label class="block text-slate-700 font-medium mb-1">District</label>
                 <select
                   [(ngModel)]="formData.district"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800 bg-white"
                 >
                   <option value="All Districts">All Districts</option>
                   <option value="Jaipur">Jaipur</option>
@@ -468,7 +468,7 @@ export interface UserManagementItem {
                 <label class="block text-slate-700 font-medium mb-1">Block Name</label>
                 <select
                   [(ngModel)]="formData.blockName"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800 bg-white"
                 >
                   <option value="All Blocks">All Blocks</option>
                   <option value="Amber">Amber</option>
@@ -486,7 +486,7 @@ export interface UserManagementItem {
                   maxlength="12"
                   placeholder="12-digit Aadhaar number"
                   [(ngModel)]="formData.aadhaarId"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 font-mono text-xs"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800 font-mono text-xs"
                 />
               </div>
 

@@ -22,7 +22,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
     <section #sectionRef class="w-full bg-[#FFFFFF] py-9 sm:py-12 md:py-16 xl:py-20 border-b border-[#DCE4ED]" aria-labelledby="about-isms-heading">
       
       <!-- Centered Container: Max width 1440px with responsive padding (20px mobile) -->
-      <div class="w-full max-w-[1440px] mx-auto px-5 sm:px-8 xl:px-12 box-border">
+      <div class="w-full max-w-360 mx-auto px-5 sm:px-8 xl:px-12 box-border">
         
         <!-- Two-Column Layout: Stacks on mobile, ~55% left & ~45% right on desktop with 40–48px gap, vertically centered -->
         <div class="flex flex-col lg:grid lg:grid-cols-[55fr_45fr] items-center gap-6 md:gap-8 lg:gap-12 w-full">
@@ -36,15 +36,15 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
             </h2>
 
             <!-- Small Orange Underline: 42px width, 4px height, #F28C28, 2px radius, 14–16px bottom spacing -->
-            <div class="w-[42px] h-[4px] bg-[#F28C28] rounded-[2px] mt-2.5 mb-4 sm:mb-[16px]" aria-hidden="true"></div>
+            <div class="w-10.5 h-1 bg-[#F28C28] rounded-xs mt-2.5 mb-4 sm:mb-4" aria-hidden="true"></div>
 
             <!-- Existing Description Paragraph 1: 100% original text, natural wrapping, left-aligned -->
-            <p class="font-['Inter',sans-serif] text-[15px] xl:text-[16px] font-normal leading-[1.65] text-[#344256] text-left max-w-[700px] m-0 mb-4">
+            <p class="font-['Inter',sans-serif] text-[15px] xl:text-[16px] font-normal leading-[1.65] text-[#344256] text-left max-w-175 m-0 mb-4">
               Integrated Scheme Management System (ISMS 2.0) is a comprehensive e-Governance and Management Information System (MIS) designed to digitally transform, integrate, and streamline the processes involved in the planning, implementation, monitoring, and management of skill development schemes across Rajasthan. The platform provides a centralized and secure digital ecosystem that unites youth, training providers, government departments, empaneled agencies, and certification bodies on a single, high-transparency platform — ensuring accountability, real-time visibility, and data-driven decision making at every stage.
             </p>
 
             <!-- Existing Description Paragraph 2: Divided at natural sentence boundary, 100% original text -->
-            <p class="font-['Inter',sans-serif] text-[15px] xl:text-[16px] font-normal leading-[1.65] text-[#344256] text-left max-w-[700px] m-0">
+            <p class="font-['Inter',sans-serif] text-[15px] xl:text-[16px] font-normal leading-[1.65] text-[#344256] text-left max-w-175 m-0">
               ISMS 2.0 enables end-to-end scheme management — from scheme launching and candidate enrollment through bio-metric attendance, quality inspections, assessment, certification, and direct benefit and fund disbursements — all within one unified, auditable platform.
             </p>
           </div>
@@ -53,14 +53,14 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
           <div class="w-full flex items-center justify-center">
             
             <!-- Video Container Card: 16:9, rounded 12px, border 1px solid #DCE4ED, subtle shadow -->
-            <div class="w-full rounded-[12px] overflow-hidden bg-[#0B2440] border border-[#DCE4ED] shadow-[0_4px_16px_rgba(18,54,90,0.08)] relative [transform:translateZ(0)] will-change-transform">
+            <div class="w-full rounded-xl overflow-hidden bg-[#0B2440] border border-[#DCE4ED] shadow-[0_4px_16px_rgba(18,54,90,0.08)] relative transform-[translateZ(0)] will-change-transform">
               
               <div class="relative w-full aspect-video bg-[#0B2440] overflow-hidden flex items-center justify-center">
                 
                 <!-- Actual Video Element -->
                 <video 
                   #videoRef
-                  class="w-full h-full object-cover object-center transition-opacity duration-300 [transform:translateZ(0)]"
+                  class="w-full h-full object-cover object-center transition-opacity duration-300 transform-[translateZ(0)]"
                   [class.opacity-0]="!isVideoLoaded()"
                   [class.opacity-100]="isVideoLoaded()"
                   playsinline
@@ -72,7 +72,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 
                 <!-- Poster / Loading Placeholder Before Video Loads -->
                 @if (!isVideoLoaded()) {
-                  <div class="absolute inset-0 bg-gradient-to-br from-[#0B2440] to-[#12365A] flex flex-col items-center justify-center p-5 text-center z-5">
+                  <div class="absolute inset-0 bg-linear-to-br from-[#0B2440] to-[#12365A] flex flex-col items-center justify-center p-5 text-center z-5">
                     <div class="w-11 h-11 rounded-full bg-white/12 flex items-center justify-center mb-2.5 text-white">
                       <svg class="w-5 h-5 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
@@ -128,7 +128,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
                 </div>
 
                 <!-- Video Caption Overlay (Positioned in lower portion, subtle dark navy gradient, 14–18px padding) -->
-                <div class="absolute bottom-0 inset-x-0 z-10 pointer-events-none bg-gradient-to-t from-[#0B2440]/95 via-[#0B2440]/65 to-transparent pt-7 pb-3.5 px-4 sm:pt-8 sm:pb-4 sm:px-4.5 box-border">
+                <div class="absolute bottom-0 inset-x-0 z-10 pointer-events-none bg-linear-to-t from-[#0B2440]/95 via-[#0B2440]/65 to-transparent pt-7 pb-3.5 px-4 sm:pt-8 sm:pb-4 sm:px-4.5 box-border">
                   <p class="font-['Inter',sans-serif] text-[13px] sm:text-[14px] lg:text-[14.5px] text-white leading-normal sm:leading-relaxed font-normal m-0 drop-shadow-sm">
                     “{{ fullQuote }}”
                   </p>

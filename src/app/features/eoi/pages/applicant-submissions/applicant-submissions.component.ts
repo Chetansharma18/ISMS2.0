@@ -13,7 +13,7 @@ import {
   standalone: true,
   imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent],
   template: `
-    <div class="w-full min-h-full bg-white text-[#1F2933] font-sans">
+    <div class="w-full min-h-full bg-white text-text-primary font-sans">
       <div class="p-4 sm:p-5 space-y-3 font-sans">
         
         <!-- Header via Reusable PageHeaderComponent -->
@@ -48,7 +48,7 @@ import {
 
           <div class="flex items-center gap-2.5">
             @if (!allReviewed()) {
-              <span class="text-[11px] text-slate-500 bg-amber-50 text-amber-800 px-2.5 py-1 rounded border border-amber-200 font-normal">
+              <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded border border-amber-200 font-normal">
                 Requires all applications to be Reviewed (Accepted or Rejected) to activate Sanction Order
               </span>
             } @else {
@@ -68,7 +68,7 @@ import {
               type="button"
               (click)="openSanctionOrder()"
               [disabled]="!allReviewed()"
-              class="px-3.5 py-1.5 rounded text-xs font-semibold transition-all flex items-center gap-2 border shadow-2xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3.5 py-1.5 rounded text-xs font-semibold transition-all flex items-center gap-2 border shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
               [class.bg-emerald-700]="allReviewed()"
               [class.text-white]="allReviewed()"
               [class.border-emerald-800]="allReviewed()"
@@ -94,7 +94,7 @@ import {
           <button
             type="button"
             (click)="setFilter('ALL')"
-            class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
+            class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
             [class.bg-[#174A6E]]="selectedFilter() === 'ALL'"
             [class.text-white]="selectedFilter() === 'ALL'"
             [class.border-[#174A6E]]="selectedFilter() === 'ALL'"
@@ -119,7 +119,7 @@ import {
           <button
             type="button"
             (click)="setFilter('UNDER_SCRUTINY')"
-            class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
+            class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
             [class.bg-[#174A6E]]="selectedFilter() === 'UNDER_SCRUTINY'"
             [class.text-white]="selectedFilter() === 'UNDER_SCRUTINY'"
             [class.border-[#174A6E]]="selectedFilter() === 'UNDER_SCRUTINY'"
@@ -144,7 +144,7 @@ import {
           <button
             type="button"
             (click)="setFilter('APPROVED')"
-            class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
+            class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
             [class.bg-[#174A6E]]="selectedFilter() === 'APPROVED'"
             [class.text-white]="selectedFilter() === 'APPROVED'"
             [class.border-[#174A6E]]="selectedFilter() === 'APPROVED'"
@@ -169,7 +169,7 @@ import {
           <button
             type="button"
             (click)="setFilter('REJECTED')"
-            class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
+            class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
             [class.bg-[#174A6E]]="selectedFilter() === 'REJECTED'"
             [class.text-white]="selectedFilter() === 'REJECTED'"
             [class.border-[#174A6E]]="selectedFilter() === 'REJECTED'"
@@ -207,10 +207,10 @@ import {
         </app-table>
 
         <ng-template #applicantTemplate let-item>
-          <div class="font-medium text-[#1F2933] text-[13px]">
+          <div class="font-medium text-text-primary text-[13px]">
             {{ item.anonymousLabel }}
           </div>
-          <div class="text-[11px] font-mono text-[#7A8792] mt-0.5">
+          <div class="text-[11px] font-mono text-text-muted mt-0.5">
             {{ item.regNumber }}
           </div>
         </ng-template>
@@ -218,7 +218,7 @@ import {
         <ng-template #actionTemplate let-item>
           <a
             [routerLink]="['/admin/review', item.id]"
-            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-md bg-[#0B3558] hover:bg-[#07243c] !text-white shadow-2xs transition-colors font-semibold text-xs whitespace-nowrap cursor-pointer"
+            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-md bg-[#0B3558] hover:bg-[#07243c] text-white! shadow-2xs transition-colors font-semibold text-xs whitespace-nowrap cursor-pointer"
             style="color: #ffffff !important;"
           >
             <span style="color: #ffffff !important;">Review</span>

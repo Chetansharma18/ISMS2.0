@@ -121,7 +121,7 @@ import { FormsModule } from '@angular/forms';
                 type="button"
                 (click)="submitOtp()"
                 [disabled]="!isComplete() || isSubmitting()"
-                class="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-[#0B3558] hover:bg-[#07243c] disabled:opacity-50 disabled:cursor-not-allowed enabled:cursor-pointer shadow-sm transition-all flex items-center justify-center gap-2 active:scale-98"
+                class="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-[#0B3558] hover:bg-[#07243c] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all flex items-center justify-center gap-2 active:scale-98"
               >
                 @if (isSubmitting()) {
                   <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">

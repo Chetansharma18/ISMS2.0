@@ -23,11 +23,11 @@ import { CommonModule } from '@angular/common';
           onerror="this.src='/Service%20background.png'"
         />
         <!-- Soft translucent light overlay ensuring high text readability while showcasing the heritage architecture -->
-        <div class="absolute inset-0 bg-white/80 sm:bg-transparent sm:bg-gradient-to-r sm:from-white/35 sm:via-white/72 sm:to-white/35"></div>
+        <div class="absolute inset-0 bg-white/80 sm:bg-transparent sm:bg-linear-to-r sm:from-white/35 sm:via-white/72 sm:to-white/35"></div>
       </div>
 
       <!-- Centered Content Container: Max Width 1400–1440px with Responsive Padding (20px Mobile) -->
-      <div class="relative z-10 w-full max-w-[1400px] xl:max-w-[1440px] mx-auto px-5 sm:px-8 xl:px-12 box-border">
+      <div class="relative z-10 w-full max-w-350 xl:max-w-360 mx-auto px-5 sm:px-8 xl:px-12 box-border">
         
         <!-- Two-Column Layout: Phone (~38%) on Left, Content (~62%) on Right on Desktop, Stacked on Mobile -->
         <div class="flex flex-col lg:grid lg:grid-cols-[38fr_62fr] items-center gap-10 sm:gap-12 lg:gap-14 xl:gap-16 w-full">
@@ -37,7 +37,7 @@ import { CommonModule } from '@angular/common';
             <img 
               src="/mobile-app-phone.png" 
               alt="ISMS 2.0 Mobile Application Mockup" 
-              class="w-full max-w-[210px] sm:max-w-[240px] md:max-w-[260px] lg:max-w-[280px] xl:max-w-[290px] h-auto object-contain drop-shadow-[0_16px_36px_rgba(11,36,64,0.18)] select-none pointer-events-none transition-transform duration-300 hover:scale-[1.01]"
+              class="w-full max-w-52.5 sm:max-w-60 md:max-w-65 lg:max-w-70 xl:max-w-72.5 h-auto object-contain drop-shadow-[0_16px_36px_rgba(11,36,64,0.18)] select-none pointer-events-none transition-transform duration-300 hover:scale-[1.01]"
               loading="lazy"
               onerror="this.src='/hero-bg.png'"
             />
@@ -53,16 +53,16 @@ import { CommonModule } from '@angular/common';
               </h2>
 
               <!-- Small Orange Underline: Width 42px, Height 3px, #F28C28, Radius 2px -->
-              <div class="w-[42px] h-[3px] bg-[#F28C28] rounded-[2px] mt-2.5 mb-4" aria-hidden="true"></div>
+              <div class="w-10.5 h-0.75 bg-[#F28C28] rounded-xs mt-2.5 mb-4" aria-hidden="true"></div>
             </div>
 
             <!-- Existing Description: Exact text preserved, Inter 16px/15px, Left-aligned, Line-height 1.6, Color #344256 -->
-            <p class="font-['Inter',sans-serif] text-[15px] sm:text-[16px] font-normal leading-[1.6] text-[#344256] max-w-[620px] m-0 mb-6 sm:mb-7 text-left">
+            <p class="font-['Inter',sans-serif] text-[15px] sm:text-[16px] font-normal leading-[1.6] text-[#344256] max-w-155 m-0 mb-6 sm:mb-7 text-left">
               An integrated, multilingual mobile application providing instantaneous access to scheme notifications, biometric attendance, training center verifications, and grievances.
             </p>
 
             <!-- Three Feature Highlights: Horizontal Compact Items (40-44px icon, #EEF5FB bg, #12365A text) -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 mb-6 sm:mb-8 max-w-[620px]">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 mb-6 sm:mb-8 max-w-155">
               
               <!-- Feature 1: For Multiple Stakeholders -->
               <div class="flex items-center gap-3 bg-white/95 border border-[#123B5D]/10 rounded-[10px] px-3.5 py-2.5 shadow-[0_2px_8px_rgba(18,54,90,0.04)]">
@@ -101,7 +101,7 @@ import { CommonModule } from '@angular/common';
             </div>
 
             <!-- Statistics Panel: One Clean White Panel (3 equal columns with dividers) -->
-            <div class="w-full max-w-[620px] bg-white/96 border border-[#E1E7EE] rounded-[12px] shadow-[0_8px_24px_rgba(15,40,70,0.08)] p-4 sm:p-5 lg:p-6 box-border">
+            <div class="w-full max-w-155 bg-white/96 border border-[#E1E7EE] rounded-xl shadow-[0_8px_24px_rgba(15,40,70,0.08)] p-4 sm:p-5 lg:p-6 box-border">
               <div class="grid grid-cols-3 divide-x divide-[#E1E7EE] text-center">
                 
                 <!-- Stat 1: 1K+ Downloads -->

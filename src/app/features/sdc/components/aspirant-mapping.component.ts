@@ -42,7 +42,7 @@ import {
             </div>
 
             @if (formData.aadhaarDocName) {
-              <div class="h-[38px] flex items-center justify-between px-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs gap-2 shadow-2xs hover:border-slate-400 transition-colors">
+              <div class="h-9.5 flex items-center justify-between px-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs gap-2 shadow-2xs hover:border-slate-400 transition-colors">
                 <div class="flex items-center gap-1.5 min-w-0 flex-1 truncate">
                   <!-- PDF Badge or Image icon based on file type -->
                   @if (formData.aadhaarDocName.toLowerCase().endsWith('.pdf')) {
@@ -66,7 +66,7 @@ import {
                     class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#174A6E] hover:text-[#0B3558] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
                     title="View Aadhaar Card"
                   >
-                    <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -84,7 +84,7 @@ import {
                 </div>
               </div>
             } @else {
-              <label class="h-[38px] flex items-center justify-between px-3 border border-dashed border-slate-300 rounded-lg cursor-pointer transition-all bg-slate-50/50 hover:bg-slate-100/70 hover:border-rose-400 shadow-2xs group">
+              <label class="h-9.5 flex items-center justify-between px-3 border border-dashed border-slate-300 rounded-lg cursor-pointer transition-all bg-slate-50/50 hover:bg-slate-100/70 hover:border-rose-400 shadow-2xs group">
                 <div class="flex items-center gap-2 text-slate-600 truncate">
                   <!-- Red PDF icon in empty state -->
                   <span class="w-5 h-5 rounded bg-rose-600 text-white text-[7.5px] font-extrabold flex items-center justify-center tracking-tight shrink-0 group-hover:bg-rose-700 transition-colors">PDF</span>
@@ -610,7 +610,7 @@ import {
             </div>
 
             <!-- Batch Mapping Confirmation Bar -->
-            <div class="p-4 bg-gradient-to-r from-[#0B3558] to-[#174A6E] text-white rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+            <div class="p-4 bg-linear-to-r from-[#0B3558] to-[#174A6E] text-white rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
               <div class="space-y-1 text-center sm:text-left">
                 <span class="text-[11px] text-blue-300 font-bold uppercase tracking-wider block">
                   Mapping Target Batch: {{ batch().batchCode }}
@@ -655,7 +655,7 @@ import {
       @if (showSuccessModal()) {
         <div class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
           <div class="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden border border-slate-200 animate-in zoom-in-95 duration-150">
-            <div class="bg-gradient-to-r from-emerald-600 to-teal-700 p-5 text-white text-center">
+            <div class="bg-linear-to-r from-emerald-600 to-teal-700 p-5 text-white text-center">
               <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-2.5">
                 <svg class="w-6 h-6 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />

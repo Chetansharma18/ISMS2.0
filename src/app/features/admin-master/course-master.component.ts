@@ -64,6 +64,7 @@ export type { CourseMasterItem };
       <!-- Master Table -->
       <div class="overflow-x-auto rounded-lg border border-slate-200">
         <app-table
+        [rowClass]="getRowClass"
           [columns]="columns"
           [data]="filteredCourses()"
           [pagination]="true"
@@ -469,4 +470,10 @@ openAddModal(): void {
       });
     }
   }
+
+  getRowClass = (item: any): string => {
+    const isInactive = item.status === 'Inactive' || item.schemeStatus === 'Inactive';
+    return isInactive ? 'opacity-50 bg-slate-50 transition-colors' : 'bg-white transition-colors';
+  };
+
 }

@@ -63,6 +63,7 @@ export type { UserRoleMasterItem };
 
       <!-- Master Table -->
       <app-table
+        [rowClass]="getRowClass"
         [columns]="columns"
         [data]="filteredRoles()"
         [pagination]="true"
@@ -382,4 +383,10 @@ openAddModal(): void {
       });
     }
   }
+
+  getRowClass = (item: any): string => {
+    const isInactive = item.status === 'Inactive' || item.schemeStatus === 'Inactive';
+    return isInactive ? 'opacity-50 bg-slate-50 transition-colors' : 'bg-white transition-colors';
+  };
+
 }

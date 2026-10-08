@@ -118,6 +118,7 @@ export interface UserManagementItem {
 
       <!-- Users Table -->
       <app-table
+        [rowClass]="getRowClass"
         [columns]="columns"
         [data]="filteredUsers()"
         [pagination]="true"
@@ -398,26 +399,16 @@ export interface UserManagementItem {
                 }
               </div>
 
-              <!-- Alternate Mobile No. -->
+
+              <!-- Aadhaar Id -->
               <div>
-                <label class="block text-slate-700 font-medium mb-1">Alternate Mobile No.</label>
+                <label class="block text-slate-700 font-medium mb-1">Aadhaar Id</label>
                 <input
                   type="text"
-                  maxlength="10"
-                  placeholder="Optional alternate mobile"
-                  [(ngModel)]="formData.alternateMobileNo"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
-                />
-              </div>
-
-              <!-- Alternate E-Mail -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">Alternate E-Mail</label>
-                <input
-                  type="email"
-                  placeholder="Optional alternate email"
-                  [(ngModel)]="formData.alternateEmail"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
+                  maxlength="12"
+                  placeholder="12-digit Aadhaar number"
+                  [(ngModel)]="formData.aadhaarId"
+                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 font-mono text-xs"
                 />
               </div>
             </div>
@@ -432,11 +423,11 @@ export interface UserManagementItem {
                   [ngClass]="{'border-red-500': submitted() && !formData.userType, 'border-[#8FA3B6]': !(submitted() && !formData.userType)}"
                   class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
                 >
-                  <option value="Admin">Admin</option>
                   <option value="Super Admin">Super Admin</option>
-                  <option value="TP">Training Partner (TP)</option>
+                  <option value="Department">Department</option>
+                  <option value="Citizen">Citizen</option>
                 </select>
-                <div class="text-[11px] text-slate-500 mt-0.5">Select user classification (Admin, Super Admin, or TP).</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Select user classification (Super Admin, Department, or Citizen).</div>
               </div>
 
               <!-- Role Type -->
@@ -448,14 +439,12 @@ export interface UserManagementItem {
                   class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
                 >
                   <option value="" disabled selected>Select Role Type</option>
-                  <option value="tp">tp</option>
-                  <option value="scheme oc">scheme oc</option>
-                  <option value="mis manager">mis manager</option>
-                  <option value="programmer">programmer</option>
-                  <option value="gm">gm</option>
-                  <option value="zc">zc</option>
-                  <option value="md">md</option>
+                  <option value="OIC">OIC</option>
+                  <option value="manager">manager</option>
                   <option value="super admin">super admin</option>
+                  <option value="S.A">S.A</option>
+                  <option value="Admin">Admin</option>
+                  <option value="ZC">ZC</option>
                 </select>
                 @if (submitted() && !formData.roleType) {
                   <div class="text-xs text-red-500 mt-0.5 font-medium">Role Type is required</div>
@@ -523,17 +512,7 @@ export interface UserManagementItem {
                 </select>
               </div>
 
-              <!-- Aadhaar Id -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">Aadhaar Id</label>
-                <input
-                  type="text"
-                  maxlength="12"
-                  placeholder="12-digit Aadhaar number"
-                  [(ngModel)]="formData.aadhaarId"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 font-mono text-xs"
-                />
-              </div>
+
 
             </div>
 
@@ -894,4 +873,10 @@ export class UserManagementComponent {
       });
     });
   }
+
+  getRowClass = (item: any): string => {
+    const isInactive = item.status === 'Inactive' || item.schemeStatus === 'Inactive';
+    return isInactive ? 'opacity-50 bg-slate-50 transition-colors' : 'bg-white transition-colors';
+  };
+
 }

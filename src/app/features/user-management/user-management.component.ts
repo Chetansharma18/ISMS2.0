@@ -72,6 +72,50 @@ export interface UserManagementItem {
         </div>
       </app-page-header>
 
+      <!-- Role Filters -->
+      <div class="w-full flex flex-col sm:flex-row gap-3">
+        <button
+          type="button"
+          (click)="selectedRoleFilter.set('all')"
+          [ngClass]="selectedRoleFilter() === 'all' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
+          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
+        >
+          All
+        </button>
+        <button
+          type="button"
+          (click)="selectedRoleFilter.set('citizen')"
+          [ngClass]="selectedRoleFilter() === 'citizen' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
+          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
+        >
+          Citizen
+        </button>
+        <button
+          type="button"
+          (click)="selectedRoleFilter.set('super admin')"
+          [ngClass]="selectedRoleFilter() === 'super admin' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
+          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
+        >
+          Super Admin
+        </button>
+        <button
+          type="button"
+          (click)="selectedRoleFilter.set('department')"
+          [ngClass]="selectedRoleFilter() === 'department' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
+          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
+        >
+          Department
+        </button>
+        <button
+          type="button"
+          (click)="selectedRoleFilter.set('tp')"
+          [ngClass]="selectedRoleFilter() === 'tp' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
+          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
+        >
+          TP
+        </button>
+      </div>
+
       <!-- Users Table -->
       <app-table
         [columns]="columns"
@@ -521,6 +565,7 @@ export interface UserManagementItem {
 })
 export class UserManagementComponent {
   searchQuery = signal<string>('');
+  selectedRoleFilter = signal<string>('all');
   showModal = signal<boolean>(false);
   showViewModal = signal<boolean>(false);
   showConfirmModal = signal<boolean>(false);
@@ -566,14 +611,27 @@ export class UserManagementComponent {
 
   readonly filteredUsers = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
+    const filter = this.selectedRoleFilter().toLowerCase();
     const all = this.users();
-    if (!q) return all;
-    return all.filter(u =>
-      u.userId.toLowerCase().includes(q) ||
-      u.username.toLowerCase().includes(q) ||
-      u.ssoId.toLowerCase().includes(q) ||
-      u.roleType.toLowerCase().includes(q) ||
-      u.districtName.toLowerCase().includes(q)
+    
+    let filtered = all;
+    if (filter !== 'all') {
+      filtered = filtered.filter(u => 
+        (u.roleType && u.roleType.toLowerCase().includes(filter)) || 
+        (u.userType && u.userType.toLowerCase().includes(filter)) ||
+        (u.schemeDepartment && u.schemeDepartment.toLowerCase().includes(filter)) ||
+        // Fallback matching logic for specific 'department' and 'citizen' cases that might not exactly map to strings
+        (filter === 'department' && u.userType === 'Admin')
+      );
+    }
+
+    if (!q) return filtered;
+    return filtered.filter(u =>
+      (u.userId && u.userId.toLowerCase().includes(q)) ||
+      (u.username && u.username.toLowerCase().includes(q)) ||
+      (u.ssoId && u.ssoId.toLowerCase().includes(q)) ||
+      (u.roleType && u.roleType.toLowerCase().includes(q)) ||
+      (u.districtName && u.districtName.toLowerCase().includes(q))
     );
   });
 

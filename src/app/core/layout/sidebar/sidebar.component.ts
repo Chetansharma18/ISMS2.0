@@ -128,24 +128,6 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
                   </a>
 
                   <a
-                    routerLink="/admin/master/permission"
-                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-semibold"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">Permission Master</span>
-                  </a>
-
-                  <a
-                    routerLink="/admin/master/user-role"
-                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-semibold"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">User Role Type</span>
-                  </a>
-
-                  <a
                     routerLink="/admin/master/district-block"
                     routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-semibold"
                     class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
@@ -203,6 +185,24 @@ import { BatchService, isBatchApproved, isBatchRejected } from '../../../feature
                   >
                     <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
                     <span class="truncate">USERS</span>
+                  </a>
+
+                  <a
+                    routerLink="/admin/master/user-role"
+                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">ROLE MANAGEMENT</span>
+                  </a>
+
+                  <a
+                    routerLink="/admin/master/permission"
+                    routerLinkActive="bg-[#EAF2F6] text-[#174A6E] font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-[#F5F7F9] hover:text-[#174A6E] transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">Permission Master</span>
                   </a>
                 </div>
               }

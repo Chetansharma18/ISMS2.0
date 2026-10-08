@@ -2414,7 +2414,7 @@ export interface EoiDocumentItem {
                 type="button"
                 (click)="goToStep(5)"
                 [disabled]="!declarationAgreed()"
-                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer"
+                class="px-6 py-2.5 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors"
               >
                 Proceed to EMD Fee Payment ({{ formattedEmdFee() }}) &rarr;
               </button>
@@ -2585,7 +2585,7 @@ export interface EoiDocumentItem {
                   type="button"
                   (click)="triggerEmdPayment()"
                   [disabled]="isPaymentProcessing()"
-                  class="px-8 py-3 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs sm:text-sm font-bold shadow-sm transition-colors cursor-pointer flex items-center gap-2"
+                  class="px-8 py-3 bg-[#0B3558] hover:bg-[#07233B] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs sm:text-sm font-bold shadow-sm transition-colors flex items-center gap-2"
                 >
                   @if (isPaymentProcessing()) {
                     <span class="animate-spin text-sm">&#9696;</span>

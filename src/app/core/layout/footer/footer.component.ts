@@ -437,16 +437,7 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
                     </button>
                   </li>
 
-                  <li>
-                    <button
-                      type="button"
-                      (click)="downloadUserManual()"
-                      class="footer-link text-[0.875rem] font-['Inter',sans-serif] cursor-pointer bg-transparent border-0 p-0 text-left flex items-center gap-1.5"
-                      aria-label="Download ISMS 2.0 User Manual">
-                      <span>User Manual</span>
-                      <span class="text-[9.5px] uppercase font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">PDF</span>
-                    </button>
-                  </li>
+               
                 </ul>
 
                 <!-- Dynamic Visitor Counter & Last Updated -->
@@ -544,30 +535,13 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
                 </a>
               </div>
 
-              <!-- User Manual Download Card (Software Guide & How It Works) -->
-              <div class="mt-6 pt-4 border-t border-slate-700/60 w-full max-w-xs">
+              <div class="mt-5 w-full">
                 <button
                   type="button"
                   (click)="downloadUserManual()"
                   [disabled]="isGeneratingManual()"
-                  class="group w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-transparent hover:from-amber-500/25 hover:via-amber-500/15 border border-amber-500/30 hover:border-amber-400 text-left transition-all duration-200 cursor-pointer shadow-xs focus:outline-hidden focus:ring-2 focus:ring-amber-400"
-                  aria-label="Download ISMS 2.0 User Manual PDF - Complete software guide"
-                  title="Download ISMS 2.0 User Manual (How the Software Works)">
-                  
-                  <!-- PDF Icon badge -->
-                  <div class="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                    @if (isGeneratingManual()) {
-                      <svg class="w-4 h-4 animate-spin text-amber-300" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                      </svg>
-                    } @else {
-                      <svg class="w-5 h-5 text-amber-400 group-hover:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    }
-                  </div>
-
+                  class="w-full flex items-center gap-3 rounded-xl border border-amber-500/30 bg-slate-900/70 p-3 text-left transition-colors hover:border-amber-400/60 hover:bg-slate-900 disabled:cursor-wait disabled:opacity-70 group"
+                  aria-label="Download ISMS 2.0 User Manual">
                   <!-- Text Details -->
                   <div class="flex flex-col min-w-0">
                     <div class="flex items-center gap-1.5">

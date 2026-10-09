@@ -14,7 +14,7 @@ export interface UserManagementItem {
   blockName?: string;
   email?: string;
   mobileNo?: string;
-  schemeStatus: 'Active' | 'Inactive';
+  schemeStatus: 'Active' | 'Inactive' | 'Blacklisted';
 }
 
 export interface MockUserItem {

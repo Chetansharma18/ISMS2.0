@@ -252,3 +252,8 @@ export const MOCK_SCHEMES: SchemeTenderItem[] = resolveMock([
     committeeMembers: []
   }
 ]);
+
+/** Distinct scheme short names, used to populate Scheme selection dropdowns. */
+export const SCHEME_NAME_OPTIONS: string[] = Array.from(
+  new Set(MOCK_SCHEMES.map(s => s.schemeName))
+);

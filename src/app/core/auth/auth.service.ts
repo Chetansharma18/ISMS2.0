@@ -34,126 +34,52 @@ export const USER_ROLES: RoleConfig[] = [
   },
   {
     role: 'dept_admin',
-    label: 'Department Admin',
-    badge: 'Officer Portal',
+    label: 'Department User',
+    badge: 'Department User',
     description: 'Departmental scheme officer and scrutiny incharge'
   },
   {
     role: 'super_admin',
     label: 'Super Admin',
-    badge: 'System Admin',
+    badge: 'Super Admin',
     description: 'System administrator with full access'
   }
 ];
 
-export interface DeptRole {
-  id: string;
-  name: string;
-  designation: string;
-  department: string;
-  ssoId: string;
-  email: string;
-  initials: string;
-  role: UserRole;
-  badge: string;
-  avatarBg: string;
-}
-
-export const DEPT_ADMIN_ROLES: DeptRole[] = [
-  {
-    id: 'scheme_officer',
-    name: 'Dr. Ashok Sharma',
-    designation: 'Scheme Officer In-Charge',
-    department: 'Skill Schemes & Sanctions',
-    ssoId: 'officer.mmkvy@rajasthan.gov.in',
-    email: 'officer.mmkvy@rajasthan.gov.in',
-    initials: 'AS',
-    role: 'dept_admin',
-    badge: 'Scheme OIC',
-    avatarBg: 'bg-[#0B3558] text-white'
-  },
-  {
-    id: 'scrutiny_officer',
-    name: 'Sh. Mahendra Meena',
-    designation: 'Desk Scrutiny Officer',
-    department: 'EOI Scrutiny & Verification',
-    ssoId: 'scrutiny.officer@rajasthan.gov.in',
-    email: 'scrutiny.officer@rajasthan.gov.in',
-    initials: 'MM',
-    role: 'dept_admin',
-    badge: 'Scrutiny Officer',
-    avatarBg: 'bg-[#0B3558] text-white'
-  },
-  {
-    id: 'super_admin',
-    name: 'Sh. Rajesh Verma (IAS)',
-    designation: 'Super Administrator',
-    department: 'State Directorate (RSLDC HQ)',
-    ssoId: 'super.admin@rajasthan.gov.in',
-    email: 'super.admin@rajasthan.gov.in',
-    initials: 'RV',
-    role: 'super_admin',
-    badge: 'Super Admin',
-    avatarBg: 'bg-[#0B3558] text-white'
-  }
-];
-
-export interface SwitchableAccount {
-  role: UserRole;
-  title: string;
-  name: string;
-  email: string;
-  subtitle: string;
-  initials: string;
-  badge: string;
-  avatarBg: string;
+/**
+ * A role granted to the signed-in user. One user can hold more than one role
+ * and switch the active one without signing out. Only the role changes on a
+ * switch - the user identity (name / SSO ID) stays the same.
+ */
+export interface AssignedRole {
+  /** Matches the UserRole it activates */
+  id: Extract<UserRole, 'dept_admin' | 'super_admin'>;
+  /** Label shown in the switcher - role only, no person or designation */
+  label: string;
+  /** Landing route for the role */
   defaultRoute: string;
 }
 
-export const SWITCHABLE_ACCOUNTS: SwitchableAccount[] = [
+/**
+ * Display identity for each admin role. Used as both the name shown in the
+ * header and the SSO ID placeholder - plain role identifiers, no person name.
+ */
+export const ACCOUNT_LABELS: Record<Extract<UserRole, 'dept_admin' | 'super_admin'>, string> = {
+  dept_admin: 'dept_user',
+  super_admin: 'super_admin'
+};
+
+/** The two roles a dual-role departmental account can switch between. */
+export const SWITCHABLE_ROLES: AssignedRole[] = [
   {
-    role: 'dept_admin',
-    title: 'Department Admin',
-    name: 'Dr. Ashok Sharma (RSLDC)',
-    email: 'dept.admin@rajasthan.gov.in',
-    subtitle: 'Officer Portal • Scrutiny & Sanctions',
-    initials: 'DA',
-    badge: 'Officer Portal',
-    avatarBg: 'bg-[#0B3558] text-white',
+    id: 'dept_admin',
+    label: 'Department User',
     defaultRoute: '/admin/eoi-view'
   },
   {
-    role: 'existing_user',
-    title: 'Training Partner (TP / PIA)',
-    name: 'Approved Citizen (TP)',
-    email: 'tp.partner@skillcraft.org',
-    subtitle: 'Registered Agency • Scheme Bidding',
-    initials: 'TP',
-    badge: 'Registered TP',
-    avatarBg: 'bg-emerald-700 text-white',
-    defaultRoute: '/tenders'
-  },
-  {
-    role: 'super_admin',
-    title: 'Super Administrator',
-    name: 'Sh. Rajesh Verma (IAS)',
-    email: 'super.admin@rajasthan.gov.in',
-    subtitle: 'State Admin • Full System & Masters',
-    initials: 'SA',
-    badge: 'System Admin',
-    avatarBg: 'bg-indigo-700 text-white',
+    id: 'super_admin',
+    label: 'Super Admin',
     defaultRoute: '/admin/eoi-configuration'
-  },
-  {
-    role: 'new_user',
-    title: 'New Applicant',
-    name: 'New Applicant User',
-    email: 'new.applicant@enterprise.in',
-    subtitle: 'First Time User • OTR Registration',
-    initials: 'NU',
-    badge: 'First Time User',
-    avatarBg: 'bg-amber-600 text-white',
-    defaultRoute: '/registration'
   }
 ];
 
@@ -173,13 +99,29 @@ export class AuthService {
   /** Flag indicating whether the current department admin session has verified OTP */
   isDeptAdminOtpVerified = signal<boolean>(false);
 
-  /** Currently selected Department Role ID */
-  currentDeptRoleId = signal<string>('scheme_officer');
+  /** Roles granted to the signed-in user. Empty when the user holds a single role. */
+  readonly assignedRoles = computed<AssignedRole[]>(() => {
+    const role = this.currentUser()?.role;
+    const holdsBothRoles = role === 'dept_admin' || role === 'super_admin';
+    return holdsBothRoles ? SWITCHABLE_ROLES : [];
+  });
 
-  /** Active Department Role object */
-  readonly currentDeptRole = computed<DeptRole>(() => {
-    const id = this.currentDeptRoleId();
-    return DEPT_ADMIN_ROLES.find(r => r.id === id) || DEPT_ADMIN_ROLES[0];
+  /** True when the signed-in user can switch between roles. */
+  readonly canSwitchRole = computed<boolean>(() => this.assignedRoles().length > 1);
+
+  /** The currently active role of the signed-in user. */
+  readonly activeRole = computed<AssignedRole | null>(() => {
+    const role = this.currentUser()?.role;
+    return SWITCHABLE_ROLES.find(r => r.id === role) ?? null;
+  });
+
+  /** Label of the active role - used wherever the role has to be displayed. */
+  readonly activeRoleLabel = computed<string>(() => {
+    const user = this.currentUser();
+    if (!user) return '';
+    return this.activeRole()?.label
+      ?? USER_ROLES.find(r => r.role === user.role)?.label
+      ?? '';
   });
 
   constructor() {
@@ -189,22 +131,17 @@ export class AuthService {
   private initUser(): void {
     if (typeof localStorage !== 'undefined') {
       try {
-        const savedDeptRole = localStorage.getItem('isms_dept_role_id');
-        if (savedDeptRole && DEPT_ADMIN_ROLES.some(r => r.id === savedDeptRole)) {
-          this.currentDeptRoleId.set(savedDeptRole);
-        }
-
         const saved = localStorage.getItem(this.STORAGE_KEY);
         if (saved) {
           const parsed: UserPersona = JSON.parse(saved);
-          this.currentUser.set(parsed);
-
+          // Normalize admin personas saved under an older build that stored a
+          // person's name/designation instead of a plain role identifier.
           if (parsed.role === 'dept_admin' || parsed.role === 'super_admin') {
-            const matched = DEPT_ADMIN_ROLES.find(r => r.name === parsed.label || r.ssoId === parsed.ssoId);
-            if (matched) {
-              this.currentDeptRoleId.set(matched.id);
-            }
+            parsed.label = ACCOUNT_LABELS[parsed.role];
+            parsed.subLabel = USER_ROLES.find(r => r.role === parsed.role)?.label ?? parsed.subLabel;
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(parsed));
           }
+          this.currentUser.set(parsed);
         } else {
           this.currentUser.set({
             id: 'Approved Citizen (TP)',
@@ -261,20 +198,13 @@ export class AuthService {
     const roleConfig = USER_ROLES.find(r => r.role === role) || USER_ROLES[0];
 
     let label = ssoId;
-    let subLabel = roleConfig.label;
+    // The sub label always carries the active role, never a designation or name.
+    const subLabel = roleConfig.label;
 
-    if (role === 'dept_admin') {
-      const activeDept = this.currentDeptRole();
-      if (!identifier.trim() || identifier.trim() === 'dept_admin') {
-        label = activeDept.name;
-        subLabel = activeDept.designation;
-      }
-    } else if (role === 'super_admin') {
-      const superRole = DEPT_ADMIN_ROLES.find(r => r.role === 'super_admin') || DEPT_ADMIN_ROLES[2];
-      if (!identifier.trim() || identifier.trim() === 'super_admin') {
-        label = superRole.name;
-        subLabel = superRole.designation;
-      }
+    // Admin roles display a plain role identifier instead of a person name.
+    const isPlaceholderId = !identifier.trim() || identifier.trim() === role;
+    if ((role === 'dept_admin' || role === 'super_admin') && isPlaceholderId) {
+      label = ACCOUNT_LABELS[role];
     }
 
     const persona: UserPersona = {
@@ -317,25 +247,26 @@ export class AuthService {
     return USER_ROLES.find(r => r.role === role) || USER_ROLES[0];
   }
 
-  getDeptAdminRoles(): DeptRole[] {
-    return DEPT_ADMIN_ROLES;
+  /** All roles the signed-in user may switch between. */
+  getAssignedRoles(): AssignedRole[] {
+    return this.assignedRoles();
   }
 
   /**
-   * Switches department role instantly for Department Admin
-   * Updates display name, designation, and persona across the application
+   * Switches the active role of the signed-in user without signing out.
+   * The identity is preserved - only the role changes, and with it the
+   * permissions, navigation and landing page.
    */
-  switchDeptRole(roleId: string): void {
-    const target = DEPT_ADMIN_ROLES.find(r => r.id === roleId) || DEPT_ADMIN_ROLES[0];
-    this.currentDeptRoleId.set(target.id);
-    this.setDeptAdminOtpVerified(true);
+  switchActiveRole(roleId: AssignedRole['id'], navigate = true): void {
+    const target = SWITCHABLE_ROLES.find(r => r.id === roleId);
+    const user = this.currentUser();
+    if (!target || !user || user.role === target.id) return;
 
     const persona: UserPersona = {
-      id: target.name,
-      ssoId: target.ssoId,
-      label: target.name,
-      subLabel: target.designation,
-      role: target.role,
+      ...user,
+      label: ACCOUNT_LABELS[target.id],
+      subLabel: target.label,
+      role: target.id,
       isProfileComplete: true
     };
 
@@ -343,41 +274,15 @@ export class AuthService {
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(persona));
-        localStorage.setItem('isms_dept_role_id', target.id);
       } catch { }
     }
-  }
 
-  getSwitchableAccounts(): SwitchableAccount[] {
-    return SWITCHABLE_ACCOUNTS;
-  }
+    // The session is already authenticated, so returning to the department
+    // workspace must not prompt for OTP again.
+    this.setDeptAdminOtpVerified(true);
 
-  /**
-   * Switches user role instantly without logging out
-   */
-  switchRole(role: UserRole, targetRoute?: string): void {
-    if (role === 'dept_admin') {
-      this.switchDeptRole(this.currentDeptRoleId());
-      if (targetRoute) {
-        this.router.navigate([targetRoute]);
-      } else {
-        this.router.navigate(['/admin/eoi-view']);
-      }
-      return;
+    if (navigate) {
+      this.router.navigate([target.defaultRoute]);
     }
-
-    const account = SWITCHABLE_ACCOUNTS.find(a => a.role === role) || SWITCHABLE_ACCOUNTS[0];
-
-    const persona: UserPersona = {
-      id: account.name,
-      ssoId: account.name,
-      label: account.name,
-      subLabel: account.subtitle,
-      role: role,
-      isProfileComplete: role !== 'new_user'
-    };
-
-    const dest = targetRoute || account.defaultRoute;
-    this.login(persona, dest);
   }
 }

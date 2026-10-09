@@ -11,7 +11,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { AuthService } from '../../auth/auth.service';
+import { AuthService, AssignedRole } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -157,8 +157,7 @@ import { AuthService } from '../../auth/auth.service';
               <!-- Dropdown Menu -->
               @if (dropdownOpen()) {
                 <div
-                  class="absolute right-0 top-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl z-[100] overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150 font-sans"
-                  [ngClass]="isDeptAdmin() ? 'w-68 sm:w-76' : 'w-56 sm:w-60'"
+                  class="absolute right-0 top-full mt-2 w-56 sm:w-64 bg-white border border-slate-200 rounded-xl shadow-xl z-[100] overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150 font-sans"
                   role="menu"
                 >
                   <!-- 1. User Info Header -->
@@ -190,44 +189,29 @@ import { AuthService } from '../../auth/auth.service';
                       <span>View Profile</span>
                     </a>
 
-                    <!-- DEPARTMENT ROLES: Only for dept_admin -->
-                    @if (isDeptAdmin()) {
+                    <!-- SWITCH ROLE: shown only when the user holds more than one role -->
+                    @if (canSwitchRole()) {
                       <div class="my-1 border-t border-slate-100"></div>
 
                       <div class="px-3 pt-1 pb-0.5 text-[10.5px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5 text-[#0B3558]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                         </svg>
-                        <span>Department Roles</span>
+                        <span>Switch Role</span>
                       </div>
 
-                      @for (deptRole of deptRoles; track deptRole.id) {
+                      @for (role of assignedRoles(); track role.id) {
                         <button
                           type="button"
-                          (click)="onSelectDeptRole(deptRole.id)"
-                          class="w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-left transition-colors cursor-pointer border-0 group"
-                          [ngClass]="activeDeptRoleId() === deptRole.id ? 'bg-[#0B3558]/10 text-[#0B3558] font-semibold' : 'text-slate-700 hover:bg-[#F0F5FA] hover:text-[#0B3558]'"
+                          (click)="onSelectRole(role.id)"
+                          class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-left transition-colors cursor-pointer border-0"
+                          [ngClass]="isActiveRole(role.id) ? 'bg-[#0B3558]/10 text-[#0B3558] font-bold' : 'text-slate-700 hover:bg-[#F0F5FA] hover:text-[#0B3558] font-medium'"
+                          [attr.aria-current]="isActiveRole(role.id) ? 'true' : null"
                         >
-                          <div class="flex items-center gap-2.5 min-w-0">
-                            <!-- Initials Circle -->
-                            <div
-                              class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold uppercase shrink-0 transition-colors"
-                              [ngClass]="activeDeptRoleId() === deptRole.id ? 'bg-[#0B3558] text-white shadow-2xs' : 'bg-slate-200 text-slate-700 group-hover:bg-[#0B3558]/20 group-hover:text-[#0B3558]'"
-                            >
-                              {{ deptRole.initials }}
-                            </div>
-                            <div class="min-w-0">
-                              <div class="truncate text-xs leading-tight font-medium" [class.text-[#0B3558]]="activeDeptRoleId() === deptRole.id" [class.font-bold]="activeDeptRoleId() === deptRole.id">
-                                {{ deptRole.name }}
-                              </div>
-                              <div class="truncate text-[10.5px] leading-tight text-slate-500 mt-0.5">
-                                {{ deptRole.designation }}
-                              </div>
-                            </div>
-                          </div>
+                          <span class="truncate text-xs leading-tight">{{ role.label }}</span>
 
-                          @if (activeDeptRoleId() === deptRole.id) {
-                            <svg class="w-4 h-4 text-[#0B3558] shrink-0 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                          @if (isActiveRole(role.id)) {
+                            <svg class="w-4 h-4 text-[#0B3558] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
                           }
@@ -305,14 +289,10 @@ export class HeaderComponent {
 
   readonly currentUser = this.authService.currentUser;
 
-  readonly isDeptAdmin = computed(() => {
-    const role = this.currentUser()?.role;
-    return role === 'dept_admin' || role === 'super_admin';
-  });
-
-  readonly deptRoles = this.authService.getDeptAdminRoles();
-  readonly activeDeptRoleId = this.authService.currentDeptRoleId;
-  readonly activeDeptRole = this.authService.currentDeptRole;
+  /** Roles granted to the signed-in user, and the one currently active */
+  readonly assignedRoles = this.authService.assignedRoles;
+  readonly canSwitchRole = this.authService.canSwitchRole;
+  readonly activeRoleLabel = this.authService.activeRoleLabel;
 
   readonly displayName = computed(() => {
     const u = this.currentUser();
@@ -320,14 +300,16 @@ export class HeaderComponent {
     return u.label || u.ssoId || u.id;
   });
 
+  /** Always the active role - never a designation or a person name */
   readonly userSubLabel = computed(() => {
     const u = this.currentUser();
     if (!u) return '';
-    if (this.isDeptAdmin()) {
-      return this.activeDeptRole()?.badge || u.subLabel || 'Officer';
-    }
-    return u.subLabel || 'SSOID User';
+    return this.activeRoleLabel() || u.subLabel || 'SSOID User';
   });
+
+  isActiveRole(roleId: string): boolean {
+    return this.currentUser()?.role === roleId;
+  }
 
   readonly avatarChar = computed(() => {
     const name = this.displayName();
@@ -339,7 +321,7 @@ export class HeaderComponent {
   readonly avatarBgClass = computed(() => {
     const role = this.currentUser()?.role;
     if (role === 'dept_admin' || role === 'super_admin') {
-      return this.activeDeptRole()?.avatarBg || 'bg-[#0B3558] text-white';
+      return 'bg-[#0B3558] text-white';
     }
     if (role === 'new_user') {
       return 'bg-amber-600 text-white';
@@ -396,8 +378,8 @@ export class HeaderComponent {
     this.authService.logout();
   }
 
-  onSelectDeptRole(roleId: string): void {
+  onSelectRole(roleId: AssignedRole['id']): void {
     this.dropdownOpen.set(false);
-    this.authService.switchDeptRole(roleId);
+    this.authService.switchActiveRole(roleId);
   }
 }

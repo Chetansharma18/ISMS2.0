@@ -1,8 +1,8 @@
-import { Component, inject, signal, computed, OnInit, HostListener } from '@angular/core';
+import { Component, inject, signal, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { EoiStateService, Scheme } from '../../services/eoi-state.service';
-import { AuthService } from '../../../../core/auth/auth.service';
+import { AuthService, AssignedRole } from '../../../../core/auth/auth.service';
 import {
   PageHeaderComponent,
   TableComponent,
@@ -44,69 +44,53 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
               <span class="font-bold text-[#0c2d4e]">{{ schemes().length }}</span>
             </div>
 
-            <!-- Department Admin Active Role Switcher Widget -->
-            <div class="relative z-30" id="dept-role-dropdown-container">
-              <button
-                type="button"
-                (click)="toggleRoleDropdown()"
-                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0B3558] hover:bg-[#07243c] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
-                title="Switch Department Role"
-              >
-                <div class="w-5 h-5 rounded-full bg-white/20 text-white flex items-center justify-center text-[10px] font-bold">
-                  {{ activeOfficerInitials() }}
-                </div>
-                <span>Role: {{ activeOfficerTitle() }}</span>
-                <svg class="w-3.5 h-3.5 text-sky-200 transition-transform duration-200" [class.rotate-180]="roleDropdownOpen()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              <!-- Dropdown Menu -->
-              @if (roleDropdownOpen()) {
-                <div
-                  class="absolute right-0 top-full mt-2 w-68 sm:w-76 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150 text-left font-sans"
+            <!-- Active Role Switcher (only when the user holds more than one role) -->
+            @if (canSwitchRole()) {
+              <div class="relative z-30" id="dept-role-dropdown-container">
+                <button
+                  type="button"
+                  (click)="toggleRoleDropdown()"
+                  class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0B3558] hover:bg-[#07243c] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                  title="Switch Role"
                 >
-                  <div class="px-3 py-2 border-b border-slate-100 bg-slate-50">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Department Role</span>
-                    <span class="text-xs text-slate-700 font-bold">Switch Officer / Desk In-Charge</span>
-                  </div>
+                  <span>Role: {{ activeRoleLabel() }}</span>
+                  <svg class="w-3.5 h-3.5 text-sky-200 transition-transform duration-200" [class.rotate-180]="roleDropdownOpen()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
 
-                  <div class="p-1.5 space-y-0.5">
-                    @for (deptRole of deptRoles; track deptRole.id) {
-                      <button
-                        type="button"
-                        (click)="onSelectDeptRole(deptRole.id)"
-                        class="w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-left transition-colors cursor-pointer border-0 group"
-                        [ngClass]="activeDeptRoleId() === deptRole.id ? 'bg-[#0B3558]/10 text-[#0B3558] font-semibold' : 'text-slate-700 hover:bg-[#F0F5FA] hover:text-[#0B3558]'"
-                      >
-                        <div class="flex items-center gap-2.5 min-w-0">
-                          <div
-                            class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold uppercase shrink-0 transition-colors"
-                            [ngClass]="activeDeptRoleId() === deptRole.id ? 'bg-[#0B3558] text-white shadow-2xs' : 'bg-slate-200 text-slate-700 group-hover:bg-[#0B3558]/20 group-hover:text-[#0B3558]'"
-                          >
-                            {{ deptRole.initials }}
-                          </div>
-                          <div class="min-w-0">
-                            <div class="truncate text-xs leading-tight font-medium" [class.text-[#0B3558]]="activeDeptRoleId() === deptRole.id" [class.font-bold]="activeDeptRoleId() === deptRole.id">
-                              {{ deptRole.name }}
-                            </div>
-                            <div class="truncate text-[10.5px] leading-tight text-slate-500 mt-0.5">
-                              {{ deptRole.designation }}
-                            </div>
-                          </div>
-                        </div>
+                <!-- Dropdown Menu -->
+                @if (roleDropdownOpen()) {
+                  <div
+                    class="absolute right-0 top-full mt-2 w-52 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150 text-left font-sans"
+                  >
+                    <div class="px-3 py-2 border-b border-slate-100 bg-slate-50">
+                      <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Switch Role</span>
+                    </div>
 
-                        @if (activeDeptRoleId() === deptRole.id) {
-                          <svg class="w-4 h-4 text-[#0B3558] shrink-0 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                        }
-                      </button>
-                    }
+                    <div class="p-1.5 space-y-0.5">
+                      @for (role of assignedRoles(); track role.id) {
+                        <button
+                          type="button"
+                          (click)="onSelectRole(role.id)"
+                          class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-left transition-colors cursor-pointer border-0"
+                          [ngClass]="isActiveRole(role.id) ? 'bg-[#0B3558]/10 text-[#0B3558] font-bold' : 'text-slate-700 hover:bg-[#F0F5FA] hover:text-[#0B3558] font-medium'"
+                          [attr.aria-current]="isActiveRole(role.id) ? 'true' : null"
+                        >
+                          <span class="truncate text-xs leading-tight">{{ role.label }}</span>
+
+                          @if (isActiveRole(role.id)) {
+                            <svg class="w-4 h-4 text-[#0B3558] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          }
+                        </button>
+                      }
+                    </div>
                   </div>
-                </div>
-              }
-            </div>
+                }
+              </div>
+            }
           </div>
         </app-page-header>
 
@@ -225,9 +209,13 @@ export class DepartmentEoiViewComponent implements OnInit {
 
   onOtpVerified(otp: string): void {
     this.authService.setDeptAdminOtpVerified(true);
-    // If not logged in as dept_admin, set credentials
     if (this.authService.currentUser()?.role !== 'dept_admin') {
-      this.authService.loginWithCredentials(this.currentSsoId(), 'dept_admin', null);
+      if (this.authService.canSwitchRole()) {
+        // User already holds the department role - just make it the active one
+        this.authService.switchActiveRole('dept_admin', false);
+      } else {
+        this.authService.loginWithCredentials(this.currentSsoId(), 'dept_admin', null);
+      }
     }
     this.showOtpModal.set(false);
   }
@@ -238,24 +226,21 @@ export class DepartmentEoiViewComponent implements OnInit {
   }
 
   roleDropdownOpen = signal<boolean>(false);
-  readonly deptRoles = this.authService.getDeptAdminRoles();
-  readonly activeDeptRoleId = this.authService.currentDeptRoleId;
-  readonly activeDeptRole = this.authService.currentDeptRole;
+  readonly assignedRoles = this.authService.assignedRoles;
+  readonly canSwitchRole = this.authService.canSwitchRole;
+  readonly activeRoleLabel = this.authService.activeRoleLabel;
 
-  readonly activeOfficerInitials = computed(() => this.activeDeptRole().initials);
-  readonly activeOfficerTitle = computed(() => this.activeDeptRole().badge);
+  isActiveRole(roleId: string): boolean {
+    return this.authService.currentUser()?.role === roleId;
+  }
 
   toggleRoleDropdown(): void {
     this.roleDropdownOpen.update(v => !v);
   }
 
-  onSelectDeptRole(roleId: string): void {
+  onSelectRole(roleId: AssignedRole['id']): void {
     this.roleDropdownOpen.set(false);
-    this.authService.switchDeptRole(roleId);
-    const user = this.authService.currentUser();
-    if (user) {
-      this.currentSsoId.set(user.ssoId || user.id);
-    }
+    this.authService.switchActiveRole(roleId);
   }
 
   @HostListener('document:click', ['$event'])

@@ -11,6 +11,7 @@ import {
   TableColumn
 } from '../../shared';
 import { SchemeDetailViewComponent } from './scheme-detail-view.component';
+import { SCHEME_NAME_OPTIONS } from '../../core/mock/data';
 
 export interface SchemeTender {
   sNo: number;
@@ -440,12 +441,17 @@ export interface EoiDocumentItem {
             
             <label class="text-slate-700 font-medium">Scheme*</label>
             <select [(ngModel)]="newEoiData.scheme" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.scheme, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.scheme)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white">
-              <option value="MMKVY">MMKVY</option>
-              <option value="RAJKVIK">RAJKVIK</option>
+              @for (name of schemeNameOptions; track name) {
+                <option [value]="name">{{ name }}</option>
+              }
             </select>
 
             <label class="text-slate-700 font-medium">Scheme Category</label>
-            <input type="text" value="ALL" disabled class="w-full px-2.5 py-1.5 border border-[#e2e8f0] bg-[#f8fafc] rounded text-slate-500" />
+            <select [(ngModel)]="newEoiData.schemeCategory" class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white">
+              @for (cat of schemeCategoryOptions; track cat) {
+                <option [value]="cat">{{ cat }}</option>
+              }
+            </select>
 
             <label class="text-slate-700 font-medium">Date of Eol Published*</label>
             <input type="date" [(ngModel)]="newEoiData.publishedDate" [ngClass]="{'border-red-500': newEoiSubmitted() && !newEoiData.publishedDate, 'border-[#8FA3B6]': !(newEoiSubmitted() && !newEoiData.publishedDate)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800" />
@@ -697,9 +703,16 @@ export class TendersPageComponent {
   });
   private promptDismissed = false;
 
+  /** Scheme names available in the "Configure New EOI" scheme dropdown. */
+  readonly schemeNameOptions = SCHEME_NAME_OPTIONS;
+
+  /** Scheme Category options for the "Configure New EOI" form. */
+  readonly schemeCategoryOptions = ['ALL', 'NA', 'RAJVIK', 'SAKSHAM', 'SAMARTH'];
+
   newEoiData = {
     refNo: '',
     scheme: 'MMKVY',
+    schemeCategory: 'ALL',
     publishedDate: '',
     submissionDate: '',
     eoiCategory: 'General',
@@ -965,6 +978,7 @@ export class TendersPageComponent {
     this.newEoiData = {
       refNo: '',
       scheme: 'MMKVY',
+      schemeCategory: 'ALL',
       publishedDate: '',
       submissionDate: '',
       eoiCategory: 'General',
@@ -975,6 +989,16 @@ export class TendersPageComponent {
       documents: []
     };
     this.showConfigureEoiModal.set(true);
+  }
+
+  /** Maps a scheme's stored category value onto one of the fixed dropdown options. */
+  private normalizeSchemeCategory(value?: string): string {
+    const v = (value || '').trim().toUpperCase();
+    if (v.includes('RAJKVIK') || v.includes('RAJVIK')) return 'RAJVIK';
+    if (v.includes('SAKSH')) return 'SAKSHAM';
+    if (v.includes('SAMARTH')) return 'SAMARTH';
+    if (v === 'NA' || v === '') return 'NA';
+    return 'ALL';
   }
 
   editScheme(scheme: SchemeTender): void {
@@ -999,6 +1023,7 @@ export class TendersPageComponent {
     this.newEoiData = {
       refNo: scheme.refNo,
       scheme: scheme.schemeName,
+      schemeCategory: this.normalizeSchemeCategory(scheme.schemeCategory || scheme.category),
       publishedDate: parseDate(scheme.datePublished),
       submissionDate: parseDate(scheme.closingDate),
       eoiCategory: scheme.eoiCategory || 'General',
@@ -1271,8 +1296,8 @@ export class TendersPageComponent {
       refNo: d.refNo,
       schemeName: d.scheme,
       schemeTitle: d.scheme,
-      schemeCategory: 'ALL',
-      category: 'ALL',
+      schemeCategory: d.schemeCategory,
+      category: d.schemeCategory,
       datePublished: formatDt(d.publishedDate),
       closingDate: formatDt(d.submissionDate),
       eoiCategory: d.eoiCategory,

@@ -159,15 +159,7 @@ export interface UserManagementItem {
 
       <!-- Custom Template for Role Type -->
       <ng-template #roleTypeTemplate let-item>
-        <span
-          class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold border"
-          [ngClass]="{
-            'bg-purple-50 text-purple-700 border-purple-200': item.roleType === 'tp' || item.userType === 'TP',
-            'bg-sky-50 text-[#174A6E] border-sky-200': item.roleType !== 'tp' && item.userType !== 'TP'
-          }"
-        >
-          {{ item.roleType }}
-        </span>
+        <span class="text-[13px] font-medium text-slate-700">{{ roleTypeLabel(item.roleType) }}</span>
       </ng-template>
 
       <!-- Custom Template for Scheme Status -->
@@ -219,36 +211,69 @@ export interface UserManagementItem {
             <span>Edit</span>
           </button>
 
-          <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
+          <!-- Active / Inactive Toggle (hidden for blacklisted users) -->
+          @if (item.schemeStatus !== 'Blacklisted') {
+            <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
 
-          <!-- Active / Inactive Toggle -->
-          <div
-            class="inline-flex items-center gap-1.5"
-            title="Toggle Status"
-            (click)="$event.stopPropagation();"
-          >
-            <button
-              type="button"
-              (click)="toggleUserStatus(item)"
-              class="relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-              [ngClass]="item.schemeStatus !== 'Active' ? 'bg-slate-400 hover:bg-slate-500' : 'bg-emerald-500 hover:bg-emerald-600'"
-              role="switch"
-              [attr.aria-checked]="item.schemeStatus === 'Active'"
+            <div
+              class="inline-flex items-center gap-1.5"
+              title="Toggle Status"
+              (click)="$event.stopPropagation();"
             >
-              <span class="sr-only">Toggle Active Status</span>
-              <span
-                class="pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                [ngClass]="item.schemeStatus !== 'Active' ? 'translate-x-0' : 'translate-x-3'"
-              ></span>
-            </button>
-            <span 
-              class="font-medium text-[12px] select-none transition-colors cursor-pointer"
-              (click)="toggleUserStatus(item)"
-              [ngClass]="item.schemeStatus !== 'Active' ? 'text-slate-500 hover:text-slate-700' : 'text-emerald-600 hover:text-emerald-700'"
-            >
-              {{ item.schemeStatus !== 'Active' ? 'Inactive' : 'Active' }}
-            </span>
-          </div>
+              <button
+                type="button"
+                (click)="toggleUserStatus(item)"
+                class="relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                [ngClass]="item.schemeStatus !== 'Active' ? 'bg-slate-400 hover:bg-slate-500' : 'bg-emerald-500 hover:bg-emerald-600'"
+                role="switch"
+                [attr.aria-checked]="item.schemeStatus === 'Active'"
+              >
+                <span class="sr-only">Toggle Active Status</span>
+                <span
+                  class="pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                  [ngClass]="item.schemeStatus !== 'Active' ? 'translate-x-0' : 'translate-x-3'"
+                ></span>
+              </button>
+              <span 
+                class="font-medium text-[12px] select-none transition-colors cursor-pointer"
+                (click)="toggleUserStatus(item)"
+                [ngClass]="item.schemeStatus !== 'Active' ? 'text-slate-500 hover:text-slate-700' : 'text-emerald-600 hover:text-emerald-700'"
+              >
+                {{ item.schemeStatus !== 'Active' ? 'Inactive' : 'Active' }}
+              </span>
+            </div>
+          }
+
+          <!-- Blacklist control (Training Partners only) -->
+          @if (isTrainingPartner(item)) {
+            <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
+
+            @if (item.schemeStatus === 'Blacklisted') {
+              <button
+                type="button"
+                (click)="$event.stopPropagation(); requestBlacklistToggle(item)"
+                class="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
+                title="Remove this Training Partner from the blacklist"
+              >
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Remove Blacklist</span>
+              </button>
+            } @else {
+              <button
+                type="button"
+                (click)="$event.stopPropagation(); requestBlacklistToggle(item)"
+                class="inline-flex items-center gap-1 text-rose-600 hover:text-rose-700 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
+                title="Mark this Training Partner as blacklisted"
+              >
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                </svg>
+                <span>Mark Blacklisted</span>
+              </button>
+            }
+          }
         </div>
       </ng-template>
 
@@ -286,7 +311,7 @@ export interface UserManagementItem {
             </div>
             <div>
               <span class="text-slate-500 font-medium block text-xs">Role Type</span>
-              <span class="font-semibold text-[#174A6E]">{{ u.roleType }}</span>
+              <span class="font-semibold text-[#174A6E]">{{ roleTypeLabel(u.roleType) }}</span>
             </div>
             <div>
               <span class="text-slate-500 font-medium block text-xs">Designation</span>
@@ -464,12 +489,9 @@ export interface UserManagementItem {
                   class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
                 >
                   <option value="" disabled selected>Select Role Type</option>
-                  <option value="OIC">OIC</option>
-                  <option value="manager">manager</option>
-                  <option value="super admin">super admin</option>
-                  <option value="S.A">S.A</option>
-                  <option value="Admin">Admin</option>
-                  <option value="ZC">ZC</option>
+                  @for (role of roleTypeOptions; track role.value) {
+                    <option [value]="role.value">{{ role.label }}</option>
+                  }
                 </select>
                 @if (submitted() && !formData.roleType) {
                   <div class="text-xs text-red-500 mt-0.5 font-medium">Role Type is required</div>
@@ -574,7 +596,7 @@ export class UserManagementComponent {
   showViewModal = signal<boolean>(false);
   showConfirmModal = signal<boolean>(false);
   confirmModalData = signal<{
-    type: 'edit' | 'status' | 'delete';
+    type: 'edit' | 'status' | 'delete' | 'blacklist';
     user: UserManagementItem;
     title: string;
     message: string;
@@ -585,6 +607,46 @@ export class UserManagementComponent {
   editingId = signal<string | null>(null);
   selectedViewUser = signal<UserManagementItem | null>(null);
   submitted = signal<boolean>(false);
+
+  /** Canonical role types: stored value (DB) -> human readable label shown in the UI. */
+  readonly roleTypeOptions: ReadonlyArray<{ value: string; label: string }> = [
+    { value: 'super admin', label: 'Super Admin' },
+    { value: 'scheme oc', label: 'Scheme Officer In-Charge' },
+    { value: 'mis manager', label: 'MIS Manager' },
+    { value: 'gm', label: 'General Manager' },
+    { value: 'zc', label: 'Zone Coordinator' },
+    { value: 'programmer', label: 'Programmer' },
+    { value: 'tp', label: 'Training Partner' }
+  ];
+
+  private readonly roleTypeLabelMap: Record<string, string> = {
+    'super admin': 'Super Admin',
+    's.a': 'Super Admin',
+    'sa': 'Super Admin',
+    'admin': 'Administrator',
+    'scheme oc': 'Scheme Officer In-Charge',
+    'oic': 'Officer In-Charge',
+    'mis manager': 'MIS Manager',
+    'manager': 'Manager',
+    'gm': 'General Manager',
+    'zc': 'Zone Coordinator',
+    'programmer': 'Programmer',
+    'tp': 'Training Partner',
+    'citizen': 'Citizen'
+  };
+
+  /** Converts a stored role type (e.g. "mis manager", "gm") into a readable label. */
+  roleTypeLabel(roleType: string | null | undefined): string {
+    if (!roleType) return '-';
+    const key = roleType.trim().toLowerCase();
+    return this.roleTypeLabelMap[key]
+      ?? key.replace(/\b[a-z]/g, char => char.toUpperCase());
+  }
+
+  /** Blacklisting applies to Training Partners only. */
+  isTrainingPartner(item: UserManagementItem): boolean {
+    return item.userType === 'TP' || (item.roleType || '').trim().toLowerCase() === 'tp';
+  }
 
   formData = {
     userId: '',
@@ -646,6 +708,9 @@ export class UserManagementComponent {
       (u.userId && u.userId.toLowerCase().includes(q)) ||
       (u.username && u.username.toLowerCase().includes(q)) ||
       (u.ssoId && u.ssoId.toLowerCase().includes(q)) ||
+      (u.roleType && u.roleType.toLowerCase().includes(q)) ||
+      this.roleTypeLabel(u.roleType).toLowerCase().includes(q) ||
+      (u.districtName && u.districtName.toLowerCase().includes(q)) ||
       (u.schemeDepartment && u.schemeDepartment.toLowerCase().includes(q))
     );
   });
@@ -728,7 +793,7 @@ export class UserManagementComponent {
       label: 'Actions',
       align: 'center',
       type: 'custom',
-      width: 'min-w-[310px]'
+      width: 'min-w-[430px]'
     }
   ];
 
@@ -904,6 +969,33 @@ export class UserManagementComponent {
     this.showConfirmModal.set(true);
   }
 
+  requestBlacklistToggle(item: UserManagementItem): void {
+    const isBlacklisted = item.schemeStatus === 'Blacklisted';
+
+    this.confirmModalData.set({
+      type: 'blacklist',
+      user: item,
+      title: isBlacklisted ? 'Remove from Blacklist' : 'Mark as Blacklisted',
+      message: isBlacklisted
+        ? `Are you sure you want to remove Training Partner "${item.username}" (${item.userId}) from the blacklist? The account will be restored to Active status.`
+        : `Are you sure you want to mark Training Partner "${item.username}" (${item.userId}) as Blacklisted? The account will be blocked from participating in schemes, tenders and batches.`,
+      confirmLabel: isBlacklisted ? 'Yes, Remove Blacklist' : 'Yes, Mark Blacklisted',
+      accentBarClass: isBlacklisted ? 'bg-emerald-600' : 'bg-rose-600'
+    });
+    this.showConfirmModal.set(true);
+  }
+
+  toggleBlacklistStatus(item: UserManagementItem): void {
+    const newStatus: UserManagementItem['schemeStatus'] =
+      item.schemeStatus === 'Blacklisted' ? 'Active' : 'Blacklisted';
+
+    this.userRepo.update(item.id, { schemeStatus: newStatus }).subscribe(updated => {
+      this.users.update(current =>
+        current.map(u => u.id === item.id ? { ...u, schemeStatus: updated?.schemeStatus || newStatus } : u)
+      );
+    });
+  }
+
   requestDeleteUser(item: UserManagementItem): void {
     this.confirmModalData.set({
       type: 'delete',
@@ -927,6 +1019,8 @@ export class UserManagementComponent {
       this.openEditModal(data.user);
     } else if (data.type === 'status') {
       this.toggleUserStatus(data.user);
+    } else if (data.type === 'blacklist') {
+      this.toggleBlacklistStatus(data.user);
     } else if (data.type === 'delete') {
       this.deleteUser(data.user);
     }
@@ -947,6 +1041,9 @@ export class UserManagementComponent {
   }
 
   getRowClass = (item: any): string => {
+    if (item.status === 'Blacklisted' || item.schemeStatus === 'Blacklisted') {
+      return 'bg-rose-50/60 transition-colors';
+    }
     const isInactive = item.status === 'Inactive' || item.schemeStatus === 'Inactive';
     return isInactive ? 'opacity-50 bg-slate-50 transition-colors' : 'bg-white transition-colors';
   };

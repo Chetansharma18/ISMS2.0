@@ -2927,134 +2927,65 @@ export interface EoiDocumentItem {
            EOI APPLICATION SUCCESSFULLY SUBMITTED POPUP MODAL
            ==================================================================== -->
       @if (showEmdSuccessModal()) {
-        <div class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200 font-sans">
-          <div class="relative bg-white rounded-2xl max-w-lg w-full p-5 sm:p-7 shadow-2xl border border-slate-200 text-center space-y-4 animate-in zoom-in-95 duration-150 my-auto">
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto font-sans"
+             style="background: rgba(10, 20, 40, 0.45); backdrop-filter: blur(3px);"
+             role="dialog"
+             aria-modal="true"
+             (click)="closeSuccessModalAndGoToStep6()">
+          <div class="w-full max-w-md bg-white rounded-xl border border-slate-200 relative font-sans shadow-2xl p-5 sm:p-6 text-left my-auto animate-in zoom-in-95 duration-150"
+               (click)="$event.stopPropagation()">
             
-            <!-- Top Close Button -->
+            <!-- Close Button (Crisp SVG matching application font/UI style) -->
             <button
               type="button"
               (click)="closeSuccessModalAndGoToStep6()"
-              class="absolute top-3.5 right-3.5 w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer text-lg font-bold leading-none"
-              title="Close and view receipts"
+              class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none"
+              title="Close"
+              aria-label="Close"
             >
-              &times;
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
 
-            <!-- Success Icon Badge -->
-            <div class="relative w-16 h-16 mx-auto">
-              <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-inner ring-8 ring-emerald-50">
-                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <span class="absolute -bottom-1 -right-1 bg-[#0B3558] text-white p-1 rounded-full shadow-xs">
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </span>
-            </div>
-
-            <!-- Title & Subtitle -->
-            <div class="space-y-1">
-              <h3 class="text-xl sm:text-2xl font-black text-[#0B3558] m-0 tracking-tight">
-                EOI Successfully Submitted!
+            <!-- Title & Message -->
+            <div class="pr-7 space-y-1">
+              <h3 class="text-base sm:text-lg font-bold text-[#0B3558] m-0 tracking-tight leading-snug">
+                EOI Successfully Submitted
               </h3>
-              <p class="text-xs sm:text-[13px] text-slate-600 leading-relaxed m-0">
-                Your Expression of Interest (EOI) proposal for <strong class="text-slate-900">{{ schemeTitle() }}</strong> has been officially registered with RSLDC.
+              <p class="text-xs sm:text-sm text-slate-600 m-0 leading-relaxed">
+                Your Expression of Interest application has been successfully submitted.
               </p>
             </div>
 
-            <!-- Prominent EOI Application ID Card -->
-            <div class="p-3.5 sm:p-4 bg-gradient-to-br from-sky-50/80 via-blue-50/50 to-indigo-50/40 border-2 border-[#0B3558]/20 rounded-xl space-y-2 text-center relative overflow-hidden shadow-2xs">
+            <!-- Details: Scheme Name & Application Number -->
+            <div class="mt-4 bg-slate-50 border border-slate-200 rounded-lg p-3.5 space-y-2.5 text-xs sm:text-sm">
+              <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+                <span class="text-slate-500 font-medium text-[11px] uppercase tracking-wider shrink-0">Scheme Name</span>
+                <span class="font-semibold text-slate-800 text-xs sm:text-sm sm:text-right">{{ schemeTitle() }}</span>
+              </div>
+              <div class="border-t border-slate-200"></div>
               <div class="flex items-center justify-between gap-2">
-                <span class="text-[10.5px] uppercase font-bold tracking-wider text-[#0B3558] flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                  Official EOI Application ID
-                </span>
-                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                  Registered &amp; Active
-                </span>
-              </div>
-
-              <div class="flex items-center justify-between bg-white px-3.5 py-3 rounded-xl border border-slate-200 shadow-xs gap-3">
-                <div class="text-left min-w-0">
-                  <span class="text-[11px] font-bold text-[#0B3558] block uppercase tracking-wider flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                    </svg>
-                    THIS IS YOUR OFFICIAL EOI ID:
-                  </span>
-                  <span class="font-mono text-lg sm:text-xl font-black text-[#0B3558] tracking-wider select-all break-all block mt-0.5">
-                    {{ eoiApplicationId() }}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  (click)="copyRef()"
-                  class="px-3.5 py-2 rounded-lg font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-xs shrink-0"
-                  [ngClass]="copiedRef() ? 'bg-emerald-600 text-white ring-2 ring-emerald-300' : 'bg-[#0B3558] hover:bg-[#07233B] text-white'"
-                  title="Copy EOI Application ID"
-                >
-                  @if (copiedRef()) {
-                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
-                    <span>✓ Copied!</span>
-                  } @else {
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                    <span>Copy ID</span>
-                  }
-                </button>
-              </div>
-
-              <p class="text-[11px] text-slate-500 m-0 leading-tight text-left flex items-start gap-1.5 pt-0.5">
-                <svg class="w-3.5 h-3.5 text-[#0483AC] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Please preserve this EOI ID for application tracking, departmental scrutiny updates, and official correspondence.</span>
-              </p>
-            </div>
-
-            <!-- Key Details Summary Breakdown -->
-            <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-left text-xs space-y-2">
-              <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
-                <span class="text-slate-500 text-[11px] font-medium">Scheme Name</span>
-                <span class="font-semibold text-slate-800 text-xs">{{ schemeName() }}</span>
-              </div>
-              <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
-                <span class="text-slate-500 text-[11px] font-medium">EOI Reference No.</span>
-                <span class="font-mono text-slate-700 text-xs truncate max-w-[60%]" [title]="schemeRefNo()">{{ schemeRefNo() }}</span>
-              </div>
-              <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
-                <span class="text-slate-500 text-[11px] font-medium">EMD / Payment Status</span>
-                <span class="font-mono font-semibold text-slate-800 text-xs">{{ paymentMethod() === 'exemption' ? 'MSME Exempted (₹0.00)' : formattedEmdFee() + ' (Settled)' }}</span>
-              </div>
-              <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
-                <span class="text-slate-500 text-[11px] font-medium">Submission Timestamp</span>
-                <span class="font-semibold text-slate-800 text-xs">{{ submissionTimestamp() }}</span>
-              </div>
-              <div class="flex items-center justify-between pt-0.5">
-                <span class="font-bold text-slate-700 text-xs">Application Stage</span>
-                <span class="inline-flex items-center gap-1 font-bold text-sky-800 text-xs bg-sky-50 border border-sky-200 px-2.5 py-0.5 rounded-full">
-                  <span class="w-1.5 h-1.5 rounded-full bg-sky-600 animate-pulse"></span>
-                  Submitted &bull; Under Review
-                </span>
+                <span class="text-slate-500 font-medium text-[11px] uppercase tracking-wider shrink-0">Application Number</span>
+                <span class="font-mono font-bold text-[#0B3558] text-xs sm:text-sm">{{ eoiApplicationId() }}</span>
               </div>
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
-              <button
-                type="button"
-                (click)="closeSuccessModalAndGoToStep6()"
-                class="w-full sm:flex-1 py-3 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-xl text-xs sm:text-sm font-bold shadow-md transition-colors cursor-pointer flex items-center justify-center gap-2"
-              >
-                <span>Proceed to Step 6: Download Receipts &rarr;</span>
-              </button>
+            <div class="mt-5 flex flex-col-reverse sm:flex-row items-center justify-end gap-2.5">
               <button
                 type="button"
                 (click)="goToTenderStatus()"
-                class="w-full sm:w-auto px-4 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-xl text-xs sm:text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap"
+                class="w-full sm:w-auto px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs sm:text-sm font-medium transition-colors cursor-pointer text-center"
               >
-                <span>Track in Tender Status</span>
+                Track in Tender Status
+              </button>
+              <button
+                type="button"
+                (click)="closeSuccessModalAndGoToStep6()"
+                class="w-full sm:w-auto px-4 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs sm:text-sm font-semibold transition-colors cursor-pointer text-center shadow-xs"
+              >
+                Proceed to Download Receipts
               </button>
             </div>
 

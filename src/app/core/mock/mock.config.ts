@@ -39,7 +39,18 @@ export const MOCK_CONFIG: MockConfigSettings = {
     MASTERS: true,
     GRIEVANCES: true,
     REGISTRATION: true,
-    AUTH: true
+    AUTH: true,
+    ADMIN_GRIEVANCES: true,
+    SUBMITTED_TENDERS: true,
+    CAMERA_BATCHES: true,
+    SECTORS: true,
+    DESIGNATIONS: true,
+    COURSES: true,
+    DISTRICTS: true,
+    EOI_CATEGORIES: true,
+    PERMISSIONS: true,
+    SCHEME_MASTERS: true,
+    USER_ROLES: true
   }
 };
 

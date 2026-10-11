@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OtrFormService } from '../../services/otr-form.service';
@@ -19,6 +19,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
 @Component({
   selector: 'app-step3-auth-person',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     FormsModule,

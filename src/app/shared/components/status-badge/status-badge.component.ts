@@ -1,10 +1,11 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BadgeVariant } from '../table/table.types';
 
 @Component({
   selector: 'app-status-badge',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
     <span
@@ -21,16 +22,16 @@ export class StatusBadgeComponent {
   get variantClasses(): string {
     switch (this.variant) {
       case 'success':
-        return 'bg-[#EAF2F6] text-[#174A6E] border border-[#D9E1E7]';
+        return 'bg-primary-light text-brand border border-theme';
       case 'warning':
         return 'bg-[#FFFBEB] text-[#92400E] border border-[#FDE68A]';
       case 'danger':
         return 'bg-[#FEF2F2] text-[#991B1B] border border-[#FECACA]';
       case 'info':
-        return 'bg-[#EAF2F6] text-[#174A6E] border border-[#D9E1E7]';
+        return 'bg-primary-light text-brand border border-theme';
       case 'neutral':
       default:
-        return 'bg-[#F5F7F9] text-[#5F6B76] border border-[#D9E1E7]';
+        return 'bg-surface-muted text-[#5F6B76] border border-border';
     }
   }
 }

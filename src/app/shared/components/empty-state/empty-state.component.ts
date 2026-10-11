@@ -1,13 +1,14 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-empty-state',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
     <div class="flex flex-col items-center justify-center p-8 sm:p-12 text-center max-w-md mx-auto font-sans">
-      <div class="w-12 h-12 rounded-full bg-[#EAF2F6] flex items-center justify-center text-[#174A6E] mb-3">
+      <div class="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center text-brand mb-3">
         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" [attr.d]="iconPath" />
         </svg>

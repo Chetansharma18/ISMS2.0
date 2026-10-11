@@ -1,28 +1,33 @@
 import {
+  ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   Input,
   Output,
   EventEmitter,
   inject,
   signal,
-  computed,
-  HostListener
+  computed
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { AuthService, AssignedRole } from '../../auth/auth.service';
+import { AuthService, AssignedRole, UserRole } from '../../auth/auth.service';
+import { PermissionService } from '../../permissions/permission.service';
+import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, RouterModule, ClickOutsideDirective],
   host: {
     class: 'block w-full relative z-50'
   },
   template: `
     <header
-      class="w-full bg-[#FFFFFF] border-b border-[#DCE4ED] box-border relative z-50 select-none"
+      class="w-full bg-white border-b border-[#DCE4ED] box-border relative z-50 select-none"
       [class.sticky]="isSticky"
       [class.top-0]="isSticky"
       role="banner"
@@ -35,7 +40,7 @@ import { AuthService, AssignedRole } from '../../auth/auth.service';
             <button
               type="button"
               (click)="toggleMobileMenu.emit()"
-              class="md:hidden p-1.5 -ml-1 text-slate-700 hover:text-[#0B3558] hover:bg-slate-100 rounded-lg transition-colors cursor-pointer shrink-0"
+              class="md:hidden p-1.5 -ml-1 text-slate-700 hover:text-navy hover:bg-slate-100 rounded-lg transition-colors cursor-pointer shrink-0"
               aria-label="Toggle navigation menu"
               title="Open Navigation Menu"
             >
@@ -118,7 +123,7 @@ import { AuthService, AssignedRole } from '../../auth/auth.service';
 
           <!-- When Logged In (and on internal portal page): User Profile Menu & Role Switcher -->
           @if (currentUser() && !isLandingPage()) {
-            <div class="relative z-[100]" id="user-menu-container">
+            <div class="relative z-[100]" id="user-menu-container" (appClickOutside)="closeDropdown()">
               <button
                 type="button"
                 id="user-menu-btn"
@@ -161,7 +166,7 @@ import { AuthService, AssignedRole } from '../../auth/auth.service';
                   role="menu"
                 >
                   <!-- 1. User Info Header -->
-                  <div class="px-3.5 py-2.5 border-b border-slate-100 bg-[#F8FAFC]">
+                  <div class="px-3.5 py-2.5 border-b border-slate-100 bg-slate-50">
                     <div class="flex items-center gap-2.5">
                       <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase shrink-0 shadow-xs text-white"
                         [ngClass]="avatarBgClass()">
@@ -180,7 +185,7 @@ import { AuthService, AssignedRole } from '../../auth/auth.service';
                     <a
                       routerLink="/profile"
                       (click)="closeDropdown()"
-                      class="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-700 hover:bg-[#F0F5FA] hover:text-[#0B3558] rounded-lg transition-colors cursor-pointer no-underline font-medium"
+                      class="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-700 hover:bg-[#F0F5FA] hover:text-navy rounded-lg transition-colors cursor-pointer no-underline font-medium"
                       role="menuitem"
                     >
                       <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -194,7 +199,7 @@ import { AuthService, AssignedRole } from '../../auth/auth.service';
                       <div class="my-1 border-t border-slate-100"></div>
 
                       <div class="px-3 pt-1 pb-0.5 text-[10.5px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 text-[#0B3558]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-3.5 h-3.5 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                         </svg>
                         <span>Switch Role</span>
@@ -205,13 +210,13 @@ import { AuthService, AssignedRole } from '../../auth/auth.service';
                           type="button"
                           (click)="onSelectRole(role.id)"
                           class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-left transition-colors cursor-pointer border-0"
-                          [ngClass]="isActiveRole(role.id) ? 'bg-[#0B3558]/10 text-[#0B3558] font-bold' : 'text-slate-700 hover:bg-[#F0F5FA] hover:text-[#0B3558] font-medium'"
+                          [ngClass]="isActiveRole(role.id) ? 'bg-navy/10 text-navy font-bold' : 'text-slate-700 hover:bg-[#F0F5FA] hover:text-navy font-medium'"
                           [attr.aria-current]="isActiveRole(role.id) ? 'true' : null"
                         >
                           <span class="truncate text-xs leading-tight">{{ role.label }}</span>
 
                           @if (isActiveRole(role.id)) {
-                            <svg class="w-4 h-4 text-[#0B3558] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <svg class="w-4 h-4 text-navy shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
                           }
@@ -274,6 +279,8 @@ import { AuthService, AssignedRole } from '../../auth/auth.service';
 export class HeaderComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
+  private permissions = inject(PermissionService);
+  private destroyRef = inject(DestroyRef);
 
   @Input() isSticky = true;
   @Input() currentLang: 'en' | 'hi' = 'en';
@@ -308,7 +315,7 @@ export class HeaderComponent {
   });
 
   isActiveRole(roleId: string): boolean {
-    return this.currentUser()?.role === roleId;
+    return this.permissions.hasRole(roleId as UserRole);
   }
 
   readonly avatarChar = computed(() => {
@@ -319,14 +326,13 @@ export class HeaderComponent {
   });
 
   readonly avatarBgClass = computed(() => {
-    const role = this.currentUser()?.role;
-    if (role === 'dept_admin' || role === 'super_admin') {
-      return 'bg-[#0B3558] text-white';
+    if (this.permissions.hasRole(['dept_admin', 'super_admin'])) {
+      return 'bg-navy text-white';
     }
-    if (role === 'new_user') {
+    if (this.permissions.hasRole('new_user')) {
       return 'bg-amber-600 text-white';
     }
-    return 'bg-[#174A6E] text-white';
+    return 'bg-primary text-white';
   });
 
   constructor() {
@@ -339,7 +345,10 @@ export class HeaderComponent {
     checkUrl(this.router.url);
 
     this.router.events
-      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe((event: NavigationEnd) => {
         checkUrl(event.urlAfterRedirects);
         // Close dropdown on navigation
@@ -347,14 +356,6 @@ export class HeaderComponent {
       });
   }
 
-  /** Close dropdown when clicking outside */
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('#user-menu-container')) {
-      this.dropdownOpen.set(false);
-    }
-  }
 
   toggleDropdown(): void {
     this.dropdownOpen.update(v => !v);

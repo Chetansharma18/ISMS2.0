@@ -1,23 +1,13 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { UserRole, RoleConfig } from '../models/role.model';
+import { UserPersona } from '../models/user.model';
+import { StorageService } from '../services/storage.service';
 
-export type UserRole = 'new_user' | 'existing_user' | 'dept_admin' | 'super_admin';
-
-export interface UserPersona {
-  id: string;
-  ssoId: string;
-  label: string;
-  subLabel: string;
-  role: UserRole;
-  isProfileComplete?: boolean;
-}
-
-export interface RoleConfig {
-  role: UserRole;
-  label: string;
-  badge: string;
-  description: string;
-}
+// Canonical definitions live in core/models. Re-exported here so existing
+// `import { UserRole } from '.../auth.service'` call sites keep working.
+export type { UserRole, RoleConfig } from '../models/role.model';
+export type { UserPersona } from '../models/user.model';
 
 export const USER_ROLES: RoleConfig[] = [
   {
@@ -88,7 +78,10 @@ export const SWITCHABLE_ROLES: AssignedRole[] = [
 })
 export class AuthService {
   private router = inject(Router);
+  private storage = inject(StorageService);
   private readonly STORAGE_KEY = 'isms_user';
+  private readonly OTP_VERIFIED_KEY = 'isms_dept_admin_otp_verified';
+  private readonly OTR_PROMPT_DISMISSED_KEY = 'isms_otr_prompt_dismissed';
 
   /** Controls visibility of the theme-based SSO redirecting modal */
   isRedirecting = signal<boolean>(false);
@@ -129,38 +122,32 @@ export class AuthService {
   }
 
   private initUser(): void {
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const saved = localStorage.getItem(this.STORAGE_KEY);
-        if (saved) {
-          const parsed: UserPersona = JSON.parse(saved);
-          // Normalize admin personas saved under an older build that stored a
-          // person's name/designation instead of a plain role identifier.
-          if (parsed.role === 'dept_admin' || parsed.role === 'super_admin') {
-            parsed.label = ACCOUNT_LABELS[parsed.role];
-            parsed.subLabel = USER_ROLES.find(r => r.role === parsed.role)?.label ?? parsed.subLabel;
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(parsed));
-          }
-          this.currentUser.set(parsed);
-        } else {
-          this.currentUser.set({
-            id: 'Approved Citizen (TP)',
-            ssoId: 'Approved Citizen (TP)',
-            label: 'Approved Citizen (TP)',
-            subLabel: 'Registered TP/PIA',
-            role: 'existing_user',
-            isProfileComplete: true
-          });
+    try {
+      const parsed = this.storage.getItem<UserPersona>(this.STORAGE_KEY);
+      if (parsed) {
+        // Normalize admin personas saved under an older build that stored a
+        // person's name/designation instead of a plain role identifier.
+        if (parsed.role === 'dept_admin' || parsed.role === 'super_admin') {
+          parsed.label = ACCOUNT_LABELS[parsed.role];
+          parsed.subLabel = USER_ROLES.find(r => r.role === parsed.role)?.label ?? parsed.subLabel;
+          this.storage.setItem(this.STORAGE_KEY, parsed);
         }
-      } catch {
-        // Fallback gracefully
+        this.currentUser.set(parsed);
+      } else {
+        this.currentUser.set({
+          id: 'Approved Citizen (TP)',
+          ssoId: 'Approved Citizen (TP)',
+          label: 'Approved Citizen (TP)',
+          subLabel: 'Registered TP/PIA',
+          role: 'existing_user',
+          isProfileComplete: true
+        });
       }
+    } catch {
+      // Fallback gracefully
     }
-    if (typeof sessionStorage !== 'undefined') {
-      const isVerified = sessionStorage.getItem('isms_dept_admin_otp_verified');
-      if (isVerified === 'true') {
-        this.isDeptAdminOtpVerified.set(true);
-      }
+    if (this.storage.getSessionString(this.OTP_VERIFIED_KEY) === 'true') {
+      this.isDeptAdminOtpVerified.set(true);
     }
   }
 
@@ -179,11 +166,7 @@ export class AuthService {
 
   login(persona: UserPersona, redirectUrl: string | null = '/registration'): void {
     this.currentUser.set(persona);
-    if (typeof localStorage !== 'undefined') {
-      try {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(persona));
-      } catch { }
-    }
+    this.storage.setItem(this.STORAGE_KEY, persona);
     if (redirectUrl) {
       this.router.navigate([redirectUrl]);
     }
@@ -220,26 +203,18 @@ export class AuthService {
 
   setDeptAdminOtpVerified(verified: boolean): void {
     this.isDeptAdminOtpVerified.set(verified);
-    if (typeof sessionStorage !== 'undefined') {
-      if (verified) {
-        sessionStorage.setItem('isms_dept_admin_otp_verified', 'true');
-      } else {
-        sessionStorage.removeItem('isms_dept_admin_otp_verified');
-      }
+    if (verified) {
+      this.storage.setSessionString(this.OTP_VERIFIED_KEY, 'true');
+    } else {
+      this.storage.removeSessionItem(this.OTP_VERIFIED_KEY);
     }
   }
 
   logout(): void {
     this.currentUser.set(null);
     this.setDeptAdminOtpVerified(false);
-    if (typeof localStorage !== 'undefined') {
-      try {
-        localStorage.removeItem(this.STORAGE_KEY);
-      } catch { }
-    }
-    if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.removeItem('isms_otr_prompt_dismissed');
-    }
+    this.storage.removeItem(this.STORAGE_KEY);
+    this.storage.removeSessionItem(this.OTR_PROMPT_DISMISSED_KEY);
     this.router.navigate(['/sso-login']);
   }
 
@@ -271,11 +246,7 @@ export class AuthService {
     };
 
     this.currentUser.set(persona);
-    if (typeof localStorage !== 'undefined') {
-      try {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(persona));
-      } catch { }
-    }
+    this.storage.setItem(this.STORAGE_KEY, persona);
 
     // The session is already authenticated, so returning to the department
     // workspace must not prompt for OTP again.

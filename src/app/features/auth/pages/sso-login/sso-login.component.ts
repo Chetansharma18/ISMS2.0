@@ -1,14 +1,16 @@
-import { Component, signal, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService, UserRole, USER_ROLES } from '../../../../core/auth/auth.service';
+import { StorageService } from '../../../../core/services/storage.service';
 import { OtrFormService } from '../../../registration/services/otr-form.service';
 import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dept-admin-otp-modal/dept-admin-otp-modal.component';
 
 @Component({
   selector: 'app-sso-login',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule, RouterModule, DeptAdminOtpModalComponent],
   host: {
     class: 'block w-full min-h-full flex flex-col bg-white'
@@ -162,9 +164,9 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
                       type="button"
                       (click)="selectRole(r.role)"
                       class="px-3 py-2 rounded-md text-xs sm:text-sm font-bold border transition-all text-left flex items-center justify-between cursor-pointer"
-                      [class.bg-[#0B3558]]="selectedRole() === r.role"
+                      [class.bg-navy]="selectedRole() === r.role"
                       [class.text-white]="selectedRole() === r.role"
-                      [class.border-[#0B3558]]="selectedRole() === r.role"
+                      [class.border-navy]="selectedRole() === r.role"
                       [class.bg-slate-50]="selectedRole() !== r.role"
                       [class.text-slate-700]="selectedRole() !== r.role"
                       [class.border-slate-300]="selectedRole() !== r.role"
@@ -184,7 +186,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
                 <button
                   type="submit"
                   [disabled]="isLoading()"
-                  class="w-full bg-[#0B3558] hover:bg-[#07233B] text-white font-bold text-sm sm:text-base py-3 px-5 rounded-md transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 shadow-sm"
+                  class="w-full bg-navy hover:bg-navy-dark text-white font-bold text-sm sm:text-base py-3 px-5 rounded-md transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 shadow-sm"
                 >
                   @if (isLoading()) {
                     <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -228,6 +230,7 @@ export class SsoLoginComponent {
   private authService = inject(AuthService);
   private otrFormService = inject(OtrFormService);
   private router = inject(Router);
+  private storage = inject(StorageService);
 
   readonly availableRoles = USER_ROLES;
   selectedRole = signal<UserRole>('new_user');
@@ -281,12 +284,8 @@ export class SsoLoginComponent {
       this.authService.loginWithCredentials(identifier, role, null);
 
       // Reset the dismissed flag upon fresh login so the OTR prompt triggers
-      if (typeof sessionStorage !== 'undefined') {
-        sessionStorage.removeItem('isms_otr_prompt_dismissed');
-      }
-      if (typeof localStorage !== 'undefined') {
-        localStorage.removeItem('isms_eoi_prompt_shown_new_user');
-      }
+      this.storage.removeSessionItem('isms_otr_prompt_dismissed');
+      this.storage.removeItem('isms_eoi_prompt_shown_new_user');
 
       if (role === 'super_admin') {
         // Super Admin navigates directly to EOI Configuration / Masters

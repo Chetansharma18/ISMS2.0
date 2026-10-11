@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FileDoc } from '../../../../features/registration/models/otr-form.model';
 import { DocumentViewerModalComponent } from '../../document-viewer-modal/document-viewer-modal.component';
@@ -6,6 +6,7 @@ import { DocumentViewerModalComponent } from '../../document-viewer-modal/docume
 @Component({
   selector: 'app-form-file-upload',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, DocumentViewerModalComponent],
   template: `
     <div class="w-full flex flex-col font-sans">
@@ -80,7 +81,7 @@ import { DocumentViewerModalComponent } from '../../document-viewer-modal/docume
             <button
               type="button"
               (click)="openPreview()"
-              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#0483AC] hover:text-[#036c8f] bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-ocean hover:text-ocean-dark bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
               title="Preview {{ fileDoc.fileName }}"
             >
               <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">

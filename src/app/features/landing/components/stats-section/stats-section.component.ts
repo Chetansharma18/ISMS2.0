@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 interface StatMetric {
@@ -13,6 +13,7 @@ interface StatMetric {
 @Component({
   selector: 'app-stats-section',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   host: {
     class: 'block w-full'
@@ -23,7 +24,7 @@ interface StatMetric {
         
         <!-- Section Header -->
         <div class="text-center max-w-3xl mx-auto mb-10">
-          <span class="text-xs font-bold text-[#EA580C] uppercase tracking-wider bg-orange-50 px-3 py-1 rounded-full border border-orange-200/60">
+          <span class="text-xs font-bold text-orange-600 uppercase tracking-wider bg-orange-50 px-3 py-1 rounded-full border border-orange-200/60">
             Real-Time Governance Metrics
           </span>
           <div style="font-size: 2.4rem; line-height: 1.15; font-weight: 900; color: #0B3558; margin-top: 10px; letter-spacing: -0.025em; font-family: 'Inter', sans-serif;">
@@ -37,7 +38,7 @@ interface StatMetric {
         <!-- 4 Column Stats Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           @for (stat of stats; track stat.label) {
-            <div class="p-6 rounded-xl border border-slate-200/80 bg-slate-50/40 hover:bg-white hover:border-[#0B3558]/30 transition-all duration-200 shadow-2xs hover:shadow-xs flex flex-col justify-between">
+            <div class="p-6 rounded-xl border border-slate-200/80 bg-slate-50/40 hover:bg-white hover:border-navy/30 transition-all duration-200 shadow-2xs hover:shadow-xs flex flex-col justify-between">
               <div>
                 <div class="flex items-center justify-between mb-3">
                   <span class="text-xs font-bold px-2 py-0.5 rounded {{ stat.badge }}">
@@ -74,17 +75,17 @@ export class StatsSectionComponent {
       count: '50',
       label: 'Districts Covered',
       description: 'Comprehensive skill delivery spanning all districts of Rajasthan.',
-      badge: 'bg-blue-50 text-[#0B3558]',
+      badge: 'bg-blue-50 text-navy',
       iconBg: 'bg-blue-100',
-      iconColor: 'text-[#0B3558]'
+      iconColor: 'text-navy'
     },
     {
       count: '1,280+',
       label: 'Accredited Training Centers',
       description: 'Standardized infrastructure empanelled through biometric verification.',
-      badge: 'bg-orange-50 text-[#EA580C]',
+      badge: 'bg-orange-50 text-orange-600',
       iconBg: 'bg-orange-100',
-      iconColor: 'text-[#EA580C]'
+      iconColor: 'text-orange-600'
     },
     {
       count: '5,42,000+',

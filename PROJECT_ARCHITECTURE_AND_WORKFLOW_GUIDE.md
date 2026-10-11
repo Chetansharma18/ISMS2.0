@@ -19,19 +19,20 @@
 10. [Document & PDF Viewer System (Statutory Certificates & Seals)](#10-document--pdf-viewer-system)
 11. [Connecting Real Backend REST APIs (Spring Boot / Node.js)](#11-connecting-real-backend-rest-apis)
 12. [Troubleshooting & Frequently Asked Questions (FAQ)](#12-troubleshooting--faq)
+13. [Engineering Conventions (Component Structure, State, Storage, Testing)](#13-engineering-conventions)
 
 ---
 
 ## 1. Quick Start & How to Run
 
 ### Prerequisites
-- **Node.js**: v18.x or v20.x
-- **Angular CLI**: v18+ / v21+ (`@angular/cli`)
+- **Node.js**: v20.x or newer
+- **Angular CLI**: v21 (`@angular/cli`)
 
 ### Run Development Server
 ```bash
 # Navigate to the project folder
-cd d:\ISMS\Frontend\isms-ui\isms-ui
+cd "d:\ISMS\ISMS Frontend\ISMS2.0"
 
 # Install dependencies (if fresh clone)
 npm install
@@ -43,11 +44,13 @@ npx ng serve --port 4200
 ```
 Open your browser at `http://localhost:4200`.
 
-### Production Build Check
+### Production Build, Type Check and Tests
 ```bash
-npx ng build
+npx ng build                                   # production build into dist/isms-ui
+npx ngc -p tsconfig.app.json --noEmit          # fast type + template check, writes nothing
+npx ng test --no-watch                         # Vitest unit tests (single run)
 ```
-*(Build compiles with zero TypeScript errors into `dist/isms-ui`)*.
+*(`ngc --noEmit` catches TypeScript and template errors without touching `dist`, so it is safe to run while a build is in progress.)*
 
 ### Test Credentials (Built-in Auth Switcher)
 Click the user profile icon or role switcher in the top navigation bar to test any role:
@@ -65,8 +68,9 @@ Click the user profile icon or role switcher in the top navigation bar to test a
 ISMS 2.0 is an enterprise e-Governance portal developed for the Government of Rajasthan to manage skill training schemes, Expression of Interest (EOI) bidding, training partner accreditation, batch monitoring via CCTV, and official sanction orders.
 
 ### Core Tech Stack
-- **Framework**: Angular 18+ (Standalone Components, Signals, Reactive State with RxJS)
-- **Styling**: TailwindCSS & Custom Vanilla CSS (Official Rajasthan Government Palette: `#0B3558` Deep Navy, `#174A6E` Slate Blue, `#F8FAFC` Clean Slate)
+- **Framework**: Angular 21 (Standalone Components, Signals, Reactive State with RxJS)
+- **Testing**: Vitest through `ng test`
+- **Styling**: TailwindCSS with design tokens declared in `src/styles.css` under `@theme` (see section 13). Use token classes such as `bg-primary`, `text-brand`, `bg-navy`, `bg-surface-muted` instead of raw hex values.
 - **Document & PDF Engine**: `jsPDF` vector rendering engine with official stamps, Ashok Stambh emblem, QR codes, and digital signature seals
 - **Architecture**: Universal Data Engine pattern (`DataEngineService`) enabling instantaneous switching between Centralized Mock Data and live REST APIs with zero component rewrites.
 
@@ -246,95 +250,70 @@ Every dataset is protected by `resolveMock(data)`. When `useMockData` is false, 
 
 ## 6. Complete Project File Structure & File Roles
 
+Paths below are relative to `src/`. Large screens are split into a thin container component plus child parts, so a folder usually holds one `*.component.ts` container, a folder of the same name with its parts, and `*.util.ts` / `*.model.ts` files.
+
 ```
-d:/ISMS/Frontend/isms-ui/isms-ui/src/
+src/
+├── environments/                        # MASTER CONFIG: `useMockData`, `apiUrl`
+├── styles.css                           # Tailwind entry + @theme design tokens
 │
-├── environments/
-│   ├── environment.ts                   # MASTER CONFIG: toggle `useMockData: true/false`, apiUrl
-│   └── environment.prod.ts              # Production config
-│
-├── app/
-│   ├── app.config.ts                    # Root Angular application providers, router, animations, HTTP
-│   ├── app.routes.ts                    # Master route declarations (Lazy-loaded feature components)
-│   ├── app.component.ts                 # Root wrapper (Header, Sidebar, Role Switcher, Router-Outlet)
-│   │
-│   ├── core/                            # SINGLETON SERVICES & ARCHITECTURE CORE
-│   │   ├── auth/
-│   │   │   ├── auth.service.ts          # Authentication state, current user, role switching, logout
-│   │   │   ├── auth.guard.ts            # Route guard preventing unauthorized role access
-│   │   │   └── components/
-│   │   │       └── dept-admin-otp-modal/# 6-digit OTP modal dialog for Department Admin login
-│   │   │
-│   │   ├── config/
-│   │   │   └── api.config.ts            # Central registry of all backend REST endpoints & HTTP methods
-│   │   │
-│   │   ├── http/
-│   │   │   └── http.service.ts          # Angular HttpClient wrapper with error handling & headers
-│   │   │
-│   │   ├── services/
-│   │   │   └── data-engine.service.ts   # UNIVERSAL REPOSITORY: Bridges mock store vs. real backend HTTP
-│   │   │
-│   │   └── mock/                        # CENTRALIZED MOCK SUBSYSTEM
-│   │       ├── mock.config.ts           # resolveMock<T>() helper linked to environment.useMockData
-│   │       ├── mock-database.service.ts # In-memory relational storage with CRUD & filtering
-│   │       └── data/                    # 13 Mock Datasets (schemes, eoi, users, sdc, batches, etc.)
-│   │
-│   ├── shared/                          # REUSABLE UI COMPONENT LIBRARY
-│   │   ├── components/
-│   │   │   ├── table/                   # Generic table: sorting, pagination, search, custom cells
-│   │   │   ├── page-header/             # Standard title, breadcrumbs, action button area
-│   │   │   ├── button/                  # Interactive button with variants (primary, outline, danger)
-│   │   │   └── action-modal/            # Modal dialog shell with header, body, footer
-│   │   └── models/
-│   │       └── table.model.ts           # TypeScript interfaces: TableColumn<T>, TableAction, PageEvent
-│   │
-│   └── features/                        # BUSINESS FEATURE MODULES (SCREENS)
-│       ├── tenders/                     # SCHEMES & EOI CREATION
-│       │   ├── tenders-page.component.ts        # Active Schemes list & Super Admin "Configure EOI"
-│       │   ├── scheme-detail-view.component.ts  # Full Scheme overview, RFP download, PDF generator
-│       │   ├── scheme-form.component.ts         # Multi-step EOI Scheme creation form
-│       │   └── services/scheme.service.ts       # Scheme service connecting to DataEngineService
-│       │
-│       ├── registration/                # ONE-TIME REGISTRATION (OTR)
-│       │   ├── registration-shell.component.ts  # 4-Step Registration Wizard
-│       │   └── models/otr-form.model.ts         # Org, Signatory, Bank data models
-│       │
-│       ├── eoi/                         # EOI SUBMISSIONS & SCRUTINY DESK
-│       │   ├── pages/
-│       │   │   ├── department-eoi-view/         # List of EOI schemes with total response counts
-│       │   │   ├── applicant-submissions/       # List of applicant organizations under a scheme
-│       │   │   └── scrutiny-desk/               # Scrutiny desk with Document Viewer & Scoring
-│       │   └── services/
-│       │       ├── eoi-state.service.ts         # Reactive state for applicants & scrutiny
-│       │       └── eoi-api.service.ts           # EOI endpoints connector
-│       │
-│       ├── sdc/                         # SANCTION ORDERS & CCTV MONITORING
-│       │   ├── components/
-│       │   │   ├── sanction-orders.component.ts # Sanction Order table & printable document viewer
-│       │   │   └── camera-batch-list.component.ts# Live CCTV camera feeds with Pan/Zoom & Record
-│       │   └── models/sdc.model.ts              # Sanction Order, SDC Centre, Camera feed types
-│       │
-│       ├── ipa/                         # IN-PRINCIPLE APPROVAL (IPA)
-│       │   └── ipa-list.component.ts            # IPA document table & official PDF generator
-│       │
-│       ├── grievance/                   # TRAINING PARTNER HELPDESK
-│       │   └── grievance-list.component.ts      # Ticket raising, category selection, status track
-│       │
-│       ├── admin-grievance/             # OFFICER GRIEVANCE ESCALATION
-│       │   └── admin-grievance-list.component.ts# Ticket review, priority assignment, resolution
-│       │
-│       ├── admin-master/                # MASTER LOOKUP TABLES (8 MASTERS)
-│       │   ├── course-master.component.ts       # Course QP codes and NSQF levels
-│       │   ├── sector-master.component.ts       # Industry sector codes
-│       │   ├── designation-master.component.ts  # Department officer designations
-│       │   ├── district-block-master.component.ts# Rajasthan districts & blocks
-│       │   ├── eoi-category-master.component.ts # EOI categories (General, RTD, Special)
-│       │   ├── permission-master.component.ts   # System permissions
-│       │   ├── scheme-master.component.ts       # Master scheme catalog
-│       │   └── user-role-master.component.ts    # Role permission mappings
-│       │
-│       └── user-management/             # USER ACCOUNTS
-│           └── user-management.component.ts     # User management, SSO IDs, active status toggles
+└── app/
+    ├── app.config.ts / app.routes.ts    # Providers, router (every screen is lazy-loaded)
+    ├── app.component.ts                 # Root: router-outlet, toast outlet, SSO redirect
+    │
+    ├── core/                            # SINGLETONS, DATA LAYER, LAYOUT
+    │   ├── auth/                        # AuthService, guard, interceptor, OTP + SSO modals
+    │   ├── config/                      # api.config.ts (endpoint registry), role/menu/app config
+    │   ├── http/http.service.ts         # HttpClient wrapper
+    │   ├── models/                      # Domain types shared by mocks, services and screens
+    │   │                                #   (admin-masters, grievance, camera, tender, user-management ...)
+    │   ├── permissions/                 # PermissionService: the one place for role checks
+    │   ├── services/
+    │   │   ├── data-engine.service.ts   # Universal repository: mock store or real HTTP
+    │   │   ├── persisted-store.ts       # Signal-backed list persisted via StorageService
+    │   │   ├── storage.service.ts       # ONLY gateway to localStorage / sessionStorage
+    │   │   ├── notification.service.ts  # Toasts (rendered by app-toast-outlet)
+    │   │   └── language.service.ts
+    │   ├── layout/                      # header, sidebar, footer, main-layout, auth-layout
+    │   └── mock/                        # mock.config.ts, mock-database.service.ts, data/*.mock.ts
+    │
+    ├── shared/                          # REUSABLE UI LIBRARY (import from '../../shared')
+    │   ├── components/
+    │   │   ├── table/                   # Generic table (sorting, pagination, custom cells)
+    │   │   ├── page-header/  button/  status-badge/  empty-state/  loader/
+    │   │   ├── form-controls/           # app-form-input / select / textarea / file-upload / section
+    │   │   ├── form-sdc/                # Config-driven dynamic form (+ form-sdc.util.ts)
+    │   │   ├── action-modal/            # Standard dialog: title, body, primary/secondary actions
+    │   │   ├── document-sheet-modal/    # Printable A4 sheet dialog
+    │   │   ├── document-viewer-modal/   # Document / image preview
+    │   │   ├── profile-preview-modal/
+    │   │   ├── stepper/                 # app-stepper for wizards
+    │   │   ├── toast-outlet/            # Mounted once in app.component
+    │   │   └── master-crud/             # Generic CRUD page driven by a config object
+    │   ├── directives/                  # click-outside
+    │   ├── pipes/                       # date-format, inr-currency
+    │   ├── utils/                       # date, formatters, validators (+ specs)
+    │   └── validators/ types/
+    │
+    └── features/                        # BUSINESS SCREENS
+        ├── landing/  auth/  registration/  profile/
+        ├── tenders/                     # tenders-page, tender-status, scheme-detail-view
+        │   ├── tenders-page/            #   child parts + tenders-page.util.ts
+        │   ├── tender-status/           #   child parts + tender-status.util.ts + receipts service
+        │   └── scheme-detail-view/      #   PDF service + util
+        ├── eoi/
+        │   ├── components/scheme-form/  #   scheme-form.state.ts (per-instance state), steps/, util
+        │   ├── components/document-editor/  shared editable A4 pieces (letterhead, signatory ...)
+        │   ├── pages/                   #   scrutiny-desk, ipa-editor, eoi-sanction-editor, ... each with components/
+        │   └── services/                #   eoi-state.service.ts (facade) + .models/.seed/.util/.storage
+        ├── sdc/
+        │   ├── components/              #   aspirant-detail/, aspirant-mapping/, batch-form/,
+        │   │                            #   batch-detail/, sdc-detail/ hold the child parts
+        │   ├── config/                  #   form configs (aspirant-form.config.ts is a barrel)
+        │   └── services/                #   sdc / batch / aspirant services (PersistedStore)
+        ├── ipa/  grievance/  admin-grievance/
+        ├── admin-master/                # 8 thin configs over MasterCrudPageComponent
+        └── user-management/             # container + parts/ + util
 ```
 
 ---
@@ -342,7 +321,7 @@ d:/ISMS/Frontend/isms-ui/isms-ui/src/
 ## 7. Developer Guide 1: How to Add a New Scheme
 
 ### Option A: Via Code (In Central Mock Store)
-1. Open [`src/app/core/mock/data/schemes.mock.ts`](file:///d:/ISMS/Frontend/isms-ui/isms-ui/src/app/core/mock/data/schemes.mock.ts).
+1. Open [`src/app/core/mock/data/schemes.mock.ts`](src/app/core/mock/data/schemes.mock.ts).
 2. Inside the `MOCK_SCHEMES = resolveMock([...])` array, add your new scheme object:
 
 ```typescript
@@ -402,7 +381,7 @@ All tables in ISMS 2.0 use the centralized shared component:
 Open your component (for example, `src/app/features/user-management/user-management.component.ts`):
 
 ```typescript
-import { TableColumn } from '../../../shared/models/table.model';
+import { TableColumn } from '../../shared';
 
 // In your component class:
 readonly columns: TableColumn<UserData>[] = [
@@ -504,9 +483,7 @@ Create `src/app/features/inspections/inspection-list.component.ts`:
 ```typescript
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
-import { TableComponent } from '../../shared/components/table/table.component';
-import { TableColumn } from '../../shared/models/table.model';
+import { PageHeaderComponent, TableComponent, TableColumn } from '../../shared';
 
 @Component({
   selector: 'app-inspection-list',
@@ -539,7 +516,7 @@ export class InspectionListComponent {
 ```
 
 ### Step 2: Register the Route
-Open [`src/app/app.routes.ts`](file:///d:/ISMS/Frontend/isms-ui/isms-ui/src/app/app.routes.ts) and add:
+Open [`src/app/app.routes.ts`](src/app/app.routes.ts) and add:
 ```typescript
 {
   path: 'admin/inspections',
@@ -549,7 +526,7 @@ Open [`src/app/app.routes.ts`](file:///d:/ISMS/Frontend/isms-ui/isms-ui/src/app/
 ```
 
 ### Step 3: Add to Navigation Menu
-Open the sidebar navigation in `src/app/app.component.html` and add the link:
+Open the sidebar in `src/app/core/layout/sidebar/sidebar.component.ts` and add the link in its template:
 ```html
 <a routerLink="/admin/inspections" routerLinkActive="active-nav" class="nav-item">
   <i class="fa fa-clipboard-check"></i>
@@ -644,6 +621,51 @@ If `useMockData: false`, all mock data is turned off globally. Set `useMockData:
 
 ### Q4: How do I verify there are no compilation errors?
 **Answer**: Run `npx ng build` in PowerShell. Ensure it exits with code 0.
+
+---
+
+## 13. Engineering Conventions
+
+### Component structure
+- A screen is a **thin container**: it owns routing, data loading and orchestration. Presentation goes into child components in a folder named after the screen (`tenders-page/`, `batch-form/` ...). If a container passes 500 lines, split it.
+- Pure logic (validation, mapping, totals, filtering) goes into a `*.util.ts` file with a `*.util.spec.ts` beside it. Utils take plain arguments and need no `TestBed`.
+- Types live in `*.model.ts` next to the screen, or in `core/models` when the mock layer and services share them. Mock files re-export from there.
+- Re-use before writing: tables use `app-table`, dialogs use `app-action-modal` (or `app-document-sheet-modal` for A4 sheets), wizards use `app-stepper`, master lookups use `MasterCrudPageComponent`, forms use `app-form-*` controls.
+- Large child sets share state through an `@Injectable()` provided by the parent component (see `scheme-form.state.ts`), not through a root singleton.
+
+### Change detection and state
+- Use signals for state read by templates. Use `ChangeDetectionStrategy.OnPush` on every component whose template reads only signals, signal inputs, immutable `@Input` values or `async` pipes.
+- Components that edit a parent-owned object in place with `ngModel` must stay on the default strategy. Do not add OnPush there until that state is signal-based, or the view goes stale.
+- Update list state immutably (`signal.update(list => list.map(...))`) so OnPush children re-render.
+
+### Subscriptions
+- Subscribe to reads and route params with `takeUntilDestroyed(this.destroyRef)` as the last operator in the pipe.
+- Do **not** add it to fire-and-forget writes (`create`, `update`, `delete`, submit calls). Cancelling those on navigation would drop the write once a real backend is connected.
+
+### Storage
+- Never call `localStorage` or `sessionStorage` directly. Use `StorageService`:
+  `getItem/setItem/removeItem` (JSON), `getString/setString` (raw strings), and the `getSession*/setSession*/removeSessionItem` variants.
+- Keep the on-disk format stable: a key written as a raw string must be read with `getString`, not `getItem`.
+- For a persisted list that must also sync across tabs, use `createPersistedStore()` (`core/services/persisted-store.ts`).
+
+### Roles and permissions
+- Never compare role strings in a screen. Inject `PermissionService` and call `hasRole('dept_admin')` or `hasRole([...])`.
+
+### Styling
+- Tokens are declared in `src/styles.css` under `@theme`: `primary`, `brand`, `brand-dark`, `navy`, `navy-dark`, `ocean`, `ocean-dark`, `theme`, `surface-muted`, `field-border`.
+- Use token classes (`bg-primary`, `text-brand`). Brand-blue **text** is `text-brand`; the legacy `.text-primary` class resolves to dark text.
+- Do not use `!important` helper classes; they override every `hover:` and `disabled:` variant.
+- Hide scrollbars with the `no-scrollbar` utility.
+
+### Testing
+- Run `npx ng test --no-watch`. Specs sit beside the code they test.
+- Cover pure utils, services (`DataEngineService`, `StorageService`, `PermissionService`, `NotificationService`, `PersistedStore`) and shared components with a small host component.
+- In host components used by specs, drive inputs with signals (plain fields changed after the first check raise `NG0100`).
+
+### Verifying a change
+1. `npx ngc -p tsconfig.app.json --noEmit` (empty output means clean).
+2. `npx ng test --no-watch`.
+3. `npx ng build`, then click through the flow you touched.
 
 ---
 

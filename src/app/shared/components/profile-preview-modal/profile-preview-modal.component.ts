@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, computed, signal, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, computed, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,6 +8,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
 @Component({
   selector: 'app-profile-preview-modal',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   template: `
     @if (isOpen) {
@@ -20,7 +21,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
           class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-4xl flex flex-col max-h-[92vh] overflow-hidden font-sans animate-in zoom-in-95 duration-200"
         >
           <!-- Modal Header -->
-          <div class="px-5 py-3.5 bg-[#0483AC] text-white flex items-center justify-between gap-3 shrink-0">
+          <div class="px-5 py-3.5 bg-ocean text-white flex items-center justify-between gap-3 shrink-0">
             <div class="flex items-center gap-2.5">
               <svg class="w-5 h-5 text-white shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -49,7 +50,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
           <!-- Notice Banner -->
           <div class="bg-sky-50 px-5 py-2.5 border-b border-sky-100 flex items-center justify-between flex-wrap gap-2 text-xs">
             <div class="flex items-center gap-2 text-sky-900">
-              <svg class="w-4 h-4 text-[#0483AC] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="w-4 h-4 text-ocean shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>All information below is read-only. Click <strong>Edit Profile</strong> to modify any details.</span>
@@ -57,7 +58,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
             <button
               type="button"
               (click)="onEditProfile()"
-              class="inline-flex items-center gap-1 px-3 py-1 bg-white hover:bg-slate-50 border border-sky-300 text-[#0483AC] text-xs font-semibold rounded shadow-2xs transition-colors cursor-pointer"
+              class="inline-flex items-center gap-1 px-3 py-1 bg-white hover:bg-slate-50 border border-sky-300 text-ocean text-xs font-semibold rounded shadow-2xs transition-colors cursor-pointer"
             >
               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -146,8 +147,8 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                           }
                           <tr class="bg-slate-50 font-semibold border-t border-slate-200">
                             <td class="py-1 px-3 text-slate-700 border-r border-slate-100">3-Year Average</td>
-                            <td class="py-1 px-3 text-[#0483AC] border-r border-slate-100">{{ avgTotalTurnover() }} Lacs</td>
-                            <td class="py-1 px-3 text-[#0483AC]">{{ avgSkillTurnover() }} Lacs</td>
+                            <td class="py-1 px-3 text-ocean border-r border-slate-100">{{ avgTotalTurnover() }} Lacs</td>
+                            <td class="py-1 px-3 text-ocean">{{ avgSkillTurnover() }} Lacs</td>
                           </tr>
                         </tbody>
                       </table>
@@ -221,7 +222,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
               <div class="p-4 space-y-3">
                 <!-- Select Designated OIC for Scheme -->
                 <div class="bg-amber-50/70 border border-amber-200 rounded-lg p-3">
-                  <label class="block text-xs font-bold text-[#0B3558] mb-1">
+                  <label class="block text-xs font-bold text-navy mb-1">
                     Designate Officer In-Charge for this Proposal:
                   </label>
                   <p class="text-[11px] text-slate-600 mb-2">
@@ -230,7 +231,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                   <select
                     [ngModel]="selectedOicId()"
                     (ngModelChange)="selectedOicId.set($event)"
-                    class="w-full sm:w-auto min-w-[280px] bg-white border border-slate-300 rounded px-3 py-1.5 text-xs text-slate-800 font-medium focus:ring-1 focus:ring-[#0483AC]"
+                    class="w-full sm:w-auto min-w-[280px] bg-white border border-slate-300 rounded px-3 py-1.5 text-xs text-slate-800 font-medium focus:ring-1 focus:ring-ocean"
                   >
                     @for (oic of step2(); track oic.id) {
                       <option [value]="oic.id">
@@ -245,14 +246,14 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                   @for (oic of step2(); track oic.id; let idx = $index) {
                     <div
                       class="p-2.5 rounded-lg border text-xs transition-colors"
-                      [class.border-[#0483AC]]="selectedOicId() === oic.id"
+                      [class.border-ocean]="selectedOicId() === oic.id"
                       [class.bg-sky-50/40]="selectedOicId() === oic.id"
                       [class.border-slate-200]="selectedOicId() !== oic.id"
                     >
                       <div class="flex items-center justify-between pb-1 mb-1 border-b border-slate-100">
                         <span class="font-bold text-slate-800">{{ oic.name || 'Officer #' + (idx + 1) }}</span>
                         @if (selectedOicId() === oic.id) {
-                          <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#0483AC] text-white">Selected for Scheme</span>
+                          <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-ocean text-white">Selected for Scheme</span>
                         }
                       </div>
                       <div class="grid grid-cols-2 gap-1 text-[11px]">
@@ -336,7 +337,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
               <button
                 type="button"
                 (click)="onProceed()"
-                class="px-5 py-2 bg-[#0B3558] hover:bg-[#07233B] text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-none"
+                class="px-5 py-2 bg-navy hover:bg-navy-dark text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-none"
               >
                 <span>Proceed to Apply</span>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

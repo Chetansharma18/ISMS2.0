@@ -6,7 +6,8 @@ import {
   signal,
   computed,
   ElementRef,
-  HostListener
+  HostListener,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-form-select',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   template: `
     <div class="w-full flex flex-col relative">
@@ -36,24 +38,24 @@ import { FormsModule } from '@angular/forms';
         (click)="toggleDropdown()"
         [disabled]="disabled"
         class="w-full h-[35px] flex items-center justify-between px-2.5 text-xs sm:text-[13px] leading-[20px] rounded-[4px] border transition-all duration-150 text-left bg-white font-sans cursor-pointer"
-        [class.border-[#D9E1E7]]="!error && !disabled"
+        [class.border-theme]="!error && !disabled"
         [class.border-rose-600]="!!error"
         [class.ring-1]="!!error"
         [class.ring-rose-600]="!!error"
-        [class.bg-[#F5F7F9]]="disabled"
+        [class.bg-surface-muted]="disabled"
         [class.cursor-not-allowed]="disabled"
-        [class.focus:border-[#174A6E]]="!disabled && !error"
+        [class.focus:border-primary]="!disabled && !error"
         [class.focus:ring-2]="!disabled && !error"
-        [class.focus:ring-[#EAF2F6]]="!disabled && !error"
+        [class.focus:ring-primary-light]="!disabled && !error"
         aria-haspopup="listbox"
         [attr.aria-expanded]="isOpen()"
       >
-        <span [class.text-[#7A8792]]="!value" [class.text-[#1F2933]]="!!value" class="truncate">
+        <span [class.text-muted]="!value" [class.text-primary]="!!value" class="truncate">
           {{ value || placeholder }}
         </span>
 
         <svg
-          class="w-4 h-4 text-[#7A8792] transition-transform duration-200 shrink-0 ml-2"
+          class="w-4 h-4 text-muted transition-transform duration-200 shrink-0 ml-2"
           [class.rotate-180]="isOpen()"
           fill="none"
           stroke="currentColor"
@@ -66,45 +68,45 @@ import { FormsModule } from '@angular/forms';
       <!-- Dropdown Popup Menu with Outside-Click Detector -->
       @if (isOpen()) {
         <div
-          class="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-[4px] border border-[#D9E1E7] shadow-[0_8px_24px_rgba(31,41,51,0.12)] overflow-hidden font-sans"
+          class="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-[4px] border border-theme shadow-[0_8px_24px_rgba(31,41,51,0.12)] overflow-hidden font-sans"
           role="listbox"
         >
           <!-- Search input for large lists -->
           @if (shouldShowSearch()) {
-            <div class="p-2 border-b border-[#D9E1E7] bg-[#F5F7F9]">
+            <div class="p-2 border-b border-theme bg-surface-muted">
               <input
                 type="text"
                 [(ngModel)]="searchQuery"
                 placeholder="Search options..."
-                class="w-full h-[32px] px-2.5 text-[13px] rounded-[4px] border border-[#D9E1E7] focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] bg-white text-[#1F2933]"
+                class="w-full h-[32px] px-2.5 text-[13px] rounded-[4px] border border-theme focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-white text-primary"
                 (click)="$event.stopPropagation()"
               />
             </div>
           }
 
           <!-- Options List -->
-          <ul class="max-h-56 overflow-y-auto py-1 divide-y divide-[#D9E1E7]/40 text-[13px]">
+          <ul class="max-h-56 overflow-y-auto py-1 divide-y divide-border/40 text-[13px]">
             @for (opt of filteredOptions(); track opt) {
               <li
                 (click)="selectOption(opt)"
                 class="px-3 py-2 cursor-pointer transition-colors flex items-center justify-between"
-                [class.bg-[#EAF2F6]]="opt === value"
-                [class.text-[#174A6E]]="opt === value"
+                [class.bg-primary-light]="opt === value"
+                [class.text-brand]="opt === value"
                 [class.font-medium]="opt === value"
-                [class.hover:bg-[#F5F7F9]]="opt !== value"
-                [class.text-[#1F2933]]="opt !== value"
+                [class.hover:bg-surface-muted]="opt !== value"
+                [class.text-primary]="opt !== value"
                 role="option"
                 [attr.aria-selected]="opt === value"
               >
                 <span class="truncate">{{ opt }}</span>
                 @if (opt === value) {
-                  <svg class="w-4 h-4 text-[#174A6E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 text-brand shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                   </svg>
                 }
               </li>
             } @empty {
-              <li class="px-3 py-3 text-center text-[12px] text-[#7A8792]">
+              <li class="px-3 py-3 text-center text-[12px] text-muted">
                 No matching options found
               </li>
             }

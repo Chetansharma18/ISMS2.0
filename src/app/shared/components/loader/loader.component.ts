@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface LoaderBar {
@@ -10,6 +10,7 @@ export interface LoaderBar {
 @Component({
   selector: 'app-loader',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
     <div
@@ -89,7 +90,7 @@ export interface LoaderBar {
 })
 export class LoaderComponent {
   @Input() text: string = '';
-  @Input() textClass: string = 'text-[#0B3558]';
+  @Input() textClass: string = 'text-navy';
   @Input() subtext: string = '';
   @Input() url: string = '';
   @Input() size: 'sm' | 'md' | 'lg' | 'xl' = 'md';

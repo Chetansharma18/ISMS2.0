@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -13,6 +13,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
 @Component({
   selector: 'app-aspirant-list',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterModule,
@@ -21,7 +22,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
     TableComponent
   ],
   template: `
-    <div class="w-full min-h-full bg-white text-slate-800 font-sans selection:bg-[#174A6E] selection:text-white" style="font-family: 'Inter', sans-serif;">
+    <div class="w-full min-h-full bg-white text-slate-800 font-sans selection:bg-primary selection:text-white" style="font-family: 'Inter', sans-serif;">
       <div class="p-4 sm:p-6 space-y-4 font-sans">
 
         <!-- Page Header -->
@@ -69,7 +70,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
               <select
                 [ngModel]="selectedSdc()"
                 (ngModelChange)="selectedSdc.set($event)"
-                class="w-full h-8 px-2 text-xs bg-white border border-slate-300 rounded-[4px] text-slate-800 focus:outline-none focus:border-[#174A6E]"
+                class="w-full h-8 px-2 text-xs bg-white border border-slate-300 rounded-[4px] text-slate-800 focus:outline-none focus:border-primary"
               >
                 <option value="All">All SDC Centers ({{ allSdcOptions.length - 1 }})</option>
                 @for (opt of allSdcOptions.slice(1); track opt.code) {
@@ -86,7 +87,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
               <select
                 [ngModel]="selectedScheme()"
                 (ngModelChange)="selectedScheme.set($event)"
-                class="w-full h-8 px-2 text-xs bg-white border border-slate-300 rounded-[4px] text-slate-800 focus:outline-none focus:border-[#174A6E]"
+                class="w-full h-8 px-2 text-xs bg-white border border-slate-300 rounded-[4px] text-slate-800 focus:outline-none focus:border-primary"
               >
                 <option value="All">All Schemes ({{ allSchemeOptions.length - 1 }})</option>
                 @for (sc of allSchemeOptions.slice(1); track sc) {
@@ -103,7 +104,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
               <select
                 [ngModel]="selectedBatch()"
                 (ngModelChange)="selectedBatch.set($event)"
-                class="w-full h-8 px-2 text-xs bg-white border border-slate-300 rounded-[4px] text-slate-800 focus:outline-none focus:border-[#174A6E]"
+                class="w-full h-8 px-2 text-xs bg-white border border-slate-300 rounded-[4px] text-slate-800 focus:outline-none focus:border-primary"
               >
                 <option value="All">All Batches ({{ allBatchOptions.length - 1 }})</option>
                 @for (b of allBatchOptions.slice(1); track b.code) {
@@ -120,7 +121,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
               <select
                 [ngModel]="selectedStatus()"
                 (ngModelChange)="selectedStatus.set($event)"
-                class="w-full h-8 px-2 text-xs bg-white border border-slate-300 rounded-[4px] text-slate-800 focus:outline-none focus:border-[#174A6E]"
+                class="w-full h-8 px-2 text-xs bg-white border border-slate-300 rounded-[4px] text-slate-800 focus:outline-none focus:border-primary"
               >
                 <option value="All">All Statuses</option>
                 <option value="ENROLLED">Enrolled</option>
@@ -142,21 +143,21 @@ import { TableColumn } from '../../../shared/components/table/table.types';
                   type="button"
                   (click)="setQuickTab(f.id)"
                   class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-                  [class.bg-[#174A6E]]="activeQuickTab() === f.id"
+                  [class.bg-primary]="activeQuickTab() === f.id"
                   [class.text-white]="activeQuickTab() === f.id"
-                  [class.border-[#174A6E]]="activeQuickTab() === f.id"
+                  [class.border-primary]="activeQuickTab() === f.id"
                   [class.bg-white]="activeQuickTab() !== f.id"
                   [class.text-[#5F6B76]]="activeQuickTab() !== f.id"
-                  [class.border-[#D9E1E7]]="activeQuickTab() !== f.id"
-                  [class.hover:bg-[#EAF2F6]]="activeQuickTab() !== f.id"
-                  [class.hover:text-[#174A6E]]="activeQuickTab() !== f.id"
+                  [class.border-border]="activeQuickTab() !== f.id"
+                  [class.hover:bg-primary-light]="activeQuickTab() !== f.id"
+                  [class.hover:text-brand]="activeQuickTab() !== f.id"
                 >
                   <span>{{ f.label }}</span>
                   <span
                     class="px-1.5 py-0.2 rounded-full text-[10px]"
                     [class.bg-white/20]="activeQuickTab() === f.id"
                     [class.text-white]="activeQuickTab() === f.id"
-                    [class.bg-[#F5F7F9]]="activeQuickTab() !== f.id"
+                    [class.bg-surface-muted]="activeQuickTab() !== f.id"
                     [class.text-[#5F6B76]]="activeQuickTab() !== f.id"
                   >
                     {{ f.count }}
@@ -177,7 +178,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
                   (ngModelChange)="onSearchInput($event)"
                   (keyup.enter)="applySearch()"
                   placeholder="Search Aspirant ID, Name, Aadhaar, SDC, Batch..."
-                  class="w-full pl-8 pr-7 py-1.5 text-[13px] bg-white border border-[#D9E1E7] rounded-[4px] text-[#1F2933] placeholder:text-[#7A8792] focus:outline-none focus:border-[#174A6E] focus:ring-1 focus:ring-[#174A6E] transition-colors font-normal"
+                  class="w-full pl-8 pr-7 py-1.5 text-[13px] bg-white border border-border rounded-[4px] text-[#1F2933] placeholder:text-[#7A8792] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors font-normal"
                 />
                 @if (searchQuery()) {
                   <button
@@ -192,7 +193,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
               <button
                 type="button"
                 (click)="applySearch()"
-                class="px-3.5 py-1.5 rounded-[4px] bg-[#174A6E] hover:bg-[#123B59] active:scale-95 text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
+                class="px-3.5 py-1.5 rounded-[4px] bg-primary hover:bg-primary-dark active:scale-95 text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
                 title="Search Aspirants"
               >
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -230,7 +231,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         <!-- Template: Aspirant ID & Reg Date -->
         <ng-template #aspirantInfoTemplate let-a>
           <div class="font-mono text-xs whitespace-nowrap">
-            <a [routerLink]="['/aspirants', a.id]" class="font-bold text-[#174A6E] hover:underline block cursor-pointer whitespace-nowrap" title="View details of {{ a.aspirantName }}">{{ a.id }}</a>
+            <a [routerLink]="['/aspirants', a.id]" class="font-bold text-brand hover:underline block cursor-pointer whitespace-nowrap" title="View details of {{ a.aspirantName }}">{{ a.id }}</a>
             <span class="text-[11px] text-slate-500 font-normal block mt-0.5 whitespace-nowrap">Enrolled: {{ a.enrollmentDate }}</span>
           </div>
         </ng-template>
@@ -238,7 +239,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         <!-- Template: Candidate Details (Name, Father/Relation Name, Age/Gender, Category) -->
         <ng-template #candidateTemplate let-a>
           <div class="py-1 min-w-0">
-            <a [routerLink]="['/aspirants', a.id]" class="font-bold text-slate-900 hover:text-[#174A6E] hover:underline text-[13px] leading-snug block cursor-pointer" title="View details of {{ a.aspirantName }}">
+            <a [routerLink]="['/aspirants', a.id]" class="font-bold text-slate-900 hover:text-brand hover:underline text-[13px] leading-snug block cursor-pointer" title="View details of {{ a.aspirantName }}">
               {{ a.aspirantName }}
             </a>
             <div class="text-[11px] text-slate-500 leading-tight mt-0.5">
@@ -340,7 +341,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
             <button
               type="button"
               (click)="viewDetails(a)"
-              class="whitespace-nowrap inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
+              class="whitespace-nowrap inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-primary hover:bg-primary-dark text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
               style="color: #ffffff !important; background-color: #174A6E !important;"
               title="View & Edit Aspirant Details"
             >

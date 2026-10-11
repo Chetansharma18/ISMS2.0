@@ -1,4 +1,5 @@
-import { Component, signal, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, signal, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -8,26 +9,20 @@ import {
   TableComponent,
   ButtonComponent,
   ActionModalComponent,
+  StatusBadgeComponent,
+  EmptyStateComponent,
   TableColumn
 } from '../../shared';
-import { MOCK_GRIEVANCES } from '../../core/mock/data/grievances.mock';
-import { environment } from '../../../environments/environment';
+import { DataEngineService } from '../../core/services/data-engine.service';
 
-export interface Grievance {
-  sNo: number;
-  submittedAt: string;
-  title: string;
-  description: string;
-  issueType: 'Enquire' | 'Technical' | 'accounts';
-  attachment: string;
-  attachmentUrl?: SafeResourceUrl;
-  status: 'Open' | 'In progress' | 'Resolved' | 'closed';
-  comments?: string;
-}
+import { Grievance, GRIEVANCE_STATUS_BADGE, grievanceStatusVariant } from './grievance.shared';
+
+export type { Grievance };
 
 @Component({
   selector: 'app-grievance-list',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterModule,
@@ -35,7 +30,9 @@ export interface Grievance {
     PageHeaderComponent,
     TableComponent,
     ButtonComponent,
-    ActionModalComponent
+    ActionModalComponent,
+    StatusBadgeComponent,
+    EmptyStateComponent
   ],
   template: `
     <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
@@ -45,7 +42,7 @@ export interface Grievance {
           title="Grievance"
           bgColor="#0B3558"
         >
-          <button (click)="openRaiseTicket()" class="px-3 py-1.5 bg-white hover:bg-slate-50 text-[#0B3558] text-sm font-semibold rounded shadow transition-colors flex items-center gap-1.5 cursor-pointer">
+          <button (click)="openRaiseTicket()" class="px-3 py-1.5 bg-white hover:bg-slate-50 text-navy text-sm font-semibold rounded shadow transition-colors flex items-center gap-1.5 cursor-pointer">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
             </svg>
@@ -55,12 +52,11 @@ export interface Grievance {
 
         <app-table
           [columns]="grievanceColumns"
-          [data]="grievances"
+          [data]="grievances()"
           [pagination]="true"
           [pageSize]="10"
           itemUnit="grievances"
           [customTemplates]="{
-            status: statusTemplate,
             viewAction: viewActionTemplate,
             submittedAt: dateTimeTemplate,
             attachment: attachmentTemplate
@@ -85,17 +81,6 @@ export interface Grievance {
           }
         </ng-template>
 
-        <ng-template #statusTemplate let-item>
-          <span class="font-semibold"
-            [ngClass]="{
-              'text-blue-600': item.status === 'Open',
-              'text-amber-600': item.status === 'In progress',
-              'text-emerald-600': item.status === 'Resolved',
-              'text-slate-600': item.status === 'closed'
-            }">
-            {{ item.status }}
-          </span>
-        </ng-template>
 
         <ng-template #viewActionTemplate let-item>
           <app-button
@@ -182,15 +167,9 @@ export interface Grievance {
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status</label>
-                <span class="font-semibold text-[13px]"
-                  [ngClass]="{
-                    'text-blue-600': selectedTicket()!.status === 'Open',
-                    'text-amber-600': selectedTicket()!.status === 'In progress',
-                    'text-emerald-600': selectedTicket()!.status === 'Resolved',
-                    'text-slate-600': selectedTicket()!.status === 'closed'
-                  }">
+                <app-status-badge [variant]="statusVariant(selectedTicket()!.status)">
                   {{ selectedTicket()!.status }}
-                </span>
+                </app-status-badge>
               </div>
               <div>
                 <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Issue Type</label>
@@ -252,13 +231,11 @@ export interface Grievance {
           @if (previewAttachmentUrl()) {
             <iframe [src]="previewAttachmentUrl()" class="w-full h-full min-h-[70vh] border-0 bg-white"></iframe>
           } @else {
-            <svg class="w-16 h-16 text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <p class="text-slate-600 font-medium text-lg">No Preview Available</p>
-            <p class="text-slate-400 text-sm mt-1 text-center max-w-sm leading-relaxed">
-              This is a dummy file from the test data. <br> Raise a new ticket and upload a real PDF to see the live preview.
-            </p>
+            <app-empty-state
+              title="No Preview Available"
+              description="This is a dummy file from the test data. Raise a new ticket and upload a real PDF to see the live preview."
+              iconPath="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            ></app-empty-state>
           }
         </div>
       </app-action-modal>
@@ -267,7 +244,9 @@ export interface Grievance {
   `
 })
 export class GrievanceListComponent {
+  readonly statusVariant = grievanceStatusVariant;
   private sanitizer = inject(DomSanitizer);
+  private destroyRef = inject(DestroyRef);
 
   readonly isModalOpen = signal(false);
   readonly isViewModalOpen = signal(false);
@@ -294,11 +273,21 @@ export class GrievanceListComponent {
     { key: 'description', label: 'Description', cellClass: 'font-normal text-slate-700 min-w-[180px]' },
     { key: 'issueType', label: 'Issue Type', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'attachment', label: 'Attachment', align: 'center', type: 'custom' },
-    { key: 'status', label: 'Status', align: 'center', type: 'custom' },
+    { key: 'status', label: 'Status', align: 'center', type: 'status', badgeVariantMap: GRIEVANCE_STATUS_BADGE },
     { key: 'viewAction', label: 'View', align: 'center', width: 'w-16', type: 'custom' }
   ];
 
-  grievances: Grievance[] = environment.useMockData ? (MOCK_GRIEVANCES as Grievance[]) : [];
+  private readonly repo = inject(DataEngineService).for<Grievance>('GRIEVANCES');
+
+  readonly grievances = signal<Grievance[]>([]);
+
+  constructor() {
+    this.repo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => this.grievances.set(this.renumber(list)));
+  }
+
+  private renumber(list: Grievance[]): Grievance[] {
+    return list.map((g, i) => ({ ...g, sNo: i + 1 }));
+  }
 
   openRaiseTicket() {
     this.newTicket = { title: '', description: '', issueType: '', attachment: '', attachmentUrl: null };
@@ -389,24 +378,20 @@ export class GrievanceListComponent {
     this.isSubmitted.set(true);
     if (!this.isFormValid()) return;
 
-    const newGrievance: Grievance = {
-      sNo: 0,
+    // The blob preview URL only exists in the browser, so it is kept out of the persisted record.
+    const attachmentUrl = this.newTicket.attachmentUrl || undefined;
+    const record: Partial<Grievance> = {
       submittedAt: new Date().toISOString(),
       title: this.newTicket.title,
       description: this.newTicket.description,
       issueType: this.newTicket.issueType as 'Enquire' | 'Technical' | 'accounts',
       attachment: this.newTicket.attachment || 'None',
-      attachmentUrl: this.newTicket.attachmentUrl || undefined,
       status: 'Open'
     };
 
-    const updatedList = [newGrievance, ...this.grievances];
-    
-    updatedList.forEach((g, index) => {
-      g.sNo = index + 1;
+    this.repo.create(record).subscribe(created => {
+      this.grievances.update(list => this.renumber([{ ...created, attachmentUrl }, ...list]));
+      this.closeModal();
     });
-
-    this.grievances = [...updatedList];
-    this.closeModal();
   }
 }

@@ -1,35 +1,29 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, signal, computed, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { AuthService } from '../../core/auth/auth.service';
+import { PermissionService } from '../../core/permissions/permission.service';
 import {
   PageHeaderComponent,
   TableComponent,
   ButtonComponent,
   ActionModalComponent,
+  StatusBadgeComponent,
+  EmptyStateComponent,
   TableColumn
 } from '../../shared';
-import { MOCK_ADMIN_GRIEVANCES } from '../../core/mock/data/grievances.mock';
-import { environment } from '../../../environments/environment';
+import { DataEngineService } from '../../core/services/data-engine.service';
 
-export interface AdminGrievance {
-  sNo: number;
-  userName: string;
-  submittedAt: string;
-  title: string;
-  description: string;
-  issueType: 'Enquire' | 'Technical' | 'accounts';
-  attachment: string;
-  attachmentUrl?: SafeResourceUrl;
-  status: 'Open' | 'In progress' | 'Resolved' | 'closed';
-  comments?: string;
-}
+import { AdminGrievance, GRIEVANCE_STATUS_BADGE, grievanceStatusVariant } from '../grievance/grievance.shared';
+
+export type { AdminGrievance };
 
 @Component({
   selector: 'app-admin-grievance-list',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterModule,
@@ -37,7 +31,9 @@ export interface AdminGrievance {
     PageHeaderComponent,
     TableComponent,
     ButtonComponent,
-    ActionModalComponent
+    ActionModalComponent,
+    StatusBadgeComponent,
+    EmptyStateComponent
   ],
   template: `
     <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
@@ -51,12 +47,11 @@ export interface AdminGrievance {
 
         <app-table
           [columns]="grievanceColumns"
-          [data]="grievances"
+          [data]="grievances()"
           [pagination]="true"
           [pageSize]="10"
           itemUnit="grievances"
           [customTemplates]="{
-            status: statusTemplate,
             viewAction: viewActionTemplate,
             submittedAt: dateTimeTemplate,
             attachment: attachmentTemplate
@@ -81,17 +76,6 @@ export interface AdminGrievance {
           }
         </ng-template>
 
-        <ng-template #statusTemplate let-item>
-          <span class="font-semibold"
-            [ngClass]="{
-              'text-blue-600': item.status === 'Open',
-              'text-amber-600': item.status === 'In progress',
-              'text-emerald-600': item.status === 'Resolved',
-              'text-slate-600': item.status === 'closed'
-            }">
-            {{ item.status }}
-          </span>
-        </ng-template>
 
         <ng-template #viewActionTemplate let-item>
           <app-button
@@ -124,15 +108,9 @@ export interface AdminGrievance {
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status</label>
-                <span class="font-semibold text-[13px]"
-                  [ngClass]="{
-                    'text-blue-600': selectedTicket()!.status === 'Open',
-                    'text-amber-600': selectedTicket()!.status === 'In progress',
-                    'text-emerald-600': selectedTicket()!.status === 'Resolved',
-                    'text-slate-600': selectedTicket()!.status === 'closed'
-                  }">
+                <app-status-badge [variant]="statusVariant(selectedTicket()!.status)">
                   {{ selectedTicket()!.status }}
-                </span>
+                </app-status-badge>
               </div>
               <div>
                 <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Issue Type</label>
@@ -183,7 +161,7 @@ export interface AdminGrievance {
             <!-- Forward Form Section -->
             @if (isForwarding()) {
               <div class="mt-6 pt-5 border-t border-slate-200">
-                <h4 class="text-[14px] font-bold text-[#0B3558] mb-4 flex items-center gap-2">
+                <h4 class="text-[14px] font-bold text-navy mb-4 flex items-center gap-2">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
@@ -221,7 +199,7 @@ export interface AdminGrievance {
             <!-- Comment Form Section -->
             @if (isCommenting()) {
               <div class="mt-6 pt-5 border-t border-slate-200">
-                <h4 class="text-[14px] font-bold text-[#0B3558] mb-4 flex items-center gap-2">
+                <h4 class="text-[14px] font-bold text-navy mb-4 flex items-center gap-2">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
@@ -254,13 +232,11 @@ export interface AdminGrievance {
           @if (previewAttachmentUrl()) {
             <iframe [src]="previewAttachmentUrl()" class="w-full h-full min-h-[70vh] border-0 bg-white"></iframe>
           } @else {
-            <svg class="w-16 h-16 text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <p class="text-slate-600 font-medium text-lg">No Preview Available</p>
-            <p class="text-slate-400 text-sm mt-1 text-center max-w-sm leading-relaxed">
-              This is a dummy file from the test data. <br> Raise a new ticket and upload a real PDF to see the live preview.
-            </p>
+            <app-empty-state
+              title="No Preview Available"
+              description="This is a dummy file from the test data. Raise a new ticket and upload a real PDF to see the live preview."
+              iconPath="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            ></app-empty-state>
           }
         </div>
       </app-action-modal>
@@ -269,12 +245,12 @@ export interface AdminGrievance {
   `
 })
 export class AdminGrievanceListComponent {
+  readonly statusVariant = grievanceStatusVariant;
   private sanitizer = inject(DomSanitizer);
-  private authService = inject(AuthService);
+  private permissions = inject(PermissionService);
+  private destroyRef = inject(DestroyRef);
 
-  readonly isDeptAdmin = computed(() => {
-    return this.authService.currentUser()?.role === 'dept_admin';
-  });
+  readonly isDeptAdmin = computed(() => this.permissions.hasRole('dept_admin'));
 
   readonly isViewModalOpen = signal(false);
   readonly isPreviewModalOpen = signal(false);
@@ -303,11 +279,25 @@ export class AdminGrievanceListComponent {
     { key: 'description', label: 'Description', cellClass: 'font-normal text-slate-700 min-w-[180px]' },
     { key: 'issueType', label: 'Issue Type', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'attachment', label: 'Attachment', align: 'center', type: 'custom' },
-    { key: 'status', label: 'Status', align: 'center', type: 'custom' },
+    { key: 'status', label: 'Status', align: 'center', type: 'status', badgeVariantMap: GRIEVANCE_STATUS_BADGE },
     { key: 'viewAction', label: 'View', align: 'center', width: 'w-16', type: 'custom' }
   ];
 
-  grievances: AdminGrievance[] = environment.useMockData ? (MOCK_ADMIN_GRIEVANCES as AdminGrievance[]) : [];
+  // Admin rows are keyed by their serial number in the seed data.
+  private readonly repo = inject(DataEngineService).for<AdminGrievance>('ADMIN_GRIEVANCES', { idKey: 'sNo' });
+
+  readonly grievances = signal<AdminGrievance[]>([]);
+
+  constructor() {
+    this.repo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => this.grievances.set(list));
+  }
+
+  /** Persists a change and swaps the updated row in immutably so OnPush tables re-render. */
+  private patchTicket(ticket: AdminGrievance, patch: Partial<AdminGrievance>): void {
+    this.repo.update(ticket.sNo, patch).subscribe(updated => {
+      this.grievances.update(list => list.map(g => (g.sNo === ticket.sNo ? { ...g, ...updated } : g)));
+    });
+  }
 
   viewTicket(ticket: AdminGrievance) {
     this.selectedTicket.set(ticket);
@@ -382,8 +372,10 @@ export class AdminGrievanceListComponent {
 
     const ticket = this.selectedTicket();
     if (ticket) {
-      ticket.status = 'In progress';
-      ticket.comments = `[Forwarded to ${this.forwardForm.concernedUser} - Priority: ${this.forwardForm.priority}]\n\n${this.forwardForm.comments}`;
+      this.patchTicket(ticket, {
+        status: 'In progress',
+        comments: `[Forwarded to ${this.forwardForm.concernedUser} - Priority: ${this.forwardForm.priority}]\n\n${this.forwardForm.comments}`
+      });
     }
     this.closeViewModal();
   }
@@ -393,7 +385,7 @@ export class AdminGrievanceListComponent {
 
     const ticket = this.selectedTicket();
     if (ticket) {
-      ticket.comments = this.commentForm.comments;
+      this.patchTicket(ticket, { comments: this.commentForm.comments });
     }
     this.closeViewModal();
   }

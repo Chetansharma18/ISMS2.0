@@ -1,5 +1,6 @@
 import { BatchRecord } from '../../../features/sdc/models/batch.model';
 import { resolveMock } from '../mock.config';
+import { CameraBatchItem } from '../../models/camera.model';
 export interface MockBatchItem {
   id: string;
   batchCode: string;
@@ -17,15 +18,7 @@ export interface MockBatchItem {
   attendancePercent: number;
 }
 
-export interface CameraBatchItem {
-  id: string;
-  batchName: string;
-  batchCode: string;
-  sdcName: string;
-  tpName: string;
-  branch: string;
-  cameraStatus: string;
-}
+export type { CameraBatchItem };
 
 export const MOCK_CAMERA_BATCHES: CameraBatchItem[] = resolveMock([
   {

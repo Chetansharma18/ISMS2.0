@@ -1,25 +1,29 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SdcService } from '../services/sdc.service';
 import { SdcRecord } from '../models/sdc.model';
 import { AuthService } from '../../../core/auth/auth.service';
+import { PermissionService } from '../../../core/permissions/permission.service';
 import {
   PageHeaderComponent,
   TableComponent,
+  ActionModalComponent,
   TableColumn
 } from '../../../shared';
 
 @Component({
   selector: 'app-sdc-list',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterModule,
     FormsModule,
     PageHeaderComponent,
-    TableComponent
+    TableComponent,
+    ActionModalComponent
   ],
   template: `
     <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
@@ -32,7 +36,7 @@ import {
         >
           <a
             routerLink="/sdc/create"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#174A6E] hover:bg-[#0B3558] text-white rounded text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary hover:bg-navy text-white rounded text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
             title="Register New SDC Center"
           >
             <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -64,21 +68,21 @@ import {
                 type="button"
                 (click)="setFilter(f.id)"
                 class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-                [class.bg-[#174A6E]]="activeFilter() === f.id"
+                [class.bg-primary]="activeFilter() === f.id"
                 [class.text-white]="activeFilter() === f.id"
-                [class.border-[#174A6E]]="activeFilter() === f.id"
+                [class.border-primary]="activeFilter() === f.id"
                 [class.bg-white]="activeFilter() !== f.id"
                 [class.text-[#5F6B76]]="activeFilter() !== f.id"
-                [class.border-[#D9E1E7]]="activeFilter() !== f.id"
-                [class.hover:bg-[#EAF2F6]]="activeFilter() !== f.id"
-                [class.hover:text-[#174A6E]]="activeFilter() !== f.id"
+                [class.border-border]="activeFilter() !== f.id"
+                [class.hover:bg-primary-light]="activeFilter() !== f.id"
+                [class.hover:text-brand]="activeFilter() !== f.id"
               >
                 <span>{{ f.label }}</span>
                 <span
                   class="px-1.5 py-0.2 rounded-full text-[10px]"
                   [class.bg-white/20]="activeFilter() === f.id"
                   [class.text-white]="activeFilter() === f.id"
-                  [class.bg-[#F5F7F9]]="activeFilter() !== f.id"
+                  [class.bg-surface-muted]="activeFilter() !== f.id"
                   [class.text-[#5F6B76]]="activeFilter() !== f.id"
                 >
                   {{ f.count }}
@@ -95,7 +99,7 @@ import {
 
         <!-- Admin Advanced Filter Bar (TP filter, Scheme filter, District filter, and Search) -->
         @if (isAdmin()) {
-          <div class="bg-[#F8FAFC] border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs">
+          <div class="bg-slate-50 border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs">
             
             <!-- Filter: TP Name -->
             <div class="flex items-center gap-1.5">
@@ -103,7 +107,7 @@ import {
               <select
                 [ngModel]="selectedTp()"
                 (ngModelChange)="selectedTp.set($event)"
-                class="bg-white border border-border rounded-sm px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E] max-w-50"
+                class="bg-white border border-border rounded-sm px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary max-w-50"
               >
                 <option value="ALL">All Training Partners ({{ tpList().length }})</option>
                 @for (tp of tpList(); track tp) {
@@ -118,7 +122,7 @@ import {
               <select
                 [ngModel]="selectedScheme()"
                 (ngModelChange)="selectedScheme.set($event)"
-                class="bg-white border border-border rounded-sm px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
+                class="bg-white border border-border rounded-sm px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 <option value="ALL">All Schemes</option>
                 @for (sch of schemeList(); track sch) {
@@ -133,7 +137,7 @@ import {
               <select
                 [ngModel]="selectedDistrict()"
                 (ngModelChange)="selectedDistrict.set($event)"
-                class="bg-white border border-border rounded-sm px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
+                class="bg-white border border-border rounded-sm px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 <option value="ALL">All Districts</option>
                 @for (dst of districtList(); track dst) {
@@ -149,7 +153,7 @@ import {
                 [ngModel]="searchQuery()"
                 (ngModelChange)="searchQuery.set($event)"
                 placeholder="Search TP name, SDC, code, sector, district..."
-                class="w-full bg-white border border-border rounded-sm pl-7 pr-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
+                class="w-full bg-white border border-border rounded-sm pl-7 pr-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
               />
               <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2 top-1.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -198,7 +202,7 @@ import {
               {{ sdc.tpName }}
             </div>
             <div class="text-[11px] text-secondary font-mono mt-0.5 flex items-center justify-center gap-1.5">
-              <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#174A6E]"></span>
+              <span class="inline-block w-1.5 h-1.5 rounded-full bg-primary"></span>
               <span>{{ sdc.mouRefNo || 'TP Verified' }}</span>
             </div>
           </div>
@@ -287,7 +291,7 @@ import {
                 <button
                   type="button"
                   (click)="createBatch(sdc)"
-                  class="w-full justify-center whitespace-nowrap inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
+                  class="w-full justify-center whitespace-nowrap inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
                   title="Create Batch"
                 >
                   <span class="text-sm font-bold leading-none">+</span>
@@ -300,7 +304,7 @@ import {
                 <button
                   type="button"
                   (click)="openApproveModal(sdc)"
-                  class="w-full justify-center whitespace-nowrap inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
+                  class="w-full justify-center whitespace-nowrap inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
                   title="Approve SDC"
                 >
                   <svg class="w-3.5 h-3.5 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -332,120 +336,91 @@ import {
     </div>
 
     <!-- ========================================================================= -->
-    <!-- ADMIN SDC APPROVAL MODAL (Themed in official ISMS blue)                  -->
+    <!-- ADMIN SDC APPROVAL MODAL (shared ActionModalComponent)                    -->
     <!-- ========================================================================= -->
-    @if (approvingSdc(); as targetCenter) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs font-sans">
-        <div class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-          
-          <!-- Modal Header -->
-          <div class="bg-[#174A6E] text-white px-5 py-3.5 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <svg class="w-5 h-5 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <h3 class="font-bold text-sm">Approve Skill Development Center</h3>
+    <app-action-modal
+      [isOpen]="!!approvingSdc()"
+      title="Approve Skill Development Center"
+      accentBarClass="bg-primary"
+      [showCloseButton]="true"
+      [closeOnBackdrop]="false"
+      maxWidthClass="max-w-lg"
+      primaryLabel="Confirm & Approve SDC"
+      secondaryLabel="Cancel"
+      (primaryAction)="confirmApproval()"
+      (secondaryAction)="closeApproveModal()"
+      (close)="closeApproveModal()"
+    >
+      @if (approvingSdc(); as targetCenter) {
+        <div class="mt-4 space-y-4 text-xs">
+          <!-- Center Summary Box -->
+          <div class="bg-primary-light border border-border rounded-lg p-3 space-y-1.5">
+            <div class="flex justify-between items-start">
+              <span class="text-[11px] font-semibold text-slate-500 uppercase">Training Partner</span>
+              <span class="font-mono text-[11px] font-bold text-brand">{{ targetCenter.sdcCode }}</span>
             </div>
-            <button
-              type="button"
-              (click)="closeApproveModal()"
-              class="text-white/80 hover:text-white text-lg font-bold cursor-pointer"
-            >✕</button>
+            <div class="font-bold text-slate-900 text-sm">{{ targetCenter.tpName }}</div>
+            <div class="text-slate-900 font-bold pt-1 border-t border-border/70 flex items-center justify-between">
+              <span>{{ targetCenter.sdcName }}</span>
+              <span class="text-slate-500 font-medium">{{ targetCenter.district }}</span>
+            </div>
+            <div class="text-[11px] text-slate-500">
+              Scheme: <strong class="text-slate-800">{{ targetCenter.scheme }}</strong> • Sector: <strong class="text-slate-800">{{ targetCenter.sector }}</strong>
+            </div>
           </div>
 
-          <!-- Modal Body -->
-          <div class="p-5 space-y-4 text-xs">
-            
-            <!-- Center Summary Box -->
-            <div class="bg-[#EAF2F6] border border-border rounded-lg p-3 space-y-1.5">
-              <div class="flex justify-between items-start">
-                <span class="text-[11px] font-semibold text-slate-500 uppercase">Training Partner</span>
-                <span class="font-mono text-[11px] font-bold text-[#174A6E]">{{ targetCenter.sdcCode }}</span>
-              </div>
-              <div class="font-bold text-slate-900 text-sm">{{ targetCenter.tpName }}</div>
-              <div class="text-slate-900 font-bold pt-1 border-t border-border/70 flex items-center justify-between">
-                <span>{{ targetCenter.sdcName }}</span>
-                <span class="text-slate-500 font-medium">{{ targetCenter.district }}</span>
-              </div>
-              <div class="text-[11px] text-slate-500">
-                Scheme: <strong class="text-slate-800">{{ targetCenter.scheme }}</strong> • Sector: <strong class="text-slate-800">{{ targetCenter.sector }}</strong>
-              </div>
-            </div>
-
-            <!-- Approved Target Capacity -->
-            <div>
-              <label class="block font-semibold text-slate-700 mb-1">
-                Approved Target Capacity (Aspirants) <span class="text-rose-500">*</span>
-              </label>
-              <input
-                type="number"
-                [(ngModel)]="approvalTargetCapacity"
-                min="1"
-                max="5000"
-                class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
-                placeholder="Enter approved capacity"
-              />
-              <span class="text-[10.5px] text-slate-500 mt-0.5 block">Original requested capacity: {{ targetCenter.sdcCapacity }} trainees</span>
-            </div>
-
-            <!-- Approval Remarks -->
-            <div>
-              <label class="block font-semibold text-slate-700 mb-1">
-                Approval Remarks / Sanction Notes <span class="text-rose-500">*</span>
-              </label>
-              <textarea
-                [(ngModel)]="approvalRemarks"
-                rows="3"
-                class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
-                placeholder="Enter official approval remarks..."
-              ></textarea>
-            </div>
-
-            <!-- Confirmation notice -->
-            <div class="p-2.5 rounded bg-amber-50 border border-amber-200 text-amber-900 text-[11px] flex items-center gap-2">
-              <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Approving this SDC will permit {{ targetCenter.tpName }} to create active batches and mobilize trainees.</span>
-            </div>
-
+          <!-- Approved Target Capacity -->
+          <div>
+            <label for="sdcApprovalCapacity" class="block font-semibold text-slate-700 mb-1">
+              Approved Target Capacity (Aspirants) <span class="text-rose-500">*</span>
+            </label>
+            <input
+              id="sdcApprovalCapacity"
+              type="number"
+              [(ngModel)]="approvalTargetCapacity"
+              min="1"
+              max="5000"
+              class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Enter approved capacity"
+            />
+            <span class="text-[10.5px] text-slate-500 mt-0.5 block">Original requested capacity: {{ targetCenter.sdcCapacity }} trainees</span>
           </div>
 
-          <!-- Modal Footer -->
-          <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2.5">
-            <button
-              type="button"
-              (click)="closeApproveModal()"
-              class="px-3.5 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold cursor-pointer transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              (click)="confirmApproval()"
-              class="px-4 py-1.5 rounded-lg bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-sm cursor-pointer transition-colors flex items-center gap-1.5"
-            >
-              <svg class="w-3.5 h-3.5 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Confirm & Approve SDC</span>
-            </button>
+          <!-- Approval Remarks -->
+          <div>
+            <label for="sdcApprovalRemarks" class="block font-semibold text-slate-700 mb-1">
+              Approval Remarks / Sanction Notes <span class="text-rose-500">*</span>
+            </label>
+            <textarea
+              id="sdcApprovalRemarks"
+              [(ngModel)]="approvalRemarks"
+              rows="3"
+              class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Enter official approval remarks..."
+            ></textarea>
           </div>
 
+          <!-- Confirmation notice -->
+          <div class="p-2.5 rounded bg-amber-50 border border-amber-200 text-amber-900 text-[11px] flex items-center gap-2">
+            <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Approving this SDC will permit {{ targetCenter.tpName }} to create active batches and mobilize trainees.</span>
+          </div>
         </div>
-      </div>
-    }
+      }
+    </app-action-modal>
   `
 })
 export class SdcListComponent {
   readonly sdcService = inject(SdcService);
   readonly authService = inject(AuthService);
   readonly router = inject(Router);
+  private readonly permissions = inject(PermissionService);
 
   /** Detect Admin vs TP mode */
   readonly isAdmin = computed(() => {
-    const role = this.authService.currentUser()?.role;
-    return role === 'dept_admin' || (this.router.url.startsWith('/sdc') && !this.router.url.startsWith('/sdcs'));
+    return this.permissions.hasRole('dept_admin') || (this.router.url.startsWith('/sdc') && !this.router.url.startsWith('/sdcs'));
   });
 
   activeFilter = signal<string>('All');

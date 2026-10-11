@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, signal, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OtrFormService } from '../../services/otr-form.service';
 import { FileDoc } from '../../models/otr-form.model';
@@ -7,6 +7,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
 @Component({
   selector: 'app-step5-preview',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, DocumentViewerModalComponent],
   template: `
     <div class="w-full space-y-4 font-sans bg-white pb-4">
@@ -18,7 +19,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
         <!-- Section Header Bar with Expand / Collapse & Edit -->
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5 cursor-pointer select-none" (click)="toggleSection(1)">
-            <span class="w-5 h-5 rounded-full border border-sky-400 text-[#0B3558] flex items-center justify-center text-xs font-bold shrink-0">1</span>
+            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">1</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">
               Organisation Details
             </h2>
@@ -124,7 +125,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
         <!-- Section Header Bar with Expand / Collapse & Edit -->
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5 cursor-pointer select-none" (click)="toggleSection(2)">
-            <span class="w-5 h-5 rounded-full border border-sky-400 text-[#0B3558] flex items-center justify-center text-xs font-bold shrink-0">2</span>
+            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">2</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">
               Authorized Person Details
             </h2>
@@ -226,7 +227,7 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
         <!-- Section Header Bar with Expand / Collapse & Edit -->
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5 cursor-pointer select-none" (click)="toggleSection(3)">
-            <span class="w-5 h-5 rounded-full border border-sky-400 text-[#0B3558] flex items-center justify-center text-xs font-bold shrink-0">3</span>
+            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">3</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">
               Bank Details
             </h2>

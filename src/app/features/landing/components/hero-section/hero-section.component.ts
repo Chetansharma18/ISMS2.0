@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeroTendersComponent } from '../hero-tenders/hero-tenders.component';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -6,6 +6,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
 @Component({
   selector: 'app-hero-section',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, HeroTendersComponent],
   host: {
     class: 'block w-full'

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   Input,
   Output,
@@ -18,6 +19,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-dept-admin-otp-modal',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   template: `
     @if (isOpen) {
@@ -32,11 +34,11 @@ import { FormsModule } from '@angular/forms';
           class="relative w-full max-w-110 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200"
         >
           <!-- Top Accent Bar -->
-          <div class="h-1.5 w-full bg-[#0B3558]"></div>
+          <div class="h-1.5 w-full bg-navy"></div>
 
           <div class="p-6 sm:p-7">
             <!-- Security Shield Icon -->
-            <div class="w-12 h-12 rounded-xl bg-[#EAF2F6] text-[#0B3558] flex items-center justify-center mx-auto mb-4 shadow-2xs">
+            <div class="w-12 h-12 rounded-xl bg-primary-light text-navy flex items-center justify-center mx-auto mb-4 shadow-2xs">
               <svg class="w-6 h-6 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
@@ -44,7 +46,7 @@ import { FormsModule } from '@angular/forms';
 
             <!-- Header Titles -->
             <div class="text-center">
-              <h2 id="otp-title" class="text-xl sm:text-[22px] font-extrabold text-[#0B3558] tracking-tight m-0">
+              <h2 id="otp-title" class="text-xl sm:text-[22px] font-extrabold text-navy tracking-tight m-0">
                 Department Admin Verification
               </h2>
               <p class="text-xs sm:text-[13px] text-slate-500 mt-2 leading-relaxed m-0">
@@ -83,9 +85,9 @@ import { FormsModule } from '@angular/forms';
                   [value]="digit"
                   (input)="onDigitInput($event, i)"
                   (keydown)="onKeyDown($event, i)"
-                  class="w-11 h-13 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-black font-mono text-slate-800 bg-white border-2 rounded-xl focus:border-[#0B3558] focus:ring-4 focus:ring-[#0B3558]/15 outline-none transition-all shadow-2xs select-none"
+                  class="w-11 h-13 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-black font-mono text-slate-800 bg-white border-2 rounded-xl focus:border-navy focus:ring-4 focus:ring-navy/15 outline-none transition-all shadow-2xs select-none"
                   [class.border-rose-400]="errorMessage()"
-                  [class.border-[#0B3558]]="digit !== '' && !errorMessage()"
+                  [class.border-navy]="digit !== '' && !errorMessage()"
                   [class.border-slate-200]="digit === '' && !errorMessage()"
                 />
               }
@@ -102,13 +104,13 @@ import { FormsModule } from '@angular/forms';
             <div class="text-center text-xs text-slate-500 mb-6">
               @if (timerSeconds() > 0) {
                 <span>Didn't receive OTP? Resend in </span>
-                <span class="font-mono font-bold text-[#0B3558]">00:{{ timerSeconds() < 10 ? '0' + timerSeconds() : timerSeconds() }}</span>
+                <span class="font-mono font-bold text-navy">00:{{ timerSeconds() < 10 ? '0' + timerSeconds() : timerSeconds() }}</span>
               } @else {
                 <span>Didn't receive OTP? </span>
                 <button
                   type="button"
                   (click)="resendOtp()"
-                  class="text-[#0B3558] hover:text-[#07243c] font-bold underline cursor-pointer transition-colors"
+                  class="text-navy hover:text-[#07243c] font-bold underline cursor-pointer transition-colors"
                 >
                   Resend OTP
                 </button>
@@ -121,7 +123,7 @@ import { FormsModule } from '@angular/forms';
                 type="button"
                 (click)="submitOtp()"
                 [disabled]="!isComplete() || isSubmitting()"
-                class="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-[#0B3558] hover:bg-[#07243c] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all flex items-center justify-center gap-2 active:scale-98"
+                class="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-navy hover:bg-[#07243c] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all flex items-center justify-center gap-2 active:scale-98"
               >
                 @if (isSubmitting()) {
                   <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">

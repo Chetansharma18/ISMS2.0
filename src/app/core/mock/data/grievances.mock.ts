@@ -1,19 +1,9 @@
 import { resolveMock } from '../mock.config';
 
-export interface GrievanceItem {
-  sNo: number;
-  submittedAt: string;
-  title: string;
-  description: string;
-  issueType: 'Enquire' | 'Technical' | 'accounts';
-  attachment: string;
-  status: 'Open' | 'In progress' | 'Resolved' | 'closed';
-  comments?: string;
-}
+import { GrievanceItem, AdminGrievanceItem } from '../../models/grievance.model';
 
-export interface AdminGrievanceItem extends GrievanceItem {
-  userName: string;
-}
+// Types live in core/models; re-exported so existing imports keep working.
+export type { GrievanceItem, AdminGrievanceItem };
 
 export const MOCK_GRIEVANCES: GrievanceItem[] = resolveMock([
   {

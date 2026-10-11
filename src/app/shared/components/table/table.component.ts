@@ -5,7 +5,8 @@ import {
   EventEmitter,
   signal,
   computed,
-  TemplateRef
+  TemplateRef,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +17,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 @Component({
   selector: 'app-table',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule, RouterModule, StatusBadgeComponent],
   template: `
     <div class="bg-white border border-slate-200 rounded-lg overflow-hidden font-sans" style="box-shadow: 0 1px 4px rgba(0,0,0,0.06);">
@@ -127,7 +129,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                         @if (col.link) {
                           <a
                             [routerLink]="getColLink(col, item)"
-                            class="text-[#174A6E] hover:text-[#0B3558] hover:underline font-medium inline-flex items-center gap-1 cursor-pointer transition-colors"
+                            class="text-brand hover:text-navy hover:underline font-medium inline-flex items-center gap-1 cursor-pointer transition-colors"
                           >
                             <span>{{ getFormattedValue(item, col, idx) }}</span>
                             <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -138,7 +140,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                           <button
                             type="button"
                             (click)="onLinkClick(col, item, $event)"
-                            class="text-[#174A6E] hover:text-[#0B3558] hover:underline font-medium inline-flex items-center gap-1 cursor-pointer transition-colors text-left"
+                            class="text-brand hover:text-navy hover:underline font-medium inline-flex items-center gap-1 cursor-pointer transition-colors text-left"
                           >
                             <span>{{ getFormattedValue(item, col, idx) }}</span>
                             <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -238,9 +240,9 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                   type="button"
                   (click)="setPage(+p)"
                   class="min-w-7.5 h-7.5 px-1.5 rounded-sm flex items-center justify-center text-[12px] font-medium transition-colors cursor-pointer border"
-                  [class.bg-[#174A6E]]="currentPage() === p"
+                  [class.bg-primary]="currentPage() === p"
                   [class.text-white]="currentPage() === p"
-                  [class.border-[#174A6E]]="currentPage() === p"
+                  [class.border-primary]="currentPage() === p"
                   [class.bg-white]="currentPage() !== p"
                   [class.text-slate-700]="currentPage() !== p"
                   [class.border-slate-300]="currentPage() !== p"
@@ -481,17 +483,17 @@ export class TableComponent {
     switch (act.variant) {
       case 'primary':
       case 'pdf-view':
-        return base + 'bg-[#0B3558] hover:bg-[#07233B] text-white';
+        return base + 'bg-navy hover:bg-navy-dark text-white';
       case 'secondary':
         return base + 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300';
       case 'outline':
-        return base + 'border border-[#174A6E] text-[#174A6E] hover:bg-[#EAF2F6]';
+        return base + 'border border-primary text-brand hover:bg-primary-light';
       case 'danger':
         return base + 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200';
       case 'ghost':
         return 'p-1 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded transition-colors';
       default:
-        return base + 'bg-[#0B3558] hover:bg-[#07233B] text-white';
+        return base + 'bg-navy hover:bg-navy-dark text-white';
     }
   }
 }

@@ -1,8 +1,10 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { jsPDF } from 'jspdf';
 import { EoiStateService, ApplicantResponse } from '../../services/eoi-state.service';
+import { formatDate } from '../../../../shared/utils';
 import {
   PageHeaderComponent,
   TableComponent,
@@ -12,6 +14,7 @@ import {
 @Component({
   selector: 'app-applicant-submissions',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent],
   template: `
     <div class="w-full min-h-full bg-white text-text-primary font-sans">
@@ -97,21 +100,21 @@ import {
               type="button"
               (click)="setFilter('ALL')"
               class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-              [class.bg-[#174A6E]]="selectedFilter() === 'ALL'"
+              [class.bg-primary]="selectedFilter() === 'ALL'"
               [class.text-white]="selectedFilter() === 'ALL'"
-              [class.border-[#174A6E]]="selectedFilter() === 'ALL'"
+              [class.border-primary]="selectedFilter() === 'ALL'"
               [class.bg-white]="selectedFilter() !== 'ALL'"
               [class.text-[#5F6B76]]="selectedFilter() !== 'ALL'"
-              [class.border-[#D9E1E7]]="selectedFilter() !== 'ALL'"
-              [class.hover:bg-[#EAF2F6]]="selectedFilter() !== 'ALL'"
-              [class.hover:text-[#174A6E]]="selectedFilter() !== 'ALL'"
+              [class.border-border]="selectedFilter() !== 'ALL'"
+              [class.hover:bg-primary-light]="selectedFilter() !== 'ALL'"
+              [class.hover:text-brand]="selectedFilter() !== 'ALL'"
             >
               <span>All</span>
               <span
                 class="px-1.5 py-0.2 rounded-full text-[10px]"
                 [class.bg-white/20]="selectedFilter() === 'ALL'"
                 [class.text-white]="selectedFilter() === 'ALL'"
-                [class.bg-[#F5F7F9]]="selectedFilter() !== 'ALL'"
+                [class.bg-surface-muted]="selectedFilter() !== 'ALL'"
                 [class.text-[#5F6B76]]="selectedFilter() !== 'ALL'"
               >
                 {{ totalSubmissionsCount() }}
@@ -122,21 +125,21 @@ import {
               type="button"
               (click)="setFilter('UNDER_SCRUTINY')"
               class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-              [class.bg-[#174A6E]]="selectedFilter() === 'UNDER_SCRUTINY'"
+              [class.bg-primary]="selectedFilter() === 'UNDER_SCRUTINY'"
               [class.text-white]="selectedFilter() === 'UNDER_SCRUTINY'"
-              [class.border-[#174A6E]]="selectedFilter() === 'UNDER_SCRUTINY'"
+              [class.border-primary]="selectedFilter() === 'UNDER_SCRUTINY'"
               [class.bg-white]="selectedFilter() !== 'UNDER_SCRUTINY'"
               [class.text-[#5F6B76]]="selectedFilter() !== 'UNDER_SCRUTINY'"
-              [class.border-[#D9E1E7]]="selectedFilter() !== 'UNDER_SCRUTINY'"
-              [class.hover:bg-[#EAF2F6]]="selectedFilter() !== 'UNDER_SCRUTINY'"
-              [class.hover:text-[#174A6E]]="selectedFilter() !== 'UNDER_SCRUTINY'"
+              [class.border-border]="selectedFilter() !== 'UNDER_SCRUTINY'"
+              [class.hover:bg-primary-light]="selectedFilter() !== 'UNDER_SCRUTINY'"
+              [class.hover:text-brand]="selectedFilter() !== 'UNDER_SCRUTINY'"
             >
               <span>Under Scrutiny</span>
               <span
                 class="px-1.5 py-0.2 rounded-full text-[10px]"
                 [class.bg-white/20]="selectedFilter() === 'UNDER_SCRUTINY'"
                 [class.text-white]="selectedFilter() === 'UNDER_SCRUTINY'"
-                [class.bg-[#F5F7F9]]="selectedFilter() !== 'UNDER_SCRUTINY'"
+                [class.bg-surface-muted]="selectedFilter() !== 'UNDER_SCRUTINY'"
                 [class.text-[#5F6B76]]="selectedFilter() !== 'UNDER_SCRUTINY'"
               >
                 {{ countPending() }}
@@ -147,21 +150,21 @@ import {
               type="button"
               (click)="setFilter('APPROVED')"
               class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-              [class.bg-[#174A6E]]="selectedFilter() === 'APPROVED'"
+              [class.bg-primary]="selectedFilter() === 'APPROVED'"
               [class.text-white]="selectedFilter() === 'APPROVED'"
-              [class.border-[#174A6E]]="selectedFilter() === 'APPROVED'"
+              [class.border-primary]="selectedFilter() === 'APPROVED'"
               [class.bg-white]="selectedFilter() !== 'APPROVED'"
               [class.text-[#5F6B76]]="selectedFilter() !== 'APPROVED'"
-              [class.border-[#D9E1E7]]="selectedFilter() !== 'APPROVED'"
-              [class.hover:bg-[#EAF2F6]]="selectedFilter() !== 'APPROVED'"
-              [class.hover:text-[#174A6E]]="selectedFilter() !== 'APPROVED'"
+              [class.border-border]="selectedFilter() !== 'APPROVED'"
+              [class.hover:bg-primary-light]="selectedFilter() !== 'APPROVED'"
+              [class.hover:text-brand]="selectedFilter() !== 'APPROVED'"
             >
               <span>Accepted</span>
               <span
                 class="px-1.5 py-0.2 rounded-full text-[10px]"
                 [class.bg-white/20]="selectedFilter() === 'APPROVED'"
                 [class.text-white]="selectedFilter() === 'APPROVED'"
-                [class.bg-[#F5F7F9]]="selectedFilter() !== 'APPROVED'"
+                [class.bg-surface-muted]="selectedFilter() !== 'APPROVED'"
                 [class.text-[#5F6B76]]="selectedFilter() !== 'APPROVED'"
               >
                 {{ countApproved() }}
@@ -172,21 +175,21 @@ import {
               type="button"
               (click)="setFilter('REJECTED')"
               class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-              [class.bg-[#174A6E]]="selectedFilter() === 'REJECTED'"
+              [class.bg-primary]="selectedFilter() === 'REJECTED'"
               [class.text-white]="selectedFilter() === 'REJECTED'"
-              [class.border-[#174A6E]]="selectedFilter() === 'REJECTED'"
+              [class.border-primary]="selectedFilter() === 'REJECTED'"
               [class.bg-white]="selectedFilter() !== 'REJECTED'"
               [class.text-[#5F6B76]]="selectedFilter() !== 'REJECTED'"
-              [class.border-[#D9E1E7]]="selectedFilter() !== 'REJECTED'"
-              [class.hover:bg-[#EAF2F6]]="selectedFilter() !== 'REJECTED'"
-              [class.hover:text-[#174A6E]]="selectedFilter() !== 'REJECTED'"
+              [class.border-border]="selectedFilter() !== 'REJECTED'"
+              [class.hover:bg-primary-light]="selectedFilter() !== 'REJECTED'"
+              [class.hover:text-brand]="selectedFilter() !== 'REJECTED'"
             >
               <span>Rejected</span>
               <span
                 class="px-1.5 py-0.2 rounded-full text-[10px]"
                 [class.bg-white/20]="selectedFilter() === 'REJECTED'"
                 [class.text-white]="selectedFilter() === 'REJECTED'"
-                [class.bg-[#F5F7F9]]="selectedFilter() !== 'REJECTED'"
+                [class.bg-surface-muted]="selectedFilter() !== 'REJECTED'"
                 [class.text-[#5F6B76]]="selectedFilter() !== 'REJECTED'"
               >
                 {{ countRejected() }}
@@ -200,7 +203,7 @@ import {
               type="button"
               (click)="downloadAllZip()"
               [disabled]="filteredResponses().length === 0 || isDownloadingAll()"
-              class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md border border-[#0B3558] bg-[#0B3558] hover:bg-[#07243c] text-white text-xs font-semibold transition-all cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+              class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md border border-navy bg-navy hover:bg-[#07243c] text-white text-xs font-semibold transition-all cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
               [title]="'Download all generated documents as a ZIP archive for ' + (selectedFilter() === 'APPROVED' ? 'Accepted' : selectedFilter() === 'REJECTED' ? 'Rejected' : selectedFilter() === 'UNDER_SCRUTINY' ? 'Under Scrutiny' : 'All') + ' applicants'"
             >
               @if (isDownloadingAll() && downloadType() === 'zip') {
@@ -221,17 +224,17 @@ import {
               type="button"
               (click)="downloadAllPdf()"
               [disabled]="filteredResponses().length === 0 || isDownloadingAll()"
-              class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-[#0B3558] hover:text-[#07243c] text-xs font-semibold transition-all cursor-pointer shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
+              class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-navy hover:text-[#07243c] text-xs font-semibold transition-all cursor-pointer shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
               [title]="'Download all generated documents in a single PDF for ' + (selectedFilter() === 'APPROVED' ? 'Accepted' : selectedFilter() === 'REJECTED' ? 'Rejected' : selectedFilter() === 'UNDER_SCRUTINY' ? 'Under Scrutiny' : 'All') + ' applicants'"
             >
               @if (isDownloadingAll() && downloadType() === 'pdf') {
-                <svg class="w-3.5 h-3.5 animate-spin text-[#0B3558]" fill="none" viewBox="0 0 24 24">
+                <svg class="w-3.5 h-3.5 animate-spin text-navy" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 <span>Generating PDF...</span>
               } @else {
-                <svg class="w-3.5 h-3.5 text-[#0B3558]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-3.5 h-3.5 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <span>Download All (PDF)</span>
@@ -266,7 +269,7 @@ import {
         <ng-template #actionTemplate let-item>
           <a
             [routerLink]="['/admin/review', item.id]"
-            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-md bg-[#0B3558] hover:bg-[#07243c] text-white! shadow-2xs transition-colors font-semibold text-xs whitespace-nowrap cursor-pointer"
+            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-md bg-navy hover:bg-[#07243c] text-white! shadow-2xs transition-colors font-semibold text-xs whitespace-nowrap cursor-pointer"
             style="color: #ffffff !important;"
           >
             <span style="color: #ffffff !important;">Review</span>
@@ -282,6 +285,7 @@ export class ApplicantSubmissionsComponent {
   private eoiStateService = inject(EoiStateService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   responses = signal<ApplicantResponse[]>([]);
   selectedFilter = signal<'ALL' | 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED'>('ALL');
@@ -304,7 +308,7 @@ export class ApplicantSubmissionsComponent {
   ];
 
   constructor() {
-    this.route.params.subscribe(params => {
+    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const sId = params['schemeId'] || 'ALL';
       this.schemeId.set(sId);
       this.loadResponses(sId);
@@ -312,7 +316,7 @@ export class ApplicantSubmissionsComponent {
   }
 
   loadResponses(sId: string): void {
-    this.eoiStateService.getResponses(sId).subscribe(data => {
+    this.eoiStateService.getResponses(sId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => {
       this.responses.set(data);
     });
   }
@@ -611,7 +615,7 @@ export class ApplicantSubmissionsComponent {
       const filterTag = currentFilter === 'APPROVED' ? 'Accepted_IPA' : currentFilter === 'REJECTED' ? 'Rejected_Outcome' : currentFilter === 'UNDER_SCRUTINY' ? 'Under_Scrutiny' : 'All_Applications';
       const folderName = `RSLDC_${filterTag}_${this.schemeId() || 'EOI'}`;
       const folder = zip.folder(folderName) || zip;
-      const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const today = formatDate(new Date());
 
       for (let i = 0; i < list.length; i++) {
         const app = list[i];
@@ -652,7 +656,7 @@ export class ApplicantSubmissionsComponent {
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       const currentSchemeTitle = list[0]?.schemeName || 'RSLDC Skill Development Scheme';
       const currentFilter = this.selectedFilter();
-      const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const today = formatDate(new Date());
 
       list.forEach((app, idx) => {
         if (idx > 0) {

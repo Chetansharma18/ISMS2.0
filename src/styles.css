@@ -31,6 +31,34 @@
   --color-header-blue: #174A6E;
   --color-table-header: #EAF2F6;
   --color-sso-blue: #131862;
+
+  /* Aliases kept for existing markup: text-brand / text-brand-dark / border-theme */
+  --color-brand: #174A6E;
+  --color-brand-dark: #123B59;
+  --color-theme: #D9E1E7;
+
+  /* Deep navy used for headers, primary CTAs and document chrome */
+  --color-navy: #0B3558;
+  --color-navy-dark: #07233B;
+
+  /* Accent blues used for links, back buttons and highlights */
+  --color-ocean: #0483AC;
+  --color-ocean-dark: #036C8F;
+
+  /* Neutral surfaces and form borders */
+  --color-surface-muted: #F5F7F9;
+  --color-field-border: #8FA3B6;
+}
+
+/* Horizontal scrollers (steppers, tab strips) that should scroll without a visible bar.
+   Used by StepperComponent, registration-shell and scheme-form tab filters. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* ---------------------------------------------------------
@@ -536,42 +564,10 @@ select:disabled,
 /* ---------------------------------------------------------
    13. THEME GLOBAL UTILITIES
    --------------------------------------------------------- */
-.bg-primary {
-  background-color: var(--color-primary) !important;
-}
-
-.bg-primary-dark {
-  background-color: var(--color-primary-dark) !important;
-}
-
-.bg-primary-light {
-  background-color: var(--color-primary-light) !important;
-}
-
-.bg-background {
-  background-color: var(--color-background) !important;
-}
-
-.bg-surface {
-  background-color: var(--color-surface) !important;
-}
-
-.text-brand {
-  color: var(--color-primary) !important;
-}
-
-.text-brand-dark {
-  color: var(--color-primary-dark) !important;
-}
-
-.border-theme {
-  border-color: var(--color-border) !important;
-}
-
-.border-primary {
-  border-color: var(--color-primary) !important;
-}
-
+/* Colour utilities (bg-primary, bg-primary-dark, bg-primary-light, bg-background, bg-surface,
+   border-primary, text-brand, text-brand-dark, border-theme, bg-navy, text-ocean ...) are generated
+   by Tailwind from the @theme tokens above. They used to be hand-written `!important` classes, which
+   silently beat every hover:/focus:/disabled: variant. Add new brand colours to @theme instead. */
 /* ---------------------------------------------------------
    14. ACCESSIBILITY & STATE
    --------------------------------------------------------- */

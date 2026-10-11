@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -18,6 +18,7 @@ interface CameraUser {
 @Component({
   selector: 'app-camera-monitoring',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, FormsModule, PageHeaderComponent, TableComponent],
   template: `
     <div class="w-full min-h-full bg-background text-primary font-sans">
@@ -68,20 +69,20 @@ interface CameraUser {
         </ng-template>
 
         <ng-template #sdcCountTemplate let-user>
-          <div class="inline-flex flex-col items-center justify-center text-[#334155] text-[11.5px] font-semibold leading-tight min-w-17.5">
+          <div class="inline-flex flex-col items-center justify-center text-slate-700 text-[11.5px] font-semibold leading-tight min-w-17.5">
             <span>{{ user.sdcCount }} SDC</span>
             <span>Center(s)</span>
           </div>
         </ng-template>
 
         <ng-template #totalBatchesTemplate let-user>
-          <span class="inline-flex items-center text-[#475569] text-[11.5px] font-semibold tracking-wide">
+          <span class="inline-flex items-center text-slate-600 text-[11.5px] font-semibold tracking-wide">
             {{ user.totalBatches }} Batches
           </span>
         </ng-template>
 
         <ng-template #totalCamerasTemplate let-user>
-          <span class="inline-flex items-center gap-1.5 text-[#15803D] text-[11.5px] font-semibold tracking-wide">
+          <span class="inline-flex items-center gap-1.5 text-green-700 text-[11.5px] font-semibold tracking-wide">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4zM5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
             </svg>

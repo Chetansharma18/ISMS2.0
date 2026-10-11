@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   signal,
   ElementRef,
@@ -15,6 +16,7 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
 @Component({
   selector: 'app-footer',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   host: {
     class: 'block w-full bg-[#070e18]'
@@ -367,7 +369,7 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
               </div>
 
               <!-- Organisation Address / Department Hierarchy -->
-              <div class="text-[0.8125rem] text-[#cbd5e1] leading-relaxed font-['Inter',sans-serif]">
+              <div class="text-[0.8125rem] text-slate-300 leading-relaxed font-['Inter',sans-serif]">
                 Rajasthan Skill &amp; Livelihoods Development Corporation<br/>
                 Department of Skill, Employment and Entrepreneurship<br/>
                 Government of Rajasthan

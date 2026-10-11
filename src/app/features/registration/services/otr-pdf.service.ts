@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { jsPDF } from 'jspdf';
 import { OtrFormData } from '../models/otr-form.model';
+import { formatDate, formatDateMedium } from '../../../shared/utils';
 
 @Injectable({
   providedIn: 'root'
@@ -152,7 +153,7 @@ export class OtrPdfService {
       doc.setFontSize(6.8);
       doc.setTextColor(148, 163, 184);
       doc.text(
-        `Generated on ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} | ISMS 2.0 Secure Registration Record | Page ${currentPage}`,
+        `Generated on ${formatDateMedium(new Date())} | ISMS 2.0 Secure Registration Record | Page ${currentPage}`,
         105,
         286,
         { align: 'center' }
@@ -189,7 +190,7 @@ export class OtrPdfService {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(100, 116, 139);
-    doc.text(`Submission Date: ${data.submittedAt ? new Date(data.submittedAt).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN')}`, 145, y + 7);
+    doc.text(`Submission Date: ${formatDate(data.submittedAt || new Date())}`, 145, y + 7);
 
     y += 16;
 

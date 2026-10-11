@@ -1,12 +1,14 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
+import { PermissionService } from '../../core/permissions/permission.service';
 import { OtrFormService } from '../registration/services/otr-form.service';
 import { OtrValidationService } from '../registration/services/otr-validation.service';
 import { OtrPdfService } from '../registration/services/otr-pdf.service';
 import { DocumentViewerModalComponent } from '../../shared/components/document-viewer-modal/document-viewer-modal.component';
 import { FileDoc } from '../registration/models/otr-form.model';
+import { formatDate } from '../../shared/utils';
 
 export interface RegistrationStepItem {
   id: string;
@@ -20,6 +22,7 @@ export interface RegistrationStepItem {
 @Component({
   selector: 'app-profile-page',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, DocumentViewerModalComponent],
   template: `
     <div class="w-full min-h-full font-sans p-4 sm:p-5 space-y-4 select-none" style="background-color: #FEFEFD; font-family: 'Inter', sans-serif;">
@@ -65,14 +68,14 @@ export interface RegistrationStepItem {
           } @else {
             <div class="flex items-center gap-3 bg-[#F0FDF4] border border-[#86EFAC] rounded-xl px-4 py-2.5 shadow-2xs">
               <!-- Green Checkmark Circle -->
-              <div class="w-6 h-6 rounded-full bg-[#15803D] text-white flex items-center justify-center shrink-0">
+              <div class="w-6 h-6 rounded-full bg-green-700 text-white flex items-center justify-center shrink-0">
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
               <div>
                 <div class="text-[12px] font-bold text-[#166534] leading-tight">Profile Complete</div>
-                <div class="text-[11px] text-[#15803D] mt-0.5 leading-tight">All registration steps verified and active.</div>
+                <div class="text-[11px] text-green-700 mt-0.5 leading-tight">All registration steps verified and active.</div>
               </div>
             </div>
           }
@@ -134,7 +137,7 @@ export interface RegistrationStepItem {
           <button
             type="button"
             (click)="goToRegistration()"
-            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-white text-[13.5px] font-semibold bg-[#0B3558] hover:bg-[#07243c] shadow-sm transition-all cursor-pointer"
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-white text-[13.5px] font-semibold bg-navy hover:bg-[#07243c] shadow-sm transition-all cursor-pointer"
           >
             <span>{{ ctaButtonText() }}</span>
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -166,9 +169,9 @@ export interface RegistrationStepItem {
                 <div
                   class="w-8 h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 z-10 shadow-2xs transition-colors"
                   [ngClass]="{
-                    'bg-[#15803D] text-white': step.isCompleted,
-                    'bg-[#0B3558] text-white': !step.isCompleted && isCurrentStep(step.stepNumber),
-                    'bg-[#E2E8F0] text-slate-600': !step.isCompleted && !isCurrentStep(step.stepNumber)
+                    'bg-green-700 text-white': step.isCompleted,
+                    'bg-navy text-white': !step.isCompleted && isCurrentStep(step.stepNumber),
+                    'bg-slate-200 text-slate-600': !step.isCompleted && !isCurrentStep(step.stepNumber)
                   }"
                 >
                   {{ step.stepNumber }}
@@ -190,9 +193,9 @@ export interface RegistrationStepItem {
                   <div
                     class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors"
                     [ngClass]="{
-                      'bg-[#ECFDF5] text-[#15803D]': step.isCompleted,
+                      'bg-[#ECFDF5] text-green-700': step.isCompleted,
                       'bg-[#EFF6FF] text-[#1D4ED8]': !step.isCompleted && isCurrentStep(step.stepNumber),
-                      'bg-[#F8FAFC] text-[#0B3558] border border-slate-100': !step.isCompleted && !isCurrentStep(step.stepNumber)
+                      'bg-slate-50 text-navy border border-slate-100': !step.isCompleted && !isCurrentStep(step.stepNumber)
                     }"
                   >
                     @switch (step.icon) {
@@ -234,7 +237,7 @@ export interface RegistrationStepItem {
                 <div class="flex items-center justify-between md:justify-end gap-3 sm:gap-4 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
                   <!-- Status Pill -->
                   @if (step.isCompleted) {
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#ECFDF5] text-[#15803D] border border-[#A7F3D0] select-none">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#ECFDF5] text-green-700 border border-[#A7F3D0] select-none">
                       <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
@@ -263,7 +266,7 @@ export interface RegistrationStepItem {
                     <button
                       type="button"
                       (click)="navigateToStep(step.stepNumber)"
-                      class="inline-flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold bg-[#0B3558] hover:bg-[#07243c] text-white shadow-sm transition-colors cursor-pointer min-w-[125px]"
+                      class="inline-flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold bg-navy hover:bg-[#07243c] text-white shadow-sm transition-colors cursor-pointer min-w-[125px]"
                     >
                       <span>Continue Step</span>
                       <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -293,10 +296,10 @@ export interface RegistrationStepItem {
      
       <!-- Reusable Document Preview Modal (preserved for document review) -->
       <app-document-viewer-modal
-        [isOpen]="isDocViewerOpen"
-        [doc]="selectedDoc"
-        [title]="selectedDocTitle"
-        (close)="isDocViewerOpen = false"
+        [isOpen]="isDocViewerOpen()"
+        [doc]="selectedDoc()"
+        [title]="selectedDocTitle()"
+        (close)="isDocViewerOpen.set(false)"
       ></app-document-viewer-modal>
 
     </div>
@@ -305,6 +308,7 @@ export interface RegistrationStepItem {
 export class ProfilePageComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
+  private permissions = inject(PermissionService);
   private otrFormService = inject(OtrFormService);
   private validationService = inject(OtrValidationService);
   private pdfService = inject(OtrPdfService);
@@ -313,9 +317,9 @@ export class ProfilePageComponent {
   readonly formData = this.otrFormService.formData;
 
   /** Document viewer modal state */
-  isDocViewerOpen = false;
-  selectedDoc: FileDoc | null = null;
-  selectedDocTitle = '';
+  readonly isDocViewerOpen = signal(false);
+  readonly selectedDoc = signal<FileDoc | null>(null);
+  readonly selectedDocTitle = signal('');
 
   /** 4 Standard Registration Steps */
   readonly sections = computed<RegistrationStepItem[]>(() => {
@@ -401,7 +405,7 @@ export class ProfilePageComponent {
     const data = this.formData();
     if (data.status === 'Submitted') return false;
     if (!user) return true;
-    if (user.role === 'new_user') {
+    if (this.permissions.hasRole('new_user')) {
       return this.completedSectionsCount() < 4;
     }
     return user.isProfileComplete === false;
@@ -427,14 +431,14 @@ export class ProfilePageComponent {
 
   /** Opens document viewer modal */
   openDoc(doc: FileDoc | null, title: string, defaultName = 'document.pdf'): void {
-    this.selectedDoc = doc || {
+    this.selectedDoc.set(doc || {
       fileName: defaultName,
       fileSize: '1.45 MB',
-      uploadDate: new Date().toLocaleDateString('en-GB'),
+      uploadDate: formatDate(new Date()),
       status: 'uploaded'
-    };
-    this.selectedDocTitle = title;
-    this.isDocViewerOpen = true;
+    });
+    this.selectedDocTitle.set(title);
+    this.isDocViewerOpen.set(true);
   }
 
   /** Print / Download profile PDF */

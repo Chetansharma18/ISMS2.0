@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { StorageService } from '../services/storage.service';
 import { MOCK_CONFIG, isMockEnabled } from './mock.config';
+import { PaginatedResponse } from '../models/common.model';
 import {
   MOCK_SCHEMES,
   MOCK_USERS,
@@ -23,7 +25,8 @@ import {
   MOCK_EOI_CATEGORY_ITEMS,
   MOCK_PERMISSION_MASTER_ITEMS,
   MOCK_SCHEME_MASTER_ITEMS,
-  MOCK_USER_ROLE_MASTER_ITEMS
+  MOCK_USER_ROLE_MASTER_ITEMS,
+  MOCK_CAMERA_BATCHES
 } from './data';
 
 export interface QueryOptions {
@@ -35,13 +38,8 @@ export interface QueryOptions {
   sort?: { key: string; direction: 'asc' | 'desc' };
 }
 
-export interface QueryResult<T> {
-  items: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-}
+/** Same shape as the canonical PaginatedResponse in core/models; kept as an alias for existing callers. */
+export type QueryResult<T> = PaginatedResponse<T>;
 
 /**
  * Centralized Mock Database Service
@@ -52,6 +50,7 @@ export interface QueryResult<T> {
   providedIn: 'root'
 })
 export class MockDatabaseService {
+  private readonly storage = inject(StorageService);
   private readonly store = new Map<string, any[]>();
 
   // Initial seed definitions
@@ -70,6 +69,7 @@ export class MockDatabaseService {
     GRIEVANCES: MOCK_GRIEVANCES,
     ADMIN_GRIEVANCES: MOCK_ADMIN_GRIEVANCES,
     SUBMITTED_TENDERS: MOCK_SUBMITTED_TENDERS,
+    CAMERA_BATCHES: MOCK_CAMERA_BATCHES,
     DESIGNATIONS: MOCK_DESIGNATION_MASTER_ITEMS,
     EOI_CATEGORIES: MOCK_EOI_CATEGORY_ITEMS,
     PERMISSIONS: MOCK_PERMISSION_MASTER_ITEMS,
@@ -296,31 +296,17 @@ export class MockDatabaseService {
   // --- Storage Helper Utilities ---
 
   private saveToStorage(resourceKey: string, data: any[]): void {
-    if (!MOCK_CONFIG.persistInStorage || typeof sessionStorage === 'undefined') return;
-    try {
-      sessionStorage.setItem(`${MOCK_CONFIG.storagePrefix}${resourceKey}`, JSON.stringify(data));
-    } catch {
-      // Ignore quota or private-mode errors
-    }
+    if (!MOCK_CONFIG.persistInStorage) return;
+    this.storage.setSessionItem(`${MOCK_CONFIG.storagePrefix}${resourceKey}`, data);
   }
 
   private loadFromStorage(resourceKey: string): any[] | null {
-    if (!this.isMockActive(resourceKey) || !MOCK_CONFIG.persistInStorage || typeof sessionStorage === 'undefined') return null;
-    try {
-      const val = sessionStorage.getItem(`${MOCK_CONFIG.storagePrefix}${resourceKey}`);
-      return val ? JSON.parse(val) : null;
-    } catch {
-      return null;
-    }
+    if (!this.isMockActive(resourceKey) || !MOCK_CONFIG.persistInStorage) return null;
+    return this.storage.getSessionItem<any[]>(`${MOCK_CONFIG.storagePrefix}${resourceKey}`);
   }
 
   private removeFromStorage(resourceKey: string): void {
-    if (typeof sessionStorage === 'undefined') return;
-    try {
-      sessionStorage.removeItem(`${MOCK_CONFIG.storagePrefix}${resourceKey}`);
-    } catch {
-      // Ignore
-    }
+    this.storage.removeSessionItem(`${MOCK_CONFIG.storagePrefix}${resourceKey}`);
   }
 
   private deepClone<T>(obj: T): T {

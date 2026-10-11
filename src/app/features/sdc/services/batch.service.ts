@@ -1,137 +1,99 @@
 import { INITIAL_BATCH_RECORDS } from '../../../core/mock/data/batches.mock';
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { environment } from '../../../../environments/environment';
+import { createPersistedStore } from '../../../core/services/persisted-store';
 import { BatchRecord, CreateBatchDto, BatchTrainee, BatchApprovalStatus, BatchInspectionStatus, BatchStatus } from '../models/batch.model';
 import { SdcService } from './sdc.service';
 
 
+
+/**
+ * Refreshes saved batches with canonical seed fields, recomputes their approval status from the
+ * mapped-aspirant count, de-duplicates batch codes, and appends seed batches not yet saved.
+ */
+function reconcileBatches(stored: BatchRecord[], seed: readonly BatchRecord[]): BatchRecord[] {
+  const canonicalMap = new Map(seed.map(b => [b.id, b]));
+
+  const updated = stored.map(b => {
+    const canonical = canonicalMap.get(b.id);
+    const mappedCount = canonical ? canonical.mappedAspirantsCount : (b.mappedAspirantsCount ?? b.trainees?.length ?? 0);
+    const maxStr = canonical?.maxStrength || b.maxStrength || 30;
+    const isApproved = mappedCount >= 25 && mappedCount <= maxStr;
+    const isRejected = b.status === 'REJECTED' || b.approvalStatus === 'REJECTED' || canonical?.status === 'REJECTED';
+
+    const computedStatus: BatchStatus = isRejected ? 'REJECTED' : (isApproved ? 'APPROVED' : 'PENDING_APPROVAL');
+    const computedApprovalStatus: BatchApprovalStatus = isRejected ? 'REJECTED' : (isApproved ? 'APPROVED' : 'PENDING');
+
+    if (canonical) {
+      return {
+        ...b,
+        batchCode: canonical.batchCode,
+        batchName: canonical.batchName,
+        sdcId: canonical.sdcId,
+        sdcCode: canonical.sdcCode,
+        sdcName: canonical.sdcName,
+        sdcDistrict: canonical.sdcDistrict,
+        tpName: canonical.tpName,
+        scheme: canonical.scheme,
+        sector: canonical.sector,
+        courseName: canonical.courseName,
+        maxStrength: canonical.maxStrength,
+        mappedAspirantsCount: canonical.mappedAspirantsCount,
+        status: computedStatus,
+        approvalStatus: computedApprovalStatus,
+        inspectionStatus: b.inspectionStatus || canonical.inspectionStatus
+      };
+    }
+
+    return {
+      ...b,
+      mappedAspirantsCount: mappedCount,
+      status: computedStatus,
+      approvalStatus: computedApprovalStatus
+    };
+  });
+
+  // Ensure unique batch codes across all items
+  const seenCodes = new Set<string>();
+  let maxCodeSeq = 0;
+  updated.forEach(b => {
+    const m = b.batchCode?.match(/B-26-(\d+)/);
+    if (m) {
+      const seq = parseInt(m[1], 10);
+      if (seq > maxCodeSeq) maxCodeSeq = seq;
+    }
+  });
+
+  updated.forEach(b => {
+    if (seenCodes.has(b.batchCode)) {
+      maxCodeSeq++;
+      b.batchCode = `B-26-${String(maxCodeSeq).padStart(4, '0')}`;
+    }
+    seenCodes.add(b.batchCode);
+  });
+
+  const existingIds = new Set(updated.map(p => p.id));
+  return [...updated, ...seed.filter(b => !existingIds.has(b.id))];
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class BatchService {
   private sdcService = inject(SdcService);
-  private readonly STORAGE_KEY = 'isms_batch_records';
 
-  /** Reactive list of batches initialized with localStorage fallback */
-  private readonly _batches = signal<BatchRecord[]>(this.loadInitialBatches());
+  private readonly store = createPersistedStore<BatchRecord>({
+    key: 'isms_batch_records',
+    seed: INITIAL_BATCH_RECORDS,
+    reconcile: reconcileBatches
+  });
+
+  /** Reactive list of batches, restored from storage with seed fallback */
+  private readonly _batches = this.store.items;
 
   readonly batches = this._batches.asReadonly();
 
-  constructor() {
-    if (typeof window !== 'undefined') {
-      window.addEventListener('storage', (event: StorageEvent) => {
-        if (!environment.useMockData) return;
-        if (event.key === this.STORAGE_KEY && event.newValue) {
-          try {
-            const records: BatchRecord[] = JSON.parse(event.newValue);
-            if (Array.isArray(records) && records.length > 0) {
-              this._batches.set(records);
-            }
-          } catch { }
-        }
-      });
-    }
-  }
-
-  private loadInitialBatches(): BatchRecord[] {
-    if (!environment.useMockData) {
-      return [];
-    }
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const stored = localStorage.getItem(this.STORAGE_KEY);
-        if (stored) {
-          const parsed: BatchRecord[] = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            const canonicalMap = new Map(INITIAL_BATCH_RECORDS.map(b => [b.id, b]));
-
-            // Sanitize existing items with canonical data
-            const updated = parsed.map(b => {
-              const canonical = canonicalMap.get(b.id);
-              const mappedCount = canonical ? canonical.mappedAspirantsCount : (b.mappedAspirantsCount ?? b.trainees?.length ?? 0);
-              const maxStr = canonical?.maxStrength || b.maxStrength || 30;
-              const isApproved = mappedCount >= 25 && mappedCount <= maxStr;
-              const isRejected = b.status === 'REJECTED' || b.approvalStatus === 'REJECTED' || canonical?.status === 'REJECTED';
-
-              const computedStatus: BatchStatus = isRejected ? 'REJECTED' : (isApproved ? 'APPROVED' : 'PENDING_APPROVAL');
-              const computedApprovalStatus: BatchApprovalStatus = isRejected ? 'REJECTED' : (isApproved ? 'APPROVED' : 'PENDING');
-
-              if (canonical) {
-                return {
-                  ...b,
-                  batchCode: canonical.batchCode,
-                  batchName: canonical.batchName,
-                  sdcId: canonical.sdcId,
-                  sdcCode: canonical.sdcCode,
-                  sdcName: canonical.sdcName,
-                  sdcDistrict: canonical.sdcDistrict,
-                  tpName: canonical.tpName,
-                  scheme: canonical.scheme,
-                  sector: canonical.sector,
-                  courseName: canonical.courseName,
-                  maxStrength: canonical.maxStrength,
-                  mappedAspirantsCount: canonical.mappedAspirantsCount,
-                  status: computedStatus,
-                  approvalStatus: computedApprovalStatus,
-                  inspectionStatus: b.inspectionStatus || canonical.inspectionStatus
-                };
-              }
-              
-              return {
-                ...b,
-                mappedAspirantsCount: mappedCount,
-                status: computedStatus,
-                approvalStatus: computedApprovalStatus
-              };
-            });
-
-            // Ensure unique batch codes across all items
-            const seenCodes = new Set<string>();
-            let maxCodeSeq = 0;
-            updated.forEach(b => {
-              const m = b.batchCode?.match(/B-26-(\d+)/);
-              if (m) {
-                const seq = parseInt(m[1], 10);
-                if (seq > maxCodeSeq) maxCodeSeq = seq;
-              }
-            });
-
-            updated.forEach(b => {
-              if (seenCodes.has(b.batchCode)) {
-                maxCodeSeq++;
-                b.batchCode = `B-26-${String(maxCodeSeq).padStart(4, '0')}`;
-              }
-              seenCodes.add(b.batchCode);
-            });
-
-            const existingIds = new Set(updated.map(p => p.id));
-            const missing = INITIAL_BATCH_RECORDS.filter(b => !existingIds.has(b.id));
-            const combined = [...updated, ...missing];
-            this.persist(combined);
-            return combined;
-          }
-        }
-      } catch (e) {
-        console.error('Failed to load batches from localStorage', e);
-      }
-    }
-    this.persist(INITIAL_BATCH_RECORDS);
-    return INITIAL_BATCH_RECORDS;
-  }
-
   private persist(records?: BatchRecord[]): void {
-    if (!environment.useMockData) {
-      return;
-    }
-    const list = records || this._batches();
-    if (typeof localStorage !== 'undefined') {
-      try {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
-      } catch (e) {
-        console.error('Failed to persist batches to localStorage', e);
-      }
-    }
+    this.store.persist(records);
   }
 
   /** Stats */

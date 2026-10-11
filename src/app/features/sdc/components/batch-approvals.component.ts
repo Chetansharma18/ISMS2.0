@@ -1,10 +1,11 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BatchService } from '../services/batch.service';
 import { BatchRecord } from '../models/batch.model';
 import {
+  ActionModalComponent,
   PageHeaderComponent,
   TableComponent,
   TableColumn
@@ -13,10 +14,12 @@ import {
 @Component({
   selector: 'app-batch-approvals',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterModule,
     FormsModule,
+    ActionModalComponent,
     PageHeaderComponent,
     TableComponent
   ],
@@ -50,21 +53,21 @@ import {
                 type="button"
                 (click)="setFilter(f.id)"
                 class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-                [class.bg-[#174A6E]]="activeFilter() === f.id"
+                [class.bg-primary]="activeFilter() === f.id"
                 [class.text-white]="activeFilter() === f.id"
-                [class.border-[#174A6E]]="activeFilter() === f.id"
+                [class.border-primary]="activeFilter() === f.id"
                 [class.bg-white]="activeFilter() !== f.id"
                 [class.text-[#5F6B76]]="activeFilter() !== f.id"
-                [class.border-[#D9E1E7]]="activeFilter() !== f.id"
-                [class.hover:bg-[#EAF2F6]]="activeFilter() !== f.id"
-                [class.hover:text-[#174A6E]]="activeFilter() !== f.id"
+                [class.border-border]="activeFilter() !== f.id"
+                [class.hover:bg-primary-light]="activeFilter() !== f.id"
+                [class.hover:text-brand]="activeFilter() !== f.id"
               >
                 <span>{{ f.label }}</span>
                 <span
                   class="px-1.5 py-0.2 rounded-full text-[10px]"
                   [class.bg-white/20]="activeFilter() === f.id"
                   [class.text-white]="activeFilter() === f.id"
-                  [class.bg-[#F5F7F9]]="activeFilter() !== f.id"
+                  [class.bg-surface-muted]="activeFilter() !== f.id"
                   [class.text-[#5F6B76]]="activeFilter() !== f.id"
                 >
                   {{ f.count }}
@@ -79,7 +82,7 @@ import {
         </div>
 
         <!-- Admin Advanced Filter Bar (Center, Scheme, District, Search) -->
-        <div class="bg-[#F8FAFC] border border-[#D9E1E7] rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs">
+        <div class="bg-slate-50 border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs">
           
           <!-- Filter: Center Name -->
           <div class="flex items-center gap-1.5">
@@ -87,7 +90,7 @@ import {
             <select
               [ngModel]="selectedCenter()"
               (ngModelChange)="selectedCenter.set($event)"
-              class="bg-white border border-[#D9E1E7] rounded-[4px] px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E] max-w-[200px]"
+              class="bg-white border border-border rounded-[4px] px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary max-w-[200px]"
             >
               <option value="ALL">All Centers ({{ centerList().length }})</option>
               @for (c of centerList(); track c) {
@@ -102,7 +105,7 @@ import {
             <select
               [ngModel]="selectedScheme()"
               (ngModelChange)="selectedScheme.set($event)"
-              class="bg-white border border-[#D9E1E7] rounded-[4px] px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
+              class="bg-white border border-border rounded-[4px] px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="ALL">All Schemes</option>
               @for (sch of schemeList(); track sch) {
@@ -117,7 +120,7 @@ import {
             <select
               [ngModel]="selectedDistrict()"
               (ngModelChange)="selectedDistrict.set($event)"
-              class="bg-white border border-[#D9E1E7] rounded-[4px] px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
+              class="bg-white border border-border rounded-[4px] px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="ALL">All Districts</option>
               @for (dst of districtList(); track dst) {
@@ -133,7 +136,7 @@ import {
               [ngModel]="searchQuery()"
               (ngModelChange)="searchQuery.set($event)"
               placeholder="Search batch code, course, center, scheme..."
-              class="w-full bg-white border border-[#D9E1E7] rounded-[4px] pl-7 pr-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#174A6E]"
+              class="w-full bg-white border border-border rounded-[4px] pl-7 pr-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2 top-1.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -259,7 +262,7 @@ import {
                 <button
                   type="button"
                   (click)="openApproveModal(batch)"
-                  class="w-full justify-center whitespace-nowrap inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#174A6E] hover:bg-[#123B59] active:bg-[#0E2D44] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer shrink-0"
+                  class="w-full justify-center whitespace-nowrap inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-primary hover:bg-primary-dark active:bg-[#0E2D44] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer shrink-0"
                   title="Approve Batch"
                 >
                   <svg class="w-3.5 h-3.5 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -293,42 +296,36 @@ import {
     <!-- ========================================================================= -->
     <!-- ADMIN BATCH APPROVAL MODAL (Themed identically to SDC Approval modal)    -->
     <!-- ========================================================================= -->
-    @if (approvingBatch(); as targetBatch) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs font-sans">
-        <div class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-          
-          <!-- Modal Header -->
-          <div class="bg-[#174A6E] text-white px-5 py-3.5 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <svg class="w-5 h-5 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <h3 class="font-bold text-sm">Approve Training Batch</h3>
-            </div>
-            <button
-              type="button"
-              (click)="closeApproveModal()"
-              class="text-white/80 hover:text-white text-lg font-bold cursor-pointer"
-            >✕</button>
-          </div>
-
-          <!-- Modal Body -->
-          <div class="p-5 space-y-4 text-xs">
+    <app-action-modal
+      [isOpen]="!!approvingBatch()"
+      title="Approve Training Batch"
+      accentBarClass="bg-primary"
+      [showCloseButton]="true"
+      [closeOnBackdrop]="false"
+      maxWidthClass="max-w-lg"
+      primaryLabel="Confirm &amp; Approve Batch"
+      secondaryLabel="Cancel"
+      (primaryAction)="confirmApproval()"
+      (secondaryAction)="closeApproveModal()"
+      (close)="closeApproveModal()"
+    >
+      @if (approvingBatch(); as targetBatch) {
+          <div class="mt-4 space-y-4 text-xs">
             
             <!-- Batch Summary Box -->
-            <div class="bg-[#EAF2F6] border border-[#D9E1E7] rounded-lg p-3 space-y-1.5">
+            <div class="bg-primary-light border border-border rounded-lg p-3 space-y-1.5">
               <div class="flex justify-between items-start">
                 <span class="text-[11px] font-semibold text-slate-500 uppercase">Batch Information</span>
-                <span class="font-mono text-[11px] font-bold text-[#174A6E]">{{ targetBatch.batchCode }}</span>
+                <span class="font-mono text-[11px] font-bold text-brand">{{ targetBatch.batchCode }}</span>
               </div>
               <div class="font-bold text-slate-900 text-sm">{{ targetBatch.batchName || targetBatch.courseName }}</div>
-              <div class="text-slate-900 font-bold pt-1 border-t border-[#D9E1E7]/70 flex items-center justify-between">
+              <div class="text-slate-900 font-bold pt-1 border-t border-border/70 flex items-center justify-between">
                 <span>{{ targetBatch.sdcName }}</span>
                 <span class="text-slate-500 font-medium">{{ targetBatch.sdcDistrict }}</span>
               </div>
               <div class="text-[11px] text-slate-500 flex items-center justify-between flex-wrap gap-2">
                 <span>Scheme: <strong class="text-slate-800">{{ targetBatch.scheme }}</strong> • Sector: <strong class="text-slate-800">{{ targetBatch.sector }}</strong></span>
-                <span class="font-semibold text-slate-700">Mapped: <strong class="text-[#174A6E]">{{ targetBatch.mappedAspirantsCount || 0 }}/{{ targetBatch.maxStrength || 30 }} Aspirants</strong></span>
+                <span class="font-semibold text-slate-700">Mapped: <strong class="text-brand">{{ targetBatch.mappedAspirantsCount || 0 }}/{{ targetBatch.maxStrength || 30 }} Aspirants</strong></span>
               </div>
             </div>
 
@@ -342,7 +339,7 @@ import {
                 [(ngModel)]="approvalTargetCapacity"
                 min="1"
                 max="500"
-                class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
+                class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Enter approved capacity"
               />
               <span class="text-[10.5px] text-slate-500 mt-0.5 block">Requested capacity: {{ targetBatch.maxStrength || 30 }} trainees</span>
@@ -356,7 +353,7 @@ import {
               <textarea
                 [(ngModel)]="approvalRemarks"
                 rows="3"
-                class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#174A6E]"
+                class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Enter official approval remarks..."
               ></textarea>
             </div>
@@ -370,31 +367,8 @@ import {
             </div>
 
           </div>
-
-          <!-- Modal Footer -->
-          <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2.5">
-            <button
-              type="button"
-              (click)="closeApproveModal()"
-              class="px-3.5 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold cursor-pointer transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              (click)="confirmApproval()"
-              class="px-4 py-1.5 rounded-lg bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold shadow-sm cursor-pointer transition-colors flex items-center gap-1.5"
-            >
-              <svg class="w-3.5 h-3.5 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Confirm & Approve Batch</span>
-            </button>
-          </div>
-
-        </div>
-      </div>
-    }
+      }
+    </app-action-modal>
   `
 })
 export class BatchApprovalsComponent {

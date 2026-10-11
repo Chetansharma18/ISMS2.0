@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import {
   OtrFormData,
   Step1OrgDetails,
@@ -8,13 +8,17 @@ import {
   createInitialOtrFormData,
   createExistingUserOtrData
 } from '../models/otr-form.model';
-import { AuthService } from '../../../core/auth/auth.service';
+import { PermissionService } from '../../../core/permissions/permission.service';
+import { StorageService } from '../../../core/services/storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OtrFormService {
   private readonly STORAGE_KEY = 'isms_otr_form_data_v3';
+  // Must be declared before _formData: loadInitialData() reads it during field init.
+  private readonly permissions = inject(PermissionService);
+  private readonly storage = inject(StorageService);
 
   private readonly _formData = signal<OtrFormData>(this.loadInitialData());
 
@@ -54,25 +58,16 @@ export class OtrFormService {
   });
 
   private loadInitialData(): OtrFormData {
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const userSaved = localStorage.getItem('isms_user');
-        if (userSaved) {
-          const user = JSON.parse(userSaved);
-          if (user && user.role === 'existing_user') {
-            return createExistingUserOtrData();
-          }
-        }
-        const cached = localStorage.getItem(this.STORAGE_KEY);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (parsed && parsed.step1 && parsed.step2) {
-            return parsed;
-          }
-        }
-      } catch (err) {
-        console.warn('Could not restore OTR draft from localStorage:', err);
+    try {
+      if (this.permissions.hasRole('existing_user')) {
+        return createExistingUserOtrData();
       }
+      const parsed = this.storage.getItem<OtrFormData>(this.STORAGE_KEY);
+      if (parsed && parsed.step1 && parsed.step2) {
+        return parsed;
+      }
+    } catch (err) {
+      console.warn('Could not restore OTR draft from localStorage:', err);
     }
     return createInitialOtrFormData();
   }
@@ -284,13 +279,7 @@ export class OtrFormService {
   }
 
   private persistDraft(data: OtrFormData): void {
-    if (typeof localStorage !== 'undefined') {
-      try {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
-      } catch (err) {
-        console.warn('LocalStorage save failed:', err);
-      }
-    }
+    this.storage.setItem(this.STORAGE_KEY, data);
   }
 
   submitForm(): string {
@@ -314,10 +303,6 @@ export class OtrFormService {
   resetForm(): void {
     const fresh = createInitialOtrFormData();
     this._formData.set(fresh);
-    if (typeof localStorage !== 'undefined') {
-      try {
-        localStorage.removeItem(this.STORAGE_KEY);
-      } catch {}
-    }
+    this.storage.removeItem(this.STORAGE_KEY);
   }
 }

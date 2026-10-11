@@ -1,21 +1,7 @@
 import { resolveMock } from '../mock.config';
+import { UserManagementItem } from '../../models/user-management.model';
 
-export interface UserManagementItem {
-  sNo: number;
-  id: string;
-  userId: string;
-  username: string;
-  ssoId: string;
-  userType: 'Admin' | 'Super Admin' | 'TP';
-  roleType: string;
-  designation?: string;
-  schemeDepartment?: string;
-  districtName: string;
-  blockName?: string;
-  email?: string;
-  mobileNo?: string;
-  schemeStatus: 'Active' | 'Inactive' | 'Blacklisted';
-}
+export type { UserManagementItem };
 
 export interface MockUserItem {
   id: string;

@@ -1,8 +1,9 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { EoiStateService, Scheme } from '../../services/eoi-state.service';
-import { PageHeaderComponent, TableComponent, TableColumn } from '../../../../shared';
+import { PageHeaderComponent, TableComponent, TableColumn, formatDate } from '../../../../shared';
 
 export interface AcceptedCompanyRow {
   srNo: number;
@@ -18,6 +19,7 @@ export interface AcceptedCompanyRow {
 @Component({
   selector: 'app-sanction-order',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent],
   template: `
     <div class="w-full min-h-full bg-white text-[#1F2933] font-sans pb-12">
@@ -88,7 +90,7 @@ export interface AcceptedCompanyRow {
           <button
             type="button"
             (click)="openIpaModal(row)"
-            class="px-3 py-1.5 bg-[#174A6E] hover:bg-[#0E324D] text-white rounded text-xs font-medium transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap shrink-0"
+            class="px-3 py-1.5 bg-primary hover:bg-[#0E324D] text-white rounded text-xs font-medium transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap shrink-0"
           >
             <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -106,7 +108,7 @@ export interface AcceptedCompanyRow {
         <div class="bg-white rounded-lg shadow-xl border border-slate-300 w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
           
           <!-- Modal Header -->
-          <div class="px-5 py-3.5 bg-[#0B3558] text-white flex items-center justify-between">
+          <div class="px-5 py-3.5 bg-navy text-white flex items-center justify-between">
             <div class="flex items-center gap-2">
               <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -149,7 +151,7 @@ export interface AcceptedCompanyRow {
             <!-- Subject & Recipient -->
             <div class="space-y-1 font-sans">
               <p class="font-bold text-slate-900">To,</p>
-              <p class="font-bold text-[#0B3558] text-sm">{{ selectedIpaCompany()?.agencyName }}</p>
+              <p class="font-bold text-navy text-sm">{{ selectedIpaCompany()?.agencyName }}</p>
               <p class="text-slate-600">Application ID: <span class="font-mono">{{ selectedIpaCompany()?.appId }}</span></p>
               <p class="text-slate-600">District: {{ selectedIpaCompany()?.district }}, Rajasthan</p>
             </div>
@@ -239,12 +241,13 @@ export class SanctionOrderComponent implements OnInit {
   private eoiStateService = inject(EoiStateService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   acceptedRows = signal<AcceptedCompanyRow[]>([]);
   currentScheme = signal<Scheme | undefined>(undefined);
   selectedIpaCompany = signal<AcceptedCompanyRow | null>(null);
 
-  todayDate = new Date().toLocaleDateString('en-GB');
+  todayDate = formatDate(new Date());
 
   readonly availableDistricts: string[] = [
     'Jodhpur', 'Alwar', 'Jaipur', 'Kota', 'Udaipur', 'Sikar', 'Ajmer', 'Bhilwara'
@@ -267,7 +270,7 @@ export class SanctionOrderComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
+    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const sId = params['schemeId'] || 'MMKVY-01';
       this.loadSchemeAndAcceptedCompanies(sId);
     });
@@ -275,12 +278,12 @@ export class SanctionOrderComponent implements OnInit {
 
   private loadSchemeAndAcceptedCompanies(schemeId: string): void {
     // Fetch scheme metadata
-    this.eoiStateService.getSchemeById(schemeId).subscribe(scheme => {
+    this.eoiStateService.getSchemeById(schemeId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(scheme => {
       this.currentScheme.set(scheme);
     });
 
     // Fetch accepted responses for this scheme ONLY
-    this.eoiStateService.getResponses(schemeId).subscribe(responses => {
+    this.eoiStateService.getResponses(schemeId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(responses => {
       const approved = responses.filter(r => r.status === 'APPROVED');
       
       const rows: AcceptedCompanyRow[] = approved.map((resp, idx) => ({

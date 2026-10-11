@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 
@@ -10,6 +10,7 @@ export interface BreadcrumbItem {
 @Component({
   selector: 'app-page-header',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule],
   styles: [`
     :host {
@@ -39,7 +40,7 @@ export interface BreadcrumbItem {
           <button
             type="button"
             (click)="onBackClick()"
-            class="w-8 h-8 rounded-full border border-slate-300 bg-white/90 hover:bg-white flex items-center justify-center text-[#123B59] shadow-sm transition-all cursor-pointer shrink-0"
+            class="w-8 h-8 rounded-full border border-slate-300 bg-white/90 hover:bg-white flex items-center justify-center text-brand-dark shadow-sm transition-all cursor-pointer shrink-0"
             [title]="backTitle"
             [attr.aria-label]="backTitle"
           >
@@ -57,7 +58,7 @@ export interface BreadcrumbItem {
               {{ title }}
             </h1>
             @if (badge) {
-              <span class="px-2 py-0.5 text-xs font-bold rounded-md bg-[#174A6E] text-white select-none tracking-wide shrink-0">
+              <span class="px-2 py-0.5 text-xs font-bold rounded-md bg-primary text-white select-none tracking-wide shrink-0">
                 {{ badge }}
               </span>
             }

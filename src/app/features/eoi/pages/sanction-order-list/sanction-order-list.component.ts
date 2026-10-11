@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { EoiStateService, Scheme } from '../../services/eoi-state.service';
@@ -11,6 +12,7 @@ import {
 @Component({
   selector: 'app-sanction-order-list',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent],
   template: `
     <div class="w-full min-h-full bg-background text-primary font-sans">
@@ -87,7 +89,7 @@ export class SanctionOrderListComponent {
   ];
 
   constructor() {
-    this.eoiStateService.getSchemes().subscribe(data => {
+    this.eoiStateService.getSchemes().pipe(takeUntilDestroyed()).subscribe(data => {
       // Filter ONLY schemes whose status is 'Closed'
       const closedSchemes = data.filter(s => s.status === 'Closed');
       this.schemes.set(closedSchemes);

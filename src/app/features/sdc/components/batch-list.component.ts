@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +14,7 @@ import {
 @Component({
   selector: 'app-batch-list',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterModule,
@@ -55,7 +56,7 @@ import {
                   class="px-1.5 py-0.2 rounded-full text-[10px]"
                   [class.bg-white/20]="activeFilter() === f.id"
                   [class.text-white]="activeFilter() === f.id"
-                  [class.bg-[#F5F7F9]]="activeFilter() !== f.id"
+                  [class.bg-surface-muted]="activeFilter() !== f.id"
                   [class.text-text-secondary]="activeFilter() !== f.id"
                 >
                   {{ f.count }}

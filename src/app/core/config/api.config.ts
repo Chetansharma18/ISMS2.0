@@ -114,6 +114,56 @@ export const API_ENDPOINTS = {
     DELETE: { url: (id: string | number) => `/masters/${id}`, method: 'DELETE' as ApiMethod }
   },
 
+  // Admin Master Lookup Tables (DataKeys used by MasterCrudPageComponent)
+  SECTORS: {
+    LIST: { url: '/masters/sectors', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/sectors', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/sectors/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/sectors/${id}`, method: 'DELETE' as ApiMethod }
+  },
+  DESIGNATIONS: {
+    LIST: { url: '/masters/designations', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/designations', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/designations/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/designations/${id}`, method: 'DELETE' as ApiMethod }
+  },
+  COURSES: {
+    LIST: { url: '/masters/courses', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/courses', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/courses/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/courses/${id}`, method: 'DELETE' as ApiMethod }
+  },
+  DISTRICTS: {
+    LIST: { url: '/masters/district-blocks', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/district-blocks', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/district-blocks/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/district-blocks/${id}`, method: 'DELETE' as ApiMethod }
+  },
+  EOI_CATEGORIES: {
+    LIST: { url: '/masters/eoi-categories', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/eoi-categories', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/eoi-categories/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/eoi-categories/${id}`, method: 'DELETE' as ApiMethod }
+  },
+  PERMISSIONS: {
+    LIST: { url: '/masters/permissions', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/permissions', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/permissions/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/permissions/${id}`, method: 'DELETE' as ApiMethod }
+  },
+  SCHEME_MASTERS: {
+    LIST: { url: '/masters/schemes', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/schemes', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/schemes/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/schemes/${id}`, method: 'DELETE' as ApiMethod }
+  },
+  USER_ROLES: {
+    LIST: { url: '/masters/user-roles', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/user-roles', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/user-roles/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/user-roles/${id}`, method: 'DELETE' as ApiMethod }
+  },
+
   // Grievance Redressal (DataKey: 'GRIEVANCES')
   GRIEVANCES: {
     LIST: { url: '/grievances', method: 'GET' as ApiMethod },
@@ -121,6 +171,33 @@ export const API_ENDPOINTS = {
     ADD: { url: '/grievances', method: 'POST' as ApiMethod },
     UPDATE: { url: (id: string | number) => `/grievances/${id}`, method: 'PUT' as ApiMethod },
     DELETE: { url: (id: string | number) => `/grievances/${id}`, method: 'DELETE' as ApiMethod }
+  },
+
+  // Admin grievance desk (DataKey: 'ADMIN_GRIEVANCES')
+  ADMIN_GRIEVANCES: {
+    LIST: { url: '/admin/grievances', method: 'GET' as ApiMethod },
+    GET: { url: (id: string | number) => `/admin/grievances/${id}`, method: 'GET' as ApiMethod },
+    ADD: { url: '/admin/grievances', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/admin/grievances/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/admin/grievances/${id}`, method: 'DELETE' as ApiMethod }
+  },
+
+  // Applicant EOI submissions shown on Tender Status (DataKey: 'SUBMITTED_TENDERS')
+  SUBMITTED_TENDERS: {
+    LIST: { url: '/eoi/submitted-tenders', method: 'GET' as ApiMethod },
+    GET: { url: (id: string | number) => `/eoi/submitted-tenders/${id}`, method: 'GET' as ApiMethod },
+    ADD: { url: '/eoi/submitted-tenders', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/eoi/submitted-tenders/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/eoi/submitted-tenders/${id}`, method: 'DELETE' as ApiMethod }
+  },
+
+  // Camera / CCTV batch list (DataKey: 'CAMERA_BATCHES')
+  CAMERA_BATCHES: {
+    LIST: { url: '/camera/batches', method: 'GET' as ApiMethod },
+    GET: { url: (id: string | number) => `/camera/batches/${id}`, method: 'GET' as ApiMethod },
+    ADD: { url: '/camera/batches', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/camera/batches/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/camera/batches/${id}`, method: 'DELETE' as ApiMethod }
   },
 
   // File Uploads & Downloads

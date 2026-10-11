@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { PageHeaderComponent, TableComponent, TableColumn } from '../../../shared';
@@ -17,6 +17,7 @@ interface SdcMonitoringItem {
 @Component({
   selector: 'app-camera-sdc-list',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent],
   template: `
     <div class="w-full min-h-full bg-background text-primary font-sans">
@@ -72,7 +73,7 @@ interface SdcMonitoringItem {
         </ng-template>
 
         <ng-template #configuredFeedsTemplate let-item>
-          <span class="inline-flex items-center gap-1.5 text-[#15803D] text-[11.5px] font-semibold tracking-wide">
+          <span class="inline-flex items-center gap-1.5 text-green-700 text-[11.5px] font-semibold tracking-wide">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4zM5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
             </svg>

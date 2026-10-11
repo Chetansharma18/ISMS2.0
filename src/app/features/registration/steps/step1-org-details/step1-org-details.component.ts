@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OtrFormService } from '../../services/otr-form.service';
@@ -20,6 +20,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
 @Component({
   selector: 'app-step1-org-details',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     FormsModule,
@@ -320,7 +321,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               type="checkbox"
               [ngModel]="data().sameAsRegistered"
               (ngModelChange)="toggleSameAsRegistered($event)"
-              class="w-4 h-4 text-[#0B3558] border-slate-300 rounded focus:ring-[#0B3558] accent-[#0B3558]"
+              class="w-4 h-4 text-navy border-slate-300 rounded focus:ring-navy accent-navy"
             />
             <span>Office Address is same as Registered Address</span>
           </label>

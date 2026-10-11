@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, HostListener, OnDestroy, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener, OnDestroy, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FileDoc } from '../../../features/registration/models/otr-form.model';
@@ -6,6 +6,7 @@ import { FileDoc } from '../../../features/registration/models/otr-form.model';
 @Component({
   selector: 'app-document-viewer-modal',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
     @if (isOpen && doc) {
@@ -16,11 +17,11 @@ import { FileDoc } from '../../../features/registration/models/otr-form.model';
         (click)="onBackdropClick($event)"
       >
         <div
-          class="bg-white rounded-lg border border-[#D9E1E7] shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[92vh] font-sans animate-in zoom-in-95 duration-150"
+          class="bg-white rounded-lg border border-theme shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[92vh] font-sans animate-in zoom-in-95 duration-150"
           (click)="$event.stopPropagation()"
         >
           <!-- Modal Header -->
-          <div class="px-5 py-3.5 border-b border-[#D9E1E7] bg-[#174A6E] text-white flex items-center justify-between gap-3 shrink-0">
+          <div class="px-5 py-3.5 border-b border-theme bg-primary text-white flex items-center justify-between gap-3 shrink-0">
             <div class="flex items-center gap-2.5 min-w-0">
               <!-- PDF or Image Icon -->
               <div class="w-7 h-7 rounded-md bg-white/20 flex items-center justify-center shrink-0">
@@ -57,7 +58,7 @@ import { FileDoc } from '../../../features/registration/models/otr-form.model';
           </div>
 
           <!-- Document Metadata Strip -->
-          <div class="px-5 py-2.5 bg-[#F5F7F9] border-b border-[#D9E1E7] flex flex-wrap items-center gap-4 text-xs text-slate-600 shrink-0">
+          <div class="px-5 py-2.5 bg-surface-muted border-b border-theme flex flex-wrap items-center gap-4 text-xs text-slate-600 shrink-0">
             <div>
               <span class="text-slate-400 text-[11px] font-medium block">File Name</span>
               <span class="font-semibold text-slate-800 break-all">{{ doc.fileName }}</span>
@@ -99,7 +100,7 @@ import { FileDoc } from '../../../features/registration/models/otr-form.model';
               <!-- Fallback when no URL -->
               <div class="w-full max-w-xl bg-white border-2 border-slate-200 rounded-lg p-6 sm:p-8 shadow-sm text-center space-y-5 m-6">
                 <div class="border-b-2 border-slate-200 pb-4 space-y-1">
-                  <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#EAF2F6] text-[#174A6E] rounded-full text-xs font-semibold uppercase tracking-wider">
+                  <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary-light text-brand rounded-full text-xs font-semibold uppercase tracking-wider">
                     Integrated Scheme Management System (ISMS 2.0)
                   </div>
                   <h4 class="text-base font-bold text-slate-900 pt-2 tracking-tight">Official Document Attachment</h4>
@@ -124,11 +125,11 @@ import { FileDoc } from '../../../features/registration/models/otr-form.model';
           </div>
 
           <!-- Modal Footer -->
-          <div class="px-5 py-3 border-t border-[#D9E1E7] bg-white flex items-center justify-end shrink-0">
+          <div class="px-5 py-3 border-t border-theme bg-white flex items-center justify-end shrink-0">
             <button
               type="button"
               (click)="closeModal()"
-              class="px-5 py-1.5 rounded-lg bg-[#174A6E] hover:bg-[#123B59] text-white text-xs font-semibold transition-colors cursor-pointer shadow-xs active:scale-95"
+              class="px-5 py-1.5 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-semibold transition-colors cursor-pointer shadow-xs active:scale-95"
             >
               Close
             </button>

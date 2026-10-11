@@ -1,4 +1,5 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { OtrFormService } from './services/otr-form.service';
@@ -9,6 +10,7 @@ import { Step1OrgDetailsComponent } from './steps/step1-org-details/step1-org-de
 import { Step3AuthPersonComponent } from './steps/step3-auth-person/step3-auth-person.component';
 import { Step4BankDetailsComponent } from './steps/step4-bank-details/step4-bank-details.component';
 import { Step5PreviewComponent } from './steps/step5-preview/step5-preview.component';
+import { ActionModalComponent } from '../../shared/components/action-modal/action-modal.component';
 
 export interface StepMeta {
   number: number;
@@ -18,15 +20,17 @@ export interface StepMeta {
 @Component({
   selector: 'app-registration-shell',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     Step1OrgDetailsComponent,
     Step3AuthPersonComponent,
     Step4BankDetailsComponent,
-    Step5PreviewComponent
+    Step5PreviewComponent,
+    ActionModalComponent
   ],
   template: `
-    <div class="min-h-screen bg-[#FEFEFD] flex flex-col justify-between selection:bg-[#0B3558] selection:text-white font-sans" style="font-family: 'Inter', sans-serif;">
+    <div class="min-h-screen bg-[#FEFEFD] flex flex-col justify-between selection:bg-navy selection:text-white font-sans" style="font-family: 'Inter', sans-serif;">
 
       <!-- ====================================================================
            Main Content Area
@@ -106,7 +110,7 @@ export interface StepMeta {
                 <span
                   class="text-xs sm:text-[13.5px] tracking-tight whitespace-nowrap"
                   [class.font-extrabold]="activeStep() === step.number"
-                  [class.text-[#0B3558]]="activeStep() === step.number"
+                  [class.text-navy]="activeStep() === step.number"
                   [class.text-slate-800]="isStepCompleted(step.number) && activeStep() !== step.number"
                   [class.font-semibold]="activeStep() !== step.number"
                   [class.text-slate-600]="!isStepCompleted(step.number) && activeStep() !== step.number"
@@ -119,7 +123,7 @@ export interface StepMeta {
               @if (!last) {
                 <div
                   class="flex-1 h-0.5 mx-2.5 sm:mx-6 transition-colors duration-200"
-                  [class.bg-[#0B3558]]="isStepCompleted(step.number)"
+                  [class.bg-navy]="isStepCompleted(step.number)"
                   [class.bg-slate-200]="!isStepCompleted(step.number)"
                 ></div>
               }
@@ -134,7 +138,7 @@ export interface StepMeta {
           <div [class.hidden]="activeStep() !== 1" class="space-y-4">
             <!-- Step 1 Card Header -->
             <div class="flex items-center gap-3 pb-3.5 border-b border-slate-100">
-              <span class="w-7 h-7 rounded-full bg-[#0B3558] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
+              <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
                 1
               </span>
               <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">
@@ -149,7 +153,7 @@ export interface StepMeta {
             <!-- Step 2 Card Header -->
             <div class="pb-3.5 border-b border-slate-100 space-y-1">
               <div class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-full bg-[#0B3558] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
+                <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
                   2
                 </span>
                 <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">
@@ -168,7 +172,7 @@ export interface StepMeta {
             <!-- Step 3 Card Header -->
             <div class="pb-3.5 border-b border-slate-100 space-y-1">
               <div class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-full bg-[#0B3558] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
+                <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
                   3
                 </span>
                 <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">
@@ -187,7 +191,7 @@ export interface StepMeta {
             <!-- Step 4 Card Header -->
             <div class="pb-3.5 border-b border-slate-100 space-y-1">
               <div class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-full bg-[#0B3558] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
+                <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
                   4
                 </span>
                 <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">
@@ -238,7 +242,7 @@ export interface StepMeta {
                 <button
                   type="button"
                   (click)="nextStep()"
-                  class="px-6 sm:px-7 py-2.5 rounded-lg bg-[#0B3558] hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  class="px-6 sm:px-7 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <span>Next Step</span>
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -254,7 +258,7 @@ export interface StepMeta {
                 <button
                   type="button"
                   (click)="nextStep()"
-                  class="px-6 sm:px-7 py-2.5 rounded-lg bg-[#0B3558] hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  class="px-6 sm:px-7 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <span>Next Step</span>
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -276,7 +280,7 @@ export interface StepMeta {
                 <button
                   type="button"
                   (click)="nextStep()"
-                  class="px-6 sm:px-7 py-2.5 rounded-lg bg-[#0B3558] hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  class="px-6 sm:px-7 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <span>Next Step</span>
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -290,7 +294,7 @@ export interface StepMeta {
                 <button
                   type="button"
                   (click)="downloadOtrPdf()"
-                  class="px-4 sm:px-5 py-2.5 rounded-lg border border-[#0483AC] text-[#0483AC] bg-white hover:bg-sky-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
+                  class="px-4 sm:px-5 py-2.5 rounded-lg border border-ocean text-ocean bg-white hover:bg-sky-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
                   title="Download complete details in PDF"
                 >
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -302,7 +306,7 @@ export interface StepMeta {
                 <button
                   type="button"
                   (click)="submitApplication()"
-                  class="px-6 sm:px-8 py-2.5 rounded-lg bg-[#0B3558] hover:bg-[#07243c] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  class="px-6 sm:px-8 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
                 
                   <span>Register</span>
@@ -328,7 +332,7 @@ export interface StepMeta {
             [class.bg-rose-600]="toast.type === 'error'"
             [class.border-rose-700]="toast.type === 'error'"
             [class.text-white]="toast.type === 'error'"
-            [class.bg-[#0B3558]]="toast.type === 'info'"
+            [class.bg-navy]="toast.type === 'info'"
             [class.border-[#1b4b73]]="toast.type === 'info'"
             [class.text-white]="toast.type === 'info'"
             [class.bg-amber-900/95]="toast.type === 'warning'"
@@ -371,48 +375,21 @@ export interface StepMeta {
       <!-- ====================================================================
            5. Submission Success Popup (Clean, Minimal, Professional)
            ==================================================================== -->
-      @if (submittedRegId()) {
-        <div class="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4">
-          <div class="absolute inset-0" (click)="navigateToHome()"></div>
-          
-          <div class="relative bg-white rounded-lg max-w-sm sm:max-w-md w-full p-6 sm:p-7 shadow-xl border border-slate-200 text-center space-y-4 z-10 animate-in fade-in zoom-in-95 duration-150">
-            <button
-              type="button"
-              (click)="navigateToHome()"
-              class="absolute top-3.5 right-3.5 text-slate-400 hover:text-slate-700 w-7 h-7 flex items-center justify-center rounded-md hover:bg-slate-100 transition-colors cursor-pointer text-xl leading-none"
-              aria-label="Close"
-            >
-              &times;
-            </button>
-
-            <div class="pt-2">
-              <h3 class="text-base sm:text-lg font-bold text-slate-900 m-0">
-                Profile created successfully.
-              </h3>
-              <p class="text-xs sm:text-sm text-slate-600 mt-2 font-mono">
-                Reference ID: <span class="font-bold text-[#0B3558]">{{ submittedRegId() }}</span>
-              </p>
-            </div>
-
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-2">
-              <button
-                type="button"
-                (click)="downloadOtrPdf()"
-                class="w-full sm:w-auto px-5 py-2 rounded-md bg-[#0B3558] hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-xs"
-              >
-                Download PDF
-              </button>
-              <button
-                type="button"
-                (click)="navigateToHome()"
-                class="w-full sm:w-auto px-5 py-2 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        </div>
-      }
+      <app-action-modal
+        [isOpen]="!!submittedRegId()"
+        title="Profile created successfully."
+        [showCloseButton]="true"
+        maxWidthClass="max-w-md"
+        primaryLabel="Download PDF"
+        secondaryLabel="OK"
+        (primaryAction)="downloadOtrPdf()"
+        (secondaryAction)="navigateToHome()"
+        (close)="navigateToHome()"
+      >
+        <p class="text-xs sm:text-sm text-slate-600 mt-2 mb-0 font-mono">
+          Reference ID: <span class="font-bold text-navy">{{ submittedRegId() }}</span>
+        </p>
+      </app-action-modal>
 
     </div>
   `
@@ -423,13 +400,14 @@ export class RegistrationShellComponent {
   otrFormService = inject(OtrFormService);
   validationService = inject(OtrValidationService);
   private pdfService = inject(OtrPdfService);
+  private destroyRef = inject(DestroyRef);
 
   readonly activeStep = signal<number>(1);
   readonly submittedRegId = signal<string | null>(null);
   readonly submitErrorMessage = signal<string | null>(null);
 
   constructor() {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const step = parseInt(params['step'], 10);
       if (step >= 1 && step <= 4) {
         this.activeStep.set(step);

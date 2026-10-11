@@ -1,4 +1,5 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, signal, computed, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -6,36 +7,53 @@ import { DataEngineService } from '../../core/services/data-engine.service';
 import {
   PageHeaderComponent,
   TableComponent,
-  ActionModalComponent,
   TableColumn
 } from '../../shared';
+import { UserManagementItem } from '../../core/models/user-management.model';
+import {
+  ConfirmModalData,
+  ROLE_FILTER_OPTIONS,
+  UserFormData,
+  buildBlacklistConfirm,
+  buildDeleteConfirm,
+  buildEditConfirm,
+  buildNewUser,
+  buildStatusConfirm,
+  buildUserChanges,
+  createEmptyUserForm,
+  filterUsers,
+  isTrainingPartner,
+  isUserFormValid,
+  roleTypeLabel,
+  userFormFromItem,
+  userRowClass
+} from './user-management.util';
+import { RoleFilterBarComponent } from './parts/role-filter-bar.component';
+import { BlacklistSearchPanelComponent } from './parts/blacklist-search-panel.component';
+import { SchemeStatusBadgeComponent } from './parts/scheme-status-badge.component';
+import { UserActionsCellComponent } from './parts/user-actions-cell.component';
+import { UserDetailsModalComponent } from './parts/user-details-modal.component';
+import { UserFormModalComponent } from './parts/user-form-modal.component';
+import { UserConfirmModalComponent } from './parts/user-confirm-modal.component';
 
-export interface UserManagementItem {
-  sNo: number;
-  id: string;
-  userId: string;
-  username: string;
-  ssoId: string;
-  userType: 'Admin' | 'Super Admin' | 'TP';
-  roleType: string;
-  designation?: string;
-  schemeDepartment?: string;
-  districtName: string;
-  blockName?: string;
-  email?: string;
-  mobileNo?: string;
-  schemeStatus: 'Active' | 'Inactive' | 'Blacklisted';
-}
+export type { UserManagementItem };
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     FormsModule,
     PageHeaderComponent,
     TableComponent,
-    ActionModalComponent
+    RoleFilterBarComponent,
+    BlacklistSearchPanelComponent,
+    SchemeStatusBadgeComponent,
+    UserActionsCellComponent,
+    UserDetailsModalComponent,
+    UserFormModalComponent,
+    UserConfirmModalComponent
   ],
   template: `
     <div class="w-full min-h-screen bg-white text-slate-800 font-sans p-4 sm:p-6 lg:p-8 space-y-6">
@@ -51,7 +69,7 @@ export interface UserManagementItem {
                 placeholder="Search by User ID, Username, SSO ID, Role, or District..."
                 [ngModel]="searchQuery()"
                 (ngModelChange)="onSearchChange($event)"
-                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#174A6E] transition-all"
+                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-primary transition-all"
               />
               <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -64,7 +82,7 @@ export interface UserManagementItem {
             <button
               type="button"
               (click)="openAddModal()"
-              class="px-4 py-2.5 bg-[#174A6E] hover:bg-[#0B3558] text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 shrink-0"
+              class="px-4 py-2.5 bg-primary hover:bg-navy text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 shrink-0"
             >
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -77,68 +95,21 @@ export interface UserManagementItem {
 
       <!-- Role Filters -->
       @if (selectedRoleFilter() !== 'blacklisted') {
-        <div class="w-full flex flex-col sm:flex-row gap-3">
-        <button
-          type="button"
-          (click)="selectedRoleFilter.set('all')"
-          [ngClass]="selectedRoleFilter() === 'all' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
-          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
-        >
-          All
-        </button>
-        <button
-          type="button"
-          (click)="selectedRoleFilter.set('citizen')"
-          [ngClass]="selectedRoleFilter() === 'citizen' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
-          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
-        >
-          Citizen
-        </button>
-        <button
-          type="button"
-          (click)="selectedRoleFilter.set('super admin')"
-          [ngClass]="selectedRoleFilter() === 'super admin' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
-          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
-        >
-          Super Admin
-        </button>
-        <button
-          type="button"
-          (click)="selectedRoleFilter.set('department')"
-          [ngClass]="selectedRoleFilter() === 'department' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
-          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
-        >
-          Department
-        </button>
-        <button
-          type="button"
-          (click)="selectedRoleFilter.set('tp')"
-          [ngClass]="selectedRoleFilter() === 'tp' ? 'bg-[#174A6E] text-white shadow-md border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-[#174A6E] hover:border-[#174A6E]/30'"
-          class="px-4 py-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer flex-1 text-center shadow-sm"
-        >
-          TP
-        </button>
-      </div>
+        <app-role-filter-bar
+          [options]="roleFilterOptions"
+          [selected]="selectedRoleFilter()"
+          (selectedChange)="selectedRoleFilter.set($event)"
+        />
       }
 
       @if (selectedRoleFilter() === 'blacklisted') {
-        <div class="w-full bg-white border border-rose-200 p-4 rounded-xl shadow-sm mt-3 mb-1 flex flex-col md:flex-row gap-4 items-end">
-          <div class="flex-1 w-full">
-            <label class="block text-slate-700 font-semibold mb-1.5 text-sm">Search User to Blacklist (SSO ID or Name)</label>
-            <div class="flex gap-2">
-              <input type="text" [ngModel]="blacklistInput()" (ngModelChange)="blacklistInput.set($event)" placeholder="Enter SSO ID or Name..." class="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:border-rose-500">
-              <button (click)="blacklistUserBySearch()" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm rounded-lg font-semibold shadow-sm transition-colors whitespace-nowrap cursor-pointer">
-                Blacklist User
-              </button>
-            </div>
-            @if (blacklistError()) {
-              <div class="text-xs text-rose-500 mt-1.5 font-medium">{{ blacklistError() }}</div>
-            }
-            @if (blacklistSuccess()) {
-              <div class="text-xs text-emerald-600 mt-1.5 font-medium">{{ blacklistSuccess() }}</div>
-            }
-          </div>
-        </div>
+        <app-blacklist-search-panel
+          [value]="blacklistInput()"
+          [error]="blacklistError()"
+          [success]="blacklistSuccess()"
+          (valueChange)="blacklistInput.set($event)"
+          (blacklist)="blacklistUserBySearch()"
+        />
       }
 
       <!-- Users Table -->
@@ -164,427 +135,44 @@ export interface UserManagementItem {
 
       <!-- Custom Template for Scheme Status -->
       <ng-template #schemeStatusTemplate let-item>
-        @if (item.schemeStatus === 'Active') {
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 select-none">
-            Active
-          </span>
-        } @else if (item.schemeStatus === 'Blacklisted') {
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 select-none">
-            Blacklisted
-          </span>
-        } @else {
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 select-none">
-            Inactive
-          </span>
-        }
+        <app-scheme-status-badge [status]="item.schemeStatus" />
       </ng-template>
 
-      <!-- Custom Template for Action Column (View, Edit, Mark Inactive/Blacklisted, Delete) -->
+      <!-- Custom Template for Action Column (View, Edit, Mark Inactive/Blacklisted) -->
       <ng-template #actionTemplate let-item>
-        <div class="flex items-center justify-center gap-2 whitespace-nowrap">
-          <!-- View -->
-          <button
-            type="button"
-            (click)="$event.stopPropagation(); openViewModal(item)"
-            class="inline-flex items-center gap-1 text-[#174A6E] hover:text-[#0B3558] font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
-            title="View Details"
-          >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-            <span>View</span>
-          </button>
-
-          <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
-
-          <!-- Edit -->
-          <button
-            type="button"
-            (click)="$event.stopPropagation(); requestEditUser(item)"
-            class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
-            title="Edit User"
-          >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            <span>Edit</span>
-          </button>
-
-          <!-- Active / Inactive Toggle (hidden for blacklisted users) -->
-          @if (item.schemeStatus !== 'Blacklisted') {
-            <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
-
-            <div
-              class="inline-flex items-center gap-1.5"
-              title="Toggle Status"
-              (click)="$event.stopPropagation();"
-            >
-              <button
-                type="button"
-                (click)="toggleUserStatus(item)"
-                class="relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-                [ngClass]="item.schemeStatus !== 'Active' ? 'bg-slate-400 hover:bg-slate-500' : 'bg-emerald-500 hover:bg-emerald-600'"
-                role="switch"
-                [attr.aria-checked]="item.schemeStatus === 'Active'"
-              >
-                <span class="sr-only">Toggle Active Status</span>
-                <span
-                  class="pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                  [ngClass]="item.schemeStatus !== 'Active' ? 'translate-x-0' : 'translate-x-3'"
-                ></span>
-              </button>
-              <span 
-                class="font-medium text-[12px] select-none transition-colors cursor-pointer"
-                (click)="toggleUserStatus(item)"
-                [ngClass]="item.schemeStatus !== 'Active' ? 'text-slate-500 hover:text-slate-700' : 'text-emerald-600 hover:text-emerald-700'"
-              >
-                {{ item.schemeStatus !== 'Active' ? 'Inactive' : 'Active' }}
-              </span>
-            </div>
-          }
-
-          <!-- Blacklist control (Training Partners only) -->
-          @if (isTrainingPartner(item)) {
-            <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
-
-            @if (item.schemeStatus === 'Blacklisted') {
-              <button
-                type="button"
-                (click)="$event.stopPropagation(); requestBlacklistToggle(item)"
-                class="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
-                title="Remove this Training Partner from the blacklist"
-              >
-                <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Remove Blacklist</span>
-              </button>
-            } @else {
-              <button
-                type="button"
-                (click)="$event.stopPropagation(); requestBlacklistToggle(item)"
-                class="inline-flex items-center gap-1 text-rose-600 hover:text-rose-700 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
-                title="Mark this Training Partner as blacklisted"
-              >
-                <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                </svg>
-                <span>Mark Blacklisted</span>
-              </button>
-            }
-          }
-        </div>
+        <app-user-actions-cell
+          [user]="item"
+          (view)="openViewModal($event)"
+          (edit)="requestEditUser($event)"
+          (toggleStatus)="toggleUserStatus($event)"
+          (toggleBlacklist)="requestBlacklistToggle($event)"
+        />
       </ng-template>
 
       <!-- Modal: View User Details -->
-      <app-action-modal
+      <app-user-details-modal
         [isOpen]="showViewModal()"
-        [showCloseButton]="true"
-        [closeOnBackdrop]="true"
-        [showAccentBar]="false"
-        secondaryLabel="Close"
-        maxWidthClass="max-w-[580px]"
-        (secondaryAction)="closeViewModal()"
-        (close)="closeViewModal()"
-      >
-        <h2 class="m-0 text-[#0B3558]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
-          User Details - {{ selectedViewUser()?.username }}
-        </h2>
-        @if (selectedViewUser(); as u) {
-          <div class="mt-4 font-sans text-[13px] grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <div>
-              <span class="text-slate-500 font-medium block text-xs">User ID</span>
-              <span class="font-mono font-semibold text-slate-800">{{ u.userId }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 font-medium block text-xs">Username</span>
-              <span class="font-semibold text-slate-800">{{ u.username }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 font-medium block text-xs">SSO ID</span>
-              <span class="font-mono text-slate-800">{{ u.ssoId }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 font-medium block text-xs">User Type</span>
-              <span class="font-medium text-slate-800">{{ u.userType }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 font-medium block text-xs">Role Type</span>
-              <span class="font-semibold text-[#174A6E]">{{ roleTypeLabel(u.roleType) }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 font-medium block text-xs">Designation</span>
-              <span class="text-slate-800">{{ u.designation || 'N/A' }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 font-medium block text-xs">Scheme Department</span>
-              <span class="text-slate-800">{{ u.schemeDepartment || 'RSLDC' }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 font-medium block text-xs">District</span>
-              <span class="text-slate-800">{{ u.districtName }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 font-medium block text-xs">Block Name</span>
-              <span class="text-slate-800">{{ u.blockName || 'All Blocks' }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 font-medium block text-xs">Status</span>
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
-                [ngClass]="u.schemeStatus === 'Active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'">
-                {{ u.schemeStatus }}
-              </span>
-            </div>
-          </div>
-        }
-      </app-action-modal>
+        [user]="selectedViewUser()"
+        (closed)="closeViewModal()"
+      />
 
       <!-- Modal: Add / Edit User -->
-      <app-action-modal
+      <app-user-form-modal
         [isOpen]="showModal()"
-        [showCloseButton]="true"
-        [closeOnBackdrop]="false"
-        [reverseButtons]="true"
-        [showAccentBar]="false"
-        [primaryLabel]="editingId() ? 'Save Changes' : 'Submit'"
-        secondaryLabel="Cancel"
-        maxWidthClass="max-w-[780px]"
-        (primaryAction)="submitUser()"
-        (secondaryAction)="closeModal()"
-        (close)="closeModal()"
-      >
-        <h2 class="m-0 text-[#0B3558]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
-          {{ editingId() ? 'Edit User' : 'Add New User' }}
-        </h2>
-        
-        <div class="mt-4 font-sans text-[13px] space-y-4 max-h-[75vh] overflow-y-auto pr-1">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
-            
-            <!-- LEFT COLUMN -->
-            <div class="space-y-3">
-              <!-- SSO ID -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">SSO ID*</label>
-                <input
-                  type="text"
-                  placeholder="e.g. SSO_1008"
-                  [(ngModel)]="formData.ssoId"
-                  [ngClass]="{'border-red-500': submitted() && !formData.ssoId, 'border-[#8FA3B6]': !(submitted() && !formData.ssoId)}"
-                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 font-mono text-xs"
-                />
-                @if (submitted() && !formData.ssoId) {
-                  <div class="text-xs text-red-500 mt-0.5 font-medium">SSO ID is required</div>
-                }
-              </div>
-
-              <!-- First Name -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">First Name*</label>
-                <input
-                  type="text"
-                  placeholder="e.g. John"
-                  [(ngModel)]="formData.firstName"
-                  [ngClass]="{'border-red-500': submitted() && !formData.firstName, 'border-[#8FA3B6]': !(submitted() && !formData.firstName)}"
-                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
-                />
-                @if (submitted() && !formData.firstName) {
-                  <div class="text-xs text-red-500 mt-0.5 font-medium">First Name is required</div>
-                }
-              </div>
-
-              <!-- Last Name -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">Last Name*</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Doe"
-                  [(ngModel)]="formData.lastName"
-                  [ngClass]="{'border-red-500': submitted() && !formData.lastName, 'border-[#8FA3B6]': !(submitted() && !formData.lastName)}"
-                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
-                />
-                @if (submitted() && !formData.lastName) {
-                  <div class="text-xs text-red-500 mt-0.5 font-medium">Last Name is required</div>
-                }
-              </div>
-
-              <!-- Date Of Birth -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">Date Of Birth</label>
-                <input
-                  type="date"
-                  [(ngModel)]="formData.dateOfBirth"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800"
-                />
-              </div>
-
-              <!-- E-Mail -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">E-Mail*</label>
-                <input
-                  type="email"
-                  placeholder="name@example.com"
-                  [(ngModel)]="formData.email"
-                  [ngClass]="{'border-red-500': submitted() && !formData.email, 'border-[#8FA3B6]': !(submitted() && !formData.email)}"
-                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
-                />
-                @if (submitted() && !formData.email) {
-                  <div class="text-xs text-red-500 mt-0.5 font-medium">E-Mail is required</div>
-                }
-              </div>
-
-              <!-- Mobile No. -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">Mobile No.*</label>
-                <input
-                  type="text"
-                  maxlength="10"
-                  placeholder="10-digit mobile number"
-                  [(ngModel)]="formData.mobileNo"
-                  [ngClass]="{'border-red-500': submitted() && !formData.mobileNo, 'border-[#8FA3B6]': !(submitted() && !formData.mobileNo)}"
-                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800"
-                />
-                @if (submitted() && !formData.mobileNo) {
-                  <div class="text-xs text-red-500 mt-0.5 font-medium">Mobile No. is required</div>
-                }
-              </div>
-
-
-              <!-- Aadhaar Id -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">Aadhaar Id</label>
-                <input
-                  type="text"
-                  maxlength="12"
-                  placeholder="12-digit Aadhaar number"
-                  [(ngModel)]="formData.aadhaarId"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:border-[#174A6E] text-slate-800 font-mono text-xs"
-                />
-              </div>
-            </div>
-
-            <!-- RIGHT COLUMN -->
-            <div class="space-y-3">
-              <!-- User Type -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">User Type*</label>
-                <select
-                  [(ngModel)]="formData.userType"
-                  [ngClass]="{'border-red-500': submitted() && !formData.userType, 'border-[#8FA3B6]': !(submitted() && !formData.userType)}"
-                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
-                >
-                  <option value="Super Admin">Super Admin</option>
-                  <option value="Department">Department</option>
-                  <option value="Citizen">Citizen</option>
-                </select>
-                <div class="text-[11px] text-slate-500 mt-0.5">Select user classification (Super Admin, Department, or Citizen).</div>
-              </div>
-
-              <!-- Role Type -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">Role Type*</label>
-                <select
-                  [(ngModel)]="formData.roleType"
-                  [ngClass]="{'border-red-500': submitted() && !formData.roleType, 'border-[#8FA3B6]': !(submitted() && !formData.roleType)}"
-                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-[#174A6E] text-slate-800 bg-white"
-                >
-                  <option value="" disabled selected>Select Role Type</option>
-                  @for (role of roleTypeOptions; track role.value) {
-                    <option [value]="role.value">{{ role.label }}</option>
-                  }
-                </select>
-                @if (submitted() && !formData.roleType) {
-                  <div class="text-xs text-red-500 mt-0.5 font-medium">Role Type is required</div>
-                }
-              </div>
-
-              <!-- Designation -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">Designation</label>
-                <select
-                  [(ngModel)]="formData.designation"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800 bg-white"
-                >
-                  <option value="Managing Director">Managing Director</option>
-                  <option value="Joint Director">Joint Director</option>
-                  <option value="General Manager">General Manager</option>
-                  <option value="Zone Coordinator">Zone Coordinator</option>
-                  <option value="Programmer">Programmer</option>
-                  <option value="MIS Manager">MIS Manager</option>
-                  <option value="Scheme Nodal Officer">Scheme Nodal Officer</option>
-                </select>
-              </div>
-
-              <!-- Scheme Department -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">Scheme Department</label>
-                <select
-                  [(ngModel)]="formData.schemeDepartment"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800 bg-white"
-                >
-                  <option value="RSLDC">RSLDC</option>
-                  <option value="Skill & Entrepreneurship">Skill & Entrepreneurship</option>
-                  <option value="Planning Department">Planning Department</option>
-                </select>
-              </div>
-
-              <!-- District -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">District</label>
-                <select
-                  [(ngModel)]="formData.district"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800 bg-white"
-                >
-                  <option value="All Districts">All Districts</option>
-                  <option value="Jaipur">Jaipur</option>
-                  <option value="Jodhpur">Jodhpur</option>
-                  <option value="Udaipur">Udaipur</option>
-                  <option value="Ajmer">Ajmer</option>
-                  <option value="Kota">Kota</option>
-                </select>
-              </div>
-
-              <!-- Block Name -->
-              <div>
-                <label class="block text-slate-700 font-medium mb-1">Block Name</label>
-                <select
-                  [(ngModel)]="formData.blockName"
-                  class="w-full px-2.5 py-1.5 border border-[#8FA3B6] rounded focus:outline-none focus:ring-1 focus:ring-[#174A6E] text-slate-800 bg-white"
-                >
-                  <option value="All Blocks">All Blocks</option>
-                  <option value="Amber">Amber</option>
-                  <option value="Sanganer">Sanganer</option>
-                  <option value="Mandore">Mandore</option>
-                  <option value="Girwa">Girwa</option>
-                </select>
-              </div>
-
-
-            </div>
-
-          </div>
-        </div>
-      </app-action-modal>
+        [editing]="!!editingId()"
+        [formData]="formData()"
+        [submitted]="submitted()"
+        (save)="submitUser()"
+        (cancelled)="closeModal()"
+      />
 
       <!-- Centered Confirmation Modal (Edit / Status Change / Delete) -->
-      <app-action-modal
+      <app-user-confirm-modal
         [isOpen]="showConfirmModal()"
-        [showCloseButton]="true"
-        [closeOnBackdrop]="true"
-        [showAccentBar]="true"
-        [accentBarClass]="confirmModalData()?.accentBarClass || 'bg-[#174A6E]'"
-        [title]="confirmModalData()?.title || 'Confirmation'"
-        [primaryLabel]="confirmModalData()?.confirmLabel || 'Confirm'"
-        secondaryLabel="Cancel"
-        maxWidthClass="max-w-[460px]"
-        (primaryAction)="onConfirmAction()"
-        (secondaryAction)="closeConfirmModal()"
-        (close)="closeConfirmModal()"
-      >
-        <p class="text-sm text-slate-600 mt-2 mb-0 leading-relaxed font-sans">
-          {{ confirmModalData()?.message }}
-        </p>
-      </app-action-modal>
+        [data]="confirmModalData()"
+        (confirmed)="onConfirmAction()"
+        (dismissed)="closeConfirmModal()"
+      />
 
     </div>
   `
@@ -595,88 +183,30 @@ export class UserManagementComponent {
   showModal = signal<boolean>(false);
   showViewModal = signal<boolean>(false);
   showConfirmModal = signal<boolean>(false);
-  confirmModalData = signal<{
-    type: 'edit' | 'status' | 'delete' | 'blacklist';
-    user: UserManagementItem;
-    title: string;
-    message: string;
-    confirmLabel: string;
-    accentBarClass?: string;
-  } | null>(null);
+  confirmModalData = signal<ConfirmModalData | null>(null);
 
   editingId = signal<string | null>(null);
   selectedViewUser = signal<UserManagementItem | null>(null);
   submitted = signal<boolean>(false);
 
-  /** Canonical role types: stored value (DB) -> human readable label shown in the UI. */
-  readonly roleTypeOptions: ReadonlyArray<{ value: string; label: string }> = [
-    { value: 'super admin', label: 'Super Admin' },
-    { value: 'scheme oc', label: 'Scheme Officer In-Charge' },
-    { value: 'mis manager', label: 'MIS Manager' },
-    { value: 'gm', label: 'General Manager' },
-    { value: 'zc', label: 'Zone Coordinator' },
-    { value: 'programmer', label: 'Programmer' },
-    { value: 'tp', label: 'Training Partner' }
-  ];
+  readonly roleFilterOptions = ROLE_FILTER_OPTIONS;
 
-  private readonly roleTypeLabelMap: Record<string, string> = {
-    'super admin': 'Super Admin',
-    's.a': 'Super Admin',
-    'sa': 'Super Admin',
-    'admin': 'Administrator',
-    'scheme oc': 'Scheme Officer In-Charge',
-    'oic': 'Officer In-Charge',
-    'mis manager': 'MIS Manager',
-    'manager': 'Manager',
-    'gm': 'General Manager',
-    'zc': 'Zone Coordinator',
-    'programmer': 'Programmer',
-    'tp': 'Training Partner',
-    'citizen': 'Citizen'
-  };
+  roleTypeLabel = roleTypeLabel;
+  isTrainingPartner = isTrainingPartner;
 
-  /** Converts a stored role type (e.g. "mis manager", "gm") into a readable label. */
-  roleTypeLabel(roleType: string | null | undefined): string {
-    if (!roleType) return '-';
-    const key = roleType.trim().toLowerCase();
-    return this.roleTypeLabelMap[key]
-      ?? key.replace(/\b[a-z]/g, char => char.toUpperCase());
-  }
-
-  /** Blacklisting applies to Training Partners only. */
-  isTrainingPartner(item: UserManagementItem): boolean {
-    return item.userType === 'TP' || (item.roleType || '').trim().toLowerCase() === 'tp';
-  }
-
-  formData = {
-    userId: '',
-    ssoId: '',
-    firstName: '',
-    lastName: '',
-    dateOfBirth: '',
-    email: '',
-    mobileNo: '',
-    alternateMobileNo: '',
-    alternateEmail: '',
-    userType: 'Admin' as 'Admin' | 'Super Admin' | 'TP',
-    roleType: '',
-    designation: 'Joint Director',
-    schemeDepartment: 'RSLDC',
-    district: 'Jaipur',
-    blockName: 'All Blocks',
-    aadhaarId: ''
-  };
+  formData = signal<UserFormData>(createEmptyUserForm());
 
   private dataEngine = inject(DataEngineService);
   private userRepo = this.dataEngine.for<UserManagementItem>('USERS');
   private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
 
   users = signal<UserManagementItem[]>([]);
 
   constructor() {
-    this.userRepo.getAll().subscribe(list => this.users.set(list));
+    this.userRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => this.users.set(list));
 
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       if (params['filter'] === 'blacklisted') {
         this.selectedRoleFilter.set('blacklisted');
       } else {
@@ -685,35 +215,9 @@ export class UserManagementComponent {
     });
   }
 
-  readonly filteredUsers = computed(() => {
-    const q = this.searchQuery().toLowerCase().trim();
-    const filter = this.selectedRoleFilter().toLowerCase();
-    const all = this.users();
-
-    let filtered = all;
-
-    if (filter === 'blacklisted') {
-      filtered = filtered.filter(u => u.schemeStatus === 'Blacklisted');
-    } else if (filter !== 'all') {
-      filtered = filtered.filter(u =>
-        (u.roleType && u.roleType.toLowerCase().includes(filter)) ||
-        (u.userType && u.userType.toLowerCase().includes(filter)) ||
-        (u.schemeDepartment && u.schemeDepartment.toLowerCase().includes(filter)) ||
-        (filter === 'department' && u.userType === 'Admin')
-      );
-    }
-
-    if (!q) return filtered;
-    return filtered.filter(u =>
-      (u.userId && u.userId.toLowerCase().includes(q)) ||
-      (u.username && u.username.toLowerCase().includes(q)) ||
-      (u.ssoId && u.ssoId.toLowerCase().includes(q)) ||
-      (u.roleType && u.roleType.toLowerCase().includes(q)) ||
-      this.roleTypeLabel(u.roleType).toLowerCase().includes(q) ||
-      (u.districtName && u.districtName.toLowerCase().includes(q)) ||
-      (u.schemeDepartment && u.schemeDepartment.toLowerCase().includes(q))
-    );
-  });
+  readonly filteredUsers = computed(() =>
+    filterUsers(this.users(), this.selectedRoleFilter(), this.searchQuery())
+  );
 
   blacklistInput = signal('');
   blacklistError = signal('');
@@ -805,49 +309,14 @@ export class UserManagementComponent {
     this.editingId.set(null);
     this.submitted.set(false);
     const nextIdNum = 1000 + this.users().length + 1;
-    this.formData = {
-      userId: `USR-${nextIdNum}`,
-      ssoId: '',
-      firstName: '',
-      lastName: '',
-      dateOfBirth: '',
-      email: '',
-      mobileNo: '',
-      alternateMobileNo: '',
-      alternateEmail: '',
-      userType: 'Admin',
-      roleType: '',
-      designation: 'Joint Director',
-      schemeDepartment: 'RSLDC',
-      district: 'Jaipur',
-      blockName: 'All Blocks',
-      aadhaarId: ''
-    };
+    this.formData.set(createEmptyUserForm(`USR-${nextIdNum}`));
     this.showModal.set(true);
   }
 
   openEditModal(item: UserManagementItem): void {
     this.editingId.set(item.id);
     this.submitted.set(false);
-    const names = item.username ? item.username.split(' ') : [''];
-    this.formData = {
-      userId: item.userId,
-      ssoId: item.ssoId || '',
-      firstName: names[0] || '',
-      lastName: names.slice(1).join(' ') || '',
-      dateOfBirth: '1990-01-01',
-      email: item.email || `${item.username.replace(/\s+/g, '')}@isms.gov.in`,
-      mobileNo: item.mobileNo || '9829012345',
-      alternateMobileNo: '',
-      alternateEmail: '',
-      userType: item.userType,
-      roleType: item.roleType,
-      designation: item.designation || 'Joint Director',
-      schemeDepartment: item.schemeDepartment || 'RSLDC',
-      district: item.districtName,
-      blockName: item.blockName || 'All Blocks',
-      aadhaarId: ''
-    };
+    this.formData.set(userFormFromItem(item));
     this.showModal.set(true);
   }
 
@@ -875,50 +344,22 @@ export class UserManagementComponent {
 
   submitUser(): void {
     this.submitted.set(true);
-    if (!this.formData.ssoId.trim() || !this.formData.firstName.trim() || !this.formData.lastName.trim() || !this.formData.email.trim() || !this.formData.mobileNo.trim() || !this.formData.roleType) {
+    const form = this.formData();
+    if (!isUserFormValid(form)) {
       return; // Required validation
     }
 
-    const fullName = `${this.formData.firstName.trim()} ${this.formData.lastName.trim()}`.trim();
     const editId = this.editingId();
     if (editId) {
       // Edit existing user
-      const changes: Partial<UserManagementItem> = {
-        userId: this.formData.userId.trim(),
-        username: fullName,
-        ssoId: this.formData.ssoId.trim(),
-        userType: this.formData.userType,
-        roleType: this.formData.roleType,
-        designation: this.formData.designation,
-        schemeDepartment: this.formData.schemeDepartment,
-        districtName: this.formData.district,
-        blockName: this.formData.blockName,
-        email: this.formData.email.trim(),
-        mobileNo: this.formData.mobileNo.trim()
-      };
-      this.userRepo.update(editId, changes).subscribe(res => {
+      this.userRepo.update(editId, buildUserChanges(form)).subscribe(res => {
         this.users.update(current =>
           current.map(u => u.id === editId ? { ...u, ...res } : u)
         );
       });
     } else {
       // Add new user
-      const newItem: Partial<UserManagementItem> = {
-        sNo: 1,
-        id: 'usr-' + Date.now(),
-        userId: this.formData.userId.trim(),
-        username: fullName,
-        ssoId: this.formData.ssoId.trim(),
-        userType: this.formData.userType,
-        roleType: this.formData.roleType,
-        designation: this.formData.designation,
-        schemeDepartment: this.formData.schemeDepartment,
-        districtName: this.formData.district,
-        blockName: this.formData.blockName,
-        email: this.formData.email.trim(),
-        mobileNo: this.formData.mobileNo.trim(),
-        schemeStatus: 'Active'
-      };
+      const newItem = buildNewUser(form, 'usr-' + Date.now());
 
       this.userRepo.create(newItem).subscribe(created => {
         this.users.update(current => {
@@ -931,58 +372,21 @@ export class UserManagementComponent {
     this.showModal.set(false);
   }
 
-  requestEditUser(item: UserManagementItem): void {
-    this.confirmModalData.set({
-      type: 'edit',
-      user: item,
-      title: 'Confirm Edit User',
-      message: `Are you sure you want to edit details for user "${item.username}" (${item.userId})?`,
-      confirmLabel: 'Proceed to Edit',
-      accentBarClass: 'bg-[#174A6E]'
-    });
+  private openConfirm(data: ConfirmModalData): void {
+    this.confirmModalData.set(data);
     this.showConfirmModal.set(true);
+  }
+
+  requestEditUser(item: UserManagementItem): void {
+    this.openConfirm(buildEditConfirm(item));
   }
 
   requestToggleUserStatus(item: UserManagementItem): void {
-    const isTp = item.userType === 'TP' || item.roleType === 'tp';
-    const isCurrentlyActive = item.schemeStatus === 'Active';
-
-    let actionLabel = '';
-    let targetStatusLabel = '';
-
-    if (isTp) {
-      actionLabel = isCurrentlyActive ? 'Mark Blacklisted' : 'Mark Active';
-      targetStatusLabel = isCurrentlyActive ? 'Blacklisted' : 'Active';
-    } else {
-      actionLabel = isCurrentlyActive ? 'Mark Inactive' : 'Mark Active';
-      targetStatusLabel = isCurrentlyActive ? 'Inactive' : 'Active';
-    }
-
-    this.confirmModalData.set({
-      type: 'status',
-      user: item,
-      title: `Confirm Action: ${actionLabel}`,
-      message: `Are you sure you want to change the status of user "${item.username}" (${item.userId}) to ${targetStatusLabel}?`,
-      confirmLabel: actionLabel,
-      accentBarClass: isCurrentlyActive ? 'bg-amber-500' : 'bg-emerald-600'
-    });
-    this.showConfirmModal.set(true);
+    this.openConfirm(buildStatusConfirm(item));
   }
 
   requestBlacklistToggle(item: UserManagementItem): void {
-    const isBlacklisted = item.schemeStatus === 'Blacklisted';
-
-    this.confirmModalData.set({
-      type: 'blacklist',
-      user: item,
-      title: isBlacklisted ? 'Remove from Blacklist' : 'Mark as Blacklisted',
-      message: isBlacklisted
-        ? `Are you sure you want to remove Training Partner "${item.username}" (${item.userId}) from the blacklist? The account will be restored to Active status.`
-        : `Are you sure you want to mark Training Partner "${item.username}" (${item.userId}) as Blacklisted? The account will be blocked from participating in schemes, tenders and batches.`,
-      confirmLabel: isBlacklisted ? 'Yes, Remove Blacklist' : 'Yes, Mark Blacklisted',
-      accentBarClass: isBlacklisted ? 'bg-emerald-600' : 'bg-rose-600'
-    });
-    this.showConfirmModal.set(true);
+    this.openConfirm(buildBlacklistConfirm(item));
   }
 
   toggleBlacklistStatus(item: UserManagementItem): void {
@@ -997,15 +401,7 @@ export class UserManagementComponent {
   }
 
   requestDeleteUser(item: UserManagementItem): void {
-    this.confirmModalData.set({
-      type: 'delete',
-      user: item,
-      title: 'Confirm Delete User',
-      message: `Are you sure you want to permanently delete user "${item.username}" (${item.userId})? This action cannot be undone.`,
-      confirmLabel: 'Delete User',
-      accentBarClass: 'bg-rose-600'
-    });
-    this.showConfirmModal.set(true);
+    this.openConfirm(buildDeleteConfirm(item));
   }
 
   onConfirmAction(): void {
@@ -1040,12 +436,6 @@ export class UserManagementComponent {
     });
   }
 
-  getRowClass = (item: any): string => {
-    if (item.status === 'Blacklisted' || item.schemeStatus === 'Blacklisted') {
-      return 'bg-rose-50/60 transition-colors';
-    }
-    const isInactive = item.status === 'Inactive' || item.schemeStatus === 'Inactive';
-    return isInactive ? 'opacity-50 bg-slate-50 transition-colors' : 'bg-white transition-colors';
-  };
+  getRowClass = userRowClass;
 
 }

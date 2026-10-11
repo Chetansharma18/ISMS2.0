@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 interface SchemeCard {
@@ -16,6 +16,7 @@ interface SchemeCard {
 @Component({
   selector: 'app-schemes-section',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   host: {
     class: 'block w-full'
@@ -27,10 +28,10 @@ interface SchemeCard {
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
-            <span class="text-xs font-bold text-[#0B3558] uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full border border-blue-200/70">
+            <span class="text-xs font-bold text-navy uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full border border-blue-200/70">
               State & Central Flagship Programmes
             </span>
-            <h2 class="landing-section-title text-2xl sm:text-3xl lg:text-[32px] font-bold text-[#0B3558] mt-2 tracking-tight font-sans" style="font-family: var(--font-family-base, 'Inter', sans-serif);">
+            <h2 class="landing-section-title text-2xl sm:text-3xl lg:text-[32px] font-bold text-navy mt-2 tracking-tight font-sans" style="font-family: var(--font-family-base, 'Inter', sans-serif);">
               Active Government Schemes
             </h2>
             <p class="landing-body-text text-base sm:text-lg text-slate-500 mt-1 max-w-2xl text-left">
@@ -40,7 +41,7 @@ interface SchemeCard {
 
           <div class="shrink-0 flex items-center gap-2">
             <span class="text-xs text-slate-500 font-medium">Filter:</span>
-            <span class="text-xs font-semibold px-2.5 py-1 rounded bg-[#0B3558] text-white">All Schemes (4)</span>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded bg-navy text-white">All Schemes (4)</span>
           </div>
         </div>
 
@@ -59,7 +60,7 @@ interface SchemeCard {
                   </span>
                 </div>
 
-                <h3 class="text-base font-bold text-[#0B3558] leading-snug min-h-[44px]">
+                <h3 class="text-base font-bold text-navy leading-snug min-h-[44px]">
                   {{ scheme.name }}
                 </h3>
 
@@ -78,7 +79,7 @@ interface SchemeCard {
                   </div>
                 </div>
 
-                <div class="mt-4 p-2.5 rounded-lg bg-orange-50/60 border border-orange-100 text-[11px] text-[#EA580C] font-medium flex items-center gap-1.5">
+                <div class="mt-4 p-2.5 rounded-lg bg-orange-50/60 border border-orange-100 text-[11px] text-orange-600 font-medium flex items-center gap-1.5">
                   <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                   </svg>
@@ -90,14 +91,14 @@ interface SchemeCard {
               <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
                 <button
                   type="button"
-                  class="text-xs font-bold text-[#0B3558] hover:text-[#07233B] hover:underline"
+                  class="text-xs font-bold text-navy hover:text-navy-dark hover:underline"
                 >
                   Guidelines (PDF)
                 </button>
 
                 <button
                   type="button"
-                  class="text-xs font-bold bg-[#0B3558] hover:bg-[#07233B] text-white px-3 py-1.5 rounded transition-colors shadow-2xs"
+                  class="text-xs font-bold bg-navy hover:bg-navy-dark text-white px-3 py-1.5 rounded transition-colors shadow-2xs"
                 >
                   Apply EOI
                 </button>
@@ -131,7 +132,7 @@ export class SchemesSectionComponent {
       eligibility: 'School/College Dropouts',
       targetGroup: 'Industry 4.0 & Green Jobs',
       status: 'Active Batches',
-      statusColor: 'bg-blue-50 text-[#0B3558] border border-blue-200',
+      statusColor: 'bg-blue-50 text-navy border border-blue-200',
       highlight: '100% Govt funded NSQF curriculum'
     },
     {

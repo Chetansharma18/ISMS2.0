@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   ViewChild,
@@ -13,13 +14,14 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 @Component({
   selector: 'app-about-section',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   host: {
-    class: 'block w-full bg-[#FFFFFF]'
+    class: 'block w-full bg-white'
   },
   template: `
     <!-- Section Wrapper: 64–80px desktop, 36–44px mobile, plain white background, official government feel -->
-    <section #sectionRef class="w-full bg-[#FFFFFF] py-9 sm:py-12 md:py-16 xl:py-20 border-b border-[#DCE4ED]" aria-labelledby="about-isms-heading">
+    <section #sectionRef class="w-full bg-white py-9 sm:py-12 md:py-16 xl:py-20 border-b border-[#DCE4ED]" aria-labelledby="about-isms-heading">
       
       <!-- Centered Container: Max width 1440px with responsive padding (20px mobile) -->
       <div class="w-full max-w-360 mx-auto px-5 sm:px-8 xl:px-12 box-border">

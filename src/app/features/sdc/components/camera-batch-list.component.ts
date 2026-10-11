@@ -1,16 +1,18 @@
-import { Component, signal, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, HostListener } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { PageHeaderComponent, TableComponent, TableColumn } from '../../../shared';
 import { inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { CameraBatchItem, MOCK_CAMERA_BATCHES } from '../../../core/mock/data/batches.mock';
-import { environment } from '../../../../environments/environment';
+import { CameraBatchItem } from '../../../core/models/camera.model';
+import { DataEngineService } from '../../../core/services/data-engine.service';
 
 @Component({
   selector: 'app-camera-batch-list',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent, FormsModule],
   template: `
     <div class="w-full min-h-full bg-background text-primary font-sans">
@@ -76,8 +78,8 @@ import { environment } from '../../../../environments/environment';
         </ng-template>
 
         <ng-template #cameraStatusTemplate let-item>
-          <div class="inline-flex items-center gap-1.5 text-[#15803D] text-[11.5px] font-semibold tracking-wide">
-            <div class="w-1.5 h-1.5 rounded-full bg-[#15803D]"></div>
+          <div class="inline-flex items-center gap-1.5 text-green-700 text-[11.5px] font-semibold tracking-wide">
+            <div class="w-1.5 h-1.5 rounded-full bg-green-700"></div>
             {{ item.cameraStatus }}
           </div>
         </ng-template>
@@ -99,12 +101,17 @@ import { environment } from '../../../../environments/environment';
       <!-- Live Feed Modal -->
       @if (selectedFeed() || isMultiView()) {
         <div class="fixed inset-0 z-100 bg-slate-900/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
-          <div class="bg-white rounded-xl shadow-2xl w-full max-w-[95vw] h-[95vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div
+            class="bg-white rounded-xl shadow-2xl w-full max-w-[95vw] h-[95vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="camera-feed-modal-title"
+          >
             
             <!-- Modal Header -->
-            <div class="px-4 py-3 bg-[#0B3558] text-white flex items-center justify-between shrink-0 relative z-20">
+            <div class="px-4 py-3 bg-navy text-white flex items-center justify-between shrink-0 relative z-20">
               <div class="flex items-center gap-3">
-                <h2 class="text-base sm:text-lg font-semibold m-0" style="color: white !important;">
+                <h2 id="camera-feed-modal-title" class="text-base sm:text-lg font-semibold m-0" style="color: white !important;">
                   {{ isMultiView() ? 'Multiple Live Feeds' : 'Live Feed - ' + selectedFeed()?.batchName }}
                 </h2>
                 @if (!isMultiView()) {
@@ -113,7 +120,7 @@ import { environment } from '../../../../environments/environment';
                   </span>
                 }
               </div>
-              <button (click)="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors cursor-pointer">
+              <button (click)="closeModal()" aria-label="Close" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors cursor-pointer">
                 <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
             </div>
@@ -134,7 +141,7 @@ import { environment } from '../../../../environments/environment';
                     @for (b of batches(); track b.id) {
                       <label class="flex items-start gap-2 p-2.5 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors border"
                              [class.bg-blue-50]="isBatchSelected(b)" [class.border-blue-200]="isBatchSelected(b)" [class.border-transparent]="!isBatchSelected(b)">
-                        <input type="checkbox" class="mt-0.5 rounded border-slate-300 text-[#0B3558] focus:ring-[#0B3558] cursor-pointer"
+                        <input type="checkbox" class="mt-0.5 rounded border-slate-300 text-navy focus:ring-navy cursor-pointer"
                                [checked]="isBatchSelected(b)"
                                (change)="toggleBatchSelection(b)" />
                         <div class="flex flex-col">
@@ -266,7 +273,15 @@ export class CameraBatchListComponent {
     { key: 'action', label: 'Action', align: 'center', width: 'w-36', type: 'custom' }
   ];
 
-  batches = signal<CameraBatchItem[]>(environment.useMockData ? MOCK_CAMERA_BATCHES : []);
+  batches = signal<CameraBatchItem[]>([]);
+
+  constructor() {
+    inject(DataEngineService)
+      .for<CameraBatchItem>('CAMERA_BATCHES')
+      .getAll()
+      .pipe(takeUntilDestroyed())
+      .subscribe(list => this.batches.set(list));
+  }
 
   // Modal State
   selectedFeed = signal<CameraBatchItem | null>(null);

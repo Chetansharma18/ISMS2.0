@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   signal,
   ElementRef,
@@ -12,6 +13,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TendersModalComponent } from '../tenders-modal/tenders-modal.component';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { ActionModalComponent } from '../../../../shared/components/action-modal/action-modal.component';
 
 interface TenderItem {
   date: string;
@@ -25,7 +27,8 @@ interface TenderItem {
 @Component({
   selector: 'app-hero-tenders',
   standalone: true,
-  imports: [CommonModule, RouterModule, TendersModalComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, RouterModule, TendersModalComponent, ActionModalComponent],
   template: `
     <!-- Right Column Panel: 540–600px desktop width, 410–430px height, clean official government card -->
     <div class="w-full max-w-135 lg:max-w-145 xl:max-w-150 mx-auto lg:ml-auto">
@@ -43,7 +46,7 @@ interface TenderItem {
           <button 
             type="button"
             (click)="openModal()" 
-            class="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#12365A] hover:text-[#F28C28] bg-[#F5F8FC] hover:bg-[#EAF2F6] border border-[#DCE4ED] px-3.5 py-1.5 rounded-full transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F28C28]"
+            class="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#12365A] hover:text-[#F28C28] bg-[#F5F8FC] hover:bg-primary-light border border-[#DCE4ED] px-3.5 py-1.5 rounded-full transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F28C28]"
             aria-label="View all tenders in modal">
             <span>View All</span>
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -81,7 +84,7 @@ interface TenderItem {
                     </span>
                   }
                 </div>
-                <span class="text-[11px] font-semibold text-[#12365A] bg-[#EAF2F6] border border-border rounded px-2 py-0.5 shrink-0">
+                <span class="text-[11px] font-semibold text-[#12365A] bg-primary-light border border-border rounded px-2 py-0.5 shrink-0">
                   {{ item.category }}
                 </span>
               </div>
@@ -93,7 +96,7 @@ interface TenderItem {
 
               <!-- Bottom Row: Reference Number & Login Required Indicator -->
               <div class="flex items-center justify-between gap-3 pt-0.5">
-                <p class="text-[11.5px] font-mono text-[#64748B] truncate max-w-[62%]" [title]="item.id">
+                <p class="text-[11.5px] font-mono text-slate-500 truncate max-w-[62%]" [title]="item.id">
                   {{ item.id }}
                 </p>
                 <span class="text-[11.5px] sm:text-[12px] font-semibold text-[#F28C28] group-hover:text-[#d9771e] shrink-0">
@@ -110,30 +113,17 @@ interface TenderItem {
     </div>
 
     <!-- Login Required Alert Modal -->
-    @if (showLoginModal()) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 animate-in fade-in duration-150">
-        <!-- Backdrop click closes -->
-        <div class="absolute inset-0" (click)="closeLoginPrompt()"></div>
-
-        <!-- Dialog Box -->
-        <div class="relative bg-white rounded-lg shadow-xl border border-slate-200 w-full max-w-sm p-6 z-10 animate-in zoom-in-95 duration-150">
-          <button
-            type="button"
-            (click)="closeLoginPrompt()"
-            class="absolute top-3.5 right-3.5 text-slate-400 hover:text-slate-700 w-7 h-7 flex items-center justify-center rounded-md hover:bg-slate-100 transition-colors cursor-pointer text-xl leading-none"
-            aria-label="Close"
-          >
-            &times;
-          </button>
-
-          <div class="pr-6 pt-1">
-            <p class="text-sm sm:text-base font-semibold text-slate-800 leading-relaxed m-0">
-              Please login to view Active Scheme and apply.
-            </p>
-          </div>
-        </div>
-      </div>
-    }
+    <app-action-modal
+      [isOpen]="showLoginModal()"
+      title="Login required"
+      description="Please login to view Active Scheme and apply."
+      [showCloseButton]="true"
+      maxWidthClass="max-w-sm"
+      primaryLabel="OK"
+      secondaryLabel=""
+      (primaryAction)="closeLoginPrompt()"
+      (close)="closeLoginPrompt()"
+    ></app-action-modal>
 
     <!-- All Tenders Full Modal -->
     @if (isTendersModalOpen()) {

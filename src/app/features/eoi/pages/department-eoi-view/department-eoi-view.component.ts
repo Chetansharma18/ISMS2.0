@@ -1,8 +1,10 @@
-import { Component, inject, signal, OnInit, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit, HostListener } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { EoiStateService, Scheme } from '../../services/eoi-state.service';
-import { AuthService, AssignedRole } from '../../../../core/auth/auth.service';
+import { AuthService, AssignedRole, UserRole } from '../../../../core/auth/auth.service';
+import { PermissionService } from '../../../../core/permissions/permission.service';
 import {
   PageHeaderComponent,
   TableComponent,
@@ -13,6 +15,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
 @Component({
   selector: 'app-department-eoi-view',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterModule,
@@ -50,7 +53,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
                 <button
                   type="button"
                   (click)="toggleRoleDropdown()"
-                  class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0B3558] hover:bg-[#07243c] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                  class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
                   title="Switch Role"
                 >
                   <span>Role: {{ activeRoleLabel() }}</span>
@@ -74,13 +77,13 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
                           type="button"
                           (click)="onSelectRole(role.id)"
                           class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-left transition-colors cursor-pointer border-0"
-                          [ngClass]="isActiveRole(role.id) ? 'bg-[#0B3558]/10 text-[#0B3558] font-bold' : 'text-slate-700 hover:bg-[#F0F5FA] hover:text-[#0B3558] font-medium'"
+                          [ngClass]="isActiveRole(role.id) ? 'bg-navy/10 text-navy font-bold' : 'text-slate-700 hover:bg-[#F0F5FA] hover:text-navy font-medium'"
                           [attr.aria-current]="isActiveRole(role.id) ? 'true' : null"
                         >
                           <span class="truncate text-xs leading-tight">{{ role.label }}</span>
 
                           @if (isActiveRole(role.id)) {
-                            <svg class="w-4 h-4 text-[#0B3558] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <svg class="w-4 h-4 text-navy shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
                           }
@@ -129,7 +132,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
           @if (scheme.status === 'Closed') {
             <a
               [routerLink]="['/admin/responses', scheme.id]"
-              class="inline-flex items-center justify-center px-4 py-1.5 rounded-md text-xs font-semibold bg-[#0B3558] hover:bg-[#07243c] !text-white shadow-2xs transition-colors cursor-pointer min-w-[64px]"
+              class="inline-flex items-center justify-center px-4 py-1.5 rounded-md text-xs font-semibold bg-navy hover:bg-[#07243c] !text-white shadow-2xs transition-colors cursor-pointer min-w-[64px]"
               style="color: #ffffff !important;"
             >
               <span style="color: #ffffff !important; font-weight: 600;">View</span>
@@ -162,7 +165,9 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
 export class DepartmentEoiViewComponent implements OnInit {
   private eoiStateService = inject(EoiStateService);
   private authService = inject(AuthService);
+  private permissions = inject(PermissionService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   schemes = signal<Scheme[]>([]);
   showOtpModal = signal<boolean>(false);
@@ -202,14 +207,14 @@ export class DepartmentEoiViewComponent implements OnInit {
       this.showOtpModal.set(true);
     }
 
-    this.eoiStateService.getSchemes().subscribe(data => {
+    this.eoiStateService.getSchemes().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => {
       this.schemes.set(data);
     });
   }
 
   onOtpVerified(otp: string): void {
     this.authService.setDeptAdminOtpVerified(true);
-    if (this.authService.currentUser()?.role !== 'dept_admin') {
+    if (!this.permissions.hasRole('dept_admin')) {
       if (this.authService.canSwitchRole()) {
         // User already holds the department role - just make it the active one
         this.authService.switchActiveRole('dept_admin', false);
@@ -231,7 +236,7 @@ export class DepartmentEoiViewComponent implements OnInit {
   readonly activeRoleLabel = this.authService.activeRoleLabel;
 
   isActiveRole(roleId: string): boolean {
-    return this.authService.currentUser()?.role === roleId;
+    return this.permissions.hasRole(roleId as UserRole);
   }
 
   toggleRoleDropdown(): void {

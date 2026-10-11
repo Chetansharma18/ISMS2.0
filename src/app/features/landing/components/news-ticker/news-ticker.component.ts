@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   signal,
   computed,
@@ -23,6 +24,7 @@ export interface AnnouncementItem {
 @Component({
   selector: 'app-news-ticker',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, PressReleasesModalComponent],
   host: {
     class: 'block w-full'
@@ -77,14 +79,14 @@ export interface AnnouncementItem {
                 <a
                   [href]="item.pdfUrl"
                   [download]="item.fileName"
-                  class="ticker-link inline-flex items-center gap-2 sm:gap-2.5 text-[#FFFFFF] hover:text-[#F28C28] transition-colors cursor-pointer group no-underline shrink-0 focus:outline-none focus:text-[#F28C28]"
+                  class="ticker-link inline-flex items-center gap-2 sm:gap-2.5 text-white hover:text-[#F28C28] transition-colors cursor-pointer group no-underline shrink-0 focus:outline-none focus:text-[#F28C28]"
                 >
                   <!-- Date Badge -->
                   <span class="bg-[#194A70] text-[#F6C453] font-semibold text-[11px] sm:text-[12px] px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-[3px] whitespace-nowrap shrink-0">
                     {{ item.date }}
                   </span>
                   <!-- Announcement Text (Hindi / English - explicitly pure white) -->
-                  <span class="ticker-text font-normal text-[12.5px] sm:text-[13.5px] lg:text-[14.5px] text-[#FFFFFF] font-['Noto_Sans_Devanagari','Inter',sans-serif] whitespace-nowrap group-hover:text-[#F28C28] group-hover:underline">
+                  <span class="ticker-text font-normal text-[12.5px] sm:text-[13.5px] lg:text-[14.5px] text-white font-['Noto_Sans_Devanagari','Inter',sans-serif] whitespace-nowrap group-hover:text-[#F28C28] group-hover:underline">
                     {{ item.text }}
                   </span>
                 </a>
@@ -100,14 +102,14 @@ export interface AnnouncementItem {
                   [href]="item.pdfUrl"
                   [download]="item.fileName"
                   tabindex="-1"
-                  class="ticker-link inline-flex items-center gap-2 sm:gap-2.5 text-[#FFFFFF] hover:text-[#F28C28] transition-colors cursor-pointer group no-underline shrink-0"
+                  class="ticker-link inline-flex items-center gap-2 sm:gap-2.5 text-white hover:text-[#F28C28] transition-colors cursor-pointer group no-underline shrink-0"
                 >
                   <!-- Date Badge -->
                   <span class="bg-[#194A70] text-[#F6C453] font-semibold text-[11px] sm:text-[12px] px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-[3px] whitespace-nowrap shrink-0">
                     {{ item.date }}
                   </span>
                   <!-- Announcement Text -->
-                  <span class="ticker-text font-normal text-[12.5px] sm:text-[13.5px] lg:text-[14.5px] text-[#FFFFFF] font-['Noto_Sans_Devanagari','Inter',sans-serif] whitespace-nowrap group-hover:text-[#F28C28] group-hover:underline">
+                  <span class="ticker-text font-normal text-[12.5px] sm:text-[13.5px] lg:text-[14.5px] text-white font-['Noto_Sans_Devanagari','Inter',sans-serif] whitespace-nowrap group-hover:text-[#F28C28] group-hover:underline">
                     {{ item.text }}
                   </span>
                 </a>

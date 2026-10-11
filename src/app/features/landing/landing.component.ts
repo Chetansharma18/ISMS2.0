@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NewsTickerComponent } from './components/news-ticker/news-ticker.component';
 import { HeroSectionComponent } from './components/hero-section/hero-section.component';
@@ -11,6 +11,7 @@ import { ImportantLinksComponent } from './components/important-links/important-
 @Component({
   selector: 'app-landing',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     NewsTickerComponent,

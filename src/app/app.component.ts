@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -7,6 +8,7 @@ import { FooterComponent } from './core/layout/footer/footer.component';
 import { SidebarComponent } from './core/layout/sidebar/sidebar.component';
 import { AuthService } from './core/auth/auth.service';
 import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-modal/sso-redirect-modal.component';
+import { ToastOutletComponent } from './shared/components/toast-outlet/toast-outlet.component';
 
 @Component({
   selector: 'app-root',
@@ -17,10 +19,14 @@ import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-m
     HeaderComponent,
     FooterComponent,
     SidebarComponent,
-    SsoRedirectModalComponent
+    SsoRedirectModalComponent,
+    ToastOutletComponent
   ],
   template: `
     <div class="h-screen overflow-hidden flex flex-col text-slate-900 antialiased relative" style="background-color: #FEFEFD;">
+      <!-- Global toast notifications (NotificationService) -->
+      <app-toast-outlet></app-toast-outlet>
+
       <!-- Theme-Based Blurred SSO Redirection Popup -->
       @if (authService.isRedirecting()) {
         <app-sso-redirect-modal></app-sso-redirect-modal>
@@ -56,8 +62,8 @@ import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-m
               aria-label="Mobile Navigation Menu"
             >
               <!-- Drawer Header -->
-              <div class="flex items-center justify-between px-4 py-3.5 border-b border-slate-200 bg-[#F8FAFC]">
-                <span class="text-xs font-bold text-[#0B3558] uppercase tracking-wider">Navigation Menu</span>
+              <div class="flex items-center justify-between px-4 py-3.5 border-b border-slate-200 bg-slate-50">
+                <span class="text-xs font-bold text-navy uppercase tracking-wider">Navigation Menu</span>
                 <button
                   type="button"
                   (click)="closeMobileSidebar()"
@@ -101,6 +107,7 @@ import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-m
 export class AppComponent {
   authService = inject(AuthService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   isLandingRoute = signal<boolean>(true);
   isSsoRoute = signal<boolean>(false);
@@ -116,7 +123,10 @@ export class AppComponent {
 
   constructor() {
     this.router.events
-      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe((event: NavigationEnd) => {
         const cleanUrl = event.urlAfterRedirects.split('?')[0].split('#')[0];
         const isLanding = cleanUrl === '/' || cleanUrl === '';

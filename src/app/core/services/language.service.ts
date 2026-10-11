@@ -1,5 +1,6 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { LANDING_TRANSLATIONS, LandingTranslations } from '../translations/landing.translations';
+import { StorageService } from './storage.service';
 
 export type Language = 'en' | 'hi';
 
@@ -12,6 +13,7 @@ export interface BilingualText {
   providedIn: 'root'
 })
 export class LanguageService {
+  private readonly storage = inject(StorageService);
   private readonly STORAGE_KEY = 'isms_lang';
 
   readonly currentLanguage = signal<Language>('en');
@@ -37,15 +39,9 @@ export class LanguageService {
         // Fallback gracefully
       }
 
-      if (typeof localStorage !== 'undefined') {
-        try {
-          const savedLang = localStorage.getItem(this.STORAGE_KEY) as Language;
-          if (savedLang === 'en' || savedLang === 'hi') {
-            this.currentLanguage.set(savedLang);
-          }
-        } catch {
-          // Fallback gracefully if storage is unavailable
-        }
+      const savedLang = this.storage.getString(this.STORAGE_KEY) as Language | null;
+      if (savedLang === 'en' || savedLang === 'hi') {
+        this.currentLanguage.set(savedLang);
       }
     }
     this.syncDocumentLang(this.currentLanguage());
@@ -53,12 +49,8 @@ export class LanguageService {
 
   setLanguage(lang: Language): void {
     this.currentLanguage.set(lang);
-    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-      try {
-        localStorage.setItem(this.STORAGE_KEY, lang);
-      } catch {
-        // Fallback gracefully if storage is unavailable
-      }
+    if (typeof window !== 'undefined') {
+      this.storage.setString(this.STORAGE_KEY, lang);
     }
     this.syncDocumentLang(lang);
   }

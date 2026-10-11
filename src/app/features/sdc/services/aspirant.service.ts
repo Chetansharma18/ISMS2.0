@@ -1,6 +1,6 @@
 import { INITIAL_ASPIRANTS } from '../../../core/mock/data/aspirants.mock';
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { environment } from '../../../../environments/environment';
+import { createPersistedStore } from '../../../core/services/persisted-store';
 import { AspirantRecord, AspirantTrainingStatus } from '../models/aspirant.model';
 import { AspirantFormData } from '../config/aspirant-form.config';
 import { BatchRecord } from '../models/batch.model';
@@ -9,94 +9,53 @@ import { BatchService } from './batch.service';
 import { SdcService } from './sdc.service';
 
 
+/** Refreshes saved aspirants with canonical seed fields and appends any seed aspirants not yet saved. */
+function reconcileAspirants(stored: AspirantRecord[], seed: readonly AspirantRecord[]): AspirantRecord[] {
+  const canonicalMap = new Map(seed.map(a => [a.id, a]));
+
+  const updated = stored.map(a => {
+    const canonical = canonicalMap.get(a.id);
+    if (!canonical) return a;
+    return {
+      ...a,
+      aspirantName: canonical.aspirantName,
+      sdcId: canonical.sdcId,
+      sdcCode: canonical.sdcCode,
+      sdcName: canonical.sdcName,
+      sdcDistrict: canonical.sdcDistrict,
+      batchId: canonical.batchId,
+      batchCode: canonical.batchCode,
+      batchName: canonical.batchName,
+      courseName: canonical.courseName,
+      scheme: canonical.scheme,
+      sector: canonical.sector
+    };
+  });
+
+  const existingIds = new Set(updated.map(p => p.id));
+  return [...updated, ...seed.filter(a => !existingIds.has(a.id))];
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AspirantService {
   private batchService = inject(BatchService);
   private sdcService = inject(SdcService);
-  private readonly STORAGE_KEY = 'isms_aspirant_records';
 
-  private readonly _aspirants = signal<AspirantRecord[]>(this.loadInitialAspirants());
+  private readonly store = createPersistedStore<AspirantRecord>({
+    key: 'isms_aspirant_records',
+    seed: INITIAL_ASPIRANTS,
+    reconcile: reconcileAspirants
+  });
+
+  /** Reactive list of aspirants, restored from storage with seed fallback */
+  private readonly _aspirants = this.store.items;
 
   readonly aspirants = this._aspirants.asReadonly();
 
-  constructor() {
-    if (typeof window !== 'undefined') {
-      window.addEventListener('storage', (event: StorageEvent) => {
-        if (!environment.useMockData) return;
-        if (event.key === this.STORAGE_KEY && event.newValue) {
-          try {
-            const records: AspirantRecord[] = JSON.parse(event.newValue);
-            if (Array.isArray(records) && records.length > 0) {
-              this._aspirants.set(records);
-            }
-          } catch { }
-        }
-      });
-    }
-  }
-
-  private loadInitialAspirants(): AspirantRecord[] {
-    if (!environment.useMockData) {
-      return [];
-    }
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const stored = localStorage.getItem(this.STORAGE_KEY);
-        if (stored) {
-          const parsed: AspirantRecord[] = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            const canonicalMap = new Map(INITIAL_ASPIRANTS.map(a => [a.id, a]));
-
-            const updated = parsed.map(a => {
-              const canonical = canonicalMap.get(a.id);
-              if (canonical) {
-                return {
-                  ...a,
-                  aspirantName: canonical.aspirantName,
-                  sdcId: canonical.sdcId,
-                  sdcCode: canonical.sdcCode,
-                  sdcName: canonical.sdcName,
-                  sdcDistrict: canonical.sdcDistrict,
-                  batchId: canonical.batchId,
-                  batchCode: canonical.batchCode,
-                  batchName: canonical.batchName,
-                  courseName: canonical.courseName,
-                  scheme: canonical.scheme,
-                  sector: canonical.sector
-                };
-              }
-              return a;
-            });
-
-            const existingIds = new Set(updated.map(p => p.id));
-            const missing = INITIAL_ASPIRANTS.filter(a => !existingIds.has(a.id));
-            const combined = [...updated, ...missing];
-            this.persist(combined);
-            return combined;
-          }
-        }
-      } catch (e) {
-        console.error('Failed to load aspirants from localStorage', e);
-      }
-    }
-    this.persist(INITIAL_ASPIRANTS);
-    return INITIAL_ASPIRANTS;
-  }
-
   private persist(records?: AspirantRecord[]): void {
-    if (!environment.useMockData) {
-      return;
-    }
-    const list = records || this._aspirants();
-    if (typeof localStorage !== 'undefined') {
-      try {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
-      } catch (e) {
-        console.error('Failed to persist aspirants to localStorage', e);
-      }
-    }
+    this.store.persist(records);
   }
 
   /** Stats computed across all aspirants */

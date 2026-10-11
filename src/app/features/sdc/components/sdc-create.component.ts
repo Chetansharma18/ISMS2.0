@@ -1,4 +1,5 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -77,6 +78,7 @@ import { getSdcFormFields, RAJASTHAN_LOCATION_DATA } from '../config/sdc-form.co
 export class SdcCreateComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
   private sdcService = inject(SdcService);
   private location = inject(Location);
 
@@ -117,7 +119,7 @@ export class SdcCreateComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const dist = params['district'] || 'Jaipur';
       const locInfo = RAJASTHAN_LOCATION_DATA[dist] || RAJASTHAN_LOCATION_DATA['Jaipur'];
 

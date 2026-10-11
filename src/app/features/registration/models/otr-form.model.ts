@@ -1,3 +1,5 @@
+import { REGEX_PATTERNS } from '../../../shared/utils/validators.util';
+
 export interface FileDoc {
   fileName: string;
   fileSize: string;
@@ -249,19 +251,22 @@ export const NSDC_PARTNER_TYPES: string[] = [
    Statutory Validation Regular Expressions
    ========================================================================== */
 
+// Shared patterns come from shared/utils/validators.util. Only registration-specific
+// rules (UDYAM, MICR, URL, and the looser 12-digit AADHAAR / case-insensitive PASSPORT
+// this form has always accepted) are defined locally.
 export const REGEX = {
-  PAN: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
-  GSTIN: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
+  PAN: REGEX_PATTERNS.PAN,
+  GSTIN: REGEX_PATTERNS.GSTIN,
   UDYAM: /^UDYAM-[A-Z]{2}-[0-9]{2}-[0-9]{7}$/i,
-  INDIAN_MOBILE: /^[6-9]\d{9}$/,
-  INDIAN_PIN: /^[1-9]\d{5}$/,
+  INDIAN_MOBILE: REGEX_PATTERNS.MOBILE,
+  INDIAN_PIN: REGEX_PATTERNS.PINCODE,
   AADHAAR: /^\d{12}$/,
-  VOTER_ID: /^[A-Z]{3}[0-9]{7}$/,
+  VOTER_ID: REGEX_PATTERNS.VOTER_ID,
   PASSPORT: /^[A-Z]\d{7}$/i,
-  IFSC: /^[A-Z]{4}0[A-Z0-9]{6}$/,
+  IFSC: REGEX_PATTERNS.IFSC,
   MICR: /^\d{9}$/,
-  BANK_ACCOUNT: /^\d{9,18}$/,
-  EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+  BANK_ACCOUNT: REGEX_PATTERNS.BANK_ACCOUNT,
+  EMAIL: REGEX_PATTERNS.EMAIL,
   URL: /^(https?:\/\/)?([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/i
 };
 

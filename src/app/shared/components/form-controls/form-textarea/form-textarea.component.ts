@@ -7,7 +7,8 @@ import {
   ElementRef,
   AfterViewInit,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +16,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-form-textarea',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   template: `
     <div class="w-full flex flex-col font-sans">
@@ -45,17 +47,17 @@ import { FormsModule } from '@angular/forms';
         [placeholder]="placeholder"
         [disabled]="disabled"
         [attr.maxlength]="maxLength || null"
-        class="w-full min-h-[35px] h-[35px] px-2.5 py-[6px] text-xs sm:text-[13px] leading-[20px] text-[#1F2933] placeholder:text-[#7A8792] rounded-[4px] border transition-all duration-150 focus:outline-none bg-white resize-none overflow-hidden box-border font-sans"
-        [class.border-[#D9E1E7]]="!error && !disabled"
+        class="w-full min-h-[35px] h-[35px] px-2.5 py-[6px] text-xs sm:text-[13px] leading-[20px] text-primary placeholder:text-muted rounded-[4px] border transition-all duration-150 focus:outline-none bg-white resize-none overflow-hidden box-border font-sans"
+        [class.border-theme]="!error && !disabled"
         [class.border-rose-600]="!!error"
         [class.ring-1]="!!error"
         [class.ring-rose-600]="!!error"
-        [class.bg-[#F5F7F9]]="disabled"
+        [class.bg-surface-muted]="disabled"
         [class.cursor-not-allowed]="disabled"
-        [class.text-[#7A8792]]="disabled"
-        [class.focus:border-[#174A6E]]="!error && !disabled"
+        [class.text-muted]="disabled"
+        [class.focus:border-primary]="!error && !disabled"
         [class.focus:ring-2]="!error && !disabled"
-        [class.focus:ring-[#EAF2F6]]="!error && !disabled"
+        [class.focus:ring-primary-light]="!error && !disabled"
       ></textarea>
 
       <!-- Error Message -->

@@ -1,10 +1,39 @@
-export function formatInr(amount: number | null | undefined): string {
-  if (amount === null || amount === undefined) return '-';
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0
-  }).format(amount);
+export interface InrFormatOptions {
+  /** Abbreviate large values as Lakh / Cr */
+  compact?: boolean;
+  /** Prefix with the ₹ symbol (default true) */
+  symbol?: boolean;
+  /** Max fraction digits (default 0) */
+  fractionDigits?: number;
+}
+
+/**
+ * Single source of truth for Indian Rupee formatting (e.g. ₹50,00,000).
+ * Used by TS code directly and by InrCurrencyPipe in templates.
+ */
+export function formatInr(
+  amount: number | string | null | undefined,
+  options: InrFormatOptions = {}
+): string {
+  if (amount === null || amount === undefined || amount === '') return '-';
+
+  const num = typeof amount === 'string' ? parseFloat(amount.replace(/,/g, '')) : amount;
+  if (isNaN(num)) return String(amount);
+
+  const { compact = false, symbol = true, fractionDigits = 0 } = options;
+  const prefix = symbol ? '\u20B9' : '';
+
+  if (compact) {
+    if (Math.abs(num) >= 10000000) return `${prefix}${(num / 10000000).toFixed(2)} Cr`;
+    if (Math.abs(num) >= 100000) return `${prefix}${(num / 100000).toFixed(2)} Lakh`;
+  }
+
+  const formatted = new Intl.NumberFormat('en-IN', {
+    maximumFractionDigits: fractionDigits,
+    minimumFractionDigits: 0
+  }).format(num);
+
+  return `${prefix}${formatted}`;
 }
 
 export function formatFileSize(bytes: number): string {

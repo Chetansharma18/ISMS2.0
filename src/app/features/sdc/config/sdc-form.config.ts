@@ -1,5 +1,6 @@
 import { FormFieldConfig, FormSectionConfig, FormOption } from '../../../shared/components/form-sdc';
 import { SdcScheme, SDC_SCHEME_OPTIONS, SDC_SECTOR_OPTIONS } from '../models/sdc.model';
+import { REGEX_PATTERNS } from '../../../shared/utils/validators.util';
 
 export interface SdcFormConfigOptions {
   onSchemeChange?: (scheme: SdcScheme) => void;
@@ -465,7 +466,7 @@ export function getSdcFormFields(options: SdcFormConfigOptions = {}): FormFieldC
       requiredMessage: 'Pin Code is required',
       minLength: 6,
       maxLength: 6,
-      pattern: '^[1-9][0-9]{5}$',
+      pattern: REGEX_PATTERNS.PINCODE,
       patternMessage: 'Pin Code must be a 6-digit numeric code',
       placeholder: '302029',
       colSpan: 1

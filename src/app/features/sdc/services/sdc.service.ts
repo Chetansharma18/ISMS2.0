@@ -1,6 +1,6 @@
 import { INITIAL_SDC_RECORDS } from '../../../core/mock/data/sdc.mock';
 import { Injectable, signal, computed } from '@angular/core';
-import { environment } from '../../../../environments/environment';
+import { createPersistedStore } from '../../../core/services/persisted-store';
 import {
   SdcRecord,
   SdcFormData,
@@ -11,104 +11,61 @@ import {
 
 
 
+const REAL_CENTER_PHOTOS = [
+  { id: 'p1', name: 'Center_Front_Building.jpg', url: '/center-photos/center-building.jpg', size: '2.4 MB', tag: 'Photo 1' },
+  { id: 'p2', name: 'IT_Computer_Lab.jpg', url: '/center-photos/computer-lab.jpg', size: '2.8 MB', tag: 'Photo 2' },
+  { id: 'p3', name: 'Practical_Training_Classroom.jpg', url: '/center-photos/practical-training.jpg', size: '3.1 MB', tag: 'Photo 3' }
+];
+
+const hasPlaceholderPhotos = (sdc: SdcRecord): boolean =>
+  !!sdc.centerPhotos && sdc.centerPhotos.some(p => p.url && p.url.startsWith('data:image/svg+xml'));
+
+/**
+ * Refreshes saved SDC records with the canonical seed fields (so stale saves self-heal),
+ * swaps placeholder photos for the real ones, and appends any seed records not yet saved.
+ */
+function reconcileSdcs(stored: SdcRecord[], seed: readonly SdcRecord[]): SdcRecord[] {
+  const canonicalMap = new Map(seed.map(s => [s.id, s]));
+
+  const updated = stored.map(sdc => {
+    const canonical = canonicalMap.get(sdc.id);
+    if (canonical) {
+      return {
+        ...sdc,
+        sdcCode: canonical.sdcCode,
+        sdcName: canonical.sdcName,
+        district: canonical.district,
+        tpName: canonical.tpName,
+        scheme: canonical.scheme,
+        sector: canonical.sector,
+        status: sdc.status || canonical.status,
+        centerPhotos: hasPlaceholderPhotos(sdc) ? REAL_CENTER_PHOTOS : (sdc.centerPhotos || REAL_CENTER_PHOTOS)
+      };
+    }
+    return hasPlaceholderPhotos(sdc) ? { ...sdc, centerPhotos: REAL_CENTER_PHOTOS } : sdc;
+  });
+
+  const existingIds = new Set(updated.map(p => p.id));
+  return [...updated, ...seed.filter(s => !existingIds.has(s.id))];
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class SdcService {
-  private readonly STORAGE_KEY = 'isms_sdc_records';
+  private readonly store = createPersistedStore<SdcRecord>({
+    key: 'isms_sdc_records',
+    seed: INITIAL_SDC_RECORDS,
+    reconcile: reconcileSdcs
+  });
 
-  /** Reactive list of all SDC records initialized from localStorage with seed fallback */
-  private readonly _sdcs = signal<SdcRecord[]>(this.loadInitialRecords());
+  /** Reactive list of all SDC records, restored from storage with seed fallback */
+  private readonly _sdcs = this.store.items;
 
   readonly sdcs = this._sdcs.asReadonly();
 
-  constructor() {
-    // Cross-tab and window storage synchronization
-    if (typeof window !== 'undefined') {
-      window.addEventListener('storage', (event: StorageEvent) => {
-        if (!environment.useMockData) return;
-        if (event.key === this.STORAGE_KEY && event.newValue) {
-          try {
-            const records: SdcRecord[] = JSON.parse(event.newValue);
-            if (Array.isArray(records) && records.length > 0) {
-              this._sdcs.set(records);
-            }
-          } catch { }
-        }
-      });
-    }
-  }
-
-  private loadInitialRecords(): SdcRecord[] {
-    if (!environment.useMockData) {
-      return [];
-    }
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const stored = localStorage.getItem(this.STORAGE_KEY);
-        if (stored) {
-          const parsed: SdcRecord[] = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            const realPhotos = [
-              { id: 'p1', name: 'Center_Front_Building.jpg', url: '/center-photos/center-building.jpg', size: '2.4 MB', tag: 'Photo 1' },
-              { id: 'p2', name: 'IT_Computer_Lab.jpg', url: '/center-photos/computer-lab.jpg', size: '2.8 MB', tag: 'Photo 2' },
-              { id: 'p3', name: 'Practical_Training_Classroom.jpg', url: '/center-photos/practical-training.jpg', size: '3.1 MB', tag: 'Photo 3' }
-            ];
-
-            // Canonical mapping to sanitize stale localStorage items
-            const canonicalMap = new Map(INITIAL_SDC_RECORDS.map(s => [s.id, s]));
-
-            const updated = parsed.map(sdc => {
-              const canonical = canonicalMap.get(sdc.id);
-              if (canonical) {
-                return {
-                  ...sdc,
-                  sdcCode: canonical.sdcCode,
-                  sdcName: canonical.sdcName,
-                  district: canonical.district,
-                  tpName: canonical.tpName,
-                  scheme: canonical.scheme,
-                  sector: canonical.sector,
-                  status: sdc.status || canonical.status,
-                  centerPhotos: (sdc.centerPhotos && sdc.centerPhotos.some(p => p.url && p.url.startsWith('data:image/svg+xml')))
-                    ? realPhotos
-                    : (sdc.centerPhotos || realPhotos)
-                };
-              }
-              if (sdc.centerPhotos && sdc.centerPhotos.some(p => p.url && p.url.startsWith('data:image/svg+xml'))) {
-                return { ...sdc, centerPhotos: realPhotos };
-              }
-              return sdc;
-            });
-
-            // Keep user updates, but if any seed records are missing, append them
-            const existingIds = new Set(updated.map(p => p.id));
-            const missing = INITIAL_SDC_RECORDS.filter(s => !existingIds.has(s.id));
-            const merged = [...updated, ...missing];
-            this.persist(merged);
-            return merged;
-          }
-        }
-      } catch (e) {
-        console.error('Failed to load SDC records from localStorage', e);
-      }
-    }
-    this.persist(INITIAL_SDC_RECORDS);
-    return INITIAL_SDC_RECORDS;
-  }
-
   private persist(records?: SdcRecord[]): void {
-    if (!environment.useMockData) {
-      return;
-    }
-    const list = records || this._sdcs();
-    if (typeof localStorage !== 'undefined') {
-      try {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
-      } catch (e) {
-        console.error('Failed to persist SDC records to localStorage', e);
-      }
-    }
+    this.store.persist(records);
   }
 
   /** Stats computed across all SDCs */

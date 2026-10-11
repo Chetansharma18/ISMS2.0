@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OtrFormService } from '../../services/otr-form.service';
@@ -17,6 +17,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
 @Component({
   selector: 'app-step2-oic-details',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     FormsModule,
@@ -33,10 +34,10 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
           <!-- Card Header -->
           <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
             <div class="flex items-center gap-2.5">
-              <span class="w-6 h-6 rounded-full bg-[#0B3558] text-white text-xs font-bold flex items-center justify-center shrink-0">
+              <span class="w-6 h-6 rounded-full bg-navy text-white text-xs font-bold flex items-center justify-center shrink-0">
                 {{ idx + 1 }}
               </span>
-              <h3 class="text-sm sm:text-base font-extrabold text-[#0B3558] tracking-tight">
+              <h3 class="text-sm sm:text-base font-extrabold text-navy tracking-tight">
                 {{ first ? 'Officer In-Charge' : 'Additional Officer In-Charge #' + (idx + 1) }}
               </h3>
               @if (first && sameAsAuthPerson()) {
@@ -71,9 +72,9 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
                   id="sameAsAuthPerson"
                   [checked]="sameAsAuthPerson()"
                   (change)="toggleSameAsAuthPerson($any($event.target).checked)"
-                  class="w-4 h-4 text-[#0B3558] border-slate-300 rounded focus:ring-[#0B3558] accent-[#0B3558] cursor-pointer shrink-0"
+                  class="w-4 h-4 text-navy border-slate-300 rounded focus:ring-navy accent-navy cursor-pointer shrink-0"
                 />
-                <label for="sameAsAuthPerson" class="text-xs font-semibold text-[#0B3558] cursor-pointer select-none">
+                <label for="sameAsAuthPerson" class="text-xs font-semibold text-navy cursor-pointer select-none">
                   Officer In-Charge is the same as Authorized Person
                   <span class="font-normal text-slate-500 ml-1 hidden sm:inline">(Auto-fill details from Step 2)</span>
                 </label>
@@ -233,7 +234,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
         <button
           type="button"
           (click)="addNewOfficer()"
-          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white border border-[#0B3558] hover:bg-[#0B3558]/5 text-[#0B3558] text-xs sm:text-[13px] font-semibold transition-all shadow-2xs active:scale-95 cursor-pointer"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white border border-navy hover:bg-navy/5 text-navy text-xs sm:text-[13px] font-semibold transition-all shadow-2xs active:scale-95 cursor-pointer"
         >
           <svg class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />

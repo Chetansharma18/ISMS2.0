@@ -3,27 +3,30 @@ import {
   Input,
   Output,
   EventEmitter,
-  HostListener
+  HostListener,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-action-modal',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
     @if (isOpen) {
       <div
         class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
         style="background: rgba(10,20,40,0.45); backdrop-filter: blur(3px);"
-        role="dialog"
-        aria-modal="true"
         (click)="onBackdropClick($event)"
       >
         <div
           class="w-full bg-white rounded-xl border border-slate-200 relative font-sans overflow-hidden my-auto max-h-[90vh] flex flex-col"
           [ngClass]="maxWidthClass"
           style="box-shadow: 0 20px 60px rgba(0,0,0,0.18);"
+          role="dialog"
+          aria-modal="true"
+          [attr.aria-labelledby]="title ? titleId : null"
           (click)="$event.stopPropagation()"
         >
           <!-- Top Accent Bar -->
@@ -58,7 +61,7 @@ import { CommonModule } from '@angular/common';
 
             <!-- Title -->
             @if (title) {
-              <h2 class="m-0 text-[#0B3558] pr-6" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+              <h2 [id]="titleId" class="m-0 text-navy pr-6" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
                 {{ title }}
               </h2>
             }
@@ -94,10 +97,8 @@ import { CommonModule } from '@angular/common';
                   type="button"
                   (click)="onPrimaryAction()"
                   [disabled]="disablePrimary"
-                  class="w-full sm:flex-1 py-2.5 px-4 rounded-lg text-white text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
-                  style="background-color: #0B3558; color: #ffffff !important;"
-                  onmouseover="this.style.backgroundColor='#07233B'"
-                  onmouseout="this.style.backgroundColor='#0B3558'"
+                  class="w-full sm:flex-1 py-2.5 px-4 rounded-lg text-white! text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+                  [ngClass]="primaryVariantClass"
                 >
                   {{ primaryLabel }}
                 </button>
@@ -111,6 +112,9 @@ import { CommonModule } from '@angular/common';
   `
 })
 export class ActionModalComponent {
+  private static nextId = 0;
+  readonly titleId = `action-modal-title-${++ActionModalComponent.nextId}`;
+
   @Input() isOpen = false;
   @Input() title = '';
   @Input() description = '';
@@ -119,12 +123,25 @@ export class ActionModalComponent {
   @Input() secondaryLabel = 'Cancel';
   @Input() showPrimaryArrow = true;
   @Input() showAccentBar = true;
-  @Input() accentBarClass = 'bg-[#0B3558]';
+  @Input() accentBarClass = 'bg-navy';
   @Input() showCloseButton = false;
   @Input() maxWidthClass = 'max-w-[490px]';
   @Input() closeOnBackdrop = true;
   @Input() disablePrimary = false;
   @Input() reverseButtons = false;
+  /** Colour of the primary action button. 'primary' keeps the default dark brand blue. */
+  @Input() primaryVariant: 'primary' | 'success' | 'danger' = 'primary';
+
+  get primaryVariantClass(): string {
+    switch (this.primaryVariant) {
+      case 'success':
+        return 'bg-emerald-600 hover:bg-emerald-700';
+      case 'danger':
+        return 'bg-rose-600 hover:bg-rose-700';
+      default:
+        return 'bg-navy hover:bg-navy-dark';
+    }
+  }
 
   @Output() primaryAction = new EventEmitter<void>();
   @Output() secondaryAction = new EventEmitter<void>();

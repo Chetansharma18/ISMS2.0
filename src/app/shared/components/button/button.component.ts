@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'pdf-view';
@@ -7,6 +7,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
 @Component({
   selector: 'app-button',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule],
   template: `
     <button
@@ -61,7 +62,7 @@ export class ButtonComponent {
       case 'danger':
         return 'btn-danger';
       case 'pdf-view':
-        return 'bg-white hover:bg-[#0B3558] text-slate-700 hover:text-white border border-slate-300 hover:border-[#0B3558] shadow-2xs';
+        return 'bg-white hover:bg-navy text-slate-700 hover:text-white border border-slate-300 hover:border-navy shadow-2xs';
       default:
         return 'btn-primary';
     }

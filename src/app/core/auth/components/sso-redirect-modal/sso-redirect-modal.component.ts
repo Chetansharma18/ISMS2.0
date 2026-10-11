@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth.service';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
@@ -6,6 +6,7 @@ import { LoaderComponent } from '../../../../shared/components/loader/loader.com
 @Component({
   selector: 'app-sso-redirect-modal',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, LoaderComponent],
   host: {
     class: 'block'

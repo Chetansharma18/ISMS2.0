@@ -1,10 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-form-input',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   template: `
     <div class="w-full flex flex-col font-sans">
@@ -37,19 +38,19 @@ import { FormsModule } from '@angular/forms';
       <!-- Input Box Wrapper with Prefix & Suffix -->
       <div
         class="relative flex items-center h-[35px] rounded-[4px] border transition-all duration-150 bg-white"
-        [class.border-[#D9E1E7]]="!error && !disabled"
+        [class.border-theme]="!error && !disabled"
         [class.border-rose-600]="!!error"
         [class.ring-1]="!!error"
         [class.ring-rose-600]="!!error"
-        [class.bg-[#F5F7F9]]="disabled"
+        [class.bg-surface-muted]="disabled"
         [class.cursor-not-allowed]="disabled"
-        [class.focus-within:border-[#174A6E]]="!error && !disabled"
+        [class.focus-within:border-primary]="!error && !disabled"
         [class.focus-within:ring-2]="!error && !disabled"
-        [class.focus-within:ring-[#EAF2F6]]="!error && !disabled"
+        [class.focus-within:ring-primary-light]="!error && !disabled"
       >
         <!-- Optional Prefix Tag -->
         @if (prefixText) {
-          <span class="inline-flex items-center h-full px-2.5 border-r border-[#D9E1E7] bg-[#F5F7F9] text-[12px] font-medium text-[#5F6B76] select-none rounded-l-[4px]">
+          <span class="inline-flex items-center h-full px-2.5 border-theme bg-surface-muted text-[12px] font-medium text-secondary select-none rounded-l-[4px]">
             {{ prefixText }}
           </span>
         }
@@ -64,15 +65,15 @@ import { FormsModule } from '@angular/forms';
           [disabled]="disabled"
           [readOnly]="readonly"
           [attr.maxlength]="maxLength || null"
-          class="flex-1 min-w-0 w-full h-full px-2.5 text-xs sm:text-[13px] leading-[20px] text-[#1F2933] placeholder:text-[#7A8792] focus:outline-none bg-transparent placeholder:normal-case"
+          class="flex-1 min-w-0 w-full h-full px-2.5 text-xs sm:text-[13px] leading-[20px] text-primary placeholder:text-muted focus:outline-none bg-transparent placeholder:normal-case"
           [class.uppercase]="uppercase"
           [class.cursor-not-allowed]="disabled"
-          [class.text-[#7A8792]]="disabled"
+          [class.text-muted]="disabled"
         />
 
         <!-- Optional Suffix Tag -->
         @if (suffixText) {
-          <span class="inline-flex items-center h-full px-3 border-l border-[#D9E1E7] bg-[#F5F7F9] text-[12px] font-medium text-[#5F6B76] select-none rounded-r-[4px]">
+          <span class="inline-flex items-center h-full px-3 border-l border-theme bg-surface-muted text-[12px] font-medium text-secondary select-none rounded-r-[4px]">
             {{ suffixText }}
           </span>
         }

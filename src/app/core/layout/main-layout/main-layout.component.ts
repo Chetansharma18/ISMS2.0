@@ -1,4 +1,5 @@
-import { Component, Input, signal, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Input, signal, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -9,6 +10,7 @@ import { FooterComponent } from '../footer/footer.component';
 @Component({
   selector: 'app-main-layout',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, HeaderComponent, SidebarComponent, FooterComponent],
   template: `
     <div class="h-screen overflow-hidden flex flex-col text-slate-900 antialiased font-sans" style="background-color: #FEFEFD;">
@@ -55,6 +57,7 @@ import { FooterComponent } from '../footer/footer.component';
 })
 export class MainLayoutComponent {
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   @Input() showSidebar: boolean = true;
   @Input() showFooter: boolean = false;
@@ -64,7 +67,8 @@ export class MainLayoutComponent {
   constructor() {
     // Auto-close mobile sidebar whenever router navigates
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
+      filter(event => event instanceof NavigationEnd),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe(() => {
       this.closeMobileSidebar();
     });

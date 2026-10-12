@@ -39,6 +39,8 @@ export interface MasterCrudConfig<T extends { id: string; status?: string } = an
   tagsColumns?: string[];
   /** Whether this entity supports an Active/Inactive status toggle */
   hasStatus?: boolean;
+  /** Primary submit button label in the modal (defaults to 'Save') */
+  primaryActionLabel?: string;
   /** Dynamic add/edit modal field definitions */
   fields: MasterFieldConfig<T>[];
   /** Max-width tailwind class for the add/edit modal */

@@ -187,7 +187,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
         [closeOnBackdrop]="false"
         [reverseButtons]="true"
         [showAccentBar]="false"
-        primaryLabel="Submit"
+        [primaryLabel]="config.primaryActionLabel || 'Save'"
         secondaryLabel="Cancel"
         [maxWidthClass]="config.modalWidthClass || 'max-w-[520px]'"
         (primaryAction)="submit()"

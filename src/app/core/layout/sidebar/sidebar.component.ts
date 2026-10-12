@@ -110,6 +110,15 @@ import { PermissionService } from '../../permissions/permission.service';
                   </a>
 
                   <a
+                    routerLink="/admin/master/scheme-category"
+                    routerLinkActive="bg-primary-light text-brand font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">Scheme Category Master</span>
+                  </a>
+
+                  <a
                     routerLink="/admin/master/sector"
                     routerLinkActive="bg-primary-light text-brand font-semibold"
                     class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"

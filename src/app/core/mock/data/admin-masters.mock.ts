@@ -8,7 +8,8 @@ import {
   EoiCategoryItem,
   PermissionMasterItem,
   SchemeMasterItem,
-  UserRoleMasterItem
+  UserRoleMasterItem,
+  SchemeCategoryMasterItem
 } from '../../models/admin-masters.model';
 
 // Types live in core/models; re-exported so existing imports keep working.
@@ -20,7 +21,8 @@ export type {
   EoiCategoryItem,
   PermissionMasterItem,
   SchemeMasterItem,
-  UserRoleMasterItem
+  UserRoleMasterItem,
+  SchemeCategoryMasterItem
 };
 
 export const MOCK_COURSE_MASTER_ITEMS: CourseMasterItem[] = resolveMock([
@@ -339,5 +341,13 @@ export const MOCK_USER_ROLE_MASTER_ITEMS: UserRoleMasterItem[] = resolveMock([
   { sNo: 2, id: 'role-2', roleTypeName: 'Department Officer', permissions: ['View EOI Configuration', 'Create & Edit EOI', 'Batch Approval & Scrutiny'], status: 'Active' },
   { sNo: 3, id: 'role-3', roleTypeName: 'Scrutiny Officer', permissions: ['View EOI Configuration', 'Batch Approval & Scrutiny'], status: 'Active' },
   { sNo: 4, id: 'role-4', roleTypeName: 'Training Partner', permissions: ['View EOI Configuration', 'Grievance Redressal Access'], status: 'Active' }
+]);
+
+export const MOCK_SCHEME_CATEGORY_MASTER_ITEMS: SchemeCategoryMasterItem[] = resolveMock([
+  { sNo: 1, id: 'sc-1', categoryName: 'Rajvik', schemeName: 'Rajvik', status: 'Active' },
+  { sNo: 2, id: 'sc-2', categoryName: 'samarth', schemeName: 'samarth', status: 'Active' },
+  { sNo: 3, id: 'sc-3', categoryName: 'saksham', schemeName: 'saksham', status: 'Active' },
+  { sNo: 4, id: 'sc-4', categoryName: 'na', schemeName: 'na', status: 'Active' },
+  { sNo: 5, id: 'sc-5', categoryName: 'ALL', schemeName: 'ALL', status: 'Active' }
 ]);
 

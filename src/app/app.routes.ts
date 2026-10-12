@@ -214,6 +214,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/master/scheme-category',
+    loadComponent: () =>
+      import('./features/admin-master/scheme-category-master.component').then(
+        (m) => m.SchemeCategoryMasterComponent
+      )
+  },
+  {
     path: 'admin/master/sector',
     loadComponent: () =>
       import('./features/admin-master/sector-master.component').then(

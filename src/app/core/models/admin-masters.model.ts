@@ -81,3 +81,11 @@ export interface UserRoleMasterItem {
   permissions: string[];
   status: 'Active' | 'Inactive';
 }
+
+export interface SchemeCategoryMasterItem {
+  sNo: number;
+  id: string;
+  categoryName: string;
+  schemeName?: string;
+  status: 'Active' | 'Inactive';
+}

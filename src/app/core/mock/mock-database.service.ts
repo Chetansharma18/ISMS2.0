@@ -102,14 +102,57 @@ export class MockDatabaseService {
       const stored = this.loadFromStorage(key);
       if (stored && Array.isArray(stored)) {
         if (key === 'SCHEMES') {
-          const sanitized = stored.filter(item => item?.status !== 'Closed');
-          this.store.set(key, sanitized);
-          this.saveToStorage(key, sanitized);
+          const hasOldCategories = stored.some(
+            item => item?.eoiCategory === 'Empanelment' || item?.eoiCategory === 'RTD (Recruit-Train-Deploy)'
+          );
+          const hasTargetSchemes = stored.some(
+            item => item?.schemeName === 'Vishwakarma Yuva Udyami Protsahan Yojana'
+          );
+          if (!hasTargetSchemes || hasOldCategories) {
+            const fresh = this.deepClone(this.seeds[key]);
+            this.store.set(key, fresh);
+            this.saveToStorage(key, fresh);
+          } else {
+            const sanitized = stored.filter(item => item?.status !== 'Closed');
+            this.store.set(key, sanitized);
+            this.saveToStorage(key, sanitized);
+          }
         } else if (key === 'SCHEME_MASTERS') {
           const hasTargetSchemes = stored.some(
             item => item?.schemeName === 'Vishwakarma Yuva Udyami Protsahan Yojana'
           );
           if (!hasTargetSchemes) {
+            const fresh = this.deepClone(this.seeds[key]);
+            this.store.set(key, fresh);
+            this.saveToStorage(key, fresh);
+          } else {
+            this.store.set(key, stored);
+          }
+        } else if (key === 'EOI_CATEGORIES') {
+          const hasOldItems = stored.some(
+            item => item?.categoryTitle === 'Empanelment' || item?.categoryTitle === 'RTD (Recruit-Train-Deploy)'
+          );
+          if (hasOldItems) {
+            const filtered = stored.filter(
+              item => item?.categoryTitle !== 'Empanelment' && item?.categoryTitle !== 'RTD (Recruit-Train-Deploy)'
+            );
+            this.store.set(key, filtered);
+            this.saveToStorage(key, filtered);
+          } else {
+            this.store.set(key, stored);
+          }
+        } else if (key === 'USERS') {
+          const hasOldRoles = stored.some(
+            item =>
+              item?.roleType === 'scheme oc' ||
+              item?.roleType === 'mis manager' ||
+              item?.roleType === 'programmer' ||
+              item?.roleType === 'gm' ||
+              item?.roleType === 'zc' ||
+              item?.roleType === 'tp' ||
+              item?.roleType === 'super admin'
+          );
+          if (hasOldRoles) {
             const fresh = this.deepClone(this.seeds[key]);
             this.store.set(key, fresh);
             this.saveToStorage(key, fresh);

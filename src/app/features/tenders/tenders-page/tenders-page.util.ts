@@ -148,11 +148,11 @@ export function toDisplayDate(dt: string): string {
 export function createEmptyEoiForm(): EoiFormData {
   return {
     refNo: '',
-    scheme: 'MMKVY',
-    schemeCategory: 'ALL',
+    scheme: '',
+    schemeCategory: '',
     publishedDate: '',
     submissionDate: '',
-    eoiCategory: 'General',
+    eoiCategory: '',
     description: '',
     emdFee: '',
     processFee: '',
@@ -171,10 +171,10 @@ export function eoiFormFromScheme(scheme: SchemeTender, now: number = Date.now()
   return {
     refNo: scheme.refNo,
     scheme: scheme.schemeName,
-    schemeCategory: normalizeSchemeCategory(scheme.schemeCategory || scheme.category),
+    schemeCategory: scheme.schemeCategory || scheme.category || '',
     publishedDate: toInputDate(scheme.datePublished),
     submissionDate: toInputDate(scheme.closingDate),
-    eoiCategory: scheme.eoiCategory || 'General',
+    eoiCategory: scheme.eoiCategory || '',
     description: scheme.eoiDescription || '',
     emdFee: scheme.emdFee || '',
     processFee: scheme.processFee || '',

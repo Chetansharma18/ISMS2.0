@@ -1,8 +1,9 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, computed } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActionModalComponent } from '../../../shared';
-import { ROLE_TYPE_OPTIONS, UserFormData } from '../user-management.util';
+import { UserFormData } from '../user-management.util';
+import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.model';
 
 /**
  * Add / edit user form. The form object is owned by the parent and edited in place via ngModel,
@@ -163,8 +164,8 @@ import { ROLE_TYPE_OPTIONS, UserFormData } from '../user-management.util';
                 class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white"
               >
                 <option value="" disabled selected>Select Role Type</option>
-                @for (role of roleTypeOptions; track role.value) {
-                  <option [value]="role.value">{{ role.label }}</option>
+                @for (role of activeRoleOptions(); track role) {
+                  <option [value]="role">{{ role }}</option>
                 }
               </select>
               @if (isSubmitted && !f.roleType) {
@@ -186,6 +187,8 @@ import { ROLE_TYPE_OPTIONS, UserFormData } from '../user-management.util';
                 <option value="Programmer">Programmer</option>
                 <option value="MIS Manager">MIS Manager</option>
                 <option value="Scheme Nodal Officer">Scheme Nodal Officer</option>
+                <option value="Deputy Director">Deputy Director</option>
+                <option value="District Nodal Officer">District Nodal Officer</option>
               </select>
             </div>
 
@@ -207,14 +210,13 @@ import { ROLE_TYPE_OPTIONS, UserFormData } from '../user-management.util';
               <label class="block text-slate-700 font-medium mb-1">District</label>
               <select
                 [(ngModel)]="f.district"
+                (ngModelChange)="onDistrictChange($event)"
                 class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800 bg-white"
               >
                 <option value="All Districts">All Districts</option>
-                <option value="Jaipur">Jaipur</option>
-                <option value="Jodhpur">Jodhpur</option>
-                <option value="Udaipur">Udaipur</option>
-                <option value="Ajmer">Ajmer</option>
-                <option value="Kota">Kota</option>
+                @for (district of activeDistrictOptions(); track district) {
+                  <option [value]="district">{{ district }}</option>
+                }
               </select>
             </div>
 
@@ -226,10 +228,9 @@ import { ROLE_TYPE_OPTIONS, UserFormData } from '../user-management.util';
                 class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800 bg-white"
               >
                 <option value="All Blocks">All Blocks</option>
-                <option value="Amber">Amber</option>
-                <option value="Sanganer">Sanganer</option>
-                <option value="Mandore">Mandore</option>
-                <option value="Girwa">Girwa</option>
+                @for (block of activeBlockOptions(); track block) {
+                  <option [value]="block">{{ block }}</option>
+                }
               </select>
             </div>
 
@@ -250,8 +251,55 @@ export class UserFormModalComponent {
   /** Whether the parent has attempted a submit (drives validation styling). */
   readonly submitted = input.required<boolean>();
 
+  readonly roleTypeOptions = input<readonly string[]>([]);
+  readonly districtOptions = input<readonly string[]>([]);
+  readonly districtMasterItems = input<readonly DistrictBlockMasterItem[]>([]);
+
   readonly save = output<void>();
   readonly cancelled = output<void>();
 
-  protected readonly roleTypeOptions = ROLE_TYPE_OPTIONS;
+  readonly activeRoleOptions = computed(() => {
+    const custom = this.roleTypeOptions();
+    if (custom && custom.length > 0) return custom;
+    return ['Super Admin', 'Department Officer', 'Scrutiny Officer', 'Training Partner'];
+  });
+
+  readonly activeDistrictOptions = computed(() => {
+    const custom = this.districtOptions();
+    if (custom && custom.length > 0) return custom;
+    const items = this.districtMasterItems();
+    if (items && items.length > 0) {
+      return Array.from(new Set(items.map(i => i.districtName).filter(Boolean)));
+    }
+    return ['Jaipur', 'Jodhpur', 'Udaipur', 'Ajmer', 'Kota'];
+  });
+
+  readonly activeBlockOptions = computed(() => {
+    const currentDistrict = this.formData().district;
+    const items = this.districtMasterItems();
+    if (items && items.length > 0) {
+      if (currentDistrict && currentDistrict !== 'All Districts') {
+        const matching = items
+          .filter(i => i.districtName.toLowerCase() === currentDistrict.toLowerCase())
+          .map(i => i.blockName)
+          .filter(Boolean);
+        if (matching.length > 0) {
+          return Array.from(new Set(matching));
+        }
+      }
+      return Array.from(new Set(items.map(i => i.blockName).filter(Boolean)));
+    }
+    return ['Amber', 'Sanganer', 'Mandore', 'Girwa', 'Kishangarh', 'Ladpura'];
+  });
+
+  onDistrictChange(newDist: string): void {
+    if (newDist === 'All Districts') {
+      this.formData().blockName = 'All Blocks';
+    } else {
+      const blocks = this.activeBlockOptions();
+      if (blocks.length > 0 && !blocks.includes(this.formData().blockName || '')) {
+        this.formData().blockName = blocks[0];
+      }
+    }
+  }
 }

@@ -39,25 +39,25 @@ const STORAGE_KEY = 'DOC_MASTER_ITEMS';
 const INITIAL_DOC_ITEMS: DocMasterItem[] = [
   {
     id: 'doc-1',
-    schemeName: 'Chief Minister Skill Development Scheme',
+    schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana',
     documents: 'PAN Card, Registration Certificate, Bank Passbook',
     status: 'Active'
   },
   {
     id: 'doc-2',
-    schemeName: 'Mukhyamantri Yuva Swavalamban Yojana',
+    schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)',
     documents: 'Audited Balance Sheet, Income Proof, Caste Certificate',
-    status: 'Inactive'
+    status: 'Active'
   },
   {
     id: 'doc-3',
-    schemeName: 'Empanelment of Assessment Agencies EOI',
+    schemeName: 'Mukhyamantri Yuva Sambal Yojana',
     documents: 'Accreditation Certificate, Past Work Experience, GSTIN',
-    status: 'Inactive'
+    status: 'Active'
   },
   {
     id: 'doc-4',
-    schemeName: 'Recruit-Train-Deploy (RTD) Category III',
+    schemeName: 'Mukhya Mantri Yuva Kaushal Yojana',
     documents: 'Tie-up Agreement, Center Infrastructure Proof',
     status: 'Active'
   }
@@ -467,10 +467,20 @@ export class DocMasterComponent implements OnInit, AfterViewInit {
 
   private loadData(): void {
     const cached = this.storage.getItem<DocMasterItem[]>(STORAGE_KEY);
-    if (cached && Array.isArray(cached) && cached.length > 0) {
-      const sanitized = cached.filter(
-        (item) => item.schemeName !== 'SAMARTH' && item.schemeName !== 'DDU-GKY'
-      );
+    const hasTargetSchemes = cached && Array.isArray(cached) && cached.some(
+      (item) => item.schemeName === 'Vishwakarma Yuva Udyami Protsahan Yojana'
+    );
+    if (hasTargetSchemes && cached && Array.isArray(cached)) {
+      const dummyNames = [
+        'hi',
+        'Chief Minister Skill Development Scheme',
+        'Mukhyamantri Yuva Swavalamban Yojana',
+        'Empanelment of Assessment Agencies EOI',
+        'Recruit-Train-Deploy (RTD) Category III',
+        'SAMARTH',
+        'DDU-GKY'
+      ];
+      const sanitized = cached.filter((item) => !dummyNames.includes(item.schemeName));
       this.items.set(sanitized);
       this.storage.setItem(STORAGE_KEY, sanitized);
     } else {

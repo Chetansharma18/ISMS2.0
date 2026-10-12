@@ -11,6 +11,12 @@ import {
   ActionModalComponent,
   TableColumn
 } from '../../shared';
+import { DataEngineService } from '../../core/services/data-engine.service';
+import {
+  SchemeMasterItem,
+  SchemeCategoryMasterItem,
+  EoiCategoryItem
+} from '../../core/models/admin-masters.model';
 import { SchemeDetailViewComponent } from './scheme-detail-view.component';
 import { EoiAttachment, EoiDocumentItem, EoiFormData, SchemeTender } from './tenders.models';
 import {
@@ -162,7 +168,8 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
           [fileError]="fileError()"
           [isEditing]="!!editingSchemeRefNo()"
           [schemeNameOptions]="schemeNameOptions()"
-          [schemeCategoryOptions]="schemeCategoryOptions"
+          [schemeCategoryOptions]="schemeCategoryOptions()"
+          [eoiCategoryOptions]="eoiCategoryOptions()"
           [requiredInfo]="eoiRequiredInfo"
           (attach)="openAttachmentModal()"
           (removeAttachment)="removeAttachment($event)"
@@ -227,16 +234,44 @@ export class TendersPageComponent {
   readonly showCommitteeModal = signal<boolean>(false);
   readonly selectedSchemeForCommittee = signal<SchemeTender | null>(null);
 
+  private dataEngine = inject(DataEngineService);
+
   readonly availableAdmins = this.schemeService.getAvailableAdmins();
   private promptDismissed = false;
 
-  /** Scheme names available in the "Configure New EOI" scheme dropdown. */
-  readonly schemeNameOptions = computed(() =>
-    Array.from(new Set(this.schemes().map(s => s.schemeName)))
-  );
+  readonly schemeMasterNames = signal<string[]>([]);
+  readonly schemeCategoryNames = signal<string[]>([]);
+  readonly eoiCategoryNames = signal<string[]>([]);
 
-  /** Scheme Category options for the "Configure New EOI" form. */
-  readonly schemeCategoryOptions = ['ALL', 'NA', 'RAJVIK', 'SAKSHAM', 'SAMARTH'];
+  /** Scheme names available in the "Configure New EOI" scheme dropdown (sourced from Scheme Master). */
+  readonly schemeNameOptions = computed(() => {
+    const list = [...this.schemeMasterNames()];
+    const current = this.newEoiData?.scheme;
+    if (current && !list.includes(current)) {
+      list.unshift(current);
+    }
+    return list;
+  });
+
+  /** Scheme Category options for the "Configure New EOI" form (sourced from Scheme Category Master). */
+  readonly schemeCategoryOptions = computed(() => {
+    const list = [...this.schemeCategoryNames()];
+    const current = this.newEoiData?.schemeCategory;
+    if (current && !list.includes(current)) {
+      list.unshift(current);
+    }
+    return list;
+  });
+
+  /** EOI Category options for the "Configure New EOI" form (sourced from EOI Category Master). */
+  readonly eoiCategoryOptions = computed(() => {
+    const list = [...this.eoiCategoryNames()];
+    const current = this.newEoiData?.eoiCategory;
+    if (current && !list.includes(current)) {
+      list.unshift(current);
+    }
+    return list;
+  });
 
   newEoiData: EoiFormData = createEmptyEoiForm();
   newEoiSubmitted = signal<boolean>(false);
@@ -258,6 +293,7 @@ export class TendersPageComponent {
 
   constructor() {
     this.schemeService.loadSchemes().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.loadMasterOptions();
 
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const fromLogin = params['fromLogin'] === 'true';
@@ -377,16 +413,16 @@ export class TendersPageComponent {
     const scheme = this.selectedScheme();
     this.router.navigate(['/scheme-form'], {
       queryParams: {
-        refNo: scheme?.refNo || 'RSLDC/EOI/MMKVY Cat I II III/2026-27/01',
-        title: scheme?.schemeTitle || scheme?.schemeName || 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
-        schemeName: scheme?.schemeName || 'MMKVY',
-        category: scheme?.schemeCategory || scheme?.category || 'ALL',
+        refNo: scheme?.refNo || 'RSLDC/EOI/VYUPY/2026-27/01',
+        title: scheme?.schemeTitle || scheme?.schemeName || 'Vishwakarma Yuva Udyami Protsahan Yojana',
+        schemeName: scheme?.schemeName || 'Vishwakarma Yuva Udyami Protsahan Yojana',
+        category: scheme?.schemeCategory || scheme?.category || 'Rajvik',
         eoiCategory: scheme?.eoiCategory || 'General',
         datePublished: scheme?.datePublished || '15/09/2026',
         closingDate: scheme?.closingDate || '30/11/2026',
         emdFee: scheme?.emdFee || '₹50,000',
-        processFee: scheme?.processFee || '₹2,000',
-        eoiDescription: scheme?.eoiDescription || 'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme'
+        processFee: scheme?.processFee || '₹10,000',
+        eoiDescription: scheme?.eoiDescription || 'Expression of Interest for submission of proposal to undertake Skill Training under Vishwakarma Yuva Udyami Protsahan Yojana'
       }
     });
   }
@@ -413,7 +449,58 @@ export class TendersPageComponent {
 
   // ---- Configure / edit EOI ------------------------------------------------
 
+  private loadMasterOptions(): void {
+    // 1. Load active schemes from Scheme Master
+    this.dataEngine
+      .for<SchemeMasterItem>('SCHEME_MASTERS', { idKey: 'id' })
+      .getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          const names = (items || [])
+            .filter((s) => s.status !== 'Inactive')
+            .map((s) => s.schemeName?.trim())
+            .filter((name): name is string => !!name);
+          this.schemeMasterNames.set(Array.from(new Set(names)));
+        },
+        error: () => this.schemeMasterNames.set([])
+      });
+
+    // 2. Load active scheme categories from Scheme Category Master
+    this.dataEngine
+      .for<SchemeCategoryMasterItem>('SCHEME_CATEGORIES', { idKey: 'id' })
+      .getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          const cats = (items || [])
+            .filter((c) => c.status !== 'Inactive')
+            .map((c) => (c.categoryName || c.schemeName)?.trim())
+            .filter((name): name is string => !!name);
+          this.schemeCategoryNames.set(Array.from(new Set(cats)));
+        },
+        error: () => this.schemeCategoryNames.set([])
+      });
+
+    // 3. Load active EOI categories from EOI Category Master
+    this.dataEngine
+      .for<EoiCategoryItem>('EOI_CATEGORIES', { idKey: 'id' })
+      .getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          const cats = (items || [])
+            .filter((e) => e.status !== 'Inactive')
+            .map((e) => e.categoryTitle?.trim())
+            .filter((title): title is string => !!title);
+          this.eoiCategoryNames.set(Array.from(new Set(cats)));
+        },
+        error: () => this.eoiCategoryNames.set([])
+      });
+  }
+
   openConfigureEoiModal(): void {
+    this.loadMasterOptions();
     this.editingSchemeRefNo.set(null);
     this.newEoiSubmitted.set(false);
     this.fileError.set('');
@@ -422,6 +509,7 @@ export class TendersPageComponent {
   }
 
   editScheme(scheme: SchemeTender): void {
+    this.loadMasterOptions();
     this.editingSchemeRefNo.set(scheme.refNo);
     this.newEoiSubmitted.set(false);
     this.fileError.set('');

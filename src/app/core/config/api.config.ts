@@ -157,6 +157,12 @@ export const API_ENDPOINTS = {
     UPDATE: { url: (id: string | number) => `/masters/schemes/${id}`, method: 'PUT' as ApiMethod },
     DELETE: { url: (id: string | number) => `/masters/schemes/${id}`, method: 'DELETE' as ApiMethod }
   },
+  SCHEME_CATEGORIES: {
+    LIST: { url: '/masters/scheme-categories', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/scheme-categories', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/scheme-categories/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/scheme-categories/${id}`, method: 'DELETE' as ApiMethod }
+  },
   USER_ROLES: {
     LIST: { url: '/masters/user-roles', method: 'GET' as ApiMethod },
     ADD: { url: '/masters/user-roles', method: 'POST' as ApiMethod },

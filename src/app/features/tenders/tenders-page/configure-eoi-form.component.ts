@@ -26,6 +26,7 @@ import { EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
         
         <label class="text-slate-700 font-medium">Scheme*</label>
         <select [(ngModel)]="data().scheme" [ngClass]="{'border-red-500': submitted() && !data().scheme, 'border-field-border': !(submitted() && !data().scheme)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white">
+          <option value="" disabled [selected]="!data().scheme">-- Select Scheme --</option>
           @for (name of schemeNameOptions(); track name) {
             <option [value]="name">{{ name }}</option>
           }
@@ -33,6 +34,7 @@ import { EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
 
         <label class="text-slate-700 font-medium">Scheme Category</label>
         <select [(ngModel)]="data().schemeCategory" class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:border-primary text-slate-800 bg-white">
+          <option value="" [selected]="!data().schemeCategory">-- Select Scheme Category --</option>
           @for (cat of schemeCategoryOptions(); track cat) {
             <option [value]="cat">{{ cat }}</option>
           }
@@ -46,8 +48,10 @@ import { EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
 
         <label class="text-slate-700 font-medium">EOI Category*</label>
         <select [(ngModel)]="data().eoiCategory" [ngClass]="{'border-red-500': submitted() && !data().eoiCategory, 'border-field-border': !(submitted() && !data().eoiCategory)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white">
-          <option value="General">General</option>
-          <option value="Special">Special</option>
+          <option value="" disabled [selected]="!data().eoiCategory">-- Select EOI Category --</option>
+          @for (eoiCat of eoiCategoryOptions(); track eoiCat) {
+            <option [value]="eoiCat">{{ eoiCat }}</option>
+          }
         </select>
 
         <label class="text-slate-700 font-medium">EOI Description</label>
@@ -154,6 +158,7 @@ export class ConfigureEoiFormComponent {
   readonly isEditing = input(false);
   readonly schemeNameOptions = input<string[]>([]);
   readonly schemeCategoryOptions = input<readonly string[]>([]);
+  readonly eoiCategoryOptions = input<readonly string[]>([]);
   readonly requiredInfo = input<EoiRequiredInfoItem[]>([]);
 
   /** Open the "Upload Attachment" modal. */

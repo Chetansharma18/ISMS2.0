@@ -1,52 +1,54 @@
 import { UserManagementItem } from '../../core/models/user-management.model';
 
-/** Canonical role types: stored value (DB) -> human readable label shown in the UI. */
+/** Canonical role types from Role Management. */
 export const ROLE_TYPE_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
-  { value: 'super admin', label: 'Super Admin' },
-  { value: 'scheme oc', label: 'Scheme Officer In-Charge' },
-  { value: 'mis manager', label: 'MIS Manager' },
-  { value: 'gm', label: 'General Manager' },
-  { value: 'zc', label: 'Zone Coordinator' },
-  { value: 'programmer', label: 'Programmer' },
-  { value: 'tp', label: 'Training Partner' }
+  { value: 'Super Admin', label: 'Super Admin' },
+  { value: 'Department Officer', label: 'Department Officer' },
+  { value: 'Scrutiny Officer', label: 'Scrutiny Officer' },
+  { value: 'Training Partner', label: 'Training Partner' }
 ];
 
 /** Role filter buttons shown above the users table. */
 export const ROLE_FILTER_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
   { value: 'all', label: 'All' },
-  { value: 'citizen', label: 'Citizen' },
   { value: 'super admin', label: 'Super Admin' },
-  { value: 'department', label: 'Department' },
-  { value: 'tp', label: 'TP' }
+  { value: 'department officer', label: 'Department Officer' },
+  { value: 'scrutiny officer', label: 'Scrutiny Officer' },
+  { value: 'training partner', label: 'Training Partner' }
 ];
 
 const ROLE_TYPE_LABEL_MAP: Record<string, string> = {
   'super admin': 'Super Admin',
   's.a': 'Super Admin',
   'sa': 'Super Admin',
+  'department officer': 'Department Officer',
+  'scrutiny officer': 'Scrutiny Officer',
+  'training partner': 'Training Partner',
+  'tp': 'Training Partner',
   'admin': 'Administrator',
-  'scheme oc': 'Scheme Officer In-Charge',
-  'oic': 'Officer In-Charge',
-  'mis manager': 'MIS Manager',
+  'scheme oc': 'Department Officer',
+  'oic': 'Department Officer',
+  'mis manager': 'Department Officer',
   'manager': 'Manager',
   'gm': 'General Manager',
   'zc': 'Zone Coordinator',
-  'programmer': 'Programmer',
-  'tp': 'Training Partner',
+  'programmer': 'Department Officer',
   'citizen': 'Citizen'
 };
 
-/** Converts a stored role type (e.g. "mis manager", "gm") into a readable label. */
+/** Converts a stored role type into a readable label from Role Management. */
 export function roleTypeLabel(roleType: string | null | undefined): string {
   if (!roleType) return '-';
-  const key = roleType.trim().toLowerCase();
+  const trimmed = roleType.trim();
+  const key = trimmed.toLowerCase();
   return ROLE_TYPE_LABEL_MAP[key]
-    ?? key.replace(/\b[a-z]/g, char => char.toUpperCase());
+    ?? trimmed.replace(/\b[a-z]/g, char => char.toUpperCase());
 }
 
 /** Blacklisting applies to Training Partners only. */
 export function isTrainingPartner(item: UserManagementItem): boolean {
-  return item.userType === 'TP' || (item.roleType || '').trim().toLowerCase() === 'tp';
+  const rt = (item.roleType || '').trim().toLowerCase();
+  return item.userType === 'TP' || rt === 'tp' || rt === 'training partner';
 }
 
 /** Applies the role filter ('all' | 'blacklisted' | role keyword) and the free-text search. */
@@ -56,19 +58,29 @@ export function filterUsers(
   searchQuery: string
 ): UserManagementItem[] {
   const q = searchQuery.toLowerCase().trim();
-  const filter = roleFilter.toLowerCase();
+  const filter = roleFilter.toLowerCase().trim();
 
   let filtered = users;
 
   if (filter === 'blacklisted') {
     filtered = filtered.filter(u => u.schemeStatus === 'Blacklisted');
   } else if (filter !== 'all') {
-    filtered = filtered.filter(u =>
-      (u.roleType && u.roleType.toLowerCase().includes(filter)) ||
-      (u.userType && u.userType.toLowerCase().includes(filter)) ||
-      (u.schemeDepartment && u.schemeDepartment.toLowerCase().includes(filter)) ||
-      (filter === 'department' && u.userType === 'Admin')
-    );
+    filtered = filtered.filter(u => {
+      const rt = (u.roleType || '').toLowerCase();
+      const ut = (u.userType || '').toLowerCase();
+      const sd = (u.schemeDepartment || '').toLowerCase();
+      const label = roleTypeLabel(u.roleType).toLowerCase();
+      return (
+        rt === filter ||
+        rt.includes(filter) ||
+        label === filter ||
+        label.includes(filter) ||
+        ut === filter ||
+        ut.includes(filter) ||
+        sd.includes(filter) ||
+        (filter === 'department' && (ut === 'admin' || rt.includes('department') || rt.includes('scrutiny') || label.includes('department')))
+      );
+    });
   }
 
   if (!q) return filtered;
@@ -148,7 +160,7 @@ export function userFormFromItem(item: UserManagementItem): UserFormData {
     alternateMobileNo: '',
     alternateEmail: '',
     userType: item.userType,
-    roleType: item.roleType,
+    roleType: roleTypeLabel(item.roleType),
     designation: item.designation || 'Joint Director',
     schemeDepartment: item.schemeDepartment || 'RSLDC',
     district: item.districtName,

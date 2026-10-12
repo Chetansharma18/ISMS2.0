@@ -9,6 +9,7 @@ import {
   TableComponent,
   TableColumn
 } from '../../shared';
+import { DistrictBlockMasterItem, UserRoleMasterItem } from '../../core/models/admin-masters.model';
 import { UserManagementItem } from '../../core/models/user-management.model';
 import {
   ConfirmModalData,
@@ -96,7 +97,7 @@ export type { UserManagementItem };
       <!-- Role Filters -->
       @if (selectedRoleFilter() !== 'blacklisted') {
         <app-role-filter-bar
-          [options]="roleFilterOptions"
+          [options]="roleFilterOptions()"
           [selected]="selectedRoleFilter()"
           (selectedChange)="selectedRoleFilter.set($event)"
         />
@@ -162,6 +163,9 @@ export type { UserManagementItem };
         [editing]="!!editingId()"
         [formData]="formData()"
         [submitted]="submitted()"
+        [roleTypeOptions]="roleTypeOptions()"
+        [districtOptions]="districtOptions()"
+        [districtMasterItems]="districtMasterItems()"
         (save)="submitUser()"
         (cancelled)="closeModal()"
       />
@@ -189,8 +193,6 @@ export class UserManagementComponent {
   selectedViewUser = signal<UserManagementItem | null>(null);
   submitted = signal<boolean>(false);
 
-  readonly roleFilterOptions = ROLE_FILTER_OPTIONS;
-
   roleTypeLabel = roleTypeLabel;
   isTrainingPartner = isTrainingPartner;
 
@@ -198,13 +200,25 @@ export class UserManagementComponent {
 
   private dataEngine = inject(DataEngineService);
   private userRepo = this.dataEngine.for<UserManagementItem>('USERS');
+  private roleRepo = this.dataEngine.for<UserRoleMasterItem>('USER_ROLES');
+  private districtRepo = this.dataEngine.for<DistrictBlockMasterItem>('DISTRICTS');
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
 
   users = signal<UserManagementItem[]>([]);
+  userRoles = signal<UserRoleMasterItem[]>([]);
+  districtMasterItems = signal<DistrictBlockMasterItem[]>([]);
 
   constructor() {
     this.userRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => this.users.set(list));
+    this.roleRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => {
+      const active = list.filter(r => r.status !== 'Inactive');
+      this.userRoles.set(active.length > 0 ? active : list);
+    });
+    this.districtRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => {
+      const active = list.filter(d => d.status !== 'Inactive');
+      this.districtMasterItems.set(active.length > 0 ? active : list);
+    });
 
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       if (params['filter'] === 'blacklisted') {
@@ -214,6 +228,30 @@ export class UserManagementComponent {
       }
     });
   }
+
+  readonly roleTypeOptions = computed(() => {
+    const roles = this.userRoles().map(r => r.roleTypeName).filter(Boolean);
+    const unique = Array.from(new Set(roles));
+    return unique.length > 0
+      ? unique
+      : ['Super Admin', 'Department Officer', 'Scrutiny Officer', 'Training Partner'];
+  });
+
+  readonly districtOptions = computed(() => {
+    const districts = this.districtMasterItems().map(d => d.districtName).filter(Boolean);
+    const unique = Array.from(new Set(districts));
+    return unique.length > 0
+      ? unique
+      : ['Jaipur', 'Jodhpur', 'Udaipur', 'Ajmer', 'Kota'];
+  });
+
+  readonly roleFilterOptions = computed(() => {
+    const options: Array<{ value: string; label: string }> = [{ value: 'all', label: 'All' }];
+    this.roleTypeOptions().forEach(role => {
+      options.push({ value: role.toLowerCase(), label: role });
+    });
+    return options;
+  });
 
   readonly filteredUsers = computed(() =>
     filterUsers(this.users(), this.selectedRoleFilter(), this.searchQuery())

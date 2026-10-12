@@ -315,9 +315,7 @@ export const MOCK_DISTRICT_BLOCK_MASTER_ITEMS: DistrictBlockMasterItem[] = resol
 
 export const MOCK_EOI_CATEGORY_ITEMS: EoiCategoryItem[] = resolveMock([
   { sNo: 1, id: 'cat-1', categoryTitle: 'General', description: 'Standard Expression of Interest for all eligible training partners across general sectors.', status: 'Active' },
-  { sNo: 2, id: 'cat-2', categoryTitle: 'Special', description: 'Specialized scheme proposals for specific target demographics, tribal regions, or high-priority sectors.', status: 'Active' },
-  { sNo: 3, id: 'cat-3', categoryTitle: 'Empanelment', description: 'Empanelment of assessment agencies, technical consultants, and industry training partners.', status: 'Active' },
-  { sNo: 4, id: 'cat-4', categoryTitle: 'RTD (Recruit-Train-Deploy)', description: 'Direct employment-linked training provider empanelment under Category-III RTD model.', status: 'Active' }
+  { sNo: 2, id: 'cat-2', categoryTitle: 'Special', description: 'Specialized scheme proposals for specific target demographics, tribal regions, or high-priority sectors.', status: 'Active' }
 ]);
 
 export const MOCK_PERMISSION_MASTER_ITEMS: PermissionMasterItem[] = resolveMock([

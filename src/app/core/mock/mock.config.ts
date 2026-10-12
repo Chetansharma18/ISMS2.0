@@ -50,6 +50,7 @@ export const MOCK_CONFIG: MockConfigSettings = {
     EOI_CATEGORIES: true,
     PERMISSIONS: true,
     SCHEME_MASTERS: true,
+    SCHEME_CATEGORIES: true,
     USER_ROLES: true
   }
 };

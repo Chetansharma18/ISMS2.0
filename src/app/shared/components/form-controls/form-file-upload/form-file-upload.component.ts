@@ -124,9 +124,12 @@ import { DocumentViewerModalComponent } from '../../document-viewer-modal/docume
 
       <!-- Error message -->
       @if (error) {
-        <p class="text-[11px] text-rose-600 font-medium mt-1">
-          {{ error }}
-        </p>
+        <div class="form-error-text text-rose-600 font-medium mt-0.5 flex items-center gap-1 leading-tight animate-fade-in" style="font-size: 11px !important; line-height: 14px !important;">
+          <svg class="shrink-0" style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          <span style="font-size: 11px !important; line-height: 14px !important;">{{ error }}</span>
+        </div>
       }
 
       <!-- Reusable Document Preview Modal -->
@@ -137,7 +140,13 @@ import { DocumentViewerModalComponent } from '../../document-viewer-modal/docume
         (close)="isPreviewOpen = false"
       ></app-document-viewer-modal>
     </div>
-  `
+  `,
+  styles: [`
+    .form-error-text {
+      font-size: 11px !important;
+      line-height: 14px !important;
+    }
+  `]
 })
 export class FormFileUploadComponent {
   @Input() label: string = '';

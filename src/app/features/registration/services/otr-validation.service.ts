@@ -241,8 +241,9 @@ export class OtrValidationService {
   validateStep3(step3: Step3AuthorizedPerson): string[] {
     const errors: string[] = [];
 
-    if (!step3.name?.trim() || step3.name.trim().length < 2) {
-      errors.push('Full Name of Authorized Signatory is mandatory (min 2 chars).');
+    const hasName = (step3.firstName?.trim() || step3.name?.trim());
+    if (!hasName || hasName.length < 2) {
+      errors.push('Authorized Person First Name is mandatory (min 2 chars).');
     }
     if (!step3.dob) {
       errors.push('Date of Birth is mandatory.');

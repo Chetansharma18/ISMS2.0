@@ -6,12 +6,13 @@ import { AuthService, UserRole, USER_ROLES } from '../../../../core/auth/auth.se
 import { StorageService } from '../../../../core/services/storage.service';
 import { OtrFormService } from '../../../registration/services/otr-form.service';
 import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dept-admin-otp-modal/dept-admin-otp-modal.component';
+import { NewUserCategoryModalComponent } from '../../../../core/auth/components/new-user-category-modal/new-user-category-modal.component';
 
 @Component({
   selector: 'app-sso-login',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule, DeptAdminOtpModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, DeptAdminOtpModalComponent, NewUserCategoryModalComponent],
   host: {
     class: 'block w-full min-h-full flex flex-col bg-white'
   },
@@ -172,7 +173,9 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
                       [class.border-slate-300]="selectedRole() !== r.role"
                       [class.hover:bg-slate-100]="selectedRole() !== r.role"
                     >
-                      <span class="truncate">{{ r.label }}</span>
+                      <span class="truncate">
+                        {{ r.role === 'new_user' && selectedNewUserCategory() === 'citizen' ? 'New User (Citizen)' : r.label }}
+                      </span>
                       @if (selectedRole() === r.role) {
                         <span class="text-xs font-bold">&check;</span>
                       }
@@ -218,6 +221,13 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
         (cancelled)="onDeptAdminOtpCancelled()"
       ></app-dept-admin-otp-modal>
 
+      <!-- New User Category Selection Modal (Student vs Citizen) -->
+      <app-new-user-category-modal
+        [isOpen]="showNewUserCategoryModal()"
+        (proceedWithCitizen)="onProceedWithCitizen()"
+        (cancelled)="onNewUserCategoryCancelled()"
+      ></app-new-user-category-modal>
+
     </div>
   `,
   styles: [`
@@ -241,10 +251,15 @@ export class SsoLoginComponent {
   captchaCode = signal<string>('3 1 3 1 9 8');
   isLoading = signal<boolean>(false);
   showDeptAdminOtp = signal<boolean>(false);
+  showNewUserCategoryModal = signal<boolean>(false);
+  selectedNewUserCategory = signal<'student' | 'citizen' | null>(null);
 
   selectRole(role: UserRole): void {
     this.selectedRole.set(role);
     this.emailOrSsoId = role;
+    if (role === 'new_user') {
+      this.showNewUserCategoryModal.set(true);
+    }
   }
 
   refreshCaptcha(): void {
@@ -260,12 +275,37 @@ export class SsoLoginComponent {
   }
 
   handleLogin(): void {
+    const role = this.selectedRole();
+
+    // If New User is selected and category is not chosen yet, open category modal
+    if (role === 'new_user' && !this.selectedNewUserCategory()) {
+      this.showNewUserCategoryModal.set(true);
+      return;
+    }
+
+    this.executeLogin(role);
+  }
+
+  onProceedWithCitizen(): void {
+    this.selectedRole.set('new_user');
+    this.selectedNewUserCategory.set('citizen');
+    this.emailOrSsoId = 'new_user';
+    this.showNewUserCategoryModal.set(false);
+    this.executeLogin('new_user');
+  }
+
+  onNewUserCategoryCancelled(): void {
+    this.showNewUserCategoryModal.set(false);
+    this.isLoading.set(false);
+    this.router.navigate(['/sso-login']);
+  }
+
+  private executeLogin(role: UserRole): void {
     this.isLoading.set(true);
 
     setTimeout(() => {
       this.isLoading.set(false);
       const identifier = this.emailOrSsoId.trim() || 'new_user';
-      const role = this.selectedRole();
 
       if (role === 'dept_admin') {
         // Department Admin requires 6-digit OTP verification first

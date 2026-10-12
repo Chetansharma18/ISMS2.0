@@ -56,7 +56,7 @@ export interface StepMeta {
           <!-- Title and Subtitle Row -->
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">
-              Company Registration Form
+              Organization Registration Form
             </h1>
             <span class="text-xs text-slate-500 font-medium select-none">
               Fields marked with <span class="text-rose-500 font-bold">*</span> are mandatory
@@ -205,19 +205,9 @@ export interface StepMeta {
             <app-step5-preview (editStep)="goToStep($event)"></app-step5-preview>
           </div>
 
-          <!-- Inline Error Message Banner (if submission attempted with errors) -->
-          @if (submitErrorMessage()) {
-            <div class="text-xs sm:text-sm text-rose-700 bg-rose-50 border border-rose-300 px-4 py-2.5 rounded-lg flex items-center gap-2.5 font-medium shadow-2xs animate-in fade-in duration-200">
-              <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{{ submitErrorMessage() }}</span>
-            </div>
-          }
-
           <!-- 4. Form Action Buttons (Per Step Navigation) -->
           <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <!-- Left Side: Previous Button (Steps 2, 3, 4) -->
+            <!-- Left Side: Previous Button (Steps 2, 3, 4) / Back to Profile (Step 1) -->
             <div>
               @if (activeStep() > 1) {
                 <button
@@ -229,6 +219,17 @@ export interface StepMeta {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                   </svg>
                   <span>Previous</span>
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  (click)="goBack()"
+                  class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span>Back to Profile</span>
                 </button>
               }
             </div>
@@ -329,25 +330,24 @@ export interface StepMeta {
             [class.bg-emerald-900/95]="toast.type === 'success'"
             [class.border-emerald-500/50]="toast.type === 'success'"
             [class.text-emerald-50]="toast.type === 'success'"
-            [class.bg-rose-600]="toast.type === 'error'"
-            [class.border-rose-700]="toast.type === 'error'"
-            [class.text-white]="toast.type === 'error'"
+            [class.bg-rose-600]="toast.type === 'error' || toast.type === 'warning'"
+            [class.border-rose-700]="toast.type === 'error' || toast.type === 'warning'"
+            [class.text-white]="toast.type === 'error' || toast.type === 'warning'"
             [class.bg-navy]="toast.type === 'info'"
             [class.border-[#1b4b73]]="toast.type === 'info'"
             [class.text-white]="toast.type === 'info'"
-            [class.bg-amber-900/95]="toast.type === 'warning'"
-            [class.border-amber-500/50]="toast.type === 'warning'"
-            [class.text-amber-50]="toast.type === 'warning'"
           >
             <div class="shrink-0 mt-0.5">
               @if (toast.type === 'success') {
                 <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                 </svg>
-              } @else if (toast.type === 'error') {
-                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
+              } @else if (toast.type === 'error' || toast.type === 'warning') {
+                <div class="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0 shadow-xs">
+                  <svg class="w-3.5 h-3.5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
               } @else {
                 <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -404,13 +404,19 @@ export class RegistrationShellComponent {
 
   readonly activeStep = signal<number>(1);
   readonly submittedRegId = signal<string | null>(null);
-  readonly submitErrorMessage = signal<string | null>(null);
 
   constructor() {
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const step = parseInt(params['step'], 10);
       if (step >= 1 && step <= 4) {
-        this.activeStep.set(step);
+        let targetStep = step;
+        for (let s = 1; s < step; s++) {
+          if (!this.isStepCompleted(s)) {
+            targetStep = s;
+            break;
+          }
+        }
+        this.activeStep.set(targetStep);
       }
     });
   }
@@ -446,13 +452,17 @@ export class RegistrationShellComponent {
 
   goToStep(stepNumber: number): void {
     if (stepNumber < 1 || stepNumber > 4) return;
-    this.submitErrorMessage.set(null);
+    for (let s = 1; s < stepNumber; s++) {
+      if (!this.isStepCompleted(s)) {
+        this.validationService.showToast(`Please complete Step ${s} before proceeding.`, 'error');
+        return;
+      }
+    }
     this.activeStep.set(stepNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   nextStep(): void {
-    this.submitErrorMessage.set(null);
     const current = this.activeStep();
     this.validationService.markStepSubmitted(current);
 
@@ -460,8 +470,7 @@ export class RegistrationShellComponent {
     const errors = this.validationService.getStepErrors(current, data);
 
     if (errors.length > 0) {
-      this.submitErrorMessage.set(`Please fill all required mandatory fields highlighted in red (${errors[0]}).`);
-      this.validationService.showToast(errors[0], 'error', current);
+      this.validationService.showToast('Please fill all mandatory fields marked with *', 'error', current);
       return;
     }
 
@@ -472,7 +481,6 @@ export class RegistrationShellComponent {
   }
 
   previousStep(): void {
-    this.submitErrorMessage.set(null);
     const current = this.activeStep();
     if (current > 1) {
       this.activeStep.set(current - 1);
@@ -486,26 +494,18 @@ export class RegistrationShellComponent {
   }
 
   submitApplication(): void {
-    this.submitErrorMessage.set(null);
     const data = this.otrFormService.formData();
 
     for (let s = 1; s <= 3; s++) {
       this.validationService.markStepSubmitted(s);
       const errors = this.validationService.getStepErrors(s, data);
       if (errors.length > 0) {
-        const stepLabels: Record<number, string> = {
-          1: 'Step 1 (Organization Details)',
-          2: 'Step 2 (Authorized Person Details)',
-          3: 'Step 3 (Bank Details)'
-        };
-        this.submitErrorMessage.set(`Form is not completely filled, entries are missing in ${stepLabels[s]}. Please fill all mandatory fields (${errors[0]}).`);
-        this.validationService.showToast(errors[0], 'error', s);
+        this.validationService.showToast('Please fill all mandatory fields marked with *', 'error', s);
         this.goToStep(s);
         return;
       }
     }
 
-    this.submitErrorMessage.set(null);
     const regId = this.otrFormService.submitForm();
     this.submittedRegId.set(regId);
     this.validationService.showToast(`Application successfully submitted! Ref: ${regId}`, 'success');
@@ -539,7 +539,7 @@ export class RegistrationShellComponent {
     if (this.activeStep() > 1) {
       this.previousStep();
     } else {
-      this.router.navigate(['/tenders']);
+      this.router.navigate(['/profile']);
     }
   }
 

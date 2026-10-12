@@ -245,6 +245,18 @@ textarea::placeholder {
   font-size: var(--font-size-small, 11.5px);
 }
 
+.form-error-text {
+  font-size: 11px !important;
+  line-height: 14px !important;
+  color: #e11d48 !important;
+}
+
+.form-hint-text {
+  font-size: 11px !important;
+  line-height: 14px !important;
+  color: #7a8792 !important;
+}
+
 .text-primary {
   color: var(--color-text-primary);
 }

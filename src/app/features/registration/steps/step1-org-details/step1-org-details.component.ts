@@ -229,9 +229,9 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             type="tel"
             [value]="data().contactNo"
             (valueChange)="update('contactNo', $event)"
-            placeholder="Enter mobile number"
+            placeholder="Enter 10-digit mobile number"
             [required]="true"
-            [maxLength]="15"
+            [maxLength]="10"
             [error]="getFieldError('contactNo')"
           ></app-form-input>
         </div>
@@ -466,6 +466,9 @@ export class Step1OrgDetailsComponent {
         return undefined;
       case 'contactNo':
         if (!d.contactNo?.trim()) return 'Contact Number is required';
+        if (!REGEX.INDIAN_MOBILE.test(d.contactNo) && !/^[0-9]{7,12}$/.test(d.contactNo.replace(/[-\s]/g, ''))) {
+          return 'Enter valid 10-digit mobile number';
+        }
         return undefined;
       case 'emailId':
         if (!d.emailId?.trim()) return 'Official Email ID is required';

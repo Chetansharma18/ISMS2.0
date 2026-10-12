@@ -137,7 +137,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
       <!-- MODAL: ONE-TIME REGISTRATION (OTR) POPUP PROMPT -->
       <app-otr-prompt-modal
         [isOpen]="showOtrPromptModal()"
-        (completeRegistration)="goToProfile()"
+        (completeRegistration)="goToRegistration()"
         (dismiss)="dismissOtrPrompt()"
       ></app-otr-prompt-modal>
 
@@ -395,7 +395,8 @@ export class TendersPageComponent {
   }
 
   goToRegistration(): void {
-    this.goToProfile();
+    this.dismissOtrPrompt();
+    this.router.navigate(['/registration']);
   }
 
   downloadDoc(docType: string): void {

@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, computed, signal, Output, EventEmitter } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, signal, Output, EventEmitter, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../auth/auth.service';
 import { PermissionService } from '../../permissions/permission.service';
 
@@ -411,12 +413,23 @@ import { PermissionService } from '../../permissions/permission.service';
             <!-- 9. Profile -->
             <a
               routerLink="/profile"
-              routerLinkActive="bg-primary-light text-brand font-medium border border-border"
-              [routerLinkActiveOptions]="{ exact: false }"
+              [class.bg-primary-light]="isProfileActive()"
+              [class.text-brand]="isProfileActive()"
+              [class.font-medium]="isProfileActive()"
+              [class.border]="isProfileActive()"
+              [class.border-border]="isProfileActive()"
               class="flex items-center justify-between px-3 py-2 rounded-sm text-[13px] leading-5 text-text-secondary hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
             >
               <div class="flex items-center gap-2.5">
-                <svg class="w-4 h-4 shrink-0 text-text-muted group-hover:text-brand transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                <svg
+                  class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
+                  [class.text-brand]="isProfileActive()"
+                  [class.text-text-muted]="!isProfileActive()"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                >
                   <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 <span class="tracking-tight">Profile</span>
@@ -448,12 +461,23 @@ import { PermissionService } from '../../permissions/permission.service';
             <!-- 2. Profile -->
             <a
               routerLink="/profile"
-              routerLinkActive="bg-primary-light text-brand font-medium border border-border"
-              [routerLinkActiveOptions]="{ exact: false }"
+              [class.bg-primary-light]="isProfileActive()"
+              [class.text-brand]="isProfileActive()"
+              [class.font-medium]="isProfileActive()"
+              [class.border]="isProfileActive()"
+              [class.border-border]="isProfileActive()"
               class="flex items-center justify-between px-3 py-2 rounded-sm text-[13px] leading-5 text-text-secondary hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
             >
               <div class="flex items-center gap-2.5">
-                <svg class="w-4 h-4 shrink-0 text-text-muted group-hover:text-brand transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                <svg
+                  class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
+                  [class.text-brand]="isProfileActive()"
+                  [class.text-text-muted]="!isProfileActive()"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                >
                   <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 <span class="tracking-tight">Profile</span>
@@ -476,6 +500,8 @@ import { PermissionService } from '../../permissions/permission.service';
 export class SidebarComponent {
   authService = inject(AuthService);
   private permissions = inject(PermissionService);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   readonly currentUser = this.authService.currentUser;
 
@@ -489,6 +515,31 @@ export class SidebarComponent {
 
   readonly isMasterOpen = signal<boolean>(true);
   readonly isUserManagementOpen = signal<boolean>(true);
+
+  readonly currentUrl = signal<string>(this.router.url);
+
+  constructor() {
+    this.router.events
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((e: NavigationEnd) => {
+        this.currentUrl.set(e.urlAfterRedirects || e.url);
+      });
+  }
+
+  readonly isProfileActive = computed(() => {
+    const url = this.currentUrl().split('?')[0].split('#')[0];
+    return (
+      url === '/profile' ||
+      url.startsWith('/profile/') ||
+      url === '/registration' ||
+      url.startsWith('/registration/') ||
+      url === '/otr' ||
+      url.startsWith('/otr/')
+    );
+  });
 
   @Output() linkClicked = new EventEmitter<void>();
   @Output() closeMobileNav = new EventEmitter<void>();

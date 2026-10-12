@@ -268,11 +268,28 @@ export class TendersPageComponent {
         this.storage.removeSessionItem('isms_otr_prompt_dismissed');
       }
       this.evaluateOtrModalPrompt();
+
+      const viewRefNo = params['viewRefNo'] || params['refNo'];
+      if (viewRefNo) {
+        const found = this.schemes().find(s => s.refNo === viewRefNo);
+        if (found) {
+          this.selectedScheme.set(found);
+        }
+      }
     });
 
     effect(() => {
       // Re-evaluate whenever currentUser signal changes
       this.evaluateOtrModalPrompt();
+
+      const list = this.schemes();
+      const viewRefNo = this.route.snapshot.queryParams['viewRefNo'] || this.route.snapshot.queryParams['refNo'];
+      if (viewRefNo && list.length > 0 && !this.selectedScheme()) {
+        const found = list.find(s => s.refNo === viewRefNo);
+        if (found) {
+          this.selectedScheme.set(found);
+        }
+      }
     });
   }
 
@@ -361,6 +378,7 @@ export class TendersPageComponent {
 
   backToList(): void {
     this.selectedScheme.set(null);
+    this.router.navigate([], { relativeTo: this.route, queryParams: {} });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 

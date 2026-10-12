@@ -26,7 +26,7 @@ import { filterTenders } from './tender-status.util';
           <input
             type="text"
             [(ngModel)]="searchQuery"
-            placeholder="Search Ref, Scheme, Department..."
+            placeholder="Search Ref, Scheme, Category..."
             class="w-full pl-9 pr-7 py-2 text-[13px] bg-white border border-slate-300 rounded-md placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-navy transition-colors font-normal shadow-2xs"
           />
           @if (searchQuery()) {
@@ -51,7 +51,7 @@ import { filterTenders } from './tender-status.util';
         [customTemplates]="{
           appRef: appRefTemplate,
           schemeTitle: schemeTitleTemplate,
-          department: deptTemplate,
+          schemeCategory: schemeCategoryTemplate,
           eoiStatus: eoiStatusTemplate,
           rejectionReason: rejectionReasonTemplate,
           view: viewTemplate
@@ -64,13 +64,10 @@ import { filterTenders } from './tender-status.util';
         <button
           type="button"
           (click)="open.emit(tender)"
-          class="hover:text-navy hover:underline cursor-pointer text-left inline-flex items-center gap-1 font-mono font-bold text-navy transition-colors"
+          class="font-mono font-bold text-navy hover:underline cursor-pointer text-left transition-colors"
           title="Open Application Details Page"
         >
-          <span>{{ tender.appRef }}</span>
-          <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
+          {{ tender.appRef }}
         </button>
       </ng-template>
 
@@ -83,11 +80,9 @@ import { filterTenders } from './tender-status.util';
         >
           {{ tender.schemeTitle }}
         </span>
-      </ng-template>
-
-      <!-- Custom Department Template -->
-      <ng-template #deptTemplate let-tender>
-        <span class="line-clamp-2 text-slate-600 text-[11px] leading-relaxed">{{ tender.department }}</span>
+      </ng-template>      <!-- Custom Scheme Category Template -->
+      <ng-template #schemeCategoryTemplate let-tender>
+        <span class="text-slate-800 font-medium text-xs uppercase tracking-wide">{{ tender.schemeCategory || 'GENERAL' }}</span>
       </ng-template>
 
       <!-- Custom EOI Stage Template -->
@@ -144,7 +139,7 @@ export class TenderListComponent {
     { key: '$index',           label: 'S. No.',               type: 'number', align: 'center', width: 'w-12' },
     { key: 'appRef',           label: 'Application Ref. No.', cellClass: 'whitespace-nowrap font-normal text-slate-800', type: 'custom' },
     { key: 'schemeTitle',      label: 'Scheme Name',          cellClass: 'whitespace-nowrap font-medium text-slate-800', type: 'custom' },
-    { key: 'department',       label: 'Department',           width: 'min-w-[180px] max-w-sm', type: 'custom' },
+    { key: 'schemeCategory',   label: 'Scheme Category',      align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700', type: 'custom' },
     { key: 'appliedDate',      label: 'Applied Date',         align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     {
       key: 'submittedStatus',

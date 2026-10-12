@@ -129,23 +129,17 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                         @if (col.link) {
                           <a
                             [routerLink]="getColLink(col, item)"
-                            class="text-brand hover:text-navy hover:underline font-medium inline-flex items-center gap-1 cursor-pointer transition-colors"
+                            class="text-brand hover:text-navy hover:underline font-medium cursor-pointer transition-colors"
                           >
-                            <span>{{ getFormattedValue(item, col, idx) }}</span>
-                            <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
+                            {{ getFormattedValue(item, col, idx) }}
                           </a>
                         } @else {
                           <button
                             type="button"
                             (click)="onLinkClick(col, item, $event)"
-                            class="text-brand hover:text-navy hover:underline font-medium inline-flex items-center gap-1 cursor-pointer transition-colors text-left"
+                            class="text-brand hover:text-navy hover:underline font-medium cursor-pointer transition-colors text-left"
                           >
-                            <span>{{ getFormattedValue(item, col, idx) }}</span>
-                            <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
+                            {{ getFormattedValue(item, col, idx) }}
                           </button>
                         }
                       } @else if (col.type === 'action' && col.actions && col.actions.length > 0) {

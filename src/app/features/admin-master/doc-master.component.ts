@@ -403,7 +403,7 @@ export class DocMasterComponent implements OnInit, AfterViewInit {
 
   getRowClass = (item: any): string => {
     const isInactive = item.status === 'Inactive';
-    return isInactive ? 'opacity-50 bg-slate-100/70 transition-colors' : 'bg-white transition-colors';
+    return isInactive ? 'opacity-50 !bg-slate-100/70 transition-colors' : 'bg-white transition-colors';
   };
 
   closeDropdownIfOutside(target: HTMLElement | null): void {

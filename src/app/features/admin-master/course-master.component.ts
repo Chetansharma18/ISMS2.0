@@ -55,7 +55,7 @@ const CONFIG: MasterCrudConfig<CourseMasterItem> = {
   searchFields: ['sector', 'jobRoleName', 'jobRoleCode'],
   itemUnit: 'courses',
   columns: COLUMNS,
-  hasStatus: false,
+  hasStatus: true,
   modalWidthClass: 'max-w-[720px]',
   fields: [
     { key: 'sector', label: 'Sector', type: 'select', required: true, options: SECTOR_OPTIONS, colSpan: 2 },
@@ -97,7 +97,8 @@ const CONFIG: MasterCrudConfig<CourseMasterItem> = {
     itSoftSkillTrainingHours: Number(formData.itSoftSkillTrainingHours) || 0,
     totalQpHours: Number(formData.totalQpHours) || 0,
     courseValidUpToDate: (formData.courseValidUpToDate || '').trim() || '-',
-    remark: (formData.remark || '').trim() || 'New Version'
+    remark: (formData.remark || '').trim() || 'New Version',
+    status: formData.status || 'Active'
   }),
   deleteConfirmText: (item) => `Are you sure you want to delete course "${item.jobRoleName}" (${item.jobRoleCode})?`
 };

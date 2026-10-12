@@ -119,9 +119,26 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
         </span>
       </ng-template>
 
-      <!-- Action cell template: Edit + Active/Inactive toggle -->
+      <!-- Action cell template: View + Edit + Active/Inactive toggle -->
       <ng-template #actionTemplate let-item>
         <div class="flex items-center justify-center whitespace-nowrap">
+          <!-- View Button -->
+          <button
+            type="button"
+            (click)="$event.stopPropagation(); openViewModal(item)"
+            class="inline-flex items-center gap-1 text-sky-600 hover:text-sky-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
+            title="View Details"
+          >
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span>View</span>
+          </button>
+
+          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
+
+          <!-- Edit Button -->
           <button
             type="button"
             (click)="$event.stopPropagation(); openEditModal(item)"
@@ -134,32 +151,32 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
             <span>Edit</span>
           </button>
 
-          @if (config.hasStatus) {
-            <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
-            <div class="inline-flex items-center gap-1.5" title="Toggle Status" (click)="$event.stopPropagation()">
-              <button
-                type="button"
-                (click)="toggleStatus(item)"
-                class="relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-                [ngClass]="item.status === 'Inactive' ? 'bg-slate-400 hover:bg-slate-500' : 'bg-emerald-500 hover:bg-emerald-600'"
-                role="switch"
-                [attr.aria-checked]="item.status === 'Active'"
-              >
-                <span class="sr-only">Toggle Active Status</span>
-                <span
-                  class="pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                  [ngClass]="item.status === 'Inactive' ? 'translate-x-0' : 'translate-x-3'"
-                ></span>
-              </button>
+          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
+
+          <!-- Active / Inactive Toggle -->
+          <div class="inline-flex items-center gap-1.5" title="Toggle Status" (click)="$event.stopPropagation()">
+            <button
+              type="button"
+              (click)="toggleStatus(item)"
+              class="relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              [ngClass]="item.status === 'Inactive' ? 'bg-slate-500 hover:bg-slate-600' : 'bg-emerald-500 hover:bg-emerald-600'"
+              role="switch"
+              [attr.aria-checked]="item.status !== 'Inactive'"
+            >
+              <span class="sr-only">Toggle Active Status</span>
               <span
-                class="font-medium text-[12px] select-none transition-colors cursor-pointer"
-                (click)="toggleStatus(item)"
-                [ngClass]="item.status === 'Inactive' ? 'text-slate-500 hover:text-slate-700' : 'text-emerald-600 hover:text-emerald-700'"
-              >
-                {{ item.status === 'Inactive' ? 'Inactive' : 'Active' }}
-              </span>
-            </div>
-          }
+                class="pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                [ngClass]="item.status === 'Inactive' ? 'translate-x-0' : 'translate-x-3'"
+              ></span>
+            </button>
+            <span
+              class="font-medium text-[12px] select-none transition-colors cursor-pointer"
+              (click)="toggleStatus(item)"
+              [ngClass]="item.status === 'Inactive' ? 'text-slate-700 font-semibold hover:text-slate-900' : 'text-emerald-600 hover:text-emerald-700'"
+            >
+              {{ item.status === 'Inactive' ? 'Inactive' : 'Active' }}
+            </span>
+          </div>
         </div>
       </ng-template>
 
@@ -337,6 +354,54 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
         </div>
       </app-action-modal>
 
+      <!-- View Details Modal -->
+      <app-action-modal
+        [isOpen]="showViewModal()"
+        [showCloseButton]="true"
+        [closeOnBackdrop]="true"
+        [showAccentBar]="false"
+        primaryLabel=""
+        secondaryLabel="Close"
+        [maxWidthClass]="config.modalWidthClass || 'max-w-[500px]'"
+        (secondaryAction)="closeViewModal()"
+        (close)="closeViewModal()"
+      >
+        <h2 class="m-0 text-brand-dark" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+          {{ config.entityLabel }} Details
+        </h2>
+
+        @if (selectedViewItem(); as viewItem) {
+          <div class="mt-4 font-sans text-[13px] space-y-3.5 divide-y divide-slate-100 max-h-[65vh] overflow-y-auto pr-1">
+            @for (col of viewableColumns(); track col.key) {
+              <div class="pt-2.5 flex flex-col gap-1 first:pt-0">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">{{ col.label }}</span>
+                @if (isTagArray(col.key, viewItem)) {
+                  <div class="flex flex-wrap gap-1.5 pt-0.5">
+                    @for (tag of viewItem[col.key]; track tag) {
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-sky-50 text-brand border border-sky-200">
+                        {{ tag }}
+                      </span>
+                    }
+                  </div>
+                } @else {
+                  <span class="text-sm font-medium text-slate-800 break-words">{{ formatViewValue(col, viewItem) }}</span>
+                }
+              </div>
+            }
+
+            <div class="pt-3 flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</span>
+              <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border select-none"
+                [ngClass]="viewItem.status === 'Inactive' ? 'bg-slate-50 text-slate-600 border-slate-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'"
+              >
+                {{ viewItem.status === 'Inactive' ? 'Inactive' : 'Active' }}
+              </span>
+            </div>
+          </div>
+        }
+      </app-action-modal>
+
     </div>
   `
 })
@@ -394,10 +459,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
 
   private buildColumns(): void {
     const cols = [...this.config.columns];
-    if (this.config.hasStatus) {
-      cols.push({ key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'w-28' });
-    }
-    cols.push({ key: 'action', label: 'Action', align: 'center', type: 'custom', width: 'min-w-[100px]' });
+    cols.push({ key: 'action', label: 'Action', align: 'center', type: 'custom', width: 'min-w-[210px]' });
     this.tableColumns.set(cols);
   }
 
@@ -615,15 +677,55 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     });
   }
 
+  showViewModal = signal<boolean>(false);
+  selectedViewItem = signal<any | null>(null);
+
+  readonly viewableColumns = computed(() => {
+    return this.config.columns.filter(c => c.key !== 'sNo' && c.key !== 'action' && c.key !== 'status');
+  });
+
+  isTagsColumn(key: string): boolean {
+    return !!this.config.tagsColumns?.includes(key);
+  }
+
+  isTagArray(key: string, item: any): boolean {
+    return this.isTagsColumn(key) && Array.isArray(item[key]);
+  }
+
+  formatViewValue(col: TableColumn<T>, item: any): string {
+    const val = item[col.key];
+    if (col.format) {
+      return col.format(val, item, 0);
+    }
+    if (val === null || val === undefined || val === '') {
+      return '-';
+    }
+    if (Array.isArray(val)) {
+      return val.join(', ');
+    }
+    return String(val);
+  }
+
+  openViewModal(item: any): void {
+    this.selectedViewItem.set(item);
+    this.showViewModal.set(true);
+  }
+
+  closeViewModal(): void {
+    this.showViewModal.set(false);
+    this.selectedViewItem.set(null);
+  }
+
   toggleStatus(item: any): void {
-    const newStatus = item.status === 'Active' ? 'Inactive' : 'Active';
+    const currentStatus = item.status === 'Inactive' ? 'Inactive' : 'Active';
+    const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
     this.repo.update(item.id, { status: newStatus } as any).subscribe((updated: T) => {
-      this.items.update(current => current.map((it: any) => (it.id === item.id ? updated : it)));
+      this.items.update(current => current.map((it: any) => (it.id === item.id ? { ...it, status: newStatus } : it)));
     });
   }
 
   getRowClass = (item: any): string => {
     const isInactive = item.status === 'Inactive';
-    return isInactive ? 'opacity-50 bg-slate-50 transition-colors' : 'bg-white transition-colors';
+    return isInactive ? 'opacity-50 !bg-slate-100/70 transition-colors' : 'bg-white transition-colors';
   };
 }

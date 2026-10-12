@@ -15,6 +15,7 @@ export interface CourseMasterItem {
   totalQpHours: number;
   courseValidUpToDate: string;
   remark: string;
+  status?: 'Active' | 'Inactive';
 }
 
 export interface SectorMasterItem {

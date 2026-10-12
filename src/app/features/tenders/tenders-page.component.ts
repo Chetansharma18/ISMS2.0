@@ -102,7 +102,6 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
               (manageCommittee)="openAddCommitteeModal($event)"
               (editScheme)="editScheme($event)"
               (toggleActive)="toggleActiveStatus($event)"
-              (freezeScheme)="freezeScheme($event)"
             ></app-scheme-row-actions>
           </ng-template>
 
@@ -346,8 +345,11 @@ export class TendersPageComponent {
     }
   ]);
 
-  getRowClass = (_item: SchemeTender): string => {
-    return 'bg-white cursor-pointer hover:bg-slate-100/90 transition-colors';
+  getRowClass = (item: SchemeTender): string => {
+    const isInactive = item.isActive === false;
+    return isInactive
+      ? 'opacity-50 !bg-slate-100/70 cursor-pointer hover:!bg-slate-200/80 transition-colors'
+      : 'bg-white cursor-pointer hover:bg-slate-100/90 transition-colors';
   };
 
   onRowClick(scheme: SchemeTender): void {
@@ -443,16 +445,9 @@ export class TendersPageComponent {
 
   toggleActiveStatus(scheme: SchemeTender): void {
     if (!this.isSuperAdmin() || scheme.isFrozen) return;
-    scheme.isActive = scheme.isActive === false ? true : false;
-    this.schemeService.updateScheme(scheme.refNo, scheme).subscribe();
-  }
-
-  freezeScheme(scheme: SchemeTender): void {
-    if (!this.isSuperAdmin() || scheme.isFrozen) return;
-    if (confirm(`Are you sure you want to freeze "${scheme.schemeName}"? This action cannot be undone.`)) {
-      scheme.isFrozen = true;
-      this.schemeService.updateScheme(scheme.refNo, scheme).subscribe();
-    }
+    const newActive = scheme.isActive === false ? true : false;
+    scheme.isActive = newActive;
+    this.schemeService.updateScheme(scheme.refNo, { isActive: newActive }).subscribe();
   }
 
   // ---- Committee assignment ------------------------------------------------

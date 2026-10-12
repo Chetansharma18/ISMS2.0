@@ -80,7 +80,7 @@ import { isEditDisabled } from './tenders-page.util';
             [disabled]="item().isFrozen"
             (click)="!item().isFrozen ? toggleActive.emit(item()) : null"
             class="relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-            [ngClass]="item().isFrozen ? 'bg-slate-300 cursor-not-allowed' : (item().isActive === false ? 'bg-slate-400 hover:bg-slate-500' : 'bg-emerald-500 hover:bg-emerald-600')"
+            [ngClass]="item().isFrozen ? 'bg-slate-300 cursor-not-allowed' : (item().isActive === false ? 'bg-slate-500 hover:bg-slate-600' : 'bg-emerald-500 hover:bg-emerald-600')"
             role="switch"
             [attr.aria-checked]="item().isActive !== false"
           >
@@ -93,28 +93,11 @@ import { isEditDisabled } from './tenders-page.util';
           <span 
             class="font-medium text-[12px] select-none transition-colors cursor-pointer"
             (click)="!item().isFrozen ? toggleActive.emit(item()) : null"
-            [ngClass]="item().isFrozen ? 'text-slate-400 cursor-not-allowed' : (item().isActive === false ? 'text-slate-500 hover:text-slate-700' : 'text-emerald-600 hover:text-emerald-700')"
+            [ngClass]="item().isFrozen ? 'text-slate-400 cursor-not-allowed' : (item().isActive === false ? 'text-slate-700 font-semibold hover:text-slate-900' : 'text-emerald-600 hover:text-emerald-700')"
           >
             {{ item().isActive === false ? 'Inactive' : 'Active' }}
           </span>
         </div>
-
-        <div class="h-3.5 w-[1px] bg-slate-300 shrink-0"></div>
-
-        <!-- Freeze Button -->
-        <button
-          type="button"
-          [disabled]="item().isFrozen"
-          (click)="$event.stopPropagation(); !item().isFrozen ? freezeScheme.emit(item()) : null"
-          [ngClass]="item().isFrozen ? 'text-slate-400 cursor-not-allowed' : 'text-blue-600 hover:text-blue-800 hover:underline cursor-pointer'"
-          class="inline-flex items-center gap-1 font-medium text-[12px] select-none transition-colors"
-          title="Freeze EOI Configuration"
-        >
-          <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
-          <span>{{ item().isFrozen ? 'Frozen' : 'Freeze' }}</span>
-        </button>
       }
     </div>
   `
@@ -127,7 +110,6 @@ export class SchemeRowActionsComponent {
   readonly manageCommittee = output<SchemeTender>();
   readonly editScheme = output<SchemeTender>();
   readonly toggleActive = output<SchemeTender>();
-  readonly freezeScheme = output<SchemeTender>();
 
   protected readonly isEditDisabled = isEditDisabled;
 }

@@ -256,6 +256,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/master/doc',
+    loadComponent: () =>
+      import('./features/admin-master/doc-master.component').then(
+        (m) => m.DocMasterComponent
+      )
+  },
+  {
     path: 'admin/user-management',
     loadComponent: () =>
       import('./features/user-management/user-management.component').then(

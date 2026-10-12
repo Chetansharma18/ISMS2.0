@@ -328,10 +328,10 @@ export const MOCK_PERMISSION_MASTER_ITEMS: PermissionMasterItem[] = resolveMock(
 ]);
 
 export const MOCK_SCHEME_MASTER_ITEMS: SchemeMasterItem[] = resolveMock([
-  { sNo: 1, id: 'sch-1', schemeName: 'Chief Minister Skill Development Scheme', schemeCategory: 'SAMARTH', categoryName: 'GENERAL', amount: 5000000, processFees: 10000, status: 'Active' },
-  { sNo: 2, id: 'sch-2', schemeName: 'Mukhyamantri Yuva Swavalamban Yojana', schemeCategory: 'SAKSHM', categoryName: 'GOVERNMENT INSTITUTION/PSU', amount: 7500000, processFees: 15000, status: 'Active' },
-  { sNo: 3, id: 'sch-3', schemeName: 'Empanelment of Assessment Agencies EOI', schemeCategory: 'RAJVIK', categoryName: 'GOVERNMENT INSTITUTION/INSTITUTION', amount: 2500000, processFees: 5000, status: 'Active' },
-  { sNo: 4, id: 'sch-4', schemeName: 'Recruit-Train-Deploy (RTD) Category III', schemeCategory: 'SAMARTH', categoryName: 'SPECIAL TARGET GROUP', amount: 10000000, processFees: 25000, status: 'Active' }
+  { sNo: 1, id: 'sch-1', schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana', schemeCategory: 'Rajvik', categoryName: 'GENERAL', amount: 5000000, processFees: 10000, status: 'Active' },
+  { sNo: 2, id: 'sch-2', schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)', schemeCategory: 'samarth', categoryName: 'GOVERNMENT INSTITUTION/PSU', amount: 7500000, processFees: 15000, status: 'Active' },
+  { sNo: 3, id: 'sch-3', schemeName: 'Mukhyamantri Yuva Sambal Yojana', schemeCategory: 'saksham', categoryName: 'GOVERNMENT INSTITUTION/INSTITUTION', amount: 2500000, processFees: 5000, status: 'Active' },
+  { sNo: 4, id: 'sch-4', schemeName: 'Mukhya Mantri Yuva Kaushal Yojana', schemeCategory: 'Rajvik, samarth', categoryName: 'SPECIAL TARGET GROUP', amount: 10000000, processFees: 25000, status: 'Active' }
 ]);
 
 export const MOCK_USER_ROLE_MASTER_ITEMS: UserRoleMasterItem[] = resolveMock([

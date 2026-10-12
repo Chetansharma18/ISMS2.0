@@ -144,6 +144,15 @@ import { PermissionService } from '../../permissions/permission.service';
                     <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
                     <span class="truncate">Designation</span>
                   </a>
+
+                  <a
+                    routerLink="/admin/master/doc"
+                    routerLinkActive="bg-primary-light text-brand font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">Doc Master</span>
+                  </a>
                 </div>
               }
             </div>

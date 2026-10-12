@@ -103,6 +103,17 @@ export class MockDatabaseService {
           const sanitized = stored.filter(item => item?.status !== 'Closed');
           this.store.set(key, sanitized);
           this.saveToStorage(key, sanitized);
+        } else if (key === 'SCHEME_MASTERS') {
+          const hasTargetSchemes = stored.some(
+            item => item?.schemeName === 'Vishwakarma Yuva Udyami Protsahan Yojana'
+          );
+          if (!hasTargetSchemes) {
+            const fresh = this.deepClone(this.seeds[key]);
+            this.store.set(key, fresh);
+            this.saveToStorage(key, fresh);
+          } else {
+            this.store.set(key, stored);
+          }
         } else {
           this.store.set(key, stored);
         }

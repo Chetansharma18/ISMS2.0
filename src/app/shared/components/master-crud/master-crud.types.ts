@@ -1,6 +1,6 @@
 import { TableColumn } from '../table/table.types';
 
-export type MasterFieldType = 'text' | 'number' | 'textarea' | 'select' | 'permissions';
+export type MasterFieldType = 'text' | 'number' | 'textarea' | 'select' | 'multiselect' | 'permissions';
 
 export interface MasterFieldConfig<T = any> {
   /** Key on the form data object (not necessarily the same as the entity key) */

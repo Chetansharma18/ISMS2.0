@@ -9,7 +9,7 @@ import { SchemeMasterItem } from '../../core/models/admin-masters.model';
 
 export type { SchemeMasterItem };
 
-const SCHEME_CATEGORY_OPTIONS = ['SAMARTH', 'SAKSHM', 'RAJVIK', 'ESTP', 'DDU-GKY'];
+const SCHEME_CATEGORY_OPTIONS = ['ALL', 'Rajvik', 'samarth', 'saksham', 'na'];
 const CATEGORY_NAME_OPTIONS = [
   'GENERAL',
   'GOVERNMENT INSTITUTION/PSU',
@@ -50,21 +50,23 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
   modalWidthClass: 'max-w-[560px]',
   fields: [
     { key: 'schemeName', label: 'Scheme Name', type: 'text', required: true, maxLength: 120, placeholder: 'Enter scheme name', colSpan: 3 },
-    { key: 'schemeCategory', label: 'Scheme Category', type: 'select', required: true, options: SCHEME_CATEGORY_OPTIONS, colSpan: 2 },
+    { key: 'schemeCategory', label: 'Scheme Category', type: 'multiselect', required: true, options: SCHEME_CATEGORY_OPTIONS, colSpan: 2 },
     { key: 'categoryName', label: 'Category Name', type: 'select', required: true, options: CATEGORY_NAME_OPTIONS, colSpan: 1 },
     { key: 'amount', label: 'EMD amount (\u20B9)', type: 'number', required: true, min: 0, placeholder: 'Enter amount', colSpan: 2 },
     { key: 'processFees', label: 'Process Fees (\u20B9)', type: 'number', required: true, min: 0, placeholder: 'Enter process fees', colSpan: 1 }
   ],
   createDefaults: () => ({
     schemeName: '',
-    schemeCategory: '',
+    schemeCategory: [],
     categoryName: '',
     amount: null,
     processFees: null
   }),
   buildPayload: (formData) => ({
     schemeName: formData.schemeName.trim(),
-    schemeCategory: formData.schemeCategory.trim(),
+    schemeCategory: Array.isArray(formData.schemeCategory)
+      ? formData.schemeCategory.join(', ')
+      : String(formData.schemeCategory || '').trim(),
     categoryName: formData.categoryName.trim(),
     amount: Number(formData.amount),
     processFees: Number(formData.processFees),

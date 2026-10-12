@@ -10,7 +10,8 @@ import {
   signal,
   computed,
   inject,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  HostListener
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
@@ -180,7 +181,12 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
           {{ editingId() ? 'Edit' : 'Add New' }} {{ config.entityLabel }}
         </h2>
 
-        <div class="mt-4 font-sans text-[13px] space-y-4 max-h-[65vh] overflow-y-auto pr-1">
+        <div
+          class="mt-4 font-sans text-[13px] space-y-4 max-h-[65vh] overflow-y-auto pr-1"
+          (pointerdown)="closeMultiselectIfOutside($any($event.target))"
+          (click)="closeMultiselectIfOutside($any($event.target))"
+          (focusin)="closeMultiselectIfOutside($any($event.target))"
+        >
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             @for (field of config.fields; track field.key) {
               <div [ngClass]="colSpanClass(field)">
@@ -195,12 +201,14 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                       [attr.maxlength]="field.maxLength || null"
                       [placeholder]="field.placeholder || ''"
                       [(ngModel)]="formData[field.key]"
+                      (focus)="openMultiselectField.set(null)"
                       class="w-full px-2.5 py-2 border border-field-border rounded focus:outline-none focus:border-primary text-slate-800"
                     ></textarea>
                   }
                   @case ('select') {
                     <select
                       [(ngModel)]="formData[field.key]"
+                      (focus)="openMultiselectField.set(null)"
                       [ngClass]="fieldInvalid(field) ? 'border-red-500' : 'border-field-border'"
                       class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white"
                     >
@@ -210,12 +218,59 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                       }
                     </select>
                   }
+                  @case ('multiselect') {
+                    <div class="relative multiselect-container">
+                      <button
+                        type="button"
+                        (click)="toggleMultiselect(field.key, $event)"
+                        class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white flex items-center justify-between text-left cursor-pointer"
+                        [ngClass]="fieldInvalid(field) ? 'border-red-500' : 'border-field-border'"
+                      >
+                        <span class="truncate text-xs sm:text-[13px]" [class.text-slate-400]="!formData[field.key] || formData[field.key].length === 0">
+                          {{ getMultiselectLabel(field) }}
+                        </span>
+                        <svg
+                          class="w-4 h-4 text-slate-400 shrink-0 ml-2 transition-transform duration-200"
+                          [class.rotate-180]="openMultiselectField() === field.key"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+
+                      @if (openMultiselectField() === field.key) {
+                        <div
+                          class="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-lg border border-slate-200 shadow-xl overflow-hidden font-sans max-h-52 overflow-y-auto"
+                          role="listbox"
+                        >
+                          <div class="py-1 divide-y divide-slate-100 text-xs sm:text-[13px]">
+                            @for (opt of resolveOptions(field); track opt) {
+                              <label
+                                class="flex items-center gap-2.5 px-3 py-2 hover:bg-slate-50 cursor-pointer text-slate-700 select-none transition-colors"
+                              >
+                                <input
+                                  type="checkbox"
+                                  [checked]="isMultiselectOptionChecked(field, opt)"
+                                  (change)="toggleMultiselectOption(field, opt)"
+                                  class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary cursor-pointer accent-primary"
+                                />
+                                <span [class.font-semibold]="opt === 'ALL'">{{ opt }}</span>
+                              </label>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
                   @case ('number') {
                     <input
                       type="number"
                       [min]="field.min ?? 0"
                       [placeholder]="field.placeholder || ''"
                       [(ngModel)]="formData[field.key]"
+                      (focus)="openMultiselectField.set(null)"
                       [ngClass]="fieldInvalid(field) ? 'border-red-500' : 'border-field-border'"
                       class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-primary text-slate-800"
                     />
@@ -224,6 +279,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                     <div class="flex items-center gap-2">
                       <select
                         [(ngModel)]="pendingPermission"
+                        (focus)="openMultiselectField.set(null)"
                         class="flex-1 px-2.5 py-2 border border-field-border rounded focus:outline-none focus:border-primary text-slate-800 bg-white"
                       >
                         <option value="" disabled selected>Select permission to add...</option>
@@ -265,6 +321,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                       [attr.maxlength]="field.maxLength || null"
                       [placeholder]="field.placeholder || ''"
                       [(ngModel)]="formData[field.key]"
+                      (focus)="openMultiselectField.set(null)"
                       [ngClass]="[fieldInvalid(field) ? 'border-red-500' : 'border-field-border', field.uppercase ? 'font-mono text-xs' : '']"
                       class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-primary text-slate-800"
                     />
@@ -400,11 +457,103 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     return !val || !String(val).trim();
   }
 
+  openMultiselectField = signal<string | null>(null);
+
+  closeMultiselectIfOutside(target: HTMLElement | null): void {
+    if (!target || !target.closest('.multiselect-container')) {
+      this.openMultiselectField.set(null);
+    }
+  }
+
+  @HostListener('document:pointerdown', ['$event'])
+  onDocumentPointerDown(event: PointerEvent): void {
+    this.closeMultiselectIfOutside(event.target as HTMLElement);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    this.closeMultiselectIfOutside(event.target as HTMLElement);
+  }
+
+  @HostListener('document:focusin', ['$event'])
+  onDocumentFocusIn(event: FocusEvent): void {
+    this.closeMultiselectIfOutside(event.target as HTMLElement);
+  }
+
+  toggleMultiselect(fieldKey: string, event?: Event): void {
+    if (event) event.stopPropagation();
+    this.openMultiselectField.update((current) => (current === fieldKey ? null : fieldKey));
+  }
+
+  isMultiselectOptionChecked(field: MasterFieldConfig, opt: string): boolean {
+    const selected: string[] = this.formData[field.key] || [];
+    if (opt === 'ALL') {
+      const allApplicable = this.resolveOptions(field).filter(
+        (o) => o !== 'ALL' && o.toLowerCase() !== 'na'
+      );
+      return allApplicable.length > 0 && allApplicable.every((o) => selected.includes(o));
+    }
+    return selected.includes(opt);
+  }
+
+  toggleMultiselectOption(field: MasterFieldConfig, opt: string): void {
+    const current: string[] = Array.isArray(this.formData[field.key])
+      ? [...this.formData[field.key]]
+      : [];
+    const allApplicable = this.resolveOptions(field).filter(
+      (o) => o !== 'ALL' && o.toLowerCase() !== 'na'
+    );
+
+    if (opt === 'ALL') {
+      const allSelected = allApplicable.every((o) => current.includes(o));
+      if (allSelected) {
+        // Deselect all applicable options, preserve 'na' if it was selected
+        this.formData[field.key] = current.filter((o) => !allApplicable.includes(o));
+      } else {
+        // Select all applicable options (does NOT select 'na')
+        const naSelected = current.filter((o) => o.toLowerCase() === 'na');
+        this.formData[field.key] = [...allApplicable, ...naSelected];
+      }
+    } else {
+      const index = current.indexOf(opt);
+      if (index >= 0) {
+        current.splice(index, 1);
+      } else {
+        current.push(opt);
+      }
+      this.formData[field.key] = current;
+    }
+  }
+
+  getMultiselectLabel(field: MasterFieldConfig): string {
+    const selected: string[] = this.formData[field.key] || [];
+    if (!selected || selected.length === 0) {
+      return `Select ${field.label}`;
+    }
+    const allApplicable = this.resolveOptions(field).filter(
+      (o) => o !== 'ALL' && o.toLowerCase() !== 'na'
+    );
+    const hasAllApplicable =
+      allApplicable.length > 0 && allApplicable.every((o) => selected.includes(o));
+
+    if (hasAllApplicable) {
+      const hasNa = selected.some((o) => o.toLowerCase() === 'na');
+      return hasNa ? 'ALL, na' : 'ALL';
+    }
+    return selected.join(', ');
+  }
+
   openAddModal(): void {
     this.editingId.set(null);
     this.submitted.set(false);
     this.pendingPermission = '';
+    this.openMultiselectField.set(null);
     this.formData = this.config.createDefaults();
+    for (const f of this.config.fields) {
+      if (f.type === 'multiselect' && !Array.isArray(this.formData[f.key])) {
+        this.formData[f.key] = [];
+      }
+    }
     this.showModal.set(true);
   }
 
@@ -412,12 +561,24 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     this.editingId.set((item as any).id);
     this.submitted.set(false);
     this.pendingPermission = '';
+    this.openMultiselectField.set(null);
     this.formData = { ...this.config.createDefaults(), ...item };
+    for (const f of this.config.fields) {
+      if (f.type === 'multiselect') {
+        const val = this.formData[f.key];
+        if (typeof val === 'string') {
+          this.formData[f.key] = val.split(',').map((s: string) => s.trim()).filter(Boolean);
+        } else if (!Array.isArray(val)) {
+          this.formData[f.key] = [];
+        }
+      }
+    }
     this.showModal.set(true);
   }
 
   closeModal(): void {
     this.showModal.set(false);
+    this.openMultiselectField.set(null);
   }
 
   submit(): void {

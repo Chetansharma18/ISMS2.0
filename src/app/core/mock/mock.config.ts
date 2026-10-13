@@ -51,7 +51,8 @@ export const MOCK_CONFIG: MockConfigSettings = {
     PERMISSIONS: true,
     SCHEME_MASTERS: true,
     SCHEME_CATEGORIES: true,
-    USER_ROLES: true
+    USER_ROLES: true,
+    REMARK_MASTERS: true
   }
 };
 

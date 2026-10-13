@@ -270,6 +270,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/master/remark',
+    loadComponent: () =>
+      import('./features/admin-master/remark-master.component').then(
+        (m) => m.RemarkMasterComponent
+      )
+  },
+  {
     path: 'admin/user-management',
     loadComponent: () =>
       import('./features/user-management/user-management.component').then(

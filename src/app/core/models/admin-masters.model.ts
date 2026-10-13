@@ -97,3 +97,11 @@ export interface DocMasterItem {
   documents: string;
   status: 'Active' | 'Inactive';
 }
+
+export interface RemarkMasterItem {
+  id: string;
+  sNo?: number;
+  remarkType: string;
+  description: string;
+  status: 'Active' | 'Inactive';
+}

@@ -9,7 +9,8 @@ import {
   PermissionMasterItem,
   SchemeMasterItem,
   UserRoleMasterItem,
-  SchemeCategoryMasterItem
+  SchemeCategoryMasterItem,
+  RemarkMasterItem
 } from '../../models/admin-masters.model';
 
 // Types live in core/models; re-exported so existing imports keep working.
@@ -22,7 +23,8 @@ export type {
   PermissionMasterItem,
   SchemeMasterItem,
   UserRoleMasterItem,
-  SchemeCategoryMasterItem
+  SchemeCategoryMasterItem,
+  RemarkMasterItem
 };
 
 export const MOCK_COURSE_MASTER_ITEMS: CourseMasterItem[] = resolveMock([
@@ -347,5 +349,36 @@ export const MOCK_SCHEME_CATEGORY_MASTER_ITEMS: SchemeCategoryMasterItem[] = res
   { sNo: 3, id: 'sc-3', categoryName: 'saksham', schemeName: 'saksham', status: 'Active' },
   { sNo: 4, id: 'sc-4', categoryName: 'na', schemeName: 'na', status: 'Active' },
   { sNo: 5, id: 'sc-5', categoryName: 'ALL', schemeName: 'ALL', status: 'Active' }
+]);
+
+export const MOCK_REMARK_MASTER_ITEMS: RemarkMasterItem[] = resolveMock([
+  {
+    sNo: 1,
+    id: 'rem-1',
+    remarkType: 'Positive remark',
+    description: 'All submitted compliance documents verified and approved.',
+    status: 'Active'
+  },
+  {
+    sNo: 2,
+    id: 'rem-2',
+    remarkType: 'Positive remark',
+    description: 'Infrastructure and training center facilities meet required standards.',
+    status: 'Active'
+  },
+  {
+    sNo: 3,
+    id: 'rem-3',
+    remarkType: 'Negative remark',
+    description: 'Discrepancy observed in financial turnover documents.',
+    status: 'Active'
+  },
+  {
+    sNo: 4,
+    id: 'rem-4',
+    remarkType: 'Negative remark',
+    description: 'Incomplete trainer certification details provided.',
+    status: 'Active'
+  }
 ]);
 

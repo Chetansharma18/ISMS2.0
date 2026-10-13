@@ -10,7 +10,8 @@ import {
   SchemeMasterItem,
   UserRoleMasterItem,
   SchemeCategoryMasterItem,
-  RemarkMasterItem
+  RemarkMasterItem,
+  GradingMasterItem
 } from '../../models/admin-masters.model';
 
 // Types live in core/models; re-exported so existing imports keep working.
@@ -24,7 +25,8 @@ export type {
   SchemeMasterItem,
   UserRoleMasterItem,
   SchemeCategoryMasterItem,
-  RemarkMasterItem
+  RemarkMasterItem,
+  GradingMasterItem
 };
 
 export const MOCK_COURSE_MASTER_ITEMS: CourseMasterItem[] = resolveMock([
@@ -378,6 +380,54 @@ export const MOCK_REMARK_MASTER_ITEMS: RemarkMasterItem[] = resolveMock([
     id: 'rem-4',
     remarkType: 'Negative remark',
     description: 'Incomplete trainer certification details provided.',
+    status: 'Active'
+  }
+]);
+
+export const MOCK_GRADING_MASTER_ITEMS: GradingMasterItem[] = resolveMock([
+  {
+    sNo: 1,
+    id: 'grade-1',
+    grade: 'A+',
+    minimum: 85,
+    maximum: 100,
+    range: '85 - 100',
+    status: 'Active'
+  },
+  {
+    sNo: 2,
+    id: 'grade-2',
+    grade: 'A',
+    minimum: 70,
+    maximum: 84,
+    range: '70 - 84',
+    status: 'Active'
+  },
+  {
+    sNo: 3,
+    id: 'grade-3',
+    grade: 'B',
+    minimum: 55,
+    maximum: 69,
+    range: '55 - 69',
+    status: 'Active'
+  },
+  {
+    sNo: 4,
+    id: 'grade-4',
+    grade: 'C',
+    minimum: 40,
+    maximum: 54,
+    range: '40 - 54',
+    status: 'Active'
+  },
+  {
+    sNo: 5,
+    id: 'grade-5',
+    grade: 'D',
+    minimum: 0,
+    maximum: 39,
+    range: '0 - 39',
     status: 'Active'
   }
 ]);

@@ -105,3 +105,13 @@ export interface RemarkMasterItem {
   description: string;
   status: 'Active' | 'Inactive';
 }
+
+export interface GradingMasterItem {
+  id: string;
+  sNo?: number;
+  grade: string;
+  minimum: number;
+  maximum: number;
+  range: string;
+  status: 'Active' | 'Inactive';
+}

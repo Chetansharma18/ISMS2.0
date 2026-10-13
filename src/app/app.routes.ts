@@ -277,6 +277,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/master/grading',
+    loadComponent: () =>
+      import('./features/admin-master/grading-master.component').then(
+        (m) => m.GradingMasterComponent
+      )
+  },
+  {
     path: 'admin/user-management',
     loadComponent: () =>
       import('./features/user-management/user-management.component').then(

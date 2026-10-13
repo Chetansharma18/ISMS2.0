@@ -175,6 +175,12 @@ export const API_ENDPOINTS = {
     UPDATE: { url: (id: string | number) => `/masters/remarks/${id}`, method: 'PUT' as ApiMethod },
     DELETE: { url: (id: string | number) => `/masters/remarks/${id}`, method: 'DELETE' as ApiMethod }
   },
+  GRADING_MASTERS: {
+    LIST: { url: '/masters/gradings', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/gradings', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/gradings/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/gradings/${id}`, method: 'DELETE' as ApiMethod }
+  },
 
   // Grievance Redressal (DataKey: 'GRIEVANCES')
   GRIEVANCES: {

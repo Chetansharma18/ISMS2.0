@@ -9,7 +9,7 @@ import {
   TableComponent,
   TableColumn
 } from '../../shared';
-import { DistrictBlockMasterItem, UserRoleMasterItem } from '../../core/models/admin-masters.model';
+import { DistrictBlockMasterItem, UserRoleMasterItem, SchemeMasterItem, DesignationMasterItem } from '../../core/models/admin-masters.model';
 import { UserManagementItem } from '../../core/models/user-management.model';
 import {
   ConfirmModalData,
@@ -166,6 +166,8 @@ export type { UserManagementItem };
         [roleTypeOptions]="roleTypeOptions()"
         [districtOptions]="districtOptions()"
         [districtMasterItems]="districtMasterItems()"
+        [schemeOptions]="schemeOptions()"
+        [designationOptions]="designationOptions()"
         (save)="submitUser()"
         (cancelled)="closeModal()"
       />
@@ -202,12 +204,16 @@ export class UserManagementComponent {
   private userRepo = this.dataEngine.for<UserManagementItem>('USERS');
   private roleRepo = this.dataEngine.for<UserRoleMasterItem>('USER_ROLES');
   private districtRepo = this.dataEngine.for<DistrictBlockMasterItem>('DISTRICTS');
+  private schemeRepo = this.dataEngine.for<SchemeMasterItem>('SCHEME_MASTERS');
+  private designationRepo = this.dataEngine.for<DesignationMasterItem>('DESIGNATIONS');
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
 
   users = signal<UserManagementItem[]>([]);
   userRoles = signal<UserRoleMasterItem[]>([]);
   districtMasterItems = signal<DistrictBlockMasterItem[]>([]);
+  schemeMasterItems = signal<SchemeMasterItem[]>([]);
+  designationMasterItems = signal<DesignationMasterItem[]>([]);
 
   constructor() {
     this.userRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => this.users.set(list));
@@ -219,6 +225,14 @@ export class UserManagementComponent {
       const active = list.filter(d => d.status !== 'Inactive');
       this.districtMasterItems.set(active.length > 0 ? active : list);
     });
+    this.schemeRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => {
+      const active = list.filter(s => s.status !== 'Inactive');
+      this.schemeMasterItems.set(active.length > 0 ? active : list);
+    });
+    this.designationRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => {
+      const active = list.filter(d => d.status !== 'Inactive');
+      this.designationMasterItems.set(active.length > 0 ? active : list);
+    });
 
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       if (params['filter'] === 'blacklisted') {
@@ -228,6 +242,24 @@ export class UserManagementComponent {
       }
     });
   }
+
+  readonly designationOptions = computed(() => {
+    const names = this.designationMasterItems().map(d => d.designationName).filter(Boolean);
+    return Array.from(new Set(names));
+  });
+
+  readonly schemeOptions = computed(() => {
+    const schemes = this.schemeMasterItems().map(s => s.schemeName).filter(Boolean);
+    const unique = Array.from(new Set(schemes));
+    return unique.length > 0
+      ? unique
+      : [
+          'Vishwakarma Yuva Udyami Protsahan Yojana',
+          'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+          'Mukhyamantri Yuva Sambal Yojana',
+          'Mukhya Mantri Yuva Kaushal Yojana'
+        ];
+  });
 
   readonly roleTypeOptions = computed(() => {
     const roles = this.userRoles().map(r => r.roleTypeName).filter(Boolean);

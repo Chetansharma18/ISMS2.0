@@ -119,6 +119,7 @@ export interface UserFormData {
   roleType: string;
   designation: string;
   schemeDepartment: string;
+  schemeNames?: string[];
   district: string;
   blockName: string;
   aadhaarId: string;
@@ -138,8 +139,9 @@ export function createEmptyUserForm(userId = ''): UserFormData {
     alternateEmail: '',
     userType: 'Admin',
     roleType: '',
-    designation: 'Joint Director',
-    schemeDepartment: 'RSLDC',
+    designation: '',
+    schemeDepartment: 'All Schemes',
+    schemeNames: ['All Schemes'],
     district: 'Jaipur',
     blockName: 'All Blocks',
     aadhaarId: ''
@@ -149,6 +151,14 @@ export function createEmptyUserForm(userId = ''): UserFormData {
 /** Pre-fills the form from an existing user (edit mode). */
 export function userFormFromItem(item: UserManagementItem): UserFormData {
   const names = item.username ? item.username.split(' ') : [''];
+  const schemeVal = item.schemeName || item.schemeDepartment || 'All Schemes';
+  let initialSchemes: string[] = [];
+  if (schemeVal === 'All Schemes' || schemeVal === 'ALL' || schemeVal === 'all') {
+    initialSchemes = ['All Schemes'];
+  } else {
+    initialSchemes = schemeVal.split(',').map(s => s.trim()).filter(Boolean);
+  }
+
   return {
     userId: item.userId,
     ssoId: item.ssoId || '',
@@ -161,8 +171,9 @@ export function userFormFromItem(item: UserManagementItem): UserFormData {
     alternateEmail: '',
     userType: item.userType,
     roleType: roleTypeLabel(item.roleType),
-    designation: item.designation || 'Joint Director',
-    schemeDepartment: item.schemeDepartment || 'RSLDC',
+    designation: item.designation || '',
+    schemeDepartment: schemeVal,
+    schemeNames: initialSchemes.length > 0 ? initialSchemes : ['All Schemes'],
     district: item.districtName,
     blockName: item.blockName || 'All Blocks',
     aadhaarId: ''
@@ -187,14 +198,19 @@ function userFullName(form: UserFormData): string {
 
 /** Fields written back when editing an existing user. */
 export function buildUserChanges(form: UserFormData): Partial<UserManagementItem> {
+  const schemeStr = (form.schemeNames && form.schemeNames.length > 0)
+    ? (form.schemeNames.includes('All Schemes') || form.schemeNames.includes('ALL') ? 'All Schemes' : form.schemeNames.join(', '))
+    : (form.schemeDepartment || 'All Schemes');
+
   return {
     userId: form.userId.trim(),
     username: userFullName(form),
     ssoId: form.ssoId.trim(),
-    userType: form.userType,
+    userType: form.userType || (form.roleType === 'Super Admin' ? 'Super Admin' : 'Admin'),
     roleType: form.roleType,
     designation: form.designation,
-    schemeDepartment: form.schemeDepartment,
+    schemeDepartment: schemeStr,
+    schemeName: schemeStr,
     districtName: form.district,
     blockName: form.blockName,
     email: form.email.trim(),

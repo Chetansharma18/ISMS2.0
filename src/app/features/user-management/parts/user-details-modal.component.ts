@@ -50,8 +50,8 @@ import { roleTypeLabel } from '../user-management.util';
             <span class="text-slate-800">{{ u.designation || 'N/A' }}</span>
           </div>
           <div>
-            <span class="text-slate-500 font-medium block text-xs">Scheme Department</span>
-            <span class="text-slate-800">{{ u.schemeDepartment || 'RSLDC' }}</span>
+            <span class="text-slate-500 font-medium block text-xs">Scheme Name</span>
+            <span class="text-slate-800">{{ u.schemeName || u.schemeDepartment || 'N/A' }}</span>
           </div>
           <div>
             <span class="text-slate-500 font-medium block text-xs">District</span>

@@ -272,6 +272,22 @@ describe('tenders-page.util', () => {
       expect(result.committeeMembers).toEqual(['A']);
       expect(result.requiredDocs).toEqual(['PAN Card', 'Registration Certificate']);
     });
+
+    it('appends uploaded document files to attachedDocs', () => {
+      const formWithDocs: EoiFormData = {
+        ...form,
+        documentFiles: {
+          0: { name: 'PAN Card', fileName: 'pan_card.pdf', size: '250 KB' },
+          1: { name: 'Registration Certificate', fileName: 'reg_cert.png', size: '1.2 MB' }
+        }
+      };
+      const result = buildSchemeFromForm(formWithDocs, null, 123);
+      expect(result.attachedDocs).toEqual([
+        { sNo: 1, name: 'RFP', size: '1 KB' },
+        { sNo: 2, name: 'PAN Card (pan_card.pdf)', size: '250 KB' },
+        { sNo: 3, name: 'Registration Certificate (reg_cert.png)', size: '1.2 MB' }
+      ]);
+    });
   });
 
   describe('buildCorrigendumDoc', () => {

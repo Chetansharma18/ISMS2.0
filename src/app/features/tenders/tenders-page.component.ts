@@ -549,6 +549,7 @@ export class TendersPageComponent {
         .filter(Boolean);
       if (docs.length > 0) {
         this.newEoiData.documents = [...docs];
+        this.newEoiData.documentFiles = {};
       }
     }
   }
@@ -581,6 +582,18 @@ export class TendersPageComponent {
 
   removeEoiDocument(index: number): void {
     this.newEoiData.documents.splice(index, 1);
+    if (this.newEoiData.documentFiles) {
+      const newFiles: Record<number, any> = {};
+      for (const [key, val] of Object.entries(this.newEoiData.documentFiles)) {
+        const k = Number(key);
+        if (k < index) {
+          newFiles[k] = val;
+        } else if (k > index) {
+          newFiles[k - 1] = val;
+        }
+      }
+      this.newEoiData.documentFiles = newFiles;
+    }
   }
 
   // ---- Row actions ---------------------------------------------------------

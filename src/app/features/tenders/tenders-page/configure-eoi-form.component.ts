@@ -1,9 +1,10 @@
-import { Component, input, output, computed } from '@angular/core';
+import { Component, input, output, computed, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
+import { EoiFormData, EoiRequiredInfoItem, EoiDocumentUpload } from '../tenders.models';
 import { SchemeMasterItem, DocMasterItem } from '../../../core/models/admin-masters.model';
 import { formatInr } from '../../../shared';
+import { formatBytes } from './tenders-page.util';
 
 /**
  * Body of the "Configure New EOI / Edit EOI" modal.
@@ -126,7 +127,7 @@ import { formatInr } from '../../../shared';
           <div class="flex items-center justify-between mb-2">
             <div>
               <h3 class="text-navy font-bold text-[13px] uppercase tracking-wide">EOI DOCUMENTS</h3>
-              <p class="text-[11px] text-slate-500 m-0">Required documents for proposal upload (sourced from Doc Master)</p>
+              <p class="text-[11px] text-slate-500 m-0">Required documents for proposal upload (Upload PDF, image, or TXT - max 25 MB)</p>
             </div>
             <button
               type="button"
@@ -139,6 +140,12 @@ import { formatInr } from '../../../shared';
               </svg>
             </button>
           </div>
+
+          @if (docFileError()) {
+            <div class="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-2.5 py-1.5 mb-2 font-medium">
+              {{ docFileError() }}
+            </div>
+          }
           
           @for (doc of data().documents; track $index) {
             <div class="flex items-center gap-2 mb-2 p-1.5 bg-slate-50 border border-slate-200 rounded-lg">
@@ -155,9 +162,60 @@ import { formatInr } from '../../../shared';
                   }
                 </select>
               </div>
-              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-primary/10 text-brand whitespace-nowrap shrink-0">
-                Upload Required
-              </span>
+
+              <!-- Upload Button / Uploaded File Status Pill -->
+              @if (!getUploadedDoc($index)) {
+                <label
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary hover:bg-navy text-white text-xs font-semibold cursor-pointer transition-colors whitespace-nowrap shrink-0 shadow-xs select-none active:scale-95"
+                  title="Upload PDF, image, or TXT file"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  <span>Upload</span>
+                  <input
+                    type="file"
+                    class="hidden"
+                    accept=".pdf,image/*,.jpg,.jpeg,.png,.webp,.txt"
+                    (change)="onDocFileUpload($index, $event)"
+                  />
+                </label>
+              } @else {
+                <div class="flex items-center gap-1.5 bg-emerald-50 border border-emerald-300 text-emerald-800 px-2 py-1 rounded text-xs shrink-0 max-w-[190px] sm:max-w-[220px]">
+                  <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div class="flex flex-col min-w-0 flex-1 leading-tight">
+                    <span class="truncate font-semibold text-[11px] text-emerald-900" [title]="getUploadedDoc($index)!.fileName">
+                      {{ getUploadedDoc($index)!.fileName }}
+                    </span>
+                    <span class="text-[9.5px] text-emerald-600 font-medium">{{ getUploadedDoc($index)!.size }}</span>
+                  </div>
+                  <label
+                    class="text-[10px] font-semibold text-emerald-700 hover:text-emerald-950 underline cursor-pointer ml-1 shrink-0 select-none"
+                    title="Change uploaded file"
+                  >
+                    Change
+                    <input
+                      type="file"
+                      class="hidden"
+                      accept=".pdf,image/*,.jpg,.jpeg,.png,.webp,.txt"
+                      (change)="onDocFileUpload($index, $event)"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    (click)="removeDocFile($index)"
+                    class="text-slate-400 hover:text-red-500 p-0.5 rounded cursor-pointer ml-0.5 shrink-0"
+                    title="Remove uploaded file"
+                  >
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              }
+
               <button
                 type="button"
                 (click)="removeDocument.emit($index)"
@@ -223,6 +281,52 @@ export class ConfigureEoiFormComponent {
     return Array.from(set);
   });
 
+  readonly docFileError = signal<string>('');
+
+  getUploadedDoc(index: number): EoiDocumentUpload | undefined {
+    return this.data()?.documentFiles?.[index];
+  }
+
+  onDocFileUpload(index: number, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    const allowed = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'bmp', 'gif', 'svg', 'txt'];
+    const isImage = file.type.startsWith('image/');
+    if (!allowed.includes(ext) && !isImage && file.type !== 'text/plain') {
+      this.docFileError.set(`Invalid file format for "${file.name}". Please upload a PDF, image, or TXT file.`);
+      input.value = '';
+      return;
+    }
+
+    if (file.size > 25 * 1024 * 1024) {
+      this.docFileError.set(`File "${file.name}" exceeds the 25 MB limit.`);
+      input.value = '';
+      return;
+    }
+
+    this.docFileError.set('');
+    if (!this.data().documentFiles) {
+      this.data().documentFiles = {};
+    }
+    this.data().documentFiles![index] = {
+      name: this.data().documents[index] || file.name,
+      fileName: file.name,
+      size: formatBytes(file.size),
+      file: file
+    };
+
+    input.value = '';
+  }
+
+  removeDocFile(index: number): void {
+    if (this.data()?.documentFiles) {
+      delete this.data().documentFiles![index];
+    }
+  }
+
   onSchemeChange(schemeName: string): void {
     if (!schemeName) return;
 
@@ -253,6 +357,8 @@ export class ConfigureEoiFormComponent {
         .filter(Boolean);
       if (docs.length > 0) {
         this.data().documents = [...docs];
+        this.data().documentFiles = {};
+        this.docFileError.set('');
       }
     }
 

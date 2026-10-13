@@ -55,6 +55,14 @@ export interface EoiAttachment {
   file: File;
 }
 
+/** A document file uploaded for a specific EOI document requirement. */
+export interface EoiDocumentUpload {
+  name?: string;
+  fileName: string;
+  size: string;
+  file?: File;
+}
+
 /** Form model used by the "Configure New EOI / Edit EOI" modal. */
 export interface EoiFormData {
   refNo: string;
@@ -68,4 +76,5 @@ export interface EoiFormData {
   processFee: string;
   attachments: EoiAttachment[];
   documents: string[];
+  documentFiles?: Record<number, EoiDocumentUpload>;
 }

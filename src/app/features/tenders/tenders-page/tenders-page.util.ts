@@ -157,7 +157,8 @@ export function createEmptyEoiForm(): EoiFormData {
     emdFee: '',
     processFee: '',
     attachments: [],
-    documents: []
+    documents: [],
+    documentFiles: {}
   };
 }
 
@@ -185,7 +186,8 @@ export function eoiFormFromScheme(scheme: SchemeTender, now: number = Date.now()
       size: doc.size,
       file: new File([], doc.name)
     })),
-    documents: scheme.requiredDocs ? [...scheme.requiredDocs] : []
+    documents: scheme.requiredDocs ? [...scheme.requiredDocs] : [],
+    documentFiles: {}
   };
 }
 
@@ -231,6 +233,20 @@ export function buildSchemeFromForm(
     name: att.title,
     size: att.size
   }));
+
+  if (d.documentFiles) {
+    let nextSNo = attachedDocsList.length + 1;
+    for (const [idxStr, up] of Object.entries(d.documentFiles)) {
+      if (up && up.fileName) {
+        const docName = d.documents[Number(idxStr)] || up.name || 'Document';
+        attachedDocsList.push({
+          sNo: nextSNo++,
+          name: `${docName} (${up.fileName})`,
+          size: up.size
+        });
+      }
+    }
+  }
 
   return {
     ...(existingScheme || {}),

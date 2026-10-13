@@ -181,8 +181,10 @@ describe('tenders-page.util', () => {
     const validForm = (): EoiFormData => ({
       ...createEmptyEoiForm(),
       refNo: 'REF-1',
+      scheme: 'Vishwakarma Yuva Udyami Protsahan Yojana',
       publishedDate: '2026-01-01',
       submissionDate: '2026-02-01',
+      eoiCategory: 'General',
       emdFee: '50000',
       processFee: '2000',
       attachments: [{ id: '1', title: 'RFP', fileName: 'rfp.pdf', size: '1 KB', file: {} as File }]
@@ -207,8 +209,10 @@ describe('tenders-page.util', () => {
 
     it('requires each mandatory field', () => {
       expect(isEoiFormValid({ ...validForm(), refNo: '' })).toBe(false);
+      expect(isEoiFormValid({ ...validForm(), scheme: '' })).toBe(false);
       expect(isEoiFormValid({ ...validForm(), publishedDate: '' })).toBe(false);
       expect(isEoiFormValid({ ...validForm(), submissionDate: '' })).toBe(false);
+      expect(isEoiFormValid({ ...validForm(), eoiCategory: '' })).toBe(false);
       expect(isEoiFormValid({ ...validForm(), emdFee: '' })).toBe(false);
       expect(isEoiFormValid({ ...validForm(), processFee: '' })).toBe(false);
     });
@@ -234,10 +238,12 @@ describe('tenders-page.util', () => {
       schemeCategory: 'SAMARTH',
       publishedDate: '2026-03-05',
       submissionDate: '2026-04-15',
+      eoiCategory: 'General',
       description: 'Desc',
       emdFee: '50000',
       processFee: '2000',
-      attachments: [{ id: '1', title: 'RFP', fileName: 'rfp.pdf', size: '1 KB', file: {} as File }]
+      attachments: [{ id: '1', title: 'RFP', fileName: 'rfp.pdf', size: '1 KB', file: {} as File }],
+      documents: ['PAN Card', 'Registration Certificate']
     };
 
     it('creates a new open, active, unfrozen scheme', () => {
@@ -253,6 +259,7 @@ describe('tenders-page.util', () => {
       expect(result.isActive).toBe(true);
       expect(result.isFrozen).toBe(false);
       expect(result.attachedDocs).toEqual([{ sNo: 1, name: 'RFP', size: '1 KB' }]);
+      expect(result.requiredDocs).toEqual(['PAN Card', 'Registration Certificate']);
     });
 
     it('preserves identity fields of an existing scheme', () => {
@@ -263,6 +270,7 @@ describe('tenders-page.util', () => {
       expect(result.isActive).toBe(false);
       expect(result.isFrozen).toBe(true);
       expect(result.committeeMembers).toEqual(['A']);
+      expect(result.requiredDocs).toEqual(['PAN Card', 'Registration Certificate']);
     });
   });
 

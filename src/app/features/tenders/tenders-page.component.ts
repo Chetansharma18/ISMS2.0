@@ -9,14 +9,17 @@ import { SchemeService } from './services/scheme.service';
 import {
   TableComponent,
   ActionModalComponent,
-  TableColumn
+  TableColumn,
+  formatInr
 } from '../../shared';
 import { DataEngineService } from '../../core/services/data-engine.service';
 import {
   SchemeMasterItem,
   SchemeCategoryMasterItem,
-  EoiCategoryItem
+  EoiCategoryItem,
+  DocMasterItem
 } from '../../core/models/admin-masters.model';
+import { DOC_MASTER_STORAGE_KEY, INITIAL_DOC_ITEMS } from '../admin-master/doc-master.component';
 import { SchemeDetailViewComponent } from './scheme-detail-view.component';
 import { EoiAttachment, EoiDocumentItem, EoiFormData, SchemeTender } from './tenders.models';
 import {
@@ -171,6 +174,9 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
           [schemeCategoryOptions]="schemeCategoryOptions()"
           [eoiCategoryOptions]="eoiCategoryOptions()"
           [requiredInfo]="eoiRequiredInfo"
+          [schemeMasterItems]="schemeMasterItems()"
+          [docMasterItems]="docMasterItems()"
+          (schemeChange)="onSchemeSelected($event)"
           (attach)="openAttachmentModal()"
           (removeAttachment)="removeAttachment($event)"
           (addDocument)="addEoiDocument()"
@@ -239,6 +245,8 @@ export class TendersPageComponent {
   readonly availableAdmins = this.schemeService.getAvailableAdmins();
   private promptDismissed = false;
 
+  readonly schemeMasterItems = signal<SchemeMasterItem[]>([]);
+  readonly docMasterItems = signal<DocMasterItem[]>([]);
   readonly schemeMasterNames = signal<string[]>([]);
   readonly schemeCategoryNames = signal<string[]>([]);
   readonly eoiCategoryNames = signal<string[]>([]);
@@ -457,13 +465,17 @@ export class TendersPageComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (items) => {
+          this.schemeMasterItems.set(items || []);
           const names = (items || [])
             .filter((s) => s.status !== 'Inactive')
             .map((s) => s.schemeName?.trim())
             .filter((name): name is string => !!name);
           this.schemeMasterNames.set(Array.from(new Set(names)));
         },
-        error: () => this.schemeMasterNames.set([])
+        error: () => {
+          this.schemeMasterItems.set([]);
+          this.schemeMasterNames.set([]);
+        }
       });
 
     // 2. Load active scheme categories from Scheme Category Master
@@ -497,6 +509,48 @@ export class TendersPageComponent {
         },
         error: () => this.eoiCategoryNames.set([])
       });
+
+    // 4. Load Doc Master items (from storage or fallback)
+    const cachedDocs = this.storage.getItem<DocMasterItem[]>(DOC_MASTER_STORAGE_KEY);
+    if (cachedDocs && Array.isArray(cachedDocs) && cachedDocs.length > 0) {
+      this.docMasterItems.set(cachedDocs);
+    } else {
+      this.docMasterItems.set(INITIAL_DOC_ITEMS);
+    }
+  }
+
+  onSchemeSelected(schemeName: string): void {
+    if (!schemeName) return;
+
+    // 1. Auto-fill EMD Fee, Process Fee & Scheme Category from Scheme Master
+    const schemeItem = this.schemeMasterItems().find(
+      (s) => s.schemeName?.trim().toLowerCase() === schemeName.trim().toLowerCase()
+    );
+    if (schemeItem) {
+      if (schemeItem.amount != null) {
+        this.newEoiData.emdFee = formatInr(schemeItem.amount);
+      }
+      if (schemeItem.processFees != null) {
+        this.newEoiData.processFee = formatInr(schemeItem.processFees);
+      }
+      if (schemeItem.schemeCategory) {
+        this.newEoiData.schemeCategory = schemeItem.schemeCategory;
+      }
+    }
+
+    // 2. Auto-fill required documents from Doc Master
+    const docItem = this.docMasterItems().find(
+      (d) => d.schemeName?.trim().toLowerCase() === schemeName.trim().toLowerCase()
+    );
+    if (docItem && docItem.documents) {
+      const docs = docItem.documents
+        .split(',')
+        .map((d) => d.trim())
+        .filter(Boolean);
+      if (docs.length > 0) {
+        this.newEoiData.documents = [...docs];
+      }
+    }
   }
 
   openConfigureEoiModal(): void {

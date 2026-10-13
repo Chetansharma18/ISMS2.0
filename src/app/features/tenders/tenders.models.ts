@@ -24,6 +24,7 @@ export interface SchemeTender {
   emdFee?: string;
   processFee?: string;
   attachedDocs?: EoiDocumentItem[];
+  requiredDocs?: string[];
   committeeMembers?: string[];
   createdAt?: number;
   isActive?: boolean;

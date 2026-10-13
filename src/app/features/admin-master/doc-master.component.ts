@@ -24,19 +24,14 @@ import {
 import { StorageService } from '../../core/services/storage.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { DataEngineService } from '../../core/services/data-engine.service';
-import { SchemeMasterItem } from '../../core/models/admin-masters.model';
+import { SchemeMasterItem, DocMasterItem } from '../../core/models/admin-masters.model';
 
-export interface DocMasterItem {
-  id: string;
-  sNo?: number;
-  schemeName: string;
-  documents: string;
-  status: 'Active' | 'Inactive';
-}
+export type { DocMasterItem };
 
-const STORAGE_KEY = 'DOC_MASTER_ITEMS';
+export const DOC_MASTER_STORAGE_KEY = 'DOC_MASTER_ITEMS';
+const STORAGE_KEY = DOC_MASTER_STORAGE_KEY;
 
-const INITIAL_DOC_ITEMS: DocMasterItem[] = [
+export const INITIAL_DOC_ITEMS: DocMasterItem[] = [
   {
     id: 'doc-1',
     schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana',

@@ -89,3 +89,11 @@ export interface SchemeCategoryMasterItem {
   schemeName?: string;
   status: 'Active' | 'Inactive';
 }
+
+export interface DocMasterItem {
+  id: string;
+  sNo?: number;
+  schemeName: string;
+  documents: string;
+  status: 'Active' | 'Inactive';
+}

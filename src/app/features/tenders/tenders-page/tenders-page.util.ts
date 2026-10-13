@@ -185,7 +185,7 @@ export function eoiFormFromScheme(scheme: SchemeTender, now: number = Date.now()
       size: doc.size,
       file: new File([], doc.name)
     })),
-    documents: []
+    documents: scheme.requiredDocs ? [...scheme.requiredDocs] : []
   };
 }
 
@@ -248,6 +248,7 @@ export function buildSchemeFromForm(
     emdFee: d.emdFee,
     processFee: d.processFee,
     attachedDocs: attachedDocsList,
+    requiredDocs: d.documents ? d.documents.filter(Boolean) : existingScheme?.requiredDocs || [],
     createdAt: existingScheme ? existingScheme.createdAt : now,
     isActive: existingScheme ? existingScheme.isActive : true,
     isFrozen: existingScheme ? existingScheme.isFrozen : false

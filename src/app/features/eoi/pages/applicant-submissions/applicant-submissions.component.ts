@@ -30,6 +30,9 @@ import {
           ]"
           backUrl="/admin/eoi-view"
           backTitle="Back to EOI Responses"
+          [searchable]="true"
+          searchPlaceholder="Search Applicant, Reg No., Org..."
+          [(searchQuery)]="searchQuery"
         >
           <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[#0c2d4e] border border-slate-300 text-xs font-medium shadow-xs">
             <span class="text-slate-600">Total Submissions:</span>
@@ -258,7 +261,7 @@ import {
         </app-table>
 
         <ng-template #applicantTemplate let-item>
-          <div class="font-medium text-text-primary text-[13px]">
+          <div class="font-normal text-slate-800 text-[13px]">
             {{ item.anonymousLabel }}
           </div>
           <div class="text-[11px] font-mono text-text-muted mt-0.5">
@@ -289,6 +292,7 @@ export class ApplicantSubmissionsComponent {
 
   responses = signal<ApplicantResponse[]>([]);
   selectedFilter = signal<'ALL' | 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED'>('ALL');
+  searchQuery = signal<string>('');
   schemeId = signal<string>('');
   isDownloadingAll = signal<boolean>(false);
   downloadType = signal<'zip' | 'pdf'>('zip');
@@ -354,9 +358,17 @@ export class ApplicantSubmissionsComponent {
 
   filteredResponses = computed(() => {
     const filter = this.selectedFilter();
-    const list = this.responses();
-    if (filter === 'ALL') return list;
-    return list.filter(r => r.status === filter);
+    const query = this.searchQuery().trim().toLowerCase();
+    let list = this.responses();
+    if (filter !== 'ALL') {
+      list = list.filter(r => r.status === filter);
+    }
+    if (!query) return list;
+    return list.filter(r =>
+      (r.anonymousLabel && r.anonymousLabel.toLowerCase().includes(query)) ||
+      (r.regNumber && r.regNumber.toLowerCase().includes(query)) ||
+      (r.actualLegalName && r.actualLegalName.toLowerCase().includes(query))
+    );
   });
 
   /**

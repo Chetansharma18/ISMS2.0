@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 export interface BreadcrumbItem {
   label: string;
@@ -11,7 +12,7 @@ export interface BreadcrumbItem {
   selector: 'app-page-header',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   styles: [`
     :host {
       display: block;
@@ -67,7 +68,31 @@ export interface BreadcrumbItem {
       </div>
 
       <!-- Right Action / Search Slot -->
-      <div class="relative z-10 flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto shrink-0">
+      <div class="relative z-10 flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto shrink-0 justify-end">
+        @if (searchable) {
+          <div class="relative w-full sm:w-80">
+            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              [ngModel]="searchQuery()"
+              (ngModelChange)="onSearchInput($event)"
+              [placeholder]="searchPlaceholder"
+              class="w-full pl-9 pr-7 py-2 text-[13px] bg-white border border-slate-300 rounded-md placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-navy transition-colors font-normal shadow-2xs"
+            />
+            @if (searchQuery()) {
+              <button
+                type="button"
+                (click)="onClearSearch()"
+                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs"
+                title="Clear search"
+              >
+                ✕
+              </button>
+            }
+          </div>
+        }
         <ng-content></ng-content>
       </div>
     </div>
@@ -82,10 +107,27 @@ export class PageHeaderComponent {
   @Input() backTitle = 'Go Back';
   @Input() badge?: string;
   @Input() bgColor = 'var(--color-primary, #174A6E)';
+  @Input() searchable = false;
+  @Input() searchPlaceholder = 'Search...';
+
+  readonly searchQuery = model<string>('');
 
   @Output() back = new EventEmitter<void>();
+  @Output() search = new EventEmitter<string>();
+  @Output() clear = new EventEmitter<void>();
 
   constructor(private router: Router) {}
+
+  onSearchInput(value: string): void {
+    this.searchQuery.set(value);
+    this.search.emit(value);
+  }
+
+  onClearSearch(): void {
+    this.searchQuery.set('');
+    this.search.emit('');
+    this.clear.emit();
+  }
 
   onBackClick(): void {
     if (this.back.observed) {

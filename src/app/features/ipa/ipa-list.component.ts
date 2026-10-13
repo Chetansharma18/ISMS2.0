@@ -27,33 +27,14 @@ import {
     <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
       <div class="p-4 sm:p-5 space-y-3 font-sans">
         
-        <!-- Page Header via Reusable PageHeaderComponent -->
+        <!-- Page Header via Reusable PageHeaderComponent with Built-in Search -->
         <app-page-header
           title="IPA"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'IPA' }]"
-        >
-          <!-- Search input -->
-          <div class="relative w-full sm:w-80">
-            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              [(ngModel)]="searchQuery"
-              placeholder="Search IPA, Scheme, District..."
-              class="w-full pl-9 pr-7 py-1.5 text-[13px] bg-white border border-slate-300 rounded-md placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-primary transition-colors font-normal shadow-2xs"
-            />
-            @if (searchQuery) {
-              <button
-                type="button"
-                (click)="searchQuery = ''"
-                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs"
-              >
-                ✕
-              </button>
-            }
-          </div>
-        </app-page-header>
+          [searchable]="true"
+          [(searchQuery)]="searchQuery"
+          searchPlaceholder="Search IPA, Scheme, District..."
+        />
 
         <!-- Success Alert Notification -->
         @if (successMessage()) {
@@ -94,7 +75,7 @@ import {
           <button
             type="button"
             (click)="viewIpaForm(ipa)"
-            class="font-mono text-xs font-bold text-brand hover:text-navy hover:underline cursor-pointer bg-transparent border-0 p-0 transition-colors"
+            class="font-mono text-xs font-normal text-brand hover:text-navy hover:underline cursor-pointer bg-transparent border-0 p-0 transition-colors"
             title="Click to view In-Principle Approval (IPA) document"
           >
             {{ ipa.ipaNumber }}
@@ -106,7 +87,7 @@ import {
           <div class="flex flex-col items-start gap-0.5">
             <span
               (click)="viewIpaForm(ipa)"
-              class="font-bold text-slate-900 hover:text-brand hover:underline cursor-pointer transition-colors"
+              class="font-normal text-slate-800 hover:text-brand hover:underline cursor-pointer transition-colors"
             >
               {{ ipa.schemeName || ipa.scheme }}
             </span>
@@ -521,13 +502,13 @@ export class IpaListComponent {
   });
 
   readonly ipaColumns: TableColumn<SanctionOrder>[] = [
-    { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12', cellClass: 'text-center font-medium text-slate-700' },
+    { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12', cellClass: 'text-center font-normal text-slate-700' },
     { key: 'ipaNumber', label: 'IPA Number', align: 'center', width: 'w-32', type: 'custom' },
-    { key: 'appId', label: 'Application ID', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-mono font-bold text-slate-700 text-center' },
-    { key: 'schemeName', label: 'Scheme Name', type: 'custom', width: 'min-w-[140px]', cellClass: 'whitespace-nowrap font-bold text-slate-900' },
-    { key: 'district', label: 'Sanction District', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-medium text-slate-800 text-center' },
+    { key: 'appId', label: 'Application ID', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-mono font-normal text-slate-700 text-center' },
+    { key: 'schemeName', label: 'Scheme Name', type: 'custom', width: 'min-w-[140px]', cellClass: 'whitespace-nowrap font-normal text-slate-800' },
+    { key: 'district', label: 'Sanction District', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-normal text-slate-800 text-center' },
     { key: 'sectors', label: 'Sanction Sector(s)', type: 'custom', width: 'min-w-[160px]' },
-    { key: 'sanctionTarget', label: 'Sanction Target', align: 'center', width: 'w-28', cellClass: 'whitespace-nowrap font-bold text-brand text-center' },
+    { key: 'sanctionTarget', label: 'Sanction Target', align: 'center', width: 'w-28', cellClass: 'whitespace-nowrap font-normal text-slate-800 text-center' },
     { key: 'grade', label: 'Grade', align: 'center', type: 'custom', width: 'w-16' },
     { key: 'actions', label: 'Action', align: 'center', type: 'custom', width: 'w-44' }
   ];

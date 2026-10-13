@@ -13,33 +13,14 @@ import { filterTenders } from './tender-status.util';
   template: `
     <div class="p-4 sm:p-5 space-y-4 font-sans">
       
-      <!-- Page Header via Reusable PageHeaderComponent -->
+      <!-- Page Header via Reusable PageHeaderComponent with Built-in Search -->
       <app-page-header
         title="Tender Status"
         [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Tender Status' }]"
-      >
-        <!-- Search Input -->
-        <div class="relative w-full sm:w-80">
-          <svg class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            [(ngModel)]="searchQuery"
-            placeholder="Search Ref, Scheme, Category..."
-            class="w-full pl-9 pr-7 py-2 text-[13px] bg-white border border-slate-300 rounded-md placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-navy transition-colors font-normal shadow-2xs"
-          />
-          @if (searchQuery()) {
-            <button
-              type="button"
-              (click)="searchQuery.set('')"
-              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs"
-            >
-              ✕
-            </button>
-          }
-        </div>
-      </app-page-header>
+        [searchable]="true"
+        [(searchQuery)]="searchQuery"
+        searchPlaceholder="Search Ref, Scheme, Category..."
+      />
 
       <!-- Main Status Table via Reusable TableComponent -->
       <app-table
@@ -52,6 +33,7 @@ import { filterTenders } from './tender-status.util';
           appRef: appRefTemplate,
           schemeTitle: schemeTitleTemplate,
           schemeCategory: schemeCategoryTemplate,
+          submittedStatus: submittedStatusTemplate,
           eoiStatus: eoiStatusTemplate,
           rejectionReason: rejectionReasonTemplate,
           view: viewTemplate
@@ -64,7 +46,7 @@ import { filterTenders } from './tender-status.util';
         <button
           type="button"
           (click)="open.emit(tender)"
-          class="font-mono font-bold text-navy hover:underline cursor-pointer text-left transition-colors"
+          class="font-mono font-normal text-navy hover:underline cursor-pointer text-left transition-colors"
           title="Open Application Details Page"
         >
           {{ tender.appRef }}
@@ -75,22 +57,29 @@ import { filterTenders } from './tender-status.util';
       <ng-template #schemeTitleTemplate let-tender>
         <span
           (click)="open.emit(tender)"
-          class="font-semibold text-slate-800 hover:text-navy hover:underline cursor-pointer transition-colors"
+          class="font-normal text-slate-800 hover:text-navy hover:underline cursor-pointer transition-colors"
           title="Open {{ tender.schemeTitle }}"
         >
           {{ tender.schemeTitle }}
         </span>
-      </ng-template>      <!-- Custom Scheme Category Template -->
+      </ng-template>
+
+      <!-- Custom Scheme Category Template -->
       <ng-template #schemeCategoryTemplate let-tender>
-        <span class="text-slate-800 font-medium text-xs uppercase tracking-wide">{{ tender.schemeCategory || 'GENERAL' }}</span>
+        <span class="text-slate-800 font-normal text-xs uppercase tracking-wide">{{ tender.schemeCategory || 'GENERAL' }}</span>
+      </ng-template>
+
+      <!-- Custom Submitted Status Template (Plain text, not highlighted) -->
+      <ng-template #submittedStatusTemplate let-tender>
+        <span class="text-slate-800 font-normal text-xs">{{ tender.submittedStatus }}</span>
       </ng-template>
 
       <!-- Custom EOI Stage Template -->
       <ng-template #eoiStatusTemplate let-tender>
         @if (tender.eoiStatus === 'Reviewed') {
-          <span class="text-slate-800 font-bold text-xs">{{ tender.eoiStatus }}</span>
+          <span class="text-slate-800 font-normal text-xs">{{ tender.eoiStatus }}</span>
         } @else if (tender.eoiStatus === 'Under Review') {
-          <span class="text-amber-800 font-bold text-xs">{{ tender.eoiStatus }}</span>
+          <span class="text-slate-800 font-normal text-xs">{{ tender.eoiStatus }}</span>
         } @else {
           <span class="text-slate-500 font-normal text-xs">-</span>
         }
@@ -99,7 +88,7 @@ import { filterTenders } from './tender-status.util';
       <!-- Custom Rejection Reason Template -->
       <ng-template #rejectionReasonTemplate let-tender>
         @if (tender.submittedStatus === 'Rejected') {
-          <span class="text-rose-600 text-xs leading-tight font-medium block max-w-sm text-left">
+          <span class="text-rose-600 text-xs leading-tight font-normal block max-w-sm text-left">
             {{ tender.rejectionReason || 'Technical qualification criteria not met.' }}
           </span>
         } @else {
@@ -138,20 +127,15 @@ export class TenderListComponent {
   readonly tenderColumns: TableColumn<SubmittedTender>[] = [
     { key: '$index',           label: 'S. No.',               type: 'number', align: 'center', width: 'w-12' },
     { key: 'appRef',           label: 'Application Ref. No.', cellClass: 'whitespace-nowrap font-normal text-slate-800', type: 'custom' },
-    { key: 'schemeTitle',      label: 'Scheme Name',          cellClass: 'whitespace-nowrap font-medium text-slate-800', type: 'custom' },
+    { key: 'schemeTitle',      label: 'Scheme Name',          cellClass: 'whitespace-nowrap font-normal text-slate-800', type: 'custom' },
     { key: 'schemeCategory',   label: 'Scheme Category',      align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700', type: 'custom' },
     { key: 'appliedDate',      label: 'Applied Date',         align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     {
       key: 'submittedStatus',
       label: 'Submitted Status',
       align: 'center',
-      type: 'status',
-      badgeVariantMap: {
-        'Submitted': 'info',
-        'Under Review': 'warning',
-        'Accepted': 'success',
-        'Rejected': 'danger'
-      }
+      type: 'custom',
+      cellClass: 'whitespace-nowrap font-normal text-slate-800'
     },
     { key: 'eoiStatus',        label: 'EOI Stage',            align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'rejectionReason',  label: 'Remarks', align: 'center', type: 'custom', cellClass: 'min-w-[200px]' },

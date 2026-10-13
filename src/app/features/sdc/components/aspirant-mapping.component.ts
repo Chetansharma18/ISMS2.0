@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FormSdcComponent, FormFieldConfig } from '../../../shared/components/form-sdc';
-import { DocumentViewerModalComponent } from '../../../shared/components/document-viewer-modal/document-viewer-modal.component';
 import { StepperComponent, StepperStep } from '../../../shared/components/stepper/stepper.component';
 import { AspirantAadhaarUploadComponent } from './aspirant-mapping/aspirant-aadhaar-upload.component';
 import { AspirantErrorBannerComponent } from './aspirant-mapping/aspirant-error-banner.component';
@@ -19,6 +18,7 @@ import { validateForSubmit, validateStepBeforeAdvance } from './aspirant-mapping
 import { BatchService } from '../services/batch.service';
 import { SdcService } from '../services/sdc.service';
 import { AspirantService } from '../services/aspirant.service';
+import { DocumentViewerService } from '../../../core/services/document-viewer.service';
 import {
   AspirantFormData,
   AspirantDocumentItem,
@@ -39,7 +39,6 @@ import {
     RouterModule,
     FormsModule,
     FormSdcComponent,
-    DocumentViewerModalComponent,
     StepperComponent,
     AspirantAadhaarUploadComponent,
     AspirantErrorBannerComponent,
@@ -266,14 +265,6 @@ import {
         ></app-aspirant-success-modal>
       }
 
-      <!-- Universal Document Viewer Modal (Supports Aadhaar and all Attachments) -->
-      <app-document-viewer-modal
-        [isOpen]="viewer.isOpen()"
-        [doc]="viewer.doc()"
-        [title]="viewer.title()"
-        (close)="viewer.close()"
-      ></app-document-viewer-modal>
-
     </div>
   `
 })
@@ -284,6 +275,7 @@ export class AspirantMappingComponent implements OnInit {
   readonly batchService = inject(BatchService);
   readonly sdcService = inject(SdcService);
   readonly aspirantService = inject(AspirantService);
+  private readonly docViewer = inject(DocumentViewerService);
 
   currentStep = signal<number>(1);
   readonly wizardSteps: StepperStep[] = [
@@ -299,7 +291,7 @@ export class AspirantMappingComponent implements OnInit {
 
   @ViewChild('aadhaarUploadTemplate', { static: true }) aadhaarUploadTemplate!: TemplateRef<any>;
 
-  readonly viewer = new AspirantDocumentViewerState(() => this.formData);
+  readonly viewer = new AspirantDocumentViewerState(() => this.formData, this.docViewer);
 
   batchId = signal<string>('');
   batch = computed(() => {

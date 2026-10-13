@@ -123,13 +123,13 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                         </app-status-badge>
                       } @else if (col.key === '$index' || (col.type === 'number' && (col.key === '$index' || col.key === 'sNo' || col.key === 'sno'))) {
                         <!-- 3. Auto Sequential S. No. -->
-                        <span class="font-medium text-slate-700 whitespace-nowrap">{{ (currentPage() - 1) * pageSize + idx + 1 }}</span>
+                        <span class="font-normal text-slate-700 whitespace-nowrap">{{ (currentPage() - 1) * pageSize + idx + 1 }}</span>
                       } @else if (col.type === 'link') {
                         <!-- 4. Direct Reusable Link -->
                         @if (col.link) {
                           <a
                             [routerLink]="getColLink(col, item)"
-                            class="text-brand hover:text-navy hover:underline font-medium cursor-pointer transition-colors"
+                            class="text-brand hover:text-navy hover:underline font-normal cursor-pointer transition-colors"
                           >
                             {{ getFormattedValue(item, col, idx) }}
                           </a>
@@ -137,7 +137,7 @@ import { StatusBadgeComponent } from '../status-badge/status-badge.component';
                           <button
                             type="button"
                             (click)="onLinkClick(col, item, $event)"
-                            class="text-brand hover:text-navy hover:underline font-medium cursor-pointer transition-colors text-left"
+                            class="text-brand hover:text-navy hover:underline font-normal cursor-pointer transition-colors text-left"
                           >
                             {{ getFormattedValue(item, col, idx) }}
                           </button>

@@ -59,38 +59,26 @@ export type { UserManagementItem };
     <div class="w-full min-h-screen bg-white text-slate-800 font-sans p-4 sm:p-6 lg:p-8 space-y-6">
       
       <!-- Page Header -->
-      <app-page-header title="User Management">
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
-          <!-- Search Input -->
-          <div class="flex items-center gap-2 flex-1 max-w-md">
-            <div class="relative w-full">
-              <input
-                type="text"
-                placeholder="Search by User ID, Username, SSO ID, Role, or District..."
-                [ngModel]="searchQuery()"
-                (ngModelChange)="onSearchChange($event)"
-                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-primary transition-all"
-              />
-              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-
-          <!-- Add User Button -->
-          @if (selectedRoleFilter() !== 'blacklisted') {
-            <button
-              type="button"
-              (click)="openAddModal()"
-              class="px-4 py-2.5 bg-primary hover:bg-navy text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 shrink-0"
-            >
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
-              <span>Add User</span>
-            </button>
-          }
-        </div>
+      <app-page-header
+        title="User Management"
+        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'User Management' }]"
+        [searchable]="true"
+        searchPlaceholder="Search User ID, Username, SSO, Role, District..."
+        [(searchQuery)]="searchQuery"
+      >
+        <!-- Add User Button -->
+        @if (selectedRoleFilter() !== 'blacklisted') {
+          <button
+            type="button"
+            (click)="openAddModal()"
+            class="px-3.5 py-1.5 bg-primary hover:bg-navy text-white text-xs font-semibold rounded-lg shadow-xs transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Add User</span>
+          </button>
+        }
       </app-page-header>
 
       <!-- Role Filters -->
@@ -130,7 +118,7 @@ export type { UserManagementItem };
 
       <!-- Custom Template for Role Type -->
       <ng-template #roleTypeTemplate let-item>
-        <span class="text-[13px] font-medium text-slate-700">{{ roleTypeLabel(item.roleType) }}</span>
+        <span class="text-[13px] font-normal text-slate-700">{{ roleTypeLabel(item.roleType) }}</span>
       </ng-template>
 
       <!-- Custom Template for Scheme Status -->
@@ -267,7 +255,7 @@ export class UserManagementComponent {
     {
       key: 'username',
       label: 'Username',
-      cellClass: 'whitespace-nowrap font-semibold text-slate-800'
+      cellClass: 'whitespace-nowrap font-normal text-slate-800'
     },
     {
       key: 'ssoId',

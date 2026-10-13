@@ -26,20 +26,10 @@ interface CameraUser {
         <app-page-header
           title="Camera Monitoring"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Camera Monitoring' }]"
+          [searchable]="true"
+          searchPlaceholder="Search TP or SDC Name..."
+          [(searchQuery)]="searchQuery"
         >
-          <!-- Search Bar -->
-          <div class="relative w-full sm:w-64">
-            <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              [ngModel]="searchQuery()"
-              (ngModelChange)="searchQuery.set($event)"
-              placeholder="Search by TP or SDC Name..."
-              class="w-full pl-8 pr-3 py-1.5 text-sm bg-white border-none rounded-md placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-white/50 transition-colors"
-            />
-          </div>
         </app-page-header>
 
         <app-table
@@ -59,7 +49,7 @@ interface CameraUser {
 
         <ng-template #tpInfoTemplate let-user>
           <div>
-            <div class="font-semibold text-slate-900 text-[13px] leading-snug">
+            <div class="font-normal text-slate-800 text-[13px] leading-snug">
               {{ user.tpName }}
             </div>
             <div class="text-[11.5px] text-slate-500 mt-0.5 font-mono">
@@ -69,20 +59,20 @@ interface CameraUser {
         </ng-template>
 
         <ng-template #sdcCountTemplate let-user>
-          <div class="inline-flex flex-col items-center justify-center text-slate-700 text-[11.5px] font-semibold leading-tight min-w-17.5">
+          <div class="inline-flex flex-col items-center justify-center text-slate-700 text-[11.5px] font-normal leading-tight min-w-17.5">
             <span>{{ user.sdcCount }} SDC</span>
             <span>Center(s)</span>
           </div>
         </ng-template>
 
         <ng-template #totalBatchesTemplate let-user>
-          <span class="inline-flex items-center text-slate-600 text-[11.5px] font-semibold tracking-wide">
+          <span class="inline-flex items-center text-slate-600 text-[11.5px] font-normal tracking-wide">
             {{ user.totalBatches }} Batches
           </span>
         </ng-template>
 
         <ng-template #totalCamerasTemplate let-user>
-          <span class="inline-flex items-center gap-1.5 text-green-700 text-[11.5px] font-semibold tracking-wide">
+          <span class="inline-flex items-center gap-1.5 text-green-700 text-[11.5px] font-normal tracking-wide">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
               <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4zM5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
             </svg>

@@ -545,7 +545,29 @@ import { PermissionService } from '../../permissions/permission.service';
               <span class="tracking-tight">Grievance</span>
             </a>
 
-            <!-- 9. Profile -->
+            <!-- 9. Payment History -->
+            <a
+              routerLink="/payment-history"
+              [class.bg-primary-light]="isActive('payment-history')"
+              [class.text-brand]="isActive('payment-history')"
+              [class.font-medium]="isActive('payment-history')"
+              [class.border]="isActive('payment-history')"
+              [class.border-border]="isActive('payment-history')"
+              [class.text-text-secondary]="!isActive('payment-history')"
+              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
+            >
+              <svg
+                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
+                [class.text-brand]="isActive('payment-history')"
+                [class.text-text-muted]="!isActive('payment-history')"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+              <span class="tracking-tight">History</span>
+            </a>
+
+            <!-- 10. Profile -->
             <a
               routerLink="/profile"
               [class.bg-primary-light]="isActive('profile')"
@@ -603,7 +625,29 @@ import { PermissionService } from '../../permissions/permission.service';
               <span class="tracking-tight">Active Schemes</span>
             </a>
 
-            <!-- 2. Profile -->
+            <!-- 2. Payment History -->
+            <a
+              routerLink="/payment-history"
+              [class.bg-primary-light]="isActive('payment-history')"
+              [class.text-brand]="isActive('payment-history')"
+              [class.font-medium]="isActive('payment-history')"
+              [class.border]="isActive('payment-history')"
+              [class.border-border]="isActive('payment-history')"
+              [class.text-text-secondary]="!isActive('payment-history')"
+              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
+            >
+              <svg
+                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
+                [class.text-brand]="isActive('payment-history')"
+                [class.text-text-muted]="!isActive('payment-history')"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+              <span class="tracking-tight">Payment History</span>
+            </a>
+
+            <!-- 3. Profile -->
             <a
               routerLink="/profile"
               [class.bg-primary-light]="isActive('profile')"
@@ -740,6 +784,16 @@ export class SidebarComponent {
     // 9. Grievance
     if (url.includes('grievance')) {
       return this.isDeptAdmin() ? 'dept-grievance' : 'grievance';
+    }
+
+    // 10. Payment History
+    if (
+      url === '/payment-history' ||
+      url.startsWith('/payment-history/') ||
+      url.startsWith('/history') ||
+      url.startsWith('/transactions')
+    ) {
+      return 'payment-history';
     }
 
     // 10. Super Admin routes

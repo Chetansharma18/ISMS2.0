@@ -19,7 +19,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
   selector: 'app-scheme-form',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass, DocumentViewerModalComponent, ActionModalComponent, StepperComponent, SchemeHeaderCardComponent, Step1ProcessingFeeComponent, Step2OtrProfileComponent, Step3UploadDocumentsComponent, Step4CompletePreviewComponent, Step5EmdPaymentComponent, Step6ReceiptsComponent],
+  imports: [NgClass, ActionModalComponent, StepperComponent, SchemeHeaderCardComponent, Step1ProcessingFeeComponent, Step2OtrProfileComponent, Step3UploadDocumentsComponent, Step4CompletePreviewComponent, Step5EmdPaymentComponent, Step6ReceiptsComponent],
   providers: [SchemeFormState],
   template: `
     <div class="w-full min-h-screen bg-slate-50/60 pb-16 font-sans text-slate-800">
@@ -109,16 +109,6 @@ export type { EoiDocumentItem } from './scheme-form.model';
         }
 
       </main>
-
-      <!-- ====================================================================
-           DOCUMENT VIEWER MODAL
-           ==================================================================== -->
-      <app-document-viewer-modal
-        [isOpen]="state.isViewerOpen()"
-        [doc]="state.activeViewerDoc()"
-        [title]="state.activeViewerTitle()"
-        (close)="state.closeViewer()"
-      />
 
       <!-- ====================================================================
            PROCESSING FEE PAYMENT SUCCESS MODAL

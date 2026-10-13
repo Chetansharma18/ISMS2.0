@@ -85,7 +85,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
 
           <!-- Custom Template for Closing Date -->
           <ng-template #closingDateTemplate let-item>
-            <span class="text-slate-800 font-medium text-[12.5px]">{{ item.closingDate }}</span>
+            <span class="text-slate-800 font-normal text-[12.5px]">{{ item.closingDate }}</span>
           </ng-template>
 
           <ng-template #descTemplate let-item>
@@ -327,7 +327,7 @@ export class TendersPageComponent {
     {
       key: 'schemeName',
       label: 'Scheme Name',
-      cellClass: 'whitespace-nowrap font-medium text-slate-800'
+      cellClass: 'whitespace-nowrap font-normal text-slate-800'
     },
     {
       key: 'schemeCategory',

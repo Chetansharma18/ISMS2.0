@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter, inject
 import { CommonModule } from '@angular/common';
 import { SchemeTender, EoiDocumentItem, EoiRequiredInfoItem } from './tenders.models';
 import { SchemeDetailPdfService } from './scheme-detail-view/scheme-detail-pdf.service';
+import { DocumentViewerService } from '../../core/services/document-viewer.service';
 import { isSubmissionClosed } from './scheme-detail-view/scheme-detail-view.util';
 import { SchemeDetailToolbarComponent } from './scheme-detail-view/scheme-detail-toolbar.component';
 import { SchemeDetailSummaryComponent } from './scheme-detail-view/scheme-detail-summary.component';
@@ -65,6 +66,7 @@ import { RequiredDocumentsListComponent } from './scheme-detail-view/required-do
 })
 export class SchemeDetailViewComponent {
   private pdfService = inject(SchemeDetailPdfService);
+  private docViewer = inject(DocumentViewerService);
 
   @Input({ required: true }) scheme!: SchemeTender;
   @Input() rfpDocs: EoiDocumentItem[] = [];
@@ -109,7 +111,10 @@ export class SchemeDetailViewComponent {
   }
 
   downloadRfpOrSop(docItem: EoiDocumentItem): void {
-    this.pdfService.generateRfpOrSopPdf(this.scheme, docItem);
+    this.docViewer.openDocument({
+      fileName: 'ISMS RFP.pdf',
+      title: docItem.name
+    });
     this.download.emit(docItem.name);
   }
 

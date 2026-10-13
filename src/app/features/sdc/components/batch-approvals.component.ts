@@ -168,7 +168,7 @@ import {
 
         <!-- Template: Batch Code -->
         <ng-template #batchCodeTemplate let-batch>
-          <div class="text-center font-mono font-normal text-slate-800 text-[12.5px]">
+          <div class="text-center font-mono font-normal text-slate-800 text-[13px]">
             {{ batch.batchCode }}
           </div>
         </ng-template>
@@ -212,7 +212,7 @@ import {
         <!-- Template: Capacity & Mapped Aspirants -->
         <ng-template #capacityTemplate let-batch>
           <div class="min-w-35 text-left px-1">
-            <div class="flex items-center justify-between text-xs font-normal text-slate-700 mb-1">
+            <div class="flex items-center justify-between text-[13px] font-normal text-slate-700 mb-1">
               <span>{{ batch.mappedAspirantsCount || 0 }}/{{ batch.maxStrength || 30 }} Aspirants</span>
               <span class="text-slate-400 font-normal text-[11px]">{{ getMappedPercent(batch) }}%</span>
             </div>

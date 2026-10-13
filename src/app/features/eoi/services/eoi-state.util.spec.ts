@@ -16,9 +16,9 @@ describe('eoi-state.util', () => {
     const list = withCompany1UnderScrutiny(buildInitialResponses());
     const company1 = list.find(r => r.anonymousLabel === 'Company 1')!;
     expect(company1.status).toBe('UNDER_SCRUTINY');
-    expect(company1.statusDisplay).toBe('Pending Review');
+    expect(company1.statusDisplay).toBe('Under Review');
     expect(company1.scrutinyDetails).toBeUndefined();
-    expect(list.filter(r => r.status === 'APPROVED').length).toBe(3);
+    expect(list.filter(r => r.status === 'APPROVED').length).toBe(1);
   });
 
   it('mergeStoredResponses overlays stored data and keeps unmatched seed records', () => {

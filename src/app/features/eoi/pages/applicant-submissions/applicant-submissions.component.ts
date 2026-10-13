@@ -20,7 +20,7 @@ import {
     <div class="w-full min-h-full bg-white text-text-primary font-sans">
       <div class="p-4 sm:p-5 space-y-3 font-sans">
         
-        <!-- Header via Reusable PageHeaderComponent -->
+        <!-- Header via Reusable PageHeaderComponent: Title, Breadcrumbs, and Search only -->
         <app-page-header
           title="Applicant Submissions"
           [breadcrumbs]="[
@@ -28,221 +28,181 @@ import {
             { label: 'EOI Responses', url: '/admin/eoi-view' },
             { label: 'Applicant Submissions' }
           ]"
-          backUrl="/admin/eoi-view"
-          backTitle="Back to EOI Responses"
           [searchable]="true"
           searchPlaceholder="Search Applicant, Reg No., Org..."
           [(searchQuery)]="searchQuery"
         >
-          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[#0c2d4e] border border-slate-300 text-xs font-medium shadow-xs">
-            <span class="text-slate-600">Total Submissions:</span>
-            <span class="font-bold text-[#0c2d4e]">{{ totalSubmissionsCount() }}</span>
-          </div>
         </app-page-header>
 
-        <!-- Top Toolbar: Status summary & Sanction Order Action Button -->
-        <div class="flex flex-wrap items-center justify-between gap-3 pt-1 border-b border-slate-200 pb-3">
-          <div class="flex items-center gap-2 text-xs text-slate-700">
-            <span class="flex h-2.5 w-2.5 relative">
-              <span [class.animate-ping]="allReviewed()" class="absolute inline-flex h-full w-full rounded-full opacity-75" [class.bg-emerald-400]="allReviewed()" [class.bg-amber-400]="!allReviewed()"></span>
-              <span class="relative inline-flex rounded-full h-2.5 w-2.5" [class.bg-emerald-600]="allReviewed()" [class.bg-amber-500]="!allReviewed()"></span>
-            </span>
-            <span class="font-medium text-slate-600">Review Status:</span>
-            <span class="font-semibold text-slate-900">
-              {{ countReviewed() }} of {{ totalSubmissionsCount() }} Applications Processed
-            </span>
-          </div>
-
-          <div class="flex items-center gap-2.5">
-            @if (!allReviewed()) {
-              <span class="text-[11px] bg-amber-50 text-amber-800 px-2.5 py-1 rounded border border-amber-200 font-normal">
-                Requires all applications to be Reviewed (Accepted or Rejected) to activate Sanction Order
-              </span>
-            } @else {
-              <label
-                class="px-3.5 py-1.5 rounded text-xs font-semibold bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
-                title="Upload signed Sanction Order Document (PDF)"
-              >
-                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                <span>{{ uploadedSanctionFileName() ? uploadedSanctionFileName() : 'Upload Sanction Order' }}</span>
-                <input type="file" (change)="onUploadSanctionOrder($event)" class="hidden" accept=".pdf" />
-              </label>
-            }
-
+        <!-- Simple Neutral Filter Toolbar & Review Progress -->
+        <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-2.5 sm:p-3 flex flex-wrap items-center justify-between gap-3">
+          <!-- Left: Back Button & Filter Tabs -->
+          <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+            <!-- Back Button matching existing screens -->
             <button
               type="button"
-              (click)="openSanctionOrder()"
-              [disabled]="!allReviewed()"
-              class="px-3.5 py-1.5 rounded text-xs font-semibold transition-all flex items-center gap-2 border shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
-              [class.bg-emerald-700]="allReviewed()"
-              [class.text-white]="allReviewed()"
-              [class.border-emerald-800]="allReviewed()"
-              [class.hover:bg-emerald-800]="allReviewed()"
-              [class.bg-slate-100]="!allReviewed()"
-              [class.text-slate-400]="!allReviewed()"
-              [class.border-slate-200]="!allReviewed()"
+              (click)="goBack()"
+              class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-[13px] font-semibold transition-all cursor-pointer shadow-2xs active:scale-95 shrink-0"
+              title="Back to EOI Responses"
             >
-              @if (!isSubmitted()) {
-                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span>Sanction Order</span>
-              } @else {
-                <span>Generated IPA</span>
-              }
+              <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Back</span>
             </button>
-          </div>
-        </div>
 
-        <!-- Filter Buttons Bar & Download All Action (Below Generated IPA) -->
-        <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
-          <div class="flex items-center gap-1.5 flex-wrap">
+            <!-- Simple Filter Tabs (Neutral, No Multiple Colors) -->
+            <div class="inline-flex items-center p-1 bg-slate-100 rounded-lg border border-slate-200/80 gap-1 flex-wrap">
+            <!-- All -->
             <button
               type="button"
               (click)="setFilter('ALL')"
-              class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-              [class.bg-primary]="selectedFilter() === 'ALL'"
-              [class.text-white]="selectedFilter() === 'ALL'"
-              [class.border-primary]="selectedFilter() === 'ALL'"
-              [class.bg-white]="selectedFilter() !== 'ALL'"
-              [class.text-[#5F6B76]]="selectedFilter() !== 'ALL'"
-              [class.border-border]="selectedFilter() !== 'ALL'"
-              [class.hover:bg-primary-light]="selectedFilter() !== 'ALL'"
-              [class.hover:text-brand]="selectedFilter() !== 'ALL'"
+              class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
+              [class.bg-white]="selectedFilter() === 'ALL'"
+              [class.text-slate-900]="selectedFilter() === 'ALL'"
+              [class.shadow-2xs]="selectedFilter() === 'ALL'"
+              [class.text-slate-600]="selectedFilter() !== 'ALL'"
+              [class.hover:text-slate-900]="selectedFilter() !== 'ALL'"
             >
-              <span>All</span>
+              <span>All Applications</span>
               <span
-                class="px-1.5 py-0.2 rounded-full text-[10px]"
-                [class.bg-white/20]="selectedFilter() === 'ALL'"
+                class="px-1.5 py-0.2 rounded text-[10px] font-bold"
+                [class.bg-slate-800]="selectedFilter() === 'ALL'"
                 [class.text-white]="selectedFilter() === 'ALL'"
-                [class.bg-surface-muted]="selectedFilter() !== 'ALL'"
-                [class.text-[#5F6B76]]="selectedFilter() !== 'ALL'"
+                [class.bg-slate-200]="selectedFilter() !== 'ALL'"
+                [class.text-slate-700]="selectedFilter() !== 'ALL'"
               >
                 {{ totalSubmissionsCount() }}
               </span>
             </button>
 
+            <!-- Under Review -->
             <button
               type="button"
               (click)="setFilter('UNDER_SCRUTINY')"
-              class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-              [class.bg-primary]="selectedFilter() === 'UNDER_SCRUTINY'"
-              [class.text-white]="selectedFilter() === 'UNDER_SCRUTINY'"
-              [class.border-primary]="selectedFilter() === 'UNDER_SCRUTINY'"
-              [class.bg-white]="selectedFilter() !== 'UNDER_SCRUTINY'"
-              [class.text-[#5F6B76]]="selectedFilter() !== 'UNDER_SCRUTINY'"
-              [class.border-border]="selectedFilter() !== 'UNDER_SCRUTINY'"
-              [class.hover:bg-primary-light]="selectedFilter() !== 'UNDER_SCRUTINY'"
-              [class.hover:text-brand]="selectedFilter() !== 'UNDER_SCRUTINY'"
+              class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
+              [class.bg-white]="selectedFilter() === 'UNDER_SCRUTINY'"
+              [class.text-slate-900]="selectedFilter() === 'UNDER_SCRUTINY'"
+              [class.shadow-2xs]="selectedFilter() === 'UNDER_SCRUTINY'"
+              [class.text-slate-600]="selectedFilter() !== 'UNDER_SCRUTINY'"
+              [class.hover:text-slate-900]="selectedFilter() !== 'UNDER_SCRUTINY'"
             >
-              <span>Under Scrutiny</span>
+              <span>Under Review</span>
               <span
-                class="px-1.5 py-0.2 rounded-full text-[10px]"
-                [class.bg-white/20]="selectedFilter() === 'UNDER_SCRUTINY'"
+                class="px-1.5 py-0.2 rounded text-[10px] font-bold"
+                [class.bg-slate-800]="selectedFilter() === 'UNDER_SCRUTINY'"
                 [class.text-white]="selectedFilter() === 'UNDER_SCRUTINY'"
-                [class.bg-surface-muted]="selectedFilter() !== 'UNDER_SCRUTINY'"
-                [class.text-[#5F6B76]]="selectedFilter() !== 'UNDER_SCRUTINY'"
+                [class.bg-slate-200]="selectedFilter() !== 'UNDER_SCRUTINY'"
+                [class.text-slate-700]="selectedFilter() !== 'UNDER_SCRUTINY'"
               >
                 {{ countPending() }}
               </span>
             </button>
 
+            <!-- Accepted -->
             <button
               type="button"
               (click)="setFilter('APPROVED')"
-              class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-              [class.bg-primary]="selectedFilter() === 'APPROVED'"
-              [class.text-white]="selectedFilter() === 'APPROVED'"
-              [class.border-primary]="selectedFilter() === 'APPROVED'"
-              [class.bg-white]="selectedFilter() !== 'APPROVED'"
-              [class.text-[#5F6B76]]="selectedFilter() !== 'APPROVED'"
-              [class.border-border]="selectedFilter() !== 'APPROVED'"
-              [class.hover:bg-primary-light]="selectedFilter() !== 'APPROVED'"
-              [class.hover:text-brand]="selectedFilter() !== 'APPROVED'"
+              class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
+              [class.bg-white]="selectedFilter() === 'APPROVED'"
+              [class.text-slate-900]="selectedFilter() === 'APPROVED'"
+              [class.shadow-2xs]="selectedFilter() === 'APPROVED'"
+              [class.text-slate-600]="selectedFilter() !== 'APPROVED'"
+              [class.hover:text-slate-900]="selectedFilter() !== 'APPROVED'"
             >
               <span>Accepted</span>
               <span
-                class="px-1.5 py-0.2 rounded-full text-[10px]"
-                [class.bg-white/20]="selectedFilter() === 'APPROVED'"
+                class="px-1.5 py-0.2 rounded text-[10px] font-bold"
+                [class.bg-slate-800]="selectedFilter() === 'APPROVED'"
                 [class.text-white]="selectedFilter() === 'APPROVED'"
-                [class.bg-surface-muted]="selectedFilter() !== 'APPROVED'"
-                [class.text-[#5F6B76]]="selectedFilter() !== 'APPROVED'"
+                [class.bg-slate-200]="selectedFilter() !== 'APPROVED'"
+                [class.text-slate-700]="selectedFilter() !== 'APPROVED'"
               >
                 {{ countApproved() }}
               </span>
             </button>
 
+            <!-- Rejected -->
             <button
               type="button"
               (click)="setFilter('REJECTED')"
-              class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-              [class.bg-primary]="selectedFilter() === 'REJECTED'"
-              [class.text-white]="selectedFilter() === 'REJECTED'"
-              [class.border-primary]="selectedFilter() === 'REJECTED'"
-              [class.bg-white]="selectedFilter() !== 'REJECTED'"
-              [class.text-[#5F6B76]]="selectedFilter() !== 'REJECTED'"
-              [class.border-border]="selectedFilter() !== 'REJECTED'"
-              [class.hover:bg-primary-light]="selectedFilter() !== 'REJECTED'"
-              [class.hover:text-brand]="selectedFilter() !== 'REJECTED'"
+              class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
+              [class.bg-white]="selectedFilter() === 'REJECTED'"
+              [class.text-slate-900]="selectedFilter() === 'REJECTED'"
+              [class.shadow-2xs]="selectedFilter() === 'REJECTED'"
+              [class.text-slate-600]="selectedFilter() !== 'REJECTED'"
+              [class.hover:text-slate-900]="selectedFilter() !== 'REJECTED'"
             >
               <span>Rejected</span>
               <span
-                class="px-1.5 py-0.2 rounded-full text-[10px]"
-                [class.bg-white/20]="selectedFilter() === 'REJECTED'"
+                class="px-1.5 py-0.2 rounded text-[10px] font-bold"
+                [class.bg-slate-800]="selectedFilter() === 'REJECTED'"
                 [class.text-white]="selectedFilter() === 'REJECTED'"
-                [class.bg-surface-muted]="selectedFilter() !== 'REJECTED'"
-                [class.text-[#5F6B76]]="selectedFilter() !== 'REJECTED'"
+                [class.bg-slate-200]="selectedFilter() !== 'REJECTED'"
+                [class.text-slate-700]="selectedFilter() !== 'REJECTED'"
               >
                 {{ countRejected() }}
               </span>
             </button>
-          </div>
 
-          <!-- Download Actions: ZIP and PDF options -->
-          <div class="flex items-center gap-2 flex-wrap">
+            <!-- Reverted -->
             <button
               type="button"
-              (click)="downloadAllZip()"
-              [disabled]="filteredResponses().length === 0 || isDownloadingAll()"
-              class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md border border-navy bg-navy hover:bg-[#07243c] text-white text-xs font-semibold transition-all cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
-              [title]="'Download all generated documents as a ZIP archive for ' + (selectedFilter() === 'APPROVED' ? 'Accepted' : selectedFilter() === 'REJECTED' ? 'Rejected' : selectedFilter() === 'UNDER_SCRUTINY' ? 'Under Scrutiny' : 'All') + ' applicants'"
+              (click)="setFilter('REVERTED')"
+              class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
+              [class.bg-white]="selectedFilter() === 'REVERTED'"
+              [class.text-slate-900]="selectedFilter() === 'REVERTED'"
+              [class.shadow-2xs]="selectedFilter() === 'REVERTED'"
+              [class.text-slate-600]="selectedFilter() !== 'REVERTED'"
+              [class.hover:text-slate-900]="selectedFilter() !== 'REVERTED'"
             >
-              @if (isDownloadingAll() && downloadType() === 'zip') {
-                <svg class="w-3.5 h-3.5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Creating ZIP...</span>
-              } @else {
+              <span>Reverted</span>
+              <span
+                class="px-1.5 py-0.2 rounded text-[10px] font-bold"
+                [class.bg-slate-800]="selectedFilter() === 'REVERTED'"
+                [class.text-white]="selectedFilter() === 'REVERTED'"
+                [class.bg-slate-200]="selectedFilter() !== 'REVERTED'"
+                [class.text-slate-700]="selectedFilter() !== 'REVERTED'"
+              >
+                {{ countReverted() }}
+              </span>
+            </button>
+          </div>
+        </div>
+
+          <!-- Review Status & Upload Sanction Order Option -->
+          <div class="flex items-center gap-3">
+            <!-- Upload Sanction Order Button shown ONLY when all applications are accepted or rejected -->
+            @if (allReviewed()) {
+              <button
+                type="button"
+                (click)="openSanctionOrder()"
+                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-2xs cursor-pointer shrink-0"
+                title="Upload Sanction Order"
+              >
                 <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
-                <span>Download All (ZIP)</span>
-              }
-            </button>
+                <span>Upload Sanction Order</span>
+              </button>
+            }
 
-            <button
-              type="button"
-              (click)="downloadAllPdf()"
-              [disabled]="filteredResponses().length === 0 || isDownloadingAll()"
-              class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-navy hover:text-[#07243c] text-xs font-semibold transition-all cursor-pointer shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
-              [title]="'Download all generated documents in a single PDF for ' + (selectedFilter() === 'APPROVED' ? 'Accepted' : selectedFilter() === 'REJECTED' ? 'Rejected' : selectedFilter() === 'UNDER_SCRUTINY' ? 'Under Scrutiny' : 'All') + ' applicants'"
-            >
-              @if (isDownloadingAll() && downloadType() === 'pdf') {
-                <svg class="w-3.5 h-3.5 animate-spin text-navy" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Generating PDF...</span>
-              } @else {
-                <svg class="w-3.5 h-3.5 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span>Download All (PDF)</span>
-              }
-            </button>
+            <div class="text-right">
+              <div class="text-xs font-semibold text-slate-800 flex items-center gap-1.5 justify-end">
+                <span class="text-slate-500 font-normal">Review Status:</span>
+                <span class="font-bold text-slate-800">{{ countReviewed() }} / {{ totalSubmissionsCount() }} Processed</span>
+              </div>
+              <div class="text-[11px] text-slate-500 font-normal">
+                {{ reviewPercentage() }}% Completed
+              </div>
+            </div>
+
+            <div class="w-20 sm:w-24 h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+              <div
+                class="h-full bg-slate-700 rounded-full transition-all duration-300"
+                [style.width.%]="reviewPercentage()"
+              ></div>
+            </div>
           </div>
         </div>
 
@@ -255,6 +215,7 @@ import {
           emptyMessage="No submissions found matching the selected filter."
           [customTemplates]="{
             anonymousLabel: applicantTemplate,
+            status: statusTemplate,
             action: actionTemplate
           }"
         >
@@ -267,6 +228,13 @@ import {
           <div class="text-[11px] font-mono text-text-muted mt-0.5">
             {{ item.regNumber }}
           </div>
+        </ng-template>
+
+        <!-- Clean, Proper, Non-Colorful Status -->
+        <ng-template #statusTemplate let-item>
+          <span class="inline-block px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200">
+            {{ item.status === 'UNDER_SCRUTINY' ? 'Under Review' : item.status === 'APPROVED' ? 'Accepted' : item.status === 'REVERTED' ? 'Reverted' : 'Rejected' }}
+          </span>
         </ng-template>
 
         <ng-template #actionTemplate let-item>
@@ -291,7 +259,7 @@ export class ApplicantSubmissionsComponent {
   private destroyRef = inject(DestroyRef);
 
   responses = signal<ApplicantResponse[]>([]);
-  selectedFilter = signal<'ALL' | 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED'>('ALL');
+  selectedFilter = signal<'ALL' | 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED' | 'REVERTED'>('ALL');
   searchQuery = signal<string>('');
   schemeId = signal<string>('');
   isDownloadingAll = signal<boolean>(false);
@@ -301,13 +269,7 @@ export class ApplicantSubmissionsComponent {
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
     { key: 'anonymousLabel', label: 'Applicant / Legal Firm Name', width: 'min-w-[260px]', type: 'custom' },
     { key: 'submissionDate', label: 'Submitted Date', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
-    {
-      key: 'status',
-      label: 'Status',
-      align: 'center',
-      type: 'status',
-      format: (val) => val === 'UNDER_SCRUTINY' ? 'Pending Review' : val === 'APPROVED' ? 'Accepted' : 'Rejected'
-    },
+    { key: 'status', label: 'Status', align: 'center', type: 'custom' },
     { key: 'action', label: 'Action', align: 'center', width: 'w-32', type: 'custom' }
   ];
 
@@ -325,8 +287,12 @@ export class ApplicantSubmissionsComponent {
     });
   }
 
-  setFilter(filter: 'ALL' | 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED'): void {
+  setFilter(filter: 'ALL' | 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED' | 'REVERTED'): void {
     this.selectedFilter.set(filter);
+  }
+
+  goBack(): void {
+    this.router.navigate(['/admin/eoi-view']);
   }
 
   totalSubmissionsCount = computed(() => this.responses().length);
@@ -334,7 +300,14 @@ export class ApplicantSubmissionsComponent {
   countPending = computed(() => this.responses().filter(r => r.status === 'UNDER_SCRUTINY').length);
   countApproved = computed(() => this.responses().filter(r => r.status === 'APPROVED').length);
   countRejected = computed(() => this.responses().filter(r => r.status === 'REJECTED').length);
-  countReviewed = computed(() => this.responses().filter(r => r.status === 'APPROVED' || r.status === 'REJECTED').length);
+  countReverted = computed(() => this.responses().filter(r => r.status === 'REVERTED').length);
+  countReviewed = computed(() => this.responses().filter(r => r.status === 'APPROVED' || r.status === 'REJECTED' || r.status === 'REVERTED').length);
+
+  reviewPercentage = computed(() => {
+    const total = this.totalSubmissionsCount();
+    if (!total) return 0;
+    return Math.round((this.countReviewed() / total) * 100);
+  });
 
   allReviewed = computed(() => this.responses().length > 0 && this.responses().every(r => r.status === 'APPROVED' || r.status === 'REJECTED'));
   isSubmitted = computed(() => this.eoiStateService.isSanctionSubmitted(this.schemeId()));
@@ -351,9 +324,7 @@ export class ApplicantSubmissionsComponent {
   }
 
   openSanctionOrder(): void {
-    if (this.allReviewed()) {
-      this.router.navigate(['/admin/eoi-sanction-editor', this.schemeId()]);
-    }
+    this.router.navigate(['/admin/eoi-sanction-editor', this.schemeId()]);
   }
 
   filteredResponses = computed(() => {

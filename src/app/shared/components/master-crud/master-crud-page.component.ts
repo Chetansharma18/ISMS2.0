@@ -97,7 +97,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
       <!-- Status badge cell template -->
       <ng-template #statusTemplate let-item>
         <span
-          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border select-none"
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[13px] font-normal border select-none"
           [ngClass]="item.status === 'Inactive'
             ? 'bg-slate-50 text-slate-600 border-slate-200'
             : 'bg-emerald-50 text-emerald-700 border-emerald-200'"
@@ -112,7 +112,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
           <button
             type="button"
             (click)="$event.stopPropagation(); openEditModal(item)"
-            class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-normal text-[12px] hover:underline cursor-pointer select-none transition-colors"
+            class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-normal text-[13px] hover:underline cursor-pointer select-none transition-colors"
             title="Edit"
           >
             <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">

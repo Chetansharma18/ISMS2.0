@@ -24,127 +24,115 @@ import { FormsModule } from '@angular/forms';
   template: `
     @if (isOpen) {
       <div
-        class="fixed inset-0 z-120 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs select-none font-sans animate-in fade-in duration-200"
+        class="fixed inset-0 z-120 flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-xs select-none font-sans animate-in fade-in duration-150"
         role="dialog"
         aria-modal="true"
         aria-labelledby="otp-title"
+        (keydown.escape)="cancel()"
+        (click)="onBackdropClick($event)"
       >
         <!-- Modal Card -->
         <div
-          class="relative w-full max-w-110 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200"
+          class="relative w-full max-w-[450px] bg-white rounded-xl shadow-2xl border border-slate-200/80 p-6 sm:p-7 animate-in zoom-in-95 duration-150"
+          (click)="$event.stopPropagation()"
         >
-          <!-- Top Accent Bar -->
-          <div class="h-1.5 w-full bg-navy"></div>
+          <!-- Close Button -->
+          <button
+            type="button"
+            (click)="cancel()"
+            class="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+            aria-label="Close"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
 
-          <div class="p-6 sm:p-7">
-            <!-- Security Shield Icon -->
-            <div class="w-12 h-12 rounded-xl bg-primary-light text-navy flex items-center justify-center mx-auto mb-4 shadow-2xs">
-              <svg class="w-6 h-6 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          <!-- Simple Heading & Single-Line Tagline -->
+          <div class="pr-6">
+            <h2 id="otp-title" class="text-xl sm:text-[22px] font-bold text-slate-900 tracking-tight m-0">
+              {{ title }}
+            </h2>
+            <p class="text-xs sm:text-[13px] text-slate-500 mt-1.5 m-0 leading-normal">
+              {{ tagline }}
+            </p>
+          </div>
+
+          <!-- Resend Notification Banner -->
+          @if (resendSuccess()) {
+            <div class="mt-3.5 p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-1.5 animate-in fade-in">
+              <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
               </svg>
+              <span>New OTP has been sent successfully.</span>
             </div>
+          }
 
-            <!-- Header Titles -->
-            <div class="text-center">
-              <h2 id="otp-title" class="text-xl sm:text-[22px] font-extrabold text-navy tracking-tight m-0">
-                Department Admin Verification
-              </h2>
-              <p class="text-xs sm:text-[13px] text-slate-500 mt-2 leading-relaxed m-0">
-                Please enter the 6-digit One Time Password (OTP) sent to your registered department email &amp; mobile
-                <span class="font-semibold text-slate-700 block mt-0.5">(+91 98******42 &bull; officer.rsldc&#64;rajasthan.gov.in)</span>
-              </p>
+          <!-- Error Banner -->
+          @if (errorMessage()) {
+            <div class="mt-3.5 p-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold animate-in fade-in">
+              {{ errorMessage() }}
             </div>
+          }
 
-            <!-- Resend Notification Banner -->
-            @if (resendSuccess()) {
-              <div class="mt-4 p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold text-center flex items-center justify-center gap-1.5 animate-in fade-in">
-                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>New OTP has been sent successfully!</span>
-              </div>
-            }
-
-            <!-- Error Banner -->
-            @if (errorMessage()) {
-              <div class="mt-4 p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold text-center animate-in fade-in">
-                {{ errorMessage() }}
-              </div>
-            }
-
-            <!-- 6 Individual Digit Inputs -->
-            <div class="flex items-center justify-center gap-2 sm:gap-2.5 my-6" (paste)="onPaste($event)">
-              @for (digit of otpDigits; track $index; let i = $index) {
-                <input
-                  #otpInput
-                  type="text"
-                  inputmode="numeric"
-                  maxlength="1"
-                  pattern="[0-9]*"
-                  autocomplete="one-time-code"
-                  [value]="digit"
-                  (input)="onDigitInput($event, i)"
-                  (keydown)="onKeyDown($event, i)"
-                  class="w-11 h-13 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-black font-mono text-slate-800 bg-white border-2 rounded-xl focus:border-navy focus:ring-4 focus:ring-navy/15 outline-none transition-all shadow-2xs select-none"
-                  [class.border-rose-400]="errorMessage()"
-                  [class.border-navy]="digit !== '' && !errorMessage()"
-                  [class.border-slate-200]="digit === '' && !errorMessage()"
-                />
+          <!-- 6 Individual Digit Inputs with Connectors -->
+          <div class="flex items-center justify-between gap-1 sm:gap-1.5 my-6" (paste)="onPaste($event)">
+            @for (digit of otpDigits; track $index; let i = $index) {
+              <input
+                #otpInput
+                type="text"
+                inputmode="numeric"
+                maxlength="1"
+                pattern="[0-9]*"
+                autocomplete="one-time-code"
+                [value]="digit"
+                (input)="onDigitInput($event, i)"
+                (keydown)="onKeyDown($event, i)"
+                class="w-10 h-12 sm:w-12 sm:h-13 text-center text-xl font-bold text-slate-800 bg-white border rounded-lg focus:border-sky-600 focus:ring-2 focus:ring-sky-100 outline-none transition-all shadow-2xs select-none"
+                [class.border-rose-400]="errorMessage()"
+                [class.border-sky-600]="digit !== '' && !errorMessage()"
+                [class.border-slate-300]="digit === '' && !errorMessage()"
+              />
+              @if (i < 5) {
+                <span class="w-1.5 sm:w-2.5 h-[1.5px] bg-slate-300 shrink-0"></span>
               }
-            </div>
+            }
+          </div>
 
-            <!-- Demo Hint -->
-            <div class="mb-4 text-center">
-              <span class="inline-block text-[11px] text-slate-500 bg-slate-100 border border-slate-200 rounded-md px-2.5 py-1">
-                Demo OTP: <strong class="font-mono text-slate-800 font-bold">123456</strong> (or enter any 6 digits)
-              </span>
-            </div>
-
-            <!-- Resend Timer Section -->
-            <div class="text-center text-xs text-slate-500 mb-6">
+          <!-- Bottom Action Row: Resend OTP on Left, Verify on Right -->
+          <div class="flex items-center justify-between gap-3 pt-1">
+            <!-- Left: Resend OTP Option -->
+            <div class="text-xs sm:text-[13px] text-slate-500">
               @if (timerSeconds() > 0) {
-                <span>Didn't receive OTP? Resend in </span>
-                <span class="font-mono font-bold text-navy">00:{{ timerSeconds() < 10 ? '0' + timerSeconds() : timerSeconds() }}</span>
+                <span>Didn't receive OTP? Resend in <span class="font-mono font-semibold text-sky-600">00:{{ timerSeconds() < 10 ? '0' + timerSeconds() : timerSeconds() }}</span></span>
               } @else {
-                <span>Didn't receive OTP? </span>
                 <button
                   type="button"
                   (click)="resendOtp()"
-                  class="text-navy hover:text-[#07243c] font-bold underline cursor-pointer transition-colors"
+                  class="text-sky-600 hover:text-sky-700 font-semibold hover:underline cursor-pointer transition-colors"
                 >
-                  Resend OTP
+                  Didn't receive OTP? Resend
                 </button>
               }
             </div>
 
-            <!-- Primary Action Buttons -->
-            <div class="space-y-2">
-              <button
-                type="button"
-                (click)="submitOtp()"
-                [disabled]="!isComplete() || isSubmitting()"
-                class="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-navy hover:bg-[#07243c] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all flex items-center justify-center gap-2 active:scale-98"
-              >
-                @if (isSubmitting()) {
-                  <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span>Verifying OTP...</span>
-                } @else {
-                  <span>Submit OTP &amp; Proceed &rarr;</span>
-                }
-              </button>
-
-              <button
-                type="button"
-                (click)="cancel()"
-                [disabled]="isSubmitting()"
-                class="w-full py-2.5 px-4 text-xs font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-              >
-                Cancel &amp; Go Back
-              </button>
-            </div>
+            <!-- Right: Verify Button -->
+            <button
+              type="button"
+              (click)="submitOtp()"
+              [disabled]="!isComplete() || isSubmitting()"
+              class="px-6 py-2 sm:px-7 sm:py-2.5 rounded-full text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-40 disabled:cursor-not-allowed shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
+            >
+              @if (isSubmitting()) {
+                <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Verifying...</span>
+              } @else {
+                <span>Verify</span>
+              }
+            </button>
           </div>
         </div>
       </div>
@@ -154,6 +142,8 @@ import { FormsModule } from '@angular/forms';
 export class DeptAdminOtpModalComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() isOpen = false;
   @Input() ssoId = 'dept_admin';
+  @Input() title = 'OTP Verification';
+  @Input() tagline = 'Enter the OTP sent to your registered mobile number.';
 
   @Output() verified = new EventEmitter<string>();
   @Output() cancelled = new EventEmitter<void>();
@@ -291,6 +281,12 @@ export class DeptAdminOtpModalComponent implements OnChanges, AfterViewInit, OnD
       this.isSubmitting.set(false);
       this.verified.emit(otp);
     }, 700);
+  }
+
+  onBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.cancel();
+    }
   }
 
   cancel(): void {

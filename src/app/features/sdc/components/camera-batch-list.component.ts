@@ -72,7 +72,7 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
         </ng-template>
 
         <ng-template #branchTemplate let-item>
-          <div class="flex items-center gap-1.5 text-slate-600 text-[12.5px] font-normal justify-start">
+          <div class="flex items-center gap-1.5 text-slate-600 text-[13px] font-normal justify-start">
             <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
             </svg>
@@ -81,7 +81,7 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
         </ng-template>
 
         <ng-template #cameraStatusTemplate let-item>
-          <div class="inline-flex items-center gap-1.5 text-green-700 text-[11.5px] font-normal tracking-wide">
+          <div class="inline-flex items-center gap-1.5 text-green-700 text-[13px] font-normal tracking-wide">
             <div class="w-1.5 h-1.5 rounded-full bg-green-700"></div>
             {{ item.cameraStatus }}
           </div>

@@ -82,17 +82,17 @@ import type { ActivePreviewDocument } from '../scrutiny-desk.util';
           <!-- Document Verification Strip -->
           <div class="px-5 py-2 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-600 shrink-0 gap-2">
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span class="font-medium text-slate-800">Tamper-Proof Document Verification:</span>
-              <span class="font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[11px]">
-                AUTHENTIC &bull; {{ doc()?.refCode }}
+              <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+              <span class="font-medium text-slate-800">Document Registry Record:</span>
+              <span class="font-mono text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 text-[11px]">
+                RECORD &bull; {{ doc()?.refCode }}
               </span>
             </div>
 
             <div class="flex items-center gap-3 text-[11px] text-slate-500">
               <span>Authority: <strong>Govt of Rajasthan / RSLDC</strong></span>
               <span>&bull;</span>
-              <span>Verification Desk: <strong>Verified</strong></span>
+              <span>Status: <strong>Submitted</strong></span>
             </div>
           </div>
 
@@ -137,14 +137,14 @@ import type { ActivePreviewDocument } from '../scrutiny-desk.util';
                   This is to certify that the document titled <strong class="text-slate-900 font-semibold">{{ doc()?.title }}</strong> (Original file: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-800 font-mono text-[11px]">{{ doc()?.fileName }}</code>, File Size: <strong>{{ doc()?.fileSize }}</strong>) has been officially submitted by the applicant for proposal empanelment under the <strong class="text-navy font-semibold">{{ applicant()?.schemeName }}</strong>.
                 </p>
                 <p>
-                  The statutory contents, corporate particulars, and authorized credentials have been cross-verified with official government portals (MCA-21 / GSTIN Common Portal / Income Tax e-Filing) and authenticated for Departmental Technical Scrutiny.
+                  The statutory contents, corporate particulars, and authorized credentials have been recorded from official application submission for Departmental Technical Scrutiny.
                 </p>
               </div>
 
-              <!-- Verified Entity & Proposal Parameter Table -->
+              <!-- Entity & Proposal Parameter Table -->
               <div class="border border-slate-300 rounded overflow-hidden text-xs">
                 <div class="bg-slate-100 px-3.5 py-1.5 font-bold text-slate-800 text-[11px] uppercase tracking-wider border-b border-slate-300">
-                  Verified Legal Entity Particulars
+                  Legal Entity Particulars
                 </div>
                 <div class="p-3.5 grid grid-cols-1 sm:grid-cols-2 gap-y-2.5 gap-x-4 text-xs">
                   <div>
@@ -197,9 +197,9 @@ import type { ActivePreviewDocument } from '../scrutiny-desk.util';
                     </div>
                   </div>
                   <div>
-                    <span class="font-bold text-slate-900 block text-xs">Digitally Verified</span>
+                    <span class="font-bold text-slate-900 block text-xs">Digitally Submitted</span>
                     <span>Submission: {{ applicant()?.submissionDate }}</span>
-                    <span class="text-emerald-700 font-semibold block text-[10px]">Verified against Inward Registry</span>
+                    <span class="text-slate-600 font-medium block text-[10px]">Recorded in Inward Registry</span>
                   </div>
                 </div>
 

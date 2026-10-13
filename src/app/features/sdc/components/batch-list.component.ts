@@ -132,7 +132,7 @@ import {
         <!-- Template: Capacity & Mapped Progress -->
         <ng-template #capacityTemplate let-b>
           <div class="min-w-35">
-            <div class="flex items-center justify-between text-xs font-normal text-slate-700 mb-1">
+            <div class="flex items-center justify-between text-[13px] font-normal text-slate-700 mb-1">
               <span>{{ b.mappedAspirantsCount }}/{{ b.maxStrength }} Aspirants</span>
               <span class="text-slate-400 font-normal text-[11px]">{{ getMappedPercent(b) }}%</span>
             </div>
@@ -147,7 +147,7 @@ import {
 
         <!-- Template: Duration -->
         <ng-template #durationTemplate let-b>
-          <div class="text-xs text-slate-600 space-y-0.5 whitespace-nowrap">
+          <div class="text-[13px] text-slate-600 space-y-0.5 whitespace-nowrap">
             <div><span class="text-slate-400">From:</span> {{ b.startDate }}</div>
             <div><span class="text-slate-400">To:</span> {{ b.endDate }}</div>
           </div>
@@ -156,15 +156,15 @@ import {
         <!-- Template: Status -->
         <ng-template #statusTemplate let-b>
           @if (isApproved(b)) {
-            <span class="whitespace-nowrap font-normal text-xs tracking-wider uppercase text-emerald-700">
+            <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-emerald-700">
               APPROVED
             </span>
           } @else if (isRejected(b)) {
-            <span class="whitespace-nowrap font-normal text-xs tracking-wider uppercase text-red-600">
+            <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-red-600">
               REJECTED
             </span>
           } @else {
-            <span class="whitespace-nowrap font-normal text-xs tracking-wider uppercase text-amber-600">
+            <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-amber-600">
               PENDING
             </span>
           }

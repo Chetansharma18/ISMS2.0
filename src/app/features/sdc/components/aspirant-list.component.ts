@@ -197,7 +197,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
 
         <!-- Template: Aspirant ID & Reg Date -->
         <ng-template #aspirantInfoTemplate let-a>
-          <div class="font-mono text-xs whitespace-nowrap">
+          <div class="font-mono text-[13px] whitespace-nowrap">
             <a [routerLink]="['/aspirants', a.id]" class="font-normal text-brand hover:underline block cursor-pointer whitespace-nowrap" title="View details of {{ a.aspirantName }}">{{ a.id }}</a>
             <span class="text-[11px] text-slate-500 font-normal block mt-0.5 whitespace-nowrap">Enrolled: {{ a.enrollmentDate }}</span>
           </div>
@@ -225,7 +225,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
 
         <!-- Template: Identity & Contact (Aadhaar Masked, Mobile, Email) -->
         <ng-template #identityTemplate let-a>
-          <div class="text-xs space-y-0.5">
+          <div class="text-[13px] space-y-0.5">
             <div class="flex items-center gap-1 font-mono text-slate-800 font-normal">
               <svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
@@ -246,7 +246,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         <!-- Template: SDC Center (Prompt: "and also all the sdc can be seen") -->
         <ng-template #sdcCenterTemplate let-a>
           <div class="min-w-[150px]">
-            <div class="font-normal text-slate-800 text-xs leading-snug">
+            <div class="font-normal text-slate-800 text-[13px] leading-snug">
               {{ a.sdcName }}
             </div>
             <div class="flex items-center gap-1.5 mt-0.5">
@@ -263,12 +263,12 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         <ng-template #batchCourseTemplate let-a>
           <div class="min-w-[150px]">
             <div class="flex items-center gap-1.5">
-              <span class="font-mono font-normal text-xs text-slate-800">
+              <span class="font-mono font-normal text-[13px] text-slate-800">
                 {{ a.batchCode }}
               </span>
               <span class="text-[11px] text-slate-500 truncate">{{ a.sector }}</span>
             </div>
-            <div class="font-normal text-slate-800 text-xs mt-1 leading-snug">
+            <div class="font-normal text-slate-800 text-[13px] mt-1 leading-snug">
               {{ a.courseName }}
             </div>
           </div>
@@ -277,7 +277,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         <!-- Template: Scheme (All schemes black same) -->
         <ng-template #schemeTemplate let-a>
           <div class="text-center">
-            <span class="font-normal text-xs tracking-wider uppercase text-slate-800">
+            <span class="font-normal text-[13px] tracking-wider uppercase text-slate-800">
               {{ a.scheme }}
             </span>
           </div>
@@ -287,15 +287,15 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         <ng-template #statusTemplate let-a>
           <div class="text-center">
             @if (a.trainingStatus === 'IN_TRAINING') {
-              <span class="font-normal text-xs text-sky-700 tracking-wider uppercase">
+              <span class="font-normal text-[13px] text-sky-700 tracking-wider uppercase">
                 IN TRAINING
               </span>
             } @else if (a.trainingStatus === 'CERTIFIED') {
-              <span class="font-normal text-xs text-emerald-700 tracking-wider uppercase">
+              <span class="font-normal text-[13px] text-emerald-700 tracking-wider uppercase">
                 CERTIFIED
               </span>
             } @else {
-              <span class="font-normal text-xs text-slate-600 tracking-wider uppercase">
+              <span class="font-normal text-[13px] text-slate-600 tracking-wider uppercase">
                 ENROLLED
               </span>
             }

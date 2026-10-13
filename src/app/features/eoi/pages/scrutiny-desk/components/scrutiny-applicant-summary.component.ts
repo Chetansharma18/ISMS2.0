@@ -46,6 +46,11 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
             <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
             Rejected
           </span>
+        } @else if (applicant()?.status === 'REVERTED') {
+          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-900 border border-amber-300">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+            Reverted (Shortfall Notice)
+          </span>
         }
       </div>
     </div>

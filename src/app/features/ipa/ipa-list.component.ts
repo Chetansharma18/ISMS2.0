@@ -75,7 +75,7 @@ import {
           <button
             type="button"
             (click)="viewIpaForm(ipa)"
-            class="font-mono text-xs font-normal text-brand hover:text-navy hover:underline cursor-pointer bg-transparent border-0 p-0 transition-colors"
+            class="font-mono text-[13px] font-normal text-brand hover:text-navy hover:underline cursor-pointer bg-transparent border-0 p-0 transition-colors"
             title="Click to view In-Principle Approval (IPA) document"
           >
             {{ ipa.ipaNumber }}
@@ -87,7 +87,7 @@ import {
           <div class="flex flex-col items-start gap-0.5">
             <span
               (click)="viewIpaForm(ipa)"
-              class="font-normal text-slate-800 hover:text-brand hover:underline cursor-pointer transition-colors"
+              class="font-normal text-slate-800 hover:text-brand hover:underline cursor-pointer transition-colors text-[13px]"
             >
               {{ ipa.schemeName || ipa.scheme }}
             </span>
@@ -99,14 +99,14 @@ import {
 
         <!-- Template: Sectors -->
         <ng-template #sectorsTemplate let-ipa>
-          <div class="text-xs text-slate-700 font-medium">
+          <div class="text-[13px] text-slate-800 font-normal">
             {{ (ipa.sectors || ['Skill Training']).join(', ') }}
           </div>
         </ng-template>
 
         <!-- Template: Grade -->
         <ng-template #gradeTemplate let-ipa>
-          <span class="font-bold text-xs text-emerald-700">
+          <span class="font-normal text-[13px] text-emerald-700">
             {{ ipa.grade || 'A' }}
           </span>
         </ng-template>

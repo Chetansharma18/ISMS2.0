@@ -5,8 +5,9 @@ import {
   DEFAULT_CANDIDATE_PHOTO_DATA_URL,
   generateDocumentPreviewSvg
 } from './aspirant-document-preview.util';
+import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
 
-/** Shape consumed by the shared document viewer modal. */
+/** Shape consumed by document viewer. */
 export interface AspirantViewerDoc {
   fileName: string;
   fileSize: string;
@@ -16,8 +17,8 @@ export interface AspirantViewerDoc {
 }
 
 /**
- * Signal state for the universal document viewer on the aspirant wizard.
- * It reads the (parent-owned, mutable) form data lazily so previews always use the latest values.
+ * State for opening candidate documents directly in another tab in Chrome.
+ * Reads the (parent-owned, mutable) form data lazily so previews always use the latest values.
  */
 export class AspirantDocumentViewerState {
   readonly isOpen = signal<boolean>(false);
@@ -30,47 +31,75 @@ export class AspirantDocumentViewerState {
     fileUrl: ''
   });
 
-  constructor(private readonly getFormData: () => AspirantFormData) {}
+  constructor(
+    private readonly getFormData: () => AspirantFormData,
+    private readonly docViewer?: DocumentViewerService
+  ) {}
 
   viewAadhaar(): void {
     const formData = this.getFormData();
-    this.title.set('Aadhaar Card Document Proof');
+    const fileName = formData.aadhaarDocName || 'Aadhaar_Candidate_Card.pdf';
+    const fileSize = formData.aadhaarDocSize || '1.4 MB';
+    const fileUrl = formData.aadhaarDocUrl || DEFAULT_AADHAAR_CARD_DATA_URL;
+    const title = 'Aadhaar Card Document Proof';
+
+    this.title.set(title);
     this.doc.set({
-      fileName: formData.aadhaarDocName || 'Aadhaar_Candidate_Card.pdf',
-      fileSize: formData.aadhaarDocSize || '1.4 MB',
+      fileName,
+      fileSize,
       uploadDate: 'Today',
       status: 'uploaded',
-      fileUrl: formData.aadhaarDocUrl || DEFAULT_AADHAAR_CARD_DATA_URL
+      fileUrl
     });
-    this.isOpen.set(true);
+
+    if (this.docViewer) {
+      this.docViewer.openDocument({ fileName, fileSize, fileUrl, status: 'uploaded' }, title);
+    }
   }
 
   viewPhoto(): void {
     const formData = this.getFormData();
-    this.title.set('Candidate Photograph');
+    const fileName = formData.candidatePhotoName || 'Candidate_Photograph.jpg';
+    const fileSize = '350 KB';
+    const fileUrl = formData.candidatePhotoUrl || DEFAULT_CANDIDATE_PHOTO_DATA_URL;
+    const title = 'Candidate Photograph';
+
+    this.title.set(title);
     this.doc.set({
-      fileName: formData.candidatePhotoName || 'Candidate_Photograph.jpg',
-      fileSize: '350 KB',
+      fileName,
+      fileSize,
       uploadDate: 'Today',
       status: 'uploaded',
-      fileUrl: formData.candidatePhotoUrl || DEFAULT_CANDIDATE_PHOTO_DATA_URL
+      fileUrl
     });
-    this.isOpen.set(true);
+
+    if (this.docViewer) {
+      this.docViewer.openDocument({ fileName, fileSize, fileUrl, status: 'uploaded' }, title);
+    }
   }
 
   viewDocument(doc: AspirantDocumentItem): void {
     const formData = this.getFormData();
-    this.title.set(`${doc.itemNumber ? doc.itemNumber + '. ' : ''}${doc.docName}`);
+    const title = `${doc.itemNumber ? doc.itemNumber + '. ' : ''}${doc.docName}`;
+    const fileName = doc.fileName || `${doc.docName}.pdf`;
+    const fileSize = doc.fileSize || '1.2 MB';
+    const uploadDate = doc.uploadedAt || 'Today';
+    const fileUrl =
+      doc.fileUrl ||
+      generateDocumentPreviewSvg(doc.docName, doc.description || '', formData.aspirantName, formData.aadhaarNo);
+
+    this.title.set(title);
     this.doc.set({
-      fileName: doc.fileName || `${doc.docName}.pdf`,
-      fileSize: doc.fileSize || '1.2 MB',
-      uploadDate: doc.uploadedAt || 'Today',
+      fileName,
+      fileSize,
+      uploadDate,
       status: 'uploaded',
-      fileUrl:
-        doc.fileUrl ||
-        generateDocumentPreviewSvg(doc.docName, doc.description || '', formData.aspirantName, formData.aadhaarNo)
+      fileUrl
     });
-    this.isOpen.set(true);
+
+    if (this.docViewer) {
+      this.docViewer.openDocument({ fileName, fileSize, uploadDate, fileUrl, status: 'uploaded' }, title);
+    }
   }
 
   close(): void {

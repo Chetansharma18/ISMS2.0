@@ -5,7 +5,8 @@ import {
   EventEmitter,
   signal,
   computed,
-  TemplateRef
+  TemplateRef,
+  inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +18,7 @@ import {
   FormDensity,
   FormLayoutMode
 } from './form-sdc.types';
-import { DocumentViewerModalComponent } from '../document-viewer-modal/document-viewer-modal.component';
+import { DocumentViewerService } from '../../../core/services/document-viewer.service';
 import {
   appendPhotos,
   buildFileData,
@@ -39,7 +40,7 @@ import {
 @Component({
   selector: 'app-form-sdc, app-dynamic-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, DocumentViewerModalComponent],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="space-y-4 font-sans text-slate-800" style="font-family: 'Inter', sans-serif;">
       
@@ -715,14 +716,6 @@ import {
         </div>
       </ng-template>
 
-      <!-- Reusable Document Preview Modal for Inspection -->
-      <app-document-viewer-modal
-        [isOpen]="isPreviewOpen"
-        [doc]="activePreviewDoc"
-        [title]="previewTitle"
-        (close)="isPreviewOpen = false"
-      ></app-document-viewer-modal>
-
     </div>
   `
 })
@@ -795,10 +788,7 @@ export class FormSdcComponent {
   @Output() fileView = new EventEmitter<{ field: FormFieldConfig; file: any }>();
   @Output() fileRemove = new EventEmitter<{ key: string }>();
 
-  /** Document Preview Modal State */
-  isPreviewOpen = false;
-  previewTitle = 'Document Preview';
-  activePreviewDoc: any = null;
+  private docViewer = inject(DocumentViewerService);
 
   /** Internal local validation errors map */
   internalErrors: Record<string, string> = {};
@@ -918,13 +908,12 @@ export class FormSdcComponent {
     }
   }
 
-  /** Opens the document preview modal */
+  /** Opens the document in another tab in Chrome */
   viewFile(field: FormFieldConfig, fileVal: any): void {
     const fileName = this.getFileName(fileVal) || 'Document.jpg';
-
-    this.previewTitle = this.getFieldLabel(field) || 'Document Preview';
-    this.activePreviewDoc = buildFilePreviewDoc(fileName, fileVal);
-    this.isPreviewOpen = true;
+    const label = this.getFieldLabel(field) || 'Document Preview';
+    const previewDoc = buildFilePreviewDoc(fileName, fileVal);
+    this.docViewer.openDocument(previewDoc, label);
     this.fileView.emit({ field, file: fileVal });
   }
 
@@ -971,11 +960,11 @@ export class FormSdcComponent {
     }
   }
 
-  /** Preview photo in modal */
+  /** Preview photo in a new tab in Chrome */
   previewPhoto(photo: any): void {
-    this.previewTitle = photo.tag ? `${photo.tag} - ${photo.name}` : photo.name;
-    this.activePreviewDoc = buildPhotoPreviewDoc(photo);
-    this.isPreviewOpen = true;
+    const title = photo.tag ? `${photo.tag} - ${photo.name}` : photo.name;
+    const previewDoc = buildPhotoPreviewDoc(photo);
+    this.docViewer.openDocument(previewDoc, title);
   }
 
   /** Retrieves label as string, evaluating dynamic function if provided */

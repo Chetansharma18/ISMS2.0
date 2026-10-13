@@ -6,7 +6,7 @@ import { PermissionService } from '../../core/permissions/permission.service';
 import { OtrFormService } from '../registration/services/otr-form.service';
 import { OtrValidationService } from '../registration/services/otr-validation.service';
 import { OtrPdfService } from '../registration/services/otr-pdf.service';
-import { DocumentViewerModalComponent } from '../../shared/components/document-viewer-modal/document-viewer-modal.component';
+import { DocumentViewerService } from '../../core/services/document-viewer.service';
 import { FileDoc } from '../registration/models/otr-form.model';
 import { formatDate } from '../../shared/utils';
 
@@ -23,7 +23,7 @@ export interface RegistrationStepItem {
   selector: 'app-profile-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, DocumentViewerModalComponent],
+  imports: [CommonModule, RouterModule],
   template: `
     <div class="w-full min-h-full font-sans p-4 sm:p-5 space-y-4 select-none" style="background-color: #FEFEFD; font-family: 'Inter', sans-serif;">
 
@@ -293,15 +293,6 @@ export interface RegistrationStepItem {
         </div>
       </div>
 
-     
-      <!-- Reusable Document Preview Modal (preserved for document review) -->
-      <app-document-viewer-modal
-        [isOpen]="isDocViewerOpen()"
-        [doc]="selectedDoc()"
-        [title]="selectedDocTitle()"
-        (close)="isDocViewerOpen.set(false)"
-      ></app-document-viewer-modal>
-
     </div>
   `
 })
@@ -312,14 +303,10 @@ export class ProfilePageComponent {
   private otrFormService = inject(OtrFormService);
   private validationService = inject(OtrValidationService);
   private pdfService = inject(OtrPdfService);
+  private docViewer = inject(DocumentViewerService);
 
   readonly currentUser = this.authService.currentUser;
   readonly formData = this.otrFormService.formData;
-
-  /** Document viewer modal state */
-  readonly isDocViewerOpen = signal(false);
-  readonly selectedDoc = signal<FileDoc | null>(null);
-  readonly selectedDocTitle = signal('');
 
   /** 4 Standard Registration Steps */
   readonly sections = computed<RegistrationStepItem[]>(() => {
@@ -429,16 +416,14 @@ export class ProfilePageComponent {
     this.navigateToStep(this.currentPendingStep());
   }
 
-  /** Opens document viewer modal */
+  /** Opens document in another tab in Chrome */
   openDoc(doc: FileDoc | null, title: string, defaultName = 'document.pdf'): void {
-    this.selectedDoc.set(doc || {
+    this.docViewer.openDocument(doc || {
       fileName: defaultName,
       fileSize: '1.45 MB',
       uploadDate: formatDate(new Date()),
       status: 'uploaded'
-    });
-    this.selectedDocTitle.set(title);
-    this.isDocViewerOpen.set(true);
+    }, title);
   }
 
   /** Print / Download profile PDF */

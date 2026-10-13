@@ -15,6 +15,7 @@ import {
   TableColumn
 } from '../../shared';
 import { DataEngineService } from '../../core/services/data-engine.service';
+import { DocumentViewerService } from '../../core/services/document-viewer.service';
 
 import { AdminGrievance, GRIEVANCE_STATUS_BADGE, grievanceStatusVariant } from '../grievance/grievance.shared';
 
@@ -32,8 +33,7 @@ export type { AdminGrievance };
     TableComponent,
     ButtonComponent,
     ActionModalComponent,
-    StatusBadgeComponent,
-    EmptyStateComponent
+    StatusBadgeComponent
   ],
   template: `
     <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
@@ -215,32 +215,6 @@ export type { AdminGrievance };
         }
       </app-action-modal>
 
-      <!-- Attachment Preview Modal -->
-      <app-action-modal
-        [isOpen]="isPreviewModalOpen()"
-        [title]="'Preview: ' + previewAttachmentName()"
-        primaryLabel="Close"
-        secondaryLabel=""
-        [showPrimaryArrow]="false"
-        [showCloseButton]="true"
-        [showAccentBar]="false"
-        maxWidthClass="max-w-5xl"
-        (primaryAction)="closePreview()"
-        (close)="closePreview()"
-      >
-        <div class="mt-4 border border-slate-200 rounded-lg overflow-hidden bg-slate-50 flex flex-col items-center justify-center min-h-100">
-          @if (previewAttachmentUrl()) {
-            <iframe [src]="previewAttachmentUrl()" class="w-full h-full min-h-[70vh] border-0 bg-white"></iframe>
-          } @else {
-            <app-empty-state
-              title="No Preview Available"
-              description="This is a dummy file from the test data. Raise a new ticket and upload a real PDF to see the live preview."
-              iconPath="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-            ></app-empty-state>
-          }
-        </div>
-      </app-action-modal>
-
     </div>
   `
 })
@@ -248,6 +222,7 @@ export class AdminGrievanceListComponent {
   readonly statusVariant = grievanceStatusVariant;
   private sanitizer = inject(DomSanitizer);
   private permissions = inject(PermissionService);
+  private docViewer = inject(DocumentViewerService);
   private destroyRef = inject(DestroyRef);
 
   readonly isDeptAdmin = computed(() => this.permissions.hasRole('dept_admin'));
@@ -391,16 +366,15 @@ export class AdminGrievanceListComponent {
   }
 
   openPreview(ticket: AdminGrievance) {
-    this.previewAttachmentName.set(ticket.attachment);
-    this.previewAttachmentUrl.set(ticket.attachmentUrl || null);
-    this.isPreviewModalOpen.set(true);
+    if (ticket.attachment && ticket.attachment !== 'None') {
+      this.docViewer.openDocument({
+        fileName: ticket.attachment,
+        status: 'uploaded'
+      }, `Grievance Attachment - ${ticket.title}`);
+    }
   }
 
   closePreview() {
     this.isPreviewModalOpen.set(false);
-    setTimeout(() => {
-      this.previewAttachmentName.set('');
-      this.previewAttachmentUrl.set(null);
-    }, 300);
   }
 }

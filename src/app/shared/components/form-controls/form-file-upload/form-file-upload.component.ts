@@ -1,13 +1,13 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FileDoc } from '../../../../features/registration/models/otr-form.model';
-import { DocumentViewerModalComponent } from '../../document-viewer-modal/document-viewer-modal.component';
+import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
 
 @Component({
   selector: 'app-form-file-upload',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, DocumentViewerModalComponent],
+  imports: [CommonModule],
   template: `
     <div class="w-full flex flex-col font-sans">
       <!-- Label -->
@@ -77,16 +77,15 @@ import { DocumentViewerModalComponent } from '../../document-viewer-modal/docume
 
           <!-- Actions Toolbar: View, Change, Remove -->
           <div class="flex items-center gap-1.5 shrink-0 sm:ml-auto">
-            <!-- View Option -->
+            <!-- View Option -> Opens in Chrome Tab -->
             <button
               type="button"
               (click)="openPreview()"
               class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-ocean hover:text-ocean-dark bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
-              title="Preview {{ fileDoc.fileName }}"
+              title="Open {{ fileDoc.fileName }} in new tab"
             >
               <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
               <span>View</span>
             </button>
@@ -128,18 +127,12 @@ import { DocumentViewerModalComponent } from '../../document-viewer-modal/docume
           {{ error }}
         </p>
       }
-
-      <!-- Reusable Document Preview Modal -->
-      <app-document-viewer-modal
-        [isOpen]="isPreviewOpen"
-        [doc]="fileDoc"
-        [title]="label"
-        (close)="isPreviewOpen = false"
-      ></app-document-viewer-modal>
     </div>
   `
 })
 export class FormFileUploadComponent {
+  private docViewer = inject(DocumentViewerService);
+
   @Input() label: string = '';
   @Input() fileDoc: FileDoc | null = null;
   @Input() accept: string = '.pdf,.png,.jpg,.jpeg';
@@ -152,8 +145,6 @@ export class FormFileUploadComponent {
   @Output() fileChange = new EventEmitter<FileDoc | null>();
   @Output() fileDocChange = new EventEmitter<FileDoc | null>();
 
-  isPreviewOpen = false;
-
   triggerFileSelect(input: HTMLInputElement): void {
     if (!this.disabled) {
       input.click();
@@ -162,7 +153,7 @@ export class FormFileUploadComponent {
 
   openPreview(): void {
     if (this.fileDoc) {
-      this.isPreviewOpen = true;
+      this.docViewer.openDocument(this.fileDoc, this.label);
     }
   }
 
@@ -182,12 +173,7 @@ export class FormFileUploadComponent {
     }
 
     this.error = undefined;
-    let objectUrl: string | undefined;
-    try {
-      objectUrl = URL.createObjectURL(file);
-    } catch {
-      // Fallback
-    }
+    const objectUrl = this.docViewer.registerFile(file.name, file);
 
     const doc: FileDoc = {
       fileName: file.name,

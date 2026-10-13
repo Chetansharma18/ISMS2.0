@@ -16,6 +16,7 @@ import { SubmittedTender, createSampleDocs } from '../../../../core/models/tende
 import { DataEngineService } from '../../../../core/services/data-engine.service';
 import { EoiDocumentItem, createInitialEoiDocuments } from './scheme-form.model';
 import { SchemeFormReceiptsService, SchemeReceiptData } from './scheme-form-receipts.service';
+import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
 import {
   countUploaded,
   emdPaymentModeLabel,
@@ -39,6 +40,7 @@ export class SchemeFormState {
   private route = inject(ActivatedRoute);
   private otrFormService = inject(OtrFormService);
   private receipts = inject(SchemeFormReceiptsService);
+  private docViewer = inject(DocumentViewerService);
 
   readonly otrData = this.otrFormService.formData;
 
@@ -329,14 +331,12 @@ export class SchemeFormState {
   }
 
   viewDoc(fileName: string, title: string, fileSize: string = '1.2 MB'): void {
-    this.activeViewerTitle.set(title);
-    this.activeViewerDoc.set({
+    this.docViewer.openDocument({
       fileName,
       fileSize,
       uploadDate: '04/10/2026',
       status: 'uploaded'
-    });
-    this.isViewerOpen.set(true);
+    }, title);
   }
 
   closeViewer(): void {

@@ -1,6 +1,6 @@
 import { Component, DestroyRef, signal, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DocumentViewerModalComponent } from '../../shared/components/document-viewer-modal/document-viewer-modal.component';
+import { DocumentViewerService } from '../../core/services/document-viewer.service';
 import { formatDateMedium } from '../../shared/utils';
 import { FileDoc } from '../registration/models/otr-form.model';
 import {
@@ -36,7 +36,6 @@ export type { SubmittedTender, SubmittedTenderDoc };
   selector: 'app-tender-status',
   standalone: true,
   imports: [
-    DocumentViewerModalComponent,
     TenderListComponent,
     TenderDetailHeaderComponent,
     TenderEditStatusComponent,
@@ -49,14 +48,6 @@ export type { SubmittedTender, SubmittedTenderDoc };
   ],
   template: `
     <div class="w-full min-h-full bg-white text-slate-800 font-sans">
-
-      <!-- Document Viewer Modal -->
-      <app-document-viewer-modal
-        [isOpen]="isViewerOpen()"
-        [doc]="activeViewerDoc()"
-        [title]="activeViewerTitle()"
-        (close)="closeViewer()"
-      />
 
       <!-- VIEW 1: TENDER STATUS MAIN TABLE -->
       @if (!selectedTender()) {
@@ -138,10 +129,7 @@ export class TenderStatusComponent {
   editableTender: SubmittedTender | null = null;
   isEditing = signal<boolean>(false);
 
-  // Document Viewer Modal State
-  activeViewerDoc = signal<FileDoc | null>(null);
-  activeViewerTitle = signal<string>('');
-  isViewerOpen = signal<boolean>(false);
+  private readonly docViewer = inject(DocumentViewerService);
 
   private readonly tenderRepo = inject(DataEngineService).for<SubmittedTender>('SUBMITTED_TENDERS');
 
@@ -226,19 +214,12 @@ export class TenderStatusComponent {
   }
 
   viewDoc(fileName: string, title?: string, fileSize?: string): void {
-    this.activeViewerDoc.set({
+    this.docViewer.openDocument({
       fileName,
       fileSize: fileSize || '1.2 MB',
       uploadDate: 'Verified & Attached',
       status: 'uploaded'
-    });
-    this.activeViewerTitle.set(title || fileName);
-    this.isViewerOpen.set(true);
-  }
-
-  closeViewer(): void {
-    this.isViewerOpen.set(false);
-    this.activeViewerDoc.set(null);
+    }, title || fileName);
   }
 
   onReplaceOtrDoc(request: TenderDocReplaceRequest): void {

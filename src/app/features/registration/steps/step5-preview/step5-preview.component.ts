@@ -2,13 +2,13 @@ import { ChangeDetectionStrategy, Component, inject, computed, signal, output } 
 import { CommonModule } from '@angular/common';
 import { OtrFormService } from '../../services/otr-form.service';
 import { FileDoc } from '../../models/otr-form.model';
-import { DocumentViewerModalComponent } from '../../../../shared/components/document-viewer-modal/document-viewer-modal.component';
+import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
 
 @Component({
   selector: 'app-step5-preview',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, DocumentViewerModalComponent],
+  imports: [CommonModule],
   template: `
     <div class="w-full space-y-4 font-sans bg-white pb-4">
 
@@ -305,19 +305,12 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
         }
       </section>
 
-      <!-- Document Preview Modal Dialog (if needed) -->
-      <app-document-viewer-modal
-        [isOpen]="isViewerOpen()"
-        [doc]="activeDoc()"
-        [title]="activeDocTitle()"
-        (close)="closeViewer()"
-      ></app-document-viewer-modal>
-
     </div>
   `
 })
 export class Step5PreviewComponent {
   private otrFormService = inject(OtrFormService);
+  private docViewer = inject(DocumentViewerService);
 
   readonly step1 = computed(() => this.otrFormService.step1());
   readonly step3 = computed(() => this.otrFormService.step3()); // Authorized Person Details
@@ -360,22 +353,11 @@ export class Step5PreviewComponent {
 
   editStep = output<number>();
 
-  isViewerOpen = signal<boolean>(false);
-  activeDoc = signal<FileDoc | null>(null);
-  activeDocTitle = signal<string>('');
-
   onEditStep(step: number): void {
     this.editStep.emit(step);
   }
 
   previewDoc(doc: FileDoc, title?: string): void {
-    this.activeDoc.set(doc);
-    this.activeDocTitle.set(title || doc.fileName);
-    this.isViewerOpen.set(true);
-  }
-
-  closeViewer(): void {
-    this.isViewerOpen.set(false);
-    this.activeDoc.set(null);
+    this.docViewer.openDocument(doc, title);
   }
 }

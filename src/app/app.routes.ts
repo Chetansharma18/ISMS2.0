@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { DynamicFormBuilderComponent } from './features/dynamic-form-builder/dynamic-form-builder.component';
 
 export const routes: Routes = [
   {
@@ -205,6 +206,15 @@ export const routes: Routes = [
       import('./features/two-step-verification/two-step-verification.component').then(
         (m) => m.TwoStepVerificationComponent
       )
+  },
+  {
+    path: 'admin/dynamic-form-builder',
+    component: DynamicFormBuilderComponent
+  },
+  {
+    path: 'dynamic-form-builder',
+    redirectTo: 'admin/dynamic-form-builder',
+    pathMatch: 'full'
   },
   {
     path: 'admin/master/eoi-category',

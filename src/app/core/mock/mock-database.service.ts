@@ -30,7 +30,8 @@ import {
   MOCK_REMARK_MASTER_ITEMS,
   MOCK_GRADING_MASTER_ITEMS,
   MOCK_TWO_STEP_VERIFICATION_ITEMS,
-  MOCK_CAMERA_BATCHES
+  MOCK_CAMERA_BATCHES,
+  MOCK_DYNAMIC_FORM_BUILDER_ITEMS
 } from './data';
 
 export interface QueryOptions {
@@ -82,7 +83,8 @@ export class MockDatabaseService {
     SCHEME_CATEGORIES: MOCK_SCHEME_CATEGORY_MASTER_ITEMS,
     REMARK_MASTERS: MOCK_REMARK_MASTER_ITEMS,
     GRADING_MASTERS: MOCK_GRADING_MASTER_ITEMS,
-    TWO_STEP_VERIFICATION: MOCK_TWO_STEP_VERIFICATION_ITEMS
+    TWO_STEP_VERIFICATION: MOCK_TWO_STEP_VERIFICATION_ITEMS,
+    DYNAMIC_FORM_BUILDER: MOCK_DYNAMIC_FORM_BUILDER_ITEMS
   };
 
   constructor() {
@@ -162,6 +164,20 @@ export class MockDatabaseService {
             const fresh = this.deepClone(this.seeds[key]);
             this.store.set(key, fresh);
             this.saveToStorage(key, fresh);
+          } else {
+            this.store.set(key, stored);
+          }
+        } else if (key === 'PERMISSIONS') {
+          const hasOldData = stored.some(
+            item =>
+              item?.id === 'perm-1' ||
+              item?.id === 'perm-2' ||
+              item?.id === 'perm-3' ||
+              item?.roleType === 'Role1'
+          );
+          if (hasOldData) {
+            this.store.set(key, []);
+            this.saveToStorage(key, []);
           } else {
             this.store.set(key, stored);
           }

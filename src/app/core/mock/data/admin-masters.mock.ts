@@ -13,7 +13,11 @@ import {
   RemarkMasterItem,
   GradingMasterItem,
   TwoStepVerificationItem,
-  AuthMethodType
+  AuthMethodType,
+  DynamicFormBuilderItem,
+  DynamicFormField,
+  DynamicFormFieldType,
+  FormStep
 } from '../../models/admin-masters.model';
 
 // Types live in core/models; re-exported so existing imports keep working.
@@ -30,7 +34,11 @@ export type {
   RemarkMasterItem,
   GradingMasterItem,
   TwoStepVerificationItem,
-  AuthMethodType
+  AuthMethodType,
+  DynamicFormBuilderItem,
+  DynamicFormField,
+  DynamicFormFieldType,
+  FormStep
 };
 
 export const MOCK_COURSE_MASTER_ITEMS: CourseMasterItem[] = resolveMock([
@@ -326,14 +334,7 @@ export const MOCK_EOI_CATEGORY_ITEMS: EoiCategoryItem[] = resolveMock([
   { sNo: 2, id: 'cat-2', categoryTitle: 'Special', description: 'Specialized scheme proposals for specific target demographics, tribal regions, or high-priority sectors.', status: 'Active' }
 ]);
 
-export const MOCK_PERMISSION_MASTER_ITEMS: PermissionMasterItem[] = resolveMock([
-  { sNo: 1, id: 'perm-1', permissionName: 'View EOI Configuration', permissionCode: 'PERM_EOI_VIEW', moduleName: 'EOI Management', description: 'Allows user to view all active and published EOI configurations and details.', status: 'Active' },
-  { sNo: 2, id: 'perm-2', permissionName: 'Create & Edit EOI', permissionCode: 'PERM_EOI_CREATE_EDIT', moduleName: 'EOI Management', description: 'Grants access to configure new Expression of Interest schemes and upload corrigendum documents.', status: 'Active' },
-  { sNo: 3, id: 'perm-3', permissionName: 'Delete EOI Proposal', permissionCode: 'PERM_EOI_DELETE', moduleName: 'EOI Management', description: 'Allows deletion of EOI proposal configurations from super admin desk.', status: 'Active' },
-  { sNo: 4, id: 'perm-4', permissionName: 'Batch Approval & Scrutiny', permissionCode: 'PERM_BATCH_APPROVE', moduleName: 'Batch Approval', description: 'Allows officer to review, approve, reject, or request clarification on training batches.', status: 'Active' },
-  { sNo: 5, id: 'perm-5', permissionName: 'Manage Master Records', permissionCode: 'PERM_MASTER_MANAGE', moduleName: 'Master Data', description: 'Full administrative access to add, view, and delete EOI, Scheme, Sector, Course, and District master entries.', status: 'Active' },
-  { sNo: 6, id: 'perm-6', permissionName: 'Camera CCTV Live Monitoring', permissionCode: 'PERM_CAMERA_VIEW', moduleName: 'Camera Monitoring', description: 'Access to real-time CCTV camera streams across all accredited SDC centers.', status: 'Active' }
-]);
+export const MOCK_PERMISSION_MASTER_ITEMS: PermissionMasterItem[] = resolveMock([]);
 
 export const MOCK_SCHEME_MASTER_ITEMS: SchemeMasterItem[] = resolveMock([
   { sNo: 1, id: 'sch-1', schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana', schemeCategory: 'Rajvik', categoryName: 'GENERAL', amount: 5000000, processFees: 10000, status: 'Active' },
@@ -464,6 +465,120 @@ export const MOCK_TWO_STEP_VERIFICATION_ITEMS: TwoStepVerificationItem[] = resol
     roleType: 'Training Partner',
     authTypes: ['OTP'],
     status: 'Active'
+  }
+]);
+
+export const MOCK_DYNAMIC_FORM_BUILDER_ITEMS: DynamicFormBuilderItem[] = resolveMock([
+  {
+    sNo: 1,
+    id: 'form-1',
+    formType: 'Training Center Inspection Form',
+    isStepForm: true,
+    status: 'Active',
+    createdAt: '2026-10-01',
+    steps: [
+      {
+        id: 'stp-1',
+        stepNumber: 1,
+        title: 'Basic Center Details',
+        fields: [
+          {
+            id: 'fld-1',
+            label: 'Center Name',
+            type: 'text',
+            mandatory: true
+          },
+          {
+            id: 'fld-2',
+            label: 'Center Capacity / Total Seats',
+            type: 'number',
+            mandatory: true
+          },
+          {
+            id: 'fld-3',
+            label: 'Inspection Date',
+            type: 'datepicker',
+            mandatory: true
+          }
+        ]
+      },
+      {
+        id: 'stp-2',
+        stepNumber: 2,
+        title: 'Infrastructure & Center Photos',
+        fields: [
+          {
+            id: 'fld-4',
+            label: 'Center Category Grade',
+            type: 'dropdown',
+            mandatory: true,
+            options: ['Grade A', 'Grade B', 'Grade C'],
+            optionsText: 'Grade A, Grade B, Grade C'
+          },
+          {
+            id: 'fld-5',
+            label: 'Classroom & Infrastructure Photos',
+            type: 'photo',
+            mandatory: true,
+            minPhotos: 2,
+            maxPhotos: 5,
+            maxSizeMb: 5
+          }
+        ]
+      }
+    ],
+    fields: [
+      { id: 'fld-1', label: 'Center Name', type: 'text', mandatory: true },
+      { id: 'fld-2', label: 'Center Capacity / Total Seats', type: 'number', mandatory: true },
+      { id: 'fld-3', label: 'Inspection Date', type: 'datepicker', mandatory: true },
+      { id: 'fld-4', label: 'Center Category Grade', type: 'dropdown', mandatory: true, options: ['Grade A', 'Grade B', 'Grade C'] },
+      { id: 'fld-5', label: 'Classroom & Infrastructure Photos', type: 'photo', mandatory: true, minPhotos: 2, maxPhotos: 5, maxSizeMb: 5 }
+    ]
+  },
+  {
+    sNo: 2,
+    id: 'form-2',
+    formType: 'Candidate Feedback & Verification',
+    isStepForm: false,
+    status: 'Active',
+    createdAt: '2026-10-05',
+    fields: [
+      {
+        id: 'fld-201',
+        label: 'Candidate Full Name',
+        type: 'text',
+        mandatory: true
+      },
+      {
+        id: 'fld-202',
+        label: 'Candidate Mobile Number',
+        type: 'number',
+        mandatory: true
+      },
+      {
+        id: 'fld-203',
+        label: 'Date of Enrollment',
+        type: 'datepicker',
+        mandatory: true
+      },
+      {
+        id: 'fld-204',
+        label: 'Course Rating',
+        type: 'dropdown',
+        mandatory: false,
+        options: ['Excellent', 'Good', 'Average', 'Poor'],
+        optionsText: 'Excellent, Good, Average, Poor'
+      },
+      {
+        id: 'fld-205',
+        label: 'Candidate Passport Photo',
+        type: 'photo',
+        mandatory: true,
+        minPhotos: 1,
+        maxPhotos: 2,
+        maxSizeMb: 2
+      }
+    ]
   }
 ]);
 

@@ -187,6 +187,13 @@ export const API_ENDPOINTS = {
     UPDATE: { url: (id: string | number) => `/admin/two-step-verification/${id}`, method: 'PUT' as ApiMethod },
     DELETE: { url: (id: string | number) => `/admin/two-step-verification/${id}`, method: 'DELETE' as ApiMethod }
   },
+  DYNAMIC_FORM_BUILDER: {
+    LIST: { url: '/admin/dynamic-form-builder', method: 'GET' as ApiMethod },
+    GET: { url: (id: string | number) => `/admin/dynamic-form-builder/${id}`, method: 'GET' as ApiMethod },
+    ADD: { url: '/admin/dynamic-form-builder', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/admin/dynamic-form-builder/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/admin/dynamic-form-builder/${id}`, method: 'DELETE' as ApiMethod }
+  },
 
   // Grievance Redressal (DataKey: 'GRIEVANCES')
   GRIEVANCES: {

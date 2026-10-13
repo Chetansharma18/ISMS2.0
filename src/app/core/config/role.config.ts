@@ -24,6 +24,12 @@ export const USER_ROLES_CONFIG: RoleConfig[] = [
     label: 'Super Admin',
     badge: 'System Admin',
     description: 'System administrator with full access'
+  },
+  {
+    role: 'aspirant',
+    label: 'Aspirant',
+    badge: 'Aspirant',
+    description: 'Aspirant candidate looking for skill training programs'
   }
 ];
 

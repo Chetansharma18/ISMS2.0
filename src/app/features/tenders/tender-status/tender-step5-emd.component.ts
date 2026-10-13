@@ -18,12 +18,6 @@ import { calculateTotalFee } from './tender-status.util';
             Step 3: Statutory Fees Payment Details (Processing Fee &amp; EMD)
           </h3>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-slate-500 font-medium">Total Settled:</span>
-          <span class="px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono font-bold text-xs">
-            {{ totalAmountDeposited() }}
-          </span>
-        </div>
       </div>
 
       <!-- Simple, Clean & Easy-to-Understand Fees Table -->
@@ -107,7 +101,7 @@ import { calculateTotalFee } from './tender-status.util';
               <td class="py-2.5 px-3 text-center border-r border-slate-200">
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                  Deposited
+                  Paid
                 </span>
               </td>
               <td class="py-2.5 px-3 text-center">

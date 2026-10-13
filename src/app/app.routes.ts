@@ -53,6 +53,20 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'training-calendar',
+    loadComponent: () =>
+      import('./features/aspirant/pages/training-calendar.component').then(
+        (m) => m.TrainingCalendarComponent
+      )
+  },
+  {
+    path: 'expressed-interest',
+    loadComponent: () =>
+      import('./features/aspirant/pages/expressed-interest.component').then(
+        (m) => m.ExpressedInterestComponent
+      )
+  },
+  {
     path: 'grievance',
     loadComponent: () =>
       import('./features/grievance/grievance-list.component').then(

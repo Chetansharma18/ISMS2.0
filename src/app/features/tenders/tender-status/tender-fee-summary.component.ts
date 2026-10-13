@@ -36,7 +36,7 @@ import { SubmittedTender } from '../../../core/models/tender.model';
           <div class="p-3 bg-surface-muted border border-slate-200 rounded-lg space-y-2">
             <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
               <span class="font-medium text-slate-800 text-xs">2. Earnest Money Deposit (EMD)</span>
-              <span class="font-medium text-emerald-700 text-[11px]">Deposited</span>
+              <span class="font-medium text-emerald-700 text-[11px]">Paid</span>
             </div>
             <div class="grid grid-cols-2 gap-y-1.5 gap-x-2 text-xs text-slate-600">
               <div><span class="text-slate-500 text-[11px] block">Amount</span><span class="font-medium text-slate-900">{{ app().emdAmount }}</span></div>

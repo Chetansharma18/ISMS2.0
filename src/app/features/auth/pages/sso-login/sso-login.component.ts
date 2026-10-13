@@ -221,10 +221,12 @@ import { NewUserCategoryModalComponent } from '../../../../core/auth/components/
         (cancelled)="onDeptAdminOtpCancelled()"
       ></app-dept-admin-otp-modal>
 
-      <!-- New User Category Selection Modal (Student vs Citizen) -->
+      <!-- New User Category Selection Modal (Aspirant vs Citizen) -->
       <app-new-user-category-modal
         [isOpen]="showNewUserCategoryModal()"
         (proceedWithCitizen)="onProceedWithCitizen()"
+        (proceedWithStudent)="onProceedWithStudent()"
+        (proceedWithAspirant)="onProceedWithAspirant()"
         (cancelled)="onNewUserCategoryCancelled()"
       ></app-new-user-category-modal>
 
@@ -290,8 +292,41 @@ export class SsoLoginComponent {
     this.selectedRole.set('new_user');
     this.selectedNewUserCategory.set('citizen');
     this.emailOrSsoId = 'new_user';
-    this.showNewUserCategoryModal.set(false);
-    this.executeLogin('new_user');
+
+    // Seed clean initial draft for new user registration
+    this.otrFormService.resetToInitialDraft();
+
+    // Authenticate session synchronously so authGuard passes immediately
+    this.authService.loginWithCredentials('new_user', 'new_user', null);
+
+    // Reset prompt flags so the OTR prompt appears on tenders page
+    this.storage.removeSessionItem('isms_otr_prompt_dismissed');
+    this.storage.removeItem('isms_eoi_prompt_shown_new_user');
+
+    // Navigate directly to /tenders without closing the modal beforehand,
+    // ensuring the SSO ID login screen never flashes for a few seconds
+    this.router.navigate(['/tenders'], { queryParams: { fromLogin: 'true' } }).then(() => {
+      this.showNewUserCategoryModal.set(false);
+      this.isLoading.set(false);
+    });
+  }
+
+  onProceedWithAspirant(): void {
+    this.selectedRole.set('aspirant');
+    this.selectedNewUserCategory.set('student');
+    this.emailOrSsoId = 'aspirant_user';
+
+    this.authService.loginWithCredentials('aspirant_user', 'aspirant', null);
+    this.storage.removeSessionItem('isms_aspirant_prompt_dismissed');
+
+    this.router.navigate(['/training-calendar'], { queryParams: { fromLogin: 'true' } }).then(() => {
+      this.showNewUserCategoryModal.set(false);
+      this.isLoading.set(false);
+    });
+  }
+
+  onProceedWithStudent(): void {
+    this.onProceedWithAspirant();
   }
 
   onNewUserCategoryCancelled(): void {
@@ -330,6 +365,8 @@ export class SsoLoginComponent {
       if (role === 'super_admin') {
         // Super Admin navigates directly to EOI Configuration / Masters
         this.router.navigate(['/admin/eoi-configuration']);
+      } else if (role === 'aspirant') {
+        this.router.navigate(['/training-calendar']);
       } else {
         // Directly show tenders with fromLogin query param
         this.router.navigate(['/tenders'], { queryParams: { fromLogin: 'true' } });

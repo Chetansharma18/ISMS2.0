@@ -149,6 +149,7 @@ export class TenderListComponent {
       badgeVariantMap: {
         'Submitted': 'info',
         'Under Review': 'warning',
+        'Approved': 'success',
         'Accepted': 'success',
         'Rejected': 'danger'
       }

@@ -10,6 +10,7 @@ import { NewUserCategoryModalComponent } from './new-user-category-modal.compone
     <app-new-user-category-modal
       [isOpen]="open()"
       (proceedWithCitizen)="proceedCount = proceedCount + 1"
+      (proceedWithAspirant)="aspirantCount = aspirantCount + 1"
       (cancelled)="cancelCount = cancelCount + 1"
     ></app-new-user-category-modal>
   `
@@ -17,6 +18,7 @@ import { NewUserCategoryModalComponent } from './new-user-category-modal.compone
 class TestHostComponent {
   open = signal(false);
   proceedCount = 0;
+  aspirantCount = 0;
   cancelCount = 0;
 }
 
@@ -41,25 +43,33 @@ describe('NewUserCategoryModalComponent', () => {
     expect(el().querySelector('[role="dialog"]')).toBeNull();
   });
 
-  it('renders student and citizen options when open', () => {
+  it('renders student/aspirant and citizen options when open', () => {
     openModal();
     const dialog = el().querySelector('[role="dialog"]');
     expect(dialog).not.toBeNull();
 
     const text = dialog?.textContent || '';
-    expect(text).toContain('Student');
+    expect(text).toContain('Aspirant');
     expect(text).toContain('Training Related Interest');
     expect(text).toContain('Citizen');
     expect(text).toContain('Express Interest & Conduct Schemes');
   });
 
-  it('switches between Student and Citizen selections', () => {
+  it('has neither category selected by default and disables continue', () => {
     openModal();
-    const studentCard = el().querySelectorAll('.group.relative')[0] as HTMLElement;
-    studentCard.click();
+    const continueBtn = Array.from(el().querySelectorAll('button')).find(b =>
+      b.textContent?.includes('Continue') && b.disabled
+    );
+    expect(continueBtn).toBeDefined();
+  });
+
+  it('switches between Aspirant and Citizen selections', () => {
+    openModal();
+    const aspirantCard = el().querySelectorAll('.group.relative')[0] as HTMLElement;
+    aspirantCard.click();
     fixture.detectChanges();
 
-    expect(el().textContent).toContain('Student Module Coming Soon');
+    expect(el().textContent).toContain('Continue as Aspirant');
 
     const citizenCard = el().querySelectorAll('.group.relative')[1] as HTMLElement;
     citizenCard.click();
@@ -70,6 +80,10 @@ describe('NewUserCategoryModalComponent', () => {
 
   it('emits proceedWithCitizen on confirming citizen', () => {
     openModal();
+    const citizenCard = el().querySelectorAll('.group.relative')[1] as HTMLElement;
+    citizenCard.click();
+    fixture.detectChanges();
+
     const continueBtn = Array.from(el().querySelectorAll('button')).find(b =>
       b.textContent?.includes('Continue as Citizen')
     );
@@ -78,6 +92,22 @@ describe('NewUserCategoryModalComponent', () => {
     fixture.detectChanges();
 
     expect(host.proceedCount).toBe(1);
+  });
+
+  it('emits proceedWithAspirant on confirming aspirant', () => {
+    openModal();
+    const aspirantCard = el().querySelectorAll('.group.relative')[0] as HTMLElement;
+    aspirantCard.click();
+    fixture.detectChanges();
+
+    const continueBtn = Array.from(el().querySelectorAll('button')).find(b =>
+      b.textContent?.includes('Continue as Aspirant')
+    );
+    expect(continueBtn).toBeDefined();
+    continueBtn?.click();
+    fixture.detectChanges();
+
+    expect(host.aspirantCount).toBe(1);
   });
 
   it('emits cancelled on clicking close button', () => {

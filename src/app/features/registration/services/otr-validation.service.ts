@@ -263,7 +263,9 @@ export class OtrValidationService {
     if (step3.emailId?.trim() && !REGEX.EMAIL.test(step3.emailId)) {
       errors.push('Invalid Email-ID format for Authorized Signatory.');
     }
-    if (step3.aadhaarNo?.trim() && !REGEX.AADHAAR.test(step3.aadhaarNo)) {
+    if (!step3.aadhaarNo?.trim()) {
+      errors.push('Aadhaar Number is mandatory.');
+    } else if (!REGEX.AADHAAR.test(step3.aadhaarNo)) {
       errors.push('Invalid Aadhaar Number (Must be 12 numeric digits).');
     }
     if (step3.voterIdNo?.trim() && !REGEX.VOTER_ID.test(step3.voterIdNo.toUpperCase())) {

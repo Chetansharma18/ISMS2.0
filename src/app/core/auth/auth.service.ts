@@ -36,6 +36,13 @@ export const USER_ROLES: RoleConfig[] = [
   }
 ];
 
+export const ASPIRANT_ROLE_CONFIG: RoleConfig = {
+  role: 'aspirant',
+  label: 'Aspirant',
+  badge: 'Aspirant',
+  description: 'Aspirant candidate looking for skill training programs'
+};
+
 /**
  * A role granted to the signed-in user. One user can hold more than one role
  * and switch the active one without signing out. Only the role changes on a
@@ -113,8 +120,7 @@ export class AuthService {
     const user = this.currentUser();
     if (!user) return '';
     return this.activeRole()?.label
-      ?? USER_ROLES.find(r => r.role === user.role)?.label
-      ?? '';
+      ?? this.getRoleConfig(user.role).label;
   });
 
   constructor() {
@@ -178,7 +184,7 @@ export class AuthService {
     redirectUrl: string | null = '/registration'
   ): void {
     const ssoId = identifier.trim() || 'new_user';
-    const roleConfig = USER_ROLES.find(r => r.role === role) || USER_ROLES[0];
+    const roleConfig = this.getRoleConfig(role);
 
     let label = ssoId;
     // The sub label always carries the active role, never a designation or name.
@@ -201,6 +207,15 @@ export class AuthService {
     this.login(persona, redirectUrl);
   }
 
+  markProfileCompleted(): void {
+    const user = this.currentUser();
+    if (user) {
+      const updated: UserPersona = { ...user, isProfileComplete: true };
+      this.currentUser.set(updated);
+      this.storage.setItem(this.STORAGE_KEY, updated);
+    }
+  }
+
   setDeptAdminOtpVerified(verified: boolean): void {
     this.isDeptAdminOtpVerified.set(verified);
     if (verified) {
@@ -219,6 +234,7 @@ export class AuthService {
   }
 
   getRoleConfig(role: UserRole): RoleConfig {
+    if (role === 'aspirant') return ASPIRANT_ROLE_CONFIG;
     return USER_ROLES.find(r => r.role === role) || USER_ROLES[0];
   }
 

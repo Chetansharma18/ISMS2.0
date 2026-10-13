@@ -72,14 +72,16 @@ export type NewUserCategory = 'student' | 'citizen';
           <!-- Category Options Body -->
           <div class="p-5 sm:p-6 space-y-3.5">
 
-            <!-- OPTION 1: STUDENT (Training Related Interest) -->
+            <!-- OPTION 1: ASPIRANT (Training Related Interest) -->
             <div
               (click)="selectCategory('student')"
               class="group relative rounded-xl border-2 p-4 sm:p-4.5 transition-all cursor-pointer select-none"
               [class.border-indigo-600]="selectedCategory() === 'student'"
               [class.bg-indigo-50/50]="selectedCategory() === 'student'"
+              [class.ring-2]="selectedCategory() === 'student'"
+              [class.ring-indigo-600/15]="selectedCategory() === 'student'"
               [class.border-slate-200]="selectedCategory() !== 'student'"
-              [class.bg-slate-50/60]="selectedCategory() !== 'student'"
+              [class.bg-white]="selectedCategory() !== 'student'"
               [class.hover:border-indigo-300]="selectedCategory() !== 'student'"
               [class.hover:bg-slate-50]="selectedCategory() !== 'student'"
             >
@@ -111,9 +113,8 @@ export type NewUserCategory = 'student' | 'citizen';
                 <div class="flex-1">
                   <div class="flex items-center gap-2">
                     <h3 class="text-sm sm:text-base font-bold text-slate-900 m-0">
-                      Student
+                      Aspirant
                     </h3>
-                    <span class="text-xs text-slate-500 font-normal">(छात्र / शिक्षार्थी)</span>
                   </div>
 
                   <div class="mt-1 text-xs font-semibold text-indigo-700">
@@ -125,19 +126,6 @@ export type NewUserCategory = 'student' | 'citizen';
                   </p>
                 </div>
               </div>
-
-              <!-- Inline Coming Soon Alert for Student -->
-              @if (selectedCategory() === 'student') {
-                <div class="mt-3.5 pt-3 border-t border-indigo-200/80 flex items-start gap-2 text-xs text-amber-900 bg-amber-50/90 p-2.5 rounded-lg border border-amber-200 animate-in fade-in">
-                  <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div>
-                    <strong class="font-bold">Student Module Coming Soon:</strong>
-                    Direct candidate admission & training interest registration will be introduced in the next release. To participate in active schemes, please proceed as Citizen.
-                  </div>
-                </div>
-              }
             </div>
 
             <!-- OPTION 2: CITIZEN (Express Interest & Conduct Schemes) -->
@@ -181,7 +169,6 @@ export type NewUserCategory = 'student' | 'citizen';
                     <h3 class="text-sm sm:text-base font-bold text-slate-900 m-0">
                       Citizen
                     </h3>
-                    <span class="text-xs text-slate-500 font-normal">(नागरिक / संस्था / TP)</span>
                   </div>
 
                   <div class="mt-1 text-xs font-semibold text-emerald-700">
@@ -189,7 +176,7 @@ export type NewUserCategory = 'student' | 'citizen';
                   </div>
 
                   <p class="mt-1 text-xs text-slate-600 leading-relaxed m-0">
-                    Express interest to conduct skill training programs, submit Expression of Interest (EOI), empanel as Training Partner / PIA, and complete One-Time Registration (OTR).
+                    Express interest to conduct skill training programs, submit Expression of Interest (EOI).
                   </p>
                 </div>
               </div>
@@ -210,18 +197,44 @@ export type NewUserCategory = 'student' | 'citizen';
             @if (selectedCategory() === 'citizen') {
               <button
                 type="button"
-                (click)="confirmCitizen()"
-                class="w-full sm:w-auto px-5 py-2.5 text-xs sm:text-sm font-bold text-white bg-navy hover:bg-[#07243c] rounded-xl transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2"
+                (click)="confirmSelection()"
+                [disabled]="isSubmitting()"
+                class="w-full sm:w-auto px-5 py-2.5 text-xs sm:text-sm font-bold text-white bg-navy hover:bg-[#07243c] rounded-xl transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75"
               >
-                <span>Continue as Citizen &rarr;</span>
+                @if (isSubmitting()) {
+                  <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Continuing...</span>
+                } @else {
+                  <span>Continue as Citizen &rarr;</span>
+                }
+              </button>
+            } @else if (selectedCategory() === 'student') {
+              <button
+                type="button"
+                (click)="confirmSelection()"
+                [disabled]="isSubmitting()"
+                class="w-full sm:w-auto px-5 py-2.5 text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75"
+              >
+                @if (isSubmitting()) {
+                  <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Continuing...</span>
+                } @else {
+                  <span>Continue as Aspirant &rarr;</span>
+                }
               </button>
             } @else {
               <button
                 type="button"
-                (click)="selectCategory('citizen')"
-                class="w-full sm:w-auto px-5 py-2.5 text-xs sm:text-sm font-bold text-navy bg-white border border-slate-300 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-2"
+                disabled
+                class="w-full sm:w-auto px-5 py-2.5 text-xs sm:text-sm font-bold text-slate-400 bg-slate-100 border border-slate-200 rounded-xl transition-colors cursor-not-allowed flex items-center justify-center gap-2"
               >
-                <span>Switch to Citizen &rarr;</span>
+                <span>Continue &rarr;</span>
               </button>
             }
           </div>
@@ -234,24 +247,54 @@ export type NewUserCategory = 'student' | 'citizen';
 export class NewUserCategoryModalComponent {
   private router = inject(Router, { optional: true });
 
-  @Input() isOpen = false;
+  private _isOpen = false;
+  @Input()
+  set isOpen(val: boolean) {
+    this._isOpen = val;
+    this.isSubmitting.set(false);
+    if (val) {
+      this.selectedCategory.set(null);
+    }
+  }
+  get isOpen(): boolean {
+    return this._isOpen;
+  }
 
   @Output() categoryConfirmed = new EventEmitter<'citizen' | 'student'>();
   @Output() proceedWithCitizen = new EventEmitter<void>();
+  @Output() proceedWithStudent = new EventEmitter<void>();
+  @Output() proceedWithAspirant = new EventEmitter<{ skip: boolean }>();
   @Output() cancelled = new EventEmitter<void>();
 
-  selectedCategory = signal<NewUserCategory>('citizen');
+  selectedCategory = signal<NewUserCategory | null>(null);
+  isSubmitting = signal<boolean>(false);
 
   selectCategory(cat: NewUserCategory): void {
     this.selectedCategory.set(cat);
   }
 
+  confirmSelection(): void {
+    const cat = this.selectedCategory();
+    if (!cat || this.isSubmitting()) return;
+
+    this.isSubmitting.set(true);
+    this.categoryConfirmed.emit(cat);
+
+    if (cat === 'citizen') {
+      this.proceedWithCitizen.emit();
+    } else {
+      this.proceedWithAspirant.emit({ skip: false });
+      this.proceedWithStudent.emit();
+    }
+  }
+
   confirmCitizen(): void {
-    this.categoryConfirmed.emit('citizen');
-    this.proceedWithCitizen.emit();
+    this.selectedCategory.set('citizen');
+    this.confirmSelection();
   }
 
   cancel(): void {
+    this.isSubmitting.set(false);
     this.cancelled.emit();
   }
 }

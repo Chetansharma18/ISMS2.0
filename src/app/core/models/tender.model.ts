@@ -27,7 +27,7 @@ export interface SubmittedTender {
   processingFee: string;
   transactionRef: string;
   emdTransactionRef: string;
-  submittedStatus: 'Submitted' | 'Under Review' | 'Accepted' | 'Rejected';
+  submittedStatus: 'Submitted' | 'Under Review' | 'Approved' | 'Accepted' | 'Rejected';
   eoiStatus: '-' | 'Under Review' | 'Reviewed' | string;
   rejectionReason?: string;
   editCount: number;

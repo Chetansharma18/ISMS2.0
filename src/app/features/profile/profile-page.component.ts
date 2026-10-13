@@ -7,8 +7,11 @@ import { OtrFormService } from '../registration/services/otr-form.service';
 import { OtrValidationService } from '../registration/services/otr-validation.service';
 import { OtrPdfService } from '../registration/services/otr-pdf.service';
 import { DocumentViewerService } from '../../core/services/document-viewer.service';
+import { DocumentViewerModalComponent } from '../../shared/components/document-viewer-modal/document-viewer-modal.component';
 import { FileDoc } from '../registration/models/otr-form.model';
 import { formatDate } from '../../shared/utils';
+import { AspirantProfileFormComponent } from '../aspirant/components/aspirant-profile-form.component';
+import { AspirantPortalService } from '../aspirant/services/aspirant-portal.service';
 
 export interface RegistrationStepItem {
   id: string;
@@ -23,71 +26,105 @@ export interface RegistrationStepItem {
   selector: 'app-profile-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, DocumentViewerModalComponent, AspirantProfileFormComponent],
   template: `
     <div class="w-full min-h-full font-sans p-4 sm:p-5 space-y-4 select-none" style="background-color: #FEFEFD; font-family: 'Inter', sans-serif;">
 
-      <!-- ====================================================================
-           1. HERO BANNER: Profile Summary with Heritage Backdrop & Alert Box
-           ==================================================================== -->
-      <div class="relative w-full rounded-xl overflow-hidden border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-3.5 sm:px-7 sm:py-4 bg-[#edf4fa]">
-        <!-- Panoramic Fort Heritage Image -->
-        <div
-          class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none"
-          style="background-image: url('/hero-bg.png'); background-position: right 20%; opacity: 0.95;"
-        ></div>
-        <!-- Soft Gradient Overlay: seamlessly fades fort into left background -->
-        <div
-          class="absolute inset-0 pointer-events-none"
-          style="background: linear-gradient(90deg, #edf4fa 0%, #edf4fa 28%, rgba(237, 244, 250, 0.88) 52%, rgba(237, 244, 250, 0.28) 72%, transparent 100%);"
-        ></div>
-
-        <!-- Left: Title & Subtitle -->
-        <div class="relative z-10">
-          <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#0c2d4e] m-0">
-            Profile Summary
-          </h1>
-          <p class="text-xs sm:text-[13px] text-slate-500 mt-1 m-0 font-normal">
-            Complete your registration steps to become eligible for scheme proposals under RSLDC.
-          </p>
+      @if (isAspirant()) {
+        <!-- ====================================================================
+             ASPIRANT PROFILE VIEW
+             ==================================================================== -->
+        <!-- 1. HERO BANNER -->
+        <div class="relative w-full rounded-xl overflow-hidden border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-3.5 sm:px-7 sm:py-4 bg-[#edf4fa]">
+          <div
+            class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none"
+            style="background-image: url('/hero-bg.png'); background-position: right 20%; opacity: 0.95;"
+          ></div>
+          <div
+            class="absolute inset-0 pointer-events-none"
+            style="background: linear-gradient(90deg, #edf4fa 0%, #edf4fa 28%, rgba(237, 244, 250, 0.88) 52%, rgba(237, 244, 250, 0.28) 72%, transparent 100%);"
+          ></div>
+          <div class="relative z-10">
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#0c2d4e] m-0">
+              Aspirant Profile Summary
+            </h1>
+            <p class="text-xs sm:text-[13px] text-slate-500 mt-1 m-0 font-normal">
+              Complete your candidate registration steps to become eligible to express interest in training programs under RSLDC.
+            </p>
+          </div>
         </div>
 
-        <!-- Right: Status Badge Alert Card -->
-        <div class="relative z-10 shrink-0">
-          @if (isProfileIncomplete()) {
-            <div class="flex items-center gap-3 bg-[#FFFDF5] border border-[#FDE68A] rounded-xl px-4 py-2.5 shadow-2xs">
-              <!-- Amber Exclamation Circle -->
-              <div class="w-6 h-6 rounded-full bg-[#D97706] text-white flex items-center justify-center shrink-0">
-                <span class="font-bold text-xs">!</span>
-              </div>
-              <div>
-                <div class="text-[12px] font-bold text-[#92400E] leading-tight">Profile Incomplete</div>
-                <div class="text-[11px] text-[#A16207] mt-0.5 leading-tight">Complete all steps to apply for EOI opportunities.</div>
+        <!-- 2. ASPIRANT OTR PROGRESS CARD: Circular Donut Chart + Details -->
+        <div class="w-full bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
+          <div class="flex flex-col sm:flex-row items-center sm:items-start md:items-center text-center sm:text-left gap-4 sm:gap-6 flex-1 min-w-0">
+            <div class="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 flex items-center justify-center">
+              <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="38" stroke="#E2E8F0" stroke-width="8" fill="none" />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="38"
+                  [attr.stroke]="isAspirantComplete() ? '#15803D' : '#0B3558'"
+                  stroke-width="8"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-dasharray="238.76"
+                  [attr.stroke-dashoffset]="aspirantDonutDashOffset()"
+                  class="transition-all duration-700 ease-out"
+                />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <span class="text-lg sm:text-xl font-bold text-slate-800 leading-none">
+                  {{ aspirantCompletionPercentage() }}%
+                </span>
               </div>
             </div>
-          } @else {
-            <div class="flex items-center gap-3 bg-[#F0FDF4] border border-[#86EFAC] rounded-xl px-4 py-2.5 shadow-2xs">
-              <!-- Green Checkmark Circle -->
-              <div class="w-6 h-6 rounded-full bg-green-700 text-white flex items-center justify-center shrink-0">
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <div>
-                <div class="text-[12px] font-bold text-[#166534] leading-tight">Profile Complete</div>
-                <div class="text-[11px] text-green-700 mt-0.5 leading-tight">All registration steps verified and active.</div>
-              </div>
-            </div>
-          }
-        </div>
-      </div>
 
-      <!-- ====================================================================
-           2. OTR PROGRESS CARD: Circular Donut Chart + Details + CTA
-           ==================================================================== -->
-      <div class="w-full bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
-        <!-- Left: Donut Chart + Information + Progress Bar -->
-        <div class="flex flex-col sm:flex-row items-center sm:items-start md:items-center text-center sm:text-left gap-4 sm:gap-6 flex-1 min-w-0">
+            <div class="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
+              <h2 class="text-base sm:text-[17px] font-bold text-slate-900 m-0">Aspirant One Time Registration (OTR)</h2>
+              <p class="text-xs sm:text-[13px] text-slate-500 leading-relaxed m-0 max-w-3xl">
+                Complete all mandatory candidate registration steps to become eligible for skill training admissions. Once complete, you can express interest for all open training programs.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. ASPIRANT REGISTRATION FORM (With OTR Step Progress Header) -->
+        <app-aspirant-profile-form (profileSaved)="onAspirantProfileSaved()"></app-aspirant-profile-form>
+      } @else {
+        <!-- ====================================================================
+             1. HERO BANNER: Profile Summary with Heritage Backdrop & Alert Box
+             ==================================================================== -->
+        <div class="relative w-full rounded-xl overflow-hidden border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-3.5 sm:px-7 sm:py-4 bg-[#edf4fa]">
+          <!-- Panoramic Fort Heritage Image -->
+          <div
+            class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none"
+            style="background-image: url('/hero-bg.png'); background-position: right 20%; opacity: 0.95;"
+          ></div>
+          <!-- Soft Gradient Overlay: seamlessly fades fort into left background -->
+          <div
+            class="absolute inset-0 pointer-events-none"
+            style="background: linear-gradient(90deg, #edf4fa 0%, #edf4fa 28%, rgba(237, 244, 250, 0.88) 52%, rgba(237, 244, 250, 0.28) 72%, transparent 100%);"
+          ></div>
+
+          <!-- Left: Title & Subtitle -->
+          <div class="relative z-10">
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#0c2d4e] m-0">
+              Profile Summary
+            </h1>
+            <p class="text-xs sm:text-[13px] text-slate-500 mt-1 m-0 font-normal">
+              Complete your registration steps to become eligible for scheme proposals under RSLDC.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- ====================================================================
+             2. OTR PROGRESS CARD: Circular Donut Chart + Details + CTA
+             ==================================================================== -->
+        <div class="w-full bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
+          <!-- Left: Donut Chart + Information + Progress Bar -->
+          <div class="flex flex-col sm:flex-row items-center sm:items-start md:items-center text-center sm:text-left gap-4 sm:gap-6 flex-1 min-w-0">
           
           <!-- Circular Progress Donut Chart (SVG) -->
           <div class="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 flex items-center justify-center">
@@ -291,6 +328,15 @@ export interface RegistrationStepItem {
           }
         </div>
       </div>
+    }
+
+      <!-- Reusable Document Preview Modal (preserved for document review) -->
+      <app-document-viewer-modal
+        [isOpen]="isDocViewerOpen()"
+        [doc]="selectedDoc()"
+        [title]="selectedDocTitle()"
+        (close)="isDocViewerOpen.set(false)"
+      ></app-document-viewer-modal>
 
     </div>
   `
@@ -303,18 +349,29 @@ export class ProfilePageComponent {
   private validationService = inject(OtrValidationService);
   private pdfService = inject(OtrPdfService);
   private docViewer = inject(DocumentViewerService);
+  protected readonly aspirantPortal = inject(AspirantPortalService);
 
   readonly currentUser = this.authService.currentUser;
   readonly formData = this.otrFormService.formData;
+
+  readonly isAspirant = computed(() => this.currentUser()?.role === 'aspirant' || this.permissions.hasRole('aspirant'));
+  readonly isAspirantComplete = this.aspirantPortal.isProfileComplete;
+  readonly aspirantCompletionPercentage = computed(() => this.isAspirantComplete() ? 100 : 0);
+  readonly aspirantDonutDashOffset = computed(() => this.isAspirantComplete() ? 0 : 238.76);
+
+  /** Document viewer modal state */
+  readonly isDocViewerOpen = signal(false);
+  readonly selectedDoc = signal<FileDoc | null>(null);
+  readonly selectedDocTitle = signal('');
 
   /** 4 Standard Registration Steps */
   readonly sections = computed<RegistrationStepItem[]>(() => {
     const data = this.formData();
     const isSubmitted = data.status === 'Submitted';
 
-    const isStep1Complete = this.validationService.validateStep1(data.step1).length === 0;
-    const isStep2Complete = this.validationService.validateStep3(data.step3).length === 0;
-    const isStep3Complete = this.validationService.validateStep4(data.step4).length === 0;
+    const isStep1Complete = isSubmitted || this.validationService.validateStep1(data.step1).length === 0;
+    const isStep2Complete = isSubmitted || this.validationService.validateStep3(data.step3).length === 0;
+    const isStep3Complete = isSubmitted || this.validationService.validateStep4(data.step4).length === 0;
     const isStep4Complete = isSubmitted;
 
     return [
@@ -440,5 +497,9 @@ export class ProfilePageComponent {
   /** Print / Download profile PDF */
   downloadProfilePdf(): void {
     this.pdfService.printOtrProfile(this.formData());
+  }
+
+  onAspirantProfileSaved(): void {
+    this.authService.markProfileCompleted();
   }
 }

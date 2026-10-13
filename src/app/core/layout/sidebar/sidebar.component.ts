@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../auth/auth.service';
 import { PermissionService } from '../../permissions/permission.service';
+import { AspirantPortalService } from '../../../features/aspirant/services/aspirant-portal.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -47,9 +48,86 @@ import { PermissionService } from '../../permissions/permission.service';
         <nav class="flex flex-col gap-1 px-2.5 py-3" aria-label="Main Navigation">
 
           <!-- ================================================================
-               ROLE: SUPER ADMIN
+               ROLE: ASPIRANT
                ================================================================ -->
-          @if (isSuperAdmin()) {
+          @if (isAspirant()) {
+            <!-- 1. Training Calendar -->
+            <a
+              routerLink="/training-calendar"
+              [class.bg-primary-light]="isActive('training-calendar')"
+              [class.text-brand]="isActive('training-calendar')"
+              [class.font-medium]="isActive('training-calendar')"
+              [class.border]="isActive('training-calendar')"
+              [class.border-border]="isActive('training-calendar')"
+              [class.text-text-secondary]="!isActive('training-calendar')"
+              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
+            >
+              <svg
+                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
+                [class.text-brand]="isActive('training-calendar')"
+                [class.text-text-muted]="!isActive('training-calendar')"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span class="tracking-tight">Training Calendar</span>
+            </a>
+
+            <!-- 2. Expressed Interest -->
+            <a
+              routerLink="/expressed-interest"
+              [class.bg-primary-light]="isActive('expressed-interest')"
+              [class.text-brand]="isActive('expressed-interest')"
+              [class.font-medium]="isActive('expressed-interest')"
+              [class.border]="isActive('expressed-interest')"
+              [class.border-border]="isActive('expressed-interest')"
+              [class.text-text-secondary]="!isActive('expressed-interest')"
+              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
+            >
+              <svg
+                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
+                [class.text-brand]="isActive('expressed-interest')"
+                [class.text-text-muted]="!isActive('expressed-interest')"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="tracking-tight">Expressed Interest</span>
+            </a>
+
+            <!-- 3. Profile -->
+            <a
+              routerLink="/profile"
+              [class.bg-primary-light]="isActive('profile')"
+              [class.text-brand]="isActive('profile')"
+              [class.font-medium]="isActive('profile')"
+              [class.border]="isActive('profile')"
+              [class.border-border]="isActive('profile')"
+              [class.text-text-secondary]="!isActive('profile')"
+              class="flex items-center justify-between px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
+            >
+              <div class="flex items-center gap-2.5">
+                <svg
+                  class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
+                  [class.text-brand]="isActive('profile')"
+                  [class.text-text-muted]="!isActive('profile')"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span class="tracking-tight">Profile</span>
+              </div>
+              @if (isAspirantProfilePending()) {
+                <span class="px-2 py-0.5 rounded-full text-[11px] leading-tight shrink-0 inline-flex items-center gap-1.5 transition-all select-none bg-amber-50 text-[#C2410C] border border-amber-300 font-semibold shadow-2xs">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-600 shrink-0 animate-pulse"></span>
+                  Pending
+                </span>
+              }
+            </a>
+          } @else if (isSuperAdmin()) {
             <!-- 1. EOI Configuration -->
             <a
               routerLink="/admin/eoi-configuration"
@@ -752,18 +830,28 @@ import { PermissionService } from '../../permissions/permission.service';
 export class SidebarComponent {
   authService = inject(AuthService);
   private permissions = inject(PermissionService);
+  private aspirantPortal = inject(AspirantPortalService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
   readonly currentUser = this.authService.currentUser;
 
+  readonly isAspirant = computed(() => this.currentUser()?.role === 'aspirant' || this.permissions.hasRole('aspirant'));
+  readonly isAspirantProfilePending = computed(() => {
+    if (this.aspirantPortal.isProfileComplete()) return false;
+    if (this.currentUser()?.isProfileComplete === true) return false;
+    return true;
+  });
+
   readonly isExistingUser = computed(() => this.permissions.hasRole('existing_user'));
   readonly isDeptAdmin = computed(() => this.permissions.hasRole('dept_admin'));
   readonly isSuperAdmin = computed(() => this.permissions.hasRole('super_admin'));
 
-  readonly isProfilePending = computed(() =>
-    this.permissions.hasRole('new_user') || this.currentUser()?.isProfileComplete === false
-  );
+  readonly isProfilePending = computed(() => {
+    if (this.aspirantPortal.isProfileComplete()) return false;
+    if (this.currentUser()?.isProfileComplete === true) return false;
+    return this.permissions.hasRole('new_user') || this.currentUser()?.isProfileComplete === false;
+  });
 
   readonly isMasterOpen = signal<boolean>(true);
   readonly isUserManagementOpen = signal<boolean>(true);
@@ -788,6 +876,14 @@ export class SidebarComponent {
 
   readonly activeKey = computed<string>(() => {
     const url = this.cleanUrl();
+
+    // 0. Aspirant Portal routes
+    if (url === '/training-calendar' || url.startsWith('/training-calendar')) {
+      return 'training-calendar';
+    }
+    if (url === '/expressed-interest' || url.startsWith('/expressed-interest')) {
+      return 'expressed-interest';
+    }
 
     // 1. Profile / Registration / OTR / Dashboard
     if (
@@ -904,6 +1000,9 @@ export class SidebarComponent {
     }
     if (this.isDeptAdmin()) {
       return 'dept-eoi-view';
+    }
+    if (this.isAspirant()) {
+      return 'training-calendar';
     }
     return 'active-schemes';
   });

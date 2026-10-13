@@ -196,15 +196,15 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
             <!-- Row 3 -->
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Bhamashah No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().bhamashahNo || 'Not Provided' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().bhamashahNo || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Voter ID No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().voterIdNo || 'Not Provided' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().voterIdNo || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Passport No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().passportNo || 'Not Provided' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().passportNo || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">State</span>
@@ -289,11 +289,11 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">MICR Code</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step4().micrCode || 'Optional / -' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step4().micrCode || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Transfer Mode</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step4().transferMode || 'NEFT' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step4().transferMode || '-' }}</span>
             </div>
 
             <!-- Row 3 Address -->

@@ -440,7 +440,7 @@ export function createExistingUserOtrData(): OtrFormData {
         pan: 'ABCPS1234K',
         aadhaarNo: '987654321098',
         bhamashahNo: 'BHM889210',
-        voterIdNo: 'RJ/14/098/123456',
+        voterIdNo: 'RJX1409812',
         passportNo: 'Z9876543',
         appointmentLetterDoc: {
           fileName: 'MD_Appointment_Letter.pdf',
@@ -465,7 +465,7 @@ export function createExistingUserOtrData(): OtrFormData {
         pan: 'ABQPV5678L',
         aadhaarNo: '876543210987',
         bhamashahNo: 'BHM441092',
-        voterIdNo: 'RJ/14/098/654321',
+        voterIdNo: 'RJX1409865',
         passportNo: '',
         appointmentLetterDoc: {
           fileName: 'Operations_Head_Order.pdf',
@@ -489,7 +489,7 @@ export function createExistingUserOtrData(): OtrFormData {
       mobileNo: '9829154321',
       aadhaarNo: '765432109876',
       bhamashahNo: 'BHM771209',
-      voterIdNo: 'RJ/14/098/987123',
+      voterIdNo: 'RJX1409871',
       passportNo: '',
       state: 'Rajasthan',
       residenceAddress: 'B-14, Malviya Nagar, Jaipur, Rajasthan - 302017',

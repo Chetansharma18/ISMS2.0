@@ -207,6 +207,16 @@ export class MockDatabaseService {
           } else {
             this.store.set(key, stored);
           }
+          const sanitized = stored.filter(item => item?.status !== 'Closed');
+          this.store.set(key, sanitized);
+          this.saveToStorage(key, sanitized);
+        } else if (key === 'SUBMITTED_TENDERS') {
+          const sanitized = stored.map(item => ({
+            ...item,
+            submittedStatus: item.submittedStatus === 'Accepted' ? 'Approved' : item.submittedStatus
+          }));
+          this.store.set(key, sanitized);
+          this.saveToStorage(key, sanitized);
         } else {
           this.store.set(key, stored);
         }

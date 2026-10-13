@@ -11,6 +11,7 @@ import { Step3AuthPersonComponent } from './steps/step3-auth-person/step3-auth-p
 import { Step4BankDetailsComponent } from './steps/step4-bank-details/step4-bank-details.component';
 import { Step5PreviewComponent } from './steps/step5-preview/step5-preview.component';
 import { ActionModalComponent } from '../../shared/components/action-modal/action-modal.component';
+import { AuthService } from '../../core/auth/auth.service';
 
 export interface StepMeta {
   number: number;
@@ -97,8 +98,6 @@ export interface StepMeta {
                     <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="stroke: #ffffff;">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                     </svg>
-                  } @else if (isStepError(step.number) && activeStep() !== step.number) {
-                    <span style="color: #ffffff !important; font-weight: bold;">!</span>
                   } @else {
                     <span [style.color]="(activeStep() === step.number || isStepCompleted(step.number)) ? '#ffffff' : '#64748b'" style="font-weight: 700; font-size: 13px;">
                       {{ step.number }}
@@ -268,16 +267,8 @@ export interface StepMeta {
                 </button>
               }
 
-              <!-- STEP 3 NAVIGATION: [Previous (left)] [Save as Draft] [Next Step ->] -->
+              <!-- STEP 3 NAVIGATION: [Previous (left)] [Next Step ->] -->
               @if (activeStep() === 3) {
-                <button
-                  type="button"
-                  (click)="saveDraft()"
-                  class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                >
-                  Save as Draft
-                </button>
-
                 <button
                   type="button"
                   (click)="nextStep()"
@@ -304,14 +295,23 @@ export interface StepMeta {
                   <span>Download PDF</span>
                 </button>
 
-                <button
-                  type="button"
-                  (click)="submitApplication()"
-                  class="px-6 sm:px-8 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-                >
-                
-                  <span>Register</span>
-                </button>
+                @if (isAlreadySubmitted()) {
+                  <button
+                    type="button"
+                    (click)="backToProfile()"
+                    class="px-6 sm:px-8 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  >
+                    <span>Back to Profile</span>
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    (click)="submitApplication()"
+                    class="px-6 sm:px-8 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  >
+                    <span>Register</span>
+                  </button>
+                }
               }
             </div>
           </div>
@@ -383,11 +383,11 @@ export interface StepMeta {
         primaryLabel="Download PDF"
         secondaryLabel="OK"
         (primaryAction)="downloadOtrPdf()"
-        (secondaryAction)="navigateToHome()"
-        (close)="navigateToHome()"
+        (secondaryAction)="navigateToExistingUserProfile()"
+        (close)="navigateToExistingUserProfile()"
       >
         <p class="text-xs sm:text-sm text-slate-600 mt-2 mb-0 font-mono">
-          Reference ID: <span class="font-bold text-navy">{{ submittedRegId() }}</span>
+          USER ID: <span class="font-bold text-navy">{{ submittedRegId() }}</span>
         </p>
       </app-action-modal>
 
@@ -397,6 +397,7 @@ export interface StepMeta {
 export class RegistrationShellComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private authService = inject(AuthService);
   otrFormService = inject(OtrFormService);
   validationService = inject(OtrValidationService);
   private pdfService = inject(OtrPdfService);
@@ -405,18 +406,16 @@ export class RegistrationShellComponent {
   readonly activeStep = signal<number>(1);
   readonly submittedRegId = signal<string | null>(null);
 
+  readonly isAlreadySubmitted = computed(() => {
+    const data = this.otrFormService.formData();
+    return data.status === 'Submitted' || this.submittedRegId() !== null;
+  });
+
   constructor() {
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const step = parseInt(params['step'], 10);
       if (step >= 1 && step <= 4) {
-        let targetStep = step;
-        for (let s = 1; s < step; s++) {
-          if (!this.isStepCompleted(s)) {
-            targetStep = s;
-            break;
-          }
-        }
-        this.activeStep.set(targetStep);
+        this.activeStep.set(step);
       }
     });
   }
@@ -429,10 +428,14 @@ export class RegistrationShellComponent {
   ];
 
   isStepCompleted(stepNumber: number): boolean {
-    if (stepNumber === 4) {
-      return this.submittedRegId() !== null;
-    }
     const data = this.otrFormService.formData();
+    const isSubmitted = data.status === 'Submitted' || this.submittedRegId() !== null;
+    if (isSubmitted) {
+      return true;
+    }
+    if (stepNumber === 4) {
+      return false;
+    }
     return this.validationService.isStepValid(stepNumber, data);
   }
 
@@ -452,12 +455,6 @@ export class RegistrationShellComponent {
 
   goToStep(stepNumber: number): void {
     if (stepNumber < 1 || stepNumber > 4) return;
-    for (let s = 1; s < stepNumber; s++) {
-      if (!this.isStepCompleted(s)) {
-        this.validationService.showToast(`Please complete Step ${s} before proceeding.`, 'error');
-        return;
-      }
-    }
     this.activeStep.set(stepNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -541,6 +538,30 @@ export class RegistrationShellComponent {
     } else {
       this.router.navigate(['/profile']);
     }
+  }
+
+  backToProfile(): void {
+    this.router.navigate(['/profile']);
+  }
+
+  navigateToExistingUserProfile(): void {
+    const data = this.otrFormService.formData();
+    const orgName = data.step1.fullName?.trim() || data.step1.shortName?.trim() || 'Approved Citizen (TP)';
+
+    this.otrFormService.setExistingUserData(data);
+
+    // Transition session to existing_user persona with complete profile status
+    this.authService.login({
+      id: orgName,
+      ssoId: 'new_user',
+      label: orgName,
+      subLabel: 'Registered TP/PIA',
+      role: 'existing_user',
+      isProfileComplete: true
+    }, null);
+
+    this.submittedRegId.set(null);
+    this.router.navigate(['/tenders']);
   }
 
   navigateToHome(): void {

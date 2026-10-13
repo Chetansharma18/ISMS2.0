@@ -134,8 +134,14 @@ export class TenderListComponent {
       key: 'submittedStatus',
       label: 'Submitted Status',
       align: 'center',
-      type: 'custom',
-      cellClass: 'whitespace-nowrap font-normal text-slate-800'
+      type: 'status',
+      badgeVariantMap: {
+        'Submitted': 'info',
+        'Under Review': 'warning',
+        'Approved': 'success',
+        'Accepted': 'success',
+        'Rejected': 'danger'
+      }
     },
     { key: 'eoiStatus',        label: 'EOI Stage',            align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'rejectionReason',  label: 'Remarks', align: 'center', type: 'custom', cellClass: 'min-w-[200px]' },

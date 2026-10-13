@@ -134,11 +134,12 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
         <!-- Aadhaar -> 3 cols -->
         <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
-            label="Aadhaar No. (Optional)"
+            label="Aadhaar No."
             type="tel"
             [value]="data().aadhaarNo"
             (valueChange)="update('aadhaarNo', $event)"
             placeholder="Enter Aadhaar number"
+            [required]="true"
             [maxLength]="12"
             [error]="getFieldError('aadhaarNo')"
           ></app-form-input>

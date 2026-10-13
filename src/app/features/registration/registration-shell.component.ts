@@ -11,6 +11,7 @@ import { Step3AuthPersonComponent } from './steps/step3-auth-person/step3-auth-p
 import { Step4BankDetailsComponent } from './steps/step4-bank-details/step4-bank-details.component';
 import { Step5PreviewComponent } from './steps/step5-preview/step5-preview.component';
 import { ActionModalComponent } from '../../shared/components/action-modal/action-modal.component';
+import { AuthService } from '../../core/auth/auth.service';
 
 export interface StepMeta {
   number: number;
@@ -56,7 +57,7 @@ export interface StepMeta {
           <!-- Title and Subtitle Row -->
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">
-              Company Registration Form
+              Organization Registration Form
             </h1>
             <span class="text-xs text-slate-500 font-medium select-none">
               Fields marked with <span class="text-rose-500 font-bold">*</span> are mandatory
@@ -97,8 +98,6 @@ export interface StepMeta {
                     <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="stroke: #ffffff;">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                     </svg>
-                  } @else if (isStepError(step.number) && activeStep() !== step.number) {
-                    <span style="color: #ffffff !important; font-weight: bold;">!</span>
                   } @else {
                     <span [style.color]="(activeStep() === step.number || isStepCompleted(step.number)) ? '#ffffff' : '#64748b'" style="font-weight: 700; font-size: 13px;">
                       {{ step.number }}
@@ -205,19 +204,9 @@ export interface StepMeta {
             <app-step5-preview (editStep)="goToStep($event)"></app-step5-preview>
           </div>
 
-          <!-- Inline Error Message Banner (if submission attempted with errors) -->
-          @if (submitErrorMessage()) {
-            <div class="text-xs sm:text-sm text-rose-700 bg-rose-50 border border-rose-300 px-4 py-2.5 rounded-lg flex items-center gap-2.5 font-medium shadow-2xs animate-in fade-in duration-200">
-              <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{{ submitErrorMessage() }}</span>
-            </div>
-          }
-
           <!-- 4. Form Action Buttons (Per Step Navigation) -->
           <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <!-- Left Side: Previous Button (Steps 2, 3, 4) -->
+            <!-- Left Side: Previous Button (Steps 2, 3, 4) / Back to Profile (Step 1) -->
             <div>
               @if (activeStep() > 1) {
                 <button
@@ -229,6 +218,17 @@ export interface StepMeta {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                   </svg>
                   <span>Previous</span>
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  (click)="goBack()"
+                  class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span>Back to Profile</span>
                 </button>
               }
             </div>
@@ -267,16 +267,8 @@ export interface StepMeta {
                 </button>
               }
 
-              <!-- STEP 3 NAVIGATION: [Previous (left)] [Save as Draft] [Next Step ->] -->
+              <!-- STEP 3 NAVIGATION: [Previous (left)] [Next Step ->] -->
               @if (activeStep() === 3) {
-                <button
-                  type="button"
-                  (click)="saveDraft()"
-                  class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                >
-                  Save as Draft
-                </button>
-
                 <button
                   type="button"
                   (click)="nextStep()"
@@ -303,14 +295,23 @@ export interface StepMeta {
                   <span>Download PDF</span>
                 </button>
 
-                <button
-                  type="button"
-                  (click)="submitApplication()"
-                  class="px-6 sm:px-8 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-                >
-                
-                  <span>Register</span>
-                </button>
+                @if (isAlreadySubmitted()) {
+                  <button
+                    type="button"
+                    (click)="backToProfile()"
+                    class="px-6 sm:px-8 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  >
+                    <span>Back to Profile</span>
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    (click)="submitApplication()"
+                    class="px-6 sm:px-8 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                  >
+                    <span>Register</span>
+                  </button>
+                }
               }
             </div>
           </div>
@@ -329,25 +330,24 @@ export interface StepMeta {
             [class.bg-emerald-900/95]="toast.type === 'success'"
             [class.border-emerald-500/50]="toast.type === 'success'"
             [class.text-emerald-50]="toast.type === 'success'"
-            [class.bg-rose-600]="toast.type === 'error'"
-            [class.border-rose-700]="toast.type === 'error'"
-            [class.text-white]="toast.type === 'error'"
+            [class.bg-rose-600]="toast.type === 'error' || toast.type === 'warning'"
+            [class.border-rose-700]="toast.type === 'error' || toast.type === 'warning'"
+            [class.text-white]="toast.type === 'error' || toast.type === 'warning'"
             [class.bg-navy]="toast.type === 'info'"
             [class.border-[#1b4b73]]="toast.type === 'info'"
             [class.text-white]="toast.type === 'info'"
-            [class.bg-amber-900/95]="toast.type === 'warning'"
-            [class.border-amber-500/50]="toast.type === 'warning'"
-            [class.text-amber-50]="toast.type === 'warning'"
           >
             <div class="shrink-0 mt-0.5">
               @if (toast.type === 'success') {
                 <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                 </svg>
-              } @else if (toast.type === 'error') {
-                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
+              } @else if (toast.type === 'error' || toast.type === 'warning') {
+                <div class="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0 shadow-xs">
+                  <svg class="w-3.5 h-3.5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
               } @else {
                 <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -383,11 +383,11 @@ export interface StepMeta {
         primaryLabel="Download PDF"
         secondaryLabel="OK"
         (primaryAction)="downloadOtrPdf()"
-        (secondaryAction)="navigateToHome()"
-        (close)="navigateToHome()"
+        (secondaryAction)="navigateToExistingUserProfile()"
+        (close)="navigateToExistingUserProfile()"
       >
         <p class="text-xs sm:text-sm text-slate-600 mt-2 mb-0 font-mono">
-          Reference ID: <span class="font-bold text-navy">{{ submittedRegId() }}</span>
+          USER ID: <span class="font-bold text-navy">{{ submittedRegId() }}</span>
         </p>
       </app-action-modal>
 
@@ -397,6 +397,7 @@ export interface StepMeta {
 export class RegistrationShellComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private authService = inject(AuthService);
   otrFormService = inject(OtrFormService);
   validationService = inject(OtrValidationService);
   private pdfService = inject(OtrPdfService);
@@ -404,7 +405,11 @@ export class RegistrationShellComponent {
 
   readonly activeStep = signal<number>(1);
   readonly submittedRegId = signal<string | null>(null);
-  readonly submitErrorMessage = signal<string | null>(null);
+
+  readonly isAlreadySubmitted = computed(() => {
+    const data = this.otrFormService.formData();
+    return data.status === 'Submitted' || this.submittedRegId() !== null;
+  });
 
   constructor() {
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
@@ -423,10 +428,14 @@ export class RegistrationShellComponent {
   ];
 
   isStepCompleted(stepNumber: number): boolean {
-    if (stepNumber === 4) {
-      return this.submittedRegId() !== null;
-    }
     const data = this.otrFormService.formData();
+    const isSubmitted = data.status === 'Submitted' || this.submittedRegId() !== null;
+    if (isSubmitted) {
+      return true;
+    }
+    if (stepNumber === 4) {
+      return false;
+    }
     return this.validationService.isStepValid(stepNumber, data);
   }
 
@@ -446,24 +455,17 @@ export class RegistrationShellComponent {
 
   goToStep(stepNumber: number): void {
     if (stepNumber < 1 || stepNumber > 4) return;
-    this.submitErrorMessage.set(null);
     this.activeStep.set(stepNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  /**
+   * Moves to the next step without blocking on incomplete fields, so applicants can fill
+   * the sections in any order. Mandatory fields are still validated on final submission
+   * (see submitApplication) and are marked with * on every step.
+   */
   nextStep(): void {
-    this.submitErrorMessage.set(null);
     const current = this.activeStep();
-    this.validationService.markStepSubmitted(current);
-
-    const data = this.otrFormService.formData();
-    const errors = this.validationService.getStepErrors(current, data);
-
-    if (errors.length > 0) {
-      this.submitErrorMessage.set(`Please fill all required mandatory fields highlighted in red (${errors[0]}).`);
-      this.validationService.showToast(errors[0], 'error', current);
-      return;
-    }
 
     if (current < 4) {
       this.activeStep.set(current + 1);
@@ -472,7 +474,6 @@ export class RegistrationShellComponent {
   }
 
   previousStep(): void {
-    this.submitErrorMessage.set(null);
     const current = this.activeStep();
     if (current > 1) {
       this.activeStep.set(current - 1);
@@ -486,26 +487,18 @@ export class RegistrationShellComponent {
   }
 
   submitApplication(): void {
-    this.submitErrorMessage.set(null);
     const data = this.otrFormService.formData();
 
     for (let s = 1; s <= 3; s++) {
       this.validationService.markStepSubmitted(s);
       const errors = this.validationService.getStepErrors(s, data);
       if (errors.length > 0) {
-        const stepLabels: Record<number, string> = {
-          1: 'Step 1 (Organization Details)',
-          2: 'Step 2 (Authorized Person Details)',
-          3: 'Step 3 (Bank Details)'
-        };
-        this.submitErrorMessage.set(`Form is not completely filled, entries are missing in ${stepLabels[s]}. Please fill all mandatory fields (${errors[0]}).`);
-        this.validationService.showToast(errors[0], 'error', s);
+        this.validationService.showToast('Please fill all mandatory fields marked with *', 'error', s);
         this.goToStep(s);
         return;
       }
     }
 
-    this.submitErrorMessage.set(null);
     const regId = this.otrFormService.submitForm();
     this.submittedRegId.set(regId);
     this.validationService.showToast(`Application successfully submitted! Ref: ${regId}`, 'success');
@@ -539,8 +532,32 @@ export class RegistrationShellComponent {
     if (this.activeStep() > 1) {
       this.previousStep();
     } else {
-      this.router.navigate(['/tenders']);
+      this.router.navigate(['/profile']);
     }
+  }
+
+  backToProfile(): void {
+    this.router.navigate(['/profile']);
+  }
+
+  navigateToExistingUserProfile(): void {
+    const data = this.otrFormService.formData();
+    const orgName = data.step1.fullName?.trim() || data.step1.shortName?.trim() || 'Approved Citizen (TP)';
+
+    this.otrFormService.setExistingUserData(data);
+
+    // Transition session to existing_user persona with complete profile status
+    this.authService.login({
+      id: orgName,
+      ssoId: 'new_user',
+      label: orgName,
+      subLabel: 'Registered TP/PIA',
+      role: 'existing_user',
+      isProfileComplete: true
+    }, null);
+
+    this.submittedRegId.set(null);
+    this.router.navigate(['/tenders']);
   }
 
   navigateToHome(): void {

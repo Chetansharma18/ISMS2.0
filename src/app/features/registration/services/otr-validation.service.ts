@@ -65,6 +65,9 @@ export class OtrValidationService {
     if (!step1.registrationCertDoc || step1.registrationCertDoc.status !== 'uploaded') {
       errors.push('Certificate of Registration Document upload is mandatory.');
     }
+    if (!step1.preferredSector?.trim()) {
+      errors.push('Preferred Sector selection is mandatory.');
+    }
 
     // Statutory & Tax
     if (!step1.companyPan?.trim()) {
@@ -241,8 +244,9 @@ export class OtrValidationService {
   validateStep3(step3: Step3AuthorizedPerson): string[] {
     const errors: string[] = [];
 
-    if (!step3.name?.trim() || step3.name.trim().length < 2) {
-      errors.push('Full Name of Authorized Signatory is mandatory (min 2 chars).');
+    const hasName = (step3.firstName?.trim() || step3.name?.trim());
+    if (!hasName || hasName.length < 2) {
+      errors.push('Authorized Person First Name is mandatory (min 2 chars).');
     }
     if (!step3.dob) {
       errors.push('Date of Birth is mandatory.');
@@ -262,7 +266,9 @@ export class OtrValidationService {
     if (step3.emailId?.trim() && !REGEX.EMAIL.test(step3.emailId)) {
       errors.push('Invalid Email-ID format for Authorized Signatory.');
     }
-    if (step3.aadhaarNo?.trim() && !REGEX.AADHAAR.test(step3.aadhaarNo)) {
+    if (!step3.aadhaarNo?.trim()) {
+      errors.push('Aadhaar Number is mandatory.');
+    } else if (!REGEX.AADHAAR.test(step3.aadhaarNo)) {
       errors.push('Invalid Aadhaar Number (Must be 12 numeric digits).');
     }
     if (step3.voterIdNo?.trim() && !REGEX.VOTER_ID.test(step3.voterIdNo.toUpperCase())) {

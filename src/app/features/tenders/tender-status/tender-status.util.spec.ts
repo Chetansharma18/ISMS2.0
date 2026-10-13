@@ -3,6 +3,7 @@ import { SubmittedTender } from '../../../core/models/tender.model';
 import { FileDoc } from '../../registration/models/otr-form.model';
 import {
   applyOtrDocument,
+  calculateTotalFee,
   canEditTender,
   documentCategoryLabel,
   filterTenders,
@@ -149,5 +150,25 @@ describe('applyOtrDocument', () => {
     expect(tender.signatoryDetails.authorizationLetterDoc).toBe(fileDoc);
     expect(tender.bankDetails.cancelledChequeDoc).toBe(fileDoc);
     expect(tender.orgDetails.panCardDoc).toBeUndefined();
+  });
+});
+
+describe('calculateTotalFee', () => {
+  it('sums processing fee and EMD fee accurately with Indian Rupee formatting', () => {
+    // MMKVY
+    expect(calculateTotalFee('₹ 2,000', '₹ 50,000')).toBe('₹ 52,000.00');
+    expect(calculateTotalFee('₹ 2,000.00', '₹ 50,000.00')).toBe('₹ 52,000.00');
+    // MNSKSY
+    expect(calculateTotalFee('₹ 2,500', '₹ 75,000')).toBe('₹ 77,500.00');
+    // IM-Shakti
+    expect(calculateTotalFee('₹ 3,000', '₹ 1,00,000')).toBe('₹ 1,03,000.00');
+    // RYSY
+    expect(calculateTotalFee('₹ 1,500', '₹ 40,000')).toBe('₹ 41,500.00');
+  });
+
+  it('handles missing or non-numeric inputs gracefully', () => {
+    expect(calculateTotalFee(undefined, '₹ 50,000')).toBe('₹ 50,000.00');
+    expect(calculateTotalFee('₹ 2,000', undefined)).toBe('₹ 2,000.00');
+    expect(calculateTotalFee('', '')).toBe('₹ 0.00');
   });
 });

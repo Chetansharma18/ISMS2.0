@@ -15,10 +15,10 @@ import { EditableLogoComponent } from './editable-logo.component';
   template: `
     <div class="border-b-2 border-slate-800 pb-3 mb-4 text-center font-sans">
       <div class="flex items-center justify-between gap-4 mb-2">
-        <!-- Left Emblem Logo (Editable & Uploadable) -->
+        <!-- Left Emblem Logo (RSLDC) -->
         <app-editable-logo
           [src]="leftLogoUrl()"
-          alt="Emblem Logo"
+          alt="RSLDC Logo"
           (logoUpload)="leftLogoUpload.emit($event)"
           (logoError)="leftLogoError.emit()"
         />
@@ -45,11 +45,11 @@ import { EditableLogoComponent } from './editable-logo.component';
           />
         </div>
 
-        <!-- Right Organization Logo (Editable & Uploadable) -->
+        <!-- Right Organization Logo (Rajasthan Sarkar) -->
         <app-editable-logo
           [src]="rightLogoUrl()"
-          alt="Right Logo"
-          [showFallbackText]="true"
+          alt="Rajasthan Sarkar"
+          [showFallbackText]="false"
           (logoUpload)="rightLogoUpload.emit($event)"
         />
       </div>

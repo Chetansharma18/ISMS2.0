@@ -1,6 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DataEngineService } from '../../../../core/services/data-engine.service';
+import { SectorMasterItem } from '../../../../core/models/admin-masters.model';
+import { SKILL_SECTOR_NAMES } from '../../../../core/config/sector.config';
 import { OtrFormService } from '../../services/otr-form.service';
 import { OtrValidationService } from '../../services/otr-validation.service';
 import {
@@ -211,6 +215,19 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
           </div>
         }
 
+        <!-- Preferred Sector (options come from the Sector Master) -->
+        <div class="lg:col-span-6 sm:col-span-2">
+          <app-form-select
+            label="Preferred Sector"
+            [value]="data().preferredSector"
+            (valueChange)="update('preferredSector', $event)"
+            [options]="sectorOptions()"
+            placeholder="Select preferred sector"
+            [required]="true"
+            [error]="getFieldError('preferredSector')"
+          ></app-form-select>
+        </div>
+
         <!-- Contact Profile Fields -->
         <div class="lg:col-span-3 sm:col-span-1">
           <app-form-select
@@ -229,14 +246,14 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             type="tel"
             [value]="data().contactNo"
             (valueChange)="update('contactNo', $event)"
-            placeholder="Enter mobile number"
+            placeholder="Enter 10-digit mobile number"
             [required]="true"
-            [maxLength]="15"
+            [maxLength]="10"
             [error]="getFieldError('contactNo')"
           ></app-form-input>
         </div>
 
-        <div class="lg:col-span-3 sm:col-span-1">
+        <div class="lg:col-span-6 sm:col-span-1">
           <app-form-input
             label="Organisation Email ID"
             type="email"
@@ -248,7 +265,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
           ></app-form-input>
         </div>
 
-        <div class="lg:col-span-3 sm:col-span-1">
+        <div class="lg:col-span-6 sm:col-span-1">
           <app-form-input
             label="Website"
             [value]="data().website"
@@ -395,6 +412,23 @@ export class Step1OrgDetailsComponent {
   readonly statesList = STATES_MASTER;
   readonly nsdcPartnersList = NSDC_PARTNER_TYPES;
 
+  /** Active sectors from the Sector Master; falls back to the official list if the master is empty or unavailable. */
+  readonly sectorOptions = signal<string[]>([...SKILL_SECTOR_NAMES]);
+
+  constructor() {
+    inject(DataEngineService)
+      .for<SectorMasterItem>('SECTORS')
+      .getAll()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: sectors => {
+          const names = sectors.filter(s => s.status !== 'Inactive').map(s => s.sectorName);
+          if (names.length > 0) this.sectorOptions.set(names);
+        },
+        error: () => { /* keep the built-in list */ }
+      });
+  }
+
   readonly data = computed(() => this.otrFormService.step1());
   readonly isSubmitted = computed(() => this.validationService.submittedSteps().has(1));
 
@@ -433,6 +467,9 @@ export class Step1OrgDetailsComponent {
           return 'Registration Certificate is required';
         }
         return undefined;
+      case 'preferredSector':
+        if (!d.preferredSector?.trim()) return 'Preferred Sector is required';
+        return undefined;
       case 'companyPan':
         if (!d.companyPan?.trim()) return 'Company PAN is required';
         if (!REGEX.PAN.test(d.companyPan.toUpperCase())) return 'Invalid PAN format (e.g. ABCDE1234F)';
@@ -466,6 +503,9 @@ export class Step1OrgDetailsComponent {
         return undefined;
       case 'contactNo':
         if (!d.contactNo?.trim()) return 'Contact Number is required';
+        if (!REGEX.INDIAN_MOBILE.test(d.contactNo) && !/^[0-9]{7,12}$/.test(d.contactNo.replace(/[-\s]/g, ''))) {
+          return 'Enter valid 10-digit mobile number';
+        }
         return undefined;
       case 'emailId':
         if (!d.emailId?.trim()) return 'Official Email ID is required';

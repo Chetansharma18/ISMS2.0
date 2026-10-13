@@ -1,9 +1,17 @@
-/** Default Government of Rajasthan emblem shown in the letterhead of the official letters. */
-export const DEFAULT_LEFT_LOGO_URL =
-  'https://upload.wikimedia.org/wikipedia/commons/8/84/Government_of_Rajasthan_Logo.svg';
+/** Default RSLDC logo (left) and Rajasthan Sarkar emblem (right) shown in official letterheads. */
+export const DEFAULT_LEFT_LOGO_URL = '/rsldc-logo.png';
+export const DEFAULT_RIGHT_LOGO_URL = '/Rajasthan-Sarkar.png';
 
-/** Inline SVG emblem used when the left logo image fails to load. */
-export const DEFAULT_EMBLEM_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 16 L54 28 L67 28 L56 36 L60 48 L50 40 L40 48 L44 36 L33 28 L46 28 Z" fill="%230b3558"/><path d="M25 65 Q50 55 75 65 Q50 72 25 65 Z" fill="%23b91c1c"/><text x="50" y="83" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" fill="%230b3558">GOVT OF RAJASTHAN</text></svg>`;
+/**
+ * Older drafts saved a generic star emblem (an inline SVG) in place of the RSLDC logo.
+ * Such a saved logo is ignored so the RSLDC logo is shown; uploaded PNG/JPG logos are kept.
+ */
+export function isLegacyEmblem(logoUrl: string): boolean {
+  return logoUrl.startsWith('data:image/svg');
+}
+
+/** Inline SVG emblem or image fallback when left logo fails to load. */
+export const DEFAULT_EMBLEM_SVG = '/rsldc-logo.png';
 
 export type ClauseLabelFormat = 'alpha' | 'decimal';
 

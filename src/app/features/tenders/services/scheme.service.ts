@@ -88,8 +88,11 @@ export class SchemeService {
   /**
    * Assigns committee members to a scheme
    */
-  assignCommittee(refNo: string, members: string[]): Observable<SchemeTenderItem> {
-    return this.updateScheme(refNo, { committeeMembers: members });
+  assignCommittee(refNo: string, members: string[], approver?: string): Observable<SchemeTenderItem> {
+    return this.updateScheme(refNo, {
+      committeeMembers: members,
+      ...(approver !== undefined ? { committeeApprover: approver } : {})
+    });
   }
 
   /**

@@ -1,5 +1,6 @@
 import type { ApplicantResponse } from '../../services/eoi-state.service';
 import type { SanctionTableRow } from './eoi-sanction-editor.model';
+import { matchesApplicationId } from '../../services/eoi-state.util';
 
 export const AVAILABLE_DISTRICTS: readonly string[] = [
   'Jaipur', 'Jodhpur', 'Udaipur', 'Alwar', 'Kota', 'Sikar', 'Ajmer', 'Bhilwara', 'Beawar', 'Chittorgarh'
@@ -11,6 +12,8 @@ export const AVAILABLE_SECTORS: readonly string[] = [
 
 /** Maps the scrutiny grade of an approved applicant to the letter printed in the sanction order. */
 export function gradeToLetter(grade: string | undefined): string {
+  // Grades from the Grading Master (for example "A+" or "B") are used as they are.
+  if (grade && !grade.startsWith('Grade')) return grade;
   return grade === 'Grade A' ? 'A' : (grade === 'Grade B' ? 'B' : 'A');
 }
 
@@ -19,7 +22,7 @@ export function buildRowsFromApproved(approved: ApplicantResponse[]): SanctionTa
   return approved.map((resp, idx) => ({
     id: resp.id,
     appId: resp.id,
-    agencyName: resp.actualLegalName || resp.anonymousLabel,
+    agencyName: resp.anonymousLabel || resp.actualLegalName,
     district: resp.trainingCentres?.[0]?.district || AVAILABLE_DISTRICTS[idx % AVAILABLE_DISTRICTS.length],
     sector: resp.placementTrackRecord?.[0]?.sector || AVAILABLE_SECTORS[idx % AVAILABLE_SECTORS.length],
     category: 'A-1 (Skill)',
@@ -28,13 +31,34 @@ export function buildRowsFromApproved(approved: ApplicantResponse[]): SanctionTa
   }));
 }
 
-/** Fallback sample target rows from sanctionorder2.pdf. */
+/**
+ * Draft rows for the table: one per approved company, named "Company 1", "Company 2" and so on.
+ * Edits saved earlier (district, sector, category, target) are kept for companies that are still approved.
+ * Rows added by hand stay; rows of companies that are no longer approved are dropped.
+ */
+export function syncRowsWithApproved(
+  saved: SanctionTableRow[],
+  approved: ApplicantResponse[],
+  allResponses: ApplicantResponse[]
+): SanctionTableRow[] {
+  const fresh = buildRowsFromApproved(approved);
+  const synced = fresh.map(row => {
+    const earlier = saved.find(s => s.appId === row.appId);
+    return earlier
+      ? { ...row, district: earlier.district, sector: earlier.sector, category: earlier.category, target: earlier.target }
+      : row;
+  });
+  const manual = saved.filter(s => !allResponses.some(r => matchesApplicationId(r, s.appId)));
+  return [...synced, ...manual];
+}
+
+/** Sample rows, shown only when no company has been approved yet. */
 export function createFallbackTableRows(): SanctionTableRow[] {
   return [
-    { id: '1', appId: 'APP-004661', agencyName: 'Apex Technical & Infrastructure Solutions Pvt Ltd', district: 'Alwar', sector: 'Apparel, Agriculture', category: 'A-1 (Skill)', grade: 'A', target: 150 },
-    { id: '2', appId: 'APP-004662', agencyName: 'Marwar Skill Foundation', district: 'Jodhpur', sector: 'Textile & Handloom', category: 'A-1 (Skill)', grade: 'A', target: 150 },
-    { id: '3', appId: 'APP-004663', agencyName: 'Singhania Vocational Institute', district: 'Udaipur', sector: 'Automotive', category: 'A-1 (Skill)', grade: 'A', target: 150 },
-    { id: '4', appId: 'APP-004664', agencyName: 'DMR Enterprises Private Limited', district: 'Alwar', sector: 'Healthcare', category: 'A-1 (Skill)', grade: 'A', target: 150 }
+    { id: 'APP-2024-001', appId: 'APP-2024-001', agencyName: 'Company 1', district: 'Alwar', sector: 'Apparel, Agriculture', category: 'A-1 (Skill)', grade: 'A', target: 150 },
+    { id: 'APP-2024-002', appId: 'APP-2024-002', agencyName: 'Company 2', district: 'Jodhpur', sector: 'Textile & Handloom', category: 'A-1 (Skill)', grade: 'A', target: 150 },
+    { id: 'APP-2024-003', appId: 'APP-2024-003', agencyName: 'Company 3', district: 'Udaipur', sector: 'Healthcare, Life Sciences', category: 'A-1 (Skill)', grade: 'A', target: 150 },
+    { id: 'APP-2024-004', appId: 'APP-2024-004', agencyName: 'Company 4', district: 'Alwar', sector: 'Healthcare, Life Sciences', category: 'A-1 (Skill)', grade: 'A', target: 150 }
   ];
 }
 

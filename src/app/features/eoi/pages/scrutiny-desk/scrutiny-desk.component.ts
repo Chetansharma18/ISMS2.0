@@ -1,73 +1,73 @@
 import { Component, DestroyRef, inject, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute } from '@angular/router';
-import { EoiStateService, ApplicantResponse, DossierDocument } from '../../services/eoi-state.service';
-import { ActionModalComponent } from '../../../../shared/components/action-modal/action-modal.component';
+import { ActivatedRoute } from '@angular/router';
+import {
+  EoiStateService,
+  ApplicantResponse,
+  DossierDocument,
+  ApplicationActivityLog
+} from '../../services/eoi-state.service';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { formatDateMedium } from '../../../../shared/utils';
+import { AuthService } from '../../../../core/auth/auth.service';
+import { ShortfallBridgeService } from '../../services/shortfall-bridge.service';
 import { ScrutinyToolbarComponent } from './components/scrutiny-toolbar.component';
-import { ScrutinyApplicantSummaryComponent } from './components/scrutiny-applicant-summary.component';
-import { ScrutinyDecisionRecordComponent } from './components/scrutiny-decision-record.component';
-import { ScrutinyProfileDetailsComponent } from './components/scrutiny-profile-details.component';
-import { ScrutinyDossierDocsComponent } from './components/scrutiny-dossier-docs.component';
 import { ScrutinyDocViewerComponent } from './components/scrutiny-doc-viewer.component';
+import { ScrutinyDecisionRecordComponent } from './components/scrutiny-decision-record.component';
+import { ScrutinyReviewSectionsComponent } from './components/scrutiny-review-sections.component';
+import { ScrutinyPastPerformanceComponent } from './components/scrutiny-past-performance.component';
+import { RevertSubmission, ScrutinyRevertModalComponent } from './components/scrutiny-revert-modal.component';
+import { ScrutinyRemarksComponent } from './components/scrutiny-remarks.component';
 import { ScrutinyPdfService } from './scrutiny-pdf.service';
 import {
-  ActivePreviewDocument,
-  GRADE_OPTIONS,
-  GradeLabel,
-  clampScore,
-  gradeFromScore,
-  isAcceptFormValid,
-  isRejectFormValid,
-  toActivePreviewDocument
-} from './scrutiny-desk.util';
+  DecisionSubmission,
+  GradeOption,
+  ScrutinyDecisionModalComponent
+} from './components/scrutiny-decision-modal.component';
+import { ActivePreviewDocument } from './scrutiny-desk.util';
+import { DataEngineService } from '../../../../core/services/data-engine.service';
+import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
 
 @Component({
   selector: 'app-scrutiny-desk',
   standalone: true,
   imports: [
-    FormsModule,
-    RouterModule,
-    ActionModalComponent,
     ScrutinyToolbarComponent,
-    ScrutinyApplicantSummaryComponent,
     ScrutinyDecisionRecordComponent,
-    ScrutinyProfileDetailsComponent,
-    ScrutinyDossierDocsComponent,
+    ScrutinyReviewSectionsComponent,
+    ScrutinyPastPerformanceComponent,
+    ScrutinyRemarksComponent,
+    ScrutinyRevertModalComponent,
+    ScrutinyDecisionModalComponent,
     ScrutinyDocViewerComponent
   ],
   template: `
-    <div class="w-full min-h-screen bg-white text-slate-800 font-sans p-4 sm:p-6 lg:p-8 animate-in fade-in duration-200" style="font-family: 'Inter', sans-serif;">
+    <div class="w-full min-h-screen bg-[#FEFEFD] text-slate-800 font-sans px-4 sm:px-5 lg:px-6 py-4 sm:py-5 space-y-5" style="font-family: 'Inter', sans-serif;">
 
       <app-scrutiny-toolbar
         [applicant]="applicant()"
+        (revert)="openRevertModal()"
+        (remarks)="openRemarksModal()"
         (reject)="openRejectModal()"
-        (accept)="openAcceptModal()"
+        (approve)="openApproveModal()"
       />
 
-      <app-scrutiny-applicant-summary [applicant]="applicant()" />
+      @if (applicant(); as app) {
+        @if (app.status !== 'UNDER_SCRUTINY') {
+          <app-scrutiny-decision-record [applicant]="app" />
+        }
 
-      <app-scrutiny-decision-record [applicant]="applicant()" />
+        <app-scrutiny-review-sections
+          [applicant]="app"
+          [isDownloadingZip]="isDownloadingZip()"
+          (viewDoc)="openOfficialDoc($event)"
+          (downloadZip)="downloadAllZip()"
+        />
 
-      <app-scrutiny-profile-details [applicant]="applicant()" />
+        <app-scrutiny-past-performance [engagements]="app.pastEngagements ?? []" />
 
-      <app-scrutiny-dossier-docs
-        [applicant]="applicant()"
-        [isDownloadingZip]="isDownloadingZip()"
-        (viewDocument)="openOfficialDoc($event)"
-        (downloadZip)="downloadAllZip()"
-      />
-
-      <!-- Bottom Return Button -->
-      <div class="mt-8 pt-4 border-t border-slate-200 flex items-center justify-between">
-        <a
-          [routerLink]="['/admin/responses', applicant()?.schemeId || 'ALL']"
-          class="inline-flex items-center gap-1.5 px-4 py-2 border border-slate-300 bg-white hover:bg-slate-50 rounded-md text-xs font-medium text-slate-700 transition-colors cursor-pointer shadow-2xs"
-        >
-          &larr; Return to Submissions List
-        </a>
-      </div>
+        <app-scrutiny-remarks [log]="getActivityLog()" />
+      }
 
     </div>
 
@@ -79,113 +79,42 @@ import {
       (downloadPdf)="downloadDocPdf()"
     />
 
-    <!-- ====================================================================
-         ACCEPT APPLICATION MODAL (shared ActionModalComponent)
-         ==================================================================== -->
-    <app-action-modal
-      [isOpen]="showAcceptModal()"
-      title="Accept &amp; Empanel Application"
-      [description]="decisionSubtitle()"
-      accentBarClass="bg-emerald-600"
-      [showCloseButton]="true"
-      [closeOnBackdrop]="false"
-      maxWidthClass="max-w-lg"
-      primaryLabel="Confirm &amp; Issue Empanelment Order"
-      primaryVariant="success"
-      [disablePrimary]="!isAcceptFormValid()"
-      secondaryLabel="Cancel"
-      (primaryAction)="confirmAcceptApplication()"
-      (secondaryAction)="closeModals()"
-      (close)="closeModals()"
-    >
-      <div class="mt-4 space-y-4 text-xs">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div>
-            <label for="modalScoreInput" class="block text-xs font-medium text-slate-700 mb-1">
-              Technical Evaluation Score (0 - 100) *
-            </label>
-            <div class="relative">
-              <input
-                id="modalScoreInput"
-                type="number"
-                min="0"
-                max="100"
-                [(ngModel)]="technicalScore"
-                (ngModelChange)="onScoreChange($event)"
-                placeholder="e.g. 88"
-                class="w-full px-3 py-2 border border-slate-300 rounded text-xs font-normal text-slate-900 focus:outline-none focus:ring-1 focus:ring-emerald-600 shadow-2xs"
-              />
-              <span class="absolute right-3 top-2 text-slate-400 font-normal text-xs">/ 100</span>
-            </div>
-          </div>
+    @if (showRevertModal()) {
+      <app-scrutiny-revert-modal
+        [applicantLabel]="applicant()?.anonymousLabel ?? ''"
+        [documentOptions]="shortfallDocTitles()"
+        (confirmed)="confirmRevert($event)"
+        (close)="closeModals()"
+      />
+    }
 
-          <div>
-            <label for="modalGradeSelect" class="block text-xs font-medium text-slate-700 mb-1">
-              Assigned Technical Grade *
-            </label>
-            <select
-              id="modalGradeSelect"
-              [(ngModel)]="selectedGrade"
-              class="w-full px-2.5 py-2 border border-slate-300 rounded text-xs font-normal text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-emerald-600 cursor-pointer shadow-2xs"
-            >
-              <option value="" disabled>-- Select Grade --</option>
-              @for (g of gradeOptions; track g.value) {
-                <option [value]="g.value">{{ g.label }}</option>
-              }
-            </select>
-          </div>
-        </div>
+    @if (showRemarksModal()) {
+      <app-scrutiny-decision-modal
+        mode="remark"
+        [applicantLabel]="applicant()?.anonymousLabel ?? ''"
+        (confirmed)="confirmAddRemark($event)"
+        (close)="closeModals()"
+      />
+    }
 
-        <div>
-          <label for="modalApprovalRemarks" class="block text-xs font-medium text-slate-700 mb-1">
-            Empanelment Recommendation Remarks
-          </label>
-          <textarea
-            id="modalApprovalRemarks"
-            rows="4"
-            [(ngModel)]="decisionRemarks"
-            placeholder="Specify official empanelment recommendation, batch allocation, or special conditions..."
-            class="w-full p-2.5 border border-slate-300 rounded text-xs font-normal text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-600 bg-white shadow-2xs"
-          ></textarea>
-        </div>
-      </div>
-    </app-action-modal>
+    @if (showRejectModal()) {
+      <app-scrutiny-decision-modal
+        mode="reject"
+        [applicantLabel]="applicant()?.anonymousLabel ?? ''"
+        (confirmed)="confirmReject($event)"
+        (close)="closeModals()"
+      />
+    }
 
-    <!-- ====================================================================
-         REJECT APPLICATION MODAL (shared ActionModalComponent)
-         ==================================================================== -->
-    <app-action-modal
-      [isOpen]="showRejectModal()"
-      title="Reject Application"
-      [description]="decisionSubtitle()"
-      accentBarClass="bg-rose-600"
-      [showCloseButton]="true"
-      [closeOnBackdrop]="false"
-      maxWidthClass="max-w-lg"
-      primaryLabel="Confirm Rejection"
-      primaryVariant="danger"
-      [disablePrimary]="!isRejectFormValid()"
-      secondaryLabel="Cancel"
-      (primaryAction)="confirmRejectApplication()"
-      (secondaryAction)="closeModals()"
-      (close)="closeModals()"
-    >
-      <div class="mt-4 text-xs">
-        <label for="modalRejectionRemarks" class="block text-xs font-medium text-slate-700 mb-1">
-          Rejection Remarks / Reason for Disqualification *
-        </label>
-        <textarea
-          id="modalRejectionRemarks"
-          rows="4"
-          [(ngModel)]="decisionRemarks"
-          placeholder="Specify the exact reasons, clause citations, or deficiencies observed during scrutiny..."
-          class="w-full p-2.5 border border-slate-300 rounded text-xs font-normal text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-600 bg-white shadow-2xs"
-        ></textarea>
-        <span class="text-[11px] text-slate-400 mt-1 block">
-          Please provide clear remarks for the rejection order.
-        </span>
-      </div>
-    </app-action-modal>
+    @if (showApproveModal()) {
+      <app-scrutiny-decision-modal
+        mode="approve"
+        [applicantLabel]="applicant()?.anonymousLabel ?? ''"
+        [grades]="grades()"
+        (confirmed)="confirmApprove($event)"
+        (close)="closeModals()"
+      />
+    }
   `
 })
 export class ScrutinyDeskComponent {
@@ -193,40 +122,95 @@ export class ScrutinyDeskComponent {
   private route = inject(ActivatedRoute);
   private notifications = inject(NotificationService);
   private pdfService = inject(ScrutinyPdfService);
+  private shortfallBridge = inject(ShortfallBridgeService);
+  private auth = inject(AuthService);
+  private gradingRepo = inject(DataEngineService).for<GradingMasterItem>('GRADING_MASTERS', { idKey: 'id' });
+
+  /** Name recorded against every action and remark, so it is clear who said what. */
+  private reviewerName(): string {
+    // Committee members are shown by a number only (no name or designation). The number is
+    // derived from the signed-in user, so the same user is always the same member.
+    const ssoId = this.auth.currentUser()?.ssoId ?? '';
+    let sum = 0;
+    for (const ch of ssoId) sum += ch.charCodeAt(0);
+    return `Committee Member ${(sum % 5) + 1}`;
+  }
   private destroyRef = inject(DestroyRef);
+
+  Math = Math;
 
   applicant = signal<ApplicantResponse | undefined>(undefined);
 
-  /** Subtitle shown under the accept / reject modal title. */
-  readonly decisionSubtitle = computed(() => {
-    const app = this.applicant();
-    return app ? `${app.anonymousLabel} \u2022 ${app.id}` : '';
-  });
-
-  readonly gradeOptions = GRADE_OPTIONS;
-
-  // Popup Modal States
-  showAcceptModal = signal<boolean>(false);
+  // Modal Dialog States
+  showApproveModal = signal<boolean>(false);
   showRejectModal = signal<boolean>(false);
+  showRevertModal = signal<boolean>(false);
+  showRemarksModal = signal<boolean>(false);
 
-  // Form inputs
-  technicalScore: number | null = 88;
-  selectedGrade = 'Grade A';
-  decisionRemarks = '';
+  /** Active grades from the Grading Master, highest first. */
+  readonly grades = signal<GradeOption[]>([]);
 
-  // Proper Document Viewer State
+  // Document Viewer State
   activeDoc = signal<ActivePreviewDocument | null>(null);
-
   isDownloadingZip = signal<boolean>(false);
 
-  private notifyDecisionCommitted(): void {
-    this.notifications.success(
-      `The decision for ${this.applicant()?.anonymousLabel ?? 'this applicant'} has been recorded.`,
-      'Scrutiny Decision Successfully Committed'
-    );
-  }
+  // Available TP / OTR documents for the shortfall dropdown
+  readonly availableShortfallDocs = computed(() => {
+    const app = this.applicant();
+    const defaultDocs = [
+      { id: 'DOC_REG', title: 'Organisation Registration Certificate', category: 'OTR' },
+      { id: 'DOC_PAN', title: 'Organisation PAN Card', category: 'OTR' },
+      { id: 'DOC_GST', title: 'GST Registration Certificate', category: 'OTR' },
+      { id: 'DOC_BALANCE', title: 'Audited Balance Sheet / Turnover Certificate', category: 'Proposal' },
+      { id: 'DOC_BOARD', title: 'Board Resolution / Power of Attorney', category: 'Proposal' },
+      { id: 'DOC_NSDC', title: 'NSDC Partner Certificate', category: 'Proposal' },
+      { id: 'DOC_ADDITIONAL', title: 'Additional Supporting Document', category: 'Proposal' },
+      { id: 'DOC_SIGNATORY', title: 'Authorized Signatory Identity Proof (Aadhaar / Voter ID)', category: 'OTR' },
+      { id: 'DOC_BANK', title: 'Bank Account Mandate / Cancelled Cheque', category: 'OTR' },
+      { id: 'DOC_CENTRE', title: 'Training Centre Infrastructure & Equipment Proof', category: 'Proposal' },
+      { id: 'DOC_AFFIDAVIT', title: 'Non-Blacklisting Declaration & Affidavit (Rs. 100 Stamp)', category: 'Statutory' },
+      { id: 'DOC_EMD', title: 'EMD Statutory Deposit Receipt / Challan', category: 'Statutory' }
+    ];
+
+    if (!app?.uploadedDocuments?.length) {
+      return defaultDocs;
+    }
+
+    const uploaded = app.uploadedDocuments.map(d => ({
+      id: d.id,
+      title: d.title,
+      category: d.category || 'Uploaded'
+    }));
+
+    const seen = new Set<string>();
+    const list: { id: string; title: string; category: string }[] = [];
+    for (const doc of [...uploaded, ...defaultDocs]) {
+      const key = doc.title.toLowerCase().trim();
+      if (!seen.has(key)) {
+        seen.add(key);
+        list.push(doc);
+      }
+    }
+    return list;
+  });
+
+  /** Document names offered in the shortfall dropdown. */
+  readonly shortfallDocTitles = computed(() => this.availableShortfallDocs().map(d => d.title));
 
   constructor() {
+    // Grades offered when approving come from the Grading Master (active grades only).
+    this.gradingRepo
+      .getAll()
+      .pipe(takeUntilDestroyed())
+      .subscribe(items =>
+        this.grades.set(
+          items
+            .filter(item => item.status !== 'Inactive')
+            .sort((a, b) => b.maximum - a.maximum)
+            .map(({ grade, minimum, maximum, range }) => ({ grade, minimum, maximum, range }))
+        )
+      );
+
     this.route.params.pipe(takeUntilDestroyed()).subscribe(params => {
       const appId = params['applicationId'];
       if (appId) {
@@ -238,82 +222,289 @@ export class ScrutinyDeskComponent {
   loadApplicant(appId: string): void {
     this.eoiStateService.getResponseById(appId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => {
       this.applicant.set(data);
-      if (data?.scrutinyDetails?.technicalScore) {
-        this.technicalScore = data.scrutinyDetails.technicalScore;
-        this.selectedGrade = data.scrutinyDetails.grade || 'Grade A';
-        this.decisionRemarks = data.scrutinyDetails.remarks || '';
-      }
     });
   }
 
-  onScoreChange(val: number): void {
-    if (val !== null && val !== undefined) {
-      const clamped = clampScore(val);
-      this.technicalScore = clamped;
-      this.selectedGrade = gradeFromScore(clamped);
+  // --- Activity History Timeline Stream ---
+  getActivityLog(): ApplicationActivityLog[] {
+    const app = this.applicant();
+    if (app?.activityLog && app.activityLog.length > 0) {
+      return app.activityLog;
     }
+
+    const subDate = app?.submissionDate || '08/09/2026 14:30 PM';
+    const initial: ApplicationActivityLog[] = [
+      {
+        id: 'ACT-1',
+        timestamp: subDate,
+        action: 'SUBMITTED',
+        title: 'EOI Proposal Submitted & Statutory Fee Paid',
+        actor: `${app?.authorizedSignatory?.name || 'Applicant'} (${app?.authorizedSignatory?.designation || 'Authorized Signatory'})`,
+        actorRole: 'Applicant / TP',
+        description: `Complete proposal submitted under ${app?.schemeName || 'MMKVY'}. EMD Fee (₹${app?.emdFee?.toLocaleString() || '50,000'}) and Processing Fee (₹${app?.processingFee?.toLocaleString() || '2,000'}) successfully deposited via e-Challan. 7 Proposal documents uploaded.`,
+        badgeClass: 'bg-blue-50 text-blue-800 border-blue-200'
+      },
+      {
+        id: 'ACT-2',
+        timestamp: '09/09/2026 10:15 AM',
+        action: 'UNDER_REVIEW',
+        title: 'Application Assigned to Scrutiny Desk',
+        actor: 'Scrutiny Desk',
+        actorRole: 'Department Scrutiny Officer',
+        description: 'Proposal dossier marked for Stage-1 technical eligibility scrutiny, statutory OTR document validation, and training infrastructure review.',
+        badgeClass: 'bg-amber-50 text-amber-800 border-amber-200'
+      }
+    ];
+
+    if (app?.status === 'REVERTED' && app.scrutinyDetails?.shortfall) {
+      initial.push({
+        id: 'ACT-3',
+        timestamp: app.scrutinyDetails.decisionTimestamp || '10/09/2026 11:30 AM',
+        action: 'REVERTED',
+        title: 'Shortfall Notice Issued (Reverted to Applicant)',
+        actor: app.scrutinyDetails.scrutinyOfficer || 'Committee Member 1',
+        actorRole: 'Department Scrutiny Officer',
+        description: `Shortfall notice issued for ${app.scrutinyDetails.shortfall.documents.length} document(s).${app.scrutinyDetails.shortfall.officeOrderRef ? ` Office Order Ref: ${app.scrutinyDetails.shortfall.officeOrderRef}.` : ''} Rectification window: ${app.scrutinyDetails.shortfall.deadlineDays} Days. Remarks: "${app.scrutinyDetails.remarks}"`,
+        badgeClass: 'bg-amber-50 text-amber-800 border-amber-200',
+        meta: {
+          documents: app.scrutinyDetails.shortfall.documents,
+          officeOrderRef: app.scrutinyDetails.shortfall.officeOrderRef,
+          remarks: app.scrutinyDetails.remarks
+        }
+      });
+    } else if (app?.status === 'APPROVED' && app.scrutinyDetails) {
+      initial.push({
+        id: 'ACT-3',
+        timestamp: app.scrutinyDetails.decisionTimestamp || '11/09/2026 16:45 PM',
+        action: 'APPROVED',
+        title: 'Application Approved & Empanelled',
+        actor: app.scrutinyDetails.scrutinyOfficer || 'Committee Member 1',
+        actorRole: 'Empanelment Committee',
+        description: `Technical Evaluation Score awarded: ${app.scrutinyDetails.technicalScore}/100 (${app.scrutinyDetails.grade}). Empanelment recommendation: "${app.scrutinyDetails.remarks}"`,
+        badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+        meta: {
+          score: app.scrutinyDetails.technicalScore,
+          grade: app.scrutinyDetails.grade,
+          remarks: app.scrutinyDetails.remarks
+        }
+      });
+    } else if (app?.status === 'REJECTED' && app.scrutinyDetails) {
+      initial.push({
+        id: 'ACT-3',
+        timestamp: app.scrutinyDetails.decisionTimestamp || '11/09/2026 15:20 PM',
+        action: 'REJECTED',
+        title: 'Application Disqualified & Rejected',
+        actor: app.scrutinyDetails.scrutinyOfficer || 'Committee Member 1',
+        actorRole: 'Department Scrutiny Officer',
+        description: `Application disqualified. Reason: "${app.scrutinyDetails.remarks}". Statutory EMD refund initiated.`,
+        badgeClass: 'bg-rose-50 text-rose-800 border-rose-200',
+        meta: {
+          remarks: app.scrutinyDetails.remarks
+        }
+      });
+    }
+
+    return initial;
   }
 
-  openAcceptModal(): void {
-    this.decisionRemarks = this.applicant()?.scrutinyDetails?.remarks ||
-      'Bidder satisfies all technical thresholds, infrastructure capacity, and statutory documentation requirements for Category I empanelment.';
-    this.showAcceptModal.set(true);
+  // --- Modal Openers ---
+  openApproveModal(): void {
+    this.showApproveModal.set(true);
   }
 
   openRejectModal(): void {
-    this.decisionRemarks = this.applicant()?.scrutinyDetails?.remarks || '';
     this.showRejectModal.set(true);
   }
 
+  openRevertModal(): void {
+    this.showRevertModal.set(true);
+  }
+
+  openRemarksModal(): void {
+    this.showRemarksModal.set(true);
+  }
+
   closeModals(): void {
-    this.showAcceptModal.set(false);
+    this.showApproveModal.set(false);
     this.showRejectModal.set(false);
+    this.showRevertModal.set(false);
+    this.showRemarksModal.set(false);
   }
 
-  isAcceptFormValid(): boolean {
-    return isAcceptFormValid(this.technicalScore, this.selectedGrade);
-  }
-
-  isRejectFormValid(): boolean {
-    return isRejectFormValid(this.decisionRemarks);
-  }
-
-  confirmAcceptApplication(): void {
+  // --- Actions ---
+  /** Approves the application with the score and grade chosen by the committee member. */
+  confirmApprove(submission: DecisionSubmission): void {
     const app = this.applicant();
-    if (!app || this.technicalScore === null) return;
+    if (!app) return;
+
+    const grade = submission.grade ?? '';
+    const now = new Date();
+    const nowStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const newActivity: ApplicationActivityLog = {
+      id: `ACT-${Date.now()}`,
+      timestamp: nowStr,
+      action: 'APPROVED',
+      title: 'Application Approved',
+      actor: this.reviewerName(),
+      actorRole: 'Empanelment Committee',
+      description: `Approved with grade ${grade}.`,
+      badgeClass: 'bg-sky-50 text-navy border-sky-200',
+      meta: {
+        grade,
+        remarks: submission.remark || undefined
+      }
+    };
 
     this.eoiStateService.updateScrutinyDecision(app.id, {
       status: 'APPROVED',
-      technicalScore: this.technicalScore,
-      grade: this.selectedGrade as GradeLabel,
-      remarks: this.decisionRemarks
+      scrutinyOfficer: this.reviewerName(),
+      grade,
+      remarks: submission.remark,
+      activityLog: [...this.getActivityLog(), newActivity]
     });
 
     this.closeModals();
-    this.notifyDecisionCommitted();
+    this.notifications.success(`${app.anonymousLabel} has been approved (grade ${grade}).`, 'Application Approved');
     this.loadApplicant(app.id);
   }
 
-  confirmRejectApplication(): void {
+  /** Rejects the application. The remark is mandatory. */
+  confirmReject(submission: DecisionSubmission): void {
     const app = this.applicant();
-    if (!app || !this.isRejectFormValid()) return;
+    if (!app || !submission.remark) return;
+
+    const now = new Date();
+    const nowStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const newActivity: ApplicationActivityLog = {
+      id: `ACT-${Date.now()}`,
+      timestamp: nowStr,
+      action: 'REJECTED',
+      title: 'Application Rejected',
+      actor: this.reviewerName(),
+      actorRole: 'Department Scrutiny Officer',
+      description: 'Application rejected.',
+      badgeClass: 'bg-rose-50 text-rose-800 border-rose-200',
+      meta: {
+        remarks: submission.remark
+      }
+    };
 
     this.eoiStateService.updateScrutinyDecision(app.id, {
       status: 'REJECTED',
-      technicalScore: this.technicalScore || 0,
-      grade: (this.selectedGrade || 'Grade E') as GradeLabel,
-      remarks: this.decisionRemarks,
-      disqualificationReason: this.decisionRemarks
+      scrutinyOfficer: this.reviewerName(),
+      technicalScore: 0,
+      remarks: submission.remark,
+      disqualificationReason: submission.remark,
+      activityLog: [...this.getActivityLog(), newActivity]
     });
 
     this.closeModals();
-    this.notifyDecisionCommitted();
+    this.notifications.success(`${app.anonymousLabel} has been rejected.`, 'Application Rejected');
     this.loadApplicant(app.id);
   }
 
-  /** Opens the Document / PDF Viewer for a dossier document. */
+
+  /** Raises the shortfall: returns the application to the applicant with the documents asked for. */
+  confirmRevert(submission: RevertSubmission): void {
+    const app = this.applicant();
+    if (!app) return;
+
+    const now = new Date();
+    const nowStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const due = new Date(now);
+    due.setDate(due.getDate() + submission.dueDays);
+
+    const newActivity: ApplicationActivityLog = {
+      id: `ACT-${Date.now()}`,
+      timestamp: nowStr,
+      action: 'REVERTED',
+      title: 'Shortfall Raised',
+      actor: this.reviewerName(),
+      actorRole: 'Department Scrutiny Officer',
+      description: `Shortfall raised for ${submission.documents.length} document(s). Response time: ${submission.dueDays} days.`,
+      badgeClass: 'bg-amber-50 text-amber-800 border-amber-200',
+      meta: {
+        documents: submission.documents,
+        remarks: submission.comment
+      }
+    };
+
+    this.eoiStateService.updateScrutinyDecision(app.id, {
+      status: 'REVERTED',
+      scrutinyOfficer: this.reviewerName(),
+      technicalScore: 0,
+      grade: 'Grade E',
+      remarks: submission.comment,
+      shortfall: {
+        documents: submission.documents,
+        deadlineDays: submission.dueDays,
+        revertedAt: now.toLocaleDateString('en-GB')
+      },
+      activityLog: [...this.getActivityLog(), newActivity]
+    });
+
+    // Show the shortfall, with the files shared by the department, on the applicant's Tender Status page.
+    this.shortfallBridge
+      .raiseNotice(app.id, {
+        raisedOn: formatDateMedium(now, '-'),
+        raisedBy: 'Department',
+        dueDate: formatDateMedium(due, '-'),
+        remarks: submission.comment,
+        requiredDocs: submission.documents,
+        sharedDocs: submission.sharedFiles
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
+
+    this.closeModals();
+    this.notifications.success('Shortfall sent to the applicant.', 'Shortfall Raised');
+    this.loadApplicant(app.id);
+  }
+
+  /** Records a remark against the signed-in committee member. It reaches the Scheme OIC automatically. */
+  confirmAddRemark(submission: DecisionSubmission): void {
+    const app = this.applicant();
+    const remark = submission.remark.trim();
+    if (!app || !remark) return;
+
+    const now = new Date();
+    const nowStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const newActivity: ApplicationActivityLog = {
+      id: `ACT-${Date.now()}`,
+      timestamp: nowStr,
+      action: 'REMARK_ADDED',
+      title: 'Remark added',
+      actor: this.reviewerName(),
+      actorRole: 'Department Scrutiny Officer',
+      description: remark,
+      badgeClass: 'bg-purple-50 text-purple-800 border-purple-200',
+      meta: {
+        remarks: remark
+      }
+    };
+
+    this.eoiStateService.updateScrutinyDecision(app.id, {
+      status: app.status,
+      technicalScore: app.scrutinyDetails?.technicalScore || 0,
+      grade: app.scrutinyDetails?.grade,
+      remarks: app.scrutinyDetails?.remarks ?? remark,
+      shortfall: app.scrutinyDetails?.shortfall,
+      activityLog: [...this.getActivityLog(), newActivity],
+      scrutinyOfficer: app.scrutinyDetails?.scrutinyOfficer ?? this.reviewerName()
+    });
+
+    this.closeModals();
+    this.notifications.success('Your remark has been recorded.', 'Remark Added');
+    this.loadApplicant(app.id);
+  }
+
+
+  /** Opens the Document / PDF Viewer for a dossier document directly in another tab in Chrome. */
   openOfficialDoc(doc: DossierDocument): void {
-    this.activeDoc.set(toActivePreviewDocument(doc, this.applicant()?.id));
+    window.open(encodeURI('/document/ISMS RFP.pdf'), '_blank');
   }
 
   closeDocViewer(): void {

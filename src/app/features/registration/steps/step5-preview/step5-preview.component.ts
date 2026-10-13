@@ -2,13 +2,13 @@ import { ChangeDetectionStrategy, Component, inject, computed, signal, output } 
 import { CommonModule } from '@angular/common';
 import { OtrFormService } from '../../services/otr-form.service';
 import { FileDoc } from '../../models/otr-form.model';
-import { DocumentViewerModalComponent } from '../../../../shared/components/document-viewer-modal/document-viewer-modal.component';
+import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
 
 @Component({
   selector: 'app-step5-preview',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, DocumentViewerModalComponent],
+  imports: [CommonModule],
   template: `
     <div class="w-full space-y-4 font-sans bg-white pb-4">
 
@@ -88,6 +88,10 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
             </div>
 
             <!-- Row 3 -->
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Preferred Sector</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().preferredSector || '-' }}</span>
+            </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">NSDC Partner</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().nsdcPartner || '-' }}</span>
@@ -196,15 +200,15 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
             <!-- Row 3 -->
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Bhamashah No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().bhamashahNo || 'Not Provided' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().bhamashahNo || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Voter ID No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().voterIdNo || 'Not Provided' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().voterIdNo || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Passport No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().passportNo || 'Not Provided' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().passportNo || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">State</span>
@@ -289,11 +293,11 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">MICR Code</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step4().micrCode || 'Optional / -' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step4().micrCode || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Transfer Mode</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step4().transferMode || 'NEFT' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step4().transferMode || '-' }}</span>
             </div>
 
             <!-- Row 3 Address -->
@@ -305,19 +309,12 @@ import { DocumentViewerModalComponent } from '../../../../shared/components/docu
         }
       </section>
 
-      <!-- Document Preview Modal Dialog (if needed) -->
-      <app-document-viewer-modal
-        [isOpen]="isViewerOpen()"
-        [doc]="activeDoc()"
-        [title]="activeDocTitle()"
-        (close)="closeViewer()"
-      ></app-document-viewer-modal>
-
     </div>
   `
 })
 export class Step5PreviewComponent {
   private otrFormService = inject(OtrFormService);
+  private docViewer = inject(DocumentViewerService);
 
   readonly step1 = computed(() => this.otrFormService.step1());
   readonly step3 = computed(() => this.otrFormService.step3()); // Authorized Person Details
@@ -360,22 +357,11 @@ export class Step5PreviewComponent {
 
   editStep = output<number>();
 
-  isViewerOpen = signal<boolean>(false);
-  activeDoc = signal<FileDoc | null>(null);
-  activeDocTitle = signal<string>('');
-
   onEditStep(step: number): void {
     this.editStep.emit(step);
   }
 
   previewDoc(doc: FileDoc, title?: string): void {
-    this.activeDoc.set(doc);
-    this.activeDocTitle.set(title || doc.fileName);
-    this.isViewerOpen.set(true);
-  }
-
-  closeViewer(): void {
-    this.isViewerOpen.set(false);
-    this.activeDoc.set(null);
+    this.docViewer.openDocument(doc, title);
   }
 }

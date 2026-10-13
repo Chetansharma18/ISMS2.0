@@ -4,13 +4,23 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { StorageService } from '../../core/services/storage.service';
+import { EOI_WIZARD_STEP_COUNT, EoiDraft, EoiDraftService } from '../../core/services/eoi-draft.service';
 import { PermissionService } from '../../core/permissions/permission.service';
 import { SchemeService } from './services/scheme.service';
 import {
   TableComponent,
   ActionModalComponent,
-  TableColumn
+  TableColumn,
+  formatInr
 } from '../../shared';
+import { DataEngineService } from '../../core/services/data-engine.service';
+import {
+  SchemeMasterItem,
+  SchemeCategoryMasterItem,
+  EoiCategoryItem,
+  DocMasterItem
+} from '../../core/models/admin-masters.model';
+import { DOC_MASTER_STORAGE_KEY, INITIAL_DOC_ITEMS } from '../admin-master/doc-master.component';
 import { SchemeDetailViewComponent } from './scheme-detail-view.component';
 import { EoiAttachment, EoiDocumentItem, EoiFormData, SchemeTender } from './tenders.models';
 import {
@@ -65,6 +75,32 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
             (configureEoi)="openConfigureEoiModal()"
           ></app-schemes-header>
 
+          <!-- Unfinished EOI applications of the signed-in applicant -->
+          @for (draft of pendingDrafts(); track draft.refNo) {
+            <div
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900"
+              role="alert"
+            >
+              <p class="m-0 flex items-start gap-2 text-[13px] leading-snug">
+                <svg class="w-4 h-4 mt-0.5 shrink-0 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                </svg>
+                <span>
+                  <strong class="font-semibold">Application pending:</strong>
+                  your EOI application for <strong class="font-semibold">{{ draft.schemeName }}</strong>
+                  ({{ draft.refNo }}) is incomplete. You stopped at Step {{ draft.step }} of {{ draftStepCount }}.
+                </span>
+              </p>
+              <button
+                type="button"
+                (click)="resumeApplication(draft.refNo)"
+                class="shrink-0 inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-navy hover:bg-navy-dark text-white text-xs font-semibold cursor-pointer transition-colors"
+              >
+                Continue Application
+              </button>
+            </div>
+          }
+
           <!-- Schemes Table via Reusable TableComponent -->
           <app-table
             [columns]="schemeColumns()"
@@ -76,6 +112,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
             itemUnit="schemes"
             emptyMessage="No active schemes available matching your search query."
             [customTemplates]="{
+              schemeName: schemeNameTemplate,
               closingDate: closingDateTemplate,
               eoiDescription: descTemplate,
               viewAction: viewActionTemplate
@@ -83,9 +120,20 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
           >
           </app-table>
 
+          <!-- Scheme name, with a "pending" tag when the applicant left this application unfinished -->
+          <ng-template #schemeNameTemplate let-item>
+            <span class="text-slate-800 font-normal text-[13px]">{{ item.schemeName }}</span>
+            @if (draftFor(item.refNo); as draft) {
+              <span class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-amber-300 bg-amber-100 text-amber-800 text-[10.5px] font-semibold align-middle">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
+                Pending &bull; Step {{ draft.step }} of {{ draftStepCount }}
+              </span>
+            }
+          </ng-template>
+
           <!-- Custom Template for Closing Date -->
           <ng-template #closingDateTemplate let-item>
-            <span class="text-slate-800 font-medium text-[12.5px]">{{ item.closingDate }}</span>
+            <span class="text-slate-800 font-normal text-[13px]">{{ item.closingDate }}</span>
           </ng-template>
 
           <ng-template #descTemplate let-item>
@@ -98,11 +146,12 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
             <app-scheme-row-actions
               [item]="item"
               [isSuperAdmin]="isSuperAdmin()"
+              [hasPendingApplication]="!!draftFor(item.refNo)"
               (viewScheme)="viewSchemeDetails($event)"
+              (resumeScheme)="resumeApplication($event.refNo)"
               (manageCommittee)="openAddCommitteeModal($event)"
               (editScheme)="editScheme($event)"
               (toggleActive)="toggleActiveStatus($event)"
-              (freezeScheme)="freezeScheme($event)"
             ></app-scheme-row-actions>
           </ng-template>
 
@@ -137,7 +186,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
       <!-- MODAL: ONE-TIME REGISTRATION (OTR) POPUP PROMPT -->
       <app-otr-prompt-modal
         [isOpen]="showOtrPromptModal()"
-        (completeRegistration)="goToProfile()"
+        (completeRegistration)="goToRegistration()"
         (dismiss)="dismissOtrPrompt()"
       ></app-otr-prompt-modal>
 
@@ -150,7 +199,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
         [closeOnBackdrop]="false"
         [reverseButtons]="true"
         [showAccentBar]="false"
-        primaryLabel="Submit"
+        primaryLabel="Publish EOI"
         secondaryLabel="Cancel"
         maxWidthClass="max-w-[650px]"
         (primaryAction)="submitNewEoi()"
@@ -163,8 +212,12 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
           [fileError]="fileError()"
           [isEditing]="!!editingSchemeRefNo()"
           [schemeNameOptions]="schemeNameOptions()"
-          [schemeCategoryOptions]="schemeCategoryOptions"
+          [schemeCategoryOptions]="schemeCategoryOptions()"
+          [eoiCategoryOptions]="eoiCategoryOptions()"
           [requiredInfo]="eoiRequiredInfo"
+          [schemeMasterItems]="schemeMasterItems()"
+          [docMasterItems]="docMasterItems()"
+          (schemeChange)="onSchemeSelected($event)"
           (attach)="openAttachmentModal()"
           (removeAttachment)="removeAttachment($event)"
           (addDocument)="addEoiDocument()"
@@ -192,7 +245,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
         [showCloseButton]="false"
         title="Confirm Submission"
         description="Are you sure you want to submit this EOI configuration?"
-        primaryLabel="Yes, Submit"
+        primaryLabel="Publish EOI"
         secondaryLabel="No, Cancel"
         (primaryAction)="confirmSubmitNewEoi()"
         (secondaryAction)="closeConfirmSubmitEoiModal()"
@@ -228,16 +281,46 @@ export class TendersPageComponent {
   readonly showCommitteeModal = signal<boolean>(false);
   readonly selectedSchemeForCommittee = signal<SchemeTender | null>(null);
 
+  private dataEngine = inject(DataEngineService);
+
   readonly availableAdmins = this.schemeService.getAvailableAdmins();
   private promptDismissed = false;
 
-  /** Scheme names available in the "Configure New EOI" scheme dropdown. */
-  readonly schemeNameOptions = computed(() =>
-    Array.from(new Set(this.schemes().map(s => s.schemeName)))
-  );
+  readonly schemeMasterItems = signal<SchemeMasterItem[]>([]);
+  readonly docMasterItems = signal<DocMasterItem[]>([]);
+  readonly schemeMasterNames = signal<string[]>([]);
+  readonly schemeCategoryNames = signal<string[]>([]);
+  readonly eoiCategoryNames = signal<string[]>([]);
 
-  /** Scheme Category options for the "Configure New EOI" form. */
-  readonly schemeCategoryOptions = ['ALL', 'NA', 'RAJVIK', 'SAKSHAM', 'SAMARTH'];
+  /** Scheme names available in the "Configure New EOI" scheme dropdown (sourced from Scheme Master). */
+  readonly schemeNameOptions = computed(() => {
+    const list = [...this.schemeMasterNames()];
+    const current = this.newEoiData?.scheme;
+    if (current && !list.includes(current)) {
+      list.unshift(current);
+    }
+    return list;
+  });
+
+  /** Scheme Category options for the "Configure New EOI" form (sourced from Scheme Category Master). */
+  readonly schemeCategoryOptions = computed(() => {
+    const list = [...this.schemeCategoryNames()];
+    const current = this.newEoiData?.schemeCategory;
+    if (current && !list.includes(current)) {
+      list.unshift(current);
+    }
+    return list;
+  });
+
+  /** EOI Category options for the "Configure New EOI" form (sourced from EOI Category Master). */
+  readonly eoiCategoryOptions = computed(() => {
+    const list = [...this.eoiCategoryNames()];
+    const current = this.newEoiData?.eoiCategory;
+    if (current && !list.includes(current)) {
+      list.unshift(current);
+    }
+    return list;
+  });
 
   newEoiData: EoiFormData = createEmptyEoiForm();
   newEoiSubmitted = signal<boolean>(false);
@@ -251,6 +334,16 @@ export class TendersPageComponent {
   pageSize = 10;
   searchQuery = signal<string>('');
 
+  private readonly draftService = inject(EoiDraftService);
+  protected readonly draftStepCount = EOI_WIZARD_STEP_COUNT;
+
+  /** Unfinished applications for schemes that are still listed. Admins do not apply, so they never see any. */
+  readonly pendingDrafts = computed(() =>
+    this.isSuperAdmin()
+      ? []
+      : this.draftService.drafts().filter(d => this.schemes().some(s => s.refNo === d.refNo))
+  );
+
   readonly filteredSchemes = computed(() => filterActiveSchemes(this.schemes(), this.searchQuery()));
 
   onSearchChange(val: string): void {
@@ -259,6 +352,7 @@ export class TendersPageComponent {
 
   constructor() {
     this.schemeService.loadSchemes().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.loadMasterOptions();
 
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const fromLogin = params['fromLogin'] === 'true';
@@ -268,11 +362,28 @@ export class TendersPageComponent {
         this.storage.removeSessionItem('isms_otr_prompt_dismissed');
       }
       this.evaluateOtrModalPrompt();
+
+      const viewRefNo = params['viewRefNo'] || params['refNo'];
+      if (viewRefNo) {
+        const found = this.schemes().find(s => s.refNo === viewRefNo);
+        if (found) {
+          this.selectedScheme.set(found);
+        }
+      }
     });
 
     effect(() => {
       // Re-evaluate whenever currentUser signal changes
       this.evaluateOtrModalPrompt();
+
+      const list = this.schemes();
+      const viewRefNo = this.route.snapshot.queryParams['viewRefNo'] || this.route.snapshot.queryParams['refNo'];
+      if (viewRefNo && list.length > 0 && !this.selectedScheme()) {
+        const found = list.find(s => s.refNo === viewRefNo);
+        if (found) {
+          this.selectedScheme.set(found);
+        }
+      }
     });
   }
 
@@ -310,7 +421,8 @@ export class TendersPageComponent {
     {
       key: 'schemeName',
       label: 'Scheme Name',
-      cellClass: 'whitespace-nowrap font-medium text-slate-800'
+      type: 'custom',
+      cellClass: 'whitespace-nowrap font-normal text-slate-800'
     },
     {
       key: 'schemeCategory',
@@ -346,9 +458,27 @@ export class TendersPageComponent {
     }
   ]);
 
-  getRowClass = (_item: SchemeTender): string => {
-    return 'bg-white cursor-pointer hover:bg-slate-100/90 transition-colors';
+  getRowClass = (item: SchemeTender): string => {
+    const isInactive = item.isActive === false;
+    if (isInactive) {
+      return 'opacity-50 !bg-slate-100/70 cursor-pointer hover:!bg-slate-200/80 transition-colors';
+    }
+    return this.draftFor(item.refNo)
+      ? '!bg-amber-50 cursor-pointer hover:!bg-amber-100/70 transition-colors'
+      : 'bg-white cursor-pointer hover:bg-slate-100/90 transition-colors';
   };
+
+  /** Pending (unfinished) application the signed-in applicant has for the given scheme, if any. */
+  draftFor(refNo: string): EoiDraft | null {
+    return this.pendingDrafts().find(d => d.refNo === refNo) ?? null;
+  }
+
+  /** Reopens the wizard exactly where the applicant left it. */
+  resumeApplication(refNo: string): void {
+    const draft = this.draftFor(refNo);
+    if (!draft) return;
+    this.router.navigate(['/scheme-form'], { queryParams: { ...draft.queryParams, refNo: draft.refNo } });
+  }
 
   onRowClick(scheme: SchemeTender): void {
     this.viewSchemeDetails(scheme);
@@ -361,6 +491,7 @@ export class TendersPageComponent {
 
   backToList(): void {
     this.selectedScheme.set(null);
+    this.router.navigate([], { relativeTo: this.route, queryParams: {} });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -375,16 +506,16 @@ export class TendersPageComponent {
     const scheme = this.selectedScheme();
     this.router.navigate(['/scheme-form'], {
       queryParams: {
-        refNo: scheme?.refNo || 'RSLDC/EOI/MMKVY Cat I II III/2026-27/01',
-        title: scheme?.schemeTitle || scheme?.schemeName || 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
-        schemeName: scheme?.schemeName || 'MMKVY',
-        category: scheme?.schemeCategory || scheme?.category || 'ALL',
+        refNo: scheme?.refNo || 'RSLDC/EOI/VYUPY/2026-27/01',
+        title: scheme?.schemeTitle || scheme?.schemeName || 'Vishwakarma Yuva Udyami Protsahan Yojana',
+        schemeName: scheme?.schemeName || 'Vishwakarma Yuva Udyami Protsahan Yojana',
+        category: scheme?.schemeCategory || scheme?.category || 'Rajvik',
         eoiCategory: scheme?.eoiCategory || 'General',
         datePublished: scheme?.datePublished || '15/09/2026',
         closingDate: scheme?.closingDate || '30/11/2026',
         emdFee: scheme?.emdFee || '₹50,000',
-        processFee: scheme?.processFee || '₹2,000',
-        eoiDescription: scheme?.eoiDescription || 'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme'
+        processFee: scheme?.processFee || '₹10,000',
+        eoiDescription: scheme?.eoiDescription || 'Expression of Interest for submission of proposal to undertake Skill Training under Vishwakarma Yuva Udyami Protsahan Yojana'
       }
     });
   }
@@ -395,7 +526,8 @@ export class TendersPageComponent {
   }
 
   goToRegistration(): void {
-    this.goToProfile();
+    this.dismissOtrPrompt();
+    this.router.navigate(['/registration']);
   }
 
   downloadDoc(docType: string): void {
@@ -411,7 +543,105 @@ export class TendersPageComponent {
 
   // ---- Configure / edit EOI ------------------------------------------------
 
+  private loadMasterOptions(): void {
+    // 1. Load active schemes from Scheme Master
+    this.dataEngine
+      .for<SchemeMasterItem>('SCHEME_MASTERS', { idKey: 'id' })
+      .getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          this.schemeMasterItems.set(items || []);
+          const names = (items || [])
+            .filter((s) => s.status !== 'Inactive')
+            .map((s) => s.schemeName?.trim())
+            .filter((name): name is string => !!name);
+          this.schemeMasterNames.set(Array.from(new Set(names)));
+        },
+        error: () => {
+          this.schemeMasterItems.set([]);
+          this.schemeMasterNames.set([]);
+        }
+      });
+
+    // 2. Load active scheme categories from Scheme Category Master
+    this.dataEngine
+      .for<SchemeCategoryMasterItem>('SCHEME_CATEGORIES', { idKey: 'id' })
+      .getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          const cats = (items || [])
+            .filter((c) => c.status !== 'Inactive')
+            .map((c) => (c.categoryName || c.schemeName)?.trim())
+            .filter((name): name is string => !!name);
+          this.schemeCategoryNames.set(Array.from(new Set(cats)));
+        },
+        error: () => this.schemeCategoryNames.set([])
+      });
+
+    // 3. Load active EOI categories from EOI Category Master
+    this.dataEngine
+      .for<EoiCategoryItem>('EOI_CATEGORIES', { idKey: 'id' })
+      .getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          const cats = (items || [])
+            .filter((e) => e.status !== 'Inactive')
+            .map((e) => e.categoryTitle?.trim())
+            .filter((title): title is string => !!title);
+          this.eoiCategoryNames.set(Array.from(new Set(cats)));
+        },
+        error: () => this.eoiCategoryNames.set([])
+      });
+
+    // 4. Load Doc Master items (from storage or fallback)
+    const cachedDocs = this.storage.getItem<DocMasterItem[]>(DOC_MASTER_STORAGE_KEY);
+    if (cachedDocs && Array.isArray(cachedDocs) && cachedDocs.length > 0) {
+      this.docMasterItems.set(cachedDocs);
+    } else {
+      this.docMasterItems.set(INITIAL_DOC_ITEMS);
+    }
+  }
+
+  onSchemeSelected(schemeName: string): void {
+    if (!schemeName) return;
+
+    // 1. Auto-fill EMD Fee, Process Fee & Scheme Category from Scheme Master
+    const schemeItem = this.schemeMasterItems().find(
+      (s) => s.schemeName?.trim().toLowerCase() === schemeName.trim().toLowerCase()
+    );
+    if (schemeItem) {
+      if (schemeItem.amount != null) {
+        this.newEoiData.emdFee = formatInr(schemeItem.amount);
+      }
+      if (schemeItem.processFees != null) {
+        this.newEoiData.processFee = formatInr(schemeItem.processFees);
+      }
+      if (schemeItem.schemeCategory) {
+        this.newEoiData.schemeCategory = schemeItem.schemeCategory;
+      }
+    }
+
+    // 2. Auto-fill required documents from Doc Master
+    const docItem = this.docMasterItems().find(
+      (d) => d.schemeName?.trim().toLowerCase() === schemeName.trim().toLowerCase()
+    );
+    if (docItem && docItem.documents) {
+      const docs = docItem.documents
+        .split(',')
+        .map((d) => d.trim())
+        .filter(Boolean);
+      if (docs.length > 0) {
+        this.newEoiData.documents = [...docs];
+        this.newEoiData.documentFiles = {};
+      }
+    }
+  }
+
   openConfigureEoiModal(): void {
+    this.loadMasterOptions();
     this.editingSchemeRefNo.set(null);
     this.newEoiSubmitted.set(false);
     this.fileError.set('');
@@ -420,6 +650,7 @@ export class TendersPageComponent {
   }
 
   editScheme(scheme: SchemeTender): void {
+    this.loadMasterOptions();
     this.editingSchemeRefNo.set(scheme.refNo);
     this.newEoiSubmitted.set(false);
     this.fileError.set('');
@@ -437,22 +668,27 @@ export class TendersPageComponent {
 
   removeEoiDocument(index: number): void {
     this.newEoiData.documents.splice(index, 1);
+    if (this.newEoiData.documentFiles) {
+      const newFiles: Record<number, any> = {};
+      for (const [key, val] of Object.entries(this.newEoiData.documentFiles)) {
+        const k = Number(key);
+        if (k < index) {
+          newFiles[k] = val;
+        } else if (k > index) {
+          newFiles[k - 1] = val;
+        }
+      }
+      this.newEoiData.documentFiles = newFiles;
+    }
   }
 
   // ---- Row actions ---------------------------------------------------------
 
   toggleActiveStatus(scheme: SchemeTender): void {
     if (!this.isSuperAdmin() || scheme.isFrozen) return;
-    scheme.isActive = scheme.isActive === false ? true : false;
-    this.schemeService.updateScheme(scheme.refNo, scheme).subscribe();
-  }
-
-  freezeScheme(scheme: SchemeTender): void {
-    if (!this.isSuperAdmin() || scheme.isFrozen) return;
-    if (confirm(`Are you sure you want to freeze "${scheme.schemeName}"? This action cannot be undone.`)) {
-      scheme.isFrozen = true;
-      this.schemeService.updateScheme(scheme.refNo, scheme).subscribe();
-    }
+    const newActive = scheme.isActive === false ? true : false;
+    scheme.isActive = newActive;
+    this.schemeService.updateScheme(scheme.refNo, { isActive: newActive }).subscribe();
   }
 
   // ---- Committee assignment ------------------------------------------------
@@ -468,11 +704,15 @@ export class TendersPageComponent {
     this.selectedSchemeForCommittee.set(null);
   }
 
-  saveCommittee(members: string[]): void {
+  saveCommittee(payload: { approver?: string; members: string[] } | string[]): void {
     const scheme = this.selectedSchemeForCommittee();
     if (!scheme) return;
 
-    this.schemeService.assignCommittee(scheme.refNo, [...members]).subscribe();
+    if (Array.isArray(payload)) {
+      this.schemeService.assignCommittee(scheme.refNo, [...payload]).subscribe();
+    } else {
+      this.schemeService.assignCommittee(scheme.refNo, [...payload.members], payload.approver).subscribe();
+    }
     this.closeCommitteeModal();
   }
 

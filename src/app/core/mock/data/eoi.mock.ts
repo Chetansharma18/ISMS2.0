@@ -9,7 +9,7 @@ export interface MockEoiApplicantItem {
   schemeName: string;
   eoiRefNo: string;
   submissionDate: string;
-  status: 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED';
+  status: 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED' | 'REVERTED';
   statusDisplay: string;
   emdFee: number;
   emdStatus: 'PAID' | 'REFUNDED';

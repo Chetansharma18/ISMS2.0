@@ -9,6 +9,7 @@ export interface UserManagementItem {
   roleType: string;
   designation?: string;
   schemeDepartment?: string;
+  schemeName?: string;
   districtName: string;
   blockName?: string;
   email?: string;

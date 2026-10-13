@@ -54,6 +54,41 @@ describe('StepperComponent', () => {
     expect(emitted).toEqual([3]);
   });
 
+  describe('wizard variant (Organization Registration Form look)', () => {
+    beforeEach(() => {
+      fixture.componentRef.setInput('variant', 'wizard');
+      fixture.detectChanges();
+    });
+
+    it('renders plain labels, one button per step, with the current step marked', () => {
+      const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+      expect(buttons().length).toBe(3);
+      expect(text).toContain('Fee');
+      expect(text).not.toContain('1. Fee');
+      expect(buttons()[1].getAttribute('aria-current')).toBe('step');
+    });
+
+    it('fills finished and active circles navy and leaves upcoming ones white', () => {
+      expect(component.wizardCircleClass(1)).toContain('bg-navy');
+      expect(component.wizardCircleClass(2)).toContain('bg-navy');
+      expect(component.wizardCircleClass(3)).toContain('bg-white');
+    });
+
+    it('draws navy connectors only after finished steps', () => {
+      const lines = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('ol > li > span.flex-1'));
+      expect(lines.length).toBe(2);
+      expect(lines[0].className).toContain('bg-navy');
+      expect(lines[1].className).toContain('bg-slate-200');
+    });
+
+    it('emits the 1-based step number on click', () => {
+      const emitted: number[] = [];
+      component.stepClick.subscribe((n: number) => emitted.push(n));
+      buttons()[0].click();
+      expect(emitted).toEqual([1]);
+    });
+  });
+
   it('uses the success colour for completed circles and brand colour for the current one', () => {
     expect(component.circleClass(1)).toContain('bg-emerald-600');
     expect(component.circleClass(2)).toContain('bg-primary');

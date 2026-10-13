@@ -16,7 +16,7 @@ import { formatFeeDisplay } from './scheme-detail-view.util';
       <div
         (click)="downloadRfp.emit()"
         class="flex items-start gap-3 cursor-pointer group select-none"
-        title="Download Request for Proposal (RFP)"
+        title="View Request for Proposal (RFP)"
       >
         <div class="w-7 h-7 rounded bg-[#D92D20] flex items-center justify-center text-white text-[9.5px] font-bold tracking-tight shrink-0 mt-0.5 shadow-2xs group-hover:scale-105 transition-transform">
           PDF
@@ -35,7 +35,7 @@ import { formatFeeDisplay } from './scheme-detail-view.util';
       <div
         (click)="downloadSop.emit()"
         class="flex items-start gap-3 cursor-pointer group select-none"
-        title="Download Standard Operating Procedure (SOP)"
+        title="View Standard Operating Procedure (SOP)"
       >
         <div class="w-7 h-7 rounded bg-[#D92D20] flex items-center justify-center text-white text-[9.5px] font-bold tracking-tight shrink-0 mt-0.5 shadow-2xs group-hover:scale-105 transition-transform">
           PDF

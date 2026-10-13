@@ -1,25 +1,36 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { SchemeFormState } from '../../scheme-form.state';
 
-/** Step 4: processing fee status strip. */
+/** Step 4: processing fee status summary. */
 @Component({
   selector: 'app-step4-fee-status',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <div class="p-4 rounded-xl bg-blue-50/50 border border-blue-200 text-xs space-y-2">
-      <div class="flex items-center justify-between flex-wrap gap-2 pb-1.5 border-b border-blue-200">
-        <span class="font-bold text-navy uppercase tracking-wider text-[11px]">1. Processing Fee Verification</span>
-        <span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">✓ Paid ({{ state.formattedProcessFee() }})</span>
+    <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+      <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">1</span>
+          <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Processing Fee</h2>
+        </div>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">Paid</span>
       </div>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11.5px] text-slate-700">
-        <div>Amount: <strong class="font-bold text-slate-900">{{ state.formattedProcessFee() }}</strong></div>
-        <div>Mode: <strong>{{ state.selectedProcPaymentModeLabel }}</strong></div>
-        <div>Challan GRN: <strong class="font-mono text-slate-900">GRN-RAJ-2026-981240</strong></div>
-        <div>Settled On: <strong>{{ state.procFeeDate() }}</strong></div>
+      <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-4 text-xs">
+        <div>
+          <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Amount Paid</span>
+          <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.formattedProcessFee() }}</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Paid On</span>
+          <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.procFeeDate() }}</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Transaction ID</span>
+          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">CIN-SBI-9912081</span>
+        </div>
       </div>
-    </div>
+    </section>
   `
 })
 export class Step4FeeStatusComponent {

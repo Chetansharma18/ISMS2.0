@@ -6,12 +6,13 @@ import { AuthService, UserRole, USER_ROLES } from '../../../../core/auth/auth.se
 import { StorageService } from '../../../../core/services/storage.service';
 import { OtrFormService } from '../../../registration/services/otr-form.service';
 import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dept-admin-otp-modal/dept-admin-otp-modal.component';
+import { NewUserCategoryModalComponent } from '../../../../core/auth/components/new-user-category-modal/new-user-category-modal.component';
 
 @Component({
   selector: 'app-sso-login',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule, DeptAdminOtpModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, DeptAdminOtpModalComponent, NewUserCategoryModalComponent],
   host: {
     class: 'block w-full min-h-full flex flex-col bg-white'
   },
@@ -172,7 +173,9 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
                       [class.border-slate-300]="selectedRole() !== r.role"
                       [class.hover:bg-slate-100]="selectedRole() !== r.role"
                     >
-                      <span class="truncate">{{ r.label }}</span>
+                      <span class="truncate">
+                        {{ r.role === 'new_user' && selectedNewUserCategory() === 'citizen' ? 'New User (Citizen)' : r.label }}
+                      </span>
                       @if (selectedRole() === r.role) {
                         <span class="text-xs font-bold">&check;</span>
                       }
@@ -218,6 +221,15 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
         (cancelled)="onDeptAdminOtpCancelled()"
       ></app-dept-admin-otp-modal>
 
+      <!-- New User Category Selection Modal (Aspirant vs Citizen) -->
+      <app-new-user-category-modal
+        [isOpen]="showNewUserCategoryModal()"
+        (proceedWithCitizen)="onProceedWithCitizen()"
+        (proceedWithStudent)="onProceedWithStudent()"
+        (proceedWithAspirant)="onProceedWithAspirant()"
+        (cancelled)="onNewUserCategoryCancelled()"
+      ></app-new-user-category-modal>
+
     </div>
   `,
   styles: [`
@@ -241,10 +253,15 @@ export class SsoLoginComponent {
   captchaCode = signal<string>('3 1 3 1 9 8');
   isLoading = signal<boolean>(false);
   showDeptAdminOtp = signal<boolean>(false);
+  showNewUserCategoryModal = signal<boolean>(false);
+  selectedNewUserCategory = signal<'student' | 'citizen' | null>(null);
 
   selectRole(role: UserRole): void {
     this.selectedRole.set(role);
     this.emailOrSsoId = role;
+    if (role === 'new_user') {
+      this.showNewUserCategoryModal.set(true);
+    }
   }
 
   refreshCaptcha(): void {
@@ -260,12 +277,70 @@ export class SsoLoginComponent {
   }
 
   handleLogin(): void {
+    const role = this.selectedRole();
+
+    // If New User is selected and category is not chosen yet, open category modal
+    if (role === 'new_user' && !this.selectedNewUserCategory()) {
+      this.showNewUserCategoryModal.set(true);
+      return;
+    }
+
+    this.executeLogin(role);
+  }
+
+  onProceedWithCitizen(): void {
+    this.selectedRole.set('new_user');
+    this.selectedNewUserCategory.set('citizen');
+    this.emailOrSsoId = 'new_user';
+
+    // Seed clean initial draft for new user registration
+    this.otrFormService.resetToInitialDraft();
+
+    // Authenticate session synchronously so authGuard passes immediately
+    this.authService.loginWithCredentials('new_user', 'new_user', null);
+
+    // Reset prompt flags so the OTR prompt appears on tenders page
+    this.storage.removeSessionItem('isms_otr_prompt_dismissed');
+    this.storage.removeItem('isms_eoi_prompt_shown_new_user');
+
+    // Navigate directly to /tenders without closing the modal beforehand,
+    // ensuring the SSO ID login screen never flashes for a few seconds
+    this.router.navigate(['/tenders'], { queryParams: { fromLogin: 'true' } }).then(() => {
+      this.showNewUserCategoryModal.set(false);
+      this.isLoading.set(false);
+    });
+  }
+
+  onProceedWithAspirant(): void {
+    this.selectedRole.set('aspirant');
+    this.selectedNewUserCategory.set('student');
+    this.emailOrSsoId = 'aspirant_user';
+
+    this.authService.loginWithCredentials('aspirant_user', 'aspirant', null);
+    this.storage.removeSessionItem('isms_aspirant_prompt_dismissed');
+
+    this.router.navigate(['/training-calendar'], { queryParams: { fromLogin: 'true' } }).then(() => {
+      this.showNewUserCategoryModal.set(false);
+      this.isLoading.set(false);
+    });
+  }
+
+  onProceedWithStudent(): void {
+    this.onProceedWithAspirant();
+  }
+
+  onNewUserCategoryCancelled(): void {
+    this.showNewUserCategoryModal.set(false);
+    this.isLoading.set(false);
+    this.router.navigate(['/sso-login']);
+  }
+
+  private executeLogin(role: UserRole): void {
     this.isLoading.set(true);
 
     setTimeout(() => {
       this.isLoading.set(false);
       const identifier = this.emailOrSsoId.trim() || 'new_user';
-      const role = this.selectedRole();
 
       if (role === 'dept_admin') {
         // Department Admin requires 6-digit OTP verification first
@@ -290,6 +365,8 @@ export class SsoLoginComponent {
       if (role === 'super_admin') {
         // Super Admin navigates directly to EOI Configuration / Masters
         this.router.navigate(['/admin/eoi-configuration']);
+      } else if (role === 'aspirant') {
+        this.router.navigate(['/training-calendar']);
       } else {
         // Directly show tenders with fromLogin query param
         this.router.navigate(['/tenders'], { queryParams: { fromLogin: 'true' } });

@@ -15,6 +15,46 @@ interface Sector {
  * Exercises the mock path of DataEngineService end to end (MockDatabaseService is real).
  * The HTTP layer is stubbed and must never be touched while mock mode is on.
  */
+describe('DataEngineService reference data cache', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    TestBed.resetTestingModule();
+  });
+
+  it('drops a Sector Master copy cached from an older seed and serves the current official list', async () => {
+    // What a browser session holds after running a build that only had 8 sectors.
+    sessionStorage.setItem(
+      'isms_mock_db_SECTORS',
+      JSON.stringify([{ sNo: 1, id: 'sec-1', sectorName: 'Aerospace and Aviation', sectorCode: 'SEC-AERO-01', status: 'Active' }])
+    );
+    const forbidden = () => { throw new Error('HttpService must not be used in mock mode'); };
+    TestBed.configureTestingModule({
+      providers: [{ provide: HttpService, useValue: { get: forbidden, post: forbidden, put: forbidden, delete: forbidden } }]
+    });
+
+    const sectors = await firstValueFrom(TestBed.inject(DataEngineService).for<Sector>('SECTORS').getAll());
+    expect(sectors.length).toBe(35);
+    expect(sectors.find(s => s.sectorName === 'Tourism & Hospitality')?.sectorCode).toBe('THC');
+  });
+
+  it('keeps a Sector Master edited in this session while the seed is unchanged', async () => {
+    const forbidden = () => { throw new Error('HttpService must not be used in mock mode'); };
+    TestBed.configureTestingModule({
+      providers: [{ provide: HttpService, useValue: { get: forbidden, post: forbidden, put: forbidden, delete: forbidden } }]
+    });
+    const first = TestBed.inject(DataEngineService);
+    await firstValueFrom(first.for<Sector>('SECTORS').create({ sectorName: 'Added Sector', sectorCode: 'ADD', status: 'Active' }));
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [{ provide: HttpService, useValue: { get: forbidden, post: forbidden, put: forbidden, delete: forbidden } }]
+    });
+    const reloaded = await firstValueFrom(TestBed.inject(DataEngineService).for<Sector>('SECTORS').getAll());
+    expect(reloaded.length).toBe(36);
+    expect(reloaded.some(s => s.sectorName === 'Added Sector')).toBe(true);
+  });
+});
+
 describe('DataEngineService (mock mode)', () => {
   let engine: DataEngineService;
 

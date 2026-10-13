@@ -46,6 +46,16 @@ export class EoiStorage {
       ?? this.storage.getItem<SanctionOrderDocumentData>(SANCTION_DOC_LATEST_KEY);
   }
 
+  /** Sanction order saved for exactly this scheme (no fallback to another scheme's order). */
+  loadSchemeSanctionOrder(schemeId: string): SanctionOrderDocumentData | null {
+    return this.storage.getItem<SanctionOrderDocumentData>(`isms_sanction_doc_${schemeId}`);
+  }
+
+  /** True once the sanction order of exactly this scheme has been e-signed and released. */
+  isSchemeSanctionReleased(schemeId: string): boolean {
+    return this.storage.getString(`isms_sanction_submitted_${schemeId}`) === 'true';
+  }
+
   saveSanctionOrder(schemeId: string, data: SanctionOrderDocumentData): void {
     this.storage.setItem(`isms_sanction_doc_${schemeId}`, data);
     this.storage.setItem(SANCTION_DOC_LATEST_KEY, data);
@@ -56,6 +66,31 @@ export class EoiStorage {
     return this.storage.getItem<IpaDocumentData>(`isms_ipa_doc_${schemeId}_${appId}`)
       ?? this.storage.getItem<IpaDocumentData>(`isms_ipa_doc_${schemeId}`)
       ?? this.storage.getItem<IpaDocumentData>(IPA_DOC_LATEST_KEY);
+  }
+
+  /** IPA saved for exactly this application (no fallback to another company's IPA). */
+  loadAppIpa(schemeId: string, appId: string): IpaDocumentData | null {
+    return this.storage.getItem<IpaDocumentData>(`isms_ipa_doc_${schemeId}_${appId}`);
+  }
+
+  /** True once the IPA of exactly this application has been e-signed and released. */
+  isIpaReleased(schemeId: string, appId: string): boolean {
+    return this.storage.getString(`isms_ipa_released_${schemeId}_${appId}`) === 'true';
+  }
+
+  markIpaReleased(schemeId: string, appId: string): void {
+    this.storage.setString(`isms_ipa_released_${schemeId}_${appId}`, 'true');
+  }
+
+  /** Every IPA that was e-signed for this application, oldest first. */
+  loadIssuedIpas(schemeId: string, appId: string): IpaDocumentData[] {
+    return this.storage.getItem<IpaDocumentData[]>(`isms_ipa_issued_${schemeId}_${appId}`) ?? [];
+  }
+
+  /** Keeps a copy of an e-signed IPA, so later drafts for the same application do not replace it. */
+  appendIssuedIpa(schemeId: string, appId: string, data: IpaDocumentData): void {
+    const issued = this.loadIssuedIpas(schemeId, appId);
+    this.storage.setItem(`isms_ipa_issued_${schemeId}_${appId}`, [...issued, data]);
   }
 
   saveIpa(schemeId: string, appId: string, data: IpaDocumentData): void {

@@ -5,13 +5,15 @@ import { EoiStateService } from '../../services/eoi-state.service';
 import { LetterheadComponent } from '../../components/document-editor/letterhead.component';
 import { FileNoDateRowComponent } from '../../components/document-editor/file-no-date-row.component';
 import { ClauseListComponent } from '../../components/document-editor/clause-list.component';
-import { DEFAULT_EMBLEM_SVG, DEFAULT_LEFT_LOGO_URL } from '../../components/document-editor/document-editor.util';
-import { IpaActionBarComponent } from './components/ipa-action-bar.component';
+import { DEFAULT_EMBLEM_SVG, DEFAULT_LEFT_LOGO_URL, DEFAULT_RIGHT_LOGO_URL, isLegacyEmblem } from '../../components/document-editor/document-editor.util';
 import { IpaRecipientBlockComponent } from './components/ipa-recipient-block.component';
 import { IpaSubjectBlockComponent } from './components/ipa-subject-block.component';
 import { IpaCourseTableComponent } from './components/ipa-course-table.component';
 import { IpaTargetSummaryTableComponent } from './components/ipa-target-summary-table.component';
 import { IpaSignatoryBlockComponent } from './components/ipa-signatory-block.component';
+import { EsignModalComponent } from '../eoi-sanction-editor/components/esign-modal.component';
+import { IpaPdfService } from './ipa-pdf.service';
+import type { IpaDocumentData } from '../../services/eoi-state.models';
 import { IpaCourseRow, TargetSummaryRow } from './ipa-editor.model';
 import {
   createDefaultCopyTo,
@@ -24,6 +26,11 @@ import {
 
 export type { IpaCourseRow, TargetSummaryRow } from './ipa-editor.model';
 
+/** Names and address that earlier versions of the template carried; they are not shown any more. */
+const STALE_NAMES = ['Apex Technical & Infrastructure Solutions Pvt Ltd', 'M/s. Gupta Brothers'];
+const STALE_ADDRESS = 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi, 110042';
+const isStaleName = (name: string): boolean => !name.trim() || STALE_NAMES.includes(name.trim());
+
 @Component({
   selector: 'app-ipa-editor',
   standalone: true,
@@ -31,118 +38,141 @@ export type { IpaCourseRow, TargetSummaryRow } from './ipa-editor.model';
     LetterheadComponent,
     FileNoDateRowComponent,
     ClauseListComponent,
-    IpaActionBarComponent,
     IpaRecipientBlockComponent,
     IpaSubjectBlockComponent,
     IpaCourseTableComponent,
     IpaTargetSummaryTableComponent,
-    IpaSignatoryBlockComponent
+    IpaSignatoryBlockComponent,
+    EsignModalComponent
   ],
   template: `
-    <div class="w-full min-h-full bg-slate-100 text-[#1F2933] font-sans pb-12 print:bg-white print:p-0 print:pb-0">
+    <div class="w-full min-h-screen bg-slate-50 text-[#1F2933] font-sans py-6 px-3 sm:px-6 lg:px-8 print:bg-white print:p-0">
 
-      <!-- Top Action Bar (Hidden in Print) -->
-      <app-ipa-action-bar
-        [schemeId]="schemeId()"
-        [isSaved]="isSaved()"
-        [savedNotification]="savedNotification()"
-        (save)="saveIpaAndNotify()"
-        (print)="printPdf()"
-      />
+      <!-- Success Notification Toast -->
+      @if (toastMessage()) {
+        <div class="fixed top-5 right-5 z-50 px-4 py-3 bg-navy text-white rounded-lg shadow-xl text-xs sm:text-sm font-semibold animate-in fade-in duration-200" role="status">
+          {{ toastMessage() }}
+        </div>
+      }
 
-      <!-- EDITABLE IPA DOCUMENT CONTAINER (Matches IPA.pdf layout exactly) -->
-      <div class="ipa-pdf-container max-w-6xl mx-auto bg-white p-4 sm:p-6 print:p-0 print:max-w-none text-[#111827] font-serif leading-relaxed text-xs sm:text-sm border border-slate-300 shadow-md rounded-sm print:border-none print:shadow-none">
+      <!-- Responsive Document Wrapper fitting full screen without excessive side margins -->
+      <div class="w-full max-w-6xl mx-auto space-y-4">
 
-        <!-- Header with Official Logos & Government Title -->
-        <app-letterhead
-          [(headerTitle)]="headerTitle"
-          [(headerSubtitle)]="headerSubtitle"
-          [(headerAddress)]="headerAddress"
-          [leftLogoUrl]="leftLogoUrl()"
-          [rightLogoUrl]="rightLogoUrl()"
-          (leftLogoUpload)="leftLogoUrl.set($event)"
-          (rightLogoUpload)="rightLogoUrl.set($event)"
-          (leftLogoError)="onLeftLogoError()"
-        />
+        <!-- Page header: this is a draft until it is finalized -->
+        <div class="font-sans print:hidden space-y-3">
+          <button
+            type="button"
+            (click)="goBack()"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
+          >
+            <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Back</span>
+          </button>
 
-        <!-- File No & Date (Editable) -->
-        <app-file-no-date-row [(fileNo)]="fileNo" [(date)]="ipaDate" marginClass="mb-3" />
+          <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">Draft IPA</h1>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">Draft</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
+            Review and edit the In-Principle Approval below, then release it.
+          </p>
+        </div>
 
-        <!-- Recipient Details Block (To, PIA Name, Address, SAR) -->
-        <app-ipa-recipient-block
-          [(recipientName)]="recipientName"
-          [(recipientAddress1)]="recipientAddress1"
-          [(recipientAddress2)]="recipientAddress2"
-          [(recipientSar)]="recipientSar"
-        />
+        <!-- EDITABLE IPA DOCUMENT CONTAINER (Matches IPA.pdf layout exactly) -->
+        <div class="ipa-pdf-container w-full bg-white p-6 sm:p-10 lg:p-12 print:p-0 text-[#111827] font-serif leading-relaxed text-xs sm:text-sm border border-slate-300 shadow-sm rounded-lg print:border-none print:shadow-none">
 
-        <!-- Reference, Subject, Preamble and PIA / SDC block -->
-        <app-ipa-subject-block
-          [(referenceNo)]="referenceNo"
-          [(subjectText)]="subjectText"
-          [(preambleText)]="preambleText"
-          [(piaName)]="piaName"
-          [(sdcAddress)]="sdcAddress"
-        />
+          <!-- Header with Official Logos & Government Title -->
+          <app-letterhead
+            [(headerTitle)]="headerTitle"
+            [(headerSubtitle)]="headerSubtitle"
+            [(headerAddress)]="headerAddress"
+            [leftLogoUrl]="leftLogoUrl()"
+            [rightLogoUrl]="rightLogoUrl()"
+            (leftLogoUpload)="leftLogoUrl.set($event)"
+            (rightLogoUpload)="rightLogoUrl.set($event)"
+            (leftLogoError)="onLeftLogoError()"
+          />
 
-        <!-- MAIN COURSE APPROVAL TABLE (Matching IPA.pdf layout exactly) -->
-        <app-ipa-course-table
-          [rows]="courseRows"
-          [totalTrainees]="totalTraineesCount()"
-          [totalCostPerBatch]="totalCostPerBatchSum()"
-          [totalCycles]="totalCyclesCount()"
-          [totalBudget]="totalBudgetSum()"
-          (addRow)="addCourseRow()"
-          (removeRow)="removeCourseRow($event)"
-        />
+          <!-- File No & Date (Editable) -->
+          <app-file-no-date-row [(fileNo)]="fileNo" [(date)]="ipaDate" marginClass="mb-3" />
 
-        <!-- TARGET ALLOCATION SUMMARY TABLE (Matching IPA.pdf) -->
-        <app-ipa-target-summary-table [rows]="targetSummary" />
+          <!-- Recipient Details Block (To, PIA Name, Address, SAR) -->
+          <app-ipa-recipient-block
+            [(recipientName)]="recipientName"
+            [(recipientAddress1)]="recipientAddress1"
+            [(recipientAddress2)]="recipientAddress2"
+            [(recipientSar)]="recipientSar"
+          />
 
-        <!-- TERMS AND CONDITIONS CLAUSES (Editable a to h from IPA.pdf) -->
-        <app-clause-list
-          [clauses]="termsAndConditions"
-          intro="IPA is issued subject to following terms and conditions: -"
-          listClass="list-alpha pl-5 space-y-2 text-slate-800 leading-relaxed text-[11px] sm:text-xs"
-          labelClass="font-bold shrink-0 text-slate-800"
-          labelFormat="alpha"
-          (add)="addClause()"
-          (remove)="removeClause($event)"
-        />
+          <!-- Reference, Subject, Preamble and PIA / SDC block -->
+          <app-ipa-subject-block
+            [(referenceNo)]="referenceNo"
+            [(subjectText)]="subjectText"
+            [(preambleText)]="preambleText"
+            [(piaName)]="piaName"
+            [(sdcAddress)]="sdcAddress"
+          />
 
-        <!-- SIGNATORY & DISTRIBUTION BLOCK (Editable) -->
-        <app-ipa-signatory-block
-          [copyToList]="copyToList"
-          [(signatoryTitle)]="signatoryTitle"
-          [(signatorySub)]="signatorySub"
-        />
+          <!-- MAIN COURSE APPROVAL TABLE (Matching IPA.pdf layout exactly) -->
+          <app-ipa-course-table
+            [rows]="courseRows"
+            [totalTrainees]="totalTraineesCount()"
+            [totalCostPerBatch]="totalCostPerBatchSum()"
+            [totalCycles]="totalCyclesCount()"
+            [totalBudget]="totalBudgetSum()"
+            (addRow)="addCourseRow()"
+            (removeRow)="removeCourseRow($event)"
+          />
+
+          <!-- TARGET ALLOCATION SUMMARY TABLE (Matching IPA.pdf) -->
+          <app-ipa-target-summary-table [rows]="targetSummary" />
+
+          <!-- TERMS AND CONDITIONS CLAUSES (Editable a to h from IPA.pdf) -->
+          <app-clause-list
+            [clauses]="termsAndConditions"
+            intro="IPA is issued subject to following terms and conditions: -"
+            listClass="list-alpha pl-5 space-y-2 text-slate-800 leading-relaxed text-[11px] sm:text-xs"
+            labelClass="font-bold shrink-0 text-slate-800"
+            labelFormat="alpha"
+            (add)="addClause()"
+            (remove)="removeClause($event)"
+          />
+
+          <!-- SIGNATORY & DISTRIBUTION BLOCK (Editable) -->
+          <app-ipa-signatory-block
+            [copyToList]="copyToList"
+            [(signatoryTitle)]="signatoryTitle"
+            [(signatorySub)]="signatorySub"
+          />
+
+        </div>
+
+        <!-- Bottom action bar -->
+        <div class="flex items-center justify-end gap-2.5 font-sans print:hidden pt-2">
+          <button
+            type="button"
+            (click)="saveDraft()"
+            class="px-6 py-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-sm font-semibold shadow-sm transition-colors cursor-pointer active:scale-95"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            (click)="showEsign.set(true)"
+            class="px-6 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-sm transition-colors cursor-pointer active:scale-95"
+            style="color: #ffffff !important;"
+          >
+            <span style="color: #ffffff !important;">E-Sign</span>
+          </button>
+        </div>
 
       </div>
 
-      <!-- Bottom Action Bar -->
-      <div class="mt-8 max-w-6xl mx-auto flex items-center justify-between gap-4 font-sans print:hidden">
-        <button
-          type="button"
-          (click)="saveIpaAndNotify()"
-          class="px-5 py-2 rounded bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold shadow transition-colors cursor-pointer flex items-center gap-2"
-        >
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          <span>{{ isSaved() ? '✓ Saved &amp; Issued' : 'Save &amp; Finalize IPA Letter' }}</span>
-        </button>
-
-        <button
-          type="button"
-          (click)="printPdf()"
-          class="px-4 py-2 rounded bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium shadow transition-colors cursor-pointer flex items-center gap-1.5"
-        >
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-          </svg>
-          <span>Print Document</span>
-        </button>
-      </div>
+      @if (showEsign()) {
+        <app-esign-modal documentName="IPA" (signed)="onSigned()" (close)="showEsign.set(false)" />
+      }
 
     </div>
   `
@@ -152,16 +182,17 @@ export class IpaEditorComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private pdfService = inject(IpaPdfService);
 
   schemeId = signal<string>('');
   appId = signal<string>('');
-  savedNotification = signal<boolean>(false);
-  isSaved = signal<boolean>(false);
+  toastMessage = signal<string>('');
+  showEsign = signal<boolean>(false);
 
   // Logo state and SVG fallbacks (Border-free emblem logo)
   defaultEmblemSvg = DEFAULT_EMBLEM_SVG;
   leftLogoUrl = signal<string>(DEFAULT_LEFT_LOGO_URL);
-  rightLogoUrl = signal<string>('');
+  rightLogoUrl = signal<string>(DEFAULT_RIGHT_LOGO_URL);
   rightLogoText = 'RSLDC\nJAIPUR';
 
   // Header & Ref Fields matching IPA.pdf
@@ -172,8 +203,8 @@ export class IpaEditorComponent implements OnInit {
   fileNo = 'FORSLDC/Skills/MMKVY-Cat.II: SAKSHM/2026-27/2895-97';
   ipaDate = '15/9/26';
 
-  recipientName = 'M/s. Gupta Brothers';
-  recipientAddress1 = 'D-5, Subzi Mandi Yard, Sri Ganganagar';
+  recipientName = '';
+  recipientAddress1 = '';
   recipientAddress2 = 'Sri Ganganagar, Rajasthan, Pin Code-335001';
   recipientSar = 'SAR: 2200-099-001';
 
@@ -181,7 +212,7 @@ export class IpaEditorComponent implements OnInit {
   subjectText = 'In-Principal Approval (IPA-1)- MMKVY-Cat. II / SAKSHM sponsored by RSLDC for F.Y. 2026-27.';
   preambleText = 'In reference to your request and based on the recommendation from inspection team, in-principal approval is hereby accorded for conducting cycles (as detailed below) for following courses during financial year 2026-27, as per the terms and conditions stipulated in relevant guidelines.';
 
-  piaName = 'M/s. Gupta Brothers';
+  piaName = '';
   sdcAddress = 'Near Panchayati Mandir, Opposite Government Hospital, Kesisinghpur, Sriganganagar, 335027';
 
   // Course Approval Table matching IPA.pdf exactly
@@ -209,7 +240,9 @@ export class IpaEditorComponent implements OnInit {
   }
 
   private loadIpaDetails(sId: string, aId: string): void {
-    const savedData = this.eoiStateService.getIpaData(sId, aId);
+    // This company's own saved IPA, if any. Otherwise the last saved IPA (or the default) is only a template.
+    const ownData = this.eoiStateService.getAppIpa(sId, aId);
+    const savedData = ownData ?? this.eoiStateService.getIpaData(sId, aId);
     if (savedData) {
       this.headerTitle = savedData.headerTitle || this.headerTitle;
       this.headerSubtitle = savedData.headerSubtitle || this.headerSubtitle;
@@ -239,23 +272,33 @@ export class IpaEditorComponent implements OnInit {
       }
       this.signatoryTitle = savedData.signatoryTitle || this.signatoryTitle;
       this.signatorySub = savedData.signatorySub || this.signatorySub;
-      if (savedData.leftLogoUrl) {
+      if (savedData.leftLogoUrl && !isLegacyEmblem(savedData.leftLogoUrl) && (savedData.leftLogoUrl.startsWith('data:') || savedData.leftLogoUrl.includes('rsldc-logo'))) {
         this.leftLogoUrl.set(savedData.leftLogoUrl);
+      } else {
+        this.leftLogoUrl.set(DEFAULT_LEFT_LOGO_URL);
       }
-      if (savedData.rightLogoUrl) {
+      if (savedData.rightLogoUrl && (savedData.rightLogoUrl.startsWith('data:') || savedData.rightLogoUrl.includes('Rajasthan-Sarkar'))) {
         this.rightLogoUrl.set(savedData.rightLogoUrl);
+      } else {
+        this.rightLogoUrl.set(DEFAULT_RIGHT_LOGO_URL);
       }
     }
 
-    this.eoiStateService.getResponseById(aId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(resp => {
-      if (resp && !savedData) {
-        this.recipientName = resp.actualLegalName || resp.anonymousLabel;
-        this.piaName = resp.actualLegalName || resp.anonymousLabel;
-        if (resp.organisation?.registeredAddress) {
-          this.recipientAddress1 = resp.organisation.registeredAddress;
-        }
-      }
-    });
+    // The saved copy is an IPA that was already e-signed, so this page starts the next one (IPA-2, IPA-3, ...).
+    if (ownData?.signedAt) {
+      const next = this.eoiStateService.getIssuedIpaCount(sId, aId) + 1;
+      this.subjectText = this.subjectText.replace(/IPA-\d+/i, `IPA-${next}`);
+    }
+
+    // The letter is addressed to this company, named as in the sanction order. A name left over from an
+    // earlier template (or an empty one) is replaced; a name typed into this company's own IPA is kept.
+    const companyName = this.eoiStateService.getSchemeSanctionOrder(sId)?.tableRows.find(row => row.appId === aId)?.agencyName;
+    if (companyName) {
+      if (!ownData || isStaleName(this.recipientName)) this.recipientName = companyName;
+      if (!ownData || isStaleName(this.piaName)) this.piaName = companyName;
+    }
+    if (this.recipientAddress1 === STALE_ADDRESS) this.recipientAddress1 = '';
+
   }
 
   // NOTE: these computeds read a plain array (no signal dependency), so they are evaluated once;
@@ -293,10 +336,50 @@ export class IpaEditorComponent implements OnInit {
     this.leftLogoUrl.set(this.defaultEmblemSvg);
   }
 
-  saveIpaAndNotify(): void {
+  /** Back to the approved companies of this scheme. */
+  goBack(): void {
+    void this.router.navigate(['/admin/ipa', this.schemeId() || 'ALL']);
+  }
+
+  /** Saves the draft and stays on the page. */
+  saveDraft(): void {
+    this.persist();
+    this.showToast('Draft saved.');
+  }
+
+  /**
+   * The OTP was verified: the IPA is saved and released, the signed PDF opens in a new tab,
+   * and this page moves on to the approved companies of the scheme.
+   */
+  onSigned(): void {
+    // The tab is opened straight away (while the click is still being handled) so the browser allows it.
+    const tab = window.open('', '_blank');
     const sId = this.schemeId() || 'MMKVY-01';
     const aId = this.appId() || 'APP-004661';
-    const data = {
+    const data: IpaDocumentData = { ...this.documentData(sId, aId), signedAt: new Date().toISOString() };
+
+    this.showEsign.set(false);
+    this.eoiStateService.saveIpaReleased(sId, aId, data);
+    void this.pdfService.openSignedPdf(data, tab);
+    this.showToast('IPA e-signed and released.', () => this.goBack());
+  }
+
+  private showToast(message: string, afterwards?: () => void): void {
+    this.toastMessage.set(message);
+    setTimeout(() => {
+      this.toastMessage.set('');
+      afterwards?.();
+    }, afterwards ? 1200 : 1500);
+  }
+
+  private persist(): void {
+    const sId = this.schemeId() || 'MMKVY-01';
+    const aId = this.appId() || 'APP-004661';
+    this.eoiStateService.saveIpaData(sId, aId, this.documentData(sId, aId));
+  }
+
+  private documentData(sId: string, aId: string): IpaDocumentData {
+    return {
       schemeId: sId,
       appId: aId,
       headerTitle: this.headerTitle,
@@ -322,13 +405,6 @@ export class IpaEditorComponent implements OnInit {
       leftLogoUrl: this.leftLogoUrl(),
       rightLogoUrl: this.rightLogoUrl()
     };
-    this.eoiStateService.saveIpaData(sId, aId, data);
-    this.savedNotification.set(true);
-    this.isSaved.set(true);
-    setTimeout(() => {
-      this.savedNotification.set(false);
-      this.router.navigate(['/admin/sanction-order', this.schemeId()]);
-    }, 1200);
   }
 
   printPdf(): void {

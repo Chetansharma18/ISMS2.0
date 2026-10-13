@@ -17,7 +17,7 @@ import { AspirantBankEditComponent } from './aspirant-detail/aspirant-bank-edit.
 import { AspirantDocumentsEditComponent } from './aspirant-detail/aspirant-documents-edit.component';
 import { AspirantAddDocumentModalComponent } from './aspirant-detail/aspirant-add-document-modal.component';
 import { AspirantEditDocumentModalComponent } from './aspirant-detail/aspirant-edit-document-modal.component';
-import { AspirantPreviewDocumentModalComponent } from './aspirant-detail/aspirant-preview-document-modal.component';
+import { DocumentViewerService } from '../../../core/services/document-viewer.service';
 import {
   buildFallbackDocuments,
   buildFallbackEditDocuments,
@@ -42,8 +42,7 @@ import {
     AspirantBankEditComponent,
     AspirantDocumentsEditComponent,
     AspirantAddDocumentModalComponent,
-    AspirantEditDocumentModalComponent,
-    AspirantPreviewDocumentModalComponent
+    AspirantEditDocumentModalComponent
   ],
   template: `
     <div class="w-full min-h-full bg-white text-slate-800 font-sans pb-16" style="font-family: 'Inter', sans-serif;">
@@ -179,17 +178,6 @@ import {
         ></app-aspirant-edit-document-modal>
       }
 
-      <!-- MODAL: DOCUMENT PREVIEW DIALOG -->
-      @if (previewDoc(); as doc) {
-        <app-aspirant-preview-document-modal
-          [doc]="doc"
-          [aspirantId]="aspirant()?.id"
-          (replaceFile)="onModalReplaceFile(doc, $event)"
-          (download)="downloadSampleDoc(doc)"
-          (close)="closePreview()"
-        ></app-aspirant-preview-document-modal>
-      }
-
     </div>
   `
 })
@@ -197,6 +185,7 @@ export class AspirantDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private aspirantService = inject(AspirantService);
+  private docViewer = inject(DocumentViewerService);
 
   aspirant = signal<AspirantRecord | null>(null);
   isEditMode = signal<boolean>(false);
@@ -370,7 +359,12 @@ export class AspirantDetailComponent implements OnInit {
   }
 
   openPreviewDoc(doc: AspirantDocumentItem): void {
-    this.previewDoc.set(doc);
+    this.docViewer.openDocument({
+      fileName: doc.fileName,
+      fileSize: doc.fileSize,
+      uploadDate: doc.uploadedAt || 'Verified',
+      status: 'uploaded'
+    }, doc.docName);
   }
 
   closePreview(): void {

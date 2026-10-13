@@ -16,9 +16,9 @@ describe('eoi-state.util', () => {
     const list = withCompany1UnderScrutiny(buildInitialResponses());
     const company1 = list.find(r => r.anonymousLabel === 'Company 1')!;
     expect(company1.status).toBe('UNDER_SCRUTINY');
-    expect(company1.statusDisplay).toBe('Pending Review');
+    expect(company1.statusDisplay).toBe('Under Review');
     expect(company1.scrutinyDetails).toBeUndefined();
-    expect(list.filter(r => r.status === 'APPROVED').length).toBe(3);
+    expect(list.filter(r => r.schemeId === 'MMKVY-01' && r.status === 'APPROVED').length).toBe(1);
   });
 
   it('mergeStoredResponses overlays stored data and keeps unmatched seed records', () => {
@@ -81,10 +81,10 @@ describe('eoi-state.util', () => {
 
     expect(result).not.toBe(target);
     expect(result.status).toBe('APPROVED');
-    expect(result.statusDisplay).toBe('Accepted');
+    expect(result.statusDisplay).toBe('Approved');
     expect(result.emdStatus).toBe('PAID');
     expect(result.scrutinyDetails?.technicalScore).toBe(100);
-    expect(result.scrutinyDetails?.scrutinyOfficer).toBe('Department Scrutiny Officer (RSLDC)');
+    expect(result.scrutinyDetails?.scrutinyOfficer).toBe('Committee Member 1');
     expect(result.scrutinyDetails?.decisionTimestamp).toBe(`${formatDate(now)} ${formatTime(now)}`);
   });
 

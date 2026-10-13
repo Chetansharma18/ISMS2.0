@@ -23,7 +23,8 @@ import {
   findSchemeById,
   matchesApplicationId,
   mergeStoredResponses,
-  withCompany1UnderScrutiny
+  withCompany1UnderScrutiny,
+  withTwoCompaniesUnderReview
 } from './eoi-state.util';
 
 // The data shapes live in eoi-state.models.ts; re-exported so existing imports keep working.
@@ -62,14 +63,15 @@ export class EoiStateService {
     try {
       const parsed = this.storage.loadResponses();
       if (Array.isArray(parsed) && parsed.length > 0) {
-        this.responsesSubject.next(mergeStoredResponses(this.initialResponses, parsed));
+        const merged = withTwoCompaniesUnderReview(mergeStoredResponses(this.initialResponses, parsed));
+        this.responsesSubject.next(merged);
         return;
       }
     } catch (e) {
       console.error('Error loading stored responses', e);
     }
-    // Default fallback: ensure Company 1 is UNDER_SCRUTINY
-    const defaultList = withCompany1UnderScrutiny(this.initialResponses);
+    // Default fallback: ensure Company 1 and Company 2 are UNDER_SCRUTINY
+    const defaultList = withTwoCompaniesUnderReview(this.initialResponses);
     this.responsesSubject.next(defaultList);
     this.saveToStorage(defaultList);
   }
@@ -146,6 +148,21 @@ export class EoiStateService {
     return this.storage.loadSanctionOrder(sId) ?? this.getDefaultSanctionOrderData(sId);
   }
 
+  /** The sanction order saved for exactly this scheme (draft or released), or null. */
+  getSchemeSanctionOrder(schemeId: string): SanctionOrderDocumentData | null {
+    return this.storage.loadSchemeSanctionOrder(schemeId);
+  }
+
+  /** True once this scheme's sanction order has been e-signed and released. */
+  isSchemeSanctionReleased(schemeId: string): boolean {
+    return this.storage.isSchemeSanctionReleased(schemeId);
+  }
+
+  /** Keeps the sanction order as a draft: it is not released until it is e-signed. */
+  saveSanctionOrderDraft(schemeId: string, data: SanctionOrderDocumentData): void {
+    this.storage.saveSanctionOrder(schemeId, data);
+  }
+
   saveSanctionOrderData(schemeId: string, data: SanctionOrderDocumentData): void {
     this.storage.saveSanctionOrder(schemeId, data);
     this.markSanctionSubmitted(schemeId);
@@ -166,5 +183,44 @@ export class EoiStateService {
 
   saveIpaData(schemeId: string, appId: string, data: IpaDocumentData): void {
     this.storage.saveIpa(schemeId, appId, data);
+  }
+
+  /** The IPA saved for exactly this application (draft or released), or null. */
+  getAppIpa(schemeId: string, appId: string): IpaDocumentData | null {
+    return this.storage.loadAppIpa(schemeId, appId);
+  }
+
+  /** True once this application's IPA has been e-signed and released. */
+  isIpaReleased(schemeId: string, appId: string): boolean {
+    return this.storage.isIpaReleased(schemeId, appId);
+  }
+
+  /** Saves the IPA and marks it released (it has been e-signed). */
+  saveIpaReleased(schemeId: string, appId: string, data: IpaDocumentData): void {
+    this.storage.saveIpa(schemeId, appId, data);
+    this.storage.appendIssuedIpa(schemeId, appId, data);
+    this.storage.markIpaReleased(schemeId, appId);
+  }
+
+  /** How many IPAs have been e-signed for this application. */
+  getIssuedIpaCount(schemeId: string, appId: string): number {
+    const issued = this.storage.loadIssuedIpas(schemeId, appId).length;
+    // An IPA released before copies were kept still counts as one.
+    return issued > 0 ? issued : this.storage.isIpaReleased(schemeId, appId) ? 1 : 0;
+  }
+
+  /** The IPA that was e-signed last for this application, or null when none has been. */
+  getLatestIssuedIpa(schemeId: string, appId: string): IpaDocumentData | null {
+    const issued = this.getIssuedIpas(schemeId, appId);
+    return issued.length > 0 ? issued[issued.length - 1] : null;
+  }
+
+  /** Every IPA that was e-signed for this application, oldest first. */
+  getIssuedIpas(schemeId: string, appId: string): IpaDocumentData[] {
+    const issued = this.storage.loadIssuedIpas(schemeId, appId);
+    if (issued.length > 0) return issued;
+    // An IPA released before copies were kept is read from the saved document.
+    const legacy = this.storage.isIpaReleased(schemeId, appId) ? this.storage.loadAppIpa(schemeId, appId) : null;
+    return legacy ? [legacy] : [];
   }
 }

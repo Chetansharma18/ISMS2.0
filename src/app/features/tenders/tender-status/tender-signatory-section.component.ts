@@ -9,84 +9,24 @@ import { TenderDocCardComponent, TenderDocReplaceRequest, TenderDocViewRequest }
   imports: [FormsModule, TenderDocCardComponent],
   host: { class: 'block' },
   template: `
-    <div class="bg-white border border-slate-200 rounded-lg p-5 space-y-4 shadow-2xs">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-        <h3 class="font-semibold text-slate-900 text-sm">
-          2. Authorized Person Details
-        </h3>
-        @if (isEditing()) {
-          <span class="text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-medium text-[11px]">Editing Active</span>
-        }
+    <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4">
+      <div class="pb-3.5 border-b border-slate-100 flex items-center gap-3">
+        <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">2</span>
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">Authorized Person Details</h2>
       </div>
 
-      @if (isEditing() && editable(); as ed) {
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-          <div>
-            <label class="text-slate-600 block text-[11px] font-medium mb-1">Full Name *</label>
-            <input type="text" [(ngModel)]="ed.signatoryDetails.name" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary" />
-          </div>
-          <div>
-            <label class="text-slate-600 block text-[11px] font-medium mb-1">Designation</label>
-            <input type="text" [(ngModel)]="ed.signatoryDetails.designation" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary" />
-          </div>
-          <div>
-            <label class="text-slate-600 block text-[11px] font-medium mb-1">Date of Birth *</label>
-            <input type="text" [(ngModel)]="ed.signatoryDetails.dob" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary" />
-          </div>
-          <div>
-            <label class="text-slate-600 block text-[11px] font-medium mb-1">Age</label>
-            <input type="text" [(ngModel)]="ed.signatoryDetails.age" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary" />
-          </div>
-          <div>
-            <label class="text-slate-600 block text-[11px] font-medium mb-1">PAN *</label>
-            <input type="text" [(ngModel)]="ed.signatoryDetails.pan" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary" />
-          </div>
-          <div>
-            <label class="text-slate-600 block text-[11px] font-medium mb-1">Mobile No. *</label>
-            <input type="text" [(ngModel)]="ed.signatoryDetails.mobileNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary" />
-          </div>
-          <div>
-            <label class="text-slate-600 block text-[11px] font-medium mb-1">Email Address *</label>
-            <input type="email" [(ngModel)]="ed.signatoryDetails.emailId" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary" />
-          </div>
-          <div>
-            <label class="text-slate-600 block text-[11px] font-medium mb-1">Aadhaar No. (Optional)</label>
-            <input type="text" [(ngModel)]="ed.signatoryDetails.aadhaarNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary" />
-          </div>
-          <div>
-            <label class="text-slate-600 block text-[11px] font-medium mb-1">Bhamashah No. (Optional)</label>
-            <input type="text" [(ngModel)]="ed.signatoryDetails.bhamashahNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary" />
-          </div>
-          <div>
-            <label class="text-slate-600 block text-[11px] font-medium mb-1">Voter ID No. (Optional)</label>
-            <input type="text" [(ngModel)]="ed.signatoryDetails.voterIdNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary" />
-          </div>
-          <div>
-            <label class="text-slate-600 block text-[11px] font-medium mb-1">Passport No. (Optional)</label>
-            <input type="text" [(ngModel)]="ed.signatoryDetails.passportNo" class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary" />
-          </div>
-          <div>
-            <label class="text-slate-600 block text-[11px] font-medium mb-1">State</label>
-            <input type="text" [(ngModel)]="ed.signatoryDetails.state" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary" />
-          </div>
-          <div class="sm:col-span-2 lg:col-span-4">
-            <label class="text-slate-600 block text-[11px] font-medium mb-1">Residential Address</label>
-            <textarea [(ngModel)]="ed.signatoryDetails.residenceAddress" rows="2" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
-          </div>
-        </div>
-      } @else {
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-3.5 gap-x-6 text-xs">
-          <div><span class="text-slate-500 block text-[11px] mb-0.5">Full Name</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.name || '-' }}</span></div>
-          <div><span class="text-slate-500 block text-[11px] mb-0.5">Designation</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.designation || '-' }}</span></div>
-          <div><span class="text-slate-500 block text-[11px] mb-0.5">Date of Birth / Age</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.dob || '-' }} ({{ app().signatoryDetails.age || '42' }} Yrs)</span></div>
-          <div><span class="text-slate-500 block text-[11px] mb-0.5">PAN</span><span class="font-mono text-slate-900 font-medium">{{ app().signatoryDetails.pan || '-' }}</span></div>
-          <div><span class="text-slate-500 block text-[11px] mb-0.5">Mobile No.</span><span class="font-mono text-slate-900">{{ app().signatoryDetails.mobileNo || '-' }}</span></div>
-          <div><span class="text-slate-500 block text-[11px] mb-0.5">Email Address</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.emailId || '-' }}</span></div>
-          <div><span class="text-slate-500 block text-[11px] mb-0.5">Aadhaar No.</span><span class="font-mono text-slate-900">{{ app().signatoryDetails.aadhaarNo || '-' }}</span></div>
-          <div><span class="text-slate-500 block text-[11px] mb-0.5">State</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.state || 'Rajasthan' }}</span></div>
-          <div class="col-span-2 sm:col-span-4"><span class="text-slate-500 block text-[11px] mb-0.5">Residential Address</span><span class="text-slate-900 leading-relaxed">{{ app().signatoryDetails.residenceAddress || '-' }}</span></div>
-        </div>
-      }
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-y-3.5 gap-x-6 text-xs">
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">Full Name</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.name || '-' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">Designation</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.designation || '-' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">Date of Birth / Age</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.dob || '-' }} ({{ app().signatoryDetails.age || '42' }} Yrs)</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">PAN</span><span class="font-mono text-slate-900 font-medium">{{ app().signatoryDetails.pan || '-' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">Mobile No.</span><span class="font-mono text-slate-900">{{ app().signatoryDetails.mobileNo || '-' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">Email Address</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.emailId || '-' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">Aadhaar No.</span><span class="font-mono text-slate-900">{{ app().signatoryDetails.aadhaarNo || '-' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">Voter ID / Bhamashah No.</span><span class="font-mono text-slate-900">{{ app().signatoryDetails.voterIdNo || app().signatoryDetails.bhamashahNo || 'Not Provided' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">State</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.state || 'Rajasthan' }}</span></div>
+        <div class="col-span-2 sm:col-span-3"><span class="text-slate-500 block text-[11px] mb-0.5">Residential Address</span><span class="text-slate-900 leading-relaxed">{{ app().signatoryDetails.residenceAddress || '-' }}</span></div>
+      </div>
 
       <!-- Attached Signatory Documents -->
       <div class="pt-3 border-t border-slate-200 space-y-2.5">

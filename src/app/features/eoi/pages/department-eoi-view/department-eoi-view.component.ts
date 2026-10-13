@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit, HostListener } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -40,69 +40,19 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
         <app-page-header
           title="EOI Responses"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'EOI Responses' }]"
+          [searchable]="true"
+          [(searchQuery)]="searchQuery"
+          searchPlaceholder="Search Scheme Name, Ref No, Category..."
         >
-          <div class="flex items-center gap-2.5 flex-wrap">
-            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[#0c2d4e] border border-slate-300 text-xs font-medium shadow-xs">
-              <span class="text-slate-600">Published Schemes:</span>
-              <span class="font-bold text-[#0c2d4e]">{{ schemes().length }}</span>
-            </div>
-
-            <!-- Active Role Switcher (only when the user holds more than one role) -->
-            @if (canSwitchRole()) {
-              <div class="relative z-30" id="dept-role-dropdown-container">
-                <button
-                  type="button"
-                  (click)="toggleRoleDropdown()"
-                  class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
-                  title="Switch Role"
-                >
-                  <span>Role: {{ activeRoleLabel() }}</span>
-                  <svg class="w-3.5 h-3.5 text-sky-200 transition-transform duration-200" [class.rotate-180]="roleDropdownOpen()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-
-                <!-- Dropdown Menu -->
-                @if (roleDropdownOpen()) {
-                  <div
-                    class="absolute right-0 top-full mt-2 w-52 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150 text-left font-sans"
-                  >
-                    <div class="px-3 py-2 border-b border-slate-100 bg-slate-50">
-                      <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Switch Role</span>
-                    </div>
-
-                    <div class="p-1.5 space-y-0.5">
-                      @for (role of assignedRoles(); track role.id) {
-                        <button
-                          type="button"
-                          (click)="onSelectRole(role.id)"
-                          class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-left transition-colors cursor-pointer border-0"
-                          [ngClass]="isActiveRole(role.id) ? 'bg-navy/10 text-navy font-bold' : 'text-slate-700 hover:bg-[#F0F5FA] hover:text-navy font-medium'"
-                          [attr.aria-current]="isActiveRole(role.id) ? 'true' : null"
-                        >
-                          <span class="truncate text-xs leading-tight">{{ role.label }}</span>
-
-                          @if (isActiveRole(role.id)) {
-                            <svg class="w-4 h-4 text-navy shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                            </svg>
-                          }
-                        </button>
-                      }
-                    </div>
-                  </div>
-                }
-              </div>
-            }
-          </div>
         </app-page-header>
 
         <!-- Main Schemes Table via Reusable TableComponent -->
         <app-table
           [columns]="schemeColumns"
-          [data]="schemes()"
+          [data]="filteredSchemes()"
           [pagination]="true"
           [pageSize]="10"
+          emptyMessage="No schemes match your search query."
           [customTemplates]="{
             schemeTitle: schemeTitleTemplate,
             responseCount: responseCountTemplate,
@@ -113,7 +63,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
 
         <!-- Custom Scheme Title Template -->
         <ng-template #schemeTitleTemplate let-scheme>
-          <div class="font-semibold text-slate-900 text-[13px] leading-snug">
+          <div class="font-normal text-slate-800 text-[13px] leading-snug">
             {{ scheme.schemeTitle }}
           </div>
           <div class="text-[11px] font-mono text-slate-500 mt-0.5">
@@ -123,7 +73,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
 
         <!-- Custom Response Count Template -->
         <ng-template #responseCountTemplate let-scheme>
-          <span class="font-bold text-slate-900 text-[13px]">{{ scheme.responseCount }}</span>
+          <span class="font-normal text-slate-800 text-[13px]">{{ scheme.responseCount }}</span>
           <span class="text-slate-500 text-[11px] ml-1">EOIs</span>
         </ng-template>
 
@@ -170,8 +120,20 @@ export class DepartmentEoiViewComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   schemes = signal<Scheme[]>([]);
+  readonly searchQuery = signal<string>('');
   showOtpModal = signal<boolean>(false);
   currentSsoId = signal<string>('dept_admin');
+
+  readonly filteredSchemes = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    if (!q) return this.schemes();
+    return this.schemes().filter(s =>
+      (s.schemeTitle && s.schemeTitle.toLowerCase().includes(q)) ||
+      (s.refNo && s.refNo.toLowerCase().includes(q)) ||
+      (s.category && s.category.toLowerCase().includes(q)) ||
+      (s.status && s.status.toLowerCase().includes(q))
+    );
+  });
 
   readonly schemeColumns: TableColumn<Scheme>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-14' },

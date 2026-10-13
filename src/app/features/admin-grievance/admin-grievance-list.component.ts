@@ -15,6 +15,7 @@ import {
   TableColumn
 } from '../../shared';
 import { DataEngineService } from '../../core/services/data-engine.service';
+import { DocumentViewerService } from '../../core/services/document-viewer.service';
 
 import { AdminGrievance, GRIEVANCE_STATUS_BADGE, grievanceStatusVariant } from '../grievance/grievance.shared';
 
@@ -32,8 +33,7 @@ export type { AdminGrievance };
     TableComponent,
     ButtonComponent,
     ActionModalComponent,
-    StatusBadgeComponent,
-    EmptyStateComponent
+    StatusBadgeComponent
   ],
   template: `
     <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
@@ -41,16 +41,20 @@ export type { AdminGrievance };
         
         <app-page-header
           title="Grievance Management"
-          bgColor="#0B3558"
+          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Grievance Management' }]"
+          [searchable]="true"
+          [(searchQuery)]="searchQuery"
+          searchPlaceholder="Search User, Title, Description, Issue Type..."
         >
         </app-page-header>
 
         <app-table
           [columns]="grievanceColumns"
-          [data]="grievances()"
+          [data]="filteredGrievances()"
           [pagination]="true"
           [pageSize]="10"
           itemUnit="grievances"
+          emptyMessage="No grievances match your search query."
           [customTemplates]="{
             viewAction: viewActionTemplate,
             submittedAt: dateTimeTemplate,
@@ -61,14 +65,14 @@ export type { AdminGrievance };
 
         <ng-template #dateTimeTemplate let-item>
           <div class="flex flex-col text-center">
-            <span class="text-slate-800 font-medium whitespace-nowrap">{{ item.submittedAt | date:'dd MMM yyyy' }}</span>
+            <span class="text-slate-800 font-normal whitespace-nowrap">{{ item.submittedAt | date:'dd MMM yyyy' }}</span>
             <span class="text-slate-500 text-[11px] whitespace-nowrap">{{ item.submittedAt | date:'hh:mm a' }}</span>
           </div>
         </ng-template>
         
         <ng-template #attachmentTemplate let-item>
           @if (item.attachment && item.attachment !== 'None') {
-            <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-medium text-sky-600 hover:text-sky-700 hover:underline break-all max-w-37.5 inline-block">
+            <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-normal text-sky-600 hover:text-sky-700 hover:underline break-all max-w-37.5 inline-block">
               {{ item.attachment }}
             </a>
           } @else {
@@ -215,32 +219,6 @@ export type { AdminGrievance };
         }
       </app-action-modal>
 
-      <!-- Attachment Preview Modal -->
-      <app-action-modal
-        [isOpen]="isPreviewModalOpen()"
-        [title]="'Preview: ' + previewAttachmentName()"
-        primaryLabel="Close"
-        secondaryLabel=""
-        [showPrimaryArrow]="false"
-        [showCloseButton]="true"
-        [showAccentBar]="false"
-        maxWidthClass="max-w-5xl"
-        (primaryAction)="closePreview()"
-        (close)="closePreview()"
-      >
-        <div class="mt-4 border border-slate-200 rounded-lg overflow-hidden bg-slate-50 flex flex-col items-center justify-center min-h-100">
-          @if (previewAttachmentUrl()) {
-            <iframe [src]="previewAttachmentUrl()" class="w-full h-full min-h-[70vh] border-0 bg-white"></iframe>
-          } @else {
-            <app-empty-state
-              title="No Preview Available"
-              description="This is a dummy file from the test data. Raise a new ticket and upload a real PDF to see the live preview."
-              iconPath="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-            ></app-empty-state>
-          }
-        </div>
-      </app-action-modal>
-
     </div>
   `
 })
@@ -248,6 +226,7 @@ export class AdminGrievanceListComponent {
   readonly statusVariant = grievanceStatusVariant;
   private sanitizer = inject(DomSanitizer);
   private permissions = inject(PermissionService);
+  private docViewer = inject(DocumentViewerService);
   private destroyRef = inject(DestroyRef);
 
   readonly isDeptAdmin = computed(() => this.permissions.hasRole('dept_admin'));
@@ -271,11 +250,13 @@ export class AdminGrievanceListComponent {
     comments: ''
   };
 
+  readonly searchQuery = signal<string>('');
+
   readonly grievanceColumns: TableColumn<AdminGrievance>[] = [
     { key: 'sNo', label: 'Sr No.', type: 'number', align: 'center', width: 'w-12' },
-    { key: 'userName', label: 'User Name', cellClass: 'font-medium text-sky-700 min-w-[120px]' },
+    { key: 'userName', label: 'User Name', cellClass: 'font-normal text-sky-700 min-w-[120px]' },
     { key: 'submittedAt', label: 'Date & Time', align: 'center', type: 'custom', width: 'w-24' },
-    { key: 'title', label: 'Title', cellClass: 'font-medium text-slate-800 min-w-[120px]' },
+    { key: 'title', label: 'Title', cellClass: 'font-normal text-slate-800 min-w-[120px]' },
     { key: 'description', label: 'Description', cellClass: 'font-normal text-slate-700 min-w-[180px]' },
     { key: 'issueType', label: 'Issue Type', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'attachment', label: 'Attachment', align: 'center', type: 'custom' },
@@ -287,6 +268,18 @@ export class AdminGrievanceListComponent {
   private readonly repo = inject(DataEngineService).for<AdminGrievance>('ADMIN_GRIEVANCES', { idKey: 'sNo' });
 
   readonly grievances = signal<AdminGrievance[]>([]);
+
+  readonly filteredGrievances = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    if (!q) return this.grievances();
+    return this.grievances().filter(g =>
+      (g.userName && g.userName.toLowerCase().includes(q)) ||
+      (g.title && g.title.toLowerCase().includes(q)) ||
+      (g.description && g.description.toLowerCase().includes(q)) ||
+      (g.issueType && g.issueType.toLowerCase().includes(q)) ||
+      (g.status && g.status.toLowerCase().includes(q))
+    );
+  });
 
   constructor() {
     this.repo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => this.grievances.set(list));
@@ -391,16 +384,15 @@ export class AdminGrievanceListComponent {
   }
 
   openPreview(ticket: AdminGrievance) {
-    this.previewAttachmentName.set(ticket.attachment);
-    this.previewAttachmentUrl.set(ticket.attachmentUrl || null);
-    this.isPreviewModalOpen.set(true);
+    if (ticket.attachment && ticket.attachment !== 'None') {
+      this.docViewer.openDocument({
+        fileName: ticket.attachment,
+        status: 'uploaded'
+      }, `Grievance Attachment - ${ticket.title}`);
+    }
   }
 
   closePreview() {
     this.isPreviewModalOpen.set(false);
-    setTimeout(() => {
-      this.previewAttachmentName.set('');
-      this.previewAttachmentUrl.set(null);
-    }, 300);
   }
 }

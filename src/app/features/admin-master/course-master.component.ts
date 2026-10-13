@@ -5,19 +5,11 @@ import {
   TableColumn
 } from '../../shared';
 import { CourseMasterItem } from '../../core/models/admin-masters.model';
+import { SKILL_SECTOR_NAMES } from '../../core/config/sector.config';
 
 export type { CourseMasterItem };
 
-const SECTOR_OPTIONS = [
-  'Aerospace and Aviation',
-  'Agriculture',
-  'Apparel',
-  'Automotive',
-  'Beauty & Wellness',
-  'Healthcare',
-  'IT-ITeS',
-  'Logistics'
-];
+const SECTOR_OPTIONS = [...SKILL_SECTOR_NAMES];
 
 const COMMON_NORMS_OPTIONS = ['I', 'II', 'III'];
 
@@ -40,7 +32,7 @@ const COLUMNS: TableColumn<CourseMasterItem>[] = [
     cellClass: (value: string) => {
       const base = 'min-w-[140px] text-xs font-medium whitespace-nowrap';
       if (value === 'Expired') return `${base} text-rose-600`;
-      if (value === 'New Version') return `${base} text-emerald-600`;
+      if (value === 'New Version' || value === 'New Course') return `${base} text-emerald-600`;
       if (value === 'Not Valid') return `${base} text-slate-600`;
       return `${base} text-amber-800`;
     }
@@ -55,7 +47,7 @@ const CONFIG: MasterCrudConfig<CourseMasterItem> = {
   searchFields: ['sector', 'jobRoleName', 'jobRoleCode'],
   itemUnit: 'courses',
   columns: COLUMNS,
-  hasStatus: false,
+  hasStatus: true,
   modalWidthClass: 'max-w-[720px]',
   fields: [
     { key: 'sector', label: 'Sector', type: 'select', required: true, options: SECTOR_OPTIONS, colSpan: 2 },
@@ -97,7 +89,8 @@ const CONFIG: MasterCrudConfig<CourseMasterItem> = {
     itSoftSkillTrainingHours: Number(formData.itSoftSkillTrainingHours) || 0,
     totalQpHours: Number(formData.totalQpHours) || 0,
     courseValidUpToDate: (formData.courseValidUpToDate || '').trim() || '-',
-    remark: (formData.remark || '').trim() || 'New Version'
+    remark: (formData.remark || '').trim() || 'New Version',
+    status: formData.status || 'Active'
   }),
   deleteConfirmText: (item) => `Are you sure you want to delete course "${item.jobRoleName}" (${item.jobRoleCode})?`
 };

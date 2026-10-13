@@ -1,23 +1,27 @@
-import { Component, DestroyRef, signal, inject } from '@angular/core';
+import { Component, DestroyRef, computed, signal, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DocumentViewerModalComponent } from '../../shared/components/document-viewer-modal/document-viewer-modal.component';
+import { DocumentViewerService } from '../../core/services/document-viewer.service';
 import { formatDateMedium } from '../../shared/utils';
 import { FileDoc } from '../registration/models/otr-form.model';
 import {
+  ShortfallRequest,
   SubmittedTender,
   SubmittedTenderDoc
 } from '../../core/models/tender.model';
+import { ShortfallBridgeService } from '../eoi/services/shortfall-bridge.service';
+import { TenderShortfallSectionComponent } from './tender-status/tender-shortfall-section.component';
+import { ShortfallResponseModalComponent, ShortfallSubmission } from './tender-status/shortfall-response-modal.component';
+import { openShortfalls, withShortfallResponse } from './tender-status/tender-shortfall.util';
 import { DataEngineService } from '../../core/services/data-engine.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { TenderListComponent } from './tender-status/tender-list.component';
 import { TenderDetailHeaderComponent } from './tender-status/tender-detail-header.component';
 import { TenderEditStatusComponent } from './tender-status/tender-edit-status.component';
-import { TenderFeeSummaryComponent } from './tender-status/tender-fee-summary.component';
 import { TenderOrgSectionComponent } from './tender-status/tender-org-section.component';
 import { TenderSignatorySectionComponent } from './tender-status/tender-signatory-section.component';
 import { TenderBankSectionComponent } from './tender-status/tender-bank-section.component';
 import { TenderDocumentsTableComponent } from './tender-status/tender-documents-table.component';
-import { TenderReceiptsSectionComponent } from './tender-status/tender-receipts-section.component';
+import { TenderStep5EmdComponent } from './tender-status/tender-step5-emd.component';
 import {
   TenderDocReplaceRequest,
   TenderDocViewRequest,
@@ -36,27 +40,19 @@ export type { SubmittedTender, SubmittedTenderDoc };
   selector: 'app-tender-status',
   standalone: true,
   imports: [
-    DocumentViewerModalComponent,
     TenderListComponent,
     TenderDetailHeaderComponent,
     TenderEditStatusComponent,
-    TenderFeeSummaryComponent,
     TenderOrgSectionComponent,
     TenderSignatorySectionComponent,
     TenderBankSectionComponent,
     TenderDocumentsTableComponent,
-    TenderReceiptsSectionComponent
+    TenderStep5EmdComponent,
+    TenderShortfallSectionComponent,
+    ShortfallResponseModalComponent
   ],
   template: `
     <div class="w-full min-h-full bg-white text-slate-800 font-sans">
-
-      <!-- Document Viewer Modal -->
-      <app-document-viewer-modal
-        [isOpen]="isViewerOpen()"
-        [doc]="activeViewerDoc()"
-        [title]="activeViewerTitle()"
-        (close)="closeViewer()"
-      />
 
       <!-- VIEW 1: TENDER STATUS MAIN TABLE -->
       @if (!selectedTender()) {
@@ -64,12 +60,13 @@ export type { SubmittedTender, SubmittedTenderDoc };
           [tenders]="tenders()"
           [(searchQuery)]="searchQuery"
           (open)="openApplicationPage($event)"
+          (respond)="startShortfallResponse($event)"
         />
       }
 
       <!-- VIEW 2: SUBMISSION DETAIL / EDIT -->
       @if (selectedTender()) {
-        <div class="p-4 sm:p-6 lg:p-8 space-y-5 font-sans animate-in fade-in duration-150">
+        <div class="px-4 sm:px-5 lg:px-6 py-4 sm:py-5 space-y-5 font-sans animate-in fade-in duration-150">
 
           <app-tender-detail-header
             [tender]="selectedTender()!"
@@ -81,12 +78,27 @@ export type { SubmittedTender, SubmittedTenderDoc };
             (print)="printApplication()"
           />
 
+          @if (pendingNoticeCount() > 0) {
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900" role="alert">
+              <p class="m-0 text-[13px] leading-snug">
+                <strong class="font-semibold">Shortfall request:</strong>
+                the department has asked for more documents on this application ({{ pendingNoticeCount() }} pending).
+              </p>
+              <button
+                type="button"
+                (click)="startShortfallResponse(selectedTender()!)"
+                class="shrink-0 px-3 py-1.5 rounded-md bg-navy hover:bg-navy-dark text-white text-xs font-semibold cursor-pointer transition-colors"
+              >
+                Respond
+              </button>
+            </div>
+          }
+
           <app-tender-edit-status [tender]="selectedTender()!" [isEditing]="isEditing()" />
 
-          <app-tender-fee-summary [app]="currentApplication()" />
-
-          <!-- ALL APPLICATION SECTIONS IN ONE CONTINUOUS PAGE -->
+          <!-- APPLICATION SECTIONS PROPERLY NUMBERED -->
           <div class="space-y-5 text-xs">
+            <!-- Step 1: OTR Profile Details (Org, Signatory, Bank) -->
             <app-tender-org-section
               [app]="currentApplication()"
               [editable]="editableTender"
@@ -111,6 +123,7 @@ export type { SubmittedTender, SubmittedTenderDoc };
               (replaceOtrDoc)="onReplaceOtrDoc($event)"
             />
 
+            <!-- Step 2: Mandated Proposal Documents & Annexures (16 files) -->
             <app-tender-documents-table
               [documents]="currentApplication().documents"
               [isEditing]="isEditing()"
@@ -118,11 +131,26 @@ export type { SubmittedTender, SubmittedTenderDoc };
               (replaceDoc)="onReplaceDoc($event)"
             />
 
-            <app-tender-receipts-section [app]="currentApplication()" />
+            <!-- Step 3: Statutory Fees Payment Details (Processing Fee & EMD Table) -->
+            <app-tender-step5-emd [app]="currentApplication()" />
+
+            <!-- Shortfall requests from the department and the response history -->
+            <app-tender-shortfall-section
+              [app]="selectedTender()!"
+              (respond)="openShortfallModal(selectedTender()!, $event)"
+              (viewDoc)="onViewDoc($event)"
+            />
           </div>
 
         </div>
       }
+
+      <app-shortfall-response-modal
+        [isOpen]="!!respondingRequest()"
+        [request]="respondingRequest()"
+        (submitted)="submitShortfallResponse($event)"
+        (close)="closeShortfallModal()"
+      />
 
     </div>
   `
@@ -138,14 +166,22 @@ export class TenderStatusComponent {
   editableTender: SubmittedTender | null = null;
   isEditing = signal<boolean>(false);
 
-  // Document Viewer Modal State
-  activeViewerDoc = signal<FileDoc | null>(null);
-  activeViewerTitle = signal<string>('');
-  isViewerOpen = signal<boolean>(false);
+  private readonly docViewer = inject(DocumentViewerService);
 
   private readonly tenderRepo = inject(DataEngineService).for<SubmittedTender>('SUBMITTED_TENDERS');
+  private readonly shortfallBridge = inject(ShortfallBridgeService);
 
   tenders = signal<SubmittedTender[]>([]);
+
+  // Revert (shortfall) response flow
+  private respondingTender: SubmittedTender | null = null;
+  readonly respondingRequest = signal<ShortfallRequest | null>(null);
+
+  /** Revert requests of the open application that still wait for a reply. */
+  readonly pendingNoticeCount = computed(() => {
+    const tender = this.selectedTender();
+    return tender ? openShortfalls(tender).length : 0;
+  });
 
   constructor() {
     this.tenderRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => this.tenders.set(list));
@@ -185,7 +221,7 @@ export class TenderStatusComponent {
     // Deep clone active tender for editing
     this.editableTender = JSON.parse(JSON.stringify(tender));
     this.isEditing.set(true);
-    this.notify.warning(`Editing active. You have ${remainingEdits(tender)} edit(s) remaining.`);
+    this.notify.warning(`Document replacement enabled. You have ${remainingEdits(tender)} edit(s) remaining.`);
   }
 
   saveEdits(): void {
@@ -195,7 +231,8 @@ export class TenderStatusComponent {
     const newEditCount = (this.editableTender.editCount || 0) + 1;
     this.editableTender.editCount = newEditCount;
 
-    const updated = { ...this.editableTender };
+    // Keep the latest revert requests and replies: the edit copy was taken before any reply was sent.
+    const updated = { ...this.editableTender, shortfalls: this.selectedTender()!.shortfalls };
 
     // Update in reactive signal list, then persist through the data layer
     this.tenders.update(list => list.map(t => t.id === updated.id ? updated : t));
@@ -220,25 +257,58 @@ export class TenderStatusComponent {
     window.print();
   }
 
+  // ---- Revert (shortfall) requests -----------------------------------------
+
+  /** Opens the reply form for the oldest request that still waits for a response. */
+  startShortfallResponse(tender: SubmittedTender): void {
+    const next = openShortfalls(tender)[0];
+    if (next) this.openShortfallModal(tender, next);
+  }
+
+  openShortfallModal(tender: SubmittedTender, request: ShortfallRequest): void {
+    if (request.status !== 'Open') return;
+    this.respondingTender = tender;
+    this.respondingRequest.set(request);
+  }
+
+  closeShortfallModal(): void {
+    this.respondingTender = null;
+    this.respondingRequest.set(null);
+  }
+
+  submitShortfallResponse(submission: ShortfallSubmission): void {
+    const tender = this.respondingTender;
+    const notice = this.respondingRequest();
+    if (!tender || !notice) return;
+
+    const shortfalls = withShortfallResponse(tender, submission.shortfallId, submission.response);
+    const updated: SubmittedTender = { ...tender, shortfalls };
+
+    this.tenders.update(list => list.map(t => (t.id === updated.id ? updated : t)));
+    if (this.selectedTender()?.id === updated.id) this.selectedTender.set(updated);
+
+    this.tenderRepo.update(updated.id, { shortfalls }).subscribe();
+    this.shortfallBridge
+      .notifyDepartment(updated, notice, submission.response)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
+
+    this.closeShortfallModal();
+    this.notify.success('Your response to the shortfall request has been submitted.');
+  }
+
   // Document Viewer Helpers
   onViewDoc(request: TenderDocViewRequest): void {
     this.viewDoc(request.fileName, request.title, request.fileSize);
   }
 
   viewDoc(fileName: string, title?: string, fileSize?: string): void {
-    this.activeViewerDoc.set({
+    this.docViewer.openDocument({
       fileName,
       fileSize: fileSize || '1.2 MB',
       uploadDate: 'Verified & Attached',
       status: 'uploaded'
-    });
-    this.activeViewerTitle.set(title || fileName);
-    this.isViewerOpen.set(true);
-  }
-
-  closeViewer(): void {
-    this.isViewerOpen.set(false);
-    this.activeViewerDoc.set(null);
+    }, title || fileName);
   }
 
   onReplaceOtrDoc(request: TenderDocReplaceRequest): void {

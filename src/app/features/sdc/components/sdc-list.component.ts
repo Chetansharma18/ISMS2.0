@@ -33,10 +33,13 @@ import {
         <app-page-header
           title="Skill Development Centers (SDC)"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'SDC Management' }]"
+          [searchable]="true"
+          [(searchQuery)]="searchQuery"
+          searchPlaceholder="Search TP name, SDC, code, sector, district..."
         >
           <a
             routerLink="/sdc/create"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary hover:bg-navy text-white rounded text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-navy hover:bg-navy-dark text-white rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
             title="Register New SDC Center"
           >
             <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -146,26 +149,12 @@ import {
               </select>
             </div>
 
-            <!-- Search input -->
-            <div class="flex-1 min-w-50 relative">
-              <input
-                type="text"
-                [ngModel]="searchQuery()"
-                (ngModelChange)="searchQuery.set($event)"
-                placeholder="Search TP name, SDC, code, sector, district..."
-                class="w-full bg-white border border-border rounded-sm pl-7 pr-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
-              />
-              <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2 top-1.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-
             <!-- Reset filters -->
             @if (hasActiveFilters()) {
               <button
                 type="button"
                 (click)="resetFilters()"
-                class="px-2 py-1 text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded border border-rose-200 transition-colors cursor-pointer font-medium"
+                class="px-2.5 py-1 text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded border border-rose-200 transition-colors cursor-pointer font-medium ml-auto"
               >
                 Reset Filters
               </button>
@@ -198,7 +187,7 @@ import {
         <!-- Template: TP Name (First Column for Admin) -->
         <ng-template #tpNameTemplate let-sdc>
           <div class="py-1 text-center flex flex-col items-center justify-center">
-            <div class="font-medium text-primary text-[13px] leading-snug">
+            <div class="font-normal text-slate-800 text-[13px] leading-snug">
               {{ sdc.tpName }}
             </div>
             <div class="text-[11px] text-secondary font-mono mt-0.5 flex items-center justify-center gap-1.5">
@@ -211,7 +200,7 @@ import {
         <!-- Template: Center Name + District + Code -->
         <ng-template #centerNameTemplate let-sdc>
           <div class="py-0.5 text-center flex flex-col items-center justify-center">
-            <div class="font-medium text-primary leading-snug text-[13px] flex items-center justify-center gap-1.5 flex-wrap">
+            <div class="font-normal text-slate-800 leading-snug text-[13px] flex items-center justify-center gap-1.5 flex-wrap">
               <span>{{ sdc.sdcName }}</span>
               @if (isAdmin()) {
                 <span class="font-mono text-[11px] px-1.5 py-0.2 rounded bg-slate-100 text-secondary font-normal">
@@ -231,7 +220,7 @@ import {
 
         <!-- Template: Capacity (For Admin Table) -->
         <ng-template #capacityTemplate let-sdc>
-          <div class="text-center font-medium text-primary text-[13px]">
+          <div class="text-center font-normal text-slate-800 text-[13px]">
             {{ sdc.approval?.approvedTargetCapacity || sdc.sdcCapacity }} <span class="text-[11px] text-secondary font-normal">Trainees</span>
           </div>
         </ng-template>
@@ -261,19 +250,19 @@ import {
         <ng-template #statusTemplate let-sdc>
           <div class="flex items-center justify-center">
             @if (sdc.status === 'APPROVED' || sdc.status === 'Approved') {
-              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-emerald-700">
+              <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-emerald-700">
                 APPROVED
               </span>
             } @else if (sdc.status === 'PENDING_INSPECTION' || sdc.status?.includes('INSPECTION')) {
-              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-red-600">
+              <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-red-600">
                 {{ formatStatus(sdc.status).toUpperCase() }}
               </span>
             } @else if (sdc.status === 'REJECTED' || sdc.status === 'Rejected') {
-              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-red-600">
+              <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-red-600">
                 REJECTED
               </span>
             } @else {
-              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-amber-700">
+              <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-amber-700">
                 {{ formatStatus(sdc.status).toUpperCase() }}
               </span>
             }
@@ -454,7 +443,7 @@ export class SdcListComponent {
     } else {
       return [
         { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-14' },
-        { key: 'sdcCode', label: 'SDC Code', align: 'center', width: 'w-28', cellClass: 'whitespace-nowrap font-mono font-medium text-slate-800 text-center' },
+        { key: 'sdcCode', label: 'SDC Code', align: 'center', width: 'w-28', cellClass: 'whitespace-nowrap font-mono font-normal text-slate-800 text-center' },
         { key: 'centerName', label: 'Center Name', align: 'center', type: 'custom' },
         { key: 'scheme', label: 'Scheme', align: 'center', type: 'custom' },
         { key: 'schemeCategory', label: 'Scheme Category', align: 'center', type: 'custom', width: 'w-36' },

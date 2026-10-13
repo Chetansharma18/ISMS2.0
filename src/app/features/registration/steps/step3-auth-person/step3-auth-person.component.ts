@@ -31,17 +31,30 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
   template: `
     <div class="w-full font-sans">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-3.5 gap-y-2.5">
-        <!-- Full Name -> 5 cols -->
-        <div class="lg:col-span-5 sm:col-span-1">
-          <app-form-input
-            label="Full Name"
-            [value]="data().name"
-            (valueChange)="update('name', $event)"
-            placeholder="Enter full name"
-            [required]="true"
-            [maxLength]="100"
-            [error]="getFieldError('name')"
-          ></app-form-input>
+        <!-- First Name & Last Name -> 5 cols (Split in half) -->
+        <div class="lg:col-span-5 sm:col-span-1 grid grid-cols-2 gap-x-3.5">
+          <div>
+            <app-form-input
+              label="First Name"
+              [value]="firstName()"
+              (valueChange)="onFirstNameChange($event)"
+              placeholder="Enter first name"
+              [required]="true"
+              [maxLength]="50"
+              [error]="getFieldError('firstName')"
+            ></app-form-input>
+          </div>
+          <div>
+            <app-form-input
+              label="Last Name"
+              [value]="lastName()"
+              (valueChange)="onLastNameChange($event)"
+              placeholder="Enter last name"
+              [required]="false"
+              [maxLength]="50"
+              [error]="getFieldError('lastName')"
+            ></app-form-input>
+          </div>
         </div>
 
         <!-- Designation -> 3 cols -->
@@ -121,11 +134,12 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
         <!-- Aadhaar -> 3 cols -->
         <div class="lg:col-span-3 sm:col-span-1">
           <app-form-input
-            label="Aadhaar No. (Optional)"
+            label="Aadhaar No."
             type="tel"
             [value]="data().aadhaarNo"
             (valueChange)="update('aadhaarNo', $event)"
             placeholder="Enter Aadhaar number"
+            [required]="true"
             [maxLength]="12"
             [error]="getFieldError('aadhaarNo')"
           ></app-form-input>
@@ -218,12 +232,61 @@ export class Step3AuthPersonComponent {
   readonly data = computed(() => this.otrFormService.step3());
   readonly isSubmitted = computed(() => this.validationService.submittedSteps().has(2));
 
+  readonly firstName = computed(() => {
+    const d = this.data();
+    if (d.firstName !== undefined && d.firstName !== null) {
+      return d.firstName;
+    }
+    if (d.name) {
+      const parts = d.name.trim().split(/\s+/);
+      return parts[0] || '';
+    }
+    return '';
+  });
+
+  readonly lastName = computed(() => {
+    const d = this.data();
+    if (d.lastName !== undefined && d.lastName !== null) {
+      return d.lastName;
+    }
+    if (d.name) {
+      const parts = d.name.trim().split(/\s+/);
+      return parts.slice(1).join(' ') || '';
+    }
+    return '';
+  });
+
+  onFirstNameChange(value: string): void {
+    const first = value;
+    const last = this.lastName();
+    const fullName = [first.trim(), last.trim()].filter(Boolean).join(' ');
+    this.otrFormService.updateStep3({
+      firstName: first,
+      lastName: last,
+      name: fullName
+    });
+  }
+
+  onLastNameChange(value: string): void {
+    const first = this.firstName();
+    const last = value;
+    const fullName = [first.trim(), last.trim()].filter(Boolean).join(' ');
+    this.otrFormService.updateStep3({
+      firstName: first,
+      lastName: last,
+      name: fullName
+    });
+  }
+
   getFieldError(field: string): string | undefined {
     if (!this.isSubmitted()) return undefined;
     const d = this.data();
     switch (field) {
+      case 'firstName':
       case 'name':
-        if (!d.name?.trim()) return 'Authorized Person Full Name is required';
+        if (!this.firstName()?.trim() && !d.name?.trim()) return 'Authorized Person First Name is required';
+        return undefined;
+      case 'lastName':
         return undefined;
       case 'dob':
         if (!d.dob) return 'Date of Birth is required';

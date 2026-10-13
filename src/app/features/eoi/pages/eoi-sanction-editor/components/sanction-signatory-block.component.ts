@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-/** Dispatch reference and signatory block. */
+/** Dispatch reference of the sanction order. */
 @Component({
   selector: 'app-sanction-signatory-block',
   standalone: true,
@@ -18,32 +18,9 @@ import { FormsModule } from '@angular/forms';
           class="font-mono text-[11px] text-slate-700 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-500 focus:border-slate-800 focus:outline-none w-64 block"
         />
       </div>
-
-      <div class="text-right space-y-1">
-        <div class="flex flex-col items-end">
-          <input
-            type="text"
-            [ngModel]="signatoryName()" (ngModelChange)="signatoryName.set($event)"
-            class="text-right font-bold text-slate-900 bg-transparent border-b border-dashed border-slate-300 focus:border-slate-800 focus:outline-none block w-48 text-xs"
-          />
-          <input
-            type="text"
-            [ngModel]="signatoryTitle()" (ngModelChange)="signatoryTitle.set($event)"
-            class="text-right font-medium text-slate-700 bg-transparent border-b border-dashed border-slate-300 focus:border-slate-800 focus:outline-none block w-48 text-xs"
-          />
-          <input
-            type="text"
-            [ngModel]="signatoryOrg()" (ngModelChange)="signatoryOrg.set($event)"
-            class="text-right text-slate-500 text-[10px] bg-transparent border-b border-dashed border-slate-300 focus:border-slate-800 focus:outline-none block w-48"
-          />
-        </div>
-      </div>
     </div>
   `
 })
 export class SanctionSignatoryBlockComponent {
   readonly dispatchRef = model<string>('');
-  readonly signatoryName = model<string>('');
-  readonly signatoryTitle = model<string>('');
-  readonly signatoryOrg = model<string>('');
 }

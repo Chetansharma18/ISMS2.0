@@ -59,9 +59,22 @@ export class OtrFormService {
 
   private loadInitialData(): OtrFormData {
     try {
+      if (this.permissions.hasRole('new_user')) {
+        const parsed = this.storage.getItem<OtrFormData>('isms_otr_form_data_new');
+        if (parsed && parsed.step1 && parsed.step2 && parsed.status === 'Draft' && parsed.step1.fullName !== 'Company 1') {
+          return parsed;
+        }
+        return createInitialOtrFormData();
+      }
+
       if (this.permissions.hasRole('existing_user')) {
+        const parsed = this.storage.getItem<OtrFormData>('isms_otr_form_data_existing');
+        if (parsed && parsed.step1 && parsed.step2) {
+          return parsed;
+        }
         return createExistingUserOtrData();
       }
+
       const parsed = this.storage.getItem<OtrFormData>(this.STORAGE_KEY);
       if (parsed && parsed.step1 && parsed.step2) {
         return parsed;
@@ -75,13 +88,21 @@ export class OtrFormService {
   loadExistingUserData(): void {
     const data = createExistingUserOtrData();
     this._formData.set(data);
-    this.persistDraft(data);
+    this.storage.setItem('isms_otr_form_data_existing', data);
+    this.storage.setItem(this.STORAGE_KEY, data);
+  }
+
+  setExistingUserData(data: OtrFormData): void {
+    this._formData.set(data);
+    this.storage.setItem('isms_otr_form_data_existing', data);
+    this.storage.setItem(this.STORAGE_KEY, data);
   }
 
   resetToInitialDraft(): void {
     const data = createInitialOtrFormData();
     this._formData.set(data);
-    this.persistDraft(data);
+    this.storage.setItem('isms_otr_form_data_new', data);
+    this.storage.removeItem(this.STORAGE_KEY);
   }
 
   /* ==========================================================================
@@ -213,6 +234,18 @@ export class OtrFormService {
     this._formData.update(current => {
       const updatedStep3: Step3AuthorizedPerson = { ...current.step3, ...changes };
 
+      if (changes.firstName !== undefined || changes.lastName !== undefined) {
+        if (changes.name === undefined) {
+          const first = updatedStep3.firstName?.trim() || '';
+          const last = updatedStep3.lastName?.trim() || '';
+          updatedStep3.name = [first, last].filter(Boolean).join(' ');
+        }
+      } else if (changes.name !== undefined && changes.firstName === undefined && changes.lastName === undefined) {
+        const parts = (changes.name || '').trim().split(/\s+/);
+        updatedStep3.firstName = parts[0] || '';
+        updatedStep3.lastName = parts.slice(1).join(' ') || '';
+      }
+
       if (changes.dob !== undefined) {
         updatedStep3.age = this.calculateAgeFromDob(changes.dob);
       }
@@ -279,6 +312,10 @@ export class OtrFormService {
   }
 
   private persistDraft(data: OtrFormData): void {
+    const key = this.permissions.hasRole('existing_user')
+      ? 'isms_otr_form_data_existing'
+      : 'isms_otr_form_data_new';
+    this.storage.setItem(key, data);
     this.storage.setItem(this.STORAGE_KEY, data);
   }
 

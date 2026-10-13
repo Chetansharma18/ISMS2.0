@@ -27,13 +27,17 @@ import {
     <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
       <div class="p-4 sm:p-5 space-y-3 font-sans">
         
-        <!-- Page Header via Reusable PageHeaderComponent -->
+        <!-- Page Header via Reusable PageHeaderComponent with Built-in Search -->
         <app-page-header
           title="Batch Management"
+          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Batch Management' }]"
+          [searchable]="true"
+          [(searchQuery)]="searchQuery"
+          searchPlaceholder="Search Batch Code, Course, Center, Scheme..."
         ></app-page-header>
 
-        <!-- Filter Controls & Search Toolbar (Matching Active EOI & Tender Status) -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-1">
+        <!-- Filter Controls Toolbar -->
+        <div class="flex items-center justify-between gap-3 pt-1">
           
           <!-- Status Filter Badges / Pills -->
           <div class="flex items-center gap-1.5 flex-wrap">
@@ -65,29 +69,6 @@ import {
             }
           </div>
 
-          <!-- Search Input with Search Icon & Clear Button -->
-          <div class="relative w-full sm:w-72">
-            <svg class="w-3.5 h-3.5 text-text-muted absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              [ngModel]="searchQuery()"
-              (ngModelChange)="searchQuery.set($event)"
-              placeholder="Search Batch Code, Course, Center, Scheme..."
-              class="w-full pl-8 pr-7 py-1.5 text-[13px] bg-white border border-border rounded-sm placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-primary transition-colors font-normal"
-            />
-            @if (searchQuery()) {
-              <button
-                type="button"
-                (click)="searchQuery.set('')"
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs"
-              >
-                &times;
-              </button>
-            }
-          </div>
-
         </div>
 
         <!-- Batches Table via Reusable TableComponent -->
@@ -113,7 +94,7 @@ import {
         <!-- Template: Batch Info -->
         <ng-template #batchInfoTemplate let-b>
           <div>
-            <div class="font-medium text-primary text-[13px] font-mono leading-snug">
+            <div class="font-normal text-slate-800 text-[13px] font-mono leading-snug">
               {{ b.batchCode }}
             </div>
             <div class="text-[11px] text-secondary mt-0.5 font-normal">
@@ -125,7 +106,7 @@ import {
         <!-- Template: Course & Scheme -->
         <ng-template #courseSchemeTemplate let-b>
           <div>
-            <div class="font-medium text-primary text-[13px] leading-snug">
+            <div class="font-normal text-slate-800 text-[13px] leading-snug">
               {{ b.courseName }}
             </div>
             <div class="mt-0.5">
@@ -139,7 +120,7 @@ import {
         <!-- Template: Center (SDC) -->
         <ng-template #centerTemplate let-b>
           <div>
-            <div class="font-medium text-primary text-[13px] leading-snug">
+            <div class="font-normal text-slate-800 text-[13px] leading-snug">
               {{ b.sdcName }}
             </div>
             <div class="text-[11px] text-secondary mt-0.5 font-mono">
@@ -151,7 +132,7 @@ import {
         <!-- Template: Capacity & Mapped Progress -->
         <ng-template #capacityTemplate let-b>
           <div class="min-w-35">
-            <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1">
+            <div class="flex items-center justify-between text-[13px] font-normal text-slate-700 mb-1">
               <span>{{ b.mappedAspirantsCount }}/{{ b.maxStrength }} Aspirants</span>
               <span class="text-slate-400 font-normal text-[11px]">{{ getMappedPercent(b) }}%</span>
             </div>
@@ -166,7 +147,7 @@ import {
 
         <!-- Template: Duration -->
         <ng-template #durationTemplate let-b>
-          <div class="text-xs text-slate-600 space-y-0.5 whitespace-nowrap">
+          <div class="text-[13px] text-slate-600 space-y-0.5 whitespace-nowrap">
             <div><span class="text-slate-400">From:</span> {{ b.startDate }}</div>
             <div><span class="text-slate-400">To:</span> {{ b.endDate }}</div>
           </div>
@@ -175,15 +156,15 @@ import {
         <!-- Template: Status -->
         <ng-template #statusTemplate let-b>
           @if (isApproved(b)) {
-            <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-emerald-700">
+            <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-emerald-700">
               APPROVED
             </span>
           } @else if (isRejected(b)) {
-            <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-red-600">
+            <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-red-600">
               REJECTED
             </span>
           } @else {
-            <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-amber-700">
+            <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-amber-600">
               PENDING
             </span>
           }

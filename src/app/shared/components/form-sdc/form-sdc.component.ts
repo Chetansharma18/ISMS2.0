@@ -5,7 +5,8 @@ import {
   EventEmitter,
   signal,
   computed,
-  TemplateRef
+  TemplateRef,
+  inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +18,7 @@ import {
   FormDensity,
   FormLayoutMode
 } from './form-sdc.types';
-import { DocumentViewerModalComponent } from '../document-viewer-modal/document-viewer-modal.component';
+import { DocumentViewerService } from '../../../core/services/document-viewer.service';
 import {
   appendPhotos,
   buildFileData,
@@ -39,7 +40,7 @@ import {
 @Component({
   selector: 'app-form-sdc, app-dynamic-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, DocumentViewerModalComponent],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="space-y-4 font-sans text-slate-800" style="font-family: 'Inter', sans-serif;">
       
@@ -363,9 +364,12 @@ import {
                 </div>
               </label>
               @if (getFieldError(field.key)) {
-                <p class="text-[11px] text-rose-600 font-medium flex items-center gap-1 mt-0.5 m-0">
-                  <span>{{ getFieldError(field.key) }}</span>
-                </p>
+                <div class="form-error-text text-rose-600 font-medium flex items-center gap-1 mt-0.5 m-0 leading-tight" style="font-size: 11px !important; line-height: 14px !important;">
+                  <svg class="shrink-0 text-rose-600" style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                  <span style="font-size: 11px !important; line-height: 14px !important;">{{ getFieldError(field.key) }}</span>
+                </div>
               }
             </div>
           } @else if (field.type === 'switch') {
@@ -698,12 +702,12 @@ import {
 
             <!-- Validation Error Alert -->
             @if (getFieldError(field.key)) {
-              <p class="text-[11px] text-rose-600 font-medium flex items-center gap-1 mt-0.5 m-0 leading-tight">
-                <svg class="w-3 h-3 shrink-0 text-rose-600" fill="currentColor" viewBox="0 0 20 20">
+              <div class="form-error-text text-rose-600 font-medium flex items-center gap-1 mt-0.5 m-0 leading-tight" style="font-size: 11px !important; line-height: 14px !important;">
+                <svg class="shrink-0 text-rose-600" style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                 </svg>
-                <span>{{ getFieldError(field.key) }}</span>
-              </p>
+                <span style="font-size: 11px !important; line-height: 14px !important;">{{ getFieldError(field.key) }}</span>
+              </div>
             } @else if (field.hint) {
               <!-- Field Help Hint -->
               <p class="text-[11px] text-slate-400 mt-0.5 leading-tight m-0">
@@ -714,14 +718,6 @@ import {
           }
         </div>
       </ng-template>
-
-      <!-- Reusable Document Preview Modal for Inspection -->
-      <app-document-viewer-modal
-        [isOpen]="isPreviewOpen"
-        [doc]="activePreviewDoc"
-        [title]="previewTitle"
-        (close)="isPreviewOpen = false"
-      ></app-document-viewer-modal>
 
     </div>
   `
@@ -795,10 +791,7 @@ export class FormSdcComponent {
   @Output() fileView = new EventEmitter<{ field: FormFieldConfig; file: any }>();
   @Output() fileRemove = new EventEmitter<{ key: string }>();
 
-  /** Document Preview Modal State */
-  isPreviewOpen = false;
-  previewTitle = 'Document Preview';
-  activePreviewDoc: any = null;
+  private docViewer = inject(DocumentViewerService);
 
   /** Internal local validation errors map */
   internalErrors: Record<string, string> = {};
@@ -918,13 +911,12 @@ export class FormSdcComponent {
     }
   }
 
-  /** Opens the document preview modal */
+  /** Opens the document in another tab in Chrome */
   viewFile(field: FormFieldConfig, fileVal: any): void {
     const fileName = this.getFileName(fileVal) || 'Document.jpg';
-
-    this.previewTitle = this.getFieldLabel(field) || 'Document Preview';
-    this.activePreviewDoc = buildFilePreviewDoc(fileName, fileVal);
-    this.isPreviewOpen = true;
+    const label = this.getFieldLabel(field) || 'Document Preview';
+    const previewDoc = buildFilePreviewDoc(fileName, fileVal);
+    this.docViewer.openDocument(previewDoc, label);
     this.fileView.emit({ field, file: fileVal });
   }
 
@@ -971,11 +963,11 @@ export class FormSdcComponent {
     }
   }
 
-  /** Preview photo in modal */
+  /** Preview photo in a new tab in Chrome */
   previewPhoto(photo: any): void {
-    this.previewTitle = photo.tag ? `${photo.tag} - ${photo.name}` : photo.name;
-    this.activePreviewDoc = buildPhotoPreviewDoc(photo);
-    this.isPreviewOpen = true;
+    const title = photo.tag ? `${photo.tag} - ${photo.name}` : photo.name;
+    const previewDoc = buildPhotoPreviewDoc(photo);
+    this.docViewer.openDocument(previewDoc, title);
   }
 
   /** Retrieves label as string, evaluating dynamic function if provided */

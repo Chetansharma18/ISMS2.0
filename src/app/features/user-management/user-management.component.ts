@@ -9,6 +9,7 @@ import {
   TableComponent,
   TableColumn
 } from '../../shared';
+import { DistrictBlockMasterItem, UserRoleMasterItem, SchemeMasterItem, DesignationMasterItem } from '../../core/models/admin-masters.model';
 import { UserManagementItem } from '../../core/models/user-management.model';
 import {
   ConfirmModalData,
@@ -59,44 +60,32 @@ export type { UserManagementItem };
     <div class="w-full min-h-screen bg-white text-slate-800 font-sans p-4 sm:p-6 lg:p-8 space-y-6">
       
       <!-- Page Header -->
-      <app-page-header title="User Management">
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
-          <!-- Search Input -->
-          <div class="flex items-center gap-2 flex-1 max-w-md">
-            <div class="relative w-full">
-              <input
-                type="text"
-                placeholder="Search by User ID, Username, SSO ID, Role, or District..."
-                [ngModel]="searchQuery()"
-                (ngModelChange)="onSearchChange($event)"
-                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-primary transition-all"
-              />
-              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-
-          <!-- Add User Button -->
-          @if (selectedRoleFilter() !== 'blacklisted') {
-            <button
-              type="button"
-              (click)="openAddModal()"
-              class="px-4 py-2.5 bg-primary hover:bg-navy text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 shrink-0"
-            >
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
-              <span>Add User</span>
-            </button>
-          }
-        </div>
+      <app-page-header
+        title="User Management"
+        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'User Management' }]"
+        [searchable]="true"
+        searchPlaceholder="Search User ID, Username, SSO, Role, District..."
+        [(searchQuery)]="searchQuery"
+      >
+        <!-- Add User Button -->
+        @if (selectedRoleFilter() !== 'blacklisted') {
+          <button
+            type="button"
+            (click)="openAddModal()"
+            class="px-3.5 py-1.5 bg-primary hover:bg-navy text-white text-xs font-semibold rounded-lg shadow-xs transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Add User</span>
+          </button>
+        }
       </app-page-header>
 
       <!-- Role Filters -->
       @if (selectedRoleFilter() !== 'blacklisted') {
         <app-role-filter-bar
-          [options]="roleFilterOptions"
+          [options]="roleFilterOptions()"
           [selected]="selectedRoleFilter()"
           (selectedChange)="selectedRoleFilter.set($event)"
         />
@@ -130,7 +119,7 @@ export type { UserManagementItem };
 
       <!-- Custom Template for Role Type -->
       <ng-template #roleTypeTemplate let-item>
-        <span class="text-[13px] font-medium text-slate-700">{{ roleTypeLabel(item.roleType) }}</span>
+        <span class="text-[13px] font-normal text-slate-700">{{ roleTypeLabel(item.roleType) }}</span>
       </ng-template>
 
       <!-- Custom Template for Scheme Status -->
@@ -162,6 +151,11 @@ export type { UserManagementItem };
         [editing]="!!editingId()"
         [formData]="formData()"
         [submitted]="submitted()"
+        [roleTypeOptions]="roleTypeOptions()"
+        [districtOptions]="districtOptions()"
+        [districtMasterItems]="districtMasterItems()"
+        [schemeOptions]="schemeOptions()"
+        [designationOptions]="designationOptions()"
         (save)="submitUser()"
         (cancelled)="closeModal()"
       />
@@ -189,8 +183,6 @@ export class UserManagementComponent {
   selectedViewUser = signal<UserManagementItem | null>(null);
   submitted = signal<boolean>(false);
 
-  readonly roleFilterOptions = ROLE_FILTER_OPTIONS;
-
   roleTypeLabel = roleTypeLabel;
   isTrainingPartner = isTrainingPartner;
 
@@ -198,13 +190,37 @@ export class UserManagementComponent {
 
   private dataEngine = inject(DataEngineService);
   private userRepo = this.dataEngine.for<UserManagementItem>('USERS');
+  private roleRepo = this.dataEngine.for<UserRoleMasterItem>('USER_ROLES');
+  private districtRepo = this.dataEngine.for<DistrictBlockMasterItem>('DISTRICTS');
+  private schemeRepo = this.dataEngine.for<SchemeMasterItem>('SCHEME_MASTERS');
+  private designationRepo = this.dataEngine.for<DesignationMasterItem>('DESIGNATIONS');
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
 
   users = signal<UserManagementItem[]>([]);
+  userRoles = signal<UserRoleMasterItem[]>([]);
+  districtMasterItems = signal<DistrictBlockMasterItem[]>([]);
+  schemeMasterItems = signal<SchemeMasterItem[]>([]);
+  designationMasterItems = signal<DesignationMasterItem[]>([]);
 
   constructor() {
     this.userRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => this.users.set(list));
+    this.roleRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => {
+      const active = list.filter(r => r.status !== 'Inactive');
+      this.userRoles.set(active.length > 0 ? active : list);
+    });
+    this.districtRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => {
+      const active = list.filter(d => d.status !== 'Inactive');
+      this.districtMasterItems.set(active.length > 0 ? active : list);
+    });
+    this.schemeRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => {
+      const active = list.filter(s => s.status !== 'Inactive');
+      this.schemeMasterItems.set(active.length > 0 ? active : list);
+    });
+    this.designationRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => {
+      const active = list.filter(d => d.status !== 'Inactive');
+      this.designationMasterItems.set(active.length > 0 ? active : list);
+    });
 
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       if (params['filter'] === 'blacklisted') {
@@ -214,6 +230,48 @@ export class UserManagementComponent {
       }
     });
   }
+
+  readonly designationOptions = computed(() => {
+    const names = this.designationMasterItems().map(d => d.designationName).filter(Boolean);
+    return Array.from(new Set(names));
+  });
+
+  readonly schemeOptions = computed(() => {
+    const schemes = this.schemeMasterItems().map(s => s.schemeName).filter(Boolean);
+    const unique = Array.from(new Set(schemes));
+    return unique.length > 0
+      ? unique
+      : [
+          'Vishwakarma Yuva Udyami Protsahan Yojana',
+          'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+          'Mukhyamantri Yuva Sambal Yojana',
+          'Mukhya Mantri Yuva Kaushal Yojana'
+        ];
+  });
+
+  readonly roleTypeOptions = computed(() => {
+    const roles = this.userRoles().map(r => r.roleTypeName).filter(Boolean);
+    const unique = Array.from(new Set(roles));
+    return unique.length > 0
+      ? unique
+      : ['Super Admin', 'Department Officer', 'Scrutiny Officer', 'Training Partner'];
+  });
+
+  readonly districtOptions = computed(() => {
+    const districts = this.districtMasterItems().map(d => d.districtName).filter(Boolean);
+    const unique = Array.from(new Set(districts));
+    return unique.length > 0
+      ? unique
+      : ['Jaipur', 'Jodhpur', 'Udaipur', 'Ajmer', 'Kota'];
+  });
+
+  readonly roleFilterOptions = computed(() => {
+    const options: Array<{ value: string; label: string }> = [{ value: 'all', label: 'All' }];
+    this.roleTypeOptions().forEach(role => {
+      options.push({ value: role.toLowerCase(), label: role });
+    });
+    return options;
+  });
 
   readonly filteredUsers = computed(() =>
     filterUsers(this.users(), this.selectedRoleFilter(), this.searchQuery())
@@ -267,7 +325,7 @@ export class UserManagementComponent {
     {
       key: 'username',
       label: 'Username',
-      cellClass: 'whitespace-nowrap font-semibold text-slate-800'
+      cellClass: 'whitespace-nowrap font-normal text-slate-800'
     },
     {
       key: 'ssoId',

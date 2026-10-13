@@ -1,175 +1,100 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { SchemeFormState } from '../scheme-form.state';
+import { EoiDocumentItem } from '../scheme-form.model';
+import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from './step3-document-rules';
 
 /** Step 3: upload the 16 proposal documents. */
 @Component({
   selector: 'app-step3-upload-documents',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass],
   host: { class: 'block' },
   template: `
-    <div class="space-y-6 font-sans">
-      
-      <div class="bg-white border border-slate-200 rounded-xl p-5 sm:p-8 shadow-xs font-sans space-y-6">
-        
-        <!-- Header Strip with "Attach All Mandated Annexures" -->
-        <div class="flex items-start sm:items-center justify-between flex-col sm:flex-row gap-4 pb-4 border-b border-slate-100">
-          <div>
-            <h3 class="text-base sm:text-lg font-bold text-navy tracking-tight">
-              Mandatory EOI Proposal Documents Checklist (16 Documents)
-            </h3>
-            <p class="text-xs text-slate-500 mt-1">
-              Separated into Mandatory Statutory Documents, Official Scheme Annexures, and Supporting Documents.
-            </p>
+    <div class="space-y-5 font-sans">
+
+      <!-- Documents section block -->
+      <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+        <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2.5">
+            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy text-xs font-bold flex items-center justify-center shrink-0">1</span>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Proposal Documents</h2>
           </div>
-
-          <button
-            type="button"
-            (click)="state.attachAllSampleDocs()"
-            class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 hover:text-slate-900 rounded-lg text-xs font-semibold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
-          >
-            <span>Attach All Mandated Annexures</span>
-          </button>
+          <span class="text-[11.5px] font-medium text-slate-500 shrink-0">
+            {{ state.attachedDocsCount() }} / {{ state.eoiDocuments().length }} uploaded
+          </span>
         </div>
 
-        <!-- Filter Tabs matching user screenshot -->
-        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 text-xs">
-          
-          <button
-            type="button"
-            (click)="state.selectedDocTab.set('all')"
-            class="px-3.5 py-1.5 rounded-lg font-semibold transition-all cursor-pointer shrink-0"
-            [ngClass]="state.selectedDocTab() === 'all' ? 'bg-navy text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-          >
-            All Documents (16)
-          </button>
+        <div class="divide-y divide-slate-100">
+          @for (doc of state.eoiDocuments(); track doc.id) {
+            <div class="px-4 sm:px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 
-          <button
-            type="button"
-            (click)="state.selectedDocTab.set('mandatory')"
-            class="px-3.5 py-1.5 rounded-lg font-semibold transition-all cursor-pointer shrink-0 flex items-center gap-1.5"
-            [ngClass]="state.selectedDocTab() === 'mandatory' ? 'bg-navy text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-          >
-            <span>1. Mandatory Statutory Documents</span>
-            <span class="text-[10px] px-1.5 py-0.2 rounded" [ngClass]="state.selectedDocTab() === 'mandatory' ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-700 font-bold'">
-              {{ state.mandatoryAttachedCount() }}/6
-            </span>
-          </button>
-
-          <button
-            type="button"
-            (click)="state.selectedDocTab.set('annexure')"
-            class="px-3.5 py-1.5 rounded-lg font-semibold transition-all cursor-pointer shrink-0 flex items-center gap-1.5"
-            [ngClass]="state.selectedDocTab() === 'annexure' ? 'bg-navy text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-          >
-            <span>2. Scheme Annexures</span>
-            <span class="text-[10px] px-1.5 py-0.2 rounded" [ngClass]="state.selectedDocTab() === 'annexure' ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-700 font-bold'">
-              {{ state.annexureAttachedCount() }}/8
-            </span>
-          </button>
-
-          <button
-            type="button"
-            (click)="state.selectedDocTab.set('remaining')"
-            class="px-3.5 py-1.5 rounded-lg font-semibold transition-all cursor-pointer shrink-0 flex items-center gap-1.5"
-            [ngClass]="state.selectedDocTab() === 'remaining' ? 'bg-navy text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-          >
-            <span>3. Remaining Documents</span>
-            <span class="text-[10px] px-1.5 py-0.2 rounded" [ngClass]="state.selectedDocTab() === 'remaining' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700 font-bold'">
-              {{ state.remainingAttachedCount() }}/2
-            </span>
-          </button>
-
-        </div>
-
-        <!-- 16 Document Cards Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3.5 pt-2">
-          @for (doc of state.filteredDocuments(); track doc.id) {
-            <div class="p-3.5 sm:p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all flex items-center justify-between gap-3 text-xs">
-              
-              <!-- Left: Number badge, title, tag, status -->
+              <!-- Left: number, name, requirement hint, file info -->
               <div class="flex items-start gap-3 min-w-0">
-                
-                <!-- Number Badge -->
-                <span
-                  class="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5"
-                  [ngClass]="{
-                    'bg-rose-100 text-rose-700 border border-rose-200': doc.category === 'mandatory',
-                    'bg-sky-100 text-sky-700 border border-sky-200': doc.category === 'annexure',
-                    'bg-slate-100 text-slate-700 border border-slate-200': doc.category === 'remaining'
-                  }"
-                >
+                <span class="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
                   {{ doc.id }}
                 </span>
 
-                <!-- Name & Status -->
                 <div class="min-w-0">
-                  <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="font-bold text-slate-800 text-xs sm:text-[12.5px] leading-tight">
-                      {{ doc.name }}
-                    </span>
-                    
-                    <!-- Tag Pill -->
-                    @if (doc.category === 'mandatory') {
-                      <span class="text-[10px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-100">
-                        Mandatory
-                      </span>
-                    } @else if (doc.category === 'annexure') {
-                      <span class="text-[10px] font-bold text-sky-700 bg-sky-50 px-1.5 py-0.2 rounded border border-sky-100">
-                        Annexure
-                      </span>
-                    } @else {
-                      <span class="text-[10px] font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.2 rounded">
-                        Supporting
-                      </span>
-                    }
+                  <div class="text-[12.5px] font-medium text-slate-900 leading-tight">
+                    {{ doc.name }}@if (doc.isMandatory) { <span class="text-red-600 font-bold"> *</span> }
+                  </div>
+
+                  <div class="text-[11.5px] text-slate-500 mt-0.5">
+                    Supported: {{ formatLabel }} &nbsp;|&nbsp; Max size: {{ maxSizeMb }} MB
                   </div>
 
                   @if (doc.status === 'uploaded' && doc.fileName) {
-                    <span class="text-[11px] font-mono text-slate-600 block mt-1 truncate" title="{{ doc.fileName }} ({{ doc.fileSize }})">
+                    <span class="text-[11.5px] font-mono text-slate-600 block mt-1 truncate" title="{{ doc.fileName }} ({{ doc.fileSize }})">
                       {{ doc.fileName }} ({{ doc.fileSize }})
                     </span>
                   }
-                </div>
 
+                  @if (errors()[doc.id]) {
+                    <p class="text-[11.5px] text-red-600 m-0 mt-1" role="alert">{{ errors()[doc.id] }}</p>
+                  }
+                </div>
               </div>
 
-              <!-- Right Action Button -->
-              <div class="flex items-center gap-1.5 shrink-0">
+              <!-- Right: actions -->
+              <div class="flex items-center gap-1.5 shrink-0 sm:ml-0 ml-9">
                 @if (doc.status === 'pending') {
-                  <label class="px-3.5 py-1.5 bg-navy hover:bg-navy-dark text-white rounded-lg text-xs font-semibold cursor-pointer shadow-xs transition-colors flex items-center gap-1">
-                    <span>Upload PDF</span>
-                    <input type="file" (change)="state.onFileSelected($event, doc)" class="hidden" accept=".pdf" />
+                  <label class="px-3.5 py-1.5 bg-navy hover:bg-[#07243c] text-white rounded-lg text-xs font-semibold cursor-pointer shadow-xs active:scale-95 transition-all flex items-center gap-1">
+                    <span>Upload</span>
+                    <input type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
                   </label>
                 } @else {
                   <button
                     type="button"
                     (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)"
-                    class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-medium cursor-pointer"
+                    class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-medium cursor-pointer transition-colors"
                   >
                     View
                   </button>
-                  <label class="px-2.5 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 text-ocean rounded-md text-xs font-medium cursor-pointer">
+                  <label class="px-2.5 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 text-ocean rounded-md text-xs font-medium cursor-pointer transition-colors">
                     Replace
-                    <input type="file" (change)="state.onFileSelected($event, doc)" class="hidden" accept=".pdf" />
+                    <input type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
                   </label>
+                  <button
+                    type="button"
+                    (click)="onRemove(doc)"
+                    class="px-2.5 py-1.5 bg-white hover:bg-red-50 border border-red-200 text-red-600 rounded-md text-xs font-medium cursor-pointer transition-colors"
+                  >
+                    Remove
+                  </button>
                 }
               </div>
 
             </div>
           }
         </div>
-
-      </div>
+      </section>
 
       <!-- Footer Action Bar -->
-      <div class="flex items-center justify-between pt-3 border-t border-slate-200 flex-wrap gap-3">
+      <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
         <button
           type="button"
           (click)="state.goToStep(2)"
-          class="px-5 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold cursor-pointer"
+          class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
         >
           &larr; Back to OTR Profile
         </button>
@@ -177,7 +102,7 @@ import { SchemeFormState } from '../scheme-form.state';
         <button
           type="button"
           (click)="state.goToStep(4)"
-          class="px-6 py-2.5 bg-navy hover:bg-navy-dark text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer"
+          class="px-6 sm:px-7 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
         >
           Proceed to Complete Preview &rarr;
         </button>
@@ -188,4 +113,49 @@ import { SchemeFormState } from '../scheme-form.state';
 })
 export class Step3UploadDocumentsComponent {
   protected readonly state = inject(SchemeFormState);
+
+  protected readonly accept = DOC_ACCEPT;
+  protected readonly formatLabel = DOC_FORMAT_LABEL;
+  protected readonly maxSizeMb = DOC_MAX_SIZE_MB;
+
+  /** Inline validation messages keyed by document id. */
+  protected readonly errors = signal<Record<number, string>>({});
+
+  /** Validates the picked file (type and size), then delegates to the shared upload handler. */
+  protected onFileChange(event: Event, doc: EoiDocumentItem): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    const error = validateDocFile(file);
+    if (error) {
+      this.setError(doc.id, error);
+      input.value = '';
+      return;
+    }
+
+    this.setError(doc.id, null);
+    this.state.onFileSelected(event, doc);
+  }
+
+  /** Clears the attached file; the list is re-emitted because the state handler mutates in place. */
+  protected onRemove(doc: EoiDocumentItem): void {
+    this.state.removeSchemeDoc(doc);
+    this.state.eoiDocuments.update(docs => [...docs]);
+    this.setError(doc.id, null);
+  }
+
+  private setError(id: number, message: string | null): void {
+    this.errors.update(current => {
+      const next = { ...current };
+      if (message) {
+        next[id] = message;
+      } else {
+        delete next[id];
+      }
+      return next;
+    });
+  }
 }

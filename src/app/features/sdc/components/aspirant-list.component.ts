@@ -28,13 +28,17 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         <!-- Page Header -->
         <app-page-header
           title="Aspirants Management"
+          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Aspirants Management' }]"
+          [searchable]="true"
+          [(searchQuery)]="searchQuery"
+          searchPlaceholder="Search Aspirant ID, Name, Aadhaar, SDC, Batch..."
         >
           <div class="flex items-center gap-2">
             <!-- Export CSV Button -->
             <button
               type="button"
               (click)="exportToCsv()"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer select-none"
+              class="inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer select-none"
               title="Export roster to CSV"
             >
               <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -133,8 +137,8 @@ import { TableColumn } from '../../../shared/components/table/table.types';
 
           </div>
 
-          <!-- Row 2: Status Quick Filter Pills + Search Input -->
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 border-t border-slate-200">
+          <!-- Row 2: Status Quick Filter Pills -->
+          <div class="flex items-center justify-between gap-3 pt-2 border-t border-slate-200">
             
             <!-- Quick Category/Filter Pills -->
             <div class="flex items-center gap-1.5 flex-wrap">
@@ -166,43 +170,6 @@ import { TableColumn } from '../../../shared/components/table/table.types';
               }
             </div>
 
-            <!-- Search Input & Working Search Button -->
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-              <div class="relative w-full sm:w-72">
-                <svg class="w-3.5 h-3.5 text-[#7A8792] absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input
-                  type="text"
-                  [ngModel]="searchQuery()"
-                  (ngModelChange)="onSearchInput($event)"
-                  (keyup.enter)="applySearch()"
-                  placeholder="Search Aspirant ID, Name, Aadhaar, SDC, Batch..."
-                  class="w-full pl-8 pr-7 py-1.5 text-[13px] bg-white border border-border rounded-[4px] text-[#1F2933] placeholder:text-[#7A8792] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors font-normal"
-                />
-                @if (searchQuery()) {
-                  <button
-                    type="button"
-                    (click)="clearSearch()"
-                    class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs"
-                  >
-                    &times;
-                  </button>
-                }
-              </div>
-              <button
-                type="button"
-                (click)="applySearch()"
-                class="px-3.5 py-1.5 rounded-[4px] bg-primary hover:bg-primary-dark active:scale-95 text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
-                title="Search Aspirants"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <span>Search</span>
-              </button>
-            </div>
-
           </div>
 
         </div>
@@ -230,8 +197,8 @@ import { TableColumn } from '../../../shared/components/table/table.types';
 
         <!-- Template: Aspirant ID & Reg Date -->
         <ng-template #aspirantInfoTemplate let-a>
-          <div class="font-mono text-xs whitespace-nowrap">
-            <a [routerLink]="['/aspirants', a.id]" class="font-bold text-brand hover:underline block cursor-pointer whitespace-nowrap" title="View details of {{ a.aspirantName }}">{{ a.id }}</a>
+          <div class="font-mono text-[13px] whitespace-nowrap">
+            <a [routerLink]="['/aspirants', a.id]" class="font-normal text-brand hover:underline block cursor-pointer whitespace-nowrap" title="View details of {{ a.aspirantName }}">{{ a.id }}</a>
             <span class="text-[11px] text-slate-500 font-normal block mt-0.5 whitespace-nowrap">Enrolled: {{ a.enrollmentDate }}</span>
           </div>
         </ng-template>
@@ -239,17 +206,17 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         <!-- Template: Candidate Details (Name, Father/Relation Name, Age/Gender, Category) -->
         <ng-template #candidateTemplate let-a>
           <div class="py-1 min-w-0">
-            <a [routerLink]="['/aspirants', a.id]" class="font-bold text-slate-900 hover:text-brand hover:underline text-[13px] leading-snug block cursor-pointer" title="View details of {{ a.aspirantName }}">
+            <a [routerLink]="['/aspirants', a.id]" class="font-normal text-slate-800 hover:text-brand hover:underline text-[13px] leading-snug block cursor-pointer" title="View details of {{ a.aspirantName }}">
               {{ a.aspirantName }}
             </a>
             <div class="text-[11px] text-slate-500 leading-tight mt-0.5">
-              <span class="text-slate-400 font-medium">{{ a.relationType || 'Father' }}:</span>
+              <span class="text-slate-400 font-normal">{{ a.relationType || 'Father' }}:</span>
               <span class="text-slate-700 font-normal ml-1">{{ a.relationName }}</span>
             </div>
             <div class="flex items-center gap-1.5 mt-1">
-              <span class="text-[10.5px] text-slate-500 font-medium">{{ a.gender }}, {{ a.age }} yrs</span>
+              <span class="text-[10.5px] text-slate-500 font-normal">{{ a.gender }}, {{ a.age }} yrs</span>
               <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-              <span class="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+              <span class="px-1.5 py-0.2 rounded text-[9.5px] font-normal bg-slate-100 text-slate-700 border border-slate-200">
                 {{ a.category }}
               </span>
             </div>
@@ -258,8 +225,8 @@ import { TableColumn } from '../../../shared/components/table/table.types';
 
         <!-- Template: Identity & Contact (Aadhaar Masked, Mobile, Email) -->
         <ng-template #identityTemplate let-a>
-          <div class="text-xs space-y-0.5">
-            <div class="flex items-center gap-1 font-mono text-slate-900 font-semibold">
+          <div class="text-[13px] space-y-0.5">
+            <div class="flex items-center gap-1 font-mono text-slate-800 font-normal">
               <svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
               </svg>
@@ -279,13 +246,13 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         <!-- Template: SDC Center (Prompt: "and also all the sdc can be seen") -->
         <ng-template #sdcCenterTemplate let-a>
           <div class="min-w-[150px]">
-            <div class="font-semibold text-slate-900 text-xs leading-snug">
+            <div class="font-normal text-slate-800 text-[13px] leading-snug">
               {{ a.sdcName }}
             </div>
             <div class="flex items-center gap-1.5 mt-0.5">
-              <span class="text-[10.5px] font-mono text-slate-900 font-bold">{{ a.sdcCode }}</span>
+              <span class="text-[10.5px] font-mono text-slate-700 font-normal">{{ a.sdcCode }}</span>
               <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-              <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
+              <span class="px-1.5 py-0.2 rounded text-[10px] font-normal bg-slate-100 text-slate-600 border border-slate-200">
                 {{ a.sdcDistrict }}
               </span>
             </div>
@@ -296,12 +263,12 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         <ng-template #batchCourseTemplate let-a>
           <div class="min-w-[150px]">
             <div class="flex items-center gap-1.5">
-              <span class="font-mono font-bold text-xs text-slate-900">
+              <span class="font-mono font-normal text-[13px] text-slate-800">
                 {{ a.batchCode }}
               </span>
               <span class="text-[11px] text-slate-500 truncate">{{ a.sector }}</span>
             </div>
-            <div class="font-medium text-slate-800 text-xs mt-1 leading-snug">
+            <div class="font-normal text-slate-800 text-[13px] mt-1 leading-snug">
               {{ a.courseName }}
             </div>
           </div>
@@ -310,7 +277,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         <!-- Template: Scheme (All schemes black same) -->
         <ng-template #schemeTemplate let-a>
           <div class="text-center">
-            <span class="font-bold text-xs tracking-wider uppercase text-slate-900">
+            <span class="font-normal text-[13px] tracking-wider uppercase text-slate-800">
               {{ a.scheme }}
             </span>
           </div>
@@ -320,15 +287,15 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         <ng-template #statusTemplate let-a>
           <div class="text-center">
             @if (a.trainingStatus === 'IN_TRAINING') {
-              <span class="font-bold text-xs text-sky-700 tracking-wider uppercase">
+              <span class="font-normal text-[13px] text-sky-700 tracking-wider uppercase">
                 IN TRAINING
               </span>
             } @else if (a.trainingStatus === 'CERTIFIED') {
-              <span class="font-bold text-xs text-emerald-700 tracking-wider uppercase">
+              <span class="font-normal text-[13px] text-emerald-700 tracking-wider uppercase">
                 CERTIFIED
               </span>
             } @else {
-              <span class="font-bold text-xs text-slate-600 tracking-wider uppercase">
+              <span class="font-normal text-[13px] text-slate-600 tracking-wider uppercase">
                 ENROLLED
               </span>
             }

@@ -27,12 +27,12 @@ export interface SchemeReceiptData {
 @Injectable({ providedIn: 'root' })
 export class SchemeFormReceiptsService {
   downloadProcessingFeeReceipt(data: SchemeReceiptData): void {
-    const filename = `Processing_Fee_Receipt_GRN-RAJ-2026-981240.html`;
+    const filename = `Processing_Fee_Receipt.html`;
     const htmlContent = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Cyber Treasury Rajasthan - Processing Fee e-Challan Receipt</title>
+  <title>Processing Fee Receipt</title>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 25px; color: #1e293b; background: #fff; line-height: 1.4; font-size: 12px; }
     @media print { body { padding: 0; } @page { size: A4; margin: 12mm; } .no-print { display: none !important; } }
@@ -52,23 +52,23 @@ export class SchemeFormReceiptsService {
   </div>
 
   <div class="header-box">
-    <div class="gov-title">Government of Rajasthan &bull; Finance Department</div>
-    <div class="main-title">e-GRAS Cyber Treasury Official Processing Fee Receipt</div>
+    <div class="gov-title">Government of Rajasthan &bull; RSLDC</div>
+    <div class="main-title">Processing Fee Payment Receipt</div>
     <div style="font-size: 11px; color: #475569; margin-top: 4px;">Integrated Scheme Management System (ISMS 2.0) &bull; RSLDC Tender Application</div>
   </div>
 
   <table>
-    <tr><td style="width: 25%; font-weight: bold; background: #f8fafc;">GRN Number</td><td style="font-family: monospace; font-weight: bold;">GRN-RAJ-2026-981240</td><td style="width: 25%; font-weight: bold; background: #f8fafc;">Transaction Date</td><td>${data.procFeeDate} 20:25:10 IST</td></tr>
-    <tr><td style="font-weight: bold; background: #f8fafc;">Remitter Name</td><td>${data.org.fullName}</td><td style="font-weight: bold; background: #f8fafc;">CIN / PAN</td><td style="font-family: monospace;">${data.org.registrationNumber} / ${data.org.companyPan}</td></tr>
-    <tr><td style="font-weight: bold; background: #f8fafc;">Department</td><td>Rajasthan Skill &amp; Livelihoods Dev. Corp.</td><td style="font-weight: bold; background: #f8fafc;">Scheme Ref</td><td style="font-family: monospace;">${data.schemeRefNo}</td></tr>
-    <tr><td style="font-weight: bold; background: #f8fafc;">Bank / Mode</td><td>${data.procPaymentModeLabel}</td><td style="font-weight: bold; background: #f8fafc;">Payment Status</td><td style="font-weight: bold; color: #15803d;">SUCCESS / SETTLED</td></tr>
+    <tr><td style="width: 25%; font-weight: bold; background: #f8fafc;">Transaction ID</td><td style="font-family: monospace; font-weight: bold;">CIN-SBI-9912081</td><td style="width: 25%; font-weight: bold; background: #f8fafc;">Paid On</td><td>${data.procFeeDate}</td></tr>
+    <tr><td style="font-weight: bold; background: #f8fafc;">Paid By</td><td>${data.org.fullName}</td><td style="font-weight: bold; background: #f8fafc;">CIN / PAN</td><td style="font-family: monospace;">${data.org.registrationNumber} / ${data.org.companyPan}</td></tr>
+    <tr><td style="font-weight: bold; background: #f8fafc;">Payable To</td><td>Rajasthan Skill &amp; Livelihoods Development Corporation (RSLDC)</td><td style="font-weight: bold; background: #f8fafc;">Scheme Ref</td><td style="font-family: monospace;">${data.schemeRefNo}</td></tr>
+    <tr><td style="font-weight: bold; background: #f8fafc;">Payment Status</td><td colspan="3" style="font-weight: bold; color: #15803d;">PAID</td></tr>
   </table>
 
   <table>
-    <thead><tr><th>S.No</th><th>Account Head</th><th>Purpose / Description</th><th style="text-align: right;">Amount (₹)</th></tr></thead>
+    <thead><tr><th>S.No</th><th>Description</th><th style="text-align: right;">Amount (₹)</th></tr></thead>
     <tbody>
-      <tr><td style="text-align: center;">1</td><td style="font-family: monospace;">0070-60-800-01-00</td><td>EOI RFP Tender Processing Fee (Non-Refundable)</td><td style="text-align: right; font-weight: bold;">${data.numericProcessFee.toFixed(2)}</td></tr>
-      <tr style="background: #f8fafc; font-weight: bold;"><td colspan="3" style="text-align: right;">Total Amount Paid (in words: ${data.processFeeInWords}):</td><td style="text-align: right; font-size: 13px; color: #0B3558;">${data.formattedProcessFee}</td></tr>
+      <tr><td style="text-align: center;">1</td><td>EOI Processing Fee (Non-Refundable)</td><td style="text-align: right; font-weight: bold;">${data.numericProcessFee.toFixed(2)}</td></tr>
+      <tr style="background: #f8fafc; font-weight: bold;"><td colspan="2" style="text-align: right;">Total Amount Paid (in words: ${data.processFeeInWords}):</td><td style="text-align: right; font-size: 13px; color: #0B3558;">${data.formattedProcessFee}</td></tr>
     </tbody>
   </table>
 
@@ -153,7 +153,7 @@ export class SchemeFormReceiptsService {
   }
 
   downloadEmdReceipt(data: SchemeReceiptData): void {
-    const filename = `EMD_Cyber_Treasury_Receipt_GRN-RAJ-2026-981241.html`;
+    const filename = `EMD_Receipt.html`;
     const emdSettledText = data.emdExempted ? '₹ 0.00 (MSME Exempted)' : data.formattedEmdFee;
     const emdNumText = data.emdExempted ? '0.00' : data.numericEmdFee.toFixed(2);
     const emdWords = data.emdExempted ? 'Zero (Exempted)' : data.emdFeeInWords;
@@ -162,7 +162,7 @@ export class SchemeFormReceiptsService {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Cyber Treasury Rajasthan - EMD Security Deposit e-Challan Receipt</title>
+  <title>EMD Payment Receipt</title>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 25px; color: #1e293b; background: #fff; line-height: 1.4; font-size: 12px; }
     @media print { body { padding: 0; } @page { size: A4; margin: 12mm; } .no-print { display: none !important; } }
@@ -182,23 +182,23 @@ export class SchemeFormReceiptsService {
   </div>
 
   <div class="header-box">
-    <div class="gov-title">Government of Rajasthan &bull; Finance Department</div>
-    <div class="main-title">e-GRAS Cyber Treasury Official EMD Security Deposit Receipt</div>
-    <div style="font-size: 11px; color: #475569; margin-top: 4px;">Integrated Scheme Management System (ISMS 2.0) &bull; RSLDC EOI Security Deposit</div>
+    <div class="gov-title">Government of Rajasthan &bull; RSLDC</div>
+    <div class="main-title">EMD Payment Receipt</div>
+    <div style="font-size: 11px; color: #475569; margin-top: 4px;">Integrated Scheme Management System (ISMS 2.0) &bull; RSLDC Tender Application</div>
   </div>
 
   <table>
-    <tr><td style="width: 25%; font-weight: bold; background: #f8fafc;">EMD GRN Number</td><td style="font-family: monospace; font-weight: bold;">GRN-RAJ-2026-981241</td><td style="width: 25%; font-weight: bold; background: #f8fafc;">Transaction Date</td><td>${data.submissionTimestamp}</td></tr>
-    <tr><td style="font-weight: bold; background: #f8fafc;">Remitter Name</td><td>${data.org.fullName}</td><td style="font-weight: bold; background: #f8fafc;">CIN / PAN</td><td style="font-family: monospace;">${data.org.registrationNumber} / ${data.org.companyPan}</td></tr>
-    <tr><td style="font-weight: bold; background: #f8fafc;">Department</td><td>Rajasthan Skill &amp; Livelihoods Dev. Corp.</td><td style="font-weight: bold; background: #f8fafc;">Tender Scheme</td><td>${data.schemeName} (${data.schemeRefNo})</td></tr>
-    <tr><td style="font-weight: bold; background: #f8fafc;">Bank CIN / Gateway Ref</td><td style="font-family: monospace;">CIN-HDFC-9912082</td><td style="font-weight: bold; background: #f8fafc;">Payment Status</td><td style="font-weight: bold; color: #15803d;">SUCCESS / SETTLED</td></tr>
+    <tr><td style="width: 25%; font-weight: bold; background: #f8fafc;">Payment Reference No.</td><td style="font-family: monospace; font-weight: bold;">${data.emdExempted ? 'Exempted' : 'CIN-SBI-9912082'}</td><td style="width: 25%; font-weight: bold; background: #f8fafc;">Paid On</td><td>${data.submissionTimestamp}</td></tr>
+    <tr><td style="font-weight: bold; background: #f8fafc;">Paid By</td><td>${data.org.fullName}</td><td style="font-weight: bold; background: #f8fafc;">CIN / PAN</td><td style="font-family: monospace;">${data.org.registrationNumber} / ${data.org.companyPan}</td></tr>
+    <tr><td style="font-weight: bold; background: #f8fafc;">Payable To</td><td>Rajasthan Skill &amp; Livelihoods Development Corporation (RSLDC)</td><td style="font-weight: bold; background: #f8fafc;">Scheme</td><td>${data.schemeName} (${data.schemeRefNo})</td></tr>
+    <tr><td style="font-weight: bold; background: #f8fafc;">Payment Status</td><td colspan="3" style="font-weight: bold; color: #15803d;">${data.emdExempted ? 'EXEMPTED' : 'PAID'}</td></tr>
   </table>
 
   <table>
-    <thead><tr><th>S.No</th><th>Account Head</th><th>Purpose / Description</th><th style="text-align: right;">Amount (₹)</th></tr></thead>
+    <thead><tr><th>S.No</th><th>Description</th><th style="text-align: right;">Amount (₹)</th></tr></thead>
     <tbody>
-      <tr><td style="text-align: center;">1</td><td style="font-family: monospace;">8443-00-103-00-00</td><td>Earnest Money Deposit - EMD (Refundable Security)</td><td style="text-align: right; font-weight: bold;">${emdNumText}</td></tr>
-      <tr style="background: #f8fafc; font-weight: bold;"><td colspan="3" style="text-align: right;">Total EMD Settled (in words: ${emdWords}):</td><td style="text-align: right; font-size: 13px; color: #0B3558;">${emdSettledText}</td></tr>
+      <tr><td style="text-align: center;">1</td><td>Earnest Money Deposit (Refundable)</td><td style="text-align: right; font-weight: bold;">${emdNumText}</td></tr>
+      <tr style="background: #f8fafc; font-weight: bold;"><td colspan="2" style="text-align: right;">Total EMD Paid (in words: ${emdWords}):</td><td style="text-align: right; font-size: 13px; color: #0B3558;">${emdSettledText}</td></tr>
     </tbody>
   </table>
 

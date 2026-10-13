@@ -38,7 +38,12 @@ export interface AspirantDocumentSelection {
           <!-- Avatar Preview with Double Click Trigger -->
           <div
             (dblclick)="photoInput.click()"
-            class="w-24 h-28 rounded-lg border-2 border-dashed border-slate-300 hover:border-blue-500 bg-slate-50 flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden shrink-0 group relative shadow-2xs"
+            class="w-24 h-28 rounded-lg border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden shrink-0 group relative shadow-2xs"
+            [class.border-red-500]="!!photoError() && !formData().candidatePhotoUrl"
+            [class.bg-red-50/20]="!!photoError() && !formData().candidatePhotoUrl"
+            [class.border-slate-300]="!photoError() || !!formData().candidatePhotoUrl"
+            [class.bg-slate-50]="!photoError() || !!formData().candidatePhotoUrl"
+            [class.hover:border-blue-500]="!photoError() || !!formData().candidatePhotoUrl"
             title="Double click to Upload Image"
           >
             @if (formData().candidatePhotoUrl) {
@@ -70,6 +75,13 @@ export interface AspirantDocumentSelection {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                   </svg>
                   <span>Uploaded • {{ formData().candidatePhotoName || 'Candidate_Photo.jpg' }}</span>
+                </div>
+              } @else if (photoError()) {
+                <div class="form-error-text text-rose-600 font-medium flex items-center gap-1 pt-1 justify-center sm:justify-start leading-tight" style="font-size: 11px !important;">
+                  <svg class="shrink-0 text-rose-600" style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                  <span>{{ photoError() }}</span>
                 </div>
               }
             </div>
@@ -133,6 +145,7 @@ export interface AspirantDocumentSelection {
               [index]="idx"
               (viewDocument)="viewDocument.emit(doc)"
               (fileSelected)="documentSelected.emit({ doc, event: $event })"
+              (removeDocument)="documentRemoved.emit(doc)"
             ></app-aspirant-document-upload-row>
           }
         </div>
@@ -146,9 +159,11 @@ export interface AspirantDocumentSelection {
 })
 export class AspirantPhotoDocumentsStepComponent {
   readonly formData = input.required<AspirantFormData>();
+  readonly photoError = input<string>('');
 
   readonly viewPhoto = output<void>();
   readonly photoSelected = output<Event>();
   readonly viewDocument = output<AspirantDocumentItem>();
   readonly documentSelected = output<AspirantDocumentSelection>();
+  readonly documentRemoved = output<AspirantDocumentItem>();
 }

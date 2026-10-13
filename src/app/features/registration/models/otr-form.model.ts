@@ -37,6 +37,8 @@ export interface Step1OrgDetails {
   turnoverCertDoc: FileDoc | null;      // NEW: CA-certified turnover certificate
   blackListed: 'Yes' | 'No';
   nsdcPartner: string;
+  /** Sector the organisation prefers to train in (a Sector Master name). */
+  preferredSector: string;
   contactNo: string;
   emailId: string;
   website: string;
@@ -69,6 +71,8 @@ export interface OfficerInCharge {
 }
 
 export interface Step3AuthorizedPerson {
+  firstName?: string;
+  lastName?: string;
   name: string;
   dob: string;
   age: string;
@@ -297,6 +301,7 @@ export function createInitialOtrFormData(): OtrFormData {
       turnoverCertDoc: null,
       blackListed: 'No',
       nsdcPartner: 'Not Applicable',
+      preferredSector: '',
       contactNo: '',
       emailId: '',
       website: '',
@@ -328,6 +333,8 @@ export function createInitialOtrFormData(): OtrFormData {
       }
     ],
     step3: {
+      firstName: '',
+      lastName: '',
       name: '',
       dob: '',
       age: '',
@@ -413,6 +420,7 @@ export function createExistingUserOtrData(): OtrFormData {
       },
       blackListed: 'No',
       nsdcPartner: 'Non-Funded Partner',
+      preferredSector: 'Electronics',
       contactNo: '0141-2700891',
       emailId: 'contact@skilltech.org',
       website: 'https://www.skilltech.org',
@@ -436,7 +444,7 @@ export function createExistingUserOtrData(): OtrFormData {
         pan: 'ABCPS1234K',
         aadhaarNo: '987654321098',
         bhamashahNo: 'BHM889210',
-        voterIdNo: 'RJ/14/098/123456',
+        voterIdNo: 'RJX1409812',
         passportNo: 'Z9876543',
         appointmentLetterDoc: {
           fileName: 'MD_Appointment_Letter.pdf',
@@ -461,7 +469,7 @@ export function createExistingUserOtrData(): OtrFormData {
         pan: 'ABQPV5678L',
         aadhaarNo: '876543210987',
         bhamashahNo: 'BHM441092',
-        voterIdNo: 'RJ/14/098/654321',
+        voterIdNo: 'RJX1409865',
         passportNo: '',
         appointmentLetterDoc: {
           fileName: 'Operations_Head_Order.pdf',
@@ -474,6 +482,8 @@ export function createExistingUserOtrData(): OtrFormData {
       }
     ],
     step3: {
+      firstName: 'Vikram',
+      lastName: 'Singh Mehta',
       name: 'Vikram Singh Mehta',
       dob: '1982-08-14',
       age: '44',
@@ -483,7 +493,7 @@ export function createExistingUserOtrData(): OtrFormData {
       mobileNo: '9829154321',
       aadhaarNo: '765432109876',
       bhamashahNo: 'BHM771209',
-      voterIdNo: 'RJ/14/098/987123',
+      voterIdNo: 'RJX1409871',
       passportNo: '',
       state: 'Rajasthan',
       residenceAddress: 'B-14, Malviya Nagar, Jaipur, Rajasthan - 302017',

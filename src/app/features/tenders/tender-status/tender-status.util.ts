@@ -59,6 +59,7 @@ export function filterTenders(tenders: SubmittedTender[], rawQuery: string): Sub
   return tenders.filter(t =>
     t.appRef.toLowerCase().includes(query) ||
     t.schemeTitle.toLowerCase().includes(query) ||
+    (t.schemeCategory && t.schemeCategory.toLowerCase().includes(query)) ||
     t.department.toLowerCase().includes(query) ||
     t.submittedStatus.toLowerCase().includes(query) ||
     t.eoiStatus.toLowerCase().includes(query) ||
@@ -105,4 +106,19 @@ export function applyOtrDocument(tender: SubmittedTender, docType: TenderOtrDocT
       tender.bankDetails.cancelledChequeDoc = fileDoc;
       break;
   }
+}
+
+/**
+ * Computes the total remitted / deposited fee by summing processing fee and EMD fee.
+ * Formats the result in Indian Rupee format, e.g. "₹ 52,000.00".
+ */
+export function calculateTotalFee(processingFee?: string, emdAmount?: string): string {
+  const parseNum = (val?: string): number => {
+    if (!val) return 0;
+    const cleaned = val.replace(/[^\d.]/g, '');
+    const n = parseFloat(cleaned);
+    return isNaN(n) ? 0 : n;
+  };
+  const total = parseNum(processingFee) + parseNum(emdAmount);
+  return `₹ ${total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }

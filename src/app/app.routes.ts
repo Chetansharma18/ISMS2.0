@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { DynamicFormBuilderComponent } from './features/dynamic-form-builder/dynamic-form-builder.component';
 
 export const routes: Routes = [
   {
@@ -53,6 +54,20 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'training-calendar',
+    loadComponent: () =>
+      import('./features/aspirant/pages/training-calendar.component').then(
+        (m) => m.TrainingCalendarComponent
+      )
+  },
+  {
+    path: 'expressed-interest',
+    loadComponent: () =>
+      import('./features/aspirant/pages/expressed-interest.component').then(
+        (m) => m.ExpressedInterestComponent
+      )
+  },
+  {
     path: 'grievance',
     loadComponent: () =>
       import('./features/grievance/grievance-list.component').then(
@@ -65,6 +80,23 @@ export const routes: Routes = [
       import('./features/tenders/tender-status.component').then(
         (m) => m.TenderStatusComponent
       )
+  },
+  {
+    path: 'payment-history',
+    loadComponent: () =>
+      import('./features/payment-history/payment-history.component').then(
+        (m) => m.PaymentHistoryComponent
+      )
+  },
+  {
+    path: 'history',
+    redirectTo: 'payment-history',
+    pathMatch: 'full'
+  },
+  {
+    path: 'transactions',
+    redirectTo: 'payment-history',
+    pathMatch: 'full'
   },
   {
     path: 'ipa',
@@ -121,6 +153,23 @@ export const routes: Routes = [
       import('./features/eoi/pages/sanction-order-list/sanction-order-list.component').then(
         (m) => m.SanctionOrderListComponent
       )
+  },
+  {
+    path: 'admin/ipa',
+    loadComponent: () =>
+      import('./features/eoi/pages/ipa-list/ipa-list.component').then((m) => m.IpaListComponent)
+  },
+  {
+    path: 'admin/ipa/:schemeId',
+    loadComponent: () =>
+      import('./features/eoi/pages/ipa-list/ipa-approved-tps.component').then(
+        (m) => m.IpaApprovedTpsComponent
+      )
+  },
+  {
+    path: 'admin/mou-draft/:schemeId',
+    loadComponent: () =>
+      import('./features/eoi/pages/mou/mou-draft.component').then((m) => m.MouDraftComponent)
   },
   {
     path: 'admin/eoi-sanction-editor/:schemeId',
@@ -200,6 +249,22 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/two-step-verification',
+    loadComponent: () =>
+      import('./features/two-step-verification/two-step-verification.component').then(
+        (m) => m.TwoStepVerificationComponent
+      )
+  },
+  {
+    path: 'admin/dynamic-form-builder',
+    component: DynamicFormBuilderComponent
+  },
+  {
+    path: 'dynamic-form-builder',
+    redirectTo: 'admin/dynamic-form-builder',
+    pathMatch: 'full'
+  },
+  {
     path: 'admin/master/eoi-category',
     loadComponent: () =>
       import('./features/admin-master/eoi-category-master.component').then(
@@ -211,6 +276,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/admin-master/scheme-master.component').then(
         (m) => m.SchemeMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/scheme-category',
+    loadComponent: () =>
+      import('./features/admin-master/scheme-category-master.component').then(
+        (m) => m.SchemeCategoryMasterComponent
       )
   },
   {
@@ -253,6 +325,27 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/admin-master/designation-master.component').then(
         (m) => m.DesignationMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/doc',
+    loadComponent: () =>
+      import('./features/admin-master/doc-master.component').then(
+        (m) => m.DocMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/remark',
+    loadComponent: () =>
+      import('./features/admin-master/remark-master.component').then(
+        (m) => m.RemarkMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/grading',
+    loadComponent: () =>
+      import('./features/admin-master/grading-master.component').then(
+        (m) => m.GradingMasterComponent
       )
   },
   {
@@ -384,9 +477,11 @@ export const routes: Routes = [
   },
   {
     path: 'tp/sanction-orders',
+    // Same table as the department's; the training partner can only view released orders.
+    data: { viewOnly: true },
     loadComponent: () =>
-      import('./features/sdc/components/sanction-orders.component').then(
-        (m) => m.SanctionOrdersComponent
+      import('./features/eoi/pages/sanction-order-list/sanction-order-list.component').then(
+        (m) => m.SanctionOrderListComponent
       )
   },
   {

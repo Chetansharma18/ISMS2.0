@@ -1,7 +1,10 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, computed, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
+import { EoiFormData, EoiRequiredInfoItem, EoiDocumentUpload } from '../tenders.models';
+import { SchemeMasterItem, DocMasterItem } from '../../../core/models/admin-masters.model';
+import { formatInr } from '../../../shared';
+import { formatBytes } from './tenders-page.util';
 
 /**
  * Body of the "Configure New EOI / Edit EOI" modal.
@@ -25,7 +28,13 @@ import { EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
         <input type="text" maxlength="100" [(ngModel)]="data().refNo" [ngClass]="{'border-red-500': submitted() && !data().refNo, 'border-field-border': !(submitted() && !data().refNo)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800" />
         
         <label class="text-slate-700 font-medium">Scheme*</label>
-        <select [(ngModel)]="data().scheme" [ngClass]="{'border-red-500': submitted() && !data().scheme, 'border-field-border': !(submitted() && !data().scheme)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white">
+        <select
+          [(ngModel)]="data().scheme"
+          (ngModelChange)="onSchemeChange($event)"
+          [ngClass]="{'border-red-500': submitted() && !data().scheme, 'border-field-border': !(submitted() && !data().scheme)}"
+          class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white"
+        >
+          <option value="" disabled [selected]="!data().scheme">-- Select Scheme --</option>
           @for (name of schemeNameOptions(); track name) {
             <option [value]="name">{{ name }}</option>
           }
@@ -33,6 +42,7 @@ import { EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
 
         <label class="text-slate-700 font-medium">Scheme Category</label>
         <select [(ngModel)]="data().schemeCategory" class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:border-primary text-slate-800 bg-white">
+          <option value="" [selected]="!data().schemeCategory">-- Select Scheme Category --</option>
           @for (cat of schemeCategoryOptions(); track cat) {
             <option [value]="cat">{{ cat }}</option>
           }
@@ -46,18 +56,20 @@ import { EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
 
         <label class="text-slate-700 font-medium">EOI Category*</label>
         <select [(ngModel)]="data().eoiCategory" [ngClass]="{'border-red-500': submitted() && !data().eoiCategory, 'border-field-border': !(submitted() && !data().eoiCategory)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white">
-          <option value="General">General</option>
-          <option value="Special">Special</option>
+          <option value="" disabled [selected]="!data().eoiCategory">-- Select EOI Category --</option>
+          @for (eoiCat of eoiCategoryOptions(); track eoiCat) {
+            <option [value]="eoiCat">{{ eoiCat }}</option>
+          }
         </select>
 
         <label class="text-slate-700 font-medium">EOI Description</label>
         <input type="text" maxlength="100" [(ngModel)]="data().description" class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800" />
 
         <label class="text-slate-700 font-medium">EMD Fee*</label>
-        <input type="text" maxlength="100" [(ngModel)]="data().emdFee" [ngClass]="{'border-red-500': submitted() && !data().emdFee, 'border-field-border': !(submitted() && !data().emdFee)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800" />
+        <input type="text" maxlength="100" [(ngModel)]="data().emdFee" [ngClass]="{'border-red-500': submitted() && !data().emdFee, 'border-field-border': !(submitted() && !data().emdFee)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800" />
 
         <label class="text-slate-700 font-medium">Process Fee*</label>
-        <input type="text" maxlength="100" [(ngModel)]="data().processFee" [ngClass]="{'border-red-500': submitted() && !data().processFee, 'border-field-border': !(submitted() && !data().processFee)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800" />
+        <input type="text" maxlength="100" [(ngModel)]="data().processFee" [ngClass]="{'border-red-500': submitted() && !data().processFee, 'border-field-border': !(submitted() && !data().processFee)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800" />
 
         <label class="text-slate-700 font-medium self-start pt-1">Attach File*</label>
         <div class="space-y-2 overflow-hidden w-full">
@@ -113,23 +125,103 @@ import { EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
         <!-- EOI Documents Section -->
         <div class="col-span-1 sm:col-span-2 mt-1 pt-2 border-t border-slate-200">
           <div class="flex items-center justify-between mb-2">
-            <h3 class="text-navy font-bold text-[13px] uppercase tracking-wide">EOI DOCUMENTS</h3>
-            <button type="button" (click)="addDocument.emit()" class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center hover:bg-navy transition-colors shadow-sm cursor-pointer" title="Add Document">
+            <div>
+              <h3 class="text-navy font-bold text-[13px] uppercase tracking-wide">EOI DOCUMENTS</h3>
+              <p class="text-[11px] text-slate-500 m-0">Required documents for proposal upload (Upload PDF, image, or TXT - max 25 MB)</p>
+            </div>
+            <button
+              type="button"
+              (click)="addDocument.emit()"
+              class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center hover:bg-navy transition-colors shadow-sm cursor-pointer"
+              title="Add Document"
+            >
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
               </svg>
             </button>
           </div>
+
+          @if (docFileError()) {
+            <div class="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-2.5 py-1.5 mb-2 font-medium">
+              {{ docFileError() }}
+            </div>
+          }
           
           @for (doc of data().documents; track $index) {
-            <div class="flex items-center gap-3 mb-2">
-              <select [(ngModel)]="data().documents[$index]" [ngClass]="{'border-red-500': submitted() && !data().documents[$index], 'border-field-border': !(submitted() && !data().documents[$index])}" class="flex-1 px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white shadow-sm">
-                <option value="">-- Select Document Required --</option>
-                @for (req of requiredInfo(); track req.sNo) {
-                  <option [value]="req.name">{{ req.name }}</option>
-                }
-              </select>
-              <button type="button" (click)="removeDocument.emit($index)" class="text-slate-400 hover:text-red-600 p-1.5 rounded hover:bg-red-50 transition-colors cursor-pointer" title="Remove">
+            <div class="flex items-center gap-2 mb-2 p-1.5 bg-slate-50 border border-slate-200 rounded-lg">
+              <span class="text-xs font-semibold text-slate-500 w-6 text-center shrink-0">{{ $index + 1 }}.</span>
+              <div class="flex-1 min-w-0">
+                <select
+                  [(ngModel)]="data().documents[$index]"
+                  [ngClass]="{'border-red-500': submitted() && !data().documents[$index], 'border-slate-300': !(submitted() && !data().documents[$index])}"
+                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white text-xs font-medium shadow-xs"
+                >
+                  <option value="">-- Select Document Required --</option>
+                  @for (docName of availableDocumentOptions(); track docName) {
+                    <option [value]="docName">{{ docName }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Upload Button / Uploaded File Status Pill -->
+              @if (!getUploadedDoc($index)) {
+                <label
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary hover:bg-navy text-white text-xs font-semibold cursor-pointer transition-colors whitespace-nowrap shrink-0 shadow-xs select-none active:scale-95"
+                  title="Upload PDF, image, or TXT file"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  <span>Upload</span>
+                  <input
+                    type="file"
+                    class="hidden"
+                    accept=".pdf,image/*,.jpg,.jpeg,.png,.webp,.txt"
+                    (change)="onDocFileUpload($index, $event)"
+                  />
+                </label>
+              } @else {
+                <div class="flex items-center gap-1.5 bg-emerald-50 border border-emerald-300 text-emerald-800 px-2 py-1 rounded text-xs shrink-0 max-w-[190px] sm:max-w-[220px]">
+                  <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div class="flex flex-col min-w-0 flex-1 leading-tight">
+                    <span class="truncate font-semibold text-[11px] text-emerald-900" [title]="getUploadedDoc($index)!.fileName">
+                      {{ getUploadedDoc($index)!.fileName }}
+                    </span>
+                    <span class="text-[9.5px] text-emerald-600 font-medium">{{ getUploadedDoc($index)!.size }}</span>
+                  </div>
+                  <label
+                    class="text-[10px] font-semibold text-emerald-700 hover:text-emerald-950 underline cursor-pointer ml-1 shrink-0 select-none"
+                    title="Change uploaded file"
+                  >
+                    Change
+                    <input
+                      type="file"
+                      class="hidden"
+                      accept=".pdf,image/*,.jpg,.jpeg,.png,.webp,.txt"
+                      (change)="onDocFileUpload($index, $event)"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    (click)="removeDocFile($index)"
+                    class="text-slate-400 hover:text-red-500 p-0.5 rounded cursor-pointer ml-0.5 shrink-0"
+                    title="Remove uploaded file"
+                  >
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              }
+
+              <button
+                type="button"
+                (click)="removeDocument.emit($index)"
+                class="text-slate-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors cursor-pointer shrink-0"
+                title="Remove Document"
+              >
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -138,7 +230,7 @@ import { EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
           }
           @if (data().documents.length === 0) {
             <div class="text-[12px] text-slate-500 italic py-3 text-center border border-dashed border-slate-300 rounded bg-slate-50/50">
-              No documents added. Click the + button to require a document.
+              Select a scheme above to automatically load required documents from Doc Master, or click + to add manually.
             </div>
           }
         </div>
@@ -154,11 +246,122 @@ export class ConfigureEoiFormComponent {
   readonly isEditing = input(false);
   readonly schemeNameOptions = input<string[]>([]);
   readonly schemeCategoryOptions = input<readonly string[]>([]);
+  readonly eoiCategoryOptions = input<readonly string[]>([]);
   readonly requiredInfo = input<EoiRequiredInfoItem[]>([]);
+  readonly schemeMasterItems = input<SchemeMasterItem[]>([]);
+  readonly docMasterItems = input<DocMasterItem[]>([]);
+
+  readonly schemeChange = output<string>();
 
   /** Open the "Upload Attachment" modal. */
   readonly attach = output<void>();
   readonly removeAttachment = output<number>();
   readonly addDocument = output<void>();
   readonly removeDocument = output<number>();
+
+  readonly availableDocumentOptions = computed(() => {
+    const set = new Set<string>();
+    // 1. Documents from Doc Master
+    this.docMasterItems().forEach(item => {
+      if (item.documents) {
+        item.documents.split(',').forEach(d => {
+          const trimmed = d.trim();
+          if (trimmed) set.add(trimmed);
+        });
+      }
+    });
+    // 2. Documents already in form
+    (this.data()?.documents || []).forEach(doc => {
+      if (doc?.trim()) set.add(doc.trim());
+    });
+    // 3. Fallback from requiredInfo
+    this.requiredInfo().forEach(req => {
+      if (req.name?.trim()) set.add(req.name.trim());
+    });
+    return Array.from(set);
+  });
+
+  readonly docFileError = signal<string>('');
+
+  getUploadedDoc(index: number): EoiDocumentUpload | undefined {
+    return this.data()?.documentFiles?.[index];
+  }
+
+  onDocFileUpload(index: number, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    const allowed = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'bmp', 'gif', 'svg', 'txt'];
+    const isImage = file.type.startsWith('image/');
+    if (!allowed.includes(ext) && !isImage && file.type !== 'text/plain') {
+      this.docFileError.set(`Invalid file format for "${file.name}". Please upload a PDF, image, or TXT file.`);
+      input.value = '';
+      return;
+    }
+
+    if (file.size > 25 * 1024 * 1024) {
+      this.docFileError.set(`File "${file.name}" exceeds the 25 MB limit.`);
+      input.value = '';
+      return;
+    }
+
+    this.docFileError.set('');
+    if (!this.data().documentFiles) {
+      this.data().documentFiles = {};
+    }
+    this.data().documentFiles![index] = {
+      name: this.data().documents[index] || file.name,
+      fileName: file.name,
+      size: formatBytes(file.size),
+      file: file
+    };
+
+    input.value = '';
+  }
+
+  removeDocFile(index: number): void {
+    if (this.data()?.documentFiles) {
+      delete this.data().documentFiles![index];
+    }
+  }
+
+  onSchemeChange(schemeName: string): void {
+    if (!schemeName) return;
+
+    // 1. Auto-fill EMD Fee, Process Fee & Scheme Category from Scheme Master
+    const schemeItem = this.schemeMasterItems().find(
+      s => s.schemeName?.trim().toLowerCase() === schemeName.trim().toLowerCase()
+    );
+    if (schemeItem) {
+      if (schemeItem.amount != null) {
+        this.data().emdFee = formatInr(schemeItem.amount);
+      }
+      if (schemeItem.processFees != null) {
+        this.data().processFee = formatInr(schemeItem.processFees);
+      }
+      if (schemeItem.schemeCategory) {
+        this.data().schemeCategory = schemeItem.schemeCategory;
+      }
+    }
+
+    // 2. Auto-fill required documents from Doc Master
+    const docItem = this.docMasterItems().find(
+      d => d.schemeName?.trim().toLowerCase() === schemeName.trim().toLowerCase()
+    );
+    if (docItem && docItem.documents) {
+      const docs = docItem.documents
+        .split(',')
+        .map(d => d.trim())
+        .filter(Boolean);
+      if (docs.length > 0) {
+        this.data().documents = [...docs];
+        this.data().documentFiles = {};
+        this.docFileError.set('');
+      }
+    }
+
+    this.schemeChange.emit(schemeName);
+  }
 }

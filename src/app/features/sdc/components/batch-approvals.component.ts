@@ -30,6 +30,10 @@ import {
         <!-- Page Header via Reusable PageHeaderComponent -->
         <app-page-header
           title="Batch Approvals"
+          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'SDC Management', url: '/admin/sdc' }, { label: 'Batch Approvals' }]"
+          [searchable]="true"
+          searchPlaceholder="Search batch code, course, center, scheme..."
+          [(searchQuery)]="searchQuery"
         ></app-page-header>
 
         <!-- Success Alert Notification -->
@@ -81,7 +85,7 @@ import {
           </div>
         </div>
 
-        <!-- Admin Advanced Filter Bar (Center, Scheme, District, Search) -->
+        <!-- Admin Advanced Filter Bar (Center, Scheme, District) -->
         <div class="bg-slate-50 border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs">
           
           <!-- Filter: Center Name -->
@@ -129,26 +133,12 @@ import {
             </select>
           </div>
 
-          <!-- Search input -->
-          <div class="flex-1 min-w-[200px] relative">
-            <input
-              type="text"
-              [ngModel]="searchQuery()"
-              (ngModelChange)="searchQuery.set($event)"
-              placeholder="Search batch code, course, center, scheme..."
-              class="w-full bg-white border border-border rounded-[4px] pl-7 pr-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2 top-1.5 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-
           <!-- Reset filters -->
           @if (hasActiveFilters()) {
             <button
               type="button"
               (click)="resetFilters()"
-              class="px-2 py-1 text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded border border-rose-200 transition-colors cursor-pointer font-medium"
+              class="px-2 py-1 text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded border border-rose-200 transition-colors cursor-pointer font-medium ml-auto"
             >
               Reset Filters
             </button>
@@ -178,7 +168,7 @@ import {
 
         <!-- Template: Batch Code -->
         <ng-template #batchCodeTemplate let-batch>
-          <div class="text-center font-mono font-medium text-primary text-[12.5px]">
+          <div class="text-center font-mono font-normal text-slate-800 text-[13px]">
             {{ batch.batchCode }}
           </div>
         </ng-template>
@@ -186,7 +176,7 @@ import {
         <!-- Template: Batch & Course Name -->
         <ng-template #batchNameTemplate let-batch>
           <div class="text-center py-0.5">
-            <div class="font-medium text-primary text-[13px] leading-snug">{{ batch.batchName || batch.courseName }}</div>
+            <div class="font-normal text-slate-800 text-[13px] leading-snug">{{ batch.batchName || batch.courseName }}</div>
             <div class="text-[11px] text-secondary font-normal mt-0.5">{{ batch.courseName }}</div>
           </div>
         </ng-template>
@@ -194,7 +184,7 @@ import {
         <!-- Template: SDC Center + District -->
         <ng-template #centerNameTemplate let-batch>
           <div class="text-center py-0.5">
-            <div class="font-medium text-primary text-[13px] leading-snug">{{ batch.sdcName }}</div>
+            <div class="font-normal text-slate-800 text-[13px] leading-snug">{{ batch.sdcName }}</div>
             <div class="text-[11px] text-secondary font-normal flex items-center justify-center gap-1 mt-0.5">
               <svg class="w-3 h-3 text-muted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -207,14 +197,14 @@ import {
 
         <!-- Template: Scheme -->
         <ng-template #schemeTemplate let-batch>
-          <div class="text-center font-normal text-primary text-[13px]">
+          <div class="text-center font-normal text-slate-800 text-[13px]">
             {{ batch.scheme || '—' }}
           </div>
         </ng-template>
 
         <!-- Template: Sector -->
         <ng-template #sectorTemplate let-batch>
-          <div class="text-center font-normal text-primary text-[13px]">
+          <div class="text-center font-normal text-slate-800 text-[13px]">
             {{ batch.sector || '—' }}
           </div>
         </ng-template>
@@ -222,7 +212,7 @@ import {
         <!-- Template: Capacity & Mapped Aspirants -->
         <ng-template #capacityTemplate let-batch>
           <div class="min-w-35 text-left px-1">
-            <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1">
+            <div class="flex items-center justify-between text-[13px] font-normal text-slate-700 mb-1">
               <span>{{ batch.mappedAspirantsCount || 0 }}/{{ batch.maxStrength || 30 }} Aspirants</span>
               <span class="text-slate-400 font-normal text-[11px]">{{ getMappedPercent(batch) }}%</span>
             </div>

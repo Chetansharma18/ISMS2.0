@@ -1,6 +1,6 @@
 import { TableColumn } from '../table/table.types';
 
-export type MasterFieldType = 'text' | 'number' | 'textarea' | 'select' | 'permissions';
+export type MasterFieldType = 'text' | 'number' | 'textarea' | 'select' | 'multiselect' | 'permissions';
 
 export interface MasterFieldConfig<T = any> {
   /** Key on the form data object (not necessarily the same as the entity key) */
@@ -39,6 +39,8 @@ export interface MasterCrudConfig<T extends { id: string; status?: string } = an
   tagsColumns?: string[];
   /** Whether this entity supports an Active/Inactive status toggle */
   hasStatus?: boolean;
+  /** Primary submit button label in the modal (defaults to 'Save') */
+  primaryActionLabel?: string;
   /** Dynamic add/edit modal field definitions */
   fields: MasterFieldConfig<T>[];
   /** Max-width tailwind class for the add/edit modal */

@@ -115,6 +115,10 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                     <span class="text-slate-800">{{ step1().msmeRegistered }} @if(step1().udyamNumber){ - {{ step1().udyamNumber }} }</span>
                   </div>
                   <div>
+                    <span class="text-slate-400 block text-[10.5px]">Preferred Sector</span>
+                    <span class="text-slate-800">{{ step1().preferredSector || '-' }}</span>
+                  </div>
+                  <div>
                     <span class="text-slate-400 block text-[10.5px]">NSDC Partner</span>
                     <span class="text-slate-800">{{ step1().nsdcPartner || 'None' }}</span>
                   </div>

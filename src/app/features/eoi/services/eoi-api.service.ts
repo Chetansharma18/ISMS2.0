@@ -42,7 +42,7 @@ export class EoiApiService {
    */
   updateScrutinyStatus(
     id: string | number,
-    status: 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED',
+    status: 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED' | 'REVERTED',
     statusDisplay: string
   ): Observable<MockEoiApplicantItem> {
     return this.repo.update(id, { status, statusDisplay });

@@ -8,14 +8,10 @@ import { documentCategoryLabel } from './tender-status.util';
   standalone: true,
   host: { class: 'block' },
   template: `
-        <div class="bg-white border border-slate-200 rounded-lg p-5 space-y-4 shadow-2xs">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-            <h3 class="font-semibold text-slate-900 text-sm">
-              4. Mandated Proposal Documents &amp; Annexures (16 Files Attached)
-            </h3>
-            @if (isEditing()) {
-              <span class="text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-medium text-[11px]">Editing Active</span>
-            }
+        <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4">
+          <div class="pb-3.5 border-b border-slate-100 flex items-center gap-3">
+            <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">4</span>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">Proposal Documents</h2>
           </div>
 
           <div class="border border-slate-200 rounded-lg overflow-hidden">
@@ -54,7 +50,7 @@ import { documentCategoryLabel } from './tender-status.util';
                         @if (isEditing()) {
                           <label class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-brand rounded text-xs font-medium cursor-pointer">
                             Replace
-                            <input type="file" (change)="replaceDoc.emit({ event: $event, doc })" class="hidden" accept=".pdf" />
+                            <input type="file" (change)="replaceDoc.emit({ event: $event, doc })" class="hidden" accept=".pdf,.doc,.docx" />
                           </label>
                         }
                       </div>

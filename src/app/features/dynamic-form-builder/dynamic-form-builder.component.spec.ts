@@ -7,6 +7,7 @@ import {
   DynamicFormBuilderItem
 } from './dynamic-form-builder.component';
 import { DataEngineService } from '../../core/services/data-engine.service';
+import { NotificationService } from '../../core/services/notification.service';
 
 describe('DynamicFormBuilderComponent', () => {
   let mockForms: DynamicFormBuilderItem[];
@@ -68,7 +69,8 @@ describe('DynamicFormBuilderComponent', () => {
 
   function createComponent(): DynamicFormBuilderComponent {
     const injector = createEnvironmentInjector([
-      { provide: DataEngineService, useValue: mockDataEngine }
+      { provide: DataEngineService, useValue: mockDataEngine },
+      { provide: NotificationService, useClass: NotificationService }
     ], null as any);
 
     return runInInjectionContext(injector, () => new DynamicFormBuilderComponent());
@@ -198,9 +200,9 @@ describe('DynamicFormBuilderComponent', () => {
     expect(comp.forms().length).toBe(1);
   });
 
-  it('has correct table columns for Form Type, Status, and Form actions', () => {
+  it('has correct table columns for Form Type and Form actions', () => {
     const comp = createComponent();
-    expect(comp.tableColumns.map(c => c.label)).toEqual(['S. No.', 'Form Type', 'Status', 'Form actions']);
+    expect(comp.tableColumns.map(c => c.label)).toEqual(['S. No.', 'Form Type', 'Form actions']);
   });
 
   it('handles step form creation, adding steps, step fields, and reordering', () => {
@@ -300,6 +302,295 @@ describe('DynamicFormBuilderComponent', () => {
     expect(comp.previewStepIndex()).toBe(0);
 
     comp.closePreviewModal();
+    expect(comp.showPreviewModal()).toBe(false);
+  });
+
+  it('handles Organisation Registration Form 4-step wizard preview, uploads, same address toggle and review jump', () => {
+    const comp = createComponent();
+    const companyForm: DynamicFormBuilderItem = {
+      sNo: 1,
+      id: 'form-company-reg',
+      formType: 'Organisation Registration Form',
+      isStepForm: true,
+      status: 'Active',
+      steps: [
+        { id: 's1', stepNumber: 1, title: 'Organisation Details', fields: [{ id: 'crf-1', label: 'Organisation Name', type: 'text', mandatory: true }, { id: 'crf-6', label: 'Certificate of Registration', type: 'photo', mandatory: true }] },
+        { id: 's2', stepNumber: 2, title: 'Authorized Person', fields: [{ id: 'crf-201', label: 'Full Name', type: 'text', mandatory: true }] },
+        { id: 's3', stepNumber: 3, title: 'Bank Details', fields: [{ id: 'crf-301', label: 'Name of the Bank', type: 'dropdown', mandatory: true }] },
+        { id: 's4', stepNumber: 4, title: 'Preview & Submit', fields: [] }
+      ],
+      fields: []
+    };
+
+    comp.openPreviewModal(companyForm);
+    expect(comp.showPreviewModal()).toBe(true);
+    expect(comp.previewStepIndex()).toBe(0);
+    expect(comp.previewFormValues['crf-5']).toBe('Rajasthan');
+    expect(comp.previewFormValues['crf-9']).toBe('No');
+    expect(comp.getStepSubtitle(companyForm, 0)).toBe('Please provide your organisation details to complete the registration process.');
+
+    // Simulate file upload
+    comp.simulateFileUpload(companyForm.steps![0].fields[1]);
+    expect(comp.uploadedFiles['crf-6']).toContain('.pdf');
+
+    // Remove uploaded file
+    comp.removeUploadedFile('crf-6', { stopPropagation: () => {} } as any);
+    expect(comp.uploadedFiles['crf-6']).toBeUndefined();
+
+    // Toggle same address
+    comp.previewFormValues['crf-15'] = '123 Jaipur Road';
+    comp.previewFormValues['crf-18'] = '302001';
+    comp.isOfficeSameAsRegistered = true;
+    comp.onSameAddressToggle();
+    expect(comp.previewFormValues['crf-19']).toBe('123 Jaipur Road');
+    expect(comp.previewFormValues['crf-22']).toBe('302001');
+
+    // Navigate to Step 2
+    comp.previewNextStep(companyForm);
+    expect(comp.previewStepIndex()).toBe(1);
+    expect(comp.getStepSubtitle(companyForm, 1)).toBe('Provide details of the person authorized to sign and represent the organization.');
+
+    // Navigate to Step 3
+    comp.previewNextStep(companyForm);
+    expect(comp.previewStepIndex()).toBe(2);
+    expect(comp.getStepSubtitle(companyForm, 2)).toBe('Provide bank account details for receiving payments under the scheme.');
+
+    // Save as draft
+    comp.saveAsDraft();
+
+    // Navigate to Step 4 (Review & Submit)
+    comp.previewNextStep(companyForm);
+    expect(comp.previewStepIndex()).toBe(3);
+    expect(comp.isReviewStep(companyForm, 3)).toBe(true);
+    expect(comp.getStepSubtitle(companyForm, 3)).toBe('Please verify the information provided below. You can edit any section if required.');
+
+    // Jump from Review to Step 1 via Edit Details
+    comp.goToPreviewStep(0);
+    expect(comp.previewStepIndex()).toBe(0);
+
+    // Jump back to Review Step 4
+    comp.goToPreviewStep(3);
+    expect(comp.previewStepIndex()).toBe(3);
+
+    // Download PDF
+    comp.downloadPdf();
+
+    // Submit registration
+    comp.registerSubmit();
+    expect(comp.showPreviewModal()).toBe(false);
+  });
+
+  it('handles EOI Configuration Form preview, scheme auto-selection, document rows, and publish EOI', () => {
+    const comp = createComponent();
+    const eoiForm: DynamicFormBuilderItem = {
+      id: 'form-eoi-config',
+      sNo: 2,
+      formType: 'EOI Configuration Form',
+      isStepForm: false,
+      status: 'Active',
+      fields: [
+        { id: 'eoi-1', label: 'EOI Reference No.', type: 'text', mandatory: true },
+        { id: 'eoi-2', label: 'Scheme', type: 'dropdown', mandatory: true },
+        { id: 'eoi-3', label: 'Scheme Category', type: 'dropdown', mandatory: false },
+        { id: 'eoi-4', label: 'Date of EoI Published', type: 'datepicker', mandatory: true },
+        { id: 'eoi-5', label: 'Last Date of EoI Submission', type: 'datepicker', mandatory: true },
+        { id: 'eoi-6', label: 'EOI Category', type: 'dropdown', mandatory: true },
+        { id: 'eoi-7', label: 'EOI Description', type: 'text', mandatory: false },
+        { id: 'eoi-8', label: 'EMD Fee', type: 'number', mandatory: true },
+        { id: 'eoi-9', label: 'Process Fee', type: 'number', mandatory: true },
+        { id: 'eoi-10', label: 'Attach File', type: 'photo', mandatory: true },
+        { id: 'eoi-11', label: 'EOI DOCUMENTS', type: 'dropdown', mandatory: false }
+      ]
+    };
+
+    expect(comp.isEoiForm(eoiForm)).toBe(true);
+
+    comp.openPreviewModal(eoiForm);
+    expect(comp.showPreviewModal()).toBe(true);
+    expect(comp.previewFormValues['eoi-1']).toBe('EOI/RAJ/SKILL/2026/04');
+    expect(comp.previewFormValues['eoi-4']).toBe('10 / 13 / 2026');
+    expect(comp.previewFormValues['eoi-5']).toBe('10 / 13 / 2026');
+    expect(comp.eoiDocumentRows.length).toBe(0);
+
+    // Select scheme -> auto-selects scheme category and auto-loads default documents
+    comp.onEoiSchemeChange('Vishwakarma Yuva Udyami Protsahan Yojana');
+    expect(comp.previewFormValues['eoi-3']).toBe('Rajvik');
+    expect(comp.eoiDocumentRows.length).toBe(3);
+
+    // Add manual document row
+    comp.addEoiDocumentRow();
+    expect(comp.eoiDocumentRows.length).toBe(4);
+    comp.eoiDocumentRows[3].docName = 'Power of Attorney / Board Resolution';
+
+    // Simulate upload on document row
+    comp.simulateRowDocUpload(3);
+    expect(comp.eoiDocumentRows[3].uploadedFile).toContain('Power_of_Attorney');
+
+    // Remove a document row
+    comp.removeEoiDocumentRow(0);
+    expect(comp.eoiDocumentRows.length).toBe(3);
+
+    // Attach File simulation
+    comp.simulateFileUpload({ id: 'eoi-10', label: 'EOI Proposal File', type: 'photo', mandatory: true });
+    expect(comp.uploadedFiles['eoi-10']).toBeTruthy();
+
+    // Publish EOI
+    comp.publishEoi();
+    expect(comp.showPreviewModal()).toBe(false);
+  });
+
+  it('handles Apply for EOI Form 2-step wizard, OTR documents, 16 proposal checklist, tabs, and submit', () => {
+    const comp = createComponent();
+    const applyEoiForm: DynamicFormBuilderItem = {
+      id: 'form-apply-eoi',
+      sNo: 3,
+      formType: 'Apply for EOI Form',
+      isStepForm: true,
+      status: 'Active',
+      steps: [
+        {
+          id: 'step-otr',
+          stepNumber: 1,
+          title: 'OTR Profile',
+          fields: [
+            { id: 'eoi-otr-1', label: 'NAME (SHORT NAME)', type: 'text', mandatory: true },
+            { id: 'eoi-otr-2', label: 'FULL NAME OF ORGANIZATION', type: 'text', mandatory: true },
+            { id: 'eoi-otr-4', label: 'REGISTRATION NUMBER (CIN)', type: 'text', mandatory: true }
+          ]
+        },
+        {
+          id: 'step-upload-docs',
+          stepNumber: 2,
+          title: 'Upload Documents',
+          fields: [
+            { id: 'eoi-doc-1', label: 'Covering Letter (Annexure 1)', type: 'photo', mandatory: true },
+            { id: 'eoi-doc-7', label: 'Training & Placement Track Record (Annexure 5)', type: 'photo', mandatory: false }
+          ]
+        }
+      ]
+    };
+
+    expect(comp.isApplyEoiForm(applyEoiForm)).toBe(true);
+    expect(comp.isEoiForm(applyEoiForm)).toBe(false);
+
+    // Open Preview
+    comp.openPreviewModal(applyEoiForm);
+    expect(comp.showPreviewModal()).toBe(true);
+    expect(comp.applyEoiStep()).toBe(1);
+    expect(comp.getPreviewModalMaxWidth()).toBe('max-w-[1240px]');
+    expect(comp.previewFormValues['eoi-otr-1']).toBe('Company 1');
+    expect(comp.previewFormValues['eoi-otr-4']).toBe('U80302RJ2022NPL079811');
+
+    // OTR Document actions
+    expect(comp.otrRegDocs.length).toBe(4);
+    comp.changeOtrDoc(comp.otrRegDocs[0]);
+    expect(comp.otrRegDocs[0].fileName).toContain('Updated_2026.pdf');
+    comp.removeOtrDoc(comp.otrRegDocs[1]);
+    expect(comp.otrRegDocs[1].fileName).toBe('Not_Uploaded.pdf');
+
+    // Proceed to Step 2: Upload Documents
+    comp.applyEoiStep.set(2);
+    expect(comp.applyEoiStep()).toBe(2);
+    expect(comp.applyEoiDocuments.length).toBe(16);
+
+    // Filter Tabs
+    comp.selectedApplyDocTab.set('mandatory');
+    expect(comp.getFilteredApplyDocs().length).toBe(6);
+    comp.selectedApplyDocTab.set('annexure');
+    expect(comp.getFilteredApplyDocs().length).toBe(8);
+    comp.selectedApplyDocTab.set('remaining');
+    expect(comp.getFilteredApplyDocs().length).toBe(2);
+    comp.selectedApplyDocTab.set('all');
+    expect(comp.getFilteredApplyDocs().length).toBe(16);
+
+    // Document upload and removal
+    expect(comp.getApplyMandatoryUploadedCount()).toBe(0);
+    comp.uploadApplyDoc(1);
+    expect(comp.getApplyMandatoryUploadedCount()).toBe(1);
+    comp.removeApplyDoc(1);
+    expect(comp.getApplyMandatoryUploadedCount()).toBe(0);
+
+    // Attach All Mandated Annexures button
+    comp.attachAllApplyMandatedAnnexures();
+    expect(comp.getApplyMandatoryUploadedCount()).toBe(6);
+    expect(comp.getApplyAnnexureUploadedCount()).toBe(8);
+    expect(comp.getApplyRemainingUploadedCount()).toBe(2);
+
+    // Submit Apply EOI
+    comp.submitApplyEoi();
+    expect(comp.showPreviewModal()).toBe(false);
+  });
+
+  it('handles Department User Registration Form preview, fields, scheme multi-select, and submission', () => {
+    const comp = createComponent();
+    const deptUserItem: DynamicFormBuilderItem = {
+      sNo: 4,
+      id: 'form-dept-user',
+      formType: 'Department User Registration Form',
+      isStepForm: false,
+      status: 'Active',
+      fields: [
+        { id: 'du-1', label: 'SSO ID', type: 'text', mandatory: true },
+        { id: 'du-2', label: 'Role Type', type: 'dropdown', mandatory: true },
+        { id: 'du-3', label: 'First Name', type: 'text', mandatory: true },
+        { id: 'du-4', label: 'Last Name', type: 'text', mandatory: true },
+        { id: 'du-5', label: 'E-Mail', type: 'text', mandatory: true },
+        { id: 'du-6', label: 'Mobile No.', type: 'number', mandatory: true },
+        { id: 'du-7', label: 'Date Of Birth', type: 'datepicker', mandatory: false },
+        { id: 'du-8', label: 'Aadhaar Id', type: 'number', mandatory: false },
+        { id: 'du-9', label: 'Designation', type: 'dropdown', mandatory: false },
+        { id: 'du-10', label: 'Scheme Name', type: 'dropdown', mandatory: false },
+        { id: 'du-11', label: 'District', type: 'dropdown', mandatory: false },
+        { id: 'du-12', label: 'Block Name', type: 'dropdown', mandatory: false }
+      ]
+    };
+
+    expect(comp.isDeptUserForm(deptUserItem)).toBe(true);
+
+    // Open Preview
+    comp.openPreviewModal(deptUserItem);
+    expect(comp.showPreviewModal()).toBe(true);
+    expect(comp.getPreviewModalMaxWidth()).toBe('max-w-[780px]');
+
+    // Check defaults
+    expect(comp.previewFormValues['du-7']).toBe('10 / 13 / 2026');
+    expect(comp.previewFormValues['du-11']).toBe('Jaipur');
+    expect(comp.previewFormValues['du-12']).toBe('All Blocks');
+
+    // Scheme Multi-Select toggles
+    expect(comp.isDeptUserAllSchemesSelected()).toBe(true);
+    expect(comp.getDeptUserSchemeDisplayLabel()).toContain('All Schemes');
+
+    comp.toggleDeptUserSchemeOption('Vishwakarma Yuva Udyami Protsahan Yojana');
+    expect(comp.isDeptUserAllSchemesSelected()).toBe(false);
+
+    // Clicking All Schemes when not all are selected will select all
+    comp.toggleDeptUserAllSchemes();
+    expect(comp.isDeptUserAllSchemesSelected()).toBe(true);
+
+    // Clicking All Schemes when all are selected will unselect all
+    comp.toggleDeptUserAllSchemes();
+    expect(comp.isDeptUserAllSchemesSelected()).toBe(false);
+    expect(comp.getDeptUserSchemeDisplayLabel()).toBe('Select Scheme Name');
+
+    // Re-select all
+    comp.toggleDeptUserAllSchemes();
+    expect(comp.isDeptUserAllSchemesSelected()).toBe(true);
+
+    // Validation failure on empty mandatory fields
+    comp.submitDeptUser();
+    expect(comp.deptUserSubmitted()).toBe(true);
+    expect(comp.showPreviewModal()).toBe(true); // Still open due to validation error
+
+    // Fill mandatory fields and submit
+    comp.previewFormValues['du-1'] = 'SSO_1008';
+    comp.previewFormValues['du-2'] = 'Department User';
+    comp.previewFormValues['du-3'] = 'John';
+    comp.previewFormValues['du-4'] = 'Doe';
+    comp.previewFormValues['du-5'] = 'name@example.com';
+    comp.previewFormValues['du-6'] = '9876543210';
+
+    comp.submitDeptUser();
     expect(comp.showPreviewModal()).toBe(false);
   });
 });

@@ -471,112 +471,393 @@ export const MOCK_TWO_STEP_VERIFICATION_ITEMS: TwoStepVerificationItem[] = resol
 export const MOCK_DYNAMIC_FORM_BUILDER_ITEMS: DynamicFormBuilderItem[] = resolveMock([
   {
     sNo: 1,
-    id: 'form-1',
-    formType: 'Training Center Inspection Form',
+    id: 'form-company-reg',
+    formType: 'Organisation Registration Form',
     isStepForm: true,
     status: 'Active',
-    createdAt: '2026-10-01',
+    createdAt: '2026-10-13',
     steps: [
       {
-        id: 'stp-1',
+        id: 'stp-cr-1',
         stepNumber: 1,
-        title: 'Basic Center Details',
+        title: 'Organisation Details',
         fields: [
-          {
-            id: 'fld-1',
-            label: 'Center Name',
-            type: 'text',
-            mandatory: true
-          },
-          {
-            id: 'fld-2',
-            label: 'Center Capacity / Total Seats',
-            type: 'number',
-            mandatory: true
-          },
-          {
-            id: 'fld-3',
-            label: 'Inspection Date',
-            type: 'datepicker',
-            mandatory: true
-          }
+          { id: 'crf-1', label: 'Organisation Name', type: 'text', mandatory: true },
+          { id: 'crf-2', label: 'Nature of Entity', type: 'dropdown', mandatory: true, options: ['Private Limited Company', 'Public Limited Company', 'Partnership Firm', 'Limited Liability Partnership (LLP)', 'Sole Proprietorship', 'Society / Trust / NGO'], optionsText: 'Private Limited Company, Public Limited Company, Partnership Firm, Limited Liability Partnership (LLP), Sole Proprietorship, Society / Trust / NGO' },
+          { id: 'crf-3', label: 'Registration No. (CIN / Reg. No.)', type: 'text', mandatory: true },
+          { id: 'crf-4', label: 'Date of Registration', type: 'datepicker', mandatory: true },
+          { id: 'crf-5', label: 'State / UT of Registration', type: 'dropdown', mandatory: true, options: ['Rajasthan', 'Delhi', 'Maharashtra', 'Gujarat', 'Uttar Pradesh', 'Karnataka', 'Haryana', 'Madhya Pradesh', 'Punjab', 'Tamil Nadu'], optionsText: 'Rajasthan, Delhi, Maharashtra, Gujarat, Uttar Pradesh, Karnataka, Haryana, Madhya Pradesh, Punjab, Tamil Nadu' },
+          { id: 'crf-6', label: 'Certificate of Registration / Incorporation', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 3, maxSizeMb: 5 },
+          { id: 'crf-7', label: 'Organisation PAN', type: 'text', mandatory: true },
+          { id: 'crf-8', label: 'Organisation PAN Card', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 2, maxSizeMb: 5 },
+          { id: 'crf-9', label: 'GST Registered', type: 'dropdown', mandatory: true, options: ['Yes', 'No'], optionsText: 'Yes, No' },
+          { id: 'crf-10', label: 'MSME / Udyam Registered', type: 'dropdown', mandatory: true, options: ['Yes', 'No'], optionsText: 'Yes, No' },
+          { id: 'crf-11', label: 'NSDC Partner', type: 'dropdown', mandatory: false, options: ['Not Applicable', 'Yes', 'No'], optionsText: 'Not Applicable, Yes, No' },
+          { id: 'crf-12', label: 'Organisation Contact No.', type: 'number', mandatory: true },
+          { id: 'crf-13', label: 'Organisation Email ID', type: 'text', mandatory: true },
+          { id: 'crf-14', label: 'Website', type: 'text', mandatory: false },
+          { id: 'crf-15', label: 'Registered Address', type: 'text', mandatory: true },
+          { id: 'crf-16', label: 'State / UT', type: 'dropdown', mandatory: true, options: ['Rajasthan', 'Delhi', 'Maharashtra', 'Gujarat', 'Uttar Pradesh', 'Karnataka'], optionsText: 'Rajasthan, Delhi, Maharashtra, Gujarat, Uttar Pradesh, Karnataka' },
+          { id: 'crf-17', label: 'District', type: 'dropdown', mandatory: true, options: ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Ajmer', 'Bikaner'], optionsText: 'Jaipur, Jodhpur, Udaipur, Kota, Ajmer, Bikaner' },
+          { id: 'crf-18', label: 'PIN Code', type: 'number', mandatory: true },
+          { id: 'crf-19', label: 'Office Address', type: 'text', mandatory: true },
+          { id: 'crf-20', label: 'Office State / UT', type: 'dropdown', mandatory: true, options: ['Rajasthan', 'Delhi', 'Maharashtra', 'Gujarat', 'Uttar Pradesh', 'Karnataka'], optionsText: 'Rajasthan, Delhi, Maharashtra, Gujarat, Uttar Pradesh, Karnataka' },
+          { id: 'crf-21', label: 'Office District', type: 'dropdown', mandatory: true, options: ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Ajmer', 'Bikaner'], optionsText: 'Jaipur, Jodhpur, Udaipur, Kota, Ajmer, Bikaner' },
+          { id: 'crf-22', label: 'Office PIN Code', type: 'number', mandatory: true }
         ]
       },
       {
-        id: 'stp-2',
+        id: 'stp-cr-2',
         stepNumber: 2,
-        title: 'Infrastructure & Center Photos',
+        title: 'Authorized Person',
         fields: [
-          {
-            id: 'fld-4',
-            label: 'Center Category Grade',
-            type: 'dropdown',
-            mandatory: true,
-            options: ['Grade A', 'Grade B', 'Grade C'],
-            optionsText: 'Grade A, Grade B, Grade C'
-          },
-          {
-            id: 'fld-5',
-            label: 'Classroom & Infrastructure Photos',
-            type: 'photo',
-            mandatory: true,
-            minPhotos: 2,
-            maxPhotos: 5,
-            maxSizeMb: 5
-          }
+          { id: 'crf-201', label: 'Full Name', type: 'text', mandatory: true },
+          { id: 'crf-202', label: 'Designation', type: 'dropdown', mandatory: false, options: ['Director', 'Managing Director', 'Partner', 'Proprietor', 'Authorized Signatory', 'CEO / President'], optionsText: 'Director, Managing Director, Partner, Proprietor, Authorized Signatory, CEO / President' },
+          { id: 'crf-203', label: 'Date of Birth', type: 'datepicker', mandatory: true },
+          { id: 'crf-204', label: 'Age', type: 'number', mandatory: false },
+          { id: 'crf-205', label: 'PAN', type: 'text', mandatory: true },
+          { id: 'crf-206', label: 'Mobile No.', type: 'number', mandatory: true },
+          { id: 'crf-207', label: 'Email Address', type: 'text', mandatory: true },
+          { id: 'crf-208', label: 'Aadhaar No. (Optional)', type: 'number', mandatory: false },
+          { id: 'crf-209', label: 'Bhamashah No. (Optional)', type: 'text', mandatory: false },
+          { id: 'crf-210', label: 'Voter ID No. (Optional)', type: 'text', mandatory: false },
+          { id: 'crf-211', label: 'Passport No. (Optional)', type: 'text', mandatory: false },
+          { id: 'crf-212', label: 'State', type: 'dropdown', mandatory: false, options: ['Rajasthan', 'Delhi', 'Maharashtra', 'Gujarat', 'Uttar Pradesh'], optionsText: 'Rajasthan, Delhi, Maharashtra, Gujarat, Uttar Pradesh' },
+          { id: 'crf-213', label: 'Residential Address', type: 'text', mandatory: false },
+          { id: 'crf-214', label: 'Authorization Letter / Board Resolution', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 3, maxSizeMb: 5 },
+          { id: 'crf-215', label: 'Authorized Person Identity Proof', type: 'photo', mandatory: false, minPhotos: 1, maxPhotos: 2, maxSizeMb: 5 }
+        ]
+      },
+      {
+        id: 'stp-cr-3',
+        stepNumber: 3,
+        title: 'Bank Details',
+        fields: [
+          { id: 'crf-301', label: 'Name of the Bank', type: 'dropdown', mandatory: true, options: ['State Bank of India', 'HDFC Bank', 'ICICI Bank', 'Punjab National Bank', 'Bank of Baroda', 'Axis Bank', 'Canara Bank', 'Union Bank of India'], optionsText: 'State Bank of India, HDFC Bank, ICICI Bank, Punjab National Bank, Bank of Baroda, Axis Bank, Canara Bank, Union Bank of India' },
+          { id: 'crf-302', label: 'Branch Name', type: 'text', mandatory: true },
+          { id: 'crf-303', label: 'Transfer Mode', type: 'dropdown', mandatory: true, options: ['NEFT', 'RTGS', 'IMPS'], optionsText: 'NEFT, RTGS, IMPS' },
+          { id: 'crf-304', label: 'Account Type', type: 'dropdown', mandatory: true, options: ['Current', 'Savings', 'Cash Credit', 'Overdraft'], optionsText: 'Current, Savings, Cash Credit, Overdraft' },
+          { id: 'crf-305', label: 'Account Holder Name', type: 'text', mandatory: true },
+          { id: 'crf-306', label: 'Account Number', type: 'number', mandatory: true },
+          { id: 'crf-307', label: 'IFSC Code', type: 'text', mandatory: true },
+          { id: 'crf-308', label: 'MICR Code (Optional)', type: 'number', mandatory: false },
+          { id: 'crf-309', label: 'Branch Address', type: 'text', mandatory: true },
+          { id: 'crf-310', label: 'Upload Cancelled Cheque / Bank Passbook', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 2, maxSizeMb: 5 }
+        ]
+      },
+      {
+        id: 'stp-cr-4',
+        stepNumber: 4,
+        title: 'Preview & Submit',
+        fields: [
+          { id: 'crf-401', label: 'Declaration & Verification', type: 'text', mandatory: true },
+          { id: 'crf-402', label: 'Authorized Signatory Undertaking', type: 'dropdown', mandatory: true, options: ['I agree and declare all details are accurate', 'Details verified by Authorized Person'], optionsText: 'I agree and declare all details are accurate, Details verified by Authorized Person' },
+          { id: 'crf-403', label: 'Signatory Signature / Stamp', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 1, maxSizeMb: 2 }
         ]
       }
     ],
-    fields: [
-      { id: 'fld-1', label: 'Center Name', type: 'text', mandatory: true },
-      { id: 'fld-2', label: 'Center Capacity / Total Seats', type: 'number', mandatory: true },
-      { id: 'fld-3', label: 'Inspection Date', type: 'datepicker', mandatory: true },
-      { id: 'fld-4', label: 'Center Category Grade', type: 'dropdown', mandatory: true, options: ['Grade A', 'Grade B', 'Grade C'] },
-      { id: 'fld-5', label: 'Classroom & Infrastructure Photos', type: 'photo', mandatory: true, minPhotos: 2, maxPhotos: 5, maxSizeMb: 5 }
-    ]
+    fields: []
   },
   {
     sNo: 2,
-    id: 'form-2',
-    formType: 'Candidate Feedback & Verification',
+    id: 'form-eoi-config',
+    formType: 'EOI Configuration Form',
     isStepForm: false,
     status: 'Active',
-    createdAt: '2026-10-05',
+    createdAt: '2026-10-13',
     fields: [
+      { id: 'eoi-1', label: 'EOI Reference No.', type: 'text', mandatory: true },
       {
-        id: 'fld-201',
-        label: 'Candidate Full Name',
-        type: 'text',
-        mandatory: true
+        id: 'eoi-2',
+        label: 'Scheme',
+        type: 'dropdown',
+        mandatory: true,
+        options: [
+          'Vishwakarma Yuva Udyami Protsahan Yojana',
+          'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+          'Mukhyamantri Yuva Sambal Yojana',
+          'Mukhya Mantri Yuva Kaushal Yojana'
+        ],
+        optionsText: 'Vishwakarma Yuva Udyami Protsahan Yojana, Mukhyamantri Yuva Swarojgar Yojana (2026), Mukhyamantri Yuva Sambal Yojana, Mukhya Mantri Yuva Kaushal Yojana'
       },
       {
-        id: 'fld-202',
-        label: 'Candidate Mobile Number',
-        type: 'number',
-        mandatory: true
-      },
-      {
-        id: 'fld-203',
-        label: 'Date of Enrollment',
-        type: 'datepicker',
-        mandatory: true
-      },
-      {
-        id: 'fld-204',
-        label: 'Course Rating',
+        id: 'eoi-3',
+        label: 'Scheme Category',
         type: 'dropdown',
         mandatory: false,
-        options: ['Excellent', 'Good', 'Average', 'Poor'],
-        optionsText: 'Excellent, Good, Average, Poor'
+        options: ['Rajvik', 'samarth', 'saksham', 'na', 'ALL'],
+        optionsText: 'Rajvik, samarth, saksham, na, ALL'
       },
+      { id: 'eoi-4', label: 'Date of EoI Published', type: 'datepicker', mandatory: true },
+      { id: 'eoi-5', label: 'Last Date of EoI Submission', type: 'datepicker', mandatory: true },
       {
-        id: 'fld-205',
-        label: 'Candidate Passport Photo',
+        id: 'eoi-6',
+        label: 'EOI Category',
+        type: 'dropdown',
+        mandatory: true,
+        options: ['General', 'Special'],
+        optionsText: 'General, Special'
+      },
+      { id: 'eoi-7', label: 'EOI Description', type: 'text', mandatory: false },
+      { id: 'eoi-8', label: 'EMD Fee', type: 'number', mandatory: true },
+      { id: 'eoi-9', label: 'Process Fee', type: 'number', mandatory: true },
+      {
+        id: 'eoi-10',
+        label: 'Attach File',
         type: 'photo',
         mandatory: true,
         minPhotos: 1,
-        maxPhotos: 2,
-        maxSizeMb: 2
+        maxPhotos: 5,
+        maxSizeMb: 25
+      },
+      {
+        id: 'eoi-11',
+        label: 'EOI Documents',
+        type: 'dropdown',
+        mandatory: true,
+        options: [
+          'Registration Certificate / Incorporation',
+          'Audited Balance Sheet & Financial Statements',
+          'PAN Card & GST Registration Certificate',
+          'Past Experience & Work Order Copies',
+          'Power of Attorney / Board Resolution',
+          'Affidavit / Non-Blacklisting Declaration'
+        ],
+        optionsText: 'Registration Certificate / Incorporation, Audited Balance Sheet & Financial Statements, PAN Card & GST Registration Certificate, Past Experience & Work Order Copies, Power of Attorney / Board Resolution, Affidavit / Non-Blacklisting Declaration'
+      }
+    ]
+  },
+  {
+    sNo: 3,
+    id: 'form-apply-eoi',
+    formType: 'Apply for EOI Form',
+    isStepForm: true,
+    status: 'Active',
+    createdAt: '2026-10-13',
+    steps: [
+      {
+        id: 'step-otr',
+        stepNumber: 1,
+        title: 'OTR Profile',
+        fields: [
+          { id: 'eoi-otr-1', label: 'NAME (SHORT NAME)', type: 'text', mandatory: true },
+          { id: 'eoi-otr-2', label: 'FULL NAME OF ORGANIZATION', type: 'text', mandatory: true },
+          {
+            id: 'eoi-otr-3',
+            label: 'NATURE OF ENTITY',
+            type: 'dropdown',
+            mandatory: true,
+            options: ['Private Limited', 'Public Limited', 'Partnership', 'Proprietorship', 'Society / Trust', 'LLP'],
+            optionsText: 'Private Limited, Public Limited, Partnership, Proprietorship, Society / Trust, LLP'
+          },
+          { id: 'eoi-otr-4', label: 'REGISTRATION NUMBER (CIN)', type: 'text', mandatory: true },
+          { id: 'eoi-otr-5', label: 'DATE OF REGISTRATION', type: 'datepicker', mandatory: true },
+          {
+            id: 'eoi-otr-6',
+            label: 'STATE / UT OF REGISTRATION',
+            type: 'dropdown',
+            mandatory: true,
+            options: ['Rajasthan', 'Delhi', 'Haryana', 'Uttar Pradesh', 'Gujarat', 'Maharashtra'],
+            optionsText: 'Rajasthan, Delhi, Haryana, Uttar Pradesh, Gujarat, Maharashtra'
+          },
+          { id: 'eoi-otr-7', label: 'COMPANY PAN', type: 'text', mandatory: true },
+          {
+            id: 'eoi-otr-8',
+            label: 'GST REGISTERED',
+            type: 'dropdown',
+            mandatory: true,
+            options: ['Yes', 'No'],
+            optionsText: 'Yes, No'
+          },
+          { id: 'eoi-otr-9', label: 'GSTIN', type: 'text', mandatory: true },
+          {
+            id: 'eoi-otr-10',
+            label: 'MSME / UDYAM REGISTERED',
+            type: 'dropdown',
+            mandatory: true,
+            options: ['Yes', 'No'],
+            optionsText: 'Yes, No'
+          },
+          { id: 'eoi-otr-11', label: 'UDYAM REGISTRATION NO.', type: 'text', mandatory: true },
+          {
+            id: 'eoi-otr-12',
+            label: 'NSDC PARTNER STATUS',
+            type: 'dropdown',
+            mandatory: false,
+            options: ['Approved', 'Applied', 'Not Applicable'],
+            optionsText: 'Approved, Applied, Not Applicable'
+          },
+          { id: 'eoi-otr-13', label: 'COMPANY CONTACT NO.', type: 'text', mandatory: true },
+          { id: 'eoi-otr-14', label: 'COMPANY EMAIL-ID', type: 'text', mandatory: true },
+          { id: 'eoi-otr-15', label: 'WEBSITE', type: 'text', mandatory: false },
+          { id: 'eoi-otr-16', label: 'REGISTERED ADDRESS', type: 'text', mandatory: true },
+          { id: 'eoi-otr-17', label: 'OFFICE ADDRESS', type: 'text', mandatory: true },
+          {
+            id: 'eoi-otr-18',
+            label: 'ATTACHED REGISTRATION DOCUMENTS',
+            type: 'photo',
+            mandatory: true,
+            minPhotos: 1,
+            maxPhotos: 4,
+            maxSizeMb: 25
+          },
+          { id: 'eoi-otr-19', label: 'FULL NAME', type: 'text', mandatory: true },
+          {
+            id: 'eoi-otr-20',
+            label: 'DESIGNATION',
+            type: 'dropdown',
+            mandatory: true,
+            options: ['Authorized Representative', 'Director', 'Partner', 'Proprietor', 'Managing Trustee'],
+            optionsText: 'Authorized Representative, Director, Partner, Proprietor, Managing Trustee'
+          },
+          { id: 'eoi-otr-21', label: 'DATE OF BIRTH / AGE', type: 'datepicker', mandatory: true },
+          { id: 'eoi-otr-22', label: 'OFFICIAL MOBILE NO.', type: 'text', mandatory: true },
+          { id: 'eoi-otr-23', label: 'OFFICIAL EMAIL-ID', type: 'text', mandatory: true },
+          { id: 'eoi-otr-24', label: 'PAN', type: 'text', mandatory: true },
+          { id: 'eoi-otr-25', label: 'AADHAAR NUMBER', type: 'text', mandatory: true },
+          {
+            id: 'eoi-otr-26',
+            label: 'STATE',
+            type: 'dropdown',
+            mandatory: true,
+            options: ['Rajasthan', 'Delhi', 'Haryana', 'Uttar Pradesh', 'Gujarat'],
+            optionsText: 'Rajasthan, Delhi, Haryana, Uttar Pradesh, Gujarat'
+          },
+          { id: 'eoi-otr-27', label: 'RESIDENCE ADDRESS', type: 'text', mandatory: true },
+          {
+            id: 'eoi-otr-28',
+            label: 'ATTACHED SIGNATORY DOCUMENTS',
+            type: 'photo',
+            mandatory: true,
+            minPhotos: 1,
+            maxPhotos: 2,
+            maxSizeMb: 25
+          },
+          {
+            id: 'eoi-otr-29',
+            label: 'BANK NAME',
+            type: 'dropdown',
+            mandatory: true,
+            options: ['State Bank of India', 'HDFC Bank', 'ICICI Bank', 'Punjab National Bank', 'Bank of Baroda'],
+            optionsText: 'State Bank of India, HDFC Bank, ICICI Bank, Punjab National Bank, Bank of Baroda'
+          },
+          { id: 'eoi-otr-30', label: 'BRANCH NAME', type: 'text', mandatory: true },
+          {
+            id: 'eoi-otr-31',
+            label: 'ACCOUNT TYPE',
+            type: 'dropdown',
+            mandatory: true,
+            options: ['Current Account', 'Savings Account'],
+            optionsText: 'Current Account, Savings Account'
+          },
+          { id: 'eoi-otr-32', label: 'ACCOUNT HOLDER NAME', type: 'text', mandatory: true },
+          { id: 'eoi-otr-33', label: 'ACCOUNT NUMBER', type: 'text', mandatory: true },
+          { id: 'eoi-otr-34', label: 'IFSC CODE', type: 'text', mandatory: true },
+          {
+            id: 'eoi-otr-35',
+            label: 'TRANSFER MODE',
+            type: 'dropdown',
+            mandatory: true,
+            options: ['NEFT', 'RTGS', 'IMPS'],
+            optionsText: 'NEFT, RTGS, IMPS'
+          },
+          {
+            id: 'eoi-otr-36',
+            label: 'CANCELLED CHEQUE / PASSBOOK',
+            type: 'photo',
+            mandatory: true,
+            minPhotos: 1,
+            maxPhotos: 1,
+            maxSizeMb: 10
+          }
+        ]
+      },
+      {
+        id: 'step-upload-docs',
+        stepNumber: 2,
+        title: 'Upload Documents',
+        fields: [
+          { id: 'eoi-doc-1', label: 'Covering Letter (Annexure 1)', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-2', label: 'Audited Financial Statements (Annexure 3)', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-3', label: 'Anti-Blacklisting Notarized Affidavit (Annexure 6)', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-4', label: 'Statutory Compliance Self-Declaration (Annexure 7)', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-5', label: 'Signed & Sealed EOI Document', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-6', label: 'Debarment Undertaking Document', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-7', label: 'Training & Placement Track Record (Annexure 5)', type: 'photo', mandatory: false, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-8', label: 'Active Skill Development Centres (Annexure 4)', type: 'photo', mandatory: false, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-9', label: 'Board of Directors Details (Annexure 8)', type: 'photo', mandatory: false, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-10', label: 'Industry Placement Tie-ups & MOUs (Annexure 9)', type: 'photo', mandatory: false, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-11', label: 'Relevant Sector Experience Proof (Annexure 10)', type: 'photo', mandatory: false, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-12', label: 'District Cluster Mobilization Plan (Annexure 11)', type: 'photo', mandatory: false, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-13', label: 'Technical Evaluation Matrix (Annexure 12)', type: 'photo', mandatory: false, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-14', label: 'Supporting Credentials & Accreditations (Annexure 13)', type: 'photo', mandatory: false, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-15', label: 'NSDC Stake Partner Certificate', type: 'photo', mandatory: false, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 },
+          { id: 'eoi-doc-16', label: 'CA Turnover Certificate with UDIN (Annexure 14)', type: 'photo', mandatory: false, minPhotos: 1, maxPhotos: 1, maxSizeMb: 25 }
+        ]
+      }
+    ],
+    fields: []
+  },
+  {
+    sNo: 4,
+    id: 'form-dept-user',
+    formType: 'Department User Registration Form',
+    isStepForm: false,
+    status: 'Active',
+    createdAt: '2026-10-13',
+    fields: [
+      { id: 'du-1', label: 'SSO ID', type: 'text', mandatory: true },
+      {
+        id: 'du-2',
+        label: 'Role Type',
+        type: 'dropdown',
+        mandatory: true,
+        options: ['Super Admin', 'Admin', 'Department User', 'Training Partner', 'Inspection Agency', 'Finance Officer'],
+        optionsText: 'Super Admin, Admin, Department User, Training Partner, Inspection Agency, Finance Officer'
+      },
+      { id: 'du-3', label: 'First Name', type: 'text', mandatory: true },
+      { id: 'du-4', label: 'Last Name', type: 'text', mandatory: true },
+      { id: 'du-5', label: 'E-Mail', type: 'text', mandatory: true },
+      { id: 'du-6', label: 'Mobile No.', type: 'number', mandatory: true },
+      { id: 'du-7', label: 'Date Of Birth', type: 'datepicker', mandatory: false },
+      { id: 'du-8', label: 'Aadhaar Id', type: 'number', mandatory: false },
+      {
+        id: 'du-9',
+        label: 'Designation',
+        type: 'dropdown',
+        mandatory: false,
+        options: ['Joint Director', 'Deputy Director', 'Assistant Director', 'Section Officer', 'Project Officer', 'Clerk'],
+        optionsText: 'Joint Director, Deputy Director, Assistant Director, Section Officer, Project Officer, Clerk'
+      },
+      {
+        id: 'du-10',
+        label: 'Scheme Name',
+        type: 'dropdown',
+        mandatory: false,
+        options: [
+          'All Schemes (4 selected)',
+          'Vishwakarma Yuva Udyami Protsahan Yojana',
+          'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+          'Mukhyamantri Yuva Sambal Yojana',
+          'Mukhya Mantri Yuva Kaushal Yojana'
+        ],
+        optionsText: 'All Schemes (4 selected), Vishwakarma Yuva Udyami Protsahan Yojana, Mukhyamantri Yuva Swarojgar Yojana (2026), Mukhyamantri Yuva Sambal Yojana, Mukhya Mantri Yuva Kaushal Yojana'
+      },
+      {
+        id: 'du-11',
+        label: 'District',
+        type: 'dropdown',
+        mandatory: false,
+        options: ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Bikaner', 'Ajmer', 'Alwar', 'Bharatpur', 'Bhilwara'],
+        optionsText: 'Jaipur, Jodhpur, Udaipur, Kota, Bikaner, Ajmer, Alwar, Bharatpur, Bhilwara'
+      },
+      {
+        id: 'du-12',
+        label: 'Block Name',
+        type: 'dropdown',
+        mandatory: false,
+        options: ['All Blocks', 'Amber', 'Bassi', 'Chaksu', 'Govindgarh', 'Jamwa Ramgarh', 'Jhotwara', 'Kotputli', 'Sanganer', 'Shahpura', 'Viratnagar'],
+        optionsText: 'All Blocks, Amber, Bassi, Chaksu, Govindgarh, Jamwa Ramgarh, Jhotwara, Kotputli, Sanganer, Shahpura, Viratnagar'
       }
     ]
   }

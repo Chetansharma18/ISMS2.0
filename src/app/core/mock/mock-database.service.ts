@@ -181,6 +181,32 @@ export class MockDatabaseService {
           } else {
             this.store.set(key, stored);
           }
+        } else if (key === 'DYNAMIC_FORM_BUILDER') {
+          const hasOrgForm = stored.some(
+            item => item?.formType === 'Organisation Registration Form'
+          );
+          const hasEoiForm = stored.some(
+            item => item?.formType === 'EOI Configuration Form'
+          );
+          const hasApplyEoiForm = stored.some(
+            item => item?.formType === 'Apply for EOI Form'
+          );
+          const hasDeptUserForm = stored.some(
+            item => item?.formType === 'Department User Registration Form'
+          );
+          const hasOldRemovedForms = stored.some(
+            item =>
+              item?.formType === 'Training Center Inspection Form' ||
+              item?.formType === 'Candidate Feedback & Verification' ||
+              item?.formType === 'Company Registration Form'
+          );
+          if (!hasOrgForm || !hasEoiForm || !hasApplyEoiForm || !hasDeptUserForm || hasOldRemovedForms) {
+            const fresh = this.deepClone(this.seeds[key]);
+            this.store.set(key, fresh);
+            this.saveToStorage(key, fresh);
+          } else {
+            this.store.set(key, stored);
+          }
         } else {
           this.store.set(key, stored);
         }

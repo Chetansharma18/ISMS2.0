@@ -250,19 +250,19 @@ import {
         <ng-template #statusTemplate let-sdc>
           <div class="flex items-center justify-center">
             @if (sdc.status === 'APPROVED' || sdc.status === 'Approved') {
-              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-emerald-700">
+              <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-emerald-700">
                 APPROVED
               </span>
             } @else if (sdc.status === 'PENDING_INSPECTION' || sdc.status?.includes('INSPECTION')) {
-              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-red-600">
+              <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-red-600">
                 {{ formatStatus(sdc.status).toUpperCase() }}
               </span>
             } @else if (sdc.status === 'REJECTED' || sdc.status === 'Rejected') {
-              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-red-600">
+              <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-red-600">
                 REJECTED
               </span>
             } @else {
-              <span class="whitespace-nowrap font-bold text-xs tracking-wider uppercase text-amber-700">
+              <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-amber-700">
                 {{ formatStatus(sdc.status).toUpperCase() }}
               </span>
             }

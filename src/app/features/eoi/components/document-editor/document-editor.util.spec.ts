@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { DEFAULT_EMBLEM_SVG, DEFAULT_LEFT_LOGO_URL, clauseLabel } from './document-editor.util';
+import { DEFAULT_EMBLEM_SVG, DEFAULT_LEFT_LOGO_URL, DEFAULT_RIGHT_LOGO_URL, clauseLabel } from './document-editor.util';
 
 describe('document-editor.util', () => {
   it('clauseLabel returns alphabetic labels', () => {
@@ -14,7 +14,8 @@ describe('document-editor.util', () => {
   });
 
   it('exposes the default letterhead logo constants', () => {
-    expect(DEFAULT_LEFT_LOGO_URL.startsWith('https://')).toBe(true);
-    expect(DEFAULT_EMBLEM_SVG.startsWith('data:image/svg+xml')).toBe(true);
+    expect(DEFAULT_LEFT_LOGO_URL).toBe('/rsldc-logo.png');
+    expect(DEFAULT_RIGHT_LOGO_URL).toBe('/Rajasthan-Sarkar.png');
+    expect(DEFAULT_EMBLEM_SVG).toBe('/rsldc-logo.png');
   });
 });

@@ -485,22 +485,28 @@ table.table th {
 }
 
 .table td,
-table.table td {
+table.table td,
+app-table td {
   height: 44px;
   padding: 0 var(--space-3);
   color: #1e293b;
   border-bottom: 1px solid var(--color-border);
-  font-size: 13px;
-  font-weight: 400 !important; /* Uniform normal font inside all table data cells matching Tender Status */
+  font-size: 13px !important;
+  font-weight: 400 !important; /* Uniform normal font inside all table data cells matching Active Schemes / Tender Status */
 }
 
-/* Ensure data cell spans, links, divs, buttons inside tables are strictly normal font weight */
-.table tbody td span:not(.badge):not([class*="badge"]),
-.table tbody td div:not(.badge):not([class*="badge"]),
-.table tbody td a:not(.btn):not([class*="btn"]),
-table tbody td span:not(.badge):not([class*="badge"]):not(.btn):not([class*="btn"]),
-table tbody td div:not(.badge):not([class*="badge"]):not(.btn):not([class*="btn"]),
-table tbody td a:not(.btn):not([class*="btn"]) {
+/* Ensure data cell spans, links, divs inside portal tables default to 13px text size and strictly normal font weight */
+.table tbody td,
+table.table tbody td,
+app-table tbody td {
+  font-size: 13px !important;
+}
+
+.table tbody td span:not([class*="text-[10"]):not([class*="text-[11"]):not([class*="text-[9"]):not(.badge):not([class*="badge"]),
+.table tbody td div:not([class*="text-[10"]):not([class*="text-[11"]):not([class*="text-[9"]):not(.badge):not([class*="badge"]),
+table.table tbody td span:not([class*="text-[10"]):not([class*="text-[11"]):not([class*="text-[9"]):not(.badge):not([class*="badge"]):not(.btn):not([class*="btn"]),
+table.table tbody td div:not([class*="text-[10"]):not([class*="text-[11"]):not([class*="text-[9"]):not(.badge):not([class*="badge"]):not(.btn):not([class*="btn"]),
+app-table tbody td a:not(.btn):not([class*="btn"]) {
   font-weight: 400 !important;
 }
 

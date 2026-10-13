@@ -42,8 +42,8 @@ export interface ApplicantResponse {
   schemeName: string;
   eoiRefNo: string;
   submissionDate: string;
-  status: 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED';
-  statusDisplay: string; // "Pending Review" | "Accepted" | "Rejected"
+  status: 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED' | 'REVERTED';
+  statusDisplay: string; // "Pending Review" | "Accepted" | "Rejected" | "Reverted"
   emdFee: number;
   emdStatus: 'PAID' | 'REFUNDED';
   processingFee: number;
@@ -121,6 +121,44 @@ export interface ApplicantResponse {
     approvalDocument?: CommitteeApprovalDocument;
     scrutinyOfficer: string;
     decisionTimestamp: string;
+    shortfall?: {
+      documents: string[];
+      officeOrderRef: string;
+      officeOrderFileName?: string;
+      deadlineDays: number;
+      revertedAt: string;
+    };
+    remarksHistory?: {
+      id: string;
+      remark: string;
+      author: string;
+      timestamp: string;
+      forwardedTo?: string;
+      priority?: 'Normal' | 'Urgent';
+    }[];
+  };
+
+  // Full timeline audit trail of application lifecycle events & transactions
+  activityLog?: ApplicationActivityLog[];
+}
+
+export interface ApplicationActivityLog {
+  id: string;
+  timestamp: string;
+  action: 'SUBMITTED' | 'UNDER_REVIEW' | 'REVERTED' | 'RESUBMITTED' | 'REMARK_ADDED' | 'FORWARDED' | 'APPROVED' | 'REJECTED';
+  title: string;
+  actor: string;
+  actorRole: 'Applicant / TP' | 'Department Scrutiny Officer' | 'Joint Director' | 'Empanelment Committee' | 'System';
+  description: string;
+  badgeClass?: string;
+  meta?: {
+    documents?: string[];
+    officeOrderRef?: string;
+    officeOrderFileName?: string;
+    forwardedTo?: string;
+    score?: number;
+    grade?: string;
+    remarks?: string;
   };
 }
 
@@ -232,12 +270,28 @@ export interface IpaDocumentData {
 
 /** Input of `EoiStateService.updateScrutinyDecision`. */
 export interface ScrutinyDecisionInput {
-  status: 'APPROVED' | 'REJECTED';
-  grade: 'Grade A' | 'Grade B' | 'Grade C' | 'Grade D' | 'Grade E';
-  technicalScore: number;
+  status: 'APPROVED' | 'REJECTED' | 'REVERTED';
+  grade?: 'Grade A' | 'Grade B' | 'Grade C' | 'Grade D' | 'Grade E';
+  technicalScore?: number;
   remarks: string;
   disqualificationReason?: string;
   attachedScrutinyNote?: string;
   approvalDocument?: CommitteeApprovalDocument;
   scrutinyOfficer?: string;
+  shortfall?: {
+    documents: string[];
+    officeOrderRef: string;
+    officeOrderFileName?: string;
+    deadlineDays: number;
+    revertedAt: string;
+  };
+  remarksHistory?: {
+    id: string;
+    remark: string;
+    author: string;
+    timestamp: string;
+    forwardedTo?: string;
+    priority?: 'Normal' | 'Urgent';
+  }[];
+  activityLog?: ApplicationActivityLog[];
 }

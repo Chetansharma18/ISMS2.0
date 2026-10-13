@@ -117,8 +117,8 @@ export function buildInitialResponses(): ApplicantResponse[] {
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
       eoiRefNo: 'RSLDC/EOI/2026/MMKVY-01',
       submissionDate: '08/09/2026 14:30 PM',
-      status: 'APPROVED',
-      statusDisplay: 'Accepted',
+      status: 'UNDER_SCRUTINY',
+      statusDisplay: 'Under Review',
       emdFee: 50000,
       emdStatus: 'PAID',
       processingFee: 2000,
@@ -238,24 +238,7 @@ export function buildInitialResponses(): ApplicantResponse[] {
         { id: 'doc-7', title: 'Additional Supporting Document', fileSize: '4.5 MB PDF', category: 'Annexures', verified: true }
       ],
 
-      scrutinyDetails: {
-        technicalScore: 92,
-        grade: 'Grade A',
-        remarks: 'All statutory parameters, training infrastructure, and past audited placement thresholds meet Category I empanelment guidelines.',
-        scrutinyOfficer: 'Shri R. K. Sharma (Joint Director, RSLDC)',
-        decisionTimestamp: '10/09/2026 16:40 PM',
-        approvalDocument: {
-          id: 'RES-MMKVY-2026-088',
-          documentName: 'Committee_Empanelment_Resolution_088.pdf',
-          uploadDate: '10/09/2026',
-          fileSize: '3.4 MB',
-          signatories: [
-            { name: 'Dr. Alok Verma, IAS', designation: 'Managing Director, RSLDC', signedAt: '10/09/2026 15:30', verified: true },
-            { name: 'Shri R. K. Sharma', designation: 'Joint Director (Scrutiny In-charge)', signedAt: '10/09/2026 15:45', verified: true },
-            { name: 'Smt. Neeta Mathur', designation: 'Senior Accounts Officer (Finance)', signedAt: '10/09/2026 16:00', verified: true }
-          ]
-        }
-      }
+      scrutinyDetails: undefined
     },
 
     {
@@ -267,8 +250,8 @@ export function buildInitialResponses(): ApplicantResponse[] {
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
       eoiRefNo: 'RSLDC/EOI/2026/MMKVY-01',
       submissionDate: '07/09/2026 09:15 AM',
-      status: 'APPROVED',
-      statusDisplay: 'Accepted',
+      status: 'UNDER_SCRUTINY',
+      statusDisplay: 'Under Review',
       emdFee: 50000,
       emdStatus: 'PAID',
       processingFee: 2000,
@@ -366,24 +349,7 @@ export function buildInitialResponses(): ApplicantResponse[] {
         { id: 'doc-207', title: 'Additional Supporting Document', fileSize: '3.1 MB PDF', category: 'Annexures', verified: true }
       ],
 
-      scrutinyDetails: {
-        technicalScore: 88,
-        grade: 'Grade A',
-        remarks: 'All statutory parameters, training infrastructure, and past audited placement thresholds meet Category I empanelment guidelines.',
-        scrutinyOfficer: 'Shri R. K. Sharma (Joint Director, RSLDC)',
-        decisionTimestamp: '10/09/2026 16:40 PM',
-        approvalDocument: {
-          id: 'RES-MMKVY-2026-088',
-          documentName: 'Committee_Empanelment_Resolution_088.pdf',
-          uploadDate: '10/09/2026',
-          fileSize: '3.4 MB',
-          signatories: [
-            { name: 'Dr. Alok Verma, IAS', designation: 'Managing Director, RSLDC', signedAt: '10/09/2026 15:30', verified: true },
-            { name: 'Shri R. K. Sharma', designation: 'Joint Director (Scrutiny In-charge)', signedAt: '10/09/2026 15:45', verified: true },
-            { name: 'Smt. Neeta Mathur', designation: 'Senior Accounts Officer (Finance)', signedAt: '10/09/2026 16:00', verified: true }
-          ]
-        }
-      }
+      scrutinyDetails: undefined
     },
 
     {
@@ -500,10 +466,10 @@ export function buildInitialResponses(): ApplicantResponse[] {
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
       eoiRefNo: 'RSLDC/EOI/2026/MMKVY-01',
       submissionDate: '14/07/2026 11:20 AM',
-      status: 'APPROVED',
-      statusDisplay: 'Accepted',
+      status: 'REJECTED',
+      statusDisplay: 'Rejected',
       emdFee: 50000,
-      emdStatus: 'PAID',
+      emdStatus: 'REFUNDED',
       processingFee: 2000,
       processingFeeStatus: 'PAID',
 
@@ -622,22 +588,11 @@ export function buildInitialResponses(): ApplicantResponse[] {
       ],
 
       scrutinyDetails: {
-        technicalScore: 92,
-        grade: 'Grade A',
-        remarks: 'Exemplary technical infrastructure and robust track record across four Rajasthan districts. Fully approved for Category I empanelment.',
+        technicalScore: 54,
+        grade: 'Grade C',
+        remarks: 'Documentation non-compliance: deficient technical infrastructure and missing verified audit statements for Category I placement requirements.',
         scrutinyOfficer: 'Shri R. K. Sharma (Joint Director, RSLDC)',
-        decisionTimestamp: '25/08/2026 14:15 PM',
-        approvalDocument: {
-          id: 'RES-MMKVY-2026-042',
-          documentName: 'Committee_Empanelment_Resolution_042.pdf',
-          uploadDate: '25/08/2026',
-          fileSize: '3.1 MB',
-          signatories: [
-            { name: 'Dr. Alok Verma, IAS', designation: 'Managing Director, RSLDC', signedAt: '25/08/2026 13:30', verified: true },
-            { name: 'Shri R. K. Sharma', designation: 'Joint Director (Scrutiny In-charge)', signedAt: '25/08/2026 13:50', verified: true },
-            { name: 'Smt. Neeta Mathur', designation: 'Senior Accounts Officer (Finance)', signedAt: '25/08/2026 14:05', verified: true }
-          ]
-        }
+        decisionTimestamp: '25/08/2026 14:15 PM'
       }
     }
   ];
@@ -688,8 +643,8 @@ export function buildDefaultSanctionOrderData(schemeId: string = 'MMKVY-01'): Sa
       'PM, PMCA',
       'Respective (Project Implementing Agencies) via mail'
     ],
-    leftLogoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/84/Government_of_Rajasthan_Logo.svg',
-    rightLogoUrl: '',
+    leftLogoUrl: '/rsldc-logo.png',
+    rightLogoUrl: '/Rajasthan-Sarkar.png',
     rightLogoText: 'RSLDC\nJAIPUR'
   };
 }
@@ -802,7 +757,7 @@ export function buildDefaultIpaData(schemeId: string = 'MMKVY-01', appId: string
     ],
     signatoryTitle: 'Scheme OIC',
     signatorySub: 'RSLDC',
-    leftLogoUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/84/Government_of_Rajasthan_Logo.svg',
-    rightLogoUrl: ''
+    leftLogoUrl: '/rsldc-logo.png',
+    rightLogoUrl: '/Rajasthan-Sarkar.png'
   };
 }

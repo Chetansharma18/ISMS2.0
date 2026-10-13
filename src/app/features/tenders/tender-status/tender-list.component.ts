@@ -46,7 +46,7 @@ import { filterTenders } from './tender-status.util';
         <button
           type="button"
           (click)="open.emit(tender)"
-          class="font-mono font-normal text-navy hover:underline cursor-pointer text-left transition-colors"
+          class="font-mono font-normal text-navy hover:underline cursor-pointer text-left transition-colors text-[13px]"
           title="Open Application Details Page"
         >
           {{ tender.appRef }}
@@ -57,7 +57,7 @@ import { filterTenders } from './tender-status.util';
       <ng-template #schemeTitleTemplate let-tender>
         <span
           (click)="open.emit(tender)"
-          class="font-normal text-slate-800 hover:text-navy hover:underline cursor-pointer transition-colors"
+          class="font-normal text-slate-800 hover:text-navy hover:underline cursor-pointer transition-colors text-[13px]"
           title="Open {{ tender.schemeTitle }}"
         >
           {{ tender.schemeTitle }}
@@ -66,33 +66,33 @@ import { filterTenders } from './tender-status.util';
 
       <!-- Custom Scheme Category Template -->
       <ng-template #schemeCategoryTemplate let-tender>
-        <span class="text-slate-800 font-normal text-xs uppercase tracking-wide">{{ tender.schemeCategory || 'GENERAL' }}</span>
+        <span class="text-slate-800 font-normal text-[13px] uppercase tracking-wide">{{ tender.schemeCategory || 'GENERAL' }}</span>
       </ng-template>
 
       <!-- Custom Submitted Status Template (Plain text, not highlighted) -->
       <ng-template #submittedStatusTemplate let-tender>
-        <span class="text-slate-800 font-normal text-xs">{{ tender.submittedStatus }}</span>
+        <span class="text-slate-800 font-normal text-[13px]">{{ tender.submittedStatus }}</span>
       </ng-template>
 
       <!-- Custom EOI Stage Template -->
       <ng-template #eoiStatusTemplate let-tender>
         @if (tender.eoiStatus === 'Reviewed') {
-          <span class="text-slate-800 font-normal text-xs">{{ tender.eoiStatus }}</span>
+          <span class="text-slate-800 font-normal text-[13px]">{{ tender.eoiStatus }}</span>
         } @else if (tender.eoiStatus === 'Under Review') {
-          <span class="text-slate-800 font-normal text-xs">{{ tender.eoiStatus }}</span>
+          <span class="text-slate-800 font-normal text-[13px]">{{ tender.eoiStatus }}</span>
         } @else {
-          <span class="text-slate-500 font-normal text-xs">-</span>
+          <span class="text-slate-500 font-normal text-[13px]">-</span>
         }
       </ng-template>
 
       <!-- Custom Rejection Reason Template -->
       <ng-template #rejectionReasonTemplate let-tender>
         @if (tender.submittedStatus === 'Rejected') {
-          <span class="text-rose-600 text-xs leading-tight font-normal block max-w-sm text-left">
+          <span class="text-rose-600 text-[13px] leading-tight font-normal block max-w-sm text-left">
             {{ tender.rejectionReason || 'Technical qualification criteria not met.' }}
           </span>
         } @else {
-          <span class="text-slate-400 font-normal text-center block">-</span>
+          <span class="text-slate-400 font-normal text-center block text-[13px]">-</span>
         }
       </ng-template>
 
@@ -102,7 +102,7 @@ import { filterTenders } from './tender-status.util';
           type="button"
           (click)="open.emit(tender)"
           title="Open Application Details Page"
-          class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-navy hover:bg-navy-dark text-white rounded-md text-xs font-semibold cursor-pointer shadow-2xs transition-colors"
+          class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-navy hover:bg-navy-dark text-white rounded-md text-[13px] font-normal cursor-pointer shadow-2xs transition-colors"
         >
           <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

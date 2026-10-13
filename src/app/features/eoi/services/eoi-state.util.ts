@@ -19,6 +19,7 @@ export function mergeStoredResponses(
     return {
       ...init,
       ...match,
+      activityLog: match.activityLog || init.activityLog,
       annualActionPlan: (match.annualActionPlan && match.annualActionPlan.length > 0) ? match.annualActionPlan : init.annualActionPlan,
       bankDetails: match.bankDetails || init.bankDetails,
       organisation: { ...init.organisation, ...match.organisation },
@@ -27,21 +28,24 @@ export function mergeStoredResponses(
   });
 }
 
-/** Seed list with "Company 1" reset to an unevaluated, pending-review application. */
-export function withCompany1UnderScrutiny(initial: ApplicantResponse[]): ApplicantResponse[] {
+/** Seed list with Company 1 and Company 2 set to "Under Review" for presentation. */
+export function withTwoCompaniesUnderReview(initial: ApplicantResponse[]): ApplicantResponse[] {
   return initial.map(resp => {
     const isCompany1 = resp.anonymousLabel === 'Company 1' || resp.id === 'APP-2024-001' || resp.id === 'APP-004661' || resp.id === 'APP-005001';
-    if (isCompany1) {
+    const isCompany2 = resp.anonymousLabel === 'Company 2' || resp.id === 'APP-2024-002';
+    if (isCompany1 || isCompany2) {
       return {
         ...resp,
         status: 'UNDER_SCRUTINY' as const,
-        statusDisplay: 'Pending Review',
+        statusDisplay: 'Under Review',
         scrutinyDetails: undefined
       };
     }
     return resp;
   });
 }
+
+export const withCompany1UnderScrutiny = withTwoCompaniesUnderReview;
 
 /** Scheme lookup used by `getSchemeById` (matches the id, or a ref number containing it). */
 export function findSchemeById(schemes: Scheme[], schemeId: string): Scheme | undefined {
@@ -94,20 +98,24 @@ export function applyScrutinyDecision(
   now: Date = new Date()
 ): ApplicantResponse {
   const isApproved = decision.status === 'APPROVED';
-  const updatedEmdStatus = isApproved ? 'PAID' : 'REFUNDED';
-  const statusDisplay = isApproved ? 'Accepted' : 'Rejected';
+  const isReverted = decision.status === 'REVERTED';
+  const updatedEmdStatus = (isApproved || isReverted) ? 'PAID' : 'REFUNDED';
+  const statusDisplay = isApproved ? 'Accepted' : isReverted ? 'Reverted' : 'Rejected';
 
   return {
     ...target,
     status: decision.status,
     statusDisplay: statusDisplay,
     emdStatus: updatedEmdStatus,
+    activityLog: decision.activityLog ?? target.activityLog,
     scrutinyDetails: {
-      technicalScore: Math.min(100, Math.max(0, decision.technicalScore)),
+      technicalScore: Math.min(100, Math.max(0, decision.technicalScore ?? 0)),
       grade: decision.grade,
       remarks: decision.remarks,
       disqualificationReason: decision.disqualificationReason,
       approvalDocument: decision.approvalDocument,
+      shortfall: decision.shortfall ?? target.scrutinyDetails?.shortfall,
+      remarksHistory: decision.remarksHistory ?? target.scrutinyDetails?.remarksHistory,
       scrutinyOfficer: decision.scrutinyOfficer || 'Department Scrutiny Officer (RSLDC)',
       decisionTimestamp: `${formatDate(now)} ${formatTime(now)}`
     }

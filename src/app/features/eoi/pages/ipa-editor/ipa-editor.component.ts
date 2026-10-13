@@ -5,8 +5,7 @@ import { EoiStateService } from '../../services/eoi-state.service';
 import { LetterheadComponent } from '../../components/document-editor/letterhead.component';
 import { FileNoDateRowComponent } from '../../components/document-editor/file-no-date-row.component';
 import { ClauseListComponent } from '../../components/document-editor/clause-list.component';
-import { DEFAULT_EMBLEM_SVG, DEFAULT_LEFT_LOGO_URL } from '../../components/document-editor/document-editor.util';
-import { IpaActionBarComponent } from './components/ipa-action-bar.component';
+import { DEFAULT_EMBLEM_SVG, DEFAULT_LEFT_LOGO_URL, DEFAULT_RIGHT_LOGO_URL } from '../../components/document-editor/document-editor.util';
 import { IpaRecipientBlockComponent } from './components/ipa-recipient-block.component';
 import { IpaSubjectBlockComponent } from './components/ipa-subject-block.component';
 import { IpaCourseTableComponent } from './components/ipa-course-table.component';
@@ -31,7 +30,6 @@ export type { IpaCourseRow, TargetSummaryRow } from './ipa-editor.model';
     LetterheadComponent,
     FileNoDateRowComponent,
     ClauseListComponent,
-    IpaActionBarComponent,
     IpaRecipientBlockComponent,
     IpaSubjectBlockComponent,
     IpaCourseTableComponent,
@@ -39,19 +37,23 @@ export type { IpaCourseRow, TargetSummaryRow } from './ipa-editor.model';
     IpaSignatoryBlockComponent
   ],
   template: `
-    <div class="w-full min-h-full bg-slate-100 text-[#1F2933] font-sans pb-12 print:bg-white print:p-0 print:pb-0">
+    <div class="w-full min-h-screen bg-slate-50 text-[#1F2933] font-sans py-6 px-3 sm:px-6 lg:px-8 print:bg-white print:p-0">
 
-      <!-- Top Action Bar (Hidden in Print) -->
-      <app-ipa-action-bar
-        [schemeId]="schemeId()"
-        [isSaved]="isSaved()"
-        [savedNotification]="savedNotification()"
-        (save)="saveIpaAndNotify()"
-        (print)="printPdf()"
-      />
+      <!-- Success Notification Toast -->
+      @if (savedNotification()) {
+        <div class="fixed top-5 right-5 z-50 p-4 bg-emerald-600 text-white rounded-lg shadow-xl text-xs sm:text-sm font-semibold flex items-center gap-2 animate-in fade-in duration-200">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>In-Principle Approval (IPA) Saved &amp; Finalized Successfully!</span>
+        </div>
+      }
 
-      <!-- EDITABLE IPA DOCUMENT CONTAINER (Matches IPA.pdf layout exactly) -->
-      <div class="ipa-pdf-container max-w-6xl mx-auto bg-white p-4 sm:p-6 print:p-0 print:max-w-none text-[#111827] font-serif leading-relaxed text-xs sm:text-sm border border-slate-300 shadow-md rounded-sm print:border-none print:shadow-none">
+      <!-- Responsive Document Wrapper fitting full screen without excessive side margins -->
+      <div class="w-full max-w-6xl mx-auto space-y-4">
+
+        <!-- EDITABLE IPA DOCUMENT CONTAINER (Matches IPA.pdf layout exactly) -->
+        <div class="ipa-pdf-container w-full bg-white p-6 sm:p-8 lg:p-10 print:p-0 text-[#111827] font-serif leading-relaxed text-xs sm:text-sm border border-slate-300 shadow-sm rounded-lg print:border-none print:shadow-none">
 
         <!-- Header with Official Logos & Government Title -->
         <app-letterhead
@@ -119,29 +121,20 @@ export type { IpaCourseRow, TargetSummaryRow } from './ipa-editor.model';
 
       </div>
 
-      <!-- Bottom Action Bar -->
-      <div class="mt-8 max-w-6xl mx-auto flex items-center justify-between gap-4 font-sans print:hidden">
-        <button
-          type="button"
-          (click)="saveIpaAndNotify()"
-          class="px-5 py-2 rounded bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold shadow transition-colors cursor-pointer flex items-center gap-2"
-        >
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          <span>{{ isSaved() ? '✓ Saved &amp; Issued' : 'Save &amp; Finalize IPA Letter' }}</span>
-        </button>
+        <!-- Bottom Action Bar: Save & Finalize shifted to right, Print removed -->
+        <div class="flex items-center justify-end font-sans print:hidden pt-2">
+          <button
+            type="button"
+            (click)="saveIpaAndNotify()"
+            class="px-6 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold shadow-sm hover:shadow transition-all cursor-pointer flex items-center gap-2 active:scale-95"
+          >
+            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Save &amp; Finalize IPA Letter</span>
+          </button>
+        </div>
 
-        <button
-          type="button"
-          (click)="printPdf()"
-          class="px-4 py-2 rounded bg-slate-800 hover:bg-slate-900 text-white text-xs font-medium shadow transition-colors cursor-pointer flex items-center gap-1.5"
-        >
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-          </svg>
-          <span>Print Document</span>
-        </button>
       </div>
 
     </div>
@@ -161,7 +154,7 @@ export class IpaEditorComponent implements OnInit {
   // Logo state and SVG fallbacks (Border-free emblem logo)
   defaultEmblemSvg = DEFAULT_EMBLEM_SVG;
   leftLogoUrl = signal<string>(DEFAULT_LEFT_LOGO_URL);
-  rightLogoUrl = signal<string>('');
+  rightLogoUrl = signal<string>(DEFAULT_RIGHT_LOGO_URL);
   rightLogoText = 'RSLDC\nJAIPUR';
 
   // Header & Ref Fields matching IPA.pdf
@@ -239,11 +232,15 @@ export class IpaEditorComponent implements OnInit {
       }
       this.signatoryTitle = savedData.signatoryTitle || this.signatoryTitle;
       this.signatorySub = savedData.signatorySub || this.signatorySub;
-      if (savedData.leftLogoUrl) {
+      if (savedData.leftLogoUrl && (savedData.leftLogoUrl.startsWith('data:') || savedData.leftLogoUrl.includes('rsldc-logo'))) {
         this.leftLogoUrl.set(savedData.leftLogoUrl);
+      } else {
+        this.leftLogoUrl.set(DEFAULT_LEFT_LOGO_URL);
       }
-      if (savedData.rightLogoUrl) {
+      if (savedData.rightLogoUrl && (savedData.rightLogoUrl.startsWith('data:') || savedData.rightLogoUrl.includes('Rajasthan-Sarkar'))) {
         this.rightLogoUrl.set(savedData.rightLogoUrl);
+      } else {
+        this.rightLogoUrl.set(DEFAULT_RIGHT_LOGO_URL);
       }
     }
 

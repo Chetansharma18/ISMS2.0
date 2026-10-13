@@ -27,39 +27,42 @@ export interface AcceptedCompanyRow {
         
         <!-- Top Action Header -->
         <app-page-header
-          title="Sanction Order - Allocated Targets"
+          title="Allocate Target"
           [breadcrumbs]="[
             { label: 'Home', url: '/' },
             { label: 'Sanction Order', url: '/admin/sanction-orders' },
-            { label: 'Accepted Companies Table' }
+            { label: 'Allocate Target' }
           ]"
-          backUrl="/admin/sanction-orders"
-          backTitle="Back to Sanction Order List"
           [searchable]="true"
           searchPlaceholder="Search agency, district, sector, appId..."
           [(searchQuery)]="searchQuery"
         >
-          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[#0c2d4e] border border-slate-300 text-xs font-medium shadow-xs">
-            <span class="text-slate-600">Accepted Companies:</span>
-            <span class="font-bold text-[#0c2d4e]">{{ acceptedRows().length }}</span>
-          </div>
         </app-page-header>
 
-        <!-- Scheme Context Banner -->
-        @if (currentScheme()) {
-          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
-            <div>
-              <span class="font-semibold text-slate-800 text-sm block sm:inline">{{ currentScheme()?.schemeTitle }}</span>
-              <span class="text-slate-500 sm:ml-2 font-mono text-[11px]">Ref: {{ currentScheme()?.refNo }}</span>
+        <!-- Back Button & Scheme Context Banner -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <!-- Back button matching remaining pages -->
+          <button
+            type="button"
+            (click)="goBack()"
+            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-[13px] font-semibold transition-all cursor-pointer shadow-2xs active:scale-95 shrink-0"
+            title="Back to Sanction Orders"
+          >
+            <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Back</span>
+          </button>
+
+          @if (currentScheme()) {
+            <div class="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+              <div>
+                <span class="font-semibold text-slate-800 text-sm block sm:inline">{{ currentScheme()?.schemeTitle }}</span>
+                <span class="text-slate-500 sm:ml-2 font-mono text-[11px]">Ref: {{ currentScheme()?.refNo }}</span>
+              </div>
             </div>
-            <div class="flex items-center gap-2 shrink-0">
-              <span class="px-2.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[11px] font-semibold border border-emerald-200">
-                &check; Sanction Issued
-              </span>
-              <span class="text-slate-500 text-[11px]">Category: {{ currentScheme()?.category || 'General' }}</span>
-            </div>
-          </div>
-        }
+          }
+        </div>
 
         <!-- Allocated Physical Targets Table (Using Reusable TableComponent) -->
         <app-table
@@ -70,18 +73,11 @@ export interface AcceptedCompanyRow {
           itemUnit="companies"
           emptyMessage="No accepted companies / approved tenders found for this scheme."
           [customTemplates]="{
-            category: categoryTemplate,
             grade: gradeTemplate,
             action: actionTemplate
           }"
         >
         </app-table>
-
-        <ng-template #categoryTemplate let-row>
-          <span class="inline-block px-2 py-0.5 rounded bg-sky-50 text-sky-800 border border-sky-200 font-medium text-[11px]">
-            {{ row.category }}
-          </span>
-        </ng-template>
 
         <ng-template #gradeTemplate let-row>
           <span class="inline-block px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 font-bold border border-emerald-200 text-[11px]">
@@ -93,12 +89,12 @@ export interface AcceptedCompanyRow {
           <button
             type="button"
             (click)="openIpaModal(row)"
-            class="px-3 py-1.5 bg-primary hover:bg-[#0E324D] text-white rounded text-xs font-medium transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap shrink-0"
+            class="px-3.5 py-1.5 bg-primary hover:bg-[#0E324D] text-white rounded text-xs font-semibold transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap shrink-0"
           >
             <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <span class="whitespace-nowrap">Generated IPA</span>
+            <span class="whitespace-nowrap">Generate IPA</span>
           </button>
         </ng-template>
 
@@ -279,11 +275,14 @@ export class SanctionOrderComponent implements OnInit {
     { key: 'agencyName', label: 'Name Of the Agency/PIA', width: 'min-w-[220px]', cellClass: 'whitespace-nowrap font-normal text-slate-800' },
     { key: 'district', label: 'Sanction District', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap text-slate-700 font-normal text-center' },
     { key: 'sector', label: 'Sanction Sector(s)', width: 'min-w-[180px]', cellClass: 'whitespace-nowrap text-slate-700 font-normal' },
-    { key: 'category', label: 'Application Category', align: 'center', type: 'custom', width: 'w-36' },
     { key: 'grade', label: 'Grade', align: 'center', type: 'custom', width: 'w-20' },
     { key: 'target', label: 'Sanction Target', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-normal text-slate-800 text-center text-[13px]' },
     { key: 'action', label: 'Action', align: 'center', type: 'custom', width: 'w-36', cellClass: 'whitespace-nowrap text-center' }
   ];
+
+  goBack(): void {
+    this.router.navigate(['/admin/sanction-orders']);
+  }
 
   ngOnInit(): void {
     this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {

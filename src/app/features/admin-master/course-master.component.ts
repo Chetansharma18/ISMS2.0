@@ -5,19 +5,11 @@ import {
   TableColumn
 } from '../../shared';
 import { CourseMasterItem } from '../../core/models/admin-masters.model';
+import { SKILL_SECTOR_NAMES } from '../../core/config/sector.config';
 
 export type { CourseMasterItem };
 
-const SECTOR_OPTIONS = [
-  'Aerospace and Aviation',
-  'Agriculture',
-  'Apparel',
-  'Automotive',
-  'Beauty & Wellness',
-  'Healthcare',
-  'IT-ITeS',
-  'Logistics'
-];
+const SECTOR_OPTIONS = [...SKILL_SECTOR_NAMES];
 
 const COMMON_NORMS_OPTIONS = ['I', 'II', 'III'];
 
@@ -40,7 +32,7 @@ const COLUMNS: TableColumn<CourseMasterItem>[] = [
     cellClass: (value: string) => {
       const base = 'min-w-[140px] text-xs font-medium whitespace-nowrap';
       if (value === 'Expired') return `${base} text-rose-600`;
-      if (value === 'New Version') return `${base} text-emerald-600`;
+      if (value === 'New Version' || value === 'New Course') return `${base} text-emerald-600`;
       if (value === 'Not Valid') return `${base} text-slate-600`;
       return `${base} text-amber-800`;
     }

@@ -9,7 +9,8 @@ import {
   createDefaultTerms,
   createFallbackTableRows,
   createNewTableRow,
-  gradeToLetter
+  gradeToLetter,
+  syncRowsWithApproved
 } from './eoi-sanction-editor.util';
 
 function approved(overrides: Partial<ApplicantResponse>): ApplicantResponse {
@@ -31,7 +32,7 @@ describe('eoi-sanction-editor.util', () => {
     expect(gradeToLetter(undefined)).toBe('A');
   });
 
-  it('buildRowsFromApproved uses the legal name, centre district and track-record sector', () => {
+  it('buildRowsFromApproved uses the company label, centre district and track-record sector', () => {
     const rows = buildRowsFromApproved([
       approved({
         trainingCentres: [{ district: 'Kota' }] as unknown as ApplicantResponse['trainingCentres'],
@@ -43,7 +44,7 @@ describe('eoi-sanction-editor.util', () => {
       {
         id: 'APP-1',
         appId: 'APP-1',
-        agencyName: 'Apex Pvt Ltd',
+        agencyName: 'Company 1',
         district: 'Kota',
         sector: 'Textile',
         category: 'A-1 (Skill)',
@@ -63,6 +64,25 @@ describe('eoi-sanction-editor.util', () => {
     expect(rows[1].district).toBe(AVAILABLE_DISTRICTS[1]);
     expect(rows[1].sector).toBe(AVAILABLE_SECTORS[1]);
     expect(rows[0].grade).toBe('A');
+  });
+
+  it('syncRowsWithApproved follows the approved companies and keeps earlier edits', () => {
+    const c1 = approved({ id: 'APP-2024-001', anonymousLabel: 'Company 1', regNumber: 'R1' } as Partial<ApplicantResponse>);
+    const c2 = approved({ id: 'APP-2024-002', anonymousLabel: 'Company 2', regNumber: 'R2' } as Partial<ApplicantResponse>);
+    const saved = [
+      // Stale row of a company that is not approved, with a real name
+      { id: 'x', appId: 'APP-2024-002', agencyName: 'Marwar Skill Foundation', district: 'Kota', sector: 'S', category: 'C', grade: 'A', target: 90 },
+      // Edited row of an approved company
+      { id: 'y', appId: 'APP-2024-001', agencyName: 'Apex Technical', district: 'Sikar', sector: 'Retail', category: 'A-2', grade: 'A', target: 200 },
+      // Row added by hand
+      { id: 'z', appId: 'APP-004750', agencyName: 'Agency 5', district: 'Jaipur', sector: 'S', category: 'C', grade: 'A', target: 150 }
+    ];
+
+    const rows = syncRowsWithApproved(saved, [c1], [c1, c2]);
+
+    expect(rows.map(r => r.agencyName)).toEqual(['Company 1', 'Agency 5']);
+    expect(rows[0].district).toBe('Sikar');
+    expect(rows[0].target).toBe(200);
   });
 
   it('createNewTableRow numbers the row after the existing ones', () => {

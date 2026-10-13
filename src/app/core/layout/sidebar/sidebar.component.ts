@@ -418,6 +418,28 @@ import { AspirantPortalService } from '../../../features/aspirant/services/aspir
               <span class="tracking-tight font-medium">Sanction Order</span>
             </a>
 
+            <!-- IPA -->
+            <a
+              routerLink="/admin/ipa"
+              [class.bg-primary-light]="isActive('dept-ipa')"
+              [class.text-brand]="isActive('dept-ipa')"
+              [class.font-medium]="isActive('dept-ipa')"
+              [class.border]="isActive('dept-ipa')"
+              [class.border-border]="isActive('dept-ipa')"
+              [class.text-text-secondary]="!isActive('dept-ipa')"
+              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
+            >
+              <svg
+                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
+                [class.text-brand]="isActive('dept-ipa')"
+                [class.text-text-muted]="!isActive('dept-ipa')"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span class="tracking-tight font-medium">IPA</span>
+            </a>
+
             <!-- 3. SDC Approvals -->
             <a
               routerLink="/sdc"
@@ -914,6 +936,16 @@ export class SidebarComponent {
       return 'tender-status';
     }
 
+    // IPA (department admin): list, approved TPs and the IPA editor
+    if (url.startsWith('/admin/ipa')) {
+      return 'dept-ipa';
+    }
+
+    // MoU draft opens from the Sanction Order list, so keep that item highlighted
+    if (url.startsWith('/admin/mou-draft')) {
+      return 'dept-sanction-orders';
+    }
+
     // 4. Sanction Order
     if (url.includes('sanction-order')) {
       return this.isDeptAdmin() ? 'dept-sanction-orders' : 'sanction-order';
@@ -981,6 +1013,17 @@ export class SidebarComponent {
     }
     if (url.startsWith('/admin/master/user-role')) {
       return 'admin-master-user-role';
+    }
+    if (url.startsWith('/admin/two-step-verification')) {
+      return 'admin-two-step-verification';
+    }
+    if (url.startsWith('/admin/dynamic-form-builder')) {
+      return 'admin-dynamic-form-builder';
+    }
+    // Remaining master pages (doc, remark, grading ...) highlight themselves via routerLinkActive,
+    // so they must not fall through to the "EOI Configuration" default below.
+    if (url.startsWith('/admin/master')) {
+      return 'admin-master';
     }
     if (url.startsWith('/admin/user-management')) {
       return 'admin-user-management';

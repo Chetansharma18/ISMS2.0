@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { StorageService } from '../../core/services/storage.service';
+import { EOI_WIZARD_STEP_COUNT, EoiDraft, EoiDraftService } from '../../core/services/eoi-draft.service';
 import { PermissionService } from '../../core/permissions/permission.service';
 import { SchemeService } from './services/scheme.service';
 import {
@@ -74,6 +75,32 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
             (configureEoi)="openConfigureEoiModal()"
           ></app-schemes-header>
 
+          <!-- Unfinished EOI applications of the signed-in applicant -->
+          @for (draft of pendingDrafts(); track draft.refNo) {
+            <div
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900"
+              role="alert"
+            >
+              <p class="m-0 flex items-start gap-2 text-[13px] leading-snug">
+                <svg class="w-4 h-4 mt-0.5 shrink-0 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                </svg>
+                <span>
+                  <strong class="font-semibold">Application pending:</strong>
+                  your EOI application for <strong class="font-semibold">{{ draft.schemeName }}</strong>
+                  ({{ draft.refNo }}) is incomplete. You stopped at Step {{ draft.step }} of {{ draftStepCount }}.
+                </span>
+              </p>
+              <button
+                type="button"
+                (click)="resumeApplication(draft.refNo)"
+                class="shrink-0 inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-navy hover:bg-navy-dark text-white text-xs font-semibold cursor-pointer transition-colors"
+              >
+                Continue Application
+              </button>
+            </div>
+          }
+
           <!-- Schemes Table via Reusable TableComponent -->
           <app-table
             [columns]="schemeColumns()"
@@ -85,12 +112,24 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
             itemUnit="schemes"
             emptyMessage="No active schemes available matching your search query."
             [customTemplates]="{
+              schemeName: schemeNameTemplate,
               closingDate: closingDateTemplate,
               eoiDescription: descTemplate,
               viewAction: viewActionTemplate
             }"
           >
           </app-table>
+
+          <!-- Scheme name, with a "pending" tag when the applicant left this application unfinished -->
+          <ng-template #schemeNameTemplate let-item>
+            <span class="text-slate-800 font-normal text-[13px]">{{ item.schemeName }}</span>
+            @if (draftFor(item.refNo); as draft) {
+              <span class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-amber-300 bg-amber-100 text-amber-800 text-[10.5px] font-semibold align-middle">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
+                Pending &bull; Step {{ draft.step }} of {{ draftStepCount }}
+              </span>
+            }
+          </ng-template>
 
           <!-- Custom Template for Closing Date -->
           <ng-template #closingDateTemplate let-item>
@@ -107,7 +146,9 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
             <app-scheme-row-actions
               [item]="item"
               [isSuperAdmin]="isSuperAdmin()"
+              [hasPendingApplication]="!!draftFor(item.refNo)"
               (viewScheme)="viewSchemeDetails($event)"
+              (resumeScheme)="resumeApplication($event.refNo)"
               (manageCommittee)="openAddCommitteeModal($event)"
               (editScheme)="editScheme($event)"
               (toggleActive)="toggleActiveStatus($event)"
@@ -293,6 +334,16 @@ export class TendersPageComponent {
   pageSize = 10;
   searchQuery = signal<string>('');
 
+  private readonly draftService = inject(EoiDraftService);
+  protected readonly draftStepCount = EOI_WIZARD_STEP_COUNT;
+
+  /** Unfinished applications for schemes that are still listed. Admins do not apply, so they never see any. */
+  readonly pendingDrafts = computed(() =>
+    this.isSuperAdmin()
+      ? []
+      : this.draftService.drafts().filter(d => this.schemes().some(s => s.refNo === d.refNo))
+  );
+
   readonly filteredSchemes = computed(() => filterActiveSchemes(this.schemes(), this.searchQuery()));
 
   onSearchChange(val: string): void {
@@ -370,6 +421,7 @@ export class TendersPageComponent {
     {
       key: 'schemeName',
       label: 'Scheme Name',
+      type: 'custom',
       cellClass: 'whitespace-nowrap font-normal text-slate-800'
     },
     {
@@ -408,10 +460,25 @@ export class TendersPageComponent {
 
   getRowClass = (item: SchemeTender): string => {
     const isInactive = item.isActive === false;
-    return isInactive
-      ? 'opacity-50 !bg-slate-100/70 cursor-pointer hover:!bg-slate-200/80 transition-colors'
+    if (isInactive) {
+      return 'opacity-50 !bg-slate-100/70 cursor-pointer hover:!bg-slate-200/80 transition-colors';
+    }
+    return this.draftFor(item.refNo)
+      ? '!bg-amber-50 cursor-pointer hover:!bg-amber-100/70 transition-colors'
       : 'bg-white cursor-pointer hover:bg-slate-100/90 transition-colors';
   };
+
+  /** Pending (unfinished) application the signed-in applicant has for the given scheme, if any. */
+  draftFor(refNo: string): EoiDraft | null {
+    return this.pendingDrafts().find(d => d.refNo === refNo) ?? null;
+  }
+
+  /** Reopens the wizard exactly where the applicant left it. */
+  resumeApplication(refNo: string): void {
+    const draft = this.draftFor(refNo);
+    if (!draft) return;
+    this.router.navigate(['/scheme-form'], { queryParams: { ...draft.queryParams, refNo: draft.refNo } });
+  }
 
   onRowClick(scheme: SchemeTender): void {
     this.viewSchemeDetails(scheme);

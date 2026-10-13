@@ -1,76 +1,68 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { NgClass } from '@angular/common';
 import { SchemeFormState } from '../../scheme-form.state';
 
-/** Step 4: uploaded documents status table. */
+/** Step 4: read-only summary of the uploaded proposal documents. */
 @Component({
   selector: 'app-step4-documents-table',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass],
   host: { class: 'block' },
   template: `
-    <div class="space-y-2.5">
-      <div class="flex items-center justify-between pb-1.5 border-b border-slate-200 flex-wrap gap-2">
-        <span class="font-bold text-navy uppercase tracking-wider text-[11px]">3. Uploaded Proposal Documents ({{ state.attachedDocsCount() }} / 16 Attached)</span>
+    <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+      <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">5</span>
+          <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Documents ({{ state.attachedDocsCount() }} / {{ state.eoiDocuments().length }} Uploaded)</h2>
+        </div>
         <button
           type="button"
-          (click)="state.attachAllSampleDocs()"
-          class="px-3 py-1 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 rounded-md font-semibold text-xs cursor-pointer shadow-2xs"
+          (click)="state.goToStep(3)"
+          class="inline-flex items-center px-3 py-1 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
         >
-          Attach All Mandated Annexures
+          Edit Details
         </button>
       </div>
 
-      <div class="border border-slate-200 rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
-          <thead class="bg-slate-100/80 text-slate-600 font-bold text-[10.5px] uppercase tracking-wider border-b border-slate-200">
+          <thead class="bg-slate-50/90 text-slate-600 text-[11.5px] font-semibold border-b border-slate-200">
             <tr>
-              <th class="p-2.5 w-10 text-center">#</th>
-              <th class="p-2.5">Document Title</th>
-              <th class="p-2.5">Classification</th>
-              <th class="p-2.5">Attached File</th>
-              <th class="p-2.5 text-center">Action</th>
+              <th class="px-3 py-2.5 w-10 text-center">#</th>
+              <th class="px-3 py-2.5">Document Name</th>
+              <th class="px-3 py-2.5">File Name</th>
+              <th class="px-3 py-2.5">Size</th>
+              <th class="px-3 py-2.5">Status</th>
+              <th class="px-3 py-2.5 text-center">Action</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100 text-slate-700">
+          <tbody class="text-slate-700">
             @for (doc of state.eoiDocuments(); track doc.id) {
-              <tr class="hover:bg-slate-50/50">
-                <td class="p-2.5 text-center font-bold text-slate-400">{{ doc.id }}</td>
-                <td class="p-2.5 font-semibold text-slate-800">{{ doc.name }}</td>
-                <td class="p-2.5">
-                  <span class="text-[10px] px-2 py-0.5 rounded font-semibold"
-                    [ngClass]="{
-                      'bg-rose-50 text-rose-700 border border-rose-200': doc.category === 'mandatory',
-                      'bg-sky-50 text-sky-700 border border-sky-200': doc.category === 'annexure',
-                      'bg-slate-100 text-slate-600': doc.category === 'remaining'
-                    }">
-                    {{ doc.category === 'mandatory' ? 'Mandatory Statutory' : (doc.category === 'annexure' ? 'Scheme Annexure' : 'Supporting') }}
-                  </span>
+              <tr class="border-t border-slate-100 hover:bg-slate-50/50">
+                <td class="px-3 py-2.5 text-center font-semibold text-slate-400">{{ doc.id }}</td>
+                <td class="px-3 py-2.5 font-medium text-slate-900 text-[12.5px]">
+                  {{ doc.name }}
+                  @if (doc.isMandatory) {
+                    <span class="text-rose-600 font-bold" title="Mandatory">*</span>
+                  }
                 </td>
-                <td class="p-2.5 font-mono text-[11.5px] text-slate-600">
-                  {{ doc.fileName ? (doc.fileName + ' (' + doc.fileSize + ')') : '-' }}
-                </td>
-                <td class="p-2.5 text-center">
+                <td class="px-3 py-2.5 text-[12.5px] text-slate-700 break-all">{{ doc.fileName || '-' }}</td>
+                <td class="px-3 py-2.5 text-[12.5px] text-slate-700 whitespace-nowrap">{{ doc.fileSize || '-' }}</td>
+                <td class="px-3 py-2.5">
                   @if (doc.status === 'uploaded') {
-                    <div class="flex items-center justify-center gap-1">
-                      <button
-                        type="button"
-                        (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)"
-                        class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10.5px] font-medium cursor-pointer"
-                      >
-                        View
-                      </button>
-                      <label class="px-2 py-0.5 bg-sky-50 hover:bg-sky-100 border border-sky-300 text-ocean rounded text-[10.5px] font-medium cursor-pointer">
-                        Replace
-                        <input type="file" (change)="state.onFileSelected($event, doc)" class="hidden" accept=".pdf" />
-                      </label>
-                    </div>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-semibold">Uploaded</span>
                   } @else {
-                    <label class="px-2.5 py-0.5 bg-navy hover:bg-navy-dark text-white rounded text-[10.5px] font-semibold cursor-pointer shadow-2xs">
-                      Upload PDF
-                      <input type="file" (change)="state.onFileSelected($event, doc)" class="hidden" accept=".pdf" />
-                    </label>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600 text-[11px] font-semibold">Not uploaded</span>
+                  }
+                </td>
+                <td class="px-3 py-2.5 text-center">
+                  @if (doc.status === 'uploaded') {
+                    <button
+                      type="button"
+                      (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)"
+                      class="text-ocean font-semibold text-xs hover:underline cursor-pointer"
+                    >
+                      View
+                    </button>
                   }
                 </td>
               </tr>
@@ -78,7 +70,7 @@ import { SchemeFormState } from '../../scheme-form.state';
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
   `
 })
 export class Step4DocumentsTableComponent {

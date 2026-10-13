@@ -9,14 +9,10 @@ import { TenderDocCardComponent, TenderDocReplaceRequest, TenderDocViewRequest }
   imports: [FormsModule, TenderDocCardComponent],
   host: { class: 'block' },
   template: `
-    <div class="bg-white border border-slate-200 rounded-lg p-5 space-y-4 shadow-2xs">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-        <div class="flex items-center gap-2">
-          <span class="w-6 h-6 rounded-full bg-navy text-white text-xs font-bold flex items-center justify-center shrink-0">1</span>
-          <h3 class="font-semibold text-slate-900 text-sm">
-            Step 1: OTR Profile - Organisation Details &amp; Legal Registration
-          </h3>
-        </div>
+    <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4">
+      <div class="pb-3.5 border-b border-slate-100 flex items-center gap-3">
+        <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">1</span>
+        <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">Organisation Details</h2>
       </div>
 
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-y-3.5 gap-x-6 text-xs">

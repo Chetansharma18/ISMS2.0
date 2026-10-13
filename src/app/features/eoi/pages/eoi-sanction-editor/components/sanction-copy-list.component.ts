@@ -18,9 +18,25 @@ import { FormsModule } from '@angular/forms';
               [ngModel]="copyToList()[i]" (ngModelChange)="setCopyTo(i, $event)"
               class="w-full bg-transparent border-b border-dashed border-slate-200 hover:border-slate-400 focus:border-slate-800 focus:outline-none px-1 text-[11px]"
             />
+            <button
+              type="button"
+              (click)="removeCopyTo(i)"
+              class="shrink-0 w-5 h-5 rounded text-rose-500 hover:text-rose-700 hover:bg-rose-50 flex items-center justify-center cursor-pointer print:hidden"
+              title="Remove row"
+              aria-label="Remove row"
+            >
+              &times;
+            </button>
           </li>
         }
       </ol>
+      <button
+        type="button"
+        (click)="addCopyTo()"
+        class="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded border border-slate-300 bg-white hover:bg-slate-50 text-[11px] font-semibold text-navy cursor-pointer print:hidden"
+      >
+        + Add Row
+      </button>
     </div>
   `
 })
@@ -29,5 +45,13 @@ export class SanctionCopyListComponent {
 
   setCopyTo(index: number, value: string): void {
     this.copyToList()[index] = value;
+  }
+
+  addCopyTo(): void {
+    this.copyToList().push('');
+  }
+
+  removeCopyTo(index: number): void {
+    this.copyToList().splice(index, 1);
   }
 }

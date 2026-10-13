@@ -65,6 +65,9 @@ export class OtrValidationService {
     if (!step1.registrationCertDoc || step1.registrationCertDoc.status !== 'uploaded') {
       errors.push('Certificate of Registration Document upload is mandatory.');
     }
+    if (!step1.preferredSector?.trim()) {
+      errors.push('Preferred Sector selection is mandatory.');
+    }
 
     // Statutory & Tax
     if (!step1.companyPan?.trim()) {

@@ -14,6 +14,46 @@ export interface SubmittedTenderDoc {
   status: 'uploaded' | 'pending';
 }
 
+/** A file shared by the department along with a shortfall notice (office order, format, sample...). */
+export interface ShortfallSharedDoc {
+  title: string;
+  fileName: string;
+  fileSize: string;
+}
+
+/** A file the applicant uploaded against one document asked for in a shortfall notice. */
+export interface ShortfallUpload {
+  requiredDoc: string;
+  fileName: string;
+  fileSize: string;
+  uploadedOn: string;
+}
+
+/** The applicant's reply to a shortfall notice. */
+export interface ShortfallResponse {
+  respondedOn: string;
+  remarks: string;
+  uploads: ShortfallUpload[];
+}
+
+/** One revert (shortfall) notice raised by the department on a submitted application. */
+export interface ShortfallRequest {
+  id: string;
+  /** Only present when the shortfall came with an office order. */
+  officeOrderRef?: string;
+  raisedOn: string;
+  raisedBy: string;
+  /** Last date to respond (DD-Mon-YYYY). */
+  dueDate: string;
+  remarks: string;
+  /** Documents the applicant has to upload. */
+  requiredDocs: string[];
+  /** Supporting files shared by the department. */
+  sharedDocs: ShortfallSharedDoc[];
+  status: 'Open' | 'Responded';
+  response?: ShortfallResponse;
+}
+
 export interface SubmittedTender {
   id: string;
   appRef: string;
@@ -38,6 +78,8 @@ export interface SubmittedTender {
   officers: OfficerInCharge[];
   bankDetails: Step4BankDetails;
   documents: SubmittedTenderDoc[];
+  /** Revert (shortfall) notices from the department and the applicant's replies, oldest first. */
+  shortfalls?: ShortfallRequest[];
 }
 
 export function createSampleDocs(): SubmittedTenderDoc[] {

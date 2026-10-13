@@ -30,6 +30,21 @@ import { isEditDisabled } from './tenders-page.util';
         <span>View</span>
       </button>
 
+      @if (hasPendingApplication() && !isSuperAdmin()) {
+        <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
+        <button
+          type="button"
+          (click)="$event.stopPropagation(); resumeScheme.emit(item())"
+          class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-900 font-semibold text-[12px] hover:underline cursor-pointer select-none transition-colors"
+          title="Continue your pending application"
+        >
+          <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+          <span>Continue</span>
+        </button>
+      }
+
       @if (isSuperAdmin()) {
         <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
 
@@ -105,8 +120,11 @@ import { isEditDisabled } from './tenders-page.util';
 export class SchemeRowActionsComponent {
   readonly item = input.required<SchemeTender>();
   readonly isSuperAdmin = input(false);
+  /** The applicant has started, but not submitted, an application for this scheme. */
+  readonly hasPendingApplication = input(false);
 
   readonly viewScheme = output<SchemeTender>();
+  readonly resumeScheme = output<SchemeTender>();
   readonly manageCommittee = output<SchemeTender>();
   readonly editScheme = output<SchemeTender>();
   readonly toggleActive = output<SchemeTender>();

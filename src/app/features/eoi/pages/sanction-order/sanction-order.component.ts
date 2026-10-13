@@ -71,7 +71,7 @@ export interface AcceptedCompanyRow {
           [pagination]="true"
           [pageSize]="10"
           itemUnit="companies"
-          emptyMessage="No accepted companies / approved tenders found for this scheme."
+          emptyMessage="No approved companies found for this scheme."
           [customTemplates]="{
             grade: gradeTemplate,
             action: actionTemplate

@@ -37,6 +37,8 @@ export interface Step1OrgDetails {
   turnoverCertDoc: FileDoc | null;      // NEW: CA-certified turnover certificate
   blackListed: 'Yes' | 'No';
   nsdcPartner: string;
+  /** Sector the organisation prefers to train in (a Sector Master name). */
+  preferredSector: string;
   contactNo: string;
   emailId: string;
   website: string;
@@ -299,6 +301,7 @@ export function createInitialOtrFormData(): OtrFormData {
       turnoverCertDoc: null,
       blackListed: 'No',
       nsdcPartner: 'Not Applicable',
+      preferredSector: '',
       contactNo: '',
       emailId: '',
       website: '',
@@ -417,6 +420,7 @@ export function createExistingUserOtrData(): OtrFormData {
       },
       blackListed: 'No',
       nsdcPartner: 'Non-Funded Partner',
+      preferredSector: 'Electronics',
       contactNo: '0141-2700891',
       emailId: 'contact@skilltech.org',
       website: 'https://www.skilltech.org',

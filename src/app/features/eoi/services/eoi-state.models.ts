@@ -33,6 +33,19 @@ export interface DossierDocument {
   verified: boolean;
 }
 
+/** Result of an earlier EOI the same organisation was empanelled under, measured against its target. */
+export interface PastEngagement {
+  schemeName: string;
+  financialYear: string;
+  eoiRefNo: string;
+  /** Trainees allotted to the organisation. */
+  target: number;
+  trained: number;
+  certified: number;
+  placed: number;
+  status: 'Completed' | 'Ongoing';
+}
+
 export interface ApplicantResponse {
   id: string;
   anonymousLabel: string; // e.g. "Company 1"
@@ -43,7 +56,7 @@ export interface ApplicantResponse {
   eoiRefNo: string;
   submissionDate: string;
   status: 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED' | 'REVERTED';
-  statusDisplay: string; // "Pending Review" | "Accepted" | "Rejected" | "Reverted"
+  statusDisplay: string; // "Under Review" | "Approved" | "Rejected" | "Reverted"
   emdFee: number;
   emdStatus: 'PAID' | 'REFUNDED';
   processingFee: number;
@@ -112,10 +125,14 @@ export interface ApplicantResponse {
   // Uploaded Checklist Documents (Screenshot 3)
   uploadedDocuments: DossierDocument[];
 
+  /** Earlier schemes this organisation was empanelled under, with the results achieved against target. */
+  pastEngagements?: PastEngagement[];
+
   // Evaluation & Scrutiny Decision details
   scrutinyDetails?: {
     technicalScore?: number;
-    grade?: 'Grade A' | 'Grade B' | 'Grade C' | 'Grade D' | 'Grade E';
+    /** Grade from the Grading Master (for example "A+" or "B"). */
+    grade?: string;
     remarks?: string;
     disqualificationReason?: string;
     approvalDocument?: CommitteeApprovalDocument;
@@ -123,7 +140,7 @@ export interface ApplicantResponse {
     decisionTimestamp: string;
     shortfall?: {
       documents: string[];
-      officeOrderRef: string;
+      officeOrderRef?: string;
       officeOrderFileName?: string;
       deadlineDays: number;
       revertedAt: string;
@@ -203,9 +220,8 @@ export interface SanctionOrderDocumentData {
   tableRows: SanctionTableRow[];
   termsAndConditions: string[];
   dispatchRef: string;
-  signatoryName: string;
-  signatoryTitle: string;
-  signatoryOrg: string;
+  /** When the order was e-signed (ISO date-time). Empty while it is a draft. */
+  signedAt?: string;
   copyToList: string[];
   leftLogoUrl?: string;
   rightLogoUrl?: string;
@@ -264,14 +280,16 @@ export interface IpaDocumentData {
   ccList: string[];
   signatoryTitle: string;
   signatorySub: string;
+  /** When the IPA was e-signed (ISO date-time). Empty while it is a draft. */
+  signedAt?: string;
   leftLogoUrl?: string;
   rightLogoUrl?: string;
 }
 
 /** Input of `EoiStateService.updateScrutinyDecision`. */
 export interface ScrutinyDecisionInput {
-  status: 'APPROVED' | 'REJECTED' | 'REVERTED';
-  grade?: 'Grade A' | 'Grade B' | 'Grade C' | 'Grade D' | 'Grade E';
+  status: 'APPROVED' | 'REJECTED' | 'REVERTED' | 'UNDER_SCRUTINY';
+  grade?: string;
   technicalScore?: number;
   remarks: string;
   disqualificationReason?: string;
@@ -280,7 +298,7 @@ export interface ScrutinyDecisionInput {
   scrutinyOfficer?: string;
   shortfall?: {
     documents: string[];
-    officeOrderRef: string;
+    officeOrderRef?: string;
     officeOrderFileName?: string;
     deadlineDays: number;
     revertedAt: string;

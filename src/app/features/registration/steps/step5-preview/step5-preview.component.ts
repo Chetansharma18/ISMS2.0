@@ -89,6 +89,10 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
 
             <!-- Row 3 -->
             <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Preferred Sector</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().preferredSector || '-' }}</span>
+            </div>
+            <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">NSDC Partner</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().nsdcPartner || '-' }}</span>
             </div>

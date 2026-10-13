@@ -1,408 +1,411 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SchemeFormState } from '../../scheme-form.state';
+import {
+  DISTRICTS_BY_STATE,
+  NATURE_OF_ENTITIES,
+  NSDC_PARTNER_TYPES,
+  STATES_MASTER
+} from '../../../../../registration/models/otr-form.model';
+import { FormInputComponent } from '../../../../../../shared/components/form-controls/form-input/form-input.component';
+import { FormSelectComponent } from '../../../../../../shared/components/form-controls/form-select/form-select.component';
+import { FormTextareaComponent } from '../../../../../../shared/components/form-controls/form-textarea/form-textarea.component';
+import { FormFileUploadComponent } from '../../../../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
 
-/** Step 2: company particulars and registration documents (editable). */
+const NO_DISTRICTS: string[] = [];
+
+/**
+ * Step 2: company particulars and registration documents (editable).
+ * Deliberately stays on default change detection: the state objects are mutated in place.
+ */
 @Component({
   selector: 'app-step2-organisation',
   standalone: true,
-  imports: [FormsModule],
+  imports: [
+    FormsModule,
+    FormInputComponent,
+    FormSelectComponent,
+    FormTextareaComponent,
+    FormFileUploadComponent
+  ],
   host: { class: 'block' },
   template: `
-    <div class="space-y-4">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
-        <h4 class="text-sm sm:text-base font-bold text-navy uppercase tracking-wide m-0">
-          1. COMPANY PARTICULARS &amp; REGISTRATION DETAILS
-        </h4>
-        <span class="text-xs text-slate-500 font-mono font-semibold">CIN: {{ state.editableStep1.registrationNumber || '-' }}</span>
+    <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+      <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">1</span>
+          <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Company Particulars &amp; Registration Details</h2>
+        </div>
+        <span class="text-xs text-slate-500 font-mono font-semibold truncate">CIN: {{ state.editableStep1.registrationNumber || '-' }}</span>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-        <div>
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">NAME (SHORT NAME)</label>
-          <input type="text" [(ngModel)]="state.editableStep1.shortName" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy" placeholder="e.g. SVEPL" />
+      <div class="p-4 sm:p-5 w-full space-y-3 font-sans">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-3.5 gap-y-2.5">
+          <!-- Organisation Name -->
+          <div class="lg:col-span-9 sm:col-span-2">
+            <app-form-input
+              label="Organisation Name"
+              [value]="state.editableStep1.fullName"
+              (valueChange)="onFullNameChange($event)"
+              placeholder="Enter organisation name"
+              [required]="true"
+              [maxLength]="200"
+            ></app-form-input>
+          </div>
+
+          <!-- Nature of Entity -->
+          <div class="lg:col-span-3 sm:col-span-1">
+            <app-form-select
+              label="Nature of Entity"
+              [value]="state.editableStep1.natureOfEntity"
+              (valueChange)="state.editableStep1.natureOfEntity = $event"
+              [options]="natureOfEntitiesList"
+              placeholder="Select nature of entity"
+              [required]="true"
+            ></app-form-select>
+          </div>
+
+          <!-- Registration Number -->
+          <div class="lg:col-span-4 sm:col-span-1">
+            <app-form-input
+              label="Registration No. (CIN / Reg. No.)"
+              [value]="state.editableStep1.registrationNumber"
+              (valueChange)="state.editableStep1.registrationNumber = $event"
+              placeholder="Enter registration number"
+              [required]="true"
+              [uppercase]="true"
+              [maxLength]="50"
+            ></app-form-input>
+          </div>
+
+          <!-- Date of Registration -->
+          <div class="lg:col-span-3 sm:col-span-1">
+            <app-form-input
+              label="Date of Registration"
+              type="date"
+              [value]="state.editableStep1.dateOfRegistration"
+              (valueChange)="state.editableStep1.dateOfRegistration = $event"
+              [required]="true"
+            ></app-form-input>
+          </div>
+
+          <!-- State / UT of Registration -->
+          <div class="lg:col-span-5 sm:col-span-1">
+            <app-form-select
+              label="State / UT of Registration"
+              [value]="state.editableStep1.stateOfLegalReg"
+              (valueChange)="state.editableStep1.stateOfLegalReg = $event"
+              [options]="statesList"
+              placeholder="Select state / UT"
+              [required]="true"
+            ></app-form-select>
+          </div>
+
+          <!-- Certificate of Incorporation -->
+          <div class="lg:col-span-12 sm:col-span-2">
+            <app-form-file-upload
+              label="Certificate of Registration / Incorporation"
+              [fileDoc]="state.editableStep1.registrationCertDoc"
+              (fileChange)="state.editableStep1.registrationCertDoc = $event"
+              [required]="true"
+            ></app-form-file-upload>
+          </div>
+
+          <!-- Organisation PAN -->
+          <div class="lg:col-span-3 sm:col-span-1">
+            <app-form-input
+              label="Organisation PAN"
+              [value]="state.editableStep1.companyPan"
+              (valueChange)="state.editableStep1.companyPan = $event"
+              placeholder="Enter organisation PAN"
+              [required]="true"
+              [uppercase]="true"
+              [maxLength]="10"
+            ></app-form-input>
+          </div>
+
+          <!-- Organisation PAN Card -->
+          <div class="lg:col-span-5 sm:col-span-1">
+            <app-form-file-upload
+              label="Organisation PAN Card"
+              [fileDoc]="state.editableStep1.panCardDoc"
+              (fileChange)="state.editableStep1.panCardDoc = $event"
+              [required]="true"
+            ></app-form-file-upload>
+          </div>
+
+          <!-- GST Registered -->
+          <div class="lg:col-span-2 sm:col-span-1">
+            <app-form-select
+              label="GST Registered"
+              [value]="state.editableStep1.gstRegistered"
+              (valueChange)="onGstRegisteredChange($event)"
+              [options]="yesNo"
+              [required]="true"
+            ></app-form-select>
+          </div>
+
+          <!-- MSME Registered -->
+          <div class="lg:col-span-2 sm:col-span-1">
+            <app-form-select
+              label="MSME / Udyam Registered"
+              [value]="state.editableStep1.msmeRegistered"
+              (valueChange)="onMsmeRegisteredChange($event)"
+              [options]="yesNo"
+              [required]="true"
+            ></app-form-select>
+          </div>
+
+          <!-- Conditional: GST details -->
+          @if (state.editableStep1.gstRegistered === 'Yes') {
+            <div class="lg:col-span-4 sm:col-span-1">
+              <app-form-input
+                label="GSTIN"
+                [value]="state.editableStep1.gstin"
+                (valueChange)="state.editableStep1.gstin = $event"
+                placeholder="Enter GSTIN"
+                [required]="true"
+                [uppercase]="true"
+                [maxLength]="15"
+              ></app-form-input>
+            </div>
+
+            <div class="lg:col-span-8 sm:col-span-1">
+              <app-form-file-upload
+                label="GST Registration Certificate"
+                [fileDoc]="state.editableStep1.gstCertDoc"
+                (fileChange)="state.editableStep1.gstCertDoc = $event"
+                [required]="true"
+              ></app-form-file-upload>
+            </div>
+          }
+
+          <!-- Conditional: MSME details -->
+          @if (state.editableStep1.msmeRegistered === 'Yes') {
+            <div class="lg:col-span-4 sm:col-span-1">
+              <app-form-input
+                label="Udyam Number"
+                [value]="state.editableStep1.udyamNumber"
+                (valueChange)="state.editableStep1.udyamNumber = $event"
+                placeholder="Enter Udyam registration number"
+                [required]="true"
+                [uppercase]="true"
+                [maxLength]="19"
+              ></app-form-input>
+            </div>
+
+            <div class="lg:col-span-8 sm:col-span-1">
+              <app-form-file-upload
+                label="MSME / Udyam Registration Certificate"
+                [fileDoc]="state.editableStep1.msmeCertDoc"
+                (fileChange)="state.editableStep1.msmeCertDoc = $event"
+                [required]="true"
+              ></app-form-file-upload>
+            </div>
+          }
+
+          <!-- Contact profile -->
+          <div class="lg:col-span-3 sm:col-span-1">
+            <app-form-select
+              label="NSDC Partner"
+              [value]="state.editableStep1.nsdcPartner"
+              (valueChange)="state.editableStep1.nsdcPartner = $event"
+              [options]="nsdcPartnersList"
+              placeholder="Select"
+              [required]="false"
+            ></app-form-select>
+          </div>
+
+          <div class="lg:col-span-3 sm:col-span-1">
+            <app-form-input
+              label="Organisation Contact No."
+              type="tel"
+              [value]="state.editableStep1.contactNo"
+              (valueChange)="state.editableStep1.contactNo = $event"
+              placeholder="Enter contact number"
+              [required]="true"
+              [maxLength]="15"
+            ></app-form-input>
+          </div>
+
+          <div class="lg:col-span-6 sm:col-span-2">
+            <app-form-input
+              label="Organisation Email ID"
+              type="email"
+              [value]="state.editableStep1.emailId"
+              (valueChange)="state.editableStep1.emailId = $event"
+              placeholder="Enter email address"
+              [required]="true"
+            ></app-form-input>
+          </div>
+
+          <div class="lg:col-span-6 sm:col-span-2">
+            <app-form-input
+              label="Website"
+              [value]="state.editableStep1.website"
+              (valueChange)="state.editableStep1.website = $event"
+              placeholder="Enter website (https://www.example.com)"
+            ></app-form-input>
+          </div>
         </div>
 
-        <div class="sm:col-span-2">
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">FULL NAME OF ORGANIZATION</label>
-          <input type="text" [(ngModel)]="state.editableStep1.fullName" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy" placeholder="Full Legal Name" />
-        </div>
+        <!-- Address details -->
+        <div class="pt-2.5 border-t border-slate-200/80 space-y-2.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-3.5 gap-y-2.5">
+            <div class="lg:col-span-6 sm:col-span-2">
+              <app-form-textarea
+                label="Registered Address"
+                [value]="state.editableStep1.registeredAddress"
+                (valueChange)="state.editableStep1.registeredAddress = $event"
+                placeholder="Enter address, locality, building name and number"
+                [required]="true"
+              ></app-form-textarea>
+            </div>
 
-        <div>
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">NATURE OF ENTITY</label>
-          <input type="text" [(ngModel)]="state.editableStep1.natureOfEntity" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy" placeholder="e.g. Private Limited Company" />
-        </div>
+            <div class="lg:col-span-2 sm:col-span-1">
+              <app-form-select
+                label="State / UT"
+                [value]="state.editableStep1.registeredState"
+                (valueChange)="onRegisteredStateChange($event)"
+                [options]="statesList"
+                placeholder="Select state / UT"
+                [required]="true"
+              ></app-form-select>
+            </div>
 
-        <div>
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">REGISTRATION NUMBER (CIN)</label>
-          <input type="text" [(ngModel)]="state.editableStep1.registrationNumber" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy" placeholder="CIN Number" />
-        </div>
+            <div class="lg:col-span-2 sm:col-span-1">
+              <app-form-select
+                label="District"
+                [value]="state.editableStep1.registeredDistrict"
+                (valueChange)="state.editableStep1.registeredDistrict = $event"
+                [options]="districtsFor(state.editableStep1.registeredState)"
+                [disabled]="!state.editableStep1.registeredState"
+                placeholder="Select district"
+                [required]="true"
+              ></app-form-select>
+            </div>
 
-        <div>
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">DATE OF REGISTRATION</label>
-          <input type="text" [(ngModel)]="state.editableStep1.dateOfRegistration" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy" placeholder="DD/MM/YYYY" />
-        </div>
+            <div class="lg:col-span-2 sm:col-span-1">
+              <app-form-input
+                label="PIN Code"
+                type="tel"
+                [value]="state.editableStep1.registeredPincode"
+                (valueChange)="state.editableStep1.registeredPincode = $event"
+                placeholder="Enter PIN code"
+                [required]="true"
+                [maxLength]="6"
+              ></app-form-input>
+            </div>
+          </div>
 
-        <div>
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">STATE / UT OF REGISTRATION</label>
-          <input type="text" [(ngModel)]="state.editableStep1.stateOfLegalReg" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy" placeholder="State" />
-        </div>
+          <!-- Same as registered -->
+          <div class="pt-1 border-t border-slate-100">
+            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                [ngModel]="state.editableStep1.sameAsRegistered"
+                (ngModelChange)="state.editableStep1.sameAsRegistered = $event"
+                class="w-4 h-4 text-navy border-slate-300 rounded focus:ring-navy accent-navy"
+              />
+              <span>Office Address is same as Registered Address</span>
+            </label>
+          </div>
 
-        <div>
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">COMPANY PAN</label>
-          <input type="text" [(ngModel)]="state.editableStep1.companyPan" class="w-full px-3 py-2 text-xs font-mono font-bold border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy" placeholder="Company PAN" />
-        </div>
+          @if (!state.editableStep1.sameAsRegistered) {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-3.5 gap-y-2.5">
+              <div class="lg:col-span-6 sm:col-span-2">
+                <app-form-textarea
+                  label="Office Address"
+                  [value]="state.editableStep1.officeAddress"
+                  (valueChange)="state.editableStep1.officeAddress = $event"
+                  placeholder="Enter office address, locality, building name and number"
+                  [required]="true"
+                ></app-form-textarea>
+              </div>
 
-        <div>
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">GST REGISTERED</label>
-          <select [(ngModel)]="state.editableStep1.gstRegistered" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy">
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
-        </div>
+              <div class="lg:col-span-2 sm:col-span-1">
+                <app-form-select
+                  label="State / UT"
+                  [value]="state.editableStep1.officeState"
+                  (valueChange)="onOfficeStateChange($event)"
+                  [options]="statesList"
+                  placeholder="Select state / UT"
+                  [required]="true"
+                ></app-form-select>
+              </div>
 
-        <div>
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">GSTIN</label>
-          <input type="text" [(ngModel)]="state.editableStep1.gstin" [disabled]="state.editableStep1.gstRegistered !== 'Yes'" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg bg-white disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-navy" placeholder="15-digit GSTIN" />
-        </div>
+              <div class="lg:col-span-2 sm:col-span-1">
+                <app-form-select
+                  label="District"
+                  [value]="state.editableStep1.officeDistrict"
+                  (valueChange)="state.editableStep1.officeDistrict = $event"
+                  [options]="districtsFor(state.editableStep1.officeState)"
+                  [disabled]="!state.editableStep1.officeState"
+                  placeholder="Select district"
+                  [required]="true"
+                ></app-form-select>
+              </div>
 
-        <div>
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">MSME / UDYAM REGISTERED</label>
-          <select [(ngModel)]="state.editableStep1.msmeRegistered" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy">
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">UDYAM REGISTRATION NO.</label>
-          <input type="text" [(ngModel)]="state.editableStep1.udyamNumber" [disabled]="state.editableStep1.msmeRegistered !== 'Yes'" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg bg-white disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-navy" placeholder="UDYAM-RJ-XX-XXXXXXX" />
-        </div>
-
-        <div>
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">NSDC PARTNER STATUS</label>
-          <select [(ngModel)]="state.editableStep1.nsdcPartner" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy">
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">COMPANY CONTACT NO.</label>
-          <input type="text" [(ngModel)]="state.editableStep1.contactNo" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy" placeholder="Phone number" />
-        </div>
-
-        <div>
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">COMPANY EMAIL-ID</label>
-          <input type="email" [(ngModel)]="state.editableStep1.emailId" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy" placeholder="Official email" />
-        </div>
-
-        <div>
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">WEBSITE</label>
-          <input type="text" [(ngModel)]="state.editableStep1.website" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy" placeholder="https://domain.com" />
-        </div>
-
-        <div class="sm:col-span-2 lg:col-span-3">
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">REGISTERED ADDRESS</label>
-          <textarea [(ngModel)]="state.editableStep1.registeredAddress" rows="2" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy" placeholder="Complete Registered Address"></textarea>
-        </div>
-
-        <div class="sm:col-span-2 lg:col-span-3">
-          <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">OFFICE ADDRESS</label>
-          <textarea [(ngModel)]="state.editableStep1.officeAddress" rows="2" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-navy" placeholder="Corporate / Branch Office Address"></textarea>
+              <div class="lg:col-span-2 sm:col-span-1">
+                <app-form-input
+                  label="PIN Code"
+                  type="tel"
+                  [value]="state.editableStep1.officePincode"
+                  (valueChange)="state.editableStep1.officePincode = $event"
+                  placeholder="Enter PIN code"
+                  [required]="true"
+                  [maxLength]="6"
+                ></app-form-input>
+              </div>
+            </div>
+          }
         </div>
       </div>
-
-      <!-- Attached Registration Documents -->
-      <div class="pt-3 border-t border-slate-100">
-        <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider block mb-2.5">
-          ATTACHED REGISTRATION DOCUMENTS
-        </span>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-          
-          <!-- Doc 1: Certificate of Incorporation -->
-          @if (state.editableStep1.registrationCertDoc && state.editableStep1.registrationCertDoc.status === 'uploaded') {
-            <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
-              <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
-                  <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
-                  <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
-                </svg>
-                <div class="flex flex-col min-w-0">
-                  <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Certificate of Incorporation</span>
-                  <span class="font-medium text-slate-800 truncate text-xs" title="{{ state.editableStep1.registrationCertDoc.fileName }}">
-                    {{ state.editableStep1.registrationCertDoc.fileName }}
-                  </span>
-                  <div class="mt-0.5">
-                    <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
-                      {{ state.editableStep1.registrationCertDoc.fileSize || '1.4 MB' }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div class="flex items-center gap-1.5 shrink-0">
-                <button
-                  type="button"
-                  (click)="state.viewDoc(state.editableStep1.registrationCertDoc.fileName, 'Certificate of Incorporation', state.editableStep1.registrationCertDoc.fileSize || '1.4 MB')"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-ocean hover:text-ocean-dark bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
-                  title="Preview Document"
-                >
-                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  <span>View</span>
-                </button>
-                <label
-                  class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
-                  title="Change Document"
-                >
-                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  <span>Change</span>
-                  <input type="file" (change)="state.replaceOtrDoc($event, 'regCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-                </label>
-                <button
-                  type="button"
-                  (click)="state.removeOtrDoc('regCert')"
-                  class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
-                  title="Remove Document"
-                >
-                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  <span>Remove</span>
-                </button>
-              </div>
-            </div>
-          } @else {
-            <div class="flex items-center justify-between gap-2.5 p-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
-              <span class="text-xs text-slate-500 font-medium">Certificate of Incorporation</span>
-              <label class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer shadow-2xs shrink-0 flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-slate-600 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                <span>Upload Document</span>
-                <input type="file" (change)="state.replaceOtrDoc($event, 'regCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-              </label>
-            </div>
-          }
-
-          <!-- Doc 2: Organization PAN Card -->
-          @if (state.editableStep1.panCardDoc && state.editableStep1.panCardDoc.status === 'uploaded') {
-            <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
-              <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
-                  <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
-                  <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
-                </svg>
-                <div class="flex flex-col min-w-0">
-                  <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Organization PAN Card</span>
-                  <span class="font-medium text-slate-800 truncate text-xs" title="{{ state.editableStep1.panCardDoc.fileName }}">
-                    {{ state.editableStep1.panCardDoc.fileName }}
-                  </span>
-                  <div class="mt-0.5">
-                    <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
-                      {{ state.editableStep1.panCardDoc.fileSize || '840 KB' }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div class="flex items-center gap-1.5 shrink-0">
-                <button
-                  type="button"
-                  (click)="state.viewDoc(state.editableStep1.panCardDoc.fileName, 'Organization PAN Card', state.editableStep1.panCardDoc.fileSize || '840 KB')"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-ocean hover:text-ocean-dark bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
-                  title="Preview Document"
-                >
-                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  <span>View</span>
-                </button>
-                <label
-                  class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
-                  title="Change Document"
-                >
-                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  <span>Change</span>
-                  <input type="file" (change)="state.replaceOtrDoc($event, 'panCard')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-                </label>
-                <button
-                  type="button"
-                  (click)="state.removeOtrDoc('panCard')"
-                  class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
-                  title="Remove Document"
-                >
-                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  <span>Remove</span>
-                </button>
-              </div>
-            </div>
-          } @else {
-            <div class="flex items-center justify-between gap-2.5 p-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
-              <span class="text-xs text-slate-500 font-medium">Organization PAN Card</span>
-              <label class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer shadow-2xs shrink-0 flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-slate-600 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                <span>Upload Document</span>
-                <input type="file" (change)="state.replaceOtrDoc($event, 'panCard')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-              </label>
-            </div>
-          }
-
-          <!-- Doc 3: GST Certificate -->
-          @if (state.editableStep1.gstCertDoc && state.editableStep1.gstCertDoc.status === 'uploaded') {
-            <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
-              <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
-                  <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
-                  <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
-                </svg>
-                <div class="flex flex-col min-w-0">
-                  <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">GST Certificate</span>
-                  <span class="font-medium text-slate-800 truncate text-xs" title="{{ state.editableStep1.gstCertDoc.fileName }}">
-                    {{ state.editableStep1.gstCertDoc.fileName }}
-                  </span>
-                  <div class="mt-0.5">
-                    <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
-                      {{ state.editableStep1.gstCertDoc.fileSize || '920 KB' }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div class="flex items-center gap-1.5 shrink-0">
-                <button
-                  type="button"
-                  (click)="state.viewDoc(state.editableStep1.gstCertDoc.fileName, 'GST Certificate', state.editableStep1.gstCertDoc.fileSize || '920 KB')"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-ocean hover:text-ocean-dark bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
-                  title="Preview Document"
-                >
-                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  <span>View</span>
-                </button>
-                <label
-                  class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
-                  title="Change Document"
-                >
-                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  <span>Change</span>
-                  <input type="file" (change)="state.replaceOtrDoc($event, 'gstCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-                </label>
-                <button
-                  type="button"
-                  (click)="state.removeOtrDoc('gstCert')"
-                  class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
-                  title="Remove Document"
-                >
-                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  <span>Remove</span>
-                </button>
-              </div>
-            </div>
-          } @else {
-            <div class="flex items-center justify-between gap-2.5 p-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
-              <span class="text-xs text-slate-500 font-medium">GST Certificate</span>
-              <label class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer shadow-2xs shrink-0 flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-slate-600 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                <span>Upload Document</span>
-                <input type="file" (change)="state.replaceOtrDoc($event, 'gstCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-              </label>
-            </div>
-          }
-
-          <!-- Doc 4: Udyam Certificate -->
-          @if (state.editableStep1.msmeCertDoc && state.editableStep1.msmeCertDoc.status === 'uploaded') {
-            <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
-              <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
-                  <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
-                  <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
-                </svg>
-                <div class="flex flex-col min-w-0">
-                  <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">Udyam Certificate</span>
-                  <span class="font-medium text-slate-800 truncate text-xs" title="{{ state.editableStep1.msmeCertDoc.fileName }}">
-                    {{ state.editableStep1.msmeCertDoc.fileName }}
-                  </span>
-                  <div class="mt-0.5">
-                    <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10.5px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs">
-                      {{ state.editableStep1.msmeCertDoc.fileSize || '650 KB' }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div class="flex items-center gap-1.5 shrink-0">
-                <button
-                  type="button"
-                  (click)="state.viewDoc(state.editableStep1.msmeCertDoc.fileName, 'Udyam Certificate', state.editableStep1.msmeCertDoc.fileSize || '650 KB')"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-ocean hover:text-ocean-dark bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
-                  title="Preview Document"
-                >
-                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  <span>View</span>
-                </button>
-                <label
-                  class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
-                  title="Change Document"
-                >
-                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  <span>Change</span>
-                  <input type="file" (change)="state.replaceOtrDoc($event, 'msmeCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-                </label>
-                <button
-                  type="button"
-                  (click)="state.removeOtrDoc('msmeCert')"
-                  class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
-                  title="Remove Document"
-                >
-                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  <span>Remove</span>
-                </button>
-              </div>
-            </div>
-          } @else {
-            <div class="flex items-center justify-between gap-2.5 p-3 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
-              <span class="text-xs text-slate-500 font-medium">Udyam Certificate</span>
-              <label class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer shadow-2xs shrink-0 flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-slate-600 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                <span>Upload Document</span>
-                <input type="file" (change)="state.replaceOtrDoc($event, 'msmeCert')" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-              </label>
-            </div>
-          }
-
-        </div>
-      </div>
-
-    </div>
+    </section>
   `
 })
 export class Step2OrganisationComponent {
   protected readonly state = inject(SchemeFormState);
+
+  protected readonly natureOfEntitiesList = NATURE_OF_ENTITIES;
+  protected readonly statesList = STATES_MASTER;
+  protected readonly nsdcPartnersList = NSDC_PARTNER_TYPES;
+  protected readonly yesNo: string[] = ['Yes', 'No'];
+
+  protected districtsFor(stateName: string): string[] {
+    return (stateName && DISTRICTS_BY_STATE[stateName]) || NO_DISTRICTS;
+  }
+
+  protected onFullNameChange(value: string): void {
+    this.state.editableStep1.fullName = value;
+    this.state.editableStep1.shortName = value;
+  }
+
+  protected onGstRegisteredChange(value: string): void {
+    const org = this.state.editableStep1;
+    org.gstRegistered = value as 'Yes' | 'No';
+    if (value === 'No') {
+      org.gstin = '';
+      org.gstCertDoc = null;
+    }
+  }
+
+  protected onMsmeRegisteredChange(value: string): void {
+    const org = this.state.editableStep1;
+    org.msmeRegistered = value as 'Yes' | 'No';
+    if (value === 'No') {
+      org.udyamNumber = '';
+      org.msmeCertDoc = null;
+    }
+  }
+
+  protected onRegisteredStateChange(value: string): void {
+    this.state.editableStep1.registeredState = value;
+    this.state.editableStep1.registeredDistrict = '';
+  }
+
+  protected onOfficeStateChange(value: string): void {
+    this.state.editableStep1.officeState = value;
+    this.state.editableStep1.officeDistrict = '';
+  }
 }

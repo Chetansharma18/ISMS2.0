@@ -19,6 +19,7 @@ describe('DynamicFormBuilderComponent', () => {
         sNo: 1,
         id: 'f1',
         formType: 'Inspection Form',
+        isStepForm: false,
         status: 'Active',
         fields: [
           { id: 'fld-1', label: 'Center Name', type: 'text', mandatory: true },
@@ -29,6 +30,7 @@ describe('DynamicFormBuilderComponent', () => {
         sNo: 2,
         id: 'f2',
         formType: 'Candidate Form',
+        isStepForm: false,
         status: 'Active',
         fields: [
           { id: 'fld-3', label: 'Candidate Age', type: 'number', mandatory: false },
@@ -467,7 +469,8 @@ describe('DynamicFormBuilderComponent', () => {
             { id: 'eoi-doc-7', label: 'Training & Placement Track Record (Annexure 5)', type: 'photo', mandatory: false }
           ]
         }
-      ]
+      ],
+      fields: []
     };
 
     expect(comp.isApplyEoiForm(applyEoiForm)).toBe(true);

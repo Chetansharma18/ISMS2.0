@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent, TableComponent, TableColumn } from '../../../shared';
 import { SubmittedTender } from '../../../core/models/tender.model';
 import { filterTenders } from './tender-status.util';
+import { openShortfalls, shortfallSummary } from './tender-shortfall.util';
 
 @Component({
   selector: 'app-tender-list',
@@ -36,6 +37,7 @@ import { filterTenders } from './tender-status.util';
           submittedStatus: submittedStatusTemplate,
           eoiStatus: eoiStatusTemplate,
           rejectionReason: rejectionReasonTemplate,
+          shortfall: shortfallTemplate,
           view: viewTemplate
         }"
       >
@@ -96,6 +98,36 @@ import { filterTenders } from './tender-status.util';
         }
       </ng-template>
 
+      <!-- Revert requests raised by the department -->
+      <ng-template #shortfallTemplate let-tender>
+        @switch (shortfallState(tender)) {
+          @case ('open') {
+            <button
+              type="button"
+              (click)="respond.emit(tender)"
+              title="The department has asked for more documents. Click to respond."
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-[12.5px] font-semibold cursor-pointer transition-colors whitespace-nowrap"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
+              Respond ({{ openCount(tender) }})
+            </button>
+          }
+          @case ('responded') {
+            <button
+              type="button"
+              (click)="open.emit(tender)"
+              title="View the shortfall requests and your responses"
+              class="text-[12.5px] text-slate-700 hover:text-navy hover:underline cursor-pointer whitespace-nowrap"
+            >
+              Responded
+            </button>
+          }
+          @default {
+            <span class="text-slate-400 text-[13px]">-</span>
+          }
+        }
+      </ng-template>
+
       <!-- Custom View Action Button Template -->
       <ng-template #viewTemplate let-tender>
         <button
@@ -120,6 +152,8 @@ export class TenderListComponent {
   /** Search text; owned by the container so it survives opening a detail page. */
   readonly searchQuery = model('');
   readonly open = output<SubmittedTender>();
+  /** The applicant wants to answer an open revert request. */
+  readonly respond = output<SubmittedTender>();
 
   readonly pageSize = 6;
 
@@ -145,8 +179,17 @@ export class TenderListComponent {
     },
     { key: 'eoiStatus',        label: 'EOI Stage',            align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'rejectionReason',  label: 'Remarks', align: 'center', type: 'custom', cellClass: 'min-w-[200px]' },
+    { key: 'shortfall',        label: 'Shortfall Request',    align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
     { key: 'view',             label: 'View',                 align: 'center', width: 'w-20', type: 'custom' }
   ];
+
+  protected shortfallState(tender: SubmittedTender): 'open' | 'responded' | 'none' {
+    return shortfallSummary(tender);
+  }
+
+  protected openCount(tender: SubmittedTender): number {
+    return openShortfalls(tender).length;
+  }
 
   readonly filteredTenders = computed(() => filterTenders(this.tenders(), this.searchQuery()));
 }

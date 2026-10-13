@@ -99,7 +99,7 @@ import {
               </span>
             </button>
 
-            <!-- Accepted -->
+            <!-- Approved -->
             <button
               type="button"
               (click)="setFilter('APPROVED')"
@@ -110,7 +110,7 @@ import {
               [class.text-slate-600]="selectedFilter() !== 'APPROVED'"
               [class.hover:text-slate-900]="selectedFilter() !== 'APPROVED'"
             >
-              <span>Accepted</span>
+              <span>Approved</span>
               <span
                 class="px-1.5 py-0.2 rounded text-[10px] font-bold"
                 [class.bg-slate-800]="selectedFilter() === 'APPROVED'"
@@ -170,39 +170,44 @@ import {
           </div>
         </div>
 
-          <!-- Review Status & Upload Sanction Order Option -->
-          <div class="flex items-center gap-3">
-            <!-- Upload Sanction Order Button shown ONLY when all applications are accepted or rejected -->
+          <!-- Review status, and the sanction order once every application is decided -->
+          <div class="flex items-center gap-4 flex-wrap">
+            <div class="text-right">
+              <div class="text-xs font-semibold text-slate-800 flex items-center gap-1.5 justify-end">
+                <span class="text-slate-500 font-normal">Review Status:</span>
+                @if (allReviewed()) {
+                  <span class="font-bold text-slate-800">Reviewed</span>
+                } @else {
+                  <span class="font-bold text-slate-800">{{ countReviewed() }} / {{ totalSubmissionsCount() }} Processed</span>
+                }
+              </div>
+              <div class="text-[11px] text-slate-500 font-normal">
+                @if (allReviewed()) {
+                  All {{ totalSubmissionsCount() }} applications
+                } @else {
+                  {{ reviewPercentage() }}% Completed
+                }
+              </div>
+            </div>
+
             @if (allReviewed()) {
               <button
                 type="button"
                 (click)="openSanctionOrder()"
-                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-2xs cursor-pointer shrink-0"
-                title="Upload Sanction Order"
+                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs font-semibold transition-colors shadow-2xs cursor-pointer shrink-0 active:scale-95"
+                style="color: #ffffff !important;"
+                title="Prepare the sanction order for this scheme"
               >
-                <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                <span>Upload Sanction Order</span>
+                <span style="color: #ffffff !important;">Release Sanction Order</span>
               </button>
+            } @else {
+              <div class="w-20 sm:w-24 h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+                <div
+                  class="h-full bg-slate-700 rounded-full transition-all duration-300"
+                  [style.width.%]="reviewPercentage()"
+                ></div>
+              </div>
             }
-
-            <div class="text-right">
-              <div class="text-xs font-semibold text-slate-800 flex items-center gap-1.5 justify-end">
-                <span class="text-slate-500 font-normal">Review Status:</span>
-                <span class="font-bold text-slate-800">{{ countReviewed() }} / {{ totalSubmissionsCount() }} Processed</span>
-              </div>
-              <div class="text-[11px] text-slate-500 font-normal">
-                {{ reviewPercentage() }}% Completed
-              </div>
-            </div>
-
-            <div class="w-20 sm:w-24 h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
-              <div
-                class="h-full bg-slate-700 rounded-full transition-all duration-300"
-                [style.width.%]="reviewPercentage()"
-              ></div>
-            </div>
           </div>
         </div>
 
@@ -233,7 +238,7 @@ import {
         <!-- Clean, Proper, Non-Colorful Status -->
         <ng-template #statusTemplate let-item>
           <span class="inline-block px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200">
-            {{ item.status === 'UNDER_SCRUTINY' ? 'Under Review' : item.status === 'APPROVED' ? 'Accepted' : item.status === 'REVERTED' ? 'Reverted' : 'Rejected' }}
+            {{ item.status === 'UNDER_SCRUTINY' ? 'Under Review' : item.status === 'APPROVED' ? 'Approved' : item.status === 'REVERTED' ? 'Reverted' : 'Rejected' }}
           </span>
         </ng-template>
 
@@ -244,7 +249,6 @@ import {
             style="color: #ffffff !important;"
           >
             <span style="color: #ffffff !important;">Review</span>
-            <span style="color: #ffffff !important;">&rarr;</span>
           </a>
         </ng-template>
 
@@ -310,19 +314,8 @@ export class ApplicantSubmissionsComponent {
   });
 
   allReviewed = computed(() => this.responses().length > 0 && this.responses().every(r => r.status === 'APPROVED' || r.status === 'REJECTED'));
-  isSubmitted = computed(() => this.eoiStateService.isSanctionSubmitted(this.schemeId()));
-  uploadedSanctionFileName = signal<string>('');
 
-  onUploadSanctionOrder(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      this.uploadedSanctionFileName.set(file.name);
-      this.eoiStateService.markSanctionSubmitted(this.schemeId());
-      input.value = '';
-    }
-  }
-
+  /** Opens the draft sanction order for this scheme. */
   openSanctionOrder(): void {
     this.router.navigate(['/admin/eoi-sanction-editor', this.schemeId()]);
   }
@@ -489,7 +482,7 @@ export class ApplicantSubmissionsComponent {
 
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(22, 101, 52);
-      pdf.text('ACCEPTED & ISSUED', 75, y + 13);
+      pdf.text('APPROVED & ISSUED', 75, y + 13);
       pdf.text('Grade A (Verified)', 75, y + 19);
       pdf.text('300 Trainees (FY 2026-27)', 75, y + 25);
 
@@ -507,7 +500,7 @@ export class ApplicantSubmissionsComponent {
       y += 36;
     } else if (isRejected) {
       const bodyText = `With reference to your proposal submitted under EOI Ref No. ${app.eoiRefNo || this.schemeId()}, the State Level Scrutiny Committee has completed the document verification and technical scrutiny.\n\n` +
-        `We regret to inform you that your application could not be accepted for empanelment under ${currentSchemeTitle} for FY 2026-27 due to non-fulfillment of mandatory eligibility criteria or technical dossier discrepancies.\n\n` +
+        `We regret to inform you that your application could not be approved for empanelment under ${currentSchemeTitle} for FY 2026-27 due to non-fulfillment of mandatory eligibility criteria or technical dossier discrepancies.\n\n` +
         `Review Status: REJECTED (Disqualified at Stage 1 Technical Scrutiny).`;
       const splitBody = pdf.splitTextToSize(bodyText, 180);
       pdf.text(splitBody, 15, y);
@@ -595,7 +588,7 @@ export class ApplicantSubmissionsComponent {
       const zip = new JSZip();
       const currentSchemeTitle = list[0]?.schemeName || 'RSLDC Skill Development Scheme';
       const currentFilter = this.selectedFilter();
-      const filterTag = currentFilter === 'APPROVED' ? 'Accepted_IPA' : currentFilter === 'REJECTED' ? 'Rejected_Outcome' : currentFilter === 'UNDER_SCRUTINY' ? 'Under_Scrutiny' : 'All_Applications';
+      const filterTag = currentFilter === 'APPROVED' ? 'Approved_IPA' : currentFilter === 'REJECTED' ? 'Rejected_Outcome' : currentFilter === 'UNDER_SCRUTINY' ? 'Under_Scrutiny' : 'All_Applications';
       const folderName = `RSLDC_${filterTag}_${this.schemeId() || 'EOI'}`;
       const folder = zip.folder(folderName) || zip;
       const today = formatDate(new Date());
@@ -648,7 +641,7 @@ export class ApplicantSubmissionsComponent {
         this.renderApplicantPdfPage(pdf, app, currentSchemeTitle, today, idx + 1, list.length);
       });
 
-      const filterTag = currentFilter === 'APPROVED' ? 'Accepted_IPA' : currentFilter === 'REJECTED' ? 'Rejected' : currentFilter === 'UNDER_SCRUTINY' ? 'Under_Scrutiny' : 'All';
+      const filterTag = currentFilter === 'APPROVED' ? 'Approved_IPA' : currentFilter === 'REJECTED' ? 'Rejected' : currentFilter === 'UNDER_SCRUTINY' ? 'Under_Scrutiny' : 'All';
       const fileName = `RSLDC_${filterTag}_Applications_${this.schemeId() || 'EOI'}.pdf`;
       pdf.save(fileName);
     } catch (err) {

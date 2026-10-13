@@ -211,9 +211,12 @@ export class MockDatabaseService {
           this.store.set(key, sanitized);
           this.saveToStorage(key, sanitized);
         } else if (key === 'SUBMITTED_TENDERS') {
+          // Sessions saved before shortfall notices existed pick up the seeded notices of the same record.
+          const seeded = new Map<string, any>((this.seeds[key] as any[]).map(s => [s.id, s]));
           const sanitized = stored.map(item => ({
             ...item,
-            submittedStatus: item.submittedStatus === 'Accepted' ? 'Approved' : item.submittedStatus
+            submittedStatus: item.submittedStatus === 'Accepted' ? 'Approved' : item.submittedStatus,
+            shortfalls: item.shortfalls ?? seeded.get(item.id)?.shortfalls
           }));
           this.store.set(key, sanitized);
           this.saveToStorage(key, sanitized);
@@ -409,13 +412,46 @@ export class MockDatabaseService {
 
   // --- Storage Helper Utilities ---
 
+  /**
+   * Resources whose seed data is reference data (e.g. the official Sector / Course lists).
+   * A copy cached in the browser session is discarded when the seed changes, so updated
+   * reference data shows up without the user having to clear their session storage.
+   */
+  private static readonly SEED_VERSIONED_RESOURCES = new Set(['SECTORS', 'COURSES']);
+
+  private seedFingerprint(resourceKey: string): string {
+    const json = JSON.stringify(this.seeds[resourceKey] ?? []);
+    let hash = 5381;
+    for (let i = 0; i < json.length; i++) {
+      hash = ((hash << 5) + hash + json.charCodeAt(i)) | 0;
+    }
+    return `${json.length}:${hash}`;
+  }
+
+  private fingerprintKey(resourceKey: string): string {
+    return `${MOCK_CONFIG.storagePrefix}${resourceKey}__seed`;
+  }
+
   private saveToStorage(resourceKey: string, data: any[]): void {
     if (!MOCK_CONFIG.persistInStorage) return;
     this.storage.setSessionItem(`${MOCK_CONFIG.storagePrefix}${resourceKey}`, data);
+    if (MockDatabaseService.SEED_VERSIONED_RESOURCES.has(resourceKey)) {
+      this.storage.setSessionString(this.fingerprintKey(resourceKey), this.seedFingerprint(resourceKey));
+    }
   }
 
   private loadFromStorage(resourceKey: string): any[] | null {
     if (!this.isMockActive(resourceKey) || !MOCK_CONFIG.persistInStorage) return null;
+
+    if (
+      MockDatabaseService.SEED_VERSIONED_RESOURCES.has(resourceKey) &&
+      this.storage.getSessionString(this.fingerprintKey(resourceKey)) !== this.seedFingerprint(resourceKey)
+    ) {
+      // Cached copy was saved from an older seed (or before versioning existed): drop it.
+      this.removeFromStorage(resourceKey);
+      return null;
+    }
+
     return this.storage.getSessionItem<any[]>(`${MOCK_CONFIG.storagePrefix}${resourceKey}`);
   }
 

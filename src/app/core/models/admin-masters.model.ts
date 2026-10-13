@@ -9,7 +9,8 @@ export interface CourseMasterItem {
   version: string;
   nsqfLevel: string;
   commonNormsCategory: string;
-  theoryDurationHours: number;
+  /** Theory hours; 'NA' for the few legacy NSQF units that publish no theory duration. */
+  theoryDurationHours: number | 'NA';
   practicalOjtDurationHours: string;
   itSoftSkillTrainingHours: number;
   totalQpHours: number;

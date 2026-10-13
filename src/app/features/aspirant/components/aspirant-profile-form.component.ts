@@ -16,7 +16,6 @@ import { validateFields } from '../../../shared/components/form-sdc/form-sdc.uti
 import { DocumentViewerModalComponent } from '../../../shared/components/document-viewer-modal/document-viewer-modal.component';
 import { ActionModalComponent } from '../../../shared/components/action-modal/action-modal.component';
 import { AspirantAadhaarUploadComponent } from '../../sdc/components/aspirant-mapping/aspirant-aadhaar-upload.component';
-import { AspirantErrorBannerComponent } from '../../sdc/components/aspirant-mapping/aspirant-error-banner.component';
 import { AspirantStepNavBarComponent } from '../../sdc/components/aspirant-mapping/aspirant-step-nav-bar.component';
 import {
   AspirantPhotoDocumentsStepComponent,
@@ -61,7 +60,6 @@ export interface AspirantStepItem {
     ActionModalComponent,
     DocumentViewerModalComponent,
     AspirantAadhaarUploadComponent,
-    AspirantErrorBannerComponent,
     AspirantPhotoDocumentsStepComponent
   ],
   template: `

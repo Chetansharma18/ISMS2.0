@@ -459,17 +459,13 @@ export class RegistrationShellComponent {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  /**
+   * Moves to the next step without blocking on incomplete fields, so applicants can fill
+   * the sections in any order. Mandatory fields are still validated on final submission
+   * (see submitApplication) and are marked with * on every step.
+   */
   nextStep(): void {
     const current = this.activeStep();
-    this.validationService.markStepSubmitted(current);
-
-    const data = this.otrFormService.formData();
-    const errors = this.validationService.getStepErrors(current, data);
-
-    if (errors.length > 0) {
-      this.validationService.showToast('Please fill all mandatory fields marked with *', 'error', current);
-      return;
-    }
 
     if (current < 4) {
       this.activeStep.set(current + 1);

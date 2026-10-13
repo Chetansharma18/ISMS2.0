@@ -155,6 +155,23 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/ipa',
+    loadComponent: () =>
+      import('./features/eoi/pages/ipa-list/ipa-list.component').then((m) => m.IpaListComponent)
+  },
+  {
+    path: 'admin/ipa/:schemeId',
+    loadComponent: () =>
+      import('./features/eoi/pages/ipa-list/ipa-approved-tps.component').then(
+        (m) => m.IpaApprovedTpsComponent
+      )
+  },
+  {
+    path: 'admin/mou-draft/:schemeId',
+    loadComponent: () =>
+      import('./features/eoi/pages/mou/mou-draft.component').then((m) => m.MouDraftComponent)
+  },
+  {
     path: 'admin/eoi-sanction-editor/:schemeId',
     loadComponent: () =>
       import('./features/eoi/pages/eoi-sanction-editor/eoi-sanction-editor.component').then(
@@ -460,9 +477,11 @@ export const routes: Routes = [
   },
   {
     path: 'tp/sanction-orders',
+    // Same table as the department's; the training partner can only view released orders.
+    data: { viewOnly: true },
     loadComponent: () =>
-      import('./features/sdc/components/sanction-orders.component').then(
-        (m) => m.SanctionOrdersComponent
+      import('./features/eoi/pages/sanction-order-list/sanction-order-list.component').then(
+        (m) => m.SanctionOrderListComponent
       )
   },
   {

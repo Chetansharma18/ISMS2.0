@@ -1,9 +1,9 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, switchMap } from 'rxjs';
 import { OtrFormService } from '../../../registration/services/otr-form.service';
-import { formatDate, formatDateMedium, formatDateTime, formatInr } from '../../../../shared/utils';
+import { formatDateMedium, formatDateTime, formatInr } from '../../../../shared/utils';
 import { StepperStep } from '../../../../shared/components/stepper/stepper.component';
 import {
   Step1OrgDetails,
@@ -14,6 +14,7 @@ import {
 } from '../../../registration/models/otr-form.model';
 import { SubmittedTender, createSampleDocs } from '../../../../core/models/tender.model';
 import { DataEngineService } from '../../../../core/services/data-engine.service';
+import { EoiDraftService } from '../../../../core/services/eoi-draft.service';
 import { EoiDocumentItem, createInitialEoiDocuments } from './scheme-form.model';
 import { SchemeFormReceiptsService, SchemeReceiptData } from './scheme-form-receipts.service';
 import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
@@ -30,6 +31,12 @@ import {
   procPaymentModeLabel
 } from './scheme-form.util';
 
+/** How long the processing-fee success screen stays up before Step 2 opens by itself. */
+const PROC_FEE_SUCCESS_REDIRECT_MS = 2500;
+
+/** How long the payment + submission success screen stays up before the receipts page opens. */
+const SUBMISSION_SUCCESS_REDIRECT_MS = 3000;
+
 /**
  * Component-scoped state and actions shared by the EOI application wizard
  * (provided by SchemeFormComponent and injected by the step components).
@@ -41,6 +48,12 @@ export class SchemeFormState {
   private otrFormService = inject(OtrFormService);
   private receipts = inject(SchemeFormReceiptsService);
   private docViewer = inject(DocumentViewerService);
+
+  private draftStore = inject(EoiDraftService);
+  private draftRestored = false;
+  private schemeQueryParams: Record<string, string> = {};
+  /** True once the application has been submitted; a submitted application is no longer a draft. */
+  private readonly submitted = signal<boolean>(false);
 
   readonly otrData = this.otrFormService.formData;
 
@@ -81,7 +94,7 @@ export class SchemeFormState {
   procFeePaid = signal<boolean>(false);
   isProcPaying = signal<boolean>(false);
   showProcFeeSuccessModal = signal<boolean>(false);
-  procFeeDate = signal<string>('04/10/2026');
+  procFeeDate = signal<string>('04 Oct 2026, 08:35 PM');
   procPaymentMethod = signal<'upi' | 'card' | 'netbanking' | 'e-gras'>('upi');
   upiOption = signal<'id' | 'qr'>('id');
   upiId = signal<string>('skills.enterprise@okaxis');
@@ -96,7 +109,11 @@ export class SchemeFormState {
   emdSelectedBank = signal<string>('sbi');
   isPaymentProcessing = signal<boolean>(false);
   showEmdSuccessModal = signal<boolean>(false);
+  /** EOI Submission Reference Number issued when the application is submitted. */
   readonly eoiApplicationId = signal<string>('ISMS-EOI-2026-9842');
+  /** Payment reference numbers returned by the payment gateway. */
+  readonly procPaymentRef = 'CIN-SBI-9912081';
+  readonly emdPaymentRef = computed(() => (this.paymentMethod() === 'exemption' ? 'Exempted' : 'CIN-SBI-9912082'));
   readonly copiedRef = signal<boolean>(false);
   submissionTimestamp = signal<string>('04 Oct 2026, 08:35 PM');
 
@@ -162,7 +179,8 @@ export class SchemeFormState {
 
   readonly attachedDocsCount = computed(() => countUploaded(this.eoiDocuments()));
 
-  declarationAgreed = signal<boolean>(true);
+  /** Statutory declaration on the preview step: the applicant must tick it themselves. */
+  declarationAgreed = signal<boolean>(false);
 
   // Document Viewer Modal State
   isViewerOpen = signal<boolean>(false);
@@ -188,6 +206,9 @@ export class SchemeFormState {
   constructor() {
     this.route.queryParams.pipe(takeUntilDestroyed()).subscribe(params => {
       if (params['refNo']) this.schemeRefNo.set(params['refNo']);
+      this.schemeQueryParams = Object.fromEntries(
+        Object.entries(params).filter(([, v]) => typeof v === 'string')
+      ) as Record<string, string>;
       if (params['title']) this.schemeTitle.set(params['title']);
       if (params['schemeName']) this.schemeName.set(params['schemeName']);
       if (params['code']) this.schemeCode.set(params['code']);
@@ -199,10 +220,54 @@ export class SchemeFormState {
       if (params['emdFee']) this.schemeEmdFee.set(params['emdFee']);
       if (params['processFee']) this.schemeProcessFee.set(params['processFee']);
       if (params['eoiDescription']) this.schemeDescription.set(params['eoiDescription']);
+      if (params['refNo'] && !this.draftRestored) {
+        this.draftRestored = true;
+        this.restoreDraft(params['refNo']);
+      }
+    });
+
+    // Keep a draft up to date once the applicant has started (paid the processing fee) and until they submit,
+    // so the Active Schemes page can flag this application as pending.
+    effect(() => {
+      const paid = this.procFeePaid();
+      const step = this.currentStep();
+      const docs = this.eoiDocuments();
+      const refNo = this.schemeRefNo();
+      const procFeeDate = this.procFeeDate();
+      if (!paid || this.submitted() || step >= this.wizardSteps.length) return;
+      this.draftStore.save({
+        refNo,
+        schemeName: this.schemeName(),
+        queryParams: this.schemeQueryParams,
+        step: Math.max(step, 2),
+        procFeePaid: true,
+        procFeeDate,
+        documents: docs
+          .filter(d => d.status === 'uploaded')
+          .map(d => ({ id: d.id, fileName: d.fileName, fileSize: d.fileSize, uploadedDate: d.uploadedDate })),
+        updatedAt: new Date().toISOString()
+      });
     });
   }
 
+  /** Reopens an application that was left unfinished: fee status, uploaded documents and the step. */
+  private restoreDraft(refNo: string): void {
+    const draft = this.draftStore.get(refNo);
+    if (!draft) return;
+    this.procFeePaid.set(draft.procFeePaid);
+    this.procFeeDate.set(draft.procFeeDate);
+    this.eoiDocuments.update(docs =>
+      docs.map(doc => {
+        const saved = draft.documents.find(d => d.id === doc.id);
+        return saved ? { ...doc, ...saved, status: 'uploaded' as const } : doc;
+      })
+    );
+    this.currentStep.set(Math.min(Math.max(draft.step, 2), this.wizardSteps.length - 1));
+  }
+
   goToStep(step: number): void {
+    // Once the processing fee is paid the applicant moves forward only: Step 1 cannot be reopened.
+    if (step < 2 && this.procFeePaid()) return;
     this.currentStep.set(step);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -222,8 +287,13 @@ export class SchemeFormState {
     setTimeout(() => {
       this.isProcPaying.set(false);
       this.procFeePaid.set(true);
-      this.procFeeDate.set(formatDate(new Date()));
+      this.procFeeDate.set(formatDateTime(new Date()));
       this.showProcFeeSuccessModal.set(true);
+      // The success screen cannot be dismissed: it carries the applicant on to Step 2 by itself.
+      setTimeout(() => {
+        this.showProcFeeSuccessModal.set(false);
+        this.goToStep(2);
+      }, PROC_FEE_SUCCESS_REDIRECT_MS);
     }, 600);
   }
 
@@ -310,9 +380,9 @@ export class SchemeFormState {
   }
 
   removeSchemeDoc(doc: EoiDocumentItem): void {
-    doc.status = 'pending';
-    doc.fileName = '';
-    doc.fileSize = '';
+    this.eoiDocuments.update(docs =>
+      docs.map(d => (d.id === doc.id ? { ...d, status: 'pending' as const, fileName: '', fileSize: '', uploadedDate: '' } : d))
+    );
   }
 
   replaceOicDoc(event: Event, index: number): void {
@@ -351,7 +421,11 @@ export class SchemeFormState {
       const now = new Date();
       this.submissionTimestamp.set(formatDateTime(now));
       this.recordSubmittedTender(now);
+      this.submitted.set(true);
+      this.draftStore.clear(this.schemeRefNo());
       this.showEmdSuccessModal.set(true);
+      // The combined payment + submission screen cannot be dismissed: it opens the receipts page by itself.
+      setTimeout(() => this.closeSuccessModalAndGoToStep6(), SUBMISSION_SUCCESS_REDIRECT_MS);
     }, 800);
   }
 
@@ -410,8 +484,8 @@ export class SchemeFormState {
       department: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
       emdAmount: this.paymentMethod() === 'exemption' ? '₹ 0 (Exempted)' : this.formattedEmdFee(),
       processingFee: this.formattedProcessFee(),
-      transactionRef: 'GRN-RAJ-2026-981240',
-      emdTransactionRef: this.paymentMethod() === 'exemption' ? 'EXEMPT-UDYAM-RJ14' : 'GRN-RAJ-2026-981241',
+      transactionRef: this.procPaymentRef,
+      emdTransactionRef: this.emdPaymentRef(),
       submittedStatus: 'Submitted',
       eoiStatus: 'Under Review',
       editCount: 0,

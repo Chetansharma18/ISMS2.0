@@ -99,8 +99,15 @@ export function applyScrutinyDecision(
 ): ApplicantResponse {
   const isApproved = decision.status === 'APPROVED';
   const isReverted = decision.status === 'REVERTED';
-  const updatedEmdStatus = (isApproved || isReverted) ? 'PAID' : 'REFUNDED';
-  const statusDisplay = isApproved ? 'Accepted' : isReverted ? 'Reverted' : 'Rejected';
+  const isUnderScrutiny = decision.status === 'UNDER_SCRUTINY';
+  const updatedEmdStatus = (isApproved || isReverted || isUnderScrutiny) ? 'PAID' : 'REFUNDED';
+  const statusDisplay = isApproved
+    ? 'Approved'
+    : isReverted
+      ? 'Reverted'
+      : isUnderScrutiny
+        ? 'Under Review'
+        : 'Rejected';
 
   return {
     ...target,
@@ -116,7 +123,7 @@ export function applyScrutinyDecision(
       approvalDocument: decision.approvalDocument,
       shortfall: decision.shortfall ?? target.scrutinyDetails?.shortfall,
       remarksHistory: decision.remarksHistory ?? target.scrutinyDetails?.remarksHistory,
-      scrutinyOfficer: decision.scrutinyOfficer || 'Department Scrutiny Officer (RSLDC)',
+      scrutinyOfficer: decision.scrutinyOfficer || 'Committee Member 1',
       decisionTimestamp: `${formatDate(now)} ${formatTime(now)}`
     }
   };

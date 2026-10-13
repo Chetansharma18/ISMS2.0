@@ -271,6 +271,7 @@ export class OtrPdfService {
     drawTableRow('Registration No. (CIN)', s1.registrationNumber || '-', 'Date of Registration', s1.dateOfRegistration || '-');
     drawTableRow('State/UT of Registration', s1.stateOfLegalReg || '-', 'Organization PAN', s1.companyPan || '-');
     drawTableRow('GST Registered', `${s1.gstRegistered} ${s1.gstRegistered === 'Yes' && s1.gstin ? '(' + s1.gstin + ')' : ''}`, 'MSME Registered', `${s1.msmeRegistered} ${s1.msmeRegistered === 'Yes' && s1.udyamNumber ? '(' + s1.udyamNumber + ')' : ''}`);
+    drawTableRow('Preferred Sector', s1.preferredSector || '-');
     drawTableRow('NSDC Partner', s1.nsdcPartner || 'Not Applicable', 'Contact Number', s1.contactNo || '-');
     drawTableRow('Official Email ID', s1.emailId || '-', 'Website', s1.website || '-');
 
@@ -402,6 +403,7 @@ export class OtrPdfService {
             <tr><td class="lbl">Date of Registration:</td><td class="val">${s1.dateOfRegistration || '-'}</td><td class="lbl">State of Reg.:</td><td class="val">${s1.stateOfLegalReg || '-'}</td></tr>
             <tr><td class="lbl">Organization PAN:</td><td class="val" style="font-weight:700;">${s1.companyPan || '-'}</td><td class="lbl">GST Registered:</td><td class="val">${s1.gstRegistered} ${s1.gstin ? '(' + s1.gstin + ')' : ''}</td></tr>
             <tr><td class="lbl">MSME Registered:</td><td class="val">${s1.msmeRegistered} ${s1.udyamNumber ? '(' + s1.udyamNumber + ')' : ''}</td><td class="lbl">NSDC Partner:</td><td class="val">${s1.nsdcPartner || 'Not Applicable'}</td></tr>
+            <tr><td class="lbl">Preferred Sector:</td><td class="val" colspan="3">${s1.preferredSector || '-'}</td></tr>
             <tr><td class="lbl">Contact No.:</td><td class="val">${s1.contactNo || '-'}</td><td class="lbl">Email ID:</td><td class="val">${s1.emailId || '-'}</td></tr>
             <tr><td class="lbl">Registered Address:</td><td class="val" colspan="3">${regAddress}</td></tr>
             <tr><td class="lbl">Office Address:</td><td class="val" colspan="3">${officeAddress}</td></tr>

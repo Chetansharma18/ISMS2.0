@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import type { AspirantDocumentItem, AspirantFormData } from '../../config/aspirant-form.config';
+import type { DocumentViewerService } from '../../../../core/services/document-viewer.service';
 import { AspirantDocumentViewerState } from './aspirant-document-viewer.state';
 import {
   DEFAULT_AADHAAR_CARD_DATA_URL,
@@ -35,10 +36,12 @@ describe('AspirantDocumentViewerState', () => {
     expect(state.title()).toBe('Aadhaar Card Document Proof');
   });
 
-  it('opens the Aadhaar viewer with defaults when nothing is uploaded', () => {
-    const state = new AspirantDocumentViewerState(() => makeFormData());
+  it('opens the Aadhaar document in a new tab through the viewer service, with defaults when nothing is uploaded', () => {
+    const openDocument = vi.fn();
+    const state = new AspirantDocumentViewerState(() => makeFormData(), { openDocument } as unknown as DocumentViewerService);
     state.viewAadhaar();
-    expect(state.isOpen()).toBe(true);
+    expect(openDocument).toHaveBeenCalledTimes(1);
+    expect(openDocument.mock.calls[0][1]).toBe('Aadhaar Card Document Proof');
     expect(state.doc().fileName).toBe('Aadhaar_Candidate_Card.pdf');
     expect(state.doc().fileSize).toBe('1.4 MB');
     expect(state.doc().fileUrl).toBe(DEFAULT_AADHAAR_CARD_DATA_URL);

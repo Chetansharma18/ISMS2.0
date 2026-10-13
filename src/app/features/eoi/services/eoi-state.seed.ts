@@ -8,6 +8,8 @@ import type {
   SanctionOrderDocumentData,
   Scheme
 } from './eoi-state.models';
+import { buildSamarthResponses } from './eoi-state.seed-samarth';
+import { withSeedHistory } from './eoi-state.seed-history';
 
 /** Initial schemes matching Screenshot 1. */
 export function buildInitialSchemes(): Scheme[] {
@@ -107,7 +109,7 @@ export function buildInitialSchemes(): Scheme[] {
 
 /** Initial 4 applicant responses matching Screenshot 2. */
 export function buildInitialResponses(): ApplicantResponse[] {
-  return [
+  return withSeedHistory([
     {
       id: 'APP-2024-001',
       anonymousLabel: 'Company 1',
@@ -362,7 +364,7 @@ export function buildInitialResponses(): ApplicantResponse[] {
       eoiRefNo: 'RSLDC/EOI/2026/MMKVY-01',
       submissionDate: '05/09/2026 16:45 PM',
       status: 'APPROVED',
-      statusDisplay: 'Accepted',
+      statusDisplay: 'Approved',
       emdFee: 50000,
       emdStatus: 'PAID',
       processingFee: 2000,
@@ -452,7 +454,7 @@ export function buildInitialResponses(): ApplicantResponse[] {
         technicalScore: 84,
         grade: 'Grade A',
         remarks: 'Documentation verified successfully. Excellent infrastructure and past placement record.',
-        scrutinyOfficer: 'Shri R. K. Sharma (Joint Director, RSLDC)',
+        scrutinyOfficer: 'Committee Member 1',
         decisionTimestamp: '09/09/2026 11:20 AM'
       }
     },
@@ -591,11 +593,13 @@ export function buildInitialResponses(): ApplicantResponse[] {
         technicalScore: 54,
         grade: 'Grade C',
         remarks: 'Documentation non-compliance: deficient technical infrastructure and missing verified audit statements for Category I placement requirements.',
-        scrutinyOfficer: 'Shri R. K. Sharma (Joint Director, RSLDC)',
+        scrutinyOfficer: 'Committee Member 1',
         decisionTimestamp: '25/08/2026 14:15 PM'
       }
-    }
-  ];
+    },
+
+    ...buildSamarthResponses()
+  ]);
 }
 
 export function buildDefaultSanctionOrderData(schemeId: string = 'MMKVY-01'): SanctionOrderDocumentData {
@@ -630,9 +634,6 @@ export function buildDefaultSanctionOrderData(schemeId: string = 'MMKVY-01'): Sa
       'Mandatory Use of Masked Aadhaar: In compliance with UIDAI Regulations 2021, it is mandatory for all TPs to use masked Aadhaar displaying only the last four digits in all official documentation.'
     ],
     dispatchRef: 'RSLDC/Skills/MMKVY/RAJKViK/SO/2026-2027',
-    signatoryName: 'RISHAV MANDAL',
-    signatoryTitle: 'Managing Director',
-    signatoryOrg: 'RSLDC, Jaipur (GoR)',
     copyToList: [
       'PS to Hon\'ble Minister, DSEE, GoR',
       'PS to ACS, DSEE, GoR',
@@ -658,14 +659,15 @@ export function buildDefaultIpaData(schemeId: string = 'MMKVY-01', appId: string
     headerAddress: 'EMI Campus, J-8-A, Jhalana Institutional Area, Jaipur- 302004 (Rajasthan)',
     fileNo: 'FORSLDC/Skills/MMKVY-Cat.II: SAKSHM/2026-27/2895-97',
     ipaDate: '15/9/26',
-    recipientName: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
-    recipientAddress1: 'GROUND FLOOR, KHASRA NO-5/24, GALI NO-7, SOUTH PART-II, SWAROOP NAGAR EXTN, North Delhi, Delhi, 110042',
+    // The company's own name is filled in from the sanction order when the IPA is opened.
+    recipientName: '',
+    recipientAddress1: '',
     recipientAddress2: 'Sri Ganganagar, Rajasthan, Pin Code-335001',
     sarNumber: 'SAR: 2200-099-001',
     referenceNo: 'F () RSLDC/SKILL/MMKVY-Cat.-II: SAKSHM/2026-27/535, Dated: 15/07/2026',
     subjectText: 'In-Principal Approval (IPA-1)- MMKVY-Cat. II / SAKSHM sponsored by RSLDC for F.Y. 2026-27.',
     preambleText: 'In reference to your request and based on the recommendation from inspection team, in-principal approval is hereby accorded for conducting cycles (as detailed below) for following courses during financial year 2026-27, as per the terms and conditions stipulated in relevant guidelines.',
-    piaName: 'Apex Technical & Infrastructure Solutions Pvt Ltd',
+    piaName: '',
     sdcAddress: 'Near Panchayati Mandir, Opposite Government Hospital, Kesisinghpur, Sriganganagar, 335027',
     courseRows: [
       {

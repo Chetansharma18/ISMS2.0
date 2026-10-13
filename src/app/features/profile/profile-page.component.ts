@@ -169,9 +169,8 @@ export interface RegistrationStepItem {
                 <div
                   class="w-8 h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 z-10 shadow-2xs transition-colors"
                   [ngClass]="{
-                    'bg-green-700 text-white': step.isCompleted,
-                    'bg-navy text-white': !step.isCompleted && isCurrentStep(step.stepNumber),
-                    'bg-slate-200 text-slate-600': !step.isCompleted && !isCurrentStep(step.stepNumber)
+                    'bg-navy text-white': step.isCompleted || isCurrentStep(step.stepNumber),
+                    'bg-slate-100 text-slate-400 border border-slate-200': !step.isCompleted && !isCurrentStep(step.stepNumber)
                   }"
                 >
                   {{ step.stepNumber }}
@@ -179,7 +178,10 @@ export interface RegistrationStepItem {
 
                 <!-- Vertical Connector Line -->
                 @if (!last) {
-                  <div class="w-[2px] flex-1 bg-slate-200 my-1"></div>
+                  <div
+                    class="w-[2px] flex-1 my-1 transition-colors"
+                    [ngClass]="step.isCompleted ? 'bg-navy' : 'bg-slate-200'"
+                  ></div>
                 }
               </div>
 
@@ -195,7 +197,7 @@ export interface RegistrationStepItem {
                     [ngClass]="{
                       'bg-[#ECFDF5] text-green-700': step.isCompleted,
                       'bg-[#EFF6FF] text-[#1D4ED8]': !step.isCompleted && isCurrentStep(step.stepNumber),
-                      'bg-slate-50 text-navy border border-slate-100': !step.isCompleted && !isCurrentStep(step.stepNumber)
+                      'bg-slate-50 text-slate-400 border border-slate-100': !step.isCompleted && !isCurrentStep(step.stepNumber)
                     }"
                   >
                     @switch (step.icon) {
@@ -243,8 +245,16 @@ export interface RegistrationStepItem {
                       </svg>
                       <span>Completed</span>
                     </span>
-                  } @else {
+                  } @else if (isCurrentStep(step.stepNumber)) {
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FFFBEB] text-[#B45309] border border-[#FDE68A] select-none">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="9"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 3"/>
+                      </svg>
+                      <span>Pending</span>
+                    </span>
+                  } @else {
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-400 border border-slate-200 select-none">
                       <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="9"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 3"/>
@@ -270,17 +280,6 @@ export interface RegistrationStepItem {
                     >
                       <span>Continue Step</span>
                       <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                      </svg>
-                    </button>
-                  } @else {
-                    <button
-                      type="button"
-                      (click)="navigateToStep(step.stepNumber)"
-                      class="inline-flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 shadow-2xs transition-colors cursor-pointer min-w-[105px]"
-                    >
-                      <span>Start Step</span>
-                      <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                       </svg>
                     </button>
@@ -406,8 +405,20 @@ export class ProfilePageComponent {
     return 'Continue Registration';
   });
 
+  isStepAccessible(stepNumber: number): boolean {
+    if (stepNumber === 1) return true;
+    const list = this.sections();
+    const target = list.find(s => s.stepNumber === stepNumber);
+    if (target?.isCompleted) return true;
+    return this.isCurrentStep(stepNumber);
+  }
+
   /** Navigates to a specific step in the registration form */
   navigateToStep(stepNumber: number): void {
+    if (!this.isStepAccessible(stepNumber)) {
+      this.router.navigate(['/registration'], { queryParams: { step: this.currentPendingStep() } });
+      return;
+    }
     this.router.navigate(['/registration'], { queryParams: { step: stepNumber } });
   }
 

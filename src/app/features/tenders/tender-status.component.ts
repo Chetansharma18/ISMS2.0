@@ -12,12 +12,11 @@ import { NotificationService } from '../../core/services/notification.service';
 import { TenderListComponent } from './tender-status/tender-list.component';
 import { TenderDetailHeaderComponent } from './tender-status/tender-detail-header.component';
 import { TenderEditStatusComponent } from './tender-status/tender-edit-status.component';
-import { TenderFeeSummaryComponent } from './tender-status/tender-fee-summary.component';
 import { TenderOrgSectionComponent } from './tender-status/tender-org-section.component';
 import { TenderSignatorySectionComponent } from './tender-status/tender-signatory-section.component';
 import { TenderBankSectionComponent } from './tender-status/tender-bank-section.component';
 import { TenderDocumentsTableComponent } from './tender-status/tender-documents-table.component';
-import { TenderReceiptsSectionComponent } from './tender-status/tender-receipts-section.component';
+import { TenderStep5EmdComponent } from './tender-status/tender-step5-emd.component';
 import {
   TenderDocReplaceRequest,
   TenderDocViewRequest,
@@ -39,12 +38,11 @@ export type { SubmittedTender, SubmittedTenderDoc };
     TenderListComponent,
     TenderDetailHeaderComponent,
     TenderEditStatusComponent,
-    TenderFeeSummaryComponent,
     TenderOrgSectionComponent,
     TenderSignatorySectionComponent,
     TenderBankSectionComponent,
     TenderDocumentsTableComponent,
-    TenderReceiptsSectionComponent
+    TenderStep5EmdComponent
   ],
   template: `
     <div class="w-full min-h-full bg-white text-slate-800 font-sans">
@@ -74,10 +72,9 @@ export type { SubmittedTender, SubmittedTenderDoc };
 
           <app-tender-edit-status [tender]="selectedTender()!" [isEditing]="isEditing()" />
 
-          <app-tender-fee-summary [app]="currentApplication()" />
-
-          <!-- ALL APPLICATION SECTIONS IN ONE CONTINUOUS PAGE -->
+          <!-- APPLICATION SECTIONS PROPERLY NUMBERED -->
           <div class="space-y-5 text-xs">
+            <!-- Step 1: OTR Profile Details (Org, Signatory, Bank) -->
             <app-tender-org-section
               [app]="currentApplication()"
               [editable]="editableTender"
@@ -102,6 +99,7 @@ export type { SubmittedTender, SubmittedTenderDoc };
               (replaceOtrDoc)="onReplaceOtrDoc($event)"
             />
 
+            <!-- Step 2: Mandated Proposal Documents & Annexures (16 files) -->
             <app-tender-documents-table
               [documents]="currentApplication().documents"
               [isEditing]="isEditing()"
@@ -109,7 +107,11 @@ export type { SubmittedTender, SubmittedTenderDoc };
               (replaceDoc)="onReplaceDoc($event)"
             />
 
-            <app-tender-receipts-section [app]="currentApplication()" />
+            <!-- Step 3: Statutory Fees Payment Details (Processing Fee & EMD Table) -->
+            <app-tender-step5-emd
+              [app]="currentApplication()"
+              (viewFeeReceipt)="onViewFeeReceipt($event)"
+            />
           </div>
 
         </div>
@@ -173,7 +175,7 @@ export class TenderStatusComponent {
     // Deep clone active tender for editing
     this.editableTender = JSON.parse(JSON.stringify(tender));
     this.isEditing.set(true);
-    this.notify.warning(`Editing active. You have ${remainingEdits(tender)} edit(s) remaining.`);
+    this.notify.warning(`Document replacement enabled. You have ${remainingEdits(tender)} edit(s) remaining.`);
   }
 
   saveEdits(): void {
@@ -211,6 +213,23 @@ export class TenderStatusComponent {
   // Document Viewer Helpers
   onViewDoc(request: TenderDocViewRequest): void {
     this.viewDoc(request.fileName, request.title, request.fileSize);
+  }
+
+  onViewFeeReceipt(type: 'processing' | 'emd'): void {
+    const tender = this.currentApplication();
+    if (type === 'processing') {
+      this.viewDoc(
+        `Processing_Fee_Receipt_${tender.transactionRef || 'GRN-RAJ-2026-981240'}.pdf`,
+        'Processing Fee Official Receipt (Form GA-57)',
+        '148 KB'
+      );
+    } else {
+      this.viewDoc(
+        `EMD_Deposit_Receipt_${tender.emdTransactionRef || 'GRN-RAJ-2026-981241'}.pdf`,
+        'Earnest Money Deposit (EMD) Official Receipt (Account Head 8443)',
+        '185 KB'
+      );
+    }
   }
 
   viewDoc(fileName: string, title?: string, fileSize?: string): void {

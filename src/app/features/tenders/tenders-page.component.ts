@@ -85,7 +85,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
 
           <!-- Custom Template for Closing Date -->
           <ng-template #closingDateTemplate let-item>
-            <span class="text-slate-800 font-medium text-[12.5px]">{{ item.closingDate }}</span>
+            <span class="text-slate-800 font-normal text-[12.5px]">{{ item.closingDate }}</span>
           </ng-template>
 
           <ng-template #descTemplate let-item>
@@ -137,7 +137,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
       <!-- MODAL: ONE-TIME REGISTRATION (OTR) POPUP PROMPT -->
       <app-otr-prompt-modal
         [isOpen]="showOtrPromptModal()"
-        (completeRegistration)="goToProfile()"
+        (completeRegistration)="goToRegistration()"
         (dismiss)="dismissOtrPrompt()"
       ></app-otr-prompt-modal>
 
@@ -268,11 +268,28 @@ export class TendersPageComponent {
         this.storage.removeSessionItem('isms_otr_prompt_dismissed');
       }
       this.evaluateOtrModalPrompt();
+
+      const viewRefNo = params['viewRefNo'] || params['refNo'];
+      if (viewRefNo) {
+        const found = this.schemes().find(s => s.refNo === viewRefNo);
+        if (found) {
+          this.selectedScheme.set(found);
+        }
+      }
     });
 
     effect(() => {
       // Re-evaluate whenever currentUser signal changes
       this.evaluateOtrModalPrompt();
+
+      const list = this.schemes();
+      const viewRefNo = this.route.snapshot.queryParams['viewRefNo'] || this.route.snapshot.queryParams['refNo'];
+      if (viewRefNo && list.length > 0 && !this.selectedScheme()) {
+        const found = list.find(s => s.refNo === viewRefNo);
+        if (found) {
+          this.selectedScheme.set(found);
+        }
+      }
     });
   }
 
@@ -310,7 +327,7 @@ export class TendersPageComponent {
     {
       key: 'schemeName',
       label: 'Scheme Name',
-      cellClass: 'whitespace-nowrap font-medium text-slate-800'
+      cellClass: 'whitespace-nowrap font-normal text-slate-800'
     },
     {
       key: 'schemeCategory',
@@ -361,6 +378,7 @@ export class TendersPageComponent {
 
   backToList(): void {
     this.selectedScheme.set(null);
+    this.router.navigate([], { relativeTo: this.route, queryParams: {} });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -395,7 +413,8 @@ export class TendersPageComponent {
   }
 
   goToRegistration(): void {
-    this.goToProfile();
+    this.dismissOtrPrompt();
+    this.router.navigate(['/registration']);
   }
 
   downloadDoc(docType: string): void {

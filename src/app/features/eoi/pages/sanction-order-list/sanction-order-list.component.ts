@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -22,6 +22,9 @@ import {
         <app-page-header
           title="Sanction Order"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Sanction Order' }]"
+          [searchable]="true"
+          searchPlaceholder="Search Scheme, Ref No., Category..."
+          [(searchQuery)]="searchQuery"
         >
           <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[#0c2d4e] border border-slate-300 text-xs font-medium shadow-xs">
             <span class="text-slate-600">Closed Schemes (Sanction Ready):</span>
@@ -32,7 +35,7 @@ import {
         <!-- Main Sanction Order Schemes Table via Reusable TableComponent -->
         <app-table
           [columns]="schemeColumns"
-          [data]="schemes()"
+          [data]="filteredSchemes()"
           [pagination]="true"
           [pageSize]="10"
           [customTemplates]="{
@@ -43,7 +46,7 @@ import {
         </app-table>
 
         <ng-template #schemeTitleTemplate let-scheme>
-          <div class="font-medium text-primary text-[13px] leading-snug">
+          <div class="font-normal text-slate-800 text-[13px] leading-snug">
             {{ scheme.schemeTitle }}
           </div>
           <div class="text-[11px] font-mono text-muted mt-0.5">
@@ -67,6 +70,18 @@ import {
 export class SanctionOrderListComponent {
   private eoiStateService = inject(EoiStateService);
   schemes = signal<Scheme[]>([]);
+  searchQuery = signal('');
+
+  filteredSchemes = computed(() => {
+    const query = this.searchQuery().trim().toLowerCase();
+    const list = this.schemes();
+    if (!query) return list;
+    return list.filter(s =>
+      (s.schemeTitle && s.schemeTitle.toLowerCase().includes(query)) ||
+      (s.refNo && s.refNo.toLowerCase().includes(query)) ||
+      (s.category && s.category.toLowerCase().includes(query))
+    );
+  });
 
   readonly schemeColumns: TableColumn<Scheme>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },

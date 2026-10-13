@@ -41,16 +41,20 @@ export type { AdminGrievance };
         
         <app-page-header
           title="Grievance Management"
-          bgColor="#0B3558"
+          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Grievance Management' }]"
+          [searchable]="true"
+          [(searchQuery)]="searchQuery"
+          searchPlaceholder="Search User, Title, Description, Issue Type..."
         >
         </app-page-header>
 
         <app-table
           [columns]="grievanceColumns"
-          [data]="grievances()"
+          [data]="filteredGrievances()"
           [pagination]="true"
           [pageSize]="10"
           itemUnit="grievances"
+          emptyMessage="No grievances match your search query."
           [customTemplates]="{
             viewAction: viewActionTemplate,
             submittedAt: dateTimeTemplate,
@@ -61,14 +65,14 @@ export type { AdminGrievance };
 
         <ng-template #dateTimeTemplate let-item>
           <div class="flex flex-col text-center">
-            <span class="text-slate-800 font-medium whitespace-nowrap">{{ item.submittedAt | date:'dd MMM yyyy' }}</span>
+            <span class="text-slate-800 font-normal whitespace-nowrap">{{ item.submittedAt | date:'dd MMM yyyy' }}</span>
             <span class="text-slate-500 text-[11px] whitespace-nowrap">{{ item.submittedAt | date:'hh:mm a' }}</span>
           </div>
         </ng-template>
         
         <ng-template #attachmentTemplate let-item>
           @if (item.attachment && item.attachment !== 'None') {
-            <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-medium text-sky-600 hover:text-sky-700 hover:underline break-all max-w-37.5 inline-block">
+            <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-normal text-sky-600 hover:text-sky-700 hover:underline break-all max-w-37.5 inline-block">
               {{ item.attachment }}
             </a>
           } @else {
@@ -246,11 +250,13 @@ export class AdminGrievanceListComponent {
     comments: ''
   };
 
+  readonly searchQuery = signal<string>('');
+
   readonly grievanceColumns: TableColumn<AdminGrievance>[] = [
     { key: 'sNo', label: 'Sr No.', type: 'number', align: 'center', width: 'w-12' },
-    { key: 'userName', label: 'User Name', cellClass: 'font-medium text-sky-700 min-w-[120px]' },
+    { key: 'userName', label: 'User Name', cellClass: 'font-normal text-sky-700 min-w-[120px]' },
     { key: 'submittedAt', label: 'Date & Time', align: 'center', type: 'custom', width: 'w-24' },
-    { key: 'title', label: 'Title', cellClass: 'font-medium text-slate-800 min-w-[120px]' },
+    { key: 'title', label: 'Title', cellClass: 'font-normal text-slate-800 min-w-[120px]' },
     { key: 'description', label: 'Description', cellClass: 'font-normal text-slate-700 min-w-[180px]' },
     { key: 'issueType', label: 'Issue Type', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'attachment', label: 'Attachment', align: 'center', type: 'custom' },
@@ -262,6 +268,18 @@ export class AdminGrievanceListComponent {
   private readonly repo = inject(DataEngineService).for<AdminGrievance>('ADMIN_GRIEVANCES', { idKey: 'sNo' });
 
   readonly grievances = signal<AdminGrievance[]>([]);
+
+  readonly filteredGrievances = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    if (!q) return this.grievances();
+    return this.grievances().filter(g =>
+      (g.userName && g.userName.toLowerCase().includes(q)) ||
+      (g.title && g.title.toLowerCase().includes(q)) ||
+      (g.description && g.description.toLowerCase().includes(q)) ||
+      (g.issueType && g.issueType.toLowerCase().includes(q)) ||
+      (g.status && g.status.toLowerCase().includes(q))
+    );
+  });
 
   constructor() {
     this.repo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => this.grievances.set(list));

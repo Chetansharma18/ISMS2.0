@@ -11,6 +11,8 @@ import { EoiDocumentItem, EoiRequiredInfoItem, SchemeTender } from '../tenders.m
 export class SchemeDetailPdfService {
   /** Downloads a one-page RFP / SOP extract for the given scheme. */
   generateRfpOrSopPdf(s: SchemeTender, docItem: EoiDocumentItem): void {
+    window.open(encodeURI('/document/ISMS RFP.pdf'), '_blank');
+    return;
     const pdfDoc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
     // Outer framing border

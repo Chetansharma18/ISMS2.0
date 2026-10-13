@@ -27,7 +27,13 @@ import {
       <div class="p-4 sm:p-5 space-y-3 font-sans">
         
         <!-- Page Header via Reusable PageHeaderComponent -->
-        <app-page-header title="Sanction Order"></app-page-header>
+        <app-page-header
+          title="Sanction Order"
+          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Sanction Order' }]"
+          [searchable]="true"
+          [(searchQuery)]="searchQuery"
+          searchPlaceholder="Search IPA Number, Scheme Name, Category..."
+        ></app-page-header>
 
         <!-- Success Toast Notification -->
         @if (successMessage()) {
@@ -43,11 +49,11 @@ import {
         <!-- Orders Table via Reusable TableComponent -->
         <app-table
           [columns]="orderColumns"
-          [data]="orders"
+          [data]="filteredOrders()"
           [pagination]="true"
           [pageSize]="pageSize"
           itemUnit="orders"
-          emptyMessage="No sanction orders available."
+          emptyMessage="No sanction orders match your search query."
           [customTemplates]="{
             schemeName: schemeNameTemplate,
             actions: actionsTemplate
@@ -57,7 +63,7 @@ import {
 
         <!-- Template: Scheme Name -->
         <ng-template #schemeNameTemplate let-so>
-          <span class="font-bold text-slate-900">{{ so.schemeName || so.scheme }}</span>
+          <span class="font-normal text-slate-800">{{ so.schemeName || so.scheme }}</span>
         </ng-template>
 
         <!-- Template: Actions (View Sanction Order) -->
@@ -288,8 +294,20 @@ export class SanctionOrdersComponent {
 
   readonly pageSize = 10;
   readonly orders: SanctionOrder[] = environment.useMockData ? MOCK_SANCTION_ORDERS : [];
+  readonly searchQuery = signal<string>('');
   successMessage = signal<string>('');
   selectedOrder = signal<SanctionOrder | null>(null);
+
+  readonly filteredOrders = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return this.orders;
+    return this.orders.filter(o =>
+      (o.ipaNumber && o.ipaNumber.toLowerCase().includes(query)) ||
+      (o.schemeName && o.schemeName.toLowerCase().includes(query)) ||
+      (o.scheme && o.scheme.toLowerCase().includes(query)) ||
+      (o.category && o.category.toLowerCase().includes(query))
+    );
+  });
 
   defaultEmblemSvg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 16 L54 28 L67 28 L56 36 L60 48 L50 40 L40 48 L44 36 L33 28 L46 28 Z" fill="%230b3558"/><path d="M25 65 Q50 55 75 65 Q50 72 25 65 Z" fill="%23b91c1c"/><text x="50" y="83" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle" fill="%230b3558">GOVT OF RAJASTHAN</text></svg>`;
 
@@ -300,9 +318,9 @@ export class SanctionOrdersComponent {
   });
 
   readonly orderColumns: TableColumn<SanctionOrder>[] = [
-    { key: 'ipaNumber', label: 'IPA Number', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap font-mono font-medium text-slate-700 text-center' },
-    { key: 'schemeName', label: 'Scheme Name', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-bold text-slate-900 text-center' },
-    { key: 'category', label: 'Category', align: 'center', cellClass: 'whitespace-nowrap font-medium text-slate-700 text-center' },
+    { key: 'ipaNumber', label: 'IPA Number', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap font-mono font-normal text-slate-700 text-center' },
+    { key: 'schemeName', label: 'Scheme Name', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-normal text-slate-800 text-center' },
+    { key: 'category', label: 'Category', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700 text-center' },
     { key: 'actions', label: 'Action', align: 'center', type: 'custom', width: 'w-56' }
   ];
 

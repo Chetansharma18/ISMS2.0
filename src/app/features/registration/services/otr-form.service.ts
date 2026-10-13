@@ -213,6 +213,18 @@ export class OtrFormService {
     this._formData.update(current => {
       const updatedStep3: Step3AuthorizedPerson = { ...current.step3, ...changes };
 
+      if (changes.firstName !== undefined || changes.lastName !== undefined) {
+        if (changes.name === undefined) {
+          const first = updatedStep3.firstName?.trim() || '';
+          const last = updatedStep3.lastName?.trim() || '';
+          updatedStep3.name = [first, last].filter(Boolean).join(' ');
+        }
+      } else if (changes.name !== undefined && changes.firstName === undefined && changes.lastName === undefined) {
+        const parts = (changes.name || '').trim().split(/\s+/);
+        updatedStep3.firstName = parts[0] || '';
+        updatedStep3.lastName = parts.slice(1).join(' ') || '';
+      }
+
       if (changes.dob !== undefined) {
         updatedStep3.age = this.calculateAgeFromDob(changes.dob);
       }

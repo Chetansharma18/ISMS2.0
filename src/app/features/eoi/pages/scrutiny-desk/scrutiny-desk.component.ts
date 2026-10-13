@@ -311,9 +311,9 @@ export class ScrutinyDeskComponent {
     this.loadApplicant(app.id);
   }
 
-  /** Opens the Document / PDF Viewer for a dossier document. */
+  /** Opens the Document / PDF Viewer for a dossier document directly in another tab in Chrome. */
   openOfficialDoc(doc: DossierDocument): void {
-    this.activeDoc.set(toActivePreviewDocument(doc, this.applicant()?.id));
+    window.open(encodeURI('/document/ISMS RFP.pdf'), '_blank');
   }
 
   closeDocViewer(): void {

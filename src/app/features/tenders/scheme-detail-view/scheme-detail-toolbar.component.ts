@@ -19,7 +19,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
         <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
-        <span>Back to Active Schemes</span>
+        <span>Back</span>
       </button>
 
       <!-- Right Action Buttons -->

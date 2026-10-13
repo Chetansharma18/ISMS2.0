@@ -21,7 +21,7 @@ import { canEditTender } from './tender-status.util';
             <svg class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
-            <span>Back to Tender Status</span>
+            <span>Back</span>
           </button>
 
           <div class="space-y-0.5">
@@ -40,11 +40,9 @@ import { canEditTender } from './tender-status.util';
               >
                 {{ tender().submittedStatus }}
               </span>
-              @if (isEditing()) {
-                <span class="bg-amber-100 text-amber-900 border border-amber-300 text-[11px] font-semibold px-2 py-0.5 rounded">
-                  Edit Mode Active
-                </span>
-              }
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 uppercase tracking-wide">
+                {{ tender().schemeCategory || 'GENERAL' }}
+              </span>
             </div>
             <h2 class="text-sm sm:text-base font-semibold text-slate-800">
               {{ tender().schemeTitle }}

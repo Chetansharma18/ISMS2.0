@@ -10,12 +10,12 @@ import { documentCategoryLabel } from './tender-status.util';
   template: `
         <div class="bg-white border border-slate-200 rounded-lg p-5 space-y-4 shadow-2xs">
           <div class="flex items-center justify-between pb-3 border-b border-slate-200">
-            <h3 class="font-semibold text-slate-900 text-sm">
-              4. Mandated Proposal Documents &amp; Annexures (16 Files Attached)
-            </h3>
-            @if (isEditing()) {
-              <span class="text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 font-medium text-[11px]">Editing Active</span>
-            }
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-navy text-white text-xs font-bold flex items-center justify-center shrink-0">2</span>
+              <h3 class="font-semibold text-slate-900 text-sm">
+                Step 2: Mandated Proposal Documents &amp; Annexures (16 Files Attached)
+              </h3>
+            </div>
           </div>
 
           <div class="border border-slate-200 rounded-lg overflow-hidden">
@@ -54,7 +54,7 @@ import { documentCategoryLabel } from './tender-status.util';
                         @if (isEditing()) {
                           <label class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-brand rounded text-xs font-medium cursor-pointer">
                             Replace
-                            <input type="file" (change)="replaceDoc.emit({ event: $event, doc })" class="hidden" accept=".pdf" />
+                            <input type="file" (change)="replaceDoc.emit({ event: $event, doc })" class="hidden" accept=".pdf,.doc,.docx" />
                           </label>
                         }
                       </div>

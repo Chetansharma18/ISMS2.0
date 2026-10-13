@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal, HostListener } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
@@ -28,12 +28,15 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
           [showBack]="true"
           backUrl="/admin/camera-monitoring/TP-001"
           backTitle="Back to SDC List"
+          [searchable]="true"
+          searchPlaceholder="Search batch name, code, SDC..."
+          [(searchQuery)]="searchQuery"
         >
         </app-page-header>
 
         <app-table
           [columns]="columns"
-          [data]="batches()"
+          [data]="filteredBatches()"
           [pagination]="true"
           [pageSize]="10"
           [customTemplates]="{
@@ -48,7 +51,7 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
 
         <ng-template #batchInfoTemplate let-item>
           <div>
-            <div class="font-bold text-slate-800 text-[13px] leading-snug">
+            <div class="font-normal text-slate-800 text-[13px] leading-snug">
               {{ item.batchName }}
             </div>
             <div class="text-[11.5px] text-slate-500 mt-0.5 font-mono">
@@ -59,7 +62,7 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
 
         <ng-template #sdcTpInfoTemplate let-item>
           <div>
-            <div class="font-bold text-slate-800 text-[13px] leading-snug">
+            <div class="font-normal text-slate-800 text-[13px] leading-snug">
               {{ item.sdcName }}
             </div>
             <div class="text-[11.5px] text-slate-500 mt-0.5 font-mono">
@@ -69,7 +72,7 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
         </ng-template>
 
         <ng-template #branchTemplate let-item>
-          <div class="flex items-center gap-1.5 text-slate-600 text-[12.5px] font-medium justify-start">
+          <div class="flex items-center gap-1.5 text-slate-600 text-[12.5px] font-normal justify-start">
             <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
             </svg>
@@ -78,7 +81,7 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
         </ng-template>
 
         <ng-template #cameraStatusTemplate let-item>
-          <div class="inline-flex items-center gap-1.5 text-green-700 text-[11.5px] font-semibold tracking-wide">
+          <div class="inline-flex items-center gap-1.5 text-green-700 text-[11.5px] font-normal tracking-wide">
             <div class="w-1.5 h-1.5 rounded-full bg-green-700"></div>
             {{ item.cameraStatus }}
           </div>
@@ -274,6 +277,19 @@ export class CameraBatchListComponent {
   ];
 
   batches = signal<CameraBatchItem[]>([]);
+  searchQuery = signal<string>('');
+
+  filteredBatches = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    if (!q) return this.batches();
+    return this.batches().filter(b =>
+      (b.batchName && b.batchName.toLowerCase().includes(q)) ||
+      (b.batchCode && b.batchCode.toLowerCase().includes(q)) ||
+      (b.sdcName && b.sdcName.toLowerCase().includes(q)) ||
+      (b.tpName && b.tpName.toLowerCase().includes(q)) ||
+      (b.branch && b.branch.toLowerCase().includes(q))
+    );
+  });
 
   constructor() {
     inject(DataEngineService)

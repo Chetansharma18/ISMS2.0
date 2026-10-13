@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, signal, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, signal, computed, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -40,22 +40,26 @@ export type { Grievance };
         
         <app-page-header
           title="Grievance"
-          bgColor="#0B3558"
+          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Grievance' }]"
+          [searchable]="true"
+          [(searchQuery)]="searchQuery"
+          searchPlaceholder="Search Title, Description, Issue Type..."
         >
-          <button (click)="openRaiseTicket()" class="px-3 py-1.5 bg-white hover:bg-slate-50 text-navy text-sm font-semibold rounded shadow transition-colors flex items-center gap-1.5 cursor-pointer">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <button (click)="openRaiseTicket()" class="px-3.5 py-2 bg-navy hover:bg-navy-dark text-white text-xs font-semibold rounded-md shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
             </svg>
-            Raise Ticket
+            <span>Raise Ticket</span>
           </button>
         </app-page-header>
 
         <app-table
           [columns]="grievanceColumns"
-          [data]="grievances()"
+          [data]="filteredGrievances()"
           [pagination]="true"
           [pageSize]="10"
           itemUnit="grievances"
+          emptyMessage="No grievances match your search query."
           [customTemplates]="{
             viewAction: viewActionTemplate,
             submittedAt: dateTimeTemplate,
@@ -66,14 +70,14 @@ export type { Grievance };
 
         <ng-template #dateTimeTemplate let-item>
           <div class="flex flex-col text-center">
-            <span class="text-slate-800 font-medium whitespace-nowrap">{{ item.submittedAt | date:'dd MMM yyyy' }}</span>
+            <span class="text-slate-800 font-normal whitespace-nowrap">{{ item.submittedAt | date:'dd MMM yyyy' }}</span>
             <span class="text-slate-500 text-[11px] whitespace-nowrap">{{ item.submittedAt | date:'hh:mm a' }}</span>
           </div>
         </ng-template>
         
         <ng-template #attachmentTemplate let-item>
           @if (item.attachment && item.attachment !== 'None') {
-            <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-medium text-sky-600 hover:text-sky-700 hover:underline break-all max-w-37.5 inline-block">
+            <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-normal text-sky-600 hover:text-sky-700 hover:underline break-all max-w-37.5 inline-block">
               {{ item.attachment }}
             </a>
           } @else {
@@ -241,10 +245,12 @@ export class GrievanceListComponent {
     attachmentUrl: null as SafeResourceUrl | null
   };
 
+  readonly searchQuery = signal<string>('');
+
   readonly grievanceColumns: TableColumn<Grievance>[] = [
     { key: 'sNo', label: 'Sr No.', type: 'number', align: 'center', width: 'w-12' },
     { key: 'submittedAt', label: 'Date & Time', align: 'center', type: 'custom', width: 'w-24' },
-    { key: 'title', label: 'Title', cellClass: 'font-medium text-slate-800 min-w-[120px]' },
+    { key: 'title', label: 'Title', cellClass: 'font-normal text-slate-800 min-w-[120px]' },
     { key: 'description', label: 'Description', cellClass: 'font-normal text-slate-700 min-w-[180px]' },
     { key: 'issueType', label: 'Issue Type', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'attachment', label: 'Attachment', align: 'center', type: 'custom' },
@@ -255,6 +261,17 @@ export class GrievanceListComponent {
   private readonly repo = inject(DataEngineService).for<Grievance>('GRIEVANCES');
 
   readonly grievances = signal<Grievance[]>([]);
+
+  readonly filteredGrievances = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    if (!q) return this.grievances();
+    return this.grievances().filter(g =>
+      (g.title && g.title.toLowerCase().includes(q)) ||
+      (g.description && g.description.toLowerCase().includes(q)) ||
+      (g.issueType && g.issueType.toLowerCase().includes(q)) ||
+      (g.status && g.status.toLowerCase().includes(q))
+    );
+  });
 
   constructor() {
     this.repo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => this.grievances.set(this.renumber(list)));

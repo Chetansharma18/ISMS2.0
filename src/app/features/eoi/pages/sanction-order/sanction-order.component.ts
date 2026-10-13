@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
@@ -35,6 +35,9 @@ export interface AcceptedCompanyRow {
           ]"
           backUrl="/admin/sanction-orders"
           backTitle="Back to Sanction Order List"
+          [searchable]="true"
+          searchPlaceholder="Search agency, district, sector, appId..."
+          [(searchQuery)]="searchQuery"
         >
           <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[#0c2d4e] border border-slate-300 text-xs font-medium shadow-xs">
             <span class="text-slate-600">Accepted Companies:</span>
@@ -61,7 +64,7 @@ export interface AcceptedCompanyRow {
         <!-- Allocated Physical Targets Table (Using Reusable TableComponent) -->
         <app-table
           [columns]="companyColumns"
-          [data]="acceptedRows()"
+          [data]="filteredAcceptedRows()"
           [pagination]="true"
           [pageSize]="10"
           itemUnit="companies"
@@ -246,6 +249,19 @@ export class SanctionOrderComponent implements OnInit {
   acceptedRows = signal<AcceptedCompanyRow[]>([]);
   currentScheme = signal<Scheme | undefined>(undefined);
   selectedIpaCompany = signal<AcceptedCompanyRow | null>(null);
+  searchQuery = signal<string>('');
+
+  filteredAcceptedRows = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    if (!q) return this.acceptedRows();
+    return this.acceptedRows().filter(r =>
+      (r.agencyName && r.agencyName.toLowerCase().includes(q)) ||
+      (r.appId && r.appId.toLowerCase().includes(q)) ||
+      (r.district && r.district.toLowerCase().includes(q)) ||
+      (r.sector && r.sector.toLowerCase().includes(q)) ||
+      (r.category && r.category.toLowerCase().includes(q))
+    );
+  });
 
   todayDate = formatDate(new Date());
 
@@ -259,13 +275,13 @@ export class SanctionOrderComponent implements OnInit {
 
   readonly companyColumns: TableColumn<AcceptedCompanyRow>[] = [
     { key: '$index', label: 'Sr. No', type: 'number', align: 'center', width: 'w-16' },
-    { key: 'appId', label: 'Application ID', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap font-mono font-medium text-slate-900 text-center' },
-    { key: 'agencyName', label: 'Name Of the Agency/PIA', width: 'min-w-[220px]', cellClass: 'whitespace-nowrap font-bold text-slate-900' },
-    { key: 'district', label: 'Sanction District', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap text-slate-700 font-medium text-center' },
-    { key: 'sector', label: 'Sanction Sector(s)', width: 'min-w-[180px]', cellClass: 'whitespace-nowrap text-slate-700' },
+    { key: 'appId', label: 'Application ID', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap font-mono font-normal text-slate-800 text-center' },
+    { key: 'agencyName', label: 'Name Of the Agency/PIA', width: 'min-w-[220px]', cellClass: 'whitespace-nowrap font-normal text-slate-800' },
+    { key: 'district', label: 'Sanction District', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap text-slate-700 font-normal text-center' },
+    { key: 'sector', label: 'Sanction Sector(s)', width: 'min-w-[180px]', cellClass: 'whitespace-nowrap text-slate-700 font-normal' },
     { key: 'category', label: 'Application Category', align: 'center', type: 'custom', width: 'w-36' },
     { key: 'grade', label: 'Grade', align: 'center', type: 'custom', width: 'w-20' },
-    { key: 'target', label: 'Sanction Target', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-bold text-slate-900 text-center text-sm' },
+    { key: 'target', label: 'Sanction Target', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap font-normal text-slate-800 text-center text-[13px]' },
     { key: 'action', label: 'Action', align: 'center', type: 'custom', width: 'w-36', cellClass: 'whitespace-nowrap text-center' }
   ];
 

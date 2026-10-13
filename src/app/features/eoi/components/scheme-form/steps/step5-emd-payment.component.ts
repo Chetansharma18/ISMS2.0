@@ -57,7 +57,7 @@ import { SchemeFormState } from '../scheme-form.state';
             Select Payment Method for EMD Deposit:
           </label>
           
-          <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             
             <!-- UPI -->
             <button
@@ -108,23 +108,6 @@ import { SchemeFormState } from '../scheme-form.state';
                 </span>
               </div>
               <span class="text-[10px] text-slate-500 block leading-tight">Corporate &amp; Retail</span>
-            </button>
-
-            <!-- Cyber Treasury e-GRAS -->
-            <button
-              type="button"
-              (click)="state.paymentMethod.set('e-gras')"
-              class="p-3 sm:p-3.5 rounded-xl border text-left cursor-pointer transition-all flex flex-col justify-between gap-2"
-              [ngClass]="state.paymentMethod() === 'e-gras' ? 'border-navy bg-blue-50/60 ring-2 ring-navy/30 shadow-xs' : 'border-slate-200 hover:border-slate-300 bg-white'"
-            >
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-900">Cyber Treasury</span>
-                <span class="w-4 h-4 rounded-full flex items-center justify-center border text-[10px]"
-                  [ngClass]="state.paymentMethod() === 'e-gras' ? 'border-navy bg-navy text-white font-bold' : 'border-slate-300 bg-white'">
-                  @if (state.paymentMethod() === 'e-gras') { &check; }
-                </span>
-              </div>
-              <span class="text-[10px] text-slate-500 block leading-tight">e-GRAS Portal</span>
             </button>
 
             <!-- MSME Exemption -->

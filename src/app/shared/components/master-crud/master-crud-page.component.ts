@@ -50,36 +50,24 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
     <div class="w-full min-h-screen bg-white text-slate-800 font-sans p-4 sm:p-6 lg:p-8 space-y-6">
 
       <!-- Page Header -->
-      <app-page-header [title]="config.title">
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
-          <!-- Search Input -->
-          <div class="flex items-center gap-2 flex-1 max-w-md">
-            <div class="relative w-full">
-              <input
-                type="text"
-                [placeholder]="config.searchPlaceholder"
-                [ngModel]="searchQuery()"
-                (ngModelChange)="onSearchChange($event)"
-                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-              />
-              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-
-          <!-- Add Button -->
-          <button
-            type="button"
-            (click)="openAddModal()"
-            class="px-4 py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 shrink-0"
-          >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Add {{ config.entityLabel }}</span>
-          </button>
-        </div>
+      <app-page-header
+        [title]="config.title"
+        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: config.title }]"
+        [searchable]="true"
+        [searchPlaceholder]="config.searchPlaceholder || 'Search...'"
+        [(searchQuery)]="searchQuery"
+      >
+        <!-- Add Button -->
+        <button
+          type="button"
+          (click)="openAddModal()"
+          class="px-3.5 py-1.5 bg-primary hover:bg-primary-dark text-white text-xs font-semibold rounded-lg shadow-xs transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Add {{ config.entityLabel }}</span>
+        </button>
       </app-page-header>
 
       <!-- Master Table -->
@@ -99,7 +87,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
       <ng-template #tagsTemplate let-item let-column="column">
         <div class="flex flex-wrap gap-1.5 py-1">
           @for (tag of item[column.key]; track tag) {
-            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-sky-50 text-brand border border-sky-200">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-normal bg-sky-50 text-brand border border-sky-200">
               {{ tag }}
             </span>
           }
@@ -124,7 +112,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
           <button
             type="button"
             (click)="$event.stopPropagation(); openEditModal(item)"
-            class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
+            class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-normal text-[12px] hover:underline cursor-pointer select-none transition-colors"
             title="Edit"
           >
             <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -151,7 +139,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                 ></span>
               </button>
               <span
-                class="font-medium text-[12px] select-none transition-colors cursor-pointer"
+                class="font-normal text-[12px] select-none transition-colors cursor-pointer"
                 (click)="toggleStatus(item)"
                 [ngClass]="item.status === 'Inactive' ? 'text-slate-500 hover:text-slate-700' : 'text-emerald-600 hover:text-emerald-700'"
               >

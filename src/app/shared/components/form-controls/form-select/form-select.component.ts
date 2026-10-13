@@ -38,7 +38,7 @@ import { FormsModule } from '@angular/forms';
         (click)="toggleDropdown()"
         [disabled]="disabled"
         class="w-full h-[35px] flex items-center justify-between px-2.5 text-xs sm:text-[13px] leading-[20px] rounded-[4px] border transition-all duration-150 text-left bg-white font-sans cursor-pointer"
-        [class.border-theme]="!error && !disabled"
+        [class.border-theme]="!error"
         [class.border-rose-600]="!!error"
         [class.ring-1]="!!error"
         [class.ring-rose-600]="!!error"
@@ -116,22 +116,32 @@ import { FormsModule } from '@angular/forms';
 
       <!-- Inline Error Message -->
       @if (error) {
-        <p class="text-[11px] text-rose-600 font-medium mt-1 flex items-center gap-1 animate-fade-in">
-          <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <div class="form-error-text text-rose-600 font-medium mt-0.5 flex items-center gap-1 leading-tight animate-fade-in" style="font-size: 11px !important; line-height: 14px !important;">
+          <svg class="shrink-0" style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
           </svg>
-          <span>{{ error }}</span>
-        </p>
+          <span style="font-size: 11px !important; line-height: 14px !important;">{{ error }}</span>
+        </div>
       }
 
       <!-- Helper Hint -->
       @if (!error && hint) {
-        <p class="text-[11px] text-slate-400 mt-1 leading-tight">
+        <div class="form-hint-text text-slate-400 mt-0.5 leading-tight" style="font-size: 11px !important; line-height: 14px !important;">
           {{ hint }}
-        </p>
+        </div>
       }
     </div>
-  `
+  `,
+  styles: [`
+    .form-error-text {
+      font-size: 11px !important;
+      line-height: 14px !important;
+    }
+    .form-hint-text {
+      font-size: 11px !important;
+      line-height: 14px !important;
+    }
+  `]
 })
 export class FormSelectComponent {
   private static nextId = 0;

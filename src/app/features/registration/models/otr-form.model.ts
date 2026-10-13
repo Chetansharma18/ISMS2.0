@@ -69,6 +69,8 @@ export interface OfficerInCharge {
 }
 
 export interface Step3AuthorizedPerson {
+  firstName?: string;
+  lastName?: string;
   name: string;
   dob: string;
   age: string;
@@ -328,6 +330,8 @@ export function createInitialOtrFormData(): OtrFormData {
       }
     ],
     step3: {
+      firstName: '',
+      lastName: '',
       name: '',
       dob: '',
       age: '',
@@ -474,6 +478,8 @@ export function createExistingUserOtrData(): OtrFormData {
       }
     ],
     step3: {
+      firstName: 'Vikram',
+      lastName: 'Singh Mehta',
       name: 'Vikram Singh Mehta',
       dob: '1982-08-14',
       age: '44',

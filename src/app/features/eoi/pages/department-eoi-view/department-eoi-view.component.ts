@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, OnInit, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, OnInit, HostListener } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -40,6 +40,9 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
         <app-page-header
           title="EOI Responses"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'EOI Responses' }]"
+          [searchable]="true"
+          [(searchQuery)]="searchQuery"
+          searchPlaceholder="Search Scheme Name, Ref No, Category..."
         >
           <div class="flex items-center gap-2.5 flex-wrap">
             <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[#0c2d4e] border border-slate-300 text-xs font-medium shadow-xs">
@@ -100,9 +103,10 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
         <!-- Main Schemes Table via Reusable TableComponent -->
         <app-table
           [columns]="schemeColumns"
-          [data]="schemes()"
+          [data]="filteredSchemes()"
           [pagination]="true"
           [pageSize]="10"
+          emptyMessage="No schemes match your search query."
           [customTemplates]="{
             schemeTitle: schemeTitleTemplate,
             responseCount: responseCountTemplate,
@@ -113,7 +117,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
 
         <!-- Custom Scheme Title Template -->
         <ng-template #schemeTitleTemplate let-scheme>
-          <div class="font-semibold text-slate-900 text-[13px] leading-snug">
+          <div class="font-normal text-slate-800 text-[13px] leading-snug">
             {{ scheme.schemeTitle }}
           </div>
           <div class="text-[11px] font-mono text-slate-500 mt-0.5">
@@ -123,7 +127,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
 
         <!-- Custom Response Count Template -->
         <ng-template #responseCountTemplate let-scheme>
-          <span class="font-bold text-slate-900 text-[13px]">{{ scheme.responseCount }}</span>
+          <span class="font-normal text-slate-800 text-[13px]">{{ scheme.responseCount }}</span>
           <span class="text-slate-500 text-[11px] ml-1">EOIs</span>
         </ng-template>
 
@@ -170,8 +174,20 @@ export class DepartmentEoiViewComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   schemes = signal<Scheme[]>([]);
+  readonly searchQuery = signal<string>('');
   showOtpModal = signal<boolean>(false);
   currentSsoId = signal<string>('dept_admin');
+
+  readonly filteredSchemes = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    if (!q) return this.schemes();
+    return this.schemes().filter(s =>
+      (s.schemeTitle && s.schemeTitle.toLowerCase().includes(q)) ||
+      (s.refNo && s.refNo.toLowerCase().includes(q)) ||
+      (s.category && s.category.toLowerCase().includes(q)) ||
+      (s.status && s.status.toLowerCase().includes(q))
+    );
+  });
 
   readonly schemeColumns: TableColumn<Scheme>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-14' },

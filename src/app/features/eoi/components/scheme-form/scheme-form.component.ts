@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Location, NgClass } from '@angular/common';
+import { Router } from '@angular/router';
+import { DocumentViewerModalComponent } from '../../../../shared/components/document-viewer-modal/document-viewer-modal.component';
 import { ActionModalComponent } from '../../../../shared/components/action-modal/action-modal.component';
 import { StepperComponent } from '../../../../shared/components/stepper/stepper.component';
 import { SchemeFormState } from './scheme-form.state';
@@ -302,9 +304,15 @@ export type { EoiDocumentItem } from './scheme-form.model';
 })
 export class SchemeFormComponent {
   protected readonly state = inject(SchemeFormState);
-  private readonly location = inject(Location);
+  private readonly router = inject(Router);
 
   goBack(): void {
-    this.location.back();
+    if (this.state.currentStep() > 1) {
+      this.state.goToStep(this.state.currentStep() - 1);
+    } else {
+      this.router.navigate(['/tenders'], {
+        queryParams: { viewRefNo: this.state.schemeRefNo() }
+      });
+    }
   }
 }

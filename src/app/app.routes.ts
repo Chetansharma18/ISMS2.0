@@ -67,6 +67,23 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'payment-history',
+    loadComponent: () =>
+      import('./features/payment-history/payment-history.component').then(
+        (m) => m.PaymentHistoryComponent
+      )
+  },
+  {
+    path: 'history',
+    redirectTo: 'payment-history',
+    pathMatch: 'full'
+  },
+  {
+    path: 'transactions',
+    redirectTo: 'payment-history',
+    pathMatch: 'full'
+  },
+  {
     path: 'ipa',
     loadComponent: () =>
       import('./features/ipa/ipa-list.component').then(

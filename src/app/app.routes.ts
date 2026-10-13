@@ -200,6 +200,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/two-step-verification',
+    loadComponent: () =>
+      import('./features/two-step-verification/two-step-verification.component').then(
+        (m) => m.TwoStepVerificationComponent
+      )
+  },
+  {
     path: 'admin/master/eoi-category',
     loadComponent: () =>
       import('./features/admin-master/eoi-category-master.component').then(

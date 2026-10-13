@@ -618,11 +618,15 @@ export class TendersPageComponent {
     this.selectedSchemeForCommittee.set(null);
   }
 
-  saveCommittee(members: string[]): void {
+  saveCommittee(payload: { approver?: string; members: string[] } | string[]): void {
     const scheme = this.selectedSchemeForCommittee();
     if (!scheme) return;
 
-    this.schemeService.assignCommittee(scheme.refNo, [...members]).subscribe();
+    if (Array.isArray(payload)) {
+      this.schemeService.assignCommittee(scheme.refNo, [...payload]).subscribe();
+    } else {
+      this.schemeService.assignCommittee(scheme.refNo, [...payload.members], payload.approver).subscribe();
+    }
     this.closeCommitteeModal();
   }
 

@@ -22,6 +22,7 @@ export interface SchemeTenderItem {
   processFee?: string;
   attachedDocs?: Array<{ sNo: number; name: string; size: string }>;
   committeeMembers?: string[];
+  committeeApprover?: string;
   createdAt?: number;
   isActive?: boolean;
   isFrozen?: boolean;

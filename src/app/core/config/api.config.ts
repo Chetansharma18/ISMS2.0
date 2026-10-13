@@ -181,6 +181,12 @@ export const API_ENDPOINTS = {
     UPDATE: { url: (id: string | number) => `/masters/gradings/${id}`, method: 'PUT' as ApiMethod },
     DELETE: { url: (id: string | number) => `/masters/gradings/${id}`, method: 'DELETE' as ApiMethod }
   },
+  TWO_STEP_VERIFICATION: {
+    LIST: { url: '/admin/two-step-verification', method: 'GET' as ApiMethod },
+    ADD: { url: '/admin/two-step-verification', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/admin/two-step-verification/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/admin/two-step-verification/${id}`, method: 'DELETE' as ApiMethod }
+  },
 
   // Grievance Redressal (DataKey: 'GRIEVANCES')
   GRIEVANCES: {

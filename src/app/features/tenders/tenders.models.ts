@@ -26,6 +26,7 @@ export interface SchemeTender {
   attachedDocs?: EoiDocumentItem[];
   requiredDocs?: string[];
   committeeMembers?: string[];
+  committeeApprover?: string;
   createdAt?: number;
   isActive?: boolean;
   isFrozen?: boolean;

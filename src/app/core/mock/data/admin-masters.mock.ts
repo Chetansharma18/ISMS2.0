@@ -11,7 +11,9 @@ import {
   UserRoleMasterItem,
   SchemeCategoryMasterItem,
   RemarkMasterItem,
-  GradingMasterItem
+  GradingMasterItem,
+  TwoStepVerificationItem,
+  AuthMethodType
 } from '../../models/admin-masters.model';
 
 // Types live in core/models; re-exported so existing imports keep working.
@@ -26,7 +28,9 @@ export type {
   UserRoleMasterItem,
   SchemeCategoryMasterItem,
   RemarkMasterItem,
-  GradingMasterItem
+  GradingMasterItem,
+  TwoStepVerificationItem,
+  AuthMethodType
 };
 
 export const MOCK_COURSE_MASTER_ITEMS: CourseMasterItem[] = resolveMock([
@@ -428,6 +432,37 @@ export const MOCK_GRADING_MASTER_ITEMS: GradingMasterItem[] = resolveMock([
     minimum: 0,
     maximum: 39,
     range: '0 - 39',
+    status: 'Active'
+  }
+]);
+
+export const MOCK_TWO_STEP_VERIFICATION_ITEMS: TwoStepVerificationItem[] = resolveMock([
+  {
+    sNo: 1,
+    id: '2fa-1',
+    roleType: 'Super Admin',
+    authTypes: ['OTP', 'Auth App', 'PIN'],
+    status: 'Active'
+  },
+  {
+    sNo: 2,
+    id: '2fa-2',
+    roleType: 'Department Officer',
+    authTypes: ['OTP', 'Auth App'],
+    status: 'Active'
+  },
+  {
+    sNo: 3,
+    id: '2fa-3',
+    roleType: 'Scrutiny Officer',
+    authTypes: ['OTP', 'PIN'],
+    status: 'Active'
+  },
+  {
+    sNo: 4,
+    id: '2fa-4',
+    roleType: 'Training Partner',
+    authTypes: ['OTP'],
     status: 'Active'
   }
 ]);

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { DynamicFormBuilderComponent } from './features/dynamic-form-builder/dynamic-form-builder.component';
 
 export const routes: Routes = [
   {
@@ -217,6 +218,22 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/two-step-verification',
+    loadComponent: () =>
+      import('./features/two-step-verification/two-step-verification.component').then(
+        (m) => m.TwoStepVerificationComponent
+      )
+  },
+  {
+    path: 'admin/dynamic-form-builder',
+    component: DynamicFormBuilderComponent
+  },
+  {
+    path: 'dynamic-form-builder',
+    redirectTo: 'admin/dynamic-form-builder',
+    pathMatch: 'full'
+  },
+  {
     path: 'admin/master/eoi-category',
     loadComponent: () =>
       import('./features/admin-master/eoi-category-master.component').then(
@@ -228,6 +245,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/admin-master/scheme-master.component').then(
         (m) => m.SchemeMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/scheme-category',
+    loadComponent: () =>
+      import('./features/admin-master/scheme-category-master.component').then(
+        (m) => m.SchemeCategoryMasterComponent
       )
   },
   {
@@ -270,6 +294,27 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/admin-master/designation-master.component').then(
         (m) => m.DesignationMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/doc',
+    loadComponent: () =>
+      import('./features/admin-master/doc-master.component').then(
+        (m) => m.DocMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/remark',
+    loadComponent: () =>
+      import('./features/admin-master/remark-master.component').then(
+        (m) => m.RemarkMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/grading',
+    loadComponent: () =>
+      import('./features/admin-master/grading-master.component').then(
+        (m) => m.GradingMasterComponent
       )
   },
   {

@@ -148,16 +148,17 @@ export function toDisplayDate(dt: string): string {
 export function createEmptyEoiForm(): EoiFormData {
   return {
     refNo: '',
-    scheme: 'MMKVY',
-    schemeCategory: 'ALL',
+    scheme: '',
+    schemeCategory: '',
     publishedDate: '',
     submissionDate: '',
-    eoiCategory: 'General',
+    eoiCategory: '',
     description: '',
     emdFee: '',
     processFee: '',
     attachments: [],
-    documents: []
+    documents: [],
+    documentFiles: {}
   };
 }
 
@@ -171,10 +172,10 @@ export function eoiFormFromScheme(scheme: SchemeTender, now: number = Date.now()
   return {
     refNo: scheme.refNo,
     scheme: scheme.schemeName,
-    schemeCategory: normalizeSchemeCategory(scheme.schemeCategory || scheme.category),
+    schemeCategory: scheme.schemeCategory || scheme.category || '',
     publishedDate: toInputDate(scheme.datePublished),
     submissionDate: toInputDate(scheme.closingDate),
-    eoiCategory: scheme.eoiCategory || 'General',
+    eoiCategory: scheme.eoiCategory || '',
     description: scheme.eoiDescription || '',
     emdFee: scheme.emdFee || '',
     processFee: scheme.processFee || '',
@@ -185,7 +186,8 @@ export function eoiFormFromScheme(scheme: SchemeTender, now: number = Date.now()
       size: doc.size,
       file: new File([], doc.name)
     })),
-    documents: []
+    documents: scheme.requiredDocs ? [...scheme.requiredDocs] : [],
+    documentFiles: {}
   };
 }
 
@@ -232,6 +234,20 @@ export function buildSchemeFromForm(
     size: att.size
   }));
 
+  if (d.documentFiles) {
+    let nextSNo = attachedDocsList.length + 1;
+    for (const [idxStr, up] of Object.entries(d.documentFiles)) {
+      if (up && up.fileName) {
+        const docName = d.documents[Number(idxStr)] || up.name || 'Document';
+        attachedDocsList.push({
+          sNo: nextSNo++,
+          name: `${docName} (${up.fileName})`,
+          size: up.size
+        });
+      }
+    }
+  }
+
   return {
     ...(existingScheme || {}),
     sNo: existingScheme ? existingScheme.sNo : 1,
@@ -248,6 +264,7 @@ export function buildSchemeFromForm(
     emdFee: d.emdFee,
     processFee: d.processFee,
     attachedDocs: attachedDocsList,
+    requiredDocs: d.documents ? d.documents.filter(Boolean) : existingScheme?.requiredDocs || [],
     createdAt: existingScheme ? existingScheme.createdAt : now,
     isActive: existingScheme ? existingScheme.isActive : true,
     isFrozen: existingScheme ? existingScheme.isFrozen : false

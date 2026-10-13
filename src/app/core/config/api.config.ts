@@ -157,11 +157,42 @@ export const API_ENDPOINTS = {
     UPDATE: { url: (id: string | number) => `/masters/schemes/${id}`, method: 'PUT' as ApiMethod },
     DELETE: { url: (id: string | number) => `/masters/schemes/${id}`, method: 'DELETE' as ApiMethod }
   },
+  SCHEME_CATEGORIES: {
+    LIST: { url: '/masters/scheme-categories', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/scheme-categories', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/scheme-categories/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/scheme-categories/${id}`, method: 'DELETE' as ApiMethod }
+  },
   USER_ROLES: {
     LIST: { url: '/masters/user-roles', method: 'GET' as ApiMethod },
     ADD: { url: '/masters/user-roles', method: 'POST' as ApiMethod },
     UPDATE: { url: (id: string | number) => `/masters/user-roles/${id}`, method: 'PUT' as ApiMethod },
     DELETE: { url: (id: string | number) => `/masters/user-roles/${id}`, method: 'DELETE' as ApiMethod }
+  },
+  REMARK_MASTERS: {
+    LIST: { url: '/masters/remarks', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/remarks', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/remarks/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/remarks/${id}`, method: 'DELETE' as ApiMethod }
+  },
+  GRADING_MASTERS: {
+    LIST: { url: '/masters/gradings', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/gradings', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/gradings/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/gradings/${id}`, method: 'DELETE' as ApiMethod }
+  },
+  TWO_STEP_VERIFICATION: {
+    LIST: { url: '/admin/two-step-verification', method: 'GET' as ApiMethod },
+    ADD: { url: '/admin/two-step-verification', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/admin/two-step-verification/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/admin/two-step-verification/${id}`, method: 'DELETE' as ApiMethod }
+  },
+  DYNAMIC_FORM_BUILDER: {
+    LIST: { url: '/admin/dynamic-form-builder', method: 'GET' as ApiMethod },
+    GET: { url: (id: string | number) => `/admin/dynamic-form-builder/${id}`, method: 'GET' as ApiMethod },
+    ADD: { url: '/admin/dynamic-form-builder', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/admin/dynamic-form-builder/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/admin/dynamic-form-builder/${id}`, method: 'DELETE' as ApiMethod }
   },
 
   // Grievance Redressal (DataKey: 'GRIEVANCES')

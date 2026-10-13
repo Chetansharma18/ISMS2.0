@@ -15,6 +15,7 @@ export interface CourseMasterItem {
   totalQpHours: number;
   courseValidUpToDate: string;
   remark: string;
+  status?: 'Active' | 'Inactive';
 }
 
 export interface SectorMasterItem {
@@ -55,10 +56,14 @@ export interface EoiCategoryItem {
 export interface PermissionMasterItem {
   sNo: number;
   id: string;
-  permissionName: string;
-  permissionCode: string;
+  roleType: string;
   moduleName: string;
-  description: string;
+  canView: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  permissionName?: string;
+  permissionCode?: string;
+  description?: string;
   status: 'Active' | 'Inactive';
 }
 
@@ -79,4 +84,81 @@ export interface UserRoleMasterItem {
   roleTypeName: string;
   permissions: string[];
   status: 'Active' | 'Inactive';
+}
+
+export interface SchemeCategoryMasterItem {
+  sNo: number;
+  id: string;
+  categoryName: string;
+  schemeName?: string;
+  status: 'Active' | 'Inactive';
+}
+
+export interface DocMasterItem {
+  id: string;
+  sNo?: number;
+  schemeName: string;
+  documents: string;
+  status: 'Active' | 'Inactive';
+}
+
+export interface RemarkMasterItem {
+  id: string;
+  sNo?: number;
+  remarkType: string;
+  description: string;
+  status: 'Active' | 'Inactive';
+}
+
+export interface GradingMasterItem {
+  id: string;
+  sNo?: number;
+  grade: string;
+  minimum: number;
+  maximum: number;
+  range: string;
+  status: 'Active' | 'Inactive';
+}
+
+export type AuthMethodType = 'OTP' | 'Auth App' | 'PIN';
+
+export interface TwoStepVerificationItem {
+  id: string;
+  sNo?: number;
+  roleType: string;
+  authTypes: AuthMethodType[];
+  status?: 'Active' | 'Inactive';
+}
+
+export type DynamicFormFieldType = 'text' | 'number' | 'datepicker' | 'dropdown' | 'photo';
+
+export interface DynamicFormField {
+  id: string;
+  label: string;
+  type: DynamicFormFieldType;
+  mandatory: boolean;
+  options?: string[]; // for dropdown list (comma-separated or items)
+  optionsText?: string; // raw input string helper for comma-separated options
+  minPhotos?: number; // for photo upload
+  maxPhotos?: number; // for photo upload
+  maxSizeMb?: number; // for photo upload in MB
+}
+
+export interface FormStep {
+  id: string;
+  stepNumber: number;
+  title: string;
+  fields: DynamicFormField[];
+}
+
+export interface DynamicFormBuilderItem {
+  id: string;
+  sNo?: number;
+  formType: string; // Form Name / Type
+  isStepForm: boolean; // Yes / No
+  steps?: FormStep[]; // When isStepForm is true
+  fields: DynamicFormField[];
+  status?: 'Active' | 'Inactive';
+  createdAt?: string;
+  updatedAt?: string;
 }

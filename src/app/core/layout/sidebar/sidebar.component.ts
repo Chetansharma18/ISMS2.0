@@ -73,6 +73,32 @@ import { PermissionService } from '../../permissions/permission.service';
               <span class="tracking-tight">EOI Configuration</span>
             </a>
 
+            <!-- Two step verification -->
+            <a
+              routerLink="/admin/two-step-verification"
+              routerLinkActive="bg-primary-light text-brand font-medium border border-border"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 text-text-secondary hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
+            >
+              <svg class="w-4 h-4 shrink-0 text-text-muted group-hover:text-brand transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span class="tracking-tight">Two step verification</span>
+            </a>
+
+            <!-- Dynamic Form Builder -->
+            <a
+              routerLink="/admin/dynamic-form-builder"
+              routerLinkActive="bg-primary-light text-brand font-medium border border-border"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 text-text-secondary hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
+            >
+              <svg class="w-4 h-4 shrink-0 text-text-muted group-hover:text-brand transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+              <span class="tracking-tight">Dynamic Form Builder</span>
+            </a>
+
             <!-- 2. Master Dropdown Slider Section -->
             <div class="flex flex-col">
               <!-- Master Header Toggle -->
@@ -121,6 +147,15 @@ import { PermissionService } from '../../permissions/permission.service';
                   </a>
 
                   <a
+                    routerLink="/admin/master/scheme-category"
+                    routerLinkActive="bg-primary-light text-brand font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">Scheme Category Master</span>
+                  </a>
+
+                  <a
                     routerLink="/admin/master/sector"
                     routerLinkActive="bg-primary-light text-brand font-semibold"
                     class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
@@ -154,6 +189,33 @@ import { PermissionService } from '../../permissions/permission.service';
                   >
                     <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
                     <span class="truncate">Designation</span>
+                  </a>
+
+                  <a
+                    routerLink="/admin/master/doc"
+                    routerLinkActive="bg-primary-light text-brand font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">Doc Master</span>
+                  </a>
+
+                  <a
+                    routerLink="/admin/master/remark"
+                    routerLinkActive="bg-primary-light text-brand font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">Remark Master</span>
+                  </a>
+
+                  <a
+                    routerLink="/admin/master/grading"
+                    routerLinkActive="bg-primary-light text-brand font-semibold"
+                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                    <span class="truncate">Grading Master</span>
                   </a>
                 </div>
               }

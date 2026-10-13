@@ -26,7 +26,12 @@ import {
   MOCK_PERMISSION_MASTER_ITEMS,
   MOCK_SCHEME_MASTER_ITEMS,
   MOCK_USER_ROLE_MASTER_ITEMS,
-  MOCK_CAMERA_BATCHES
+  MOCK_SCHEME_CATEGORY_MASTER_ITEMS,
+  MOCK_REMARK_MASTER_ITEMS,
+  MOCK_GRADING_MASTER_ITEMS,
+  MOCK_TWO_STEP_VERIFICATION_ITEMS,
+  MOCK_CAMERA_BATCHES,
+  MOCK_DYNAMIC_FORM_BUILDER_ITEMS
 } from './data';
 
 export interface QueryOptions {
@@ -74,7 +79,12 @@ export class MockDatabaseService {
     EOI_CATEGORIES: MOCK_EOI_CATEGORY_ITEMS,
     PERMISSIONS: MOCK_PERMISSION_MASTER_ITEMS,
     SCHEME_MASTERS: MOCK_SCHEME_MASTER_ITEMS,
-    USER_ROLES: MOCK_USER_ROLE_MASTER_ITEMS
+    USER_ROLES: MOCK_USER_ROLE_MASTER_ITEMS,
+    SCHEME_CATEGORIES: MOCK_SCHEME_CATEGORY_MASTER_ITEMS,
+    REMARK_MASTERS: MOCK_REMARK_MASTER_ITEMS,
+    GRADING_MASTERS: MOCK_GRADING_MASTER_ITEMS,
+    TWO_STEP_VERIFICATION: MOCK_TWO_STEP_VERIFICATION_ITEMS,
+    DYNAMIC_FORM_BUILDER: MOCK_DYNAMIC_FORM_BUILDER_ITEMS
   };
 
   constructor() {
@@ -100,9 +110,103 @@ export class MockDatabaseService {
       const stored = this.loadFromStorage(key);
       if (stored && Array.isArray(stored)) {
         if (key === 'SCHEMES') {
-          const sanitized = stored.filter(item => item?.status !== 'Closed');
-          this.store.set(key, sanitized);
-          this.saveToStorage(key, sanitized);
+          const hasOldCategories = stored.some(
+            item => item?.eoiCategory === 'Empanelment' || item?.eoiCategory === 'RTD (Recruit-Train-Deploy)'
+          );
+          const hasTargetSchemes = stored.some(
+            item => item?.schemeName === 'Vishwakarma Yuva Udyami Protsahan Yojana'
+          );
+          if (!hasTargetSchemes || hasOldCategories) {
+            const fresh = this.deepClone(this.seeds[key]);
+            this.store.set(key, fresh);
+            this.saveToStorage(key, fresh);
+          } else {
+            const sanitized = stored.filter(item => item?.status !== 'Closed');
+            this.store.set(key, sanitized);
+            this.saveToStorage(key, sanitized);
+          }
+        } else if (key === 'SCHEME_MASTERS') {
+          const hasTargetSchemes = stored.some(
+            item => item?.schemeName === 'Vishwakarma Yuva Udyami Protsahan Yojana'
+          );
+          if (!hasTargetSchemes) {
+            const fresh = this.deepClone(this.seeds[key]);
+            this.store.set(key, fresh);
+            this.saveToStorage(key, fresh);
+          } else {
+            this.store.set(key, stored);
+          }
+        } else if (key === 'EOI_CATEGORIES') {
+          const hasOldItems = stored.some(
+            item => item?.categoryTitle === 'Empanelment' || item?.categoryTitle === 'RTD (Recruit-Train-Deploy)'
+          );
+          if (hasOldItems) {
+            const filtered = stored.filter(
+              item => item?.categoryTitle !== 'Empanelment' && item?.categoryTitle !== 'RTD (Recruit-Train-Deploy)'
+            );
+            this.store.set(key, filtered);
+            this.saveToStorage(key, filtered);
+          } else {
+            this.store.set(key, stored);
+          }
+        } else if (key === 'USERS') {
+          const hasOldRoles = stored.some(
+            item =>
+              item?.roleType === 'scheme oc' ||
+              item?.roleType === 'mis manager' ||
+              item?.roleType === 'programmer' ||
+              item?.roleType === 'gm' ||
+              item?.roleType === 'zc' ||
+              item?.roleType === 'tp' ||
+              item?.roleType === 'super admin'
+          );
+          if (hasOldRoles) {
+            const fresh = this.deepClone(this.seeds[key]);
+            this.store.set(key, fresh);
+            this.saveToStorage(key, fresh);
+          } else {
+            this.store.set(key, stored);
+          }
+        } else if (key === 'PERMISSIONS') {
+          const hasOldData = stored.some(
+            item =>
+              item?.id === 'perm-1' ||
+              item?.id === 'perm-2' ||
+              item?.id === 'perm-3' ||
+              item?.roleType === 'Role1'
+          );
+          if (hasOldData) {
+            this.store.set(key, []);
+            this.saveToStorage(key, []);
+          } else {
+            this.store.set(key, stored);
+          }
+        } else if (key === 'DYNAMIC_FORM_BUILDER') {
+          const hasOrgForm = stored.some(
+            item => item?.formType === 'Organisation Registration Form'
+          );
+          const hasEoiForm = stored.some(
+            item => item?.formType === 'EOI Configuration Form'
+          );
+          const hasApplyEoiForm = stored.some(
+            item => item?.formType === 'Apply for EOI Form'
+          );
+          const hasDeptUserForm = stored.some(
+            item => item?.formType === 'Department User Registration Form'
+          );
+          const hasOldRemovedForms = stored.some(
+            item =>
+              item?.formType === 'Training Center Inspection Form' ||
+              item?.formType === 'Candidate Feedback & Verification' ||
+              item?.formType === 'Company Registration Form'
+          );
+          if (!hasOrgForm || !hasEoiForm || !hasApplyEoiForm || !hasDeptUserForm || hasOldRemovedForms) {
+            const fresh = this.deepClone(this.seeds[key]);
+            this.store.set(key, fresh);
+            this.saveToStorage(key, fresh);
+          } else {
+            this.store.set(key, stored);
+          }
         } else {
           this.store.set(key, stored);
         }

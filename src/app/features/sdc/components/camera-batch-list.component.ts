@@ -214,8 +214,37 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
             </button>
 
+            <!-- Mute/Unmute Toggle Button -->
+            <button (click)="toggleMute(feed.id, videoEl)" 
+                    class="w-8 h-8 rounded bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white flex items-center justify-center transition-colors border border-white/20 cursor-pointer" 
+                    [class.bg-blue-600]="!isMuted(feed.id)"
+                    [title]="isMuted(feed.id) ? 'Unmute Audio' : 'Mute Audio'">
+              @if (isMuted(feed.id)) {
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                </svg>
+              } @else {
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                </svg>
+              }
+            </button>
+
+            <!-- View Recorded Clip Button (if available) -->
+            @if (lastRecordedUrls()[feed.id]) {
+              <button (click)="openRecordingPreview(feed)" 
+                      class="h-8 px-2.5 rounded bg-emerald-600/90 hover:bg-emerald-600 backdrop-blur-sm text-white flex items-center gap-1.5 transition-colors border border-emerald-400/40 cursor-pointer shadow-sm"
+                      title="Preview Recorded Video">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+                <span class="text-xs font-semibold">View Recording</span>
+              </button>
+            }
+
             <!-- Record Button -->
-            <button (click)="toggleRecord(feed.id)" 
+            <button (click)="toggleRecord(feed.id, videoEl)" 
                     class="flex items-center gap-1.5 px-2.5 h-8 rounded backdrop-blur-sm text-white text-xs font-semibold transition-colors border border-white/20 cursor-pointer"
                     [ngClass]="recordingStates()[feed.id] ? 'bg-red-600 hover:bg-red-700 border-red-500' : 'bg-black/60 hover:bg-black/80'"
                     title="Record Feed">
@@ -232,10 +261,13 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
                (mouseup)="endPan(feed.id)"
                (mouseleave)="endPan(feed.id)">
             <video 
-              src="https://www.w3schools.com/html/mov_bbb.mp4" 
+              #videoEl
+              src="/video.mp4" 
               autoplay 
               loop 
-              muted 
+              [muted]="isMuted(feed.id)" 
+              playsinline
+              crossorigin="anonymous"
               class="w-full h-full object-cover origin-center pointer-events-none"
               [style.transform]="getTransform(feed.id)"
               [style.transition]="isDragging(feed.id) ? 'none' : 'transform 0.3s ease'"
@@ -249,17 +281,68 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
               </div>
             }
 
-            <!-- Fullscreen Toggle Button -->
-            <button (click)="toggleFullScreen(videoContainer)" class="absolute bottom-4 right-4 w-8 h-8 rounded bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white flex items-center justify-center transition-colors border border-white/20 cursor-pointer shadow-lg opacity-100 sm:opacity-0 sm:group-hover:opacity-100 z-30" title="Toggle Full Screen">
-              @if (isFullscreen()) {
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9L4 4m0 0v4m0-4h4m6 5l5-5m0 0v4m0-4h-4m-5 6l-5 5m0 0v-4m0 4h4m6-5l5 5m0 0v-4m0 4h-4"/></svg>
-              } @else {
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
-              }
-            </button>
+            <!-- Bottom Controls (Mute & Fullscreen) -->
+            <div class="absolute bottom-4 right-4 flex items-center gap-2 z-30 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+              <!-- Mute Toggle Button -->
+              <button (click)="toggleMute(feed.id, videoEl)" class="w-8 h-8 rounded bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white flex items-center justify-center transition-colors border border-white/20 cursor-pointer shadow-lg" [class.bg-blue-600]="!isMuted(feed.id)" [title]="isMuted(feed.id) ? 'Unmute Audio' : 'Mute Audio'">
+                @if (isMuted(feed.id)) {
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                  </svg>
+                } @else {
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                  </svg>
+                }
+              </button>
+
+              <!-- Fullscreen Toggle Button -->
+              <button (click)="toggleFullScreen(videoContainer)" class="w-8 h-8 rounded bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white flex items-center justify-center transition-colors border border-white/20 cursor-pointer shadow-lg" title="Toggle Full Screen">
+                @if (isFullscreen()) {
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9L4 4m0 0v4m0-4h4m6 5l5-5m0 0v4m0-4h-4m-5 6l-5 5m0 0v-4m0 4h4m6-5l5 5m0 0v-4m0 4h-4"/></svg>
+                } @else {
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                }
+              </button>
+            </div>
           </div>
         </div>
       </ng-template>
+
+      <!-- Recorded Video Preview Modal -->
+      @if (previewRecording()) {
+        <div class="fixed inset-0 z-120 bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
+          <div class="bg-slate-950 border border-slate-700 rounded-xl overflow-hidden max-w-2xl w-full shadow-2xl flex flex-col">
+            <div class="px-4 py-3 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <h3 class="text-sm sm:text-base font-semibold m-0 text-white">
+                  Recorded Video - {{ previewRecording()?.batchName }}
+                </h3>
+              </div>
+              <button (click)="closeRecordingPreview()" aria-label="Close" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <div class="p-4 bg-black flex items-center justify-center">
+              <video [src]="previewRecording()?.url" controls autoplay playsinline class="w-full max-h-[60vh] rounded-lg shadow-lg"></video>
+            </div>
+            <div class="px-4 py-3 bg-slate-900 border-t border-slate-800 flex items-center justify-between text-xs text-slate-300">
+              <span>Clip recorded from live feed</span>
+              <div class="flex items-center gap-2">
+                <a [href]="previewRecording()?.url" [download]="'Batch_Recording_' + previewRecording()?.batchId + '.mp4'" class="btn btn-primary btn-sm inline-flex items-center gap-1.5" style="color: white !important;">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                  <span>Download</span>
+                </a>
+                <button (click)="closeRecordingPreview()" class="btn btn-secondary btn-sm">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
 
     </div>
   `
@@ -307,9 +390,15 @@ export class CameraBatchListComponent {
   
   // Video Options State
   recordingStates = signal<Record<string, boolean>>({});
+  lastRecordedUrls = signal<Record<string, string>>({});
+  previewRecording = signal<{ batchId: string; batchName: string; url: string } | null>(null);
   zoomedStates = signal<Record<string, boolean>>({});
   panStates = signal<Record<string, {x: number, y: number, isDragging: boolean, startX: number, startY: number}>>({});
+  mutedStates = signal<Record<string, boolean>>({});
   isFullscreen = signal<boolean>(false);
+
+  private mediaRecorders = new Map<string, MediaRecorder>();
+  private recordedChunks = new Map<string, Blob[]>();
 
   @HostListener('document:fullscreenchange')
   onFullScreenChange() {
@@ -337,9 +426,33 @@ export class CameraBatchListComponent {
   closeModal() {
     this.selectedFeed.set(null);
     this.isMultiView.set(false);
+    this.mediaRecorders.forEach(rec => {
+      if (rec.state !== 'inactive') {
+        try { rec.stop(); } catch {}
+      }
+    });
+    this.mediaRecorders.clear();
     this.recordingStates.set({});
     this.zoomedStates.set({});
     this.panStates.set({});
+    this.mutedStates.set({});
+    this.previewRecording.set(null);
+  }
+
+  isMuted(feedId: string): boolean {
+    const s = this.mutedStates()[feedId];
+    return s === undefined ? true : s;
+  }
+
+  toggleMute(feedId: string, videoEl?: HTMLVideoElement) {
+    const nextMuted = !this.isMuted(feedId);
+    this.mutedStates.update(s => ({ ...s, [feedId]: nextMuted }));
+    if (videoEl) {
+      videoEl.muted = nextMuted;
+      if (!nextMuted) {
+        videoEl.play().catch(() => {});
+      }
+    }
   }
 
   toggleMultiView() {
@@ -386,23 +499,132 @@ export class CameraBatchListComponent {
     return 'col-span-1';
   }
 
-  toggleRecord(batchId: string) {
-    const current = this.recordingStates();
-    const isRec = !!current[batchId];
-    this.recordingStates.set({ ...current, [batchId]: !isRec });
-    
+  private getRecorderOptions(): { mimeType?: string; ext: string } {
+    if (typeof MediaRecorder === 'undefined') {
+      return { ext: 'mp4' };
+    }
+    const candidates = [
+      { mime: 'video/mp4;codecs=avc1', ext: 'mp4' },
+      { mime: 'video/mp4', ext: 'mp4' },
+      { mime: 'video/webm;codecs=vp9,opus', ext: 'webm' },
+      { mime: 'video/webm;codecs=vp8,opus', ext: 'webm' },
+      { mime: 'video/webm', ext: 'webm' }
+    ];
+    for (const c of candidates) {
+      if (MediaRecorder.isTypeSupported(c.mime)) {
+        return { mimeType: c.mime, ext: c.ext };
+      }
+    }
+    return { ext: 'mp4' };
+  }
+
+  toggleRecord(batchId: string, videoEl?: HTMLVideoElement) {
+    const isRec = !!this.recordingStates()[batchId];
     if (isRec) {
-      this.downloadRecording(batchId);
+      this.stopRecording(batchId);
+    } else {
+      this.startRecording(batchId, videoEl);
     }
   }
 
-  downloadRecording(batchId: string) {
+  private startRecording(batchId: string, videoEl?: HTMLVideoElement) {
+    try {
+      let stream: MediaStream | null = null;
+      if (videoEl) {
+        const anyV = videoEl as any;
+        if (typeof anyV.captureStream === 'function') {
+          stream = anyV.captureStream(30);
+        } else if (typeof anyV.mozCaptureStream === 'function') {
+          stream = anyV.mozCaptureStream(30);
+        }
+      }
+
+      if (!stream) {
+        const videos = document.querySelectorAll('video');
+        for (let i = 0; i < videos.length; i++) {
+          const v = videos[i] as any;
+          if (v && typeof v.captureStream === 'function') {
+            stream = v.captureStream(30);
+            break;
+          }
+        }
+      }
+
+      if (!stream || typeof MediaRecorder === 'undefined') {
+        this.recordingStates.update(s => ({ ...s, [batchId]: true }));
+        return;
+      }
+
+      const { mimeType, ext } = this.getRecorderOptions();
+      const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+      const chunks: Blob[] = [];
+
+      recorder.ondataavailable = (event: BlobEvent) => {
+        if (event.data && event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+
+      recorder.onstop = () => {
+        const mime = recorder.mimeType || mimeType || 'video/mp4';
+        const blob = new Blob(chunks, { type: mime });
+        const url = URL.createObjectURL(blob);
+
+        // Store URL for in-app viewing
+        this.lastRecordedUrls.update(u => ({ ...u, [batchId]: url }));
+
+        // Download the recording
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Batch_Recording_${batchId}_${new Date().getTime()}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      };
+
+      this.recordedChunks.set(batchId, chunks);
+      this.mediaRecorders.set(batchId, recorder);
+      recorder.start(250);
+      this.recordingStates.update(s => ({ ...s, [batchId]: true }));
+    } catch (err) {
+      console.error('Error starting live recording:', err);
+      this.recordingStates.update(s => ({ ...s, [batchId]: true }));
+    }
+  }
+
+  private stopRecording(batchId: string) {
+    this.recordingStates.update(s => ({ ...s, [batchId]: false }));
+    const recorder = this.mediaRecorders.get(batchId);
+    if (recorder && recorder.state !== 'inactive') {
+      recorder.stop();
+      this.mediaRecorders.delete(batchId);
+    } else {
+      this.downloadFallback(batchId);
+    }
+  }
+
+  private downloadFallback(batchId: string) {
     const a = document.createElement('a');
-    a.href = 'https://www.w3schools.com/html/mov_bbb.mp4';
+    a.href = '/video.mp4';
     a.download = `Batch_Recording_${batchId}_${new Date().getTime()}.mp4`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  }
+
+  openRecordingPreview(feed: CameraBatchItem) {
+    const url = this.lastRecordedUrls()[feed.id];
+    if (url) {
+      this.previewRecording.set({
+        batchId: feed.id,
+        batchName: feed.batchName,
+        url
+      });
+    }
+  }
+
+  closeRecordingPreview() {
+    this.previewRecording.set(null);
   }
 
   toggleZoom(batchId: string) {

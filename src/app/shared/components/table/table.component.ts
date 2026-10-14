@@ -271,6 +271,9 @@ export class TableComponent {
   private _dataSignal = signal<any[]>([]);
   @Input() set data(value: any[]) {
     this._dataSignal.set(value || []);
+    if (this.currentPage() > 1 && (value || []).length <= (this.currentPage() - 1) * this.pageSize) {
+      this.currentPage.set(1);
+    }
   }
   get data(): any[] {
     return this._dataSignal();

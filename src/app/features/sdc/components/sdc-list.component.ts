@@ -39,13 +39,14 @@ import {
         >
           <a
             routerLink="/sdc/create"
-            class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-navy hover:bg-navy-dark text-white rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-navy hover:bg-navy-dark text-white !text-white rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer no-underline"
+            style="color: #ffffff !important;"
             title="Register New SDC Center"
           >
-            <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-3.5 h-3.5 stroke-2 text-white" style="color: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
             </svg>
-            <span>Add SDC</span>
+            <span class="text-white !text-white" style="color: #ffffff !important;">Add SDC</span>
           </a>
         </app-page-header>
 

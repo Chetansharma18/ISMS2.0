@@ -16,12 +16,13 @@ import { filter } from 'rxjs/operators';
 import { AuthService, AssignedRole, UserRole } from '../../auth/auth.service';
 import { PermissionService } from '../../permissions/permission.service';
 import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
+import { HeaderNotificationComponent } from './header-notification.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, ClickOutsideDirective],
+  imports: [CommonModule, RouterModule, ClickOutsideDirective, HeaderNotificationComponent],
   host: {
     class: 'block w-full relative z-50'
   },
@@ -84,8 +85,8 @@ import { ClickOutsideDirective } from '../../../shared/directives/click-outside.
         </a>
         </div>
 
-        <!-- RIGHT SIDE: Language Controls + Divider + Login / User Pill -->
-        <div class="flex items-center gap-2 sm:gap-4 lg:gap-5 shrink-0">
+        <!-- RIGHT SIDE: Language Controls + Divider + Notification + Divider + Login / User Pill -->
+        <div class="flex items-center gap-2 sm:gap-3.5 lg:gap-4 shrink-0">
 
           <!-- Language Controls -->
           <div class="flex items-center gap-1.5 sm:gap-2.5 text-xs sm:text-[14px]" aria-label="Language selection">
@@ -121,8 +122,17 @@ import { ClickOutsideDirective } from '../../../shared/directives/click-outside.
             </button>
           </div>
 
-          <!-- When Logged In (and on internal portal page): User Profile Menu & Role Switcher -->
+          <!-- When Logged In (and on internal portal page): Notification Bell + User Profile Menu & Role Switcher -->
           @if (currentUser() && !isLandingPage()) {
+            <!-- Thin Vertical Divider between Language & Notifications -->
+            <div class="w-px h-5 sm:h-6 bg-[#DCE4ED] shrink-0"></div>
+
+            <!-- Notification Option (Role-Specific Portal Notifications) -->
+            <app-header-notification></app-header-notification>
+
+            <!-- Thin Vertical Divider between Notifications & Username -->
+            <div class="w-px h-5 sm:h-6 bg-[#DCE4ED] shrink-0"></div>
+
             <div class="relative z-[100]" id="user-menu-container" (appClickOutside)="closeDropdown()">
               <button
                 type="button"

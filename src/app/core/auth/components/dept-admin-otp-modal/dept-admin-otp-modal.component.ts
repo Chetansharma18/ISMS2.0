@@ -33,14 +33,14 @@ import { FormsModule } from '@angular/forms';
       >
         <!-- Modal Card -->
         <div
-          class="relative w-full max-w-[450px] bg-white rounded-xl shadow-2xl border border-slate-200/80 p-6 sm:p-7 animate-in zoom-in-95 duration-150"
+          class="relative w-full max-w-[460px] bg-white rounded-2xl shadow-2xl border border-[#DCE4ED] p-6 sm:p-7 animate-in zoom-in-95 duration-150"
           (click)="$event.stopPropagation()"
         >
           <!-- Close Button -->
           <button
             type="button"
             (click)="cancel()"
-            class="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+            class="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-[#12365A] hover:bg-slate-100 transition-colors cursor-pointer"
             aria-label="Close"
           >
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -48,12 +48,12 @@ import { FormsModule } from '@angular/forms';
             </svg>
           </button>
 
-          <!-- Simple Heading & Single-Line Tagline -->
+          <!-- Heading & Tagline -->
           <div class="pr-6">
-            <h2 id="otp-title" class="text-xl sm:text-[22px] font-bold text-slate-900 tracking-tight m-0">
+            <h2 id="otp-title" class="text-xl sm:text-[22px] font-bold text-[#12365A] tracking-tight m-0">
               {{ title }}
             </h2>
-            <p class="text-xs sm:text-[13px] text-slate-500 mt-1.5 m-0 leading-normal">
+            <p class="text-xs sm:text-[13.5px] text-[#5F6B76] mt-1.5 m-0 leading-normal">
               {{ tagline }}
             </p>
           </div>
@@ -88,13 +88,13 @@ import { FormsModule } from '@angular/forms';
                 [value]="digit"
                 (input)="onDigitInput($event, i)"
                 (keydown)="onKeyDown($event, i)"
-                class="w-10 h-12 sm:w-12 sm:h-13 text-center text-xl font-bold text-slate-800 bg-white border rounded-lg focus:border-sky-600 focus:ring-2 focus:ring-sky-100 outline-none transition-all shadow-2xs select-none"
+                class="w-10 h-12 sm:w-12 sm:h-13 text-center text-xl font-bold text-[#12365A] bg-white border rounded-xl focus:border-[#12365A] focus:ring-2 focus:ring-[#12365A]/15 outline-none transition-all shadow-2xs select-none"
                 [class.border-rose-400]="errorMessage()"
-                [class.border-sky-600]="digit !== '' && !errorMessage()"
-                [class.border-slate-300]="digit === '' && !errorMessage()"
+                [class.border-[#12365A]]="digit !== '' && !errorMessage()"
+                [class.border-[#DCE4ED]]="digit === '' && !errorMessage()"
               />
               @if (i < 5) {
-                <span class="w-1.5 sm:w-2.5 h-[1.5px] bg-slate-300 shrink-0"></span>
+                <span class="w-1.5 sm:w-2.5 h-[2px] bg-[#DCE4ED] shrink-0"></span>
               }
             }
           </div>
@@ -102,14 +102,14 @@ import { FormsModule } from '@angular/forms';
           <!-- Bottom Action Row: Resend OTP on Left, Verify on Right -->
           <div class="flex items-center justify-between gap-3 pt-1">
             <!-- Left: Resend OTP Option -->
-            <div class="text-xs sm:text-[13px] text-slate-500">
+            <div class="text-xs sm:text-[13px] text-[#5F6B76]">
               @if (timerSeconds() > 0) {
-                <span>Didn't receive OTP? Resend in <span class="font-mono font-semibold text-sky-600">00:{{ timerSeconds() < 10 ? '0' + timerSeconds() : timerSeconds() }}</span></span>
+                <span>Didn't receive OTP? Resend in <span class="font-mono font-bold text-[#12365A]">00:{{ timerSeconds() < 10 ? '0' + timerSeconds() : timerSeconds() }}</span></span>
               } @else {
                 <button
                   type="button"
                   (click)="resendOtp()"
-                  class="text-sky-600 hover:text-sky-700 font-semibold hover:underline cursor-pointer transition-colors"
+                  class="text-[#12365A] hover:text-[#0B2440] font-semibold hover:underline cursor-pointer transition-colors border-0 bg-transparent p-0"
                 >
                   Didn't receive OTP? Resend
                 </button>
@@ -121,7 +121,7 @@ import { FormsModule } from '@angular/forms';
               type="button"
               (click)="submitOtp()"
               [disabled]="!isComplete() || isSubmitting()"
-              class="px-6 py-2 sm:px-7 sm:py-2.5 rounded-full text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-40 disabled:cursor-not-allowed shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
+              class="px-6 py-2 sm:px-7 sm:py-2.5 rounded-full text-sm font-semibold text-white bg-[#12365A] hover:bg-[#0B2440] disabled:opacity-40 disabled:bg-slate-300 disabled:cursor-not-allowed shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shrink-0 border-0"
             >
               @if (isSubmitting()) {
                 <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">

@@ -2,7 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   HostListener,
+  ViewChild,
   computed,
   inject,
   signal
@@ -288,10 +290,10 @@ interface FormBuilderFormData {
                 </div>
 
                 <!-- Steps Tabs Navigation -->
-                <div class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-100">
+                <div #stepTabsContainer class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-100">
                   @for (step of formData.steps; track step.id; let sIdx = $index) {
                     <div
-                      (click)="activeStepIndex.set(sIdx)"
+                      (click)="selectStep(sIdx)"
                       class="group inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all shrink-0 select-none"
                       [ngClass]="activeStepIndex() === sIdx
                         ? 'bg-primary text-white border-primary shadow-xs'
@@ -381,7 +383,7 @@ interface FormBuilderFormData {
           </div>
 
           <!-- SCROLLABLE FIELDS LIST -->
-          <div class="flex-1 min-h-0 overflow-y-auto pr-1 pt-3 pb-2 space-y-3">
+          <div #fieldsScrollContainer class="flex-1 min-h-0 overflow-y-auto pr-1 pt-3 pb-2 space-y-3">
             @if (formData.isStepForm) {
               @if (getActiveStep(); as activeStep) {
                 <!-- Fields List for Active Step -->
@@ -404,8 +406,9 @@ interface FormBuilderFormData {
                           class="p-3.5 rounded-lg border transition-all duration-150 relative bg-white"
                           [ngClass]="{
                             'border-primary bg-primary-light/30 shadow-md ring-2 ring-primary/20': dragOverIndex === fIdx,
-                            'border-slate-200 shadow-2xs': dragOverIndex !== fIdx,
-                            'opacity-50 border-dashed': draggedIndex === fIdx
+                            'border-slate-200 shadow-2xs': dragOverIndex !== fIdx && recentlyAddedFieldId !== field.id,
+                            'opacity-50 border-dashed': draggedIndex === fIdx,
+                            'border-primary ring-2 ring-primary/30 shadow-md': recentlyAddedFieldId === field.id
                           }"
                         >
                           <!-- Field Card Top Bar -->
@@ -574,8 +577,9 @@ interface FormBuilderFormData {
                       class="p-3.5 rounded-lg border transition-all duration-150 relative bg-white"
                       [ngClass]="{
                         'border-primary bg-primary-light/30 shadow-md ring-2 ring-primary/20': dragOverIndex === idx,
-                        'border-slate-200 shadow-2xs': dragOverIndex !== idx,
-                        'opacity-50 border-dashed': draggedIndex === idx
+                        'border-slate-200 shadow-2xs': dragOverIndex !== idx && recentlyAddedFieldId !== field.id,
+                        'opacity-50 border-dashed': draggedIndex === idx,
+                        'border-primary ring-2 ring-primary/30 shadow-md': recentlyAddedFieldId === field.id
                       }"
                     >
                       <!-- Field Top Bar -->
@@ -2500,6 +2504,10 @@ export class DynamicFormBuilderComponent {
   private notification = inject(NotificationService);
   private formRepo = this.dataEngine.for<DynamicFormBuilderItem>('DYNAMIC_FORM_BUILDER');
 
+  @ViewChild('fieldsScrollContainer') fieldsScrollContainer?: ElementRef<HTMLDivElement>;
+  @ViewChild('stepTabsContainer') stepTabsContainer?: ElementRef<HTMLDivElement>;
+  recentlyAddedFieldId: string | null = null;
+
   readonly forms = signal<DynamicFormBuilderItem[]>([]);
   readonly searchQuery = signal<string>('');
 
@@ -2701,6 +2709,17 @@ export class DynamicFormBuilderComponent {
     return this.formData.steps[idx] || this.formData.steps[0] || null;
   }
 
+  selectStep(index: number): void {
+    this.activeStepIndex.set(index);
+    setTimeout(() => {
+      try {
+        if (this.fieldsScrollContainer?.nativeElement) {
+          this.fieldsScrollContainer.nativeElement.scrollTop = 0;
+        }
+      } catch (err) {}
+    }, 0);
+  }
+
   addStep(): void {
     const nextNum = this.formData.steps.length + 1;
     const newStep: FormStep = {
@@ -2718,6 +2737,8 @@ export class DynamicFormBuilderComponent {
     };
     this.formData.steps = [...this.formData.steps, newStep];
     this.activeStepIndex.set(this.formData.steps.length - 1);
+    this.recentlyAddedFieldId = newStep.fields[0]?.id || null;
+    this.scrollToActiveStepTab();
   }
 
   deleteStep(index: number, event?: Event): void {
@@ -2741,6 +2762,8 @@ export class DynamicFormBuilderComponent {
       mandatory: false
     };
     step.fields = [...step.fields, newField];
+    this.recentlyAddedFieldId = newField.id;
+    this.scrollToBottomFields();
   }
 
   deleteStepField(fIndex: number): void {
@@ -2872,6 +2895,70 @@ export class DynamicFormBuilderComponent {
       mandatory: false
     };
     this.formData.fields = [...this.formData.fields, newField];
+    this.recentlyAddedFieldId = newField.id;
+    this.scrollToBottomFields();
+  }
+
+  private scrollToBottomFields(): void {
+    setTimeout(() => {
+      try {
+        const container = this.fieldsScrollContainer?.nativeElement;
+        if (container) {
+          if (typeof container.scrollTo === 'function') {
+            container.scrollTo({
+              top: container.scrollHeight,
+              behavior: 'smooth'
+            });
+          } else {
+            container.scrollTop = container.scrollHeight;
+          }
+
+          const inputs = container.querySelectorAll<HTMLInputElement>('input[placeholder*="Center Address"]');
+          if (inputs.length > 0) {
+            const lastInput = inputs[inputs.length - 1];
+            try {
+              lastInput.focus({ preventScroll: true });
+            } catch (e) {
+              lastInput.focus();
+            }
+          }
+        }
+      } catch (err) {}
+    }, 60);
+
+    setTimeout(() => {
+      if (this.recentlyAddedFieldId) {
+        this.recentlyAddedFieldId = null;
+      }
+    }, 2500);
+  }
+
+  private scrollToActiveStepTab(): void {
+    setTimeout(() => {
+      try {
+        const tabEl = this.stepTabsContainer?.nativeElement;
+        if (tabEl) {
+          if (typeof tabEl.scrollTo === 'function') {
+            tabEl.scrollTo({ left: tabEl.scrollWidth, behavior: 'smooth' });
+          } else {
+            tabEl.scrollLeft = tabEl.scrollWidth;
+          }
+        }
+        if (this.fieldsScrollContainer?.nativeElement) {
+          this.fieldsScrollContainer.nativeElement.scrollTop = 0;
+          const inputs = this.fieldsScrollContainer.nativeElement.querySelectorAll<HTMLInputElement>('input[placeholder*="Center Address"]');
+          if (inputs.length > 0) {
+            inputs[0].focus({ preventScroll: true });
+          }
+        }
+      } catch (err) {}
+    }, 60);
+
+    setTimeout(() => {
+      if (this.recentlyAddedFieldId) {
+        this.recentlyAddedFieldId = null;
+      }
+    }, 2500);
   }
 
   deleteField(index: number): void {
@@ -2991,6 +3078,13 @@ export class DynamicFormBuilderComponent {
       ]
     };
     this.showBuilderModal.set(true);
+    setTimeout(() => {
+      try {
+        if (this.fieldsScrollContainer?.nativeElement) {
+          this.fieldsScrollContainer.nativeElement.scrollTop = 0;
+        }
+      } catch (e) {}
+    }, 50);
   }
 
   openEditModal(item: DynamicFormBuilderItem): void {
@@ -3031,6 +3125,13 @@ export class DynamicFormBuilderComponent {
     };
 
     this.showBuilderModal.set(true);
+    setTimeout(() => {
+      try {
+        if (this.fieldsScrollContainer?.nativeElement) {
+          this.fieldsScrollContainer.nativeElement.scrollTop = 0;
+        }
+      } catch (e) {}
+    }, 50);
   }
 
   closeBuilderModal(): void {

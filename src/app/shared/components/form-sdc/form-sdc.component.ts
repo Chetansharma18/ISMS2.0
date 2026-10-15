@@ -423,30 +423,87 @@ import {
               }
             </div>
 
-            <!-- SELECT DROPDOWN -->
+            <!-- SELECT DROPDOWN (CUSTOM DOM-ANCHORED TO PREVENT DETACHMENT ON SCROLL) -->
             @if (field.type === 'select') {
-              <div class="relative">
-                <select
+              <div class="relative w-full" (click)="$event.stopPropagation()">
+                <!-- Trigger Button -->
+                <button
+                  type="button"
                   [id]="'input-' + field.key"
-                  [ngModel]="getValue(field.key)"
-                  (ngModelChange)="onValueChange(field, $event)"
+                  (click)="toggleSelect(field.key, $event)"
                   [disabled]="isFieldDisabled(field)"
-                  class="w-full h-[38px] px-3 text-xs bg-white border rounded-lg text-slate-800 transition-all focus:outline-none appearance-none cursor-pointer pr-8 hover:border-slate-400"
+                  class="w-full h-[38px] px-3 text-xs bg-white border rounded-lg text-slate-800 transition-all focus:outline-none flex items-center justify-between cursor-pointer hover:border-slate-400 text-left"
                   [ngClass]="{
                     'border-red-500 bg-red-50/20 focus:border-red-600 focus:ring-2 focus:ring-red-100': !!getFieldError(field.key),
                     'border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-100': !getFieldError(field.key),
-                    'bg-slate-50 cursor-not-allowed text-slate-500 border-slate-200': isFieldDisabled(field)
+                    'bg-slate-50 cursor-not-allowed text-slate-400 border-slate-200': isFieldDisabled(field)
                   }"
+                  [attr.aria-expanded]="openSelectKey() === field.key"
                 >
-                  <option value="" disabled [selected]="!getValue(field.key)">
-                    {{ getFieldPlaceholder(field) || 'Please select' }}
-                  </option>
-                  @for (opt of field.options; track opt.value) {
-                    <option [value]="opt.value" [disabled]="opt.disabled">
-                      {{ opt.label }}
-                    </option>
-                  }
-                </select>
+                  <span class="truncate flex-1" [class.text-slate-400]="!getValue(field.key)">
+                    {{ getSelectedOptionLabel(field) || getFieldPlaceholder(field) || 'Select an option' }}
+                  </span>
+                  <svg
+                    class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ml-2"
+                    [class.rotate-180]="openSelectKey() === field.key"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <!-- Custom Floating Menu (Anchored to trigger, scrolls with page, never jumps to screen 0,0) -->
+                @if (openSelectKey() === field.key && !isFieldDisabled(field)) {
+                  <div
+                    class="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-lg border border-slate-200 shadow-xl overflow-hidden min-w-full"
+                    style="box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1);"
+                  >
+                    <!-- Search bar if > 6 options (e.g. 50 districts or educational qualifications) -->
+                    @if ((field.options || []).length > 6) {
+                      <div class="p-2 border-b border-slate-100 bg-slate-50/80">
+                        <input
+                          type="text"
+                          [value]="searchSelectQuery()"
+                          (input)="onSearchSelectInput($event)"
+                          placeholder="Search..."
+                          class="w-full h-8 px-2.5 text-xs rounded-md border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-slate-800 placeholder:text-slate-400"
+                          (click)="$event.stopPropagation()"
+                          autofocus
+                        />
+                      </div>
+                    }
+
+                    <!-- Options List -->
+                    <ul class="max-h-56 overflow-y-auto py-1 divide-y divide-slate-100/60 text-xs m-0 p-0 list-none">
+                      @for (opt of getFilteredSelectOptions(field); track opt.value) {
+                        <li
+                          (click)="selectDropdownOption(field, opt, $event)"
+                          class="px-3 py-2 cursor-pointer transition-colors flex items-center justify-between"
+                          [class.bg-sky-50]="opt.value === getValue(field.key)"
+                          [class.text-brand]="opt.value === getValue(field.key)"
+                          [class.font-semibold]="opt.value === getValue(field.key)"
+                          [class.hover:bg-slate-50]="opt.value !== getValue(field.key)"
+                          [class.text-slate-700]="opt.value !== getValue(field.key)"
+                          [class.opacity-50]="opt.disabled"
+                          [class.pointer-events-none]="opt.disabled"
+                        >
+                          <span class="truncate">{{ opt.label }}</span>
+                          @if (opt.value === getValue(field.key)) {
+                            <svg class="w-4 h-4 text-brand shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                            </svg>
+                          }
+                        </li>
+                      } @empty {
+                        <li class="px-3 py-3 text-center text-xs text-slate-400">
+                          No matching options found
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                }
               </div>
             }
 
@@ -569,6 +626,108 @@ import {
               </div>
             }
 
+            <!-- SINGLE PHOTO UPLOAD CONTROL (PASSPORT SIZE CARD PREVIEW WITH [X] REMOVE BUTTON) -->
+            @else if (field.type === 'photo') {
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4 py-1">
+                @let currentFile = getValue(field.key);
+                <div
+                  class="relative group w-36 h-44 rounded-xl border-2 transition-all overflow-hidden bg-white shadow-2xs shrink-0 flex items-center justify-center"
+                  [ngClass]="{
+                    'border-red-500 bg-red-50/20': !!getFieldError(field.key),
+                    'border-dashed border-slate-300 hover:border-brand hover:bg-slate-50/60': !getFieldError(field.key) && !isNonEmptyFile(currentFile),
+                    'border-solid border-slate-200': isNonEmptyFile(currentFile)
+                  }"
+                >
+                  @if (isNonEmptyFile(currentFile)) {
+                    <!-- Uploaded Image Preview -->
+                    <img
+                      [src]="getFileUrl(currentFile)"
+                      [alt]="getFileName(currentFile) || 'Candidate Photo'"
+                      class="w-full h-full object-cover cursor-pointer"
+                      (click)="viewFile(field, currentFile)"
+                      title="Click to view full image"
+                    />
+
+                    <!-- Top Right [X] Delete Button (Matching Screenshot 4) -->
+                    @if (!isFieldDisabled(field)) {
+                      <button
+                        type="button"
+                        (click)="removePhotoFile(field, $event)"
+                        class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/95 hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-slate-300 hover:border-rose-300 rounded shadow-xs flex items-center justify-center transition-colors cursor-pointer z-10"
+                        title="Remove Photo"
+                        aria-label="Remove Photo"
+                      >
+                        <span class="text-sm font-bold leading-none select-none">&times;</span>
+                      </button>
+                    }
+
+                    <!-- Hover Change Overlay -->
+                    @if (!isFieldDisabled(field)) {
+                      <label
+                        class="absolute inset-x-0 bottom-0 bg-slate-900/80 py-1.5 text-center text-white text-[10.5px] font-medium opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10"
+                      >
+                        Change Photo
+                        <input
+                          type="file"
+                          [id]="'input-' + field.key"
+                          [accept]="field.accept || 'image/*,.jpg,.jpeg,.png'"
+                          [disabled]="isFieldDisabled(field)"
+                          (change)="onFileChange(field, $event)"
+                          class="hidden"
+                        />
+                      </label>
+                    }
+                  } @else {
+                    <!-- Empty State: Avatar Silhouette & "Double click / click to Upload Image" (Matching Screenshot 4) -->
+                    <label
+                      class="w-full h-full flex flex-col items-center justify-center p-3 text-center cursor-pointer transition-colors"
+                      [class.opacity-50]="isFieldDisabled(field)"
+                      [class.cursor-not-allowed]="isFieldDisabled(field)"
+                    >
+                      <div class="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-sky-50 text-slate-400 group-hover:text-brand flex items-center justify-center mb-2 transition-colors">
+                        <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                      <span class="text-[11px] text-slate-400 font-medium leading-tight select-none">
+                        Double click to
+                      </span>
+                      <span class="text-xs font-bold text-slate-700 leading-tight select-none mt-0.5">
+                        Upload Image
+                      </span>
+                      <span class="text-[10px] text-slate-400 leading-tight select-none mt-1">
+                        JPG, PNG (Max {{ field.maxFileSizeMb || 5 }}MB)
+                      </span>
+                      <input
+                        type="file"
+                        [id]="'input-' + field.key"
+                        [accept]="field.accept || 'image/*,.jpg,.jpeg,.png'"
+                        [disabled]="isFieldDisabled(field)"
+                        (change)="onFileChange(field, $event)"
+                        class="hidden"
+                      />
+                    </label>
+                  }
+                </div>
+
+                <!-- Info description alongside the passport box -->
+                <div class="text-xs space-y-1 text-slate-500 max-w-sm">
+                  <p class="font-semibold text-slate-800 m-0">Official Candidate Photograph</p>
+                  <p class="text-[11.5px] leading-relaxed text-slate-500 m-0">
+                    Upload a clear, recent passport-size photograph with white or light background.
+                  </p>
+                  <div class="flex items-center gap-2 pt-0.5 text-[11px] text-slate-500 font-medium">
+                    <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
+                      JPG / PNG / JPEG
+                    </span>
+                    <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
+                      Max {{ field.maxFileSizeMb || 5 }} MB
+                    </span>
+                  </div>
+                </div>
+              </div>
+            }
+
             <!-- PHOTOS UPLOAD CONTROL (MIN 3 REQUIREMENT + THUMBNAILS + ADD MORE BUTTON) -->
             @else if (field.type === 'photos') {
               <div class="space-y-1.5">
@@ -682,6 +841,7 @@ import {
                   [type]="field.type || 'text'"
                   [value]="getValue(field.key)"
                   (input)="onNativeInput(field, $event)"
+                  (change)="onNativeInput(field, $event)"
                   [placeholder]="getFieldPlaceholder(field) || ''"
                   [disabled]="isFieldDisabled(field)"
                   [readonly]="field.readonly"
@@ -917,6 +1077,69 @@ export class FormSdcComponent {
     this.setValue(field.key, val, field);
   }
 
+  /** Currently active open select dropdown field key */
+  openSelectKey = signal<string | null>(null);
+
+  /** Search query for filtering select options */
+  searchSelectQuery = signal<string>('');
+
+  /** Toggles select dropdown open/close */
+  toggleSelect(key: string, event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.openSelectKey() === key) {
+      this.openSelectKey.set(null);
+    } else {
+      this.openSelectKey.set(key);
+      this.searchSelectQuery.set('');
+    }
+  }
+
+  /** Selects an option from custom dropdown */
+  selectDropdownOption(field: FormFieldConfig, opt: FormOption, event: MouseEvent): void {
+    event.stopPropagation();
+    if (opt.disabled) return;
+    this.setValue(field.key, opt.value, field);
+    this.openSelectKey.set(null);
+  }
+
+  /** Returns filtered options based on search query */
+  getFilteredSelectOptions(field: FormFieldConfig): FormOption[] {
+    const opts = field.options || [];
+    const q = this.searchSelectQuery().trim().toLowerCase();
+    if (!q) return opts;
+    return opts.filter(o => (o.label || '').toLowerCase().includes(q));
+  }
+
+  /** Returns display label for selected value */
+  getSelectedOptionLabel(field: FormFieldConfig): string {
+    const val = this.getValue(field.key);
+    if (val === undefined || val === null || val === '') return '';
+    const match = (field.options || []).find(o => o.value === val);
+    return match ? match.label : String(val);
+  }
+
+  /** Search input handler */
+  onSearchSelectInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.searchSelectQuery.set(target.value);
+  }
+
+  /** Closes select dropdown on document click */
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    if (this.openSelectKey()) {
+      this.openSelectKey.set(null);
+    }
+  }
+
+  /** Closes select dropdown on Escape key */
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.openSelectKey()) {
+      this.openSelectKey.set(null);
+    }
+  }
+
   /** Handles select / generic value changes */
   onValueChange(field: FormFieldConfig, value: any): void {
     this.setValue(field.key, value, field);
@@ -1031,6 +1254,21 @@ export class FormSdcComponent {
     if (this.activePhotoPreview()) {
       this.closePhotoPreview();
     }
+  }
+
+  /** Helper to get file URL (for image preview) */
+  getFileUrl(val: any): string {
+    if (!val) return '';
+    if (typeof val === 'string') return val;
+    return val.fileUrl || val.url || '';
+  }
+
+  /** Removes a photo file */
+  removePhotoFile(field: FormFieldConfig, event: MouseEvent): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.setValue(field.key, null, field);
+    this.fileRemove.emit({ key: field.key });
   }
 
   /** Retrieves label as string, evaluating dynamic function if provided */

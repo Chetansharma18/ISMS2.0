@@ -26,12 +26,15 @@ export interface AspirantDocumentItem {
 }
 
 export interface AspirantFormData {
+  registrationNo?: string;
+  aspirantRegNo?: string;
+
   // Step 1: Main / Personal Details
   aadhaarNo: string;
   confirmAadhaarNo?: string;
   janaadhaarId: string;
-  otherIdType: string;
-  otherIdNo: string;
+  otherIdType?: string;
+  otherIdNo?: string;
   aadhaarDocUrl?: string;
   aadhaarDocName?: string;
   aadhaarDocSize?: string;
@@ -39,79 +42,94 @@ export interface AspirantFormData {
   aspirantName: string;
   gender: string;
   relationType: string;
-  relationName: string;
+  relation?: string;
+  relationName?: string;
   motherName: string;
   dob: string;
   age: number | string;
   educationalQualification: string;
   religion: string;
   category: string;
-  minority: string;
+  minority?: string;
   specialAbility: string;
   disabilityType?: string;
-  areaType: string;
+  areaType?: string;
   interestedOutOfRajasthan?: string;
+  interestedSector?: string;
 
-  // Step 2: Address & Contact Details
-  permHouseNo: string;
-  permStreet: string;
-  permWard: string;
-  permCity: string;
-  permDistrict: string;
-  permBlock: string;
-  permTehsil: string;
-  permMunicipality: string;
-  permPincode: string;
-  permAssembly: string;
-  permParliament: string;
+  // Step 2: Training and Employment Details
+  trainingPreferredDistrict?: string;
+  employmentType?: string;
 
-  isAddressSame: boolean;
+  // Step 3: Address Details
+  address?: string;
+  homeDistrict?: string;
+  ruralUrban?: string;
+  pincode?: string;
 
-  commHouseNo: string;
-  commStreet: string;
-  commWard: string;
-  commCity: string;
-  commDistrict: string;
-  commBlock: string;
-  commTehsil: string;
-  commMunicipality: string;
-  commPincode: string;
+  permHouseNo?: string;
+  permStreet?: string;
+  permWard?: string;
+  permCity?: string;
+  permDistrict?: string;
+  permBlock?: string;
+  permTehsil?: string;
+  permMunicipality?: string;
+  permPincode?: string;
+  permAssembly?: string;
+  permParliament?: string;
 
+  isAddressSame?: boolean;
+
+  commHouseNo?: string;
+  commStreet?: string;
+  commWard?: string;
+  commCity?: string;
+  commDistrict?: string;
+  commBlock?: string;
+  commTehsil?: string;
+  commMunicipality?: string;
+  commPincode?: string;
+
+  // Step 4: Contact Details
   mobileNo: string;
-  altMobileNo: string;
-  landlineNo: string;
-  email: string;
+  altMobileNo?: string;
+  landlineNo?: string;
+  email?: string;
 
-  // Step 3: Bank, Economic & Worker Details
-  bankAccountNo: string;
-  bankAccountName: string;
-  bankAccountType: string;
-  bankName: string;
-  bankBranch: string;
-  ifscCode: string;
-  micrCode: string;
-
-  annualFamilyIncome: number | string;
-  incomeSlab: string;
-  economicStatus: string;
-  economicCardNo: string;
-
-  bocwWorker: string;
-  bocwNo: string;
-  mgnregaWorker: string;
-  mgnregaNo: string;
-  isRsby: string;
-  rsbyNo: string;
-  gramsabhaPip: string;
-  nrlmMember: string;
-  nrlmNo: string;
-
-  epicNo: string;
-
-  // Step 4: Sector Preference, Photo & Documents
-  preferredSectors: string[];
+  // Step 5: Upload and Consent / Additional Fields
+  candidatePhoto?: any;
   candidatePhotoUrl?: string;
   candidatePhotoName?: string;
+  termsAccepted?: boolean;
+
+  // Optional legacy Bank & Worker Details
+  bankAccountNo?: string;
+  bankAccountName?: string;
+  bankAccountType?: string;
+  bankName?: string;
+  bankBranch?: string;
+  ifscCode?: string;
+  micrCode?: string;
+
+  annualFamilyIncome?: number | string;
+  incomeSlab?: string;
+  economicStatus?: string;
+  economicCardNo?: string;
+
+  bocwWorker?: string;
+  bocwNo?: string;
+  mgnregaWorker?: string;
+  mgnregaNo?: string;
+  isRsby?: string;
+  rsbyNo?: string;
+  gramsabhaPip?: string;
+  nrlmMember?: string;
+  nrlmNo?: string;
+
+  epicNo?: string;
+
+  preferredSectors: string[];
   documents: AspirantDocumentItem[];
 }
 

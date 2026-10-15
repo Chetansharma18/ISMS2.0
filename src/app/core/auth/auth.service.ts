@@ -33,15 +33,16 @@ export const USER_ROLES: RoleConfig[] = [
     label: 'Super Admin',
     badge: 'Super Admin',
     description: 'System administrator with full access'
+  },
+  {
+    role: 'aspirant',
+    label: 'Aspirant',
+    badge: 'Aspirant',
+    description: 'Aspirant candidate looking for skill training programs'
   }
 ];
 
-export const ASPIRANT_ROLE_CONFIG: RoleConfig = {
-  role: 'aspirant',
-  label: 'Aspirant',
-  badge: 'Aspirant',
-  description: 'Aspirant candidate looking for skill training programs'
-};
+export const ASPIRANT_ROLE_CONFIG: RoleConfig = USER_ROLES[4];
 
 /**
  * A role granted to the signed-in user. One user can hold more than one role

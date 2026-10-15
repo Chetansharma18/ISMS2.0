@@ -83,13 +83,13 @@ import { ToastOutletComponent } from './shared/components/toast-outlet/toast-out
             </div>
           }
 
-          <main class="flex-1 min-w-0 overflow-y-auto flex flex-col overscroll-y-none [-webkit-overflow-scrolling:touch]" style="background-color: #FEFEFD;">
+          <main class="flex-1 min-w-0 overflow-y-auto flex flex-col" style="background-color: #FEFEFD;">
             <router-outlet></router-outlet>
           </main>
         </div>
       } @else {
         <main 
-          class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col overscroll-y-none [-webkit-overflow-scrolling:touch] relative" 
+          class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col relative" 
           [style.background-color]="isLandingRoute() ? '#070e18' : '#FEFEFD'"
         >
           <div class="w-full flex-1 flex flex-col bg-[#FEFEFD]">

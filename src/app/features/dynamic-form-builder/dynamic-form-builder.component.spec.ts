@@ -298,12 +298,16 @@ describe('DynamicFormBuilderComponent', () => {
     // Next step
     comp.previewNextStep(stepForm);
     expect(comp.previewStepIndex()).toBe(1);
+    expect(comp.isReviewStep(stepForm, 1)).toBe(false);
+    expect(comp.getStepSubtitle(stepForm, 1)).toBe('Please fill in details for Step 2: Uploads');
 
     // Previous step
     comp.previewPrevStep();
     expect(comp.previewStepIndex()).toBe(0);
 
-    comp.closePreviewModal();
+    // Jump to last step and submit
+    comp.previewNextStep(stepForm);
+    comp.submitPreviewForm(stepForm);
     expect(comp.showPreviewModal()).toBe(false);
   });
 

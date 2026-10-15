@@ -2071,7 +2071,7 @@ interface FormBuilderFormData {
                         </div>
 
                         <div class="flex items-center gap-2.5">
-                          @if (previewStepIndex() === 2) {
+                          @if (previewStepIndex() === 2 && form.id === 'form-company-reg') {
                             <button
                               type="button"
                               (click)="saveAsDraft()"
@@ -2081,16 +2081,29 @@ interface FormBuilderFormData {
                             </button>
                           }
 
-                          <button
-                            type="button"
-                            (click)="previewNextStep(form)"
-                            class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#0e2138] hover:bg-[#163355] text-white text-xs font-semibold transition-all shadow-xs cursor-pointer"
-                          >
-                            <span>Next Step</span>
-                            <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                            </svg>
-                          </button>
+                          @if (previewStepIndex() === form.steps.length - 1) {
+                            <button
+                              type="button"
+                              (click)="submitPreviewForm(form)"
+                              class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#0e2138] hover:bg-[#163355] text-white text-xs font-semibold transition-all shadow-xs cursor-pointer"
+                            >
+                              <span>Submit</span>
+                              <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            </button>
+                          } @else {
+                            <button
+                              type="button"
+                              (click)="previewNextStep(form)"
+                              class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#0e2138] hover:bg-[#163355] text-white text-xs font-semibold transition-all shadow-xs cursor-pointer"
+                            >
+                              <span>Next Step</span>
+                              <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                              </svg>
+                            </button>
+                          }
                         </div>
                       </div>
                     </div>
@@ -3226,7 +3239,7 @@ export class DynamicFormBuilderComponent {
   }
 
   getStepSubtitle(form: DynamicFormBuilderItem, stepIdx: number): string {
-    if (form.formType === 'Company Registration Form' || form.formType === 'Organisation Registration Form' || form.steps?.length === 4) {
+    if (form.id === 'form-company-reg' || ((form.formType === 'Company Registration Form' || form.formType === 'Organisation Registration Form') && form.steps?.[0]?.title.includes('Organisation'))) {
       switch (stepIdx) {
         case 0: return 'Please provide your organisation details to complete the registration process.';
         case 1: return 'Provide details of the person authorized to sign and represent the organization.';
@@ -3245,17 +3258,25 @@ export class DynamicFormBuilderComponent {
   }
 
   getStepInnerDescription(form: DynamicFormBuilderItem, stepIdx: number): string {
-    switch (stepIdx) {
-      case 1: return 'Provide details of the person authorized to sign and represent the organization.';
-      case 2: return 'Provide bank account details for receiving payments under the scheme.';
-      case 3: return 'Please verify the information provided below. You can edit any section if required.';
-      default: return '';
+    if (form.id === 'form-company-reg' || ((form.formType === 'Company Registration Form' || form.formType === 'Organisation Registration Form') && form.steps?.[0]?.title.includes('Organisation'))) {
+      switch (stepIdx) {
+        case 1: return 'Provide details of the person authorized to sign and represent the organization.';
+        case 2: return 'Provide bank account details for receiving payments under the scheme.';
+        case 3: return 'Please verify the information provided below. You can edit any section if required.';
+        default: return '';
+      }
     }
+    return form.steps?.[stepIdx]?.title ? `Please provide details for ${form.steps[stepIdx].title}.` : '';
   }
 
   isReviewStep(form: DynamicFormBuilderItem, stepIdx: number): boolean {
     if (!form.steps || form.steps.length === 0) return false;
-    return stepIdx === form.steps.length - 1;
+    return (form.id === 'form-company-reg' || ((form.formType === 'Company Registration Form' || form.formType === 'Organisation Registration Form') && form.steps?.[0]?.title.includes('Organisation'))) && stepIdx === form.steps.length - 1;
+  }
+
+  submitPreviewForm(form: DynamicFormBuilderItem): void {
+    this.notification.success(`${form.formType} submitted successfully in preview.`);
+    this.closePreviewModal();
   }
 
   onDateChange(fieldId: string): void {

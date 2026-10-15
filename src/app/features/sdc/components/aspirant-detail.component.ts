@@ -460,3 +460,4 @@ export class AspirantDetailComponent implements OnInit {
     window.print();
   }
 }
+8

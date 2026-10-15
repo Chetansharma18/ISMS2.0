@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent, TableComponent, TableColumn } from '../../shared';
 import { PaymentHistoryService } from './services/payment-history.service';
 import { PaymentTransaction } from '../../core/models/payment-transaction.model';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-payment-history',
@@ -29,7 +30,7 @@ import { PaymentTransaction } from '../../core/models/payment-transaction.model'
         [data]="filteredTransactions()"
         [pagination]="true"
         [pageSize]="pageSize"
-        emptyMessage="No payment records match your search query."
+        [emptyMessage]="isNewUser() ? 'No payment records found.' : 'No payment records match your search query.'"
         [customTemplates]="{
           paymentRef: paymentRefTemplate,
           description: descriptionTemplate,
@@ -110,10 +111,15 @@ import { PaymentTransaction } from '../../core/models/payment-transaction.model'
   `
 })
 export class PaymentHistoryComponent {
+  private authService = inject(AuthService);
   readonly paymentService = inject(PaymentHistoryService);
 
   readonly searchQuery = signal('');
   readonly pageSize = 10;
+
+  readonly isNewUser = computed(() => {
+    return this.authService.currentUser()?.role === 'new_user';
+  });
 
   readonly columns: TableColumn[] = [
     {
@@ -171,6 +177,11 @@ export class PaymentHistoryComponent {
   ];
 
   readonly filteredTransactions = computed(() => {
+    // For new_user role, remove table content rows (only for new user)
+    if (this.isNewUser()) {
+      return [];
+    }
+
     const q = this.searchQuery().trim().toLowerCase();
     const list = this.paymentService.transactions();
     if (!q) return list;

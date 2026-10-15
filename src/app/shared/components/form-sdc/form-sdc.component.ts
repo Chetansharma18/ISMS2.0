@@ -759,13 +759,15 @@ import {
 
                   <div class="flex items-center gap-3 flex-wrap pt-1">
                     @for (photo of photosList; track photo.id || photo.name; let pIdx = $index) {
-                      <div class="relative group w-24 h-24 rounded-lg border border-slate-300 bg-white overflow-hidden shadow-2xs hover:shadow-xs transition-all shrink-0">
+                      <div
+                        class="relative group w-24 h-24 rounded-lg border border-slate-300 bg-white overflow-hidden shadow-2xs hover:shadow-xs transition-all shrink-0 cursor-pointer"
+                        (click)="previewPhoto(photo)"
+                        [title]="(photo.tag ? photo.tag + ' - ' : '') + photo.name + ' - Click to view full image'"
+                      >
                         <img
                           [src]="photo.url"
                           [alt]="photo.name"
-                          class="w-full h-full object-cover cursor-pointer group-hover:scale-105 transition-transform"
-                          (click)="previewPhoto(photo)"
-                          [title]="photo.name + ' - Click to view'"
+                          class="w-full h-full object-cover group-hover:scale-105 transition-transform"
                         />
                         <div
                           class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none"
@@ -775,15 +777,15 @@ import {
                         @if (!isFieldDisabled(field)) {
                           <button
                             type="button"
-                            (click)="removePhoto(field, pIdx)"
-                            class="absolute top-1 right-1 w-5 h-5 bg-rose-600 hover:bg-rose-700 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-xs cursor-pointer"
+                            (click)="removePhoto(field, pIdx); $event.stopPropagation()"
+                            class="absolute top-1 right-1 w-5 h-5 bg-rose-600 hover:bg-rose-700 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-xs cursor-pointer z-10"
                             title="Remove Photo"
                           >
                             <span class="text-xs font-bold leading-none">&times;</span>
                           </button>
                         }
-                        <span class="absolute bottom-0 inset-x-0 bg-slate-900/80 text-white text-[9px] font-medium text-center truncate px-1 py-0.5 select-none">
-                          {{ 'Photo ' + (pIdx + 1) }}
+                        <span class="absolute bottom-0 inset-x-0 bg-slate-900/80 text-white text-[9px] font-medium text-center truncate px-1 py-0.5 select-none pointer-events-none">
+                          {{ photo.tag || ('Photo ' + (pIdx + 1)) }}
                         </span>
                       </div>
                     }
@@ -879,6 +881,51 @@ import {
           }
         </div>
       </ng-template>
+
+      <!-- Full View Center Photo Lightbox Modal -->
+      @if (activePhotoPreview(); as previewPhotoItem) {
+        <div
+          class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-950/80 backdrop-blur-xs animate-in fade-in duration-150"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="sdc-photo-fullview-title"
+          (click)="closePhotoPreview()"
+        >
+          <div
+            class="bg-white rounded-xl border border-slate-300 shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-150"
+            (click)="$event.stopPropagation()"
+          >
+            <!-- Modal Header -->
+            <div class="px-5 py-3 border-b border-[#0d2843] bg-[#12365A] text-white flex items-center justify-between gap-3 shrink-0">
+              <div class="truncate">
+                <h3 id="sdc-photo-fullview-title" class="text-sm font-semibold text-white tracking-tight m-0 truncate" style="color: #ffffff !important;">
+                  {{ previewPhotoItem.tag || previewPhotoItem.name || 'Center Photo Preview' }}
+                </h3>
+                <span class="text-[11px] text-white/80 font-normal" style="color: rgba(255,255,255,0.85) !important;">
+                  {{ previewPhotoItem.name }} {{ previewPhotoItem.size ? '• ' + previewPhotoItem.size : '' }}
+                </span>
+              </div>
+              <button
+                type="button"
+                (click)="closePhotoPreview()"
+                class="w-8 h-8 rounded-full text-white/80 hover:text-white hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer text-lg leading-none select-none"
+                title="Close"
+              >
+                &times;
+              </button>
+            </div>
+
+            <!-- Image View Body -->
+            <div class="p-4 bg-slate-950 flex items-center justify-center overflow-auto max-h-[80vh]">
+              <img
+                [src]="previewPhotoItem.url"
+                [alt]="previewPhotoItem.name"
+                class="max-w-full max-h-[74vh] object-contain rounded-md shadow-2xl transition-all"
+              />
+            </div>
+          </div>
+        </div>
+      }
 
     </div>
   `
@@ -1187,11 +1234,26 @@ export class FormSdcComponent {
     }
   }
 
-  /** Preview photo in a new tab in Chrome */
+  /** Active photo being viewed in full-view modal */
+  readonly activePhotoPreview = signal<any | null>(null);
+
+  /** Preview photo in a full-view modal */
   previewPhoto(photo: any): void {
-    const title = photo.tag ? `${photo.tag} - ${photo.name}` : photo.name;
-    const previewDoc = buildPhotoPreviewDoc(photo);
-    this.docViewer.openDocument(previewDoc, title);
+    if (!photo) return;
+    this.activePhotoPreview.set(photo);
+  }
+
+  /** Closes the full-view photo modal */
+  closePhotoPreview(): void {
+    this.activePhotoPreview.set(null);
+  }
+
+  /** Close modal on Escape key press */
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    if (this.activePhotoPreview()) {
+      this.closePhotoPreview();
+    }
   }
 
   /** Helper to get file URL (for image preview) */

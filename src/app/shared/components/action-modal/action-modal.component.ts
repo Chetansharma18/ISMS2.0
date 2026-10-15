@@ -35,7 +35,7 @@ import { CommonModule } from '@angular/common';
           }
 
           <!-- Modal Body -->
-          <div class="px-4 sm:px-7 pt-5 sm:pt-6 pb-5 sm:pb-7 overflow-y-auto flex-1">
+          <div class="px-4 sm:px-7 pt-5 sm:pt-6 pb-5 sm:pb-7 overflow-y-auto flex-1 flex flex-col min-h-0">
 
             <!-- Close Button -->
             @if (showCloseButton) {
@@ -74,35 +74,37 @@ import { CommonModule } from '@angular/common';
             }
 
             <!-- Projected Custom Slot -->
-            <div class="w-full">
+            <div class="w-full flex-1 min-h-0 flex flex-col">
               <ng-content></ng-content>
             </div>
 
             <!-- Action Buttons Footer -->
             @if (primaryLabel || secondaryLabel) {
-              <div class="mt-6 mb-5 border-t border-slate-100"></div>
+              <div class="mt-auto">
+                <div class="mt-6 mb-5 border-t border-slate-100"></div>
 
-              <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" [class.sm:flex-row-reverse]="!secondaryLabel">
-                @if (secondaryLabel) {
-                  <button
-                    type="button"
-                    (click)="onSecondaryAction()"
-                    class="w-full sm:flex-1 py-2.5 px-4 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors cursor-pointer"
-                  >
-                    {{ secondaryLabel }}
-                  </button>
-                }
-                @if (primaryLabel) {
-                  <button
-                    type="button"
-                    (click)="onPrimaryAction()"
-                    [disabled]="disablePrimary"
-                    class="w-full sm:flex-1 py-2.5 px-4 rounded-lg text-white! text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
-                    [ngClass]="primaryVariantClass"
-                  >
-                    {{ primaryLabel }}
-                  </button>
-                }
+                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" [class.sm:flex-row-reverse]="!secondaryLabel">
+                  @if (secondaryLabel) {
+                    <button
+                      type="button"
+                      (click)="onSecondaryAction()"
+                      class="w-full sm:flex-1 py-2.5 px-4 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors cursor-pointer"
+                    >
+                      {{ secondaryLabel }}
+                    </button>
+                  }
+                  @if (primaryLabel) {
+                    <button
+                      type="button"
+                      (click)="onPrimaryAction()"
+                      [disabled]="disablePrimary"
+                      class="w-full sm:flex-1 py-2.5 px-4 rounded-lg text-white! text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+                      [ngClass]="primaryVariantClass"
+                    >
+                      {{ primaryLabel }}
+                    </button>
+                  }
+                </div>
               </div>
             }
 

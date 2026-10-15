@@ -600,4 +600,18 @@ describe('DynamicFormBuilderComponent', () => {
     comp.submitDeptUser();
     expect(comp.showPreviewModal()).toBe(false);
   });
+
+  it('toggles step form mode via toggleStepFormMode', () => {
+    const comp = createComponent();
+    comp.openAddModal();
+    expect(comp.formData.isStepForm).toBe(false);
+
+    comp.toggleStepFormMode();
+    expect(comp.formData.isStepForm).toBe(true);
+    expect(comp.formData.steps.length).toBeGreaterThan(0);
+
+    comp.toggleStepFormMode();
+    expect(comp.formData.isStepForm).toBe(false);
+  });
 });
+

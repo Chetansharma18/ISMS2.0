@@ -2,7 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   HostListener,
+  ViewChild,
   computed,
   inject,
   signal
@@ -68,7 +70,7 @@ interface FormBuilderFormData {
             </div>
           </div>
 
-          <!-- Add New Form Button -->
+          <!-- Add New Form Button (hidden for now)
           <button
             type="button"
             (click)="openAddModal()"
@@ -79,6 +81,7 @@ interface FormBuilderFormData {
             </svg>
             <span>Add new Form</span>
           </button>
+          -->
         </div>
       </app-page-header>
 
@@ -190,120 +193,133 @@ interface FormBuilderFormData {
         [showAccentBar]="false"
         [primaryLabel]="isEditing() ? 'Update Form' : 'Save Form'"
         secondaryLabel="Cancel"
-        maxWidthClass="max-w-[840px]"
+        maxWidthClass="max-w-[860px] min-h-[85vh] max-h-[92vh] flex flex-col"
         (primaryAction)="submitForm()"
         (secondaryAction)="closeBuilderModal()"
         (close)="closeBuilderModal()"
       >
-        <h2 class="m-0 text-navy" style="font-size: 19px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
-          {{ isEditing() ? 'Edit Dynamic Form' : 'Add new Form' }}
-        </h2>
-        <p class="mt-1 mb-4 text-xs text-slate-500">
-          Configure form name, choose whether it's a step-form wizard, and design fields. Drag fields to reorder.
-        </p>
+        <div class="flex flex-col h-full min-h-0 font-sans text-[13px]">
+          <!-- FROZEN TOP SECTION: Title, Description, Form Name, Step Toggle, Steps Tabs, Step/Field Headers & Add Buttons -->
+          <div class="shrink-0 space-y-3 pb-3 border-b border-slate-100">
+            <h2 class="m-0 text-navy" style="font-size: 19px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+              {{ isEditing() ? 'Edit Dynamic Form' : 'Add new Form' }}
+            </h2>
+            <p class="m-0 text-xs text-slate-500">
+              Configure form name, choose whether it's a step-form wizard, and design fields. Drag fields to reorder.
+            </p>
 
-        <div class="space-y-4 font-sans text-[13px]">
-          <!-- 1. Form Name -->
-          <div>
-            <label class="block text-slate-700 font-semibold mb-1">
-              Form Name*
-            </label>
-            <input
-              type="text"
-              [(ngModel)]="formData.formType"
-              placeholder="e.g. Center Inspection Form, Candidate Verification Form"
-              class="w-full px-3 py-2 border rounded-lg text-slate-800 bg-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm"
-              [class.border-red-500]="submitted() && !formData.formType.trim()"
-            />
-            @if (submitted() && !formData.formType.trim()) {
-              <div class="text-xs text-red-500 mt-1 font-medium">Form Name is required</div>
-            }
-          </div>
-
-          <!-- 2. Step Form (Yes / No) Tick Box & Toggle -->
-          <div class="p-3.5 rounded-lg border border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <!-- 1. Form Name -->
             <div>
-              <span class="block text-xs font-bold text-slate-800">
-                Step Form (Yes / No)?
-              </span>
-              <span class="text-[11px] text-slate-500">
-                If Yes, you can add multiple steps with individual titles and step-wise form fields. If No, direct form fields will open.
-              </span>
+              <label class="block text-slate-700 font-semibold mb-1">
+                Form Name*
+              </label>
+              <input
+                type="text"
+                [(ngModel)]="formData.formType"
+                placeholder="e.g. Center Inspection Form, Candidate Verification Form"
+                class="w-full px-3 py-2 border rounded-lg text-slate-800 bg-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm"
+                [class.border-red-500]="submitted() && !formData.formType.trim()"
+              />
+              @if (submitted() && !formData.formType.trim()) {
+                <div class="text-xs text-red-500 mt-1 font-medium">Form Name is required</div>
+              }
             </div>
 
-            <!-- Modern Toggle Switch -->
-            <label class="inline-flex items-center gap-2.5 cursor-pointer select-none shrink-0">
-              <input
-                type="checkbox"
-                [(ngModel)]="formData.isStepForm"
-                (ngModelChange)="onStepFormToggle()"
-                class="sr-only peer"
-              />
-              <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-              <span class="text-xs font-bold" [class.text-primary]="formData.isStepForm" [class.text-slate-500]="!formData.isStepForm">
-                {{ formData.isStepForm ? 'Yes (Step Form)' : 'No (Direct Form)' }}
-              </span>
-            </label>
-          </div>
+            <!-- 2. Step Form (Yes / No) Tick Box & Toggle -->
+            <div class="p-3.5 rounded-lg border border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span class="block text-xs font-bold text-slate-800">
+                  Step Form (Yes / No)?
+                </span>
+                <span class="text-[11px] text-slate-500">
+                  If Yes, you can add multiple steps with individual titles and step-wise form fields. If No, direct form fields will open.
+                </span>
+              </div>
 
-          <!-- CASE A: STEP FORM ENABLED -->
-          @if (formData.isStepForm) {
-            <div class="space-y-4 pt-1">
-              <!-- Steps Bar Header -->
-              <div class="flex items-center justify-between pb-1 border-b border-slate-200">
-                <div class="flex items-center gap-2">
-                  <h3 class="font-bold text-slate-800 text-sm m-0">Form Steps</h3>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">
-                    {{ formData.steps.length }} {{ formData.steps.length === 1 ? 'step' : 'steps' }}
-                  </span>
-                </div>
-
-                <!-- Add Step Button -->
+              <!-- Sliding Toggle Switch -->
+              <div class="inline-flex items-center gap-2.5 select-none shrink-0">
                 <button
                   type="button"
-                  (click)="addStep()"
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-md shadow-xs transition-colors cursor-pointer"
+                  id="step-form-toggle-btn"
+                  (click)="toggleStepFormMode()"
+                  role="switch"
+                  [attr.aria-checked]="formData.isStepForm"
+                  class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+                  [ngClass]="formData.isStepForm ? 'bg-[#0e2138] hover:bg-[#163355]' : 'bg-slate-300 hover:bg-slate-400'"
+                  title="Toggle between Step Form and Direct Form"
                 >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                  </svg>
-                  <span>Add Step</span>
+                  <span class="sr-only">Toggle Step Form Mode</span>
+                  <span
+                    class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out"
+                    [ngClass]="formData.isStepForm ? 'translate-x-5' : 'translate-x-0'"
+                  ></span>
                 </button>
+                <span
+                  (click)="toggleStepFormMode()"
+                  class="text-xs font-bold cursor-pointer select-none transition-colors"
+                  [ngClass]="formData.isStepForm ? 'text-[#0e2138]' : 'text-slate-600 hover:text-slate-800'"
+                >
+                  {{ formData.isStepForm ? 'Yes (Step Form)' : 'No (Direct Form)' }}
+                </span>
               </div>
+            </div>
 
-              <!-- Steps Tabs Navigation -->
-              <div class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-100">
-                @for (step of formData.steps; track step.id; let sIdx = $index) {
-                  <div
-                    (click)="activeStepIndex.set(sIdx)"
-                    class="group inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all shrink-0 select-none"
-                    [ngClass]="activeStepIndex() === sIdx
-                      ? 'bg-primary text-white border-primary shadow-xs'
-                      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900'"
-                  >
-                    <span>Step {{ sIdx + 1 }}: {{ step.title || 'Untitled Step' }}</span>
-                    <span class="text-[10.5px] opacity-80">({{ step.fields.length }} fields)</span>
-
-                    <!-- Delete Step Button (if > 1 step) -->
-                    @if (formData.steps.length > 1) {
-                      <button
-                        type="button"
-                        (click)="deleteStep(sIdx, $event)"
-                        class="p-0.5 rounded hover:bg-white/20 text-current transition-colors cursor-pointer"
-                        title="Delete this step"
-                      >
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    }
+            <!-- STEP FORM: Steps bar + tabs + step title + step fields header -->
+            @if (formData.isStepForm) {
+              <div class="space-y-2.5 pt-1">
+                <!-- Steps Bar Header -->
+                <div class="flex items-center justify-between pb-1 border-b border-slate-200">
+                  <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-slate-800 text-sm m-0">Form Steps</h3>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">
+                      {{ formData.steps.length }} {{ formData.steps.length === 1 ? 'step' : 'steps' }}
+                    </span>
                   </div>
-                }
-              </div>
 
-              <!-- Active Step Content Area -->
-              @if (getActiveStep(); as activeStep) {
-                <div class="p-4 rounded-xl border border-slate-200 bg-white space-y-4">
+                  <!-- Add Step Button -->
+                  <button
+                    type="button"
+                    (click)="addStep()"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-md shadow-xs transition-colors cursor-pointer"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Add Step</span>
+                  </button>
+                </div>
+
+                <!-- Steps Tabs Navigation -->
+                <div #stepTabsContainer class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-100">
+                  @for (step of formData.steps; track step.id; let sIdx = $index) {
+                    <div
+                      (click)="selectStep(sIdx)"
+                      class="group inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all shrink-0 select-none"
+                      [ngClass]="activeStepIndex() === sIdx
+                        ? 'bg-primary text-white border-primary shadow-xs'
+                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900'"
+                    >
+                      <span>Step {{ sIdx + 1 }}: {{ step.title || 'Untitled Step' }}</span>
+                      <span class="text-[10.5px] opacity-80">({{ step.fields.length }} fields)</span>
+
+                      <!-- Delete Step Button (if > 1 step) -->
+                      @if (formData.steps.length > 1) {
+                        <button
+                          type="button"
+                          (click)="deleteStep(sIdx, $event)"
+                          class="p-0.5 rounded hover:bg-white/20 text-current transition-colors cursor-pointer"
+                          title="Delete this step"
+                        >
+                          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+
+                @if (getActiveStep(); as activeStep) {
                   <!-- Active Step Title Input -->
                   <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">
@@ -338,16 +354,47 @@ interface FormBuilderFormData {
                       <span>Add Field to this Step</span>
                     </button>
                   </div>
+                }
+              </div>
+            }
 
-                  <!-- Fields List for Active Step -->
-                  @if (activeStep.fields.length === 0) {
-                    <div class="p-6 border-2 border-dashed border-slate-200 rounded-lg text-center bg-white space-y-1">
-                      <div class="text-xs font-semibold text-slate-600">No fields in this step yet</div>
-                      <div class="text-[11px] text-slate-400">Click "+ Add Field to this Step" above to add fields.</div>
-                    </div>
-                  } @else {
-                    <div class="space-y-3">
-                      @for (field of activeStep.fields; track field.id; let fIdx = $index) {
+            <!-- DIRECT FORM: Form Fields Header + Add Field button -->
+            @if (!formData.isStepForm) {
+              <div class="flex items-center justify-between pb-1 border-b border-slate-200 pt-1">
+                <div class="flex items-center gap-2">
+                  <h3 class="font-bold text-slate-800 text-sm m-0">Form Fields</h3>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-light text-brand">
+                    {{ formData.fields.length }} {{ formData.fields.length === 1 ? 'field' : 'fields' }}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  (click)="addField()"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary hover:bg-navy text-white text-xs font-semibold rounded-md shadow-xs transition-colors cursor-pointer"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span>Add Field</span>
+                </button>
+              </div>
+            }
+          </div>
+
+          <!-- SCROLLABLE FIELDS LIST -->
+          <div #fieldsScrollContainer class="flex-1 min-h-0 overflow-y-auto pr-1 pt-3 pb-2 space-y-3">
+            @if (formData.isStepForm) {
+              @if (getActiveStep(); as activeStep) {
+                <!-- Fields List for Active Step -->
+                @if (activeStep.fields.length === 0) {
+                  <div class="p-6 border-2 border-dashed border-slate-200 rounded-lg text-center bg-white space-y-1">
+                    <div class="text-xs font-semibold text-slate-600">No fields in this step yet</div>
+                    <div class="text-[11px] text-slate-400">Click "+ Add Field to this Step" above to add fields.</div>
+                  </div>
+                } @else {
+                  <div class="space-y-3">
+                    @for (field of activeStep.fields; track field.id; let fIdx = $index) {
                         <!-- Field Card Component (Reusable Markup) -->
                         <div
                           draggable="true"
@@ -359,8 +406,9 @@ interface FormBuilderFormData {
                           class="p-3.5 rounded-lg border transition-all duration-150 relative bg-white"
                           [ngClass]="{
                             'border-primary bg-primary-light/30 shadow-md ring-2 ring-primary/20': dragOverIndex === fIdx,
-                            'border-slate-200 shadow-2xs': dragOverIndex !== fIdx,
-                            'opacity-50 border-dashed': draggedIndex === fIdx
+                            'border-slate-200 shadow-2xs': dragOverIndex !== fIdx && recentlyAddedFieldId !== field.id,
+                            'opacity-50 border-dashed': draggedIndex === fIdx,
+                            'border-primary ring-2 ring-primary/30 shadow-md': recentlyAddedFieldId === field.id
                           }"
                         >
                           <!-- Field Card Top Bar -->
@@ -500,35 +548,9 @@ interface FormBuilderFormData {
                         </div>
                       }
                     </div>
-                  }
-                </div>
+                }
               }
-            </div>
-          }
-
-          <!-- CASE B: DIRECT FORM (SINGLE STEP) -->
-          @if (!formData.isStepForm) {
-            <div class="space-y-3 pt-1">
-              <div class="flex items-center justify-between pb-1 border-b border-slate-200">
-                <div class="flex items-center gap-2">
-                  <h3 class="font-bold text-slate-800 text-sm m-0">Form Fields</h3>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-light text-brand">
-                    {{ formData.fields.length }} {{ formData.fields.length === 1 ? 'field' : 'fields' }}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  (click)="addField()"
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary hover:bg-navy text-white text-xs font-semibold rounded-md shadow-xs transition-colors cursor-pointer"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                  </svg>
-                  <span>Add Field</span>
-                </button>
-              </div>
-
+            } @else {
               <!-- Empty state for direct fields -->
               @if (formData.fields.length === 0) {
                 <div class="p-8 border-2 border-dashed border-slate-200 rounded-lg text-center bg-white space-y-2">
@@ -555,8 +577,9 @@ interface FormBuilderFormData {
                       class="p-3.5 rounded-lg border transition-all duration-150 relative bg-white"
                       [ngClass]="{
                         'border-primary bg-primary-light/30 shadow-md ring-2 ring-primary/20': dragOverIndex === idx,
-                        'border-slate-200 shadow-2xs': dragOverIndex !== idx,
-                        'opacity-50 border-dashed': draggedIndex === idx
+                        'border-slate-200 shadow-2xs': dragOverIndex !== idx && recentlyAddedFieldId !== field.id,
+                        'opacity-50 border-dashed': draggedIndex === idx,
+                        'border-primary ring-2 ring-primary/30 shadow-md': recentlyAddedFieldId === field.id
                       }"
                     >
                       <!-- Field Top Bar -->
@@ -695,12 +718,12 @@ interface FormBuilderFormData {
                   }
                 </div>
               }
-            </div>
-          }
+            }
+          </div>
 
           <!-- Form Global Warnings -->
           @if (submitted() && !hasAtLeastOneField()) {
-            <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-600 font-medium">
+            <div class="shrink-0 mt-2 p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-600 font-medium">
               Please add at least one form field before saving.
             </div>
           }
@@ -2071,7 +2094,7 @@ interface FormBuilderFormData {
                         </div>
 
                         <div class="flex items-center gap-2.5">
-                          @if (previewStepIndex() === 2) {
+                          @if (previewStepIndex() === 2 && form.id === 'form-company-reg') {
                             <button
                               type="button"
                               (click)="saveAsDraft()"
@@ -2081,16 +2104,29 @@ interface FormBuilderFormData {
                             </button>
                           }
 
-                          <button
-                            type="button"
-                            (click)="previewNextStep(form)"
-                            class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#0e2138] hover:bg-[#163355] text-white text-xs font-semibold transition-all shadow-xs cursor-pointer"
-                          >
-                            <span>Next Step</span>
-                            <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                            </svg>
-                          </button>
+                          @if (previewStepIndex() === form.steps.length - 1) {
+                            <button
+                              type="button"
+                              (click)="submitPreviewForm(form)"
+                              class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#0e2138] hover:bg-[#163355] text-white text-xs font-semibold transition-all shadow-xs cursor-pointer"
+                            >
+                              <span>Submit</span>
+                              <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            </button>
+                          } @else {
+                            <button
+                              type="button"
+                              (click)="previewNextStep(form)"
+                              class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#0e2138] hover:bg-[#163355] text-white text-xs font-semibold transition-all shadow-xs cursor-pointer"
+                            >
+                              <span>Next Step</span>
+                              <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                              </svg>
+                            </button>
+                          }
                         </div>
                       </div>
                     </div>
@@ -2468,6 +2504,10 @@ export class DynamicFormBuilderComponent {
   private notification = inject(NotificationService);
   private formRepo = this.dataEngine.for<DynamicFormBuilderItem>('DYNAMIC_FORM_BUILDER');
 
+  @ViewChild('fieldsScrollContainer') fieldsScrollContainer?: ElementRef<HTMLDivElement>;
+  @ViewChild('stepTabsContainer') stepTabsContainer?: ElementRef<HTMLDivElement>;
+  recentlyAddedFieldId: string | null = null;
+
   readonly forms = signal<DynamicFormBuilderItem[]>([]);
   readonly searchQuery = signal<string>('');
 
@@ -2641,6 +2681,11 @@ export class DynamicFormBuilderComponent {
 
   // --- Step Management ---
 
+  toggleStepFormMode(): void {
+    this.formData.isStepForm = !this.formData.isStepForm;
+    this.onStepFormToggle();
+  }
+
   onStepFormToggle(): void {
     if (this.formData.isStepForm && this.formData.steps.length === 0) {
       // Migrate existing direct fields into Step 1 or create Step 1
@@ -2664,6 +2709,17 @@ export class DynamicFormBuilderComponent {
     return this.formData.steps[idx] || this.formData.steps[0] || null;
   }
 
+  selectStep(index: number): void {
+    this.activeStepIndex.set(index);
+    setTimeout(() => {
+      try {
+        if (this.fieldsScrollContainer?.nativeElement) {
+          this.fieldsScrollContainer.nativeElement.scrollTop = 0;
+        }
+      } catch (err) {}
+    }, 0);
+  }
+
   addStep(): void {
     const nextNum = this.formData.steps.length + 1;
     const newStep: FormStep = {
@@ -2681,6 +2737,8 @@ export class DynamicFormBuilderComponent {
     };
     this.formData.steps = [...this.formData.steps, newStep];
     this.activeStepIndex.set(this.formData.steps.length - 1);
+    this.recentlyAddedFieldId = newStep.fields[0]?.id || null;
+    this.scrollToActiveStepTab();
   }
 
   deleteStep(index: number, event?: Event): void {
@@ -2704,6 +2762,8 @@ export class DynamicFormBuilderComponent {
       mandatory: false
     };
     step.fields = [...step.fields, newField];
+    this.recentlyAddedFieldId = newField.id;
+    this.scrollToBottomFields();
   }
 
   deleteStepField(fIndex: number): void {
@@ -2835,6 +2895,70 @@ export class DynamicFormBuilderComponent {
       mandatory: false
     };
     this.formData.fields = [...this.formData.fields, newField];
+    this.recentlyAddedFieldId = newField.id;
+    this.scrollToBottomFields();
+  }
+
+  private scrollToBottomFields(): void {
+    setTimeout(() => {
+      try {
+        const container = this.fieldsScrollContainer?.nativeElement;
+        if (container) {
+          if (typeof container.scrollTo === 'function') {
+            container.scrollTo({
+              top: container.scrollHeight,
+              behavior: 'smooth'
+            });
+          } else {
+            container.scrollTop = container.scrollHeight;
+          }
+
+          const inputs = container.querySelectorAll<HTMLInputElement>('input[placeholder*="Center Address"]');
+          if (inputs.length > 0) {
+            const lastInput = inputs[inputs.length - 1];
+            try {
+              lastInput.focus({ preventScroll: true });
+            } catch (e) {
+              lastInput.focus();
+            }
+          }
+        }
+      } catch (err) {}
+    }, 60);
+
+    setTimeout(() => {
+      if (this.recentlyAddedFieldId) {
+        this.recentlyAddedFieldId = null;
+      }
+    }, 2500);
+  }
+
+  private scrollToActiveStepTab(): void {
+    setTimeout(() => {
+      try {
+        const tabEl = this.stepTabsContainer?.nativeElement;
+        if (tabEl) {
+          if (typeof tabEl.scrollTo === 'function') {
+            tabEl.scrollTo({ left: tabEl.scrollWidth, behavior: 'smooth' });
+          } else {
+            tabEl.scrollLeft = tabEl.scrollWidth;
+          }
+        }
+        if (this.fieldsScrollContainer?.nativeElement) {
+          this.fieldsScrollContainer.nativeElement.scrollTop = 0;
+          const inputs = this.fieldsScrollContainer.nativeElement.querySelectorAll<HTMLInputElement>('input[placeholder*="Center Address"]');
+          if (inputs.length > 0) {
+            inputs[0].focus({ preventScroll: true });
+          }
+        }
+      } catch (err) {}
+    }, 60);
+
+    setTimeout(() => {
+      if (this.recentlyAddedFieldId) {
+        this.recentlyAddedFieldId = null;
+      }
+    }, 2500);
   }
 
   deleteField(index: number): void {
@@ -2954,6 +3078,13 @@ export class DynamicFormBuilderComponent {
       ]
     };
     this.showBuilderModal.set(true);
+    setTimeout(() => {
+      try {
+        if (this.fieldsScrollContainer?.nativeElement) {
+          this.fieldsScrollContainer.nativeElement.scrollTop = 0;
+        }
+      } catch (e) {}
+    }, 50);
   }
 
   openEditModal(item: DynamicFormBuilderItem): void {
@@ -2994,6 +3125,13 @@ export class DynamicFormBuilderComponent {
     };
 
     this.showBuilderModal.set(true);
+    setTimeout(() => {
+      try {
+        if (this.fieldsScrollContainer?.nativeElement) {
+          this.fieldsScrollContainer.nativeElement.scrollTop = 0;
+        }
+      } catch (e) {}
+    }, 50);
   }
 
   closeBuilderModal(): void {
@@ -3226,7 +3364,7 @@ export class DynamicFormBuilderComponent {
   }
 
   getStepSubtitle(form: DynamicFormBuilderItem, stepIdx: number): string {
-    if (form.formType === 'Company Registration Form' || form.formType === 'Organisation Registration Form' || form.steps?.length === 4) {
+    if (form.id === 'form-company-reg' || ((form.formType === 'Company Registration Form' || form.formType === 'Organisation Registration Form') && form.steps?.[0]?.title.includes('Organisation'))) {
       switch (stepIdx) {
         case 0: return 'Please provide your organisation details to complete the registration process.';
         case 1: return 'Provide details of the person authorized to sign and represent the organization.';
@@ -3245,17 +3383,25 @@ export class DynamicFormBuilderComponent {
   }
 
   getStepInnerDescription(form: DynamicFormBuilderItem, stepIdx: number): string {
-    switch (stepIdx) {
-      case 1: return 'Provide details of the person authorized to sign and represent the organization.';
-      case 2: return 'Provide bank account details for receiving payments under the scheme.';
-      case 3: return 'Please verify the information provided below. You can edit any section if required.';
-      default: return '';
+    if (form.id === 'form-company-reg' || ((form.formType === 'Company Registration Form' || form.formType === 'Organisation Registration Form') && form.steps?.[0]?.title.includes('Organisation'))) {
+      switch (stepIdx) {
+        case 1: return 'Provide details of the person authorized to sign and represent the organization.';
+        case 2: return 'Provide bank account details for receiving payments under the scheme.';
+        case 3: return 'Please verify the information provided below. You can edit any section if required.';
+        default: return '';
+      }
     }
+    return form.steps?.[stepIdx]?.title ? `Please provide details for ${form.steps[stepIdx].title}.` : '';
   }
 
   isReviewStep(form: DynamicFormBuilderItem, stepIdx: number): boolean {
     if (!form.steps || form.steps.length === 0) return false;
-    return stepIdx === form.steps.length - 1;
+    return (form.id === 'form-company-reg' || ((form.formType === 'Company Registration Form' || form.formType === 'Organisation Registration Form') && form.steps?.[0]?.title.includes('Organisation'))) && stepIdx === form.steps.length - 1;
+  }
+
+  submitPreviewForm(form: DynamicFormBuilderItem): void {
+    this.notification.success(`${form.formType} submitted successfully in preview.`);
+    this.closePreviewModal();
   }
 
   onDateChange(fieldId: string): void {
@@ -3642,7 +3788,7 @@ export class DynamicFormBuilderComponent {
       'crf-308': 'Enter MICR code (9 digits)',
       'crf-309': 'Enter branch address, street, locality, city, PIN code'
     };
-    return placeholders[field.id] || (field.label ? `Enter ${field.label.toLowerCase()}` : 'Enter value');
+    return placeholders[field.id] || '';
   }
 
   getDropdownPlaceholder(field: DynamicFormField): string {

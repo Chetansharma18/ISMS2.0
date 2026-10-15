@@ -3,6 +3,8 @@ import { AspirantFormData, getDefaultAspirantDocuments } from '../../config/aspi
 /** Blank model for a new aspirant registration; every field starts empty or at its form default. */
 export function createEmptyAspirantFormData(): AspirantFormData {
   return {
+    registrationNo: 'ASP/2026/08421',
+    aspirantRegNo: 'ASP/2026/08421',
     // Step 1: Identity & Personal Details — starts empty
     aadhaarNo: '',
     confirmAadhaarNo: '',
@@ -16,6 +18,7 @@ export function createEmptyAspirantFormData(): AspirantFormData {
     aspirantName: '',
     gender: '',
     relationType: '',
+    relation: '',
     relationName: '',
     motherName: '',
     dob: '',
@@ -27,8 +30,18 @@ export function createEmptyAspirantFormData(): AspirantFormData {
     specialAbility: 'No',
     disabilityType: '',
     areaType: '',
+    interestedSector: '',
 
-    // Step 2: Address Details — starts empty
+    // Step 2: Training and Employment Details
+    trainingPreferredDistrict: '',
+    employmentType: '',
+
+    // Step 3: Address Details
+    address: '',
+    homeDistrict: '',
+    ruralUrban: 'Rural',
+    pincode: '',
+
     permHouseNo: '',
     permStreet: '',
     permWard: '',
@@ -53,10 +66,15 @@ export function createEmptyAspirantFormData(): AspirantFormData {
     commMunicipality: '',
     commPincode: '',
 
+    // Step 4: Contact Details
     mobileNo: '',
     altMobileNo: '',
     landlineNo: '',
     email: '',
+
+    // Step 5: Upload and Consent
+    candidatePhoto: null,
+    termsAccepted: false,
 
     // Step 3: Bank & Worker Details — starts empty
     bankAccountNo: '',

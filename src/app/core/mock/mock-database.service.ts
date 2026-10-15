@@ -175,9 +175,13 @@ export class MockDatabaseService {
               item?.id === 'perm-3' ||
               item?.roleType === 'Role1'
           );
-          if (hasOldData) {
-            this.store.set(key, []);
-            this.saveToStorage(key, []);
+          const hasSampleData = stored.some(
+            item => item?.id && String(item.id).startsWith('pm-')
+          );
+          if (hasOldData || !stored || stored.length === 0 || !hasSampleData) {
+            const fresh = this.deepClone(this.seeds[key]);
+            this.store.set(key, fresh);
+            this.saveToStorage(key, fresh);
           } else {
             this.store.set(key, stored);
           }

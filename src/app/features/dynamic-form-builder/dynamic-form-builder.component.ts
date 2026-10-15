@@ -68,7 +68,7 @@ interface FormBuilderFormData {
             </div>
           </div>
 
-          <!-- Add New Form Button -->
+          <!-- Add New Form Button (hidden for now)
           <button
             type="button"
             (click)="openAddModal()"
@@ -79,6 +79,7 @@ interface FormBuilderFormData {
             </svg>
             <span>Add new Form</span>
           </button>
+          -->
         </div>
       </app-page-header>
 

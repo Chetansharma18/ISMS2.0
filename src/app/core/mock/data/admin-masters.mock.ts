@@ -79,7 +79,108 @@ export const MOCK_EOI_CATEGORY_ITEMS: EoiCategoryItem[] = resolveMock([
   { sNo: 2, id: 'cat-2', categoryTitle: 'Special', description: 'Specialized scheme proposals for specific target demographics, tribal regions, or high-priority sectors.', status: 'Active' }
 ]);
 
-export const MOCK_PERMISSION_MASTER_ITEMS: PermissionMasterItem[] = resolveMock([]);
+export const MOCK_PERMISSION_MASTER_ITEMS: PermissionMasterItem[] = resolveMock([
+  {
+    sNo: 1,
+    id: 'pm-1',
+    roleType: 'Super Admin',
+    moduleName: 'Role Management',
+    canView: true,
+    canEdit: true,
+    canDelete: true,
+    status: 'Active'
+  },
+  {
+    sNo: 2,
+    id: 'pm-2',
+    roleType: 'Super Admin',
+    moduleName: 'User Management',
+    canView: true,
+    canEdit: true,
+    canDelete: true,
+    status: 'Active'
+  },
+  {
+    sNo: 3,
+    id: 'pm-3',
+    roleType: 'Super Admin',
+    moduleName: 'EOI Configuration',
+    canView: true,
+    canEdit: true,
+    canDelete: true,
+    status: 'Active'
+  },
+  {
+    sNo: 4,
+    id: 'pm-4',
+    roleType: 'Super Admin',
+    moduleName: 'Scheme Master',
+    canView: true,
+    canEdit: true,
+    canDelete: true,
+    status: 'Active'
+  },
+  {
+    sNo: 5,
+    id: 'pm-5',
+    roleType: 'Department Officer',
+    moduleName: 'Batch Approval & Scrutiny',
+    canView: true,
+    canEdit: true,
+    canDelete: false,
+    status: 'Active'
+  },
+  {
+    sNo: 6,
+    id: 'pm-6',
+    roleType: 'Department Officer',
+    moduleName: 'Camera CCTV Live Monitoring',
+    canView: true,
+    canEdit: true,
+    canDelete: false,
+    status: 'Active'
+  },
+  {
+    sNo: 7,
+    id: 'pm-7',
+    roleType: 'Department Officer',
+    moduleName: 'Payment & Financial Reports',
+    canView: true,
+    canEdit: false,
+    canDelete: false,
+    status: 'Active'
+  },
+  {
+    sNo: 8,
+    id: 'pm-8',
+    roleType: 'Scrutiny Officer',
+    moduleName: 'Doc Master',
+    canView: true,
+    canEdit: true,
+    canDelete: false,
+    status: 'Active'
+  },
+  {
+    sNo: 9,
+    id: 'pm-9',
+    roleType: 'Scrutiny Officer',
+    moduleName: 'Candidate / Aspirant Database',
+    canView: true,
+    canEdit: false,
+    canDelete: false,
+    status: 'Active'
+  },
+  {
+    sNo: 10,
+    id: 'pm-10',
+    roleType: 'Training Partner',
+    moduleName: 'Grievance Redressal',
+    canView: true,
+    canEdit: true,
+    canDelete: false,
+    status: 'Active'
+  }
+]);
 
 export const MOCK_SCHEME_MASTER_ITEMS: SchemeMasterItem[] = resolveMock([
   { sNo: 1, id: 'sch-1', schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana', schemeCategory: 'Rajvik', categoryName: 'GENERAL', amount: 5000000, processFees: 10000, status: 'Active' },

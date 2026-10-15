@@ -14,6 +14,7 @@ export type FormFieldType =
   | 'checkbox'
   | 'radio'
   | 'file'
+  | 'photo'
   | 'photos'
   | 'switch'
   | 'heading'

@@ -76,9 +76,9 @@ import { AspirantPortalService, TrainingCalendarItem } from '../services/aspiran
 
       <!-- Custom Status Template -->
       <ng-template #statusTemplate let-item>
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-          {{ item.status || 'Interest Submitted' }}
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 whitespace-nowrap shadow-2xs select-none">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0 inline-block"></span>
+          <span class="leading-none">{{ item.status || 'Interest Submitted' }}</span>
         </span>
       </ng-template>
 
@@ -101,7 +101,7 @@ export class ExpressedInterestComponent {
     { key: 'batchDate',        label: 'Batch Date',        align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-800' },
     { key: 'batchTime',        label: 'Batch Time',        align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'expressedDate',    label: 'Expressed On',      align: 'center', cellClass: 'whitespace-nowrap font-medium text-slate-900' },
-    { key: 'status',           label: 'Status',            align: 'center', type: 'custom', width: 'w-36' }
+    { key: 'status',           label: 'Status',            align: 'center', type: 'custom', width: 'min-w-[170px]', cellClass: 'whitespace-nowrap text-center min-w-[170px]' }
   ];
 
   readonly filteredExpressed = computed(() => {

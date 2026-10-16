@@ -298,12 +298,16 @@ describe('DynamicFormBuilderComponent', () => {
     // Next step
     comp.previewNextStep(stepForm);
     expect(comp.previewStepIndex()).toBe(1);
+    expect(comp.isReviewStep(stepForm, 1)).toBe(false);
+    expect(comp.getStepSubtitle(stepForm, 1)).toBe('Please fill in details for Step 2: Uploads');
 
     // Previous step
     comp.previewPrevStep();
     expect(comp.previewStepIndex()).toBe(0);
 
-    comp.closePreviewModal();
+    // Jump to last step and submit
+    comp.previewNextStep(stepForm);
+    comp.submitPreviewForm(stepForm);
     expect(comp.showPreviewModal()).toBe(false);
   });
 
@@ -596,4 +600,18 @@ describe('DynamicFormBuilderComponent', () => {
     comp.submitDeptUser();
     expect(comp.showPreviewModal()).toBe(false);
   });
+
+  it('toggles step form mode via toggleStepFormMode', () => {
+    const comp = createComponent();
+    comp.openAddModal();
+    expect(comp.formData.isStepForm).toBe(false);
+
+    comp.toggleStepFormMode();
+    expect(comp.formData.isStepForm).toBe(true);
+    expect(comp.formData.steps.length).toBeGreaterThan(0);
+
+    comp.toggleStepFormMode();
+    expect(comp.formData.isStepForm).toBe(false);
+  });
 });
+

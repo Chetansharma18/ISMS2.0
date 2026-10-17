@@ -112,7 +112,7 @@ describe('NewUserCategoryModalComponent', () => {
 
   it('emits cancelled on clicking close button', () => {
     openModal();
-    const closeBtn = el().querySelector('button[aria-label="Close dialog"]') as HTMLButtonElement;
+    const closeBtn = el().querySelector('button[aria-label="Close"]') as HTMLButtonElement;
     expect(closeBtn).not.toBeNull();
     closeBtn.click();
     fixture.detectChanges();

@@ -1,5 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ButtonComponent, DocTableDirective, IconComponent, InputDirective } from '../../../../../shared';
 import type { IpaCourseRow } from '../ipa-editor.model';
 import { recalculateRowTotal } from '../ipa-editor.util';
 
@@ -7,7 +8,7 @@ import { recalculateRowTotal } from '../ipa-editor.util';
 @Component({
   selector: 'app-ipa-course-table',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, ButtonComponent, DocTableDirective, IconComponent, InputDirective],
   host: { class: 'block' },
   template: `
     <div class="my-5">
@@ -15,17 +16,13 @@ import { recalculateRowTotal } from '../ipa-editor.util';
         <h4 class="font-bold text-slate-900 text-xs uppercase tracking-tight">
           APPROVED COURSE &amp; CYCLES DETAILS:
         </h4>
-        <button
-          type="button"
-          (click)="addRow.emit()"
-          class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded text-xs font-sans font-medium cursor-pointer flex items-center gap-1 print:hidden"
-        >
+        <button appButton variant="outline" size="sm" class="print:hidden" (click)="addRow.emit()">
           <span>+ Add Course Row</span>
         </button>
       </div>
 
       <div class="w-full overflow-hidden">
-        <table class="w-full table-fixed text-center border-collapse font-sans text-[8.5px] border border-slate-900 leading-tight">
+        <table appDocTable class="w-full table-fixed text-center border-collapse font-sans text-[8.5px] border border-slate-900 leading-tight">
           <thead>
             <tr class="bg-slate-100 text-slate-900 border-b border-slate-900 font-bold">
               <th rowspan="2" class="p-0.5 border-r border-b border-slate-900 w-[2.5%]">S. No.</th>
@@ -59,85 +56,107 @@ import { recalculateRowTotal } from '../ipa-editor.util';
                 </td>
                 <td class="p-0.5 border-r border-slate-900 text-left">
                   <textarea
+                    appInput
+                    variant="plain"
                     [(ngModel)]="row.sector"
                     rows="2"
-                    class="w-full bg-transparent border-none focus:outline-none p-0 text-[8.5px] leading-tight resize-none"
+                    class="w-full leading-tight resize-none"
                   ></textarea>
                 </td>
                 <td class="p-0.5 border-r border-slate-900 text-left font-bold">
                   <textarea
+                    appInput
+                    variant="plain"
                     [(ngModel)]="row.courseName"
                     rows="2"
-                    class="w-full font-bold bg-transparent border-none focus:outline-none p-0 text-[8.5px] leading-tight resize-none"
+                    class="w-full font-bold leading-tight resize-none"
                   ></textarea>
                 </td>
                 <td class="p-0.5 border-r border-slate-900 font-mono text-center">
                   <input
+                    appInput
+                    variant="plain"
                     type="text"
                     [(ngModel)]="row.courseCode"
-                    class="w-full text-center bg-transparent border-none focus:outline-none p-0 text-[8.5px]"
+                    class="w-full text-center"
                   />
                 </td>
                 <td class="p-0.5 border-r border-slate-900 text-center">
                   <input
+                    appInput
+                    variant="plain"
                     type="number"
                     [(ngModel)]="row.durationDays"
-                    class="w-full text-center bg-transparent border-none focus:outline-none p-0 text-[8.5px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    class="w-full text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </td>
                 <td class="p-0.5 border-r border-slate-900 text-center">
                   <input
+                    appInput
+                    variant="plain"
                     type="number"
                     [(ngModel)]="row.durationHours"
-                    class="w-full text-center bg-transparent border-none focus:outline-none p-0 text-[8.5px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    class="w-full text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </td>
                 <td class="p-0.5 border-r border-slate-900 text-center">
                   <input
+                    appInput
+                    variant="plain"
                     type="text"
                     [(ngModel)]="row.mandatoryOjt"
-                    class="w-full text-center bg-transparent border-none focus:outline-none p-0 text-[8.5px]"
+                    class="w-full text-center"
                   />
                 </td>
                 <td class="p-0.5 border-r border-slate-900 text-center">
                   <textarea
+                    appInput
+                    variant="plain"
                     [(ngModel)]="row.minEdu"
                     rows="2"
-                    class="w-full text-center bg-transparent border-none focus:outline-none p-0 text-[8.5px] leading-tight resize-none"
+                    class="w-full text-center leading-tight resize-none"
                   ></textarea>
                 </td>
                 <td class="p-0.5 border-r border-slate-900 text-center">
                   <textarea
+                    appInput
+                    variant="plain"
                     [(ngModel)]="row.minAge"
                     rows="2"
-                    class="w-full text-center bg-transparent border-none focus:outline-none p-0 text-[8.5px] leading-tight resize-none"
+                    class="w-full text-center leading-tight resize-none"
                   ></textarea>
                 </td>
                 <td class="p-0.5 border-r border-slate-900 text-center font-bold">
                   <input
+                    appInput
+                    variant="plain"
                     type="text"
                     [(ngModel)]="row.rnr"
-                    class="w-full text-center font-bold bg-transparent border-none focus:outline-none p-0 text-[8.5px]"
+                    class="w-full text-center font-bold"
                   />
                 </td>
                 <td class="p-0.5 border-r border-slate-900 text-center font-bold">
                   <input
+                    appInput
+                    variant="plain"
                     type="text"
                     [(ngModel)]="row.rCat"
-                    class="w-full text-center font-bold bg-transparent border-none focus:outline-none p-0 text-[8.5px]"
+                    class="w-full text-center font-bold"
                   />
                 </td>
                 <!-- Cost Per Trainee Stacked Cell -->
                 <td class="p-0 border-r border-slate-900 align-top">
-                  <table class="w-full text-[8px] border-collapse">
+                  <table appDocTable class="w-full text-[8px] border-collapse">
                     <tr class="border-b border-slate-300">
                       <td class="p-0.2 border-r border-slate-300 font-semibold w-5 text-center">C</td>
                       <td class="p-0.2 text-right font-medium pr-0.5">
                         <input
+                          appInput
+                          variant="plain"
                           type="number"
                           [(ngModel)]="row.costC"
                           (ngModelChange)="recalculateRowTotal(row)"
-                          class="w-full text-right bg-transparent border-none focus:outline-none p-0 text-[8px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          class="w-full text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </td>
                     </tr>
@@ -145,10 +164,12 @@ import { recalculateRowTotal } from '../ipa-editor.util';
                       <td class="p-0.2 border-r border-slate-300 font-semibold text-center">H</td>
                       <td class="p-0.2 text-right font-medium pr-0.5">
                         <input
+                          appInput
+                          variant="plain"
                           type="number"
                           [(ngModel)]="row.costH"
                           (ngModelChange)="recalculateRowTotal(row)"
-                          class="w-full text-right bg-transparent border-none focus:outline-none p-0 text-[8px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          class="w-full text-right [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </td>
                     </tr>
@@ -156,9 +177,11 @@ import { recalculateRowTotal } from '../ipa-editor.util';
                       <td class="p-0.2 border-r border-slate-300 font-semibold text-center">Toolkit</td>
                       <td class="p-0.2 text-right font-medium pr-0.5">
                         <input
+                          appInput
+                          variant="plain"
                           type="text"
                           [(ngModel)]="row.costToolkit"
-                          class="w-full text-right bg-transparent border-none focus:outline-none p-0 text-[8px]"
+                          class="w-full text-right"
                         />
                       </td>
                     </tr>
@@ -170,10 +193,12 @@ import { recalculateRowTotal } from '../ipa-editor.util';
                 </td>
                 <td class="p-0.5 border-r border-slate-900 text-center font-bold">
                   <input
+                    appInput
+                    variant="plain"
                     type="number"
                     [(ngModel)]="row.approvedTrainees"
                     (ngModelChange)="recalculateRowTotal(row)"
-                    class="w-full text-center font-bold bg-transparent border-none focus:outline-none p-0 text-[8.5px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    class="w-full text-center font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </td>
                 <td class="p-0.5 border-r border-slate-900 text-center font-bold text-slate-900">
@@ -181,10 +206,12 @@ import { recalculateRowTotal } from '../ipa-editor.util';
                 </td>
                 <td class="p-0.5 border-r border-slate-900 text-center font-bold">
                   <input
+                    appInput
+                    variant="plain"
                     type="number"
                     [(ngModel)]="row.cycles"
                     (ngModelChange)="recalculateRowTotal(row)"
-                    class="w-full text-center font-bold bg-transparent border-none focus:outline-none p-0 text-[8.5px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    class="w-full text-center font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </td>
                 <td class="p-0.5 border-r border-slate-900 text-center font-bold text-slate-900">
@@ -192,19 +219,26 @@ import { recalculateRowTotal } from '../ipa-editor.util';
                 </td>
                 <td class="p-0.5 border-r border-slate-900 text-center font-bold">
                   <input
+                    appInput
+                    variant="plain"
                     type="number"
                     [(ngModel)]="row.perDayHours"
-                    class="w-full text-center font-bold bg-transparent border-none focus:outline-none p-0 text-[8.5px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    class="w-full text-center font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </td>
                 <td class="p-0.5 text-center print:hidden">
                   <button
+                    appButton
+                    variant="ghost"
+                    size="xs"
+                    iconOnly
                     type="button"
                     (click)="removeRow.emit(i)"
-                    class="text-rose-600 hover:text-rose-800 text-xs font-bold px-0.5"
+                    class="print:hidden"
+                    aria-label="Delete row"
                     title="Delete Row"
                   >
-                    &times;
+                    <app-icon name="close" size="xs" />
                   </button>
                 </td>
               </tr>

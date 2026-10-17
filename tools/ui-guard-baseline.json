@@ -1,0 +1,26 @@
+{
+  "features/eoi/pages/mou/mou-draft.component.ts": {
+    "page-frame": 1
+  },
+  "features/eoi/pages/scrutiny-desk/scrutiny-desk.component.ts": {
+    "page-frame": 1
+  },
+  "features/profile/profile-page.component.ts": {
+    "page-frame": 1
+  },
+  "features/sdc/components/aspirant-detail.component.ts": {
+    "page-frame": 1
+  },
+  "features/sdc/components/batch-detail.component.ts": {
+    "page-frame": 1
+  },
+  "features/sdc/components/sdc-detail.component.ts": {
+    "page-frame": 1
+  },
+  "features/tenders/tender-status.component.ts": {
+    "page-frame": 1
+  },
+  "features/tenders/tenders-page.component.ts": {
+    "page-frame": 1
+  }
+}

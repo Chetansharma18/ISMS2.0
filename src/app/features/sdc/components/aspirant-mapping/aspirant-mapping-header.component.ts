@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { BatchRecord } from '../../models/batch.model';
+import { ButtonComponent, IconComponent } from '../../../../shared';
 
 /** Page header: back button, title and the target-batch context pill. */
 @Component({
@@ -7,18 +8,20 @@ import { BatchRecord } from '../../models/batch.model';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
+  imports: [ButtonComponent, IconComponent],
   template: `
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
       <div class="flex items-center gap-3">
         <button
+          appButton
+          variant="outline"
+          size="sm"
+          class="shrink-0"
           type="button"
           (click)="back.emit()"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 active:scale-95 text-xs font-semibold text-slate-700 shadow-2xs transition-all cursor-pointer shrink-0"
           title="Back to Batches"
         >
-          <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
+          <app-icon name="chevron-left" size="sm" />
           <span>Back</span>
         </button>
         

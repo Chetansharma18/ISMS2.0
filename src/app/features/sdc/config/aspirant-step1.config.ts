@@ -1,13 +1,14 @@
+import { TemplateRef } from '@angular/core';
 import { FormFieldConfig } from '../../../shared/components/form-sdc';
 import { REGEX_PATTERNS } from '../../../shared/utils/validators.util';
-import { calculateAgeFromDob } from './aspirant-form.types';
+import { AspirantFormData, calculateAgeFromDob } from './aspirant-form.types';
 
 /**
  * Step 1: IDENTITY DETAILS  Form Fields
  */
 export function getStep1PersonalFields(
-  onDobChange?: (dob: string, model: any) => void,
-  aadhaarTemplateRef?: any
+  onDobChange?: (dob: string, model: AspirantFormData) => void,
+  aadhaarTemplateRef?: TemplateRef<unknown>
 ): FormFieldConfig[] {
   return [
     // Identity Details Header
@@ -42,7 +43,7 @@ export function getStep1PersonalFields(
       pattern: '^[0-9]{12}$',
       patternMessage: 'Confirm Aadhaar must be exactly 12 digits',
       placeholder: 'Re-enter 12 digit Aadhaar number',
-      validator: (value: string, model: any) => {
+      validator: (value: string, model: AspirantFormData) => {
         if (!value) return null;
         if (value !== model?.aadhaarNo) {
           return 'Aadhaar numbers do not match';
@@ -86,7 +87,7 @@ export function getStep1PersonalFields(
     },
     {
       key: 'otherIdNo',
-      label: (m: any) => {
+      label: (m: AspirantFormData) => {
         const type = m?.otherIdType;
         if (!type || type === 'None') return 'Other ID Nos.';
         if (type === 'PAN Card' || type.toLowerCase().includes('pan')) return 'PAN';
@@ -96,7 +97,7 @@ export function getStep1PersonalFields(
         if (type.toLowerCase().includes('ration')) return 'Ration Card No.';
         return `${type}`;
       },
-      placeholder: (m: any) => {
+      placeholder: (m: AspirantFormData) => {
         const type = m?.otherIdType;
         if (type === 'PAN Card' || type?.toLowerCase().includes('pan')) return 'e.g. ABCDE1234F  (10 chars)';
         if (type === 'Voter ID') return 'e.g. ABC1234567  (10 chars)';
@@ -106,7 +107,7 @@ export function getStep1PersonalFields(
         return 'Enter document number';
       },
       uppercase: true,
-      validator: (value: string, model: any) => {
+      validator: (value: string, model: AspirantFormData) => {
         if (!value) return null;
         const type = model?.otherIdType;
         if (!type || type === 'None') return null;
@@ -169,7 +170,7 @@ export function getStep1PersonalFields(
     },
     {
       key: 'relationName',
-      label: (model: any) => {
+      label: (model: AspirantFormData) => {
         const rel = (model?.relationType || '').trim();
         if (rel === 'Father') return "Father's Name";
         if (rel === 'Husband') return "Husband's Name";
@@ -177,7 +178,7 @@ export function getStep1PersonalFields(
         if (rel === 'Guardian') return "Guardian's Name";
         return "Father's / Husband's / Guardian Name";
       },
-      placeholder: (model: any) => {
+      placeholder: (model: AspirantFormData) => {
         const rel = (model?.relationType || '').trim();
         if (rel === 'Father') return "Father's full name";
         if (rel === 'Husband') return "Husband's full name";

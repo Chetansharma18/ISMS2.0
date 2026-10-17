@@ -1,13 +1,15 @@
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ButtonComponent, InputDirective } from '../../../../shared';
 import { BatchFacultyEditorComponent } from './batch-faculty-editor.component';
 import { BatchHostelEditorComponent } from './batch-hostel-editor.component';
 
 /** Inline edit form for a batch. Edits the parent-owned edit model in place via ngModel. */
+// Default change detection: the parent edits fields of the edit model in place (course / duration on sector or course change).
 @Component({
   selector: 'app-batch-edit-form',
   standalone: true,
-  imports: [FormsModule, BatchFacultyEditorComponent, BatchHostelEditorComponent],
+  imports: [FormsModule, ButtonComponent, InputDirective, BatchFacultyEditorComponent, BatchHostelEditorComponent],
   host: { class: 'block' },
   template: `
     <div class="border border-slate-200 rounded-xl p-5 sm:p-6 bg-white shadow-2xs space-y-6 animate-in fade-in duration-150">
@@ -31,9 +33,10 @@ import { BatchHostelEditorComponent } from './batch-hostel-editor.component';
             Sector <span class="text-rose-500">*</span>
           </label>
           <select
+            appInput
             [(ngModel)]="editModel.sector"
             (ngModelChange)="sectorChange.emit($event)"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           >
             @for (sec of sectorList(); track sec) {
               <option [value]="sec">{{ sec }}</option>
@@ -46,9 +49,10 @@ import { BatchHostelEditorComponent } from './batch-hostel-editor.component';
             Course <span class="text-rose-500">*</span>
           </label>
           <select
+            appInput
             [(ngModel)]="editModel.courseName"
             (ngModelChange)="courseChange.emit($event)"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           >
             @for (c of availableCourses(); track c.courseName) {
               <option [value]="c.courseName">{{ c.courseName }}</option>
@@ -62,11 +66,12 @@ import { BatchHostelEditorComponent } from './batch-hostel-editor.component';
             Batch Duration In HRS. <span class="text-rose-500">*</span>
           </label>
           <input
+            appInput
             type="number"
             [(ngModel)]="editModel.batchDurationHours"
             min="10"
             max="2000"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
             placeholder="e.g. 400"
           />
         </div>
@@ -76,9 +81,10 @@ import { BatchHostelEditorComponent } from './batch-hostel-editor.component';
             Batch Start Date <span class="text-rose-500">*</span>
           </label>
           <input
+            appInput
             type="date"
             [(ngModel)]="editModel.startDate"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           />
         </div>
 
@@ -87,9 +93,10 @@ import { BatchHostelEditorComponent } from './batch-hostel-editor.component';
             Batch End Date
           </label>
           <input
+            appInput
             type="date"
             [(ngModel)]="editModel.endDate"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           />
         </div>
 
@@ -98,9 +105,10 @@ import { BatchHostelEditorComponent } from './batch-hostel-editor.component';
             Batch Start Time <span class="text-rose-500">*</span>
           </label>
           <input
+            appInput
             type="text"
             [(ngModel)]="editModel.startTime"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
             placeholder="09:00 AM"
           />
         </div>
@@ -111,9 +119,10 @@ import { BatchHostelEditorComponent } from './batch-hostel-editor.component';
             Batch End Time <span class="text-rose-500">*</span>
           </label>
           <input
+            appInput
             type="text"
             [(ngModel)]="editModel.endTime"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
             placeholder="05:00 PM"
           />
         </div>
@@ -123,20 +132,22 @@ import { BatchHostelEditorComponent } from './batch-hostel-editor.component';
             Approved Batch Strength <span class="text-rose-500">*</span>
           </label>
           <input
+            appInput
             type="number"
             [(ngModel)]="editModel.approvedBatchStrength"
             min="1"
             max="500"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           />
         </div>
 
         <div class="sm:col-span-2">
           <label class="block font-semibold text-slate-700 mb-1">Remarks</label>
           <input
+            appInput
             type="text"
             [(ngModel)]="editModel.remarks"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
             placeholder="Enter batch remarks or prerequisites..."
           />
         </div>
@@ -149,16 +160,17 @@ import { BatchHostelEditorComponent } from './batch-hostel-editor.component';
       <!-- Form Action Buttons (Save / Cancel) -->
       <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
         <button
+          appButton
+          variant="outline"
           type="button"
           (click)="cancelled.emit()"
-          class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 text-xs font-semibold cursor-pointer transition-colors"
         >
           Cancel
         </button>
         <button
+          appButton
           type="button"
           (click)="saved.emit()"
-          class="px-5 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg text-xs font-semibold shadow-xs cursor-pointer transition-colors"
         >
           Save Changes
         </button>

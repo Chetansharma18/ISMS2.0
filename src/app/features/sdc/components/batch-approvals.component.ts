@@ -6,26 +6,35 @@ import { BatchService } from '../services/batch.service';
 import { BatchRecord } from '../models/batch.model';
 import {
   ActionModalComponent,
+  ButtonComponent,
+  IconComponent,
+  InputDirective,
   PageHeaderComponent,
+  PageShellComponent,
   TableComponent,
   TableColumn
 } from '../../../shared';
+import { FilterTabsComponent } from '../../../shared';
 
 @Component({
   selector: 'app-batch-approvals',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FilterTabsComponent,
     CommonModule,
     RouterModule,
     FormsModule,
     ActionModalComponent,
+    ButtonComponent,
+    IconComponent,
+    InputDirective,
     PageHeaderComponent,
+    PageShellComponent,
     TableComponent
   ],
   template: `
-    <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
-      <div class="p-4 sm:p-5 space-y-3 font-sans">
+    <app-page-shell>
 
         <!-- Page Header via Reusable PageHeaderComponent -->
         <app-page-header
@@ -40,45 +49,16 @@ import {
         @if (successMessage()) {
           <div class="p-3 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 flex items-center justify-between text-xs animate-in fade-in">
             <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
+              <app-icon name="check" [stroke]="2" class="text-emerald-600 shrink-0" />
               <span class="font-medium">{{ successMessage() }}</span>
             </div>
-            <button (click)="successMessage.set('')" class="text-emerald-600 hover:text-emerald-900 cursor-pointer font-bold">✕</button>
+            <button appButton variant="ghost" size="sm" iconOnly aria-label="Dismiss" (click)="successMessage.set('')"><app-icon name="close" size="xs" /></button>
           </div>
         }
 
         <!-- Status Filter Badges / Pills Toolbar -->
         <div class="flex items-center justify-between gap-3 pt-1">
-          <div class="flex items-center gap-1.5 flex-wrap">
-            @for (f of filterOptions(); track f.id) {
-              <button
-                type="button"
-                (click)="setFilter(f.id)"
-                class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-                [class.bg-primary]="activeFilter() === f.id"
-                [class.text-white]="activeFilter() === f.id"
-                [class.border-primary]="activeFilter() === f.id"
-                [class.bg-white]="activeFilter() !== f.id"
-                [class.text-[#5F6B76]]="activeFilter() !== f.id"
-                [class.border-border]="activeFilter() !== f.id"
-                [class.hover:bg-primary-light]="activeFilter() !== f.id"
-                [class.hover:text-brand]="activeFilter() !== f.id"
-              >
-                <span>{{ f.label }}</span>
-                <span
-                  class="px-1.5 py-0.2 rounded-full text-[10px]"
-                  [class.bg-white/20]="activeFilter() === f.id"
-                  [class.text-white]="activeFilter() === f.id"
-                  [class.bg-surface-muted]="activeFilter() !== f.id"
-                  [class.text-[#5F6B76]]="activeFilter() !== f.id"
-                >
-                  {{ f.count }}
-                </span>
-              </button>
-            }
-          </div>
+          <app-filter-tabs [options]="filterOptions()" [value]="activeFilter()" (valueChange)="setFilter($event)" />
 
           <div class="text-xs text-slate-500 font-medium hidden sm:block">
             Showing {{ filteredBatches().length }} {{ filteredBatches().length === 1 ? 'batch' : 'batches' }}
@@ -92,9 +72,11 @@ import {
           <div class="flex items-center gap-1.5">
             <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Center:</label>
             <select
+              appInput
+              size="sm"
               [ngModel]="selectedCenter()"
               (ngModelChange)="selectedCenter.set($event)"
-              class="bg-white border border-border rounded-[4px] px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary max-w-[200px]"
+              class="max-w-[200px]"
             >
               <option value="ALL">All Centers ({{ centerList().length }})</option>
               @for (c of centerList(); track c) {
@@ -107,9 +89,10 @@ import {
           <div class="flex items-center gap-1.5">
             <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Scheme:</label>
             <select
+              appInput
+              size="sm"
               [ngModel]="selectedScheme()"
               (ngModelChange)="selectedScheme.set($event)"
-              class="bg-white border border-border rounded-[4px] px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="ALL">All Schemes</option>
               @for (sch of schemeList(); track sch) {
@@ -122,9 +105,10 @@ import {
           <div class="flex items-center gap-1.5">
             <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">District:</label>
             <select
+              appInput
+              size="sm"
               [ngModel]="selectedDistrict()"
               (ngModelChange)="selectedDistrict.set($event)"
-              class="bg-white border border-border rounded-[4px] px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="ALL">All Districts</option>
               @for (dst of districtList(); track dst) {
@@ -136,9 +120,12 @@ import {
           <!-- Reset filters -->
           @if (hasActiveFilters()) {
             <button
+              appButton
+              variant="danger"
+              size="sm"
               type="button"
               (click)="resetFilters()"
-              class="px-2 py-1 text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded border border-rose-200 transition-colors cursor-pointer font-medium ml-auto"
+              class="ml-auto"
             >
               Reset Filters
             </button>
@@ -186,10 +173,7 @@ import {
           <div class="text-center py-0.5">
             <div class="font-normal text-slate-800 text-[13px] leading-snug">{{ batch.sdcName }}</div>
             <div class="text-[11px] text-secondary font-normal flex items-center justify-center gap-1 mt-0.5">
-              <svg class="w-3 h-3 text-muted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+              <app-icon name="map-pin" size="xs" [stroke]="2" class="text-muted shrink-0" />
               <span>{{ batch.sdcDistrict || 'Rajasthan' }}</span>
             </div>
           </div>
@@ -236,28 +220,24 @@ import {
             <div class="w-[120px] flex justify-center shrink-0">
               @if (isApproved(batch)) {
                 <span class="inline-flex items-center gap-1 text-emerald-700 font-semibold text-xs py-1">
-                  <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <app-icon name="check" size="sm" [stroke]="2.5" class="text-emerald-600" />
                   <span>Approved</span>
                 </span>
               } @else if (isRejected(batch)) {
                 <span class="inline-flex items-center gap-1 text-rose-700 font-semibold text-xs py-1">
-                  <svg class="w-3.5 h-3.5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <app-icon name="close" size="sm" [stroke]="2.5" class="text-rose-600" />
                   <span>Rejected</span>
                 </span>
               } @else {
                 <button
+                  appButton
+                  size="sm"
+                  block
                   type="button"
                   (click)="openApproveModal(batch)"
-                  class="w-full justify-center whitespace-nowrap inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-primary hover:bg-primary-dark active:bg-[#0E2D44] text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer shrink-0"
                   title="Approve Batch"
                 >
-                  <svg class="w-3.5 h-3.5 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <app-icon name="check" size="sm" />
                   <span>Approve Batch</span>
                 </button>
               }
@@ -265,23 +245,22 @@ import {
 
             <!-- Slot 2: View Details button (116px fixed width) -->
             <button
+              appButton
+              variant="outline"
+              size="sm"
+              class="w-[116px] shrink-0"
               type="button"
               (click)="viewDetails(batch)"
-              class="w-[116px] justify-center whitespace-nowrap inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
               title="View Batch Details"
             >
-              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
+              <app-icon name="eye" size="sm" />
               <span>View Details</span>
             </button>
 
           </div>
         </ng-template>
 
-      </div>
-    </div>
+    </app-page-shell>
 
     <!-- ========================================================================= -->
     <!-- ADMIN BATCH APPROVAL MODAL (Themed identically to SDC Approval modal)    -->
@@ -325,11 +304,12 @@ import {
                 Approved Trainee Capacity <span class="text-rose-500">*</span>
               </label>
               <input
+                appInput
                 type="number"
                 [(ngModel)]="approvalTargetCapacity"
                 min="1"
                 max="500"
-                class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary"
+                class="w-full"
                 placeholder="Enter approved capacity"
               />
               <span class="text-[10.5px] text-slate-500 mt-0.5 block">Requested capacity: {{ targetBatch.maxStrength || 30 }} trainees</span>
@@ -341,18 +321,17 @@ import {
                 Approval Remarks / Sanction Notes <span class="text-rose-500">*</span>
               </label>
               <textarea
+                appInput
                 [(ngModel)]="approvalRemarks"
                 rows="3"
-                class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary"
+                class="w-full"
                 placeholder="Enter official approval remarks..."
               ></textarea>
             </div>
 
             <!-- Confirmation notice -->
             <div class="p-2.5 rounded bg-amber-50 border border-amber-200 text-amber-900 text-[11px] flex items-center gap-2">
-              <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <app-icon name="info-circle" [stroke]="2" class="text-amber-600 shrink-0" />
               <span>Approving this batch will permit commencement of training and biometric attendance capture.</span>
             </div>
 

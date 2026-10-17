@@ -5,12 +5,13 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
-  PageHeaderComponent,
-  TableComponent,
+  ListPageComponent,
   ButtonComponent,
+  IconComponent,
   ActionModalComponent,
   StatusBadgeComponent,
   EmptyStateComponent,
+  InputDirective,
   TableColumn
 } from '../../shared';
 import { DataEngineService } from '../../core/services/data-engine.service';
@@ -28,75 +29,58 @@ export type { Grievance };
     CommonModule,
     RouterModule,
     FormsModule,
-    PageHeaderComponent,
-    TableComponent,
+    ListPageComponent,
     ButtonComponent,
+    IconComponent,
     ActionModalComponent,
-    StatusBadgeComponent
+    StatusBadgeComponent,
+    InputDirective
   ],
   template: `
-    <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
-      <div class="p-4 sm:p-5 space-y-3 font-sans">
-        
-        <app-page-header
-          title="Grievance"
-          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Grievance' }]"
-          [searchable]="true"
-          [(searchQuery)]="searchQuery"
-          searchPlaceholder="Search Title, Description, Issue Type..."
-        >
-          <button (click)="openRaiseTicket()" class="px-3.5 py-2 bg-navy hover:bg-navy-dark text-white text-xs font-semibold rounded-md shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Raise Ticket</span>
-          </button>
-        </app-page-header>
+    <app-list-page
+      title="Grievance"
+      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Grievance' }]"
+      [(searchQuery)]="searchQuery"
+      searchPlaceholder="Search Title, Description, Issue Type..."
+      [columns]="grievanceColumns"
+      [data]="filteredGrievances()"
+      [pageSize]="10"
+      itemUnit="grievances"
+      emptyMessage="No grievances match your search query."
+      [customTemplates]="{
+        viewAction: viewActionTemplate,
+        submittedAt: dateTimeTemplate,
+        attachment: attachmentTemplate
+      }"
+    >
+      <button headerActions appButton size="sm" (click)="openRaiseTicket()">
+        <app-icon name="plus" size="sm" />
+        <span>Raise Ticket</span>
+      </button>
+    </app-list-page>
 
-        <app-table
-          [columns]="grievanceColumns"
-          [data]="filteredGrievances()"
-          [pagination]="true"
-          [pageSize]="10"
-          itemUnit="grievances"
-          emptyMessage="No grievances match your search query."
-          [customTemplates]="{
-            viewAction: viewActionTemplate,
-            submittedAt: dateTimeTemplate,
-            attachment: attachmentTemplate
-          }"
-        >
-        </app-table>
-
-        <ng-template #dateTimeTemplate let-item>
-          <div class="flex flex-col text-center">
-            <span class="text-slate-800 font-normal whitespace-nowrap">{{ item.submittedAt | date:'dd MMM yyyy' }}</span>
-            <span class="text-slate-500 text-[11px] whitespace-nowrap">{{ item.submittedAt | date:'hh:mm a' }}</span>
-          </div>
-        </ng-template>
-        
-        <ng-template #attachmentTemplate let-item>
-          @if (item.attachment && item.attachment !== 'None') {
-            <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-normal text-sky-600 hover:text-sky-700 hover:underline break-all max-w-37.5 inline-block">
-              {{ item.attachment }}
-            </a>
-          } @else {
-            <span class="text-slate-400">-</span>
-          }
-        </ng-template>
-
-
-        <ng-template #viewActionTemplate let-item>
-          <app-button
-            variant="pdf-view"
-            size="sm"
-            (click)="viewTicket(item)"
-          >
-            View
-          </app-button>
-        </ng-template>
-
+    <ng-template #dateTimeTemplate let-item>
+      <div class="flex flex-col text-center">
+        <span class="text-slate-800 font-normal whitespace-nowrap">{{ item.submittedAt | date:'dd MMM yyyy' }}</span>
+        <span class="text-slate-500 text-[11px] whitespace-nowrap">{{ item.submittedAt | date:'hh:mm a' }}</span>
       </div>
+    </ng-template>
+
+    <ng-template #attachmentTemplate let-item>
+      @if (item.attachment && item.attachment !== 'None') {
+        <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-normal text-sky-600 hover:text-sky-700 hover:underline break-all max-w-37.5 inline-block">
+          {{ item.attachment }}
+        </a>
+      } @else {
+        <span class="text-slate-400">-</span>
+      }
+    </ng-template>
+
+    <ng-template #viewActionTemplate let-item>
+      <button appButton variant="outline" size="sm" (click)="viewTicket(item)">
+        View
+      </button>
+    </ng-template>
 
       <!-- Raise Ticket Modal -->
       <app-action-modal
@@ -118,7 +102,7 @@ export type { Grievance };
                 {{ getWordCount(newTicket.title) }}/100 words
               </span>
             </div>
-            <input type="text" [(ngModel)]="newTicket.title" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all placeholder:text-slate-400" [ngClass]="{'border-rose-300 focus:ring-rose-500/30': isFieldInvalid('title'), 'border-slate-300 focus:ring-sky-500/30': !isFieldInvalid('title')}" placeholder="Enter title" />
+            <input appInput type="text" [(ngModel)]="newTicket.title" class="w-full" [invalid]="isFieldInvalid('title')" placeholder="Enter title" />
           </div>
           <div>
             <div class="flex justify-between items-end mb-1.5">
@@ -127,11 +111,11 @@ export type { Grievance };
                 {{ getWordCount(newTicket.description) }}/500 words
               </span>
             </div>
-            <textarea [(ngModel)]="newTicket.description" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all placeholder:text-slate-400" [ngClass]="{'border-rose-300 focus:ring-rose-500/30': isFieldInvalid('description'), 'border-slate-300 focus:ring-sky-500/30': !isFieldInvalid('description')}" rows="4" placeholder="Enter description"></textarea>
+            <textarea appInput [(ngModel)]="newTicket.description" class="w-full" [invalid]="isFieldInvalid('description')" rows="4" placeholder="Enter description"></textarea>
           </div>
           <div>
             <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Issue Type <span class="text-rose-500">*</span></label>
-            <select [(ngModel)]="newTicket.issueType" class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all text-slate-700" [ngClass]="{'border-rose-300 focus:ring-rose-500/30': isFieldInvalid('issueType'), 'border-slate-300 focus:ring-sky-500/30': !isFieldInvalid('issueType')}">
+            <select appInput [(ngModel)]="newTicket.issueType" class="w-full" [invalid]="isFieldInvalid('issueType')">
               <option value="" disabled selected>Select issue type</option>
               <option value="Enquire">Enquire</option>
               <option value="Technical">Technical</option>
@@ -146,7 +130,7 @@ export type { Grievance };
             <input type="file" accept=".pdf,.png,.jpg,.jpeg,.txt" (change)="onFileSelected($event)" class="w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[13px] file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 cursor-pointer" />
             @if (attachmentError()) {
               <p class="text-rose-500 text-[11px] font-medium mt-1.5 flex items-center gap-1">
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <app-icon name="alert-triangle" size="sm" [stroke]="2" />
                 {{ attachmentError() }}
               </p>
             }
@@ -200,7 +184,7 @@ export type { Grievance };
               <div>
                 <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Attachment</label>
                 <a href="#" (click)="openPreview(selectedTicket()!); $event.preventDefault();" class="text-[13px] font-medium text-sky-600 hover:text-sky-700 hover:underline flex items-center gap-1.5 w-fit break-all">
-                  <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                  <app-icon name="paperclip" [stroke]="2" class="shrink-0" />
                   {{ selectedTicket()!.attachment }}
                 </a>
               </div>
@@ -217,8 +201,6 @@ export type { Grievance };
           </div>
         }
       </app-action-modal>
-
-    </div>
   `
 })
 export class GrievanceListComponent {
@@ -347,13 +329,14 @@ export class GrievanceListComponent {
     return false;
   }
 
-  onFileSelected(event: any) {
+  onFileSelected(event: Event) {
     this.attachmentError.set('');
-    const file = event.target.files[0];
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
         this.attachmentError.set('File size exceeds the 5MB limit.');
-        event.target.value = ''; // Reset input
+        input.value = ''; // Reset input
         this.newTicket.attachment = '';
         this.newTicket.attachmentUrl = null;
         return;

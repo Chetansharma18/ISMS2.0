@@ -9,21 +9,26 @@ import { AspirantRecord, AspirantTrainingStatus } from '../models/aspirant.model
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { TableComponent } from '../../../shared/components/table/table.component';
 import { TableColumn } from '../../../shared/components/table/table.types';
+import { ButtonComponent, FilterTabsComponent, IconComponent, InputDirective, PageShellComponent } from '../../../shared';
 
 @Component({
   selector: 'app-aspirant-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FilterTabsComponent,
     CommonModule,
     RouterModule,
     FormsModule,
     PageHeaderComponent,
-    TableComponent
+    TableComponent,
+    ButtonComponent,
+    IconComponent,
+    InputDirective,
+    PageShellComponent
   ],
   template: `
-    <div class="w-full min-h-full bg-white text-slate-800 font-sans selection:bg-primary selection:text-white" style="font-family: 'Inter', sans-serif;">
-      <div class="p-4 sm:p-6 space-y-4 font-sans">
+    <app-page-shell>
 
         <!-- Page Header -->
         <app-page-header
@@ -36,14 +41,14 @@ import { TableColumn } from '../../../shared/components/table/table.types';
           <div class="flex items-center gap-2">
             <!-- Export CSV Button -->
             <button
+              appButton
+              size="sm"
+              variant="outline"
               type="button"
               (click)="exportToCsv()"
-              class="inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer select-none"
               title="Export roster to CSV"
             >
-              <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
+              <app-icon name="download" size="sm" />
               <span>Export CSV</span>
             </button>
           </div>
@@ -56,7 +61,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
               <span class="font-bold text-emerald-700">Success:</span>
               <span>{{ successMessage() }}</span>
             </div>
-            <button (click)="successMessage.set('')" class="text-emerald-600 hover:text-emerald-900 cursor-pointer font-bold">✕</button>
+            <button appButton variant="ghost" size="sm" iconOnly aria-label="Dismiss" (click)="successMessage.set('')"><app-icon name="close" size="xs" /></button>
           </div>
         }
 
@@ -72,9 +77,11 @@ import { TableColumn } from '../../../shared/components/table/table.types';
                 Filter by SDC Center:
               </label>
               <select
+                appInput
+                size="sm"
                 [ngModel]="selectedSdc()"
                 (ngModelChange)="selectedSdc.set($event)"
-                class="w-full h-8 px-2 text-xs bg-white border border-slate-300 rounded-[4px] text-slate-800 focus:outline-none focus:border-primary"
+                class="w-full"
               >
                 <option value="All">All SDC Centers ({{ allSdcOptions.length - 1 }})</option>
                 @for (opt of allSdcOptions.slice(1); track opt.code) {
@@ -89,9 +96,11 @@ import { TableColumn } from '../../../shared/components/table/table.types';
                 Filter by Scheme:
               </label>
               <select
+                appInput
+                size="sm"
                 [ngModel]="selectedScheme()"
                 (ngModelChange)="selectedScheme.set($event)"
-                class="w-full h-8 px-2 text-xs bg-white border border-slate-300 rounded-[4px] text-slate-800 focus:outline-none focus:border-primary"
+                class="w-full"
               >
                 <option value="All">All Schemes ({{ allSchemeOptions.length - 1 }})</option>
                 @for (sc of allSchemeOptions.slice(1); track sc) {
@@ -106,9 +115,11 @@ import { TableColumn } from '../../../shared/components/table/table.types';
                 Filter by Batch:
               </label>
               <select
+                appInput
+                size="sm"
                 [ngModel]="selectedBatch()"
                 (ngModelChange)="selectedBatch.set($event)"
-                class="w-full h-8 px-2 text-xs bg-white border border-slate-300 rounded-[4px] text-slate-800 focus:outline-none focus:border-primary"
+                class="w-full"
               >
                 <option value="All">All Batches ({{ allBatchOptions.length - 1 }})</option>
                 @for (b of allBatchOptions.slice(1); track b.code) {
@@ -123,9 +134,11 @@ import { TableColumn } from '../../../shared/components/table/table.types';
                 Training Status:
               </label>
               <select
+                appInput
+                size="sm"
                 [ngModel]="selectedStatus()"
                 (ngModelChange)="selectedStatus.set($event)"
-                class="w-full h-8 px-2 text-xs bg-white border border-slate-300 rounded-[4px] text-slate-800 focus:outline-none focus:border-primary"
+                class="w-full"
               >
                 <option value="All">All Statuses</option>
                 <option value="ENROLLED">Enrolled</option>
@@ -141,34 +154,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
           <div class="flex items-center justify-between gap-3 pt-2 border-t border-slate-200">
             
             <!-- Quick Category/Filter Pills -->
-            <div class="flex items-center gap-1.5 flex-wrap">
-              @for (f of quickFilterTabs(); track f.id) {
-                <button
-                  type="button"
-                  (click)="setQuickTab(f.id)"
-                  class="px-2.5 py-1 rounded-[4px] text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-                  [class.bg-primary]="activeQuickTab() === f.id"
-                  [class.text-white]="activeQuickTab() === f.id"
-                  [class.border-primary]="activeQuickTab() === f.id"
-                  [class.bg-white]="activeQuickTab() !== f.id"
-                  [class.text-[#5F6B76]]="activeQuickTab() !== f.id"
-                  [class.border-border]="activeQuickTab() !== f.id"
-                  [class.hover:bg-primary-light]="activeQuickTab() !== f.id"
-                  [class.hover:text-brand]="activeQuickTab() !== f.id"
-                >
-                  <span>{{ f.label }}</span>
-                  <span
-                    class="px-1.5 py-0.2 rounded-full text-[10px]"
-                    [class.bg-white/20]="activeQuickTab() === f.id"
-                    [class.text-white]="activeQuickTab() === f.id"
-                    [class.bg-surface-muted]="activeQuickTab() !== f.id"
-                    [class.text-[#5F6B76]]="activeQuickTab() !== f.id"
-                  >
-                    {{ f.count }}
-                  </span>
-                </button>
-              }
-            </div>
+            <app-filter-tabs [options]="quickFilterTabs()" [value]="activeQuickTab()" (valueChange)="setQuickTab($event)" />
 
           </div>
 
@@ -227,9 +213,7 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         <ng-template #identityTemplate let-a>
           <div class="text-[13px] space-y-0.5">
             <div class="flex items-center gap-1 font-mono text-slate-800 font-normal">
-              <svg class="w-3.5 h-3.5 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-              </svg>
+              <app-icon name="identification" size="sm" [stroke]="2" class="text-blue-600 shrink-0" />
               <span>{{ a.aadhaarMasked }}</span>
             </div>
             <div class="text-slate-600 text-[11px] flex items-center gap-1">
@@ -306,25 +290,20 @@ import { TableColumn } from '../../../shared/components/table/table.types';
         <ng-template #actionsTemplate let-a>
           <div class="flex items-center justify-end gap-1.5 whitespace-nowrap">
             <button
+              appButton
+              size="sm"
+              class="shrink-0"
               type="button"
               (click)="viewDetails(a)"
-              class="whitespace-nowrap inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-primary hover:bg-primary-dark text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
-              style="color: #ffffff !important; background-color: #174A6E !important;"
               title="View & Edit Aspirant Details"
             >
-              <svg class="w-3.5 h-3.5 text-white" style="color: #ffffff !important; stroke: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              <span style="color: #ffffff !important;">View Details</span>
+              <app-icon name="eye" size="sm" />
+              <span>View Details</span>
             </button>
           </div>
         </ng-template>
 
-      </div>
-
-
-    </div>
+    </app-page-shell>
   `
 })
 export class AspirantListComponent {

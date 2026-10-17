@@ -13,7 +13,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TendersModalComponent } from '../tenders-modal/tenders-modal.component';
 import { AuthService } from '../../../../core/auth/auth.service';
-import { ActionModalComponent } from '../../../../shared/components/action-modal/action-modal.component';
+import { ActionModalComponent, ButtonComponent, IconComponent } from '../../../../shared';
 
 interface TenderItem {
   date: string;
@@ -28,7 +28,7 @@ interface TenderItem {
   selector: 'app-hero-tenders',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, TendersModalComponent, ActionModalComponent],
+  imports: [CommonModule, RouterModule, TendersModalComponent, ActionModalComponent, ButtonComponent, IconComponent],
   template: `
     <!-- Right Column Panel: 540–600px desktop width, 410–430px height, clean official government card -->
     <div class="w-full max-w-135 lg:max-w-145 xl:max-w-150 mx-auto lg:ml-auto">
@@ -44,14 +44,14 @@ interface TenderItem {
           
           <!-- View All Action -->
           <button 
+            appButton
+            variant="outline"
+            size="sm"
             type="button"
             (click)="openModal()" 
-            class="inline-flex items-center gap-1.5 text-[12px] font-semibold text-[#12365A] hover:text-[#F28C28] bg-[#F5F8FC] hover:bg-primary-light border border-[#DCE4ED] px-3.5 py-1.5 rounded-full transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F28C28]"
             aria-label="View all tenders in modal">
             <span>View All</span>
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
-            </svg>
+            <app-icon name="chevron-right" size="sm" />
           </button>
         </div>
 
@@ -162,7 +162,7 @@ export class HeroTendersComponent implements AfterViewInit, OnDestroy {
 
   private animationFrameId?: number;
   private isInteracting = false;
-  private resumeTimeout?: any;
+  private resumeTimeout?: ReturnType<typeof setTimeout>;
   private isSectionVisible = true;
   private observer?: IntersectionObserver;
   private visibilityHandler?: () => void;

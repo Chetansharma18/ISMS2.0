@@ -14,6 +14,7 @@ import { SanctionCopyListComponent } from './components/sanction-copy-list.compo
 import { EsignModalComponent } from './components/esign-modal.component';
 import { SanctionPdfService } from './sanction-pdf.service';
 import type { SanctionOrderDocumentData } from '../../services/eoi-state.models';
+import { ButtonComponent, DocumentPageComponent } from '../../../../shared';
 import { SanctionTableRow } from './eoi-sanction-editor.model';
 import {
   AVAILABLE_DISTRICTS,
@@ -32,6 +33,8 @@ export type { SanctionTableRow } from './eoi-sanction-editor.model';
   selector: 'app-eoi-sanction-editor',
   standalone: true,
   imports: [
+    DocumentPageComponent,
+    ButtonComponent,
     LetterheadComponent,
     FileNoDateRowComponent,
     ClauseListComponent,
@@ -42,42 +45,13 @@ export type { SanctionTableRow } from './eoi-sanction-editor.model';
     EsignModalComponent
   ],
   template: `
-    <div class="w-full min-h-screen bg-slate-50 text-[#1F2933] font-sans py-6 px-3 sm:px-6 lg:px-8 print:bg-white print:p-0">
-
-      <!-- Success Notification Toast -->
-      @if (toastMessage()) {
-        <div class="fixed top-5 right-5 z-50 px-4 py-3 bg-navy text-white rounded-lg shadow-xl text-xs sm:text-sm font-semibold animate-in fade-in duration-200" role="status">
-          {{ toastMessage() }}
-        </div>
-      }
-
-      <!-- Responsive Document Wrapper fitting full screen without excessive side margins -->
-      <div class="w-full max-w-6xl mx-auto space-y-4">
-
-        <!-- Page header: this is a draft until it is released -->
-        <div class="font-sans print:hidden space-y-3">
-          <button
-            type="button"
-            (click)="goBack()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
-          >
-            <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            <span>Back</span>
-          </button>
-
-          <div class="flex items-center gap-3 flex-wrap">
-            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">Draft Sanction Order</h1>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">Draft</span>
-          </div>
-          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
-            Review and edit the sanction order below, then release it.
-          </p>
-        </div>
-
-        <!-- EDITABLE SANCTION ORDER DOCUMENT / PDF INTERFACE -->
-        <div class="sanction-pdf-container w-full bg-white p-6 sm:p-10 lg:p-12 print:p-0 text-[#111827] font-serif leading-relaxed text-xs sm:text-sm border border-slate-300 shadow-sm rounded-lg print:border-none print:shadow-none">
+    <app-document-page
+      title="Draft Sanction Order"
+      badge="Draft"
+      subtitle="Review and edit the sanction order below, then release it."
+      [toast]="toastMessage()"
+      (back)="goBack()"
+    >
 
           <!-- Header with Official Logos: Left (RSLDC) & Right (Bharat Sarkar) -->
           <app-letterhead
@@ -130,34 +104,17 @@ export type { SanctionTableRow } from './eoi-sanction-editor.model';
           <!-- COPY TO DISTRIBUTION LIST (Editable) -->
           <app-sanction-copy-list [copyToList]="copyToList" />
 
-        </div>
-
-        <!-- Bottom action bar -->
-        <div class="flex items-center justify-end gap-2.5 font-sans print:hidden pt-2">
-          <button
-            type="button"
-            (click)="saveDraft()"
-            class="px-6 py-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-sm font-semibold shadow-sm transition-colors cursor-pointer active:scale-95"
-          >
-            Save
-          </button>
-          <button
-            type="button"
-            (click)="showEsign.set(true)"
-            class="px-6 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-sm transition-colors cursor-pointer active:scale-95"
-            style="color: #ffffff !important;"
-          >
-            <span style="color: #ffffff !important;">E-Sign</span>
-          </button>
-        </div>
-
-      </div>
+      <ng-container actions>
+        <button appButton variant="outline" size="lg" (click)="saveDraft()">Save</button>
+        <button appButton size="lg" (click)="showEsign.set(true)">E-Sign</button>
+      </ng-container>
 
       @if (showEsign()) {
-        <app-esign-modal (signed)="onSigned()" (close)="showEsign.set(false)" />
+        <div overlay>
+          <app-esign-modal (signed)="onSigned()" (close)="showEsign.set(false)" />
+        </div>
       }
-
-    </div>
+    </app-document-page>
   `
 })
 export class EoiSanctionEditorComponent implements OnInit {

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { NgClass } from '@angular/common';
+import { TableColumn, TableComponent } from '../../../../../shared';
 import type { PastEngagement } from '../../../services/eoi-state.models';
 
 /** Share of `part` in `whole`, rounded to a whole percent (0 when there is no whole). */
@@ -14,7 +15,7 @@ function percent(part: number, whole: number): number {
 @Component({
   selector: 'app-scrutiny-past-performance',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, TableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
@@ -53,46 +54,29 @@ function percent(part: number, whole: number): number {
           </div>
         </div>
 
-        <div class="overflow-x-auto border border-slate-200 rounded-lg">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-slate-50/90 text-slate-600 text-[11.5px] font-semibold border-b border-slate-200">
-              <tr>
-                <th class="px-4 py-2.5 w-10 text-center">#</th>
-                <th class="px-4 py-2.5">Scheme</th>
-                <th class="px-4 py-2.5 whitespace-nowrap">Year</th>
-                <th class="px-4 py-2.5 text-right">Target</th>
-                <th class="px-4 py-2.5 text-right">Trained</th>
-                <th class="px-4 py-2.5 text-right">Certified</th>
-                <th class="px-4 py-2.5 text-right">Placed</th>
-                <th class="px-4 py-2.5 text-right whitespace-nowrap">Achievement</th>
-              </tr>
-            </thead>
-            <tbody class="text-slate-700">
-              @for (row of engagements(); track row.eoiRefNo; let i = $index) {
-                <tr class="border-t border-slate-100 hover:bg-slate-50/50">
-                  <td class="px-4 py-2.5 text-center font-semibold text-slate-400">{{ i + 1 }}</td>
-                  <td class="px-4 py-2.5">
-                    <span class="block font-medium text-slate-900 text-[12.5px]">{{ row.schemeName }}</span>
-                    <span class="block text-[11px] text-slate-500 font-mono">{{ row.eoiRefNo }}</span>
-                  </td>
-                  <td class="px-4 py-2.5 whitespace-nowrap">
-                    {{ row.financialYear }}
-                    @if (row.status === 'Ongoing') {
-                      <span class="ml-1 px-1.5 py-0.5 rounded-full border border-amber-300 bg-amber-50 text-amber-800 text-[10px] font-semibold">Ongoing</span>
-                    }
-                  </td>
-                  <td class="px-4 py-2.5 text-right">{{ row.target }}</td>
-                  <td class="px-4 py-2.5 text-right">{{ row.trained }}</td>
-                  <td class="px-4 py-2.5 text-right">{{ row.certified }}</td>
-                  <td class="px-4 py-2.5 text-right">{{ row.placed }}</td>
-                  <td class="px-4 py-2.5 text-right font-semibold whitespace-nowrap" [ngClass]="tone(achievement(row))">
-                    {{ achievement(row) }}%
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+        <app-table
+          [columns]="columns"
+          [data]="engagements()"
+          [customTemplates]="{ scheme: schemeTemplate, year: yearTemplate, achievement: achievementTemplate }"
+        >
+        </app-table>
+
+        <ng-template #schemeTemplate let-row>
+          <span class="block font-medium text-slate-900 text-[12.5px]">{{ row.schemeName }}</span>
+          <span class="block text-[11px] text-slate-500 font-mono">{{ row.eoiRefNo }}</span>
+        </ng-template>
+
+        <ng-template #yearTemplate let-row>
+          {{ row.financialYear }}
+          @if (row.status === 'Ongoing') {
+            <span class="ml-1 px-1.5 py-0.5 rounded-full border border-amber-300 bg-amber-50 text-amber-800 text-[10px] font-semibold">Ongoing</span>
+          }
+        </ng-template>
+
+        <ng-template #achievementTemplate let-row>
+          <span class="font-semibold" [ngClass]="tone(achievement(row))">{{ achievement(row) }}%</span>
+        </ng-template>
+
         <p class="m-0 text-[11px] text-slate-500">
           Achievement is the share of the target that was trained. Placement is measured against the number trained.
         </p>
@@ -102,6 +86,17 @@ function percent(part: number, whole: number): number {
 })
 export class ScrutinyPastPerformanceComponent {
   readonly engagements = input<PastEngagement[]>([]);
+
+  protected readonly columns: TableColumn<PastEngagement>[] = [
+    { key: '$index', label: '#', type: 'number', align: 'center', width: 'w-10' },
+    { key: 'scheme', label: 'Scheme', type: 'custom' },
+    { key: 'year', label: 'Year', type: 'custom', cellClass: 'whitespace-nowrap' },
+    { key: 'target', label: 'Target', align: 'right' },
+    { key: 'trained', label: 'Trained', align: 'right' },
+    { key: 'certified', label: 'Certified', align: 'right' },
+    { key: 'placed', label: 'Placed', align: 'right' },
+    { key: 'achievement', label: 'Achievement', type: 'custom', align: 'right', cellClass: 'whitespace-nowrap' }
+  ];
 
   protected readonly totals = computed(() => {
     const rows = this.engagements();

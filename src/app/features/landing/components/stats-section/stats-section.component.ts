@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { IconComponent } from '../../../../shared';
 
 interface StatMetric {
   count: string;
@@ -14,7 +15,7 @@ interface StatMetric {
   selector: 'app-stats-section',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   host: {
     class: 'block w-full'
   },
@@ -45,9 +46,7 @@ interface StatMetric {
                     Live Record
                   </span>
                   <div class="w-8 h-8 rounded-lg {{ stat.iconBg }} {{ stat.iconColor }} flex items-center justify-center">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
+                    <app-icon name="trending-up" [stroke]="2" />
                   </div>
                 </div>
 

@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, input, model, output } from '@angular/core';
 import { PsdPaymentOptionsComponent } from './psd-payment-options.component';
 import { PsdPaymentReceiptComponent } from './psd-payment-receipt.component';
+import { ButtonComponent, IconComponent } from '../../../../shared';
 
 @Component({
   selector: 'app-psd-payment-panel',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PsdPaymentOptionsComponent, PsdPaymentReceiptComponent],
+  imports: [PsdPaymentOptionsComponent, PsdPaymentReceiptComponent, ButtonComponent, IconComponent],
   host: { class: 'block' },
   template: `
     <div class="space-y-6 animate-in fade-in duration-200">
@@ -24,15 +25,15 @@ import { PsdPaymentReceiptComponent } from './psd-payment-receipt.component';
         <div class="flex items-center gap-2">
           @if (isPaymentCompleted()) {
             <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-brand text-xs font-bold border border-blue-200">
-              <svg class="w-3.5 h-3.5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-              </svg>
+              <app-icon name="check" size="sm" [stroke]="2.5" class="text-brand" />
               <span>Fee Verified: ₹500.00 Paid</span>
             </div>
             <button
+              appButton
+              variant="ghost"
+              size="sm"
               type="button"
               (click)="viewPaymentOptions.emit()"
-              class="text-[11px] text-slate-500 hover:text-slate-800 underline cursor-pointer"
             >
               View Payment Options
             </button>

@@ -1,6 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { AspirantFormData, AspirantDocumentItem } from '../../config/aspirant-form.config';
 import { AspirantDocumentUploadRowComponent } from './aspirant-document-upload-row.component';
+import { ButtonComponent, IconComponent } from '../../../../shared';
 
 /** Event payload emitted when a file is chosen for one of the listed documents. */
 export interface AspirantDocumentSelection {
@@ -17,7 +18,7 @@ export interface AspirantDocumentSelection {
   selector: 'app-aspirant-photo-documents-step',
   standalone: true,
   host: { class: 'block' },
-  imports: [AspirantDocumentUploadRowComponent],
+  imports: [AspirantDocumentUploadRowComponent, ButtonComponent, IconComponent],
   template: `
     <div class="space-y-5 animate-in fade-in duration-150">
 
@@ -52,9 +53,7 @@ export interface AspirantDocumentSelection {
                 Double Click
               </div>
             } @else {
-              <svg class="w-8 h-8 text-slate-400 group-hover:text-blue-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
+              <app-icon name="user" size="2xl" [stroke]="1.5" class="text-slate-400 group-hover:text-blue-600 transition-colors" />
               <span class="text-[9px] text-slate-400 text-center font-semibold mt-1 px-1">
                 Double click to upload
               </span>
@@ -71,16 +70,12 @@ export interface AspirantDocumentSelection {
               </p>
               @if (formData().candidatePhotoUrl) {
                 <div class="text-[11px] font-semibold text-emerald-700 pt-0.5 flex items-center gap-1.5 justify-center sm:justify-start">
-                  <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <app-icon name="check" size="sm" [stroke]="2.5" class="text-emerald-600 shrink-0" />
                   <span>Uploaded • {{ formData().candidatePhotoName || 'Candidate_Photo.jpg' }}</span>
                 </div>
               } @else if (photoError()) {
                 <div class="form-error-text text-rose-600 font-medium flex items-center gap-1 pt-1 justify-center sm:justify-start leading-tight" style="font-size: 11px !important;">
-                  <svg class="shrink-0 text-rose-600" style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                  </svg>
+                  <app-icon name="error-circle" size="xs" solid class="text-rose-600" />
                   <span>{{ photoError() }}</span>
                 </div>
               }
@@ -90,27 +85,24 @@ export interface AspirantDocumentSelection {
               @if (formData().candidatePhotoUrl) {
                 <!-- View Option (only when photo is uploaded) -->
                 <button
+                  appButton
+                  variant="outline"
                   type="button"
                   (click)="viewPhoto.emit()"
-                  class="px-3.5 py-2 bg-white hover:bg-slate-50 text-brand border border-slate-300 rounded-lg font-semibold text-xs shadow-2xs transition-all cursor-pointer inline-flex items-center gap-1.5 active:scale-95"
                   title="View candidate photograph"
                 >
-                  <svg class="w-3.5 h-3.5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
+                  <app-icon name="eye" size="sm" />
                   <span>View</span>
                 </button>
               }
 
               <button
+                appButton
+                variant="outline"
                 type="button"
                 (click)="photoInput.click()"
-                class="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 active:scale-95 text-slate-800 rounded-lg font-semibold text-xs transition-all shadow-2xs cursor-pointer inline-flex items-center gap-1.5"
               >
-                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
+                <app-icon name="upload" size="sm" />
                 <span>{{ formData().candidatePhotoUrl ? 'Change Image' : 'Choose Image' }}</span>
               </button>
               <input

@@ -7,6 +7,9 @@ import { DataEngineService } from '../../core/services/data-engine.service';
 import {
   PageHeaderComponent,
   TableComponent,
+  ButtonComponent,
+  IconComponent,
+  PageShellComponent,
   TableColumn
 } from '../../shared';
 import { DistrictBlockMasterItem, UserRoleMasterItem, SchemeMasterItem, DesignationMasterItem } from '../../core/models/admin-masters.model';
@@ -48,6 +51,9 @@ export type { UserManagementItem };
     FormsModule,
     PageHeaderComponent,
     TableComponent,
+    ButtonComponent,
+    IconComponent,
+    PageShellComponent,
     RoleFilterBarComponent,
     BlacklistSearchPanelComponent,
     SchemeStatusBadgeComponent,
@@ -57,7 +63,7 @@ export type { UserManagementItem };
     UserConfirmModalComponent
   ],
   template: `
-    <div class="w-full min-h-screen bg-white text-slate-800 font-sans p-4 sm:p-6 lg:p-8 space-y-6">
+    <app-page-shell>
       
       <!-- Page Header -->
       <app-page-header
@@ -70,13 +76,13 @@ export type { UserManagementItem };
         <!-- Add User Button -->
         @if (selectedRoleFilter() !== 'blacklisted') {
           <button
+            appButton
+            size="sm"
             type="button"
             (click)="openAddModal()"
-            class="px-3.5 py-1.5 bg-primary hover:bg-navy text-white text-xs font-semibold rounded-lg shadow-xs transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+            class="shrink-0"
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
+            <app-icon name="plus" size="sm" />
             <span>Add User</span>
           </button>
         }
@@ -168,7 +174,7 @@ export type { UserManagementItem };
         (dismissed)="closeConfirmModal()"
       />
 
-    </div>
+    </app-page-shell>
   `
 })
 export class UserManagementComponent {

@@ -123,7 +123,7 @@ export class SdcService {
       id: newId,
       sdcCode: generatedCode,
       sdcName: s1.sdcName || formData.sdcName || 'Rajasthan Skill Development Center',
-      scheme: (s1.scheme || formData.scheme || 'SAMARTH') as any,
+      scheme: (s1.scheme || formData.scheme || 'SAMARTH') as SdcRecord['scheme'],
       schemeCategory: raw.schemeCategory || s1.schemeCategory || (raw.scheme === 'SAMARTH' ? 'SAMARTH' : 'RAJKVIK'),
       sector: formData.sector || s1.sector || 'Aerospace and Aviation',
       tpName: s1.tpName || formData.tpName || 'SkillMasters Rajasthan Pvt Ltd',

@@ -6,12 +6,28 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../auth/auth.service';
 import { PermissionService } from '../../permissions/permission.service';
 import { AspirantPortalService } from '../../../features/aspirant/services/aspirant-portal.service';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
+import {
+  ADMIN_TOOL_NAV,
+  ASPIRANT_NAV,
+  DEFAULT_MATCH,
+  DEPT_ADMIN_NAV,
+  EOI_CONFIGURATION_NAV,
+  EXACT_MATCH,
+  EXISTING_USER_NAV,
+  MASTER_ICON,
+  MASTER_NAV,
+  NEW_USER_NAV,
+  USER_MANAGEMENT_ICON,
+  USER_MANAGEMENT_NAV
+} from './sidebar-nav.config';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ButtonComponent, IconComponent],
   host: {
     class: 'block shrink-0 h-full'
   },
@@ -32,821 +48,134 @@ import { AspirantPortalService } from '../../../features/aspirant/services/aspir
             <span class="text-[11px] text-slate-500 font-medium">Menu</span>
           </div>
           <button
-            type="button"
+            appButton
+            variant="ghost"
+            size="sm"
+            iconOnly
             (click)="closeMobileNav.emit()"
-            class="w-7 h-7 flex items-center justify-center rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition-colors cursor-pointer"
             aria-label="Close navigation menu"
             title="Close menu"
           >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <app-icon name="close" />
           </button>
         </div>
 
         <!-- Navigation Links -->
         <nav class="flex flex-col gap-1 px-2.5 py-3" aria-label="Main Navigation">
-
-          <!-- ================================================================
-               ROLE: ASPIRANT
-               ================================================================ -->
           @if (isAspirant()) {
-            <!-- 1. Training Calendar -->
-            <a
-              routerLink="/training-calendar"
-              [class.bg-primary-light]="isActive('training-calendar')"
-              [class.text-brand]="isActive('training-calendar')"
-              [class.font-medium]="isActive('training-calendar')"
-              [class.border]="isActive('training-calendar')"
-              [class.border-border]="isActive('training-calendar')"
-              [class.text-text-secondary]="!isActive('training-calendar')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('training-calendar')"
-                [class.text-text-muted]="!isActive('training-calendar')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <span class="tracking-tight">Training Calendar</span>
-            </a>
-
-            <!-- 2. Expressed Interest -->
-            <a
-              routerLink="/expressed-interest"
-              [class.bg-primary-light]="isActive('expressed-interest')"
-              [class.text-brand]="isActive('expressed-interest')"
-              [class.font-medium]="isActive('expressed-interest')"
-              [class.border]="isActive('expressed-interest')"
-              [class.border-border]="isActive('expressed-interest')"
-              [class.text-text-secondary]="!isActive('expressed-interest')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('expressed-interest')"
-                [class.text-text-muted]="!isActive('expressed-interest')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span class="tracking-tight">Expressed Interest</span>
-            </a>
-
-            <!-- 3. Profile -->
-            <a
-              routerLink="/profile"
-              [class.bg-primary-light]="isActive('profile')"
-              [class.text-brand]="isActive('profile')"
-              [class.font-medium]="isActive('profile')"
-              [class.border]="isActive('profile')"
-              [class.border-border]="isActive('profile')"
-              [class.text-text-secondary]="!isActive('profile')"
-              class="flex items-center justify-between px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <div class="flex items-center gap-2.5">
-                <svg
-                  class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                  [class.text-brand]="isActive('profile')"
-                  [class.text-text-muted]="!isActive('profile')"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="1.75"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span class="tracking-tight">Profile</span>
-              </div>
-              @if (isAspirantProfilePending()) {
-                <span class="px-2 py-0.5 rounded-full text-[11px] leading-tight shrink-0 inline-flex items-center gap-1.5 transition-all select-none bg-amber-50 text-[#C2410C] border border-amber-300 font-semibold shadow-2xs">
-                  <span class="w-1.5 h-1.5 rounded-full bg-orange-600 shrink-0 animate-pulse"></span>
-                  Pending
-                </span>
-              }
-            </a>
+            @for (item of aspirantNav; track item.key) {
+              <ng-container *ngTemplateOutlet="navLink; context: { $implicit: item, pending: item.key === 'profile' && isAspirantProfilePending() }" />
+            }
           } @else if (isSuperAdmin()) {
-            <!-- 1. EOI Configuration -->
-            <a
-              routerLink="/admin/eoi-configuration"
-              [class.bg-primary-light]="isActive('admin-eoi-configuration')"
-              [class.text-brand]="isActive('admin-eoi-configuration')"
-              [class.font-medium]="isActive('admin-eoi-configuration')"
-              [class.border]="isActive('admin-eoi-configuration')"
-              [class.border-border]="isActive('admin-eoi-configuration')"
-              [class.text-text-secondary]="!isActive('admin-eoi-configuration')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('admin-eoi-configuration')"
-                [class.text-text-muted]="!isActive('admin-eoi-configuration')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
+            <ng-container *ngTemplateOutlet="navLink; context: { $implicit: eoiConfigurationNav }" />
+
+            @for (item of adminToolNav; track item.link) {
+              <a
+                [routerLink]="item.link"
+                routerLinkActive="bg-primary-light text-brand font-medium border border-border"
+                [routerLinkActiveOptions]="defaultMatch"
+                class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 text-text-secondary hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
               >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span class="tracking-tight">EOI Configuration</span>
-            </a>
+                <app-icon [name]="item.icon" class="text-text-muted group-hover:text-brand transition-colors" />
+                <span class="tracking-tight">{{ item.label }}</span>
+              </a>
+            }
 
-            <!-- Two step verification -->
-            <a
-              routerLink="/admin/two-step-verification"
-              routerLinkActive="bg-primary-light text-brand font-medium border border-border"
-              [routerLinkActiveOptions]="{ exact: false }"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 text-text-secondary hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg class="w-4 h-4 shrink-0 text-text-muted group-hover:text-brand transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-              <span class="tracking-tight">Two step verification</span>
-            </a>
-
-            <!-- Dynamic Form Builder -->
-            <a
-              routerLink="/admin/dynamic-form-builder"
-              routerLinkActive="bg-primary-light text-brand font-medium border border-border"
-              [routerLinkActiveOptions]="{ exact: false }"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 text-text-secondary hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg class="w-4 h-4 shrink-0 text-text-muted group-hover:text-brand transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-              </svg>
-              <span class="tracking-tight">Dynamic Form Builder</span>
-            </a>
-
-            <!-- 2. Master Dropdown Slider Section -->
-            <div class="flex flex-col">
-              <!-- Master Header Toggle -->
-              <button
-                type="button"
-                (click)="toggleMaster()"
-                class="flex items-center justify-between w-full px-3 py-2 rounded-sm text-[13px] leading-5 text-text-secondary hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-              >
-                <div class="flex items-center gap-2.5">
-                  <svg class="w-4 h-4 shrink-0 text-text-muted group-hover:text-brand transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                  </svg>
-                  <span class="tracking-tight font-medium">Master</span>
-                </div>
-                <svg
-                  class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand transition-transform duration-200"
-                  [ngClass]="{'transform rotate-180': isMasterOpen()}"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              <!-- Dropdown Slider Sub-items -->
-              @if (isMasterOpen()) {
-                <div class="flex flex-col gap-0.5 pl-7 pr-1 pt-1 pb-1 transition-all duration-300">
-                  <a
-                    routerLink="/admin/master/eoi-category"
-                    routerLinkActive="bg-primary-light text-brand font-semibold"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">EOI Category Master</span>
-                  </a>
-
-                  <a
-                    routerLink="/admin/master/scheme"
-                    routerLinkActive="bg-primary-light text-brand font-semibold"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">Scheme Master</span>
-                  </a>
-
-                  <a
-                    routerLink="/admin/master/scheme-category"
-                    routerLinkActive="bg-primary-light text-brand font-semibold"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">Scheme Category Master</span>
-                  </a>
-
-                  <a
-                    routerLink="/admin/master/sector"
-                    routerLinkActive="bg-primary-light text-brand font-semibold"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">Sector Master</span>
-                  </a>
-
-                  <a
-                    routerLink="/admin/master/course"
-                    routerLinkActive="bg-primary-light text-brand font-semibold"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">Course Master</span>
-                  </a>
-
-                  <a
-                    routerLink="/admin/master/district-block"
-                    routerLinkActive="bg-primary-light text-brand font-semibold"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">District &amp; Block Master</span>
-                  </a>
-
-                  <a
-                    routerLink="/admin/master/designation"
-                    routerLinkActive="bg-primary-light text-brand font-semibold"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">Designation</span>
-                  </a>
-
-                  <a
-                    routerLink="/admin/master/doc"
-                    routerLinkActive="bg-primary-light text-brand font-semibold"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">Doc Master</span>
-                  </a>
-
-                  <a
-                    routerLink="/admin/master/remark"
-                    routerLinkActive="bg-primary-light text-brand font-semibold"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">Remark Master</span>
-                  </a>
-
-                  <a
-                    routerLink="/admin/master/grading"
-                    routerLinkActive="bg-primary-light text-brand font-semibold"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">Grading Master</span>
-                  </a>
-                </div>
-              }
-            </div>
-
-            <!-- 3. User Management Dropdown Slider Section -->
-            <div class="flex flex-col">
-              <!-- User Management Header Toggle -->
-              <button
-                type="button"
-                (click)="toggleUserManagement()"
-                class="flex items-center justify-between w-full px-3 py-2 rounded-[4px] text-[13px] leading-[20px] text-[#5F6B76] hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-              >
-                <div class="flex items-center gap-2.5">
-                  <svg class="w-4 h-4 shrink-0 text-[#7A8792] group-hover:text-brand transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                  <span class="tracking-tight font-medium">User Management</span>
-                </div>
-                <svg
-                  class="w-3.5 h-3.5 text-slate-400 group-hover:text-brand transition-transform duration-200"
-                  [ngClass]="{'transform rotate-180': isUserManagementOpen()}"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              <!-- Dropdown Slider Sub-items -->
-              @if (isUserManagementOpen()) {
-                <div class="flex flex-col gap-0.5 pl-7 pr-1 pt-1 pb-1 transition-all duration-300">
-                  <a
-                    routerLink="/admin/user-management"
-                    [queryParams]="{ filter: 'all' }"
-                    routerLinkActive="bg-primary-light text-brand font-semibold"
-                    [routerLinkActiveOptions]="{ exact: true, queryParams: 'exact', matrixParams: 'ignored', paths: 'exact', fragment: 'ignored' }"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">Users</span>
-                  </a>
-
-                  <a
-                    routerLink="/admin/user-management"
-                    [queryParams]="{ filter: 'blacklisted' }"
-                    routerLinkActive="bg-primary-light text-brand font-semibold"
-                    [routerLinkActiveOptions]="{ exact: true, queryParams: 'exact', matrixParams: 'ignored', paths: 'exact', fragment: 'ignored' }"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">Blacklisted users</span>
-                  </a>
-
-                  <a
-                    routerLink="/admin/master/user-role"
-                    routerLinkActive="bg-primary-light text-brand font-semibold"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">Role Management</span>
-                  </a>
-
-                  <a
-                    routerLink="/admin/master/permission"
-                    routerLinkActive="bg-primary-light text-brand font-semibold"
-                    class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
-                    <span class="truncate">Permission Management</span>
-                  </a>
-                </div>
-              }
-            </div>
+            <ng-container *ngTemplateOutlet="navSection; context: { $implicit: masterSection }" />
+            <ng-container *ngTemplateOutlet="navSection; context: { $implicit: userManagementSection }" />
           } @else if (isDeptAdmin()) {
-            <!-- ================================================================
-                 ROLE: DEPARTMENT ADMIN
-                 ================================================================ -->
-            <!-- 1. EOI Responses -->
-            <a
-              routerLink="/admin/eoi-view"
-              [class.bg-primary-light]="isActive('dept-eoi-view')"
-              [class.text-brand]="isActive('dept-eoi-view')"
-              [class.font-medium]="isActive('dept-eoi-view')"
-              [class.border]="isActive('dept-eoi-view')"
-              [class.border-border]="isActive('dept-eoi-view')"
-              [class.text-text-secondary]="!isActive('dept-eoi-view')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('dept-eoi-view')"
-                [class.text-text-muted]="!isActive('dept-eoi-view')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <span class="tracking-tight font-medium">EOI Responses</span>
-            </a>
-
-            <!-- 2. Sanction Order Section -->
-            <a
-              routerLink="/admin/sanction-orders"
-              [class.bg-primary-light]="isActive('dept-sanction-orders')"
-              [class.text-brand]="isActive('dept-sanction-orders')"
-              [class.font-medium]="isActive('dept-sanction-orders')"
-              [class.border]="isActive('dept-sanction-orders')"
-              [class.border-border]="isActive('dept-sanction-orders')"
-              [class.text-text-secondary]="!isActive('dept-sanction-orders')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('dept-sanction-orders')"
-                [class.text-text-muted]="!isActive('dept-sanction-orders')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <span class="tracking-tight font-medium">Sanction Order</span>
-            </a>
-
-            <!-- IPA -->
-            <a
-              routerLink="/admin/ipa"
-              [class.bg-primary-light]="isActive('dept-ipa')"
-              [class.text-brand]="isActive('dept-ipa')"
-              [class.font-medium]="isActive('dept-ipa')"
-              [class.border]="isActive('dept-ipa')"
-              [class.border-border]="isActive('dept-ipa')"
-              [class.text-text-secondary]="!isActive('dept-ipa')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('dept-ipa')"
-                [class.text-text-muted]="!isActive('dept-ipa')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-              <span class="tracking-tight font-medium">IPA</span>
-            </a>
-
-            <!-- 3. SDC Approvals -->
-            <a
-              routerLink="/sdc"
-              [class.bg-primary-light]="isActive('dept-sdc')"
-              [class.text-brand]="isActive('dept-sdc')"
-              [class.font-medium]="isActive('dept-sdc')"
-              [class.border]="isActive('dept-sdc')"
-              [class.border-border]="isActive('dept-sdc')"
-              [class.text-text-secondary]="!isActive('dept-sdc')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('dept-sdc')"
-                [class.text-text-muted]="!isActive('dept-sdc')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              <span class="tracking-tight">SDC Approvals</span>
-            </a>
-
-            <!-- 4. Batch Approvals -->
-            <a
-              routerLink="/admin/batch-approvals"
-              [class.bg-primary-light]="isActive('dept-batch-approvals')"
-              [class.text-brand]="isActive('dept-batch-approvals')"
-              [class.font-medium]="isActive('dept-batch-approvals')"
-              [class.border]="isActive('dept-batch-approvals')"
-              [class.border-border]="isActive('dept-batch-approvals')"
-              [class.text-text-secondary]="!isActive('dept-batch-approvals')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('dept-batch-approvals')"
-                [class.text-text-muted]="!isActive('dept-batch-approvals')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-              <span class="tracking-tight font-medium">Batch Approvals</span>
-            </a>
-
-            <!-- 5. Grievance Management -->
-            <a
-              routerLink="/admin/grievance"
-              [class.bg-primary-light]="isActive('dept-grievance')"
-              [class.text-brand]="isActive('dept-grievance')"
-              [class.font-medium]="isActive('dept-grievance')"
-              [class.border]="isActive('dept-grievance')"
-              [class.border-border]="isActive('dept-grievance')"
-              [class.text-text-secondary]="!isActive('dept-grievance')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('dept-grievance')"
-                [class.text-text-muted]="!isActive('dept-grievance')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span class="tracking-tight">Grievance Management</span>
-            </a>
-
-            <!-- 6. Camera Monitoring -->
-            <a
-              routerLink="/admin/camera-monitoring"
-              [class.bg-primary-light]="isActive('dept-camera-monitoring')"
-              [class.text-brand]="isActive('dept-camera-monitoring')"
-              [class.font-medium]="isActive('dept-camera-monitoring')"
-              [class.border]="isActive('dept-camera-monitoring')"
-              [class.border-border]="isActive('dept-camera-monitoring')"
-              [class.text-text-secondary]="!isActive('dept-camera-monitoring')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('dept-camera-monitoring')"
-                [class.text-text-muted]="!isActive('dept-camera-monitoring')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              <span class="tracking-tight">Camera Monitoring</span>
-            </a>
+            @for (item of deptAdminNav; track item.key) {
+              <ng-container *ngTemplateOutlet="navLink; context: { $implicit: item }" />
+            }
           } @else if (isExistingUser()) {
-            <!-- ================================================================
-                 ROLE: EXISTING USER
-                 ================================================================ -->
-            <!-- 1. Active Schemes -->
-            <a
-              routerLink="/tenders"
-              [class.bg-primary-light]="isActive('active-schemes')"
-              [class.text-brand]="isActive('active-schemes')"
-              [class.font-medium]="isActive('active-schemes')"
-              [class.border]="isActive('active-schemes')"
-              [class.border-border]="isActive('active-schemes')"
-              [class.text-text-secondary]="!isActive('active-schemes')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('active-schemes')"
-                [class.text-text-muted]="!isActive('active-schemes')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              <span class="tracking-tight">Active Schemes</span>
-            </a>
-
-            <!-- 2. Tender Status -->
-            <a
-              routerLink="/tender-status"
-              [class.bg-primary-light]="isActive('tender-status')"
-              [class.text-brand]="isActive('tender-status')"
-              [class.font-medium]="isActive('tender-status')"
-              [class.border]="isActive('tender-status')"
-              [class.border-border]="isActive('tender-status')"
-              [class.text-text-secondary]="!isActive('tender-status')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('tender-status')"
-                [class.text-text-muted]="!isActive('tender-status')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span class="tracking-tight">Tender Status</span>
-            </a>
-
-            <!-- 3. Sanction Order -->
-            <a
-              routerLink="/tp/sanction-orders"
-              [class.bg-primary-light]="isActive('sanction-order')"
-              [class.text-brand]="isActive('sanction-order')"
-              [class.font-medium]="isActive('sanction-order')"
-              [class.border]="isActive('sanction-order')"
-              [class.border-border]="isActive('sanction-order')"
-              [class.text-text-secondary]="!isActive('sanction-order')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('sanction-order')"
-                [class.text-text-muted]="!isActive('sanction-order')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-              </svg>
-              <span class="tracking-tight">Sanction Order</span>
-            </a>
-
-            <!-- 4. IPA -->
-            <a
-              routerLink="/ipa"
-              [class.bg-primary-light]="isActive('ipa')"
-              [class.text-brand]="isActive('ipa')"
-              [class.font-medium]="isActive('ipa')"
-              [class.border]="isActive('ipa')"
-              [class.border-border]="isActive('ipa')"
-              [class.text-text-secondary]="!isActive('ipa')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('ipa')"
-                [class.text-text-muted]="!isActive('ipa')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <span class="tracking-tight">IPA</span>
-            </a>
-
-            <!-- 5. SDC Management -->
-            <a
-              routerLink="/sdcs"
-              [class.bg-primary-light]="isActive('sdc-management')"
-              [class.text-brand]="isActive('sdc-management')"
-              [class.font-medium]="isActive('sdc-management')"
-              [class.border]="isActive('sdc-management')"
-              [class.border-border]="isActive('sdc-management')"
-              [class.text-text-secondary]="!isActive('sdc-management')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('sdc-management')"
-                [class.text-text-muted]="!isActive('sdc-management')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              <span class="tracking-tight">SDC Management</span>
-            </a>
-
-            <!-- 6. Batch Management -->
-            <a
-              routerLink="/batches"
-              [class.bg-primary-light]="isActive('batch-management')"
-              [class.text-brand]="isActive('batch-management')"
-              [class.font-medium]="isActive('batch-management')"
-              [class.border]="isActive('batch-management')"
-              [class.border-border]="isActive('batch-management')"
-              [class.text-text-secondary]="!isActive('batch-management')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('batch-management')"
-                [class.text-text-muted]="!isActive('batch-management')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-              <span class="tracking-tight">Batch Management</span>
-            </a>
-
-            <!-- 7. Aspirants Management -->
-            <a
-              routerLink="/aspirants"
-              [class.bg-primary-light]="isActive('aspirants-management')"
-              [class.text-brand]="isActive('aspirants-management')"
-              [class.font-medium]="isActive('aspirants-management')"
-              [class.border]="isActive('aspirants-management')"
-              [class.border-border]="isActive('aspirants-management')"
-              [class.text-text-secondary]="!isActive('aspirants-management')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('aspirants-management')"
-                [class.text-text-muted]="!isActive('aspirants-management')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-              </svg>
-              <span class="tracking-tight">Aspirants Management</span>
-            </a>
-
-            <!-- 8. Grievance -->
-            <a
-              routerLink="/grievance"
-              [class.bg-primary-light]="isActive('grievance')"
-              [class.text-brand]="isActive('grievance')"
-              [class.font-medium]="isActive('grievance')"
-              [class.border]="isActive('grievance')"
-              [class.border-border]="isActive('grievance')"
-              [class.text-text-secondary]="!isActive('grievance')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('grievance')"
-                [class.text-text-muted]="!isActive('grievance')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-              <span class="tracking-tight">Grievance</span>
-            </a>
-
-            <!-- 9. Payment History -->
-            <a
-              routerLink="/payment-history"
-              [class.bg-primary-light]="isActive('payment-history')"
-              [class.text-brand]="isActive('payment-history')"
-              [class.font-medium]="isActive('payment-history')"
-              [class.border]="isActive('payment-history')"
-              [class.border-border]="isActive('payment-history')"
-              [class.text-text-secondary]="!isActive('payment-history')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('payment-history')"
-                [class.text-text-muted]="!isActive('payment-history')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-              </svg>
-              <span class="tracking-tight">History</span>
-            </a>
-
-            <!-- 10. Profile -->
-            <a
-              routerLink="/profile"
-              [class.bg-primary-light]="isActive('profile')"
-              [class.text-brand]="isActive('profile')"
-              [class.font-medium]="isActive('profile')"
-              [class.border]="isActive('profile')"
-              [class.border-border]="isActive('profile')"
-              [class.text-text-secondary]="!isActive('profile')"
-              class="flex items-center justify-between px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <div class="flex items-center gap-2.5">
-                <svg
-                  class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                  [class.text-brand]="isActive('profile')"
-                  [class.text-text-muted]="!isActive('profile')"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="1.75"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span class="tracking-tight">Profile</span>
-              </div>
-              @if (isProfilePending()) {
-                <span class="px-2 py-0.5 rounded-full text-[11px] leading-tight shrink-0 inline-flex items-center gap-1.5 transition-all select-none bg-amber-50 text-[#C2410C] border border-amber-300 font-semibold shadow-2xs">
-                  <span class="w-1.5 h-1.5 rounded-full bg-orange-600 shrink-0 animate-pulse"></span>
-                  Pending
-                </span>
-              }
-            </a>
+            @for (item of existingUserNav; track item.key) {
+              <ng-container *ngTemplateOutlet="navLink; context: { $implicit: item, pending: item.key === 'profile' && isProfilePending() }" />
+            }
           } @else {
-            <!-- ================================================================
-                 ROLE: NEW USER / STANDARD
-                 ================================================================ -->
-            <!-- 1. Active Schemes -->
-            <a
-              routerLink="/tenders"
-              [class.bg-primary-light]="isActive('active-schemes')"
-              [class.text-brand]="isActive('active-schemes')"
-              [class.font-medium]="isActive('active-schemes')"
-              [class.border]="isActive('active-schemes')"
-              [class.border-border]="isActive('active-schemes')"
-              [class.text-text-secondary]="!isActive('active-schemes')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('active-schemes')"
-                [class.text-text-muted]="!isActive('active-schemes')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              <span class="tracking-tight">Active Schemes</span>
-            </a>
-
-            <!-- 2. Payment History -->
-            <a
-              routerLink="/payment-history"
-              [class.bg-primary-light]="isActive('payment-history')"
-              [class.text-brand]="isActive('payment-history')"
-              [class.font-medium]="isActive('payment-history')"
-              [class.border]="isActive('payment-history')"
-              [class.border-border]="isActive('payment-history')"
-              [class.text-text-secondary]="!isActive('payment-history')"
-              class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <svg
-                class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                [class.text-brand]="isActive('payment-history')"
-                [class.text-text-muted]="!isActive('payment-history')"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-              </svg>
-              <span class="tracking-tight">Payment History</span>
-            </a>
-
-            <!-- 3. Profile -->
-            <a
-              routerLink="/profile"
-              [class.bg-primary-light]="isActive('profile')"
-              [class.text-brand]="isActive('profile')"
-              [class.font-medium]="isActive('profile')"
-              [class.border]="isActive('profile')"
-              [class.border-border]="isActive('profile')"
-              [class.text-text-secondary]="!isActive('profile')"
-              class="flex items-center justify-between px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
-            >
-              <div class="flex items-center gap-2.5">
-                <svg
-                  class="w-4 h-4 shrink-0 group-hover:text-brand transition-colors"
-                  [class.text-brand]="isActive('profile')"
-                  [class.text-text-muted]="!isActive('profile')"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="1.75"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span class="tracking-tight">Profile</span>
-              </div>
-              @if (isProfilePending()) {
-                <span class="px-2 py-0.5 rounded-full text-[11px] leading-tight shrink-0 inline-flex items-center gap-1.5 transition-all select-none bg-amber-50 text-[#C2410C] border border-amber-300 font-semibold shadow-2xs">
-                  <span class="w-1.5 h-1.5 rounded-full bg-orange-600 shrink-0 animate-pulse"></span>
-                  Pending
-                </span>
-              }
-            </a>
+            @for (item of newUserNav; track item.key) {
+              <ng-container *ngTemplateOutlet="navLink; context: { $implicit: item, pending: item.key === 'profile' && isProfilePending() }" />
+            }
           }
 
         </nav>
       </div>
 
     </aside>
+
+    <!-- One link: icon, label and (for Profile) the "Pending" badge -->
+    <ng-template #navLink let-item let-pending="pending">
+      <a
+        [routerLink]="item.link"
+        [class.bg-primary-light]="isActive(item.key)"
+        [class.text-brand]="isActive(item.key)"
+        [class.font-medium]="isActive(item.key)"
+        [class.border]="isActive(item.key)"
+        [class.border-border]="isActive(item.key)"
+        [class.text-text-secondary]="!isActive(item.key)"
+        class="flex items-center justify-between px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
+      >
+        <div class="flex items-center gap-2.5">
+          <app-icon
+            [name]="item.icon"
+            [stroke]="item.stroke ?? 1.75"
+            class="group-hover:text-brand transition-colors"
+            [class.text-brand]="isActive(item.key)"
+            [class.text-text-muted]="!isActive(item.key)"
+          />
+          <span class="tracking-tight" [class.font-medium]="item.bold">{{ item.label }}</span>
+        </div>
+        @if (pending) {
+          <span class="px-2 py-0.5 rounded-full text-[11px] leading-tight shrink-0 inline-flex items-center gap-1.5 transition-all select-none bg-amber-50 text-[#C2410C] border border-amber-300 font-semibold shadow-2xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange-600 shrink-0 animate-pulse"></span>
+            Pending
+          </span>
+        }
+      </a>
+    </ng-template>
+
+    <!-- A collapsible section (Master, User Management) -->
+    <ng-template #navSection let-section>
+      <div class="flex flex-col">
+        <!-- ui-guard-allow: a section header is a navigation row, not a button -->
+        <button
+          appButton
+          variant="ghost"
+          block
+          type="button"
+          (click)="section.toggle()"
+          class="justify-between h-auto px-3 py-2 rounded-sm text-[13px] leading-5 text-text-secondary hover:bg-surface-muted hover:text-brand group"
+        >
+          <div class="flex items-center gap-2.5">
+            <app-icon [name]="section.icon" class="text-text-muted group-hover:text-brand transition-colors" />
+            <span class="tracking-tight font-medium">{{ section.label }}</span>
+          </div>
+          <app-icon
+            name="chevron-down"
+            size="sm"
+            [stroke]="2"
+            class="text-slate-400 group-hover:text-brand transition-transform duration-200"
+            [ngClass]="{'transform rotate-180': section.open()}"
+          />
+        </button>
+
+        @if (section.open()) {
+          <div class="flex flex-col gap-0.5 pl-7 pr-1 pt-1 pb-1 transition-all duration-300">
+            @for (sub of section.items; track sub.label) {
+              <a
+                [routerLink]="sub.link"
+                [queryParams]="sub.query"
+                routerLinkActive="bg-primary-light text-brand font-semibold"
+                [routerLinkActiveOptions]="sub.query ? exactMatch : defaultMatch"
+                class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                <span class="truncate">{{ sub.label }}</span>
+              </a>
+            }
+          </div>
+        }
+      </div>
+    </ng-template>
   `
 })
 export class SidebarComponent {
@@ -877,6 +206,32 @@ export class SidebarComponent {
 
   readonly isMasterOpen = signal<boolean>(true);
   readonly isUserManagementOpen = signal<boolean>(true);
+
+  // Links of each role come from sidebar-nav.config.ts.
+  protected readonly aspirantNav = ASPIRANT_NAV;
+  protected readonly deptAdminNav = DEPT_ADMIN_NAV;
+  protected readonly existingUserNav = EXISTING_USER_NAV;
+  protected readonly newUserNav = NEW_USER_NAV;
+  protected readonly eoiConfigurationNav = EOI_CONFIGURATION_NAV;
+  protected readonly adminToolNav = ADMIN_TOOL_NAV;
+  protected readonly exactMatch = EXACT_MATCH;
+  protected readonly defaultMatch = DEFAULT_MATCH;
+
+  protected readonly masterSection = {
+    label: 'Master',
+    icon: MASTER_ICON,
+    items: MASTER_NAV,
+    open: this.isMasterOpen,
+    toggle: () => this.toggleMaster()
+  };
+
+  protected readonly userManagementSection = {
+    label: 'User Management',
+    icon: USER_MANAGEMENT_ICON,
+    items: USER_MANAGEMENT_NAV,
+    open: this.isUserManagementOpen,
+    toggle: () => this.toggleUserManagement()
+  };
 
   readonly currentUrl = signal<string>(this.router.url);
 

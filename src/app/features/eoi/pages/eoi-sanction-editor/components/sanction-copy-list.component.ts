@@ -1,11 +1,12 @@
 import { Component, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ButtonComponent, IconComponent, InputDirective } from '../../../../../shared';
 
 /** Copy-to distribution list. Edits the parent-owned list in place (default change detection). */
 @Component({
   selector: 'app-sanction-copy-list',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective],
   host: { class: 'block' },
   template: `
     <div class="mt-6 pt-4 border-t border-slate-300 font-sans text-xs">
@@ -14,27 +15,28 @@ import { FormsModule } from '@angular/forms';
         @for (item of copyToList(); track i; let i = $index) {
           <li class="group flex items-center gap-2">
             <input
+              appInput
+              variant="plain"
               type="text"
               [ngModel]="copyToList()[i]" (ngModelChange)="setCopyTo(i, $event)"
-              class="w-full bg-transparent border-b border-dashed border-slate-200 hover:border-slate-400 focus:border-slate-800 focus:outline-none px-1 text-[11px]"
+              class="w-full"
             />
             <button
-              type="button"
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              class="shrink-0 -my-1.5 print:hidden"
               (click)="removeCopyTo(i)"
-              class="shrink-0 w-5 h-5 rounded text-rose-500 hover:text-rose-700 hover:bg-rose-50 flex items-center justify-center cursor-pointer print:hidden"
               title="Remove row"
               aria-label="Remove row"
             >
-              &times;
+              <app-icon name="close" size="sm" />
             </button>
           </li>
         }
       </ol>
-      <button
-        type="button"
-        (click)="addCopyTo()"
-        class="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded border border-slate-300 bg-white hover:bg-slate-50 text-[11px] font-semibold text-navy cursor-pointer print:hidden"
-      >
+      <button appButton variant="outline" size="sm" class="mt-2 print:hidden" (click)="addCopyTo()">
         + Add Row
       </button>
     </div>

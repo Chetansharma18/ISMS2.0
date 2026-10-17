@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { IconComponent } from '../../../../shared';
 
 @Component({
   selector: 'app-services-section',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   host: {
     class: 'block w-full'
   },
@@ -68,9 +69,7 @@ import { CommonModule } from '@angular/common';
               <!-- Feature 1: For Multiple Stakeholders -->
               <div class="flex items-center gap-3 bg-white/95 border border-[#123B5D]/10 rounded-[10px] px-3.5 py-2.5 shadow-[0_2px_8px_rgba(18,54,90,0.04)]">
                 <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-[#EEF5FB] flex items-center justify-center text-[#12365A] shrink-0">
-                  <svg class="w-5 h-5 text-[#12365A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
+                  <app-icon name="stakeholders" size="lg" [stroke]="1.8" class="text-[#12365A]" />
                 </div>
                 <span class="font-['Inter',sans-serif] text-[14px] sm:text-[14.5px] font-semibold text-[#12365A] leading-snug">
                   For Multiple Stakeholders
@@ -90,9 +89,7 @@ import { CommonModule } from '@angular/common';
               <!-- Feature 3: Secure & Role Based Access -->
               <div class="flex items-center gap-3 bg-white/95 border border-[#123B5D]/10 rounded-[10px] px-3.5 py-2.5 shadow-[0_2px_8px_rgba(18,54,90,0.04)]">
                 <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-[#EEF5FB] flex items-center justify-center text-[#12365A] shrink-0">
-                  <svg class="w-5 h-5 text-[#12365A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                  </svg>
+                  <app-icon name="shield-tick" size="lg" [stroke]="1.8" class="text-[#12365A]" />
                 </div>
                 <span class="font-['Inter',sans-serif] text-[14px] sm:text-[14.5px] font-semibold text-[#12365A] leading-snug">
                   Secure &amp; Role Based Access

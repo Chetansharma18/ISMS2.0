@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ButtonComponent, ModalComponent } from '../../../../shared';
 
 interface PressRelease {
   date: string;
@@ -13,37 +14,15 @@ interface PressRelease {
   selector: 'app-press-releases-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [CommonModule, ModalComponent, ButtonComponent],
   template: `
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm">
-      
-      <!-- Modal Container -->
-      <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl flex flex-col max-h-full overflow-hidden border border-slate-200">
-        
-        <!-- Header -->
-        <div class="bg-navy text-white px-6 py-4 flex items-center justify-between shrink-0">
-          <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-lg bg-orange-600 flex items-center justify-center shrink-0">
-              <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-              </svg>
-            </div>
-            <div>
-              <h3 class="text-lg font-bold leading-tight">Press Releases & Official Statements</h3>
-              <p class="text-[11px] text-blue-200 mt-0.5">Rajasthan Skill and Livelihoods Development Corporation (RSLDC)</p>
-            </div>
-          </div>
-          
-          <button (click)="close.emit()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <!-- Body / Scrollable List -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50">
-          
+    <app-modal
+      title="Press Releases & Official Statements"
+      subtitle="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)"
+      size="lg"
+      (close)="close.emit()"
+    >
+        <div class="space-y-6">
           @for (item of releases; track item.date; let last = $last) {
             <div class="group">
               <div class="flex items-center gap-3 mb-3">
@@ -65,16 +44,11 @@ interface PressRelease {
 
         </div>
 
-        <!-- Footer -->
-        <div class="border-t border-slate-200 bg-white px-6 py-4 flex items-center justify-between shrink-0">
-          <span class="text-xs text-slate-500 font-medium">Source: RSLDC Public Relations & Media</span>
-          <button (click)="close.emit()" class="bg-navy hover:bg-navy-dark text-white px-5 py-2 rounded-md text-sm font-semibold transition-colors">
-            Close
-          </button>
-        </div>
-
-      </div>
-    </div>
+        <ng-container modalFooter>
+          <span class="text-xs text-slate-500 font-medium mr-auto">Source: RSLDC Public Relations & Media</span>
+          <button appButton (click)="close.emit()">Close</button>
+        </ng-container>
+    </app-modal>
   `
 })
 export class PressReleasesModalComponent {

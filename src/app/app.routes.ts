@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { DynamicFormBuilderComponent } from './features/dynamic-form-builder/dynamic-form-builder.component';
 
 export const routes: Routes = [
   {
@@ -257,7 +256,10 @@ export const routes: Routes = [
   },
   {
     path: 'admin/dynamic-form-builder',
-    component: DynamicFormBuilderComponent
+    loadComponent: () =>
+      import('./features/dynamic-form-builder/dynamic-form-builder.component').then(
+        (m) => m.DynamicFormBuilderComponent
+      )
   },
   {
     path: 'dynamic-form-builder',

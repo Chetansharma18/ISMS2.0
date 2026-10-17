@@ -4,7 +4,7 @@ import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FormSdcComponent } from '../../../shared/components/form-sdc';
-import { PageHeaderComponent } from '../../../shared';
+import { PageHeaderComponent, ButtonComponent, IconComponent, PageShellComponent } from '../../../shared';
 import { SdcService } from '../services/sdc.service';
 import { SdcNewRegistrationData, SdcScheme, CenterPhotoItem } from '../models/sdc.model';
 import { getSdcFormFields, RAJASTHAN_LOCATION_DATA } from '../config/sdc-form.config';
@@ -12,10 +12,9 @@ import { getSdcFormFields, RAJASTHAN_LOCATION_DATA } from '../config/sdc-form.co
 @Component({
   selector: 'app-sdc-create',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, FormSdcComponent, PageHeaderComponent],
+  imports: [CommonModule, RouterModule, FormsModule, FormSdcComponent, PageHeaderComponent, ButtonComponent, IconComponent, PageShellComponent],
   template: `
-    <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
-      <div class="p-4 sm:p-5 space-y-4 font-sans">
+    <app-page-shell>
         
         <!-- Standard Panoramic Page Header with Back Button and IPA badge -->
         <app-page-header
@@ -31,13 +30,13 @@ import { getSdcFormFields, RAJASTHAN_LOCATION_DATA } from '../config/sdc-form.co
         >
           <div class="flex items-center gap-2">
             <button
+              appButton
+              variant="outline"
+              size="sm"
               type="button"
               (click)="goBack()"
-              class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 active:scale-95 text-xs font-semibold text-slate-700 shadow-2xs transition-all cursor-pointer"
             >
-              <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <app-icon name="close" size="sm" />
               <span>Cancel</span>
             </button>
           </div>
@@ -47,12 +46,10 @@ import { getSdcFormFields, RAJASTHAN_LOCATION_DATA } from '../config/sdc-form.co
         @if (errorMessage()) {
           <div class="p-3 rounded-lg border border-rose-200 bg-rose-50 text-rose-800 flex items-center justify-between text-xs animate-in fade-in">
             <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
+              <app-icon name="alert-triangle" [stroke]="2" class="text-rose-600 shrink-0" />
               <span>{{ errorMessage() }}</span>
             </div>
-            <button (click)="errorMessage.set('')" class="text-rose-500 hover:text-rose-800 cursor-pointer font-bold">✕</button>
+            <button appButton variant="ghost" size="sm" iconOnly aria-label="Dismiss" (click)="errorMessage.set('')"><app-icon name="close" size="xs" /></button>
           </div>
         }
 
@@ -71,8 +68,7 @@ import { getSdcFormFields, RAJASTHAN_LOCATION_DATA } from '../config/sdc-form.co
           (formSubmit)="submitSdcForm()"
         ></app-form-sdc>
 
-      </div>
-    </div>
+    </app-page-shell>
   `
 })
 export class SdcCreateComponent implements OnInit {

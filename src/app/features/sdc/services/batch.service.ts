@@ -214,7 +214,7 @@ export class BatchService {
   }
 
   /** Record Inspection Result */
-  recordInspectionResult(batchId: string, passed: boolean, remarks: string, score: number = 90, checklist?: any): boolean {
+  recordInspectionResult(batchId: string, passed: boolean, remarks: string, score: number = 90, checklist?: BatchRecord['checklist']): boolean {
     let success = false;
     this._batches.update(list => {
       const updated = list.map(b => {

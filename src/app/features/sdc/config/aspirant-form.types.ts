@@ -98,7 +98,7 @@ export interface AspirantFormData {
   email?: string;
 
   // Step 5: Upload and Consent / Additional Fields
-  candidatePhoto?: any;
+  candidatePhoto?: unknown;
   candidatePhotoUrl?: string;
   candidatePhotoName?: string;
   termsAccepted?: boolean;

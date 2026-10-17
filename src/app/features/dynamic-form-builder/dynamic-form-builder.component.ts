@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { ButtonComponent, IconComponent, InputDirective, PageShellComponent, SwitchComponent } from '../../shared';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { TableComponent } from '../../shared/components/table/table.component';
 import { TableColumn } from '../../shared/components/table/table.types';
@@ -27,6 +28,20 @@ import {
 } from '../../core/models/admin-masters.model';
 
 export type { DynamicFormBuilderItem, DynamicFormField, DynamicFormFieldType, FormStep };
+
+interface ApplyEoiDocument {
+  id: number;
+  name: string;
+  category: 'mandatory' | 'annexure' | 'remaining';
+  uploadedFile?: string;
+  uploadedSize?: string;
+}
+
+interface OtrPreviewDoc {
+  label: string;
+  fileName: string;
+  fileSize: string;
+}
 
 interface FormBuilderFormData {
   id?: string;
@@ -46,43 +61,25 @@ interface FormBuilderFormData {
     FormsModule,
     PageHeaderComponent,
     TableComponent,
-    ActionModalComponent
+    ActionModalComponent,
+    ButtonComponent,
+    IconComponent,
+    InputDirective,
+    PageShellComponent,
+    SwitchComponent
   ],
   template: `
-    <div class="w-full min-h-screen bg-white text-slate-800 font-sans p-4 sm:p-6 lg:p-8 space-y-6">
+    <app-page-shell>
 
       <!-- Page Header -->
-      <app-page-header title="Dynamic Form Builder">
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
-          <!-- Search Input -->
-          <div class="flex items-center gap-2 flex-1 max-w-md">
-            <div class="relative w-full">
-              <input
-                type="text"
-                placeholder="Search by form name, step title, or field label..."
-                [ngModel]="searchQuery()"
-                (ngModelChange)="searchQuery.set($event)"
-                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-              />
-              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-
-          <!-- Add New Form Button (hidden for now)
-          <button
-            type="button"
-            (click)="openAddModal()"
-            class="px-4 py-2.5 bg-primary hover:bg-navy text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 shrink-0"
-          >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Add new Form</span>
-          </button>
-          -->
-        </div>
+      <app-page-header
+        title="Dynamic Form Builder"
+        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Dynamic Form Builder' }]"
+        [searchable]="true"
+        searchPlaceholder="Search by form name, step title, or field label..."
+        [(searchQuery)]="searchQuery"
+      >
+        <!-- "Add new Form" button is hidden for now -->
       </app-page-header>
 
       <!-- Forms Table -->
@@ -109,9 +106,7 @@ interface FormBuilderFormData {
           <div class="flex items-center gap-2">
             @if (item.isStepForm) {
               <span class="inline-flex items-center gap-1 text-[11.5px] font-semibold text-indigo-700">
-                <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
+                <app-icon name="chevron-right" size="sm" [stroke]="2" class="text-indigo-600" />
                 <span>Step Form ({{ item.steps?.length || 0 }} Steps)</span>
               </span>
             } @else {
@@ -128,15 +123,14 @@ interface FormBuilderFormData {
         <div class="flex items-center justify-center whitespace-nowrap">
           <!-- View Button -->
           <button
+            appButton
+            variant="ghost"
+            size="sm"
             type="button"
             (click)="$event.stopPropagation(); openPreviewModal(item)"
-            class="inline-flex items-center gap-1 text-sky-600 hover:text-sky-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
             title="View Details"
           >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
+            <app-icon name="eye" size="xs" />
             <span>View</span>
           </button>
 
@@ -144,14 +138,14 @@ interface FormBuilderFormData {
 
           <!-- Edit Button -->
           <button
+            appButton
+            variant="ghost"
+            size="sm"
             type="button"
             (click)="$event.stopPropagation(); openEditModal(item)"
-            class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
             title="Edit"
           >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
+            <app-icon name="edit" size="xs" />
             <span>Edit</span>
           </button>
 
@@ -159,20 +153,11 @@ interface FormBuilderFormData {
 
           <!-- Active / Inactive Toggle -->
           <div class="inline-flex items-center gap-1.5" title="Toggle Status" (click)="$event.stopPropagation()">
-            <button
-              type="button"
-              (click)="toggleStatus(item)"
-              class="relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-              [ngClass]="item.status === 'Inactive' ? 'bg-slate-500 hover:bg-slate-600' : 'bg-emerald-500 hover:bg-emerald-600'"
-              role="switch"
-              [attr.aria-checked]="item.status !== 'Inactive'"
-            >
-              <span class="sr-only">Toggle Active Status</span>
-              <span
-                class="pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                [ngClass]="item.status === 'Inactive' ? 'translate-x-0' : 'translate-x-3'"
-              ></span>
-            </button>
+            <app-switch
+              [checked]="item.status !== 'Inactive'"
+              label="Toggle Active Status"
+              (toggled)="toggleStatus(item)"
+            />
             <span
               class="font-medium text-[12px] select-none transition-colors cursor-pointer"
               (click)="toggleStatus(item)"
@@ -214,11 +199,12 @@ interface FormBuilderFormData {
                 Form Name*
               </label>
               <input
+                appInput
                 type="text"
                 [(ngModel)]="formData.formType"
                 placeholder="e.g. Center Inspection Form, Candidate Verification Form"
-                class="w-full px-3 py-2 border rounded-lg text-slate-800 bg-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm"
-                [class.border-red-500]="submitted() && !formData.formType.trim()"
+                class="w-full"
+                [invalid]="submitted() && !formData.formType.trim()"
               />
               @if (submitted() && !formData.formType.trim()) {
                 <div class="text-xs text-red-500 mt-1 font-medium">Form Name is required</div>
@@ -237,23 +223,12 @@ interface FormBuilderFormData {
               </div>
 
               <!-- Sliding Toggle Switch -->
-              <div class="inline-flex items-center gap-2.5 select-none shrink-0">
-                <button
-                  type="button"
-                  id="step-form-toggle-btn"
-                  (click)="toggleStepFormMode()"
-                  role="switch"
-                  [attr.aria-checked]="formData.isStepForm"
-                  class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
-                  [ngClass]="formData.isStepForm ? 'bg-[#0e2138] hover:bg-[#163355]' : 'bg-slate-300 hover:bg-slate-400'"
-                  title="Toggle between Step Form and Direct Form"
-                >
-                  <span class="sr-only">Toggle Step Form Mode</span>
-                  <span
-                    class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out"
-                    [ngClass]="formData.isStepForm ? 'translate-x-5' : 'translate-x-0'"
-                  ></span>
-                </button>
+              <div class="inline-flex items-center gap-2.5 select-none shrink-0" title="Toggle between Step Form and Direct Form">
+                <app-switch
+                  [checked]="formData.isStepForm"
+                  label="Toggle Step Form Mode"
+                  (toggled)="toggleStepFormMode()"
+                />
                 <span
                   (click)="toggleStepFormMode()"
                   class="text-xs font-bold cursor-pointer select-none transition-colors"
@@ -277,14 +252,8 @@ interface FormBuilderFormData {
                   </div>
 
                   <!-- Add Step Button -->
-                  <button
-                    type="button"
-                    (click)="addStep()"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-md shadow-xs transition-colors cursor-pointer"
-                  >
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
+                  <button appButton size="sm" type="button" (click)="addStep()">
+                    <app-icon name="plus" size="xs" />
                     <span>Add Step</span>
                   </button>
                 </div>
@@ -305,14 +274,16 @@ interface FormBuilderFormData {
                       <!-- Delete Step Button (if > 1 step) -->
                       @if (formData.steps.length > 1) {
                         <button
+                          appButton
+                          variant="ghost"
+                          size="sm"
+                          iconOnly
                           type="button"
                           (click)="deleteStep(sIdx, $event)"
-                          class="p-0.5 rounded hover:bg-white/20 text-current transition-colors cursor-pointer"
                           title="Delete this step"
+                          aria-label="Delete this step"
                         >
-                          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
+                          <app-icon name="close" size="xs" />
                         </button>
                       }
                     </div>
@@ -326,11 +297,13 @@ interface FormBuilderFormData {
                       Step {{ activeStepIndex() + 1 }} Title*
                     </label>
                     <input
+                      appInput
+                      size="sm"
                       type="text"
                       [(ngModel)]="activeStep.title"
                       placeholder="e.g. Basic Information, Center Infrastructure, Documents"
-                      class="w-full px-3 py-2 border rounded-md text-xs bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                      [class.border-red-500]="submitted() && !activeStep.title.trim()"
+                      class="w-full"
+                      [invalid]="submitted() && !activeStep.title.trim()"
                     />
                     @if (submitted() && !activeStep.title.trim()) {
                       <div class="text-[11px] text-red-500 mt-0.5 font-medium">Step title is required</div>
@@ -343,14 +316,8 @@ interface FormBuilderFormData {
                       Fields for Step {{ activeStepIndex() + 1 }} ({{ activeStep.fields.length }})
                     </span>
 
-                    <button
-                      type="button"
-                      (click)="addFieldToActiveStep()"
-                      class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary hover:bg-navy text-white text-xs font-semibold rounded shadow-xs transition-colors cursor-pointer"
-                    >
-                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                      </svg>
+                    <button appButton size="sm" type="button" (click)="addFieldToActiveStep()">
+                      <app-icon name="plus" size="xs" />
                       <span>Add Field to this Step</span>
                     </button>
                   </div>
@@ -368,14 +335,8 @@ interface FormBuilderFormData {
                   </span>
                 </div>
 
-                <button
-                  type="button"
-                  (click)="addField()"
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary hover:bg-navy text-white text-xs font-semibold rounded-md shadow-xs transition-colors cursor-pointer"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                  </svg>
+                <button appButton size="sm" type="button" (click)="addField()">
+                  <app-icon name="plus" size="xs" />
                   <span>Add Field</span>
                 </button>
               </div>
@@ -419,11 +380,7 @@ interface FormBuilderFormData {
                                 class="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
                                 title="Drag to reorder field"
                               >
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                                  <circle cx="8.5" cy="6" r="1.5" /><circle cx="15.5" cy="6" r="1.5" />
-                                  <circle cx="8.5" cy="12" r="1.5" /><circle cx="15.5" cy="12" r="1.5" />
-                                  <circle cx="8.5" cy="18" r="1.5" /><circle cx="15.5" cy="18" r="1.5" />
-                                </svg>
+                                <app-icon name="grip-dots" solid />
                               </div>
                               <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-[11px] font-bold text-slate-600">
                                 #{{ fIdx + 1 }}
@@ -436,37 +393,43 @@ interface FormBuilderFormData {
                             <!-- Move Up/Down + Delete Field -->
                             <div class="flex items-center gap-1">
                               <button
+                                appButton
+                                variant="ghost"
+                                size="sm"
+                                iconOnly
                                 type="button"
                                 (click)="moveStepFieldUp(fIdx)"
                                 [disabled]="fIdx === 0"
-                                class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                                 title="Move up"
+                                aria-label="Move up"
                               >
-                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
-                                </svg>
+                                <app-icon name="chevron-up" size="sm" [stroke]="2.5" />
                               </button>
                               <button
+                                appButton
+                                variant="ghost"
+                                size="sm"
+                                iconOnly
                                 type="button"
                                 (click)="moveStepFieldDown(fIdx)"
                                 [disabled]="fIdx === activeStep.fields.length - 1"
-                                class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                                 title="Move down"
+                                aria-label="Move down"
                               >
-                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                </svg>
+                                <app-icon name="chevron-down" size="xs" />
                               </button>
                               <div class="h-4 w-px bg-slate-200 mx-0.5"></div>
                               <button
+                                appButton
+                                variant="danger"
+                                size="sm"
+                                iconOnly
                                 type="button"
                                 (click)="deleteStepField(fIdx)"
-                                class="p-1 rounded text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
                                 title="Delete field"
+                                aria-label="Delete field"
                               >
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
+                                <app-icon name="trash" size="xs" />
                               </button>
                             </div>
                           </div>
@@ -476,20 +439,24 @@ interface FormBuilderFormData {
                             <div class="sm:col-span-6">
                               <label class="block text-xs font-semibold text-slate-700 mb-1">Label Name*</label>
                               <input
+                                appInput
+                                size="sm"
                                 type="text"
                                 [(ngModel)]="field.label"
                                 placeholder="e.g. Center Address, Photo of Lab"
-                                class="w-full px-2.5 py-1.5 border rounded-md text-xs bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                                [class.border-red-500]="submitted() && !field.label.trim()"
+                                class="w-full"
+                                [invalid]="submitted() && !field.label.trim()"
                               />
                             </div>
 
                             <div class="sm:col-span-4">
                               <label class="block text-xs font-semibold text-slate-700 mb-1">Field Type*</label>
                               <select
+                                appInput
+                                size="sm"
                                 [(ngModel)]="field.type"
                                 (ngModelChange)="onFieldTypeChange(field)"
-                                class="w-full px-2.5 py-1.5 border border-slate-300 rounded-md text-xs bg-white text-slate-800 focus:outline-none focus:border-primary cursor-pointer"
+                                class="w-full"
                               >
                                 <option value="text">Text</option>
                                 <option value="number">Number</option>
@@ -516,11 +483,13 @@ interface FormBuilderFormData {
                             <div class="mt-3 p-2.5 rounded-md bg-slate-50 border border-slate-200 space-y-1.5">
                               <label class="block text-xs font-semibold text-slate-700">Dropdown Options (comma-separated)*</label>
                               <input
+                                appInput
+                                size="sm"
                                 type="text"
                                 [(ngModel)]="field.optionsText"
                                 (blur)="updateFieldOptions(field)"
                                 placeholder="e.g. Option 1, Option 2, Option 3"
-                                class="w-full px-2.5 py-1.5 border border-slate-200 rounded text-xs bg-white text-slate-800 focus:outline-none focus:border-primary"
+                                class="w-full"
                               />
                             </div>
                           }
@@ -532,15 +501,15 @@ interface FormBuilderFormData {
                               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <div>
                                   <label class="block text-[11px] font-semibold text-slate-700 mb-1">Min Photos*</label>
-                                  <input type="number" min="1" [(ngModel)]="field.minPhotos" class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white text-slate-800 focus:outline-none focus:border-primary" />
+                                  <input appInput size="sm" type="number" min="1" [(ngModel)]="field.minPhotos" class="w-full" />
                                 </div>
                                 <div>
                                   <label class="block text-[11px] font-semibold text-slate-700 mb-1">Max Photos*</label>
-                                  <input type="number" min="1" [(ngModel)]="field.maxPhotos" class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white text-slate-800 focus:outline-none focus:border-primary" />
+                                  <input appInput size="sm" type="number" min="1" [(ngModel)]="field.maxPhotos" class="w-full" />
                                 </div>
                                 <div>
                                   <label class="block text-[11px] font-semibold text-slate-700 mb-1">Max Size (MB)*</label>
-                                  <input type="number" min="1" [(ngModel)]="field.maxSizeMb" class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white text-slate-800 focus:outline-none focus:border-primary" />
+                                  <input appInput size="sm" type="number" min="1" [(ngModel)]="field.maxSizeMb" class="w-full" />
                                 </div>
                               </div>
                             </div>
@@ -555,9 +524,7 @@ interface FormBuilderFormData {
               @if (formData.fields.length === 0) {
                 <div class="p-8 border-2 border-dashed border-slate-200 rounded-lg text-center bg-white space-y-2">
                   <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
+                    <app-icon name="plus-small" size="lg" [stroke]="2" />
                   </div>
                   <div class="text-sm font-semibold text-slate-700">No fields added yet</div>
                   <div class="text-xs text-slate-500 max-w-sm mx-auto">
@@ -589,11 +556,7 @@ interface FormBuilderFormData {
                             class="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/60 text-slate-400 hover:text-slate-700 transition-colors"
                             title="Drag to reorder field"
                           >
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                              <circle cx="8.5" cy="6" r="1.5" /><circle cx="15.5" cy="6" r="1.5" />
-                              <circle cx="8.5" cy="12" r="1.5" /><circle cx="15.5" cy="12" r="1.5" />
-                              <circle cx="8.5" cy="18" r="1.5" /><circle cx="15.5" cy="18" r="1.5" />
-                            </svg>
+                            <app-icon name="grip-dots" solid />
                           </div>
                           <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-200/80 text-[11px] font-bold text-slate-700">
                             #{{ idx + 1 }}
@@ -605,37 +568,43 @@ interface FormBuilderFormData {
 
                         <div class="flex items-center gap-1.5">
                           <button
+                            appButton
+                            variant="ghost"
+                            size="sm"
+                            iconOnly
                             type="button"
                             (click)="moveFieldUp(idx)"
                             [disabled]="idx === 0"
-                            class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                             title="Move field up"
+                            aria-label="Move field up"
                           >
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
-                            </svg>
+                            <app-icon name="chevron-up" size="sm" [stroke]="2.5" />
                           </button>
                           <button
+                            appButton
+                            variant="ghost"
+                            size="sm"
+                            iconOnly
                             type="button"
                             (click)="moveFieldDown(idx)"
                             [disabled]="idx === formData.fields.length - 1"
-                            class="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                             title="Move field down"
+                            aria-label="Move field down"
                           >
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                            </svg>
+                            <app-icon name="chevron-down" size="xs" />
                           </button>
                           <div class="h-4 w-px bg-slate-200 mx-0.5"></div>
                           <button
+                            appButton
+                            variant="danger"
+                            size="sm"
+                            iconOnly
                             type="button"
                             (click)="deleteField(idx)"
-                            class="p-1 rounded text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
                             title="Delete this field"
+                            aria-label="Delete this field"
                           >
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
+                            <app-icon name="trash" size="xs" />
                           </button>
                         </div>
                       </div>
@@ -645,20 +614,24 @@ interface FormBuilderFormData {
                         <div class="sm:col-span-6">
                           <label class="block text-xs font-semibold text-slate-700 mb-1">Label Name*</label>
                           <input
+                            appInput
+                            size="sm"
                             type="text"
                             [(ngModel)]="field.label"
                             placeholder="e.g. Candidate Name, Center Photo"
-                            class="w-full px-2.5 py-1.5 border rounded-md text-xs bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                            [class.border-red-500]="submitted() && !field.label.trim()"
+                            class="w-full"
+                            [invalid]="submitted() && !field.label.trim()"
                           />
                         </div>
 
                         <div class="sm:col-span-4">
                           <label class="block text-xs font-semibold text-slate-700 mb-1">Field Type*</label>
                           <select
+                            appInput
+                            size="sm"
                             [(ngModel)]="field.type"
                             (ngModelChange)="onFieldTypeChange(field)"
-                            class="w-full px-2.5 py-1.5 border border-slate-300 rounded-md text-xs bg-white text-slate-800 focus:outline-none focus:border-primary cursor-pointer"
+                            class="w-full"
                           >
                             <option value="text">Text</option>
                             <option value="number">Number</option>
@@ -685,11 +658,13 @@ interface FormBuilderFormData {
                         <div class="mt-3 p-2.5 rounded-md bg-white border border-slate-200 space-y-1.5">
                           <label class="block text-xs font-semibold text-slate-700">Dropdown Options (comma-separated)*</label>
                           <input
+                            appInput
+                            size="sm"
                             type="text"
                             [(ngModel)]="field.optionsText"
                             (blur)="updateFieldOptions(field)"
                             placeholder="e.g. Option 1, Option 2, Option 3"
-                            class="w-full px-2.5 py-1.5 border border-slate-200 rounded text-xs bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary transition-all"
+                            class="w-full"
                           />
                         </div>
                       }
@@ -701,15 +676,15 @@ interface FormBuilderFormData {
                           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
                               <label class="block text-[11px] font-semibold text-slate-700 mb-1">Min Photos*</label>
-                              <input type="number" min="1" [(ngModel)]="field.minPhotos" class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white text-slate-800 focus:outline-none focus:border-primary" />
+                              <input appInput size="sm" type="number" min="1" [(ngModel)]="field.minPhotos" class="w-full" />
                             </div>
                             <div>
                               <label class="block text-[11px] font-semibold text-slate-700 mb-1">Max Photos*</label>
-                              <input type="number" min="1" [(ngModel)]="field.maxPhotos" class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white text-slate-800 focus:outline-none focus:border-primary" />
+                              <input appInput size="sm" type="number" min="1" [(ngModel)]="field.maxPhotos" class="w-full" />
                             </div>
                             <div>
                               <label class="block text-[11px] font-semibold text-slate-700 mb-1">Max Size (MB)*</label>
-                              <input type="number" min="1" [(ngModel)]="field.maxSizeMb" class="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs bg-white text-slate-800 focus:outline-none focus:border-primary" />
+                              <input appInput size="sm" type="number" min="1" [(ngModel)]="field.maxSizeMb" class="w-full" />
                             </div>
                           </div>
                         </div>
@@ -752,9 +727,7 @@ interface FormBuilderFormData {
                   <!-- Step 1: Processing Fee (Completed) -->
                   <div class="flex items-center gap-2 shrink-0">
                     <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[11px] font-bold">
-                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+                      <app-icon name="check" size="sm" [stroke]="3" />
                     </span>
                     <span class="font-bold text-slate-700 text-xs">1. Processing Fee</span>
                     <div class="w-6 sm:w-12 h-0.5 bg-emerald-500 ml-1"></div>
@@ -767,9 +740,7 @@ interface FormBuilderFormData {
                       <span class="font-bold text-navy text-xs">2. OTR Profile</span>
                     } @else {
                       <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[11px] font-bold">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                        <app-icon name="check" size="sm" [stroke]="3" />
                       </span>
                       <span class="font-medium text-slate-700 text-xs">2. OTR Profile</span>
                     }
@@ -814,13 +785,13 @@ interface FormBuilderFormData {
               <!-- Top Back Button -->
               <div class="flex items-center justify-between">
                 <button
+                  appButton
+                  variant="outline"
+                  size="sm"
                   type="button"
                   (click)="applyEoiStep() === 2 ? applyEoiStep.set(1) : closePreviewModal()"
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
                 >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                  </svg>
+                  <app-icon name="chevron-left" size="xs" />
                   <span>Back</span>
                 </button>
 
@@ -849,42 +820,42 @@ interface FormBuilderFormData {
                       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">NAME (SHORT NAME)</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-1']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-1']" class="w-full" />
                         </div>
 
                         <div class="sm:col-span-2">
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">FULL NAME OF ORGANIZATION</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-2']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-2']" class="w-full" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">NATURE OF ENTITY</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-3']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-3']" class="w-full" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">REGISTRATION NUMBER (CIN)</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-4']" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-4']" class="w-full font-mono" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">DATE OF REGISTRATION</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-5']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-5']" class="w-full" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">STATE / UT OF REGISTRATION</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-6']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-6']" class="w-full" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">COMPANY PAN</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-7']" class="w-full px-3 py-2 text-xs font-mono font-bold border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-7']" class="w-full font-mono font-bold" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">GST REGISTERED</label>
-                          <select [(ngModel)]="previewFormValues['eoi-otr-8']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy">
+                          <select appInput size="sm" [(ngModel)]="previewFormValues['eoi-otr-8']" class="w-full">
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
                           </select>
@@ -892,12 +863,12 @@ interface FormBuilderFormData {
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">GSTIN</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-9']" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-9']" class="w-full font-mono" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">MSME / UDYAM REGISTERED</label>
-                          <select [(ngModel)]="previewFormValues['eoi-otr-10']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy">
+                          <select appInput size="sm" [(ngModel)]="previewFormValues['eoi-otr-10']" class="w-full">
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
                           </select>
@@ -905,12 +876,12 @@ interface FormBuilderFormData {
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">UDYAM REGISTRATION NO.</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-11']" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-11']" class="w-full font-mono" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">NSDC PARTNER STATUS</label>
-                          <select [(ngModel)]="previewFormValues['eoi-otr-12']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy">
+                          <select appInput size="sm" [(ngModel)]="previewFormValues['eoi-otr-12']" class="w-full">
                             <option value="Approved">Approved</option>
                             <option value="Applied">Applied</option>
                             <option value="Not Applicable">Not Applicable</option>
@@ -919,27 +890,27 @@ interface FormBuilderFormData {
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">COMPANY CONTACT NO.</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-13']" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-13']" class="w-full font-mono" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">COMPANY EMAIL-ID</label>
-                          <input type="email" [(ngModel)]="previewFormValues['eoi-otr-14']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="email" [(ngModel)]="previewFormValues['eoi-otr-14']" class="w-full" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">WEBSITE</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-15']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-15']" class="w-full" />
                         </div>
 
                         <div class="sm:col-span-2 lg:col-span-3">
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">REGISTERED ADDRESS</label>
-                          <textarea [(ngModel)]="previewFormValues['eoi-otr-16']" rows="2" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy"></textarea>
+                          <textarea appInput size="sm" [(ngModel)]="previewFormValues['eoi-otr-16']" rows="2" class="w-full"></textarea>
                         </div>
 
                         <div class="sm:col-span-2 lg:col-span-3">
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">OFFICE ADDRESS</label>
-                          <textarea [(ngModel)]="previewFormValues['eoi-otr-17']" rows="2" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy"></textarea>
+                          <textarea appInput size="sm" [(ngModel)]="previewFormValues['eoi-otr-17']" rows="2" class="w-full"></textarea>
                         </div>
                       </div>
 
@@ -952,10 +923,7 @@ interface FormBuilderFormData {
                           @for (doc of otrRegDocs; track doc.key) {
                             <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
                               <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                                <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
-                                  <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
-                                  <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
-                                </svg>
+                                <app-icon name="pdf-badge" size="lg" solid class="text-[#E5252A] select-none shadow-xs" />
                                 <div class="flex flex-col min-w-0">
                                   <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">{{ doc.label }}</span>
                                   <span class="font-medium text-slate-800 truncate text-xs">{{ doc.fileName }}</span>
@@ -967,13 +935,13 @@ interface FormBuilderFormData {
                                 </div>
                               </div>
                               <div class="flex items-center gap-1.5 shrink-0">
-                                <button type="button" (click)="viewApplyDoc(doc.fileName)" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-ocean bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded cursor-pointer">
+                                <button appButton variant="secondary" size="sm" type="button" (click)="viewApplyDoc(doc.fileName)">
                                   <span>View</span>
                                 </button>
-                                <button type="button" (click)="changeOtrDoc(doc)" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded cursor-pointer">
+                                <button appButton variant="outline" size="sm" type="button" (click)="changeOtrDoc(doc)">
                                   <span>Change</span>
                                 </button>
-                                <button type="button" (click)="removeOtrDoc(doc)" class="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded cursor-pointer">
+                                <button appButton variant="danger" size="sm" type="button" (click)="removeOtrDoc(doc)">
                                   <span>Remove</span>
                                 </button>
                               </div>
@@ -995,47 +963,47 @@ interface FormBuilderFormData {
                       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">FULL NAME</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-19']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-19']" class="w-full" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">DESIGNATION</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-20']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-20']" class="w-full" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">DATE OF BIRTH / AGE</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-21']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-21']" class="w-full" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">OFFICIAL MOBILE NO.</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-22']" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-22']" class="w-full font-mono" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">OFFICIAL EMAIL-ID</label>
-                          <input type="email" [(ngModel)]="previewFormValues['eoi-otr-23']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="email" [(ngModel)]="previewFormValues['eoi-otr-23']" class="w-full" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">PAN</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-24']" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-24']" class="w-full font-mono" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">AADHAAR NUMBER</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-25']" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-25']" class="w-full font-mono" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">STATE</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-26']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-26']" class="w-full" />
                         </div>
 
                         <div class="sm:col-span-2 lg:col-span-4">
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">RESIDENCE ADDRESS</label>
-                          <textarea [(ngModel)]="previewFormValues['eoi-otr-27']" rows="2" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy"></textarea>
+                          <textarea appInput size="sm" [(ngModel)]="previewFormValues['eoi-otr-27']" rows="2" class="w-full"></textarea>
                         </div>
                       </div>
 
@@ -1048,10 +1016,7 @@ interface FormBuilderFormData {
                           @for (doc of otrSigDocs; track doc.key) {
                             <div class="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs">
                               <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                                <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
-                                  <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
-                                  <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
-                                </svg>
+                                <app-icon name="pdf-badge" size="lg" solid class="text-[#E5252A] select-none shadow-xs" />
                                 <div class="flex flex-col min-w-0">
                                   <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">{{ doc.label }}</span>
                                   <span class="font-medium text-slate-800 truncate text-xs">{{ doc.fileName }}</span>
@@ -1063,13 +1028,13 @@ interface FormBuilderFormData {
                                 </div>
                               </div>
                               <div class="flex items-center gap-1.5 shrink-0">
-                                <button type="button" (click)="viewApplyDoc(doc.fileName)" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-ocean bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded cursor-pointer">
+                                <button appButton variant="secondary" size="sm" type="button" (click)="viewApplyDoc(doc.fileName)">
                                   <span>View</span>
                                 </button>
-                                <button type="button" (click)="changeOtrDoc(doc)" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded cursor-pointer">
+                                <button appButton variant="outline" size="sm" type="button" (click)="changeOtrDoc(doc)">
                                   <span>Change</span>
                                 </button>
-                                <button type="button" (click)="removeOtrDoc(doc)" class="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded cursor-pointer">
+                                <button appButton variant="danger" size="sm" type="button" (click)="removeOtrDoc(doc)">
                                   <span>Remove</span>
                                 </button>
                               </div>
@@ -1093,17 +1058,17 @@ interface FormBuilderFormData {
                       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">BANK NAME</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-29']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-29']" class="w-full" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">BRANCH NAME</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-30']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-30']" class="w-full" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">ACCOUNT TYPE</label>
-                          <select [(ngModel)]="previewFormValues['eoi-otr-31']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy">
+                          <select appInput size="sm" [(ngModel)]="previewFormValues['eoi-otr-31']" class="w-full">
                             <option value="Current Account">Current</option>
                             <option value="Savings Account">Savings</option>
                           </select>
@@ -1111,22 +1076,22 @@ interface FormBuilderFormData {
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">ACCOUNT HOLDER NAME</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-32']" class="w-full px-3 py-2 text-xs font-bold border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-32']" class="w-full font-bold" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">ACCOUNT NUMBER</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-33']" class="w-full px-3 py-2 text-xs font-mono font-bold border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-33']" class="w-full font-mono font-bold" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">IFSC CODE</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-34']" class="w-full px-3 py-2 text-xs font-mono font-bold border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-34']" class="w-full font-mono font-bold" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">TRANSFER MODE</label>
-                          <input type="text" [(ngModel)]="previewFormValues['eoi-otr-35']" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-navy" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-35']" class="w-full" />
                         </div>
                       </div>
 
@@ -1137,10 +1102,7 @@ interface FormBuilderFormData {
                         </span>
                         <div class="max-w-md p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 shadow-2xs text-xs">
                           <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                            <svg class="w-5 h-5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
-                              <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
-                              <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
-                            </svg>
+                            <app-icon name="pdf-badge" size="lg" solid class="text-[#E5252A] select-none shadow-xs" />
                             <div class="flex flex-col min-w-0">
                               <span class="text-[10px] uppercase font-bold text-slate-400 leading-tight">CANCELLED CHEQUE / PASSBOOK</span>
                               <span class="font-medium text-slate-800 truncate text-xs">{{ otrBankDoc.fileName }}</span>
@@ -1152,13 +1114,13 @@ interface FormBuilderFormData {
                             </div>
                           </div>
                           <div class="flex items-center gap-1.5 shrink-0">
-                            <button type="button" (click)="viewApplyDoc(otrBankDoc.fileName)" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-ocean bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded cursor-pointer">
+                            <button appButton variant="secondary" size="sm" type="button" (click)="viewApplyDoc(otrBankDoc.fileName)">
                               <span>View</span>
                             </button>
-                            <button type="button" (click)="changeOtrDoc(otrBankDoc)" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded cursor-pointer">
+                            <button appButton variant="outline" size="sm" type="button" (click)="changeOtrDoc(otrBankDoc)">
                               <span>Change</span>
                             </button>
-                            <button type="button" (click)="removeOtrDoc(otrBankDoc)" class="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded cursor-pointer">
+                            <button appButton variant="danger" size="sm" type="button" (click)="removeOtrDoc(otrBankDoc)">
                               <span>Remove</span>
                             </button>
                           </div>
@@ -1170,19 +1132,11 @@ interface FormBuilderFormData {
 
                   <!-- Action Footer for Step 1 -->
                   <div class="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between">
-                    <button
-                      type="button"
-                      (click)="closePreviewModal()"
-                      class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
-                    >
+                    <button appButton variant="outline" type="button" (click)="closePreviewModal()">
                       &larr; Back to Processing Fee
                     </button>
 
-                    <button
-                      type="button"
-                      (click)="applyEoiStep.set(2)"
-                      class="px-5 py-2.5 bg-navy hover:bg-[#163355] text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
-                    >
+                    <button appButton type="button" (click)="applyEoiStep.set(2)">
                       <span>Proceed to Upload Documents</span>
                       <span>&rarr;</span>
                     </button>
@@ -1204,9 +1158,12 @@ interface FormBuilderFormData {
                       </div>
 
                       <button
+                        appButton
+                        variant="outline"
+                        size="sm"
                         type="button"
                         (click)="attachAllApplyMandatedAnnexures()"
-                        class="px-3.5 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 hover:text-slate-900 rounded-lg text-xs font-semibold shadow-2xs transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
+                        class="shrink-0"
                       >
                         <span>Attach All Mandated Annexures</span>
                       </button>
@@ -1215,19 +1172,23 @@ interface FormBuilderFormData {
                     <!-- Filter Tabs matching Image 3 -->
                     <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 text-xs">
                       <button
+                        appButton
+                        size="sm"
                         type="button"
                         (click)="selectedApplyDocTab.set('all')"
-                        class="px-3.5 py-1.5 rounded-lg font-semibold transition-all cursor-pointer shrink-0"
-                        [ngClass]="selectedApplyDocTab() === 'all' ? 'bg-navy text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                        [variant]="selectedApplyDocTab() === 'all' ? 'primary' : 'outline'"
+                        class="shrink-0"
                       >
                         All Documents (16)
                       </button>
 
                       <button
+                        appButton
+                        size="sm"
                         type="button"
                         (click)="selectedApplyDocTab.set('mandatory')"
-                        class="px-3.5 py-1.5 rounded-lg font-semibold transition-all cursor-pointer shrink-0 flex items-center gap-1.5"
-                        [ngClass]="selectedApplyDocTab() === 'mandatory' ? 'bg-navy text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                        [variant]="selectedApplyDocTab() === 'mandatory' ? 'primary' : 'outline'"
+                        class="shrink-0"
                       >
                         <span>1. Mandatory Statutory Documents</span>
                         <span class="text-[10px] px-1.5 py-0.2 rounded" [ngClass]="selectedApplyDocTab() === 'mandatory' ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-700 font-bold'">
@@ -1236,10 +1197,12 @@ interface FormBuilderFormData {
                       </button>
 
                       <button
+                        appButton
+                        size="sm"
                         type="button"
                         (click)="selectedApplyDocTab.set('annexure')"
-                        class="px-3.5 py-1.5 rounded-lg font-semibold transition-all cursor-pointer shrink-0 flex items-center gap-1.5"
-                        [ngClass]="selectedApplyDocTab() === 'annexure' ? 'bg-navy text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                        [variant]="selectedApplyDocTab() === 'annexure' ? 'primary' : 'outline'"
+                        class="shrink-0"
                       >
                         <span>2. Scheme Annexures</span>
                         <span class="text-[10px] px-1.5 py-0.2 rounded" [ngClass]="selectedApplyDocTab() === 'annexure' ? 'bg-white/20 text-white' : 'bg-sky-100 text-sky-700 font-bold'">
@@ -1248,10 +1211,12 @@ interface FormBuilderFormData {
                       </button>
 
                       <button
+                        appButton
+                        size="sm"
                         type="button"
                         (click)="selectedApplyDocTab.set('remaining')"
-                        class="px-3.5 py-1.5 rounded-lg font-semibold transition-all cursor-pointer shrink-0 flex items-center gap-1.5"
-                        [ngClass]="selectedApplyDocTab() === 'remaining' ? 'bg-navy text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                        [variant]="selectedApplyDocTab() === 'remaining' ? 'primary' : 'outline'"
+                        class="shrink-0"
                       >
                         <span>3. Remaining Documents</span>
                         <span class="text-[10px] px-1.5 py-0.2 rounded" [ngClass]="selectedApplyDocTab() === 'remaining' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700 font-bold'">
@@ -1298,9 +1263,7 @@ interface FormBuilderFormData {
 
                               @if (doc.uploadedFile) {
                                 <div class="flex items-center gap-2 mt-1 text-[11px] text-emerald-700 font-medium">
-                                  <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                  </svg>
+                                  <app-icon name="check" size="sm" [stroke]="2.5" class="text-emerald-600" />
                                   <span class="truncate max-w-[220px]">{{ doc.uploadedFile }}</span>
                                   <span class="text-slate-400">({{ doc.uploadedSize || '1.8 MB' }})</span>
                                 </div>
@@ -1310,26 +1273,14 @@ interface FormBuilderFormData {
 
                           <div class="shrink-0 flex items-center gap-1.5">
                             @if (!doc.uploadedFile) {
-                              <button
-                                type="button"
-                                (click)="uploadApplyDoc(doc.id)"
-                                class="px-3 py-1.5 bg-navy hover:bg-[#163355] text-white font-semibold text-xs rounded-lg transition-colors cursor-pointer shadow-2xs whitespace-nowrap"
-                              >
+                              <button appButton size="sm" type="button" (click)="uploadApplyDoc(doc.id)">
                                 Upload PDF
                               </button>
                             } @else {
-                              <button
-                                type="button"
-                                (click)="uploadApplyDoc(doc.id)"
-                                class="px-2.5 py-1 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 rounded cursor-pointer"
-                              >
+                              <button appButton variant="outline" size="sm" type="button" (click)="uploadApplyDoc(doc.id)">
                                 Change
                               </button>
-                              <button
-                                type="button"
-                                (click)="removeApplyDoc(doc.id)"
-                                class="px-2 py-1 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded cursor-pointer"
-                              >
+                              <button appButton variant="danger" size="sm" type="button" (click)="removeApplyDoc(doc.id)">
                                 Remove
                               </button>
                             }
@@ -1342,19 +1293,11 @@ interface FormBuilderFormData {
 
                   <!-- Action Footer for Step 2 -->
                   <div class="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between">
-                    <button
-                      type="button"
-                      (click)="applyEoiStep.set(1)"
-                      class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
-                    >
+                    <button appButton variant="outline" type="button" (click)="applyEoiStep.set(1)">
                       &larr; Back to OTR Profile
                     </button>
 
-                    <button
-                      type="button"
-                      (click)="submitApplyEoi()"
-                      class="px-5 py-2.5 bg-navy hover:bg-[#163355] text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
-                    >
+                    <button appButton type="button" (click)="submitApplyEoi()">
                       <span>Proceed to Complete Preview</span>
                       <span>&rarr;</span>
                     </button>
@@ -1375,19 +1318,21 @@ interface FormBuilderFormData {
                   <!-- 1. EOI Reference No.* -->
                   <label class="text-slate-700 font-medium text-xs sm:text-[13px]">EOI Reference No.*</label>
                   <input
+                    appInput size="sm"
                     type="text"
                     maxlength="100"
                     [(ngModel)]="previewFormValues['eoi-1']"
-                    class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-primary text-slate-800 text-xs shadow-2xs"
+                    class="w-full"
                   />
 
                   <!-- 2. Scheme* -->
                   <label class="text-slate-700 font-medium text-xs sm:text-[13px]">Scheme*</label>
                   <div class="relative w-full">
                     <select
+                      appInput size="sm"
                       [(ngModel)]="previewFormValues['eoi-2']"
                       (ngModelChange)="onEoiSchemeChange($event)"
-                      class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-primary text-slate-800 bg-white text-xs cursor-pointer shadow-2xs appearance-none pr-8"
+                      class="w-full"
                     >
                       <option value="" disabled>-- Select Scheme --</option>
                       <option value="Vishwakarma Yuva Udyami Protsahan Yojana">Vishwakarma Yuva Udyami Protsahan Yojana</option>
@@ -1395,17 +1340,16 @@ interface FormBuilderFormData {
                       <option value="Mukhyamantri Yuva Sambal Yojana">Mukhyamantri Yuva Sambal Yojana</option>
                       <option value="Mukhya Mantri Yuva Kaushal Yojana">Mukhya Mantri Yuva Kaushal Yojana</option>
                     </select>
-                    <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <app-icon name="chevron-down" [stroke]="2" class="text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
 
                   <!-- 3. Scheme Category -->
                   <label class="text-slate-700 font-medium text-xs sm:text-[13px]">Scheme Category</label>
                   <div class="relative w-full">
                     <select
+                      appInput size="sm"
                       [(ngModel)]="previewFormValues['eoi-3']"
-                      class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-primary text-slate-800 bg-white text-xs cursor-pointer shadow-2xs appearance-none pr-8"
+                      class="w-full"
                     >
                       <option value="">-- Select Scheme Category --</option>
                       <option value="Rajvik">Rajvik</option>
@@ -1414,70 +1358,72 @@ interface FormBuilderFormData {
                       <option value="na">na</option>
                       <option value="ALL">ALL</option>
                     </select>
-                    <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <app-icon name="chevron-down" [stroke]="2" class="text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
 
                   <!-- 4. Date of EoI Published* -->
                   <label class="text-slate-700 font-medium text-xs sm:text-[13px]">Date of EoI Published*</label>
                   <input
+                    appInput size="sm"
                     type="text"
                     [(ngModel)]="previewFormValues['eoi-4']"
                     placeholder="10 / 13 / 2026"
-                    class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-primary text-slate-800 text-xs shadow-2xs"
+                    class="w-full"
                   />
 
                   <!-- 5. Last Date of EoI Submission* -->
                   <label class="text-slate-700 font-medium text-xs sm:text-[13px]">Last Date of EoI Submission*</label>
                   <input
+                    appInput size="sm"
                     type="text"
                     [(ngModel)]="previewFormValues['eoi-5']"
                     placeholder="10 / 13 / 2026"
-                    class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-primary text-slate-800 text-xs shadow-2xs"
+                    class="w-full"
                   />
 
                   <!-- 6. EOI Category* -->
                   <label class="text-slate-700 font-medium text-xs sm:text-[13px]">EOI Category*</label>
                   <div class="relative w-full">
                     <select
+                      appInput size="sm"
                       [(ngModel)]="previewFormValues['eoi-6']"
-                      class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-primary text-slate-800 bg-white text-xs cursor-pointer shadow-2xs appearance-none pr-8"
+                      class="w-full"
                     >
                       <option value="" disabled>-- Select EOI Category --</option>
                       <option value="General">General</option>
                       <option value="Special">Special</option>
                     </select>
-                    <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <app-icon name="chevron-down" [stroke]="2" class="text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
 
                   <!-- 7. EOI Description -->
                   <label class="text-slate-700 font-medium text-xs sm:text-[13px]">EOI Description</label>
                   <input
+                    appInput size="sm"
                     type="text"
                     maxlength="100"
                     [(ngModel)]="previewFormValues['eoi-7']"
-                    class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-primary text-slate-800 text-xs shadow-2xs"
+                    class="w-full"
                   />
 
                   <!-- 8. EMD Fee* -->
                   <label class="text-slate-700 font-medium text-xs sm:text-[13px]">EMD Fee*</label>
                   <input
+                    appInput size="sm"
                     type="text"
                     maxlength="100"
                     [(ngModel)]="previewFormValues['eoi-8']"
-                    class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-primary text-slate-800 text-xs shadow-2xs"
+                    class="w-full"
                   />
 
                   <!-- 9. Process Fee* -->
                   <label class="text-slate-700 font-medium text-xs sm:text-[13px]">Process Fee*</label>
                   <input
+                    appInput size="sm"
                     type="text"
                     maxlength="100"
                     [(ngModel)]="previewFormValues['eoi-9']"
-                    class="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-primary text-slate-800 text-xs shadow-2xs"
+                    class="w-full"
                   />
 
                   <!-- 10. Attach File* -->
@@ -1485,26 +1431,27 @@ interface FormBuilderFormData {
                   <div class="space-y-2 overflow-hidden w-full">
                     <div class="flex items-center gap-2">
                       <button
+                        appButton
+                        variant="outline"
+                        size="sm"
                         type="button"
                         (click)="simulateFileUpload({ id: 'eoi-10', label: 'EOI Proposal File', type: 'photo', mandatory: true })"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-[#0e2138] text-[#0e2138] hover:bg-slate-50 text-xs font-semibold cursor-pointer transition-colors shadow-2xs"
                       >
-                        <svg class="w-4 h-4 transform -rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                        </svg>
+                        <app-icon name="paperclip" [stroke]="2" class="transform -rotate-45" />
                         <span>+ Attach Document</span>
                       </button>
                       <span class="text-[11px] text-slate-500 font-medium whitespace-nowrap">(Max file size: 25 MB)</span>
                       @if (uploadedFiles['eoi-10']) {
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
+                          <app-icon name="check" size="sm" [stroke]="2.5" class="text-emerald-600" />
                           <span>{{ uploadedFiles['eoi-10'] }}</span>
                           <button
+                            appButton
+                            variant="ghost"
+                            size="sm"
                             type="button"
                             (click)="removeUploadedFile('eoi-10', $event)"
-                            class="text-emerald-700 hover:text-emerald-900 ml-1 cursor-pointer"
+                            class="ml-1"
                           >✕</button>
                         </span>
                       }
@@ -1520,14 +1467,15 @@ interface FormBuilderFormData {
                       <p class="text-[11px] text-slate-500 mt-0.5 mb-0">Required documents for proposal upload (Upload PDF, image, or TXT - max 25 MB)</p>
                     </div>
                     <button
+                      appButton
+                      size="sm"
+                      iconOnly
                       type="button"
                       (click)="addEoiDocumentRow()"
-                      class="w-6 h-6 rounded-full bg-[#0e2138] text-white flex items-center justify-center hover:bg-[#163355] transition-colors shadow-2xs cursor-pointer"
                       title="Add Document"
+                      aria-label="Add Document"
                     >
-                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                      </svg>
+                      <app-icon name="plus" size="xs" />
                     </button>
                   </div>
 
@@ -1541,8 +1489,10 @@ interface FormBuilderFormData {
                         <div class="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-lg">
                           <span class="text-xs font-semibold text-slate-500 w-5 text-center shrink-0">{{ idx + 1 }}.</span>
                           <select
+                            appInput
+                            size="sm"
                             [(ngModel)]="row.docName"
-                            class="flex-1 px-2.5 py-1.5 border border-slate-300 rounded text-xs text-slate-800 bg-white focus:outline-none focus:border-primary shadow-2xs"
+                            class="flex-1"
                           >
                             <option value="">-- Select Document Required --</option>
                             @for (docOpt of availableEoiDocs; track docOpt) {
@@ -1551,32 +1501,28 @@ interface FormBuilderFormData {
                           </select>
 
                           @if (!row.uploadedFile) {
-                            <button
-                              type="button"
-                              (click)="simulateRowDocUpload(idx)"
-                              class="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-[#0e2138] hover:bg-[#163355] text-white text-xs font-semibold transition-colors cursor-pointer shrink-0 shadow-2xs"
-                            >
-                              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                              </svg>
+                            <button appButton size="sm" type="button" (click)="simulateRowDocUpload(idx)" class="shrink-0">
+                              <app-icon name="upload" size="xs" />
                               <span>Upload</span>
                             </button>
                           } @else {
                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-medium">
                               <span>{{ row.uploadedFile }}</span>
-                              <button type="button" (click)="row.uploadedFile = ''" class="ml-1 text-emerald-800 hover:text-red-600 cursor-pointer">✕</button>
+                              <button appButton variant="ghost" size="sm" type="button" (click)="row.uploadedFile = ''" class="ml-1">✕</button>
                             </span>
                           }
 
                           <button
+                            appButton
+                            variant="danger"
+                            size="sm"
+                            iconOnly
                             type="button"
                             (click)="removeEoiDocumentRow(idx)"
-                            class="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                             title="Delete document"
+                            aria-label="Delete document"
                           >
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
+                            <app-icon name="trash" size="xs" />
                           </button>
                         </div>
                       }
@@ -1587,19 +1533,11 @@ interface FormBuilderFormData {
 
               <!-- Footer Buttons Matching Screenshots -->
               <div class="mt-5 pt-3.5 border-t border-slate-200 flex items-center justify-between">
-                <button
-                  type="button"
-                  (click)="closePreviewModal()"
-                  class="px-5 py-2.5 border border-slate-300 rounded-lg text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
-                >
+                <button appButton variant="outline" type="button" (click)="closePreviewModal()">
                   Cancel
                 </button>
 
-                <button
-                  type="button"
-                  (click)="publishEoi()"
-                  class="px-6 py-2.5 bg-[#0e2138] hover:bg-[#163355] text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer shadow-xs"
-                >
+                <button appButton type="button" (click)="publishEoi()">
                   Publish EOI
                 </button>
               </div>
@@ -1618,11 +1556,12 @@ interface FormBuilderFormData {
                   <div>
                     <label class="block text-slate-700 font-medium mb-1">SSO ID*</label>
                     <input
+                      appInput size="sm"
                       type="text"
                       placeholder="e.g. SSO_1008"
                       [(ngModel)]="previewFormValues['du-1']"
-                      [ngClass]="{'border-red-500': deptUserSubmitted() && !previewFormValues['du-1']?.trim(), 'border-field-border': !(deptUserSubmitted() && !previewFormValues['du-1']?.trim())}"
-                      class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 font-mono text-xs"
+                      [invalid]="deptUserSubmitted() && !previewFormValues['du-1']?.trim()"
+                      class="w-full font-mono"
                     />
                     @if (deptUserSubmitted() && !previewFormValues['du-1']?.trim()) {
                       <div class="text-xs text-red-500 mt-0.5 font-medium">SSO ID is required</div>
@@ -1633,9 +1572,10 @@ interface FormBuilderFormData {
                   <div>
                     <label class="block text-slate-700 font-medium mb-1">Role Type*</label>
                     <select
+                      appInput size="sm"
                       [(ngModel)]="previewFormValues['du-2']"
-                      [ngClass]="{'border-red-500': deptUserSubmitted() && !previewFormValues['du-2']?.trim(), 'border-field-border': !(deptUserSubmitted() && !previewFormValues['du-2']?.trim())}"
-                      class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white"
+                      [invalid]="deptUserSubmitted() && !previewFormValues['du-2']?.trim()"
+                      class="w-full"
                     >
                       <option value="" disabled selected>Select Role Type</option>
                       @for (role of deptUserRoleOptions; track role) {
@@ -1651,11 +1591,12 @@ interface FormBuilderFormData {
                   <div>
                     <label class="block text-slate-700 font-medium mb-1">First Name*</label>
                     <input
+                      appInput size="sm"
                       type="text"
                       placeholder="e.g. John"
                       [(ngModel)]="previewFormValues['du-3']"
-                      [ngClass]="{'border-red-500': deptUserSubmitted() && !previewFormValues['du-3']?.trim(), 'border-field-border': !(deptUserSubmitted() && !previewFormValues['du-3']?.trim())}"
-                      class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800"
+                      [invalid]="deptUserSubmitted() && !previewFormValues['du-3']?.trim()"
+                      class="w-full"
                     />
                     @if (deptUserSubmitted() && !previewFormValues['du-3']?.trim()) {
                       <div class="text-xs text-red-500 mt-0.5 font-medium">First Name is required</div>
@@ -1666,11 +1607,12 @@ interface FormBuilderFormData {
                   <div>
                     <label class="block text-slate-700 font-medium mb-1">Last Name*</label>
                     <input
+                      appInput size="sm"
                       type="text"
                       placeholder="e.g. Doe"
                       [(ngModel)]="previewFormValues['du-4']"
-                      [ngClass]="{'border-red-500': deptUserSubmitted() && !previewFormValues['du-4']?.trim(), 'border-field-border': !(deptUserSubmitted() && !previewFormValues['du-4']?.trim())}"
-                      class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800"
+                      [invalid]="deptUserSubmitted() && !previewFormValues['du-4']?.trim()"
+                      class="w-full"
                     />
                     @if (deptUserSubmitted() && !previewFormValues['du-4']?.trim()) {
                       <div class="text-xs text-red-500 mt-0.5 font-medium">Last Name is required</div>
@@ -1681,11 +1623,12 @@ interface FormBuilderFormData {
                   <div>
                     <label class="block text-slate-700 font-medium mb-1">E-Mail*</label>
                     <input
+                      appInput size="sm"
                       type="email"
                       placeholder="name@example.com"
                       [(ngModel)]="previewFormValues['du-5']"
-                      [ngClass]="{'border-red-500': deptUserSubmitted() && !previewFormValues['du-5']?.trim(), 'border-field-border': !(deptUserSubmitted() && !previewFormValues['du-5']?.trim())}"
-                      class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800"
+                      [invalid]="deptUserSubmitted() && !previewFormValues['du-5']?.trim()"
+                      class="w-full"
                     />
                     @if (deptUserSubmitted() && !previewFormValues['du-5']?.trim()) {
                       <div class="text-xs text-red-500 mt-0.5 font-medium">E-Mail is required</div>
@@ -1696,12 +1639,13 @@ interface FormBuilderFormData {
                   <div>
                     <label class="block text-slate-700 font-medium mb-1">Mobile No.*</label>
                     <input
+                      appInput size="sm"
                       type="text"
                       maxlength="10"
                       placeholder="10-digit mobile number"
                       [(ngModel)]="previewFormValues['du-6']"
-                      [ngClass]="{'border-red-500': deptUserSubmitted() && !previewFormValues['du-6']?.trim(), 'border-field-border': !(deptUserSubmitted() && !previewFormValues['du-6']?.trim())}"
-                      class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800"
+                      [invalid]="deptUserSubmitted() && !previewFormValues['du-6']?.trim()"
+                      class="w-full"
                     />
                     @if (deptUserSubmitted() && !previewFormValues['du-6']?.trim()) {
                       <div class="text-xs text-red-500 mt-0.5 font-medium">Mobile No. is required</div>
@@ -1712,10 +1656,11 @@ interface FormBuilderFormData {
                   <div>
                     <label class="block text-slate-700 font-medium mb-1">Date Of Birth</label>
                     <input
+                      appInput size="sm"
                       type="text"
                       placeholder="10 / 13 / 2026"
                       [(ngModel)]="previewFormValues['du-7']"
-                      class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800"
+                      class="w-full"
                     />
                   </div>
 
@@ -1723,11 +1668,12 @@ interface FormBuilderFormData {
                   <div>
                     <label class="block text-slate-700 font-medium mb-1">Aadhaar Id</label>
                     <input
+                      appInput size="sm"
                       type="text"
                       maxlength="12"
                       placeholder="12-digit Aadhaar number"
                       [(ngModel)]="previewFormValues['du-8']"
-                      class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:border-primary text-slate-800 font-mono text-xs"
+                      class="w-full font-mono"
                     />
                   </div>
 
@@ -1735,8 +1681,9 @@ interface FormBuilderFormData {
                   <div>
                     <label class="block text-slate-700 font-medium mb-1">Designation</label>
                     <select
+                      appInput size="sm"
                       [(ngModel)]="previewFormValues['du-9']"
-                      class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800 bg-white"
+                      class="w-full"
                     >
                       <option value="" disabled selected>Select Designation</option>
                       @for (desig of deptUserDesignationOptions; track desig) {
@@ -1749,22 +1696,22 @@ interface FormBuilderFormData {
                   <div class="relative scheme-dropdown-container">
                     <label class="block text-slate-700 font-medium mb-1">Scheme Name</label>
                     <button
+                      appButton
+                      variant="outline"
+                      block
                       type="button"
                       (click)="toggleDeptUserSchemeDropdown($event)"
-                      class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:border-primary text-slate-800 bg-white flex items-center justify-between text-left cursor-pointer transition-colors"
+                      class="justify-between text-left"
                     >
                       <span class="truncate text-xs sm:text-[13px]">
                         {{ getDeptUserSchemeDisplayLabel() }}
                       </span>
-                      <svg
-                        class="w-4 h-4 text-slate-400 shrink-0 ml-2 transition-transform duration-200"
+                      <app-icon
+                        name="chevron-down"
+                        [stroke]="2"
+                        class="text-slate-400 shrink-0 ml-2 transition-transform duration-200"
                         [class.rotate-180]="deptUserSchemeDropdownOpen()"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                      </svg>
+                      />
                     </button>
 
                     @if (deptUserSchemeDropdownOpen()) {
@@ -1808,8 +1755,9 @@ interface FormBuilderFormData {
                   <div>
                     <label class="block text-slate-700 font-medium mb-1">District</label>
                     <select
+                      appInput size="sm"
                       [(ngModel)]="previewFormValues['du-11']"
-                      class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800 bg-white"
+                      class="w-full"
                     >
                       @for (district of deptUserDistrictOptions; track district) {
                         <option [value]="district">{{ district }}</option>
@@ -1821,8 +1769,9 @@ interface FormBuilderFormData {
                   <div>
                     <label class="block text-slate-700 font-medium mb-1">Block Name</label>
                     <select
+                      appInput size="sm"
                       [(ngModel)]="previewFormValues['du-12']"
-                      class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800 bg-white"
+                      class="w-full"
                     >
                       @for (block of deptUserBlockOptions; track block) {
                         <option [value]="block">{{ block }}</option>
@@ -1834,19 +1783,11 @@ interface FormBuilderFormData {
 
               <!-- Footer Buttons (Cancel left, Submit right) matching screenshot -->
               <div class="mt-6 pt-4 border-t border-slate-200 flex items-center justify-between">
-                <button
-                  type="button"
-                  (click)="closePreviewModal()"
-                  class="px-8 py-2.5 border border-slate-300 rounded-lg text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
-                >
+                <button appButton variant="outline" type="button" (click)="closePreviewModal()">
                   Cancel
                 </button>
 
-                <button
-                  type="button"
-                  (click)="submitDeptUser()"
-                  class="px-8 py-2.5 bg-[#0e2138] hover:bg-[#163355] text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer shadow-xs"
-                >
+                <button appButton type="button" (click)="submitDeptUser()">
                   Submit
                 </button>
               </div>
@@ -1855,13 +1796,14 @@ interface FormBuilderFormData {
             <div class="font-sans text-slate-800">
               <!-- Back Button -->
               <button
+                appButton
+                variant="outline"
+                size="sm"
                 type="button"
                 (click)="closePreviewModal()"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer mb-3"
+                class="mb-3"
               >
-                <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
+                <app-icon name="back" size="xs" />
                 <span>Back</span>
               </button>
 
@@ -1887,9 +1829,11 @@ interface FormBuilderFormData {
                 <div class="flex items-center justify-between max-w-4xl mx-auto mb-8 px-2">
                   @for (step of form.steps; track step.id; let sIdx = $index) {
                     <button
+                      appButton
+                      variant="ghost"
                       type="button"
                       (click)="goToPreviewStep(sIdx)"
-                      class="flex items-center gap-2.5 group cursor-pointer focus:outline-none"
+                      class="group"
                     >
                       <div
                         class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all shrink-0"
@@ -1949,14 +1893,8 @@ interface FormBuilderFormData {
                                   @if (field.mandatory) { <span class="text-rose-500 font-bold ml-0.5">*</span> }
                                 </label>
                                 <div class="flex flex-wrap items-center gap-2.5">
-                                  <button
-                                    type="button"
-                                    (click)="simulateFileUpload(field)"
-                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-slate-300 rounded-lg bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
-                                  >
-                                    <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                    </svg>
+                                  <button appButton variant="outline" size="sm" type="button" (click)="simulateFileUpload(field)">
+                                    <app-icon name="upload" size="xs" />
                                     <span>Upload Document</span>
                                   </button>
                                   <span class="text-[11px] text-slate-400">
@@ -1964,14 +1902,15 @@ interface FormBuilderFormData {
                                   </span>
                                   @if (uploadedFiles[field.id]) {
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                      <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                      </svg>
+                                      <app-icon name="check" size="sm" [stroke]="2.5" class="text-emerald-600" />
                                       <span>{{ uploadedFiles[field.id] }}</span>
                                       <button
+                                        appButton
+                                        variant="ghost"
+                                        size="sm"
                                         type="button"
                                         (click)="removeUploadedFile(field.id, $event)"
-                                        class="text-emerald-700 hover:text-emerald-900 ml-1 cursor-pointer"
+                                        class="ml-1"
                                         title="Remove file"
                                       >
                                         ✕
@@ -1992,11 +1931,11 @@ interface FormBuilderFormData {
                                     <span class="inline-block ml-1 text-slate-400 hover:text-slate-600 cursor-help" title="11 characters code found on cheque book">ⓘ</span>
                                   }
                                 </label>
-                                <input
+                                <input appInput size="sm"
                                   type="text"
                                   [(ngModel)]="previewFormValues[field.id]"
                                   [placeholder]="getFieldPlaceholder(field)"
-                                  class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                  class="w-full"
                                 />
                               </div>
                             }
@@ -2008,11 +1947,11 @@ interface FormBuilderFormData {
                                   {{ field.label }}
                                   @if (field.mandatory) { <span class="text-rose-500 font-bold ml-0.5">*</span> }
                                 </label>
-                                <input
+                                <input appInput size="sm"
                                   type="text"
                                   [(ngModel)]="previewFormValues[field.id]"
                                   [placeholder]="getFieldPlaceholder(field)"
-                                  class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                  class="w-full"
                                 />
                               </div>
                             }
@@ -2024,12 +1963,12 @@ interface FormBuilderFormData {
                                   {{ field.label }}
                                   @if (field.mandatory) { <span class="text-rose-500 font-bold ml-0.5">*</span> }
                                 </label>
-                                <input
+                                <input appInput size="sm"
                                   type="text"
                                   [(ngModel)]="previewFormValues[field.id]"
                                   (ngModelChange)="onDateChange(field.id)"
                                   placeholder="10 / 13 / 2026"
-                                  class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                  class="w-full"
                                 />
                               </div>
                             }
@@ -2042,18 +1981,16 @@ interface FormBuilderFormData {
                                   @if (field.mandatory) { <span class="text-rose-500 font-bold ml-0.5">*</span> }
                                 </label>
                                 <div class="relative">
-                                  <select
+                                  <select appInput size="sm"
                                     [(ngModel)]="previewFormValues[field.id]"
-                                    class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all cursor-pointer appearance-none pr-8"
+                                    class="w-full"
                                   >
                                     <option value="" disabled>{{ getDropdownPlaceholder(field) }}</option>
                                     @for (opt of getOptionsArray(field); track opt) {
                                       <option [value]="opt">{{ opt }}</option>
                                     }
                                   </select>
-                                  <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                  </svg>
+                                  <app-icon name="chevron-down" [stroke]="2" class="text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                                 </div>
                               </div>
                             }
@@ -2080,14 +2017,8 @@ interface FormBuilderFormData {
                       <div class="flex items-center justify-between pt-4 border-t border-slate-100">
                         <div>
                           @if (previewStepIndex() > 0) {
-                            <button
-                              type="button"
-                              (click)="previewPrevStep()"
-                              class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
-                            >
-                              <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                              </svg>
+                            <button appButton variant="outline" type="button" (click)="previewPrevStep()">
+                              <app-icon name="chevron-left" size="xs" />
                               <span>Previous</span>
                             </button>
                           }
@@ -2095,36 +2026,20 @@ interface FormBuilderFormData {
 
                         <div class="flex items-center gap-2.5">
                           @if (previewStepIndex() === 2 && form.id === 'form-company-reg') {
-                            <button
-                              type="button"
-                              (click)="saveAsDraft()"
-                              class="px-4 py-2 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
-                            >
+                            <button appButton variant="outline" type="button" (click)="saveAsDraft()">
                               Save as Draft
                             </button>
                           }
 
                           @if (previewStepIndex() === form.steps.length - 1) {
-                            <button
-                              type="button"
-                              (click)="submitPreviewForm(form)"
-                              class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#0e2138] hover:bg-[#163355] text-white text-xs font-semibold transition-all shadow-xs cursor-pointer"
-                            >
+                            <button appButton type="button" (click)="submitPreviewForm(form)">
                               <span>Submit</span>
-                              <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                              </svg>
+                              <app-icon name="check" size="xs" />
                             </button>
                           } @else {
-                            <button
-                              type="button"
-                              (click)="previewNextStep(form)"
-                              class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#0e2138] hover:bg-[#163355] text-white text-xs font-semibold transition-all shadow-xs cursor-pointer"
-                            >
+                            <button appButton type="button" (click)="previewNextStep(form)">
                               <span>Next Step</span>
-                              <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                              </svg>
+                              <app-icon name="chevron-right" size="xs" />
                             </button>
                           }
                         </div>
@@ -2160,15 +2075,9 @@ interface FormBuilderFormData {
                           </div>
                           <span class="text-sm font-bold text-slate-900">Organisation Details</span>
                         </div>
-                        <button
-                          type="button"
-                          (click)="goToPreviewStep(0)"
-                          class="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-300 rounded-md text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
-                        >
+                        <button appButton variant="outline" size="sm" type="button" (click)="goToPreviewStep(0)">
                           <span>Edit Details</span>
-                          <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                          </svg>
+                          <app-icon name="chevron-down" size="xs" />
                         </button>
                       </div>
                       <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-4 gap-x-6 text-xs">
@@ -2240,15 +2149,9 @@ interface FormBuilderFormData {
                           </div>
                           <span class="text-sm font-bold text-slate-900">Authorized Person Details</span>
                         </div>
-                        <button
-                          type="button"
-                          (click)="goToPreviewStep(1)"
-                          class="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-300 rounded-md text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
-                        >
+                        <button appButton variant="outline" size="sm" type="button" (click)="goToPreviewStep(1)">
                           <span>Edit Details</span>
-                          <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                          </svg>
+                          <app-icon name="chevron-down" size="xs" />
                         </button>
                       </div>
                       <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-4 gap-x-6 text-xs">
@@ -2316,15 +2219,9 @@ interface FormBuilderFormData {
                           </div>
                           <span class="text-sm font-bold text-slate-900">Bank Details</span>
                         </div>
-                        <button
-                          type="button"
-                          (click)="goToPreviewStep(2)"
-                          class="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-300 rounded-md text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
-                        >
+                        <button appButton variant="outline" size="sm" type="button" (click)="goToPreviewStep(2)">
                           <span>Edit Details</span>
-                          <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                          </svg>
+                          <app-icon name="chevron-down" size="xs" />
                         </button>
                       </div>
                       <div class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-4 gap-x-6 text-xs">
@@ -2369,34 +2266,18 @@ interface FormBuilderFormData {
 
                     <!-- Step 4 Bottom Action Buttons -->
                     <div class="flex items-center justify-between pt-2">
-                      <button
-                        type="button"
-                        (click)="previewPrevStep()"
-                        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
-                      >
-                        <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                        </svg>
+                      <button appButton variant="outline" type="button" (click)="previewPrevStep()">
+                        <app-icon name="chevron-left" size="xs" />
                         <span>Previous</span>
                       </button>
 
                       <div class="flex items-center gap-3">
-                        <button
-                          type="button"
-                          (click)="downloadPdf()"
-                          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer"
-                        >
-                          <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                          </svg>
+                        <button appButton variant="outline" type="button" (click)="downloadPdf()">
+                          <app-icon name="file" [stroke]="2" />
                           <span>Download PDF</span>
                         </button>
 
-                        <button
-                          type="button"
-                          (click)="registerSubmit()"
-                          class="px-6 py-2 rounded-lg bg-[#0e2138] hover:bg-[#163355] text-white text-xs font-semibold transition-all shadow-xs cursor-pointer"
-                        >
+                        <button appButton type="button" (click)="registerSubmit()">
                           Register
                         </button>
                       </div>
@@ -2418,16 +2299,16 @@ interface FormBuilderFormData {
                       </label>
 
                       @if (field.type === 'text') {
-                        <input type="text" [(ngModel)]="previewFormValues[field.id]" [placeholder]="getFieldPlaceholder(field)" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-primary" />
+                        <input appInput size="sm" type="text" [(ngModel)]="previewFormValues[field.id]" [placeholder]="getFieldPlaceholder(field)" class="w-full" />
                       }
                       @if (field.type === 'number') {
-                        <input type="text" [(ngModel)]="previewFormValues[field.id]" [placeholder]="getFieldPlaceholder(field)" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-primary" />
+                        <input appInput size="sm" type="text" [(ngModel)]="previewFormValues[field.id]" [placeholder]="getFieldPlaceholder(field)" class="w-full" />
                       }
                       @if (field.type === 'datepicker') {
-                        <input type="text" [(ngModel)]="previewFormValues[field.id]" placeholder="10 / 13 / 2026" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-primary" />
+                        <input appInput size="sm" type="text" [(ngModel)]="previewFormValues[field.id]" placeholder="10 / 13 / 2026" class="w-full" />
                       }
                       @if (field.type === 'dropdown') {
-                        <select [(ngModel)]="previewFormValues[field.id]" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-primary cursor-pointer">
+                        <select appInput size="sm" [(ngModel)]="previewFormValues[field.id]" class="w-full">
                           <option value="" disabled>{{ getDropdownPlaceholder(field) }}</option>
                           @for (opt of getOptionsArray(field); track opt) {
                             <option [value]="opt">{{ opt }}</option>
@@ -2447,11 +2328,7 @@ interface FormBuilderFormData {
                 </div>
 
                 <div class="pt-4 border-t border-slate-200 flex justify-end">
-                  <button
-                    type="button"
-                    (click)="registerSubmit()"
-                    class="px-5 py-2 rounded-lg bg-[#0e2138] hover:bg-[#163355] text-white text-xs font-semibold transition-colors cursor-pointer"
-                  >
+                  <button appButton type="button" (click)="registerSubmit()">
                     Submit Form
                   </button>
                 </div>
@@ -2479,9 +2356,7 @@ interface FormBuilderFormData {
       >
         <div class="text-center py-2">
           <div class="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-3">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
+            <app-icon name="trash" size="xl" [stroke]="2" />
           </div>
 
           <h2 class="m-0 text-navy text-base font-bold">
@@ -2495,7 +2370,7 @@ interface FormBuilderFormData {
         </div>
       </app-action-modal>
 
-    </div>
+    </app-page-shell>
   `
 })
 export class DynamicFormBuilderComponent {
@@ -2553,13 +2428,7 @@ export class DynamicFormBuilderComponent {
 
   otrBankDoc = { key: 'bnk-1', label: 'Cancelled Cheque / Passbook', fileName: 'Cancelled_Cheque_Verified.pdf', fileSize: '850 KB' };
 
-  applyEoiDocuments: Array<{
-    id: number;
-    name: string;
-    category: 'mandatory' | 'annexure' | 'remaining';
-    uploadedFile?: string;
-    uploadedSize?: string;
-  }> = [];
+  applyEoiDocuments: ApplyEoiDocument[] = [];
 
   // Department User Registration Form State (Matching Image)
   readonly deptUserSubmitted = signal<boolean>(false);
@@ -2652,7 +2521,7 @@ export class DynamicFormBuilderComponent {
     { key: 'actions', label: 'Form actions', align: 'center', type: 'custom', width: 'min-w-[240px]' }
   ];
 
-  getRowClass = (item: any): string => {
+  getRowClass = (item: { status?: string }): string => {
     const isInactive = item.status === 'Inactive';
     return isInactive ? 'opacity-50 !bg-slate-100/70 transition-colors' : 'bg-white transition-colors';
   };
@@ -3619,13 +3488,13 @@ export class DynamicFormBuilderComponent {
     this.notification.info(`Previewing ${fileName}`);
   }
 
-  changeOtrDoc(doc: any): void {
+  changeOtrDoc(doc: OtrPreviewDoc): void {
     doc.fileName = `${doc.label.replace(/[^a-zA-Z0-9]/g, '_')}_Updated_2026.pdf`;
     doc.fileSize = '2.1 MB';
     this.notification.success(`${doc.label} updated successfully.`);
   }
 
-  removeOtrDoc(doc: any): void {
+  removeOtrDoc(doc: OtrPreviewDoc): void {
     doc.fileName = 'Not_Uploaded.pdf';
     doc.fileSize = '0 KB';
     this.notification.info(`${doc.label} removed.`);
@@ -3649,7 +3518,7 @@ export class DynamicFormBuilderComponent {
     return this.applyEoiDocuments.filter(d => d.category === 'remaining' && !!d.uploadedFile).length;
   }
 
-  getFilteredApplyDocs(): Array<any> {
+  getFilteredApplyDocs(): ApplyEoiDocument[] {
     const tab = this.selectedApplyDocTab();
     if (tab === 'all') return this.applyEoiDocuments;
     return this.applyEoiDocuments.filter(d => d.category === tab);

@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { delay, map, catchError } from 'rxjs/operators';
 import { HttpService } from '../http/http.service';
-import { MockDatabaseService, QueryOptions } from '../mock/mock-database.service';
+import { MockDatabaseService, QueryOptions, asRecord } from '../mock/mock-database.service';
 import { isMockEnabled, MOCK_CONFIG } from '../mock/mock.config';
 import {
   getEndpointForDataKey,
@@ -11,14 +11,20 @@ import {
 } from '../config/api.config';
 import { ApiResponse, PaginatedResponse } from '../models/common.model';
 
+/** Returns `res.data` when the response is wrapped in a `{ data }` envelope, otherwise the response itself. */
+function unwrapData(res: unknown): unknown {
+  const data = (res as { data?: unknown } | null | undefined)?.data;
+  return data !== undefined ? data : res;
+}
+
 export interface ResourceRepositoryOptions<T> {
   idKey?: string;
-  normalizer?: (item: any) => T;
+  normalizer?: (item: unknown) => T;
 }
 
 export interface ResourceRepository<T> {
   list(options?: QueryOptions): Observable<PaginatedResponse<T>>;
-  getAll(filter?: Record<string, any>): Observable<T[]>;
+  getAll(filter?: Record<string, unknown>): Observable<T[]>;
   getById(id: string | number): Observable<T>;
   create(payload: Partial<T>): Observable<T>;
   update(id: string | number, patch: Partial<T>): Observable<T>;
@@ -46,11 +52,11 @@ export class DataEngineService {
    */
   for<T = any>(dataKey: string, options: ResourceRepositoryOptions<T> = {}): ResourceRepository<T> {
     const idKey = options.idKey || 'id';
-    const normalizer = options.normalizer || ((item: any) => item as T);
+    const normalizer = options.normalizer || ((item: unknown) => item as T);
 
     return {
       list: (queryOpts?: QueryOptions) => this.list<T>(dataKey, queryOpts, { idKey, normalizer }),
-      getAll: (filter?: Record<string, any>) => this.getAll<T>(dataKey, filter, { idKey, normalizer }),
+      getAll: (filter?: Record<string, unknown>) => this.getAll<T>(dataKey, filter, { idKey, normalizer }),
       getById: (id: string | number) => this.getById<T>(dataKey, id, { idKey, normalizer }),
       create: (payload: Partial<T>) => this.create<T>(dataKey, payload, { idKey, normalizer }),
       update: (id: string | number, patch: Partial<T>) => this.update<T>(dataKey, id, patch, { idKey, normalizer }),
@@ -70,7 +76,7 @@ export class DataEngineService {
     queryOpts: QueryOptions = {},
     options: ResourceRepositoryOptions<T> = {}
   ): Observable<PaginatedResponse<T>> {
-    const normalizer = options.normalizer || ((item: any) => item as T);
+    const normalizer = options.normalizer || ((item: unknown) => item as T);
 
     // Path A: Centralized Mock
     if (isMockEnabled(dataKey)) {
@@ -115,16 +121,16 @@ export class DataEngineService {
    */
   getAll<T = any>(
     dataKey: string,
-    filter?: Record<string, any>,
+    filter?: Record<string, unknown>,
     options: ResourceRepositoryOptions<T> = {}
   ): Observable<T[]> {
-    const normalizer = options.normalizer || ((item: any) => item as T);
+    const normalizer = options.normalizer || ((item: unknown) => item as T);
 
     if (isMockEnabled(dataKey)) {
       let raw = this.mockDb.getAll<T>(dataKey);
       if (filter && Object.keys(filter).length > 0) {
         raw = raw.filter(item => {
-          return Object.entries(filter).every(([k, v]) => (item as any)[k] === v);
+          return Object.entries(filter).every(([k, v]) => asRecord(item)[k] === v);
         });
       }
       return of(raw.map(normalizer)).pipe(
@@ -138,7 +144,7 @@ export class DataEngineService {
     }
 
     const fullUrl = buildApiUrl(resolveEndpointUrl(endpoint.url));
-    return this.http.get<any>(fullUrl, { params: filter as any }).pipe(
+    return this.http.get<any>(fullUrl, { params: filter as Record<string, string | number | boolean> }).pipe(
       map(res => {
         const items = Array.isArray(res) ? res : res?.data?.items || res?.data || [];
         return items.map(normalizer);
@@ -159,7 +165,7 @@ export class DataEngineService {
     options: ResourceRepositoryOptions<T> = {}
   ): Observable<T> {
     const idKey = options.idKey || 'id';
-    const normalizer = options.normalizer || ((item: any) => item as T);
+    const normalizer = options.normalizer || ((item: unknown) => item as T);
 
     if (isMockEnabled(dataKey)) {
       const item = this.mockDb.getById<T>(dataKey, id, idKey);
@@ -177,9 +183,9 @@ export class DataEngineService {
     }
 
     const fullUrl = buildApiUrl(resolveEndpointUrl(endpoint.url, id));
-    return this.http.get<any>(fullUrl).pipe(
+    return this.http.get<unknown>(fullUrl).pipe(
       map(res => {
-        const item = res?.data !== undefined ? res.data : res;
+        const item = unwrapData(res);
         return normalizer(item);
       })
     );
@@ -194,7 +200,7 @@ export class DataEngineService {
     options: ResourceRepositoryOptions<T> = {}
   ): Observable<T> {
     const idKey = options.idKey || 'id';
-    const normalizer = options.normalizer || ((item: any) => item as T);
+    const normalizer = options.normalizer || ((item: unknown) => item as T);
 
     if (isMockEnabled(dataKey)) {
       const created = this.mockDb.create<T>(dataKey, payload, idKey);
@@ -209,9 +215,9 @@ export class DataEngineService {
     }
 
     const fullUrl = buildApiUrl(resolveEndpointUrl(endpoint.url));
-    return this.http.post<any>(fullUrl, payload).pipe(
+    return this.http.post<unknown>(fullUrl, payload).pipe(
       map(res => {
-        const item = res?.data !== undefined ? res.data : res;
+        const item = unwrapData(res);
         return normalizer(item);
       })
     );
@@ -227,7 +233,7 @@ export class DataEngineService {
     options: ResourceRepositoryOptions<T> = {}
   ): Observable<T> {
     const idKey = options.idKey || 'id';
-    const normalizer = options.normalizer || ((item: any) => item as T);
+    const normalizer = options.normalizer || ((item: unknown) => item as T);
 
     if (isMockEnabled(dataKey)) {
       const updated = this.mockDb.update<T>(dataKey, id, patch, idKey);
@@ -242,9 +248,9 @@ export class DataEngineService {
     }
 
     const fullUrl = buildApiUrl(resolveEndpointUrl(endpoint.url, id));
-    return this.http.put<any>(fullUrl, patch).pipe(
+    return this.http.put<unknown>(fullUrl, patch).pipe(
       map(res => {
-        const item = res?.data !== undefined ? res.data : res;
+        const item = unwrapData(res);
         return normalizer(item);
       })
     );
@@ -273,7 +279,7 @@ export class DataEngineService {
     }
 
     const fullUrl = buildApiUrl(resolveEndpointUrl(endpoint.url, id));
-    return this.http.delete<any>(fullUrl).pipe(
+    return this.http.delete<{ success?: boolean } | null>(fullUrl).pipe(
       map(res => res?.success ?? true)
     );
   }
@@ -282,13 +288,13 @@ export class DataEngineService {
 
   private extractPaginatedResponse<T>(
     res: any,
-    normalizer: (item: any) => T
+    normalizer: (item: unknown) => T
   ): PaginatedResponse<T> {
     if (!res) {
       return { items: [], total: 0, page: 1, pageSize: 10, totalPages: 1 };
     }
 
-    let itemsRaw: any[] = [];
+    let itemsRaw: unknown[] = [];
     let total = 0;
     let page = 1;
     let pageSize = 10;

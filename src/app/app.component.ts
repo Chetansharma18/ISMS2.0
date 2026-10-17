@@ -9,6 +9,9 @@ import { SidebarComponent } from './core/layout/sidebar/sidebar.component';
 import { AuthService } from './core/auth/auth.service';
 import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-modal/sso-redirect-modal.component';
 import { ToastOutletComponent } from './shared/components/toast-outlet/toast-outlet.component';
+import { ButtonComponent } from './shared/components/button/button.component';
+import { IconComponent } from './shared/components/icon/icon.component';
+import { BackdropComponent } from './shared/components/backdrop/backdrop.component';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +23,10 @@ import { ToastOutletComponent } from './shared/components/toast-outlet/toast-out
     FooterComponent,
     SidebarComponent,
     SsoRedirectModalComponent,
-    ToastOutletComponent
+    ToastOutletComponent,
+    ButtonComponent,
+    IconComponent,
+    BackdropComponent
   ],
   template: `
     <div class="h-screen overflow-hidden flex flex-col text-slate-900 antialiased relative" style="background-color: #FEFEFD;">
@@ -49,11 +55,7 @@ import { ToastOutletComponent } from './shared/components/toast-outlet/toast-out
           <!-- Mobile Sidebar Overlay Drawer: Visible on small screens when open -->
           @if (isMobileSidebarOpen()) {
             <!-- Backdrop -->
-            <div
-              class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 md:hidden transition-opacity"
-              (click)="closeMobileSidebar()"
-              aria-hidden="true"
-            ></div>
+            <app-backdrop z="z-50" class="md:hidden" (click)="closeMobileSidebar()" />
 
             <!-- Drawer Slider Panel -->
             <div
@@ -65,14 +67,15 @@ import { ToastOutletComponent } from './shared/components/toast-outlet/toast-out
               <div class="flex items-center justify-between px-4 py-3.5 border-b border-slate-200 bg-slate-50">
                 <span class="text-xs font-bold text-navy uppercase tracking-wider">Navigation Menu</span>
                 <button
+                  appButton
+                  variant="ghost"
+                  size="sm"
+                  iconOnly
                   type="button"
                   (click)="closeMobileSidebar()"
-                  class="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200/70 transition-colors cursor-pointer"
                   aria-label="Close menu"
                 >
-                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <app-icon name="close" size="lg" />
                 </button>
               </div>
 

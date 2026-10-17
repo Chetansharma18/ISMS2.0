@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { AspirantRecord } from '../../models/aspirant.model';
+import { ButtonComponent } from '../../../../shared';
 
 /** View-mode card: address and contact details. */
 @Component({
@@ -7,6 +8,7 @@ import { AspirantRecord } from '../../models/aspirant.model';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
+  imports: [ButtonComponent],
   template: `
     @let cand = aspirant();
     <div class="border border-slate-200 rounded-xl p-5 bg-white shadow-2xs space-y-4">
@@ -16,9 +18,11 @@ import { AspirantRecord } from '../../models/aspirant.model';
           <span>2. Address &amp; Contact Details</span>
         </h2>
         <button
+          appButton
+          variant="ghost"
+          size="sm"
           type="button"
           (click)="edit.emit()"
-          class="text-xs text-brand hover:underline font-semibold cursor-pointer inline-flex items-center gap-1"
         >
           <span>Edit Section</span> &rarr;
         </button>

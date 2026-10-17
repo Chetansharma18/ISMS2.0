@@ -1,5 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ButtonComponent } from '../../../../../shared';
 import { SchemeFormState } from '../scheme-form.state';
 import { Step4FeeStatusComponent } from './step4/step4-fee-status.component';
 import { Step4OrganisationPreviewComponent } from './step4/step4-organisation-preview.component';
@@ -11,7 +12,8 @@ import { Step4DocumentsTableComponent } from './step4/step4-documents-table.comp
 @Component({
   selector: 'app-step4-complete-preview',
   standalone: true,
-  imports: [FormsModule, Step4FeeStatusComponent, Step4OrganisationPreviewComponent, Step4AuthorizedPersonPreviewComponent, Step4BankPreviewComponent, Step4DocumentsTableComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FormsModule, ButtonComponent, Step4FeeStatusComponent, Step4OrganisationPreviewComponent, Step4AuthorizedPersonPreviewComponent, Step4BankPreviewComponent, Step4DocumentsTableComponent],
   host: { class: 'block' },
   template: `
     <div class="w-full space-y-4 font-sans">
@@ -51,20 +53,11 @@ import { Step4DocumentsTableComponent } from './step4/step4-documents-table.comp
 
       <!-- Footer Action Bar -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <button
-          type="button"
-          (click)="state.goToStep(3)"
-          class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
-        >
+        <button appButton variant="outline" size="lg" (click)="state.goToStep(3)">
           &larr; Back to Upload Documents
         </button>
 
-        <button
-          type="button"
-          (click)="state.goToStep(5)"
-          [disabled]="!state.declarationAgreed()"
-          class="px-6 sm:px-7 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-        >
+        <button appButton size="lg" (click)="state.goToStep(5)" [disabled]="!state.declarationAgreed()">
           Proceed to EMD Fee Payment ({{ state.formattedEmdFee() }}) &rarr;
         </button>
       </div>

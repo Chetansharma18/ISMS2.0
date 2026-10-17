@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FormSdcComponent, FormFieldConfig } from '../../../shared/components/form-sdc';
 import { StepperComponent, StepperStep } from '../../../shared/components/stepper/stepper.component';
+import { ButtonComponent, IconComponent, PageShellComponent } from '../../../shared';
 import { AspirantAadhaarUploadComponent } from './aspirant-mapping/aspirant-aadhaar-upload.component';
 import { AspirantErrorBannerComponent } from './aspirant-mapping/aspirant-error-banner.component';
 import { AspirantMappingHeaderComponent } from './aspirant-mapping/aspirant-mapping-header.component';
@@ -40,6 +41,9 @@ import {
     FormsModule,
     FormSdcComponent,
     StepperComponent,
+    ButtonComponent,
+    IconComponent,
+    PageShellComponent,
     AspirantAadhaarUploadComponent,
     AspirantErrorBannerComponent,
     AspirantMappingHeaderComponent,
@@ -48,10 +52,7 @@ import {
     AspirantSuccessModalComponent
   ],
   template: `
-    <div class="min-h-full bg-white py-4 sm:py-6 px-4 sm:px-8 font-sans selection:bg-primary selection:text-white" style="font-family: 'Inter', sans-serif;">
-      
-      <!-- Direct-on-Page Container (matching SDC & Batch forms) -->
-      <div class="w-full space-y-4">
+    <app-page-shell>
         
         <!-- Aadhaar Card Upload Control Template for Identity Details in Step 1 -->
         <ng-template #aadhaarUploadTemplate>
@@ -227,21 +228,19 @@ import {
 
               <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
                 <button
+                  appButton
+                  variant="outline"
+                  size="lg"
                   type="button"
                   (click)="submitAndMapAspirant()"
                   [disabled]="isSubmitting()"
-                  class="flex-1 sm:flex-none px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-lg font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer inline-flex items-center justify-center gap-2"
+                  [loading]="isSubmitting()"
+                  class="flex-1 sm:flex-none"
                 >
                   @if (isSubmitting()) {
-                    <svg class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                    </svg>
                     <span>Mapping to Batch...</span>
                   } @else {
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
+                    <app-icon name="check" />
                     <span>Register Aspirant</span>
                   }
                 </button>
@@ -249,8 +248,6 @@ import {
             </div>
           </app-aspirant-photo-documents-step>
         }
-
-      </div>
 
       <!-- SUCCESS MODAL AFTER MAPPING ASPIRANT -->
       @if (showSuccessModal()) {
@@ -265,7 +262,7 @@ import {
         ></app-aspirant-success-modal>
       }
 
-    </div>
+    </app-page-shell>
   `
 })
 export class AspirantMappingComponent implements OnInit {

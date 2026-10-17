@@ -13,12 +13,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
 import { PortalNotificationService } from '../../services/portal-notification.service';
 import { PortalNotification } from '../../models/portal-notification.model';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-header-notification',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, ClickOutsideDirective],
+  imports: [CommonModule, RouterModule, ClickOutsideDirective, ButtonComponent, IconComponent],
   host: {
     class: 'relative block'
   },
@@ -26,32 +28,20 @@ import { PortalNotification } from '../../models/portal-notification.model';
     <div class="relative inline-block text-left" (appClickOutside)="closeDropdown()">
       <!-- Notification Bell Trigger -->
       <button
+        appButton
+        iconOnly
+        [variant]="isOpen() ? 'secondary' : 'outline'"
         type="button"
         id="portal-notification-bell-btn"
         (click)="toggleDropdown()"
-        class="relative inline-flex items-center justify-center w-[36px] h-[36px] sm:w-[40px] sm:h-[40px] rounded-full border transition-all cursor-pointer select-none focus:outline-hidden focus:ring-2 focus:ring-[#12365A]/25"
-        [ngClass]="isOpen() 
-          ? 'bg-[#EAF2F6] border-[#12365A]/40 text-[#12365A]' 
-          : 'bg-white hover:bg-[#F5F8FA] border-[#DCE4ED] hover:border-slate-300 text-slate-600 hover:text-[#12365A] shadow-2xs'"
+        class="relative"
         [attr.aria-expanded]="isOpen()"
         aria-haspopup="true"
         aria-label="Notifications"
         [title]="unreadCount() > 0 ? (unreadCount() + ' unread notifications') : 'Notifications'"
       >
         <!-- Bell Icon -->
-        <svg
-          class="w-4 h-4 sm:w-[18px] sm:h-[18px]"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-          />
-        </svg>
+        <app-icon name="bell" size="auto" [stroke]="2" class="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
 
         <!-- Unread Count Badge -->
         @if (unreadCount() > 0) {
@@ -88,9 +78,11 @@ import { PortalNotification } from '../../models/portal-notification.model';
 
             @if (unreadCount() > 0) {
               <button
+                appButton
+                variant="ghost"
+                size="sm"
                 type="button"
                 (click)="markAllAsRead()"
-                class="text-[11px] font-medium text-[#12365A] hover:underline cursor-pointer border-0 bg-transparent p-0"
               >
                 Mark all read
               </button>

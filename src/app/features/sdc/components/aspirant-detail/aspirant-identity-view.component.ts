@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { AspirantRecord } from '../../models/aspirant.model';
+import { ButtonComponent, IconComponent } from '../../../../shared';
 
 /** View-mode card: identity details. */
 @Component({
@@ -7,6 +8,7 @@ import { AspirantRecord } from '../../models/aspirant.model';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
+  imports: [ButtonComponent, IconComponent],
   template: `
     @let cand = aspirant();
     <div class="border border-slate-200 rounded-xl p-5 bg-white shadow-2xs space-y-4">
@@ -16,9 +18,11 @@ import { AspirantRecord } from '../../models/aspirant.model';
           <span>1. Identity details </span>
         </h2>
         <button
+          appButton
+          variant="ghost"
+          size="sm"
           type="button"
           (click)="edit.emit()"
-          class="text-xs text-brand hover:underline font-semibold cursor-pointer inline-flex items-center gap-1"
         >
           <span>Edit Section</span> &rarr;
         </button>
@@ -88,15 +92,15 @@ import { AspirantRecord } from '../../models/aspirant.model';
               {{ cand.aadhaarDocName || 'Aadhaar_Document.pdf' }}
             </span>
             <button
+              appButton
+              variant="outline"
+              size="sm"
+              class="shrink-0"
               type="button"
               (click)="previewAadhaar.emit()"
-              class="px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-300 rounded text-[11px] font-semibold text-brand cursor-pointer shadow-2xs inline-flex items-center gap-1 shrink-0"
               title="Preview Aadhaar Card"
             >
-              <svg class="w-3.5 h-3.5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
+              <app-icon name="eye" size="sm" />
               <span>Preview</span>
             </button>
           </div>

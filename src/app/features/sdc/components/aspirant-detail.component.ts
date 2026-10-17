@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { AspirantService } from '../services/aspirant.service';
 import { AspirantRecord, AspirantTrainingStatus } from '../models/aspirant.model';
 import { AspirantDocumentItem } from '../config/aspirant-form.config';
-import { PageHeaderComponent } from '../../../shared/components';
+import { PageHeaderComponent, ButtonComponent, IconComponent } from '../../../shared';
 import { AspirantSummaryComponent } from './aspirant-detail/aspirant-summary.component';
 import { AspirantIdentityViewComponent } from './aspirant-detail/aspirant-identity-view.component';
 import { AspirantAddressViewComponent } from './aspirant-detail/aspirant-address-view.component';
@@ -32,6 +32,8 @@ import {
     RouterModule,
     FormsModule,
     PageHeaderComponent,
+    ButtonComponent,
+    IconComponent,
     AspirantSummaryComponent,
     AspirantIdentityViewComponent,
     AspirantAddressViewComponent,
@@ -63,12 +65,10 @@ import {
           @if (successMessage()) {
             <div class="p-3.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 flex items-center justify-between text-xs animate-in fade-in shadow-xs">
               <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
+                <app-icon name="check" [stroke]="2" class="text-emerald-600 shrink-0" />
                 <span class="font-medium">{{ successMessage() }}</span>
               </div>
-              <button (click)="successMessage.set('')" class="text-emerald-600 hover:text-emerald-900 cursor-pointer font-bold px-1">✕</button>
+              <button appButton variant="ghost" size="sm" iconOnly aria-label="Dismiss" (click)="successMessage.set('')"><app-icon name="close" size="xs" /></button>
             </div>
           }
 
@@ -120,21 +120,21 @@ import {
               <!-- Form Submit Actions Bar -->
               <div class="pt-2 flex items-center justify-end gap-3">
                 <button
+                  appButton
+                  variant="outline"
+                  size="lg"
                   type="button"
                   (click)="cancelEditing()"
-                  class="px-5 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold shadow-2xs transition-all cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
+                  appButton
+                  size="lg"
                   type="submit"
-                  class="px-6 py-2.5 bg-primary hover:bg-primary-dark active:scale-95 text-white rounded-lg text-xs font-bold shadow-xs transition-all cursor-pointer inline-flex items-center gap-2"
-                  style="color: #ffffff !important; background-color: #174A6E !important;"
                 >
-                  <svg class="w-4 h-4" style="color: #ffffff !important; stroke: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span style="color: #ffffff !important;">Save All Changes</span>
+                  <app-icon name="check" />
+                  <span>Save All Changes</span>
                 </button>
               </div>
 
@@ -152,9 +152,8 @@ import {
           <h2 class="text-base font-bold text-slate-800">Aspirant Record Not Found</h2>
           <p class="text-xs text-slate-500">The requested aspirant identifier does not exist or has been removed from the roster.</p>
           <a
+            appButton
             routerLink="/aspirants"
-            class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded-lg text-xs font-semibold cursor-pointer shadow-xs hover:bg-primary-dark"
-            style="color: #ffffff !important;"
           >
             &larr; Return to Aspirants Roster
           </a>

@@ -5,91 +5,57 @@ import { FormsModule } from '@angular/forms';
 import { BatchService } from '../services/batch.service';
 import { BatchRecord } from '../models/batch.model';
 import {
-  PageHeaderComponent,
-  TableComponent,
+  ListPageComponent,
   ButtonComponent,
+  IconComponent,
   TableColumn
 } from '../../../shared';
+import { FilterTabsComponent } from '../../../shared';
 
 @Component({
   selector: 'app-batch-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FilterTabsComponent,
     CommonModule,
     RouterModule,
     FormsModule,
-    PageHeaderComponent,
-    TableComponent,
-    ButtonComponent
+    ListPageComponent,
+    ButtonComponent,
+    IconComponent
   ],
   template: `
-    <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
-      <div class="p-4 sm:p-5 space-y-3 font-sans">
-        
-        <!-- Page Header via Reusable PageHeaderComponent with Built-in Search -->
-        <app-page-header
-          title="Batch Management"
-          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Batch Management' }]"
-          [searchable]="true"
-          [(searchQuery)]="searchQuery"
-          searchPlaceholder="Search Batch Code, Course, Center, Scheme..."
-        ></app-page-header>
-
+    <!-- Page Header + Search + Batches Table via the shared ListPageComponent -->
+    <app-list-page
+      title="Batch Management"
+      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Batch Management' }]"
+      [searchable]="true"
+      [(searchQuery)]="searchQuery"
+      searchPlaceholder="Search Batch Code, Course, Center, Scheme..."
+      [columns]="batchColumns"
+      [data]="filteredBatches()"
+      [pagination]="true"
+      [pageSize]="pageSize"
+      itemUnit="batches"
+      emptyMessage="No batches match your search criteria."
+      [customTemplates]="{
+        batchInfo: batchInfoTemplate,
+        courseScheme: courseSchemeTemplate,
+        center: centerTemplate,
+        capacity: capacityTemplate,
+        duration: durationTemplate,
+        status: statusTemplate,
+        actions: actionsTemplate
+      }"
+    >
         <!-- Filter Controls Toolbar -->
-        <div class="flex items-center justify-between gap-3 pt-1">
+        <div beforeTable class="flex items-center justify-between gap-3 pt-1">
           
           <!-- Status Filter Badges / Pills -->
-          <div class="flex items-center gap-1.5 flex-wrap">
-            @for (f of filterOptions(); track f.id) {
-              <button
-                type="button"
-                (click)="setFilter(f.id)"
-                class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-                [class.bg-primary]="activeFilter() === f.id"
-                [class.text-white]="activeFilter() === f.id"
-                [class.border-primary]="activeFilter() === f.id"
-                [class.bg-white]="activeFilter() !== f.id"
-                [class.text-text-secondary]="activeFilter() !== f.id"
-                [class.border-border]="activeFilter() !== f.id"
-                [class.hover:bg-primary-light]="activeFilter() !== f.id"
-                [class.hover:text-primary]="activeFilter() !== f.id"
-              >
-                <span>{{ f.label }}</span>
-                <span
-                  class="px-1.5 py-0.2 rounded-full text-[10px]"
-                  [class.bg-white/20]="activeFilter() === f.id"
-                  [class.text-white]="activeFilter() === f.id"
-                  [class.bg-surface-muted]="activeFilter() !== f.id"
-                  [class.text-text-secondary]="activeFilter() !== f.id"
-                >
-                  {{ f.count }}
-                </span>
-              </button>
-            }
-          </div>
+          <app-filter-tabs [options]="filterOptions()" [value]="activeFilter()" (valueChange)="setFilter($event)" />
 
         </div>
-
-        <!-- Batches Table via Reusable TableComponent -->
-        <app-table
-          [columns]="batchColumns"
-          [data]="filteredBatches()"
-          [pagination]="true"
-          [pageSize]="pageSize"
-          itemUnit="batches"
-          emptyMessage="No batches match your search criteria."
-          [customTemplates]="{
-            batchInfo: batchInfoTemplate,
-            courseScheme: courseSchemeTemplate,
-            center: centerTemplate,
-            capacity: capacityTemplate,
-            duration: durationTemplate,
-            status: statusTemplate,
-            actions: actionsTemplate
-          }"
-        >
-        </app-table>
 
         <!-- Template: Batch Info -->
         <ng-template #batchInfoTemplate let-b>
@@ -177,35 +143,33 @@ import {
           <div class="flex items-center justify-center gap-2">
             <!-- View Details Button -->
             <button
+              appButton
+              variant="outline"
+              size="sm"
+              class="shrink-0"
               type="button"
               (click)="viewDetails(b)"
-              class="whitespace-nowrap inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
               title="View Batch Details"
             >
-              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
+              <app-icon name="eye" size="sm" />
               <span>View Details</span>
             </button>
 
             <!-- Register Button shown for all batches -->
-            <app-button
+            <button
+              appButton
               variant="primary"
               size="sm"
-              (btnClick)="selectAndMap(b)"
+              (click)="selectAndMap(b)"
               title="Register Aspirant"
             >
-              <span class="text-sm font-bold leading-none">+</span>
+              <app-icon name="plus" size="sm" />
               <span>Register</span>
-            </app-button>
+            </button>
           </div>
         </ng-template>
 
-
-
-      </div>
-    </div>
+    </app-list-page>
   `
 })
 export class BatchListComponent {

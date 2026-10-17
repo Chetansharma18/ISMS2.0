@@ -3,13 +3,15 @@ import { FormsModule } from '@angular/forms';
 import { AspirantRecord } from '../../models/aspirant.model';
 import { PARENT_FORM_VIEW_PROVIDER } from './aspirant-parent-form.provider';
 import { formatFileSize } from './aspirant-document.util';
+import { ButtonComponent, InputDirective } from '../../../../shared';
 
 /** Edit-mode card: personal details and identity (edits the parent-owned form object). */
 @Component({
   selector: 'app-aspirant-personal-edit',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
-  imports: [FormsModule],
+  imports: [FormsModule, ButtonComponent, InputDirective],
   viewProviders: [PARENT_FORM_VIEW_PROVIDER],
   template: `
     <div class="border border-slate-200 rounded-xl p-5 bg-white shadow-2xs space-y-4">
@@ -25,10 +27,11 @@ import { formatFileSize } from './aspirant-document.util';
         <div>
           <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Full Name *</label>
           <input
+            appInput
             type="text"
             [(ngModel)]="form().aspirantName"
             name="aspirantName"
-            class="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-lg font-medium text-slate-900 focus:outline-none focus:border-primary"
+            class="w-full"
             required
           />
         </div>
@@ -36,9 +39,10 @@ import { formatFileSize } from './aspirant-document.util';
         <div>
           <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Relation Type</label>
           <select
+            appInput
             [(ngModel)]="form().relationType"
             name="relationType"
-            class="w-full h-9 px-2.5 text-xs bg-white border border-slate-300 rounded-lg font-medium text-slate-900 focus:outline-none focus:border-primary"
+            class="w-full"
           >
             <option value="Father">Father</option>
             <option value="Mother">Mother</option>
@@ -50,49 +54,54 @@ import { formatFileSize } from './aspirant-document.util';
         <div>
           <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Father / Guardian Name</label>
           <input
+            appInput
             type="text"
             [(ngModel)]="form().relationName"
             name="relationName"
-            class="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-lg font-medium text-slate-900 focus:outline-none focus:border-primary"
+            class="w-full"
           />
         </div>
 
         <div>
           <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Mother's Name</label>
           <input
+            appInput
             type="text"
             [(ngModel)]="form().motherName"
             name="motherName"
-            class="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-lg font-medium text-slate-900 focus:outline-none focus:border-primary"
+            class="w-full"
           />
         </div>
 
         <div>
           <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Date of Birth</label>
           <input
+            appInput
             type="date"
             [(ngModel)]="form().dob"
             name="dob"
-            class="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-lg font-medium text-slate-900 focus:outline-none focus:border-primary"
+            class="w-full"
           />
         </div>
 
         <div>
           <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Age (Years)</label>
           <input
+            appInput
             type="number"
             [(ngModel)]="form().age"
             name="age"
-            class="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-lg font-medium text-slate-900 focus:outline-none focus:border-primary"
+            class="w-full"
           />
         </div>
 
         <div>
           <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Gender</label>
           <select
+            appInput
             [(ngModel)]="form().gender"
             name="gender"
-            class="w-full h-9 px-2.5 text-xs bg-white border border-slate-300 rounded-lg font-medium text-slate-900 focus:outline-none focus:border-primary"
+            class="w-full"
           >
             <option value="Male">Male</option>
             <option value="Female">Female</option>
@@ -103,9 +112,10 @@ import { formatFileSize } from './aspirant-document.util';
         <div>
           <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Category</label>
           <select
+            appInput
             [(ngModel)]="form().category"
             name="category"
-            class="w-full h-9 px-2.5 text-xs bg-white border border-slate-300 rounded-lg font-medium text-slate-900 focus:outline-none focus:border-primary"
+            class="w-full"
           >
             <option value="General">General</option>
             <option value="OBC">OBC</option>
@@ -119,9 +129,10 @@ import { formatFileSize } from './aspirant-document.util';
         <div>
           <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Religion</label>
           <select
+            appInput
             [(ngModel)]="form().religion"
             name="religion"
-            class="w-full h-9 px-2.5 text-xs bg-white border border-slate-300 rounded-lg font-medium text-slate-900 focus:outline-none focus:border-primary"
+            class="w-full"
           >
             <option value="Hindu">Hindu</option>
             <option value="Muslim">Muslim</option>
@@ -136,9 +147,10 @@ import { formatFileSize } from './aspirant-document.util';
         <div>
           <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Educational Qualification</label>
           <select
+            appInput
             [(ngModel)]="form().educationalQualification"
             name="educationalQualification"
-            class="w-full h-9 px-2.5 text-xs bg-white border border-slate-300 rounded-lg font-medium text-slate-900 focus:outline-none focus:border-primary"
+            class="w-full"
           >
             <option value="Below 8th">Below 8th</option>
             <option value="8th Pass">8th Pass</option>
@@ -153,9 +165,10 @@ import { formatFileSize } from './aspirant-document.util';
         <div>
           <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Area Type</label>
           <select
+            appInput
             [(ngModel)]="form().areaType"
             name="areaType"
-            class="w-full h-9 px-2.5 text-xs bg-white border border-slate-300 rounded-lg font-medium text-slate-900 focus:outline-none focus:border-primary"
+            class="w-full"
           >
             <option value="Rural">Rural</option>
             <option value="Urban">Urban</option>
@@ -170,9 +183,11 @@ import { formatFileSize } from './aspirant-document.util';
               {{ form().aadhaarDocName || 'Aadhaar_Document.pdf' }}
             </span>
             <button
+              appButton
+              size="sm"
+              class="shrink-0"
               type="button"
               (click)="editAadhaarFileInput.click()"
-              class="px-3 py-1.5 bg-primary hover:bg-primary-dark text-white rounded-lg text-xs font-semibold cursor-pointer shadow-2xs shrink-0"
             >
               Replace File
             </button>

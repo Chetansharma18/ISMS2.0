@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ButtonComponent, IconComponent } from '../../../../shared';
 
 interface SchemeCard {
   id: string;
@@ -17,7 +18,7 @@ interface SchemeCard {
   selector: 'app-schemes-section',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent, IconComponent],
   host: {
     class: 'block w-full'
   },
@@ -80,9 +81,7 @@ interface SchemeCard {
                 </div>
 
                 <div class="mt-4 p-2.5 rounded-lg bg-orange-50/60 border border-orange-100 text-[11px] text-orange-600 font-medium flex items-center gap-1.5">
-                  <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                  </svg>
+                  <app-icon name="info-filled" solid size="sm" />
                   <span>{{ scheme.highlight }}</span>
                 </div>
               </div>
@@ -90,15 +89,18 @@ interface SchemeCard {
               <!-- Footer CTA -->
               <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
                 <button
+                  appButton
+                  variant="ghost"
+                  size="sm"
                   type="button"
-                  class="text-xs font-bold text-navy hover:text-navy-dark hover:underline"
                 >
                   Guidelines (PDF)
                 </button>
 
                 <button
+                  appButton
+                  size="sm"
                   type="button"
-                  class="text-xs font-bold bg-navy hover:bg-navy-dark text-white px-3 py-1.5 rounded transition-colors shadow-2xs"
                 >
                   Apply EOI
                 </button>

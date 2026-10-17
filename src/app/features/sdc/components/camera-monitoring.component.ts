@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, signal, computed } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { PageHeaderComponent, TableComponent, TableColumn } from '../../../shared';
+import { ListPageComponent, ButtonComponent, IconComponent, TableColumn } from '../../../shared';
 import { environment } from '../../../../environments/environment';
 
 interface CameraUser {
@@ -19,33 +19,26 @@ interface CameraUser {
   selector: 'app-camera-monitoring',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, FormsModule, PageHeaderComponent, TableComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ListPageComponent, ButtonComponent, IconComponent],
   template: `
-    <div class="w-full min-h-full bg-background text-primary font-sans">
-      <div class="p-4 sm:p-5 space-y-3 font-sans">
-        <app-page-header
-          title="Camera Monitoring"
-          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Camera Monitoring' }]"
-          [searchable]="true"
-          searchPlaceholder="Search TP or SDC Name..."
-          [(searchQuery)]="searchQuery"
-        >
-        </app-page-header>
-
-        <app-table
-          [columns]="columns"
-          [data]="filteredUsers()"
-          [pagination]="true"
-          [pageSize]="10"
-          [customTemplates]="{
-            tpInfo: tpInfoTemplate,
-            sdcCount: sdcCountTemplate,
-            totalBatches: totalBatchesTemplate,
-            totalCameras: totalCamerasTemplate,
-            action: actionTemplate
-          }"
-        >
-        </app-table>
+    <app-list-page
+      title="Camera Monitoring"
+      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Camera Monitoring' }]"
+      [searchable]="true"
+      searchPlaceholder="Search TP or SDC Name..."
+      [(searchQuery)]="searchQuery"
+      [columns]="columns"
+      [data]="filteredUsers()"
+      [pagination]="true"
+      [pageSize]="10"
+      [customTemplates]="{
+        tpInfo: tpInfoTemplate,
+        sdcCount: sdcCountTemplate,
+        totalBatches: totalBatchesTemplate,
+        totalCameras: totalCamerasTemplate,
+        action: actionTemplate
+      }"
+    >
 
         <ng-template #tpInfoTemplate let-user>
           <div>
@@ -73,27 +66,22 @@ interface CameraUser {
 
         <ng-template #totalCamerasTemplate let-user>
           <span class="inline-flex items-center gap-1.5 text-green-700 text-[13px] font-normal tracking-wide">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4zM5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-            </svg>
+            <app-icon name="video-camera" solid />
             {{ user.totalCameras }} Cameras
           </span>
         </ng-template>
 
         <ng-template #actionTemplate let-user>
           <a
+            appButton
+            size="sm"
             [routerLink]="['/admin/camera-monitoring', user.id]"
-            class="btn btn-primary btn-sm inline-flex items-center justify-center gap-1"
-            style="color: white !important;"
           >
-            <span style="color: white !important;">View SDCs</span>
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: white !important;">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
+            <span>View SDCs</span>
+            <app-icon name="chevron-right" size="sm" />
           </a>
         </ng-template>
-      </div>
-    </div>
+    </app-list-page>
   `
 })
 export class CameraMonitoringComponent {

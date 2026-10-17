@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { InputDirective } from '../../../../../shared';
 
 /** Dispatch reference of the sanction order. */
 @Component({
   selector: 'app-sanction-signatory-block',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, InputDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
@@ -13,9 +14,11 @@ import { FormsModule } from '@angular/forms';
       <div>
         <p class="font-bold text-slate-800">Dispatch Reference:</p>
         <input
+          appInput
+          variant="plain"
           type="text"
           [ngModel]="dispatchRef()" (ngModelChange)="dispatchRef.set($event)"
-          class="font-mono text-[11px] text-slate-700 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-500 focus:border-slate-800 focus:outline-none w-64 block"
+          class="font-mono w-64 block"
         />
       </div>
     </div>

@@ -1,15 +1,17 @@
-import { Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AspirantRecord } from '../../models/aspirant.model';
 import { PARENT_FORM_VIEW_PROVIDER } from './aspirant-parent-form.provider';
 import { formatFileSize, todayIsoDate } from './aspirant-document.util';
+import { ButtonComponent, IconComponent, InputDirective } from '../../../../shared';
 
 /** Edit-mode card: attached document slots (edits the parent-owned form object). */
 @Component({
   selector: 'app-aspirant-documents-edit',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
-  imports: [FormsModule],
+  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective],
   viewProviders: [PARENT_FORM_VIEW_PROVIDER],
   template: `
     <div class="border border-slate-200 rounded-xl p-5 bg-white shadow-2xs space-y-4">
@@ -19,10 +21,10 @@ import { formatFileSize, todayIsoDate } from './aspirant-document.util';
           <span>4. Edit Attached Documents</span>
         </h3>
         <button
+          appButton
+          size="sm"
           type="button"
           (click)="addDocumentSlotInEdit()"
-          class="px-2.5 py-1 bg-primary text-white rounded text-xs font-semibold hover:bg-primary-dark cursor-pointer shadow-2xs inline-flex items-center gap-1"
-          style="color: #ffffff !important;"
         >
           <span>+ Add Document</span>
         </button>
@@ -37,9 +39,11 @@ import { formatFileSize, todayIsoDate } from './aspirant-document.util';
               <div class="space-y-1 flex-1 md:w-56">
                 <label class="block text-[10.5px] font-bold text-slate-600">Document Type</label>
                 <select
+                  appInput
+                  size="sm"
                   [(ngModel)]="doc.docType"
                   [name]="'docType_' + idx"
-                  class="w-full h-8 px-2 text-xs bg-white border border-slate-300 rounded font-medium text-slate-900 focus:outline-none focus:border-primary"
+                  class="w-full"
                 >
                   <option value="Educational Qualification Certificate">Educational Qualification</option>
                   <option value="Bank Passbook / Cancelled Cheque">Bank Passbook / Cheque</option>
@@ -57,10 +61,12 @@ import { formatFileSize, todayIsoDate } from './aspirant-document.util';
             <div class="space-y-1 w-full md:w-64">
               <label class="block text-[10.5px] font-bold text-slate-600">Document Title</label>
               <input
+                appInput
+                size="sm"
                 type="text"
                 [(ngModel)]="doc.docName"
                 [name]="'docName_' + idx"
-                class="w-full h-8 px-2.5 text-xs bg-white border border-slate-300 rounded font-medium text-slate-900 focus:outline-none focus:border-primary"
+                class="w-full"
                 placeholder="e.g. 10th Passing Certificate"
               />
             </div>
@@ -72,9 +78,12 @@ import { formatFileSize, todayIsoDate } from './aspirant-document.util';
                   {{ doc.fileName || 'Pending upload' }}
                 </span>
                 <button
+                  appButton
+                  variant="outline"
+                  size="sm"
+                  class="shrink-0"
                   type="button"
                   (click)="triggerDocFileInput(idx)"
-                  class="px-2 py-1 bg-white border border-slate-300 hover:bg-slate-100 rounded text-[10.5px] font-semibold text-slate-700 cursor-pointer shadow-2xs shrink-0"
                 >
                   Browse
                 </button>
@@ -93,12 +102,16 @@ import { formatFileSize, todayIsoDate } from './aspirant-document.util';
                 {{ doc.status }}
               </span>
               <button
+                appButton
+                variant="ghost"
+                size="sm"
+                iconOnly
                 type="button"
                 (click)="removeDocumentFromEdit(idx)"
-                class="p-1 rounded text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer"
                 title="Remove document slot"
+                aria-label="Remove document slot"
               >
-                ✕
+                <app-icon name="close" size="xs" />
               </button>
             </div>
 

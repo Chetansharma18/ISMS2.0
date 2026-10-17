@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, HostListener, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ButtonComponent, InputDirective, ModalComponent } from '../../../../../shared';
 import { OTHER_OPTION, OptionDropdownComponent } from './option-dropdown.component';
 
 export type DecisionMode = 'remark' | 'reject' | 'approve';
@@ -58,42 +59,11 @@ const CONTENT: Record<DecisionMode, { title: string; label: string; required: bo
 @Component({
   selector: 'app-scrutiny-decision-modal',
   standalone: true,
-  imports: [OptionDropdownComponent],
+  imports: [ButtonComponent, InputDirective, ModalComponent, OptionDropdownComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div
-      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
-      style="background: rgba(10,20,40,0.5); backdrop-filter: blur(4px);"
-      (click)="close.emit()"
-    >
-      <div
-        class="w-full max-w-md bg-white rounded-xl border border-slate-200 shadow-2xl font-sans overflow-hidden my-auto max-h-[92vh] flex flex-col"
-        (click)="$event.stopPropagation()"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="decision-title"
-      >
-        <div class="h-1.5 w-full shrink-0" [class]="mode() === 'reject' ? 'bg-rose-600' : 'bg-navy'"></div>
-
-        <div class="px-5 sm:px-6 pt-5 pb-4 border-b border-slate-200 flex items-start justify-between gap-3">
-          <div>
-            <h2 id="decision-title" class="text-base sm:text-lg font-bold text-slate-900 m-0">{{ content().title }}</h2>
-            <p class="text-xs text-slate-500 m-0 mt-0.5">{{ applicantLabel() }}</p>
-          </div>
-          <button
-            type="button"
-            (click)="close.emit()"
-            class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
-            title="Close"
-            aria-label="Close"
-          >
-            <svg class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <div class="px-5 sm:px-6 py-5 overflow-y-auto flex-1 space-y-5 text-xs">
+    <app-modal [title]="content().title" [subtitle]="applicantLabel()" size="sm" (close)="close.emit()">
+        <div class="space-y-5 text-xs">
 
           @if (mode() === 'approve') {
             <div class="space-y-2">
@@ -101,9 +71,10 @@ const CONTENT: Record<DecisionMode, { title: string; label: string; required: bo
                 Grade <span class="text-rose-600">*</span>
               </label>
               <select
+                appInput
                 id="decision-grade"
                 (change)="grade.set($any($event.target).value)"
-                class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs text-slate-800 bg-white focus:outline-none focus:border-navy cursor-pointer shadow-2xs"
+                class="w-full cursor-pointer"
               >
                 <option value="" [selected]="!grade()">Select grade</option>
                 @for (g of grades(); track g.grade) {
@@ -132,37 +103,24 @@ const CONTENT: Record<DecisionMode, { title: string; label: string; required: bo
 
             @if (choice() === other) {
               <textarea
+                appInput
                 rows="3"
                 [value]="custom()"
                 (input)="custom.set($any($event.target).value)"
                 placeholder="Type your remark"
-                class="w-full p-3 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-navy bg-white shadow-2xs leading-relaxed"
+                class="w-full"
               ></textarea>
             }
           </div>
         </div>
 
-        <div class="px-5 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/70 flex flex-col-reverse sm:flex-row items-center justify-end gap-2.5">
-          <button
-            type="button"
-            (click)="close.emit()"
-            class="w-full sm:w-auto px-4 py-2 border border-slate-300 bg-white hover:bg-slate-50 rounded-lg text-xs font-medium text-slate-700 transition-colors cursor-pointer"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            (click)="submit()"
-            [disabled]="!isValid()"
-            class="w-full sm:w-auto px-5 py-2 rounded-lg text-white text-xs font-semibold transition-colors cursor-pointer shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
-            [class]="mode() === 'reject' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-navy hover:bg-[#07243c]'"
-            style="color: #ffffff !important;"
-          >
+        <ng-container modalFooter>
+          <button appButton variant="outline" (click)="close.emit()">Cancel</button>
+          <button appButton [variant]="mode() === 'reject' ? 'danger' : 'primary'" (click)="submit()" [disabled]="!isValid()">
             {{ content().action }}
           </button>
-        </div>
-      </div>
-    </div>
+        </ng-container>
+    </app-modal>
   `
 })
 export class ScrutinyDecisionModalComponent {
@@ -190,11 +148,6 @@ export class ScrutinyDecisionModalComponent {
     // Approving needs a grade; the remark is optional.
     return this.mode() !== 'approve' || !!this.grade();
   });
-
-  @HostListener('document:keydown.escape')
-  protected onEscape(): void {
-    this.close.emit();
-  }
 
   protected submit(): void {
     if (!this.isValid()) return;

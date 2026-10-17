@@ -282,6 +282,7 @@ textarea::placeholder {
 /* ---------------------------------------------------------
    7. BUTTON SYSTEM
    --------------------------------------------------------- */
+@layer components {
 .btn {
   display: inline-flex;
   align-items: center;
@@ -301,15 +302,16 @@ textarea::placeholder {
     color var(--transition-fast);
 }
 
+/* Primary action: deep navy, white text. The one filled button style of the portal. */
 .btn-primary {
-  color: #FFFFFF;
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
+  color: #FFFFFF !important;
+  background-color: var(--color-navy);
+  border-color: var(--color-navy);
 }
 
 .btn-primary:hover {
-  background-color: var(--color-primary-dark);
-  border-color: var(--color-primary-dark);
+  background-color: var(--color-navy-dark);
+  border-color: var(--color-navy-dark);
 }
 
 .btn-secondary {
@@ -318,10 +320,17 @@ textarea::placeholder {
   border-color: var(--color-primary-light);
 }
 
+/* Secondary action next to a primary one: white with a neutral border (Back, View, Cancel, Close). */
 .btn-outline {
-  color: var(--color-primary);
-  background-color: var(--color-surface);
-  border-color: var(--color-primary);
+  color: #334155;
+  background-color: #FFFFFF;
+  border-color: #CBD5E1;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.btn-outline:hover {
+  background-color: #F8FAFC;
+  border-color: #94A3B8;
 }
 
 .btn-sm {
@@ -339,7 +348,7 @@ textarea::placeholder {
 }
 
 .btn-danger {
-  color: #FFFFFF;
+  color: #FFFFFF !important;
   background-color: #C5221F;
   border-color: #C5221F;
 }
@@ -359,9 +368,64 @@ textarea::placeholder {
   background-color: var(--color-primary-light);
 }
 
+/* Quiet text action on a dark background (footer links) */
+.btn-inverse {
+  color: #CBD5E1 !important;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.btn-inverse:hover {
+  color: #FFFFFF !important;
+  text-decoration: underline;
+}
+
+/* Smallest size: a remove (x) inside a chip, a thumbnail or a dense row */
+.btn-xs {
+  height: 22px;
+  padding: 0 var(--space-2);
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.btn-icon.btn-xs {
+  width: 22px;
+  padding: 0;
+}
+
+/* Modifiers shared by every variant */
+.btn {
+  gap: var(--space-2);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.btn-block {
+  display: flex;
+  width: 100%;
+}
+
+/* Square button that holds only an icon (close, delete, print) */
+.btn-icon {
+  width: var(--height-button);
+  padding: 0;
+}
+
+.btn-icon.btn-sm {
+  width: 32px;
+}
+}
+
 /* ---------------------------------------------------------
    8. FORM CONTROLS & INPUTS
    --------------------------------------------------------- */
+@layer components {
 .form-label {
   display: block;
   margin-bottom: var(--space-2);
@@ -394,6 +458,71 @@ textarea::placeholder {
 
 .form-control::placeholder {
   color: var(--color-text-muted);
+}
+
+/* Compact field for filters, toolbars and table cells */
+.form-control-sm {
+  height: 32px;
+  padding: 0 var(--space-2);
+  font-size: var(--font-size-small);
+}
+
+/* A text area grows with its rows instead of keeping the single-line height */
+textarea.form-control {
+  height: auto;
+  min-height: var(--height-input);
+  padding: var(--space-2) var(--space-3);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.form-control.is-invalid {
+  border-color: #E11D48;
+}
+
+.form-control.is-invalid:focus {
+  border-color: #E11D48;
+  box-shadow: 0 0 0 2px rgba(225, 29, 72, 0.15);
+}
+
+.form-control:disabled,
+.form-control[readonly] {
+  background-color: #F8FAFC;
+  cursor: not-allowed;
+}
+
+/* Text typed straight into a printed letter or a table cell: no box around it */
+.form-control.form-control-plain {
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: inherit;
+}
+
+/* Only a bottom line (sign-in forms) */
+.form-control.form-control-underline {
+  height: auto;
+  padding: var(--space-2) 0;
+  border: 0;
+  border-bottom: 1px solid #94A3B8;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.form-control.form-control-underline:focus {
+  border-bottom-color: var(--color-navy);
+  box-shadow: none;
+}
+
+.form-control.form-control-plain:focus {
+  box-shadow: none;
+  background-color: rgba(23, 74, 110, 0.06);
+}
 }
 
 /* =========================================================

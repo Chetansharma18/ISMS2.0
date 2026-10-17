@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AspirantRecord, AspirantTrainingStatus } from '../../models/aspirant.model';
+import { InputDirective } from '../../../../shared';
 
 /** Hero card (photo, name, status switcher) and the training-centre / batch strip. */
 @Component({
@@ -8,7 +9,7 @@ import { AspirantRecord, AspirantTrainingStatus } from '../../models/aspirant.mo
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
-  imports: [FormsModule],
+  imports: [FormsModule, InputDirective],
   template: `
     @let cand = aspirant();
     <div class="space-y-5">
@@ -46,9 +47,10 @@ import { AspirantRecord, AspirantTrainingStatus } from '../../models/aspirant.mo
         <div class="flex items-center gap-1.5 bg-white/10 rounded-lg px-2.5 py-1 border border-white/15">
           <span class="text-xs" style="color: #ffffff !important;">Status:</span>
           <select
+            appInput
+            size="sm"
             [ngModel]="cand.trainingStatus"
             (ngModelChange)="statusChange.emit($event)"
-            class="h-7 px-2 text-xs bg-white text-slate-900 rounded font-bold focus:outline-none cursor-pointer"
           >
             <option value="ENROLLED">ENROLLED</option>
             <option value="IN_TRAINING">IN TRAINING</option>

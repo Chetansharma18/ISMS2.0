@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, input, model, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ButtonComponent, IconComponent } from '../../../../shared';
 
 @Component({
   selector: 'app-psd-payment-options',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule],
+  imports: [FormsModule, ButtonComponent, IconComponent],
   host: { class: 'block' },
   template: `
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
@@ -157,16 +158,15 @@ import { FormsModule } from '@angular/forms';
 
           <!-- Primary Action: MAKE PAYMENT BUTTON -->
           <button
+            appButton
+            size="lg"
+            block
             type="button"
             [disabled]="isPaymentProcessing()"
+            [loading]="isPaymentProcessing()"
             (click)="makePayment.emit()"
-            class="w-full py-3 px-4 bg-primary hover:bg-primary-dark active:scale-95 text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
           >
             @if (isPaymentProcessing()) {
-              <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-              </svg>
               <span>Processing Payment...</span>
             } @else {
               <span>Make Payment (₹500.00) &rarr;</span>
@@ -174,9 +174,7 @@ import { FormsModule } from '@angular/forms';
           </button>
 
           <div class="text-[10px] text-slate-400 text-center flex items-center justify-center gap-1">
-            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
+            <app-icon name="lock" size="xs" [stroke]="2" />
             <span>256-Bit SSL Secured Payment via RSLDC</span>
           </div>
 

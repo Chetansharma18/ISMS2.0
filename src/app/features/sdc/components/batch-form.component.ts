@@ -8,6 +8,7 @@ import { BatchService } from '../services/batch.service';
 import { SdcService } from '../services/sdc.service';
 import { getBatchDetailsFormFields, getCoursesForSector } from '../config/batch-form.config';
 import { formatDateTime } from '../../../shared/utils';
+import { ButtonComponent, IconComponent, PageShellComponent } from '../../../shared';
 import { BatchReceiptPdfService } from './batch-form/batch-receipt-pdf.service';
 import {
   BatchFormData,
@@ -31,6 +32,9 @@ import { PaymentSuccessModalComponent } from './batch-form/payment-success-modal
   selector: 'app-batch-form',
   standalone: true,
   imports: [
+    ButtonComponent,
+    IconComponent,
+    PageShellComponent,
     FormSdcComponent,
     StepperComponent,
     PsdPaymentPanelComponent,
@@ -39,23 +43,21 @@ import { PaymentSuccessModalComponent } from './batch-form/payment-success-modal
     PaymentSuccessModalComponent
   ],
   template: `
-    <div class="min-h-full bg-white py-4 sm:py-6 px-4 sm:px-8 font-sans selection:bg-primary selection:text-white" style="font-family: 'Inter', sans-serif;">
-      
-      <!-- Direct-on-Page Container (matching SDC creation layout) -->
-      <div class="w-full space-y-4">
+    <app-page-shell>
         
         <!-- Header: Back Button + Title & SDC Context -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-200 gap-3">
           <div class="flex items-center gap-3">
             <button
+              appButton
+              variant="outline"
+              size="sm"
+              class="shrink-0"
               type="button"
               (click)="goBack()"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 active:scale-95 text-xs font-semibold text-slate-700 shadow-2xs transition-all cursor-pointer shrink-0"
               title="Go Back"
             >
-              <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
+              <app-icon name="chevron-left" size="sm" />
               <span>Back</span>
             </button>
             
@@ -83,12 +85,10 @@ import { PaymentSuccessModalComponent } from './batch-form/payment-success-modal
         @if (errorMessage()) {
           <div class="p-3 rounded-lg border border-rose-200 bg-rose-50 text-rose-800 flex items-center justify-between text-xs animate-in fade-in">
             <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
+              <app-icon name="alert-triangle" [stroke]="2" class="text-rose-600 shrink-0" />
               <span>{{ errorMessage() }}</span>
             </div>
-            <button (click)="errorMessage.set('')" class="text-rose-500 hover:text-rose-800 cursor-pointer font-bold">✕</button>
+            <button appButton variant="ghost" size="sm" iconOnly aria-label="Dismiss" (click)="errorMessage.set('')"><app-icon name="close" size="xs" /></button>
           </div>
         }
 
@@ -172,16 +172,14 @@ import { PaymentSuccessModalComponent } from './batch-form/payment-success-modal
             <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
 
               <button
+                appButton
                 type="button"
                 (click)="submitBatchForm()"
                 [disabled]="isSubmitting()"
-                class="w-full sm:w-auto px-6 py-2 text-xs font-semibold text-white bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-sm active:scale-95 transition-all cursor-pointer inline-flex items-center justify-center gap-2"
+                [loading]="isSubmitting()"
+                class="w-full sm:w-auto"
               >
                 @if (isSubmitting()) {
-                  <svg class="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                  </svg>
                   <span>Submitting Batch...</span>
                 } @else {
                   <span>Submit Batch</span>
@@ -191,8 +189,6 @@ import { PaymentSuccessModalComponent } from './batch-form/payment-success-modal
 
           </div>
         }
-
-      </div>
 
       <!-- =====================================================================
            PAYMENT SUCCESS POPUP MODAL (MATCHING TP REGISTRATION EXPERIENCE)
@@ -212,7 +208,7 @@ import { PaymentSuccessModalComponent } from './batch-form/payment-success-modal
         ></app-payment-success-modal>
       }
 
-    </div>
+    </app-page-shell>
   `
 })
 export class BatchFormComponent implements OnInit {

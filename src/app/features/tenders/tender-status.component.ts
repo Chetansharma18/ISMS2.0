@@ -2,6 +2,7 @@ import { Component, DestroyRef, computed, signal, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DocumentViewerService } from '../../core/services/document-viewer.service';
 import { formatDateMedium } from '../../shared/utils';
+import { ButtonComponent } from '../../shared';
 import { FileDoc } from '../registration/models/otr-form.model';
 import {
   ShortfallRequest,
@@ -40,6 +41,7 @@ export type { SubmittedTender, SubmittedTenderDoc };
   selector: 'app-tender-status',
   standalone: true,
   imports: [
+    ButtonComponent,
     TenderListComponent,
     TenderDetailHeaderComponent,
     TenderEditStatusComponent,
@@ -84,11 +86,7 @@ export type { SubmittedTender, SubmittedTenderDoc };
                 <strong class="font-semibold">Shortfall request:</strong>
                 the department has asked for more documents on this application ({{ pendingNoticeCount() }} pending).
               </p>
-              <button
-                type="button"
-                (click)="startShortfallResponse(selectedTender()!)"
-                class="shrink-0 px-3 py-1.5 rounded-md bg-navy hover:bg-navy-dark text-white text-xs font-semibold cursor-pointer transition-colors"
-              >
+              <button appButton size="sm" type="button" (click)="startShortfallResponse(selectedTender()!)" class="shrink-0">
                 Respond
               </button>
             </div>

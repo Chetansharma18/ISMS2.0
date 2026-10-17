@@ -1,4 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ButtonComponent } from '../../../../../shared';
 import { SchemeFormState } from '../scheme-form.state';
 import { Step2OrganisationComponent } from './step2/step2-organisation.component';
 import { Step2AuthorizedPersonComponent } from './step2/step2-authorized-person.component';
@@ -8,7 +9,8 @@ import { Step2BankDetailsComponent } from './step2/step2-bank-details.component'
 @Component({
   selector: 'app-step2-otr-profile',
   standalone: true,
-  imports: [Step2OrganisationComponent, Step2AuthorizedPersonComponent, Step2BankDetailsComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ButtonComponent, Step2OrganisationComponent, Step2AuthorizedPersonComponent, Step2BankDetailsComponent],
   host: { class: 'block' },
   template: `
     <div class="space-y-6 font-sans">
@@ -25,11 +27,7 @@ import { Step2BankDetailsComponent } from './step2/step2-bank-details.component'
       <!-- Footer Action Bar -->
       <!-- Forward only: the processing fee step is closed once paid -->
       <div class="pt-4 border-t border-slate-100 flex items-center justify-end">
-        <button
-          type="button"
-          (click)="state.saveAndProceedToStep3()"
-          class="px-6 sm:px-7 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-        >
+        <button appButton size="lg" (click)="state.saveAndProceedToStep3()">
           Proceed to Upload Documents &rarr;
         </button>
       </div>

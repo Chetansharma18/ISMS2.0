@@ -6,7 +6,14 @@
     "start": "ng serve --host 0.0.0.0",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "prepare": "node tools/install-hooks.mjs",
+    "verify": "node tools/ui-guard.mjs && node tools/sync-ai-rules.mjs --check && ngc -p tsconfig.app.json --noEmit && ng test --no-watch",
+    "sync:ai": "node tools/sync-ai-rules.mjs",
+    "new:page": "node tools/new-page.mjs",
+    "check:ui": "node tools/ui-guard.mjs",
+    "check:ui:update": "node tools/ui-guard.mjs --update",
+    "check:ui:report": "node tools/ui-guard.mjs --report"
   },
   "private": true,
   "packageManager": "npm@11.11.1",

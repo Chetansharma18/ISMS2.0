@@ -1,11 +1,23 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ButtonComponent, IconComponent, TableColumn, TableComponent } from '../../../shared';
 import { SubmittedTender } from '../../../core/models/tender.model';
 import { TenderReceiptsService } from './tender-receipts.service';
+
+/** One receipt row of the "Payments & Receipts" table. */
+interface ReceiptRow {
+  id: number;
+  receipt: string;
+  reference: string;
+  amount: string;
+  date: string;
+  kind: 'acknowledgment' | 'emd' | 'processingFee';
+}
 
 /** Payments and receipts of a submitted application, with a download for each receipt. */
 @Component({
   selector: 'app-tender-step5-emd',
   standalone: true,
+  imports: [TableComponent, ButtonComponent, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
@@ -15,81 +27,24 @@ import { TenderReceiptsService } from './tender-receipts.service';
           <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">5</span>
           <h2 id="receipts-heading" class="text-base sm:text-lg font-bold text-slate-900 m-0">Payments &amp; Receipts</h2>
         </div>
-        <button
-          type="button"
-          (click)="downloadAll()"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
-        >
-          <svg class="w-3.5 h-3.5 text-ocean" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-          </svg>
+        <button appButton variant="outline" size="sm" type="button" (click)="downloadAll()">
+          <app-icon name="download" size="sm" />
           <span>Download All</span>
         </button>
       </div>
 
-      <div class="overflow-x-auto border border-slate-200 rounded-lg">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-slate-50/90 text-slate-600 text-[11.5px] font-semibold border-b border-slate-200">
-            <tr>
-              <th class="px-4 py-2.5 w-10 text-center">#</th>
-              <th class="px-4 py-2.5">Receipt</th>
-              <th class="px-4 py-2.5">Reference No.</th>
-              <th class="px-4 py-2.5 text-right">Amount</th>
-              <th class="px-4 py-2.5">Date</th>
-              <th class="px-4 py-2.5 text-center w-32">Action</th>
-            </tr>
-          </thead>
-          <tbody class="text-slate-700">
-            <tr class="border-t border-slate-100 hover:bg-slate-50/50">
-              <td class="px-4 py-3 text-center font-semibold text-slate-400">1</td>
-              <td class="px-4 py-3 font-medium text-slate-900 text-[12.5px]">Submission Acknowledgment</td>
-              <td class="px-4 py-3 font-mono text-[12.5px] text-slate-900">{{ app().appRef }}</td>
-              <td class="px-4 py-3 text-right text-[12.5px] text-slate-500">-</td>
-              <td class="px-4 py-3 text-[12.5px] whitespace-nowrap">{{ app().appliedDate }}</td>
-              <td class="px-4 py-3 text-center">
-                <button type="button" (click)="receipts.downloadAcknowledgment(app())" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-navy hover:bg-[#07243c] text-white text-xs font-semibold shadow-xs active:scale-95 transition-all cursor-pointer">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                  </svg>
-                  <span>Download</span>
-                </button>
-              </td>
-            </tr>
+      <app-table
+        [columns]="columns"
+        [data]="rows()"
+        [customTemplates]="{ action: actionTemplate }"
+      />
 
-            <tr class="border-t border-slate-100 hover:bg-slate-50/50">
-              <td class="px-4 py-3 text-center font-semibold text-slate-400">2</td>
-              <td class="px-4 py-3 font-medium text-slate-900 text-[12.5px]">EMD Receipt</td>
-              <td class="px-4 py-3 font-mono text-[12.5px] text-slate-900">{{ app().emdTransactionRef || '-' }}</td>
-              <td class="px-4 py-3 text-right text-[12.5px] font-medium text-slate-900 whitespace-nowrap">{{ app().emdAmount }}</td>
-              <td class="px-4 py-3 text-[12.5px] whitespace-nowrap">{{ app().appliedDate }}</td>
-              <td class="px-4 py-3 text-center">
-                <button type="button" (click)="receipts.downloadEmdReceipt(app())" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-navy hover:bg-[#07243c] text-white text-xs font-semibold shadow-xs active:scale-95 transition-all cursor-pointer">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                  </svg>
-                  <span>Download</span>
-                </button>
-              </td>
-            </tr>
-
-            <tr class="border-t border-slate-100 hover:bg-slate-50/50">
-              <td class="px-4 py-3 text-center font-semibold text-slate-400">3</td>
-              <td class="px-4 py-3 font-medium text-slate-900 text-[12.5px]">Processing Fee Receipt</td>
-              <td class="px-4 py-3 font-mono text-[12.5px] text-slate-900">{{ app().transactionRef || '-' }}</td>
-              <td class="px-4 py-3 text-right text-[12.5px] font-medium text-slate-900 whitespace-nowrap">{{ app().processingFee }}</td>
-              <td class="px-4 py-3 text-[12.5px] whitespace-nowrap">{{ app().appliedDate }}</td>
-              <td class="px-4 py-3 text-center">
-                <button type="button" (click)="receipts.downloadProcessingFeeReceipt(app())" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-navy hover:bg-[#07243c] text-white text-xs font-semibold shadow-xs active:scale-95 transition-all cursor-pointer">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                  </svg>
-                  <span>Download</span>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <ng-template #actionTemplate let-row>
+        <button appButton size="sm" type="button" (click)="download(row)">
+          <app-icon name="download" size="sm" />
+          <span>Download</span>
+        </button>
+      </ng-template>
     </section>
   `
 })
@@ -97,6 +52,39 @@ export class TenderStep5EmdComponent {
   protected readonly receipts = inject(TenderReceiptsService);
 
   readonly app = input.required<SubmittedTender>();
+
+  protected readonly columns: TableColumn<ReceiptRow>[] = [
+    { key: 'id', label: '#', align: 'center', width: 'w-10', cellClass: 'font-semibold text-slate-400' },
+    { key: 'receipt', label: 'Receipt', cellClass: 'font-medium text-slate-900' },
+    { key: 'reference', label: 'Reference No.', cellClass: 'font-mono text-slate-900' },
+    { key: 'amount', label: 'Amount', align: 'right', cellClass: 'whitespace-nowrap' },
+    { key: 'date', label: 'Date', cellClass: 'whitespace-nowrap' },
+    { key: 'action', label: 'Action', align: 'center', width: 'w-32', type: 'custom' }
+  ];
+
+  protected readonly rows = computed<ReceiptRow[]>(() => {
+    const app = this.app();
+    return [
+      { id: 1, receipt: 'Submission Acknowledgment', reference: app.appRef, amount: '-', date: app.appliedDate, kind: 'acknowledgment' },
+      { id: 2, receipt: 'EMD Receipt', reference: app.emdTransactionRef || '-', amount: app.emdAmount, date: app.appliedDate, kind: 'emd' },
+      { id: 3, receipt: 'Processing Fee Receipt', reference: app.transactionRef || '-', amount: app.processingFee, date: app.appliedDate, kind: 'processingFee' }
+    ];
+  });
+
+  protected download(row: ReceiptRow): void {
+    const app = this.app();
+    switch (row.kind) {
+      case 'acknowledgment':
+        this.receipts.downloadAcknowledgment(app);
+        break;
+      case 'emd':
+        this.receipts.downloadEmdReceipt(app);
+        break;
+      case 'processingFee':
+        this.receipts.downloadProcessingFeeReceipt(app);
+        break;
+    }
+  }
 
   protected downloadAll(): void {
     this.receipts.downloadAcknowledgment(this.app());

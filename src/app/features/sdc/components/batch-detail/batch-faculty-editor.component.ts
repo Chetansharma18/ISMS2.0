@@ -1,12 +1,18 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { createFacultyRow } from './batch-detail.util';
+import { ButtonComponent, IconComponent, InputDirective, TableColumn, TableComponent } from '../../../../shared';
 
-/** Editable faculty rows. Mutates the supplied array in place (it belongs to the parent edit model). */
+/**
+ * Editable faculty rows. Mutates the supplied array in place (it belongs to the parent edit model).
+ * app-table is OnPush and only refreshes on a new array, so the grid is fed a shallow copy (`tableRows`)
+ * that is rebuilt after every add/remove. The row objects are the parent's own, so ngModel edits them in place.
+ */
 @Component({
   selector: 'app-batch-faculty-editor',
   standalone: true,
-  imports: [FormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, TableComponent],
   host: { class: 'block' },
   template: `
     <!-- Faculty Details Editable Table -->
@@ -16,87 +22,106 @@ import { createFacultyRow } from './batch-detail.util';
           Faculty Details ({{ rows().length }} Trainers)
         </label>
         <button
+          appButton
+          size="sm"
           type="button"
           (click)="addFacultyRow()"
-          class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary hover:bg-primary-dark text-white text-xs font-semibold cursor-pointer shadow-2xs"
         >
           <span>+ Add Faculty</span>
         </button>
       </div>
 
-      <div class="border border-slate-200 rounded-lg overflow-x-auto bg-white">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
-              <th class="py-2 px-3 w-12 text-center">#</th>
-              <th class="py-2 px-3 min-w-50">Faculty Name <span class="text-rose-500">*</span></th>
-              <th class="py-2 px-3 min-w-45">Trainer Type <span class="text-rose-500">*</span></th>
-              <th class="py-2 px-3 min-w-55">Qualification / Experience <span class="text-rose-500">*</span></th>
-              <th class="py-2 px-3 w-16 text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            @for (fac of rows(); track $index; let i = $index) {
-              <tr class="hover:bg-slate-50/60 transition-colors">
-                <td class="py-2 px-3 text-center font-mono text-slate-400 font-medium">{{ i + 1 }}</td>
-                <td class="py-2 px-3">
-                  <input
-                    type="text"
-                    [(ngModel)]="fac.facultyName"
-                    placeholder="Faculty Name"
-                    class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
-                </td>
-                <td class="py-2 px-3">
-                  <select
-                    [(ngModel)]="fac.trainerType"
-                    class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
-                  >
-                    <option value="Primary Trainer">Primary Trainer</option>
-                    <option value="Assistant Trainer">Assistant Trainer</option>
-                    <option value="Domain Trainer">Domain Trainer</option>
-                    <option value="Master Trainer">Master Trainer</option>
-                  </select>
-                </td>
-                <td class="py-2 px-3">
-                  <select
-                    [(ngModel)]="fac.qualification"
-                    class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
-                  >
-                    <option value="Graduate (B.A / B.Sc / B.Com / B.Tech)">Graduate (B.A / B.Sc / B.Com / B.Tech)</option>
-                    <option value="Post Graduate (M.A / M.Sc / M.Tech)">Post Graduate (M.A / M.Sc / M.Tech)</option>
-                    <option value="PhD">PhD</option>
-                  </select>
-                </td>
-                <td class="py-2 px-3 text-center">
-                  <button
-                    type="button"
-                    (click)="removeFacultyRow(i)"
-                    [disabled]="rows().length <= 1"
-                    class="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 disabled:opacity-30 disabled:cursor-not-allowed"
-                    title="Remove Trainer"
-                  >
-                    ✕
-                  </button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+      <app-table
+        [columns]="columns"
+        [data]="tableRows()"
+        [customTemplates]="{ facultyName: nameTpl, trainerType: typeTpl, qualification: qualTpl, action: actionTpl }"
+      />
+
+      <ng-template #nameTpl let-fac>
+        <input
+          appInput
+          size="sm"
+          type="text"
+          [(ngModel)]="fac.facultyName"
+          placeholder="Faculty Name"
+          class="w-full"
+        />
+      </ng-template>
+
+      <ng-template #typeTpl let-fac>
+        <select
+          appInput
+          size="sm"
+          [(ngModel)]="fac.trainerType"
+          class="w-full"
+        >
+          <option value="Primary Trainer">Primary Trainer</option>
+          <option value="Assistant Trainer">Assistant Trainer</option>
+          <option value="Domain Trainer">Domain Trainer</option>
+          <option value="Master Trainer">Master Trainer</option>
+        </select>
+      </ng-template>
+
+      <ng-template #qualTpl let-fac>
+        <select
+          appInput
+          size="sm"
+          [(ngModel)]="fac.qualification"
+          class="w-full"
+        >
+          <option value="Graduate (B.A / B.Sc / B.Com / B.Tech)">Graduate (B.A / B.Sc / B.Com / B.Tech)</option>
+          <option value="Post Graduate (M.A / M.Sc / M.Tech)">Post Graduate (M.A / M.Sc / M.Tech)</option>
+          <option value="PhD">PhD</option>
+        </select>
+      </ng-template>
+
+      <ng-template #actionTpl let-fac let-i="index">
+        <button
+          appButton
+          variant="ghost"
+          size="sm"
+          iconOnly
+          type="button"
+          (click)="removeFacultyRow(i)"
+          [disabled]="rows().length <= 1"
+          title="Remove Trainer"
+          aria-label="Remove Trainer"
+        >
+          <app-icon name="close" size="xs" />
+        </button>
+      </ng-template>
     </div>
   `
 })
 export class BatchFacultyEditorComponent {
   readonly rows = input.required<any[]>();
 
+  /** Bumped after each add/remove so `tableRows` becomes a new array even though `rows` is mutated in place. */
+  private readonly version = signal(0);
+
+  /** Fresh copy handed to app-table; same row objects as `rows`. */
+  protected readonly tableRows = computed(() => {
+    this.version();
+    return [...this.rows()];
+  });
+
+  protected readonly columns: TableColumn[] = [
+    { key: '$index', label: '#', type: 'number', align: 'center', width: 'w-12' },
+    { key: 'facultyName', label: 'Faculty Name *', width: 'min-w-50' },
+    { key: 'trainerType', label: 'Trainer Type *', width: 'min-w-45' },
+    { key: 'qualification', label: 'Qualification / Experience *', width: 'min-w-55' },
+    { key: 'action', label: 'Action', align: 'center', width: 'w-16' }
+  ];
+
   addFacultyRow(): void {
     this.rows().push(createFacultyRow());
+    this.version.update(v => v + 1);
   }
 
   removeFacultyRow(index: number): void {
     if (this.rows().length > 1) {
       this.rows().splice(index, 1);
+      this.version.update(v => v + 1);
     }
   }
 }

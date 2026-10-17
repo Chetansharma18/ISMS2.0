@@ -22,6 +22,12 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Check UI uses the shared components
+        run: npm run check:ui
+
+      - name: AI tool instructions match AGENTS.md
+        run: node tools/sync-ai-rules.mjs --check
+
       - name: Build Angular App (Production)
         run: npm run build
 

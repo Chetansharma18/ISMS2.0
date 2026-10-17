@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, model, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { InputDirective } from '../../../../shared';
 import { EditableLogoComponent } from './editable-logo.component';
 
 /**
@@ -9,7 +10,7 @@ import { EditableLogoComponent } from './editable-logo.component';
 @Component({
   selector: 'app-letterhead',
   standalone: true,
-  imports: [FormsModule, EditableLogoComponent],
+  imports: [FormsModule, EditableLogoComponent, InputDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
@@ -26,22 +27,28 @@ import { EditableLogoComponent } from './editable-logo.component';
         <!-- Header Titles (Editable) -->
         <div class="flex-1 space-y-1">
           <input
+            appInput
+            variant="plain"
             type="text"
             [ngModel]="headerTitle()"
             (ngModelChange)="headerTitle.set($event)"
-            class="w-full text-center font-bold text-slate-900 text-base sm:text-lg uppercase bg-transparent border-b border-dashed border-transparent hover:border-slate-300 focus:border-slate-800 focus:outline-none px-1"
+            class="w-full text-center font-bold uppercase"
           />
           <input
+            appInput
+            variant="plain"
             type="text"
             [ngModel]="headerSubtitle()"
             (ngModelChange)="headerSubtitle.set($event)"
-            class="w-full text-center font-medium text-slate-700 text-xs bg-transparent border-b border-dashed border-transparent hover:border-slate-300 focus:border-slate-800 focus:outline-none px-1"
+            class="w-full text-center font-medium"
           />
           <input
+            appInput
+            variant="plain"
             type="text"
             [ngModel]="headerAddress()"
             (ngModelChange)="headerAddress.set($event)"
-            class="w-full text-center text-[11px] text-slate-600 bg-transparent border-b border-dashed border-transparent hover:border-slate-300 focus:border-slate-800 focus:outline-none px-1"
+            class="w-full text-center"
           />
         </div>
 

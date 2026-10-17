@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { EoiStateService, Scheme } from '../eoi/services/eoi-state.service';
 import type { IpaDocumentData } from '../eoi/services/eoi-state.models';
 import { IpaPdfService } from '../eoi/pages/ipa-editor/ipa-pdf.service';
-import { PageHeaderComponent, TableComponent, TableColumn } from '../../shared';
+import { ButtonComponent, IconComponent, ListPageComponent, TableColumn } from '../../shared';
 
 /** One e-signed IPA of an approved company. */
 interface IpaRow {
@@ -33,63 +32,34 @@ interface IpaRow {
   selector: 'app-ipa-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, PageHeaderComponent, TableComponent],
+  imports: [ListPageComponent, ButtonComponent, IconComponent],
   template: `
-    <div class="w-full min-h-full bg-background text-primary font-sans">
-      <div class="p-4 sm:p-5 space-y-3 font-sans">
+    <app-list-page
+      title="IPA"
+      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'IPA' }]"
+      searchPlaceholder="Search IPA, Application ID, Scheme, District..."
+      [(searchQuery)]="searchQuery"
+      [columns]="columns"
+      [data]="rows()"
+      itemUnit="IPAs"
+      emptyMessage="No IPA has been released yet."
+      [customTemplates]="{ schemeTitle: schemeTemplate, action: actionTemplate }"
+    />
 
-        <app-page-header
-          title="IPA"
-          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'IPA' }]"
-          [searchable]="true"
-          searchPlaceholder="Search IPA, Application ID, Scheme, District..."
-          [(searchQuery)]="searchQuery"
-        >
-        </app-page-header>
+    <ng-template #schemeTemplate let-row>
+      <div class="font-normal text-slate-800 text-[13px] leading-snug">{{ row.schemeTitle }}</div>
+      <div class="text-[11px] font-mono text-muted mt-0.5">Ref: {{ row.refNo }}</div>
+    </ng-template>
 
-        <app-table
-          [columns]="columns"
-          [data]="rows()"
-          [pagination]="true"
-          [pageSize]="10"
-          itemUnit="IPAs"
-          emptyMessage="No IPA has been released yet."
-          [customTemplates]="{ schemeTitle: schemeTemplate, action: actionTemplate }"
-        >
-        </app-table>
-
-        <ng-template #schemeTemplate let-row>
-          <div class="font-normal text-slate-800 text-[13px] leading-snug">{{ row.schemeTitle }}</div>
-          <div class="text-[11px] font-mono text-muted mt-0.5">Ref: {{ row.refNo }}</div>
-        </ng-template>
-
-        <ng-template #actionTemplate let-row>
-          <div class="flex items-center justify-center gap-2">
-            <button
-              type="button"
-              (click)="viewIpa(row)"
-              class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-all whitespace-nowrap cursor-pointer"
-              title="Open the e-signed IPA"
-            >
-              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              <span>View</span>
-            </button>
-            <button
-              type="button"
-              (click)="registerSdc(row)"
-              class="btn btn-primary btn-sm whitespace-nowrap cursor-pointer"
-              title="Register an SDC for this IPA"
-            >
-              <span>Register SDC</span>
-            </button>
-          </div>
-        </ng-template>
-
+    <ng-template #actionTemplate let-row>
+      <div class="flex items-center justify-center gap-2">
+        <button appButton variant="outline" size="sm" (click)="viewIpa(row)" title="Open the e-signed IPA">
+          <app-icon name="eye" size="sm" />
+          <span>View</span>
+        </button>
+        <button appButton size="sm" (click)="registerSdc(row)" title="Register an SDC for this IPA">Register SDC</button>
       </div>
-    </div>
+    </ng-template>
   `
 })
 export class IpaListComponent {

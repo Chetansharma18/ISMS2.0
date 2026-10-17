@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { ButtonComponent, IconComponent } from '../../../../../shared';
 import type { ApplicantResponse } from '../../../services/eoi-state.service';
 
 /**
@@ -10,20 +11,20 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
 @Component({
   selector: 'app-scrutiny-toolbar',
   standalone: true,
-  imports: [RouterLink, NgClass],
+  imports: [RouterLink, NgClass, ButtonComponent, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
     <div class="space-y-3">
       <div>
         <a
+          appButton
+          variant="outline"
+          size="sm"
           [routerLink]="['/admin/responses', applicant()?.schemeId || 'ALL']"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
           title="Back to Applicant Submissions"
         >
-          <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
+          <app-icon name="back" />
           <span>Back</span>
         </a>
       </div>
@@ -48,38 +49,17 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
         <!-- Review actions -->
         <div class="flex items-center gap-2 flex-wrap">
           <button
-            type="button"
+            appButton
+            variant="secondary"
+            size="sm"
             (click)="revert.emit()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-semibold transition-colors cursor-pointer shadow-2xs active:scale-95"
             title="Raise a shortfall and return the application to the applicant"
           >
             Revert
           </button>
-          <button
-            type="button"
-            (click)="remarks.emit()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer shadow-2xs active:scale-95"
-            title="Add a remark"
-          >
-            Remarks
-          </button>
-          <button
-            type="button"
-            (click)="reject.emit()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-300 bg-white hover:bg-rose-50 text-rose-700 text-xs font-semibold transition-colors cursor-pointer shadow-2xs active:scale-95"
-            title="Reject application"
-          >
-            Reject
-          </button>
-          <button
-            type="button"
-            (click)="approve.emit()"
-            class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs font-semibold transition-colors cursor-pointer shadow-2xs active:scale-95"
-            style="color: #ffffff !important;"
-            title="Approve application"
-          >
-            <span style="color: #ffffff !important;">Approve</span>
-          </button>
+          <button appButton variant="outline" size="sm" (click)="remarks.emit()" title="Add a remark">Remarks</button>
+          <button appButton variant="danger" size="sm" (click)="reject.emit()" title="Reject application">Reject</button>
+          <button appButton size="sm" (click)="approve.emit()" title="Approve application">Approve</button>
         </div>
       </div>
 

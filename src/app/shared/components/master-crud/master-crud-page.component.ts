@@ -10,8 +10,7 @@ import {
   signal,
   computed,
   inject,
-  ChangeDetectionStrategy,
-  HostListener
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
@@ -21,6 +20,12 @@ import { PageHeaderComponent } from '../page-header/page-header.component';
 import { TableComponent } from '../table/table.component';
 import { TableColumn } from '../table/table.types';
 import { ActionModalComponent } from '../action-modal/action-modal.component';
+import { ButtonComponent } from '../button/button.component';
+import { IconComponent } from '../icon/icon.component';
+import { DropdownComponent } from '../dropdown/dropdown.component';
+import { InputDirective } from '../form-controls/input/input.directive';
+import { SwitchComponent } from '../switch/switch.component';
+import { PageShellComponent } from '../../templates/page-shell/page-shell.component';
 import { DataEngineService, ResourceRepository } from '../../../core/services/data-engine.service';
 import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
 
@@ -45,10 +50,16 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
     FormsModule,
     PageHeaderComponent,
     TableComponent,
-    ActionModalComponent
+    ActionModalComponent,
+    ButtonComponent,
+    IconComponent,
+    DropdownComponent,
+    InputDirective,
+    PageShellComponent,
+    SwitchComponent
   ],
   template: `
-    <div class="w-full min-h-screen bg-white text-slate-800 font-sans p-4 sm:p-6 lg:p-8 space-y-6">
+    <app-page-shell>
 
       <!-- Page Header -->
       <app-page-header
@@ -60,13 +71,13 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
       >
         <!-- Add Button -->
         <button
+          appButton
+          size="sm"
           type="button"
           (click)="openAddModal()"
-          class="px-3.5 py-1.5 bg-primary hover:bg-primary-dark text-white text-xs font-semibold rounded-lg shadow-xs transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+          class="shrink-0"
         >
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
+          <app-icon name="plus" size="sm" />
           <span>Add {{ config.entityLabel }}</span>
         </button>
       </app-page-header>
@@ -112,15 +123,14 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
         <div class="flex items-center justify-center whitespace-nowrap">
           <!-- View Button -->
           <button
+            appButton
+            variant="ghost"
+            size="sm"
             type="button"
             (click)="$event.stopPropagation(); openViewModal(item)"
-            class="inline-flex items-center gap-1 text-sky-600 hover:text-sky-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
             title="View Details"
           >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
+            <app-icon name="eye" size="sm" />
             <span>View</span>
           </button>
 
@@ -128,14 +138,14 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
 
           <!-- Edit Button -->
           <button
+            appButton
+            variant="ghost"
+            size="sm"
             type="button"
             (click)="$event.stopPropagation(); openEditModal(item)"
-            class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-normal text-[13px] hover:underline cursor-pointer select-none transition-colors"
             title="Edit"
           >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
+            <app-icon name="edit" size="sm" />
             <span>Edit</span>
           </button>
 
@@ -143,20 +153,11 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
 
           <!-- Active / Inactive Toggle -->
           <div class="inline-flex items-center gap-1.5" title="Toggle Status" (click)="$event.stopPropagation()">
-            <button
-              type="button"
-              (click)="toggleStatus(item)"
-              class="relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-              [ngClass]="item.status === 'Inactive' ? 'bg-slate-500 hover:bg-slate-600' : 'bg-emerald-500 hover:bg-emerald-600'"
-              role="switch"
-              [attr.aria-checked]="item.status !== 'Inactive'"
-            >
-              <span class="sr-only">Toggle Active Status</span>
-              <span
-                class="pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                [ngClass]="item.status === 'Inactive' ? 'translate-x-0' : 'translate-x-3'"
-              ></span>
-            </button>
+            <app-switch
+              [checked]="item.status !== 'Inactive'"
+              label="Toggle Active Status"
+              (toggled)="toggleStatus(item)"
+            />
             <span
               class="font-medium text-[12px] select-none transition-colors cursor-pointer"
               (click)="toggleStatus(item)"
@@ -186,12 +187,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
           {{ editingId() ? 'Edit' : 'Add New' }} {{ config.entityLabel }}
         </h2>
 
-        <div
-          class="mt-4 font-sans text-[13px] space-y-4 max-h-[65vh] overflow-y-auto pr-1"
-          (pointerdown)="closeMultiselectIfOutside($any($event.target))"
-          (click)="closeMultiselectIfOutside($any($event.target))"
-          (focusin)="closeMultiselectIfOutside($any($event.target))"
-        >
+        <div class="mt-4 font-sans text-[13px] space-y-4 max-h-[65vh] overflow-y-auto pr-1">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             @for (field of config.fields; track field.key) {
               <div [ngClass]="colSpanClass(field)">
@@ -202,20 +198,20 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                 @switch (field.type) {
                   @case ('textarea') {
                     <textarea
+                      appInput
                       [rows]="field.rows || 3"
                       [attr.maxlength]="field.maxLength || null"
                       [placeholder]="field.placeholder || ''"
                       [(ngModel)]="formData[field.key]"
-                      (focus)="openMultiselectField.set(null)"
-                      class="w-full px-2.5 py-2 border border-field-border rounded focus:outline-none focus:border-primary text-slate-800"
+                      class="w-full"
                     ></textarea>
                   }
                   @case ('select') {
                     <select
+                      appInput
                       [(ngModel)]="formData[field.key]"
-                      (focus)="openMultiselectField.set(null)"
-                      [ngClass]="fieldInvalid(field) ? 'border-red-500' : 'border-field-border'"
-                      class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white"
+                      [invalid]="fieldInvalid(field)"
+                      class="w-full"
                     >
                       <option value="" disabled selected>Select {{ field.label }}</option>
                       @for (opt of resolveOptions(field); track opt) {
@@ -224,68 +220,34 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                     </select>
                   }
                   @case ('multiselect') {
-                    <div class="relative multiselect-container">
-                      <button
-                        type="button"
-                        (click)="toggleMultiselect(field.key, $event)"
-                        class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white flex items-center justify-between text-left cursor-pointer"
-                        [ngClass]="fieldInvalid(field) ? 'border-red-500' : 'border-field-border'"
-                      >
-                        <span class="truncate text-xs sm:text-[13px]" [class.text-slate-400]="!formData[field.key] || formData[field.key].length === 0">
-                          {{ getMultiselectLabel(field) }}
-                        </span>
-                        <svg
-                          class="w-4 h-4 text-slate-400 shrink-0 ml-2 transition-transform duration-200"
-                          [class.rotate-180]="openMultiselectField() === field.key"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-
-                      @if (openMultiselectField() === field.key) {
-                        <div
-                          class="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-lg border border-slate-200 shadow-xl overflow-hidden font-sans max-h-52 overflow-y-auto"
-                          role="listbox"
-                        >
-                          <div class="py-1 divide-y divide-slate-100 text-xs sm:text-[13px]">
-                            @for (opt of resolveOptions(field); track opt) {
-                              <label
-                                class="flex items-center gap-2.5 px-3 py-2 hover:bg-slate-50 cursor-pointer text-slate-700 select-none transition-colors"
-                              >
-                                <input
-                                  type="checkbox"
-                                  [checked]="isMultiselectOptionChecked(field, opt)"
-                                  (change)="toggleMultiselectOption(field, opt)"
-                                  class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary cursor-pointer accent-primary"
-                                />
-                                <span [class.font-semibold]="opt === 'ALL'">{{ opt }}</span>
-                              </label>
-                            }
-                          </div>
-                        </div>
-                      }
-                    </div>
+                    <app-dropdown
+                      multiple
+                      overlay
+                      [options]="resolveOptions(field)"
+                      [values]="valuesOf(field)"
+                      [placeholder]="'Select ' + field.label"
+                      [summary]="getMultiselectLabel(field)"
+                      [invalid]="fieldInvalid(field)"
+                      (optionToggled)="toggleMultiselectOption(field, $event)"
+                    />
                   }
                   @case ('number') {
                     <input
+                      appInput
                       type="number"
                       [min]="field.min ?? 0"
                       [placeholder]="field.placeholder || ''"
                       [(ngModel)]="formData[field.key]"
-                      (focus)="openMultiselectField.set(null)"
-                      [ngClass]="fieldInvalid(field) ? 'border-red-500' : 'border-field-border'"
-                      class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-primary text-slate-800"
+                      [invalid]="fieldInvalid(field)"
+                      class="w-full"
                     />
                   }
                   @case ('permissions') {
                     <div class="flex items-center gap-2">
                       <select
+                        appInput
                         [(ngModel)]="pendingPermission"
-                        (focus)="openMultiselectField.set(null)"
-                        class="flex-1 px-2.5 py-2 border border-field-border rounded focus:outline-none focus:border-primary text-slate-800 bg-white"
+                        class="flex-1"
                       >
                         <option value="" disabled selected>Select permission to add...</option>
                         @for (opt of unselectedPermissions(field); track opt) {
@@ -293,15 +255,16 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                         }
                       </select>
                       <button
+                        appButton
+                        iconOnly
                         type="button"
                         (click)="addPermission(field)"
                         [disabled]="!pendingPermission"
-                        class="p-2 bg-primary hover:bg-primary-dark disabled:bg-slate-300 text-white rounded-lg transition-all cursor-pointer disabled:cursor-not-allowed shrink-0 flex items-center justify-center"
+                        class="shrink-0"
                         title="Add Permission"
+                        aria-label="Add Permission"
                       >
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                        </svg>
+                        <app-icon name="plus" />
                       </button>
                     </div>
 
@@ -310,10 +273,8 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                         @for (perm of formData[field.key]; track perm) {
                           <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-white border border-field-border text-brand shadow-2xs select-none">
                             <span>{{ perm }}</span>
-                            <button type="button" (click)="removePermission(field, perm)" class="text-slate-400 hover:text-rose-600 cursor-pointer transition-colors" title="Remove">
-                              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                              </svg>
+                            <button appButton variant="ghost" size="xs" iconOnly type="button" (click)="removePermission(field, perm)" aria-label="Remove" title="Remove">
+                              <app-icon name="close" size="xs" />
                             </button>
                           </span>
                         }
@@ -322,13 +283,14 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                   }
                   @default {
                     <input
+                      appInput
                       type="text"
                       [attr.maxlength]="field.maxLength || null"
                       [placeholder]="field.placeholder || ''"
                       [(ngModel)]="formData[field.key]"
-                      (focus)="openMultiselectField.set(null)"
-                      [ngClass]="[fieldInvalid(field) ? 'border-red-500' : 'border-field-border', field.uppercase ? 'font-mono text-xs' : '']"
-                      class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-primary text-slate-800"
+                      [invalid]="fieldInvalid(field)"
+                      [ngClass]="field.uppercase ? 'font-mono text-xs' : ''"
+                      class="w-full"
                     />
                   }
                 }
@@ -390,15 +352,15 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
         }
       </app-action-modal>
 
-    </div>
+    </app-page-shell>
   `
 })
 export class MasterCrudPageComponent<T extends { id: string; status?: string } = any> implements OnInit, AfterViewInit {
   @Input({ required: true }) config!: MasterCrudConfig<T>;
 
-  @ViewChild('tagsTemplate', { static: true }) tagsTemplate!: TemplateRef<any>;
-  @ViewChild('statusTemplate', { static: true }) statusTemplate!: TemplateRef<any>;
-  @ViewChild('actionTemplate', { static: true }) actionTemplate!: TemplateRef<any>;
+  @ViewChild('tagsTemplate', { static: true }) tagsTemplate!: TemplateRef<unknown>;
+  @ViewChild('statusTemplate', { static: true }) statusTemplate!: TemplateRef<unknown>;
+  @ViewChild('actionTemplate', { static: true }) actionTemplate!: TemplateRef<unknown>;
 
   private dataEngine = inject(DataEngineService);
   private cdr = inject(ChangeDetectorRef);
@@ -425,7 +387,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   });
 
   tableColumns = signal<TableColumn<T>[]>([]);
-  customTemplates = signal<Record<string, any>>({});
+  customTemplates = signal<Record<string, TemplateRef<unknown>>>({});
 
   ngOnInit(): void {
     this.repo = this.dataEngine.for<T>(this.config.dataKey, { idKey: 'id' });
@@ -434,7 +396,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   }
 
   ngAfterViewInit(): void {
-    const templates: Record<string, TemplateRef<any>> = {
+    const templates: Record<string, TemplateRef<unknown>> = {
       status: this.statusTemplate,
       action: this.actionTemplate
     };
@@ -507,43 +469,33 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     return !val || !String(val).trim();
   }
 
-  openMultiselectField = signal<string | null>(null);
+  /**
+   * Ticked values handed to each multiselect dropdown. It is the stored selection plus 'ALL' while every
+   * applicable option is ticked, and is rebuilt (new array) only when the selection changes.
+   */
+  multiselectValues: Record<string, string[]> = {};
 
-  closeMultiselectIfOutside(target: HTMLElement | null): void {
-    if (!target || !target.closest('.multiselect-container')) {
-      this.openMultiselectField.set(null);
-    }
+  private readonly noValues: string[] = [];
+
+  /** Ticked values of one multiselect; the form is empty until the modal is opened, so fall back to a stable empty list. */
+  valuesOf(field: MasterFieldConfig): string[] {
+    return this.multiselectValues[field.key] ?? this.noValues;
   }
 
-  @HostListener('document:pointerdown', ['$event'])
-  onDocumentPointerDown(event: PointerEvent): void {
-    this.closeMultiselectIfOutside(event.target as HTMLElement);
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    this.closeMultiselectIfOutside(event.target as HTMLElement);
-  }
-
-  @HostListener('document:focusin', ['$event'])
-  onDocumentFocusIn(event: FocusEvent): void {
-    this.closeMultiselectIfOutside(event.target as HTMLElement);
-  }
-
-  toggleMultiselect(fieldKey: string, event?: Event): void {
-    if (event) event.stopPropagation();
-    this.openMultiselectField.update((current) => (current === fieldKey ? null : fieldKey));
-  }
-
-  isMultiselectOptionChecked(field: MasterFieldConfig, opt: string): boolean {
+  private syncMultiselectValues(field: MasterFieldConfig): void {
     const selected: string[] = this.formData[field.key] || [];
-    if (opt === 'ALL') {
-      const allApplicable = this.resolveOptions(field).filter(
-        (o) => o !== 'ALL' && o.toLowerCase() !== 'na'
-      );
-      return allApplicable.length > 0 && allApplicable.every((o) => selected.includes(o));
+    const allApplicable = this.resolveOptions(field).filter(
+      (o) => o !== 'ALL' && o.toLowerCase() !== 'na'
+    );
+    const allTicked = allApplicable.length > 0 && allApplicable.every((o) => selected.includes(o));
+    this.multiselectValues[field.key] = allTicked ? [...selected, 'ALL'] : [...selected];
+  }
+
+  private syncAllMultiselectValues(): void {
+    this.multiselectValues = {};
+    for (const f of this.config.fields) {
+      if (f.type === 'multiselect') this.syncMultiselectValues(f);
     }
-    return selected.includes(opt);
   }
 
   toggleMultiselectOption(field: MasterFieldConfig, opt: string): void {
@@ -573,6 +525,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
       }
       this.formData[field.key] = current;
     }
+    this.syncMultiselectValues(field);
   }
 
   getMultiselectLabel(field: MasterFieldConfig): string {
@@ -597,21 +550,20 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     this.editingId.set(null);
     this.submitted.set(false);
     this.pendingPermission = '';
-    this.openMultiselectField.set(null);
     this.formData = this.config.createDefaults();
     for (const f of this.config.fields) {
       if (f.type === 'multiselect' && !Array.isArray(this.formData[f.key])) {
         this.formData[f.key] = [];
       }
     }
+    this.syncAllMultiselectValues();
     this.showModal.set(true);
   }
 
   openEditModal(item: T): void {
-    this.editingId.set((item as any).id);
+    this.editingId.set(item.id);
     this.submitted.set(false);
     this.pendingPermission = '';
-    this.openMultiselectField.set(null);
     this.formData = { ...this.config.createDefaults(), ...item };
     for (const f of this.config.fields) {
       if (f.type === 'multiselect') {
@@ -623,12 +575,12 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
         }
       }
     }
+    this.syncAllMultiselectValues();
     this.showModal.set(true);
   }
 
   closeModal(): void {
     this.showModal.set(false);
-    this.openMultiselectField.set(null);
   }
 
   submit(): void {
@@ -641,7 +593,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
 
     if (editId) {
       this.repo.update(editId, payload).subscribe((updated: T) => {
-        this.items.update(current => current.map((it: any) => (it.id === editId ? updated : it)));
+        this.items.update(current => current.map(it => (it.id === editId ? updated : it)));
         this.showModal.set(false);
       });
     } else {
@@ -658,9 +610,9 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
       : `Are you sure you want to delete this ${this.config.entityLabel.toLowerCase()}?`;
     if (!confirm(confirmText)) return;
 
-    this.repo.delete((item as any).id).subscribe((success: boolean) => {
+    this.repo.delete(item.id).subscribe((success: boolean) => {
       if (success) {
-        this.items.update(current => current.filter((it: any) => it.id !== (item as any).id));
+        this.items.update(current => current.filter(it => it.id !== item.id));
       }
     });
   }
@@ -676,7 +628,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     return !!this.config.tagsColumns?.includes(key);
   }
 
-  isTagArray(key: string, item: any): boolean {
+  isTagArray(key: string, item: Record<string, unknown>): boolean {
     return this.isTagsColumn(key) && Array.isArray(item[key]);
   }
 
@@ -694,7 +646,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     return String(val);
   }
 
-  openViewModal(item: any): void {
+  openViewModal(item: T): void {
     this.selectedViewItem.set(item);
     this.showViewModal.set(true);
   }
@@ -704,15 +656,15 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     this.selectedViewItem.set(null);
   }
 
-  toggleStatus(item: any): void {
+  toggleStatus(item: T): void {
     const currentStatus = item.status === 'Inactive' ? 'Inactive' : 'Active';
     const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
     this.repo.update(item.id, { status: newStatus } as any).subscribe((updated: T) => {
-      this.items.update(current => current.map((it: any) => (it.id === item.id ? { ...it, status: newStatus } : it)));
+      this.items.update(current => current.map(it => (it.id === item.id ? { ...it, status: newStatus } : it)));
     });
   }
 
-  getRowClass = (item: any): string => {
+  getRowClass = (item: { status?: string }): string => {
     const isInactive = item.status === 'Inactive';
     return isInactive ? 'opacity-50 !bg-slate-100/70 transition-colors' : 'bg-white transition-colors';
   };

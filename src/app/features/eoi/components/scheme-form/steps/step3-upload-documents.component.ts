@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ButtonComponent } from '../../../../../shared';
 import { SchemeFormState } from '../scheme-form.state';
 import { EoiDocumentItem } from '../scheme-form.model';
 import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from './step3-document-rules';
@@ -7,6 +8,7 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
 @Component({
   selector: 'app-step3-upload-documents',
   standalone: true,
+  imports: [ButtonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
@@ -58,29 +60,13 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
               <!-- Right: actions -->
               <div class="flex items-center gap-1.5 shrink-0 sm:ml-0 ml-9">
                 @if (doc.status === 'pending') {
-                  <label class="px-3.5 py-1.5 bg-navy hover:bg-[#07243c] text-white rounded-lg text-xs font-semibold cursor-pointer shadow-xs active:scale-95 transition-all flex items-center gap-1">
-                    <span>Upload</span>
-                    <input type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
-                  </label>
+                  <button appButton size="sm" (click)="uploadInput.click()">Upload</button>
+                  <input #uploadInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
                 } @else {
-                  <button
-                    type="button"
-                    (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)"
-                    class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-medium cursor-pointer transition-colors"
-                  >
-                    View
-                  </button>
-                  <label class="px-2.5 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 text-ocean rounded-md text-xs font-medium cursor-pointer transition-colors">
-                    Replace
-                    <input type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
-                  </label>
-                  <button
-                    type="button"
-                    (click)="onRemove(doc)"
-                    class="px-2.5 py-1.5 bg-white hover:bg-red-50 border border-red-200 text-red-600 rounded-md text-xs font-medium cursor-pointer transition-colors"
-                  >
-                    Remove
-                  </button>
+                  <button appButton variant="outline" size="sm" (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)">View</button>
+                  <button appButton variant="secondary" size="sm" (click)="replaceInput.click()">Replace</button>
+                  <input #replaceInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
+                  <button appButton variant="danger" size="sm" (click)="onRemove(doc)">Remove</button>
                 }
               </div>
 
@@ -91,19 +77,11 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
 
       <!-- Footer Action Bar -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <button
-          type="button"
-          (click)="state.goToStep(2)"
-          class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
-        >
+        <button appButton variant="outline" size="lg" (click)="state.goToStep(2)">
           &larr; Back to OTR Profile
         </button>
 
-        <button
-          type="button"
-          (click)="state.goToStep(4)"
-          class="px-6 sm:px-7 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-        >
+        <button appButton size="lg" (click)="state.goToStep(4)">
           Proceed to Complete Preview &rarr;
         </button>
       </div>

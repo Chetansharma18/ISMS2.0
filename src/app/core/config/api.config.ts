@@ -269,7 +269,7 @@ export function getEndpointForDataKey(
   action: 'LIST' | 'GET' | 'ADD' | 'UPDATE' | 'DELETE' = 'LIST',
   _id?: string | number
 ): EndpointDef | null {
-  const resource = (API_ENDPOINTS as Record<string, any>)[dataKey];
+  const resource = (API_ENDPOINTS as Record<string, Record<string, EndpointDef> | undefined>)[dataKey];
   if (!resource) return null;
   return resource[action] || null;
 }

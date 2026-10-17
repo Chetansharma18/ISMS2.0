@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { PsdFeeBreakdownTableComponent } from './psd-fee-breakdown-table.component';
+import { ButtonComponent, IconComponent } from '../../../../shared';
 
 @Component({
   selector: 'app-psd-payment-receipt',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PsdFeeBreakdownTableComponent],
+  imports: [PsdFeeBreakdownTableComponent, ButtonComponent, IconComponent],
   host: { class: 'block' },
   template: `
     <div class="space-y-6">
@@ -80,40 +81,39 @@ import { PsdFeeBreakdownTableComponent } from './psd-fee-breakdown-table.compone
             <!-- Download & Print Actions -->
             <div class="flex items-center gap-2.5 w-full sm:w-auto">
               <button
+                appButton
+                variant="outline"
+                class="flex-1 sm:flex-none"
                 type="button"
                 (click)="downloadReceipt.emit()"
-                class="flex-1 sm:flex-none px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 active:scale-95 text-slate-800 rounded-lg font-semibold text-xs transition-all shadow-2xs cursor-pointer inline-flex items-center justify-center gap-1.5"
                 title="Download Official PDF Receipt"
               >
-                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
+                <app-icon name="download" size="sm" />
                 <span>Download Receipt (PDF)</span>
               </button>
 
               <button
+                appButton
+                variant="secondary"
                 type="button"
                 (click)="printReceipt()"
-                class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg font-semibold text-xs transition-all cursor-pointer inline-flex items-center justify-center gap-1.5"
                 title="Print Receipt"
               >
-                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
+                <app-icon name="print" size="sm" />
                 <span>Print</span>
               </button>
             </div>
 
             <!-- Proceed to Batch Details Action Button -->
             <button
+              appButton
+              size="lg"
+              class="w-full sm:w-auto"
               type="button"
               (click)="proceed.emit()"
-              class="w-full sm:w-auto px-6 py-2.5 bg-primary hover:bg-primary-dark active:scale-95 text-white rounded-lg font-bold text-xs sm:text-sm shadow-xs transition-all cursor-pointer inline-flex items-center justify-center gap-2"
             >
               <span>Proceed to Batch Details</span>
-              <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
+              <app-icon name="chevron-right" size="sm" />
             </button>
 
           </div>

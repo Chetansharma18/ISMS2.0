@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { SubmittedTender } from '../../../core/models/tender.model';
 import { TenderDocCardComponent, TenderDocReplaceRequest, TenderDocViewRequest } from './tender-doc-card.component';
 
+// Default change detection: the parent replaces documents inside the passed tender object in place while editing.
 @Component({
   selector: 'app-tender-org-section',
   standalone: true,

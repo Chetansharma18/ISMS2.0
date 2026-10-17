@@ -11,6 +11,12 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ButtonComponent } from '../button/button.component';
+import { IconComponent } from '../icon/icon.component';
+import { DropdownComponent, DropdownItem } from '../dropdown/dropdown.component';
+import { InputDirective } from '../form-controls/input/input.directive';
+import { ModalComponent } from '../modal/modal.component';
+import { SwitchComponent } from '../switch/switch.component';
 import {
   FormFieldConfig,
   FormSectionConfig,
@@ -41,7 +47,7 @@ import {
 @Component({
   selector: 'app-form-sdc, app-dynamic-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ButtonComponent, IconComponent, DropdownComponent, InputDirective, ModalComponent, SwitchComponent],
   template: `
     <div class="space-y-4 font-sans text-slate-800" style="font-family: 'Inter', sans-serif;">
       
@@ -77,17 +83,19 @@ import {
           }"
         >
           <div class="flex items-center gap-2">
-            <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-            </svg>
+            <app-icon name="info-filled" solid size="auto" class="w-3.5 h-3.5 shrink-0" />
             <span class="font-medium text-xs">{{ alertMessage }}</span>
           </div>
           <button
+            appButton
+            variant="ghost"
+            size="sm"
+            iconOnly
             type="button"
             (click)="alertMessage = ''"
-            class="hover:opacity-75 cursor-pointer font-bold px-1 text-xs"
+            aria-label="Dismiss"
           >
-            ✕
+            <app-icon name="close" size="sm" />
           </button>
         </div>
       }
@@ -111,25 +119,12 @@ import {
                         @if (section.icon) {
                           <div class="w-6 h-6 rounded-md bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
                             <ng-container [ngSwitch]="section.icon">
-                              <svg *ngSwitchCase="'building'" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                              </svg>
-                              <svg *ngSwitchCase="'location'" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                              </svg>
-                              <svg *ngSwitchCase="'document'" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                              </svg>
-                              <svg *ngSwitchCase="'academic'" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
-                              </svg>
-                              <svg *ngSwitchCase="'shield'" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                              </svg>
-                              <svg *ngSwitchDefault class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                              </svg>
+                              <app-icon *ngSwitchCase="'building'" name="building" size="sm" [stroke]="2" />
+                              <app-icon *ngSwitchCase="'location'" name="location-marker" size="sm" [stroke]="2" />
+                              <app-icon *ngSwitchCase="'document'" name="document" size="sm" [stroke]="2" />
+                              <app-icon *ngSwitchCase="'academic'" name="graduation-cap" size="sm" [stroke]="2" />
+                              <app-icon *ngSwitchCase="'shield'" name="shield-check" size="sm" [stroke]="2" />
+                              <app-icon *ngSwitchDefault name="list" size="sm" [stroke]="2" />
                             </ng-container>
                           </div>
                         }
@@ -146,9 +141,13 @@ import {
                         }
                         @if (section.collapsible) {
                           <button
+                            appButton
+                            variant="ghost"
+                            size="sm"
+                            iconOnly
                             type="button"
                             (click)="section.collapsed = !section.collapsed"
-                            class="text-slate-400 hover:text-slate-600 text-xs p-1 cursor-pointer"
+                            aria-label="Toggle section"
                           >
                             {{ section.collapsed ? '▼' : '▲' }}
                           </button>
@@ -241,9 +240,11 @@ import {
           <div class="flex items-center gap-2 w-full sm:w-auto">
             @if (showCancel) {
               <button
+                appButton
+                variant="outline"
                 type="button"
                 (click)="onCancel()"
-                class="w-full sm:w-auto px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 active:scale-95 transition-all cursor-pointer shadow-2xs"
+                class="w-full sm:w-auto"
               >
                 {{ cancelLabel }}
               </button>
@@ -251,9 +252,11 @@ import {
 
             @if (showReset) {
               <button
+                appButton
+                variant="outline"
                 type="button"
                 (click)="onReset()"
-                class="w-full sm:w-auto px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg active:scale-95 transition-all cursor-pointer"
+                class="w-full sm:w-auto"
               >
                 Reset
               </button>
@@ -261,9 +264,11 @@ import {
 
             @if (showDraft) {
               <button
+                appButton
+                variant="outline"
                 type="button"
                 (click)="onSaveDraft()"
-                class="w-full sm:w-auto px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 active:scale-95 transition-all cursor-pointer shadow-2xs"
+                class="w-full sm:w-auto"
               >
                 {{ draftLabel }}
               </button>
@@ -275,24 +280,14 @@ import {
             @for (action of customActions; track action.id) {
               @if (isActionVisible(action)) {
                 <button
+                  appButton
+                  [variant]="action.variant && action.variant !== 'secondary' ? action.variant : 'outline'"
+                  [loading]="!!action.loading"
                   type="button"
                   (click)="action.action(model)"
                   [disabled]="isActionDisabled(action)"
-                  class="w-full sm:w-auto px-4 py-2 text-xs font-semibold rounded-lg shadow-2xs transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1.5"
-                  [ngClass]="{
-                    'bg-primary hover:bg-primary-dark text-white': action.variant === 'primary',
-                    'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50': action.variant === 'secondary' || !action.variant,
-                    'border border-slate-300 text-slate-700 hover:bg-slate-50': action.variant === 'outline',
-                    'bg-rose-600 hover:bg-rose-700 text-white': action.variant === 'danger',
-                    'text-slate-600 hover:bg-slate-100': action.variant === 'ghost'
-                  }"
+                  class="w-full sm:w-auto"
                 >
-                  @if (action.loading) {
-                    <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                    </svg>
-                  }
                   <span>{{ action.label }}</span>
                 </button>
               }
@@ -304,16 +299,12 @@ import {
             <!-- Primary Submit Button -->
             @if (showSubmit) {
               <button
+                appButton
+                [loading]="submitLoading"
                 type="submit"
                 [disabled]="submitDisabled || submitLoading"
-                class="w-full sm:w-auto px-5 py-2 text-xs font-semibold text-white bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-sm active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+                class="w-full sm:w-auto"
               >
-                @if (submitLoading) {
-                  <svg class="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                  </svg>
-                }
                 <span>{{ submitLabel }}</span>
               </button>
             }
@@ -366,9 +357,7 @@ import {
               </label>
               @if (getFieldError(field.key)) {
                 <div class="form-error-text text-rose-600 font-medium flex items-center gap-1 mt-0.5 m-0 leading-tight" style="font-size: 11px !important; line-height: 14px !important;">
-                  <svg class="shrink-0 text-rose-600" style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                  </svg>
+                  <app-icon name="error-circle" solid size="auto" class="w-3 h-3 text-rose-600" />
                   <span style="font-size: 11px !important; line-height: 14px !important;">{{ getFieldError(field.key) }}</span>
                 </div>
               }
@@ -387,20 +376,12 @@ import {
                   <p class="text-[11px] text-slate-500 mt-0.5 m-0">{{ field.hint }}</p>
                 }
               </div>
-              <button
-                type="button"
-                (click)="toggleSwitch(field)"
+              <app-switch
+                [checked]="!!getValue(field.key)"
                 [disabled]="isFieldDisabled(field)"
-                class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-                [class.bg-primary]="!!getValue(field.key)"
-                [class.bg-slate-200]="!getValue(field.key)"
-              >
-                <span
-                  class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                  [class.translate-x-4]="!!getValue(field.key)"
-                  [class.translate-x-0]="!getValue(field.key)"
-                ></span>
-              </button>
+                [label]="getFieldLabel(field)"
+                (toggled)="toggleSwitch(field)"
+              />
             </div>
           } @else if (field.type === 'custom' && field.template) {
             <!-- Custom Template -->
@@ -426,90 +407,25 @@ import {
             <!-- SELECT DROPDOWN (CUSTOM DOM-ANCHORED TO PREVENT DETACHMENT ON SCROLL) -->
             @if (field.type === 'select') {
               <div class="relative w-full" (click)="$event.stopPropagation()">
-                <!-- Trigger Button -->
-                <button
-                  type="button"
-                  [id]="'input-' + field.key"
-                  (click)="toggleSelect(field.key, $event)"
+                <app-dropdown
+                  overlay
+                  [inputId]="'input-' + field.key"
+                  [options]="getDropdownOptions(field)"
+                  [value]="getSelectValue(field)"
+                  [placeholder]="getFieldPlaceholder(field) || 'Select an option'"
+                  [searchable]="(field.options || []).length > 6"
+                  emptyText="No matching options found"
                   [disabled]="isFieldDisabled(field)"
-                  class="w-full h-[38px] px-3 text-xs bg-white border rounded-lg text-slate-800 transition-all focus:outline-none flex items-center justify-between cursor-pointer hover:border-slate-400 text-left"
-                  [ngClass]="{
-                    'border-red-500 bg-red-50/20 focus:border-red-600 focus:ring-2 focus:ring-red-100': !!getFieldError(field.key),
-                    'border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-100': !getFieldError(field.key),
-                    'bg-slate-50 cursor-not-allowed text-slate-400 border-slate-200': isFieldDisabled(field)
-                  }"
-                  [attr.aria-expanded]="openSelectKey() === field.key"
-                >
-                  <span class="truncate flex-1" [class.text-slate-400]="!getValue(field.key)">
-                    {{ getSelectedOptionLabel(field) || getFieldPlaceholder(field) || 'Select an option' }}
-                  </span>
-                  <svg
-                    class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ml-2"
-                    [class.rotate-180]="openSelectKey() === field.key"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-
-                <!-- Custom Floating Menu (Anchored to trigger, scrolls with page, never jumps to screen 0,0) -->
-                @if (openSelectKey() === field.key && !isFieldDisabled(field)) {
-                  <div
-                    class="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-lg border border-slate-200 shadow-xl overflow-hidden min-w-full"
-                    style="box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.1);"
-                  >
-                    <!-- Search bar if > 6 options (e.g. 50 districts or educational qualifications) -->
-                    @if ((field.options || []).length > 6) {
-                      <div class="p-2 border-b border-slate-100 bg-slate-50/80">
-                        <input
-                          type="text"
-                          [value]="searchSelectQuery()"
-                          (input)="onSearchSelectInput($event)"
-                          placeholder="Search..."
-                          class="w-full h-8 px-2.5 text-xs rounded-md border border-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-slate-800 placeholder:text-slate-400"
-                          (click)="$event.stopPropagation()"
-                          autofocus
-                        />
-                      </div>
-                    }
-
-                    <!-- Options List -->
-                    <ul class="max-h-56 overflow-y-auto py-1 divide-y divide-slate-100/60 text-xs m-0 p-0 list-none">
-                      @for (opt of getFilteredSelectOptions(field); track opt.value) {
-                        <li
-                          (click)="selectDropdownOption(field, opt, $event)"
-                          class="px-3 py-2 cursor-pointer transition-colors flex items-center justify-between"
-                          [class.bg-sky-50]="opt.value === getValue(field.key)"
-                          [class.text-brand]="opt.value === getValue(field.key)"
-                          [class.font-semibold]="opt.value === getValue(field.key)"
-                          [class.hover:bg-slate-50]="opt.value !== getValue(field.key)"
-                          [class.text-slate-700]="opt.value !== getValue(field.key)"
-                          [class.opacity-50]="opt.disabled"
-                          [class.pointer-events-none]="opt.disabled"
-                        >
-                          <span class="truncate">{{ opt.label }}</span>
-                          @if (opt.value === getValue(field.key)) {
-                            <svg class="w-4 h-4 text-brand shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                            </svg>
-                          }
-                        </li>
-                      } @empty {
-                        <li class="px-3 py-3 text-center text-xs text-slate-400">
-                          No matching options found
-                        </li>
-                      }
-                    </ul>
-                  </div>
-                }
+                  [invalid]="!!getFieldError(field.key)"
+                  (valueChange)="onSelectChange(field, $event)"
+                />
               </div>
             }
 
             <!-- TEXTAREA -->
             @else if (field.type === 'textarea') {
               <textarea
+                appInput
                 [id]="'input-' + field.key"
                 [ngModel]="getValue(field.key)"
                 (ngModelChange)="onValueChange(field, $event)"
@@ -518,12 +434,8 @@ import {
                 [disabled]="isFieldDisabled(field)"
                 [readonly]="field.readonly"
                 [attr.maxlength]="field.maxLength || null"
-                class="w-full px-3 py-2 text-xs bg-white border rounded-lg text-slate-800 placeholder:text-slate-400 transition-all focus:outline-none resize-none hover:border-slate-400 leading-relaxed"
-                [ngClass]="{
-                  'border-red-500 bg-red-50/20 focus:border-red-600 focus:ring-2 focus:ring-red-100': !!getFieldError(field.key),
-                  'border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-100': !getFieldError(field.key),
-                  'bg-slate-50 cursor-not-allowed text-slate-500 border-slate-200': isFieldDisabled(field)
-                }"
+                [invalid]="!!getFieldError(field.key)"
+                class="w-full resize-none"
               ></textarea>
             }
 
@@ -555,9 +467,7 @@ import {
                   <div class="h-[38px] flex items-center justify-between px-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs gap-2 shadow-2xs">
                     <!-- File info: Document/Image icon, Name & Size (no PDF icon) -->
                     <div class="flex items-center gap-2 min-w-0 flex-1 truncate">
-                      <svg class="w-4 h-4 shrink-0 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
+                      <app-icon name="document" [stroke]="2" class="shrink-0 text-slate-500" />
                       <span class="font-medium text-slate-800 truncate text-xs" [title]="getFileName(currentFile)">
                         {{ getFileName(currentFile) }}
                       </span>
@@ -567,29 +477,28 @@ import {
                     <div class="flex items-center gap-1.5 shrink-0">
                       <!-- View Button -->
                       <button
+                        appButton
+                        variant="secondary"
+                        size="sm"
                         type="button"
                         (click)="viewFile(field, currentFile)"
-                        class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-ocean hover:text-ocean-dark bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
                         title="View Document"
                       >
-                        <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
+                        <app-icon name="eye" size="sm" />
                         <span>View</span>
                       </button>
 
                       <!-- Delete Button -->
                       @if (!isFieldDisabled(field)) {
                         <button
+                          appButton
+                          variant="danger"
+                          size="sm"
                           type="button"
                           (click)="removeFile(field)"
-                          class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
                           title="Delete Document"
                         >
-                          <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
+                          <app-icon name="trash" size="sm" />
                           <span>Delete</span>
                         </button>
                       }
@@ -605,9 +514,7 @@ import {
                     }"
                   >
                     <div class="flex items-center gap-2 text-slate-600 truncate">
-                      <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                      </svg>
+                      <app-icon name="upload" [stroke]="2" class="text-slate-400 shrink-0" />
                       <span class="text-xs truncate text-slate-500">{{ field.placeholder || 'Choose File...' }}</span>
                     </div>
                     <span class="px-2.5 py-1 bg-white text-slate-700 text-[11px] font-semibold rounded border border-slate-200 shadow-2xs shrink-0">
@@ -651,13 +558,17 @@ import {
                     <!-- Top Right [X] Delete Button (Matching Screenshot 4) -->
                     @if (!isFieldDisabled(field)) {
                       <button
+                        appButton
+                        variant="danger"
+                        size="xs"
+                        iconOnly
                         type="button"
                         (click)="removePhotoFile(field, $event)"
-                        class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/95 hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-slate-300 hover:border-rose-300 rounded shadow-xs flex items-center justify-center transition-colors cursor-pointer z-10"
+                        class="absolute top-1.5 right-1.5 z-10"
                         title="Remove Photo"
                         aria-label="Remove Photo"
                       >
-                        <span class="text-sm font-bold leading-none select-none">&times;</span>
+                        <app-icon name="close" size="xs" />
                       </button>
                     }
 
@@ -685,9 +596,7 @@ import {
                       [class.cursor-not-allowed]="isFieldDisabled(field)"
                     >
                       <div class="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-sky-50 text-slate-400 group-hover:text-brand flex items-center justify-center mb-2 transition-colors">
-                        <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
+                        <app-icon name="user" size="auto" [stroke]="1.8" class="w-7 h-7" />
                       </div>
                       <span class="text-[11px] text-slate-400 font-medium leading-tight select-none">
                         Double click to
@@ -749,9 +658,7 @@ import {
                       [ngClass]="photosList.length >= (field.minPhotos || 3) ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'"
                     >
                       @if (photosList.length >= (field.minPhotos || 3)) {
-                        <svg class="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
+                        <app-icon name="check-filled" solid size="auto" class="w-3 h-3 text-emerald-600" />
                       }
                       {{ photosList.length }} / {{ field.minPhotos || 3 }} min photos
                     </span>
@@ -776,12 +683,17 @@ import {
                         </div>
                         @if (!isFieldDisabled(field)) {
                           <button
+                            appButton
+                            variant="danger"
+                            size="xs"
+                            iconOnly
                             type="button"
                             (click)="removePhoto(field, pIdx); $event.stopPropagation()"
-                            class="absolute top-1 right-1 w-5 h-5 bg-rose-600 hover:bg-rose-700 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-xs cursor-pointer z-10"
+                            class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 z-10"
                             title="Remove Photo"
+                            aria-label="Remove Photo"
                           >
-                            <span class="text-xs font-bold leading-none">&times;</span>
+                            <app-icon name="close" size="xs" />
                           </button>
                         }
                         <span class="absolute bottom-0 inset-x-0 bg-slate-900/80 text-white text-[9px] font-medium text-center truncate px-1 py-0.5 select-none pointer-events-none">
@@ -797,9 +709,7 @@ import {
                         title="Upload JPG photo"
                       >
                         <div class="w-7 h-7 rounded-full bg-[#0284c7]/10 group-hover:bg-[#0284c7]/20 flex items-center justify-center transition-colors mb-1 shrink-0">
-                          <svg class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                          </svg>
+                          <app-icon name="plus" [stroke]="2.5" />
                         </div>
                         <span class="text-[11px] font-bold tracking-tight text-center leading-tight block">
                           Add JPG Photo
@@ -837,6 +747,8 @@ import {
 
                 <!-- Native Input -->
                 <input
+                  appInput
+                  variant="plain"
                   [id]="'input-' + field.key"
                   [type]="field.type || 'text'"
                   [value]="getValue(field.key)"
@@ -849,7 +761,7 @@ import {
                   [attr.max]="field.max != null ? field.max : null"
                   [attr.step]="field.step != null ? field.step : null"
                   [attr.maxlength]="field.maxLength || null"
-                  class="flex-1 w-full h-full px-3 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none bg-transparent placeholder:normal-case"
+                  class="flex-1 w-full h-full placeholder:normal-case"
                   [class.uppercase]="field.uppercase"
                   [class.cursor-not-allowed]="isFieldDisabled(field)"
                 />
@@ -866,9 +778,7 @@ import {
             <!-- Validation Error Alert -->
             @if (getFieldError(field.key)) {
               <div class="form-error-text text-rose-600 font-medium flex items-center gap-1 mt-0.5 m-0 leading-tight" style="font-size: 11px !important; line-height: 14px !important;">
-                <svg class="shrink-0 text-rose-600" style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                </svg>
+                <app-icon name="error-circle" solid size="auto" class="w-3 h-3 text-rose-600" />
                 <span style="font-size: 11px !important; line-height: 14px !important;">{{ getFieldError(field.key) }}</span>
               </div>
             } @else if (field.hint) {
@@ -884,47 +794,21 @@ import {
 
       <!-- Full View Center Photo Lightbox Modal -->
       @if (activePhotoPreview(); as previewPhotoItem) {
-        <div
-          class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-950/80 backdrop-blur-xs animate-in fade-in duration-150"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="sdc-photo-fullview-title"
-          (click)="closePhotoPreview()"
+        <app-modal
+          [title]="previewPhotoItem.tag || previewPhotoItem.name || 'Center Photo Preview'"
+          [subtitle]="(previewPhotoItem.name || '') + ' ' + (previewPhotoItem.size ? '• ' + previewPhotoItem.size : '')"
+          size="xl"
+          (close)="closePhotoPreview()"
         >
-          <div
-            class="bg-white rounded-xl border border-slate-300 shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-150"
-            (click)="$event.stopPropagation()"
-          >
-            <!-- Modal Header -->
-            <div class="px-5 py-3 border-b border-[#0d2843] bg-[#12365A] text-white flex items-center justify-between gap-3 shrink-0">
-              <div class="truncate">
-                <h3 id="sdc-photo-fullview-title" class="text-sm font-semibold text-white tracking-tight m-0 truncate" style="color: #ffffff !important;">
-                  {{ previewPhotoItem.tag || previewPhotoItem.name || 'Center Photo Preview' }}
-                </h3>
-                <span class="text-[11px] text-white/80 font-normal" style="color: rgba(255,255,255,0.85) !important;">
-                  {{ previewPhotoItem.name }} {{ previewPhotoItem.size ? '• ' + previewPhotoItem.size : '' }}
-                </span>
-              </div>
-              <button
-                type="button"
-                (click)="closePhotoPreview()"
-                class="w-8 h-8 rounded-full text-white/80 hover:text-white hover:bg-white/20 flex items-center justify-center transition-colors cursor-pointer text-lg leading-none select-none"
-                title="Close"
-              >
-                &times;
-              </button>
-            </div>
-
-            <!-- Image View Body -->
-            <div class="p-4 bg-slate-950 flex items-center justify-center overflow-auto max-h-[80vh]">
-              <img
-                [src]="previewPhotoItem.url"
-                [alt]="previewPhotoItem.name"
-                class="max-w-full max-h-[74vh] object-contain rounded-md shadow-2xl transition-all"
-              />
-            </div>
+          <!-- Image View Body -->
+          <div class="p-4 bg-slate-950 rounded-lg flex items-center justify-center overflow-auto max-h-[70vh]">
+            <img
+              [src]="previewPhotoItem.url"
+              [alt]="previewPhotoItem.name"
+              class="max-w-full max-h-[64vh] object-contain rounded-md shadow-2xl transition-all"
+            />
           </div>
-        </div>
+        </app-modal>
       }
 
     </div>
@@ -1077,67 +961,37 @@ export class FormSdcComponent {
     this.setValue(field.key, val, field);
   }
 
-  /** Currently active open select dropdown field key */
-  openSelectKey = signal<string | null>(null);
+  /** Dropdown items per `field.options` array. Cached so the dropdown gets the same array on every change detection. */
+  private readonly dropdownOptionCache = new WeakMap<FormOption[], DropdownItem[]>();
+  private readonly noDropdownOptions: DropdownItem[] = [];
 
-  /** Search query for filtering select options */
-  searchSelectQuery = signal<string>('');
-
-  /** Toggles select dropdown open/close */
-  toggleSelect(key: string, event: MouseEvent): void {
-    event.stopPropagation();
-    if (this.openSelectKey() === key) {
-      this.openSelectKey.set(null);
-    } else {
-      this.openSelectKey.set(key);
-      this.searchSelectQuery.set('');
+  /** Options of a select field in the shape <app-dropdown> takes (values are compared as strings). */
+  getDropdownOptions(field: FormFieldConfig): DropdownItem[] {
+    const opts = field.options;
+    if (!opts) return this.noDropdownOptions;
+    let items = this.dropdownOptionCache.get(opts);
+    const unchanged =
+      !!items &&
+      items.length === opts.length &&
+      items.every((it, i) => it.value === String(opts[i].value) && it.label === opts[i].label && !!it.disabled === !!opts[i].disabled);
+    if (!items || !unchanged) {
+      items = opts.map(o => ({ value: String(o.value), label: o.label, disabled: !!o.disabled }));
+      this.dropdownOptionCache.set(opts, items);
     }
+    return items;
   }
 
-  /** Selects an option from custom dropdown */
-  selectDropdownOption(field: FormFieldConfig, opt: FormOption, event: MouseEvent): void {
-    event.stopPropagation();
-    if (opt.disabled) return;
-    this.setValue(field.key, opt.value, field);
-    this.openSelectKey.set(null);
-  }
-
-  /** Returns filtered options based on search query */
-  getFilteredSelectOptions(field: FormFieldConfig): FormOption[] {
-    const opts = field.options || [];
-    const q = this.searchSelectQuery().trim().toLowerCase();
-    if (!q) return opts;
-    return opts.filter(o => (o.label || '').toLowerCase().includes(q));
-  }
-
-  /** Returns display label for selected value */
-  getSelectedOptionLabel(field: FormFieldConfig): string {
+  /** Current value of a select field as the string the dropdown works with. */
+  getSelectValue(field: FormFieldConfig): string {
     const val = this.getValue(field.key);
-    if (val === undefined || val === null || val === '') return '';
-    const match = (field.options || []).find(o => o.value === val);
-    return match ? match.label : String(val);
+    return val === undefined || val === null ? '' : String(val);
   }
 
-  /** Search input handler */
-  onSearchSelectInput(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.searchSelectQuery.set(target.value);
-  }
-
-  /** Closes select dropdown on document click */
-  @HostListener('document:click')
-  onDocumentClick(): void {
-    if (this.openSelectKey()) {
-      this.openSelectKey.set(null);
-    }
-  }
-
-  /** Closes select dropdown on Escape key */
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    if (this.openSelectKey()) {
-      this.openSelectKey.set(null);
-    }
+  /** Stores the option picked in the dropdown, keeping the option's original value type. */
+  onSelectChange(field: FormFieldConfig, picked: string): void {
+    const match = (field.options || []).find(o => String(o.value) === picked);
+    if (!match || match.disabled) return;
+    this.setValue(field.key, match.value, field);
   }
 
   /** Handles select / generic value changes */

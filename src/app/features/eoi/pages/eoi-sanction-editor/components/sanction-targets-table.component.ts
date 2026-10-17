@@ -1,12 +1,13 @@
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ButtonComponent, DocTableDirective, IconComponent, InputDirective } from '../../../../../shared';
 import type { SanctionTableRow } from '../eoi-sanction-editor.model';
 
 /** Allocated physical targets table. Edits the parent-owned rows in place (default change detection). */
 @Component({
   selector: 'app-sanction-targets-table',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, ButtonComponent, DocTableDirective, IconComponent, InputDirective],
   host: { class: 'block' },
   template: `
     <div class="my-6">
@@ -14,17 +15,13 @@ import type { SanctionTableRow } from '../eoi-sanction-editor.model';
         <h4 class="font-bold text-slate-900 text-xs uppercase tracking-tight">
           Allocated Physical Targets Table (Approved PIAs &amp; Agencies):
         </h4>
-        <button
-          type="button"
-          (click)="addRow.emit()"
-          class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded text-xs font-sans font-medium cursor-pointer flex items-center gap-1 print:hidden"
-        >
+        <button appButton variant="outline" size="sm" class="print:hidden" (click)="addRow.emit()">
           <span>+ Add Row</span>
         </button>
       </div>
 
       <div class="w-full">
-        <table class="w-full text-left border-collapse font-sans text-[10.5px] sm:text-[11px] table-fixed">
+        <table appDocTable class="w-full text-left border-collapse font-sans text-[10.5px] sm:text-[11px] table-fixed">
           <thead>
             <tr class="bg-slate-100 text-slate-900 border border-slate-800 font-bold text-center">
               <th class="p-1 border border-slate-800 w-[5%]">Sr. No</th>
@@ -46,22 +43,28 @@ import type { SanctionTableRow } from '../eoi-sanction-editor.model';
                 </td>
                 <td class="border border-slate-800 p-0.5">
                   <input
+                    appInput
+                    variant="plain"
                     type="text"
                     [(ngModel)]="row.appId"
-                    class="w-full font-mono text-center bg-transparent border-none focus:outline-none text-[10px] leading-tight"
+                    class="w-full font-mono text-center leading-tight"
                   />
                 </td>
                 <td class="border border-slate-800 p-0.5">
                   <input
+                    appInput
+                    variant="plain"
                     type="text"
                     [(ngModel)]="row.agencyName"
-                    class="w-full font-medium bg-transparent border-none focus:outline-none px-0.5 text-[11px] truncate"
+                    class="w-full font-medium truncate"
                   />
                 </td>
                 <td class="border border-slate-800 p-0.5">
                   <select
+                    appInput
+                    variant="plain"
                     [(ngModel)]="row.district"
-                    class="w-full bg-transparent border-none focus:outline-none cursor-pointer text-[10.5px] p-0 font-sans truncate"
+                    class="w-full cursor-pointer font-sans truncate"
                   >
                     @for (dist of districts(); track dist) {
                       <option [value]="dist">{{ dist }}</option>
@@ -70,8 +73,10 @@ import type { SanctionTableRow } from '../eoi-sanction-editor.model';
                 </td>
                 <td class="border border-slate-800 p-0.5">
                   <select
+                    appInput
+                    variant="plain"
                     [(ngModel)]="row.sector"
-                    class="w-full bg-transparent border-none focus:outline-none cursor-pointer text-[10.5px] p-0 font-sans truncate"
+                    class="w-full cursor-pointer font-sans truncate"
                   >
                     @for (sec of sectors(); track sec) {
                       <option [value]="sec">{{ sec }}</option>
@@ -80,33 +85,43 @@ import type { SanctionTableRow } from '../eoi-sanction-editor.model';
                 </td>
                 <td class="border border-slate-800 p-0.5 text-center">
                   <input
+                    appInput
+                    variant="plain"
                     type="text"
                     [(ngModel)]="row.category"
-                    class="w-full text-center bg-transparent border-none focus:outline-none text-[10.5px]"
+                    class="w-full text-center"
                   />
                 </td>
                 <td class="border border-slate-800 p-0.5 text-center font-bold">
                   <input
+                    appInput
+                    variant="plain"
                     type="text"
                     [(ngModel)]="row.grade"
-                    class="w-full text-center font-bold bg-transparent border-none focus:outline-none text-[11px]"
+                    class="w-full text-center font-bold"
                   />
                 </td>
                 <td class="border border-slate-800 p-0.5 text-center">
                   <input
+                    appInput
+                    variant="plain"
                     type="number"
                     [(ngModel)]="row.target"
-                    class="w-full text-center font-bold bg-transparent border-none focus:outline-none text-[11px]"
+                    class="w-full text-center font-bold"
                   />
                 </td>
                 <td class="border border-slate-800 p-0.5 text-center print:hidden">
                   <button
-                    type="button"
+                    appButton
+                    variant="ghost"
+                    size="sm"
+                    iconOnly
+                    class="-my-1.5"
                     (click)="removeRow.emit(i)"
-                    class="text-rose-600 hover:text-rose-800 text-xs font-bold px-0.5"
                     title="Delete Row"
+                    aria-label="Delete Row"
                   >
-                    &times;
+                    <app-icon name="close" size="sm" />
                   </button>
                 </td>
               </tr>

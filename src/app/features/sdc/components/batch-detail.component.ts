@@ -5,7 +5,7 @@ import { BatchService } from '../services/batch.service';
 import { BatchRecord } from '../models/batch.model';
 import { AuthService } from '../../../core/auth/auth.service';
 import { PermissionService } from '../../../core/permissions/permission.service';
-import { PageHeaderComponent } from '../../../shared/components';
+import { PageHeaderComponent, ButtonComponent, IconComponent } from '../../../shared';
 import { SECTOR_COURSES_MAP, getCoursesForSector } from '../config/courses-catalog.data';
 import { BatchHeroComponent } from './batch-detail/batch-hero.component';
 import { BatchApprovalPanelComponent } from './batch-detail/batch-approval-panel.component';
@@ -28,6 +28,8 @@ import {
   standalone: true,
   imports: [
     PageHeaderComponent,
+    ButtonComponent,
+    IconComponent,
     BatchHeroComponent,
     BatchApprovalPanelComponent,
     BatchSummaryCardComponent,
@@ -52,27 +54,27 @@ import {
             <div class="flex items-center gap-2">
               @if (!isEditing()) {
                 <button
+                  appButton
+                  variant="outline"
+                  size="sm"
                   type="button"
                   (click)="startEditing(b)"
-                  class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
                   title="Edit Batch Creation Details"
                 >
-                  <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
+                  <app-icon name="edit" size="sm" />
                   <span>Edit Details</span>
                 </button>
               }
 
               <button
+                appButton
+                variant="outline"
+                size="sm"
                 type="button"
                 (click)="printSummary()"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
                 title="Print Batch Summary"
               >
-                <svg class="w-3.5 h-3.5 stroke-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
+                <app-icon name="print" size="sm" />
                 <span>Print</span>
               </button>
             </div>
@@ -82,12 +84,10 @@ import {
           @if (successMessage()) {
             <div class="p-3.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 flex items-center justify-between text-xs animate-in fade-in">
               <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
+                <app-icon name="check" [stroke]="2" class="text-emerald-600 shrink-0" />
                 <span class="font-medium">{{ successMessage() }}</span>
               </div>
-              <button (click)="successMessage.set('')" class="text-emerald-600 hover:text-emerald-900 cursor-pointer font-bold">✕</button>
+              <button appButton variant="ghost" size="sm" iconOnly aria-label="Dismiss" (click)="successMessage.set('')"><app-icon name="close" size="xs" /></button>
             </div>
           }
 
@@ -136,9 +136,9 @@ import {
             The requested batch could not be found or may have been archived.
           </p>
           <button
+            appButton
             type="button"
             (click)="goBack()"
-            class="px-4 py-2 rounded-lg bg-primary text-white text-xs font-semibold cursor-pointer shadow-2xs hover:bg-primary-dark"
           >
             Back to Batches
           </button>

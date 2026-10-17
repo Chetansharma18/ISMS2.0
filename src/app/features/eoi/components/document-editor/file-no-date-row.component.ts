@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, input, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { InputDirective } from '../../../../shared';
 
 /** "File No" and "Date" row shown under the letterhead of the official letters. */
 @Component({
   selector: 'app-file-no-date-row',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, InputDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
@@ -16,20 +17,24 @@ import { FormsModule } from '@angular/forms';
       <div class="flex items-center gap-1.5 w-full sm:w-auto">
         <span class="text-slate-600 shrink-0">File No:</span>
         <input
+          appInput
+          variant="plain"
           type="text"
           [ngModel]="fileNo()"
           (ngModelChange)="fileNo.set($event)"
-          class="w-full sm:w-96 font-mono text-slate-900 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-500 focus:border-slate-800 focus:outline-none px-1 text-xs"
+          class="w-full sm:w-96 font-mono"
         />
       </div>
 
       <div class="flex items-center gap-1.5 shrink-0">
         <span class="text-slate-600">Date:</span>
         <input
+          appInput
+          variant="plain"
           type="text"
           [ngModel]="date()"
           (ngModelChange)="date.set($event)"
-          class="w-32 text-right font-mono text-slate-900 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-500 focus:border-slate-800 focus:outline-none px-1 text-xs"
+          class="w-32 text-right font-mono"
         />
       </div>
     </div>

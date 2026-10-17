@@ -3,12 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { SDC_SECTOR_OPTIONS } from '../../models/sdc.model';
 import { RAJASTHAN_LOCATION_DATA } from '../../config/sdc-form.config';
 import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
+import { ButtonComponent, IconComponent, InputDirective } from '../../../../shared';
 
 /** Inline edit form for an SDC. Edits the parent-owned edit model in place via ngModel. */
+// Default change detection: the parent edits the edit model in place (e.g. district change resets dependent fields).
 @Component({
   selector: 'app-sdc-edit-form',
   standalone: true,
-  imports: [FormsModule, SdcPhotoEditorComponent],
+  imports: [FormsModule, SdcPhotoEditorComponent, ButtonComponent, IconComponent, InputDirective],
   host: { class: 'block' },
   template: `
     <div class="border border-slate-200 rounded-xl p-5 sm:p-6 bg-white shadow-2xs space-y-4 animate-in fade-in duration-150">
@@ -27,9 +29,10 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
             Center Name <span class="text-rose-500">*</span>
           </label>
           <input
+            appInput
             type="text"
             [(ngModel)]="editModel.sdcName"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
             placeholder="Enter Center Name"
           />
         </div>
@@ -39,8 +42,9 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
             Sector <span class="text-rose-500">*</span>
           </label>
           <select
+            appInput
             [(ngModel)]="editModel.sector"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           >
             @for (sec of sectors; track sec) {
               <option [value]="sec">{{ sec }}</option>
@@ -52,10 +56,11 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
         <div>
           <label class="block font-semibold text-slate-700 mb-1">State</label>
           <input
+            appInput
             type="text"
             [value]="editModel.state"
             disabled
-            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-500 cursor-not-allowed"
+            class="w-full"
           />
         </div>
 
@@ -64,9 +69,10 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
             District <span class="text-rose-500">*</span>
           </label>
           <select
+            appInput
             [ngModel]="editModel.district"
             (ngModelChange)="districtChange.emit($event)"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           >
             @for (d of districts; track d) {
               <option [value]="d">{{ d }}</option>
@@ -79,8 +85,9 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
             Assembly Constituency <span class="text-rose-500">*</span>
           </label>
           <select
+            appInput
             [(ngModel)]="editModel.assemblyConstituency"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           >
             @for (a of assemblyConstituencies(); track a) {
               <option [value]="a">{{ a }}</option>
@@ -93,8 +100,9 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
             Parliament Constituency <span class="text-rose-500">*</span>
           </label>
           <select
+            appInput
             [(ngModel)]="editModel.parliamentConstituency"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           >
             @for (p of parliamentConstituencies(); track p) {
               <option [value]="p">{{ p }}</option>
@@ -106,10 +114,11 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
         <div>
           <label class="block font-semibold text-slate-700 mb-1">Division</label>
           <input
+            appInput
             type="text"
             [value]="editModel.division"
             disabled
-            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-500 cursor-not-allowed"
+            class="w-full"
           />
         </div>
 
@@ -118,8 +127,9 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
             Block <span class="text-rose-500">*</span>
           </label>
           <select
+            appInput
             [(ngModel)]="editModel.block"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           >
             @for (b of blocks(); track b) {
               <option [value]="b">{{ b }}</option>
@@ -132,9 +142,10 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
             Proposed Start Date <span class="text-rose-500">*</span>
           </label>
           <input
+            appInput
             type="date"
             [(ngModel)]="editModel.proposedStartDate"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           />
         </div>
 
@@ -143,11 +154,12 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
             SDC Capacity <span class="text-rose-500">*</span>
           </label>
           <input
+            appInput
             type="number"
             [(ngModel)]="editModel.sdcCapacity"
             min="1"
             max="1000"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           />
         </div>
 
@@ -157,9 +169,10 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
             Center Email <span class="text-rose-500">*</span>
           </label>
           <input
+            appInput
             type="email"
             [(ngModel)]="editModel.centerEmail"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
             placeholder="center@example.com"
           />
         </div>
@@ -169,9 +182,10 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
             Complete Address <span class="text-rose-500">*</span>
           </label>
           <input
+            appInput
             type="text"
             [(ngModel)]="editModel.fullAddress"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
             placeholder="Street address, building, landmark"
           />
         </div>
@@ -181,10 +195,11 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
             Pin Code <span class="text-rose-500">*</span>
           </label>
           <input
+            appInput
             type="text"
             [(ngModel)]="editModel.pincode"
             maxlength="6"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
             placeholder="302029"
           />
         </div>
@@ -193,26 +208,29 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
         <div>
           <label class="block font-semibold text-slate-700 mb-1">Total TP Trained</label>
           <input
+            appInput
             type="number"
             [(ngModel)]="editModel.totalTrainedAspirants"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           />
         </div>
 
         <div>
           <label class="block font-semibold text-slate-700 mb-1">Total TP Placed</label>
           <input
+            appInput
             type="number"
             [(ngModel)]="editModel.totalPlacedAspirants"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           />
         </div>
 
         <div class="sm:col-span-2">
           <label class="block font-semibold text-slate-700 mb-1">Hostel Category</label>
           <select
+            appInput
             [(ngModel)]="editModel.hostelCategory"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           >
             @for (cat of hostelCategories; track cat) {
               <option [value]="cat">{{ cat }}</option>
@@ -224,29 +242,32 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
         <div>
           <label class="block font-semibold text-slate-700 mb-1">Latitude</label>
           <input
+            appInput
             type="number"
             step="0.0001"
             [(ngModel)]="editModel.latitude"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           />
         </div>
 
         <div>
           <label class="block font-semibold text-slate-700 mb-1">Longitude</label>
           <input
+            appInput
             type="number"
             step="0.0001"
             [(ngModel)]="editModel.longitude"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
           />
         </div>
 
         <div class="sm:col-span-2">
           <label class="block font-semibold text-slate-700 mb-1">Remarks</label>
           <input
+            appInput
             type="text"
             [(ngModel)]="editModel.remarks"
-            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full"
             placeholder="Remarks"
           />
         </div>
@@ -261,22 +282,20 @@ import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
       <!-- Form Action Buttons -->
       <div class="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-200">
         <button
+          appButton
+          variant="outline"
           type="button"
           (click)="cancelled.emit()"
-          class="px-4 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
         >
           Cancel
         </button>
 
         <button
+          appButton
           type="button"
           (click)="saved.emit()"
-          class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer"
-          style="color: #ffffff !important;"
         >
-          <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
+          <app-icon name="check" size="sm" />
           <span>Save Changes</span>
         </button>
       </div>

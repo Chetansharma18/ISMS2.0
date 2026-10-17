@@ -1,5 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ButtonComponent, IconComponent, InputDirective } from '../../../../shared';
 import { ClauseLabelFormat, clauseLabel } from './document-editor.util';
 
 /**
@@ -9,7 +10,7 @@ import { ClauseLabelFormat, clauseLabel } from './document-editor.util';
 @Component({
   selector: 'app-clause-list',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective],
   host: { class: 'block' },
   template: `
     <div class="mt-6 mb-4 font-sans text-xs">
@@ -21,29 +22,31 @@ import { ClauseLabelFormat, clauseLabel } from './document-editor.util';
           <li class="group flex items-start gap-2">
             <span [class]="labelClass()">{{ label(i) }}</span>
             <textarea
+              appInput
+              variant="plain"
               [ngModel]="clauses()[i]"
               (ngModelChange)="setClause(i, $event)"
               rows="2"
-              class="w-full bg-transparent border border-dashed border-transparent hover:border-slate-300 focus:border-slate-800 focus:outline-none p-1 text-xs rounded leading-relaxed resize-y font-serif"
+              class="w-full leading-relaxed resize-y font-serif"
             ></textarea>
             <button
-              type="button"
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              class="opacity-0 group-hover:opacity-100 print:hidden shrink-0 mt-1"
               (click)="remove.emit(i)"
-              class="opacity-0 group-hover:opacity-100 text-rose-600 hover:text-rose-800 text-xs font-bold px-1 print:hidden shrink-0 mt-1"
               title="Remove Clause"
+              aria-label="Remove Clause"
             >
-              &times;
+              <app-icon name="close" size="sm" />
             </button>
           </li>
         }
       </ol>
 
       <div class="mt-3 print:hidden">
-        <button
-          type="button"
-          (click)="add.emit()"
-          class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded text-xs font-sans cursor-pointer flex items-center gap-1"
-        >
+        <button appButton variant="outline" size="sm" (click)="add.emit()">
           <span>+ Add Terms &amp; Conditions Clause</span>
         </button>
       </div>

@@ -335,7 +335,7 @@ export function getSdcFormFields(options: SdcFormConfigOptions = {}): FormFieldC
     options: districtOptions,
     placeholder: 'Select District',
     colSpan: 1,
-    onChange: (newDistrict: string, _field, model: Record<string, any>) => {
+    onChange: (newDistrict: string, _field, model: Record<string, unknown>) => {
       const distInfo = RAJASTHAN_LOCATION_DATA[newDistrict];
       if (distInfo) {
         // Auto-fill division accordingly
@@ -532,7 +532,7 @@ export function getSdcFormFields(options: SdcFormConfigOptions = {}): FormFieldC
       maxLength: 300,
       placeholder: 'Ready for auditor inspection',
       colSpan: 2,
-      onChange: (val: string, _f: any, model: Record<string, any>) => {
+      onChange: (val: string, _f: FormFieldConfig, model: Record<string, unknown>) => {
         model['tpRemarks'] = val;
       }
     },

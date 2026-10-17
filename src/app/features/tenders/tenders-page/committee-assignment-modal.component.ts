@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActionModalComponent } from '../../../shared';
+import { ActionModalComponent, ButtonComponent, IconComponent, InputDirective } from '../../../shared';
 import { CommitteeAdmin, SchemeTender } from '../tenders.models';
 import { filterAdmins } from './tenders-page.util';
 
@@ -24,7 +24,7 @@ import { filterAdmins } from './tenders-page.util';
   selector: 'app-committee-assignment-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass, FormsModule, ActionModalComponent],
+  imports: [NgClass, FormsModule, ActionModalComponent, ButtonComponent, IconComponent, InputDirective],
   template: `
     <app-action-modal
       [isOpen]="isOpen()"
@@ -67,9 +67,12 @@ import { filterAdmins } from './tenders-page.util';
             <!-- Approver Dropdown Trigger Box -->
             <div class="relative">
               <button
+                appButton
+                variant="outline"
+                block
                 type="button"
                 (click)="toggleApproverDropdown($event)"
-                class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between shadow-2xs hover:border-purple-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-500 transition-colors cursor-pointer"
+                class="justify-between text-left"
               >
                 <div class="flex items-center gap-2 min-w-0 pr-2">
                   @if (selectedApprover()) {
@@ -95,20 +98,15 @@ import { filterAdmins } from './tenders-page.util';
                       class="text-slate-400 hover:text-rose-600 p-0.5 rounded transition-colors cursor-pointer"
                       title="Clear approver"
                     >
-                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
+                      <app-icon name="close" size="sm" [stroke]="2" />
                     </span>
                   }
-                  <svg
-                    class="w-4 h-4 text-slate-400 transition-transform duration-200"
+                  <app-icon
+                    name="chevron-down"
+                    [stroke]="2"
+                    class="text-slate-400 transition-transform duration-200"
                     [ngClass]="{'rotate-180': isApproverDropdownOpen()}"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                  </svg>
+                  />
                 </div>
               </button>
 
@@ -122,24 +120,27 @@ import { filterAdmins } from './tenders-page.util';
                   <div class="p-2 border-b border-slate-100 shrink-0 bg-slate-50/60 rounded-t-lg">
                     <div class="relative">
                       <input
+                        appInput
+                        size="sm"
                         type="text"
                         placeholder="Search approver by name..."
                         [ngModel]="approverSearchQuery()"
                         (ngModelChange)="approverSearchQuery.set($event)"
-                        class="w-full pl-8 pr-7 py-1.5 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-500 text-slate-800 placeholder-slate-400 bg-white"
+                        class="w-full pl-9 pr-8"
                       />
-                      <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
+                      <app-icon name="search" size="sm" [stroke]="2" class="text-slate-400 absolute left-2.5 top-2.5" />
                       @if (approverSearchQuery()) {
                         <button
+                          appButton
+                          variant="ghost"
+                          size="sm"
+                          iconOnly
                           type="button"
                           (click)="approverSearchQuery.set('')"
-                          class="absolute right-2 top-2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                          class="absolute right-0.5 top-1/2 -translate-y-1/2"
+                          aria-label="Clear search"
                         >
-                          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
+                          <app-icon name="close" size="sm" />
                         </button>
                       }
                     </div>
@@ -149,12 +150,14 @@ import { filterAdmins } from './tenders-page.util';
                   <div class="max-h-52 overflow-y-auto p-1.5 space-y-1">
                     @for (adm of filteredApproverAdmins(); track adm.id) {
                       <button
+                        appButton
+                        [variant]="selectedApprover() === adm.name ? 'secondary' : 'ghost'"
+                        block
                         type="button"
                         (click)="selectApprover(adm.name)"
-                        class="w-full flex items-center justify-between px-2.5 py-2 rounded-md hover:bg-purple-50/70 cursor-pointer transition-colors text-xs text-left"
-                        [ngClass]="selectedApprover() === adm.name ? 'bg-purple-50 border border-purple-200' : ''"
+                        class="justify-between text-left"
                       >
-                        <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="flex items-center gap-2.5 min-w-0 text-xs">
                           <!-- Radio Indicator -->
                           <div
                             class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors"
@@ -197,9 +200,12 @@ import { filterAdmins } from './tenders-page.util';
             <!-- Members Dropdown Trigger Box -->
             <div class="relative">
               <button
+                appButton
+                variant="outline"
+                block
                 type="button"
                 (click)="toggleMemberDropdown($event)"
-                class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between shadow-2xs hover:border-purple-500 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-500 transition-colors cursor-pointer"
+                class="justify-between text-left"
               >
                 <div class="flex items-center gap-2 min-w-0 pr-2">
                   @if (selectedAdminIds().length === 0) {
@@ -211,15 +217,12 @@ import { filterAdmins } from './tenders-page.util';
                   }
                 </div>
 
-                <svg
-                  class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"
+                <app-icon
+                  name="chevron-down"
+                  [stroke]="2"
+                  class="text-slate-400 transition-transform duration-200 shrink-0"
                   [ngClass]="{'rotate-180': isMemberDropdownOpen()}"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
+                />
               </button>
 
               <!-- Members Popup -->
@@ -232,24 +235,27 @@ import { filterAdmins } from './tenders-page.util';
                   <div class="p-2 border-b border-slate-100 shrink-0 bg-slate-50/60 rounded-t-lg">
                     <div class="relative">
                       <input
+                        appInput
+                        size="sm"
                         type="text"
                         placeholder="Search members by name..."
                         [ngModel]="memberSearchQuery()"
                         (ngModelChange)="memberSearchQuery.set($event)"
-                        class="w-full pl-8 pr-7 py-1.5 text-xs border border-slate-200 rounded-md focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-500 text-slate-800 placeholder-slate-400 bg-white"
+                        class="w-full pl-9 pr-8"
                       />
-                      <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
+                      <app-icon name="search" size="sm" [stroke]="2" class="text-slate-400 absolute left-2.5 top-2.5" />
                       @if (memberSearchQuery()) {
                         <button
+                          appButton
+                          variant="ghost"
+                          size="sm"
+                          iconOnly
                           type="button"
                           (click)="memberSearchQuery.set('')"
-                          class="absolute right-2 top-2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                          class="absolute right-0.5 top-1/2 -translate-y-1/2"
+                          aria-label="Clear search"
                         >
-                          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
+                          <app-icon name="close" size="sm" />
                         </button>
                       }
                     </div>
@@ -299,9 +305,7 @@ import { filterAdmins } from './tenders-page.util';
                   Assigned Approver
                 </span>
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-50 border border-purple-200 text-xs">
-                  <svg class="w-3.5 h-3.5 text-purple-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
+                  <app-icon name="shield-check" size="sm" [stroke]="2.5" class="text-purple-600 shrink-0" />
                   <span class="font-semibold text-purple-900">{{ selectedApprover() }}</span>
                   @if (getAdminByName(selectedApprover()); as adm) {
                     <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-white text-purple-800 border border-purple-200">
@@ -309,14 +313,17 @@ import { filterAdmins } from './tenders-page.util';
                     </span>
                   }
                   <button
+                    appButton
+                    variant="ghost"
+                    size="xs"
+                    iconOnly
                     type="button"
                     (click)="clearApprover($event)"
-                    class="text-purple-500 hover:text-purple-800 rounded-full hover:bg-purple-200 p-0.5 ml-1 transition-colors cursor-pointer"
+                    class="ml-1"
                     title="Remove approver"
+                    aria-label="Remove approver"
                   >
-                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <app-icon name="close" size="xs" [stroke]="2.5" />
                   </button>
                 </div>
               </div>
@@ -329,11 +336,7 @@ import { filterAdmins } from './tenders-page.util';
                   Assigned Committee Members ({{ selectedAdminIds().length }})
                 </span>
                 @if (selectedAdminIds().length > 0) {
-                  <button
-                    type="button"
-                    (click)="selectedAdminIds.set([])"
-                    class="text-[10.5px] text-purple-700 hover:text-purple-900 hover:underline cursor-pointer"
-                  >
+                  <button appButton variant="ghost" size="sm" type="button" (click)="selectedAdminIds.set([])">
                     Clear all
                   </button>
                 }
@@ -349,14 +352,16 @@ import { filterAdmins } from './tenders-page.util';
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200 shadow-2xs">
                       <span>{{ name }}</span>
                       <button
+                        appButton
+                        variant="ghost"
+                        size="xs"
+                        iconOnly
                         type="button"
                         (click)="removeAdminSelection(name)"
-                        class="text-purple-600 hover:text-purple-900 rounded-full hover:bg-purple-200 p-0.5 transition-colors cursor-pointer"
                         title="Remove member"
+                        aria-label="Remove member"
                       >
-                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <app-icon name="close" size="xs" [stroke]="2.5" />
                       </button>
                     </span>
                   }

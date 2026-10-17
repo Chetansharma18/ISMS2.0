@@ -9,6 +9,9 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
+import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 
 export type NewUserCategory = 'student' | 'citizen';
 
@@ -16,61 +19,23 @@ export type NewUserCategory = 'student' | 'citizen';
   selector: 'app-new-user-category-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent, IconComponent, ModalComponent],
   template: `
     @if (isOpen) {
-      <div
-        class="fixed inset-0 z-120 flex items-center justify-center p-4 bg-white select-none font-sans animate-in fade-in duration-200"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="category-modal-title"
+      <app-modal
+        title="Choose New User Category"
+        subtitle="Select User Category / उपयोगकर्ता प्रकार"
+        widthOverride="max-w-xl"
+        [closeOnBackdrop]="false"
+        (close)="cancel()"
       >
-        <!-- Modal Card Container -->
-        <div
-          class="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col"
-          (click)="$event.stopPropagation()"
-        >
-          <!-- Top Gov Accent Gradient -->
-          <div class="h-1.5 w-full bg-gradient-to-r from-sso-blue via-navy to-ocean"></div>
-
-          <!-- Header -->
-          <div class="p-5 sm:p-6 pb-3 border-b border-slate-100 flex items-start justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-primary-light text-navy flex items-center justify-center shrink-0 shadow-2xs">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <div>
-                <div class="text-[11px] font-bold uppercase tracking-wider text-sso-blue">
-                  Select User Category / उपयोगकर्ता प्रकार
-                </div>
-                <h2 id="category-modal-title" class="text-lg sm:text-xl font-black text-slate-900 tracking-tight m-0">
-                  Choose New User Category
-                </h2>
-              </div>
-            </div>
-
-            <!-- Close Button -->
-            <button
-              type="button"
-              (click)="cancel()"
-              class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-              aria-label="Close dialog"
-            >
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
           <!-- Description -->
-          <div class="px-5 sm:px-6 pt-3 text-xs sm:text-[13px] text-slate-600 leading-relaxed">
+          <div class="text-xs sm:text-[13px] text-slate-600 leading-relaxed">
             Please choose the option that matches your purpose on the ISMS 2.0 portal:
           </div>
 
           <!-- Category Options Body -->
-          <div class="p-5 sm:p-6 space-y-3.5">
+          <div class="pt-4 space-y-3.5">
 
             <!-- OPTION 1: ASPIRANT (Training Related Interest) -->
             <div
@@ -102,11 +67,7 @@ export type NewUserCategory = 'student' | 'citizen';
 
                 <!-- Icon -->
                 <div class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
-                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path d="M12 14l9-5-9-5-9 5 9 5z" />
-                    <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14v7" />
-                  </svg>
+                  <app-icon name="academic-cap" size="lg" [stroke]="2" />
                 </div>
 
                 <!-- Content -->
@@ -158,9 +119,7 @@ export type NewUserCategory = 'student' | 'citizen';
 
                 <!-- Icon -->
                 <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
+                  <app-icon name="building" size="lg" [stroke]="2" />
                 </div>
 
                 <!-- Content -->
@@ -185,27 +144,26 @@ export type NewUserCategory = 'student' | 'citizen';
           </div>
 
           <!-- Footer Actions -->
-          <div class="p-5 sm:p-6 pt-3 bg-white border-t border-slate-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
+          <ng-container modalFooter>
             <button
+              appButton
+              variant="outline"
               type="button"
               (click)="cancel()"
-              class="w-full sm:w-auto px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              class="mr-auto"
             >
               Cancel &amp; Go Back
             </button>
 
             @if (selectedCategory() === 'citizen') {
               <button
+                appButton
+                [loading]="isSubmitting()"
                 type="button"
                 (click)="confirmSelection()"
                 [disabled]="isSubmitting()"
-                class="w-full sm:w-auto px-5 py-2.5 text-xs sm:text-sm font-bold text-white bg-navy hover:bg-[#07243c] rounded-xl transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75"
               >
                 @if (isSubmitting()) {
-                  <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
                   <span>Continuing...</span>
                 } @else {
                   <span>Continue as Citizen &rarr;</span>
@@ -213,16 +171,13 @@ export type NewUserCategory = 'student' | 'citizen';
               </button>
             } @else if (selectedCategory() === 'student') {
               <button
+                appButton
+                [loading]="isSubmitting()"
                 type="button"
                 (click)="confirmSelection()"
                 [disabled]="isSubmitting()"
-                class="w-full sm:w-auto px-5 py-2.5 text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75"
               >
                 @if (isSubmitting()) {
-                  <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
                   <span>Continuing...</span>
                 } @else {
                   <span>Continue as Aspirant &rarr;</span>
@@ -230,17 +185,15 @@ export type NewUserCategory = 'student' | 'citizen';
               </button>
             } @else {
               <button
+                appButton
                 type="button"
                 disabled
-                class="w-full sm:w-auto px-5 py-2.5 text-xs sm:text-sm font-bold text-slate-400 bg-slate-100 border border-slate-200 rounded-xl transition-colors cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <span>Continue &rarr;</span>
               </button>
             }
-          </div>
-
-        </div>
-      </div>
+          </ng-container>
+      </app-modal>
     }
   `
 })

@@ -10,6 +10,8 @@ import { SchemeService } from './services/scheme.service';
 import {
   TableComponent,
   ActionModalComponent,
+  ButtonComponent,
+  IconComponent,
   TableColumn,
   formatInr
 } from '../../shared';
@@ -50,6 +52,8 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
     RouterModule,
     TableComponent,
     ActionModalComponent,
+    ButtonComponent,
+    IconComponent,
     SchemeDetailViewComponent,
     ConfigureEoiFormComponent,
     CommitteeAssignmentModalComponent,
@@ -82,20 +86,14 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
               role="alert"
             >
               <p class="m-0 flex items-start gap-2 text-[13px] leading-snug">
-                <svg class="w-4 h-4 mt-0.5 shrink-0 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-                </svg>
+                <app-icon name="warning-triangle" [stroke]="2" class="mt-0.5 shrink-0 text-amber-600" />
                 <span>
                   <strong class="font-semibold">Application pending:</strong>
                   your EOI application for <strong class="font-semibold">{{ draft.schemeName }}</strong>
                   ({{ draft.refNo }}) is incomplete. You stopped at Step {{ draft.step }} of {{ draftStepCount }}.
                 </span>
               </p>
-              <button
-                type="button"
-                (click)="resumeApplication(draft.refNo)"
-                class="shrink-0 inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-navy hover:bg-navy-dark text-white text-xs font-semibold cursor-pointer transition-colors"
-              >
+              <button appButton size="sm" type="button" (click)="resumeApplication(draft.refNo)" class="shrink-0">
                 Continue Application
               </button>
             </div>

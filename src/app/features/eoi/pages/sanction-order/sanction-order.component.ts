@@ -3,7 +3,16 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { EoiStateService, Scheme } from '../../services/eoi-state.service';
-import { PageHeaderComponent, TableComponent, TableColumn, formatDate } from '../../../../shared';
+import {
+  ButtonComponent,
+  IconComponent,
+  ModalComponent,
+  PageHeaderComponent,
+  PageShellComponent,
+  TableComponent,
+  TableColumn,
+  formatDate
+} from '../../../../shared';
 
 export interface AcceptedCompanyRow {
   srNo: number;
@@ -20,11 +29,9 @@ export interface AcceptedCompanyRow {
   selector: 'app-sanction-order',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent],
+  imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent, PageShellComponent, ButtonComponent, IconComponent, ModalComponent],
   template: `
-    <div class="w-full min-h-full bg-white text-[#1F2933] font-sans pb-12">
-      <div class="p-4 sm:p-5 w-full space-y-4 font-sans">
-        
+    <app-page-shell>
         <!-- Top Action Header -->
         <app-page-header
           title="Allocate Target"
@@ -42,15 +49,8 @@ export interface AcceptedCompanyRow {
         <!-- Back Button & Scheme Context Banner -->
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <!-- Back button matching remaining pages -->
-          <button
-            type="button"
-            (click)="goBack()"
-            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-[13px] font-semibold transition-all cursor-pointer shadow-2xs active:scale-95 shrink-0"
-            title="Back to Sanction Orders"
-          >
-            <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
+          <button appButton variant="outline" class="shrink-0" (click)="goBack()" title="Back to Sanction Orders">
+            <app-icon name="chevron-left" size="sm" />
             <span>Back</span>
           </button>
 
@@ -86,47 +86,19 @@ export interface AcceptedCompanyRow {
         </ng-template>
 
         <ng-template #actionTemplate let-row>
-          <button
-            type="button"
-            (click)="openIpaModal(row)"
-            class="px-3.5 py-1.5 bg-primary hover:bg-[#0E324D] text-white rounded text-xs font-semibold transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap shrink-0"
-          >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span class="whitespace-nowrap">Generate IPA</span>
+          <button appButton size="sm" class="shrink-0" (click)="openIpaModal(row)">
+            <app-icon name="document-download" size="sm" [stroke]="2" />
+            <span>Generate IPA</span>
           </button>
         </ng-template>
 
-      </div>
-    </div>
+    </app-page-shell>
 
     <!-- IN-PRINCIPLE APPROVAL (IPA) DOCUMENT PREVIEW MODAL -->
     @if (selectedIpaCompany()) {
-      <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 font-sans overflow-y-auto">
-        <div class="bg-white rounded-lg shadow-xl border border-slate-300 w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
-          
-          <!-- Modal Header -->
-          <div class="px-5 py-3.5 bg-navy text-white flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <h3 class="font-bold text-sm tracking-tight">In-Principle Approval (IPA) Letter</h3>
-            </div>
-            <button
-              type="button"
-              (click)="closeIpaModal()"
-              class="text-slate-300 hover:text-white p-1 rounded hover:bg-white/10 transition-colors"
-            >
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
+      <app-modal title="In-Principle Approval (IPA) Letter" widthOverride="max-w-3xl" (close)="closeIpaModal()">
           <!-- Printable IPA Document Content -->
-          <div id="ipa-letter-content" class="p-6 sm:p-8 overflow-y-auto space-y-5 text-slate-800 text-xs font-serif leading-relaxed bg-white">
+          <div id="ipa-letter-content" class="space-y-5 text-slate-800 text-xs font-serif leading-relaxed bg-white">
             
             <!-- Letterhead -->
             <div class="text-center border-b-2 border-slate-800 pb-3 font-sans">
@@ -167,24 +139,19 @@ export interface AcceptedCompanyRow {
               </p>
               
               <div class="my-3 p-3 bg-emerald-50/70 border border-emerald-200 rounded font-sans text-xs">
-                <table class="w-full text-left font-sans">
-                  <tr>
-                    <td class="py-1 font-semibold text-slate-700 w-36">Sanctioned Sector:</td>
-                    <td class="py-1 font-bold text-slate-900">{{ selectedIpaCompany()?.sector }}</td>
-                  </tr>
-                  <tr>
-                    <td class="py-1 font-semibold text-slate-700">Sanctioned District:</td>
-                    <td class="py-1 font-bold text-slate-900">{{ selectedIpaCompany()?.district }}</td>
-                  </tr>
-                  <tr>
-                    <td class="py-1 font-semibold text-slate-700">Empanelment Grade:</td>
-                    <td class="py-1 font-bold text-emerald-800">Grade {{ selectedIpaCompany()?.grade }}</td>
-                  </tr>
-                  <tr>
-                    <td class="py-1 font-semibold text-slate-700">Sanctioned Target:</td>
-                    <td class="py-1 font-bold text-slate-900 text-sm">{{ selectedIpaCompany()?.target }} Candidates</td>
-                  </tr>
-                </table>
+                <dl class="grid grid-cols-[9rem_1fr] gap-y-2 m-0 text-left font-sans">
+                  <dt class="font-semibold text-slate-700">Sanctioned Sector:</dt>
+                  <dd class="m-0 font-bold text-slate-900">{{ selectedIpaCompany()?.sector }}</dd>
+
+                  <dt class="font-semibold text-slate-700">Sanctioned District:</dt>
+                  <dd class="m-0 font-bold text-slate-900">{{ selectedIpaCompany()?.district }}</dd>
+
+                  <dt class="font-semibold text-slate-700">Empanelment Grade:</dt>
+                  <dd class="m-0 font-bold text-emerald-800">Grade {{ selectedIpaCompany()?.grade }}</dd>
+
+                  <dt class="font-semibold text-slate-700">Sanctioned Target:</dt>
+                  <dd class="m-0 font-bold text-slate-900 text-sm">{{ selectedIpaCompany()?.target }} Candidates</dd>
+                </dl>
               </div>
 
               <p>
@@ -207,32 +174,15 @@ export interface AcceptedCompanyRow {
 
           </div>
 
-          <!-- Modal Action Footer -->
-          <div class="px-5 py-3 bg-slate-100 border-t border-slate-200 flex items-center justify-between font-sans">
-            <span class="text-xs text-slate-500 font-medium">IPA Status: Active &amp; Issued</span>
-            <div class="flex items-center gap-2">
-              <button
-                type="button"
-                (click)="printIpaLetter()"
-                class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-semibold rounded transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                <span>Print IPA Letter</span>
-              </button>
-              <button
-                type="button"
-                (click)="closeIpaModal()"
-                class="px-3.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-medium rounded transition-colors cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </div>
+          <ng-container modalFooter>
+            <span class="mr-auto text-xs text-slate-500 font-medium">IPA Status: Active &amp; Issued</span>
+            <button appButton (click)="printIpaLetter()">
+              <app-icon name="print-ipa" [stroke]="2" />
+              <span>Print IPA Letter</span>
+            </button>
+            <button appButton variant="outline" (click)="closeIpaModal()">Close</button>
+          </ng-container>
+      </app-modal>
     }
   `
 })

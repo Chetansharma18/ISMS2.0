@@ -112,6 +112,22 @@ export interface SdcInspectionData {
   recommendation: 'RECOMMENDED' | 'REJECTED' | 'CORRECTION_REQUIRED';
 }
 
+/** One thing a department officer did on an SDC: a remark, or a decision with its remark. */
+export interface SdcActivityEntry {
+  id: string;
+  action: 'REMARK_ADDED' | 'APPROVED' | 'REJECTED' | 'RETURNED';
+  /** Officer who acted (a neutral name, such as "Scrutiny Officer 1"). */
+  actor: string;
+  /** Designation of the officer. */
+  designation?: string;
+  /** ISO date-time. */
+  at: string;
+  /** The remark the officer wrote (may be empty for an approval). */
+  text: string;
+  /** Capacity sanctioned, for an approval. */
+  capacity?: number;
+}
+
 export interface SdcApprovalData {
   approvedTargetCapacity: number;
   approvalRemarks: string;
@@ -198,6 +214,28 @@ export interface SdcNewRegistrationData {
   centerPhotos?: CenterPhotoItem[];
 }
 
+/** The Performance Security Deposit of an SDC: paid once, when its first batch is created. */
+export interface SdcPsdPayment {
+  amount: number;
+  transactionId: string;
+  receiptNumber: string;
+  paymentMode: string;
+  /** When it was paid, as shown to the user. */
+  paidAt: string;
+  /** Same moment as an ISO date (yyyy-mm-dd). */
+  paidDate: string;
+}
+
+/** The one Center Head of an SDC: the person is picked by SSO ID and the details come from SSO. */
+export interface SdcCenterHead {
+  ssoId: string;
+  name: string;
+  mobile: string;
+  email: string;
+  designation: string;
+  assignedAt: string;
+}
+
 export interface SdcRecord {
   id: string;
   sdcCode: string;
@@ -234,6 +272,10 @@ export interface SdcRecord {
   allocatedCourses: AllocatedCourse[];
   documents?: SdcDocuments;
   declarationAccepted?: boolean;
+  /** Set once an approved SDC has its Center Head; only one can be assigned. */
+  centerHead?: SdcCenterHead | null;
+  /** Set when the PSD is paid with the first batch of the SDC; no PSD is taken for its later batches. */
+  psdPayment?: SdcPsdPayment;
 
   // Lifecycle & Status
   status: SdcStatus;
@@ -245,6 +287,8 @@ export interface SdcRecord {
 
   // Approval
   approval?: SdcApprovalData;
+  /** Remarks and decisions of the department officers, oldest first. */
+  activityLog?: SdcActivityEntry[];
 
   // Computed/Metrics
   activeBatchesCount?: number;

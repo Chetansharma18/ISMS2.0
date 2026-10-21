@@ -64,7 +64,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
     SchemesHeaderComponent
   ],
   template: `
-    <div class="w-full min-h-full text-slate-800 font-sans" style="background-color: #ffffff; font-family: 'Inter', sans-serif;">
+    <div class="w-full min-h-full text-slate-800 font-sans" style="background-color: #ffffff;">
       
       <!-- ====================================================================
            VIEW 1: ACTIVE EOI TABLE (Using Reusable PageHeader & DataTable)

@@ -24,7 +24,7 @@ import {
   matchesApplicationId,
   mergeStoredResponses,
   withCompany1UnderScrutiny,
-  withTwoCompaniesUnderReview
+  withCompany2SeedDecision
 } from './eoi-state.util';
 
 // The data shapes live in eoi-state.models.ts; re-exported so existing imports keep working.
@@ -63,15 +63,17 @@ export class EoiStateService {
     try {
       const parsed = this.storage.loadResponses();
       if (Array.isArray(parsed) && parsed.length > 0) {
-        const merged = withTwoCompaniesUnderReview(mergeStoredResponses(this.initialResponses, parsed));
+        const merged = withCompany1UnderScrutiny(
+          withCompany2SeedDecision(mergeStoredResponses(this.initialResponses, parsed), this.initialResponses)
+        );
         this.responsesSubject.next(merged);
         return;
       }
     } catch (e) {
       console.error('Error loading stored responses', e);
     }
-    // Default fallback: ensure Company 1 and Company 2 are UNDER_SCRUTINY
-    const defaultList = withTwoCompaniesUnderReview(this.initialResponses);
+    // Default fallback: only Company 1 is left UNDER_SCRUTINY
+    const defaultList = withCompany1UnderScrutiny(this.initialResponses);
     this.responsesSubject.next(defaultList);
     this.saveToStorage(defaultList);
   }

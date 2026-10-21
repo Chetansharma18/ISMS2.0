@@ -19,7 +19,7 @@ const DEPARTMENT_OPTIONS = [
 const COLUMNS: TableColumn<DesignationMasterItem>[] = [
   { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
   { key: 'designationName', label: 'Designation Name', cellClass: 'whitespace-nowrap font-semibold text-slate-800' },
-  { key: 'designationCode', label: 'Designation Code', cellClass: 'whitespace-nowrap font-mono text-xs text-slate-700' },
+  { key: 'designationCode', label: 'Designation Code', cellClass: 'whitespace-nowrap tabular-nums text-xs text-slate-700' },
   { key: 'departmentWing', label: 'Department / Wing', cellClass: 'whitespace-nowrap font-medium text-slate-700' }
 ];
 

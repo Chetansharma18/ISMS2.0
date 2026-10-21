@@ -46,7 +46,7 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
                   </div>
 
                   @if (doc.status === 'uploaded' && doc.fileName) {
-                    <span class="text-[11.5px] font-mono text-slate-600 block mt-1 truncate" title="{{ doc.fileName }} ({{ doc.fileSize }})">
+                    <span class="text-[11.5px] tabular-nums text-slate-600 block mt-1 truncate" title="{{ doc.fileName }} ({{ doc.fileSize }})">
                       {{ doc.fileName }} ({{ doc.fileSize }})
                     </span>
                   }

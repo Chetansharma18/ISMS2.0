@@ -32,7 +32,7 @@ interface ReceiptRow {
         <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
           <div>
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">EOI Submission Reference No.</span>
-            <span class="font-medium text-navy text-[12.5px] block mt-1 font-mono">{{ state.eoiApplicationId() }}</span>
+            <span class="font-medium text-navy text-[12.5px] block mt-1 tabular-nums">{{ state.eoiApplicationId() }}</span>
           </div>
           <div>
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Scheme</span>
@@ -40,7 +40,7 @@ interface ReceiptRow {
           </div>
           <div>
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">EOI Reference No.</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono break-all">{{ state.schemeRefNo() }}</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums break-all">{{ state.schemeRefNo() }}</span>
           </div>
           <div>
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Submitted On</span>
@@ -91,7 +91,7 @@ export class Step6ReceiptsComponent {
   protected readonly receiptColumns: TableColumn<ReceiptRow>[] = [
     { key: '$index', label: '#', type: 'number', align: 'center', width: 'w-10' },
     { key: 'name', label: 'Receipt' },
-    { key: 'reference', label: 'Reference No.', cellClass: 'font-mono' },
+    { key: 'reference', label: 'Reference No.', cellClass: 'tabular-nums' },
     { key: 'amount', label: 'Amount', align: 'right', cellClass: 'whitespace-nowrap' },
     { key: 'date', label: 'Date', cellClass: 'whitespace-nowrap' },
     { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'w-32' }

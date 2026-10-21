@@ -34,11 +34,11 @@ import { SchemeFormState } from '../../scheme-form.state';
         </div>
         <div>
           <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Account No.</span>
-          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ state.editableStep4.accountNo || '-' }}</span>
+          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep4.accountNo || '-' }}</span>
         </div>
         <div>
           <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">IFSC</span>
-          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ state.editableStep4.ifscCode || '-' }}</span>
+          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep4.ifscCode || '-' }}</span>
         </div>
         <div>
           <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Account Type</span>

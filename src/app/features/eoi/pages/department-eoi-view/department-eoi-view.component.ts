@@ -55,7 +55,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
           <div class="font-normal text-slate-800 text-[13px] leading-snug">
             {{ scheme.schemeTitle }}
           </div>
-          <div class="text-[11px] font-mono text-slate-500 mt-0.5">
+          <div class="text-[11px] tabular-nums text-slate-500 mt-0.5">
             Ref: {{ scheme.refNo }}
           </div>
         </ng-template>
@@ -129,7 +129,7 @@ export class DepartmentEoiViewComponent implements OnInit {
         return cleaned || '-';
       }
     },
-    { key: 'dateOfOpening', label: 'Date of Opening', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: 'dateOfOpening', label: 'Date of Publishing', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'dateOfClosing', label: 'Date of Closing', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'status', label: 'Status', align: 'center', type: 'status' },
     { key: 'responseCount', label: 'No. of Responses', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700', type: 'custom' },

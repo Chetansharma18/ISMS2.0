@@ -12,14 +12,12 @@ import { ButtonComponent, IconComponent, InputDirective, TableColumn, TableCompo
   imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, TableComponent],
   host: { class: 'block' },
   template: `
-    <div class="space-y-2.5 pt-2 border-t border-slate-200">
-      <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
-        <div class="flex items-center gap-2">
-          <span class="w-1.5 h-4 bg-primary rounded-full shrink-0"></span>
-          <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">
-            Hostel Details
-          </h3>
-          <span class="text-[11px] text-slate-500">(Residential facility configuration)</span>
+    <div class="space-y-2.5">
+      <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/80">
+        <div class="flex items-center gap-2" style="font-size: 13.5px !important; color: #0B3558 !important;">
+          <span class="w-1.5 h-3.5 bg-navy rounded-xs inline-block"></span>
+          <h3 class="font-bold m-0" style="font-size: 13.5px !important; color: #0B3558 !important;">Hostel Details</h3>
+          <span class="text-[11px] font-normal text-slate-500">(Residential facility, if any)</span>
         </div>
 
         <!-- Blue + Add Hostel Button -->
@@ -63,7 +61,7 @@ import { ButtonComponent, IconComponent, InputDirective, TableColumn, TableCompo
           type="text"
           [(ngModel)]="hostel.hostelCode"
           [name]="'hostel_code_' + i"
-          placeholder="e.g. HST-JP-001"
+          placeholder="e.g. HST-001"
           class="w-full"
         />
       </ng-template>

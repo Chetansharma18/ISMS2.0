@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { IconComponent } from '../icon/icon.component';
 
 export interface StepperStep {
   label: string;
@@ -20,7 +21,7 @@ export interface StepperStep {
   selector: 'app-stepper',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   template: `
     @if (variant === 'wizard') {
       <nav
@@ -45,9 +46,7 @@ export interface StepperStep {
                   aria-hidden="true"
                 >
                   @if (isCompleted(i + 1) && !isCurrent(i + 1)) {
-                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                    </svg>
+                    <app-icon name="check" [stroke]="3" class="text-white" />
                   } @else {
                     {{ i + 1 }}
                   }
@@ -99,9 +98,7 @@ export interface StepperStep {
                   aria-hidden="true"
                 >
                   @if (isCompleted(i + 1)) {
-                    <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+                    <app-icon name="check" size="sm" [stroke]="2.5" />
                   } @else {
                     {{ i + 1 }}
                   }

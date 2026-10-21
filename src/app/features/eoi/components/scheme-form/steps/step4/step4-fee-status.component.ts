@@ -27,7 +27,7 @@ import { SchemeFormState } from '../../scheme-form.state';
         </div>
         <div>
           <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Transaction ID</span>
-          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">CIN-SBI-9912081</span>
+          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">CIN-SBI-9912081</span>
         </div>
       </div>
     </section>

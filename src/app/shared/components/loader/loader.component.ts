@@ -1,5 +1,6 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { IconComponent } from '../icon/icon.component';
 
 export interface LoaderBar {
   index: number;
@@ -11,7 +12,7 @@ export interface LoaderBar {
   selector: 'app-loader',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   template: `
     <div
       class="flex flex-col items-center justify-center gap-3.5 p-4 text-center font-sans select-none"
@@ -51,10 +52,8 @@ export interface LoaderBar {
 
       <!-- Complete URL Name Pill (e.g. for SSO redirects) -->
       @if (url) {
-        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-slate-50 border border-slate-200 text-[11.5px] font-mono text-slate-700 shadow-2xs mt-0.5 max-w-full">
-          <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-slate-50 border border-slate-200 text-[11.5px] tabular-nums text-slate-700 shadow-2xs mt-0.5 max-w-full">
+          <app-icon name="lock" size="sm" [stroke]="2" class="text-navy" />
           <span class="font-medium text-slate-800 break-all select-all">{{ url }}</span>
         </div>
       }

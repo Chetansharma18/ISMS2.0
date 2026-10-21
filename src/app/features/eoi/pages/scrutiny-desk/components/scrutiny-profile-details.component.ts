@@ -87,7 +87,7 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
               </div>
               <div>
                 <span class="text-[11px] text-slate-400 block font-normal">Contact Phone</span>
-                <span class="font-mono text-slate-800 block text-xs mt-0.5">{{ applicant()?.organisation?.contactNumber }}</span>
+                <span class="tabular-nums text-slate-800 block text-xs mt-0.5">{{ applicant()?.organisation?.contactNumber }}</span>
               </div>
             </div>
 
@@ -122,7 +122,7 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
               </div>
               <div>
                 <span class="text-[11px] text-slate-400 block font-normal">Official Contact</span>
-                <span class="font-mono text-slate-800 block text-xs mt-0.5">{{ applicant()?.authorizedSignatory?.contactNumber }}</span>
+                <span class="tabular-nums text-slate-800 block text-xs mt-0.5">{{ applicant()?.authorizedSignatory?.contactNumber }}</span>
               </div>
             </div>
 
@@ -133,11 +133,11 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
               </div>
               <div>
                 <span class="text-[11px] text-slate-400 block font-normal">Signatory PAN</span>
-                <span class="font-mono font-semibold text-slate-800 block text-xs mt-0.5">{{ applicant()?.authorizedSignatory?.pan }}</span>
+                <span class="tabular-nums font-semibold text-slate-800 block text-xs mt-0.5">{{ applicant()?.authorizedSignatory?.pan }}</span>
               </div>
               <div>
                 <span class="text-[11px] text-slate-400 block font-normal">Aadhaar Reference</span>
-                <span class="font-mono text-slate-800 block text-xs mt-0.5">{{ applicant()?.authorizedSignatory?.aadhaarNo }}</span>
+                <span class="tabular-nums text-slate-800 block text-xs mt-0.5">{{ applicant()?.authorizedSignatory?.aadhaarNo }}</span>
               </div>
             </div>
 
@@ -180,7 +180,7 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
               </div>
               <div>
                 <span class="text-[11px] text-slate-400 block font-normal">Account No. &amp; IFSC</span>
-                <span class="font-mono font-bold text-slate-900 block text-xs mt-0.5">
+                <span class="tabular-nums font-bold text-slate-900 block text-xs mt-0.5">
                   {{ applicant()?.bankDetails?.accountNumber }} &bull; {{ applicant()?.bankDetails?.ifscCode }}
                 </span>
               </div>

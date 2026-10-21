@@ -19,36 +19,23 @@ const batch = (overrides: Record<string, unknown> = {}): BatchRecord =>
 
 describe('batch-detail.util', () => {
   describe('status helpers', () => {
-    it('treats a batch with 25..max mapped aspirants as approved', () => {
-      expect(isBatchApproved(batch({ mappedAspirantsCount: 25, maxStrength: 30 }))).toBe(true);
-      expect(isBatchApproved(batch({ mappedAspirantsCount: 30, maxStrength: 30 }))).toBe(true);
-    });
-
-    it('is not approved below 25 or above the strength', () => {
-      expect(isBatchApproved(batch({ mappedAspirantsCount: 24, maxStrength: 30 }))).toBe(false);
-      expect(isBatchApproved(batch({ mappedAspirantsCount: 31, maxStrength: 30 }))).toBe(false);
-    });
-
-    it('prefers approvedBatchStrength over maxStrength', () => {
-      expect(isBatchApproved(batch({ mappedAspirantsCount: 40, approvedBatchStrength: 45, maxStrength: 30 }))).toBe(true);
-    });
-
-    it('falls back to trainees length when mappedAspirantsCount is missing', () => {
-      const trainees = Array.from({ length: 26 }, (_, i) => ({ id: `t${i}` }));
-      expect(isBatchApproved(batch({ trainees }))).toBe(true);
+    it('is approved only when the department approved it, however many aspirants are registered', () => {
+      expect(isBatchApproved(batch({ approvalStatus: 'APPROVED', status: 'APPROVED' }))).toBe(true);
+      expect(isBatchApproved(batch({ mappedAspirantsCount: 30, maxStrength: 30 }))).toBe(false);
     });
 
     it('detects rejection via status or approvalStatus and never approves rejected batches', () => {
       expect(isBatchRejected(batch({ status: 'REJECTED' }))).toBe(true);
       expect(isBatchRejected(batch({ approvalStatus: 'REJECTED' }))).toBe(true);
-      expect(isBatchRejected(batch({ status: 'ACTIVE' }))).toBe(false);
-      expect(isBatchApproved(batch({ approvalStatus: 'REJECTED', mappedAspirantsCount: 28 }))).toBe(false);
+      expect(isBatchRejected(batch({ status: 'ONGOING' }))).toBe(false);
+      expect(isBatchApproved(batch({ approvalStatus: 'REJECTED', status: 'REJECTED' }))).toBe(false);
     });
 
-    it('formats status as REJECTED, APPROVED or PENDING', () => {
+    it('formats status as RETURNED, PENDING, APPROVED or REJECTED', () => {
       expect(formatBatchStatus(batch({ status: 'REJECTED' }))).toBe('REJECTED');
-      expect(formatBatchStatus(batch({ mappedAspirantsCount: 28, maxStrength: 30 }))).toBe('APPROVED');
-      expect(formatBatchStatus(batch({ mappedAspirantsCount: 3 }))).toBe('PENDING');
+      expect(formatBatchStatus(batch({ status: 'APPROVED', approvalStatus: 'APPROVED' }))).toBe('APPROVED');
+      expect(formatBatchStatus(batch({ status: 'PENDING_APPROVAL', approvalStatus: 'PENDING' }))).toBe('PENDING');
+      expect(formatBatchStatus(batch({ status: 'RETURNED_TO_TP' }))).toBe('RETURNED');
     });
   });
 

@@ -33,7 +33,7 @@ export const ASPIRANT_NAV: NavItem[] = [
 export const DEPT_ADMIN_NAV: NavItem[] = [
   { key: 'dept-eoi-view', label: 'EOI Responses', link: '/admin/eoi-view', icon: 'document', bold: true },
   { key: 'dept-sanction-orders', label: 'Sanction Order', link: '/admin/sanction-orders', icon: 'document', bold: true },
-  { key: 'dept-ipa', label: 'IPA', link: '/admin/ipa', icon: 'shield-check', bold: true },
+  { key: 'dept-ipa', label: 'In-Principal Approval (IPA)', link: '/admin/ipa', icon: 'shield-check', bold: true },
   { key: 'dept-sdc', label: 'SDC Approvals', link: '/sdc', icon: 'building' },
   { key: 'dept-batch-approvals', label: 'Batch Approvals', link: '/admin/batch-approvals', icon: 'clipboard-check', stroke: 2, bold: true },
   { key: 'dept-grievance', label: 'Grievance Management', link: '/admin/grievance', icon: 'users-group', stroke: 2 },
@@ -45,10 +45,12 @@ export const EXISTING_USER_NAV: NavItem[] = [
   ACTIVE_SCHEMES,
   { key: 'tender-status', label: 'Tender Status', link: '/tender-status', icon: 'clock' },
   { key: 'sanction-order', label: 'Sanction Order', link: '/tp/sanction-orders', icon: 'inbox' },
-  { key: 'ipa', label: 'IPA', link: '/ipa', icon: 'document' },
+  { key: 'ipa', label: 'In-Principal Approval (IPA)', link: '/ipa', icon: 'document' },
   { key: 'sdc-management', label: 'SDC Management', link: '/sdcs', icon: 'building' },
   { key: 'batch-management', label: 'Batch Management', link: '/batches', icon: 'users' },
   { key: 'aspirants-management', label: 'Aspirants Management', link: '/aspirants', icon: 'identification' },
+  { key: 'attendance', label: 'Attendance', link: '/attendance', icon: 'clipboard-check' },
+  { key: 'tp-users', label: 'User Management', link: '/tp/users', icon: 'users-group' },
   { key: 'grievance', label: 'Grievance', link: '/grievance', icon: 'alert-triangle' },
   { key: 'payment-history', label: 'History', link: '/payment-history', icon: 'clipboard' },
   PROFILE

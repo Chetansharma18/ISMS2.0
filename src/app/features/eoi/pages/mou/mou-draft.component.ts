@@ -57,7 +57,23 @@ const INDENT: Record<number, string> = { 1: 'ml-0', 2: 'ml-6', 3: 'ml-12' };
       .mou-blank-normal { min-width: 9rem; }
       .mou-blank-long { min-width: 18rem; }
       .mou-blank:focus { background: #f1f5f9; }
+      /* Stamp paper: the text starts 60% down the first page. A4 is 297 mm; with the 12 mm top margin below, 166 mm of
+         space puts the first line at 178 mm. */
+      @page { size: A4; margin: 12mm 15mm; }
+      .mou-stamp-space {
+        height: 166mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        border: 1px dashed #94a3b8;
+        border-radius: 6px;
+        color: #64748b;
+        font-size: 12px;
+        user-select: none;
+      }
       @media print {
+        .mou-stamp-space { border: 0; color: transparent; margin-bottom: 0; }
         .mou-blank:focus { background: transparent; }
         .mou-keep { break-inside: avoid; }
       }
@@ -106,11 +122,19 @@ const INDENT: Record<number, string> = { 1: 'ml-0', 2: 'ml-6', 3: 'ml-12' };
           <!-- Document -->
           <!-- The whole document can be edited. Saved edits are put back into it when the page opens. -->
           <div
+            class="mou-paper w-full bg-white p-6 sm:p-10 lg:p-14 print:p-0 text-[#111827] font-serif leading-relaxed text-[13px] sm:text-sm border border-slate-300 shadow-sm rounded-lg print:border-none print:shadow-none print:text-[12px]"
+          >
+          <!-- The top 60% of the first page is left empty: the stamp paper is used there. It is not part of the edited text. -->
+          <div class="mou-stamp-space" contenteditable="false" aria-hidden="true">
+            <span>Space for stamp paper (60% of the first page)</span>
+          </div>
+
+          <div
             #sheet
             contenteditable="true"
             spellcheck="false"
             (input)="markEdited()"
-            class="mou-sheet w-full bg-white p-6 sm:p-10 lg:p-14 print:p-0 text-[#111827] font-serif leading-relaxed text-[13px] sm:text-sm border border-slate-300 shadow-sm rounded-lg print:border-none print:shadow-none print:text-[12px] focus:outline-none"
+            class="mou-sheet focus:outline-none"
           >
           @if (!initialHtml) {
 
@@ -240,6 +264,7 @@ const INDENT: Record<number, string> = { 1: 'ml-0', 2: 'ml-6', 3: 'ml-12' };
               </tbody>
             </table>
           }
+          </div>
           </div>
         }
       </div>

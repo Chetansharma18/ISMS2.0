@@ -17,7 +17,7 @@ import { BatchRecord } from '../../models/batch.model';
           <span class="px-2 py-0.5 rounded bg-primary text-white text-[10.5px] font-bold uppercase tracking-wider">
             TRAINING PARTNER
           </span>
-          <span class="font-mono text-xs font-semibold text-slate-600">
+          <span class="tabular-nums text-xs font-semibold text-slate-600">
             {{ b.nipaNo || ('BATCH/' + b.batchCode) }}
           </span>
         </div>
@@ -27,11 +27,11 @@ import { BatchRecord } from '../../models/batch.model';
         <div class="text-xs text-slate-600 flex items-center gap-2 flex-wrap">
           <span>Center: <strong class="text-slate-800">{{ b.sdcName }}</strong></span>
           <span>•</span>
-          <span class="font-mono font-medium text-brand">{{ b.sdcCode }}</span>
+          <span class="tabular-nums font-medium text-brand">{{ b.sdcCode }}</span>
           <span>•</span>
           <span>Scheme: <strong class="text-slate-800">{{ b.scheme }}</strong></span>
           <span>•</span>
-          <span>Batch: <strong class="font-mono text-slate-800">{{ b.batchCode }}</strong></span>
+          <span>Batch: <strong class="tabular-nums text-slate-800">{{ b.batchCode }}</strong></span>
         </div>
       </div>
 

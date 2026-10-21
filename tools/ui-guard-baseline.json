@@ -11,12 +11,6 @@
   "features/sdc/components/aspirant-detail.component.ts": {
     "page-frame": 1
   },
-  "features/sdc/components/batch-detail.component.ts": {
-    "page-frame": 1
-  },
-  "features/sdc/components/sdc-detail.component.ts": {
-    "page-frame": 1
-  },
   "features/tenders/tender-status.component.ts": {
     "page-frame": 1
   },

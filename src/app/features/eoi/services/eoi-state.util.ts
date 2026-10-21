@@ -28,12 +28,11 @@ export function mergeStoredResponses(
   });
 }
 
-/** Seed list with Company 1 and Company 2 set to "Under Review" for presentation. */
-export function withTwoCompaniesUnderReview(initial: ApplicantResponse[]): ApplicantResponse[] {
+/** Seed list with Company 1 set to "Under Review" for presentation: the one application left to review. */
+export function withCompany1UnderScrutiny(initial: ApplicantResponse[]): ApplicantResponse[] {
   return initial.map(resp => {
     const isCompany1 = resp.anonymousLabel === 'Company 1' || resp.id === 'APP-2024-001' || resp.id === 'APP-004661' || resp.id === 'APP-005001';
-    const isCompany2 = resp.anonymousLabel === 'Company 2' || resp.id === 'APP-2024-002';
-    if (isCompany1 || isCompany2) {
+    if (isCompany1) {
       return {
         ...resp,
         status: 'UNDER_SCRUTINY' as const,
@@ -45,7 +44,25 @@ export function withTwoCompaniesUnderReview(initial: ApplicantResponse[]): Appli
   });
 }
 
-export const withCompany1UnderScrutiny = withTwoCompaniesUnderReview;
+/**
+ * Company 2 used to be forced to "Under Review", so saved data still holds it that way. While a saved Company 2 is
+ * still under review, it takes the decision it has in the seed, so only Company 1 is left under review.
+ */
+export function withCompany2SeedDecision(list: ApplicantResponse[], seed: ApplicantResponse[]): ApplicantResponse[] {
+  const seeded = seed.find(r => r.id === 'APP-2024-002');
+  if (!seeded || seeded.status === 'UNDER_SCRUTINY') return list;
+  return list.map(resp =>
+    resp.id === 'APP-2024-002' && resp.status === 'UNDER_SCRUTINY'
+      ? {
+          ...resp,
+          status: seeded.status,
+          statusDisplay: seeded.statusDisplay,
+          emdStatus: seeded.emdStatus,
+          scrutinyDetails: seeded.scrutinyDetails
+        }
+      : resp
+  );
+}
 
 /** Scheme lookup used by `getSchemeById` (matches the id, or a ref number containing it). */
 export function findSchemeById(schemes: Scheme[], schemeId: string): Scheme | undefined {

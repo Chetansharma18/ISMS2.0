@@ -26,8 +26,8 @@ export interface AspirantDocumentSelection {
       <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
         <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
           <div class="flex items-center gap-2">
-            <span class="w-1.5 h-4 bg-primary rounded-full"></span>
-            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0 flex items-center gap-1.5">
+            <span class="w-1.5 h-3.5 bg-navy rounded-xs inline-block"></span>
+            <h3 class="font-bold m-0 flex items-center gap-1.5" style="font-size: 13.5px !important; color: #0B3558 !important;">
               <span>Candidate Photograph</span>
               <span class="text-rose-500">*</span>
             </h3>
@@ -121,8 +121,8 @@ export interface AspirantDocumentSelection {
       <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-200">
           <div class="flex items-center gap-2">
-            <span class="w-1.5 h-4 bg-primary rounded-full"></span>
-            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">
+            <span class="w-1.5 h-3.5 bg-navy rounded-xs inline-block"></span>
+            <h3 class="font-bold m-0" style="font-size: 13.5px !important; color: #0B3558 !important;">
               Attachment / Documents
             </h3>
             <span class="text-[11px] text-slate-500 font-medium">({{ formData().documents.length }} Documents Configured)</span>

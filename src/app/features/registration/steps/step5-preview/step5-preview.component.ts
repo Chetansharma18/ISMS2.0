@@ -60,7 +60,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Registration No. (CIN / Reg. No.)</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step1().registrationNumber || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step1().registrationNumber || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Date of Registration</span>
@@ -74,7 +74,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Organisation PAN</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step1().companyPan || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step1().companyPan || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">GST Registered</span>
@@ -177,11 +177,11 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
             <!-- Row 2 -->
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">PAN</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step3().pan || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step3().pan || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Aadhaar No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step3().aadhaarNo || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step3().aadhaarNo || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Mobile No.</span>
@@ -271,7 +271,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Account Number</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step4().accountNo || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step4().accountNo || '-' }}</span>
             </div>
 
             <!-- Row 2 -->
@@ -281,11 +281,11 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">IFSC Code</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step4().ifscCode || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step4().ifscCode || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">MICR Code</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step4().micrCode || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step4().micrCode || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Transfer Mode</span>

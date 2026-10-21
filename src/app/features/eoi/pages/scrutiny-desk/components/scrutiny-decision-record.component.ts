@@ -41,7 +41,7 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
             @if (details.shortfall?.officeOrderRef) {
               <div>
                 <span class="text-[11.5px] text-slate-500 block">Office Order Ref No.</span>
-                <span class="text-[12.5px] font-medium text-slate-900 block mt-1 font-mono">{{ details.shortfall?.officeOrderRef }}</span>
+                <span class="text-[12.5px] font-medium text-slate-900 block mt-1 tabular-nums">{{ details.shortfall?.officeOrderRef }}</span>
               </div>
             }
             <div>

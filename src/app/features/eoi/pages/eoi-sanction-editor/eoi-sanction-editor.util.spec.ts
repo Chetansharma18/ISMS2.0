@@ -7,6 +7,8 @@ import {
   buildSubjectForScheme,
   createDefaultCopyTo,
   createDefaultTerms,
+  isLegacyDefaultTerms,
+  isSubClause,
   createFallbackTableRows,
   createNewTableRow,
   gradeToLetter,
@@ -108,8 +110,23 @@ describe('eoi-sanction-editor.util', () => {
     );
   });
 
+  it('recognises sub-points of a clause and terms saved before the printed wording was adopted', () => {
+    expect(isSubClause('6.1. Installation of IP camera-based face recognition system')).toBe(true);
+    expect(isSubClause('i. In compliance with the UIDAI')).toBe(true);
+    expect(isSubClause('Note: While enrolling the candidates')).toBe(true);
+    expect(isSubClause('10. The PIA shall select job roles')).toBe(false);
+    expect(isSubClause('6. The PIA shall comply')).toBe(false);
+    expect(isLegacyDefaultTerms(['PIA shall be allowed to conduct training in any one of the given two sectors or in both sectors, but PIA cannot exceed the ceiling given as above.'])).toBe(true);
+    expect(isLegacyDefaultTerms(createDefaultTerms())).toBe(false);
+  });
+
   it('default terms and copy-to lists are fresh arrays', () => {
-    expect(createDefaultTerms().length).toBe(11);
+    const terms = createDefaultTerms();
+    // The wording of the printed order: clause 1 first, the three Aadhaar points of clause 40 last, every clause filled.
+    expect(terms[0].startsWith('1. The PIA shall ensure that the total approved IPA budget')).toBe(true);
+    expect(terms[terms.length - 1].startsWith('iii. This directive applies to all forms of Aadhaar usage')).toBe(true);
+    expect(terms.every(clause => clause.trim().length > 0)).toBe(true);
+    expect(terms.filter(clause => /^40\. /.test(clause)).length).toBe(1);
     expect(createDefaultTerms()).not.toBe(createDefaultTerms());
     expect(createDefaultCopyTo().length).toBe(9);
     expect(createDefaultCopyTo()[0]).toBe("PS to Hon'ble Minister, DSEE, GoR");

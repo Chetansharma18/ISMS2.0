@@ -20,11 +20,11 @@ import { TenderDocCardComponent, TenderDocReplaceRequest, TenderDocViewRequest }
         <div><span class="text-slate-500 block text-[11px] mb-0.5">Full Name</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.name || '-' }}</span></div>
         <div><span class="text-slate-500 block text-[11px] mb-0.5">Designation</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.designation || '-' }}</span></div>
         <div><span class="text-slate-500 block text-[11px] mb-0.5">Date of Birth / Age</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.dob || '-' }} ({{ app().signatoryDetails.age || '42' }} Yrs)</span></div>
-        <div><span class="text-slate-500 block text-[11px] mb-0.5">PAN</span><span class="font-mono text-slate-900 font-medium">{{ app().signatoryDetails.pan || '-' }}</span></div>
-        <div><span class="text-slate-500 block text-[11px] mb-0.5">Mobile No.</span><span class="font-mono text-slate-900">{{ app().signatoryDetails.mobileNo || '-' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">PAN</span><span class="tabular-nums text-slate-900 font-medium">{{ app().signatoryDetails.pan || '-' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">Mobile No.</span><span class="tabular-nums text-slate-900">{{ app().signatoryDetails.mobileNo || '-' }}</span></div>
         <div><span class="text-slate-500 block text-[11px] mb-0.5">Email Address</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.emailId || '-' }}</span></div>
-        <div><span class="text-slate-500 block text-[11px] mb-0.5">Aadhaar No.</span><span class="font-mono text-slate-900">{{ app().signatoryDetails.aadhaarNo || '-' }}</span></div>
-        <div><span class="text-slate-500 block text-[11px] mb-0.5">Voter ID / Bhamashah No.</span><span class="font-mono text-slate-900">{{ app().signatoryDetails.voterIdNo || app().signatoryDetails.bhamashahNo || 'Not Provided' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">Aadhaar No.</span><span class="tabular-nums text-slate-900">{{ app().signatoryDetails.aadhaarNo || '-' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">Voter ID / Bhamashah No.</span><span class="tabular-nums text-slate-900">{{ app().signatoryDetails.voterIdNo || app().signatoryDetails.bhamashahNo || 'Not Provided' }}</span></div>
         <div><span class="text-slate-500 block text-[11px] mb-0.5">State</span><span class="font-medium text-slate-900">{{ app().signatoryDetails.state || 'Rajasthan' }}</span></div>
         <div class="col-span-2 sm:col-span-3"><span class="text-slate-500 block text-[11px] mb-0.5">Residential Address</span><span class="text-slate-900 leading-relaxed">{{ app().signatoryDetails.residenceAddress || '-' }}</span></div>
       </div>

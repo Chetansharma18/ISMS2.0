@@ -2,12 +2,13 @@ import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, inject
 import { CommonModule } from '@angular/common';
 import { FileDoc } from '../../../../features/registration/models/otr-form.model';
 import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
+import { IconComponent } from '../../icon/icon.component';
 
 @Component({
   selector: 'app-form-file-upload',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   template: `
     <div class="w-full flex flex-col font-sans">
       <!-- Label -->
@@ -42,9 +43,7 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
             [disabled]="disabled"
             class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-2xs shrink-0 flex items-center gap-1.5"
           >
-            <svg class="w-3.5 h-3.5 text-slate-600 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-            </svg>
+            <app-icon name="upload" size="sm" [stroke]="2" class="text-slate-600" />
             <span>Upload Document</span>
           </button>
           <span class="text-[11px] text-slate-500 truncate">
@@ -59,10 +58,7 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
           <!-- File info: Icon, Name and Size Badge -->
           <div class="flex items-center gap-2.5 min-w-0 flex-1">
             <!-- Authentic Adobe PDF Icon -->
-            <svg class="w-4.5 h-4.5 shrink-0 select-none shadow-xs" viewBox="0 0 24 24">
-              <rect width="24" height="24" rx="3.5" fill="#E5252A"/>
-              <path d="M5.2 15V9h2.8c1 0 1.7.7 1.7 1.5s-.7 1.5-1.7 1.5H6.7v3H5.2zm1.5-4.2h1.2c.4 0 .6-.3.6-.6s-.2-.6-.6-.6H6.7v1.2zm4.5 4.2V9h2.2c1.7 0 2.8 1.1 2.8 3s-1.1 3-2.8 3h-2.2zm1.5-1.3h.8c.8 0 1.4-.7 1.4-1.7s-.6-1.7-1.4-1.7h-.8v3.4zm5 1.3V9h4v1.3h-2.5v1.2h2v1.2h-2v2.3H16.2z" fill="white"/>
-            </svg>
+            <app-icon name="pdf-badge" solid size="auto" class="w-4.5 h-4.5 text-[#E5252A] select-none" />
 
             <div class="flex items-center gap-2 min-w-0 flex-wrap">
               <span class="font-medium text-slate-800 truncate max-w-[180px] sm:max-w-xs" [title]="fileDoc.fileName">
@@ -84,9 +80,7 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
               class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-ocean hover:text-ocean-dark bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
               title="Open {{ fileDoc.fileName }} in new tab"
             >
-              <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
+              <app-icon name="external-link" size="sm" [stroke]="2" />
               <span>View</span>
             </button>
 
@@ -98,9 +92,7 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
               class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer disabled:opacity-50"
               title="Change/Replace Document"
             >
-              <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
+              <app-icon name="refresh" size="sm" [stroke]="2" />
               <span>Change</span>
             </button>
 
@@ -112,9 +104,7 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
               class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer disabled:opacity-50"
               title="Remove File"
             >
-              <svg class="w-3.5 h-3.5 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
+              <app-icon name="trash" size="sm" [stroke]="2" />
               <span>Remove</span>
             </button>
           </div>
@@ -124,9 +114,7 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
       <!-- Error message -->
       @if (error) {
         <div class="form-error-text text-rose-600 font-medium mt-0.5 flex items-center gap-1 leading-tight animate-fade-in" style="font-size: 11px !important; line-height: 14px !important;">
-          <svg class="shrink-0" style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-          </svg>
+          <app-icon name="error" size="xs" [stroke]="2.5" />
           <span style="font-size: 11px !important; line-height: 14px !important;">{{ error }}</span>
         </div>
       }

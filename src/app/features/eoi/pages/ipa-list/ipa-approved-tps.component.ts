@@ -34,7 +34,7 @@ type ApprovedTpRow = SanctionTableRow & { released: boolean };
         @if (scheme(); as scheme) {
           <p class="m-0 text-[13px] text-slate-700 min-w-0">
             {{ scheme.schemeTitle }}
-            <span class="font-mono text-[11px] text-muted ml-2">Ref: {{ scheme.refNo }}</span>
+            <span class="tabular-nums text-[11px] text-muted ml-2">Ref: {{ scheme.refNo }}</span>
           </p>
         }
       </div>
@@ -54,7 +54,7 @@ type ApprovedTpRow = SanctionTableRow & { released: boolean };
             <app-icon name="eye" size="sm" />
             <span>View IPA</span>
           </button>
-          <button appButton size="sm" (click)="allocateTarget(row)">Allocate New Target</button>
+          <button appButton size="sm" (click)="allocateTarget(row)">Allocate Additional Target</button>
         </div>
       } @else {
         <button appButton size="sm" (click)="allocateTarget(row)">Allocate Target</button>
@@ -90,7 +90,7 @@ export class IpaApprovedTpsComponent {
 
   protected readonly columns: TableColumn<SanctionTableRow>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
-    { key: 'appId', label: 'Application ID', cellClass: 'whitespace-nowrap font-mono text-[12px] text-slate-700' },
+    { key: 'appId', label: 'Application ID', cellClass: 'whitespace-nowrap tabular-nums text-[12px] text-slate-700' },
     { key: 'agencyName', label: 'Name of the Agency / PIA', width: 'min-w-[180px]', cellClass: 'font-normal text-slate-800' },
     { key: 'district', label: 'Sanction District', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'sector', label: 'Sanction Sector(s)', width: 'min-w-[160px]', cellClass: 'font-normal text-slate-700' },

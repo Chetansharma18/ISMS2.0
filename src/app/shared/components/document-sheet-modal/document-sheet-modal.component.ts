@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { IconComponent } from '../icon/icon.component';
 
 let nextSheetId = 0;
 
@@ -18,6 +19,7 @@ let nextSheetId = 0;
   selector: 'app-document-sheet-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [IconComponent],
   host: {
     '(document:keydown.escape)': 'onEscape()'
   },
@@ -35,9 +37,7 @@ let nextSheetId = 0;
           <!-- Toolbar (hidden during print) -->
           <div class="px-5 bg-navy text-white flex items-center justify-between shrink-0 print:hidden font-sans {{ toolbarClass() }}">
             <div class="flex items-center gap-2.5">
-              <svg class="w-5 h-5 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+              <app-icon name="document" size="lg" [stroke]="2" class="text-amber-400" />
               <div>
                 <h3 [id]="titleId" class="font-bold text-sm leading-tight">{{ title() }}</h3>
                 @if (subtitle()) {
@@ -53,9 +53,7 @@ let nextSheetId = 0;
                   (click)="print.emit()"
                   class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-semibold rounded transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
                 >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                  </svg>
+                  <app-icon name="print" [stroke]="2" />
                   <span>{{ printLabel() }}</span>
                 </button>
               }
@@ -65,9 +63,7 @@ let nextSheetId = 0;
                 class="text-slate-300 hover:text-white p-1 rounded hover:bg-white/10 transition-colors cursor-pointer"
                 aria-label="Close"
               >
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <app-icon name="close" size="lg" [stroke]="2" />
               </button>
             </div>
           </div>

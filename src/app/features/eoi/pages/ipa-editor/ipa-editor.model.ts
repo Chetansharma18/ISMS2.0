@@ -1,5 +1,7 @@
 export interface IpaCourseRow {
   id: string;
+  /** District this course row is allowed in (the IPA allows a course per district). */
+  district?: string;
   sector: string;
   courseName: string;
   courseCode: string;

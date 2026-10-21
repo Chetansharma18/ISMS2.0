@@ -39,7 +39,7 @@ interface Tender {
                 <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
                   <span class="text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
                   <span class="text-slate-300">•</span>
-                  <span class="text-[11px] text-slate-500 font-mono truncate max-w-[200px] sm:max-w-none">{{ item.id }}</span>
+                  <span class="text-[11px] text-slate-500 tabular-nums truncate max-w-[200px] sm:max-w-none">{{ item.id }}</span>
                   <span class="text-slate-300">•</span>
                   <span class="text-[10px] font-semibold text-brand bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">{{ item.category }}</span>
                 </div>

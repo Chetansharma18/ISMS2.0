@@ -28,7 +28,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
           <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">2</span>
           <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Authorized Signatory Details</h2>
         </div>
-        <span class="text-xs text-slate-500 font-mono font-semibold truncate">Designated Signatory</span>
+        <span class="text-xs text-slate-500 tabular-nums font-semibold truncate">Designated Signatory</span>
       </div>
 
       <div class="p-4 sm:p-5 w-full font-sans">

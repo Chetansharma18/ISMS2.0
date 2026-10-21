@@ -1,309 +1,260 @@
-import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AspirantService } from '../services/aspirant.service';
 import { BatchService } from '../services/batch.service';
 import { SdcService } from '../services/sdc.service';
-import { AspirantRecord, AspirantTrainingStatus } from '../models/aspirant.model';
-import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { TableComponent } from '../../../shared/components/table/table.component';
-import { TableColumn } from '../../../shared/components/table/table.types';
-import { ButtonComponent, FilterTabsComponent, IconComponent, InputDirective, PageShellComponent } from '../../../shared';
+import { AspirantRecord, AspirantTrainingStatus, DROP_REASONS } from '../models/aspirant.model';
+import { isBatchApproved } from '../utils/batch-approval.util';
+import type { BatchRecord } from '../models/batch.model';
+import { categoryLabel } from '../../eoi/pages/sanction-order-list/sanction-order-list.component';
+import { downloadAspirantsCsv } from '../utils/aspirant-csv.util';
+import {
+  ButtonComponent,
+  FilterTabsComponent,
+  IconComponent,
+  InputDirective,
+  ListPageComponent,
+  ModalComponent,
+  TableColumn
+} from '../../../shared';
 
+/** A running approved batch: students can still be dropped from it. */
+function isRunningApproved(b: BatchRecord | undefined): boolean {
+  return !!b && isBatchApproved(b) && b.status !== 'COMPLETED' && b.status !== 'CANCELLED';
+}
+
+/** Training status in words, as the tables and the details show it. */
+export const ASPIRANT_STATUS_LABEL: Record<AspirantTrainingStatus, string> = {
+  ENROLLED: 'Enrolled',
+  IN_TRAINING: 'In training',
+  COMPLETED: 'Completed',
+  CERTIFIED: 'Certified',
+  DROPOUT: 'Dropout'
+};
+
+/** Colour of the status text (the same palette as the status of batches and SDCs). */
+export function aspirantStatusClass(status: AspirantTrainingStatus): string {
+  switch (status) {
+    case 'IN_TRAINING':
+      return 'text-sky-700';
+    case 'COMPLETED':
+    case 'CERTIFIED':
+      return 'text-emerald-700';
+    case 'DROPOUT':
+      return 'text-red-600';
+    default:
+      return 'text-slate-700';
+  }
+}
+
+/**
+ * Aspirants Management: every aspirant registered in the partner's batches, with the details taken at registration,
+ * the batch and center they are in, and their training status.
+ */
 @Component({
   selector: 'app-aspirant-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    FilterTabsComponent,
-    CommonModule,
-    RouterModule,
-    FormsModule,
-    PageHeaderComponent,
-    TableComponent,
-    ButtonComponent,
-    IconComponent,
-    InputDirective,
-    PageShellComponent
-  ],
+  imports: [FormsModule, FilterTabsComponent, ListPageComponent, ButtonComponent, IconComponent, InputDirective, ModalComponent],
   template: `
-    <app-page-shell>
+    <app-list-page
+      title="Aspirants Management"
+      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Aspirants Management' }]"
+      [searchable]="true"
+      [(searchQuery)]="searchQuery"
+      searchPlaceholder="Search Aspirant ID, Name, Aadhaar, Mobile, Batch, Center..."
+      [columns]="columns"
+      [data]="filteredAspirants()"
+      [pagination]="true"
+      [pageSize]="pageSize"
+      itemUnit="aspirants"
+      emptyMessage="No aspirants match the selected filters or search."
+      [customTemplates]="{
+        aspirant: aspirantTemplate,
+        person: personTemplate,
+        background: backgroundTemplate,
+        contact: contactTemplate,
+        district: districtTemplate,
+        batch: batchTemplate,
+        center: centerTemplate,
+        scheme: schemeTemplate,
+        status: statusTemplate,
+        actions: actionsTemplate
+      }"
+    >
+      <button headerActions appButton size="sm" variant="outline" type="button" (click)="exportToCsv()" title="Export the list to CSV">
+        <app-icon name="download" size="sm" />
+        <span>Export CSV</span>
+      </button>
 
-        <!-- Page Header -->
-        <app-page-header
-          title="Aspirants Management"
-          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Aspirants Management' }]"
-          [searchable]="true"
-          [(searchQuery)]="searchQuery"
-          searchPlaceholder="Search Aspirant ID, Name, Aadhaar, SDC, Batch..."
-        >
-          <div class="flex items-center gap-2">
-            <!-- Export CSV Button -->
-            <button
-              appButton
-              size="sm"
-              variant="outline"
-              type="button"
-              (click)="exportToCsv()"
-              title="Export roster to CSV"
-            >
-              <app-icon name="download" size="sm" />
-              <span>Export CSV</span>
-            </button>
-          </div>
-        </app-page-header>
+      <div beforeTable class="flex items-center justify-between gap-3 pt-1">
+        <app-filter-tabs [options]="statusTabs()" [value]="activeStatus()" (valueChange)="activeStatus.set($event)" />
+      </div>
 
-        <!-- Success Toast Notification -->
-        @if (successMessage()) {
-          <div class="p-3.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 flex items-center justify-between text-xs animate-in fade-in">
-            <div class="flex items-center gap-2">
-              <span class="font-bold text-emerald-700">Success:</span>
-              <span>{{ successMessage() }}</span>
-            </div>
-            <button appButton variant="ghost" size="sm" iconOnly aria-label="Dismiss" (click)="successMessage.set('')"><app-icon name="close" size="xs" /></button>
-          </div>
-        }
-
-        <!-- Filter & Search Controls (Matching ISMS 2.0 Toolbar) -->
-        <div class="bg-slate-50/70 border border-slate-200 rounded-xl p-3.5 space-y-3 shadow-2xs">
-          
-          <!-- Row 1: SDC Center Dropdown + Scheme Dropdown + Batch Dropdown + Status Filter -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
-            
-            <!-- SDC Center Filter (Prompt: "and also all the sdc can be seen") -->
-            <div>
-              <label class="block text-[10.5px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-                Filter by SDC Center:
-              </label>
-              <select
-                appInput
-                size="sm"
-                [ngModel]="selectedSdc()"
-                (ngModelChange)="selectedSdc.set($event)"
-                class="w-full"
-              >
-                <option value="All">All SDC Centers ({{ allSdcOptions.length - 1 }})</option>
-                @for (opt of allSdcOptions.slice(1); track opt.code) {
-                  <option [value]="opt.code">{{ opt.name }} ({{ opt.code }}) - {{ opt.district }}</option>
-                }
-              </select>
-            </div>
-
-            <!-- Scheme Filter -->
-            <div>
-              <label class="block text-[10.5px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-                Filter by Scheme:
-              </label>
-              <select
-                appInput
-                size="sm"
-                [ngModel]="selectedScheme()"
-                (ngModelChange)="selectedScheme.set($event)"
-                class="w-full"
-              >
-                <option value="All">All Schemes ({{ allSchemeOptions.length - 1 }})</option>
-                @for (sc of allSchemeOptions.slice(1); track sc) {
-                  <option [value]="sc">{{ sc }}</option>
-                }
-              </select>
-            </div>
-
-            <!-- Batch Filter -->
-            <div>
-              <label class="block text-[10.5px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-                Filter by Batch:
-              </label>
-              <select
-                appInput
-                size="sm"
-                [ngModel]="selectedBatch()"
-                (ngModelChange)="selectedBatch.set($event)"
-                class="w-full"
-              >
-                <option value="All">All Batches ({{ allBatchOptions.length - 1 }})</option>
-                @for (b of allBatchOptions.slice(1); track b.code) {
-                  <option [value]="b.code">{{ b.code }} - {{ b.course }}</option>
-                }
-              </select>
-            </div>
-
-            <!-- Status Filter -->
-            <div>
-              <label class="block text-[10.5px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-                Training Status:
-              </label>
-              <select
-                appInput
-                size="sm"
-                [ngModel]="selectedStatus()"
-                (ngModelChange)="selectedStatus.set($event)"
-                class="w-full"
-              >
-                <option value="All">All Statuses</option>
-                <option value="ENROLLED">Enrolled</option>
-                <option value="IN_TRAINING">In Training</option>
-                <option value="COMPLETED">Completed</option>
-                <option value="CERTIFIED">Certified</option>
-              </select>
-            </div>
-
-          </div>
-
-          <!-- Row 2: Status Quick Filter Pills -->
-          <div class="flex items-center justify-between gap-3 pt-2 border-t border-slate-200">
-            
-            <!-- Quick Category/Filter Pills -->
-            <app-filter-tabs [options]="quickFilterTabs()" [value]="activeQuickTab()" (valueChange)="setQuickTab($event)" />
-
-          </div>
-
+      @if (message()) {
+        <div beforeTable class="p-3 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 flex items-center justify-between text-xs">
+          <span class="font-medium">{{ message() }}</span>
+          <button appButton variant="ghost" size="sm" iconOnly aria-label="Dismiss" (click)="message.set('')"><app-icon name="close" size="xs" /></button>
         </div>
+      }
 
-        <!-- Aspirants Data Table via Reusable TableComponent -->
-        <app-table
-          [columns]="aspirantColumns"
-          [data]="filteredAspirants()"
-          [pagination]="true"
-          [pageSize]="pageSize"
-          itemUnit="aspirants"
-          emptyMessage="No aspirants match the selected filters or search query."
-          [customTemplates]="{
-            aspirantInfo: aspirantInfoTemplate,
-            candidate: candidateTemplate,
-            identity: identityTemplate,
-            sdcCenter: sdcCenterTemplate,
-            batchCourse: batchCourseTemplate,
-            scheme: schemeTemplate,
-            status: statusTemplate,
-            actions: actionsTemplate
-          }"
+      <div beforeTable class="bg-slate-50 border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs">
+        <div class="flex items-center gap-1.5">
+          <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Center:</label>
+          <select appInput size="sm" [ngModel]="selectedSdc()" (ngModelChange)="selectedSdc.set($event)" class="max-w-[220px]">
+            <option value="ALL">All Centers ({{ sdcOptions().length }})</option>
+            @for (s of sdcOptions(); track s.code) {
+              <option [value]="s.code">{{ s.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Batch:</label>
+          <select appInput size="sm" [ngModel]="selectedBatch()" (ngModelChange)="selectedBatch.set($event)" class="max-w-[220px]">
+            <option value="ALL">All Batches ({{ batchOptions().length }})</option>
+            @for (b of batchOptions(); track b.code) {
+              <option [value]="b.code">{{ b.code }} - {{ b.course }}</option>
+            }
+          </select>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Scheme:</label>
+          <select appInput size="sm" [ngModel]="selectedScheme()" (ngModelChange)="selectedScheme.set($event)">
+            <option value="ALL">All Schemes</option>
+            @for (s of schemeOptions(); track s) {
+              <option [value]="s">{{ s }}</option>
+            }
+          </select>
+        </div>
+        @if (hasActiveFilters()) {
+          <button appButton variant="danger" size="sm" type="button" (click)="resetFilters()" class="ml-auto">Reset Filters</button>
+        }
+      </div>
+
+      <!-- Aspirant: name with the ID below -->
+      <ng-template #aspirantTemplate let-a>
+        <div>
+          <div class="font-normal text-slate-800 text-[13px] leading-tight">{{ a.aspirantName }}</div>
+          <div class="text-[11px] text-secondary leading-tight mt-px tabular-nums">{{ a.id }}</div>
+        </div>
+      </ng-template>
+
+      <!-- Gender and age, with the father / husband name below -->
+      <ng-template #personTemplate let-a>
+        <div>
+          <div class="font-normal text-slate-800 text-[13px] leading-tight">{{ a.gender }}, {{ a.age }} yrs</div>
+          <div class="text-[11px] text-secondary leading-tight mt-px">{{ a.relationType || 'Father' }}: {{ a.relationName || '—' }}</div>
+        </div>
+      </ng-template>
+
+      <!-- Category, with the educational qualification below -->
+      <ng-template #backgroundTemplate let-a>
+        <div>
+          <div class="font-normal text-slate-800 text-[13px] leading-tight">{{ a.category || '—' }}</div>
+          <div class="text-[11px] text-secondary leading-tight mt-px">{{ a.educationalQualification || '—' }}</div>
+        </div>
+      </ng-template>
+
+      <!-- Aadhaar (masked), with the mobile number below -->
+      <ng-template #contactTemplate let-a>
+        <div>
+          <div class="font-normal text-slate-800 text-[13px] leading-tight tabular-nums">{{ a.aadhaarMasked }}</div>
+          <div class="text-[11px] text-secondary leading-tight mt-px tabular-nums">{{ a.mobileNo }}</div>
+        </div>
+      </ng-template>
+
+      <!-- District of the permanent address, with rural or urban below -->
+      <ng-template #districtTemplate let-a>
+        <div>
+          <div class="font-normal text-slate-800 text-[13px] leading-tight">{{ a.permDistrict || '—' }}</div>
+          <div class="text-[11px] text-secondary leading-tight mt-px">{{ a.areaType || '—' }}</div>
+        </div>
+      </ng-template>
+
+      <!-- Batch code, with the course below -->
+      <ng-template #batchTemplate let-a>
+        <div>
+          <div class="font-normal text-slate-800 text-[13px] leading-tight tabular-nums">{{ a.batchCode }}</div>
+          <div class="text-[11px] text-secondary leading-tight mt-px">{{ a.courseName }}</div>
+        </div>
+      </ng-template>
+
+      <!-- Center, with its code below -->
+      <ng-template #centerTemplate let-a>
+        <div>
+          <div class="font-normal text-slate-800 text-[13px] leading-tight">{{ a.sdcName }}</div>
+          <div class="text-[11px] text-secondary leading-tight mt-px tabular-nums">{{ a.sdcCode }}</div>
+        </div>
+      </ng-template>
+
+      <!-- Scheme, with its category below -->
+      <ng-template #schemeTemplate let-a>
+        <div>
+          <div class="font-normal text-slate-800 text-[13px] leading-tight">{{ a.scheme }}</div>
+          <div class="text-[11px] text-secondary leading-tight mt-px">{{ schemeCategory(a) }}</div>
+        </div>
+      </ng-template>
+
+      <ng-template #statusTemplate let-a>
+        <span class="whitespace-nowrap font-normal text-[13px]" [class]="statusClass(a.trainingStatus)">{{ statusText(a.trainingStatus) }}</span>
+      </ng-template>
+
+      <ng-template #actionsTemplate let-a>
+        <div class="flex items-center justify-center py-2 px-1 whitespace-nowrap">
+          <button appButton variant="outline" size="sm" class="w-24 shrink-0" type="button" (click)="viewDetails(a)" title="View aspirant details">
+            <app-icon name="eye" size="sm" />
+            <span>View</span>
+          </button>
+          <!-- Drop an active student, or register a replacement for one who has dropped. One fixed slot keeps the rows in line. -->
+          <div class="w-28 shrink-0 ml-2">
+            @if (canDrop(a)) {
+              <button appButton variant="outline" size="sm" block type="button" (click)="askToDrop(a)" title="Drop this student from the batch">
+                <app-icon name="close" size="sm" />
+                <span>Drop</span>
+              </button>
+            } @else if (canReplace(a)) {
+              <button appButton variant="primary" size="sm" block type="button" (click)="registerReplacement(a)" title="Register a student in the seat this student left">
+                <app-icon name="plus" size="sm" />
+                <span>Replace</span>
+              </button>
+            }
+          </div>
+        </div>
+      </ng-template>
+
+    </app-list-page>
+
+      @if (dropping(); as target) {
+        <app-modal
+          title="Drop Student"
+          [subtitle]="target.aspirantName + ' · Batch ' + target.batchCode"
+          size="sm"
+          [closeOnBackdrop]="false"
+          (close)="dropping.set(null)"
         >
-        </app-table>
-
-        <!-- Template: Aspirant ID & Reg Date -->
-        <ng-template #aspirantInfoTemplate let-a>
-          <div class="font-mono text-[13px] whitespace-nowrap">
-            <a [routerLink]="['/aspirants', a.id]" class="font-normal text-brand hover:underline block cursor-pointer whitespace-nowrap" title="View details of {{ a.aspirantName }}">{{ a.id }}</a>
-            <span class="text-[11px] text-slate-500 font-normal block mt-0.5 whitespace-nowrap">Enrolled: {{ a.enrollmentDate }}</span>
-          </div>
-        </ng-template>
-
-        <!-- Template: Candidate Details (Name, Father/Relation Name, Age/Gender, Category) -->
-        <ng-template #candidateTemplate let-a>
-          <div class="py-1 min-w-0">
-            <a [routerLink]="['/aspirants', a.id]" class="font-normal text-slate-800 hover:text-brand hover:underline text-[13px] leading-snug block cursor-pointer" title="View details of {{ a.aspirantName }}">
-              {{ a.aspirantName }}
-            </a>
-            <div class="text-[11px] text-slate-500 leading-tight mt-0.5">
-              <span class="text-slate-400 font-normal">{{ a.relationType || 'Father' }}:</span>
-              <span class="text-slate-700 font-normal ml-1">{{ a.relationName }}</span>
-            </div>
-            <div class="flex items-center gap-1.5 mt-1">
-              <span class="text-[10.5px] text-slate-500 font-normal">{{ a.gender }}, {{ a.age }} yrs</span>
-              <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-              <span class="px-1.5 py-0.2 rounded text-[9.5px] font-normal bg-slate-100 text-slate-700 border border-slate-200">
-                {{ a.category }}
-              </span>
+          <div class="space-y-3 text-xs text-slate-700">
+            <p class="m-0">
+              The seat in batch <strong class="tabular-nums">{{ target.batchCode }}</strong> is freed. You can register a replacement now or later,
+              also after registration for new aspirants has closed.
+            </p>
+            <div>
+              <label for="drop-reason" class="block mb-1 font-semibold text-slate-700">Reason for dropping <span class="text-rose-500">*</span></label>
+              <select id="drop-reason" appInput [ngModel]="dropReason()" (ngModelChange)="dropReason.set($event)">
+                <option value="">Select a reason</option>
+                @for (reason of dropReasons; track reason) {
+                  <option [value]="reason">{{ reason }}</option>
+                }
+              </select>
             </div>
           </div>
-        </ng-template>
-
-        <!-- Template: Identity & Contact (Aadhaar Masked, Mobile, Email) -->
-        <ng-template #identityTemplate let-a>
-          <div class="text-[13px] space-y-0.5">
-            <div class="flex items-center gap-1 font-mono text-slate-800 font-normal">
-              <app-icon name="identification" size="sm" [stroke]="2" class="text-blue-600 shrink-0" />
-              <span>{{ a.aadhaarMasked }}</span>
-            </div>
-            <div class="text-slate-600 text-[11px] flex items-center gap-1">
-              <span>{{ a.mobileNo }}</span>
-            </div>
-            @if (a.email) {
-              <div class="text-slate-400 text-[10.5px] truncate max-w-[140px]" [title]="a.email">
-                {{ a.email }}
-              </div>
-            }
-          </div>
-        </ng-template>
-
-        <!-- Template: SDC Center (Prompt: "and also all the sdc can be seen") -->
-        <ng-template #sdcCenterTemplate let-a>
-          <div class="min-w-[150px]">
-            <div class="font-normal text-slate-800 text-[13px] leading-snug">
-              {{ a.sdcName }}
-            </div>
-            <div class="flex items-center gap-1.5 mt-0.5">
-              <span class="text-[10.5px] font-mono text-slate-700 font-normal">{{ a.sdcCode }}</span>
-              <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-              <span class="px-1.5 py-0.2 rounded text-[10px] font-normal bg-slate-100 text-slate-600 border border-slate-200">
-                {{ a.sdcDistrict }}
-              </span>
-            </div>
-          </div>
-        </ng-template>
-
-        <!-- Template: Batch & Course -->
-        <ng-template #batchCourseTemplate let-a>
-          <div class="min-w-[150px]">
-            <div class="flex items-center gap-1.5">
-              <span class="font-mono font-normal text-[13px] text-slate-800">
-                {{ a.batchCode }}
-              </span>
-              <span class="text-[11px] text-slate-500 truncate">{{ a.sector }}</span>
-            </div>
-            <div class="font-normal text-slate-800 text-[13px] mt-1 leading-snug">
-              {{ a.courseName }}
-            </div>
-          </div>
-        </ng-template>
-
-        <!-- Template: Scheme (All schemes black same) -->
-        <ng-template #schemeTemplate let-a>
-          <div class="text-center">
-            <span class="font-normal text-[13px] tracking-wider uppercase text-slate-800">
-              {{ a.scheme }}
-            </span>
-          </div>
-        </ng-template>
-
-        <!-- Template: Status -->
-        <ng-template #statusTemplate let-a>
-          <div class="text-center">
-            @if (a.trainingStatus === 'IN_TRAINING') {
-              <span class="font-normal text-[13px] text-sky-700 tracking-wider uppercase">
-                IN TRAINING
-              </span>
-            } @else if (a.trainingStatus === 'CERTIFIED') {
-              <span class="font-normal text-[13px] text-emerald-700 tracking-wider uppercase">
-                CERTIFIED
-              </span>
-            } @else {
-              <span class="font-normal text-[13px] text-slate-600 tracking-wider uppercase">
-                ENROLLED
-              </span>
-            }
-          </div>
-        </ng-template>
-
-        <!-- Template: Actions -->
-        <ng-template #actionsTemplate let-a>
-          <div class="flex items-center justify-end gap-1.5 whitespace-nowrap">
-            <button
-              appButton
-              size="sm"
-              class="shrink-0"
-              type="button"
-              (click)="viewDetails(a)"
-              title="View & Edit Aspirant Details"
-            >
-              <app-icon name="eye" size="sm" />
-              <span>View Details</span>
-            </button>
-          </div>
-        </ng-template>
-
-    </app-page-shell>
+          <ng-container modalFooter>
+            <button appButton variant="outline" type="button" (click)="dropping.set(null)">Cancel</button>
+            <button appButton variant="outline" type="button" [disabled]="!dropReason()" (click)="confirmDrop(false)">Drop Only</button>
+            <button appButton type="button" [disabled]="!dropReason()" (click)="confirmDrop(true)">Drop &amp; Register Replacement</button>
+          </ng-container>
+        </app-modal>
+      }
   `
 })
 export class AspirantListComponent {
@@ -312,361 +263,156 @@ export class AspirantListComponent {
   readonly sdcService = inject(SdcService);
   readonly router = inject(Router);
 
-  // Search & Filter Reactive Signals
   readonly searchQuery = signal<string>('');
-  readonly appliedSearch = signal<string>('');
-  readonly selectedSdc = signal<string>('All');
-  readonly selectedScheme = signal<string>('All');
-  readonly selectedBatch = signal<string>('All');
-  readonly selectedStatus = signal<string>('All');
-  readonly activeQuickTab = signal<string>('ALL');
-
-  readonly successMessage = signal<string>('');
-
+  readonly activeStatus = signal<string>('ALL');
+  readonly selectedSdc = signal<string>('ALL');
+  readonly selectedBatch = signal<string>('ALL');
+  readonly selectedScheme = signal<string>('ALL');
+  readonly message = signal<string>('');
   readonly pageSize = 10;
 
-  // Demo avatar SVG matching candidate profile photo demo
-  readonly defaultAvatar = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="150" viewBox="0 0 120 150"%3E%3Crect width="120" height="150" fill="%23e2e8f0"/%3E%3Ccircle cx="60" cy="50" r="28" fill="%230f172a"/%3E%3Cpath d="M20 135 C 20 95, 100 95, 100 135 Z" fill="%231e293b"/%3E%3C/svg%3E';
-
-  readonly stats = this.aspirantService.stats;
-
-  readonly aspirantColumns: TableColumn<AspirantRecord>[] = [
+  readonly columns: TableColumn<AspirantRecord>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
-    { key: 'aspirantInfo', label: 'Aspirant ID', type: 'custom', width: 'min-w-[170px] whitespace-nowrap' },
-    { key: 'candidate', label: 'Candidate Profile', type: 'custom', width: 'min-w-[210px]' },
-    { key: 'identity', label: 'Aadhaar & Contact', type: 'custom', width: 'min-w-[150px]' },
-    { key: 'sdcCenter', label: 'Center (SDC)', type: 'custom', width: 'min-w-[170px]' },
-    { key: 'batchCourse', label: 'Batch & Course', type: 'custom', width: 'min-w-[170px]' },
-    { key: 'scheme', label: 'Scheme', align: 'center', type: 'custom', width: 'w-28' },
-    { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'w-28' },
-    { key: 'actions', label: 'Actions', align: 'right', type: 'custom', width: 'w-32' }
+    { key: 'aspirant', label: 'Aspirant', type: 'custom', width: 'min-w-[150px]' },
+    { key: 'person', label: 'Gender & Age', type: 'custom', width: 'min-w-[170px]' },
+    { key: 'background', label: 'Category & Qualification', type: 'custom', width: 'min-w-[170px]' },
+    { key: 'contact', label: 'Aadhaar & Mobile', type: 'custom', width: 'min-w-[140px]' },
+    { key: 'district', label: 'District', type: 'custom', width: 'min-w-[110px]' },
+    { key: 'batch', label: 'Batch & Course', type: 'custom', width: 'min-w-[200px]' },
+    { key: 'center', label: 'Center (SDC)', type: 'custom', width: 'min-w-[170px]' },
+    { key: 'scheme', label: 'Scheme & Category', type: 'custom', width: 'min-w-[140px]' },
+    { key: 'enrollmentDate', label: 'Enrolled On', align: 'center', cellClass: 'whitespace-nowrap tabular-nums font-normal text-slate-800 text-[13px]', width: 'w-28' },
+    { key: 'status', label: 'Status', type: 'custom', width: 'min-w-[110px]' },
+    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[260px]' }
   ];
 
-  // Dynamic filter options derived from current services
-  get allSdcOptions() {
-    const sdcs = this.sdcService.sdcs();
-    return [
-      { code: 'All', name: 'All Centers', district: 'Rajasthan' },
-      ...sdcs.map(s => ({ code: s.sdcCode, name: s.sdcName, district: s.district }))
-    ];
-  }
+  readonly sdcOptions = computed(() => {
+    const used = new Set(this.aspirantService.aspirants().map(a => a.sdcCode));
+    return this.sdcService
+      .sdcs()
+      .filter(s => used.has(s.sdcCode))
+      .map(s => ({ code: s.sdcCode, name: `${s.sdcName} (${s.sdcCode})` }));
+  });
 
-  get allSchemeOptions() {
-    return ['All', 'SAMARTH', 'MMKVY', 'RAJKVIK', 'MNSKSY', 'PMKVY'];
-  }
+  readonly batchOptions = computed(() => {
+    const used = new Set(this.aspirantService.aspirants().map(a => a.batchCode));
+    return this.batchService
+      .batches()
+      .filter(b => used.has(b.batchCode))
+      .map(b => ({ code: b.batchCode, course: b.courseName }));
+  });
 
-  get allBatchOptions() {
-    const batches = this.batchService.batches();
-    return [
-      { code: 'All', course: 'All Batches' },
-      ...batches.map(b => ({ code: b.batchCode, course: b.courseName }))
-    ];
-  }
+  readonly schemeOptions = computed(() => Array.from(new Set(this.aspirantService.aspirants().map(a => a.scheme).filter(Boolean))));
 
-  // Quick filter tabs: AEBAS Verified removed per user request
-  readonly quickFilterTabs = computed(() => {
+  readonly statusTabs = computed(() => {
     const list = this.aspirantService.aspirants();
+    const count = (status: AspirantTrainingStatus) => list.filter(a => a.trainingStatus === status).length;
     return [
       { id: 'ALL', label: 'All Aspirants', count: list.length },
-      { id: 'IN_TRAINING', label: 'In Training', count: list.filter(a => a.trainingStatus === 'IN_TRAINING').length },
-      { id: 'ENROLLED', label: 'Enrolled', count: list.filter(a => a.trainingStatus === 'ENROLLED').length }
+      { id: 'ENROLLED', label: 'Enrolled', count: count('ENROLLED') },
+      { id: 'IN_TRAINING', label: 'In Training', count: count('IN_TRAINING') },
+      { id: 'COMPLETED', label: 'Completed', count: count('COMPLETED') },
+      { id: 'CERTIFIED', label: 'Certified', count: count('CERTIFIED') },
+      { id: 'DROPOUT', label: 'Dropout', count: count('DROPOUT') }
     ];
   });
+
+  readonly hasActiveFilters = computed(
+    () => this.selectedSdc() !== 'ALL' || this.selectedBatch() !== 'ALL' || this.selectedScheme() !== 'ALL' || this.activeStatus() !== 'ALL' || this.searchQuery().trim() !== ''
+  );
 
   readonly filteredAspirants = computed(() => {
     let list = this.aspirantService.aspirants();
+    if (this.activeStatus() !== 'ALL') list = list.filter(a => a.trainingStatus === this.activeStatus());
+    if (this.selectedSdc() !== 'ALL') list = list.filter(a => a.sdcCode === this.selectedSdc());
+    if (this.selectedBatch() !== 'ALL') list = list.filter(a => a.batchCode === this.selectedBatch());
+    if (this.selectedScheme() !== 'ALL') list = list.filter(a => a.scheme === this.selectedScheme());
 
-    // 1. SDC filter
-    const sdc = this.selectedSdc();
-    if (sdc !== 'All') {
-      list = list.filter(a => a.sdcCode === sdc || a.sdcName.toLowerCase().includes(sdc.toLowerCase()));
-    }
-
-    // 2. Scheme filter
-    const scheme = this.selectedScheme();
-    if (scheme !== 'All') {
-      list = list.filter(a => a.scheme.toLowerCase() === scheme.toLowerCase());
-    }
-
-    // 3. Batch filter
-    const batch = this.selectedBatch();
-    if (batch !== 'All') {
-      list = list.filter(a => a.batchCode === batch);
-    }
-
-    // 4. Status filter
-    const status = this.selectedStatus();
-    if (status !== 'All') {
-      list = list.filter(a => a.trainingStatus === status);
-    }
-
-    // 5. Quick tab filter
-    const quick = this.activeQuickTab();
-    if (quick === 'IN_TRAINING') {
-      list = list.filter(a => a.trainingStatus === 'IN_TRAINING');
-    } else if (quick === 'ENROLLED') {
-      list = list.filter(a => a.trainingStatus === 'ENROLLED');
-    }
-
-    // 6. Free text search query
-    const query = this.appliedSearch().toLowerCase().trim();
-    if (query) {
+    const q = this.searchQuery().toLowerCase().trim();
+    if (q) {
       list = list.filter(a =>
-        a.id.toLowerCase().includes(query) ||
-        a.aspirantName.toLowerCase().includes(query) ||
-        a.aadhaarMasked.toLowerCase().includes(query) ||
-        (a.aadhaarNo && a.aadhaarNo.includes(query)) ||
-        a.mobileNo.includes(query) ||
-        a.sdcName.toLowerCase().includes(query) ||
-        a.sdcCode.toLowerCase().includes(query) ||
-        a.sdcDistrict.toLowerCase().includes(query) ||
-        a.batchCode.toLowerCase().includes(query) ||
-        a.courseName.toLowerCase().includes(query) ||
-        a.scheme.toLowerCase().includes(query) ||
-        (a.relationName && a.relationName.toLowerCase().includes(query)) ||
-        (a.permCity && a.permCity.toLowerCase().includes(query)) ||
-        (a.permDistrict && a.permDistrict.toLowerCase().includes(query)) ||
-        (a.janaadhaarId && a.janaadhaarId.toLowerCase().includes(query))
+        [a.id, a.aspirantName, a.aadhaarMasked, a.aadhaarNo, a.mobileNo, a.email, a.sdcName, a.sdcCode, a.sdcDistrict, a.batchCode, a.courseName, a.scheme, a.relationName, a.permCity, a.permDistrict, a.janaadhaarId]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+          .includes(q)
       );
     }
-
     return list;
   });
 
-  setQuickTab(tabId: string): void {
-    this.activeQuickTab.set(tabId);
-  }
-
-  onSearchInput(val: string): void {
-    this.searchQuery.set(val);
-    this.appliedSearch.set(val);
-  }
-
-  applySearch(): void {
-    this.appliedSearch.set(this.searchQuery());
-  }
-
-  clearSearch(): void {
+  resetFilters(): void {
+    this.activeStatus.set('ALL');
+    this.selectedSdc.set('ALL');
+    this.selectedBatch.set('ALL');
+    this.selectedScheme.set('ALL');
     this.searchQuery.set('');
-    this.appliedSearch.set('');
+  }
+
+  statusText(status: AspirantTrainingStatus): string {
+    return ASPIRANT_STATUS_LABEL[status] ?? status;
+  }
+
+  statusClass(status: AspirantTrainingStatus): string {
+    return aspirantStatusClass(status);
+  }
+
+  /** Scheme category of the center the aspirant's batch belongs to, in normal case. */
+  schemeCategory(a: AspirantRecord): string {
+    return categoryLabel(this.sdcService.getSdcById(a.sdcId)?.schemeCategory);
+  }
+
+  // ---- Drop and replace --------------------------------------------------------------------------
+
+  protected readonly dropReasons = DROP_REASONS;
+  /** The student the partner is about to drop (waiting for the reason and confirmation). */
+  readonly dropping = signal<AspirantRecord | null>(null);
+  readonly dropReason = signal<string>('');
+
+  /** An active student of an approved batch that is still running can be dropped. */
+  canDrop(a: AspirantRecord): boolean {
+    return a.trainingStatus !== 'DROPOUT' && isRunningApproved(this.batchService.getBatchById(a.batchId));
+  }
+
+  /** A dropped student whose seat is still empty can be replaced. */
+  canReplace(a: AspirantRecord): boolean {
+    return this.aspirantService.canRegisterReplacementFor(a);
+  }
+
+  askToDrop(a: AspirantRecord): void {
+    this.dropReason.set('');
+    this.dropping.set(a);
+  }
+
+  confirmDrop(thenReplace: boolean): void {
+    const target = this.dropping();
+    if (!target) return;
+    const dropped = this.aspirantService.dropAspirant(target.id, this.dropReason());
+    this.dropping.set(null);
+    if (!dropped) {
+      this.message.set(`${target.aspirantName} could not be dropped.`);
+      return;
+    }
+    if (thenReplace) {
+      this.registerReplacement(target);
+      return;
+    }
+    this.message.set(`${target.aspirantName} dropped from batch ${target.batchCode}. A seat is free for a replacement.`);
+  }
+
+  /** Opens the registration for the batch, to put a new student in the seat of the dropped one. */
+  registerReplacement(a: AspirantRecord): void {
+    this.router.navigate(['/batches', a.batchId, 'map-aspirant'], { queryParams: { replace: a.id } });
   }
 
   viewDetails(aspirant: AspirantRecord): void {
     this.router.navigate(['/aspirants', aspirant.id]);
   }
 
-  viewDossier(aspirant: AspirantRecord): void {
-    this.router.navigate(['/aspirants', aspirant.id]);
-  }
-
-  editAspirant(aspirant: AspirantRecord): void {
-    this.router.navigate(['/aspirants', aspirant.id], { queryParams: { edit: 'true' } });
-  }
-
-  updateStatus(aspirant: AspirantRecord, newStatus: AspirantTrainingStatus): void {
-    this.aspirantService.updateTrainingStatus(aspirant.id, newStatus);
-  }
-
-  toggleBiometric(aspirant: AspirantRecord): void {
-    this.aspirantService.toggleBiometric(aspirant.id);
-  }
-
-  openMapAspirant(): void {
-    const batches = this.batchService.batches();
-    if (batches.length > 0) {
-      this.router.navigate(['/batches', batches[0].id, 'map-aspirant']);
-    } else {
-      this.router.navigate(['/batches']);
-    }
-  }
-
   exportToCsv(): void {
-    const data: AspirantRecord[] = this.filteredAspirants().length > 0
-      ? this.filteredAspirants()
-      : this.aspirantService.aspirants();
-    if (!data.length) {
-      return;
-    }
-
-    const headers = [
-      'Aspirant ID',
-      'Candidate Name',
-      'Gender',
-      'Date of Birth',
-      'Age',
-      'Aadhaar No (Masked)',
-      'Jan Aadhaar ID',
-      'Other ID Type',
-      'Other ID Number',
-      'Father / Husband Name',
-      'Relationship',
-      'Mother Name',
-      'Educational Qualification',
-      'Category',
-      'Religion',
-      'Minority',
-      'Special Ability (PwD)',
-      'Disability Type',
-      'Area Type',
-      'Interested Out of Rajasthan',
-      'Mobile Number',
-      'Alt Mobile Number',
-      'Email Address',
-      'Permanent Address',
-      'Permanent District',
-      'Permanent Pincode',
-      'Communication Address',
-      'SDC Code',
-      'SDC Center Name',
-      'SDC District',
-      'Batch Code',
-      'Batch Name',
-      'Course Name',
-      'Sector',
-      'Government Scheme',
-      'Enrollment Date',
-      'Training Status',
-      'Biometric Verified',
-      'Attendance Percentage',
-      'Bank Name',
-      'Account Number',
-      'Account Holder Name',
-      'Account Type',
-      'Bank Branch',
-      'IFSC Code',
-      'MICR Code',
-      'Annual Family Income (INR)',
-      'Income Slab',
-      'Economic Status',
-      'Economic Card / Ration No',
-      'BoCW Worker',
-      'BoCW Registration No',
-      'MGNREGA Worker',
-      'MGNREGA Job Card No',
-      'RSBY Beneficiary',
-      'Gram Sabha PIP Listed',
-      'NRLM SHG Member',
-      'Voter ID (EPIC)',
-      'Preferred Sectors',
-      'Attached Documents Count'
-    ];
-
-    const escapeCsv = (val: any): string => {
-      if (val === null || val === undefined) return '""';
-      const str = String(val).trim();
-      return `"${str.replace(/"/g, '""')}"`;
-    };
-
-    const rows: string[][] = data.map((a: AspirantRecord) => {
-      const permAddress = [
-        a.permHouseNo,
-        a.permStreet,
-        a.permWard,
-        a.permCity,
-        a.permBlock,
-        a.permDistrict,
-        a.permPincode
-      ].filter(Boolean).join(', ');
-
-      const commAddress = a.isAddressSame
-        ? (permAddress || 'Same as Permanent Address')
-        : [
-            a.commHouseNo,
-            a.commStreet,
-            a.commWard,
-            a.commCity,
-            a.commBlock,
-            a.commDistrict,
-            a.commPincode
-          ].filter(Boolean).join(', ');
-
-      const docCount = Array.isArray(a.documents)
-        ? a.documents.filter((d: any) => d.status === 'UPLOADED').length
-        : 0;
-
-      return [
-        a.id || '',
-        a.aspirantName || '',
-        a.gender || '',
-        a.dob || '',
-        a.age != null ? String(a.age) : '',
-        a.aadhaarMasked || (a.aadhaarNo ? `XXXX-XXXX-${a.aadhaarNo.slice(-4)}` : ''),
-        a.janaadhaarId || '',
-        a.otherIdType || '',
-        a.otherIdNo || '',
-        a.relationName || '',
-        a.relationType || '',
-        a.motherName || '',
-        a.educationalQualification || '',
-        a.category || '',
-        a.religion || '',
-        a.minority || '',
-        a.specialAbility || 'No',
-        a.disabilityType || '',
-        a.areaType || '',
-        a.interestedOutOfRajasthan || 'No',
-        a.mobileNo || '',
-        a.altMobileNo || '',
-        a.email || '',
-        permAddress,
-        a.permDistrict || '',
-        a.permPincode || '',
-        commAddress,
-        a.sdcCode || '',
-        a.sdcName || '',
-        a.sdcDistrict || '',
-        a.batchCode || '',
-        a.batchName || '',
-        a.courseName || '',
-        a.sector || '',
-        a.scheme || '',
-        a.enrollmentDate || '',
-        a.trainingStatus || '',
-        a.biometricVerified ? 'Yes' : 'No',
-        a.attendancePercent != null ? `${a.attendancePercent}%` : '0%',
-        a.bankName || '',
-        a.bankAccountNo || '',
-        a.bankAccountName || '',
-        a.bankAccountType || '',
-        a.bankBranch || '',
-        a.ifscCode || '',
-        a.micrCode || '',
-        a.annualFamilyIncome != null ? String(a.annualFamilyIncome) : '',
-        a.incomeSlab || '',
-        a.economicStatus || '',
-        a.economicCardNo || '',
-        a.bocwWorker || 'No',
-        a.bocwNo || '',
-        a.mgnregaWorker || 'No',
-        a.mgnregaNo || '',
-        a.isRsby || 'No',
-        a.gramsabhaPip || 'No',
-        a.nrlmMember || 'No',
-        a.epicNo || '',
-        Array.isArray(a.preferredSectors) ? a.preferredSectors.join('; ') : '',
-        String(docCount)
-      ];
-    });
-
-    const csvContent = '\uFEFF' + [
-      headers.map(escapeCsv).join(','),
-      ...rows.map((row: string[]) => row.map(escapeCsv).join(','))
-    ].join('\r\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `Aspirants_Roster_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setTimeout(() => URL.revokeObjectURL(url), 500);
-
-    this.successMessage.set(`Exported ${data.length} candidate record${data.length === 1 ? '' : 's'} to CSV successfully.`);
-  }
-
-  printDossier(aspirant: AspirantRecord): void {
-    window.print();
+    const data = this.filteredAspirants().length > 0 ? this.filteredAspirants() : this.aspirantService.aspirants();
+    if (!data.length) return;
+    downloadAspirantsCsv(data);
+    this.message.set(`Exported ${data.length} aspirant record${data.length === 1 ? '' : 's'} to CSV.`);
   }
 }

@@ -17,7 +17,7 @@ const COLUMNS: TableColumn<CourseMasterItem>[] = [
   { key: 'sNo', label: 'Sr.No.', type: 'number', align: 'center', width: 'w-14 min-w-[55px]' },
   { key: 'sector', label: 'Sector', cellClass: 'whitespace-nowrap font-medium text-slate-800 min-w-[140px]' },
   { key: 'jobRoleName', label: 'QP/Job Role Name', cellClass: 'font-semibold text-slate-800 min-w-[180px]' },
-  { key: 'jobRoleCode', label: 'QP/Job Role Code', cellClass: 'whitespace-nowrap font-mono text-xs text-slate-700 min-w-[120px]' },
+  { key: 'jobRoleCode', label: 'QP/Job Role Code', cellClass: 'whitespace-nowrap tabular-nums text-xs text-slate-700 min-w-[120px]' },
   { key: 'version', label: 'Version', align: 'center', cellClass: 'whitespace-nowrap text-slate-700 min-w-[70px]' },
   { key: 'nsqfLevel', label: 'NSQF Level', align: 'center', cellClass: 'whitespace-nowrap text-slate-700 min-w-[85px]' },
   { key: 'commonNormsCategory', label: 'Common Norms Category', align: 'center', cellClass: 'whitespace-nowrap text-slate-700 min-w-[120px]' },

@@ -27,7 +27,7 @@ import { roleTypeLabel } from '../user-management.util';
         <div class="mt-4 font-sans text-[13px] grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
           <div>
             <span class="text-slate-500 font-medium block text-xs">User ID</span>
-            <span class="font-mono font-semibold text-slate-800">{{ u.userId }}</span>
+            <span class="tabular-nums font-semibold text-slate-800">{{ u.userId }}</span>
           </div>
           <div>
             <span class="text-slate-500 font-medium block text-xs">Username</span>
@@ -35,7 +35,7 @@ import { roleTypeLabel } from '../user-management.util';
           </div>
           <div>
             <span class="text-slate-500 font-medium block text-xs">SSO ID</span>
-            <span class="font-mono text-slate-800">{{ u.ssoId }}</span>
+            <span class="tabular-nums text-slate-800">{{ u.ssoId }}</span>
           </div>
           <div>
             <span class="text-slate-500 font-medium block text-xs">User Type</span>

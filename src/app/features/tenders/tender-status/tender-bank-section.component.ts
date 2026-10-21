@@ -22,9 +22,9 @@ import { TenderDocCardComponent, TenderDocReplaceRequest, TenderDocViewRequest }
         <div><span class="text-slate-500 block text-[11px] mb-0.5">Transfer Mode</span><span class="font-medium text-slate-900">{{ app().bankDetails.transferMode || 'NEFT / RTGS' }}</span></div>
         <div><span class="text-slate-500 block text-[11px] mb-0.5">Account Type</span><span class="font-medium text-slate-900">{{ app().bankDetails.accountType || '-' }}</span></div>
         <div><span class="text-slate-500 block text-[11px] mb-0.5">Account Holder Name</span><span class="font-medium text-slate-900">{{ app().bankDetails.accountHolderName || '-' }}</span></div>
-        <div><span class="text-slate-500 block text-[11px] mb-0.5">Account Number</span><span class="font-mono text-slate-900 font-medium">{{ app().bankDetails.accountNo || '-' }}</span></div>
-        <div><span class="text-slate-500 block text-[11px] mb-0.5">IFSC Code</span><span class="font-mono text-slate-900 font-medium">{{ app().bankDetails.ifscCode || '-' }}</span></div>
-        <div><span class="text-slate-500 block text-[11px] mb-0.5">MICR Code</span><span class="font-mono text-slate-900">{{ app().bankDetails.micrCode || '-' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">Account Number</span><span class="tabular-nums text-slate-900 font-medium">{{ app().bankDetails.accountNo || '-' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">IFSC Code</span><span class="tabular-nums text-slate-900 font-medium">{{ app().bankDetails.ifscCode || '-' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">MICR Code</span><span class="tabular-nums text-slate-900">{{ app().bankDetails.micrCode || '-' }}</span></div>
         <div class="col-span-2 sm:col-span-4"><span class="text-slate-500 block text-[11px] mb-0.5">Branch Address</span><span class="text-slate-900 leading-relaxed">{{ app().bankDetails.branchAddress || '-' }}</span></div>
       </div>
 

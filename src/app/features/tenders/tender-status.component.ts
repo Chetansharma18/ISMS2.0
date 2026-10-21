@@ -7,12 +7,16 @@ import { FileDoc } from '../registration/models/otr-form.model';
 import {
   ShortfallRequest,
   SubmittedTender,
-  SubmittedTenderDoc
+  SubmittedTenderDoc,
+  TenderAppeal
 } from '../../core/models/tender.model';
 import { ShortfallBridgeService } from '../eoi/services/shortfall-bridge.service';
 import { TenderShortfallSectionComponent } from './tender-status/tender-shortfall-section.component';
 import { ShortfallResponseModalComponent, ShortfallSubmission } from './tender-status/shortfall-response-modal.component';
 import { openShortfalls, withShortfallResponse } from './tender-status/tender-shortfall.util';
+import { TenderAppealSectionComponent } from './tender-status/tender-appeal-section.component';
+import { AppealModalComponent } from './tender-status/appeal-modal.component';
+import { canAppeal } from './tender-status/tender-appeal.util';
 import { DataEngineService } from '../../core/services/data-engine.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { TenderListComponent } from './tender-status/tender-list.component';
@@ -51,7 +55,9 @@ export type { SubmittedTender, SubmittedTenderDoc };
     TenderDocumentsTableComponent,
     TenderStep5EmdComponent,
     TenderShortfallSectionComponent,
-    ShortfallResponseModalComponent
+    TenderAppealSectionComponent,
+    ShortfallResponseModalComponent,
+    AppealModalComponent
   ],
   template: `
     <div class="w-full min-h-full bg-white text-slate-800 font-sans">
@@ -63,6 +69,7 @@ export type { SubmittedTender, SubmittedTenderDoc };
           [(searchQuery)]="searchQuery"
           (open)="openApplicationPage($event)"
           (respond)="startShortfallResponse($event)"
+          (appeal)="startAppeal($event)"
         />
       }
 
@@ -79,6 +86,18 @@ export type { SubmittedTender, SubmittedTenderDoc };
             (cancel)="cancelEditing()"
             (print)="printApplication()"
           />
+
+          @if (canAppealSelected()) {
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-900" role="alert">
+              <p class="m-0 text-[13px] leading-snug">
+                <strong class="font-semibold">Rejected:</strong>
+                {{ selectedTender()!.rejectionReason || 'Technical qualification criteria not met.' }}
+              </p>
+              <button appButton size="sm" type="button" (click)="startAppeal(selectedTender()!)" class="shrink-0">
+                Appeal
+              </button>
+            </div>
+          }
 
           @if (pendingNoticeCount() > 0) {
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900" role="alert">
@@ -138,10 +157,20 @@ export type { SubmittedTender, SubmittedTenderDoc };
               (respond)="openShortfallModal(selectedTender()!, $event)"
               (viewDoc)="onViewDoc($event)"
             />
+
+            <!-- The appeal against a rejection -->
+            <app-tender-appeal-section [app]="selectedTender()!" (viewDoc)="onViewDoc($event)" />
           </div>
 
         </div>
       }
+
+      <app-appeal-modal
+        [isOpen]="!!appealingTender()"
+        [tender]="appealingTender()"
+        (submitted)="submitAppeal($event)"
+        (close)="appealingTender.set(null)"
+      />
 
       <app-shortfall-response-modal
         [isOpen]="!!respondingRequest()"
@@ -179,6 +208,15 @@ export class TenderStatusComponent {
   readonly pendingNoticeCount = computed(() => {
     const tender = this.selectedTender();
     return tender ? openShortfalls(tender).length : 0;
+  });
+
+  /** The rejected application whose appeal form is open. */
+  readonly appealingTender = signal<SubmittedTender | null>(null);
+
+  /** The open application is rejected and has not been appealed yet. */
+  readonly canAppealSelected = computed(() => {
+    const tender = this.selectedTender();
+    return !!tender && canAppeal(tender);
   });
 
   constructor() {
@@ -230,7 +268,7 @@ export class TenderStatusComponent {
     this.editableTender.editCount = newEditCount;
 
     // Keep the latest revert requests and replies: the edit copy was taken before any reply was sent.
-    const updated = { ...this.editableTender, shortfalls: this.selectedTender()!.shortfalls };
+    const updated = { ...this.editableTender, shortfalls: this.selectedTender()!.shortfalls, appeal: this.selectedTender()!.appeal };
 
     // Update in reactive signal list, then persist through the data layer
     this.tenders.update(list => list.map(t => t.id === updated.id ? updated : t));
@@ -253,6 +291,25 @@ export class TenderStatusComponent {
 
   printApplication(): void {
     window.print();
+  }
+
+  // ---- Appeal against a rejection ------------------------------------------
+
+  startAppeal(tender: SubmittedTender): void {
+    if (canAppeal(tender)) this.appealingTender.set(tender);
+  }
+
+  submitAppeal(appeal: TenderAppeal): void {
+    const tender = this.appealingTender();
+    if (!tender || !canAppeal(tender)) return;
+
+    const updated: SubmittedTender = { ...tender, appeal };
+    this.tenders.update(list => list.map(t => (t.id === updated.id ? updated : t)));
+    if (this.selectedTender()?.id === updated.id) this.selectedTender.set(updated);
+    this.tenderRepo.update(updated.id, { appeal }).subscribe();
+
+    this.appealingTender.set(null);
+    this.notify.success('Your appeal has been submitted.');
   }
 
   // ---- Revert (shortfall) requests -----------------------------------------

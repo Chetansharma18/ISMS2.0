@@ -43,7 +43,7 @@ import { ButtonComponent, InputDirective, ModalComponent } from '../../../../sha
 
     <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
       <span class="text-[11px] text-slate-500 block">Current Attached File:</span>
-      <span class="font-mono font-medium text-slate-800 text-xs block mt-0.5 truncate">{{ doc().fileName }}</span>
+      <span class="tabular-nums font-medium text-slate-800 text-xs block mt-0.5 truncate">{{ doc().fileName }}</span>
       <span class="text-[10.5px] text-slate-400 block">{{ doc().fileSize }} • {{ doc().uploadedAt || 'Verified' }}</span>
     </div>
   </div>

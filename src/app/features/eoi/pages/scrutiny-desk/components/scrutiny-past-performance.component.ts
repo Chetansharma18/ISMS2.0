@@ -63,7 +63,7 @@ function percent(part: number, whole: number): number {
 
         <ng-template #schemeTemplate let-row>
           <span class="block font-medium text-slate-900 text-[12.5px]">{{ row.schemeName }}</span>
-          <span class="block text-[11px] text-slate-500 font-mono">{{ row.eoiRefNo }}</span>
+          <span class="block text-[11px] text-slate-500 tabular-nums">{{ row.eoiRefNo }}</span>
         </ng-template>
 
         <ng-template #yearTemplate let-row>

@@ -36,7 +36,7 @@ import { TableColumn, TableComponent } from '../../../../shared';
       </ng-template>
 
       <ng-template #codeTemplate let-hostel>
-        <span class="font-mono font-bold text-slate-700">
+        <span class="tabular-nums font-bold text-slate-700">
           {{ hostel.hostelCode || hostel.code || 'HST-JP-001' }}
         </span>
       </ng-template>

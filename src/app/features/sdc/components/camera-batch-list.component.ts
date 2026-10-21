@@ -71,7 +71,7 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
             <div class="font-normal text-slate-800 text-[13px] leading-snug">
               {{ item.batchName }}
             </div>
-            <div class="text-[11.5px] text-slate-500 mt-0.5 font-mono">
+            <div class="text-[11.5px] text-slate-500 mt-0.5 tabular-nums">
               Code: {{ item.batchCode }}
             </div>
           </div>
@@ -82,7 +82,7 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
             <div class="font-normal text-slate-800 text-[13px] leading-snug">
               {{ item.sdcName }}
             </div>
-            <div class="text-[11.5px] text-slate-500 mt-0.5 font-mono">
+            <div class="text-[11.5px] text-slate-500 mt-0.5 tabular-nums">
               TP: {{ item.tpName }}
             </div>
           </div>
@@ -268,7 +268,7 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
             @if (recordingStates()[feed.id]) {
               <div class="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-red-500/30 text-white text-xs shadow-lg animate-in slide-in-from-bottom-2 z-30">
                 <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                <span class="font-mono font-semibold tracking-wider">REC</span>
+                <span class="tabular-nums font-semibold tracking-wider">REC</span>
               </div>
             }
 

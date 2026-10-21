@@ -34,11 +34,11 @@ import { SchemeFormState } from '../../scheme-form.state';
         </div>
         <div>
           <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">PAN</span>
-          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ state.editableStep3.pan || '-' }}</span>
+          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep3.pan || '-' }}</span>
         </div>
         <div>
           <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Mobile No.</span>
-          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ state.editableStep3.mobileNo || '-' }}</span>
+          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep3.mobileNo || '-' }}</span>
         </div>
         <div>
           <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Email</span>
@@ -46,7 +46,7 @@ import { SchemeFormState } from '../../scheme-form.state';
         </div>
         <div>
           <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Aadhaar No.</span>
-          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ state.editableStep3.aadhaarNo || '-' }}</span>
+          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep3.aadhaarNo || '-' }}</span>
         </div>
         @if (state.editableStep3.state) {
           <div>

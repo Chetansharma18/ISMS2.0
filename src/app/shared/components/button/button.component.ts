@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, booleanAttribute, computed, inject, input } from '@angular/core';
+import { IconComponent } from '../icon/icon.component';
 
 /**
  * What the button is for:
@@ -29,6 +30,7 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
   selector: 'button[appButton], a[appButton]',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [IconComponent],
   host: {
     '[class]': 'classes()',
     '[attr.type]': 'nativeType()',
@@ -38,10 +40,7 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
   },
   template: `
     @if (loading()) {
-      <svg class="animate-spin h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-      </svg>
+      <app-icon name="spinner" [stroke]="2.5" class="animate-spin" />
     }
     <ng-content />
   `

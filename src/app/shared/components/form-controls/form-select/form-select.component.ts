@@ -4,19 +4,26 @@ import {
   Output,
   EventEmitter,
   signal,
-  computed,
   ElementRef,
   HostListener,
   ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { IconComponent } from '../../icon/icon.component';
+
+/** One choice of a select: the value it stores and the text it shows. */
+export interface SelectItem {
+  value: string;
+  label: string;
+  disabled?: boolean;
+}
 
 @Component({
   selector: 'app-form-select',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, IconComponent],
   template: `
     <div class="w-full flex flex-col relative">
       <!-- Label Row -->
@@ -51,18 +58,15 @@ import { FormsModule } from '@angular/forms';
         [attr.aria-expanded]="isOpen()"
       >
         <span [class.text-muted]="!value" [class.text-primary]="!!value" class="truncate">
-          {{ value || placeholder }}
+          {{ selectedLabel() || placeholder }}
         </span>
 
-        <svg
-          class="w-4 h-4 text-muted transition-transform duration-200 shrink-0 ml-2"
+        <app-icon
+          name="chevron-down"
+          [stroke]="2"
+          class="text-muted transition-transform duration-200 ml-2"
           [class.rotate-180]="isOpen()"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
+        />
       </button>
 
       <!-- Dropdown Popup Menu with Outside-Click Detector -->
@@ -86,23 +90,24 @@ import { FormsModule } from '@angular/forms';
 
           <!-- Options List -->
           <ul class="max-h-56 overflow-y-auto py-1 divide-y divide-border/40 text-[13px]">
-            @for (opt of filteredOptions(); track opt) {
+            @for (opt of filteredEntries(); track opt.value) {
               <li
                 (click)="selectOption(opt)"
                 class="px-3 py-2 cursor-pointer transition-colors flex items-center justify-between"
-                [class.bg-primary-light]="opt === value"
-                [class.text-brand]="opt === value"
-                [class.font-medium]="opt === value"
-                [class.hover:bg-surface-muted]="opt !== value"
-                [class.text-primary]="opt !== value"
+                [class.bg-primary-light]="opt.value === value"
+                [class.text-brand]="opt.value === value"
+                [class.font-medium]="opt.value === value"
+                [class.hover:bg-surface-muted]="opt.value !== value && !opt.disabled"
+                [class.text-primary]="opt.value !== value"
+                [class.opacity-50]="opt.disabled"
+                [class.cursor-not-allowed]="opt.disabled"
                 role="option"
-                [attr.aria-selected]="opt === value"
+                [attr.aria-selected]="opt.value === value"
+                [attr.aria-disabled]="opt.disabled ? true : null"
               >
-                <span class="truncate">{{ opt }}</span>
-                @if (opt === value) {
-                  <svg class="w-4 h-4 text-brand shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                  </svg>
+                <span class="truncate">{{ opt.label }}</span>
+                @if (opt.value === value) {
+                  <app-icon name="check" [stroke]="2" class="text-brand" />
                 }
               </li>
             } @empty {
@@ -117,9 +122,7 @@ import { FormsModule } from '@angular/forms';
       <!-- Inline Error Message -->
       @if (error) {
         <div class="form-error-text text-rose-600 font-medium mt-0.5 flex items-center gap-1 leading-tight animate-fade-in" style="font-size: 11px !important; line-height: 14px !important;">
-          <svg class="shrink-0" style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-          </svg>
+          <app-icon name="error" size="xs" [stroke]="2.5" />
           <span style="font-size: 11px !important; line-height: 14px !important;">{{ error }}</span>
         </div>
       }
@@ -149,7 +152,10 @@ export class FormSelectComponent {
 
   @Input() label: string = '';
   @Input() value: string = '';
+  /** Plain options: the text is both what is shown and the value. */
   @Input() options: string[] = [];
+  /** Options whose shown text differs from the value; used instead of `options` when given. */
+  @Input() items?: SelectItem[];
   @Input() placeholder: string = 'Please select';
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;
@@ -163,18 +169,26 @@ export class FormSelectComponent {
 
   constructor(private elementRef: ElementRef) { }
 
-  shouldShowSearch(): boolean {
-    return (this.options?.length || 0) > 6;
+  /** Every option as value and shown text. */
+  protected entries(): SelectItem[] {
+    return this.items ?? (this.options || []).map(option => ({ value: option, label: option }));
   }
 
-  filteredOptions = computed(() => {
-    const list = this.options || [];
-    if (!this.searchQuery.trim()) {
-      return list;
-    }
-    const q = this.searchQuery.toLowerCase();
-    return list.filter(item => item.toLowerCase().includes(q));
-  });
+  shouldShowSearch(): boolean {
+    return this.entries().length > 6;
+  }
+
+  /** The shown text of the chosen option (the value itself when the list has no such option). */
+  selectedLabel(): string {
+    if (!this.value) return '';
+    return this.entries().find(entry => entry.value === this.value)?.label ?? this.value;
+  }
+
+  filteredEntries(): SelectItem[] {
+    const list = this.entries();
+    const q = this.searchQuery.trim().toLowerCase();
+    return q ? list.filter(item => item.label.toLowerCase().includes(q)) : list;
+  }
 
   toggleDropdown(): void {
     if (!this.disabled) {
@@ -183,9 +197,10 @@ export class FormSelectComponent {
     }
   }
 
-  selectOption(option: string): void {
-    this.value = option;
-    this.valueChange.emit(option);
+  selectOption(option: SelectItem): void {
+    if (option.disabled) return;
+    this.value = option.value;
+    this.valueChange.emit(option.value);
     this.isOpen.set(false);
   }
 

@@ -326,7 +326,7 @@ export class UserManagementComponent {
     {
       key: 'userId',
       label: 'User ID',
-      cellClass: 'whitespace-nowrap font-mono text-xs text-slate-700'
+      cellClass: 'whitespace-nowrap tabular-nums text-xs text-slate-700'
     },
     {
       key: 'username',
@@ -336,7 +336,7 @@ export class UserManagementComponent {
     {
       key: 'ssoId',
       label: 'SSO ID',
-      cellClass: 'whitespace-nowrap font-mono text-xs text-slate-700'
+      cellClass: 'whitespace-nowrap tabular-nums text-xs text-slate-700'
     },
     {
       key: 'roleType',

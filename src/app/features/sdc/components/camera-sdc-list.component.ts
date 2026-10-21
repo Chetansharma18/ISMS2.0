@@ -52,7 +52,7 @@ interface SdcMonitoringItem {
             <div class="font-normal text-slate-800 text-[13px] leading-snug">
               {{ item.name }}
             </div>
-            <div class="text-[11.5px] text-slate-500 mt-0.5 font-mono">
+            <div class="text-[11.5px] text-slate-500 mt-0.5 tabular-nums">
               Code: {{ item.code }}
             </div>
           </div>

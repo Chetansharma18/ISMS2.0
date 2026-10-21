@@ -24,7 +24,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
   imports: [ButtonComponent, IconComponent, ActionModalComponent, StepperComponent, SchemeHeaderCardComponent, Step1ProcessingFeeComponent, Step2OtrProfileComponent, Step3UploadDocumentsComponent, Step4CompletePreviewComponent, Step5EmdPaymentComponent, Step6ReceiptsComponent],
   providers: [SchemeFormState],
   template: `
-    <div class="min-h-screen bg-[#FEFEFD] flex flex-col selection:bg-navy selection:text-white font-sans text-slate-800" style="font-family: 'Inter', sans-serif;">
+    <div class="min-h-screen bg-[#FEFEFD] flex flex-col selection:bg-navy selection:text-white font-sans text-slate-800" >
 
       <main class="flex-1 w-full px-4 sm:px-5 lg:px-6 py-4 sm:py-5">
 
@@ -134,7 +134,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
           <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-left text-xs space-y-2.5">
             <div class="flex items-center justify-between pb-2 border-b border-slate-200">
               <span class="text-slate-500 text-[11px] font-medium">Transaction ID</span>
-              <span class="font-mono font-semibold text-slate-800 text-xs">CIN-SBI-9912081</span>
+              <span class="tabular-nums font-semibold text-slate-800 text-xs">CIN-SBI-9912081</span>
             </div>
             <div class="flex items-center justify-between pb-2 border-b border-slate-200">
               <span class="text-slate-500 text-[11px] font-medium">Paid On</span>
@@ -181,11 +181,11 @@ export type { EoiDocumentItem } from './scheme-form.model';
           <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-left text-xs space-y-2.5">
             <div class="flex items-center justify-between gap-3 pb-2 border-b border-slate-200">
               <span class="text-slate-500 text-[11px] font-medium">Payment Reference No.</span>
-              <span class="font-mono font-semibold text-slate-800 text-xs">{{ state.emdPaymentRef() }}</span>
+              <span class="tabular-nums font-semibold text-slate-800 text-xs">{{ state.emdPaymentRef() }}</span>
             </div>
             <div class="flex items-center justify-between gap-3 pt-1">
               <span class="text-slate-500 text-[11px] font-medium">EOI Submission Reference No.</span>
-              <span class="font-mono font-semibold text-navy text-xs select-all">{{ state.eoiApplicationId() }}</span>
+              <span class="tabular-nums font-semibold text-navy text-xs select-all">{{ state.eoiApplicationId() }}</span>
             </div>
           </div>
 

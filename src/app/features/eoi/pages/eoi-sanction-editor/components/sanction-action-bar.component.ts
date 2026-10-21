@@ -41,12 +41,12 @@ import { ButtonComponent, IconComponent, PageHeaderComponent } from '../../../..
             <app-icon name="check" [stroke]="2" class="text-emerald-600" />
             Sanction Order Submitted &amp; Saved Successfully! Redirecting to EOI Responses...
           </span>
-          <span class="text-[11px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">Submitted</span>
+          <span class="text-[11px] tabular-nums bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">Submitted</span>
         </div>
       } @else {
         <div class="p-3 bg-amber-50 border border-amber-200 rounded text-xs text-amber-900 flex items-center justify-between">
           <span>&check; <strong>Live PDF Editor Mode (sanctionorder2.pdf format):</strong> Click any text, date, reference number, allocated target row, or clause below to edit directly before saving or exporting.</span>
-          <span class="text-[11px] font-mono bg-amber-100 text-amber-800 px-2 py-0.5 rounded">RSLDC Official Letterhead Format</span>
+          <span class="text-[11px] tabular-nums bg-amber-100 text-amber-800 px-2 py-0.5 rounded">RSLDC Official Letterhead Format</span>
         </div>
       }
     </div>

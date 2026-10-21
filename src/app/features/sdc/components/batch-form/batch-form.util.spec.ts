@@ -9,8 +9,25 @@ import {
   generateReceiptNumber,
   generateTransactionId,
   toIsoDateOnly,
+  toTimeInput,
   validateBatchDetails
 } from './batch-form.util';
+
+describe('toTimeInput', () => {
+  it('turns saved 12-hour times into the 24-hour value of a time field', () => {
+    expect(toTimeInput('09:00 AM')).toBe('09:00');
+    expect(toTimeInput('5:30 PM')).toBe('17:30');
+    expect(toTimeInput('12:00 AM')).toBe('00:00');
+    expect(toTimeInput('12:15 PM')).toBe('12:15');
+  });
+
+  it('keeps 24-hour times and returns an empty text for anything else', () => {
+    expect(toTimeInput('17:30')).toBe('17:30');
+    expect(toTimeInput('')).toBe('');
+    expect(toTimeInput(undefined)).toBe('');
+    expect(toTimeInput('noon')).toBe('');
+  });
+});
 
 describe('batch-form.util', () => {
   const validBatch = {
@@ -61,6 +78,7 @@ describe('batch-form.util', () => {
 
   it('createFacultyRow defaults to a primary trainer with an empty name', () => {
     expect(createFacultyRow()).toEqual({
+      ssoId: '',
       facultyName: '',
       trainerType: 'Primary Trainer',
       qualification: DEFAULT_QUALIFICATION
@@ -110,7 +128,7 @@ describe('batch-form.util', () => {
     const dto = buildCreateBatchDto(
       ctx,
       fullBatch,
-      [{ facultyName: 'Vikas', trainerType: 'Master Trainer', qualification: 'PhD' }],
+      [{ ssoId: 'FACULTY1', facultyName: 'Vikas', trainerType: 'Master Trainer', qualification: 'PhD' }],
       [{ hostelAddress: 'Plot 1', hostelCode: 'HST-001', type: 'Boys', capacity: 20 }]
     );
     expect(dto.sdcId).toBe('sdc-1');
@@ -123,6 +141,7 @@ describe('batch-form.util', () => {
     expect(dto.remarks).toBe('');
     expect(dto.psdFee).toBe(500);
     expect(dto.faculty?.[0].name).toBe('Vikas');
+    expect(dto.faculty?.[0].ssoId).toBe('FACULTY1');
     expect(dto.faculty?.[0].experienceYears).toBe(5);
     expect(dto.hostels?.[0].address).toBe('Plot 1');
     expect(dto.hostels?.[0].code).toBe('HST-001');

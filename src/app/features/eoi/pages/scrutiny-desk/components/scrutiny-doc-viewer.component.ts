@@ -18,7 +18,7 @@ import type { ActivePreviewDocument } from '../scrutiny-desk.util';
             <div class="flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-slate-500"></span>
               <span class="font-medium text-slate-800">Document Registry Record:</span>
-              <span class="font-mono text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 text-[11px]">
+              <span class="tabular-nums text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 text-[11px]">
                 RECORD &bull; {{ doc()?.refCode }}
               </span>
             </div>
@@ -60,13 +60,13 @@ import type { ActivePreviewDocument } from '../scrutiny-desk.util';
                 <h4 class="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight mt-0.5">
                   {{ doc()?.title }}
                 </h4>
-                <span class="text-[11px] font-mono text-slate-600">Certificate Reference: {{ doc()?.refCode }}</span>
+                <span class="text-[11px] tabular-nums text-slate-600">Certificate Reference: {{ doc()?.refCode }}</span>
               </div>
 
               <!-- Official Attestation Notice -->
               <div class="text-xs text-slate-700 leading-relaxed font-normal space-y-2">
                 <p>
-                  This is to certify that the document titled <strong class="text-slate-900 font-semibold">{{ doc()?.title }}</strong> (Original file: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-800 font-mono text-[11px]">{{ doc()?.fileName }}</code>, File Size: <strong>{{ doc()?.fileSize }}</strong>) has been officially submitted by the applicant for proposal empanelment under the <strong class="text-navy font-semibold">{{ applicant()?.schemeName }}</strong>.
+                  This is to certify that the document titled <strong class="text-slate-900 font-semibold">{{ doc()?.title }}</strong> (Original file: <code class="bg-slate-100 px-1 py-0.5 rounded text-slate-800 tabular-nums text-[11px]">{{ doc()?.fileName }}</code>, File Size: <strong>{{ doc()?.fileSize }}</strong>) has been officially submitted by the applicant for proposal empanelment under the <strong class="text-navy font-semibold">{{ applicant()?.schemeName }}</strong>.
                 </p>
                 <p>
                   The statutory contents, corporate particulars, and authorized credentials have been recorded from official application submission for Departmental Technical Scrutiny.
@@ -85,15 +85,15 @@ import type { ActivePreviewDocument } from '../scrutiny-desk.util';
                   </div>
                   <div>
                     <span class="text-[10.5px] text-slate-500 block uppercase">Registration Number (CIN)</span>
-                    <span class="font-mono text-slate-800 font-semibold text-xs">{{ applicant()?.organisation?.registrationNumber }}</span>
+                    <span class="tabular-nums text-slate-800 font-semibold text-xs">{{ applicant()?.organisation?.registrationNumber }}</span>
                   </div>
                   <div>
                     <span class="text-[10.5px] text-slate-500 block uppercase">Company PAN</span>
-                    <span class="font-mono text-slate-800 font-semibold text-xs">{{ applicant()?.organisation?.panNumber }}</span>
+                    <span class="tabular-nums text-slate-800 font-semibold text-xs">{{ applicant()?.organisation?.panNumber }}</span>
                   </div>
                   <div>
                     <span class="text-[10.5px] text-slate-500 block uppercase">GSTIN Identification</span>
-                    <span class="font-mono text-slate-800 font-semibold text-xs">{{ applicant()?.organisation?.gstin }}</span>
+                    <span class="tabular-nums text-slate-800 font-semibold text-xs">{{ applicant()?.organisation?.gstin }}</span>
                   </div>
                   <div>
                     <span class="text-[10.5px] text-slate-500 block uppercase">Date &amp; State of Registration</span>
@@ -142,12 +142,12 @@ import type { ActivePreviewDocument } from '../scrutiny-desk.util';
                   </div>
                   <div class="font-bold text-slate-900 text-xs">Competent Authority / Scrutiny Officer</div>
                   <div class="text-[11px] text-slate-500">Rajasthan Skill and Livelihoods Development Corporation</div>
-                  <div class="text-[10px] text-slate-400 font-mono">Certificate Ref: {{ doc()?.refCode }}</div>
+                  <div class="text-[10px] text-slate-400 tabular-nums">Certificate Ref: {{ doc()?.refCode }}</div>
                 </div>
               </div>
 
               <!-- Watermark Notice -->
-              <div class="text-center pt-2 text-[10px] text-slate-400 uppercase tracking-widest font-mono">
+              <div class="text-center pt-2 text-[10px] text-slate-400 uppercase tracking-widest tabular-nums">
                 &bull; Official Government Document Record &bull; For Technical Scrutiny &bull;
               </div>
 

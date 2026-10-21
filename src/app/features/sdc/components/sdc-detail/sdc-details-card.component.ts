@@ -18,7 +18,7 @@ import { SdcPhotoGalleryComponent } from './sdc-photo-gallery.component';
           <span class="w-2 h-2 rounded-full bg-primary"></span>
           <span>Registered Center Details & Infrastructure</span>
         </h3>
-        <span class="text-xs text-slate-500 font-mono">{{ center.sdcCode }}</span>
+        <span class="text-xs text-slate-500 tabular-nums">{{ center.sdcCode }}</span>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
@@ -89,7 +89,7 @@ import { SdcPhotoGalleryComponent } from './sdc-photo-gallery.component';
 
         <div>
           <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Pin Code</span>
-          <span class="font-mono font-medium text-slate-800 text-[13px] mt-0.5 block">{{ center.pincode }}</span>
+          <span class="tabular-nums font-medium text-slate-800 text-[13px] mt-0.5 block">{{ center.pincode }}</span>
         </div>
 
         <!-- Row 5: Total TP Trained (1) + Total TP Placed (1) + Hostel Category (2) -->
@@ -111,12 +111,12 @@ import { SdcPhotoGalleryComponent } from './sdc-photo-gallery.component';
         <!-- Row 6: Latitude (1) + Longitude (1) + Remarks (2) -->
         <div>
           <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Latitude</span>
-          <span class="font-mono text-slate-800 text-[13px] mt-0.5 block">{{ center.latitude }}</span>
+          <span class="tabular-nums text-slate-800 text-[13px] mt-0.5 block">{{ center.latitude }}</span>
         </div>
 
         <div>
           <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Longitude</span>
-          <span class="font-mono text-slate-800 text-[13px] mt-0.5 block">{{ center.longitude }}</span>
+          <span class="tabular-nums text-slate-800 text-[13px] mt-0.5 block">{{ center.longitude }}</span>
         </div>
 
         <div class="sm:col-span-2">

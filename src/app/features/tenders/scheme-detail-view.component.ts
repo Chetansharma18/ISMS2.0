@@ -23,7 +23,7 @@ import { RequiredDocumentsListComponent } from './scheme-detail-view/required-do
     RequiredDocumentsListComponent
   ],
   template: `
-    <div class="w-full bg-white text-slate-800 font-sans p-4 sm:p-6 lg:p-8 animate-in fade-in duration-200" style="font-family: 'Inter', sans-serif;">
+    <div class="w-full bg-white text-slate-800 font-sans p-4 sm:p-6 lg:p-8 animate-in fade-in duration-200" >
 
       <!-- 1. TOP CONTROLS & NAVIGATION BAR -->
       <app-scheme-detail-toolbar

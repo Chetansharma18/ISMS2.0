@@ -64,7 +64,7 @@ import { canEditTender } from './tender-status.util';
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-6 gap-y-4 text-xs">
         <div>
           <span class="text-[11.5px] text-slate-500 block leading-tight">EOI Reference No.</span>
-          <span class="text-[12.5px] font-medium text-slate-900 block mt-1 break-all font-mono">{{ tender().appRef }}</span>
+          <span class="text-[12.5px] font-medium text-slate-900 block mt-1 break-all tabular-nums">{{ tender().appRef }}</span>
         </div>
         <div>
           <span class="text-[11.5px] text-slate-500 block leading-tight">Scheme</span>

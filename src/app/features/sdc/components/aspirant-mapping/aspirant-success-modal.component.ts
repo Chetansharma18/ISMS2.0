@@ -9,8 +9,8 @@ import { ButtonComponent, ModalComponent } from '../../../../shared';
   imports: [ButtonComponent, ModalComponent],
   template: `
     <app-modal
-      title="Aspirant Mapped Successfully!"
-      [subtitle]="'Enrolled into Batch ' + batchCode()"
+      [title]="replacedName() ? 'Replacement Registered' : 'Aspirant Mapped Successfully!'"
+      [subtitle]="replacedName() ? 'Takes the seat of ' + replacedName() + ' in Batch ' + batchCode() : 'Enrolled into Batch ' + batchCode()"
       size="sm"
       [showClose]="false"
       [closeOnBackdrop]="false"
@@ -19,7 +19,7 @@ import { ButtonComponent, ModalComponent } from '../../../../shared';
           <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2 text-xs">
             <div class="flex items-center justify-between">
               <span class="text-slate-500">Aspirant ID:</span>
-              <span class="font-mono font-bold text-slate-900">{{ aspirantId() }}</span>
+              <span class="tabular-nums font-bold text-slate-900">{{ aspirantId() }}</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-slate-500">Candidate Name:</span>
@@ -27,7 +27,7 @@ import { ButtonComponent, ModalComponent } from '../../../../shared';
             </div>
             <div class="flex items-center justify-between">
               <span class="text-slate-500">Aadhaar (Masked):</span>
-              <span class="font-mono text-slate-700">XXXX-XXXX-{{ aadhaarNo().slice(-4) || '9812' }}</span>
+              <span class="tabular-nums text-slate-700">XXXX-XXXX-{{ aadhaarNo().slice(-4) || '9812' }}</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-slate-500">Batch Code:</span>
@@ -42,14 +42,16 @@ import { ButtonComponent, ModalComponent } from '../../../../shared';
         </div>
 
         <ng-container modalFooter>
-          <button
-            appButton
-            variant="outline"
-            type="button"
-            (click)="mapAnother.emit()"
-          >
-            Map Another
-          </button>
+          @if (!replacedName()) {
+            <button
+              appButton
+              variant="outline"
+              type="button"
+              (click)="mapAnother.emit()"
+            >
+              Map Another
+            </button>
+          }
 
           <button
             appButton
@@ -77,6 +79,8 @@ export class AspirantSuccessModalComponent {
   readonly aspirantId = input.required<string>();
   readonly aspirantName = input.required<string>();
   readonly aadhaarNo = input.required<string>();
+  /** Name of the dropped student this registration replaces; empty for a normal registration. */
+  readonly replacedName = input<string>('');
 
   readonly mapAnother = output<void>();
   readonly batchList = output<void>();

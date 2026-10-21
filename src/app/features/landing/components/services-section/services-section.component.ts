@@ -50,7 +50,7 @@ import { IconComponent } from '../../../../shared';
             
             <!-- Heading & Short Orange Underline -->
             <div class="mb-4 sm:mb-5">
-              <h2 id="mobile-app-heading" class="font-['Inter',sans-serif] text-[28px] sm:text-[32px] lg:text-[36px] font-bold leading-[1.2] text-[#12365A] tracking-tight m-0">
+              <h2 id="mobile-app-heading" class="font-sans text-[28px] sm:text-[32px] lg:text-[36px] font-bold leading-[1.2] text-[#12365A] tracking-tight m-0">
                 ISMS <span class="text-[#F28C28]">2.0</span> Mobile Application
               </h2>
 
@@ -59,7 +59,7 @@ import { IconComponent } from '../../../../shared';
             </div>
 
             <!-- Existing Description: Exact text preserved, Inter 16px/15px, Left-aligned, Line-height 1.6, Color #344256 -->
-            <p class="font-['Inter',sans-serif] text-[15px] sm:text-[16px] font-normal leading-[1.6] text-[#344256] max-w-155 m-0 mb-6 sm:mb-7 text-left">
+            <p class="font-sans text-[15px] sm:text-[16px] font-normal leading-[1.6] text-[#344256] max-w-155 m-0 mb-6 sm:mb-7 text-left">
               An integrated, multilingual mobile application providing instantaneous access to scheme notifications, biometric attendance, training center verifications, and grievances.
             </p>
 
@@ -71,17 +71,17 @@ import { IconComponent } from '../../../../shared';
                 <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-[#EEF5FB] flex items-center justify-center text-[#12365A] shrink-0">
                   <app-icon name="stakeholders" size="lg" [stroke]="1.8" class="text-[#12365A]" />
                 </div>
-                <span class="font-['Inter',sans-serif] text-[14px] sm:text-[14.5px] font-semibold text-[#12365A] leading-snug">
+                <span class="font-sans text-[14px] sm:text-[14.5px] font-semibold text-[#12365A] leading-snug">
                   For Multiple Stakeholders
                 </span>
               </div>
 
               <!-- Feature 2: In English & Hindi -->
               <div class="flex items-center gap-3 bg-white/95 border border-[#123B5D]/10 rounded-[10px] px-3.5 py-2.5 shadow-[0_2px_8px_rgba(18,54,90,0.04)]">
-                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-[#EEF5FB] flex items-center justify-center text-[#12365A] shrink-0 font-bold text-[13px] font-['Inter',sans-serif]">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-[#EEF5FB] flex items-center justify-center text-[#12365A] shrink-0 font-bold text-[13px] font-sans">
                   A / अ
                 </div>
-                <span class="font-['Inter',sans-serif] text-[14px] sm:text-[14.5px] font-semibold text-[#12365A] leading-snug">
+                <span class="font-sans text-[14px] sm:text-[14.5px] font-semibold text-[#12365A] leading-snug">
                   In English &amp; Hindi
                 </span>
               </div>
@@ -91,7 +91,7 @@ import { IconComponent } from '../../../../shared';
                 <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-[#EEF5FB] flex items-center justify-center text-[#12365A] shrink-0">
                   <app-icon name="shield-tick" size="lg" [stroke]="1.8" class="text-[#12365A]" />
                 </div>
-                <span class="font-['Inter',sans-serif] text-[14px] sm:text-[14.5px] font-semibold text-[#12365A] leading-snug">
+                <span class="font-sans text-[14px] sm:text-[14.5px] font-semibold text-[#12365A] leading-snug">
                   Secure &amp; Role Based Access
                 </span>
               </div>
@@ -104,31 +104,31 @@ import { IconComponent } from '../../../../shared';
                 
                 <!-- Stat 1: 1K+ Downloads -->
                 <div class="px-1.5 sm:px-4 flex flex-col items-center justify-center">
-                  <div class="font-['Inter',sans-serif] text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#12365A] leading-none tabular-nums tracking-tight">
+                  <div class="font-sans text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#12365A] leading-none tabular-nums tracking-tight">
                     1K+
                   </div>
-                  <div class="font-['Inter',sans-serif] text-[11px] sm:text-[14px] lg:text-[15px] font-normal text-[#52647A] mt-1.5 sm:mt-2">
+                  <div class="font-sans text-[11px] sm:text-[14px] lg:text-[15px] font-normal text-[#52647A] mt-1.5 sm:mt-2">
                     Downloads
                   </div>
                 </div>
 
                 <!-- Stat 2: 4.8 User Rating (with Orange Star) -->
                 <div class="px-1.5 sm:px-4 flex flex-col items-center justify-center">
-                  <div class="font-['Inter',sans-serif] text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#12365A] leading-none tabular-nums tracking-tight flex items-center justify-center gap-0.5 sm:gap-1">
+                  <div class="font-sans text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#12365A] leading-none tabular-nums tracking-tight flex items-center justify-center gap-0.5 sm:gap-1">
                     <span>4.8</span>
                     <span class="text-[#F28C28] text-[16px] sm:text-[22px] lg:text-[26px] leading-none -mt-0.5" aria-hidden="true">★</span>
                   </div>
-                  <div class="font-['Inter',sans-serif] text-[11px] sm:text-[14px] lg:text-[15px] font-normal text-[#52647A] mt-1.5 sm:mt-2">
+                  <div class="font-sans text-[11px] sm:text-[14px] lg:text-[15px] font-normal text-[#52647A] mt-1.5 sm:mt-2">
                     User Rating
                   </div>
                 </div>
 
                 <!-- Stat 3: 200+ Active Users -->
                 <div class="px-1.5 sm:px-4 flex flex-col items-center justify-center">
-                  <div class="font-['Inter',sans-serif] text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#12365A] leading-none tabular-nums tracking-tight">
+                  <div class="font-sans text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#12365A] leading-none tabular-nums tracking-tight">
                     200+
                   </div>
-                  <div class="font-['Inter',sans-serif] text-[11px] sm:text-[14px] lg:text-[15px] font-normal text-[#52647A] mt-1.5 sm:mt-2">
+                  <div class="font-sans text-[11px] sm:text-[14px] lg:text-[15px] font-normal text-[#52647A] mt-1.5 sm:mt-2">
                     Active Users
                   </div>
                 </div>

@@ -25,8 +25,8 @@ interface IpaSchemeRow {
   imports: [ListPageComponent, ButtonComponent],
   template: `
     <app-list-page
-      title="IPA"
-      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'IPA' }]"
+      title="In-Principal Approval (IPA)"
+      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'In-Principal Approval (IPA)' }]"
       searchPlaceholder="Search Scheme, Ref No., Category..."
       [(searchQuery)]="searchQuery"
       [columns]="schemeColumns"
@@ -38,7 +38,7 @@ interface IpaSchemeRow {
 
     <ng-template #schemeTitleTemplate let-row>
       <div class="font-normal text-slate-800 text-[13px] leading-snug">{{ row.schemeTitle }}</div>
-      <div class="text-[11px] font-mono text-muted mt-0.5">Ref: {{ row.refNo }}</div>
+      <div class="text-[11px] tabular-nums text-muted mt-0.5">Ref: {{ row.refNo }}</div>
     </ng-template>
 
     <ng-template #actionTemplate let-row>

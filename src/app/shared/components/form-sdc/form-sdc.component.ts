@@ -13,8 +13,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../button/button.component';
 import { IconComponent } from '../icon/icon.component';
-import { DropdownComponent, DropdownItem } from '../dropdown/dropdown.component';
+import type { DropdownItem } from '../dropdown/dropdown.component';
 import { InputDirective } from '../form-controls/input/input.directive';
+import { FormInputComponent } from '../form-controls/form-input/form-input.component';
+import { FormSelectComponent } from '../form-controls/form-select/form-select.component';
 import { ModalComponent } from '../modal/modal.component';
 import { SwitchComponent } from '../switch/switch.component';
 import {
@@ -47,9 +49,9 @@ import {
 @Component({
   selector: 'app-form-sdc, app-dynamic-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonComponent, IconComponent, DropdownComponent, InputDirective, ModalComponent, SwitchComponent],
+  imports: [CommonModule, FormsModule, ButtonComponent, IconComponent, InputDirective, ModalComponent, SwitchComponent, FormInputComponent, FormSelectComponent],
   template: `
-    <div class="space-y-4 font-sans text-slate-800" style="font-family: 'Inter', sans-serif;">
+    <div class="space-y-4 font-sans text-slate-800" >
       
       <!-- Optional Form Header -->
       @if (title || subtitle) {
@@ -322,12 +324,15 @@ import {
           
           <!-- Divider / Heading Type -->
           @if (field.type === 'heading') {
-            <div class="pt-2 pb-0.5 border-b border-slate-100 col-span-full">
-              <h4 class="text-[11px] font-bold text-slate-800 tracking-wider uppercase m-0">
-                {{ getFieldLabel(field) }}
-              </h4>
+            <div class="pt-2 pb-1.5 border-b border-slate-200/80 col-span-full">
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-3.5 bg-navy rounded-xs inline-block"></span>
+                <h4 class="font-bold m-0" style="font-size: 13.5px !important; color: #0B3558 !important;">
+                  {{ headingText(field) }}
+                </h4>
+              </div>
               @if (field.hint) {
-                <p class="text-[10px] text-slate-500 mt-0.5 m-0">{{ field.hint }}</p>
+                <p class="text-[11px] text-slate-500 mt-0.5 m-0">{{ field.hint }}</p>
               }
             </div>
           } @else if (field.type === 'divider') {
@@ -388,42 +393,52 @@ import {
             <ng-container *ngTemplateOutlet="field.template; context: { $implicit: field, model: model, value: getValue(field.key) }"></ng-container>
           } @else {
 
-            <!-- STANDARD FORM INPUT LABEL ROW -->
-            <div class="flex items-center justify-between gap-1">
-              <label [for]="'input-' + field.key" class="block text-xs font-medium text-slate-700 leading-tight select-none truncate">
-                {{ getFieldLabel(field) }}
-                @if (field.required) {
-                  <span class="text-rose-500 font-bold ml-0.5">*</span>
-                }
-              </label>
-
-              @if (field.showCharCount && field.maxLength) {
-                <span class="text-[10px] font-mono text-slate-400">
-                  {{ (getValue(field.key) || '').length }}/{{ field.maxLength }}
-                </span>
-              }
-            </div>
-
-            <!-- SELECT DROPDOWN (CUSTOM DOM-ANCHORED TO PREVENT DETACHMENT ON SCROLL) -->
+            <!-- Text-like fields and selects are the shared form controls (label, box, error and hint come with them),
+                 so every form of the portal looks the same. -->
             @if (field.type === 'select') {
-              <div class="relative w-full" (click)="$event.stopPropagation()">
-                <app-dropdown
-                  overlay
-                  [inputId]="'input-' + field.key"
-                  [options]="getDropdownOptions(field)"
-                  [value]="getSelectValue(field)"
-                  [placeholder]="getFieldPlaceholder(field) || 'Select an option'"
-                  [searchable]="(field.options || []).length > 6"
-                  emptyText="No matching options found"
-                  [disabled]="isFieldDisabled(field)"
-                  [invalid]="!!getFieldError(field.key)"
-                  (valueChange)="onSelectChange(field, $event)"
-                />
+              <app-form-select
+                [label]="getFieldLabel(field)"
+                [required]="!!field.required"
+                [items]="getDropdownOptions(field)"
+                [value]="getSelectValue(field)"
+                [placeholder]="getFieldPlaceholder(field) || 'Select an option'"
+                [disabled]="isFieldDisabled(field)"
+                [hint]="field.hint"
+                [error]="getFieldError(field.key)"
+                (valueChange)="onSelectChange(field, $event)"
+              ></app-form-select>
+            } @else if (usesFormInput(field)) {
+              <app-form-input
+                [label]="getFieldLabel(field)"
+                [required]="!!field.required"
+                [type]="inputType(field)"
+                [value]="textValue(field)"
+                [placeholder]="getFieldPlaceholder(field) || ''"
+                [disabled]="isFieldDisabled(field)"
+                [readonly]="!!field.readonly"
+                [uppercase]="!!field.uppercase"
+                [maxLength]="field.maxLength"
+                [prefixText]="field.prefixText"
+                [suffixText]="field.suffixText"
+                [showCharCount]="!!field.showCharCount"
+                [hint]="field.hint"
+                [error]="getFieldError(field.key)"
+                (valueChange)="onTextInput(field, $event)"
+              ></app-form-input>
+            } @else {
+              <!-- Label row of the remaining kinds of field (they have no shared control) -->
+              <div class="flex items-center justify-between gap-1">
+                <label [for]="'input-' + field.key" class="block text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#1F2933] select-none">
+                  {{ getFieldLabel(field) }}
+                  @if (field.required) {
+                    <span class="text-rose-600 font-bold ml-0.5">*</span>
+                  }
+                </label>
               </div>
             }
 
             <!-- TEXTAREA -->
-            @else if (field.type === 'textarea') {
+            @if (field.type === 'textarea') {
               <textarea
                 appInput
                 [id]="'input-' + field.key"
@@ -728,64 +743,19 @@ import {
               </div>
             }
 
-            <!-- STANDARD NATIVE INPUT (38px HEIGHT) -->
-            @else {
-              <div
-                class="h-[38px] flex items-center border rounded-lg bg-white transition-all overflow-hidden hover:border-slate-400"
-                [ngClass]="{
-                  'border-red-500 bg-red-50/20 focus-within:border-red-600 focus-within:ring-2 focus-within:ring-red-100': !!getFieldError(field.key),
-                  'border-slate-300 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-100': !getFieldError(field.key),
-                  'bg-slate-50 cursor-not-allowed border-slate-200': isFieldDisabled(field)
-                }"
-              >
-                <!-- Prefix Tag -->
-                @if (field.prefixText) {
-                  <span class="inline-flex items-center h-full px-2.5 bg-slate-50 border-r border-slate-200 text-xs font-medium text-slate-500 select-none shrink-0">
-                    {{ field.prefixText }}
-                  </span>
-                }
-
-                <!-- Native Input -->
-                <input
-                  appInput
-                  variant="plain"
-                  [id]="'input-' + field.key"
-                  [type]="field.type || 'text'"
-                  [value]="getValue(field.key)"
-                  (input)="onNativeInput(field, $event)"
-                  (change)="onNativeInput(field, $event)"
-                  [placeholder]="getFieldPlaceholder(field) || ''"
-                  [disabled]="isFieldDisabled(field)"
-                  [readonly]="field.readonly"
-                  [attr.min]="field.min != null ? field.min : null"
-                  [attr.max]="field.max != null ? field.max : null"
-                  [attr.step]="field.step != null ? field.step : null"
-                  [attr.maxlength]="field.maxLength || null"
-                  class="flex-1 w-full h-full placeholder:normal-case"
-                  [class.uppercase]="field.uppercase"
-                  [class.cursor-not-allowed]="isFieldDisabled(field)"
-                />
-
-                <!-- Suffix Tag -->
-                @if (field.suffixText) {
-                  <span class="inline-flex items-center h-full px-2.5 bg-slate-50 border-l border-slate-200 text-xs font-medium text-slate-500 select-none shrink-0">
-                    {{ field.suffixText }}
-                  </span>
-                }
-              </div>
-            }
-
-            <!-- Validation Error Alert -->
-            @if (getFieldError(field.key)) {
-              <div class="form-error-text text-rose-600 font-medium flex items-center gap-1 mt-0.5 m-0 leading-tight" style="font-size: 11px !important; line-height: 14px !important;">
-                <app-icon name="error-circle" solid size="auto" class="w-3 h-3 text-rose-600" />
-                <span style="font-size: 11px !important; line-height: 14px !important;">{{ getFieldError(field.key) }}</span>
-              </div>
-            } @else if (field.hint) {
-              <!-- Field Help Hint -->
-              <p class="text-[11px] text-slate-400 mt-0.5 leading-tight m-0">
-                {{ field.hint }}
-              </p>
+            <!-- Validation error and hint of the fields that have no shared control (the shared controls show their own) -->
+            @if (!usesFormControl(field)) {
+              @if (getFieldError(field.key)) {
+                <div class="form-error-text text-rose-600 font-medium flex items-center gap-1 mt-0.5 m-0 leading-tight" style="font-size: 11px !important; line-height: 14px !important;">
+                  <app-icon name="error-circle" solid size="auto" class="w-3 h-3 text-rose-600" />
+                  <span style="font-size: 11px !important; line-height: 14px !important;">{{ getFieldError(field.key) }}</span>
+                </div>
+              } @else if (field.hint) {
+                <!-- Field Help Hint -->
+                <p class="text-[11px] text-slate-400 mt-0.5 leading-tight m-0">
+                  {{ field.hint }}
+                </p>
+              }
             }
 
           }
@@ -942,6 +912,46 @@ export class FormSdcComponent {
   /** Evaluates disabled state of an action */
   isActionDisabled(action: FormActionConfig): boolean {
     return isActionDisabledFor(action, this.model);
+  }
+
+  /** A section heading in normal case ("Identity Details") even when the config wrote it in capitals. */
+  headingText(field: FormFieldConfig): string {
+    return this.getFieldLabel(field)
+      .toLowerCase()
+      .replace(/(^|[\s(/-])([a-z])/g, (_match, lead: string, letter: string) => lead + letter.toUpperCase());
+  }
+
+  /** Text-like fields (text, number, e-mail, date, time ...) are drawn with the shared form input. */
+  usesFormInput(field: FormFieldConfig): boolean {
+    return !field.type || ['text', 'number', 'email', 'password', 'tel', 'date', 'time', 'datetime-local'].includes(field.type);
+  }
+
+  /** Fields drawn with a shared control, which brings its own label, error and hint. */
+  usesFormControl(field: FormFieldConfig): boolean {
+    return field.type === 'select' || this.usesFormInput(field);
+  }
+
+  /** Type of the shared form input for a field. */
+  inputType(field: FormFieldConfig): 'text' | 'email' | 'date' | 'time' | 'number' | 'tel' | 'password' {
+    const type = field.type === 'datetime-local' ? 'text' : field.type;
+    return (type ?? 'text') as 'text' | 'email' | 'date' | 'time' | 'number' | 'tel' | 'password';
+  }
+
+  /** Current value of a text-like field as the text the input shows. */
+  textValue(field: FormFieldConfig): string {
+    const value = this.getValue(field.key);
+    return value === undefined || value === null ? '' : String(value);
+  }
+
+  /** Stores what was typed in a shared form input (numbers are stored as numbers). */
+  onTextInput(field: FormFieldConfig, text: string): void {
+    let value: any = text;
+    if (field.type === 'number') {
+      value = text === '' ? null : Number(text);
+    } else if (field.maxLength && text.length > field.maxLength) {
+      value = text.slice(0, field.maxLength);
+    }
+    this.setValue(field.key, value, field);
   }
 
   /** Handles text/number native input events */

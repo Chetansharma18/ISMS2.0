@@ -95,7 +95,7 @@ export const MOCK_ASPIRANTS: MockAspirantItem[] = resolveMock([
 ]);
 
 
-export const INITIAL_ASPIRANTS: AspirantRecord[] = resolveMock([
+const BASE_ASPIRANTS: AspirantRecord[] = resolveMock([
     {
       id: 'ASP-RJ-2026-98412',
       aadhaarNo: '789456123012',
@@ -752,3 +752,35 @@ export const INITIAL_ASPIRANTS: AspirantRecord[] = resolveMock([
       attendancePercent: 100
     }
 ]);
+
+/**
+ * More aspirants of the approved sample batch B-26-0001 (it has 28 registered), built from the first one, so the
+ * attendance screens have a full roster. The names are neutral placeholders.
+ */
+function demoAspirants(template: AspirantRecord, count: number): AspirantRecord[] {
+  return Array.from({ length: count }, (_, i) => {
+    const n = i + 1;
+    const aadhaarNo = `99991000${String(n).padStart(4, '0')}`;
+    const name = `Aspirant ${n + 40}`;
+    return {
+      ...template,
+      id: `ASP-RJ-2026-97${String(n).padStart(3, '0')}`,
+      aadhaarNo,
+      confirmAadhaarNo: aadhaarNo,
+      aadhaarMasked: `XXXX-XXXX-${aadhaarNo.slice(-4)}`,
+      aspirantName: name,
+      gender: n % 3 === 0 ? 'Female' : 'Male',
+      relationName: `Guardian of ${name}`,
+      mobileNo: `900001${String(n).padStart(4, '0')}`,
+      email: `aspirant${n + 40}@example.com`,
+      bankAccountName: name,
+      candidatePhotoName: `${name.replace(/\s+/g, '_')}.jpg`,
+      documents: template.documents.map(doc => ({ ...doc })),
+      enrollmentDate: '2026-09-02',
+      attendancePercent: 90
+    };
+  });
+}
+
+export const INITIAL_ASPIRANTS: AspirantRecord[] =
+  BASE_ASPIRANTS.length > 0 ? [...BASE_ASPIRANTS, ...demoAspirants(BASE_ASPIRANTS[0], 25)] : BASE_ASPIRANTS;

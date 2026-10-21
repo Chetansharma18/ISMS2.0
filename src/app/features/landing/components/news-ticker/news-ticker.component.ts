@@ -89,7 +89,7 @@ export interface AnnouncementItem {
                     {{ item.date }}
                   </span>
                   <!-- Announcement Text (Hindi / English - explicitly pure white) -->
-                  <span class="ticker-text font-normal text-[12.5px] sm:text-[13.5px] lg:text-[14.5px] text-white font-['Noto_Sans_Devanagari','Inter',sans-serif] whitespace-nowrap group-hover:text-[#F28C28] group-hover:underline">
+                  <span class="ticker-text font-normal text-[12.5px] sm:text-[13.5px] lg:text-[14.5px] text-white font-sans whitespace-nowrap group-hover:text-[#F28C28] group-hover:underline">
                     {{ item.text }}
                   </span>
                 </a>
@@ -112,7 +112,7 @@ export interface AnnouncementItem {
                     {{ item.date }}
                   </span>
                   <!-- Announcement Text -->
-                  <span class="ticker-text font-normal text-[12.5px] sm:text-[13.5px] lg:text-[14.5px] text-white font-['Noto_Sans_Devanagari','Inter',sans-serif] whitespace-nowrap group-hover:text-[#F28C28] group-hover:underline">
+                  <span class="ticker-text font-normal text-[12.5px] sm:text-[13.5px] lg:text-[14.5px] text-white font-sans whitespace-nowrap group-hover:text-[#F28C28] group-hover:underline">
                     {{ item.text }}
                   </span>
                 </a>

@@ -317,7 +317,7 @@ src/
     │   ├── templates/                   # page-shell, list-page, document-page, section-card
     │   ├── components/
     │   │   ├── button/                  # appButton (attribute component on <button> / <a>)
-    │   │   ├── icon/                    # app-icon + icons.ts, icons.extra-*.ts (outline), icons.solid*.ts (filled)
+    │   │   ├── icon/                    # app-icon + icons.lucide.ts (generated from tools/icons.map.json), icons.solid*.ts (filled)
     │   │   ├── form-controls/           # input/ (appInput directive) + app-form-input / select / textarea / file-upload / section
     │   │   ├── dropdown/                # app-dropdown: single, multi, search, "Other", "Select all"
     │   │   ├── filter-tabs/             # app-filter-tabs: the one row of status filter buttons
@@ -718,6 +718,7 @@ If `useMockData: false`, all mock data is turned off globally. Set `useMockData:
 - Use token classes (`bg-primary`, `text-brand`). Brand-blue **text** is `text-brand`; the legacy `.text-primary` class resolves to dark text.
 - Do not use `!important` helper classes; they override every `hover:` and `disabled:` variant.
 - Hide scrollbars with the `no-scrollbar` utility.
+- **One font.** The portal uses Inter everywhere (with Noto Sans Devanagari for Hindi), declared once as `--font-sans` in `src/styles.css`. Screens never choose a family: no `font-mono`, `font-serif`, `font-['...']` or `font-family:` (the guard rejects them; `--font-mono` points to the same font as a safety net). Hierarchy comes from size and weight only: page title, section title, body and caption sizes (`--font-size-*`, `text-*`), `font-medium` / `font-semibold`, and `tabular-nums` for IDs, reference numbers and amounts. **Print output is left as it was and must not be changed:** the printed official letters (sanction order, IPA, MoU) keep `font-serif` (the guard allows it only in `LETTER_PATHS` of `tools/ui-guard.mjs`), and the receipt print windows and PDF services keep their own fonts.
 
 ### Testing
 - Run `npx ng test --no-watch`. Specs sit beside the code they test.
@@ -749,7 +750,7 @@ field again. The look of the whole portal is changed in one place: `src/styles.c
 | Icon | `<app-icon name="eye" size="sm" />` (sizes `xs sm md lg xl 2xl 3xl auto`, `[stroke]`; `auto` fills the box you give it with classes) | `shared/components/icon` |
 | Text field, native select, text area | `<input appInput>`, `<select appInput>`, `<textarea appInput>` (`size="sm"`, `variant="plain\|underline"`, `[invalid]`) | `shared/components/form-controls/input` |
 | Row of status / category filter buttons | `<app-filter-tabs [options]="[{ id, label, count }]" [(value)]>`; add `stretch` for equal widths | `shared/components/filter-tabs` |
-| Labelled field with error text | `<app-form-input>`, `<app-form-select>`, `<app-form-textarea>` | `shared/components/form-controls` |
+| Labelled field with error text (registration / EOI / SDC form look) | `<app-form-input>`, `<app-form-select>`, `<app-form-textarea>`, `<app-form-file-upload>`, `<app-form-photos>` (several photos, minimum count), grouped with `<app-form-section title="...">` in a 12-column grid | `shared/components/form-controls` |
 | Dropdown (single, multi, search, "Other", "Select all") | `<app-dropdown [options] [(value)]>` or `<app-dropdown multiple [(values)]>` | `shared/components/dropdown` |
 | On/off switch | `<app-switch [checked] (toggled)>` | `shared/components/switch` |
 | Dim layer behind a popup | `<app-backdrop>` | `shared/components/backdrop` |
@@ -800,10 +801,21 @@ A master screen is a config object. Copy `features/admin-master/designation-mast
 `<app-master-crud-page [config]="config" />`. The page, search, table, View / Edit / Active toggle and the add / edit dialog all come from `MasterCrudPageComponent`. Field types: `text`, `number`, `textarea`, `select`, `multiselect` (an `app-dropdown`), `permissions`.
 Only a master with unusual cells or a combobox (Doc Master, Permission Management) is written by hand; it still uses the same page header, table, switch and action cell, so it looks identical.
 
-### Adding an icon
-1. Copy the `<path d="...">` data from the template or SVG that you want; never retype path data.
-2. Outline icons go into the extras file of the area (`icons.extra-core / eoi / sdc / tenders / misc / builder.ts`). Filled icons and brand marks go into `icons.solid.ts` (or `icons.solid-core / a1 / features.ts`) and are used with `<app-icon name="..." solid />`.
-3. Each area has its own file so that two people never edit the same one. The name types (`IconName`, `SolidIconName`) are derived from the files, so a missing name is a compile error.
+### Icons (Lucide)
+All outline icons come from [Lucide](https://lucide.dev) (ISC license), so every icon has the same drawing style. The app keeps its own short names, and `tools/icons.map.json` connects them:
+
+```json
+{ "close": "x", "edit": "square-pen", "trash": "trash" }
+```
+
+1. Find the icon: `npm run icons:find -- calendar` lists Lucide icons by name or tag (or browse lucide.dev/icons).
+2. Add one line to `tools/icons.map.json`: `"my-name": "lucide-name"` (keep it sorted).
+3. Run `npm run icons:build`. It writes `src/app/shared/components/icon/icons.lucide.ts` (generated: do not edit it; `npm run verify` and CI fail when it differs from the map).
+4. Use `<app-icon name="my-name" />`. The name type (`IconName`) comes from the generated file, so a wrong name is a compile error.
+
+`lucide-static` is a dev dependency used only by the generator; no icon library ships in the app bundle, only the paths that are in the map.
+Filled icons and brand marks (play, pause, the PDF badge, logos) are a separate set: `icons.solid*.ts`, used with `<app-icon name="..." solid />`.
+Raw `<svg>` is allowed only in the icon renderer (`shared/components/icon/`) and the progress ring; the guard rejects it in every other kit component and screen.
 
 ### The page title bar
 `app-page-header` draws the title, an optional back button, the search box (`[searchable]`) and a slot for buttons and filters. Pages differ only in what they put into that slot. A page that needs a filter dropdown puts an `<select appInput size="sm">` in the slot; a page that needs a different search box does not exist.
@@ -876,6 +888,7 @@ so the rules are enforced at five points, from the first keystroke to the merge:
 |---|---|
 | `raw-button`, `raw-table`, `raw-input`, `raw-select`, `raw-textarea`, `raw-svg`, `raw-overlay` | A hand-written element where a kit component exists |
 | `raw-icon-font` | `<i class="fa ...">` instead of `<app-icon>` |
+| `raw-font` | `font-mono`, `font-serif`, `font-['...']` or a `font-family:` declaration: the portal has one font (Inter) |
 | `button-style` | `appButton` with its own colour, border, padding or radius classes |
 | `header-search`, `header-button-size` | A hand-made search box in the title bar, or a title-bar button that is not `size="sm"` |
 | `page-frame` | A routed screen that is not inside `app-page-shell`, `app-list-page`, `app-document-page` or `app-master-crud-page` |
@@ -899,5 +912,7 @@ npm run new:page -- list <feature>/<name> "Title"   # new screen from the kit (a
 npm run check:ui                                    # UI rules only (about a second)
 npm run verify                                      # UI rules + AI-rules check + type check + unit tests
 npm run sync:ai                                     # copy AGENTS.md to the AI tools' files
+npm run icons:find -- <word>                        # search the Lucide icons
+npm run icons:build                                 # regenerate icons.lucide.ts after editing tools/icons.map.json
 npm run check:ui:update                             # record a lower baseline after migrating a screen
 ```

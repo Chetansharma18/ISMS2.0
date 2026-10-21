@@ -32,7 +32,7 @@ interface SchemeCard {
             <span class="text-xs font-bold text-navy uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full border border-blue-200/70">
               State & Central Flagship Programmes
             </span>
-            <h2 class="landing-section-title text-2xl sm:text-3xl lg:text-[32px] font-bold text-navy mt-2 tracking-tight font-sans" style="font-family: var(--font-family-base, 'Inter', sans-serif);">
+            <h2 class="landing-section-title text-2xl sm:text-3xl lg:text-[32px] font-bold text-navy mt-2 tracking-tight font-sans" >
               Active Government Schemes
             </h2>
             <p class="landing-body-text text-base sm:text-lg text-slate-500 mt-1 max-w-2xl text-left">
@@ -53,7 +53,7 @@ interface SchemeCard {
               <div class="p-6">
                 <!-- Status Badge & Code -->
                 <div class="flex items-center justify-between gap-2 mb-3">
-                  <span class="font-mono text-[11px] font-bold text-slate-400">
+                  <span class="tabular-nums text-[11px] font-bold text-slate-400">
                     {{ scheme.code }}
                   </span>
                   <span class="text-[11px] font-bold px-2 py-0.5 rounded {{ scheme.statusColor }}">

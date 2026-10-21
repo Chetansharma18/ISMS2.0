@@ -812,7 +812,7 @@ interface FormBuilderFormData {
                         <h4 class="text-xs sm:text-sm font-bold text-navy uppercase tracking-wide m-0">
                           1. COMPANY PARTICULARS &amp; REGISTRATION DETAILS
                         </h4>
-                        <span class="text-xs text-slate-500 font-mono font-semibold">
+                        <span class="text-xs text-slate-500 tabular-nums font-semibold">
                           CIN: {{ previewFormValues['eoi-otr-4'] || 'U80302RJ2022NPL079811' }}
                         </span>
                       </div>
@@ -835,7 +835,7 @@ interface FormBuilderFormData {
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">REGISTRATION NUMBER (CIN)</label>
-                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-4']" class="w-full font-mono" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-4']" class="w-full tabular-nums" />
                         </div>
 
                         <div>
@@ -850,7 +850,7 @@ interface FormBuilderFormData {
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">COMPANY PAN</label>
-                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-7']" class="w-full font-mono font-bold" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-7']" class="w-full tabular-nums font-bold" />
                         </div>
 
                         <div>
@@ -863,7 +863,7 @@ interface FormBuilderFormData {
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">GSTIN</label>
-                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-9']" class="w-full font-mono" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-9']" class="w-full tabular-nums" />
                         </div>
 
                         <div>
@@ -876,7 +876,7 @@ interface FormBuilderFormData {
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">UDYAM REGISTRATION NO.</label>
-                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-11']" class="w-full font-mono" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-11']" class="w-full tabular-nums" />
                         </div>
 
                         <div>
@@ -890,7 +890,7 @@ interface FormBuilderFormData {
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">COMPANY CONTACT NO.</label>
-                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-13']" class="w-full font-mono" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-13']" class="w-full tabular-nums" />
                         </div>
 
                         <div>
@@ -978,7 +978,7 @@ interface FormBuilderFormData {
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">OFFICIAL MOBILE NO.</label>
-                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-22']" class="w-full font-mono" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-22']" class="w-full tabular-nums" />
                         </div>
 
                         <div>
@@ -988,12 +988,12 @@ interface FormBuilderFormData {
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">PAN</label>
-                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-24']" class="w-full font-mono" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-24']" class="w-full tabular-nums" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">AADHAAR NUMBER</label>
-                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-25']" class="w-full font-mono" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-25']" class="w-full tabular-nums" />
                         </div>
 
                         <div>
@@ -1050,7 +1050,7 @@ interface FormBuilderFormData {
                         <h4 class="text-xs sm:text-sm font-bold text-navy uppercase tracking-wide m-0">
                           3. BANK ACCOUNT DETAILS
                         </h4>
-                        <span class="text-xs text-slate-500 font-mono font-semibold">
+                        <span class="text-xs text-slate-500 tabular-nums font-semibold">
                           IFSC: {{ previewFormValues['eoi-otr-34'] || 'SBIN0001234' }}
                         </span>
                       </div>
@@ -1081,12 +1081,12 @@ interface FormBuilderFormData {
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">ACCOUNT NUMBER</label>
-                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-33']" class="w-full font-mono font-bold" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-33']" class="w-full tabular-nums font-bold" />
                         </div>
 
                         <div>
                           <label class="text-slate-600 block text-[10.5px] uppercase font-bold mb-1">IFSC CODE</label>
-                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-34']" class="w-full font-mono font-bold" />
+                          <input appInput size="sm" type="text" [(ngModel)]="previewFormValues['eoi-otr-34']" class="w-full tabular-nums font-bold" />
                         </div>
 
                         <div>
@@ -1561,7 +1561,7 @@ interface FormBuilderFormData {
                       placeholder="e.g. SSO_1008"
                       [(ngModel)]="previewFormValues['du-1']"
                       [invalid]="deptUserSubmitted() && !previewFormValues['du-1']?.trim()"
-                      class="w-full font-mono"
+                      class="w-full tabular-nums"
                     />
                     @if (deptUserSubmitted() && !previewFormValues['du-1']?.trim()) {
                       <div class="text-xs text-red-500 mt-0.5 font-medium">SSO ID is required</div>
@@ -1673,7 +1673,7 @@ interface FormBuilderFormData {
                       maxlength="12"
                       placeholder="12-digit Aadhaar number"
                       [(ngModel)]="previewFormValues['du-8']"
-                      class="w-full font-mono"
+                      class="w-full tabular-nums"
                     />
                   </div>
 

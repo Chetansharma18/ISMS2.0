@@ -30,7 +30,7 @@ import { CenterPhotoItem } from '../../models/sdc.model';
             </div>
             <div class="p-2.5 bg-white border-t border-slate-100 flex items-center justify-between text-xs">
               <span class="font-semibold text-slate-800 text-[11.5px] truncate">{{ photo.tag || ('Photo ' + (idx + 1)) }}</span>
-              <span class="text-[10px] text-slate-400 font-mono">{{ photo.size || '' }}</span>
+              <span class="text-[10px] text-slate-400 tabular-nums">{{ photo.size || '' }}</span>
             </div>
           </div>
         }

@@ -8,7 +8,8 @@ import {
   findSchemeById,
   matchesApplicationId,
   mergeStoredResponses,
-  withCompany1UnderScrutiny
+  withCompany1UnderScrutiny,
+  withCompany2SeedDecision
 } from './eoi-state.util';
 
 describe('eoi-state.util', () => {
@@ -19,6 +20,21 @@ describe('eoi-state.util', () => {
     expect(company1.statusDisplay).toBe('Under Review');
     expect(company1.scrutinyDetails).toBeUndefined();
     expect(list.filter(r => r.schemeId === 'MMKVY-01' && r.status === 'APPROVED').length).toBe(1);
+  });
+
+  it('leaves only Company 1 under review in MMKVY-01, also for saved data that still has Company 2 under review', () => {
+    const seed = buildInitialResponses();
+    const saved = seed.map(r => (r.id === 'APP-2024-002' ? { ...r, status: 'UNDER_SCRUTINY' as const, statusDisplay: 'Under Review', scrutinyDetails: undefined } : r));
+    const list = withCompany1UnderScrutiny(withCompany2SeedDecision(saved, seed));
+    const pending = list.filter(r => r.schemeId === 'MMKVY-01' && r.status === 'UNDER_SCRUTINY');
+    expect(pending.map(r => r.anonymousLabel)).toEqual(['Company 1']);
+    expect(list.find(r => r.id === 'APP-2024-002')?.status).toBe('REJECTED');
+  });
+
+  it('keeps a decision already taken on Company 2', () => {
+    const seed = buildInitialResponses();
+    const saved = seed.map(r => (r.id === 'APP-2024-002' ? { ...r, status: 'APPROVED' as const, statusDisplay: 'Approved' } : r));
+    expect(withCompany2SeedDecision(saved, seed).find(r => r.id === 'APP-2024-002')?.status).toBe('APPROVED');
   });
 
   it('mergeStoredResponses overlays stored data and keeps unmatched seed records', () => {

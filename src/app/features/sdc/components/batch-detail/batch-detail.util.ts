@@ -1,4 +1,5 @@
 import { BatchRecord } from '../../models/batch.model';
+import { batchDisplayStatus } from '../../utils/batch-approval.util';
 
 /** Faculty row shown when a batch has no faculty configured. */
 export const DEFAULT_FACULTY: readonly any[] = [
@@ -26,23 +27,11 @@ export const DEFAULT_HOSTELS: readonly any[] = [
   }
 ];
 
-export function isBatchRejected(b: BatchRecord): boolean {
-  if (!b) return false;
-  return b.status === 'REJECTED' || b.approvalStatus === 'REJECTED';
-}
+export { isBatchApproved, isBatchRejected } from '../../utils/batch-approval.util';
 
-export function isBatchApproved(b: BatchRecord): boolean {
-  if (!b) return false;
-  if (b.status === 'REJECTED' || b.approvalStatus === 'REJECTED') return false;
-  const count = b.mappedAspirantsCount ?? b.trainees?.length ?? 0;
-  const max = b.approvedBatchStrength || b.maxStrength || 30;
-  return count >= 25 && count <= max;
-}
-
+/** RETURNED, PENDING, APPROVED or REJECTED. */
 export function formatBatchStatus(b: BatchRecord): string {
-  if (isBatchRejected(b)) return 'REJECTED';
-  if (isBatchApproved(b)) return 'APPROVED';
-  return 'PENDING';
+  return batchDisplayStatus(b);
 }
 
 export function getBatchFacultyList(b: BatchRecord): any[] {

@@ -220,6 +220,13 @@ export const RAJASTHAN_LOCATION_DATA: Record<string, DistrictInfo> = {
   }
 };
 
+/** Hostel categories of a centre (non-residential is not offered). */
+export const HOSTEL_CATEGORY_OPTIONS: string[] = [
+  'Residential (Both Boys & Girls)',
+  'Residential (Boys Only)',
+  'Residential (Girls Only)'
+];
+
 /** Standard TP Recommendation options */
 export const TP_RECOMMENDATION_OPTIONS: string[] = [
   'Recommended for Level-4 Accreditation',
@@ -278,12 +285,7 @@ export function getSdcFormFields(options: SdcFormConfigOptions = {}): FormFieldC
     value: s
   }));
 
-  // Non-Residential removed as requested
-  const hostelCategoryOptions: FormOption[] = [
-    { label: 'Residential (Both Boys & Girls)', value: 'Residential (Both Boys & Girls)' },
-    { label: 'Residential (Boys Only)', value: 'Residential (Boys Only)' },
-    { label: 'Residential (Girls Only)', value: 'Residential (Girls Only)' }
-  ];
+  const hostelCategoryOptions: FormOption[] = HOSTEL_CATEGORY_OPTIONS.map(h => ({ label: h, value: h }));
 
   const assemblyField: FormFieldConfig = {
     key: 'assemblyConstituency',

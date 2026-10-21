@@ -13,21 +13,24 @@ import { ClauseLabelFormat, clauseLabel } from './document-editor.util';
   imports: [FormsModule, ButtonComponent, IconComponent, InputDirective],
   host: { class: 'block' },
   template: `
-    <div class="mt-6 mb-4 font-sans text-xs">
-      <p class="font-bold text-slate-900 mb-2">
+    <div class="mt-6 mb-4" [class]="official() ? 'font-serif text-[13px] sm:text-sm' : 'font-sans text-xs'">
+      <p class="font-bold text-slate-900 mb-2" [class.text-justify]="official()">
         {{ intro() }}
       </p>
       <ol [class]="listClass()">
         @for (clause of clauses(); track i; let i = $index) {
-          <li class="group flex items-start gap-2">
-            <span [class]="labelClass()">{{ label(i) }}</span>
+          <li class="group flex items-start gap-2" [class.pl-8]="isSub(clauses()[i])">
+            @if (label(i)) {
+              <span [class]="labelClass()">{{ label(i) }}</span>
+            }
             <textarea
               appInput
               variant="plain"
               [ngModel]="clauses()[i]"
               (ngModelChange)="setClause(i, $event)"
-              rows="2"
-              class="w-full leading-relaxed resize-y font-serif"
+              [attr.rows]="official() ? 1 : 2"
+              class="w-full leading-relaxed font-serif"
+              [class]="official() ? 'resize-none field-sizing-content text-justify' : 'resize-y'"
             ></textarea>
             <button
               appButton
@@ -61,9 +64,16 @@ export class ClauseListComponent {
   /** Classes of the clause label span. */
   readonly labelClass = input<string>('');
   readonly labelFormat = input<ClauseLabelFormat>('decimal');
+  /** The look of the printed RSLDC letters: serif text, clauses that grow with their text. */
+  readonly official = input<boolean>(false);
 
   readonly add = output<void>();
   readonly remove = output<number>();
+
+  /** Sub-points of a clause ("6.1.", "i.", "Note:") are set in from the left in the official look. */
+  protected isSub(clause: string | undefined): boolean {
+    return this.official() && /^(\d+\.\d+\.|[ivx]+\.\s|Note:)/.test(clause ?? '');
+  }
 
   label(index: number): string {
     return clauseLabel(index, this.labelFormat());

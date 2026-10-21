@@ -13,9 +13,10 @@ export function sumCourseRows(rows: IpaCourseRow[], field: 'approvedTrainees' | 
 }
 
 /** Row added by the "+ Add Course Row" action. */
-export function createNewCourseRow(id: string): IpaCourseRow {
+export function createNewCourseRow(id: string, district = ''): IpaCourseRow {
   return {
     id,
+    district,
     sector: 'Handicraft & Local Resource Based Skills',
     courseName: 'Phad Painting',
     courseCode: 'RSLDC/HRS-001',
@@ -78,8 +79,29 @@ export function createDefaultTargetSummary(): TargetSummaryRow[] {
   ];
 }
 
-/** Default terms and conditions clauses (a to h) matching IPA.pdf. */
+/** Default terms and conditions (a to j), worded exactly as in the printed MMKVY RAJKViK IPA (fresh array on every call). */
 export function createDefaultTerms(): string[] {
+  return [
+    'PIA shall ensure the creation of batches in 15 days of issuance of IPA.',
+    'PIA shall ensure to work in accordance with the MMKVY (RAJKViK) Cat-I scheme guideline issued on 01th April 2021 & other corrigendum and further directions issued by RSLDC time to time.',
+    'The batches on ISMS portal will be approved only after live feed of IP Camera installed at SDC & must ensure proper functioning and monitoring of the IP camera as mentioned in RSLDC Order No. DSEE/RSLDC/MD/2024-25/153 dated 21.10.2024.',
+    'PIA will have to maintain video footage of complete skill training in Lab / classroom from IP camera for each batch until the final settlement of UC Claims.',
+    'PIA shall ensure to Installation of Aadhar Enabled Biometric Attendance System (AEBAS) as per office order no. RSLDC/MIS/AEBAS/2024-25/18796-01 dated 03.12.2024) for marking the attendance of SDCs daily on ISMS Portal.',
+    'PIA shall Submit Performance Security Deposit (PSD) on ISMS on or before batch Commencement.',
+    'The batches on ISMS will be approved only after the Trainer approved in file and mapped to batch is ToT certified.',
+    'PIA shall ensure to provide the dedicated bank account for MMKVY (RAJKViK) Cat-I.',
+    'PIA must ensure compliance of the condition mentioned in MoU & Sanction order & further directions issued by RSLDC time to time.',
+    'PIA shall ensure registration of batch and trainees on SIDH portal simultaneously with batch creation on SSO.'
+  ];
+}
+
+/** True when the terms are the list the draft carried before it followed the printed IPA. */
+export function isLegacyIpaTerms(terms: readonly string[]): boolean {
+  return terms.length > 0 && terms[0] === legacyIpaTerms()[0];
+}
+
+/** Terms before the printed wording was adopted (kept only so saved drafts can be recognised). */
+function legacyIpaTerms(): string[] {
   return [
     'TP shall ensure to initiation of batches within 15 days from the date issuance the IPA.',
     'TP shall ensure to work in accordance with the (MMKVY-Cat-II-SAKSHM) guideline issued on 1st April 2021 and further direction given by RSLDC.',
@@ -92,11 +114,24 @@ export function createDefaultTerms(): string[] {
   ];
 }
 
-/** Default "CC" distribution list. */
+/** Default "CC" distribution list, as in the printed IPA. */
 export function createDefaultCopyTo(): string[] {
   return [
     'CAO, RSLDC',
+    'MIS, RSLDC (Further necessary action)',
     'District Skill Coordinator (RSLDC) (By Mail)',
     'Office Copy'
   ];
+}
+
+/** The minimum-qualification note and box, filled from the first course of the IPA. */
+export function createDefaultQualification(rows: readonly IpaCourseRow[]): { note: string; title: string; text: string } {
+  const course = rows[0];
+  const code = course?.courseCode?.trim();
+  const age = (course?.minAge ?? '').replace(/^Minimum\s*/i, '').trim();
+  return {
+    note: `*The minimum qualification of the trainees need to refer from the Model Curriculum (MC) with name & reference ID${code ? `, ${code}` : ''}. The minimum qualification i.e.`,
+    title: course ? `${course.courseName} (${course.courseCode}) (Minimum Educational Qualification and Experience)` : '(Minimum Educational Qualification and Experience)',
+    text: [course?.minEdu ?? '', age ? `And Minimum Job entry ${age}` : ''].filter(line => line.trim()).join('\n')
+  };
 }

@@ -96,7 +96,7 @@ interface TenderItem {
 
               <!-- Bottom Row: Reference Number & Login Required Indicator -->
               <div class="flex items-center justify-between gap-3 pt-0.5">
-                <p class="text-[11.5px] font-mono text-slate-500 truncate max-w-[62%]" [title]="item.id">
+                <p class="text-[11.5px] tabular-nums text-slate-500 truncate max-w-[62%]" [title]="item.id">
                   {{ item.id }}
                 </p>
                 <span class="text-[11.5px] sm:text-[12px] font-semibold text-[#F28C28] group-hover:text-[#d9771e] shrink-0">

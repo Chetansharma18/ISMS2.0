@@ -32,7 +32,7 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">Registration Number (CIN)</span>
-            <span class="font-mono text-slate-900 font-medium">{{ app.organisation.registrationNumber }}</span>
+            <span class="tabular-nums text-slate-900 font-medium">{{ app.organisation.registrationNumber }}</span>
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">Date of Registration</span>
@@ -44,11 +44,11 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">Company PAN</span>
-            <span class="font-mono text-slate-900 font-medium">{{ app.organisation.panNumber }}</span>
+            <span class="tabular-nums text-slate-900 font-medium">{{ app.organisation.panNumber }}</span>
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">GSTIN</span>
-            <span class="font-mono text-slate-900 font-medium">{{ app.organisation.gstin }}</span>
+            <span class="tabular-nums text-slate-900 font-medium">{{ app.organisation.gstin }}</span>
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">Declared Turnover</span>
@@ -56,7 +56,7 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">Contact No.</span>
-            <span class="font-mono text-slate-900">{{ app.organisation.contactNumber }}</span>
+            <span class="tabular-nums text-slate-900">{{ app.organisation.contactNumber }}</span>
           </div>
           <div class="sm:col-span-2">
             <span class="text-slate-500 block text-[11px] mb-0.5">Email ID</span>
@@ -87,15 +87,15 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">PAN</span>
-            <span class="font-mono text-slate-900 font-medium">{{ app.authorizedSignatory.pan }}</span>
+            <span class="tabular-nums text-slate-900 font-medium">{{ app.authorizedSignatory.pan }}</span>
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">Aadhaar No.</span>
-            <span class="font-mono text-slate-900">{{ app.authorizedSignatory.aadhaarNo }}</span>
+            <span class="tabular-nums text-slate-900">{{ app.authorizedSignatory.aadhaarNo }}</span>
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">Mobile No.</span>
-            <span class="font-mono text-slate-900">{{ app.authorizedSignatory.contactNumber }}</span>
+            <span class="tabular-nums text-slate-900">{{ app.authorizedSignatory.contactNumber }}</span>
           </div>
           <div class="sm:col-span-2">
             <span class="text-slate-500 block text-[11px] mb-0.5">Email Address</span>
@@ -139,11 +139,11 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
             </div>
             <div>
               <span class="text-slate-500 block text-[11px] mb-0.5">Account Number</span>
-              <span class="font-mono text-slate-900 font-medium">{{ bank.accountNumber }}</span>
+              <span class="tabular-nums text-slate-900 font-medium">{{ bank.accountNumber }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11px] mb-0.5">IFSC Code</span>
-              <span class="font-mono text-slate-900 font-medium">{{ bank.ifscCode }}</span>
+              <span class="tabular-nums text-slate-900 font-medium">{{ bank.ifscCode }}</span>
             </div>
           </div>
         </section>

@@ -4,6 +4,7 @@ import { ButtonComponent, IconComponent, ListPageComponent, TableColumn } from '
 import { SubmittedTender } from '../../../core/models/tender.model';
 import { filterTenders } from './tender-status.util';
 import { openShortfalls, shortfallSummary } from './tender-shortfall.util';
+import { canAppeal } from './tender-appeal.util';
 
 @Component({
   selector: 'app-tender-list',
@@ -32,6 +33,7 @@ import { openShortfalls, shortfallSummary } from './tender-shortfall.util';
         eoiStatus: eoiStatusTemplate,
         rejectionReason: rejectionReasonTemplate,
         shortfall: shortfallTemplate,
+        appeal: appealTemplate,
         view: viewTemplate
       }"
     >
@@ -44,7 +46,7 @@ import { openShortfalls, shortfallSummary } from './tender-shortfall.util';
           size="sm"
           type="button"
           (click)="open.emit(tender)"
-          class="font-mono"
+          class="tabular-nums"
           title="Open Application Details Page"
         >
           {{ tender.appRef }}
@@ -128,6 +130,21 @@ import { openShortfalls, shortfallSummary } from './tender-shortfall.util';
         }
       </ng-template>
 
+      <!-- Appeal against a rejection -->
+      <ng-template #appealTemplate let-tender>
+        @if (canAppeal(tender)) {
+          <button appButton variant="secondary" size="sm" type="button" (click)="appeal.emit(tender)" title="Answer the rejection remarks and upload documents">
+            Appeal
+          </button>
+        } @else if (tender.appeal) {
+          <button appButton variant="ghost" size="sm" type="button" (click)="open.emit(tender)" title="View your appeal">
+            Appealed
+          </button>
+        } @else {
+          <span class="text-slate-400 text-[13px]">-</span>
+        }
+      </ng-template>
+
       <!-- Custom View Action Button Template -->
       <ng-template #viewTemplate let-tender>
         <button appButton size="sm" type="button" (click)="open.emit(tender)" title="Open Application Details Page">
@@ -146,6 +163,8 @@ export class TenderListComponent {
   readonly open = output<SubmittedTender>();
   /** The applicant wants to answer an open revert request. */
   readonly respond = output<SubmittedTender>();
+  /** The applicant wants to appeal a rejected application. */
+  readonly appeal = output<SubmittedTender>();
 
   readonly pageSize = 6;
 
@@ -172,8 +191,13 @@ export class TenderListComponent {
     { key: 'eoiStatus',        label: 'EOI Stage',            align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'rejectionReason',  label: 'Remarks', align: 'center', type: 'custom', cellClass: 'min-w-[200px]' },
     { key: 'shortfall',        label: 'Shortfall Request',    align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
+    { key: 'appeal',           label: 'Appeal',               align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
     { key: 'view',             label: 'View',                 align: 'center', width: 'w-20', type: 'custom' }
   ];
+
+  protected canAppeal(tender: SubmittedTender): boolean {
+    return canAppeal(tender);
+  }
 
   protected shortfallState(tender: SubmittedTender): 'open' | 'responded' | 'none' {
     return shortfallSummary(tender);

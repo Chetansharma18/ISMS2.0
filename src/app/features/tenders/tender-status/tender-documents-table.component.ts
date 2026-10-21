@@ -65,7 +65,7 @@ export class TenderDocumentsTableComponent {
     {
       key: 'fileName',
       label: 'Attached File Name',
-      cellClass: 'font-mono text-[11px] text-slate-600',
+      cellClass: 'tabular-nums text-[11px] text-slate-600',
       format: (_value, doc) => `${doc.fileName} (${doc.fileSize})`
     },
     { key: 'action', label: 'Action', align: 'center', type: 'custom' }

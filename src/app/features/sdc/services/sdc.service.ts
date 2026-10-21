@@ -2,12 +2,16 @@ import { INITIAL_SDC_RECORDS } from '../../../core/mock/data/sdc.mock';
 import { Injectable, signal, computed } from '@angular/core';
 import { createPersistedStore } from '../../../core/services/persisted-store';
 import {
+  SdcActivityEntry,
   SdcRecord,
   SdcFormData,
   SdcInspectionData,
   SdcStatus,
+  SdcCenterHead,
+  SdcPsdPayment,
   SCHEME_COURSE_CATALOG
 } from '../models/sdc.model';
+import { DepartmentOfficer, departmentOfficer } from '../utils/department-officer.util';
 
 
 
@@ -39,6 +43,7 @@ function reconcileSdcs(stored: SdcRecord[], seed: readonly SdcRecord[]): SdcReco
         scheme: canonical.scheme,
         sector: canonical.sector,
         status: sdc.status || canonical.status,
+        centerHead: sdc.centerHead !== undefined ? sdc.centerHead : canonical.centerHead,
         centerPhotos: hasPlaceholderPhotos(sdc) ? REAL_CENTER_PHOTOS : (sdc.centerPhotos || REAL_CENTER_PHOTOS)
       };
     }
@@ -47,6 +52,27 @@ function reconcileSdcs(stored: SdcRecord[], seed: readonly SdcRecord[]): SdcReco
 
   const existingIds = new Set(updated.map(p => p.id));
   return [...updated, ...seed.filter(s => !existingIds.has(s.id))];
+}
+
+/** The activity log of an SDC with one more entry (the log is kept oldest first). */
+function withEntry(
+  sdc: SdcRecord,
+  action: SdcActivityEntry['action'],
+  officer: DepartmentOfficer | undefined,
+  text: string,
+  capacity?: number
+): SdcActivityEntry[] {
+  const who = officer ?? departmentOfficer();
+  const entry: SdcActivityEntry = {
+    id: `sdc-act-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    action,
+    actor: who.name,
+    designation: who.designation,
+    at: new Date().toISOString(),
+    text: text.trim(),
+    ...(capacity !== undefined ? { capacity } : {})
+  };
+  return [...(sdc.activityLog ?? []), entry];
 }
 
 @Injectable({
@@ -85,6 +111,42 @@ export class SdcService {
   /** Get SDC by ID */
   getSdcById(id: string): SdcRecord | undefined {
     return this._sdcs().find(s => s.id === id);
+  }
+
+  /**
+   * Gives an approved SDC its Center Head. Only one Center Head can be assigned: returns false when the SDC is
+   * not approved, already has one, or does not exist.
+   */
+  assignCenterHead(id: string, head: Omit<SdcCenterHead, 'assignedAt'>): boolean {
+    const sdc = this.getSdcById(id);
+    if (!sdc || sdc.status !== 'APPROVED' || sdc.centerHead) return false;
+    this.updateSdc(id, { centerHead: { ...head, assignedAt: new Date().toISOString() } });
+    return true;
+  }
+
+  /** Replaces the Center Head of an approved SDC with another person. Returns false when the SDC has none to replace. */
+  changeCenterHead(id: string, head: Omit<SdcCenterHead, 'assignedAt'>): boolean {
+    const sdc = this.getSdcById(id);
+    if (!sdc || sdc.status !== 'APPROVED' || !sdc.centerHead) return false;
+    this.updateSdc(id, { centerHead: { ...head, assignedAt: new Date().toISOString() } });
+    return true;
+  }
+
+  /** Takes the Center Head off the SDC, so another can be assigned. */
+  unassignCenterHead(id: string): boolean {
+    const sdc = this.getSdcById(id);
+    if (!sdc || !sdc.centerHead) return false;
+    // null (not undefined) marks it as taken off on purpose, so the sample data does not bring it back.
+    this.updateSdc(id, { centerHead: null });
+    return true;
+  }
+
+  /** Saves the PSD paid for an SDC. It is taken once, with the first batch; returns false if it was already paid. */
+  recordPsdPayment(id: string, payment: SdcPsdPayment): boolean {
+    const sdc = this.getSdcById(id);
+    if (!sdc || sdc.psdPayment) return false;
+    this.updateSdc(id, { psdPayment: payment });
+    return true;
   }
 
   /** Update an existing SDC record with edited creation details */
@@ -224,7 +286,7 @@ export class SdcService {
   /**
    * STAGE 4: Department Approval
    */
-  approveSdc(id: string, targetCapacity: number, remarks: string): void {
+  approveSdc(id: string, targetCapacity: number, remarks: string, officer?: DepartmentOfficer): void {
     this._sdcs.update(list => {
       const updated: SdcRecord[] = list.map((item): SdcRecord =>
         item.id === id
@@ -235,8 +297,9 @@ export class SdcService {
                 approvedTargetCapacity: targetCapacity,
                 approvalRemarks: remarks,
                 approvedDate: new Date().toISOString().split('T')[0],
-                approvedBy: 'Department Approval Authority, RSLDC'
-              }
+                approvedBy: 'Department, RSLDC'
+              },
+              activityLog: withEntry(item, 'APPROVED', officer, remarks, targetCapacity)
             }
           : item
       );
@@ -248,7 +311,7 @@ export class SdcService {
   /**
    * STAGE 4: Department Rejection
    */
-  rejectSdc(id: string, remarks: string): void {
+  rejectSdc(id: string, remarks: string, officer?: DepartmentOfficer): void {
     this._sdcs.update(list => {
       const updated: SdcRecord[] = list.map((item): SdcRecord =>
         item.id === id
@@ -259,8 +322,9 @@ export class SdcService {
                 approvedTargetCapacity: 0,
                 approvalRemarks: remarks,
                 approvedDate: new Date().toISOString().split('T')[0],
-                approvedBy: 'Department Approval Authority, RSLDC'
-              }
+                approvedBy: 'Department, RSLDC'
+              },
+              activityLog: withEntry(item, 'REJECTED', officer, remarks)
             }
           : item
       );
@@ -272,20 +336,35 @@ export class SdcService {
   /**
    * STAGE 4: Return to TP for corrections
    */
-  returnToTp(id: string, remarks: string): void {
+  returnToTp(id: string, remarks: string, officer?: DepartmentOfficer): void {
     this._sdcs.update(list => {
       const updated: SdcRecord[] = list.map((item): SdcRecord =>
         item.id === id
           ? {
               ...item,
               status: 'RETURNED_TO_TP' as SdcStatus,
-              remarks: `Returned by Department: ${remarks}`
+              remarks: `Returned by Department: ${remarks}`,
+              activityLog: withEntry(item, 'RETURNED', officer, remarks)
             }
           : item
       );
       this.persist(updated);
       return updated;
     });
+  }
+
+  /** A department officer adds a remark to an SDC. The decision stays as it is. Returns false when the SDC is not found. */
+  addRemark(id: string, remark: string, officer?: DepartmentOfficer): boolean {
+    const text = remark.trim();
+    if (!text || !this.getSdcById(id)) return false;
+    this._sdcs.update(list => {
+      const updated: SdcRecord[] = list.map((item): SdcRecord =>
+        item.id === id ? { ...item, activityLog: withEntry(item, 'REMARK_ADDED', officer, text) } : item
+      );
+      this.persist(updated);
+      return updated;
+    });
+    return true;
   }
 
   /**

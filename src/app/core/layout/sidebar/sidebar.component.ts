@@ -114,7 +114,7 @@ import {
         [class.text-text-secondary]="!isActive(item.key)"
         class="flex items-center justify-between px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
       >
-        <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-2.5 min-w-0">
           <app-icon
             [name]="item.icon"
             [stroke]="item.stroke ?? 1.75"
@@ -122,7 +122,7 @@ import {
             [class.text-brand]="isActive(item.key)"
             [class.text-text-muted]="!isActive(item.key)"
           />
-          <span class="tracking-tight" [class.font-medium]="item.bold">{{ item.label }}</span>
+          <span class="tracking-tight min-w-0" [class.font-medium]="item.bold">{{ item.label }}</span>
         </div>
         @if (pending) {
           <span class="px-2 py-0.5 rounded-full text-[11px] leading-tight shrink-0 inline-flex items-center gap-1.5 transition-all select-none bg-amber-50 text-[#C2410C] border border-amber-300 font-semibold shadow-2xs">
@@ -324,6 +324,16 @@ export class SidebarComponent {
     // 8. Aspirants Management
     if (url.startsWith('/aspirants') || url.startsWith('/tp/aspirants')) {
       return 'aspirants-management';
+    }
+
+    // 8a. Attendance
+    if (url.startsWith('/attendance')) {
+      return 'attendance';
+    }
+
+    // 8b. User Management of the training partner
+    if (url.startsWith('/tp/users')) {
+      return 'tp-users';
     }
 
     // 9. Grievance

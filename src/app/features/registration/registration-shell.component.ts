@@ -35,7 +35,7 @@ export interface StepMeta {
     IconComponent
   ],
   template: `
-    <div class="min-h-screen bg-[#FEFEFD] flex flex-col justify-between selection:bg-navy selection:text-white font-sans" style="font-family: 'Inter', sans-serif;">
+    <div class="min-h-screen bg-[#FEFEFD] flex flex-col justify-between selection:bg-navy selection:text-white font-sans" >
 
       <!-- ====================================================================
            Main Content Area
@@ -335,7 +335,7 @@ export interface StepMeta {
         (secondaryAction)="navigateToExistingUserProfile()"
         (close)="navigateToExistingUserProfile()"
       >
-        <p class="text-xs sm:text-sm text-slate-600 mt-2 mb-0 font-mono">
+        <p class="text-xs sm:text-sm text-slate-600 mt-2 mb-0 tabular-nums">
           USER ID: <span class="font-bold text-navy">{{ submittedRegId() }}</span>
         </p>
       </app-action-modal>

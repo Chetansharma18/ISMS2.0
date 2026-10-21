@@ -11,7 +11,7 @@ import { ButtonComponent, IconComponent, PageHeaderComponent } from '../../../..
   template: `
     <div class="p-4 sm:p-5 print:hidden space-y-4 max-w-6xl mx-auto font-sans">
       <app-page-header
-        title="In-Principle Approval (IPA) Document Editor"
+        title="In-Principal Approval (IPA) Document Editor"
         [breadcrumbs]="[
           { label: 'Home', url: '/' },
           { label: 'Sanction Order', url: '/admin/sanction-orders' },
@@ -37,14 +37,14 @@ import { ButtonComponent, IconComponent, PageHeaderComponent } from '../../../..
         <div class="p-3 bg-emerald-50 border border-emerald-300 rounded text-xs text-emerald-900 flex items-center justify-between animate-fade-in shadow-xs">
           <span class="font-semibold flex items-center gap-1.5">
             <app-icon name="check" [stroke]="2" class="text-emerald-600" />
-            In-Principle Approval (IPA) Saved &amp; Updated Successfully! Redirecting...
+            In-Principal Approval (IPA) Saved &amp; Updated Successfully! Redirecting...
           </span>
-          <span class="text-[11px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">Saved</span>
+          <span class="text-[11px] tabular-nums bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">Saved</span>
         </div>
       } @else {
         <div class="p-3 bg-amber-50 border border-amber-200 rounded text-xs text-amber-900 flex items-center justify-between">
           <span>&check; <strong>Live IPA Editor Mode (IPA.pdf format):</strong> Click any text, date, reference number, course table row, or clause below to edit directly before saving or exporting.</span>
-          <span class="text-[11px] font-mono bg-amber-100 text-amber-800 px-2 py-0.5 rounded">RSLDC Official IPA Format</span>
+          <span class="text-[11px] tabular-nums bg-amber-100 text-amber-800 px-2 py-0.5 rounded">RSLDC Official IPA Format</span>
         </div>
       }
     </div>

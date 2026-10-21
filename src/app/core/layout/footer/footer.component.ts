@@ -70,7 +70,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
   `],
   template: `
     <footer #footerRef 
-      class="relative w-full font-['Inter',sans-serif] bg-[#0c1828] text-slate-300 border-t border-slate-700 select-none overflow-hidden" 
+      class="relative w-full font-sans bg-[#0c1828] text-slate-300 border-t border-slate-700 select-none overflow-hidden" 
       aria-label="Portal Footer">
 
       <!-- Background Image Layer: Rajasthan Forts & Palaces Heritage Silhouette (FOOTER BACKGROUND.png) - Prominently Visible -->
@@ -95,7 +95,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           <!-- Section Heading with Flanking Saffron/Amber Accents -->
           <div class="flex items-center justify-center gap-3 sm:gap-5 mb-7 sm:mb-9">
             <div class="h-px flex-1 max-w-30 bg-linear-to-l from-[#F59E0B] to-transparent"></div>
-            <h2 class="text-xl sm:text-2xl font-bold text-white tracking-wide font-['Inter',sans-serif] m-0 whitespace-nowrap">
+            <h2 class="text-xl sm:text-2xl font-bold text-white tracking-wide font-sans m-0 whitespace-nowrap">
               Other Important Links
             </h2>
             <div class="h-px flex-1 max-w-30 bg-linear-to-r from-[#F59E0B] to-transparent"></div>
@@ -363,17 +363,17 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               </div>
 
               <!-- ISMS 2.0 Brand Wordmark -->
-              <div class="text-[1.75rem] font-black text-white tracking-tight leading-none font-['Inter',sans-serif] mb-1.5">
+              <div class="text-[1.75rem] font-black text-white tracking-tight leading-none font-sans mb-1.5">
                 ISMS <span class="text-[#F59E0B]">2.0</span>
               </div>
 
               <!-- Subtitle -->
-              <div class="text-[0.875rem] font-bold text-white mb-2.5 font-['Inter',sans-serif]">
+              <div class="text-[0.875rem] font-bold text-white mb-2.5 font-sans">
                 Integrated Scheme Management System
               </div>
 
               <!-- Organisation Address / Department Hierarchy -->
-              <div class="text-[0.8125rem] text-slate-300 leading-relaxed font-['Inter',sans-serif]">
+              <div class="text-[0.8125rem] text-slate-300 leading-relaxed font-sans">
                 Rajasthan Skill &amp; Livelihoods Development Corporation<br/>
                 Department of Skill, Employment and Entrepreneurship<br/>
                 Government of Rajasthan
@@ -385,7 +385,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               <div class="flex flex-col items-start text-left w-fit">
                 
                 <!-- Section Heading -->
-                <div class="text-[0.9375rem] font-bold text-white mb-4 tracking-wider uppercase font-['Inter',sans-serif]">
+                <div class="text-[0.9375rem] font-bold text-white mb-4 tracking-wider uppercase font-sans">
                   Important Links
                 </div>
 
@@ -396,7 +396,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                       href="https://rajasthan.gov.in/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="footer-link text-[0.875rem] font-['Inter',sans-serif] cursor-pointer"
+                      class="footer-link text-[0.875rem] font-sans cursor-pointer"
                       aria-label="Rajasthan Government Official Portal (opens in a new tab)">
                       Rajasthan Government
                     </a>
@@ -407,7 +407,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                       href="https://livelihoods.rajasthan.gov.in/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="footer-link text-[0.875rem] font-['Inter',sans-serif] cursor-pointer"
+                      class="footer-link text-[0.875rem] font-sans cursor-pointer"
                       aria-label="RSLDC Official Portal (opens in a new tab)">
                       RSLDC
                     </a>
@@ -458,13 +458,13 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                 <!-- Dynamic Visitor Counter & Last Updated -->
                 <div class="flex flex-row flex-wrap items-center gap-4 mt-8 border-t border-slate-700/50 pt-4 w-fit max-w-full">
                   <div class="flex items-center gap-1.5">
-                    <span class="text-[0.8125rem] text-slate-400 font-['Inter',sans-serif]">Total Visitors:</span>
-                    <span class="text-[0.875rem] text-white font-bold font-['Inter',sans-serif] tabular-nums">042,159</span>
+                    <span class="text-[0.8125rem] text-slate-400 font-sans">Total Visitors:</span>
+                    <span class="text-[0.875rem] text-white font-bold font-sans tabular-nums">042,159</span>
                   </div>
                   <div class="w-1 h-1 rounded-full bg-slate-600 hidden sm:block"></div>
                   <div class="flex items-center gap-1.5">
-                    <span class="text-[0.8125rem] text-slate-400 font-['Inter',sans-serif]">Last Updated:</span>
-                    <span class="text-[0.875rem] text-white font-semibold font-['Inter',sans-serif]">8 Oct 2026</span>
+                    <span class="text-[0.8125rem] text-slate-400 font-sans">Last Updated:</span>
+                    <span class="text-[0.875rem] text-white font-semibold font-sans">8 Oct 2026</span>
                   </div>
                 </div>
 
@@ -474,7 +474,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
             <!-- Column 3: Connect With Us & Helpline -->
             <div class="flex flex-col items-start text-left md:ml-auto w-fit">
               <!-- Connect With Us -->
-              <div class="text-[0.9375rem] font-bold text-white mb-3.5 tracking-wider uppercase font-['Inter',sans-serif]">
+              <div class="text-[0.9375rem] font-bold text-white mb-3.5 tracking-wider uppercase font-sans">
                 Connect With Us
               </div>
 
@@ -522,7 +522,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               </div>
 
               <!-- Helpline Section -->
-              <div class="text-[0.9375rem] font-bold text-white mb-3.5 tracking-wider uppercase font-['Inter',sans-serif]">
+              <div class="text-[0.9375rem] font-bold text-white mb-3.5 tracking-wider uppercase font-sans">
                 Helpline
               </div>
 
@@ -533,7 +533,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                   class="footer-contact flex items-center gap-2.5 cursor-pointer group"
                   aria-label="Call ISMS Helpline">
                   <app-icon name="phone" [stroke]="2" class="text-slate-400 group-hover:text-[#F59E0B] shrink-0 transition-colors" />
-                  <span class="text-[0.875rem] font-semibold font-['Inter',sans-serif]">{{ helplineGlobal.contacts.phone }}</span>
+                  <span class="text-[0.875rem] font-semibold font-sans">{{ helplineGlobal.contacts.phone }}</span>
                 </a>
 
                 <!-- Email -->
@@ -542,7 +542,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                   class="footer-contact flex items-center gap-2.5 cursor-pointer group"
                   aria-label="Email ISMS Support">
                   <app-icon name="mail" [stroke]="2" class="text-slate-400 group-hover:text-[#F59E0B] shrink-0 transition-colors" />
-                  <span class="text-[0.875rem] font-semibold font-['Inter',sans-serif] break-all sm:break-normal">{{ helplineGlobal.contacts.email }}</span>
+                  <span class="text-[0.875rem] font-semibold font-sans break-all sm:break-normal">{{ helplineGlobal.contacts.email }}</span>
                 </a>
               </div>
 
@@ -588,7 +588,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
         <div class="border-t border-slate-700/50 bg-[#070e18]">
           <div class="max-w-360 mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex justify-center items-center">
-              <div class="text-[0.8125rem] text-slate-400 text-center font-['Inter',sans-serif]">
+              <div class="text-[0.8125rem] text-slate-400 text-center font-sans">
                 &copy; 2026 Government of Rajasthan. All rights reserved (ISMS 2.0)
               </div>
             </div>

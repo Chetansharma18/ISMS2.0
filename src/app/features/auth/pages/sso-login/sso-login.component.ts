@@ -127,7 +127,7 @@ import { ButtonComponent, IconComponent, InputDirective } from '../../../../shar
                 <div class="flex items-center gap-3">
                   <!-- Dotted pattern captcha display -->
                   <div
-                    class="px-4 py-2 border border-slate-300 bg-slate-100 rounded-md select-none font-mono text-base sm:text-lg font-black text-slate-800 tracking-[0.25em] flex items-center justify-center min-w-30"
+                    class="px-4 py-2 border border-slate-300 bg-slate-100 rounded-md select-none tabular-nums text-base sm:text-lg font-black text-slate-800 tracking-[0.25em] flex items-center justify-center min-w-30"
                     style="background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 6px 6px;"
                     aria-label="Captcha code"
                   >

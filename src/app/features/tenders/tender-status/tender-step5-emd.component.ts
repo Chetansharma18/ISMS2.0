@@ -56,7 +56,7 @@ export class TenderStep5EmdComponent {
   protected readonly columns: TableColumn<ReceiptRow>[] = [
     { key: 'id', label: '#', align: 'center', width: 'w-10', cellClass: 'font-semibold text-slate-400' },
     { key: 'receipt', label: 'Receipt', cellClass: 'font-medium text-slate-900' },
-    { key: 'reference', label: 'Reference No.', cellClass: 'font-mono text-slate-900' },
+    { key: 'reference', label: 'Reference No.', cellClass: 'tabular-nums text-slate-900' },
     { key: 'amount', label: 'Amount', align: 'right', cellClass: 'whitespace-nowrap' },
     { key: 'date', label: 'Date', cellClass: 'whitespace-nowrap' },
     { key: 'action', label: 'Action', align: 'center', width: 'w-32', type: 'custom' }

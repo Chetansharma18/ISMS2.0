@@ -61,7 +61,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       <!-- Dropdown Popover -->
       @if (isOpen()) {
         <div
-          class="absolute right-0 sm:right-0 top-full mt-2 w-[320px] xs:w-[360px] sm:w-[380px] max-w-[calc(100vw-24px)] bg-white border border-[#DCE4ED] rounded-xl shadow-xl z-[120] overflow-hidden flex flex-col font-['Inter',sans-serif] animate-in fade-in zoom-in-95 duration-150"
+          class="absolute right-0 sm:right-0 top-full mt-2 w-[320px] xs:w-[360px] sm:w-[380px] max-w-[calc(100vw-24px)] bg-white border border-[#DCE4ED] rounded-xl shadow-xl z-[120] overflow-hidden flex flex-col font-sans animate-in fade-in zoom-in-95 duration-150"
           role="dialog"
           aria-label="Notifications"
         >

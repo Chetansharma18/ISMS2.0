@@ -62,7 +62,7 @@ import { OtpInputComponent } from '../../../../shared/components/otp-input/otp-i
               <!-- Left: Resend OTP Option -->
               <div class="text-xs sm:text-[13px] text-[#5F6B76]">
                 @if (timerSeconds() > 0) {
-                  <span>Didn't receive OTP? Resend in <span class="font-mono font-bold text-[#12365A]">00:{{ timerSeconds() < 10 ? '0' + timerSeconds() : timerSeconds() }}</span></span>
+                  <span>Didn't receive OTP? Resend in <span class="tabular-nums font-bold text-[#12365A]">00:{{ timerSeconds() < 10 ? '0' + timerSeconds() : timerSeconds() }}</span></span>
                 } @else {
                   <button
                     appButton

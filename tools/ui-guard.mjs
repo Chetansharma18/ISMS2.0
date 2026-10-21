@@ -10,6 +10,8 @@
  *   raw-input    a text <input> without `appInput`                 -> <input appInput ...>
  *   raw-select   a <select> without `appInput`                     -> <select appInput ...>
  *   raw-textarea a <textarea> without `appInput`                   -> <textarea appInput ...>
+ *   raw-font     font-mono / font-serif / font-['..'] / font-family -> nothing: the portal has one font (Inter).
+ *                Exception: the printed letters (LETTER_PATHS) may use font-serif.
  *   header-search / header-button-size  see HEADER_RULES below (page title bars look identical)
  *   button-style, raw-icon-font          see FILE_RULES below
  *   page-frame   a routed screen outside <app-page-shell> / <app-list-page> / <app-document-page> / <app-master-crud-page>
@@ -58,6 +60,12 @@ const KIT_PREFIXES = [
   'shared/components/toast-outlet/'
 ];
 
+/** The only kit folders that may contain raw <svg>: the icon renderer (the icons are drawn here) and the progress ring (a chart). */
+const SVG_PREFIXES = ['shared/components/icon/', 'shared/components/progress-ring/'];
+
+/** The printed official letters (sanction order, IPA, MoU and the sheet components they use) keep their serif face. */
+const LETTER_PATHS = /(?:document-editor\/|eoi-sanction-editor\/|ipa-editor\/|sanction-order\/|\/mou\/|document-sheet-modal\/|templates\/document-page\/)/;
+
 const RULES = {
   'raw-button': /<button\b(?![^>]*\bappButton\b)/g,
   // A printed-letter table carries `appDocTable`.
@@ -67,7 +75,10 @@ const RULES = {
   // Checkbox, radio, file, hidden and range inputs stay native.
   'raw-input': /<input\b(?![^>]*\bappInput\b)(?![^>]*\btype="(?:checkbox|radio|file|hidden|range)")/g,
   'raw-select': /<select\b(?![^>]*\bappInput\b)/g,
-  'raw-textarea': /<textarea\b(?![^>]*\bappInput\b)/g
+  'raw-textarea': /<textarea\b(?![^>]*\bappInput\b)/g,
+  // One font for the whole portal (Inter, set in styles.css). Screens change size and weight, never the family:
+  // no font-mono / font-serif / font-['...'] classes and no font-family declarations (inherit and the theme variable are fine).
+  'raw-font': /\bfont-(?:mono|serif)\b|font-\[['"]|font-family\s*:(?!\s*(?:inherit|var\(--font-(?:sans|family-base)))/g
 };
 
 /**
@@ -139,13 +150,24 @@ function scan() {
   const routed = routedFiles();
   for (const file of walk(appDir)) {
     const rel = relative(appDir, file).split(sep).join('/');
-    if (KIT_PREFIXES.some(prefix => rel.startsWith(prefix))) continue;
+    const isKit = KIT_PREFIXES.some(prefix => rel.startsWith(prefix));
+    // Inside the kit only the icon renderer and the progress ring may contain <svg>. Every other kit component
+    // (table, stepper, page header, form controls ...) draws its icons with <app-icon>, like a screen does.
+    if (isKit && SVG_PREFIXES.some(prefix => rel.startsWith(prefix))) continue;
     if (rel.includes('/mock/') || rel.startsWith('core/mock/')) continue;
 
     const text = readFileSync(file, 'utf8');
+    if (isKit) {
+      for (const rule of ['raw-svg', 'raw-font']) {
+        const count = (text.match(RULES[rule]) ?? []).filter(hit => !(rule === 'raw-font' && hit === 'font-serif' && LETTER_PATHS.test(rel))).length;
+        if (count > 0) (result[rel] ??= {})[rule] = count;
+      }
+      continue;
+    }
     for (const [rule, pattern] of Object.entries(RULES)) {
       let count = 0;
       for (const match of text.matchAll(pattern)) {
+        if (rule === 'raw-font' && match[0] === 'font-serif' && LETTER_PATHS.test(rel)) continue;
         // An exception is marked on the line above (or the same line).
         const before = text.slice(Math.max(0, match.index - 240), match.index);
         const lastLine = before.split('\n').slice(-5).join('\n');

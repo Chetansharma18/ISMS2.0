@@ -13,14 +13,14 @@ import { ButtonComponent, IconComponent, TableColumn, TableComponent } from '../
   imports: [ButtonComponent, IconComponent, TableComponent],
   template: `
     @let cand = aspirant();
-    <div class="border border-slate-200 rounded-xl p-5 bg-white shadow-2xs space-y-4">
-      <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+    <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-7 space-y-4 font-sans">
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-1.5 border-b border-slate-200/80">
         <div>
-          <h2 class="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wider m-0 flex items-center gap-2">
-            <span class="w-1.5 h-4 bg-primary rounded-full"></span>
-            <span>4. Attached Documents ({{ cand.documents ? cand.documents.length : 0 }})</span>
+          <h2 class="font-bold m-0 flex items-center gap-2" style="font-size: 13.5px !important; color: #0B3558 !important;">
+            <span class="w-1.5 h-3.5 bg-navy rounded-xs inline-block"></span>
+            <span>Attached Documents ({{ cand.documents ? cand.documents.length : 0 }})</span>
           </h2>
-          <p class="text-[11px] text-slate-500 mt-0.5">Manage, preview, edit, replace or upload new documents for this candidate</p>
+          <p class="text-[11px] text-slate-500 mt-0.5 mb-0">Preview, edit, replace or upload documents of this aspirant</p>
         </div>
 
         <!-- Add Document Trigger Button -->
@@ -69,7 +69,7 @@ import { ButtonComponent, IconComponent, TableColumn, TableComponent } from '../
             {{ getDocExtension(doc.fileName) }}
           </span>
           <div class="min-w-0">
-            <span class="font-mono text-xs text-slate-800 block truncate max-w-[200px]" [title]="doc.fileName">
+            <span class="tabular-nums text-xs text-slate-800 block truncate max-w-[200px]" [title]="doc.fileName">
               {{ doc.fileName || 'No file attached' }}
             </span>
             <span class="text-[10.5px] text-slate-400 block font-sans">
@@ -82,13 +82,9 @@ import { ButtonComponent, IconComponent, TableColumn, TableComponent } from '../
       <!-- Template: Status -->
       <ng-template #statusTemplate let-doc>
         @if (doc.status === 'UPLOADED') {
-          <span class="px-2 py-0.5 rounded text-[10.5px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-            Uploaded ✓
-          </span>
+          <span class="whitespace-nowrap font-normal text-[13px] text-emerald-700">Uploaded</span>
         } @else {
-          <span class="px-2 py-0.5 rounded text-[10.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-            Pending
-          </span>
+          <span class="whitespace-nowrap font-normal text-[13px] text-amber-700">Pending</span>
         }
       </ng-template>
 

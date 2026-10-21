@@ -1,12 +1,13 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { IconComponent } from '../../icon/icon.component';
 
 @Component({
   selector: 'app-form-input',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, IconComponent],
   template: `
     <div class="w-full flex flex-col font-sans">
       <!-- Label Row with Required Star, optional infoTooltip, and Character Count -->
@@ -28,7 +29,7 @@ import { FormsModule } from '@angular/forms';
           </label>
 
           @if (showCharCount && maxLength) {
-            <span class="text-[10.5px] font-mono text-[#7A8792]">
+            <span class="text-[10.5px] tabular-nums text-[#7A8792]">
               {{ (value || '').length }}/{{ maxLength }}
             </span>
           }
@@ -82,9 +83,7 @@ import { FormsModule } from '@angular/forms';
       <!-- Error message alert -->
       @if (error) {
         <div class="form-error-text text-rose-600 font-medium mt-0.5 flex items-center gap-1 leading-tight animate-fade-in" style="font-size: 11px !important; line-height: 14px !important;">
-          <svg class="shrink-0" style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-          </svg>
+          <app-icon name="error" size="xs" [stroke]="2.5" />
           <span style="font-size: 11px !important; line-height: 14px !important;">{{ error }}</span>
         </div>
       }
@@ -117,7 +116,7 @@ export class FormInputComponent {
 
   @Input() label: string = '';
   @Input() value: string = '';
-  @Input() type: 'text' | 'email' | 'date' | 'number' | 'tel' | 'password' = 'text';
+  @Input() type: 'text' | 'email' | 'date' | 'time' | 'number' | 'tel' | 'password' = 'text';
   @Input() placeholder: string = '';
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;

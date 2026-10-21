@@ -30,7 +30,7 @@ import { SchemeFormState } from '../../scheme-form.state';
         </div>
         <div>
           <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Registration No.</span>
-          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ state.editableStep1.registrationNumber || '-' }}</span>
+          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep1.registrationNumber || '-' }}</span>
         </div>
         <div>
           <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Date of Registration</span>
@@ -42,7 +42,7 @@ import { SchemeFormState } from '../../scheme-form.state';
         </div>
         <div>
           <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">PAN</span>
-          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ state.editableStep1.companyPan || '-' }}</span>
+          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep1.companyPan || '-' }}</span>
         </div>
         <div>
           <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">GST Registered</span>
@@ -51,7 +51,7 @@ import { SchemeFormState } from '../../scheme-form.state';
         @if (state.editableStep1.gstRegistered === 'Yes' && state.editableStep1.gstin) {
           <div>
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">GSTIN</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ state.editableStep1.gstin }}</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep1.gstin }}</span>
           </div>
         }
         <div>
@@ -61,7 +61,7 @@ import { SchemeFormState } from '../../scheme-form.state';
         @if (state.editableStep1.msmeRegistered === 'Yes' && state.editableStep1.udyamNumber) {
           <div>
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Udyam Registration No.</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ state.editableStep1.udyamNumber }}</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep1.udyamNumber }}</span>
           </div>
         }
         @if (state.editableStep1.preferredSector) {
@@ -78,7 +78,7 @@ import { SchemeFormState } from '../../scheme-form.state';
         }
         <div>
           <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Contact No.</span>
-          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ state.editableStep1.contactNo || '-' }}</span>
+          <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep1.contactNo || '-' }}</span>
         </div>
         <div>
           <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Email</span>

@@ -38,7 +38,7 @@ import { AuthService } from '../../core/auth/auth.service';
 
       <!-- Custom Payment Reference No Template -->
       <ng-template #paymentRefTemplate let-tx>
-        <span class="font-mono text-slate-800 font-normal text-[13px] tracking-tight select-all">
+        <span class="tabular-nums text-slate-800 font-normal text-[13px] tracking-tight select-all">
           {{ tx.paymentRef }}
         </span>
       </ng-template>

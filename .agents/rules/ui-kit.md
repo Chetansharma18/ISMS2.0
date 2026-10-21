@@ -35,7 +35,7 @@ It creates the component from the kit, registers the lazy route in `app.routes.t
 | Need | Use |
 |---|---|
 | Button, link that looks like a button | `<button appButton variant="primary\|outline\|secondary\|danger\|ghost" size="sm\|md\|lg" iconOnly>` |
-| Icon | `<app-icon name="eye" size="sm" />` (filled: `solid`); new icons go into `shared/components/icon/icons*.ts` |
+| Icon | `<app-icon name="eye" size="sm" />` (filled: `solid`). Icons are Lucide: find one with `npm run icons:find -- <word>`, add `"my-name": "lucide-name"` to `tools/icons.map.json`, run `npm run icons:build`. Never paste SVG or path data |
 | Text field, select, text area | `<input appInput>`, `<select appInput>`, `<textarea appInput>` (`size="sm"`, `[invalid]`) |
 | Dropdown with search / multi select | `<app-dropdown [options] [(value)]>` or `<app-dropdown multiple [(values)]>` |
 | On / off | `<app-switch>` |
@@ -51,8 +51,9 @@ The full list, recipes and examples are in `PROJECT_ARCHITECTURE_AND_WORKFLOW_GU
 
 ## Do not
 
-- Write `<button>`, `<table>`, `<input>`, `<select>`, `<textarea>`, `<svg>`, `<i class="fa ...">` or a `fixed inset-0` overlay in a screen.
+- Write `<button>`, `<table>`, `<input>`, `<select>`, `<textarea>`, `<svg>`, `<i class="fa ...">` or a `fixed inset-0` overlay in a screen or a kit component (only the icon renderer and the progress ring may contain `<svg>`).
 - Put colour, border, padding or radius classes on `appButton` or `appInput` (`bg-`, `border`, `px-`, `py-`, `rounded`, `text-<colour>`). Use `variant` / `size`.
+- Set a font family (`font-mono`, `font-serif`, `font-['...']`, `font-family:`). The whole portal uses one font, Inter (set once in `styles.css`). Change only size and weight: `text-xs` to `text-2xl`, `font-medium`, `font-semibold`, and `tabular-nums` for IDs, reference numbers and amounts. The only exception is the printed official letters (sanction order, IPA, MoU), the receipt print windows and the PDFs, which keep their own fonts; do not change them.
 - Put your own search box or full-size button in the page header slot.
 - Wrap a routed screen in your own `div` with padding and background. Use a page frame.
 - Import the `shared` barrel in the app shell files (`app.component`, header, footer, sidebar, auth modals): import the kit file directly. It keeps the first bundle small.

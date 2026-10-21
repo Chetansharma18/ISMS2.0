@@ -19,7 +19,7 @@ import { ButtonComponent, IconComponent, ModalComponent } from '../../../../shar
   <div class="bg-slate-100 border-b border-slate-200 px-5 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
     <div class="flex items-center gap-2">
       <span class="text-slate-500">File:</span>
-      <span class="font-mono font-bold text-slate-800">{{ doc().fileName }}</span>
+      <span class="tabular-nums font-bold text-slate-800">{{ doc().fileName }}</span>
       <span class="px-1.5 py-0.2 bg-slate-200 text-slate-700 rounded text-[10px]">{{ doc().fileSize }}</span>
     </div>
     <div class="flex items-center gap-2">
@@ -43,8 +43,8 @@ import { ButtonComponent, IconComponent, ModalComponent } from '../../../../shar
       
       <div class="border-t border-b border-slate-100 py-3 space-y-1">
         <span class="text-xs font-bold text-slate-800 block">{{ doc().docType }}</span>
-        <span class="font-mono text-[11px] text-slate-600 block">{{ doc().docName }}</span>
-        <span class="text-[10px] font-mono text-slate-400 block">Doc Ref: REF-{{ doc().id }}-{{ aspirantId() }}</span>
+        <span class="tabular-nums text-[11px] text-slate-600 block">{{ doc().docName }}</span>
+        <span class="text-[10px] tabular-nums text-slate-400 block">Doc Ref: REF-{{ doc().id }}-{{ aspirantId() }}</span>
       </div>
 
       <div class="flex items-center justify-center gap-2 pt-1">

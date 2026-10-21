@@ -58,7 +58,7 @@ export interface AcceptedCompanyRow {
             <div class="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
               <div>
                 <span class="font-semibold text-slate-800 text-sm block sm:inline">{{ currentScheme()?.schemeTitle }}</span>
-                <span class="text-slate-500 sm:ml-2 font-mono text-[11px]">Ref: {{ currentScheme()?.refNo }}</span>
+                <span class="text-slate-500 sm:ml-2 tabular-nums text-[11px]">Ref: {{ currentScheme()?.refNo }}</span>
               </div>
             </div>
           }
@@ -111,7 +111,7 @@ export interface AcceptedCompanyRow {
             <div class="flex items-center justify-between font-sans text-xs font-medium border-b border-slate-200 pb-2">
               <div>
                 <span class="text-slate-500">Ref No:</span>
-                <span class="font-mono font-bold text-slate-900 ml-1">RSLDC/IPA/2026-27/{{ selectedIpaCompany()?.appId }}</span>
+                <span class="tabular-nums font-bold text-slate-900 ml-1">RSLDC/IPA/2026-27/{{ selectedIpaCompany()?.appId }}</span>
               </div>
               <div>
                 <span class="text-slate-500">Date:</span>
@@ -123,7 +123,7 @@ export interface AcceptedCompanyRow {
             <div class="space-y-1 font-sans">
               <p class="font-bold text-slate-900">To,</p>
               <p class="font-bold text-navy text-sm">{{ selectedIpaCompany()?.agencyName }}</p>
-              <p class="text-slate-600">Application ID: <span class="font-mono">{{ selectedIpaCompany()?.appId }}</span></p>
+              <p class="text-slate-600">Application ID: <span class="tabular-nums">{{ selectedIpaCompany()?.appId }}</span></p>
               <p class="text-slate-600">District: {{ selectedIpaCompany()?.district }}, Rajasthan</p>
             </div>
 
@@ -221,7 +221,7 @@ export class SanctionOrderComponent implements OnInit {
 
   readonly companyColumns: TableColumn<AcceptedCompanyRow>[] = [
     { key: '$index', label: 'Sr. No', type: 'number', align: 'center', width: 'w-16' },
-    { key: 'appId', label: 'Application ID', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap font-mono font-normal text-slate-800 text-center' },
+    { key: 'appId', label: 'Application ID', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap tabular-nums font-normal text-slate-800 text-center' },
     { key: 'agencyName', label: 'Name Of the Agency/PIA', width: 'min-w-[220px]', cellClass: 'whitespace-nowrap font-normal text-slate-800' },
     { key: 'district', label: 'Sanction District', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap text-slate-700 font-normal text-center' },
     { key: 'sector', label: 'Sanction Sector(s)', width: 'min-w-[180px]', cellClass: 'whitespace-nowrap text-slate-700 font-normal' },

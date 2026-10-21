@@ -11,6 +11,7 @@ import { SanctionSubjectBlockComponent } from './components/sanction-subject-blo
 import { SanctionTargetsTableComponent } from './components/sanction-targets-table.component';
 import { SanctionSignatoryBlockComponent } from './components/sanction-signatory-block.component';
 import { SanctionCopyListComponent } from './components/sanction-copy-list.component';
+import { SanctionFooterComponent } from './components/sanction-footer.component';
 import { EsignModalComponent } from './components/esign-modal.component';
 import { SanctionPdfService } from './sanction-pdf.service';
 import type { SanctionOrderDocumentData } from '../../services/eoi-state.models';
@@ -23,6 +24,7 @@ import {
   syncRowsWithApproved,
   createDefaultCopyTo,
   createDefaultTerms,
+  isLegacyDefaultTerms,
   createFallbackTableRows,
   createNewTableRow
 } from './eoi-sanction-editor.util';
@@ -42,6 +44,7 @@ export type { SanctionTableRow } from './eoi-sanction-editor.model';
     SanctionTargetsTableComponent,
     SanctionSignatoryBlockComponent,
     SanctionCopyListComponent,
+    SanctionFooterComponent,
     EsignModalComponent
   ],
   template: `
@@ -55,6 +58,7 @@ export type { SanctionTableRow } from './eoi-sanction-editor.model';
 
           <!-- Header with Official Logos: Left (RSLDC) & Right (Bharat Sarkar) -->
           <app-letterhead
+            [official]="true"
             [(headerTitle)]="headerTitle"
             [(headerSubtitle)]="headerSubtitle"
             [(headerAddress)]="headerAddress"
@@ -66,7 +70,7 @@ export type { SanctionTableRow } from './eoi-sanction-editor.model';
           />
 
           <!-- File No & Date (Editable) -->
-          <app-file-no-date-row [(fileNo)]="fileNo" [(date)]="sanctionDate" />
+          <app-file-no-date-row [official]="true" [(fileNo)]="fileNo" [(date)]="sanctionDate" />
 
           <!-- Document title, Subject, Reference and Preamble -->
           <app-sanction-subject-block
@@ -89,9 +93,10 @@ export type { SanctionTableRow } from './eoi-sanction-editor.model';
           <app-clause-list
             [clauses]="termsAndConditions"
             intro="The above sanction order is issued subject to complying with the following terms and conditions by Project Implementing Agencies (PIAs):"
-            listClass="list-decimal pl-5 space-y-2 text-slate-800 leading-relaxed text-[11px] sm:text-xs"
-            labelClass="font-semibold shrink-0 text-slate-700"
-            labelFormat="decimal"
+            [official]="true"
+            listClass="list-none m-0 p-0 space-y-1.5 text-slate-900"
+            labelClass="shrink-0"
+            labelFormat="none"
             (add)="addClause()"
             (remove)="removeClause($event)"
           />
@@ -99,10 +104,14 @@ export type { SanctionTableRow } from './eoi-sanction-editor.model';
           <!-- DISPATCH & SIGNATORY BLOCK (Editable) -->
           <app-sanction-signatory-block
             [(dispatchRef)]="dispatchRef"
+            [date]="sanctionDate"
           />
 
           <!-- COPY TO DISTRIBUTION LIST (Editable) -->
           <app-sanction-copy-list [copyToList]="copyToList" />
+
+          <!-- Website, e-mail and telephone of RSLDC, as in the footer of the printed order -->
+          <app-sanction-footer />
 
       <ng-container actions>
         <button appButton variant="outline" size="lg" (click)="saveDraft()">Save</button>
@@ -138,15 +147,15 @@ export class EoiSanctionEditorComponent implements OnInit {
   // Editable Document Fields matching sanctionorder2.pdf
   headerTitle = 'Rajasthan Skill and Livelihoods Development Corporation';
   headerSubtitle = '(A Government of Rajasthan Enterprise)';
-  headerAddress = 'EMI Campus, J-8-A, Jhalana Institutional Area, Jaipur - 302004 (Rajasthan)';
+  headerAddress = 'EMI Campus, J-8-A, Jhalana Institutional Area, Jaipur- 302004 (Rajasthan)';
 
   fileNo = 'F () RSLDC/Skills/MMKVY/RAJKViK/SO/2026-2027/ 1358';
   sanctionDate = '30/07/2026';
 
   documentTitle = 'Sanction Order';
-  subjectText = 'Sanction order for allocation of physical targets for Financial Year 2026-27 to PIAs under "Mukhya Mantri Kaushal Vikas Yojna" (MMKVY), Cat: I - RAJKViK.';
+  subjectText = 'Sanction order for allocation of physical targets for Financial Year 2026-27 to PIAs under "Mukhya Mantri Kaushal Vikas Yojna" (MMKVY), Cat:I - RAJKViK.';
   referenceText = 'No. RSLDC/EOI/MMKVY, Cat. I, II, III /2026-27/01, dated 22nd January 2026.';
-  preambleText = 'Based on the approved selection criteria of PIA\'s, Sanction Order is accorded to the following empanelled eligible PIAs for FY 2026-27 along with allocation of physical targets under Mukhya Mantri Kaushal Vikas Yojna" (MMKVY), Category. I- RAJKViK as per the details given below:';
+  preambleText = 'Based on the approved selection criteria of PIA\'s, Sanction Order is accorded to the following empanelled eligible PIAs for FY 2026-27 along with allocation of physical targets under Mukhya Mantri Kaushal Vikas Yojna" (MMKVY), Category: I- RAJKViK as per the details given below:';
 
   dispatchRef = 'RSLDC/Skills/MMKVY/RAJKViK/SO/2026-2027/1359-66';
 
@@ -172,16 +181,21 @@ export class EoiSanctionEditorComponent implements OnInit {
     const savedData =
       this.eoiStateService.getSchemeSanctionOrder(sId) ?? this.eoiStateService.getDefaultSanctionOrderData(sId);
     if (savedData) {
-      this.headerTitle = savedData.headerTitle || this.headerTitle;
+      // The letterhead is in normal case on the printed order; a title saved in capitals falls back to the normal-case one.
+      if (savedData.headerTitle && savedData.headerTitle !== savedData.headerTitle.toUpperCase()) {
+        this.headerTitle = savedData.headerTitle;
+      }
       this.headerSubtitle = savedData.headerSubtitle || this.headerSubtitle;
       this.headerAddress = savedData.headerAddress || this.headerAddress;
-      this.fileNo = savedData.fileNo || this.fileNo;
+      // The page prints the "File No:" label itself, so a saved number that starts with it is shown without it.
+      this.fileNo = savedData.fileNo?.replace(/^\s*File No:\s*/i, '') || this.fileNo;
       this.sanctionDate = savedData.sanctionDate || this.sanctionDate;
-      this.documentTitle = savedData.documentTitle || this.documentTitle;
+      this.documentTitle = savedData.documentTitle === 'SANCTION ORDER' ? 'Sanction Order' : savedData.documentTitle || this.documentTitle;
       this.subjectText = savedData.subjectText || this.subjectText;
       this.referenceText = savedData.referenceText || this.referenceText;
       this.preambleText = savedData.preambleText || this.preambleText;
-      if (savedData.termsAndConditions && savedData.termsAndConditions.length > 0) {
+      // A draft saved with the earlier short list of terms takes the wording of the printed order.
+      if (savedData.termsAndConditions && savedData.termsAndConditions.length > 0 && !isLegacyDefaultTerms(savedData.termsAndConditions)) {
         this.termsAndConditions = [...savedData.termsAndConditions];
       }
       this.dispatchRef = savedData.dispatchRef || this.dispatchRef;

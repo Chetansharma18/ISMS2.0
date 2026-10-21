@@ -45,7 +45,7 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
               placeholder="e.g. SSO_1008"
               [(ngModel)]="f.ssoId"
               [invalid]="isSubmitted && !f.ssoId"
-              class="w-full font-mono"
+              class="w-full tabular-nums"
             />
             @if (isSubmitted && !f.ssoId) {
               <div class="text-xs text-red-500 mt-0.5 font-medium">SSO ID is required</div>
@@ -161,7 +161,7 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
               maxlength="12"
               placeholder="12-digit Aadhaar number"
               [(ngModel)]="f.aadhaarId"
-              class="w-full font-mono"
+              class="w-full tabular-nums"
             />
           </div>
 

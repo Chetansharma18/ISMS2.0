@@ -35,7 +35,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       [class.top-0]="isSticky"
       role="banner"
     >
-      <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-['Inter',sans-serif]">
+      <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-sans">
 
         <!-- LEFT SIDE: Mobile Menu Toggle + Emblem + ISMS Logo + Separator + Identity -->
         <div class="flex items-center gap-2 sm:gap-3 shrink-0">

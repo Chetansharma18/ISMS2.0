@@ -93,7 +93,7 @@ import {
           <div class="font-normal text-slate-800 text-[13px]">
             {{ item.anonymousLabel }}
           </div>
-          <div class="text-[11px] font-mono text-text-muted mt-0.5">
+          <div class="text-[11px] tabular-nums text-text-muted mt-0.5">
             {{ item.regNumber }}
           </div>
         </ng-template>

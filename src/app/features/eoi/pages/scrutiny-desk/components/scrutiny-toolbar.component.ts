@@ -73,7 +73,7 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
         <div>
           <span class="text-[11.5px] text-slate-500 block leading-tight">EOI Reference No.</span>
-          <span class="text-[12.5px] font-medium text-slate-900 block mt-1 font-mono break-all">{{ applicant()?.eoiRefNo }}</span>
+          <span class="text-[12.5px] font-medium text-slate-900 block mt-1 tabular-nums break-all">{{ applicant()?.eoiRefNo }}</span>
         </div>
         <div>
           <span class="text-[11.5px] text-slate-500 block leading-tight">Scheme</span>
@@ -81,7 +81,7 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
         </div>
         <div>
           <span class="text-[11.5px] text-slate-500 block leading-tight">Registration No.</span>
-          <span class="text-[12.5px] font-medium text-slate-900 block mt-1 font-mono">{{ applicant()?.regNumber }}</span>
+          <span class="text-[12.5px] font-medium text-slate-900 block mt-1 tabular-nums">{{ applicant()?.regNumber }}</span>
         </div>
         <div>
           <span class="text-[11.5px] text-slate-500 block leading-tight">Submitted On</span>

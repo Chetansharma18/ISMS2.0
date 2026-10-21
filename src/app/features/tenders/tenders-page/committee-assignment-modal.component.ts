@@ -46,7 +46,7 @@ import { filterAdmins } from './tenders-page.util';
           <div class="bg-purple-50/80 border border-purple-200 rounded-lg p-3 flex flex-col gap-1">
             <div class="flex items-center justify-between">
               <span class="text-xs font-semibold text-purple-900">{{ s.schemeName }}</span>
-              <span class="font-mono text-[11px] px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-semibold border border-purple-200">
+              <span class="tabular-nums text-[11px] px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-semibold border border-purple-200">
                 {{ s.refNo }}
               </span>
             </div>
@@ -169,7 +169,7 @@ import { filterAdmins } from './tenders-page.util';
                           </div>
                           <div class="flex flex-col min-w-0">
                             <span class="font-semibold text-slate-800 truncate">{{ adm.name }}</span>
-                            <span class="text-[10px] text-slate-400 font-mono">{{ adm.ssoId }}</span>
+                            <span class="text-[10px] text-slate-400 tabular-nums">{{ adm.ssoId }}</span>
                           </div>
                         </div>
                         <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200 shrink-0 ml-2">
@@ -277,7 +277,7 @@ import { filterAdmins } from './tenders-page.util';
                           />
                           <div class="flex flex-col min-w-0">
                             <span class="font-semibold text-slate-800 truncate">{{ adm.name }}</span>
-                            <span class="text-[10px] text-slate-400 font-mono">{{ adm.ssoId }}</span>
+                            <span class="text-[10px] text-slate-400 tabular-nums">{{ adm.ssoId }}</span>
                           </div>
                         </div>
                         <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200 shrink-0 ml-2">

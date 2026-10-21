@@ -7,12 +7,13 @@ import {
   ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { IconComponent } from '../icon/icon.component';
 
 @Component({
   selector: 'app-action-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   template: `
     @if (isOpen) {
       <div
@@ -46,9 +47,7 @@ import { CommonModule } from '@angular/common';
                 title="Close"
                 aria-label="Close"
               >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <app-icon name="close" [stroke]="2.5" />
               </button>
             }
 

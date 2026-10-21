@@ -34,7 +34,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
           <div class="w-full flex flex-col justify-center text-left">
             
             <!-- Section Heading: Inter 700, 36px Desktop / 32px Tablet / 28px Mobile, #12365A -->
-            <h2 id="about-isms-heading" class="font-['Inter',sans-serif] text-[28px] sm:text-[32px] xl:text-[36px] font-bold leading-[1.2] text-[#12365A] m-0 tracking-tight">
+            <h2 id="about-isms-heading" class="font-sans text-[28px] sm:text-[32px] xl:text-[36px] font-bold leading-[1.2] text-[#12365A] m-0 tracking-tight">
               About ISMS 2.0
             </h2>
 
@@ -42,12 +42,12 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
             <div class="w-10.5 h-1 bg-[#F28C28] rounded-xs mt-2.5 mb-4 sm:mb-4" aria-hidden="true"></div>
 
             <!-- Existing Description Paragraph 1: 100% original text, natural wrapping, left-aligned -->
-            <p class="font-['Inter',sans-serif] text-[15px] xl:text-[16px] font-normal leading-[1.65] text-[#344256] text-left max-w-175 m-0 mb-4">
+            <p class="font-sans text-[15px] xl:text-[16px] font-normal leading-[1.65] text-[#344256] text-left max-w-175 m-0 mb-4">
               Integrated Scheme Management System (ISMS 2.0) is a comprehensive e-Governance and Management Information System (MIS) designed to digitally transform, integrate, and streamline the processes involved in the planning, implementation, monitoring, and management of skill development schemes across Rajasthan. The platform provides a centralized and secure digital ecosystem that unites youth, training providers, government departments, empaneled agencies, and certification bodies on a single, high-transparency platform — ensuring accountability, real-time visibility, and data-driven decision making at every stage.
             </p>
 
             <!-- Existing Description Paragraph 2: Divided at natural sentence boundary, 100% original text -->
-            <p class="font-['Inter',sans-serif] text-[15px] xl:text-[16px] font-normal leading-[1.65] text-[#344256] text-left max-w-175 m-0">
+            <p class="font-sans text-[15px] xl:text-[16px] font-normal leading-[1.65] text-[#344256] text-left max-w-175 m-0">
               ISMS 2.0 enables end-to-end scheme management — from scheme launching and candidate enrollment through bio-metric attendance, quality inspections, assessment, certification, and direct benefit and fund disbursements — all within one unified, auditable platform.
             </p>
           </div>
@@ -125,7 +125,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
 
                 <!-- Video Caption Overlay (Positioned in lower portion, subtle dark navy gradient, 14–18px padding) -->
                 <div class="absolute bottom-0 inset-x-0 z-10 pointer-events-none bg-linear-to-t from-[#0B2440]/95 via-[#0B2440]/65 to-transparent pt-7 pb-3.5 px-4 sm:pt-8 sm:pb-4 sm:px-4.5 box-border">
-                  <p class="font-['Inter',sans-serif] text-[13px] sm:text-[14px] lg:text-[14.5px] text-white leading-normal sm:leading-relaxed font-normal m-0 drop-shadow-sm">
+                  <p class="font-sans text-[13px] sm:text-[14px] lg:text-[14.5px] text-white leading-normal sm:leading-relaxed font-normal m-0 drop-shadow-sm">
                     “{{ fullQuote }}”
                   </p>
                 </div>

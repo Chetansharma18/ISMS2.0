@@ -289,7 +289,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                       [placeholder]="field.placeholder || ''"
                       [(ngModel)]="formData[field.key]"
                       [invalid]="fieldInvalid(field)"
-                      [ngClass]="field.uppercase ? 'font-mono text-xs' : ''"
+                      [ngClass]="field.uppercase ? 'tabular-nums text-xs' : ''"
                       class="w-full"
                     />
                   }

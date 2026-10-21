@@ -77,7 +77,7 @@ interface TurnoverRow {
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[10.5px]">Reg. Number (CIN)</span>
-                    <span class="font-mono text-slate-800">{{ step1().registrationNumber || '-' }}</span>
+                    <span class="tabular-nums text-slate-800">{{ step1().registrationNumber || '-' }}</span>
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[10.5px]">Date of Reg.</span>
@@ -89,7 +89,7 @@ interface TurnoverRow {
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[10.5px]">Company PAN</span>
-                    <span class="font-mono text-slate-800 font-semibold">{{ step1().companyPan || '-' }}</span>
+                    <span class="tabular-nums text-slate-800 font-semibold">{{ step1().companyPan || '-' }}</span>
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[10.5px]">GST Registered</span>
@@ -152,7 +152,7 @@ interface TurnoverRow {
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">Mobile No.</span>
-                  <span class="text-slate-800 font-mono">{{ step3().mobileNo || '-' }}</span>
+                  <span class="text-slate-800 tabular-nums">{{ step3().mobileNo || '-' }}</span>
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">Email ID</span>
@@ -160,11 +160,11 @@ interface TurnoverRow {
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">PAN</span>
-                  <span class="text-slate-800 font-mono">{{ step3().pan || '-' }}</span>
+                  <span class="text-slate-800 tabular-nums">{{ step3().pan || '-' }}</span>
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">Aadhaar No.</span>
-                  <span class="text-slate-800 font-mono">{{ step3().aadhaarNo || '-' }}</span>
+                  <span class="text-slate-800 tabular-nums">{{ step3().aadhaarNo || '-' }}</span>
                 </div>
                 <div class="sm:col-span-2">
                   <span class="text-slate-400 block text-[10.5px]">Residence Address</span>
@@ -260,11 +260,11 @@ interface TurnoverRow {
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">Account No.</span>
-                  <span class="font-mono text-slate-800">{{ step4().accountNo || '-' }}</span>
+                  <span class="tabular-nums text-slate-800">{{ step4().accountNo || '-' }}</span>
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">IFSC Code</span>
-                  <span class="font-mono text-slate-800">{{ step4().ifscCode || '-' }}</span>
+                  <span class="tabular-nums text-slate-800">{{ step4().ifscCode || '-' }}</span>
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">Transfer Mode</span>

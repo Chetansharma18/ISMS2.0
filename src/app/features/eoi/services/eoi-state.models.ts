@@ -230,6 +230,8 @@ export interface SanctionOrderDocumentData {
 
 export interface IpaCourseRow {
   id: string;
+  /** District this course row is allowed in (the IPA allows a course per district). */
+  district?: string;
   sector: string;
   courseName: string;
   courseCode: string;
@@ -274,6 +276,12 @@ export interface IpaDocumentData {
   preambleText: string;
   piaName: string;
   sdcAddress: string;
+  /** Line about the minimum qualification of the trainees, printed under the tables. */
+  qualificationNote?: string;
+  /** Heading of the box with the minimum educational qualification and experience. */
+  qualificationTitle?: string;
+  /** Lines of that box, one per line ("OR" lines included). */
+  qualificationText?: string;
   courseRows: IpaCourseRow[];
   targetSummary: TargetSummaryRow[];
   termsAndConditions: string[];

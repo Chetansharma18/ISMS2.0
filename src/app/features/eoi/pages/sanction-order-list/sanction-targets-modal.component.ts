@@ -9,11 +9,11 @@ import { ButtonComponent, ModalComponent, TableColumn, TableComponent } from '..
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ModalComponent, TableComponent, ButtonComponent],
   template: `
-    <app-modal title="Approved Companies" [subtitle]="schemeTitle()" size="xl" (close)="close.emit()">
+    <app-modal title="Approved TPs" [subtitle]="schemeTitle()" size="xl" (close)="close.emit()">
       <app-table
         [columns]="columns"
         [data]="rows()"
-        emptyMessage="No approved companies in this sanction order."
+        emptyMessage="No approved TPs in this sanction order."
       />
 
       @if (rows().length > 0) {
@@ -36,7 +36,7 @@ export class SanctionTargetsModalComponent {
 
   protected readonly columns: TableColumn<SanctionTableRow>[] = [
     { key: '$index', label: 'Sr. No', type: 'number', align: 'center', width: 'w-14' },
-    { key: 'appId', label: 'Application ID', cellClass: 'whitespace-nowrap font-mono text-[12px] text-slate-700' },
+    { key: 'appId', label: 'Application ID', cellClass: 'whitespace-nowrap tabular-nums text-[12px] text-slate-700' },
     { key: 'agencyName', label: 'Name of the Agency / PIA', cellClass: 'font-normal text-slate-800' },
     { key: 'district', label: 'Sanction District', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'sector', label: 'Sanction Sector(s)', cellClass: 'font-normal text-slate-700' },

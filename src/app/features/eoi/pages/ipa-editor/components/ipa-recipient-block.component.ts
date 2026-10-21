@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InputDirective } from '../../../../../shared';
 
-/** Recipient details block (To, PIA name, address lines and SAR number). */
+/** Recipient details block (To, PIA name, address lines and SAR number), in bold serif as on the printed IPA. */
 @Component({
   selector: 'app-ipa-recipient-block',
   standalone: true,
@@ -10,12 +10,13 @@ import { InputDirective } from '../../../../../shared';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <div class="space-y-1 mb-4 font-sans text-xs">
-      <p class="font-bold text-slate-900">To,</p>
+    <div class="space-y-0.5 mb-4 font-serif text-[13px] sm:text-sm font-bold text-slate-900">
+      <p class="m-0">To,</p>
       <input
         appInput
         variant="plain"
         type="text"
+        aria-label="Name of the agency"
         [ngModel]="recipientName()" (ngModelChange)="recipientName.set($event)"
         class="font-bold w-full block"
       />
@@ -23,22 +24,25 @@ import { InputDirective } from '../../../../../shared';
         appInput
         variant="plain"
         type="text"
-        [(ngModel)]="recipientAddress1"
-        class="w-full block"
+        aria-label="Address line 1"
+        [ngModel]="recipientAddress1()" (ngModelChange)="recipientAddress1.set($event)"
+        class="font-bold w-full block"
       />
       <input
         appInput
         variant="plain"
         type="text"
-        [(ngModel)]="recipientAddress2"
-        class="w-full block"
+        aria-label="Address line 2"
+        [ngModel]="recipientAddress2()" (ngModelChange)="recipientAddress2.set($event)"
+        class="font-bold w-full block"
       />
       <input
         appInput
         variant="plain"
         type="text"
+        aria-label="SAR number"
         [ngModel]="recipientSar()" (ngModelChange)="recipientSar.set($event)"
-        class="font-mono w-64 block mt-1"
+        class="font-bold tabular-nums w-full block"
       />
     </div>
   `

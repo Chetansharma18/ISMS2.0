@@ -6,8 +6,11 @@ import { jsPDF } from 'jspdf';
 import { EoiStateService, ApplicantResponse } from '../../services/eoi-state.service';
 import { formatDate } from '../../../../shared/utils';
 import {
-  PageHeaderComponent,
-  TableComponent,
+  ButtonComponent,
+  FilterTab,
+  FilterTabsComponent,
+  IconComponent,
+  ListPageComponent,
   TableColumn
 } from '../../../../shared';
 
@@ -15,159 +18,40 @@ import {
   selector: 'app-applicant-submissions',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent],
+  imports: [CommonModule, RouterModule, ListPageComponent, ButtonComponent, FilterTabsComponent, IconComponent],
   template: `
-    <div class="w-full min-h-full bg-white text-text-primary font-sans">
-      <div class="p-4 sm:p-5 space-y-3 font-sans">
-        
-        <!-- Header via Reusable PageHeaderComponent: Title, Breadcrumbs, and Search only -->
-        <app-page-header
-          title="Applicant Submissions"
-          [breadcrumbs]="[
-            { label: 'Home', url: '/' },
-            { label: 'EOI Responses', url: '/admin/eoi-view' },
-            { label: 'Applicant Submissions' }
-          ]"
-          [searchable]="true"
-          searchPlaceholder="Search Applicant, Reg No., Org..."
-          [(searchQuery)]="searchQuery"
-        >
-        </app-page-header>
-
+    <app-list-page
+      title="Applicant Submissions"
+      [breadcrumbs]="[
+        { label: 'Home', url: '/' },
+        { label: 'EOI Responses', url: '/admin/eoi-view' },
+        { label: 'Applicant Submissions' }
+      ]"
+      searchPlaceholder="Search Applicant, Reg No., Org..."
+      [(searchQuery)]="searchQuery"
+      [columns]="submissionColumns"
+      [data]="filteredResponses()"
+      [pagination]="true"
+      [pageSize]="10"
+      emptyMessage="No submissions found matching the selected filter."
+      [customTemplates]="{
+        anonymousLabel: applicantTemplate,
+        status: statusTemplate,
+        action: actionTemplate
+      }"
+    >
         <!-- Simple Neutral Filter Toolbar & Review Progress -->
-        <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-2.5 sm:p-3 flex flex-wrap items-center justify-between gap-3">
+        <div beforeTable class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-2.5 sm:p-3 flex flex-wrap items-center justify-between gap-3">
           <!-- Left: Back Button & Filter Tabs -->
           <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
             <!-- Back Button matching existing screens -->
-            <button
-              type="button"
-              (click)="goBack()"
-              class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-[13px] font-semibold transition-all cursor-pointer shadow-2xs active:scale-95 shrink-0"
-              title="Back to EOI Responses"
-            >
-              <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
+            <button appButton variant="outline" size="sm" class="shrink-0" (click)="goBack()" title="Back to EOI Responses">
+              <app-icon name="chevron-left" size="sm" />
               <span>Back</span>
             </button>
 
-            <!-- Simple Filter Tabs (Neutral, No Multiple Colors) -->
-            <div class="inline-flex items-center p-1 bg-slate-100 rounded-lg border border-slate-200/80 gap-1 flex-wrap">
-            <!-- All -->
-            <button
-              type="button"
-              (click)="setFilter('ALL')"
-              class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
-              [class.bg-white]="selectedFilter() === 'ALL'"
-              [class.text-slate-900]="selectedFilter() === 'ALL'"
-              [class.shadow-2xs]="selectedFilter() === 'ALL'"
-              [class.text-slate-600]="selectedFilter() !== 'ALL'"
-              [class.hover:text-slate-900]="selectedFilter() !== 'ALL'"
-            >
-              <span>All Applications</span>
-              <span
-                class="px-1.5 py-0.2 rounded text-[10px] font-bold"
-                [class.bg-slate-800]="selectedFilter() === 'ALL'"
-                [class.text-white]="selectedFilter() === 'ALL'"
-                [class.bg-slate-200]="selectedFilter() !== 'ALL'"
-                [class.text-slate-700]="selectedFilter() !== 'ALL'"
-              >
-                {{ totalSubmissionsCount() }}
-              </span>
-            </button>
-
-            <!-- Under Review -->
-            <button
-              type="button"
-              (click)="setFilter('UNDER_SCRUTINY')"
-              class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
-              [class.bg-white]="selectedFilter() === 'UNDER_SCRUTINY'"
-              [class.text-slate-900]="selectedFilter() === 'UNDER_SCRUTINY'"
-              [class.shadow-2xs]="selectedFilter() === 'UNDER_SCRUTINY'"
-              [class.text-slate-600]="selectedFilter() !== 'UNDER_SCRUTINY'"
-              [class.hover:text-slate-900]="selectedFilter() !== 'UNDER_SCRUTINY'"
-            >
-              <span>Under Review</span>
-              <span
-                class="px-1.5 py-0.2 rounded text-[10px] font-bold"
-                [class.bg-slate-800]="selectedFilter() === 'UNDER_SCRUTINY'"
-                [class.text-white]="selectedFilter() === 'UNDER_SCRUTINY'"
-                [class.bg-slate-200]="selectedFilter() !== 'UNDER_SCRUTINY'"
-                [class.text-slate-700]="selectedFilter() !== 'UNDER_SCRUTINY'"
-              >
-                {{ countPending() }}
-              </span>
-            </button>
-
-            <!-- Approved -->
-            <button
-              type="button"
-              (click)="setFilter('APPROVED')"
-              class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
-              [class.bg-white]="selectedFilter() === 'APPROVED'"
-              [class.text-slate-900]="selectedFilter() === 'APPROVED'"
-              [class.shadow-2xs]="selectedFilter() === 'APPROVED'"
-              [class.text-slate-600]="selectedFilter() !== 'APPROVED'"
-              [class.hover:text-slate-900]="selectedFilter() !== 'APPROVED'"
-            >
-              <span>Approved</span>
-              <span
-                class="px-1.5 py-0.2 rounded text-[10px] font-bold"
-                [class.bg-slate-800]="selectedFilter() === 'APPROVED'"
-                [class.text-white]="selectedFilter() === 'APPROVED'"
-                [class.bg-slate-200]="selectedFilter() !== 'APPROVED'"
-                [class.text-slate-700]="selectedFilter() !== 'APPROVED'"
-              >
-                {{ countApproved() }}
-              </span>
-            </button>
-
-            <!-- Rejected -->
-            <button
-              type="button"
-              (click)="setFilter('REJECTED')"
-              class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
-              [class.bg-white]="selectedFilter() === 'REJECTED'"
-              [class.text-slate-900]="selectedFilter() === 'REJECTED'"
-              [class.shadow-2xs]="selectedFilter() === 'REJECTED'"
-              [class.text-slate-600]="selectedFilter() !== 'REJECTED'"
-              [class.hover:text-slate-900]="selectedFilter() !== 'REJECTED'"
-            >
-              <span>Rejected</span>
-              <span
-                class="px-1.5 py-0.2 rounded text-[10px] font-bold"
-                [class.bg-slate-800]="selectedFilter() === 'REJECTED'"
-                [class.text-white]="selectedFilter() === 'REJECTED'"
-                [class.bg-slate-200]="selectedFilter() !== 'REJECTED'"
-                [class.text-slate-700]="selectedFilter() !== 'REJECTED'"
-              >
-                {{ countRejected() }}
-              </span>
-            </button>
-
-            <!-- Reverted -->
-            <button
-              type="button"
-              (click)="setFilter('REVERTED')"
-              class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
-              [class.bg-white]="selectedFilter() === 'REVERTED'"
-              [class.text-slate-900]="selectedFilter() === 'REVERTED'"
-              [class.shadow-2xs]="selectedFilter() === 'REVERTED'"
-              [class.text-slate-600]="selectedFilter() !== 'REVERTED'"
-              [class.hover:text-slate-900]="selectedFilter() !== 'REVERTED'"
-            >
-              <span>Reverted</span>
-              <span
-                class="px-1.5 py-0.2 rounded text-[10px] font-bold"
-                [class.bg-slate-800]="selectedFilter() === 'REVERTED'"
-                [class.text-white]="selectedFilter() === 'REVERTED'"
-                [class.bg-slate-200]="selectedFilter() !== 'REVERTED'"
-                [class.text-slate-700]="selectedFilter() !== 'REVERTED'"
-              >
-                {{ countReverted() }}
-              </span>
-            </button>
-          </div>
+            <!-- Simple Filter Tabs (the selected one is filled) -->
+            <app-filter-tabs [options]="filterTabs()" [value]="selectedFilter()" (valueChange)="setFilter($event)" />
         </div>
 
           <!-- Review status, and the sanction order once every application is decided -->
@@ -191,14 +75,8 @@ import {
             </div>
 
             @if (allReviewed()) {
-              <button
-                type="button"
-                (click)="openSanctionOrder()"
-                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs font-semibold transition-colors shadow-2xs cursor-pointer shrink-0 active:scale-95"
-                style="color: #ffffff !important;"
-                title="Prepare the sanction order for this scheme"
-              >
-                <span style="color: #ffffff !important;">Release Sanction Order</span>
+              <button appButton class="shrink-0" (click)="openSanctionOrder()" title="Prepare the sanction order for this scheme">
+                <span>Release Sanction Order</span>
               </button>
             } @else {
               <div class="w-20 sm:w-24 h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
@@ -211,26 +89,11 @@ import {
           </div>
         </div>
 
-        <!-- Main Submissions Table via Reusable TableComponent -->
-        <app-table
-          [columns]="submissionColumns"
-          [data]="filteredResponses()"
-          [pagination]="true"
-          [pageSize]="10"
-          emptyMessage="No submissions found matching the selected filter."
-          [customTemplates]="{
-            anonymousLabel: applicantTemplate,
-            status: statusTemplate,
-            action: actionTemplate
-          }"
-        >
-        </app-table>
-
         <ng-template #applicantTemplate let-item>
           <div class="font-normal text-slate-800 text-[13px]">
             {{ item.anonymousLabel }}
           </div>
-          <div class="text-[11px] font-mono text-text-muted mt-0.5">
+          <div class="text-[11px] tabular-nums text-text-muted mt-0.5">
             {{ item.regNumber }}
           </div>
         </ng-template>
@@ -243,17 +106,12 @@ import {
         </ng-template>
 
         <ng-template #actionTemplate let-item>
-          <a
-            [routerLink]="['/admin/review', item.id]"
-            class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-md bg-navy hover:bg-[#07243c] text-white! shadow-2xs transition-colors font-semibold text-xs whitespace-nowrap cursor-pointer"
-            style="color: #ffffff !important;"
-          >
-            <span style="color: #ffffff !important;">Review</span>
+          <a appButton size="sm" [routerLink]="['/admin/review', item.id]">
+            <span>Review</span>
           </a>
         </ng-template>
 
-      </div>
-    </div>
+    </app-list-page>
   `
 })
 export class ApplicantSubmissionsComponent {
@@ -300,6 +158,14 @@ export class ApplicantSubmissionsComponent {
   }
 
   totalSubmissionsCount = computed(() => this.responses().length);
+
+  readonly filterTabs = computed<FilterTab<'ALL' | 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED' | 'REVERTED'>[]>(() => [
+    { id: 'ALL', label: 'All Applications', count: this.totalSubmissionsCount() },
+    { id: 'UNDER_SCRUTINY', label: 'Under Review', count: this.countPending() },
+    { id: 'APPROVED', label: 'Approved', count: this.countApproved() },
+    { id: 'REJECTED', label: 'Rejected', count: this.countRejected() },
+    { id: 'REVERTED', label: 'Reverted', count: this.countReverted() }
+  ]);
 
   countPending = computed(() => this.responses().filter(r => r.status === 'UNDER_SCRUTINY').length);
   countApproved = computed(() => this.responses().filter(r => r.status === 'APPROVED').length);

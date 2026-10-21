@@ -1,40 +1,34 @@
 import { Injectable } from '@angular/core';
 import { jsPDF } from 'jspdf';
 import type { IpaDocumentData } from '../../services/eoi-state.models';
-import {
-  BOTTOM_LIMIT,
-  CONTENT_WIDTH,
-  MARGIN,
-  PAGE_WIDTH,
-  addPageNumbers,
-  drawLetterhead,
-  drawSignatureBox,
-  loadImage,
-  printable,
-  showPdf
-} from '../eoi-sanction-editor/pdf-common';
+import { BODY_SIZE, OfficialPdfPage, PT, SPACING } from '../eoi-sanction-editor/official-pdf';
+import { CONTENT_WIDTH, MARGIN, PAGE_WIDTH, loadImage, printable, showPdf } from '../eoi-sanction-editor/pdf-common';
 
 /** Approved-course table columns: label, width (mm). The widths add up to the content width. */
 const COURSE_COLUMNS: { label: string; width: number }[] = [
   { label: 'S. No.', width: 7 },
-  { label: 'Sector', width: 18 },
-  { label: 'Course Name', width: 16 },
-  { label: 'Course Code', width: 14 },
+  { label: 'District', width: 12 },
+  { label: 'Sector', width: 13 },
+  { label: 'Course Name', width: 14 },
+  { label: 'Course Code', width: 12 },
   { label: 'Duration (Days / Hrs)', width: 14 },
   { label: 'OJT (Yes/No)', width: 8 },
   { label: 'Min. Edu. Qualification', width: 12 },
   { label: 'Min. Job Entry Age', width: 9 },
   { label: 'R/NR', width: 7 },
   { label: 'R. Cat.', width: 7 },
-  { label: 'Cost Per Trainee', width: 16 },
+  { label: 'Cost Per Trainee', width: 15 },
   { label: 'Approved Trainees / batch', width: 9 },
   { label: 'Cost Per Batch', width: 13 },
   { label: 'Cycles FY 26-27', width: 8 },
-  { label: 'Total Budget', width: 14 },
+  { label: 'Total Budget', width: 12 },
   { label: 'Per Day Hrs', width: 8 }
 ];
 
-/** Builds the e-signed In-Principle Approval PDF with the same content as the draft. */
+/** Summary table columns (mm): serial number, particular, value. */
+const SUMMARY_COLUMNS = [14, 116, 50];
+
+/** Builds the e-signed In-Principal Approval PDF with the same content as the draft. */
 @Injectable({ providedIn: 'root' })
 export class IpaPdfService {
   /** Creates the signed PDF and shows it in the given browser tab (a new tab is opened if none is given). */
@@ -47,150 +41,105 @@ export class IpaPdfService {
     signedAt: Date = data.signedAt ? new Date(data.signedAt) : new Date()
   ): Promise<jsPDF> {
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    pdf.setProperties({ title: `In-Principle Approval - ${data.fileNo}` });
+    pdf.setProperties({ title: `In-Principal Approval - ${data.fileNo}` });
 
     const [leftLogo, rightLogo] = await Promise.all([loadImage(data.leftLogoUrl ?? ''), loadImage(data.rightLogoUrl ?? '')]);
-    let y = drawLetterhead(pdf, data, leftLogo, rightLogo);
+    return new IpaPdfBuilder(pdf, data, leftLogo, rightLogo).build(signedAt);
+  }
+}
 
-    const ensure = (height: number): void => {
-      if (y + height > BOTTOM_LIMIT) {
-        pdf.addPage();
-        y = MARGIN;
-      }
-    };
-    const paragraph = (text: string, opts: { size?: number; bold?: boolean; gap?: number } = {}): void => {
-      const size = opts.size ?? 9;
-      pdf.setFont('helvetica', opts.bold ? 'bold' : 'normal');
-      pdf.setFontSize(size);
-      const lines: string[] = pdf.splitTextToSize(printable(text), CONTENT_WIDTH);
-      const lineHeight = size * 0.45;
-      for (const line of lines) {
-        ensure(lineHeight);
-        pdf.text(line, MARGIN, y + size * 0.3);
-        y += lineHeight;
-      }
-      y += opts.gap ?? 2;
-    };
-
-    // File number and date
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(9);
-    pdf.text(printable(data.fileNo), MARGIN, y + 3);
-    pdf.text(`Date: ${printable(data.ipaDate)}`, PAGE_WIDTH - MARGIN, y + 3, { align: 'right' });
-    y += 8;
-
-    // Recipient
-    paragraph('To,', { bold: true, gap: 1 });
-    paragraph(data.recipientName, { bold: true, gap: 0.5 });
-    [data.recipientAddress1, data.recipientAddress2, data.sarNumber]
-      .filter(line => line?.trim())
-      .forEach(line => paragraph(line, { bold: true, gap: 0.5 }));
-    y += 3;
-
-    // Reference, subject and preamble
-    paragraph(`Ref: ${data.referenceNo}`, { gap: 1.5 });
-    paragraph(`Sub: ${data.subjectText}`, { bold: true, gap: 2.5 });
-    paragraph(data.preambleText, { gap: 2 });
-    if (data.piaName?.trim() || data.sdcAddress?.trim()) {
-      paragraph(`${data.piaName}${data.sdcAddress?.trim() ? ` - ${data.sdcAddress}` : ''}`, { bold: true, gap: 3 });
-    }
-
-    y = this.drawCourseTable(pdf, data, y) + 5;
-    y = this.drawSummaryTable(pdf, data, y) + 5;
-
-    // Terms and conditions
-    paragraph('IPA is issued subject to following terms and conditions: -', { bold: true, gap: 2 });
-    data.termsAndConditions.forEach((clause, index) => {
-      const lines: string[] = pdf.splitTextToSize(printable(clause), CONTENT_WIDTH - 8);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(8.5);
-      lines.forEach((line, lineIndex) => {
-        ensure(4);
-        if (lineIndex === 0) pdf.text(`${String.fromCharCode(97 + (index % 26))})`, MARGIN, y + 3);
-        pdf.text(line, MARGIN + 8, y + 3);
-        y += 3.9;
-      });
-      y += 1.5;
-    });
-    y += 4;
-
-    // Signatory and the digital signature
-    ensure(34);
-    pdf.setDrawColor(148, 163, 184);
-    pdf.line(MARGIN, y, PAGE_WIDTH - MARGIN, y);
-    y += 5;
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(8.5);
-    pdf.text(printable(data.signatoryTitle), MARGIN, y + 2);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(printable(data.signatorySub), MARGIN, y + 6.5);
-    const signedBy = [data.signatoryTitle, data.signatorySub].filter(part => part?.trim()).join(', ');
-    drawSignatureBox(pdf, y - 3, signedAt, signedBy);
-    y += 32;
-
-    // CC
-    const copies = data.ccList.filter(item => item.trim());
-    if (copies.length > 0) {
-      ensure(10);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(9);
-      pdf.text('CC:', MARGIN, y);
-      y += 4.5;
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(8.5);
-      copies.forEach((item, index) => {
-        const lines: string[] = pdf.splitTextToSize(printable(item), CONTENT_WIDTH - 8);
-        lines.forEach((line, lineIndex) => {
-          ensure(4);
-          if (lineIndex === 0) pdf.text(`${index + 1}-`, MARGIN + 2, y + 2.5);
-          pdf.text(line, MARGIN + 8, y + 2.5);
-          y += 3.8;
-        });
-      });
-    }
-
-    addPageNumbers(pdf);
-    return pdf;
+/** The body of the IPA: file number, recipient, subject, course table, summary, qualification, terms and CC list. */
+class IpaPdfBuilder extends OfficialPdfPage {
+  constructor(pdf: jsPDF, private readonly data: IpaDocumentData, leftLogo: string | null, rightLogo: string | null) {
+    super(pdf, data, leftLogo, rightLogo);
   }
 
-  private drawCourseTable(pdf: jsPDF, data: IpaDocumentData, startY: number): number {
-    let y = startY;
-    const fontSize = 6;
-    const lineHeight = 2.6;
-    const padding = 0.9;
+  build(signedAt: Date): jsPDF {
+    const signedBy = [this.data.signatoryTitle, this.data.signatorySub].filter(part => part?.trim()).join(', ');
+    this.drawHeader();
+    this.fileNoAndDate();
+    this.recipient();
+    this.opening();
+    this.courseTable();
+    this.summaryTable();
+    this.qualification();
+    this.terms();
+    this.copies();
+    this.drawFooters(signedAt, signedBy);
+    return this.pdf;
+  }
 
-    /** Draws one row; each cell is its own text, wrapped to its column. */
-    const drawRow = (cells: string[], style: 'header' | 'body' | 'total'): void => {
-      pdf.setFont('helvetica', style === 'body' ? 'normal' : 'bold');
-      pdf.setFontSize(fontSize);
+  private fileNoAndDate(): void {
+    const { pdf, data } = this;
+    this.font('normal', BODY_SIZE);
+    pdf.text(printable(data.fileNo), MARGIN, this.y + 3);
+    pdf.text(`Date: ${printable(data.ipaDate)}`, PAGE_WIDTH - MARGIN, this.y + 3, { align: 'right' });
+    this.y += 10;
+  }
+
+  private recipient(): void {
+    const { data } = this;
+    this.paragraph('To,', { style: 'bold', gap: 0.6, justify: false });
+    [data.recipientName, data.recipientAddress1, data.recipientAddress2, data.sarNumber]
+      .filter(line => line?.trim())
+      .forEach(line => this.paragraph(line, { style: 'bold', gap: 0.4, justify: false }));
+    this.y += 4;
+  }
+
+  private opening(): void {
+    const { data } = this;
+    this.paragraph(`Ref: ${data.referenceNo}`, { style: 'bold', gap: 1.2, justify: false });
+    this.paragraph(`Sub: ${data.subjectText}`, { style: 'bold', gap: 3 });
+    this.paragraph(data.preambleText, { gap: 3 });
+  }
+
+  /** The course table: the agency and its SDC address across the top, then the heading and one row per course. */
+  private courseTable(): void {
+    const { pdf, data } = this;
+    const size = 6.5;
+    const lineHeight = size * PT * SPACING;
+    const padding = 0.9;
+    const fullWidth = COURSE_COLUMNS.reduce((total, column) => total + column.width, 0);
+
+    // Name of the agency and the address of its SDC
+    const band = [data.piaName?.trim(), data.sdcAddress?.trim() ? `Add.- ${data.sdcAddress.trim()}` : ''].filter(Boolean) as string[];
+    if (band.length > 0) {
+      this.font('bold', 8);
+      const bandLines = band.flatMap(text => pdf.splitTextToSize(printable(text), fullWidth - padding * 2) as string[]);
+      const bandHeight = bandLines.length * (8 * PT * SPACING) + padding * 2;
+      if (this.ensure(bandHeight)) this.font('bold', 8);
+      pdf.setDrawColor(0, 0, 0);
+      pdf.rect(MARGIN, this.y, fullWidth, bandHeight);
+      bandLines.forEach((line, index) =>
+        pdf.text(line, PAGE_WIDTH / 2, this.y + padding + (index + 0.75) * (8 * PT * SPACING), { align: 'center' })
+      );
+      this.y += bandHeight;
+    }
+
+    /** Draws one row; each cell is its own text, wrapped to its column and centred. */
+    const drawRow = (cells: string[], bold: boolean): void => {
+      this.font(bold ? 'bold' : 'normal', size);
       const wrapped = cells.map((cell, i) => pdf.splitTextToSize(printable(cell), COURSE_COLUMNS[i].width - padding * 2) as string[]);
       const rowHeight = Math.max(...wrapped.map(lines => lines.length)) * lineHeight + padding * 2;
-      if (y + rowHeight > BOTTOM_LIMIT) {
-        pdf.addPage();
-        y = MARGIN;
-      }
+      if (this.ensure(rowHeight)) this.font(bold ? 'bold' : 'normal', size);
       let x = MARGIN;
       wrapped.forEach((lines, i) => {
         const width = COURSE_COLUMNS[i].width;
-        if (style === 'body') {
-          pdf.rect(x, y, width, rowHeight);
-        } else {
-          pdf.setFillColor(241, 245, 249);
-          pdf.rect(x, y, width, rowHeight, 'FD');
-        }
-        lines.forEach((line, lineIndex) => pdf.text(line, x + padding, y + padding + 2 + lineIndex * lineHeight));
+        pdf.setDrawColor(0, 0, 0);
+        pdf.rect(x, this.y, width, rowHeight);
+        const textTop = this.y + (rowHeight - lines.length * lineHeight) / 2;
+        lines.forEach((line, lineIndex) => pdf.text(line, x + width / 2, textTop + lineHeight * 0.75 + lineIndex * lineHeight, { align: 'center' }));
         x += width;
       });
-      y += rowHeight;
+      this.y += rowHeight;
     };
 
-    pdf.setDrawColor(15, 23, 42);
-    drawRow(COURSE_COLUMNS.map(c => c.label), 'header');
-
+    drawRow(COURSE_COLUMNS.map(column => column.label), true);
     data.courseRows.forEach((row, index) =>
       drawRow(
         [
           String(index + 1),
+          row.district ?? '',
           row.sector,
           row.courseName,
           row.courseCode,
@@ -200,76 +149,118 @@ export class IpaPdfService {
           row.minAge,
           row.rnr,
           row.rCat,
-          `C: ${row.costC}\nH: ${row.costH}\nToolkit: ${row.costToolkit}\nTotal: ${row.totalCostPerTrainee}`,
+          `C: ${row.costC}\nH: ${row.costH}\nToolkit: ${row.costToolkit}\nT: ${row.totalCostPerTrainee}`,
           String(row.approvedTrainees),
           String(row.costPerBatch),
           String(row.cycles),
           String(row.totalBudget),
           String(row.perDayHours)
         ],
-        'body'
+        false
       )
     );
 
     // Total row: the label spans the columns before "Approved Trainees / batch".
     const sum = (pick: (row: IpaDocumentData['courseRows'][number]) => number): number =>
       data.courseRows.reduce((total, row) => total + (Number(pick(row)) || 0), 0);
-    const labelWidth = COURSE_COLUMNS.slice(0, 11).reduce((total, c) => total + c.width, 0);
+    const labelWidth = COURSE_COLUMNS.slice(0, 12).reduce((total, column) => total + column.width, 0);
     const totals = [sum(r => r.approvedTrainees), sum(r => r.costPerBatch), sum(r => r.cycles), sum(r => r.totalBudget)];
     const totalRowHeight = lineHeight + padding * 2;
-    if (y + totalRowHeight > BOTTOM_LIMIT) {
-      pdf.addPage();
-      y = MARGIN;
-    }
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(fontSize);
-    pdf.setFillColor(241, 245, 249);
-    pdf.rect(MARGIN, y, labelWidth, totalRowHeight, 'FD');
-    pdf.text('TOTAL', MARGIN + labelWidth - padding, y + padding + 2, { align: 'right' });
+    this.font('bold', size);
+    if (this.ensure(totalRowHeight)) this.font('bold', size);
+    pdf.setDrawColor(0, 0, 0);
+    pdf.rect(MARGIN, this.y, labelWidth, totalRowHeight);
+    pdf.text('Total', MARGIN + padding, this.y + padding + lineHeight * 0.75);
     let x = MARGIN + labelWidth;
-    COURSE_COLUMNS.slice(11).forEach((column, i) => {
-      pdf.setFillColor(241, 245, 249);
-      pdf.rect(x, y, column.width, totalRowHeight, 'FD');
+    COURSE_COLUMNS.slice(12).forEach((column, i) => {
+      pdf.rect(x, this.y, column.width, totalRowHeight);
       // The last column (Per Day Hrs) has no total.
-      if (i < totals.length) pdf.text(String(totals[i]), x + padding, y + padding + 2);
+      if (i < totals.length) pdf.text(String(totals[i]), x + column.width / 2, this.y + padding + lineHeight * 0.75, { align: 'center' });
       x += column.width;
     });
-    return y + totalRowHeight;
+    this.y += totalRowHeight + 5;
   }
 
-  private drawSummaryTable(pdf: jsPDF, data: IpaDocumentData, startY: number): number {
-    const columns = [14, 116, 50];
-    const fontSize = 8;
-    const lineHeight = 3.6;
-    const padding = 1.6;
-    let y = startY;
+  private summaryTable(): void {
+    const { pdf, data } = this;
+    const size = 10;
+    const lineHeight = size * PT * SPACING;
+    const padding = 1.5;
 
-    const drawRow = (cells: string[], header: boolean): void => {
-      pdf.setFont('helvetica', header ? 'bold' : 'normal');
-      pdf.setFontSize(fontSize);
-      const wrapped = cells.map((cell, i) => pdf.splitTextToSize(printable(cell), columns[i] - padding * 2) as string[]);
-      const rowHeight = Math.max(...wrapped.map(lines => lines.length)) * lineHeight + padding * 2;
-      if (y + rowHeight > BOTTOM_LIMIT) {
-        pdf.addPage();
-        y = MARGIN;
-      }
+    const drawRow = (cells: string[], bold: boolean): void => {
+      this.font(bold ? 'bold' : 'normal', size);
+      const wrapped = cells.map((cell, i) => pdf.splitTextToSize(printable(cell), SUMMARY_COLUMNS[i] - padding * 2) as string[]);
+      const rowHeight = Math.max(...wrapped.map(lines => lines.length), 1) * lineHeight + padding * 2;
+      if (this.ensure(rowHeight)) this.font(bold ? 'bold' : 'normal', size);
       let x = MARGIN;
       wrapped.forEach((lines, i) => {
-        if (header) {
-          pdf.setFillColor(241, 245, 249);
-          pdf.rect(x, y, columns[i], rowHeight, 'FD');
-        } else {
-          pdf.rect(x, y, columns[i], rowHeight);
-        }
-        lines.forEach((line, lineIndex) => pdf.text(line, x + padding, y + padding + 2.6 + lineIndex * lineHeight));
-        x += columns[i];
+        pdf.setDrawColor(0, 0, 0);
+        pdf.rect(x, this.y, SUMMARY_COLUMNS[i], rowHeight);
+        const textTop = this.y + (rowHeight - lines.length * lineHeight) / 2;
+        lines.forEach((line, lineIndex) => {
+          const baseline = textTop + lineHeight * 0.75 + lineIndex * lineHeight;
+          if (i === 2) pdf.text(line, x + SUMMARY_COLUMNS[i] - padding, baseline, { align: 'right' });
+          else pdf.text(line, x + padding, baseline);
+        });
+        x += SUMMARY_COLUMNS[i];
       });
-      y += rowHeight;
+      this.y += rowHeight;
     };
 
-    pdf.setDrawColor(100, 116, 139);
-    drawRow(['S.no.', 'Particular', 'Value'], true);
-    data.targetSummary.forEach(row => drawRow([String(row.sNo), row.particular, row.value], false));
-    return y;
+    drawRow(['S.no.', 'Particular', ''], true);
+    data.targetSummary.forEach((row, index) => drawRow([String(index + 1), row.particular, row.value], false));
+    this.y += 5;
+  }
+
+  /** The note on the minimum qualification of the trainees and the box that lists it. */
+  private qualification(): void {
+    const { pdf, data } = this;
+    if (data.qualificationNote?.trim()) this.paragraph(data.qualificationNote, { style: 'bold', gap: 2.5 });
+
+    const title = data.qualificationTitle?.trim();
+    const body = (data.qualificationText ?? '').split('\n').map(line => line.trim()).filter(Boolean);
+    if (!title && body.length === 0) return;
+
+    const size = BODY_SIZE;
+    const lineHeight = size * PT * SPACING;
+    const padding = 1.5;
+    const textWidth = CONTENT_WIDTH - padding * 2;
+
+    this.font('bold', size);
+    const titleLines = title ? (pdf.splitTextToSize(printable(title), textWidth) as string[]) : [];
+    this.font('normal', size);
+    const bodyLines = body.flatMap(line => pdf.splitTextToSize(printable(line), textWidth) as string[]);
+    const titleHeight = titleLines.length > 0 ? titleLines.length * lineHeight + padding * 2 : 0;
+    const bodyHeight = bodyLines.length > 0 ? bodyLines.length * lineHeight + padding * 2 : 0;
+    const height = titleHeight + bodyHeight;
+
+    this.ensure(height);
+    pdf.setDrawColor(0, 0, 0);
+    pdf.rect(MARGIN, this.y, CONTENT_WIDTH, height);
+    if (titleHeight > 0) {
+      this.font('bold', size);
+      titleLines.forEach((line, i) => pdf.text(line, MARGIN + padding, this.y + padding + lineHeight * 0.75 + i * lineHeight));
+      if (bodyHeight > 0) pdf.line(MARGIN, this.y + titleHeight, MARGIN + CONTENT_WIDTH, this.y + titleHeight);
+    }
+    if (bodyHeight > 0) {
+      this.font('normal', size);
+      bodyLines.forEach((line, i) => pdf.text(line, MARGIN + padding, this.y + titleHeight + padding + lineHeight * 0.75 + i * lineHeight));
+    }
+    this.y += height + 6;
+  }
+
+  private terms(): void {
+    this.paragraph('IPA is issued subject to following terms and conditions: -', { style: 'bold', gap: 2.5 });
+    this.data.termsAndConditions
+      .filter(clause => clause.trim())
+      .forEach((clause, index) => this.paragraph(clause, { label: `${String.fromCharCode(97 + (index % 26))})`, labelWidth: 8, gap: 1.8 }));
+    this.y += 4;
+  }
+
+  private copies(): void {
+    const items = this.data.ccList.filter(item => item.trim());
+    if (items.length === 0) return;
+    this.paragraph('CC:', { gap: 1.5, justify: false });
+    items.forEach((item, index) => this.paragraph(item, { indent: 4, label: `${index + 1}-`, labelWidth: 8, gap: 1, justify: false }));
   }
 }

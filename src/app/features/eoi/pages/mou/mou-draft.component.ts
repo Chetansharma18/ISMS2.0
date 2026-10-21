@@ -17,7 +17,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EoiStateService, Scheme } from '../../services/eoi-state.service';
 import type { SanctionOrderDocumentData } from '../../services/eoi-state.models';
 import { formatDateTime } from '../../../../shared/utils';
-import { MOU_ARTICLES, MOU_RECITALS, MouContext, MouPart, splitMouText } from './mou-content';
+import { ButtonComponent, DocTableDirective, IconComponent } from '../../../../shared';
+import { MOU_ARTICLES, MOU_RECITALS, MouContext, splitMouText } from './mou-content';
 
 /** Where the edited draft of a scheme is kept in the browser. */
 const draftKey = (schemeId: string): string => `isms_mou_draft_${schemeId}`;
@@ -40,7 +41,7 @@ const INDENT: Record<number, string> = { 1: 'ml-0', 2: 'ml-6', 3: 'ml-12' };
   selector: 'app-mou-draft',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent, DocTableDirective, IconComponent],
   // The saved draft is put back as plain HTML, so the styles must not depend on Angular's scoping.
   encapsulation: ViewEncapsulation.None,
   styles: [
@@ -56,7 +57,23 @@ const INDENT: Record<number, string> = { 1: 'ml-0', 2: 'ml-6', 3: 'ml-12' };
       .mou-blank-normal { min-width: 9rem; }
       .mou-blank-long { min-width: 18rem; }
       .mou-blank:focus { background: #f1f5f9; }
+      /* Stamp paper: the text starts 60% down the first page. A4 is 297 mm; with the 12 mm top margin below, 166 mm of
+         space puts the first line at 178 mm. */
+      @page { size: A4; margin: 12mm 15mm; }
+      .mou-stamp-space {
+        height: 166mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        border: 1px dashed #94a3b8;
+        border-radius: 6px;
+        color: #64748b;
+        font-size: 12px;
+        user-select: none;
+      }
       @media print {
+        .mou-stamp-space { border: 0; color: transparent; margin-bottom: 0; }
         .mou-blank:focus { background: transparent; }
         .mou-keep { break-inside: avoid; }
       }
@@ -69,14 +86,8 @@ const INDENT: Record<number, string> = { 1: 'ml-0', 2: 'ml-6', 3: 'ml-12' };
         <!-- Toolbar -->
         <div class="print:hidden bg-white border border-slate-200 rounded-lg shadow-2xs px-4 py-3 flex items-center justify-between gap-4">
           <div class="flex items-center gap-3 min-w-0 flex-1">
-            <button
-              type="button"
-              (click)="goBack()"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs shrink-0"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
+            <button appButton variant="outline" size="sm" (click)="goBack()">
+              <app-icon name="back" />
               <span>Back</span>
             </button>
             <div class="w-px h-8 bg-slate-200 shrink-0"></div>
@@ -92,25 +103,12 @@ const INDENT: Record<number, string> = { 1: 'ml-0', 2: 'ml-6', 3: 'ml-12' };
 
           <div class="flex items-center justify-end gap-2.5 shrink-0 ml-auto">
             <span class="text-[11px] text-slate-500 mr-1 whitespace-nowrap" aria-live="polite">{{ saveStatus() }}</span>
-            <button
-              type="button"
-              (click)="print()"
-              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
-            >
-              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-              </svg>
+            <button appButton variant="outline" (click)="print()">
+              <app-icon name="print" size="sm" />
               <span>Print</span>
             </button>
-            <button
-              type="button"
-              (click)="save()"
-              class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
-              style="color: #ffffff !important;"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
+            <button appButton (click)="save()">
+              <app-icon name="check" size="sm" />
               <span>Save</span>
             </button>
           </div>
@@ -124,11 +122,19 @@ const INDENT: Record<number, string> = { 1: 'ml-0', 2: 'ml-6', 3: 'ml-12' };
           <!-- Document -->
           <!-- The whole document can be edited. Saved edits are put back into it when the page opens. -->
           <div
+            class="mou-paper w-full bg-white p-6 sm:p-10 lg:p-14 print:p-0 text-[#111827] font-serif leading-relaxed text-[13px] sm:text-sm border border-slate-300 shadow-sm rounded-lg print:border-none print:shadow-none print:text-[12px]"
+          >
+          <!-- The top 60% of the first page is left empty: the stamp paper is used there. It is not part of the edited text. -->
+          <div class="mou-stamp-space" contenteditable="false" aria-hidden="true">
+            <span>Space for stamp paper (60% of the first page)</span>
+          </div>
+
+          <div
             #sheet
             contenteditable="true"
             spellcheck="false"
             (input)="markEdited()"
-            class="mou-sheet w-full bg-white p-6 sm:p-10 lg:p-14 print:p-0 text-[#111827] font-serif leading-relaxed text-[13px] sm:text-sm border border-slate-300 shadow-sm rounded-lg print:border-none print:shadow-none print:text-[12px] focus:outline-none"
+            class="mou-sheet focus:outline-none"
           >
           @if (!initialHtml) {
 
@@ -173,11 +179,11 @@ const INDENT: Record<number, string> = { 1: 'ml-0', 2: 'ml-6', 3: 'ml-12' };
             </p>
 
             <p class="font-bold m-0 mb-2">WHEREAS:</p>
-            @for (recital of recitals; track recital.letter) {
+            @for (recital of recitals(); track recital.letter) {
               <div class="mou-keep grid grid-cols-[2rem_1fr] mb-2 text-justify">
                 <span class="font-bold">{{ recital.letter }}.</span>
                 <p class="m-0">
-                  @for (part of parts(recital.text); track $index) {
+                  @for (part of recital.parts; track $index) {
                     <ng-container *ngTemplateOutlet="partTpl; context: { $implicit: part }" />
                   }
                 </p>
@@ -186,7 +192,7 @@ const INDENT: Record<number, string> = { 1: 'ml-0', 2: 'ml-6', 3: 'ml-12' };
 
             <p class="font-bold m-0 mt-4 mb-4">NOW, THEREFORE, THE PARTIES HEREBY AGREE AS FOLLOWS:</p>
 
-            @for (article of articles; track article.title) {
+            @for (article of articles(); track article.title) {
               <section class="mb-4">
                 <h3 class="text-sm font-bold m-0 mb-2 text-center uppercase" style="break-after: avoid;">{{ article.title }}</h3>
                 @for (item of article.items; track $index) {
@@ -197,7 +203,7 @@ const INDENT: Record<number, string> = { 1: 'ml-0', 2: 'ml-6', 3: 'ml-12' };
                   >
                     <span>{{ item.no }}</span>
                     <span>
-                      @for (part of parts(item.text); track $index) {
+                      @for (part of item.parts; track $index) {
                         <ng-container *ngTemplateOutlet="partTpl; context: { $implicit: part }" />
                       }
                     </span>
@@ -212,7 +218,7 @@ const INDENT: Record<number, string> = { 1: 'ml-0', 2: 'ml-6', 3: 'ml-12' };
             </p>
 
             <!-- Signatures -->
-            <table class="mou-keep w-full border-collapse text-[13px]">
+            <table appDocTable class="mou-keep w-full border-collapse text-[13px]">
               <thead>
                 <tr>
                   <th class="border border-slate-700 px-3 py-2 text-left w-1/2">For and on behalf of RSLDC</th>
@@ -237,7 +243,7 @@ const INDENT: Record<number, string> = { 1: 'ml-0', 2: 'ml-6', 3: 'ml-12' };
               </tbody>
             </table>
 
-            <table class="mou-keep w-full border-collapse text-[13px] mt-5">
+            <table appDocTable class="mou-keep w-full border-collapse text-[13px] mt-5">
               <thead>
                 <tr>
                   <th class="border border-slate-700 px-3 py-2 text-left w-1/2">Witness 1</th>
@@ -258,6 +264,7 @@ const INDENT: Record<number, string> = { 1: 'ml-0', 2: 'ml-6', 3: 'ml-12' };
               </tbody>
             </table>
           }
+          </div>
           </div>
         }
       </div>
@@ -289,8 +296,6 @@ export class MouDraftComponent {
   private router = inject(Router);
   private eoiStateService = inject(EoiStateService);
 
-  protected readonly recitals = MOU_RECITALS;
-  protected readonly articles = MOU_ARTICLES;
   protected readonly year = new Date().getFullYear();
   protected readonly signatureLines = ['Signature', 'Name', 'Designation', 'Date', 'Place'];
   protected readonly witnessLines = ['Signature', 'Name', 'Address'];
@@ -324,6 +329,18 @@ export class MouDraftComponent {
 
   protected readonly saveStatus = signal('');
 
+  // The text is split into plain text, values and blanks once, when the scheme is known.
+  protected readonly recitals = computed(() =>
+    MOU_RECITALS.map(recital => ({ letter: recital.letter, parts: splitMouText(recital.text, this.context()) }))
+  );
+
+  protected readonly articles = computed(() =>
+    MOU_ARTICLES.map(article => ({
+      title: article.title,
+      items: article.items.map(item => ({ ...item, parts: splitMouText(item.text, this.context()) }))
+    }))
+  );
+
   constructor() {
     const saved = this.loadSaved();
     if (saved) this.saveStatus.set(`Saved ${formatDateTime(new Date(saved.savedAt))}`);
@@ -341,10 +358,6 @@ export class MouDraftComponent {
       .getSchemeById(this.schemeId)
       .pipe(takeUntilDestroyed())
       .subscribe(scheme => this.scheme.set(scheme));
-  }
-
-  protected parts(text: string): MouPart[] {
-    return splitMouText(text, this.context());
   }
 
   protected indent(level: number): string {

@@ -36,7 +36,7 @@ const NO_DISTRICTS: string[] = [];
           <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">1</span>
           <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Company Particulars &amp; Registration Details</h2>
         </div>
-        <span class="text-xs text-slate-500 font-mono font-semibold truncate">CIN: {{ state.editableStep1.registrationNumber || '-' }}</span>
+        <span class="text-xs text-slate-500 tabular-nums font-semibold truncate">CIN: {{ state.editableStep1.registrationNumber || '-' }}</span>
       </div>
 
       <div class="p-4 sm:p-5 w-full space-y-3 font-sans">

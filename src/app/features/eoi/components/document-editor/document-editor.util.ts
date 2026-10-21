@@ -13,13 +13,15 @@ export function isLegacyEmblem(logoUrl: string): boolean {
 /** Inline SVG emblem or image fallback when left logo fails to load. */
 export const DEFAULT_EMBLEM_SVG = '/rsldc-logo.png';
 
-export type ClauseLabelFormat = 'alpha' | 'decimal';
+export type ClauseLabelFormat = 'alpha' | 'decimal' | 'none';
 
 /**
  * Label shown before a numbered clause.
  * - alpha:   a), b), c) ...
  * - decimal: 1., 2., 3. ...
+ * - none:    no label; the clause text carries its own number
  */
 export function clauseLabel(index: number, format: ClauseLabelFormat): string {
+  if (format === 'none') return '';
   return format === 'alpha' ? `${String.fromCharCode(97 + index)})` : `${index + 1}.`;
 }

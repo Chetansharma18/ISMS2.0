@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { OtrFormService } from '../../services/otr-form.service';
 import { FileDoc } from '../../models/otr-form.model';
 import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
+import { ButtonComponent, IconComponent } from '../../../../shared';
 
 @Component({
   selector: 'app-step5-preview',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent, IconComponent],
   template: `
     <div class="w-full space-y-4 font-sans bg-white pb-4">
 
@@ -26,25 +27,22 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
           </div>
 
           <div class="flex items-center gap-2">
-            <button
-              type="button"
-              (click)="onEditStep(1)"
-              class="inline-flex items-center px-3 py-1 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
-              title="Edit Organisation Details"
-            >
+            <button appButton variant="outline" size="sm" type="button" (click)="onEditStep(1)" title="Edit Organisation Details">
               <span>Edit Details</span>
             </button>
 
             <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
               type="button"
               (click)="toggleSection(1)"
-              class="p-1 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition-colors cursor-pointer"
               [attr.aria-expanded]="isSection1Open()"
               title="Toggle Section"
+              aria-label="Toggle Section"
             >
-              <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="!isSection1Open()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
+              <app-icon name="chevron-down" class="transition-transform duration-200" [class.rotate-180]="!isSection1Open()" />
             </button>
           </div>
         </div>
@@ -62,7 +60,7 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Registration No. (CIN / Reg. No.)</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step1().registrationNumber || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step1().registrationNumber || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Date of Registration</span>
@@ -76,7 +74,7 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Organisation PAN</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step1().companyPan || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step1().companyPan || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">GST Registered</span>
@@ -136,25 +134,22 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
           </div>
 
           <div class="flex items-center gap-2">
-            <button
-              type="button"
-              (click)="onEditStep(2)"
-              class="inline-flex items-center px-3 py-1 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
-              title="Edit Authorized Person Details"
-            >
+            <button appButton variant="outline" size="sm" type="button" (click)="onEditStep(2)" title="Edit Authorized Person Details">
               <span>Edit Details</span>
             </button>
 
             <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
               type="button"
               (click)="toggleSection(2)"
-              class="p-1 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition-colors cursor-pointer"
               [attr.aria-expanded]="isSection2Open()"
               title="Toggle Section"
+              aria-label="Toggle Section"
             >
-              <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="!isSection2Open()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
+              <app-icon name="chevron-down" class="transition-transform duration-200" [class.rotate-180]="!isSection2Open()" />
             </button>
           </div>
         </div>
@@ -182,11 +177,11 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
             <!-- Row 2 -->
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">PAN</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step3().pan || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step3().pan || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Aadhaar No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step3().aadhaarNo || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step3().aadhaarNo || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Mobile No.</span>
@@ -238,25 +233,22 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
           </div>
 
           <div class="flex items-center gap-2">
-            <button
-              type="button"
-              (click)="onEditStep(3)"
-              class="inline-flex items-center px-3 py-1 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
-              title="Edit Bank Details"
-            >
+            <button appButton variant="outline" size="sm" type="button" (click)="onEditStep(3)" title="Edit Bank Details">
               <span>Edit Details</span>
             </button>
 
             <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
               type="button"
               (click)="toggleSection(3)"
-              class="p-1 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition-colors cursor-pointer"
               [attr.aria-expanded]="isSection3Open()"
               title="Toggle Section"
+              aria-label="Toggle Section"
             >
-              <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="!isSection3Open()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
+              <app-icon name="chevron-down" class="transition-transform duration-200" [class.rotate-180]="!isSection3Open()" />
             </button>
           </div>
         </div>
@@ -279,7 +271,7 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Account Number</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step4().accountNo || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step4().accountNo || '-' }}</span>
             </div>
 
             <!-- Row 2 -->
@@ -289,11 +281,11 @@ import { DocumentViewerService } from '../../../../core/services/document-viewer
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">IFSC Code</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step4().ifscCode || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step4().ifscCode || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">MICR Code</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 font-mono">{{ step4().micrCode || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step4().micrCode || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Transfer Mode</span>

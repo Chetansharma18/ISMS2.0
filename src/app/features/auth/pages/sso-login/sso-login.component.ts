@@ -1,3 +1,4 @@
+// ui-guard-allow: page-frame - the login screen uses the auth layout, not the portal frame
 import { ChangeDetectionStrategy, Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,12 +7,13 @@ import { AuthService, UserRole, USER_ROLES } from '../../../../core/auth/auth.se
 import { StorageService } from '../../../../core/services/storage.service';
 import { OtrFormService } from '../../../registration/services/otr-form.service';
 import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dept-admin-otp-modal/dept-admin-otp-modal.component';
+import { ButtonComponent, IconComponent, InputDirective } from '../../../../shared';
 
 @Component({
   selector: 'app-sso-login',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule, DeptAdminOtpModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, DeptAdminOtpModalComponent, ButtonComponent, IconComponent, InputDirective],
   host: {
     class: 'block w-full min-h-full flex flex-col bg-white'
   },
@@ -87,12 +89,14 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
                   SSOID / Email ID
                 </label>
                 <input
+                  appInput
+                  variant="underline"
                   id="emailOrSsoIdInput"
                   name="emailOrSsoId"
                   type="text"
                   [(ngModel)]="emailOrSsoId"
                   placeholder="Enter SSOID or Email ID"
-                  class="sso-input w-full border-b-2 border-slate-300 py-2 text-base sm:text-lg text-slate-900 focus:outline-none transition-colors bg-transparent font-medium"
+                  class="w-full text-base sm:text-lg"
                   required
                 />
               </div>
@@ -103,12 +107,14 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
                   Password
                 </label>
                 <input
+                  appInput
+                  variant="underline"
                   id="passwordInput"
                   name="password"
                   type="password"
                   [(ngModel)]="password"
                   placeholder="Enter Password"
-                  class="sso-input w-full border-b-2 border-slate-300 py-2 text-base sm:text-lg text-slate-800 tracking-widest focus:outline-none transition-colors bg-transparent"
+                  class="w-full text-base sm:text-lg tracking-widest"
                   required
                 />
               </div>
@@ -121,7 +127,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
                 <div class="flex items-center gap-3">
                   <!-- Dotted pattern captcha display -->
                   <div
-                    class="px-4 py-2 border border-slate-300 bg-slate-100 rounded-md select-none font-mono text-base sm:text-lg font-black text-slate-800 tracking-[0.25em] flex items-center justify-center min-w-30"
+                    class="px-4 py-2 border border-slate-300 bg-slate-100 rounded-md select-none tabular-nums text-base sm:text-lg font-black text-slate-800 tracking-[0.25em] flex items-center justify-center min-w-30"
                     style="background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 6px 6px;"
                     aria-label="Captcha code"
                   >
@@ -130,25 +136,26 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
 
                   <!-- Captcha Input Box -->
                   <input
+                    appInput
                     name="enteredCaptcha"
                     type="text"
                     [(ngModel)]="enteredCaptcha"
                     placeholder="Captcha"
-                    class="sso-input w-32 sm:w-36 px-3 py-2 border border-slate-300 rounded-md text-sm sm:text-base font-semibold text-slate-800 focus:outline-none"
+                    class="w-32 sm:w-36"
                     required
                   />
 
                   <!-- Refresh captcha icon -->
                   <button
+                    appButton
+                    variant="ghost"
+                    iconOnly
                     type="button"
                     (click)="refreshCaptcha()"
-                    class="p-2 text-sso-blue hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
                     title="Refresh Captcha"
                     aria-label="Refresh Captcha"
                   >
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
+                    <app-icon name="refresh" size="lg" [stroke]="2" />
                   </button>
                 </div>
               </div>
@@ -161,16 +168,12 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
                 <div class="grid grid-cols-2 gap-2">
                   @for (r of availableRoles; track r.role) {
                     <button
+                      appButton
+                      size="sm"
                       type="button"
+                      [variant]="selectedRole() === r.role ? 'primary' : 'outline'"
                       (click)="selectRole(r.role)"
-                      class="px-3 py-2 rounded-md text-xs sm:text-sm font-bold border transition-all text-left flex items-center justify-between cursor-pointer"
-                      [class.bg-navy]="selectedRole() === r.role"
-                      [class.text-white]="selectedRole() === r.role"
-                      [class.border-navy]="selectedRole() === r.role"
-                      [class.bg-slate-50]="selectedRole() !== r.role"
-                      [class.text-slate-700]="selectedRole() !== r.role"
-                      [class.border-slate-300]="selectedRole() !== r.role"
-                      [class.hover:bg-slate-100]="selectedRole() !== r.role"
+                      class="justify-between"
                     >
                       <span class="truncate">{{ r.label }}</span>
                       @if (selectedRole() === r.role) {
@@ -184,15 +187,13 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
               <!-- Submit Button: Verify & Continue -->
               <div class="pt-2">
                 <button
+                  appButton
+                  size="lg"
+                  block
                   type="submit"
-                  [disabled]="isLoading()"
-                  class="w-full bg-navy hover:bg-navy-dark text-white font-bold text-sm sm:text-base py-3 px-5 rounded-md transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 shadow-sm"
+                  [loading]="isLoading()"
                 >
                   @if (isLoading()) {
-                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
                     <span>Verifying with RajSSO...</span>
                   } @else {
                     <span>Verify &amp; Continue &rarr;</span>
@@ -221,12 +222,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
 
 
     </div>
-  `,
-  styles: [`
-    .sso-input:focus {
-      border-color: #131862 !important;
-    }
-  `]
+  `
 })
 export class SsoLoginComponent {
   private authService = inject(AuthService);

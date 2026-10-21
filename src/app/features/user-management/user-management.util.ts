@@ -96,7 +96,7 @@ export function filterUsers(
 }
 
 /** Row styling for the users table. */
-export function userRowClass(item: any): string {
+export function userRowClass(item: { status?: string; schemeStatus?: string }): string {
   if (item.status === 'Blacklisted' || item.schemeStatus === 'Blacklisted') {
     return 'bg-rose-50/60 transition-colors';
   }

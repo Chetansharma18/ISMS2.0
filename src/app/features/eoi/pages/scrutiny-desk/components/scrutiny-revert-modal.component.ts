@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, HostListener, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ButtonComponent, DropdownComponent, IconComponent, InputDirective, ModalComponent } from '../../../../../shared';
 import { OTHER_OPTION, OptionDropdownComponent } from './option-dropdown.component';
 
 /** A file the department shares with the applicant along with the shortfall. */
@@ -34,42 +35,11 @@ const COMMENT_PRESETS = [
 @Component({
   selector: 'app-scrutiny-revert-modal',
   standalone: true,
-  imports: [OptionDropdownComponent],
+  imports: [ButtonComponent, DropdownComponent, IconComponent, InputDirective, ModalComponent, OptionDropdownComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div
-      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
-      style="background: rgba(10,20,40,0.5); backdrop-filter: blur(4px);"
-      (click)="close.emit()"
-    >
-      <div
-        class="w-full max-w-xl bg-white rounded-xl border border-slate-200 shadow-2xl relative font-sans overflow-hidden my-auto max-h-[92vh] flex flex-col"
-        (click)="$event.stopPropagation()"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="revert-title"
-      >
-        <div class="h-1.5 w-full bg-navy shrink-0"></div>
-
-        <div class="px-5 sm:px-6 pt-5 pb-4 border-b border-slate-200 flex items-start justify-between gap-3">
-          <div>
-            <h2 id="revert-title" class="text-base sm:text-lg font-bold text-slate-900 m-0">Raise Shortfall</h2>
-            <p class="text-xs text-slate-500 m-0 mt-0.5">{{ applicantLabel() }}</p>
-          </div>
-          <button
-            type="button"
-            (click)="close.emit()"
-            class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
-            title="Close"
-            aria-label="Close"
-          >
-            <svg class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <div class="px-5 sm:px-6 py-5 overflow-y-auto flex-1 space-y-5 text-xs" (click)="docPanelOpen.set(false)">
+    <app-modal title="Raise Shortfall" [subtitle]="applicantLabel()" size="md" (close)="close.emit()">
+        <div class="space-y-5 text-xs">
 
           <!-- Documents asked for -->
           <div class="space-y-2">
@@ -77,82 +47,32 @@ const COMMENT_PRESETS = [
               Shortfall Documents <span class="text-rose-600">*</span>
             </label>
             <!-- Multi-select dropdown -->
-            <div class="relative" (click)="$event.stopPropagation()">
-              <button
-                id="revert-doc"
-                type="button"
-                (click)="docPanelOpen.update(open => !open)"
-                [attr.aria-expanded]="docPanelOpen()"
-                aria-haspopup="listbox"
-                class="w-full min-h-[38px] px-3 py-2 border rounded-lg bg-white cursor-pointer flex items-center justify-between gap-2 shadow-2xs hover:border-slate-400 text-left"
-                [class]="docPanelOpen() ? 'border-navy' : 'border-slate-300'"
-              >
-                <span [class]="documents().length ? 'text-slate-800 font-medium' : 'text-slate-400'">
-                  {{ documents().length ? documents().length + ' selected' : 'Select documents' }}
-                </span>
-                <svg class="w-4 h-4 text-slate-400 transition-transform" [class.rotate-180]="docPanelOpen()" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              @if (docPanelOpen()) {
-                <div class="absolute left-0 right-0 top-full mt-1 z-30 bg-white border border-slate-300 rounded-lg shadow-xl overflow-hidden" role="listbox" aria-multiselectable="true">
-                  <div class="max-h-56 overflow-y-auto divide-y divide-slate-100 p-1">
-                    @for (title of documentOptions(); track title) {
-                      <label class="flex items-center gap-2.5 p-2 hover:bg-slate-50 rounded cursor-pointer">
-                        <input
-                          type="checkbox"
-                          [checked]="documents().includes(title)"
-                          (change)="toggleDoc(title)"
-                          class="w-4 h-4 rounded text-navy border-slate-300 cursor-pointer shrink-0"
-                        />
-                        <span class="text-xs text-slate-800">{{ title }}</span>
-                      </label>
-                    }
-                    <label class="flex items-center gap-2.5 p-2 hover:bg-slate-50 rounded cursor-pointer">
-                      <input
-                        type="checkbox"
-                        [checked]="customDocOpen()"
-                        (change)="customDocOpen.set(!customDocOpen())"
-                        class="w-4 h-4 rounded text-navy border-slate-300 cursor-pointer shrink-0"
-                      />
-                      <span class="text-xs text-slate-800">Other (type your own)</span>
-                    </label>
-                  </div>
-                  <div class="p-2 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-[11px]">
-                    <span class="text-slate-500">{{ documents().length }} selected</span>
-                    <button
-                      type="button"
-                      (click)="docPanelOpen.set(false)"
-                      class="px-3 py-1 bg-navy hover:bg-[#07243c] rounded text-xs font-semibold cursor-pointer"
-                      style="color: #ffffff !important;"
-                    >
-                      Done
-                    </button>
-                  </div>
-                </div>
-              }
-            </div>
+            <app-dropdown
+              multiple
+              inputId="revert-doc"
+              placeholder="Select documents"
+              [options]="documentOptions()"
+              [values]="documents()"
+              [maxLabels]="0"
+              [footer]="true"
+              otherLabel="Other (type your own)"
+              [otherSelected]="customDocOpen()"
+              (optionToggled)="toggleDoc($event)"
+              (other)="customDocOpen.set(!customDocOpen())"
+            />
 
             @if (customDocOpen()) {
               <div class="flex items-center gap-2">
                 <input
+                  appInput
                   type="text"
                   [value]="customDoc()"
                   (input)="customDoc.set($any($event.target).value)"
                   (keydown.enter)="addCustomDoc(); $event.preventDefault()"
                   placeholder="Type the document name"
-                  class="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-navy shadow-2xs"
+                  class="flex-1"
                 />
-                <button
-                  type="button"
-                  (click)="addCustomDoc()"
-                  [disabled]="!customDoc().trim()"
-                  class="px-3.5 py-2 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                  style="color: #ffffff !important;"
-                >
-                  Add
-                </button>
+                <button appButton size="sm" (click)="addCustomDoc()" [disabled]="!customDoc().trim()">Add</button>
               </div>
             }
 
@@ -161,13 +81,8 @@ const COMMENT_PRESETS = [
                 @for (doc of documents(); track doc) {
                   <span class="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-md bg-amber-50 border border-amber-300 text-amber-900 text-xs font-medium">
                     <span>{{ doc }}</span>
-                    <button
-                      type="button"
-                      (click)="removeDoc(doc)"
-                      class="w-4 h-4 rounded hover:bg-amber-200/80 text-amber-700 hover:text-amber-900 flex items-center justify-center cursor-pointer"
-                      [attr.aria-label]="'Remove ' + doc"
-                    >
-                      &times;
+                    <button appButton variant="ghost" size="sm" iconOnly class="-my-2" (click)="removeDoc(doc)" [attr.aria-label]="'Remove ' + doc">
+                      <app-icon name="close" size="xs" />
                     </button>
                   </span>
                 }
@@ -181,13 +96,7 @@ const COMMENT_PRESETS = [
               <label class="block text-xs font-semibold text-slate-800">
                 Attach Documents <span class="text-slate-400 font-normal">(optional)</span>
               </label>
-              <button
-                type="button"
-                (click)="fileInput.click()"
-                class="px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 cursor-pointer shadow-2xs"
-              >
-                Upload
-              </button>
+              <button appButton variant="outline" size="sm" (click)="fileInput.click()">Upload</button>
             </div>
             <input #fileInput type="file" multiple class="hidden" (change)="onFilesPicked($event)" />
 
@@ -198,13 +107,7 @@ const COMMENT_PRESETS = [
                     <span class="truncate text-slate-800">
                       {{ file.fileName }} <span class="text-slate-500">({{ file.fileSize }})</span>
                     </span>
-                    <button
-                      type="button"
-                      (click)="removeFile(file.fileName)"
-                      class="shrink-0 text-rose-600 hover:text-rose-800 font-medium cursor-pointer"
-                    >
-                      Remove
-                    </button>
+                    <button appButton variant="ghost" size="sm" class="shrink-0" (click)="removeFile(file.fileName)">Remove</button>
                   </li>
                 }
               </ul>
@@ -217,9 +120,10 @@ const COMMENT_PRESETS = [
               Response Time <span class="text-rose-600">*</span>
             </label>
             <select
+              appInput
               id="revert-days"
               (change)="dueDays.set(+$any($event.target).value)"
-              class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-xs text-slate-800 bg-white focus:outline-none focus:border-navy cursor-pointer shadow-2xs"
+              class="w-full cursor-pointer"
             >
               @for (days of dayOptions; track days) {
                 <option [value]="days" [selected]="days === dueDays()">{{ days }} days</option>
@@ -242,36 +146,22 @@ const COMMENT_PRESETS = [
 
             @if (commentChoice() === other) {
               <textarea
+                appInput
                 rows="3"
                 [value]="customComment()"
                 (input)="customComment.set($any($event.target).value)"
                 placeholder="Type your comment"
-                class="w-full p-3 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-navy bg-white shadow-2xs leading-relaxed"
+                class="w-full"
               ></textarea>
             }
           </div>
         </div>
 
-        <div class="px-5 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/70 flex flex-col-reverse sm:flex-row items-center justify-end gap-2.5">
-          <button
-            type="button"
-            (click)="close.emit()"
-            class="w-full sm:w-auto px-4 py-2 border border-slate-300 bg-white hover:bg-slate-50 rounded-lg text-xs font-medium text-slate-700 transition-colors cursor-pointer"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            (click)="submit()"
-            [disabled]="!isValid()"
-            class="w-full sm:w-auto px-5 py-2 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs font-semibold transition-colors cursor-pointer shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
-            style="color: #ffffff !important;"
-          >
-            Raise Shortfall
-          </button>
-        </div>
-      </div>
-    </div>
+        <ng-container modalFooter>
+          <button appButton variant="outline" (click)="close.emit()">Cancel</button>
+          <button appButton (click)="submit()" [disabled]="!isValid()">Raise Shortfall</button>
+        </ng-container>
+    </app-modal>
   `
 })
 export class ScrutinyRevertModalComponent {
@@ -288,7 +178,6 @@ export class ScrutinyRevertModalComponent {
   protected readonly commentPresets = COMMENT_PRESETS;
 
   protected readonly documents = signal<string[]>([]);
-  protected readonly docPanelOpen = signal(false);
   protected readonly customDocOpen = signal(false);
   protected readonly customDoc = signal('');
   protected readonly sharedFiles = signal<RevertSharedFile[]>([]);
@@ -301,11 +190,6 @@ export class ScrutinyRevertModalComponent {
   );
 
   protected readonly isValid = computed(() => this.documents().length > 0 && this.comment().length > 0);
-
-  @HostListener('document:keydown.escape')
-  protected onEscape(): void {
-    this.close.emit();
-  }
 
   protected toggleDoc(title: string): void {
     this.documents.update(list => (list.includes(title) ? list.filter(d => d !== title) : [...list, title]));

@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, inject, ViewChild } from '@angular/
 import { CommonModule } from '@angular/common';
 import { HeroTendersComponent } from '../hero-tenders/hero-tenders.component';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { ButtonComponent, IconComponent } from '../../../../shared';
 
 @Component({
   selector: 'app-hero-section',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, HeroTendersComponent],
+  imports: [CommonModule, HeroTendersComponent, ButtonComponent, IconComponent],
   host: {
     class: 'block w-full'
   },
@@ -56,28 +57,27 @@ import { AuthService } from '../../../../core/auth/auth.service';
               
               <!-- Primary: Login to Portal -->
               <button
+                appButton
+                size="lg"
                 type="button"
                 (click)="onLoginClick()"
-                class="inline-flex items-center justify-center h-10.5 sm:h-11 px-5 sm:px-6 rounded-md bg-[#F28C28] hover:bg-[#d9771e] text-white text-sm sm:text-[15px] font-semibold transition-colors duration-200 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F28C28] focus:ring-offset-2 focus:ring-offset-[#0B2440]"
                 aria-label="Login to Portal"
               >
                 <span>Login to Portal</span>
-                <svg class="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
+                <app-icon name="forward" />
               </button>
 
               <!-- Secondary: View Tenders -->
               <button
+                appButton
+                variant="outline"
+                size="lg"
                 type="button"
                 (click)="onViewTendersClick()"
-                class="inline-flex items-center justify-center h-10.5 sm:h-11 px-5 sm:px-6 rounded-md bg-transparent border border-white hover:bg-white/10 text-white text-sm sm:text-[15px] font-semibold transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#0B2440]"
                 aria-label="View Tenders"
               >
                 <span>View Tenders</span>
-                <svg class="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
+                <app-icon name="forward" />
               </button>
 
             </div>

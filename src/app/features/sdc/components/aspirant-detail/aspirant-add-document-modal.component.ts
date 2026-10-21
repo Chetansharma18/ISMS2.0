@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AspirantDocumentItem } from '../../config/aspirant-form.config';
-import { AspirantModalShellComponent } from './aspirant-modal-shell.component';
+import { ButtonComponent, IconComponent, InputDirective, ModalComponent } from '../../../../shared';
 import { formatFileSize, stripFileExtension, todayIsoDate } from './aspirant-document.util';
 
 /** Modal: upload and attach a new document. Emits the filled form on save. */
@@ -9,15 +9,16 @@ import { formatFileSize, stripFileExtension, todayIsoDate } from './aspirant-doc
   selector: 'app-aspirant-add-document-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, AspirantModalShellComponent],
+  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, ModalComponent],
   template: `
-    <app-aspirant-modal-shell heading="Upload &amp; Attach Document" (close)="close.emit()">
-  <div class="p-5 space-y-4 text-xs">
+    <app-modal title="Upload &amp; Attach Document" size="sm" (close)="close.emit()">
+  <div class="space-y-4 text-xs">
     <div>
       <label class="block text-slate-700 font-semibold mb-1">Document Category / Type *</label>
       <select
+        appInput
         [(ngModel)]="newDocForm.docType"
-        class="w-full h-9 px-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:border-primary"
+        class="w-full"
       >
         <option value="Educational Qualification Certificate">Educational Qualification Certificate</option>
         <option value="Bank Passbook / Cancelled Cheque">Bank Passbook / Cancelled Cheque</option>
@@ -35,10 +36,11 @@ import { formatFileSize, stripFileExtension, todayIsoDate } from './aspirant-doc
     <div>
       <label class="block text-slate-700 font-semibold mb-1">Document Title / Description *</label>
       <input
+        appInput
         type="text"
         [(ngModel)]="newDocForm.docName"
         placeholder="e.g. 12th Senior Secondary Marksheet"
-        class="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:border-primary"
+        class="w-full"
       />
     </div>
 
@@ -53,9 +55,9 @@ import { formatFileSize, stripFileExtension, todayIsoDate } from './aspirant-doc
           class="hidden"
         />
         <div class="space-y-1">
-          <svg class="w-8 h-8 text-slate-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-          </svg>
+          <div class="flex justify-center">
+            <app-icon name="upload-cloud" size="2xl" [stroke]="1.5" class="text-slate-400" />
+          </div>
           <span class="text-xs font-semibold text-brand block">
             {{ newDocForm.fileName ? newDocForm.fileName : 'Click to browse file' }}
           </span>
@@ -67,24 +69,24 @@ import { formatFileSize, stripFileExtension, todayIsoDate } from './aspirant-doc
     </div>
   </div>
 
-  <div class="bg-slate-50 border-t border-slate-200 px-5 py-3 flex items-center justify-end gap-2.5">
+  <ng-container modalFooter>
     <button
+      appButton
+      variant="outline"
       type="button"
       (click)="close.emit()"
-      class="px-3.5 py-1.5 border border-slate-300 bg-white hover:bg-slate-100 rounded-lg text-xs font-semibold text-slate-700 cursor-pointer"
     >
       Cancel
     </button>
     <button
+      appButton
       type="button"
       (click)="save.emit(newDocForm)"
-      class="px-4 py-1.5 bg-primary hover:bg-primary-dark text-white rounded-lg text-xs font-bold cursor-pointer"
-      style="color: #ffffff !important;"
     >
       Upload &amp; Attach
     </button>
-  </div>
-    </app-aspirant-modal-shell>
+  </ng-container>
+    </app-modal>
   `
 })
 export class AspirantAddDocumentModalComponent {

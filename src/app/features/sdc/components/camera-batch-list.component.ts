@@ -2,7 +2,15 @@ import { ChangeDetectionStrategy, Component, computed, signal, HostListener } fr
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
-import { PageHeaderComponent, TableComponent, TableColumn } from '../../../shared';
+import {
+  PageHeaderComponent,
+  TableComponent,
+  TableColumn,
+  ButtonComponent,
+  IconComponent,
+  ModalComponent,
+  PageShellComponent
+} from '../../../shared';
 import { inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -13,10 +21,19 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
   selector: 'app-camera-batch-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent, FormsModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    PageHeaderComponent,
+    TableComponent,
+    FormsModule,
+    ButtonComponent,
+    IconComponent,
+    ModalComponent,
+    PageShellComponent
+  ],
   template: `
-    <div class="w-full min-h-full bg-background text-primary font-sans">
-      <div class="p-4 sm:p-5 space-y-3 font-sans">
+    <app-page-shell>
         <app-page-header
           title="Camera Monitoring - Batches"
           [breadcrumbs]="[
@@ -54,7 +71,7 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
             <div class="font-normal text-slate-800 text-[13px] leading-snug">
               {{ item.batchName }}
             </div>
-            <div class="text-[11.5px] text-slate-500 mt-0.5 font-mono">
+            <div class="text-[11.5px] text-slate-500 mt-0.5 tabular-nums">
               Code: {{ item.batchCode }}
             </div>
           </div>
@@ -65,7 +82,7 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
             <div class="font-normal text-slate-800 text-[13px] leading-snug">
               {{ item.sdcName }}
             </div>
-            <div class="text-[11.5px] text-slate-500 mt-0.5 font-mono">
+            <div class="text-[11.5px] text-slate-500 mt-0.5 tabular-nums">
               TP: {{ item.tpName }}
             </div>
           </div>
@@ -73,9 +90,7 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
 
         <ng-template #branchTemplate let-item>
           <div class="flex items-center gap-1.5 text-slate-600 text-[13px] font-normal justify-start">
-            <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-            </svg>
+            <app-icon name="map-pin" solid class="text-slate-400" />
             {{ item.branch }}
           </div>
         </ng-template>
@@ -89,55 +104,42 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
 
         <ng-template #actionTemplate let-item>
           <button
+            appButton
+            size="sm"
             (click)="openFeed(item)"
-            class="btn btn-primary btn-sm inline-flex items-center justify-center gap-1.5"
-            style="color: white !important;"
           >
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" style="color: white !important;">
-              <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4zM5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-            </svg>
-            <span style="color: white !important;">Open Live Feed</span>
+            <app-icon name="video-camera" size="sm" solid />
+            <span>Open Live Feed</span>
           </button>
         </ng-template>
-      </div>
 
       <!-- Live Feed Modal -->
       @if (selectedFeed() || isMultiView()) {
-        <div class="fixed inset-0 z-100 bg-slate-900/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
-          <div
-            class="bg-white rounded-xl shadow-2xl w-full max-w-[95vw] h-[95vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="camera-feed-modal-title"
-          >
-            
-            <!-- Modal Header -->
-            <div class="px-4 py-3 bg-navy text-white flex items-center justify-between shrink-0 relative z-20">
-              <div class="flex items-center gap-3">
-                <h2 id="camera-feed-modal-title" class="text-base sm:text-lg font-semibold m-0" style="color: white !important;">
-                  {{ isMultiView() ? 'Multiple Live Feeds' : 'Live Feed - ' + selectedFeed()?.batchName }}
-                </h2>
-                @if (!isMultiView()) {
-                  <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-red-500 text-white animate-pulse">
-                    Live
-                  </span>
-                }
+        <app-modal
+          [title]="isMultiView() ? 'Multiple Live Feeds' : 'Live Feed - ' + selectedFeed()?.batchName"
+          widthOverride="max-w-[95vw]"
+          [scrollBody]="false"
+          [closeOnBackdrop]="false"
+          (close)="closeModal()"
+        >
+            @if (!isMultiView()) {
+              <div class="mb-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-red-500 text-white animate-pulse">
+                  Live
+                </span>
               </div>
-              <button (click)="closeModal()" aria-label="Close" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors cursor-pointer">
-                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-              </button>
-            </div>
+            }
 
             <!-- Modal Body -->
-            <div class="flex-1 flex overflow-hidden bg-slate-100 relative">
+            <div class="flex h-[65vh] overflow-hidden bg-slate-100 relative rounded-lg">
               
               <!-- Left Sidebar (Multi View Only) -->
               @if (isMultiView() && showSidebar()) {
                 <div class="absolute left-0 top-0 bottom-0 z-10 w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 animate-in slide-in-from-left duration-200 shadow-xl">
                   <div class="p-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
                     <span class="font-semibold text-slate-700 text-sm">Select Batches</span>
-                    <button (click)="showSidebar.set(false)" class="text-slate-400 hover:text-slate-600">
-                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    <button appButton variant="ghost" size="sm" iconOnly aria-label="Hide sidebar" (click)="showSidebar.set(false)">
+                      <app-icon name="chevron-left" size="lg" />
                     </button>
                   </div>
                   <div class="flex-1 overflow-y-auto p-2 space-y-1">
@@ -164,7 +166,7 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
                 @if (isMultiView()) {
                   @if (multiSelectedBatches().length === 0) {
                     <div class="h-full flex flex-col items-center justify-center text-slate-400">
-                      <svg class="w-16 h-16 mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4zM5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                      <app-icon name="video" size="auto" [stroke]="1.5" class="w-16 h-16 mb-4 opacity-50" />
                       <p class="font-medium">Select batches from the sidebar to view live feeds.</p>
                     </div>
                   } @else {
@@ -182,8 +184,7 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
                 }
               </div>
             </div>
-          </div>
-        </div>
+        </app-modal>
       }
 
       <!-- Reusable Video Player Template -->
@@ -204,51 +205,41 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
           <!-- Floating Action Buttons (Top Right) -->
           <div class="absolute top-3 right-3 z-20 flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200" (click)="$event.stopPropagation()">
             <!-- Multiple View Button -->
-            <button (click)="toggleMultiView()" class="h-8 px-2.5 rounded bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white flex items-center gap-1.5 transition-colors border border-white/20 cursor-pointer" title="Toggle Multi View / Batches">
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-              <span class="text-xs font-semibold">Multi View</span>
+            <button appButton variant="outline" size="sm" (click)="toggleMultiView()" title="Toggle Multi View / Batches">
+              <app-icon name="squares-grid" size="sm" [stroke]="2" />
+              <span>Multi View</span>
             </button>
 
             <!-- Zoom/Pan Toggle Button -->
-            <button (click)="toggleZoom(feed.id)" class="w-8 h-8 rounded bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white flex items-center justify-center transition-colors border border-white/20 cursor-pointer" [class.bg-blue-600]="zoomedStates()[feed.id]" title="Toggle Zoom & Pan">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+            <button appButton [variant]="zoomedStates()[feed.id] ? 'primary' : 'outline'" size="sm" iconOnly (click)="toggleZoom(feed.id)" title="Toggle Zoom & Pan" aria-label="Toggle Zoom & Pan">
+              <app-icon name="zoom-in" [stroke]="2" />
             </button>
 
             <!-- Mute/Unmute Toggle Button -->
-            <button (click)="toggleMute(feed.id, videoEl)" 
-                    class="w-8 h-8 rounded bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white flex items-center justify-center transition-colors border border-white/20 cursor-pointer" 
-                    [class.bg-blue-600]="!isMuted(feed.id)"
-                    [title]="isMuted(feed.id) ? 'Unmute Audio' : 'Mute Audio'">
+            <button appButton [variant]="!isMuted(feed.id) ? 'primary' : 'outline'" size="sm" iconOnly (click)="toggleMute(feed.id, videoEl)"
+                    [title]="isMuted(feed.id) ? 'Unmute Audio' : 'Mute Audio'"
+                    [attr.aria-label]="isMuted(feed.id) ? 'Unmute Audio' : 'Mute Audio'">
               @if (isMuted(feed.id)) {
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-                </svg>
+                <app-icon name="volume-off" [stroke]="2" />
               } @else {
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                </svg>
+                <app-icon name="volume-on" [stroke]="2" />
               }
             </button>
 
             <!-- View Recorded Clip Button (if available) -->
             @if (lastRecordedUrls()[feed.id]) {
-              <button (click)="openRecordingPreview(feed)" 
-                      class="h-8 px-2.5 rounded bg-emerald-600/90 hover:bg-emerald-600 backdrop-blur-sm text-white flex items-center gap-1.5 transition-colors border border-emerald-400/40 cursor-pointer shadow-sm"
+              <button appButton size="sm" (click)="openRecordingPreview(feed)"
                       title="Preview Recorded Video">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-                <span class="text-xs font-semibold">View Recording</span>
+                <app-icon name="play" size="sm" solid />
+                <span>View Recording</span>
               </button>
             }
 
             <!-- Record Button -->
-            <button (click)="toggleRecord(feed.id, videoEl)" 
-                    class="flex items-center gap-1.5 px-2.5 h-8 rounded backdrop-blur-sm text-white text-xs font-semibold transition-colors border border-white/20 cursor-pointer"
-                    [ngClass]="recordingStates()[feed.id] ? 'bg-red-600 hover:bg-red-700 border-red-500' : 'bg-black/60 hover:bg-black/80'"
+            <button appButton size="sm" (click)="toggleRecord(feed.id, videoEl)"
+                    [variant]="recordingStates()[feed.id] ? 'danger' : 'outline'"
                     title="Record Feed">
-              <div class="w-2 h-2 rounded-full bg-white" [class.animate-pulse]="recordingStates()[feed.id]"></div>
+              <div class="w-2 h-2 rounded-full" [class.bg-white]="recordingStates()[feed.id]" [class.bg-red-600]="!recordingStates()[feed.id]" [class.animate-pulse]="recordingStates()[feed.id]"></div>
               <span>{{ recordingStates()[feed.id] ? 'Stop' : 'Record' }}</span>
             </button>
           </div>
@@ -277,32 +268,27 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
             @if (recordingStates()[feed.id]) {
               <div class="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-red-500/30 text-white text-xs shadow-lg animate-in slide-in-from-bottom-2 z-30">
                 <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                <span class="font-mono font-semibold tracking-wider">REC</span>
+                <span class="tabular-nums font-semibold tracking-wider">REC</span>
               </div>
             }
 
             <!-- Bottom Controls (Mute & Fullscreen) -->
             <div class="absolute bottom-4 right-4 flex items-center gap-2 z-30 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
               <!-- Mute Toggle Button -->
-              <button (click)="toggleMute(feed.id, videoEl)" class="w-8 h-8 rounded bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white flex items-center justify-center transition-colors border border-white/20 cursor-pointer shadow-lg" [class.bg-blue-600]="!isMuted(feed.id)" [title]="isMuted(feed.id) ? 'Unmute Audio' : 'Mute Audio'">
+              <button appButton [variant]="!isMuted(feed.id) ? 'primary' : 'outline'" size="sm" iconOnly (click)="toggleMute(feed.id, videoEl)" [title]="isMuted(feed.id) ? 'Unmute Audio' : 'Mute Audio'" [attr.aria-label]="isMuted(feed.id) ? 'Unmute Audio' : 'Mute Audio'">
                 @if (isMuted(feed.id)) {
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-                  </svg>
+                  <app-icon name="volume-off" [stroke]="2" />
                 } @else {
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                  </svg>
+                  <app-icon name="volume-on" [stroke]="2" />
                 }
               </button>
 
               <!-- Fullscreen Toggle Button -->
-              <button (click)="toggleFullScreen(videoContainer)" class="w-8 h-8 rounded bg-black/60 hover:bg-black/80 backdrop-blur-sm text-white flex items-center justify-center transition-colors border border-white/20 cursor-pointer shadow-lg" title="Toggle Full Screen">
+              <button appButton variant="outline" size="sm" iconOnly (click)="toggleFullScreen(videoContainer)" title="Toggle Full Screen" aria-label="Toggle Full Screen">
                 @if (isFullscreen()) {
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9L4 4m0 0v4m0-4h4m6 5l5-5m0 0v4m0-4h-4m-5 6l-5 5m0 0v-4m0 4h4m6-5l5 5m0 0v-4m0 4h-4"/></svg>
+                  <app-icon name="shrink" [stroke]="2" />
                 } @else {
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                  <app-icon name="expand" [stroke]="2" />
                 }
               </button>
             </div>
@@ -312,39 +298,28 @@ import { DataEngineService } from '../../../core/services/data-engine.service';
 
       <!-- Recorded Video Preview Modal -->
       @if (previewRecording()) {
-        <div class="fixed inset-0 z-120 bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-          <div class="bg-slate-950 border border-slate-700 rounded-xl overflow-hidden max-w-2xl w-full shadow-2xl flex flex-col">
-            <div class="px-4 py-3 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
-              <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                <h3 class="text-sm sm:text-base font-semibold m-0 text-white">
-                  Recorded Video - {{ previewRecording()?.batchName }}
-                </h3>
-              </div>
-              <button (click)="closeRecordingPreview()" aria-label="Close" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-              </button>
-            </div>
-            <div class="p-4 bg-black flex items-center justify-center">
-              <video [src]="previewRecording()?.url" controls autoplay playsinline class="w-full max-h-[60vh] rounded-lg shadow-lg"></video>
-            </div>
-            <div class="px-4 py-3 bg-slate-900 border-t border-slate-800 flex items-center justify-between text-xs text-slate-300">
-              <span>Clip recorded from live feed</span>
-              <div class="flex items-center gap-2">
-                <a [href]="previewRecording()?.url" [download]="'Batch_Recording_' + previewRecording()?.batchId + '.mp4'" class="btn btn-primary btn-sm inline-flex items-center gap-1.5" style="color: white !important;">
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                  <span>Download</span>
-                </a>
-                <button (click)="closeRecordingPreview()" class="btn btn-secondary btn-sm">
-                  Close
-                </button>
-              </div>
-            </div>
+        <app-modal
+          [title]="'Recorded Video - ' + previewRecording()?.batchName"
+          size="lg"
+          (close)="closeRecordingPreview()"
+        >
+          <div class="p-4 bg-black flex items-center justify-center rounded-lg">
+            <video [src]="previewRecording()?.url" controls autoplay playsinline class="w-full max-h-[60vh] rounded-lg shadow-lg"></video>
           </div>
-        </div>
+          <ng-container modalFooter>
+            <span class="mr-auto text-xs text-slate-500">Clip recorded from live feed</span>
+            <a appButton size="sm" [href]="previewRecording()?.url" [download]="'Batch_Recording_' + previewRecording()?.batchId + '.mp4'">
+              <app-icon name="download" size="sm" />
+              <span>Download</span>
+            </a>
+            <button appButton variant="outline" size="sm" (click)="closeRecordingPreview()">
+              Close
+            </button>
+          </ng-container>
+        </app-modal>
       }
 
-    </div>
+    </app-page-shell>
   `
 })
 export class CameraBatchListComponent {

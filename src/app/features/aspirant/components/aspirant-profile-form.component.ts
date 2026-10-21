@@ -465,7 +465,7 @@ export class AspirantProfileFormComponent implements OnInit {
     }
   }
 
-  onFieldChange(event: { key: string; value: any; model: any }): void {
+  onFieldChange(event: { key: string; value: string; model: object }): void {
     if (event.key === 'dob' && event.value) {
       this.formData.age = calculateAgeFromDob(event.value);
     }

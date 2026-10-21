@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ButtonComponent, IconComponent } from '../../../../../shared';
 import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-state.service';
 
 /** Uploaded proposal documents grid with the "Download All (ZIP)" action. */
 @Component({
   selector: 'app-scrutiny-dossier-docs',
   standalone: true,
-  imports: [],
+  imports: [ButtonComponent, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
@@ -23,22 +24,18 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
         <div class="flex items-center gap-3 flex-wrap">
           <!-- Download All Documents in ZIP format -->
           <button
-            type="button"
+            appButton
+            size="sm"
+            class="shrink-0"
+            [loading]="isDownloadingZip()"
             (click)="downloadZip.emit()"
             [disabled]="isDownloadingZip() || !applicant()?.uploadedDocuments?.length"
-            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md border border-navy bg-navy hover:bg-[#07243c] text-white text-xs font-semibold transition-all cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
             title="Download all verified proposal documents in a single ZIP file"
           >
             @if (isDownloadingZip()) {
-              <svg class="w-3.5 h-3.5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
               <span>Creating ZIP...</span>
             } @else {
-              <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-              </svg>
+              <app-icon name="upload" size="sm" />
               <span>Download All (ZIP)</span>
             }
           </button>
@@ -70,13 +67,7 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
             </div>
 
             <!-- View Document Button -->
-            <button
-              type="button"
-              (click)="viewDocument.emit(doc); $event.stopPropagation()"
-              class="px-3 py-1.5 rounded-md bg-primary-light group-hover:bg-navy group-hover:text-white text-navy font-semibold text-xs transition-colors shrink-0 cursor-pointer shadow-2xs"
-            >
-              View
-            </button>
+            <button appButton variant="secondary" size="sm" class="shrink-0" (click)="viewDocument.emit(doc); $event.stopPropagation()">View</button>
           </div>
         }
       </div>

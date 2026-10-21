@@ -6,12 +6,13 @@ import { filter } from 'rxjs/operators';
 import { HeaderComponent } from '../header/header.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { FooterComponent } from '../footer/footer.component';
+import { BackdropComponent } from '../../../shared/components/backdrop/backdrop.component';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, HeaderComponent, SidebarComponent, FooterComponent],
+  imports: [CommonModule, HeaderComponent, SidebarComponent, FooterComponent, BackdropComponent],
   template: `
     <div class="h-screen overflow-hidden flex flex-col text-slate-900 antialiased font-sans" style="background-color: #FEFEFD;">
       <app-header
@@ -23,11 +24,7 @@ import { FooterComponent } from '../footer/footer.component';
         @if (showSidebar) {
           <!-- Mobile Sidebar Backdrop Overlay -->
           @if (mobileSidebarOpen()) {
-            <div
-              (click)="closeMobileSidebar()"
-              class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 md:hidden transition-opacity duration-200"
-              aria-hidden="true"
-            ></div>
+            <app-backdrop z="z-40" class="md:hidden duration-200" (click)="closeMobileSidebar()" />
           }
 
           <!-- Sidebar Drawer on Mobile / Fixed Column on Desktop -->

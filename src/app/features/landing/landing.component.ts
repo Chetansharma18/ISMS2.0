@@ -1,3 +1,4 @@
+// ui-guard-allow: page-frame - the public landing page has its own full-width sections
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NewsTickerComponent } from './components/news-ticker/news-ticker.component';

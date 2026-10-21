@@ -11,9 +11,9 @@ export type { DistrictBlockMasterItem };
 const COLUMNS: TableColumn<DistrictBlockMasterItem>[] = [
   { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
   { key: 'districtName', label: 'District Name', cellClass: 'whitespace-nowrap font-semibold text-slate-800' },
-  { key: 'districtCode', label: 'District Code', cellClass: 'whitespace-nowrap font-mono text-xs text-slate-700' },
+  { key: 'districtCode', label: 'District Code', cellClass: 'whitespace-nowrap tabular-nums text-xs text-slate-700' },
   { key: 'blockName', label: 'Block Name', cellClass: 'whitespace-nowrap font-medium text-slate-700' },
-  { key: 'blockCode', label: 'Block Code', cellClass: 'whitespace-nowrap font-mono text-xs text-slate-700' }
+  { key: 'blockCode', label: 'Block Code', cellClass: 'whitespace-nowrap tabular-nums text-xs text-slate-700' }
 ];
 
 const CONFIG: MasterCrudConfig<DistrictBlockMasterItem> = {

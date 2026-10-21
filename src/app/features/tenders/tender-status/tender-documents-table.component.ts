@@ -1,11 +1,14 @@
 import { Component, input, output } from '@angular/core';
+import { ButtonComponent, TableColumn, TableComponent } from '../../../shared';
 import { SubmittedTenderDoc } from '../../../core/models/tender.model';
 import { TenderDocViewRequest, TenderProposalDocReplaceRequest } from './tender-doc-card.component';
 import { documentCategoryLabel } from './tender-status.util';
 
+// Default change detection: the parent mutates the passed document rows in place when a file is replaced.
 @Component({
   selector: 'app-tender-documents-table',
   standalone: true,
+  imports: [TableComponent, ButtonComponent],
   host: { class: 'block' },
   template: `
         <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4">
@@ -14,52 +17,31 @@ import { documentCategoryLabel } from './tender-status.util';
             <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">Proposal Documents</h2>
           </div>
 
-          <div class="border border-slate-200 rounded-lg overflow-hidden">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-surface-muted font-semibold text-[11px] text-slate-600 border-b border-slate-200">
-                <tr>
-                  <th class="p-2.5 text-center w-10">#</th>
-                  <th class="p-2.5">Document Title</th>
-                  <th class="p-2.5">Category</th>
-                  <th class="p-2.5">Attached File Name</th>
-                  <th class="p-2.5 text-center">Action</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 text-slate-700">
-                @for (doc of documents(); track doc.id) {
-                  <tr class="hover:bg-slate-50/70">
-                    <td class="p-2.5 text-center font-medium text-slate-400">{{ doc.id }}</td>
-                    <td class="p-2.5 font-medium text-slate-800">{{ doc.name }}</td>
-                    <td class="p-2.5">
-                      <span class="text-[10.5px] font-medium text-slate-600">
-                        {{ categoryLabel(doc.category) }}
-                      </span>
-                    </td>
-                    <td class="p-2.5 font-mono text-[11px] text-slate-600">
-                      {{ doc.fileName }} ({{ doc.fileSize }})
-                    </td>
-                    <td class="p-2.5 text-center">
-                      <div class="flex items-center justify-center gap-1.5">
-                        <button
-                          type="button"
-                          (click)="viewDoc.emit({ fileName: doc.fileName, title: doc.name, fileSize: doc.fileSize })"
-                          class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded text-xs font-medium cursor-pointer"
-                        >
-                          View
-                        </button>
-                        @if (isEditing()) {
-                          <label class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-brand rounded text-xs font-medium cursor-pointer">
-                            Replace
-                            <input type="file" (change)="replaceDoc.emit({ event: $event, doc })" class="hidden" accept=".pdf,.doc,.docx" />
-                          </label>
-                        }
-                      </div>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+          <app-table
+            [columns]="columns"
+            [data]="documents()"
+            [customTemplates]="{ action: actionTemplate }"
+          />
+
+          <ng-template #actionTemplate let-doc>
+            <div class="flex items-center justify-center gap-1.5">
+              <button
+                appButton
+                variant="outline"
+                size="sm"
+                type="button"
+                (click)="viewDoc.emit({ fileName: doc.fileName, title: doc.name, fileSize: doc.fileSize })"
+              >
+                View
+              </button>
+              @if (isEditing()) {
+                <label class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-brand rounded text-xs font-medium cursor-pointer">
+                  Replace
+                  <input type="file" (change)="replaceDoc.emit({ event: $event, doc })" class="hidden" accept=".pdf,.doc,.docx" />
+                </label>
+              }
+            </div>
+          </ng-template>
         </div>
   `
 })
@@ -71,5 +53,21 @@ export class TenderDocumentsTableComponent {
   readonly viewDoc = output<TenderDocViewRequest>();
   readonly replaceDoc = output<TenderProposalDocReplaceRequest>();
 
-  protected readonly categoryLabel = documentCategoryLabel;
+  protected readonly columns: TableColumn<SubmittedTenderDoc>[] = [
+    { key: 'id', label: '#', align: 'center', width: 'w-10', cellClass: 'font-medium text-slate-400' },
+    { key: 'name', label: 'Document Title', cellClass: 'font-medium text-slate-800' },
+    {
+      key: 'category',
+      label: 'Category',
+      cellClass: 'text-slate-600',
+      format: (value: SubmittedTenderDoc['category']) => documentCategoryLabel(value)
+    },
+    {
+      key: 'fileName',
+      label: 'Attached File Name',
+      cellClass: 'tabular-nums text-[11px] text-slate-600',
+      format: (_value, doc) => `${doc.fileName} (${doc.fileSize})`
+    },
+    { key: 'action', label: 'Action', align: 'center', type: 'custom' }
+  ];
 }

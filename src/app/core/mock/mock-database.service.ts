@@ -39,12 +39,17 @@ export interface QueryOptions {
   pageSize?: number;
   search?: string;
   searchFields?: string[];
-  filter?: Record<string, any>;
+  filter?: Record<string, unknown>;
   sort?: { key: string; direction: 'asc' | 'desc' };
 }
 
 /** Same shape as the canonical PaginatedResponse in core/models; kept as an alias for existing callers. */
 export type QueryResult<T> = PaginatedResponse<T>;
+
+/** Views a stored record as a string-keyed bag for dynamic (key-driven) property reads. */
+export function asRecord(item: unknown): Record<string, unknown> {
+  return item as Record<string, unknown>;
+}
 
 /**
  * Centralized Mock Database Service
@@ -267,7 +272,7 @@ export class MockDatabaseService {
       filtered = filtered.filter(item => {
         return Object.entries(options.filter!).every(([k, v]) => {
           if (v === undefined || v === null || v === '') return true;
-          return (item as any)[k] === v;
+          return asRecord(item)[k] === v;
         });
       });
     }
@@ -278,11 +283,11 @@ export class MockDatabaseService {
       filtered = filtered.filter(item => {
         if (options.searchFields && options.searchFields.length > 0) {
           return options.searchFields.some(f => {
-            const val = (item as any)[f];
+            const val = asRecord(item)[f];
             return val != null && String(val).toLowerCase().includes(q);
           });
         }
-        return Object.values(item as any).some(val => {
+        return Object.values(asRecord(item)).some(val => {
           return val != null && String(val).toLowerCase().includes(q);
         });
       });
@@ -292,8 +297,8 @@ export class MockDatabaseService {
     if (options.sort?.key) {
       const { key, direction } = options.sort;
       filtered.sort((a, b) => {
-        const valA = (a as any)[key];
-        const valB = (b as any)[key];
+        const valA = asRecord(a)[key];
+        const valB = asRecord(b)[key];
         if (valA == null) return 1;
         if (valB == null) return -1;
         if (valA < valB) return direction === 'desc' ? 1 : -1;
@@ -324,7 +329,7 @@ export class MockDatabaseService {
    */
   getById<T = any>(resourceKey: string, id: string | number, idKey = 'id'): T | null {
     const list = this.getAll<T>(resourceKey);
-    const found = list.find(item => String((item as any)[idKey]) === String(id));
+    const found = list.find(item => String(asRecord(item)[idKey]) === String(id));
     return found ? this.deepClone(found) : null;
   }
 
@@ -357,7 +362,7 @@ export class MockDatabaseService {
    */
   update<T = any>(resourceKey: string, id: string | number, patch: Partial<T>, idKey = 'id'): T {
     const list = this.getAll<T>(resourceKey);
-    const idx = list.findIndex(item => String((item as any)[idKey]) === String(id));
+    const idx = list.findIndex(item => String(asRecord(item)[idKey]) === String(id));
 
     if (idx === -1) {
       throw new Error(`Item with ${idKey}='${id}' not found in mock store for '${resourceKey}'`);

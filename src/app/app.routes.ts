@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { DynamicFormBuilderComponent } from './features/dynamic-form-builder/dynamic-form-builder.component';
 
 export const routes: Routes = [
   {
@@ -257,7 +256,10 @@ export const routes: Routes = [
   },
   {
     path: 'admin/dynamic-form-builder',
-    component: DynamicFormBuilderComponent
+    loadComponent: () =>
+      import('./features/dynamic-form-builder/dynamic-form-builder.component').then(
+        (m) => m.DynamicFormBuilderComponent
+      )
   },
   {
     path: 'dynamic-form-builder',
@@ -453,6 +455,14 @@ export const routes: Routes = [
           )
       },
       {
+        path: ':id/edit',
+        // The same form as Create Batch, filled with the batch being edited.
+        loadComponent: () =>
+          import('./features/sdc/components/batch-form.component').then(
+            (m) => m.BatchFormComponent
+          )
+      },
+      {
         path: ':batchId/map-aspirant',
         loadComponent: () =>
           import('./features/sdc/components/aspirant-mapping.component').then(
@@ -512,6 +522,34 @@ export const routes: Routes = [
     path: 'tp/aspirants',
     redirectTo: 'aspirants',
     pathMatch: 'full'
+  },
+  {
+    // Attendance of the aspirants of approved batches: biometric and offline marking, reports, analytics, notifications.
+    path: 'attendance',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/attendance/attendance-list.component').then(
+            (m) => m.AttendanceListComponent
+          )
+      },
+      {
+        path: ':batchId',
+        loadComponent: () =>
+          import('./features/attendance/attendance-batch.component').then(
+            (m) => m.AttendanceBatchComponent
+          )
+      }
+    ]
+  },
+  {
+    // User Management of the training partner: the Center Heads, faculty and Attender Users it created.
+    path: 'tp/users',
+    loadComponent: () =>
+      import('./features/sdc/components/tp-user-list.component').then(
+        (m) => m.TpUserListComponent
+      )
   },
   {
     path: '**',

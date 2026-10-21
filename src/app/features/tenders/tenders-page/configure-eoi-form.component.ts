@@ -1,9 +1,8 @@
 import { Component, input, output, computed, signal } from '@angular/core';
-import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EoiFormData, EoiRequiredInfoItem, EoiDocumentUpload } from '../tenders.models';
 import { SchemeMasterItem, DocMasterItem } from '../../../core/models/admin-masters.model';
-import { formatInr } from '../../../shared';
+import { ButtonComponent, IconComponent, InputDirective, formatInr } from '../../../shared';
 import { formatBytes } from './tenders-page.util';
 
 /**
@@ -16,7 +15,7 @@ import { formatBytes } from './tenders-page.util';
 @Component({
   selector: 'app-configure-eoi-form',
   standalone: true,
-  imports: [NgClass, FormsModule],
+  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective],
   host: { class: 'block' },
   template: `
     <h2 class="m-0 text-navy" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
@@ -25,14 +24,15 @@ import { formatBytes } from './tenders-page.util';
     <div class="mt-4 font-sans text-[13px] max-h-[60vh] overflow-y-auto overflow-x-hidden pr-1 sm:pr-3">
       <div class="grid grid-cols-1 sm:grid-cols-[180px_1fr] md:grid-cols-[200px_1fr] items-start sm:items-center gap-y-3 gap-x-4">
         <label class="text-slate-700 font-medium">EOI Reference No.*</label>
-        <input type="text" maxlength="100" [(ngModel)]="data().refNo" [ngClass]="{'border-red-500': submitted() && !data().refNo, 'border-field-border': !(submitted() && !data().refNo)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800" />
+        <input appInput type="text" maxlength="100" [(ngModel)]="data().refNo" [invalid]="submitted() && !data().refNo" class="w-full" />
         
         <label class="text-slate-700 font-medium">Scheme*</label>
         <select
+          appInput
           [(ngModel)]="data().scheme"
           (ngModelChange)="onSchemeChange($event)"
-          [ngClass]="{'border-red-500': submitted() && !data().scheme, 'border-field-border': !(submitted() && !data().scheme)}"
-          class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white"
+          [invalid]="submitted() && !data().scheme"
+          class="w-full"
         >
           <option value="" disabled [selected]="!data().scheme">-- Select Scheme --</option>
           @for (name of schemeNameOptions(); track name) {
@@ -41,7 +41,7 @@ import { formatBytes } from './tenders-page.util';
         </select>
 
         <label class="text-slate-700 font-medium">Scheme Category</label>
-        <select [(ngModel)]="data().schemeCategory" class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:border-primary text-slate-800 bg-white">
+        <select appInput [(ngModel)]="data().schemeCategory" class="w-full">
           <option value="" [selected]="!data().schemeCategory">-- Select Scheme Category --</option>
           @for (cat of schemeCategoryOptions(); track cat) {
             <option [value]="cat">{{ cat }}</option>
@@ -49,13 +49,13 @@ import { formatBytes } from './tenders-page.util';
         </select>
 
         <label class="text-slate-700 font-medium">Date of Eol Published*</label>
-        <input type="date" [(ngModel)]="data().publishedDate" [ngClass]="{'border-red-500': submitted() && !data().publishedDate, 'border-field-border': !(submitted() && !data().publishedDate)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800" />
+        <input appInput type="date" [(ngModel)]="data().publishedDate" [invalid]="submitted() && !data().publishedDate" class="w-full" />
 
         <label class="text-slate-700 font-medium">Last Date of Eol Submission*</label>
-        <input type="date" [(ngModel)]="data().submissionDate" [ngClass]="{'border-red-500': submitted() && !data().submissionDate, 'border-field-border': !(submitted() && !data().submissionDate)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800" />
+        <input appInput type="date" [(ngModel)]="data().submissionDate" [invalid]="submitted() && !data().submissionDate" class="w-full" />
 
         <label class="text-slate-700 font-medium">EOI Category*</label>
-        <select [(ngModel)]="data().eoiCategory" [ngClass]="{'border-red-500': submitted() && !data().eoiCategory, 'border-field-border': !(submitted() && !data().eoiCategory)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white">
+        <select appInput [(ngModel)]="data().eoiCategory" [invalid]="submitted() && !data().eoiCategory" class="w-full">
           <option value="" disabled [selected]="!data().eoiCategory">-- Select EOI Category --</option>
           @for (eoiCat of eoiCategoryOptions(); track eoiCat) {
             <option [value]="eoiCat">{{ eoiCat }}</option>
@@ -63,25 +63,19 @@ import { formatBytes } from './tenders-page.util';
         </select>
 
         <label class="text-slate-700 font-medium">EOI Description</label>
-        <input type="text" maxlength="100" [(ngModel)]="data().description" class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800" />
+        <input appInput type="text" maxlength="100" [(ngModel)]="data().description" class="w-full" />
 
         <label class="text-slate-700 font-medium">EMD Fee*</label>
-        <input type="text" maxlength="100" [(ngModel)]="data().emdFee" [ngClass]="{'border-red-500': submitted() && !data().emdFee, 'border-field-border': !(submitted() && !data().emdFee)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800" />
+        <input appInput type="text" maxlength="100" [(ngModel)]="data().emdFee" [invalid]="submitted() && !data().emdFee" class="w-full" />
 
         <label class="text-slate-700 font-medium">Process Fee*</label>
-        <input type="text" maxlength="100" [(ngModel)]="data().processFee" [ngClass]="{'border-red-500': submitted() && !data().processFee, 'border-field-border': !(submitted() && !data().processFee)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800" />
+        <input appInput type="text" maxlength="100" [(ngModel)]="data().processFee" [invalid]="submitted() && !data().processFee" class="w-full" />
 
         <label class="text-slate-700 font-medium self-start pt-1">Attach File*</label>
         <div class="space-y-2 overflow-hidden w-full">
           <div class="flex items-center gap-2">
-            <button
-              type="button"
-              (click)="attach.emit()"
-              class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-primary text-brand hover:bg-primary/5 text-xs font-semibold cursor-pointer transition-colors"
-            >
-              <svg class="w-4 h-4 transform -rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-              </svg>
+            <button appButton variant="outline" size="sm" type="button" (click)="attach.emit()">
+              <app-icon name="paperclip" [stroke]="2" class="transform -rotate-45" />
               <span>+ Attach Document</span>
             </button>
             <span class="text-[11px] text-slate-500 font-medium whitespace-nowrap">(Max file size: 25 MB)</span>
@@ -96,21 +90,22 @@ import { formatBytes } from './tenders-page.util';
               @for (att of data().attachments; track att.id; let idx = $index) {
                 <div class="flex items-center justify-between px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs max-w-full overflow-hidden">
                   <div class="flex items-center gap-1.5 min-w-0 flex-1 pr-2 overflow-hidden">
-                    <svg class="w-4 h-4 text-brand shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
+                    <app-icon name="document" [stroke]="2" class="text-brand shrink-0" />
                     <span class="font-medium text-slate-800 truncate shrink-0 max-w-35" [title]="att.title">{{ att.title }}</span>
                     <span class="text-[11px] text-slate-500 truncate min-w-0">({{ att.fileName }})</span>
                   </div>
                   <button
+                    appButton
+                    variant="ghost"
+                    size="sm"
+                    iconOnly
                     type="button"
                     (click)="removeAttachment.emit(idx)"
-                    class="text-slate-400 hover:text-red-600 p-0.5 rounded hover:bg-red-50 transition-colors cursor-pointer shrink-0 ml-1"
+                    class="shrink-0 ml-1"
                     title="Remove attachment"
+                    aria-label="Remove attachment"
                   >
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <app-icon name="close" size="sm" />
                   </button>
                 </div>
               }
@@ -130,14 +125,15 @@ import { formatBytes } from './tenders-page.util';
               <p class="text-[11px] text-slate-500 m-0">Required documents for proposal upload (Upload PDF, image, or TXT - max 25 MB)</p>
             </div>
             <button
+              appButton
+              size="sm"
+              iconOnly
               type="button"
               (click)="addDocument.emit()"
-              class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center hover:bg-navy transition-colors shadow-sm cursor-pointer"
               title="Add Document"
+              aria-label="Add Document"
             >
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
+              <app-icon name="plus" />
             </button>
           </div>
 
@@ -152,9 +148,11 @@ import { formatBytes } from './tenders-page.util';
               <span class="text-xs font-semibold text-slate-500 w-6 text-center shrink-0">{{ $index + 1 }}.</span>
               <div class="flex-1 min-w-0">
                 <select
+                  appInput
+                  size="sm"
                   [(ngModel)]="data().documents[$index]"
-                  [ngClass]="{'border-red-500': submitted() && !data().documents[$index], 'border-slate-300': !(submitted() && !data().documents[$index])}"
-                  class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white text-xs font-medium shadow-xs"
+                  [invalid]="submitted() && !data().documents[$index]"
+                  class="w-full"
                 >
                   <option value="">-- Select Document Required --</option>
                   @for (docName of availableDocumentOptions(); track docName) {
@@ -169,9 +167,7 @@ import { formatBytes } from './tenders-page.util';
                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary hover:bg-navy text-white text-xs font-semibold cursor-pointer transition-colors whitespace-nowrap shrink-0 shadow-xs select-none active:scale-95"
                   title="Upload PDF, image, or TXT file"
                 >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                  </svg>
+                  <app-icon name="upload" size="sm" [stroke]="2.5" />
                   <span>Upload</span>
                   <input
                     type="file"
@@ -182,9 +178,7 @@ import { formatBytes } from './tenders-page.util';
                 </label>
               } @else {
                 <div class="flex items-center gap-1.5 bg-emerald-50 border border-emerald-300 text-emerald-800 px-2 py-1 rounded text-xs shrink-0 max-w-[190px] sm:max-w-[220px]">
-                  <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <app-icon name="check-circle" size="sm" [stroke]="2" class="text-emerald-600 shrink-0" />
                   <div class="flex flex-col min-w-0 flex-1 leading-tight">
                     <span class="truncate font-semibold text-[11px] text-emerald-900" [title]="getUploadedDoc($index)!.fileName">
                       {{ getUploadedDoc($index)!.fileName }}
@@ -204,27 +198,33 @@ import { formatBytes } from './tenders-page.util';
                     />
                   </label>
                   <button
+                    appButton
+                    variant="ghost"
+                    size="xs"
+                    iconOnly
                     type="button"
                     (click)="removeDocFile($index)"
-                    class="text-slate-400 hover:text-red-500 p-0.5 rounded cursor-pointer ml-0.5 shrink-0"
+                    class="ml-0.5 shrink-0"
                     title="Remove uploaded file"
+                    aria-label="Remove uploaded file"
                   >
-                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <app-icon name="close" size="xs" [stroke]="2" />
                   </button>
                 </div>
               }
 
               <button
+                appButton
+                variant="ghost"
+                size="sm"
+                iconOnly
                 type="button"
                 (click)="removeDocument.emit($index)"
-                class="text-slate-400 hover:text-red-600 p-1 rounded hover:bg-red-50 transition-colors cursor-pointer shrink-0"
+                class="shrink-0"
                 title="Remove Document"
+                aria-label="Remove Document"
               >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <app-icon name="close" />
               </button>
             </div>
           }

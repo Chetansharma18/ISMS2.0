@@ -23,7 +23,7 @@ import { SchemeFormState } from '../scheme-form.state';
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-x-6 gap-y-4 pt-3.5 border-t border-slate-100 text-xs">
           <div>
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">EOI Reference No.</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 break-all font-mono">{{ state.schemeRefNo() }}</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 break-all tabular-nums">{{ state.schemeRefNo() }}</span>
           </div>
           <div>
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Scheme Name</span>

@@ -1,122 +1,117 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HostelItem } from './batch-form.util';
+import { ButtonComponent, IconComponent, InputDirective, TableColumn, TableComponent } from '../../../../shared';
 
+// Default change detection: the parent pushes/splices hostelList in place.
+// app-table is OnPush and only refreshes on a new array, so the grid is fed a shallow copy (`rows`) that is
+// rebuilt after every add/remove. The row objects stay the parent's own, so ngModel still edits them in place.
 @Component({
   selector: 'app-batch-hostel-table',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, TableComponent],
   host: { class: 'block' },
   template: `
-    <div class="space-y-2.5 pt-2 border-t border-slate-200">
-      <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
-        <div class="flex items-center gap-2">
-          <span class="w-1.5 h-4 bg-primary rounded-full shrink-0"></span>
-          <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">
-            Hostel Details
-          </h3>
-          <span class="text-[11px] text-slate-500">(Residential facility configuration)</span>
+    <div class="space-y-2.5">
+      <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/80">
+        <div class="flex items-center gap-2" style="font-size: 13.5px !important; color: #0B3558 !important;">
+          <span class="w-1.5 h-3.5 bg-navy rounded-xs inline-block"></span>
+          <h3 class="font-bold m-0" style="font-size: 13.5px !important; color: #0B3558 !important;">Hostel Details</h3>
+          <span class="text-[11px] font-normal text-slate-500">(Residential facility, if any)</span>
         </div>
 
         <!-- Blue + Add Hostel Button -->
         <button
+          appButton
+          size="sm"
           type="button"
-          (click)="addHostel.emit()"
-          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-primary hover:bg-primary-dark active:scale-95 text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+          (click)="onAdd()"
           title="Add Hostel"
         >
-          <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
+          <app-icon name="plus" size="sm" />
           <span>Add Hostel</span>
         </button>
       </div>
 
       <!-- Hostel Responsive Table -->
-      <div class="border border-slate-200 rounded-lg overflow-x-auto bg-white">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
-              <th class="py-2 px-3 w-12 text-center">#</th>
-              <th class="py-2 px-3 min-w-[260px]">Hostel Address</th>
-              <th class="py-2 px-3 min-w-[140px]">Hostel Code</th>
-              <th class="py-2 px-3 min-w-[140px]">Type</th>
-              <th class="py-2 px-3 w-28">Capacity</th>
-              <th class="py-2 px-3 w-16 text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            @for (hostel of hostelList(); track $index; let i = $index) {
-              <tr class="hover:bg-slate-50/60 transition-colors">
-                <td class="py-2 px-3 text-center font-mono text-slate-400 font-medium">{{ i + 1 }}</td>
-                
-                <!-- Hostel Address -->
-                <td class="py-2 px-3">
-                  <input
-                    type="text"
-                    [(ngModel)]="hostel.hostelAddress"
-                    [name]="'hostel_addr_' + i"
-                    placeholder="Plot / Campus Address"
-                    class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                  />
-                </td>
+      <app-table
+        [columns]="columns"
+        [data]="rows()"
+        [customTemplates]="{ hostelAddress: addressTpl, hostelCode: codeTpl, type: typeTpl, capacity: capacityTpl, action: actionTpl }"
+      />
 
-                <!-- Hostel Code -->
-                <td class="py-2 px-3">
-                  <input
-                    type="text"
-                    [(ngModel)]="hostel.hostelCode"
-                    [name]="'hostel_code_' + i"
-                    placeholder="e.g. HST-JP-001"
-                    class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                  />
-                </td>
+      <!-- Hostel Address -->
+      <ng-template #addressTpl let-hostel let-i="index">
+        <input
+          appInput
+          size="sm"
+          type="text"
+          [(ngModel)]="hostel.hostelAddress"
+          [name]="'hostel_addr_' + i"
+          placeholder="Plot / Campus Address"
+          class="w-full"
+        />
+      </ng-template>
 
-                <!-- Type -->
-                <td class="py-2 px-3">
-                  <select
-                    [(ngModel)]="hostel.type"
-                    [name]="'hostel_type_' + i"
-                    class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                  >
-                    <option value="Boys">Boys</option>
-                    <option value="Girls">Girls</option>
-                    <option value="Co-ed">Co-ed</option>
-                    <option value="Not Applicable">Not Applicable</option>
-                  </select>
-                </td>
+      <!-- Hostel Code -->
+      <ng-template #codeTpl let-hostel let-i="index">
+        <input
+          appInput
+          size="sm"
+          type="text"
+          [(ngModel)]="hostel.hostelCode"
+          [name]="'hostel_code_' + i"
+          placeholder="e.g. HST-001"
+          class="w-full"
+        />
+      </ng-template>
 
-                <!-- Capacity -->
-                <td class="py-2 px-3">
-                  <input
-                    type="number"
-                    min="0"
-                    max="500"
-                    [(ngModel)]="hostel.capacity"
-                    [name]="'hostel_cap_' + i"
-                    placeholder="0"
-                    class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-300 rounded-md text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                  />
-                </td>
+      <!-- Type -->
+      <ng-template #typeTpl let-hostel let-i="index">
+        <select
+          appInput
+          size="sm"
+          [(ngModel)]="hostel.type"
+          [name]="'hostel_type_' + i"
+          class="w-full"
+        >
+          <option value="Boys">Boys</option>
+          <option value="Girls">Girls</option>
+          <option value="Co-ed">Co-ed</option>
+          <option value="Not Applicable">Not Applicable</option>
+        </select>
+      </ng-template>
 
-                <!-- Action: Remove -->
-                <td class="py-2 px-3 text-center">
-                  <button
-                    type="button"
-                    (click)="removeHostel.emit(i)"
-                    class="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
-                    title="Remove Hostel"
-                  >
-                    <svg class="w-4 h-4 stroke-[2]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+      <!-- Capacity -->
+      <ng-template #capacityTpl let-hostel let-i="index">
+        <input
+          appInput
+          size="sm"
+          type="number"
+          min="0"
+          max="500"
+          [(ngModel)]="hostel.capacity"
+          [name]="'hostel_cap_' + i"
+          placeholder="0"
+          class="w-full"
+        />
+      </ng-template>
+
+      <!-- Action: Remove -->
+      <ng-template #actionTpl let-hostel let-i="index">
+        <button
+          appButton
+          variant="ghost"
+          size="sm"
+          iconOnly
+          type="button"
+          (click)="onRemove(i)"
+          title="Remove Hostel"
+          aria-label="Remove Hostel"
+        >
+          <app-icon name="trash" />
+        </button>
+      </ng-template>
     </div>
   `
 })
@@ -126,4 +121,32 @@ export class BatchHostelTableComponent {
 
   readonly addHostel = output<void>();
   readonly removeHostel = output<number>();
+
+  /** Bumped after each add/remove so `rows` becomes a new array even though the parent mutates its own. */
+  private readonly version = signal(0);
+
+  /** Fresh copy handed to app-table; same row objects as the parent's list. */
+  protected readonly rows = computed(() => {
+    this.version();
+    return [...this.hostelList()];
+  });
+
+  protected readonly columns: TableColumn<HostelItem>[] = [
+    { key: '$index', label: '#', type: 'number', align: 'center', width: 'w-12' },
+    { key: 'hostelAddress', label: 'Hostel Address', width: 'min-w-[260px]' },
+    { key: 'hostelCode', label: 'Hostel Code', width: 'min-w-[140px]' },
+    { key: 'type', label: 'Type', width: 'min-w-[140px]' },
+    { key: 'capacity', label: 'Capacity', width: 'w-28' },
+    { key: 'action', label: 'Action', align: 'center', width: 'w-16' }
+  ];
+
+  protected onAdd(): void {
+    this.addHostel.emit();
+    this.version.update(v => v + 1);
+  }
+
+  protected onRemove(index: number): void {
+    this.removeHostel.emit(index);
+    this.version.update(v => v + 1);
+  }
 }

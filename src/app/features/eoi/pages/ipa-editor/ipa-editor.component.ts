@@ -11,16 +11,21 @@ import { IpaSubjectBlockComponent } from './components/ipa-subject-block.compone
 import { IpaCourseTableComponent } from './components/ipa-course-table.component';
 import { IpaTargetSummaryTableComponent } from './components/ipa-target-summary-table.component';
 import { IpaSignatoryBlockComponent } from './components/ipa-signatory-block.component';
+import { IpaQualificationBlockComponent } from './components/ipa-qualification-block.component';
+import { SanctionFooterComponent } from '../eoi-sanction-editor/components/sanction-footer.component';
 import { EsignModalComponent } from '../eoi-sanction-editor/components/esign-modal.component';
+import { ButtonComponent, DocumentPageComponent } from '../../../../shared';
 import { IpaPdfService } from './ipa-pdf.service';
 import type { IpaDocumentData } from '../../services/eoi-state.models';
 import { IpaCourseRow, TargetSummaryRow } from './ipa-editor.model';
 import {
   createDefaultCopyTo,
   createDefaultCourseRows,
+  createDefaultQualification,
   createDefaultTargetSummary,
   createDefaultTerms,
   createNewCourseRow,
+  isLegacyIpaTerms,
   sumCourseRows
 } from './ipa-editor.util';
 
@@ -35,6 +40,8 @@ const isStaleName = (name: string): boolean => !name.trim() || STALE_NAMES.inclu
   selector: 'app-ipa-editor',
   standalone: true,
   imports: [
+    DocumentPageComponent,
+    ButtonComponent,
     LetterheadComponent,
     FileNoDateRowComponent,
     ClauseListComponent,
@@ -43,48 +50,22 @@ const isStaleName = (name: string): boolean => !name.trim() || STALE_NAMES.inclu
     IpaCourseTableComponent,
     IpaTargetSummaryTableComponent,
     IpaSignatoryBlockComponent,
+    IpaQualificationBlockComponent,
+    SanctionFooterComponent,
     EsignModalComponent
   ],
   template: `
-    <div class="w-full min-h-screen bg-slate-50 text-[#1F2933] font-sans py-6 px-3 sm:px-6 lg:px-8 print:bg-white print:p-0">
-
-      <!-- Success Notification Toast -->
-      @if (toastMessage()) {
-        <div class="fixed top-5 right-5 z-50 px-4 py-3 bg-navy text-white rounded-lg shadow-xl text-xs sm:text-sm font-semibold animate-in fade-in duration-200" role="status">
-          {{ toastMessage() }}
-        </div>
-      }
-
-      <!-- Responsive Document Wrapper fitting full screen without excessive side margins -->
-      <div class="w-full max-w-6xl mx-auto space-y-4">
-
-        <!-- Page header: this is a draft until it is finalized -->
-        <div class="font-sans print:hidden space-y-3">
-          <button
-            type="button"
-            (click)="goBack()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
-          >
-            <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            <span>Back</span>
-          </button>
-
-          <div class="flex items-center gap-3 flex-wrap">
-            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">Draft IPA</h1>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">Draft</span>
-          </div>
-          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
-            Review and edit the In-Principle Approval below, then release it.
-          </p>
-        </div>
-
-        <!-- EDITABLE IPA DOCUMENT CONTAINER (Matches IPA.pdf layout exactly) -->
-        <div class="ipa-pdf-container w-full bg-white p-6 sm:p-10 lg:p-12 print:p-0 text-[#111827] font-serif leading-relaxed text-xs sm:text-sm border border-slate-300 shadow-sm rounded-lg print:border-none print:shadow-none">
+    <app-document-page
+      title="Draft IPA"
+      badge="Draft"
+      subtitle="Review and edit the In-Principal Approval below, then release it."
+      [toast]="toastMessage()"
+      (back)="goBack()"
+    >
 
           <!-- Header with Official Logos & Government Title -->
           <app-letterhead
+            [official]="true"
             [(headerTitle)]="headerTitle"
             [(headerSubtitle)]="headerSubtitle"
             [(headerAddress)]="headerAddress"
@@ -96,7 +77,7 @@ const isStaleName = (name: string): boolean => !name.trim() || STALE_NAMES.inclu
           />
 
           <!-- File No & Date (Editable) -->
-          <app-file-no-date-row [(fileNo)]="fileNo" [(date)]="ipaDate" marginClass="mb-3" />
+          <app-file-no-date-row [official]="true" [showFileLabel]="false" [(fileNo)]="fileNo" [(date)]="ipaDate" marginClass="mb-3" />
 
           <!-- Recipient Details Block (To, PIA Name, Address, SAR) -->
           <app-ipa-recipient-block
@@ -106,17 +87,17 @@ const isStaleName = (name: string): boolean => !name.trim() || STALE_NAMES.inclu
             [(recipientSar)]="recipientSar"
           />
 
-          <!-- Reference, Subject, Preamble and PIA / SDC block -->
+          <!-- Reference, Subject and opening paragraph -->
           <app-ipa-subject-block
             [(referenceNo)]="referenceNo"
             [(subjectText)]="subjectText"
             [(preambleText)]="preambleText"
-            [(piaName)]="piaName"
-            [(sdcAddress)]="sdcAddress"
           />
 
-          <!-- MAIN COURSE APPROVAL TABLE (Matching IPA.pdf layout exactly) -->
+          <!-- MAIN COURSE APPROVAL TABLE, with the agency and its SDC address across the top -->
           <app-ipa-course-table
+            [(piaName)]="piaName"
+            [(sdcAddress)]="sdcAddress"
             [rows]="courseRows"
             [totalTrainees]="totalTraineesCount()"
             [totalCostPerBatch]="totalCostPerBatchSum()"
@@ -129,52 +110,42 @@ const isStaleName = (name: string): boolean => !name.trim() || STALE_NAMES.inclu
           <!-- TARGET ALLOCATION SUMMARY TABLE (Matching IPA.pdf) -->
           <app-ipa-target-summary-table [rows]="targetSummary" />
 
-          <!-- TERMS AND CONDITIONS CLAUSES (Editable a to h from IPA.pdf) -->
+          <!-- Minimum qualification of the trainees -->
+          <app-ipa-qualification-block
+            [(note)]="qualificationNote"
+            [(title)]="qualificationTitle"
+            [(text)]="qualificationText"
+          />
+
+          <!-- TERMS AND CONDITIONS CLAUSES (Editable, a to j) -->
           <app-clause-list
+            [official]="true"
             [clauses]="termsAndConditions"
             intro="IPA is issued subject to following terms and conditions: -"
-            listClass="list-alpha pl-5 space-y-2 text-slate-800 leading-relaxed text-[11px] sm:text-xs"
-            labelClass="font-bold shrink-0 text-slate-800"
+            listClass="list-none m-0 p-0 space-y-1.5 text-slate-900"
+            labelClass="shrink-0 w-6"
             labelFormat="alpha"
             (add)="addClause()"
             (remove)="removeClause($event)"
           />
 
-          <!-- SIGNATORY & DISTRIBUTION BLOCK (Editable) -->
-          <app-ipa-signatory-block
-            [copyToList]="copyToList"
-            [(signatoryTitle)]="signatoryTitle"
-            [(signatorySub)]="signatorySub"
-          />
+          <!-- CC DISTRIBUTION LIST (Editable); the signer's name and signature come from the e-sign -->
+          <app-ipa-signatory-block [copyToList]="copyToList" />
 
-        </div>
+          <!-- Website, e-mail and telephone of RSLDC, as in the footer of the printed IPA -->
+          <app-sanction-footer />
 
-        <!-- Bottom action bar -->
-        <div class="flex items-center justify-end gap-2.5 font-sans print:hidden pt-2">
-          <button
-            type="button"
-            (click)="saveDraft()"
-            class="px-6 py-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs sm:text-sm font-semibold shadow-sm transition-colors cursor-pointer active:scale-95"
-          >
-            Save
-          </button>
-          <button
-            type="button"
-            (click)="showEsign.set(true)"
-            class="px-6 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-sm transition-colors cursor-pointer active:scale-95"
-            style="color: #ffffff !important;"
-          >
-            <span style="color: #ffffff !important;">E-Sign</span>
-          </button>
-        </div>
-
-      </div>
+      <ng-container actions>
+        <button appButton variant="outline" size="lg" (click)="saveDraft()">Save</button>
+        <button appButton size="lg" (click)="showEsign.set(true)">E-Sign</button>
+      </ng-container>
 
       @if (showEsign()) {
-        <app-esign-modal documentName="IPA" (signed)="onSigned()" (close)="showEsign.set(false)" />
+        <div overlay>
+          <app-esign-modal documentName="IPA" (signed)="onSigned()" (close)="showEsign.set(false)" />
+        </div>
       }
-
-    </div>
+    </app-document-page>
   `
 })
 export class IpaEditorComponent implements OnInit {
@@ -200,17 +171,17 @@ export class IpaEditorComponent implements OnInit {
   headerSubtitle = '(A Government of Rajasthan Enterprise)';
   headerAddress = 'EMI Campus, J-8-A, Jhalana Institutional Area, Jaipur- 302004 (Rajasthan)';
 
-  fileNo = 'FORSLDC/Skills/MMKVY-Cat.II: SAKSHM/2026-27/2895-97';
-  ipaDate = '15/9/26';
+  fileNo = 'F () RSLDC/Skills/MMKVY: Cat-I/RAJKViK/IPA/2026-27/';
+  ipaDate = '28/09/2026';
 
   recipientName = '';
   recipientAddress1 = '';
   recipientAddress2 = 'Sri Ganganagar, Rajasthan, Pin Code-335001';
   recipientSar = 'SAR: 2200-099-001';
 
-  referenceNo = 'F () RSLDC/SKILL/MMKVY-Cat.-II: SAKSHM/2026-27/535, Dated: 15/07/2026';
-  subjectText = 'In-Principal Approval (IPA-1)- MMKVY-Cat. II / SAKSHM sponsored by RSLDC for F.Y. 2026-27.';
-  preambleText = 'In reference to your request and based on the recommendation from inspection team, in-principal approval is hereby accorded for conducting cycles (as detailed below) for following courses during financial year 2026-27, as per the terms and conditions stipulated in relevant guidelines.';
+  referenceNo = '-Sanction order no. F()RSLDC/Skills/MMKVY/RAJKViK/2026-27/1358 dated: 30.07.2026';
+  subjectText = 'In-Principal Approval (IPA-1)-MMKVY/RAJKViK sponsored by RSLDC for F.Y 2026-27';
+  preambleText = 'In reference to your request and based on the recommendation from inspection team, 1st in-principal approval is hereby accorded for conducting cycles (as detailed below) for following courses during financial year 2026-27, as per the terms and conditions stipulated in relevant guidelines.';
 
   piaName = '';
   sdcAddress = 'Near Panchayati Mandir, Opposite Government Hospital, Kesisinghpur, Sriganganagar, 335027';
@@ -221,11 +192,17 @@ export class IpaEditorComponent implements OnInit {
   // Target Summary Table matching IPA.pdf exactly
   targetSummary: TargetSummaryRow[] = createDefaultTargetSummary();
 
-  // Terms and Conditions Clauses (a to h) matching IPA.pdf exactly
+  // Minimum qualification of the trainees (note and box); filled from the first course until edited
+  qualificationNote = '';
+  qualificationTitle = '';
+  qualificationText = '';
+
+  // Terms and Conditions Clauses (a to j) worded as in the printed IPA
   termsAndConditions: string[] = createDefaultTerms();
 
+  // Not shown on the draft: the e-sign adds the signer. They are printed in the signature box of the PDF.
   signatoryTitle = 'Scheme OIC';
-  signatorySub = 'SAKSHM, RSLDC';
+  signatorySub = 'RAJKViK, RSLDC';
 
   copyToList: string[] = createDefaultCopyTo();
 
@@ -244,7 +221,10 @@ export class IpaEditorComponent implements OnInit {
     const ownData = this.eoiStateService.getAppIpa(sId, aId);
     const savedData = ownData ?? this.eoiStateService.getIpaData(sId, aId);
     if (savedData) {
-      this.headerTitle = savedData.headerTitle || this.headerTitle;
+      // The letterhead is in normal case on the printed IPA; a title saved in capitals falls back to the normal-case one.
+      if (savedData.headerTitle && savedData.headerTitle !== savedData.headerTitle.toUpperCase()) {
+        this.headerTitle = savedData.headerTitle;
+      }
       this.headerSubtitle = savedData.headerSubtitle || this.headerSubtitle;
       this.headerAddress = savedData.headerAddress || this.headerAddress;
       this.fileNo = savedData.fileNo || this.fileNo;
@@ -264,10 +244,12 @@ export class IpaEditorComponent implements OnInit {
       if (savedData.targetSummary && savedData.targetSummary.length > 0) {
         this.targetSummary = [...savedData.targetSummary];
       }
-      if (savedData.termsAndConditions && savedData.termsAndConditions.length > 0) {
+      // A draft saved with the earlier terms takes the wording of the printed IPA; an IPA already signed keeps its own.
+      const upgradeTerms = !savedData.signedAt && isLegacyIpaTerms(savedData.termsAndConditions ?? []);
+      if (savedData.termsAndConditions && savedData.termsAndConditions.length > 0 && !upgradeTerms) {
         this.termsAndConditions = [...savedData.termsAndConditions];
       }
-      if (savedData.ccList && savedData.ccList.length > 0) {
+      if (savedData.ccList && savedData.ccList.length > 0 && !upgradeTerms) {
         this.copyToList = [...savedData.ccList];
       }
       this.signatoryTitle = savedData.signatoryTitle || this.signatoryTitle;
@@ -299,7 +281,20 @@ export class IpaEditorComponent implements OnInit {
     }
     if (this.recipientAddress1 === STALE_ADDRESS) this.recipientAddress1 = '';
 
+    // Every course row names the district it is allowed in; default to this company's sanctioned district.
+    const sanctionDistrict = this.eoiStateService.getSchemeSanctionOrder(sId)?.tableRows
+      .find(row => row.appId === aId)?.district?.split(',')[0]?.trim() ?? '';
+    this.defaultDistrict = sanctionDistrict;
+    this.courseRows = this.courseRows.map(row => ({ ...row, district: row.district || sanctionDistrict }));
+
+    // The qualification note and box start from the first course, unless this IPA already has its own.
+    const qualification = createDefaultQualification(this.courseRows);
+    this.qualificationNote = savedData?.qualificationNote ?? qualification.note;
+    this.qualificationTitle = savedData?.qualificationTitle ?? qualification.title;
+    this.qualificationText = savedData?.qualificationText ?? qualification.text;
   }
+
+  private defaultDistrict = '';
 
   // NOTE: these computeds read a plain array (no signal dependency), so they are evaluated once;
   // behaviour intentionally preserved from the original component.
@@ -312,8 +307,9 @@ export class IpaEditorComponent implements OnInit {
   totalBudgetSum = computed(() => sumCourseRows(this.courseRows, 'totalBudget'));
 
   addCourseRow(): void {
-    const nextNo = (this.courseRows.length + 1).toString();
-    this.courseRows.push(createNewCourseRow(nextNo));
+    // Ids stay unique after deletions: SDC allocations point at a course row by id.
+    const nextNo = (Math.max(0, ...this.courseRows.map(r => Number(r.id) || 0)) + 1).toString();
+    this.courseRows.push(createNewCourseRow(nextNo, this.defaultDistrict));
   }
 
   removeCourseRow(index: number): void {
@@ -396,6 +392,9 @@ export class IpaEditorComponent implements OnInit {
       preambleText: this.preambleText,
       piaName: this.piaName,
       sdcAddress: this.sdcAddress,
+      qualificationNote: this.qualificationNote,
+      qualificationTitle: this.qualificationTitle,
+      qualificationText: this.qualificationText,
       courseRows: this.courseRows,
       targetSummary: this.targetSummary,
       termsAndConditions: this.termsAndConditions,

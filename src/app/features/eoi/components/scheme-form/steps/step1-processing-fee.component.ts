@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ButtonComponent } from '../../../../../shared';
 import { SchemeFormState } from '../scheme-form.state';
 
 /**
@@ -9,6 +10,7 @@ import { SchemeFormState } from '../scheme-form.state';
 @Component({
   selector: 'app-step1-processing-fee',
   standalone: true,
+  imports: [ButtonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
@@ -42,13 +44,13 @@ import { SchemeFormState } from '../scheme-form.state';
       <!-- Action bar -->
       <div class="pt-4 border-t border-slate-100 flex items-center justify-end">
         <button
-          type="button"
+          appButton
+          size="lg"
+          [loading]="state.isProcPaying()"
           (click)="state.payProcessingFeeAndProceed()"
           [disabled]="state.isProcPaying() || state.procFeePaid()"
-          class="px-6 sm:px-7 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
         >
           @if (state.isProcPaying()) {
-            <span class="animate-spin text-sm">&#9696;</span>
             <span>Processing...</span>
           } @else {
             <span>Proceed to Pay</span>

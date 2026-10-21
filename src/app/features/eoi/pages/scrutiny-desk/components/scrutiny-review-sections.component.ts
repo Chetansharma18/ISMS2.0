@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ButtonComponent, IconComponent, TableColumn, TableComponent } from '../../../../../shared';
 import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-state.service';
 
 /**
@@ -8,6 +9,7 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
 @Component({
   selector: 'app-scrutiny-review-sections',
   standalone: true,
+  imports: [ButtonComponent, IconComponent, TableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block space-y-5' },
   template: `
@@ -30,7 +32,7 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">Registration Number (CIN)</span>
-            <span class="font-mono text-slate-900 font-medium">{{ app.organisation.registrationNumber }}</span>
+            <span class="tabular-nums text-slate-900 font-medium">{{ app.organisation.registrationNumber }}</span>
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">Date of Registration</span>
@@ -42,11 +44,11 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">Company PAN</span>
-            <span class="font-mono text-slate-900 font-medium">{{ app.organisation.panNumber }}</span>
+            <span class="tabular-nums text-slate-900 font-medium">{{ app.organisation.panNumber }}</span>
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">GSTIN</span>
-            <span class="font-mono text-slate-900 font-medium">{{ app.organisation.gstin }}</span>
+            <span class="tabular-nums text-slate-900 font-medium">{{ app.organisation.gstin }}</span>
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">Declared Turnover</span>
@@ -54,7 +56,7 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">Contact No.</span>
-            <span class="font-mono text-slate-900">{{ app.organisation.contactNumber }}</span>
+            <span class="tabular-nums text-slate-900">{{ app.organisation.contactNumber }}</span>
           </div>
           <div class="sm:col-span-2">
             <span class="text-slate-500 block text-[11px] mb-0.5">Email ID</span>
@@ -85,15 +87,15 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">PAN</span>
-            <span class="font-mono text-slate-900 font-medium">{{ app.authorizedSignatory.pan }}</span>
+            <span class="tabular-nums text-slate-900 font-medium">{{ app.authorizedSignatory.pan }}</span>
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">Aadhaar No.</span>
-            <span class="font-mono text-slate-900">{{ app.authorizedSignatory.aadhaarNo }}</span>
+            <span class="tabular-nums text-slate-900">{{ app.authorizedSignatory.aadhaarNo }}</span>
           </div>
           <div>
             <span class="text-slate-500 block text-[11px] mb-0.5">Mobile No.</span>
-            <span class="font-mono text-slate-900">{{ app.authorizedSignatory.contactNumber }}</span>
+            <span class="tabular-nums text-slate-900">{{ app.authorizedSignatory.contactNumber }}</span>
           </div>
           <div class="sm:col-span-2">
             <span class="text-slate-500 block text-[11px] mb-0.5">Email Address</span>
@@ -137,11 +139,11 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
             </div>
             <div>
               <span class="text-slate-500 block text-[11px] mb-0.5">Account Number</span>
-              <span class="font-mono text-slate-900 font-medium">{{ bank.accountNumber }}</span>
+              <span class="tabular-nums text-slate-900 font-medium">{{ bank.accountNumber }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11px] mb-0.5">IFSC Code</span>
-              <span class="font-mono text-slate-900 font-medium">{{ bank.ifscCode }}</span>
+              <span class="tabular-nums text-slate-900 font-medium">{{ bank.ifscCode }}</span>
             </div>
           </div>
         </section>
@@ -155,46 +157,23 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
             <h2 id="docs-heading" class="text-base sm:text-lg font-bold text-slate-900 m-0">Documents</h2>
           </div>
           <button
-            type="button"
+            appButton
+            variant="outline"
+            size="sm"
             (click)="downloadZip.emit()"
             [disabled]="isDownloadingZip() || !app.uploadedDocuments.length"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <svg class="w-3.5 h-3.5 text-ocean" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-            </svg>
+            <app-icon name="download" size="sm" />
             <span>{{ isDownloadingZip() ? 'Preparing...' : 'Download All' }}</span>
           </button>
         </div>
 
-        <div class="overflow-x-auto border border-slate-200 rounded-lg">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-slate-50/90 text-slate-600 text-[11.5px] font-semibold border-b border-slate-200">
-              <tr>
-                <th class="px-4 py-2.5 w-10 text-center">#</th>
-                <th class="px-4 py-2.5">Document</th>
-                <th class="px-4 py-2.5 text-center w-28">Action</th>
-              </tr>
-            </thead>
-            <tbody class="text-slate-700">
-              @for (doc of app.uploadedDocuments; track doc.id; let i = $index) {
-                <tr class="border-t border-slate-100 hover:bg-slate-50/50">
-                  <td class="px-4 py-2.5 text-center font-semibold text-slate-400">{{ i + 1 }}</td>
-                  <td class="px-4 py-2.5 font-medium text-slate-900 text-[12.5px]">{{ doc.title }}</td>
-                  <td class="px-4 py-2.5 text-center">
-                    <button
-                      type="button"
-                      (click)="viewDoc.emit(doc)"
-                      class="px-3 py-1 rounded-md border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold cursor-pointer shadow-2xs"
-                    >
-                      View
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+        <app-table [columns]="documentColumns" [data]="app.uploadedDocuments" [customTemplates]="{ view: viewTemplate }">
+        </app-table>
+
+        <ng-template #viewTemplate let-doc>
+          <button appButton variant="outline" size="sm" (click)="viewDoc.emit(doc)">View</button>
+        </ng-template>
       </section>
     }
   `
@@ -205,4 +184,10 @@ export class ScrutinyReviewSectionsComponent {
 
   readonly viewDoc = output<DossierDocument>();
   readonly downloadZip = output<void>();
+
+  protected readonly documentColumns: TableColumn<DossierDocument>[] = [
+    { key: '$index', label: '#', type: 'number', align: 'center', width: 'w-10' },
+    { key: 'title', label: 'Document' },
+    { key: 'view', label: 'Action', type: 'custom', align: 'center', width: 'w-28' }
+  ];
 }

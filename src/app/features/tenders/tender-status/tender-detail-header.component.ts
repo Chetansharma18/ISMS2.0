@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
+import { ButtonComponent, IconComponent } from '../../../shared';
 import { SubmittedTender } from '../../../core/models/tender.model';
 import { canEditTender } from './tender-status.util';
 
@@ -7,21 +8,14 @@ import { canEditTender } from './tender-status.util';
 @Component({
   selector: 'app-tender-detail-header',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, ButtonComponent, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
     <div class="space-y-3">
       <div>
-        <button
-          type="button"
-          (click)="back.emit()"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
-          title="Back to Tender Status"
-        >
-          <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
+        <button appButton variant="outline" size="sm" type="button" (click)="back.emit()" title="Back to Tender Status">
+          <app-icon name="back" />
           <span>Back</span>
         </button>
       </div>
@@ -31,39 +25,20 @@ import { canEditTender } from './tender-status.util';
 
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           @if (isEditing()) {
-            <button
-              type="button"
-              (click)="cancel.emit()"
-              class="inline-flex items-center justify-center px-3.5 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg font-semibold text-xs cursor-pointer transition-colors shadow-2xs"
-            >
+            <button appButton variant="outline" size="sm" type="button" (click)="cancel.emit()">
               Cancel
             </button>
-            <button
-              type="button"
-              (click)="save.emit()"
-              class="inline-flex items-center justify-center gap-1.5 px-4 py-1.5 bg-navy hover:bg-[#07243c] text-white rounded-lg font-semibold text-xs cursor-pointer shadow-2xs transition-colors active:scale-95"
-            >
+            <button appButton size="sm" type="button" (click)="save.emit()">
               <span>Save Changes</span>
             </button>
           } @else {
-            <button
-              type="button"
-              (click)="print.emit()"
-              class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
-              title="Print Application"
-            >
-              <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-              </svg>
+            <button appButton variant="outline" size="sm" type="button" (click)="print.emit()" title="Print Application">
+              <app-icon name="print-simple" [stroke]="2" class="text-slate-600" />
               <span>Print</span>
             </button>
 
             @if (canEdit(tender())) {
-              <button
-                type="button"
-                (click)="edit.emit()"
-                class="inline-flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs font-semibold transition-colors cursor-pointer shadow-2xs active:scale-95"
-              >
+              <button appButton size="sm" type="button" (click)="edit.emit()">
                 <span>Edit Application</span>
               </button>
             } @else if (tender().editCount >= 3) {
@@ -89,7 +64,7 @@ import { canEditTender } from './tender-status.util';
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-6 gap-y-4 text-xs">
         <div>
           <span class="text-[11.5px] text-slate-500 block leading-tight">EOI Reference No.</span>
-          <span class="text-[12.5px] font-medium text-slate-900 block mt-1 break-all font-mono">{{ tender().appRef }}</span>
+          <span class="text-[12.5px] font-medium text-slate-900 block mt-1 break-all tabular-nums">{{ tender().appRef }}</span>
         </div>
         <div>
           <span class="text-[11.5px] text-slate-500 block leading-tight">Scheme</span>

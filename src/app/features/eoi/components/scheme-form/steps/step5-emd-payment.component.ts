@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ButtonComponent } from '../../../../../shared';
 import { SchemeFormState } from '../scheme-form.state';
 
 /**
@@ -8,6 +9,7 @@ import { SchemeFormState } from '../scheme-form.state';
 @Component({
   selector: 'app-step5-emd-payment',
   standalone: true,
+  imports: [ButtonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
@@ -64,22 +66,18 @@ import { SchemeFormState } from '../scheme-form.state';
 
       <!-- Footer Action Bar -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <button
-          type="button"
-          (click)="state.goToStep(4)"
-          class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
-        >
+        <button appButton variant="outline" size="lg" (click)="state.goToStep(4)">
           &larr; Back
         </button>
 
         <button
-          type="button"
+          appButton
+          size="lg"
+          [loading]="state.isPaymentProcessing()"
           (click)="state.triggerEmdPayment()"
           [disabled]="state.isPaymentProcessing()"
-          class="px-6 sm:px-7 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] disabled:opacity-70 disabled:cursor-not-allowed text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
         >
           @if (state.isPaymentProcessing()) {
-            <span class="animate-spin text-sm">&#9696;</span>
             <span>Processing...</span>
           } @else if (claimExemption()) {
             <span>Submit Application</span>

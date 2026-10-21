@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ApplicantResponse, EoiStateService, Scheme } from '../../services/eoi-state.service';
 import { categoryLabel } from '../sanction-order-list/sanction-order-list.component';
 import { formatDateTime } from '../../../../shared/utils';
-import { PageHeaderComponent, TableComponent, TableColumn } from '../../../../shared';
+import { ButtonComponent, ListPageComponent, TableColumn } from '../../../../shared';
 
 /** One scheme with a released sanction order. */
 interface IpaSchemeRow {
@@ -23,48 +22,28 @@ interface IpaSchemeRow {
   selector: 'app-ipa-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, PageHeaderComponent, TableComponent],
+  imports: [ListPageComponent, ButtonComponent],
   template: `
-    <div class="w-full min-h-full bg-background text-primary font-sans">
-      <div class="p-4 sm:p-5 space-y-3 font-sans">
+    <app-list-page
+      title="In-Principal Approval (IPA)"
+      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'In-Principal Approval (IPA)' }]"
+      searchPlaceholder="Search Scheme, Ref No., Category..."
+      [(searchQuery)]="searchQuery"
+      [columns]="schemeColumns"
+      [data]="rows()"
+      itemUnit="schemes"
+      emptyMessage="No sanction order has been released yet."
+      [customTemplates]="{ schemeTitle: schemeTitleTemplate, action: actionTemplate }"
+    />
 
-        <app-page-header
-          title="IPA"
-          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'IPA' }]"
-          [searchable]="true"
-          searchPlaceholder="Search Scheme, Ref No., Category..."
-          [(searchQuery)]="searchQuery"
-        >
-        </app-page-header>
+    <ng-template #schemeTitleTemplate let-row>
+      <div class="font-normal text-slate-800 text-[13px] leading-snug">{{ row.schemeTitle }}</div>
+      <div class="text-[11px] tabular-nums text-muted mt-0.5">Ref: {{ row.refNo }}</div>
+    </ng-template>
 
-        <app-table
-          [columns]="schemeColumns"
-          [data]="rows()"
-          [pagination]="true"
-          [pageSize]="10"
-          itemUnit="schemes"
-          emptyMessage="No sanction order has been released yet."
-          [customTemplates]="{ schemeTitle: schemeTitleTemplate, action: actionTemplate }"
-        >
-        </app-table>
-
-        <ng-template #schemeTitleTemplate let-row>
-          <div class="font-normal text-slate-800 text-[13px] leading-snug">{{ row.schemeTitle }}</div>
-          <div class="text-[11px] font-mono text-muted mt-0.5">Ref: {{ row.refNo }}</div>
-        </ng-template>
-
-        <ng-template #actionTemplate let-row>
-          <button
-            type="button"
-            (click)="openApprovedTps(row)"
-            class="btn btn-primary btn-sm whitespace-nowrap cursor-pointer"
-          >
-            <span>Approved TPs</span>
-          </button>
-        </ng-template>
-
-      </div>
-    </div>
+    <ng-template #actionTemplate let-row>
+      <button appButton size="sm" (click)="openApprovedTps(row)">Approved TPs</button>
+    </ng-template>
   `
 })
 export class IpaListComponent {

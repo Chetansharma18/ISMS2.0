@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PageHeaderComponent, TableComponent, TableColumn } from '../../shared';
+import { ButtonComponent, IconComponent, ListPageComponent, TableColumn } from '../../shared';
 import { PaymentHistoryService } from './services/payment-history.service';
 import { PaymentTransaction } from '../../core/models/payment-transaction.model';
 import { AuthService } from '../../core/auth/auth.service';
@@ -10,42 +10,35 @@ import { AuthService } from '../../core/auth/auth.service';
   selector: 'app-payment-history',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, TableComponent],
+  imports: [CommonModule, FormsModule, ListPageComponent, ButtonComponent, IconComponent],
   host: { class: 'block' },
   template: `
-    <div class="p-4 sm:p-5 space-y-4 font-sans text-slate-800">
-
-      <!-- Reusable Page Header with Search -->
-      <app-page-header
-        title="Payment History"
-        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Payment History' }]"
-        [searchable]="true"
-        [(searchQuery)]="searchQuery"
-        searchPlaceholder="Search Reference No, Description, Mode..."
-      />
-
-      <!-- Main Payment History Table via Reusable TableComponent -->
-      <app-table
-        [columns]="columns"
-        [data]="filteredTransactions()"
-        [pagination]="true"
-        [pageSize]="pageSize"
-        [emptyMessage]="isNewUser() ? 'No payment records found.' : 'No payment records match your search query.'"
-        [customTemplates]="{
-          paymentRef: paymentRefTemplate,
-          description: descriptionTemplate,
-          date: dateTemplate,
-          paymentMode: paymentModeTemplate,
-          amount: amountTemplate,
-          status: statusTemplate,
-          receipt: receiptTemplate
-        }"
-      >
-      </app-table>
+    <!-- Page header with search + payment table via the shared list page -->
+    <app-list-page
+      title="Payment History"
+      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Payment History' }]"
+      [searchable]="true"
+      [(searchQuery)]="searchQuery"
+      searchPlaceholder="Search Reference No, Description, Mode..."
+      [columns]="columns"
+      [data]="filteredTransactions()"
+      [pagination]="true"
+      [pageSize]="pageSize"
+      [emptyMessage]="isNewUser() ? 'No payment records found.' : 'No payment records match your search query.'"
+      [customTemplates]="{
+        paymentRef: paymentRefTemplate,
+        description: descriptionTemplate,
+        date: dateTemplate,
+        paymentMode: paymentModeTemplate,
+        amount: amountTemplate,
+        status: statusTemplate,
+        receipt: receiptTemplate
+      }"
+    >
 
       <!-- Custom Payment Reference No Template -->
       <ng-template #paymentRefTemplate let-tx>
-        <span class="font-mono text-slate-800 font-normal text-[13px] tracking-tight select-all">
+        <span class="tabular-nums text-slate-800 font-normal text-[13px] tracking-tight select-all">
           {{ tx.paymentRef }}
         </span>
       </ng-template>
@@ -94,20 +87,13 @@ import { AuthService } from '../../core/auth/auth.service';
 
       <!-- Custom Receipt Action Template -->
       <ng-template #receiptTemplate let-tx>
-        <button
-          type="button"
-          (click)="onViewReceipt(tx)"
-          class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[13px] font-normal text-brand hover:text-navy hover:bg-slate-50 border border-slate-200 rounded transition-colors cursor-pointer"
-          title="Open Receipt in Chrome tab"
-        >
-          <svg class="w-3.5 h-3.5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
+        <button appButton variant="outline" size="sm" type="button" (click)="onViewReceipt(tx)" title="Open Receipt in Chrome tab">
+          <app-icon name="document" size="sm" />
           <span>Receipt</span>
         </button>
       </ng-template>
 
-    </div>
+    </app-list-page>
   `
 })
 export class PaymentHistoryComponent {

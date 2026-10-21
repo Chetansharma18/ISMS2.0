@@ -1,33 +1,45 @@
 import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SdcService } from '../services/sdc.service';
+import { BatchService } from '../services/batch.service';
+import { maxBatchesFor, sdcTarget } from '../utils/batch-limit.util';
 import { SdcRecord } from '../models/sdc.model';
+import { categoryLabel } from '../../eoi/pages/sanction-order-list/sanction-order-list.component';
+import type { SsoProfile } from '../../../core/mock/data/sso-users.mock';
+import { CenterHeadAssignModalComponent } from './center-head-assign-modal.component';
 import { AuthService } from '../../../core/auth/auth.service';
 import { PermissionService } from '../../../core/permissions/permission.service';
 import {
   PageHeaderComponent,
   TableComponent,
-  ActionModalComponent,
+  ButtonComponent,
+  IconComponent,
+  InputDirective,
+  PageShellComponent,
   TableColumn
 } from '../../../shared';
+import { FilterTabsComponent } from '../../../shared';
 
 @Component({
   selector: 'app-sdc-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FilterTabsComponent,
     CommonModule,
-    RouterModule,
     FormsModule,
     PageHeaderComponent,
     TableComponent,
-    ActionModalComponent
+    ButtonComponent,
+    IconComponent,
+    InputDirective,
+    PageShellComponent,
+    CenterHeadAssignModalComponent
   ],
   template: `
-    <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
-      <div class="p-4 sm:p-5 space-y-3 font-sans">
+    <app-page-shell>
         
         <!-- Page Header via Reusable PageHeaderComponent -->
         <app-page-header
@@ -36,64 +48,23 @@ import {
           [searchable]="true"
           [(searchQuery)]="searchQuery"
           searchPlaceholder="Search TP name, SDC, code, sector, district..."
-        >
-          <a
-            routerLink="/sdc/create"
-            class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-navy hover:bg-navy-dark text-white !text-white rounded-md text-xs font-semibold shadow-2xs transition-colors cursor-pointer no-underline"
-            style="color: #ffffff !important;"
-            title="Register New SDC Center"
-          >
-            <svg class="w-3.5 h-3.5 stroke-2 text-white" style="color: #ffffff !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            <span class="text-white !text-white" style="color: #ffffff !important;">Add SDC</span>
-          </a>
-        </app-page-header>
+        ></app-page-header>
 
         <!-- Success Alert Notification -->
         @if (successMessage()) {
           <div class="p-3 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 flex items-center justify-between text-xs animate-in fade-in">
             <div class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
+              <app-icon name="check" [stroke]="2" class="text-emerald-600 shrink-0" />
               <span class="font-medium">{{ successMessage() }}</span>
             </div>
-            <button (click)="successMessage.set('')" class="text-emerald-600 hover:text-emerald-900 cursor-pointer font-bold">✕</button>
+            <button appButton variant="ghost" size="sm" iconOnly aria-label="Dismiss" (click)="successMessage.set('')"><app-icon name="close" size="xs" /></button>
           </div>
         }
 
         <!-- Status Filter Badges / Pills Toolbar -->
         <div class="flex items-center justify-between gap-3 pt-1">
           
-          <div class="flex items-center gap-1.5 flex-wrap">
-            @for (f of filterOptions(); track f.id) {
-              <button
-                type="button"
-                (click)="setFilter(f.id)"
-                class="px-2.5 py-1 rounded-sm text-[12px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer border"
-                [class.bg-primary]="activeFilter() === f.id"
-                [class.text-white]="activeFilter() === f.id"
-                [class.border-primary]="activeFilter() === f.id"
-                [class.bg-white]="activeFilter() !== f.id"
-                [class.text-[#5F6B76]]="activeFilter() !== f.id"
-                [class.border-border]="activeFilter() !== f.id"
-                [class.hover:bg-primary-light]="activeFilter() !== f.id"
-                [class.hover:text-brand]="activeFilter() !== f.id"
-              >
-                <span>{{ f.label }}</span>
-                <span
-                  class="px-1.5 py-0.2 rounded-full text-[10px]"
-                  [class.bg-white/20]="activeFilter() === f.id"
-                  [class.text-white]="activeFilter() === f.id"
-                  [class.bg-surface-muted]="activeFilter() !== f.id"
-                  [class.text-[#5F6B76]]="activeFilter() !== f.id"
-                >
-                  {{ f.count }}
-                </span>
-              </button>
-            }
-          </div>
+          <app-filter-tabs [options]="filterOptions()" [value]="activeFilter()" (valueChange)="setFilter($event)" />
 
           <div class="text-xs text-slate-500 font-medium hidden sm:block">
             Showing {{ filteredSdcs().length }} {{ filteredSdcs().length === 1 ? 'center' : 'centers' }}
@@ -109,9 +80,11 @@ import {
             <div class="flex items-center gap-1.5">
               <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">TP Name:</label>
               <select
+                appInput
+                size="sm"
                 [ngModel]="selectedTp()"
                 (ngModelChange)="selectedTp.set($event)"
-                class="bg-white border border-border rounded-sm px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary max-w-50"
+                class="max-w-50"
               >
                 <option value="ALL">All Training Partners ({{ tpList().length }})</option>
                 @for (tp of tpList(); track tp) {
@@ -124,9 +97,10 @@ import {
             <div class="flex items-center gap-1.5">
               <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Scheme:</label>
               <select
+                appInput
+                size="sm"
                 [ngModel]="selectedScheme()"
                 (ngModelChange)="selectedScheme.set($event)"
-                class="bg-white border border-border rounded-sm px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 <option value="ALL">All Schemes</option>
                 @for (sch of schemeList(); track sch) {
@@ -139,9 +113,10 @@ import {
             <div class="flex items-center gap-1.5">
               <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">District:</label>
               <select
+                appInput
+                size="sm"
                 [ngModel]="selectedDistrict()"
                 (ngModelChange)="selectedDistrict.set($event)"
-                class="bg-white border border-border rounded-sm px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 <option value="ALL">All Districts</option>
                 @for (dst of districtList(); track dst) {
@@ -153,9 +128,12 @@ import {
             <!-- Reset filters -->
             @if (hasActiveFilters()) {
               <button
+                appButton
+                variant="danger"
+                size="sm"
                 type="button"
                 (click)="resetFilters()"
-                class="px-2.5 py-1 text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded border border-rose-200 transition-colors cursor-pointer font-medium ml-auto"
+                class="ml-auto"
               >
                 Reset Filters
               </button>
@@ -173,49 +151,31 @@ import {
           itemUnit="centers"
           emptyMessage="No Skill Development Centers available matching the selected criteria."
           [customTemplates]="{
-            tpName: tpNameTemplate,
+            ipa: ipaTemplate,
             centerName: centerNameTemplate,
             sector: sectorTemplate,
-            scheme: schemeTemplate,
-            schemeCategory: schemeCategoryTemplate,
             capacity: capacityTemplate,
+            batches: batchesTemplate,
             status: statusTemplate,
+            centerHead: centerHeadTemplate,
             actions: actionsTemplate
           }"
         >
         </app-table>
 
-        <!-- Template: TP Name (First Column for Admin) -->
-        <ng-template #tpNameTemplate let-sdc>
-          <div class="py-1 text-center flex flex-col items-center justify-center">
-            <div class="font-normal text-slate-800 text-[13px] leading-snug">
-              {{ sdc.tpName }}
-            </div>
-            <div class="text-[11px] text-secondary font-mono mt-0.5 flex items-center justify-center gap-1.5">
-              <span class="inline-block w-1.5 h-1.5 rounded-full bg-primary"></span>
-              <span>{{ sdc.mouRefNo || 'TP Verified' }}</span>
-            </div>
+        <!-- Template: the IPA the center was registered under: IPA number, with the scheme and its category below -->
+        <ng-template #ipaTemplate let-sdc>
+          <div class="py-0.5 text-center">
+            <div class="font-normal text-slate-800 text-[13px] leading-tight tabular-nums">{{ sdc.mouRefNo || '—' }}</div>
+            <div class="text-[11px] text-secondary leading-tight mt-px">{{ sdc.scheme || '—' }} · {{ categoryText(sdc.schemeCategory) }}</div>
           </div>
         </ng-template>
 
-        <!-- Template: Center Name + District + Code -->
+        <!-- Template: Center name, with its code below. The address is in the details. -->
         <ng-template #centerNameTemplate let-sdc>
-          <div class="py-0.5 text-center flex flex-col items-center justify-center">
-            <div class="font-normal text-slate-800 leading-snug text-[13px] flex items-center justify-center gap-1.5 flex-wrap">
-              <span>{{ sdc.sdcName }}</span>
-              @if (isAdmin()) {
-                <span class="font-mono text-[11px] px-1.5 py-0.2 rounded bg-slate-100 text-secondary font-normal">
-                  {{ sdc.sdcCode }}
-                </span>
-              }
-            </div>
-            <div class="text-[11px] text-secondary mt-0.5 font-normal flex items-center justify-center gap-1">
-              <svg class="w-3 h-3 text-muted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span>{{ sdc.district }}</span>
-            </div>
+          <div class="py-0.5 text-center">
+            <div class="font-normal text-slate-800 leading-tight text-[13px]">{{ sdc.sdcName }}</div>
+            <div class="text-[11px] text-secondary leading-tight mt-px tabular-nums">{{ sdc.sdcCode }}</div>
           </div>
         </ng-template>
 
@@ -226,24 +186,17 @@ import {
           </div>
         </ng-template>
 
+        <!-- Template: Batches registered out of the batches the target allows (30 trainees per batch) -->
+        <ng-template #batchesTemplate let-sdc>
+          <div class="text-center tabular-nums font-normal text-slate-800 text-[13px]">
+            {{ batchesRegistered(sdc) }} / {{ batchLimit(sdc) }}
+          </div>
+        </ng-template>
+
         <!-- Template: Sector -->
         <ng-template #sectorTemplate let-sdc>
-          <div class="text-center font-normal text-primary text-[13px]">
+          <div class="text-center font-normal text-slate-800 text-[13px]">
             {{ sdc.sector || '—' }}
-          </div>
-        </ng-template>
-
-        <!-- Template: Scheme -->
-        <ng-template #schemeTemplate let-sdc>
-          <div class="text-center font-normal text-primary text-[13px]">
-            {{ sdc.scheme || '—' }}
-          </div>
-        </ng-template>
-
-        <!-- Template: Scheme Category -->
-        <ng-template #schemeCategoryTemplate let-sdc>
-          <div class="text-center font-normal text-primary text-[13px]">
-            {{ sdc.schemeCategory || '—' }}
           </div>
         </ng-template>
 
@@ -251,159 +204,111 @@ import {
         <ng-template #statusTemplate let-sdc>
           <div class="flex items-center justify-center">
             @if (sdc.status === 'APPROVED' || sdc.status === 'Approved') {
-              <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-emerald-700">
-                APPROVED
-              </span>
+              <span class="whitespace-nowrap font-normal text-[13px] text-emerald-700">Approved</span>
             } @else if (sdc.status === 'PENDING_INSPECTION' || sdc.status?.includes('INSPECTION')) {
-              <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-red-600">
-                {{ formatStatus(sdc.status).toUpperCase() }}
-              </span>
+              <span class="whitespace-nowrap font-normal text-[13px] text-red-600">{{ formatStatus(sdc.status) }}</span>
             } @else if (sdc.status === 'REJECTED' || sdc.status === 'Rejected') {
-              <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-red-600">
-                REJECTED
-              </span>
+              <span class="whitespace-nowrap font-normal text-[13px] text-red-600">Rejected</span>
             } @else {
-              <span class="whitespace-nowrap font-normal text-[13px] tracking-wider uppercase text-amber-700">
-                {{ formatStatus(sdc.status).toUpperCase() }}
-              </span>
+              <span class="whitespace-nowrap font-normal text-[13px] text-amber-700">{{ formatStatus(sdc.status) }}</span>
             }
           </div>
         </ng-template>
 
+        <!-- Template: Center Head (the name once assigned; "Assign Center Head" for the training partner while an approved center has none) -->
+        <ng-template #centerHeadTemplate let-sdc>
+          @if (sdc.centerHead; as head) {
+            <div class="py-0.5 text-center">
+              <div class="font-normal text-slate-800 text-[13px] leading-snug">{{ head.name }}</div>
+              <div class="text-[11px] text-secondary tabular-nums mt-0.5">{{ head.ssoId }}</div>
+            </div>
+          } @else if (sdc.status === 'APPROVED') {
+            @if (isAdmin()) {
+              <span class="text-[11px] text-muted">Not assigned</span>
+            } @else {
+              <button appButton variant="outline" size="sm" type="button" (click)="openAssignCenterHead(sdc)" title="Assign the Center Head of this center">
+                <app-icon name="plus" size="sm" />
+                <span>Assign Center Head</span>
+              </button>
+            }
+          } @else {
+            <span class="text-muted">—</span>
+          }
+        </ng-template>
+
         <!-- Template: Actions (View Details in the exact same vertical column line) -->
         <ng-template #actionsTemplate let-sdc>
-          <div class="flex items-center justify-center gap-2 whitespace-nowrap py-0.5">
+          <div class="flex items-center justify-center gap-3 whitespace-nowrap py-2 px-1">
             
-            <!-- Slot 1 (w-29 fixed container): Either '+ Create Batch' (TP) or 'Approve SDC' (Admin, only when inspection is completed) -->
-            <div class="w-29 flex justify-center shrink-0">
-              <!-- 1. For TP (SDC Management): If center is APPROVED, show "+ Create Batch" (NOT for Admin) -->
-              @if (!isAdmin() && (sdc.status === 'APPROVED' || sdc.status === 'Approved')) {
+            <!-- Slot 1 (fixed width, training partner only): '+ Create Batch', or 'Edit' when the department returned the SDC.
+                 The department only views an SDC here; it decides on the details screen. -->
+            @if (!isAdmin()) {
+            <div class="w-36 flex justify-center shrink-0">
+              <!-- If the center is APPROVED, show "+ Create Batch" -->
+              @if (sdc.status === 'APPROVED' || sdc.status === 'Approved') {
                 <button
+                  appButton
+                  size="sm"
+                  block
                   type="button"
+                  [disabled]="batchLimitReached(sdc)"
                   (click)="createBatch(sdc)"
-                  class="w-full justify-center whitespace-nowrap inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
-                  title="Create Batch"
+                  [title]="batchLimitReached(sdc) ? 'All batches of this center are registered' : 'Create Batch'"
                 >
-                  <span class="text-sm font-bold leading-none">+</span>
+                  <app-icon name="plus" size="sm" />
                   <span>Create Batch</span>
                 </button>
               }
 
-              <!-- 2. For Admin: Only show "Approve SDC" button when inspection is completed (PENDING_APPROVAL) - NEVER for PENDING_INSPECTION -->
-              @if (isAdmin() && sdc.status === 'PENDING_APPROVAL') {
+              <!-- Edit: only when the department returned the SDC for corrections -->
+              @if (sdc.status === 'RETURNED_TO_TP') {
                 <button
+                  appButton
+                  size="sm"
+                  block
                   type="button"
-                  (click)="openApproveModal(sdc)"
-                  class="w-full justify-center whitespace-nowrap inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
-                  title="Approve SDC"
+                  (click)="editSdc(sdc)"
+                  title="Edit the SDC details the department asked to correct"
                 >
-                  <svg class="w-3.5 h-3.5 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Approve SDC</span>
+                  <app-icon name="edit" size="sm" />
+                  <span>Edit</span>
                 </button>
               }
-            </div>
 
-            <!-- Slot 2: View Details button (w-29 fixed width, always in the same vertical line) -->
+            </div>
+            }
+
+            <!-- View Details button (same fixed width, always in the same vertical line) -->
             <button
+              appButton
+              variant="outline"
+              size="sm"
+              class="w-24 shrink-0"
               type="button"
               (click)="viewDetails(sdc)"
-              class="w-29 justify-center whitespace-nowrap inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
               title="View Center Details"
             >
-              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              <span>View Details</span>
+              <app-icon name="eye" size="sm" />
+              <span>View</span>
             </button>
 
           </div>
         </ng-template>
 
-      </div>
-    </div>
+    </app-page-shell>
 
-    <!-- ========================================================================= -->
-    <!-- ADMIN SDC APPROVAL MODAL (shared ActionModalComponent)                    -->
-    <!-- ========================================================================= -->
-    <app-action-modal
-      [isOpen]="!!approvingSdc()"
-      title="Approve Skill Development Center"
-      accentBarClass="bg-primary"
-      [showCloseButton]="true"
-      [closeOnBackdrop]="false"
-      maxWidthClass="max-w-lg"
-      primaryLabel="Confirm & Approve SDC"
-      secondaryLabel="Cancel"
-      (primaryAction)="confirmApproval()"
-      (secondaryAction)="closeApproveModal()"
-      (close)="closeApproveModal()"
-    >
-      @if (approvingSdc(); as targetCenter) {
-        <div class="mt-4 space-y-4 text-xs">
-          <!-- Center Summary Box -->
-          <div class="bg-primary-light border border-border rounded-lg p-3 space-y-1.5">
-            <div class="flex justify-between items-start">
-              <span class="text-[11px] font-semibold text-slate-500 uppercase">Training Partner</span>
-              <span class="font-mono text-[11px] font-bold text-brand">{{ targetCenter.sdcCode }}</span>
-            </div>
-            <div class="font-bold text-slate-900 text-sm">{{ targetCenter.tpName }}</div>
-            <div class="text-slate-900 font-bold pt-1 border-t border-border/70 flex items-center justify-between">
-              <span>{{ targetCenter.sdcName }}</span>
-              <span class="text-slate-500 font-medium">{{ targetCenter.district }}</span>
-            </div>
-            <div class="text-[11px] text-slate-500">
-              Scheme: <strong class="text-slate-800">{{ targetCenter.scheme }}</strong> • Sector: <strong class="text-slate-800">{{ targetCenter.sector }}</strong>
-            </div>
-          </div>
-
-          <!-- Approved Target Capacity -->
-          <div>
-            <label for="sdcApprovalCapacity" class="block font-semibold text-slate-700 mb-1">
-              Approved Target Capacity (Aspirants) <span class="text-rose-500">*</span>
-            </label>
-            <input
-              id="sdcApprovalCapacity"
-              type="number"
-              [(ngModel)]="approvalTargetCapacity"
-              min="1"
-              max="5000"
-              class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Enter approved capacity"
-            />
-            <span class="text-[10.5px] text-slate-500 mt-0.5 block">Original requested capacity: {{ targetCenter.sdcCapacity }} trainees</span>
-          </div>
-
-          <!-- Approval Remarks -->
-          <div>
-            <label for="sdcApprovalRemarks" class="block font-semibold text-slate-700 mb-1">
-              Approval Remarks / Sanction Notes <span class="text-rose-500">*</span>
-            </label>
-            <textarea
-              id="sdcApprovalRemarks"
-              [(ngModel)]="approvalRemarks"
-              rows="3"
-              class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Enter official approval remarks..."
-            ></textarea>
-          </div>
-
-          <!-- Confirmation notice -->
-          <div class="p-2.5 rounded bg-amber-50 border border-amber-200 text-amber-900 text-[11px] flex items-center gap-2">
-            <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Approving this SDC will permit {{ targetCenter.tpName }} to create active batches and mobilize trainees.</span>
-          </div>
-        </div>
-      }
-    </app-action-modal>
+    @if (assigningSdc(); as target) {
+      <app-center-head-assign-modal
+        [sdcName]="target.sdcName"
+        (confirmed)="confirmCenterHead($event)"
+        (closed)="assigningSdc.set(null)"
+      />
+    }
   `
 })
 export class SdcListComponent {
   readonly sdcService = inject(SdcService);
+  private readonly batchService = inject(BatchService);
   readonly authService = inject(AuthService);
   readonly router = inject(Router);
   private readonly permissions = inject(PermissionService);
@@ -420,10 +325,8 @@ export class SdcListComponent {
   searchQuery = signal<string>('');
   successMessage = signal<string>('');
 
-  /** State for Approval Modal */
-  approvingSdc = signal<SdcRecord | null>(null);
-  approvalTargetCapacity = 100;
-  approvalRemarks = 'Approved in accordance with RSLDC guidelines and verified physical infrastructure.';
+  /** The approved center whose Center Head is being assigned. */
+  assigningSdc = signal<SdcRecord | null>(null);
 
   readonly pageSize = 10;
 
@@ -432,25 +335,31 @@ export class SdcListComponent {
     if (this.isAdmin()) {
       return [
         { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-14' },
-        { key: 'tpName', label: 'TP Name', align: 'center', type: 'custom', width: 'min-w-[190px]' },
-        { key: 'centerName', label: 'SDC Center', align: 'center', type: 'custom', width: 'min-w-[210px]' },
-        { key: 'scheme', label: 'Scheme', align: 'center', type: 'custom' },
-        { key: 'schemeCategory', label: 'Scheme Category', align: 'center', type: 'custom', width: 'w-36' },
-        { key: 'sector', label: 'Sector', align: 'center', type: 'custom' },
-        { key: 'capacity', label: 'Capacity', align: 'center', type: 'custom', width: 'w-28' },
-        { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[170px]' },
-        { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[270px]' }
+        { key: 'ipa', label: 'IPA & Scheme', align: 'center', type: 'custom', width: 'min-w-[200px]' },
+        { key: 'tpName', label: 'Training Partner', align: 'center', width: 'min-w-[170px]', cellClass: 'font-normal text-slate-800 text-[13px] text-center' },
+        { key: 'centerName', label: 'SDC Center', align: 'center', type: 'custom', width: 'min-w-[200px]' },
+        { key: 'district', label: 'District', align: 'center', width: 'min-w-[110px]', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+        { key: 'sector', label: 'Sector', align: 'center', type: 'custom', width: 'min-w-[150px]' },
+        { key: 'proposedStartDate', label: 'Proposed Start Date', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap tabular-nums font-normal text-slate-800 text-[13px] text-center' },
+        { key: 'capacity', label: 'Training Target', align: 'center', type: 'custom', width: 'w-32' },
+        { key: 'batches', label: 'Batches Registered', align: 'center', type: 'custom', width: 'w-32' },
+        { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[140px]' },
+        { key: 'centerHead', label: 'Center Head', align: 'center', type: 'custom', width: 'min-w-[160px]' },
+        { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-32' }
       ];
     } else {
       return [
         { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-14' },
-        { key: 'sdcCode', label: 'SDC Code', align: 'center', width: 'w-28', cellClass: 'whitespace-nowrap font-mono font-normal text-slate-800 text-center' },
-        { key: 'centerName', label: 'Center Name', align: 'center', type: 'custom' },
-        { key: 'scheme', label: 'Scheme', align: 'center', type: 'custom' },
-        { key: 'schemeCategory', label: 'Scheme Category', align: 'center', type: 'custom', width: 'w-36' },
-        { key: 'sector', label: 'Sector', align: 'center', type: 'custom' },
-        { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[170px]' },
-        { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[270px]' }
+        { key: 'ipa', label: 'IPA & Scheme', align: 'center', type: 'custom', width: 'min-w-[200px]' },
+        { key: 'centerName', label: 'SDC Center', align: 'center', type: 'custom', width: 'min-w-[200px]' },
+        { key: 'district', label: 'District', align: 'center', width: 'min-w-[110px]', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+        { key: 'sector', label: 'Sector', align: 'center', type: 'custom', width: 'min-w-[150px]' },
+        { key: 'proposedStartDate', label: 'Proposed Start Date', align: 'center', width: 'w-32', cellClass: 'whitespace-nowrap tabular-nums font-normal text-slate-800 text-[13px] text-center' },
+        { key: 'capacity', label: 'Training Target', align: 'center', type: 'custom', width: 'w-32' },
+        { key: 'batches', label: 'Batches Registered', align: 'center', type: 'custom', width: 'w-32' },
+        { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[140px]' },
+        { key: 'centerHead', label: 'Center Head', align: 'center', type: 'custom', width: 'min-w-[190px]' },
+        { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[300px]' }
       ];
     }
   });
@@ -480,6 +389,11 @@ export class SdcListComponent {
       this.activeFilter() !== 'All'
     );
   });
+
+  /** Scheme category in normal case ("Rajvik", "Samarth"), the same way the other tables show it. */
+  categoryText(value?: string): string {
+    return categoryLabel(value);
+  }
 
   formatStatus(status?: string): string {
     switch (status) {
@@ -577,24 +491,43 @@ export class SdcListComponent {
     this.searchQuery.set('');
   }
 
-  openApproveModal(sdc: SdcRecord): void {
-    this.approvingSdc.set(sdc);
-    this.approvalTargetCapacity = sdc.sdcCapacity || 100;
-    this.approvalRemarks = 'Approved in accordance with RSLDC guidelines and verified physical infrastructure.';
+  /** Batches of the center that count against its limit (rejected and cancelled batches do not). */
+  batchesRegistered(sdc: SdcRecord): number {
+    return this.batchService
+      .batches()
+      .filter(b => b.sdcId === sdc.id && b.status !== 'REJECTED' && b.status !== 'CANCELLED').length;
   }
 
-  closeApproveModal(): void {
-    this.approvingSdc.set(null);
+  /** Batches the center can run: its target in batches of at most 30 trainees. */
+  batchLimit(sdc: SdcRecord): number {
+    return maxBatchesFor(sdcTarget(sdc));
   }
 
-  confirmApproval(): void {
-    const center = this.approvingSdc();
+  batchLimitReached(sdc: SdcRecord): boolean {
+    return this.batchesRegistered(sdc) >= this.batchLimit(sdc);
+  }
+
+  openAssignCenterHead(sdc: SdcRecord): void {
+    this.assigningSdc.set(sdc);
+  }
+
+  /** The user confirmed the details fetched from SSO: that person becomes the Center Head (only one is allowed). */
+  confirmCenterHead(person: SsoProfile): void {
+    const center = this.assigningSdc();
     if (!center) return;
-
-    this.sdcService.approveSdc(center.id, this.approvalTargetCapacity, this.approvalRemarks);
-    this.successMessage.set(`SDC "${center.sdcName}" (${center.sdcCode}) for ${center.tpName} has been approved successfully!`);
-    this.closeApproveModal();
-
+    const assigned = this.sdcService.assignCenterHead(center.id, {
+      ssoId: person.ssoId,
+      name: person.name,
+      mobile: person.mobile,
+      email: person.email,
+      designation: person.designation
+    });
+    this.successMessage.set(
+      assigned
+        ? `${person.name} is now the Center Head of "${center.sdcName}".`
+        : `"${center.sdcName}" already has a Center Head.`
+    );
+    this.assigningSdc.set(null);
     setTimeout(() => this.successMessage.set(''), 5000);
   }
 
@@ -608,6 +541,11 @@ export class SdcListComponent {
         sector: sdc.sector
       }
     });
+  }
+
+  /** Opens the SDC details already in edit mode. */
+  editSdc(sdc: SdcRecord): void {
+    this.router.navigate(['/sdcs', sdc.id], { queryParams: { edit: 1 } });
   }
 
   viewDetails(sdc: SdcRecord): void {

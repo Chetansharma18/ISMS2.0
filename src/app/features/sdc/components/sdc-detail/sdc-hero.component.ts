@@ -18,7 +18,7 @@ import { formatSdcStatus } from './sdc-detail.util';
           <span class="px-2 py-0.5 rounded bg-primary text-white text-[10.5px] font-bold uppercase tracking-wider">
             Training Partner
           </span>
-          <span class="font-mono text-xs font-semibold text-slate-600">
+          <span class="tabular-nums text-xs font-semibold text-slate-600">
             {{ center.mouRefNo || 'MOU Registered' }}
           </span>
         </div>
@@ -28,7 +28,7 @@ import { formatSdcStatus } from './sdc-detail.util';
         <div class="text-xs text-slate-600 flex items-center gap-2 flex-wrap">
           <span>Center: <strong class="text-slate-800">{{ center.sdcName }}</strong></span>
           <span>•</span>
-          <span class="font-mono font-medium text-brand">{{ center.sdcCode }}</span>
+          <span class="tabular-nums font-medium text-brand">{{ center.sdcCode }}</span>
           <span>•</span>
           <span>Scheme: <strong class="text-slate-800">{{ center.scheme }}</strong> ({{ center.schemeCategory || 'General' }})</span>
         </div>

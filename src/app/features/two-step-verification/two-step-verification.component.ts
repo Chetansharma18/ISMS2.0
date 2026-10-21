@@ -16,6 +16,7 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
 import { TableComponent } from '../../shared/components/table/table.component';
 import { TableColumn } from '../../shared/components/table/table.types';
 import { ActionModalComponent } from '../../shared/components/action-modal/action-modal.component';
+import { ButtonComponent, DropdownComponent, IconComponent, InputDirective, PageShellComponent, SwitchComponent } from '../../shared';
 import { DataEngineService, ResourceRepository } from '../../core/services/data-engine.service';
 import { AuthMethodType, TwoStepVerificationItem, UserRoleMasterItem } from '../../core/models/admin-masters.model';
 
@@ -37,42 +38,36 @@ interface TwoStepFormData {
     FormsModule,
     PageHeaderComponent,
     TableComponent,
-    ActionModalComponent
+    ActionModalComponent,
+    ButtonComponent,
+    DropdownComponent,
+    IconComponent,
+    InputDirective,
+    PageShellComponent,
+    SwitchComponent
   ],
   template: `
-    <div class="w-full min-h-screen bg-white text-slate-800 font-sans p-4 sm:p-6 lg:p-8 space-y-6">
+    <app-page-shell>
 
       <!-- Page Header -->
-      <app-page-header title="Two Step Verification">
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
-          <!-- Search Input -->
-          <div class="flex items-center gap-2 flex-1 max-w-md">
-            <div class="relative w-full">
-              <input
-                type="text"
-                placeholder="Search by role type or auth type..."
-                [ngModel]="searchQuery()"
-                (ngModelChange)="searchQuery.set($event)"
-                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 transition-all"
-              />
-              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-
-          <!-- Add New Button -->
-          <button
-            type="button"
-            (click)="openAddModal()"
-            class="px-4 py-2.5 bg-purple-700 hover:bg-purple-800 text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 shrink-0"
-          >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Add new</span>
-          </button>
-        </div>
+      <app-page-header
+        title="Two Step Verification"
+        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Two Step Verification' }]"
+        [searchable]="true"
+        searchPlaceholder="Search by role type or auth type..."
+        [(searchQuery)]="searchQuery"
+      >
+        <!-- Add New Button -->
+        <button
+          appButton
+          size="sm"
+          type="button"
+          (click)="openAddModal()"
+          class="shrink-0"
+        >
+          <app-icon name="plus" size="sm" />
+          <span>Add new</span>
+        </button>
       </app-page-header>
 
       <!-- Table -->
@@ -95,36 +90,36 @@ interface TwoStepFormData {
       <ng-template #authTypeTemplate let-item>
         <div class="flex items-center gap-5 whitespace-nowrap select-none" (click)="$event.stopPropagation()">
           <!-- OTP Tickbox -->
-          <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-medium text-slate-700 hover:text-purple-900 transition-colors">
+          <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-medium text-slate-700 hover:text-primary transition-colors">
             <input
               type="checkbox"
               [checked]="hasAuthType(item, 'OTP')"
               (change)="toggleItemAuthType(item, 'OTP')"
-              class="w-4 h-4 rounded text-purple-600 border-slate-300 focus:ring-purple-500 accent-purple-600 cursor-pointer"
+              class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
             />
-            <span [ngClass]="hasAuthType(item, 'OTP') ? 'font-semibold text-purple-900' : 'text-slate-600'">OTP</span>
+            <span [ngClass]="hasAuthType(item, 'OTP') ? 'font-semibold text-primary' : 'text-slate-600'">OTP</span>
           </label>
 
           <!-- Auth App Tickbox -->
-          <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-medium text-slate-700 hover:text-purple-900 transition-colors">
+          <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-medium text-slate-700 hover:text-primary transition-colors">
             <input
               type="checkbox"
               [checked]="hasAuthType(item, 'Auth App')"
               (change)="toggleItemAuthType(item, 'Auth App')"
-              class="w-4 h-4 rounded text-purple-600 border-slate-300 focus:ring-purple-500 accent-purple-600 cursor-pointer"
+              class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
             />
-            <span [ngClass]="hasAuthType(item, 'Auth App') ? 'font-semibold text-purple-900' : 'text-slate-600'">Auth App</span>
+            <span [ngClass]="hasAuthType(item, 'Auth App') ? 'font-semibold text-primary' : 'text-slate-600'">Auth App</span>
           </label>
 
           <!-- PIN Tickbox -->
-          <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-medium text-slate-700 hover:text-purple-900 transition-colors">
+          <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-medium text-slate-700 hover:text-primary transition-colors">
             <input
               type="checkbox"
               [checked]="hasAuthType(item, 'PIN')"
               (change)="toggleItemAuthType(item, 'PIN')"
-              class="w-4 h-4 rounded text-purple-600 border-slate-300 focus:ring-purple-500 accent-purple-600 cursor-pointer"
+              class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
             />
-            <span [ngClass]="hasAuthType(item, 'PIN') ? 'font-semibold text-purple-900' : 'text-slate-600'">PIN</span>
+            <span [ngClass]="hasAuthType(item, 'PIN') ? 'font-semibold text-primary' : 'text-slate-600'">PIN</span>
           </label>
         </div>
       </ng-template>
@@ -134,15 +129,14 @@ interface TwoStepFormData {
         <div class="flex items-center justify-center whitespace-nowrap" (click)="$event.stopPropagation()">
           <!-- View Button -->
           <button
+            appButton
+            variant="ghost"
+            size="sm"
             type="button"
             (click)="openViewModal(item)"
-            class="inline-flex items-center gap-1 text-sky-600 hover:text-sky-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
             title="View Details"
           >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
+            <app-icon name="eye" size="sm" />
             <span>View</span>
           </button>
 
@@ -150,14 +144,14 @@ interface TwoStepFormData {
 
           <!-- Edit Button -->
           <button
+            appButton
+            variant="ghost"
+            size="sm"
             type="button"
             (click)="openEditModal(item)"
-            class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
             title="Edit"
           >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
+            <app-icon name="edit" size="sm" />
             <span>Edit</span>
           </button>
 
@@ -165,20 +159,11 @@ interface TwoStepFormData {
 
           <!-- Active / Inactive Toggle -->
           <div class="inline-flex items-center gap-1.5" title="Toggle Status" (click)="$event.stopPropagation()">
-            <button
-              type="button"
-              (click)="toggleStatus(item)"
-              class="relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
-              [ngClass]="item.status === 'Inactive' ? 'bg-slate-500 hover:bg-slate-600' : 'bg-emerald-500 hover:bg-emerald-600'"
-              role="switch"
-              [attr.aria-checked]="item.status !== 'Inactive'"
-            >
-              <span class="sr-only">Toggle Active Status</span>
-              <span
-                class="pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                [ngClass]="item.status === 'Inactive' ? 'translate-x-0' : 'translate-x-3'"
-              ></span>
-            </button>
+            <app-switch
+              [checked]="item.status !== 'Inactive'"
+              label="Toggle Active Status"
+              (toggled)="toggleStatus(item)"
+            />
             <span
               class="font-medium text-[12px] select-none transition-colors cursor-pointer"
               (click)="toggleStatus(item)"
@@ -218,9 +203,11 @@ interface TwoStepFormData {
               Role *
             </label>
             <select
+              appInput
+              size="sm"
               [(ngModel)]="formData.roleType"
-              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 text-xs text-slate-800 bg-white"
-              [ngClass]="submitted() && !formData.roleType ? 'border-red-500' : 'border-slate-300'"
+              class="w-full"
+              [invalid]="submitted() && !formData.roleType"
             >
               <option value="" disabled selected>Select Role</option>
               @for (role of availableRoles(); track role) {
@@ -238,66 +225,16 @@ interface TwoStepFormData {
               Auth type *
             </label>
 
-            <!-- Multi-select Dropdown Trigger -->
-            <button
-              type="button"
-              (click)="toggleAuthDropdown($event)"
-              class="w-full px-3 py-2 bg-white border rounded-lg text-left flex items-center justify-between shadow-2xs hover:border-purple-600 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 transition-colors cursor-pointer"
-              [ngClass]="submitted() && formData.authTypes.length === 0 ? 'border-red-500' : 'border-slate-300'"
-            >
-              <div class="flex items-center gap-2 min-w-0 pr-2">
-                @if (formData.authTypes.length === 0) {
-                  <span class="text-slate-400 text-xs font-normal">Select Auth Type...</span>
-                } @else {
-                  <span class="text-slate-800 text-xs font-semibold">
-                    {{ formData.authTypes.join(', ') }}
-                  </span>
-                }
-              </div>
-
-              <svg
-                class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0"
-                [ngClass]="{'rotate-180': isAuthDropdownOpen()}"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
-            <!-- Multi-select Popup Menu -->
-            @if (isAuthDropdownOpen()) {
-              <div
-                (click)="$event.stopPropagation()"
-                class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 p-2 space-y-1 font-sans"
-              >
-                <div class="px-2 py-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1">
-                  Available Methods
-                </div>
-
-                @for (type of allAuthTypes; track type) {
-                  <label
-                    class="flex items-center justify-between px-2.5 py-2 rounded-md hover:bg-purple-50/70 cursor-pointer transition-colors text-xs select-none"
-                    [ngClass]="{'bg-purple-50/50 font-semibold text-purple-900': isFormAuthSelected(type)}"
-                  >
-                    <div class="flex items-center gap-2.5">
-                      <input
-                        type="checkbox"
-                        [checked]="isFormAuthSelected(type)"
-                        (change)="toggleFormAuth(type)"
-                        class="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 border-slate-300 cursor-pointer accent-purple-600"
-                      />
-                      <span>{{ type }}</span>
-                    </div>
-
-                    @if (isFormAuthSelected(type)) {
-                      <span class="text-[10px] text-purple-700 font-semibold uppercase">Selected</span>
-                    }
-                  </label>
-                }
-              </div>
-            }
+            <!-- Multi-select dropdown -->
+            <app-dropdown
+              multiple
+              placeholder="Select Auth Type..."
+              [options]="allAuthTypes"
+              [values]="formData.authTypes"
+              [maxLabels]="allAuthTypes.length"
+              [invalid]="submitted() && formData.authTypes.length === 0"
+              (optionToggled)="toggleFormAuth($any($event))"
+            />
 
             @if (submitted() && formData.authTypes.length === 0) {
               <p class="text-[11px] text-red-500 mt-1 font-medium">Please select at least one authentication type</p>
@@ -310,14 +247,16 @@ interface TwoStepFormData {
                   <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200 shadow-2xs">
                     <span>{{ type }}</span>
                     <button
+                      appButton
+                      variant="ghost"
+                      size="sm"
+                      iconOnly
                       type="button"
                       (click)="removeFormAuth(type)"
-                      class="text-purple-600 hover:text-purple-900 rounded-full hover:bg-purple-200 p-0.5 transition-colors cursor-pointer"
                       title="Remove method"
+                      aria-label="Remove method"
                     >
-                      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
+                      <app-icon name="close" size="xs" />
                     </button>
                   </span>
                 }
@@ -374,7 +313,7 @@ interface TwoStepFormData {
         }
       </app-action-modal>
 
-    </div>
+    </app-page-shell>
   `
 })
 export class TwoStepVerificationComponent implements OnInit {
@@ -579,7 +518,7 @@ export class TwoStepVerificationComponent implements OnInit {
     });
   }
 
-  getRowClass = (item: any): string => {
+  getRowClass = (item: { status?: string }): string => {
     const isInactive = item.status === 'Inactive';
     return isInactive ? 'opacity-50 !bg-slate-100/70 transition-colors' : 'bg-white transition-colors';
   };

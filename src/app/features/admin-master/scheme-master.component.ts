@@ -47,7 +47,7 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
   itemUnit: 'schemes',
   columns: COLUMNS,
   hasStatus: true,
-  modalWidthClass: 'max-w-[560px]',
+  modalWidthClass: 'max-w-[680px]',
   fields: [
     { key: 'schemeName', label: 'Scheme Name', type: 'text', required: true, maxLength: 120, placeholder: 'Enter scheme name', colSpan: 3 },
     { key: 'schemeCategory', label: 'Scheme Category', type: 'multiselect', required: true, options: SCHEME_CATEGORY_OPTIONS, colSpan: 2 },

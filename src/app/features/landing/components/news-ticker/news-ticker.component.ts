@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { PressReleasesModalComponent } from '../press-releases-modal/press-releases-modal.component';
+import { ButtonComponent, IconComponent } from '../../../../shared';
 
 export interface AnnouncementItem {
   id: string;
@@ -25,7 +26,7 @@ export interface AnnouncementItem {
   selector: 'app-news-ticker',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, PressReleasesModalComponent],
+  imports: [CommonModule, PressReleasesModalComponent, ButtonComponent, IconComponent],
   host: {
     class: 'block w-full'
   },
@@ -43,9 +44,11 @@ export interface AnnouncementItem {
              ============================================================ -->
         <div class="flex items-center gap-2 sm:gap-3 shrink-0 z-20 bg-[#0D3557] pr-2 sm:pr-3">
           <button
+            appButton
+            size="sm"
             type="button"
             (click)="isModalOpen.set(true)"
-            class="inline-flex items-center gap-1.5 sm:gap-2 bg-[#F28C28] hover:bg-[#d9771e] text-white font-bold px-2.5 py-1 sm:px-3 sm:py-1 rounded-[4px] text-[12px] sm:text-[13px] tracking-wider uppercase transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/40 shadow-xs shrink-0"
+            class="shrink-0"
             aria-label="View press releases and announcements"
             title="Click to view all press releases"
           >
@@ -86,7 +89,7 @@ export interface AnnouncementItem {
                     {{ item.date }}
                   </span>
                   <!-- Announcement Text (Hindi / English - explicitly pure white) -->
-                  <span class="ticker-text font-normal text-[12.5px] sm:text-[13.5px] lg:text-[14.5px] text-white font-['Noto_Sans_Devanagari','Inter',sans-serif] whitespace-nowrap group-hover:text-[#F28C28] group-hover:underline">
+                  <span class="ticker-text font-normal text-[12.5px] sm:text-[13.5px] lg:text-[14.5px] text-white font-sans whitespace-nowrap group-hover:text-[#F28C28] group-hover:underline">
                     {{ item.text }}
                   </span>
                 </a>
@@ -109,7 +112,7 @@ export interface AnnouncementItem {
                     {{ item.date }}
                   </span>
                   <!-- Announcement Text -->
-                  <span class="ticker-text font-normal text-[12.5px] sm:text-[13.5px] lg:text-[14.5px] text-white font-['Noto_Sans_Devanagari','Inter',sans-serif] whitespace-nowrap group-hover:text-[#F28C28] group-hover:underline">
+                  <span class="ticker-text font-normal text-[12.5px] sm:text-[13.5px] lg:text-[14.5px] text-white font-sans whitespace-nowrap group-hover:text-[#F28C28] group-hover:underline">
                     {{ item.text }}
                   </span>
                 </a>
@@ -127,22 +130,22 @@ export interface AnnouncementItem {
         <div class="flex items-center gap-2 shrink-0 z-20 bg-[#0D3557] pl-2 sm:pl-3">
           <div class="w-px h-4 sm:h-5 bg-white/25 shrink-0 hidden sm:block"></div>
           <button
+            appButton
+            variant="secondary"
+            size="sm"
+            iconOnly
             type="button"
             (click)="togglePauseResume()"
-            class="w-7 h-7 sm:w-8 sm:h-8 rounded-[4px] bg-[#194A70] hover:bg-[#F28C28] text-white flex items-center justify-center transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/40 shadow-2xs border border-white/10 shrink-0"
+            class="shrink-0"
             [attr.aria-label]="isPaused() ? 'Resume news announcements' : 'Pause news announcements'"
             [attr.title]="isPaused() ? 'Resume news announcements' : 'Pause news announcements'"
           >
             @if (isPaused()) {
               <!-- Play / Resume Icon -->
-              <svg class="w-3.5 h-3.5 fill-current translate-x-0.5" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
+              <app-icon name="play" solid size="sm" class="translate-x-0.5" />
             } @else {
               <!-- Pause Icon -->
-              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-              </svg>
+              <app-icon name="pause" solid size="sm" />
             }
           </button>
         </div>

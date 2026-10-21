@@ -1,11 +1,14 @@
 import { Component, input } from '@angular/core';
 import { CenterPhotoItem } from '../../models/sdc.model';
 import { buildCenterPhotoItem } from './sdc-detail.util';
+import { ButtonComponent, IconComponent } from '../../../../shared';
 
 /** Photo manager for the edit form. Mutates the supplied array in place (it belongs to the parent edit model). */
+// Default change detection: photos are pushed into the parent-owned array from a FileReader callback (no markForCheck/signal).
 @Component({
   selector: 'app-sdc-photo-editor',
   standalone: true,
+  imports: [ButtonComponent, IconComponent],
   host: { class: 'block' },
   template: `
     <div class="flex items-center justify-between mb-2">
@@ -33,10 +36,14 @@ import { buildCenterPhotoItem } from './sdc-detail.util';
           <div class="p-2 bg-white border-t border-slate-100 flex items-center justify-between">
             <span class="text-[11px] font-semibold text-slate-700 truncate">{{ photo.tag || ('Photo ' + (idx + 1)) }}</span>
             <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
               type="button"
               (click)="removePhoto(idx)"
-              class="text-rose-500 hover:text-rose-700 text-xs font-bold px-1.5 py-0.5 rounded hover:bg-rose-50"
-            >✕</button>
+              aria-label="Remove photo"
+            ><app-icon name="close" size="xs" /></button>
           </div>
         </div>
       }

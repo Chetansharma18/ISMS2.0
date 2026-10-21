@@ -220,6 +220,13 @@ export const RAJASTHAN_LOCATION_DATA: Record<string, DistrictInfo> = {
   }
 };
 
+/** Hostel categories of a centre (non-residential is not offered). */
+export const HOSTEL_CATEGORY_OPTIONS: string[] = [
+  'Residential (Both Boys & Girls)',
+  'Residential (Boys Only)',
+  'Residential (Girls Only)'
+];
+
 /** Standard TP Recommendation options */
 export const TP_RECOMMENDATION_OPTIONS: string[] = [
   'Recommended for Level-4 Accreditation',
@@ -278,12 +285,7 @@ export function getSdcFormFields(options: SdcFormConfigOptions = {}): FormFieldC
     value: s
   }));
 
-  // Non-Residential removed as requested
-  const hostelCategoryOptions: FormOption[] = [
-    { label: 'Residential (Both Boys & Girls)', value: 'Residential (Both Boys & Girls)' },
-    { label: 'Residential (Boys Only)', value: 'Residential (Boys Only)' },
-    { label: 'Residential (Girls Only)', value: 'Residential (Girls Only)' }
-  ];
+  const hostelCategoryOptions: FormOption[] = HOSTEL_CATEGORY_OPTIONS.map(h => ({ label: h, value: h }));
 
   const assemblyField: FormFieldConfig = {
     key: 'assemblyConstituency',
@@ -335,7 +337,7 @@ export function getSdcFormFields(options: SdcFormConfigOptions = {}): FormFieldC
     options: districtOptions,
     placeholder: 'Select District',
     colSpan: 1,
-    onChange: (newDistrict: string, _field, model: Record<string, any>) => {
+    onChange: (newDistrict: string, _field, model: Record<string, unknown>) => {
       const distInfo = RAJASTHAN_LOCATION_DATA[newDistrict];
       if (distInfo) {
         // Auto-fill division accordingly
@@ -532,7 +534,7 @@ export function getSdcFormFields(options: SdcFormConfigOptions = {}): FormFieldC
       maxLength: 300,
       placeholder: 'Ready for auditor inspection',
       colSpan: 2,
-      onChange: (val: string, _f: any, model: Record<string, any>) => {
+      onChange: (val: string, _f: FormFieldConfig, model: Record<string, unknown>) => {
         model['tpRemarks'] = val;
       }
     },

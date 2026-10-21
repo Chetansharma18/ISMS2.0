@@ -1,9 +1,11 @@
+// ui-guard-allow: page-frame - the Apply-for-EOI wizard has its own stepper layout
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { DocumentViewerModalComponent } from '../../../../shared/components/document-viewer-modal/document-viewer-modal.component';
 import { ActionModalComponent } from '../../../../shared/components/action-modal/action-modal.component';
 import { StepperComponent } from '../../../../shared/components/stepper/stepper.component';
+import { ButtonComponent, IconComponent } from '../../../../shared';
 import { SchemeFormState } from './scheme-form.state';
 import { SchemeHeaderCardComponent } from './steps/scheme-header-card.component';
 import { Step1ProcessingFeeComponent } from './steps/step1-processing-fee.component';
@@ -19,10 +21,10 @@ export type { EoiDocumentItem } from './scheme-form.model';
   selector: 'app-scheme-form',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ActionModalComponent, StepperComponent, SchemeHeaderCardComponent, Step1ProcessingFeeComponent, Step2OtrProfileComponent, Step3UploadDocumentsComponent, Step4CompletePreviewComponent, Step5EmdPaymentComponent, Step6ReceiptsComponent],
+  imports: [ButtonComponent, IconComponent, ActionModalComponent, StepperComponent, SchemeHeaderCardComponent, Step1ProcessingFeeComponent, Step2OtrProfileComponent, Step3UploadDocumentsComponent, Step4CompletePreviewComponent, Step5EmdPaymentComponent, Step6ReceiptsComponent],
   providers: [SchemeFormState],
   template: `
-    <div class="min-h-screen bg-[#FEFEFD] flex flex-col selection:bg-navy selection:text-white font-sans text-slate-800" style="font-family: 'Inter', sans-serif;">
+    <div class="min-h-screen bg-[#FEFEFD] flex flex-col selection:bg-navy selection:text-white font-sans text-slate-800" >
 
       <main class="flex-1 w-full px-4 sm:px-5 lg:px-6 py-4 sm:py-5">
 
@@ -31,14 +33,8 @@ export type { EoiDocumentItem } from './scheme-form.model';
           <!-- No Back from Step 2: the paid processing fee step cannot be reopened -->
           @if (state.currentStep() !== 2) {
             <div>
-              <button
-                type="button"
-                (click)="goBack()"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
-              >
-                <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
+              <button appButton variant="outline" size="sm" (click)="goBack()">
+                <app-icon name="back" />
                 <span>Back</span>
               </button>
             </div>
@@ -121,9 +117,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
         <div class="text-center space-y-5">
           <!-- Success Icon -->
           <div class="w-16 h-16 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-inner ring-4 ring-emerald-50">
-            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-            </svg>
+            <app-icon name="check" size="2xl" [stroke]="3" />
           </div>
 
           <!-- Title & Subtitle -->
@@ -140,7 +134,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
           <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-left text-xs space-y-2.5">
             <div class="flex items-center justify-between pb-2 border-b border-slate-200">
               <span class="text-slate-500 text-[11px] font-medium">Transaction ID</span>
-              <span class="font-mono font-semibold text-slate-800 text-xs">CIN-SBI-9912081</span>
+              <span class="tabular-nums font-semibold text-slate-800 text-xs">CIN-SBI-9912081</span>
             </div>
             <div class="flex items-center justify-between pb-2 border-b border-slate-200">
               <span class="text-slate-500 text-[11px] font-medium">Paid On</span>
@@ -174,9 +168,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
       >
         <div class="text-center space-y-5">
           <div class="w-16 h-16 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-inner ring-4 ring-emerald-50">
-            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-            </svg>
+            <app-icon name="check" size="2xl" [stroke]="3" />
           </div>
 
           <div class="space-y-1.5">
@@ -189,11 +181,11 @@ export type { EoiDocumentItem } from './scheme-form.model';
           <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-left text-xs space-y-2.5">
             <div class="flex items-center justify-between gap-3 pb-2 border-b border-slate-200">
               <span class="text-slate-500 text-[11px] font-medium">Payment Reference No.</span>
-              <span class="font-mono font-semibold text-slate-800 text-xs">{{ state.emdPaymentRef() }}</span>
+              <span class="tabular-nums font-semibold text-slate-800 text-xs">{{ state.emdPaymentRef() }}</span>
             </div>
             <div class="flex items-center justify-between gap-3 pt-1">
               <span class="text-slate-500 text-[11px] font-medium">EOI Submission Reference No.</span>
-              <span class="font-mono font-semibold text-navy text-xs select-all">{{ state.eoiApplicationId() }}</span>
+              <span class="tabular-nums font-semibold text-navy text-xs select-all">{{ state.eoiApplicationId() }}</span>
             </div>
           </div>
 

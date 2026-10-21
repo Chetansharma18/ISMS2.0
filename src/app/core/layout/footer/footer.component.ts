@@ -12,12 +12,14 @@ import {
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
 import { UserManualPdfService } from '../../services/user-manual-pdf.service';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonComponent, IconComponent],
   host: {
     class: 'block w-full bg-[#070e18]'
   },
@@ -68,7 +70,7 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
   `],
   template: `
     <footer #footerRef 
-      class="relative w-full font-['Inter',sans-serif] bg-[#0c1828] text-slate-300 border-t border-slate-700 select-none overflow-hidden" 
+      class="relative w-full font-sans bg-[#0c1828] text-slate-300 border-t border-slate-700 select-none overflow-hidden" 
       aria-label="Portal Footer">
 
       <!-- Background Image Layer: Rajasthan Forts & Palaces Heritage Silhouette (FOOTER BACKGROUND.png) - Prominently Visible -->
@@ -93,7 +95,7 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
           <!-- Section Heading with Flanking Saffron/Amber Accents -->
           <div class="flex items-center justify-center gap-3 sm:gap-5 mb-7 sm:mb-9">
             <div class="h-px flex-1 max-w-30 bg-linear-to-l from-[#F59E0B] to-transparent"></div>
-            <h2 class="text-xl sm:text-2xl font-bold text-white tracking-wide font-['Inter',sans-serif] m-0 whitespace-nowrap">
+            <h2 class="text-xl sm:text-2xl font-bold text-white tracking-wide font-sans m-0 whitespace-nowrap">
               Other Important Links
             </h2>
             <div class="h-px flex-1 max-w-30 bg-linear-to-r from-[#F59E0B] to-transparent"></div>
@@ -315,15 +317,17 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
             <!-- Pause / Play Accessibility Button -->
             <div class="flex justify-center mt-3">
               <button
+                appButton
+                variant="inverse"
+                size="sm"
                 type="button"
                 (click)="togglePause()"
-                [attr.aria-label]="isPausedManually() ? 'Resume animation' : 'Pause animation'"
-                class="inline-flex items-center gap-1.5 px-3 py-1 rounded text-[12px] font-medium text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 border border-white/15 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F59E0B] cursor-pointer">
+                [attr.aria-label]="isPausedManually() ? 'Resume animation' : 'Pause animation'">
                 @if (isPausedManually()) {
-                  <svg class="w-3.5 h-3.5 text-[#F59E0B]" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                  <app-icon name="play" solid size="sm" class="text-[#F59E0B]" />
                   <span>Resume Animation</span>
                 } @else {
-                  <svg class="w-3.5 h-3.5 text-slate-300" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  <app-icon name="pause" solid size="sm" class="text-slate-300" />
                   <span>Pause Animation</span>
                 }
               </button>
@@ -359,17 +363,17 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
               </div>
 
               <!-- ISMS 2.0 Brand Wordmark -->
-              <div class="text-[1.75rem] font-black text-white tracking-tight leading-none font-['Inter',sans-serif] mb-1.5">
+              <div class="text-[1.75rem] font-black text-white tracking-tight leading-none font-sans mb-1.5">
                 ISMS <span class="text-[#F59E0B]">2.0</span>
               </div>
 
               <!-- Subtitle -->
-              <div class="text-[0.875rem] font-bold text-white mb-2.5 font-['Inter',sans-serif]">
+              <div class="text-[0.875rem] font-bold text-white mb-2.5 font-sans">
                 Integrated Scheme Management System
               </div>
 
               <!-- Organisation Address / Department Hierarchy -->
-              <div class="text-[0.8125rem] text-slate-300 leading-relaxed font-['Inter',sans-serif]">
+              <div class="text-[0.8125rem] text-slate-300 leading-relaxed font-sans">
                 Rajasthan Skill &amp; Livelihoods Development Corporation<br/>
                 Department of Skill, Employment and Entrepreneurship<br/>
                 Government of Rajasthan
@@ -381,7 +385,7 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
               <div class="flex flex-col items-start text-left w-fit">
                 
                 <!-- Section Heading -->
-                <div class="text-[0.9375rem] font-bold text-white mb-4 tracking-wider uppercase font-['Inter',sans-serif]">
+                <div class="text-[0.9375rem] font-bold text-white mb-4 tracking-wider uppercase font-sans">
                   Important Links
                 </div>
 
@@ -392,7 +396,7 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
                       href="https://rajasthan.gov.in/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="footer-link text-[0.875rem] font-['Inter',sans-serif] cursor-pointer"
+                      class="footer-link text-[0.875rem] font-sans cursor-pointer"
                       aria-label="Rajasthan Government Official Portal (opens in a new tab)">
                       Rajasthan Government
                     </a>
@@ -403,37 +407,46 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
                       href="https://livelihoods.rajasthan.gov.in/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="footer-link text-[0.875rem] font-['Inter',sans-serif] cursor-pointer"
+                      class="footer-link text-[0.875rem] font-sans cursor-pointer"
                       aria-label="RSLDC Official Portal (opens in a new tab)">
                       RSLDC
                     </a>
                   </li>
 
                   <li>
+                    <!-- ui-guard-allow: footer links are text-like, zero padding -->
                     <button
+                      appButton
+                      variant="inverse"
                       type="button"
                       (click)="downloadSamplePdf('Privacy_Policy.pdf', 'Privacy Policy')"
-                      class="footer-link text-[0.875rem] font-['Inter',sans-serif] cursor-pointer bg-transparent border-0 p-0 text-left"
+                      class="footer-link h-auto px-0 text-left"
                       aria-label="Download Privacy Policy document">
                       Privacy Policy
                     </button>
                   </li>
 
                   <li>
+                    <!-- ui-guard-allow: footer links are text-like, zero padding -->
                     <button
+                      appButton
+                      variant="inverse"
                       type="button"
                       (click)="downloadSamplePdf('Terms_and_Conditions.pdf', 'Terms & Conditions')"
-                      class="footer-link text-[0.875rem] font-['Inter',sans-serif] cursor-pointer bg-transparent border-0 p-0 text-left"
+                      class="footer-link h-auto px-0 text-left"
                       aria-label="Download Terms & Conditions document">
                       Terms &amp; Conditions
                     </button>
                   </li>
 
                   <li>
+                    <!-- ui-guard-allow: footer links are text-like, zero padding -->
                     <button
+                      appButton
+                      variant="inverse"
                       type="button"
                       (click)="downloadSamplePdf('Help_and_Support.pdf', 'Help & Support')"
-                      class="footer-link text-[0.875rem] font-['Inter',sans-serif] cursor-pointer bg-transparent border-0 p-0 text-left"
+                      class="footer-link h-auto px-0 text-left"
                       aria-label="Help & Support documentation">
                       Help &amp; Support
                     </button>
@@ -445,13 +458,13 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
                 <!-- Dynamic Visitor Counter & Last Updated -->
                 <div class="flex flex-row flex-wrap items-center gap-4 mt-8 border-t border-slate-700/50 pt-4 w-fit max-w-full">
                   <div class="flex items-center gap-1.5">
-                    <span class="text-[0.8125rem] text-slate-400 font-['Inter',sans-serif]">Total Visitors:</span>
-                    <span class="text-[0.875rem] text-white font-bold font-['Inter',sans-serif] tabular-nums">042,159</span>
+                    <span class="text-[0.8125rem] text-slate-400 font-sans">Total Visitors:</span>
+                    <span class="text-[0.875rem] text-white font-bold font-sans tabular-nums">042,159</span>
                   </div>
                   <div class="w-1 h-1 rounded-full bg-slate-600 hidden sm:block"></div>
                   <div class="flex items-center gap-1.5">
-                    <span class="text-[0.8125rem] text-slate-400 font-['Inter',sans-serif]">Last Updated:</span>
-                    <span class="text-[0.875rem] text-white font-semibold font-['Inter',sans-serif]">8 Oct 2026</span>
+                    <span class="text-[0.8125rem] text-slate-400 font-sans">Last Updated:</span>
+                    <span class="text-[0.875rem] text-white font-semibold font-sans">8 Oct 2026</span>
                   </div>
                 </div>
 
@@ -461,7 +474,7 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
             <!-- Column 3: Connect With Us & Helpline -->
             <div class="flex flex-col items-start text-left md:ml-auto w-fit">
               <!-- Connect With Us -->
-              <div class="text-[0.9375rem] font-bold text-white mb-3.5 tracking-wider uppercase font-['Inter',sans-serif]">
+              <div class="text-[0.9375rem] font-bold text-white mb-3.5 tracking-wider uppercase font-sans">
                 Connect With Us
               </div>
 
@@ -474,7 +487,7 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
                   rel="noopener noreferrer"
                   class="footer-social-btn w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer"
                   aria-label="YouTube">
-                  <svg class="w-4 h-4 fill-currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                  <app-icon name="youtube" solid size="md" />
                 </a>
 
                 <!-- Twitter / X -->
@@ -484,7 +497,7 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
                   rel="noopener noreferrer"
                   class="footer-social-btn w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer"
                   aria-label="Twitter">
-                  <svg class="w-4 h-4 fill-currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                  <app-icon name="x-twitter" solid size="md" />
                 </a>
 
                 <!-- LinkedIn -->
@@ -494,7 +507,7 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
                   rel="noopener noreferrer"
                   class="footer-social-btn w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer"
                   aria-label="LinkedIn">
-                  <svg class="w-4 h-4 fill-currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                  <app-icon name="linkedin" solid size="md" />
                 </a>
 
                 <!-- Facebook -->
@@ -504,12 +517,12 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
                   rel="noopener noreferrer"
                   class="footer-social-btn w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer"
                   aria-label="Facebook">
-                  <svg class="w-4 h-4 fill-currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                  <app-icon name="facebook" solid size="md" />
                 </a>
               </div>
 
               <!-- Helpline Section -->
-              <div class="text-[0.9375rem] font-bold text-white mb-3.5 tracking-wider uppercase font-['Inter',sans-serif]">
+              <div class="text-[0.9375rem] font-bold text-white mb-3.5 tracking-wider uppercase font-sans">
                 Helpline
               </div>
 
@@ -519,10 +532,8 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
                   [href]="'tel:' + helplineGlobal.contacts.phone"
                   class="footer-contact flex items-center gap-2.5 cursor-pointer group"
                   aria-label="Call ISMS Helpline">
-                  <svg class="w-4 h-4 text-slate-400 group-hover:text-[#F59E0B] shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
-                  <span class="text-[0.875rem] font-semibold font-['Inter',sans-serif]">{{ helplineGlobal.contacts.phone }}</span>
+                  <app-icon name="phone" [stroke]="2" class="text-slate-400 group-hover:text-[#F59E0B] shrink-0 transition-colors" />
+                  <span class="text-[0.875rem] font-semibold font-sans">{{ helplineGlobal.contacts.phone }}</span>
                 </a>
 
                 <!-- Email -->
@@ -530,39 +541,41 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
                   [href]="'mailto:' + helplineGlobal.contacts.email"
                   class="footer-contact flex items-center gap-2.5 cursor-pointer group"
                   aria-label="Email ISMS Support">
-                  <svg class="w-4 h-4 text-slate-400 group-hover:text-[#F59E0B] shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <span class="text-[0.875rem] font-semibold font-['Inter',sans-serif] break-all sm:break-normal">{{ helplineGlobal.contacts.email }}</span>
+                  <app-icon name="mail" [stroke]="2" class="text-slate-400 group-hover:text-[#F59E0B] shrink-0 transition-colors" />
+                  <span class="text-[0.875rem] font-semibold font-sans break-all sm:break-normal">{{ helplineGlobal.contacts.email }}</span>
                 </a>
               </div>
 
               <div class="mt-5 w-full">
                 <button
+                  appButton
+                  variant="inverse"
+                  block
                   type="button"
                   (click)="downloadUserManual()"
                   [disabled]="isGeneratingManual()"
-                  class="w-full flex items-center gap-3 rounded-xl border border-amber-500/30 bg-slate-900/70 p-3 text-left transition-colors hover:border-amber-400/60 hover:bg-slate-900 disabled:cursor-wait disabled:opacity-70 group"
+                  class="group h-auto p-0 text-left hover:no-underline"
                   aria-label="Download ISMS 2.0 User Manual">
-                  <!-- Text Details -->
-                  <div class="flex flex-col min-w-0">
-                    <div class="flex items-center gap-1.5">
-                      <span class="text-[0.875rem] font-bold text-white group-hover:text-amber-300 transition-colors">
-                        Download User Manual
-                      </span>
-                      <span class="text-[9px] uppercase font-extrabold tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                        PDF
+                  <!-- The card look lives on this inner box so the button itself carries only layout classes -->
+                  <div class="w-full flex items-center gap-3 rounded-xl border border-amber-500/30 bg-slate-900/70 p-3 whitespace-normal transition-colors group-hover:border-amber-400/60 group-hover:bg-slate-900">
+                    <!-- Text Details -->
+                    <div class="flex flex-col min-w-0">
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-[0.875rem] font-bold text-white group-hover:text-amber-300 transition-colors">
+                          Download User Manual
+                        </span>
+                        <span class="text-[9px] uppercase font-extrabold tracking-wider px-1.5 py-0.5 rounded-sm bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                          PDF
+                        </span>
+                      </div>
+                      <span class="text-[0.75rem] text-slate-300 leading-tight">
+                        How ISMS 2.0 works &amp; step-by-step guide
                       </span>
                     </div>
-                    <span class="text-[0.75rem] text-slate-300 leading-tight">
-                      How ISMS 2.0 works &amp; step-by-step guide
-                    </span>
-                  </div>
 
-                  <!-- Arrow indicator -->
-                  <svg class="w-4 h-4 text-slate-400 group-hover:text-amber-300 group-hover:translate-x-0.5 transition-all ml-auto shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
+                    <!-- Arrow indicator -->
+                    <app-icon name="chevron-right" [stroke]="2" class="text-slate-400 group-hover:text-amber-300 group-hover:translate-x-0.5 transition-all ml-auto shrink-0" />
+                  </div>
                 </button>
               </div>
 
@@ -575,7 +588,7 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
         <div class="border-t border-slate-700/50 bg-[#070e18]">
           <div class="max-w-360 mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex justify-center items-center">
-              <div class="text-[0.8125rem] text-slate-400 text-center font-['Inter',sans-serif]">
+              <div class="text-[0.8125rem] text-slate-400 text-center font-sans">
                 &copy; 2026 Government of Rajasthan. All rights reserved (ISMS 2.0)
               </div>
             </div>

@@ -1,28 +1,25 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { AspirantDocumentItem } from '../../config/aspirant-form.config';
-import { AspirantModalShellComponent } from './aspirant-modal-shell.component';
+import { ButtonComponent, IconComponent, ModalComponent } from '../../../../shared';
 
 /** Modal: document preview with replace / download actions. */
 @Component({
   selector: 'app-aspirant-preview-document-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AspirantModalShellComponent],
+  imports: [ButtonComponent, IconComponent, ModalComponent],
   template: `
-    <app-aspirant-modal-shell
-      [heading]="doc().docName"
-      widthClass="max-w-2xl"
-      headerClass="py-3.5"
+    <app-modal
+      [title]="doc().docName"
+      size="lg"
       (close)="close.emit()"
     >
-      <svg modalIcon class="w-4 h-4 text-sky-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
+  <div class="border border-slate-200 rounded-lg overflow-hidden">
   <!-- Metadata Strip -->
   <div class="bg-slate-100 border-b border-slate-200 px-5 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
     <div class="flex items-center gap-2">
       <span class="text-slate-500">File:</span>
-      <span class="font-mono font-bold text-slate-800">{{ doc().fileName }}</span>
+      <span class="tabular-nums font-bold text-slate-800">{{ doc().fileName }}</span>
       <span class="px-1.5 py-0.2 bg-slate-200 text-slate-700 rounded text-[10px]">{{ doc().fileSize }}</span>
     </div>
     <div class="flex items-center gap-2">
@@ -46,8 +43,8 @@ import { AspirantModalShellComponent } from './aspirant-modal-shell.component';
       
       <div class="border-t border-b border-slate-100 py-3 space-y-1">
         <span class="text-xs font-bold text-slate-800 block">{{ doc().docType }}</span>
-        <span class="font-mono text-[11px] text-slate-600 block">{{ doc().docName }}</span>
-        <span class="text-[10px] font-mono text-slate-400 block">Doc Ref: REF-{{ doc().id }}-{{ aspirantId() }}</span>
+        <span class="tabular-nums text-[11px] text-slate-600 block">{{ doc().docName }}</span>
+        <span class="text-[10px] tabular-nums text-slate-400 block">Doc Ref: REF-{{ doc().id }}-{{ aspirantId() }}</span>
       </div>
 
       <div class="flex items-center justify-center gap-2 pt-1">
@@ -57,48 +54,46 @@ import { AspirantModalShellComponent } from './aspirant-modal-shell.component';
     </div>
   </div>
 
-  <!-- Footer Actions -->
-  <div class="bg-white border-t border-slate-200 px-5 py-3 flex items-center justify-between">
-    <!-- Direct Replace from inside preview modal -->
-    <div>
-      <button
-        type="button"
-        (click)="modalReplaceFileInput.click()"
-        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold cursor-pointer shadow-2xs"
-      >
-        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-        </svg>
-        <span>Replace Document File</span>
-      </button>
-      <input
-        #modalReplaceFileInput
-        type="file"
-        accept=".pdf,.jpg,.jpeg,.png"
-        (change)="onReplaceFileSelected($event)"
-        class="hidden"
-      />
-    </div>
-
-    <div class="flex items-center gap-2">
-      <button
-        type="button"
-        (click)="download.emit()"
-        class="px-3.5 py-1.5 border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold cursor-pointer shadow-2xs"
-      >
-        Download
-      </button>
-      <button
-        type="button"
-        (click)="close.emit()"
-        class="px-4 py-1.5 bg-primary text-white rounded-lg text-xs font-bold cursor-pointer"
-        style="color: #ffffff !important;"
-      >
-        Close
-      </button>
-    </div>
   </div>
-    </app-aspirant-modal-shell>
+
+  <!-- Footer Actions -->
+  <ng-container modalFooter>
+    <!-- Direct Replace from inside preview modal -->
+    <button
+      appButton
+      variant="outline"
+      class="mr-auto"
+      type="button"
+      (click)="modalReplaceFileInput.click()"
+    >
+      <app-icon name="upload" size="sm" />
+      <span>Replace Document File</span>
+    </button>
+    <input
+      #modalReplaceFileInput
+      type="file"
+      accept=".pdf,.jpg,.jpeg,.png"
+      (change)="onReplaceFileSelected($event)"
+      class="hidden"
+    />
+
+    <button
+      appButton
+      variant="outline"
+      type="button"
+      (click)="download.emit()"
+    >
+      Download
+    </button>
+    <button
+      appButton
+      type="button"
+      (click)="close.emit()"
+    >
+      Close
+    </button>
+  </ng-container>
+    </app-modal>
   `
 })
 export class AspirantPreviewDocumentModalComponent {

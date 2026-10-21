@@ -12,7 +12,13 @@ import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ActionModalComponent,
+  ButtonComponent,
+  DropdownComponent,
+  IconComponent,
+  InputDirective,
   PageHeaderComponent,
+  PageShellComponent,
+  SwitchComponent,
   TableColumn,
   TableComponent
 } from '../../shared';
@@ -67,54 +73,44 @@ interface EditPermissionForm {
   selector: 'app-permission-master',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, TableComponent, ActionModalComponent],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, TableComponent, ActionModalComponent, ButtonComponent, DropdownComponent, IconComponent, InputDirective, PageShellComponent, SwitchComponent],
   template: `
-    <div class="w-full min-h-screen bg-white text-slate-800 font-sans p-4 sm:p-6 lg:p-8 space-y-6">
+    <app-page-shell>
       
       <!-- Page Header -->
-      <app-page-header title="Permission Management">
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
-          <!-- Search & Filter Controls -->
-          <div class="flex items-center gap-3 flex-1 max-w-xl">
-            <!-- Search Input -->
-            <div class="relative w-full">
-              <input
-                type="text"
-                placeholder="Search by role type or model..."
-                [ngModel]="searchQuery()"
-                (ngModelChange)="searchQuery.set($event)"
-                class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-primary transition-all"
-              />
-              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
+      <app-page-header
+        title="Permission Management"
+        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Permission Management' }]"
+        [searchable]="true"
+        searchPlaceholder="Search by role type or model..."
+        [(searchQuery)]="searchQuery"
+      >
+        <!-- Role Filter Dropdown -->
+        <select
+          appInput
+          size="sm"
+          aria-label="Filter by role"
+          [ngModel]="selectedRoleFilter()"
+          (ngModelChange)="selectedRoleFilter.set($event)"
+          class="w-auto whitespace-nowrap shrink-0"
+        >
+          <option value="all">All Roles</option>
+          @for (role of activeRoleOptions(); track role) {
+            <option [value]="role">{{ role }}</option>
+          }
+        </select>
 
-            <!-- Role Filter Dropdown -->
-            <select
-              [ngModel]="selectedRoleFilter()"
-              (ngModelChange)="selectedRoleFilter.set($event)"
-              class="px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-1 focus:ring-primary whitespace-nowrap cursor-pointer shrink-0"
-            >
-              <option value="all">All Roles</option>
-              @for (role of activeRoleOptions(); track role) {
-                <option [value]="role">{{ role }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Add Permission Button -->
-          <button
-            type="button"
-            (click)="openAddModal()"
-            class="px-4 py-2.5 bg-primary hover:bg-navy text-white text-sm font-semibold rounded-lg shadow-sm transition-all whitespace-nowrap cursor-pointer flex items-center justify-center gap-2 shrink-0"
-          >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Add Permission</span>
-          </button>
-        </div>
+        <!-- Add Permission Button -->
+        <button
+          appButton
+          size="sm"
+          type="button"
+          (click)="openAddModal()"
+          class="shrink-0"
+        >
+          <app-icon name="plus" size="sm" />
+          <span>Add Permission</span>
+        </button>
       </app-page-header>
 
       <!-- Permissions Table -->
@@ -190,15 +186,14 @@ interface EditPermissionForm {
         <div class="flex items-center justify-center whitespace-nowrap">
           <!-- View Button -->
           <button
+            appButton
+            variant="ghost"
+            size="sm"
             type="button"
             (click)="$event.stopPropagation(); openViewModal(item)"
-            class="inline-flex items-center gap-1 text-sky-600 hover:text-sky-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
             title="View Details"
           >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
+            <app-icon name="eye" size="sm" />
             <span>View</span>
           </button>
 
@@ -206,14 +201,14 @@ interface EditPermissionForm {
 
           <!-- Edit Button -->
           <button
+            appButton
+            variant="ghost"
+            size="sm"
             type="button"
             (click)="$event.stopPropagation(); openEditModal(item)"
-            class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 font-medium text-[12px] hover:underline cursor-pointer select-none transition-colors"
             title="Edit"
           >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
+            <app-icon name="edit" size="sm" />
             <span>Edit</span>
           </button>
 
@@ -221,19 +216,11 @@ interface EditPermissionForm {
 
           <!-- Active / Inactive Toggle -->
           <div class="inline-flex items-center gap-1.5" title="Toggle Status" (click)="$event.stopPropagation()">
-            <button
-              type="button"
-              (click)="toggleStatus(item)"
-              role="switch"
-              [attr.aria-checked]="item.status !== 'Inactive'"
-              class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              [ngClass]="item.status === 'Inactive' ? 'bg-slate-300' : 'bg-emerald-500'"
-            >
-              <span
-                class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out"
-                [ngClass]="item.status === 'Inactive' ? 'translate-x-0' : 'translate-x-4'"
-              ></span>
-            </button>
+            <app-switch
+              [checked]="item.status !== 'Inactive'"
+              label="Toggle Active Status"
+              (toggled)="toggleStatus(item)"
+            />
             <span
               class="text-[12px] font-semibold select-none cursor-pointer"
               [ngClass]="item.status === 'Inactive' ? 'text-slate-500' : 'text-emerald-700'"
@@ -268,9 +255,10 @@ interface EditPermissionForm {
           <div>
             <label class="block text-slate-700 font-medium mb-1">Role Type*</label>
             <select
+              appInput
               [(ngModel)]="addForm.roleType"
-              class="w-full px-2.5 py-2 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white"
-              [class.border-red-500]="submitted() && !addForm.roleType"
+              class="w-full"
+              [invalid]="submitted() && !addForm.roleType"
             >
               <option value="" disabled selected>Select Role Type</option>
               @for (role of activeRoleOptions(); track role) {
@@ -291,97 +279,21 @@ interface EditPermissionForm {
               </span>
             </div>
 
-            <!-- Trigger Button -->
-            <button
-              type="button"
-              (click)="toggleModelDropdown($event)"
-              class="w-full px-2.5 py-2 border rounded focus:outline-none text-slate-800 bg-white flex items-center justify-between text-left cursor-pointer transition-all duration-150"
-              [class.border-red-500]="submitted() && addForm.models.length === 0"
-              [class.border-primary]="isModelDropdownOpen()"
-              [class.ring-1]="isModelDropdownOpen()"
-              [class.ring-primary]="isModelDropdownOpen()"
-              [class.border-slate-300]="!isModelDropdownOpen() && !(submitted() && addForm.models.length === 0)"
-            >
-              <span class="truncate text-xs sm:text-[13px] font-medium" [class.text-slate-400]="addForm.models.length === 0">
-                {{ getSelectedModelsLabel() }}
-              </span>
-              <svg
-                class="w-4 h-4 text-slate-500 shrink-0 ml-2 transition-transform duration-200"
-                [class.rotate-180]="isModelDropdownOpen()"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
-            <!-- Dropdown Menu (In-flow so parent modal card naturally stretches) -->
-            @if (isModelDropdownOpen()) {
-              <div
-                class="mt-2 bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden font-sans transition-all duration-200"
-                (click)="$event.stopPropagation()"
-              >
-                <!-- Search Input inside Dropdown -->
-                <div class="p-2 border-b border-slate-100 bg-slate-50/80">
-                  <div class="relative">
-                    <input
-                      type="text"
-                      [ngModel]="modelSearchText()"
-                      (ngModelChange)="modelSearchText.set($event)"
-                      placeholder="Search pages / models..."
-                      class="w-full pl-8 pr-7 py-1.5 bg-white border border-slate-200 rounded text-xs placeholder:text-slate-400 focus:outline-none focus:border-primary text-slate-800"
-                    />
-                    <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    @if (modelSearchText()) {
-                      <button
-                        type="button"
-                        (click)="modelSearchText.set('')"
-                        class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                        title="Clear search"
-                      >
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    }
-                  </div>
-                </div>
-
-                <!-- Select All and Model Checkbox Options -->
-                <div class="max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs sm:text-[13px]">
-                  <label class="flex items-center justify-between px-3 py-2 hover:bg-slate-50 cursor-pointer text-slate-800 font-semibold select-none bg-slate-50/80 sticky top-0 z-10 border-b border-slate-100">
-                    <div class="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        [checked]="isAllModelsSelected()"
-                        (change)="toggleAllModels()"
-                        class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary cursor-pointer accent-primary"
-                      />
-                      <span>Select All Pages / Models</span>
-                    </div>
-                    <span class="text-[11px] text-slate-500 font-normal">({{ addForm.models.length }}/{{ availableModels.length }})</span>
-                  </label>
-
-                  @for (m of filteredAvailableModels(); track m) {
-                    <label class="flex items-center gap-2.5 px-3 py-2 hover:bg-slate-50 cursor-pointer text-slate-700 select-none transition-colors">
-                      <input
-                        type="checkbox"
-                        [checked]="isModelSelected(m)"
-                        (change)="toggleModelOption(m)"
-                        class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary cursor-pointer accent-primary"
-                      />
-                      <span class="truncate">{{ m }}</span>
-                    </label>
-                  }
-                  @if (filteredAvailableModels().length === 0) {
-                    <div class="px-3 py-3 text-center text-xs text-slate-400">No pages / models match search</div>
-                  }
-                </div>
-              </div>
-            }
+            <!-- Multi-select with search; the list opens in the page flow so the modal card stretches -->
+            <app-dropdown
+              multiple
+              [searchable]="true"
+              searchPlaceholder="Search pages / models..."
+              emptyText="No pages / models match search"
+              placeholder="Select Model / Pages"
+              selectAllLabel="Select All Pages / Models"
+              [options]="availableModels"
+              [values]="addForm.models"
+              [summary]="getSelectedModelsLabel()"
+              [invalid]="submitted() && addForm.models.length === 0"
+              (optionToggled)="toggleModelOption($event)"
+              (selectAllToggled)="toggleAllModels()"
+            />
 
             @if (submitted() && addForm.models.length === 0) {
               <div class="text-xs text-red-500 mt-1 font-medium">Please select at least one page / model</div>
@@ -393,9 +305,11 @@ interface EditPermissionForm {
             <div class="flex items-center justify-between mb-1.5">
               <label class="block text-slate-700 font-medium">Permissions*</label>
               <button
+                appButton
+                variant="ghost"
+                size="sm"
                 type="button"
                 (click)="toggleAllAddPermissions()"
-                class="text-xs text-primary hover:text-navy font-semibold cursor-pointer underline"
               >
                 {{ (addForm.canView && addForm.canEdit && addForm.canDelete) ? 'Deselect All' : 'Select All' }}
               </button>
@@ -466,8 +380,9 @@ interface EditPermissionForm {
             <div>
               <label class="block text-slate-700 font-medium mb-1">Role Type</label>
               <select
+                appInput
                 [(ngModel)]="ef.roleType"
-                class="w-full px-2.5 py-2 border border-field-border rounded focus:outline-none focus:border-primary text-slate-800 bg-white"
+                class="w-full"
               >
                 @for (role of activeRoleOptions(); track role) {
                   <option [value]="role">{{ role }}</option>
@@ -479,8 +394,9 @@ interface EditPermissionForm {
             <div>
               <label class="block text-slate-700 font-medium mb-1">Model (Page)</label>
               <select
+                appInput
                 [(ngModel)]="ef.moduleName"
-                class="w-full px-2.5 py-2 border border-field-border rounded focus:outline-none focus:border-primary text-slate-800 bg-white"
+                class="w-full"
               >
                 @for (m of availableModels; track m) {
                   <option [value]="m">{{ m }}</option>
@@ -525,8 +441,9 @@ interface EditPermissionForm {
             <div>
               <label class="block text-slate-700 font-medium mb-1">Status</label>
               <select
+                appInput
                 [(ngModel)]="ef.status"
-                class="w-full px-2.5 py-2 border border-field-border rounded focus:outline-none focus:border-primary text-slate-800 bg-white"
+                class="w-full"
               >
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
@@ -601,7 +518,7 @@ interface EditPermissionForm {
         }
       </app-action-modal>
 
-    </div>
+    </app-page-shell>
   `
 })
 export class PermissionMasterComponent {

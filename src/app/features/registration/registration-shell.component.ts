@@ -1,3 +1,4 @@
+// ui-guard-allow: page-frame - the registration wizard has its own stepper layout
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
@@ -12,6 +13,7 @@ import { Step4BankDetailsComponent } from './steps/step4-bank-details/step4-bank
 import { Step5PreviewComponent } from './steps/step5-preview/step5-preview.component';
 import { ActionModalComponent } from '../../shared/components/action-modal/action-modal.component';
 import { AuthService } from '../../core/auth/auth.service';
+import { ButtonComponent, IconComponent } from '../../shared';
 
 export interface StepMeta {
   number: number;
@@ -28,10 +30,12 @@ export interface StepMeta {
     Step3AuthPersonComponent,
     Step4BankDetailsComponent,
     Step5PreviewComponent,
-    ActionModalComponent
+    ActionModalComponent,
+    ButtonComponent,
+    IconComponent
   ],
   template: `
-    <div class="min-h-screen bg-[#FEFEFD] flex flex-col justify-between selection:bg-navy selection:text-white font-sans" style="font-family: 'Inter', sans-serif;">
+    <div class="min-h-screen bg-[#FEFEFD] flex flex-col justify-between selection:bg-navy selection:text-white font-sans" >
 
       <!-- ====================================================================
            Main Content Area
@@ -42,14 +46,8 @@ export interface StepMeta {
         <div class="mb-5 space-y-3">
           <!-- Back button -->
           <div>
-            <button
-              type="button"
-              (click)="goBack()"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs"
-            >
-              <svg class="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
+            <button appButton variant="outline" size="sm" type="button" (click)="goBack()">
+              <app-icon name="back" />
               <span>Back</span>
             </button>
           </div>
@@ -83,9 +81,11 @@ export interface StepMeta {
             @for (step of steps; track step.number; let last = $last) {
               <!-- Step Item Button -->
               <button
+                appButton
+                variant="ghost"
                 type="button"
                 (click)="goToStep(step.number)"
-                class="flex items-center gap-2 sm:gap-2.5 transition-all cursor-pointer group bg-transparent border-0 p-0 text-left shrink-0"
+                class="gap-2 sm:gap-2.5 shrink-0 text-left"
               >
                 <!-- Number Badge / Checkmark -->
                 <span
@@ -95,9 +95,7 @@ export interface StepMeta {
                   [style.border]="(activeStep() === step.number || isStepCompleted(step.number)) ? '2px solid #0B3558' : '2px solid #cbd5e1'"
                 >
                   @if (isStepCompleted(step.number) && activeStep() !== step.number) {
-                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="stroke: #ffffff;">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                    </svg>
+                    <app-icon name="check" [stroke]="3" class="text-white" />
                   } @else {
                     <span [style.color]="(activeStep() === step.number || isStepCompleted(step.number)) ? '#ffffff' : '#64748b'" style="font-weight: 700; font-size: 13px;">
                       {{ step.number }}
@@ -209,25 +207,13 @@ export interface StepMeta {
             <!-- Left Side: Previous Button (Steps 2, 3, 4) / Back to Profile (Step 1) -->
             <div>
               @if (activeStep() > 1) {
-                <button
-                  type="button"
-                  (click)="previousStep()"
-                  class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
-                >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                  </svg>
+                <button appButton variant="outline" size="lg" type="button" (click)="previousStep()">
+                  <app-icon name="chevron-left" />
                   <span>Previous</span>
                 </button>
               } @else {
-                <button
-                  type="button"
-                  (click)="goBack()"
-                  class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
-                >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                  </svg>
+                <button appButton variant="outline" size="lg" type="button" (click)="goBack()">
+                  <app-icon name="chevron-left" />
                   <span>Back to Profile</span>
                 </button>
               }
@@ -239,15 +225,9 @@ export interface StepMeta {
               @if (activeStep() === 1) {
           
 
-                <button
-                  type="button"
-                  (click)="nextStep()"
-                  class="px-6 sm:px-7 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-                >
+                <button appButton size="lg" type="button" (click)="nextStep()">
                   <span>Next Step</span>
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
+                  <app-icon name="chevron-right" />
                 </button>
               }
 
@@ -255,60 +235,33 @@ export interface StepMeta {
               @if (activeStep() === 2) {
               
 
-                <button
-                  type="button"
-                  (click)="nextStep()"
-                  class="px-6 sm:px-7 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-                >
+                <button appButton size="lg" type="button" (click)="nextStep()">
                   <span>Next Step</span>
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
+                  <app-icon name="chevron-right" />
                 </button>
               }
 
               <!-- STEP 3 NAVIGATION: [Previous (left)] [Next Step ->] -->
               @if (activeStep() === 3) {
-                <button
-                  type="button"
-                  (click)="nextStep()"
-                  class="px-6 sm:px-7 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-semibold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-                >
+                <button appButton size="lg" type="button" (click)="nextStep()">
                   <span>Next Step</span>
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
+                  <app-icon name="chevron-right" />
                 </button>
               }
 
               <!-- STEP 4 NAVIGATION: [Previous (left)] [Download PDF] [Save as Draft] [Submit Application] -->
               @if (activeStep() === 4) {
-                <button
-                  type="button"
-                  (click)="downloadOtrPdf()"
-                  class="px-4 sm:px-5 py-2.5 rounded-lg border border-ocean text-ocean bg-white hover:bg-sky-50 active:scale-95 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs"
-                  title="Download complete details in PDF"
-                >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
+                <button appButton variant="outline" size="lg" type="button" (click)="downloadOtrPdf()" title="Download complete details in PDF">
+                  <app-icon name="document-download" [stroke]="2" />
                   <span>Download PDF</span>
                 </button>
 
                 @if (isAlreadySubmitted()) {
-                  <button
-                    type="button"
-                    (click)="backToProfile()"
-                    class="px-6 sm:px-8 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-                  >
+                  <button appButton size="lg" type="button" (click)="backToProfile()">
                     <span>Back to Profile</span>
                   </button>
                 } @else {
-                  <button
-                    type="button"
-                    (click)="submitApplication()"
-                    class="px-6 sm:px-8 py-2.5 rounded-lg bg-navy hover:bg-[#07243c] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
-                  >
+                  <button appButton size="lg" type="button" (click)="submitApplication()">
                     <span>Register</span>
                   </button>
                 }
@@ -339,19 +292,13 @@ export interface StepMeta {
           >
             <div class="shrink-0 mt-0.5">
               @if (toast.type === 'success') {
-                <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                </svg>
+                <app-icon name="check" size="lg" [stroke]="2.5" class="text-emerald-400" />
               } @else if (toast.type === 'error' || toast.type === 'warning') {
                 <div class="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0 shadow-xs">
-                  <svg class="w-3.5 h-3.5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <app-icon name="close" size="sm" [stroke]="3" class="text-rose-600" />
                 </div>
               } @else {
-                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <app-icon name="info-circle" size="lg" [stroke]="2.5" class="text-white" />
               }
             </div>
 
@@ -360,13 +307,15 @@ export interface StepMeta {
             </div>
 
             <button
+              appButton
+              variant="inverse"
+              size="xs"
+              iconOnly
               type="button"
               (click)="validationService.clearToast()"
-              class="text-white/70 hover:text-white transition-colors cursor-pointer"
+              aria-label="Dismiss notification"
             >
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <app-icon name="close" [stroke]="2" />
             </button>
           </div>
         </div>
@@ -386,7 +335,7 @@ export interface StepMeta {
         (secondaryAction)="navigateToExistingUserProfile()"
         (close)="navigateToExistingUserProfile()"
       >
-        <p class="text-xs sm:text-sm text-slate-600 mt-2 mb-0 font-mono">
+        <p class="text-xs sm:text-sm text-slate-600 mt-2 mb-0 tabular-nums">
           USER ID: <span class="font-bold text-navy">{{ submittedRegId() }}</span>
         </p>
       </app-action-modal>

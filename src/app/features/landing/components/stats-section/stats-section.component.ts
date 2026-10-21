@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { IconComponent } from '../../../../shared';
 
 interface StatMetric {
   count: string;
@@ -14,7 +15,7 @@ interface StatMetric {
   selector: 'app-stats-section',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   host: {
     class: 'block w-full'
   },
@@ -27,7 +28,7 @@ interface StatMetric {
           <span class="text-xs font-bold text-orange-600 uppercase tracking-wider bg-orange-50 px-3 py-1 rounded-full border border-orange-200/60">
             Real-Time Governance Metrics
           </span>
-          <div style="font-size: 2.4rem; line-height: 1.15; font-weight: 900; color: #0B3558; margin-top: 10px; letter-spacing: -0.025em; font-family: 'Inter', sans-serif;">
+          <div style="font-size: 2.4rem; line-height: 1.15; font-weight: 900; color: #0B3558; margin-top: 10px; letter-spacing: -0.025em;">
             Impact Across Rajasthan
           </div>
           <p class="text-[14px] sm:text-[15px] text-slate-500 mt-2 mx-auto max-w-2xl">
@@ -45,13 +46,11 @@ interface StatMetric {
                     Live Record
                   </span>
                   <div class="w-8 h-8 rounded-lg {{ stat.iconBg }} {{ stat.iconColor }} flex items-center justify-center">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
+                    <app-icon name="trending-up" [stroke]="2" />
                   </div>
                 </div>
 
-                <div style="font-size: 2.4rem; line-height: 1.05; font-weight: 800; color: #0B3558; font-family: 'Inter', sans-serif; letter-spacing: -0.02em;" class="tabular-nums mt-1">
+                <div style="font-size: 2.4rem; line-height: 1.05; font-weight: 800; color: #0B3558; letter-spacing: -0.02em;" class="tabular-nums mt-1">
                   {{ stat.count }}
                 </div>
                 <p class="text-[13px] sm:text-[14px] font-bold text-slate-700 mt-1.5 leading-snug">

@@ -3,6 +3,7 @@ import { ShortfallRequest, ShortfallResponse, ShortfallSharedDoc } from '../../.
 import { DocumentViewerService } from '../../../core/services/document-viewer.service';
 import { FileDoc } from '../../registration/models/otr-form.model';
 import { ActionModalComponent } from '../../../shared/components/action-modal/action-modal.component';
+import { ButtonComponent, InputDirective } from '../../../shared';
 import { FormFileUploadComponent } from '../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
 import { formatDateMedium } from '../../../shared/utils';
 import { isShortfallOverdue, isShortfallResponseComplete } from './tender-shortfall.util';
@@ -21,7 +22,7 @@ export interface ShortfallSubmission {
   selector: 'app-shortfall-response-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ActionModalComponent, FormFileUploadComponent],
+  imports: [ActionModalComponent, FormFileUploadComponent, ButtonComponent, InputDirective],
   template: `
     <app-action-modal
       [isOpen]="isOpen()"
@@ -61,11 +62,7 @@ export interface ShortfallSubmission {
                       <span class="block font-medium text-slate-800 truncate">{{ doc.title }}</span>
                       <span class="block text-[11px] text-slate-500 truncate">{{ doc.fileName }} &bull; {{ doc.fileSize }}</span>
                     </span>
-                    <button
-                      type="button"
-                      (click)="viewShared(doc)"
-                      class="shrink-0 px-2.5 py-1 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-navy cursor-pointer"
-                    >
+                    <button appButton variant="outline" size="sm" type="button" (click)="viewShared(doc)" class="shrink-0">
                       View
                     </button>
                   </li>
@@ -93,12 +90,13 @@ export interface ShortfallSubmission {
           <div class="space-y-1.5">
             <label class="block text-xs font-semibold text-slate-800" for="shortfall-remarks">Remarks</label>
             <textarea
+              appInput
               id="shortfall-remarks"
               rows="3"
               [value]="remarks()"
               (input)="remarks.set($any($event.target).value)"
               placeholder="Add a remark (optional)"
-              class="w-full p-2.5 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:border-navy bg-white leading-relaxed"
+              class="w-full"
             ></textarea>
           </div>
         </div>

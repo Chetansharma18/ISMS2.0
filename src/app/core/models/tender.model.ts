@@ -54,6 +54,20 @@ export interface ShortfallRequest {
   response?: ShortfallResponse;
 }
 
+/** A file the applicant attached to an appeal. */
+export interface AppealFile {
+  fileName: string;
+  fileSize: string;
+}
+
+/** The applicant's appeal against the rejection of an application: the answer to the rejection remarks and the files attached. */
+export interface TenderAppeal {
+  /** DD-Mon-YYYY. */
+  submittedOn: string;
+  reply: string;
+  files: AppealFile[];
+}
+
 export interface SubmittedTender {
   id: string;
   appRef: string;
@@ -80,6 +94,8 @@ export interface SubmittedTender {
   documents: SubmittedTenderDoc[];
   /** Revert (shortfall) notices from the department and the applicant's replies, oldest first. */
   shortfalls?: ShortfallRequest[];
+  /** The appeal against a rejection; one appeal per application. */
+  appeal?: TenderAppeal;
 }
 
 export function createSampleDocs(): SubmittedTenderDoc[] {

@@ -117,6 +117,19 @@ export const MOCK_BATCHES: MockBatchItem[] = resolveMock([
   }
 ]);
 
+/** A date (yyyy-mm-dd) this many days from today, so the sample batch with open registration stays open. */
+function daysFromToday(days: number): string {
+  const at = new Date();
+  at.setDate(at.getDate() + days);
+  const m = String(at.getMonth() + 1).padStart(2, '0');
+  const d = String(at.getDate()).padStart(2, '0');
+  return `${at.getFullYear()}-${m}-${d}`;
+}
+
+/** B-26-0002 starts 30 days from today, so its registration is open for the next 23 days. */
+const OPEN_BATCH_START = daysFromToday(30);
+const OPEN_BATCH_FREEZE = daysFromToday(23);
+const OPEN_BATCH_END = daysFromToday(30 + 92);
 
 export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
   {
@@ -127,8 +140,8 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     sdcCode: 'SDC-0001',
     sdcName: 'Jaipur Skill Center',
     sdcDistrict: 'Jaipur',
-    tpName: 'ARNOLD SAMARTH',
-    scheme: 'SAMARTH',
+    tpName: 'Company 1',
+    scheme: 'MMKVY',
     sector: 'Aerospace and Aviation',
     courseName: 'Domestic Data Entry Operator',
     qpCode: 'SSC/Q2212',
@@ -138,7 +151,7 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     softSkillHours: 50,
     totalHours: 300,
     residential: false,
-    minStrength: 15,
+    minStrength: 12,
     maxStrength: 30,
     nipaNo: 'N-IPA/RSLDC/2026/891',
     psdStatus: 'Active',
@@ -150,7 +163,8 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     faculty: [
       {
         id: 'fac-1',
-        name: 'Vikas Purohit',
+        name: 'Faculty 1',
+        ssoId: 'FACULTY1',
         type: 'Primary Trainer',
         qualification: 'B.Tech Electrical (TOT Certified)',
         experienceYears: 6
@@ -158,8 +172,23 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     ],
     status: 'APPROVED',
     approvalStatus: 'APPROVED',
+    submittedAt: '2026-08-21T10:00:00.000Z',
+    approvalLevel: 1,
+    approvalTrail: [
+      { action: 'SUBMITTED', designation: 'Training Partner', officer: 'Company 1', at: '2026-08-21T10:00:00.000Z' },
+      { action: 'FORWARDED', designation: 'Department', officer: 'Department', at: '2026-08-23T11:15:00.000Z', remarks: 'Documents and center facility verified.' },
+      { action: 'APPROVED', designation: 'Department', officer: 'Department', at: '2026-08-25T14:30:00.000Z', remarks: 'Center facility verified; biometric live feed confirmed.' }
+    ],
+    attender: {
+      ssoId: 'ATTENDER1',
+      name: 'Attender 1',
+      mobile: '9876500021',
+      email: 'attender1@example.com',
+      designation: 'Attendance Officer',
+      assignedAt: '2026-08-27T10:00:00.000Z'
+    },
     approvedAt: '2026-08-25T14:30:00.000Z',
-    approvedBy: 'Sh. Alok Sharma (Joint Director, RSLDC)',
+    approvedBy: 'Department',
     approvalRemarks: 'Center facility verified; biometric live feed confirmed.',
     inspectionStatus: 'PASSED',
     inspectionDate: '2026-08-22',
@@ -196,8 +225,8 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     sdcCode: 'SDC-0001',
     sdcName: 'Jaipur Skill Center',
     sdcDistrict: 'Jaipur',
-    tpName: 'ARNOLD SAMARTH',
-    scheme: 'SAMARTH',
+    tpName: 'Company 1',
+    scheme: 'MMKVY',
     sector: 'Aerospace and Aviation',
     courseName: 'Domestic Data Entry Operator',
     qpCode: 'SSC/Q2212',
@@ -207,29 +236,38 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     softSkillHours: 80,
     totalHours: 400,
     residential: false,
-    minStrength: 15,
+    minStrength: 12,
     maxStrength: 30,
     nipaNo: 'N-IPA/RSLDC/2026/892',
     psdStatus: 'Active',
-    startDate: '2026-10-01',
-    endDate: '2026-12-31',
-    freezeDate: '2026-09-25',
+    startDate: OPEN_BATCH_START,
+    endDate: OPEN_BATCH_END,
+    freezeDate: OPEN_BATCH_FREEZE,
     startTime: '09:00 AM',
     endTime: '05:00 PM',
     faculty: [
       {
         id: 'fac-2',
-        name: 'Pooja Verma',
+        name: 'Faculty 2',
+        ssoId: 'FACULTY2',
         type: 'Primary Trainer',
         qualification: 'MCA, TOT Certified',
         experienceYears: 4
       }
     ],
-    status: 'PENDING_APPROVAL',
-    approvalStatus: 'PENDING',
-    approvedAt: '2026-09-20T11:00:00.000Z',
-    approvedBy: 'Sh. Alok Sharma (Joint Director, RSLDC)',
-    approvalRemarks: 'Sanction order granted. Commencement allowed.',
+    // Approved; registration is open until the freeze date.
+    status: 'APPROVED',
+    approvalStatus: 'APPROVED',
+    submittedAt: '2026-09-16T10:00:00.000Z',
+    approvalLevel: 1,
+    approvalTrail: [
+      { action: 'SUBMITTED', designation: 'Training Partner', officer: 'Company 1', at: '2026-09-16T10:00:00.000Z' },
+      { action: 'FORWARDED', designation: 'Department', officer: 'Department', at: '2026-09-18T12:00:00.000Z', remarks: 'Documents and facility verified.' },
+      { action: 'APPROVED', designation: 'Department', officer: 'Department', at: '2026-09-20T12:00:00.000Z', remarks: 'Batch approved.' }
+    ],
+    approvedAt: '2026-09-20T12:00:00.000Z',
+    approvedBy: 'Department',
+    approvalRemarks: 'Batch approved.',
     inspectionStatus: 'PASSED',
     inspectionDate: '2026-09-18',
     inspectorName: 'Er. R.K. Mathur (DSO Jaipur)',
@@ -256,7 +294,7 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     sdcName: 'Bikaner Automotive & Capital Goods Center',
     sdcDistrict: 'Bikaner',
     tpName: 'Company 1',
-    scheme: 'RAJKViK',
+    scheme: 'MMKVY',
     sector: 'Automotive',
     courseName: 'Four Wheeler Service Technician',
     qpCode: 'ASC/Q1402',
@@ -266,29 +304,38 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     softSkillHours: 50,
     totalHours: 350,
     residential: false,
-    minStrength: 15,
+    minStrength: 12,
     maxStrength: 25,
     nipaNo: 'N-IPA/RSLDC/2026/893',
     psdStatus: 'Active',
     startDate: '2026-10-15',
     endDate: '2027-01-15',
-    freezeDate: '2026-10-05',
+    freezeDate: '2026-10-08',
     startTime: '09:00 AM',
     endTime: '05:00 PM',
     faculty: [
       {
         id: 'fac-3',
-        name: 'Gaurav Bishnoi',
+        name: 'Faculty 3',
+        ssoId: 'FACULTY3',
         type: 'Primary Trainer',
         qualification: 'Diploma Automobile Engineering',
         experienceYears: 5
       }
     ],
-    status: 'PENDING_APPROVAL',
-    approvalStatus: 'PENDING',
-    approvedAt: '2026-09-22T16:15:00.000Z',
-    approvedBy: 'Dr. Vivek Vyas (Inspection Officer)',
-    approvalRemarks: 'Lab hydraulic lifts and diagnostic equipment verified in person.',
+    // Approved; the start date is close, so registration has closed and only a replacement is allowed.
+    status: 'APPROVED',
+    approvalStatus: 'APPROVED',
+    submittedAt: '2026-09-22T09:00:00.000Z',
+    approvalLevel: 1,
+    approvalTrail: [
+      { action: 'SUBMITTED', designation: 'Training Partner', officer: 'Company 1', at: '2026-09-22T09:00:00.000Z' },
+      { action: 'FORWARDED', designation: 'Department', officer: 'Department', at: '2026-09-23T11:00:00.000Z', remarks: 'Documents and facility verified.' },
+      { action: 'APPROVED', designation: 'Department', officer: 'Department', at: '2026-09-24T10:00:00.000Z', remarks: 'Batch approved.' }
+    ],
+    approvedAt: '2026-09-24T10:00:00.000Z',
+    approvedBy: 'Department',
+    approvalRemarks: 'Batch approved.',
     inspectionStatus: 'PASSED',
     inspectionDate: '2026-09-21',
     inspectorName: 'Dr. Vivek Vyas (DSO Bikaner)',
@@ -314,8 +361,8 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     sdcCode: 'SDC-0001',
     sdcName: 'Jaipur Skill Center',
     sdcDistrict: 'Jaipur',
-    tpName: 'ARNOLD SAMARTH',
-    scheme: 'SAMARTH',
+    tpName: 'Company 1',
+    scheme: 'MMKVY',
     sector: 'Green Jobs',
     courseName: 'Solar PV Rooftop Grid-Tie Installer',
     qpCode: 'SGJ/Q0101',
@@ -325,26 +372,31 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     softSkillHours: 50,
     totalHours: 350,
     residential: false,
-    minStrength: 15,
+    minStrength: 12,
     maxStrength: 30,
     nipaNo: 'N-IPA/RSLDC/2026/894',
     psdStatus: 'Active',
     startDate: '2026-10-15',
     endDate: '2027-01-15',
-    freezeDate: '2026-10-05',
+    freezeDate: '2026-10-08',
     startTime: '09:00 AM',
     endTime: '05:00 PM',
     faculty: [
       {
         id: 'fac-4',
-        name: 'Rajesh Saini',
+        name: 'Faculty 1',
+        ssoId: 'FACULTY1',
         type: 'Primary Trainer',
         qualification: 'B.Tech Electrical (TOT Certified)',
         experienceYears: 5
       }
     ],
+    // Created and sent for approval; waiting for the department.
     status: 'PENDING_APPROVAL',
     approvalStatus: 'PENDING',
+    submittedAt: '2026-09-24T10:15:00.000Z',
+    approvalLevel: 0,
+    approvalTrail: [{ action: 'SUBMITTED', designation: 'Training Partner', officer: 'Company 1', at: '2026-09-24T10:15:00.000Z' }],
     inspectionStatus: 'SCHEDULED',
     inspectionDate: '2026-10-04',
     inspectorName: 'Er. Alok Sharma (DSO Jaipur)',
@@ -371,7 +423,7 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     sdcName: 'Bikaner Automotive & Capital Goods Center',
     sdcDistrict: 'Bikaner',
     tpName: 'Company 1',
-    scheme: 'RAJKViK',
+    scheme: 'MMKVY',
     sector: 'Capital Goods',
     courseName: 'CNC Operator Turning',
     qpCode: 'CSC/Q0115',
@@ -381,26 +433,34 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     softSkillHours: 50,
     totalHours: 400,
     residential: false,
-    minStrength: 15,
+    minStrength: 12,
     maxStrength: 25,
     nipaNo: 'N-IPA/RSLDC/2026/895',
     psdStatus: 'Active',
     startDate: '2026-10-20',
     endDate: '2027-01-30',
-    freezeDate: '2026-10-10',
+    freezeDate: '2026-10-13',
     startTime: '09:30 AM',
     endTime: '05:30 PM',
     faculty: [
       {
         id: 'fac-5',
-        name: 'Sunil Jangid',
+        name: 'Faculty 2',
+        ssoId: 'FACULTY2',
         type: 'Primary Trainer',
         qualification: 'Diploma Mechanical',
         experienceYears: 7
       }
     ],
+    // Sent for approval; waiting for the department.
     status: 'PENDING_APPROVAL',
     approvalStatus: 'PENDING',
+    submittedAt: '2026-09-25T14:45:00.000Z',
+    approvalLevel: 1,
+    approvalTrail: [
+      { action: 'SUBMITTED', designation: 'Training Partner', officer: 'Company 1', at: '2026-09-25T14:45:00.000Z' },
+      { action: 'FORWARDED', designation: 'Department', officer: 'Department', at: '2026-09-27T12:00:00.000Z', remarks: 'Documents and facility verified.' }
+    ],
     inspectionStatus: 'NOT_SCHEDULED',
     checklist: {
       classroomNormsMet: true,
@@ -423,7 +483,7 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     sdcCode: 'SDC-0004',
     sdcName: 'Udaipur Healthcare Institute',
     sdcDistrict: 'Udaipur',
-    tpName: 'CareFirst Foundation',
+    tpName: 'Company 1',
     scheme: 'MMKVY',
     sector: 'Healthcare',
     courseName: 'General Duty Assistant (GDA)',
@@ -434,19 +494,20 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     softSkillHours: 50,
     totalHours: 360,
     residential: true,
-    minStrength: 15,
+    minStrength: 12,
     maxStrength: 30,
     nipaNo: 'N-IPA/RSLDC/2026/896',
     psdStatus: 'Active',
     startDate: '2026-11-01',
     endDate: '2027-02-15',
-    freezeDate: '2026-10-22',
+    freezeDate: '2026-10-25',
     startTime: '09:00 AM',
     endTime: '05:00 PM',
     faculty: [
       {
         id: 'fac-6',
-        name: 'Dr. Pratibha Rathore',
+        name: 'Faculty 3',
+        ssoId: 'FACULTY3',
         type: 'Primary Trainer',
         qualification: 'B.Sc Nursing (TOT Certified)',
         experienceYears: 6
@@ -454,6 +515,9 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     ],
     status: 'PENDING_APPROVAL',
     approvalStatus: 'PENDING',
+    submittedAt: '2026-09-26T09:30:00.000Z',
+    approvalLevel: 0,
+    approvalTrail: [{ action: 'SUBMITTED', designation: 'Training Partner', officer: 'Company 1', at: '2026-09-26T09:30:00.000Z' }],
     inspectionStatus: 'PASSED',
     mappedAspirantsCount: 0,
     biometricAttendanceRate: 0,
@@ -468,8 +532,8 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     sdcCode: 'SDC-0003',
     sdcName: 'Kota Technical Training Center',
     sdcDistrict: 'Kota',
-    tpName: 'TechSkill India',
-    scheme: 'SAMARTH',
+    tpName: 'Company 1',
+    scheme: 'MMKVY',
     sector: 'Automotive',
     courseName: 'Electric Vehicle Service Technician',
     qpCode: 'ASC/Q1424',
@@ -479,19 +543,20 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     softSkillHours: 50,
     totalHours: 350,
     residential: false,
-    minStrength: 15,
+    minStrength: 12,
     maxStrength: 25,
     nipaNo: 'N-IPA/RSLDC/2026/897',
     psdStatus: 'Active',
     startDate: '2026-10-25',
     endDate: '2027-01-25',
-    freezeDate: '2026-10-15',
+    freezeDate: '2026-10-18',
     startTime: '09:00 AM',
     endTime: '05:00 PM',
     faculty: [
       {
         id: 'fac-7',
-        name: 'Praveen Malav',
+        name: 'Faculty 1',
+        ssoId: 'FACULTY1',
         type: 'Primary Trainer',
         qualification: 'M.Tech Automotive',
         experienceYears: 4
@@ -499,6 +564,12 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     ],
     status: 'PENDING_APPROVAL',
     approvalStatus: 'PENDING',
+    submittedAt: '2026-09-26T16:20:00.000Z',
+    approvalLevel: 1,
+    approvalTrail: [
+      { action: 'SUBMITTED', designation: 'Training Partner', officer: 'Company 1', at: '2026-09-26T16:20:00.000Z' },
+      { action: 'FORWARDED', designation: 'Department', officer: 'Department', at: '2026-09-28T10:30:00.000Z', remarks: 'Documents and facility verified.' }
+    ],
     inspectionStatus: 'PASSED',
     inspectorName: 'Er. M.K. Sharma (Technical Officer)',
     inspectionScore: 94,
@@ -534,19 +605,20 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     softSkillHours: 50,
     totalHours: 280,
     residential: false,
-    minStrength: 15,
+    minStrength: 12,
     maxStrength: 30,
     nipaNo: 'N-IPA/RSLDC/2026/898',
     psdStatus: 'Active',
     startDate: '2026-10-10',
     endDate: '2026-12-31',
-    freezeDate: '2026-09-30',
+    freezeDate: '2026-10-03',
     startTime: '10:00 AM',
     endTime: '06:00 PM',
     faculty: [
       {
         id: 'fac-8',
-        name: 'Meena Bhati',
+        name: 'Faculty 2',
+        ssoId: 'FACULTY2',
         type: 'Primary Trainer',
         qualification: 'MBA Marketing',
         experienceYears: 3
@@ -554,6 +626,12 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     ],
     status: 'REJECTED',
     approvalStatus: 'REJECTED',
+    submittedAt: '2026-09-23T10:00:00.000Z',
+    approvalLevel: 0,
+    approvalTrail: [
+      { action: 'SUBMITTED', designation: 'Training Partner', officer: 'Company 1', at: '2026-09-23T10:00:00.000Z' },
+      { action: 'REJECTED', designation: 'Department', officer: 'Department', at: '2026-09-25T15:00:00.000Z', remarks: 'Biometric attendance machine not configured; CCTV cloud storage link expired and lab POS terminal missing.' }
+    ],
     rejectionReason: 'Biometric AEBAS attendance machine not configured; CCTV cloud storage link expired and lab POS terminal missing.',
     inspectionStatus: 'FAILED',
     inspectorName: 'Smt. Kavita Gehlot (Inspection Officer)',
@@ -570,6 +648,59 @@ export const INITIAL_BATCH_RECORDS: BatchRecord[] = resolveMock([
     mappedAspirantsCount: 0,
     biometricAttendanceRate: 0,
     createdAt: '2026-09-22T11:00:00.000Z',
+    trainees: []
+  },
+  {
+    // Sent back by the department: the partner edits it and saving sends it again.
+    id: 'batch-209',
+    batchCode: 'B-26-0009',
+    batchName: 'Retail Sales Associate Batch 04',
+    sdcId: 'sdc-102',
+    sdcCode: 'SDC-0002',
+    sdcName: 'Jodhpur Commerce & Retail Academy',
+    sdcDistrict: 'Jodhpur',
+    tpName: 'Company 1',
+    scheme: 'MMKVY',
+    sector: 'Retail',
+    courseName: 'Retail Sales Associate',
+    qpCode: 'RAS/Q0104',
+    courseVersion: 'NSQF v1.0',
+    theoryHours: 100,
+    practicalHours: 130,
+    softSkillHours: 50,
+    totalHours: 280,
+    residential: false,
+    minStrength: 12,
+    maxStrength: 30,
+    nipaNo: 'N-IPA/RSLDC/2026/899',
+    psdStatus: 'Active',
+    startDate: '2026-11-10',
+    endDate: '2027-01-31',
+    freezeDate: '2026-11-03',
+    startTime: '10:00 AM',
+    endTime: '06:00 PM',
+    faculty: [
+      {
+        id: 'fac-9',
+        name: 'Faculty 3',
+        ssoId: 'FACULTY3',
+        type: 'Primary Trainer',
+        qualification: 'MBA Marketing',
+        experienceYears: 3
+      }
+    ],
+    status: 'RETURNED_TO_TP',
+    approvalStatus: 'RETURNED',
+    submittedAt: '2026-09-27T10:00:00.000Z',
+    approvalLevel: 0,
+    returnRemarks: 'Camera live feed link is not reachable and the faculty qualification is missing. Correct both and save the batch to send it again.',
+    approvalTrail: [
+      { action: 'SUBMITTED', designation: 'Training Partner', officer: 'Company 1', at: '2026-09-27T10:00:00.000Z' },
+      { action: 'RETURNED', designation: 'Department', officer: 'Department', at: '2026-09-29T13:00:00.000Z', remarks: 'Camera live feed link is not reachable and the faculty qualification is missing. Correct both and save the batch to send it again.' }
+    ],
+    mappedAspirantsCount: 0,
+    biometricAttendanceRate: 0,
+    createdAt: '2026-09-26T11:00:00.000Z',
     trainees: []
   }
 ]);

@@ -7,6 +7,7 @@ import { BatchRecord } from '../models/batch.model';
 import { SdcRecord } from '../models/sdc.model';
 import { BatchService } from './batch.service';
 import { SdcService } from './sdc.service';
+import { canRegisterReplacement, isBatchApproved } from '../utils/batch-approval.util';
 
 
 /** Refreshes saved aspirants with canonical seed fields and appends any seed aspirants not yet saved. */
@@ -95,7 +96,7 @@ export class AspirantService {
   /**
    * Register and map a new aspirant from the 4-step form
    */
-  addAspirant(formData: AspirantFormData, batch: BatchRecord, sdc?: SdcRecord): AspirantRecord {
+  addAspirant(formData: AspirantFormData, batch: BatchRecord, sdc?: SdcRecord, replacesAspirantId?: string): AspirantRecord {
     const nextNum = Math.floor(10000 + Math.random() * 90000);
     const newId = `ASP-RJ-2026-${nextNum}`;
     const aadhaarLast4 = formData.aadhaarNo.slice(-4) || '9999';
@@ -129,14 +130,45 @@ export class AspirantService {
       enrollmentDate: new Date().toISOString().split('T')[0],
       trainingStatus: 'ENROLLED',
       biometricVerified: true,
-      attendancePercent: 100
+      attendancePercent: 100,
+      replacesAspirantId
     };
 
-    // Prepend to reactive signal
-    this._aspirants.update(list => [newRecord, ...list]);
+    // Prepend to reactive signal; the dropped aspirant points to the one who took the seat.
+    this._aspirants.update(list => [
+      newRecord,
+      ...list.map(a => (replacesAspirantId && a.id === replacesAspirantId ? { ...a, replacedByAspirantId: newId } : a))
+    ]);
     this.persist();
 
     return newRecord;
+  }
+
+  /** Aspirants of a batch who are still in it (not dropped out). */
+  activeInBatch(batchId: string): AspirantRecord[] {
+    return this._aspirants().filter(a => a.batchId === batchId && a.trainingStatus !== 'DROPOUT');
+  }
+
+  /** A dropped aspirant whose seat is still empty, so a replacement can be registered. */
+  canRegisterReplacementFor(aspirant: AspirantRecord | undefined): boolean {
+    if (!aspirant || aspirant.trainingStatus !== 'DROPOUT' || aspirant.replacedByAspirantId) return false;
+    return canRegisterReplacement(this.batchService.getBatchById(aspirant.batchId));
+  }
+
+  /**
+   * An aspirant leaves the batch: the seat is freed and the reason is kept. Returns false when the aspirant is not
+   * in a batch that is approved and running, has already dropped out, or no reason was given.
+   */
+  dropAspirant(id: string, reason: string): boolean {
+    const aspirant = this.getAspirantById(id);
+    const why = reason.trim();
+    if (!aspirant || !why || aspirant.trainingStatus === 'DROPOUT') return false;
+    const batch = this.batchService.getBatchById(aspirant.batchId);
+    if (!batch || !isBatchApproved(batch) || batch.status === 'COMPLETED' || batch.status === 'CANCELLED') return false;
+
+    this.batchService.releaseSeat(aspirant.batchId, aspirant.aadhaarMasked);
+    this.updateAspirant(id, { trainingStatus: 'DROPOUT', dropReason: why, droppedAt: new Date().toISOString() });
+    return true;
   }
 
   /** Update an existing aspirant record */

@@ -1,54 +1,52 @@
 import { ChangeDetectionStrategy, Component, computed, input, model, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PageHeaderComponent, TableComponent, TableColumn } from '../../../shared';
+import { ButtonComponent, IconComponent, ListPageComponent, TableColumn } from '../../../shared';
 import { SubmittedTender } from '../../../core/models/tender.model';
 import { filterTenders } from './tender-status.util';
 import { openShortfalls, shortfallSummary } from './tender-shortfall.util';
+import { canAppeal } from './tender-appeal.util';
 
 @Component({
   selector: 'app-tender-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, PageHeaderComponent, TableComponent],
+  imports: [FormsModule, ListPageComponent, ButtonComponent, IconComponent],
   host: { class: 'block' },
   template: `
-    <div class="p-4 sm:p-5 space-y-4 font-sans">
-      
-      <!-- Page Header via Reusable PageHeaderComponent with Built-in Search -->
-      <app-page-header
-        title="Tender Status"
-        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Tender Status' }]"
-        [searchable]="true"
-        [(searchQuery)]="searchQuery"
-        searchPlaceholder="Search Ref, Scheme, Category..."
-      />
-
-      <!-- Main Status Table via Reusable TableComponent -->
-      <app-table
-        [columns]="tenderColumns"
-        [data]="filteredTenders()"
-        [pagination]="true"
-        [pageSize]="pageSize"
-        emptyMessage="No tender applications match your search query."
-        [customTemplates]="{
-          appRef: appRefTemplate,
-          schemeTitle: schemeTitleTemplate,
-          schemeCategory: schemeCategoryTemplate,
-          submittedStatus: submittedStatusTemplate,
-          eoiStatus: eoiStatusTemplate,
-          rejectionReason: rejectionReasonTemplate,
-          shortfall: shortfallTemplate,
-          view: viewTemplate
-        }"
-      >
-      </app-table>
+    <!-- Page header with search + status table via the shared list page -->
+    <app-list-page
+      title="Tender Status"
+      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Tender Status' }]"
+      [searchable]="true"
+      [(searchQuery)]="searchQuery"
+      searchPlaceholder="Search Ref, Scheme, Category..."
+      [columns]="tenderColumns"
+      [data]="filteredTenders()"
+      [pagination]="true"
+      [pageSize]="pageSize"
+      emptyMessage="No tender applications match your search query."
+      [customTemplates]="{
+        appRef: appRefTemplate,
+        schemeTitle: schemeTitleTemplate,
+        schemeCategory: schemeCategoryTemplate,
+        submittedStatus: submittedStatusTemplate,
+        eoiStatus: eoiStatusTemplate,
+        rejectionReason: rejectionReasonTemplate,
+        shortfall: shortfallTemplate,
+        appeal: appealTemplate,
+        view: viewTemplate
+      }"
+    >
 
       <!-- Custom App Ref Template -->
       <ng-template #appRefTemplate let-tender>
         <button
+          appButton
+          variant="ghost"
+          size="sm"
           type="button"
           (click)="open.emit(tender)"
-          class="font-mono font-normal text-navy hover:underline cursor-pointer text-left transition-colors text-[13px]"
+          class="tabular-nums"
           title="Open Application Details Page"
         >
           {{ tender.appRef }}
@@ -103,10 +101,12 @@ import { openShortfalls, shortfallSummary } from './tender-shortfall.util';
         @switch (shortfallState(tender)) {
           @case ('open') {
             <button
+              appButton
+              variant="secondary"
+              size="sm"
               type="button"
               (click)="respond.emit(tender)"
               title="The department has asked for more documents. Click to respond."
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-[12.5px] font-semibold cursor-pointer transition-colors whitespace-nowrap"
             >
               <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
               Respond ({{ openCount(tender) }})
@@ -114,10 +114,12 @@ import { openShortfalls, shortfallSummary } from './tender-shortfall.util';
           }
           @case ('responded') {
             <button
+              appButton
+              variant="ghost"
+              size="sm"
               type="button"
               (click)="open.emit(tender)"
               title="View the shortfall requests and your responses"
-              class="text-[12.5px] text-slate-700 hover:text-navy hover:underline cursor-pointer whitespace-nowrap"
             >
               Responded
             </button>
@@ -128,23 +130,30 @@ import { openShortfalls, shortfallSummary } from './tender-shortfall.util';
         }
       </ng-template>
 
+      <!-- Appeal against a rejection -->
+      <ng-template #appealTemplate let-tender>
+        @if (canAppeal(tender)) {
+          <button appButton variant="secondary" size="sm" type="button" (click)="appeal.emit(tender)" title="Answer the rejection remarks and upload documents">
+            Appeal
+          </button>
+        } @else if (tender.appeal) {
+          <button appButton variant="ghost" size="sm" type="button" (click)="open.emit(tender)" title="View your appeal">
+            Appealed
+          </button>
+        } @else {
+          <span class="text-slate-400 text-[13px]">-</span>
+        }
+      </ng-template>
+
       <!-- Custom View Action Button Template -->
       <ng-template #viewTemplate let-tender>
-        <button
-          type="button"
-          (click)="open.emit(tender)"
-          title="Open Application Details Page"
-          class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-navy hover:bg-navy-dark text-white rounded-md text-[13px] font-normal cursor-pointer shadow-2xs transition-colors"
-        >
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-          </svg>
+        <button appButton size="sm" type="button" (click)="open.emit(tender)" title="Open Application Details Page">
+          <app-icon name="eye" size="sm" />
           <span>View</span>
         </button>
       </ng-template>
 
-    </div>
+    </app-list-page>
   `
 })
 export class TenderListComponent {
@@ -154,6 +163,8 @@ export class TenderListComponent {
   readonly open = output<SubmittedTender>();
   /** The applicant wants to answer an open revert request. */
   readonly respond = output<SubmittedTender>();
+  /** The applicant wants to appeal a rejected application. */
+  readonly appeal = output<SubmittedTender>();
 
   readonly pageSize = 6;
 
@@ -180,8 +191,13 @@ export class TenderListComponent {
     { key: 'eoiStatus',        label: 'EOI Stage',            align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'rejectionReason',  label: 'Remarks', align: 'center', type: 'custom', cellClass: 'min-w-[200px]' },
     { key: 'shortfall',        label: 'Shortfall Request',    align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
+    { key: 'appeal',           label: 'Appeal',               align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
     { key: 'view',             label: 'View',                 align: 'center', width: 'w-20', type: 'custom' }
   ];
+
+  protected canAppeal(tender: SubmittedTender): boolean {
+    return canAppeal(tender);
+  }
 
   protected shortfallState(tender: SubmittedTender): 'open' | 'responded' | 'none' {
     return shortfallSummary(tender);

@@ -4,71 +4,56 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { OtrFormService } from '../../../features/registration/services/otr-form.service';
 import { OfficerInCharge } from '../../../features/registration/models/otr-form.model';
+import { ButtonComponent } from '../button/button.component';
+import { IconComponent } from '../icon/icon.component';
+import { InputDirective } from '../form-controls/input/input.directive';
+import { ModalComponent } from '../modal/modal.component';
+import { TableComponent } from '../table/table.component';
+import { TableColumn } from '../table/table.types';
+
+/** One line of the financial turnover grid; the last line is the computed 3-year average. */
+interface TurnoverRow {
+  id: string;
+  year: string;
+  totalTurnover: string;
+  skillTurnover: string;
+  isAverage: boolean;
+}
 
 @Component({
   selector: 'app-profile-preview-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ButtonComponent, IconComponent, InputDirective, ModalComponent, TableComponent],
   template: `
     @if (isOpen) {
-      <div
-        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200"
-        role="dialog"
-        aria-modal="true"
+      <app-modal
+        title="Verify Registration Profile Before Applying"
+        subtitle="Review your One Time Registration (OTR) particulars before proceeding with the scheme proposal."
+        size="xl"
+        [closeOnBackdrop]="false"
+        (close)="onClose()"
       >
-        <div
-          class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-4xl flex flex-col max-h-[92vh] overflow-hidden font-sans animate-in zoom-in-95 duration-200"
-        >
-          <!-- Modal Header -->
-          <div class="px-5 py-3.5 bg-ocean text-white flex items-center justify-between gap-3 shrink-0">
-            <div class="flex items-center gap-2.5">
-              <svg class="w-5 h-5 text-white shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <div>
-                <h3 class="text-sm sm:text-base font-bold text-white tracking-tight">
-                  Verify Registration Profile Before Applying
-                </h3>
-                <p class="text-[11px] text-sky-100 font-normal">
-                  Review your One Time Registration (OTR) particulars before proceeding with the scheme proposal.
-                </p>
+          <!-- Body -->
+          <div class="space-y-4 text-xs">
+
+            <!-- Notice Banner -->
+            <div class="bg-sky-50 px-4 py-2.5 border border-sky-100 rounded-lg flex items-center justify-between flex-wrap gap-2 text-xs">
+              <div class="flex items-center gap-2 text-sky-900">
+                <app-icon name="info" [stroke]="2" class="text-ocean shrink-0" />
+                <span>All information below is read-only. Click <strong>Edit Profile</strong> to modify any details.</span>
               </div>
+              <button
+                appButton
+                variant="outline"
+                size="sm"
+                type="button"
+                (click)="onEditProfile()"
+              >
+                <app-icon name="pencil" size="sm" [stroke]="2" />
+                <span>Edit Profile</span>
+              </button>
             </div>
-            <button
-              type="button"
-              (click)="onClose()"
-              class="w-8 h-8 rounded-lg text-white/80 hover:text-white hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer"
-              title="Close dialog"
-            >
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          <!-- Notice Banner -->
-          <div class="bg-sky-50 px-5 py-2.5 border-b border-sky-100 flex items-center justify-between flex-wrap gap-2 text-xs">
-            <div class="flex items-center gap-2 text-sky-900">
-              <svg class="w-4 h-4 text-ocean shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>All information below is read-only. Click <strong>Edit Profile</strong> to modify any details.</span>
-            </div>
-            <button
-              type="button"
-              (click)="onEditProfile()"
-              class="inline-flex items-center gap-1 px-3 py-1 bg-white hover:bg-slate-50 border border-sky-300 text-ocean text-xs font-semibold rounded shadow-2xs transition-colors cursor-pointer"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-              <span>Edit Profile</span>
-            </button>
-          </div>
-
-          <!-- Scrollable Body -->
-          <div class="p-5 overflow-y-auto space-y-4 flex-1 text-xs">
 
             <!-- SECTION 1: ORGANIZATION DETAILS -->
             <div class="border border-slate-200 rounded-lg overflow-hidden bg-white">
@@ -92,7 +77,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[10.5px]">Reg. Number (CIN)</span>
-                    <span class="font-mono text-slate-800">{{ step1().registrationNumber || '-' }}</span>
+                    <span class="tabular-nums text-slate-800">{{ step1().registrationNumber || '-' }}</span>
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[10.5px]">Date of Reg.</span>
@@ -104,7 +89,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[10.5px]">Company PAN</span>
-                    <span class="font-mono text-slate-800 font-semibold">{{ step1().companyPan || '-' }}</span>
+                    <span class="tabular-nums text-slate-800 font-semibold">{{ step1().companyPan || '-' }}</span>
                   </div>
                   <div>
                     <span class="text-slate-400 block text-[10.5px]">GST Registered</span>
@@ -132,31 +117,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                 @if (step1().financialYears && step1().financialYears.length > 0) {
                   <div class="pt-2 border-t border-slate-100">
                     <span class="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Financial Turnover (₹ Lacs)</span>
-                    <div class="overflow-x-auto w-full">
-                      <table class="w-full text-left border-collapse border border-slate-200 rounded text-xs min-w-[400px]">
-                        <thead>
-                          <tr class="bg-slate-50 text-slate-700 font-semibold text-[11px] border-b border-slate-200">
-                            <th class="py-1 px-3 border-r border-slate-200">Financial Year</th>
-                            <th class="py-1 px-3 border-r border-slate-200">Total Turnover (₹ Lacs)</th>
-                            <th class="py-1 px-3">Skill Turnover (₹ Lacs)</th>
-                          </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                          @for (fy of step1().financialYears; track fy.year) {
-                            <tr>
-                              <td class="py-1 px-3 text-slate-700 border-r border-slate-100">{{ fy.year }}</td>
-                              <td class="py-1 px-3 text-slate-700 border-r border-slate-100">{{ fy.totalTurnover || '-' }}</td>
-                              <td class="py-1 px-3 text-slate-700">{{ fy.skillTurnover || '-' }}</td>
-                            </tr>
-                          }
-                          <tr class="bg-slate-50 font-semibold border-t border-slate-200">
-                            <td class="py-1 px-3 text-slate-700 border-r border-slate-100">3-Year Average</td>
-                            <td class="py-1 px-3 text-ocean border-r border-slate-100">{{ avgTotalTurnover() }} Lacs</td>
-                            <td class="py-1 px-3 text-ocean">{{ avgSkillTurnover() }} Lacs</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+                    <app-table [columns]="turnoverColumns" [data]="turnoverRows()" />
                   </div>
                 }
 
@@ -191,7 +152,7 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">Mobile No.</span>
-                  <span class="text-slate-800 font-mono">{{ step3().mobileNo || '-' }}</span>
+                  <span class="text-slate-800 tabular-nums">{{ step3().mobileNo || '-' }}</span>
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">Email ID</span>
@@ -199,11 +160,11 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">PAN</span>
-                  <span class="text-slate-800 font-mono">{{ step3().pan || '-' }}</span>
+                  <span class="text-slate-800 tabular-nums">{{ step3().pan || '-' }}</span>
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">Aadhaar No.</span>
-                  <span class="text-slate-800 font-mono">{{ step3().aadhaarNo || '-' }}</span>
+                  <span class="text-slate-800 tabular-nums">{{ step3().aadhaarNo || '-' }}</span>
                 </div>
                 <div class="sm:col-span-2">
                   <span class="text-slate-400 block text-[10.5px]">Residence Address</span>
@@ -233,9 +194,11 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                     Choose which registered Officer In-Charge will serve as the primary operational contact for this scheme proposal.
                   </p>
                   <select
+                    appInput
+                    size="sm"
                     [ngModel]="selectedOicId()"
                     (ngModelChange)="selectedOicId.set($event)"
-                    class="w-full sm:w-auto min-w-[280px] bg-white border border-slate-300 rounded px-3 py-1.5 text-xs text-slate-800 font-medium focus:ring-1 focus:ring-ocean"
+                    class="w-full sm:w-auto min-w-[280px]"
                   >
                     @for (oic of step2(); track oic.id) {
                       <option [value]="oic.id">
@@ -297,11 +260,11 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">Account No.</span>
-                  <span class="font-mono text-slate-800">{{ step4().accountNo || '-' }}</span>
+                  <span class="tabular-nums text-slate-800">{{ step4().accountNo || '-' }}</span>
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">IFSC Code</span>
-                  <span class="font-mono text-slate-800">{{ step4().ifscCode || '-' }}</span>
+                  <span class="tabular-nums text-slate-800">{{ step4().ifscCode || '-' }}</span>
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">Transfer Mode</span>
@@ -317,42 +280,42 @@ import { OfficerInCharge } from '../../../features/registration/models/otr-form.
           </div>
 
           <!-- Modal Footer Actions -->
-          <div class="px-4 sm:px-5 py-3 sm:py-3.5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 shrink-0">
-            <button
-              type="button"
-              (click)="onEditProfile()"
-              class="px-4 py-2 border border-slate-300 text-slate-700 hover:bg-slate-100 rounded-lg text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-              <span>Edit Profile Details</span>
-            </button>
-
-            <div class="flex items-center gap-2.5 justify-end">
+          <ng-container modalFooter>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 w-full">
               <button
+                appButton
+                variant="outline"
                 type="button"
-                (click)="onClose()"
-                class="px-4 py-2 text-slate-600 hover:text-slate-800 hover:bg-slate-200/60 rounded-lg text-xs font-medium transition-colors cursor-pointer flex-1 sm:flex-none text-center"
+                (click)="onEditProfile()"
               >
-                Cancel
+                <app-icon name="pencil" size="sm" [stroke]="2" />
+                <span>Edit Profile Details</span>
               </button>
 
-              <button
-                type="button"
-                (click)="onProceed()"
-                class="px-5 py-2 bg-navy hover:bg-navy-dark text-white rounded-lg text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-none"
-              >
-                <span>Proceed to Apply</span>
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </button>
+              <div class="flex items-center gap-2.5 justify-end">
+                <button
+                  appButton
+                  variant="outline"
+                  type="button"
+                  (click)="onClose()"
+                  class="flex-1 sm:flex-none"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  appButton
+                  type="button"
+                  (click)="onProceed()"
+                  class="flex-1 sm:flex-none"
+                >
+                  <span>Proceed to Apply</span>
+                  <app-icon name="forward" />
+                </button>
+              </div>
             </div>
-          </div>
-
-        </div>
-      </div>
+          </ng-container>
+      </app-modal>
     }
   `
 })
@@ -384,6 +347,30 @@ export class ProfilePreviewModalComponent implements OnInit {
     const sum = rows.reduce((acc, r) => acc + (parseFloat(r.skillTurnover) || 0), 0);
     return (sum / rows.length).toFixed(2);
   });
+
+  protected readonly turnoverColumns: TableColumn<TurnoverRow>[] = [
+    { key: 'year', label: 'Financial Year', cellClass: (_value, row) => (row.isAverage ? 'font-semibold text-slate-700' : 'text-slate-700') },
+    { key: 'totalTurnover', label: 'Total Turnover (₹ Lacs)', cellClass: (_value, row) => (row.isAverage ? 'font-semibold text-ocean' : 'text-slate-700') },
+    { key: 'skillTurnover', label: 'Skill Turnover (₹ Lacs)', cellClass: (_value, row) => (row.isAverage ? 'font-semibold text-ocean' : 'text-slate-700') }
+  ];
+
+  /** The entered years followed by the 3-year average line. */
+  readonly turnoverRows = computed<TurnoverRow[]>(() => [
+    ...(this.step1().financialYears ?? []).map(fy => ({
+      id: fy.year,
+      year: fy.year,
+      totalTurnover: fy.totalTurnover || '-',
+      skillTurnover: fy.skillTurnover || '-',
+      isAverage: false
+    })),
+    {
+      id: 'average',
+      year: '3-Year Average',
+      totalTurnover: `${this.avgTotalTurnover()} Lacs`,
+      skillTurnover: `${this.avgSkillTurnover()} Lacs`,
+      isAverage: true
+    }
+  ]);
 
   ngOnInit(): void {
     const oics = this.step2();

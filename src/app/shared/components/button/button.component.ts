@@ -1,82 +1,75 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, ElementRef, booleanAttribute, computed, inject, input } from '@angular/core';
+import { IconComponent } from '../icon/icon.component';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'pdf-view';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+/**
+ * What the button is for:
+ * - primary:   the main action of a screen or dialog (navy, filled)
+ * - outline:   a secondary action next to it: Back, View, Cancel, Close (white, bordered)
+ * - secondary: a soft tinted action
+ * - danger:    a destructive action: Delete, Reject
+ * - ghost:     a quiet text action, for example inside a toolbar or a table row
+ * - inverse:   a quiet text action on a dark background (footer links)
+ */
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'inverse';
+/** `xs` is the 22px size for a remove (x) inside a chip, a thumbnail or a dense row. */
+export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
+/**
+ * The only button of the portal. It styles the native element it sits on, so click, disabled,
+ * type, title, aria-label and routerLink keep working exactly as on a plain button:
+ *
+ *   <button appButton variant="outline" size="sm" (click)="back()">Back</button>
+ *   <button appButton [loading]="saving()" type="submit">Save</button>
+ *   <button appButton variant="ghost" iconOnly aria-label="Close"><app-icon name="close" /></button>
+ *   <a appButton variant="outline" routerLink="/home">Home</a>
+ *
+ * Colours, heights and radii come from the `.btn` rules in styles.css, so changing them there
+ * changes every button in the app. Do not add colour, border, padding or font classes to a button.
+ */
 @Component({
-  selector: 'app-button',
+  selector: 'button[appButton], a[appButton]',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
+  imports: [IconComponent],
+  host: {
+    '[class]': 'classes()',
+    '[attr.type]': 'nativeType()',
+    '[attr.disabled]': 'isButton && (disabled() || loading()) ? "" : null',
+    '[attr.aria-disabled]': '!isButton && (disabled() || loading()) ? "true" : null',
+    '[attr.aria-busy]': 'loading() ? "true" : null'
+  },
   template: `
-    <button
-      [type]="type"
-      [disabled]="disabled || loading"
-      (click)="onClick($event)"
-      class="btn inline-flex items-center justify-center gap-2 font-medium rounded-sm transition-colors cursor-pointer select-none focus:outline-none disabled:opacity-60 disabled:pointer-events-none font-sans"
-      [ngClass]="[variantClasses, sizeClasses]"
-      [title]="title"
-      [attr.aria-label]="ariaLabel || title"
-    >
-      <!-- Optional Loading Spinner -->
-      @if (loading) {
-        <svg class="animate-spin -ml-0.5 mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-        </svg>
-      }
-
-
-      <ng-content></ng-content>
-    </button>
+    @if (loading()) {
+      <app-icon name="spinner" [stroke]="2.5" class="animate-spin" />
+    }
+    <ng-content />
   `
 })
 export class ButtonComponent {
-  @Input() variant: ButtonVariant = 'primary';
-  @Input() size: ButtonSize = 'md';
-  @Input() type: 'button' | 'submit' | 'reset' = 'button';
-  @Input() disabled = false;
-  @Input() loading = false;
-  @Input() title = '';
-  @Input() ariaLabel = '';
+  readonly variant = input<ButtonVariant>('primary');
+  readonly size = input<ButtonSize>('md');
+  /** `submit` for the button of a form; the default stays `button` so nothing submits by accident. */
+  readonly type = input<'button' | 'submit' | 'reset'>('button');
+  readonly disabled = input(false, { transform: booleanAttribute });
+  /** Shows a spinner and blocks clicks while a request is running. */
+  readonly loading = input(false, { transform: booleanAttribute });
+  /** Stretches the button to the full width of its container. */
+  readonly block = input(false, { transform: booleanAttribute });
+  /** A square button that holds only an icon. Give it an `aria-label`. */
+  readonly iconOnly = input(false, { transform: booleanAttribute });
 
-  @Output() btnClick = new EventEmitter<MouseEvent>();
+  /** True on a <button>, false on an <a>: only a real button gets `type` and `disabled`. */
+  protected readonly isButton = inject(ElementRef<HTMLElement>).nativeElement.tagName === 'BUTTON';
 
-  onClick(event: MouseEvent): void {
-    if (!this.disabled && !this.loading) {
-      this.btnClick.emit(event);
-    }
-  }
+  protected readonly nativeType = computed(() => (this.isButton ? this.type() : null));
 
-  get variantClasses(): string {
-    switch (this.variant) {
-      case 'primary':
-        return 'btn-primary';
-      case 'secondary':
-        return 'btn-secondary';
-      case 'outline':
-        return 'btn-outline';
-      case 'ghost':
-        return 'btn-ghost';
-      case 'danger':
-        return 'btn-danger';
-      case 'pdf-view':
-        return 'bg-white hover:bg-navy text-slate-700 hover:text-white border border-slate-300 hover:border-navy shadow-2xs';
-      default:
-        return 'btn-primary';
-    }
-  }
-
-  get sizeClasses(): string {
-    switch (this.size) {
-      case 'sm':
-        return 'btn-sm';
-      case 'lg':
-        return 'btn-lg';
-      case 'md':
-      default:
-        return '';
-    }
-  }
+  protected readonly classes = computed(() => {
+    const parts = ['btn', `btn-${this.variant()}`];
+    if (this.size() === 'xs') parts.push('btn-xs');
+    if (this.size() === 'sm') parts.push('btn-sm');
+    if (this.size() === 'lg') parts.push('btn-lg');
+    if (this.block()) parts.push('btn-block');
+    if (this.iconOnly()) parts.push('btn-icon');
+    return parts.join(' ');
+  });
 }

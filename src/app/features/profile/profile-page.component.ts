@@ -10,6 +10,7 @@ import { DocumentViewerService } from '../../core/services/document-viewer.servi
 import { DocumentViewerModalComponent } from '../../shared/components/document-viewer-modal/document-viewer-modal.component';
 import { FileDoc } from '../registration/models/otr-form.model';
 import { formatDate } from '../../shared/utils';
+import { ButtonComponent, IconComponent, ProgressRingComponent } from '../../shared';
 import { AspirantProfileFormComponent } from '../aspirant/components/aspirant-profile-form.component';
 import { AspirantPortalService } from '../aspirant/services/aspirant-portal.service';
 
@@ -26,9 +27,9 @@ export interface RegistrationStepItem {
   selector: 'app-profile-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, DocumentViewerModalComponent, AspirantProfileFormComponent],
+  imports: [CommonModule, RouterModule, DocumentViewerModalComponent, AspirantProfileFormComponent, ButtonComponent, IconComponent, ProgressRingComponent],
   template: `
-    <div class="w-full min-h-full font-sans p-4 sm:p-5 space-y-4" style="background-color: #FEFEFD; font-family: 'Inter', sans-serif;">
+    <div class="w-full min-h-full font-sans p-4 sm:p-5 space-y-4" style="background-color: #FEFEFD;">
 
       @if (isAspirant()) {
         <!-- ====================================================================
@@ -57,28 +58,11 @@ export interface RegistrationStepItem {
         <!-- 2. ASPIRANT OTR PROGRESS CARD: Circular Donut Chart + Details -->
         <div class="w-full bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
           <div class="flex flex-col sm:flex-row items-center sm:items-start md:items-center text-center sm:text-left gap-4 sm:gap-6 flex-1 min-w-0">
-            <div class="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 flex items-center justify-center">
-              <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="38" stroke="#E2E8F0" stroke-width="8" fill="none" />
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="38"
-                  [attr.stroke]="isAspirantComplete() ? '#15803D' : '#0B3558'"
-                  stroke-width="8"
-                  fill="none"
-                  stroke-linecap="round"
-                  stroke-dasharray="238.76"
-                  [attr.stroke-dashoffset]="aspirantDonutDashOffset()"
-                  class="transition-all duration-700 ease-out"
-                />
-              </svg>
-              <div class="absolute inset-0 flex flex-col items-center justify-center">
-                <span class="text-lg sm:text-xl font-bold text-slate-800 leading-none">
-                  {{ aspirantCompletionPercentage() }}%
-                </span>
-              </div>
-            </div>
+            <app-progress-ring
+              [value]="aspirantCompletionPercentage()"
+              [complete]="isAspirantComplete()"
+              class="w-20 h-20 sm:w-24 sm:h-24"
+            />
 
             <div class="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
               <h2 class="text-base sm:text-[17px] font-bold text-slate-900 m-0">Aspirant One Time Registration (OTR)</h2>
@@ -127,38 +111,11 @@ export interface RegistrationStepItem {
           <div class="flex flex-col sm:flex-row items-center sm:items-start md:items-center text-center sm:text-left gap-4 sm:gap-6 flex-1 min-w-0">
           
           <!-- Circular Progress Donut Chart (SVG) -->
-          <div class="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 flex items-center justify-center">
-            <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
-              <!-- Track Circle -->
-              <circle
-                cx="50"
-                cy="50"
-                r="38"
-                stroke="#E2E8F0"
-                stroke-width="8"
-                fill="none"
-              />
-              <!-- Progress Arc -->
-              <circle
-                cx="50"
-                cy="50"
-                r="38"
-                [attr.stroke]="isProfileIncomplete() ? '#0B3558' : '#15803D'"
-                stroke-width="8"
-                fill="none"
-                stroke-linecap="round"
-                stroke-dasharray="238.76"
-                [attr.stroke-dashoffset]="donutDashOffset()"
-                class="transition-all duration-700 ease-out"
-              />
-            </svg>
-            <!-- Center Percentage -->
-            <div class="absolute inset-0 flex flex-col items-center justify-center">
-              <span class="text-lg sm:text-xl font-bold text-slate-800 leading-none">
-                {{ completionPercentage() }}%
-              </span>
-            </div>
-          </div>
+          <app-progress-ring
+            [value]="completionPercentage()"
+            [complete]="!isProfileIncomplete()"
+            class="w-20 h-20 sm:w-24 sm:h-24"
+          />
 
           <!-- Text Details -->
           <div class="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
@@ -171,15 +128,9 @@ export interface RegistrationStepItem {
 
         <!-- Right: Primary Action Button + Mandatory Warning Notice -->
         <div class="shrink-0 flex flex-col items-stretch sm:items-start lg:items-end gap-2.5 w-full sm:w-auto">
-          <button
-            type="button"
-            (click)="goToRegistration()"
-            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-white text-[13.5px] font-semibold bg-navy hover:bg-[#07243c] shadow-sm transition-all cursor-pointer"
-          >
+          <button appButton size="lg" type="button" (click)="goToRegistration()" class="w-full sm:w-auto">
             <span>{{ ctaButtonText() }}</span>
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
+            <app-icon name="forward" />
           </button>
         </div>
       </div>
@@ -240,27 +191,19 @@ export interface RegistrationStepItem {
                     @switch (step.icon) {
                       @case ('building') {
                         <!-- Organization Details Icon -->
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
+                        <app-icon name="building" size="xl" [stroke]="1.8" />
                       }
                       @case ('user') {
                         <!-- Authorized Person User Icon -->
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
+                        <app-icon name="user" size="xl" [stroke]="1.8" />
                       }
                       @case ('bank') {
                         <!-- Bank Columns Icon -->
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M3 10h18M5 10v8m4-8v8m6-8v8m4-8v8M12 3L2 8h20L12 3z" />
-                        </svg>
+                        <app-icon name="bank" size="xl" [stroke]="1.8" />
                       }
                       @case ('document') {
                         <!-- Preview & Submit Document Icon -->
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
+                        <app-icon name="document" size="xl" [stroke]="1.8" />
                       }
                     }
                   </div>
@@ -277,48 +220,30 @@ export interface RegistrationStepItem {
                   <!-- Status Pill -->
                   @if (step.isCompleted) {
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#ECFDF5] text-green-700 border border-[#A7F3D0] select-none">
-                      <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+                      <app-icon name="check" size="sm" [stroke]="2.5" />
                       <span>Completed</span>
                     </span>
                   } @else if (isCurrentStep(step.stepNumber)) {
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FFFBEB] text-[#B45309] border border-[#FDE68A] select-none">
-                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="9"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 3"/>
-                      </svg>
+                      <app-icon name="clock-circle" size="sm" [stroke]="2" />
                       <span>Pending</span>
                     </span>
                   } @else {
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-400 border border-slate-200 select-none">
-                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="9"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 3"/>
-                      </svg>
+                      <app-icon name="clock-circle" size="sm" [stroke]="2" />
                       <span>Pending</span>
                     </span>
                   }
 
                   <!-- Action Button -->
                   @if (step.isCompleted) {
-                    <button
-                      type="button"
-                      (click)="navigateToStep(step.stepNumber)"
-                      class="inline-flex items-center justify-center px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 shadow-2xs transition-colors cursor-pointer min-w-[105px]"
-                    >
+                    <button appButton variant="outline" size="sm" type="button" (click)="navigateToStep(step.stepNumber)" class="min-w-[105px]">
                       <span>View Details</span>
                     </button>
                   } @else if (isCurrentStep(step.stepNumber)) {
-                    <button
-                      type="button"
-                      (click)="navigateToStep(step.stepNumber)"
-                      class="inline-flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold bg-navy hover:bg-[#07243c] text-white shadow-sm transition-colors cursor-pointer min-w-[125px]"
-                    >
+                    <button appButton size="sm" type="button" (click)="navigateToStep(step.stepNumber)" class="min-w-[125px]">
                       <span>Continue Step</span>
-                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                      </svg>
+                      <app-icon name="forward" size="sm" />
                     </button>
                   }
                 </div>
@@ -357,7 +282,6 @@ export class ProfilePageComponent {
   readonly isAspirant = computed(() => this.currentUser()?.role === 'aspirant' || this.permissions.hasRole('aspirant'));
   readonly isAspirantComplete = this.aspirantPortal.isProfileComplete;
   readonly aspirantCompletionPercentage = computed(() => this.isAspirantComplete() ? 100 : 0);
-  readonly aspirantDonutDashOffset = computed(() => this.isAspirantComplete() ? 0 : 238.76);
 
   /** Document viewer modal state */
   readonly isDocViewerOpen = signal(false);
@@ -421,13 +345,6 @@ export class ProfilePageComponent {
     if (data.status === 'Submitted') return 100;
     const count = this.completedSectionsCount();
     return Math.round((count / 4) * 100);
-  });
-
-  /** SVG circle stroke dashoffset for the 38-radius donut wheel */
-  readonly donutDashOffset = computed(() => {
-    const circumference = 238.76;
-    const pct = this.completionPercentage();
-    return circumference * (1 - pct / 100);
   });
 
   /** Identifies the earliest incomplete step number (1 to 4) */

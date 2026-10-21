@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
-import { PageHeaderComponent, TableComponent, TableColumn } from '../../../shared';
+import { PageHeaderComponent, TableComponent, TableColumn, ButtonComponent, IconComponent, PageShellComponent } from '../../../shared';
 import { environment } from '../../../../environments/environment';
 
 interface SdcMonitoringItem {
@@ -17,10 +17,9 @@ interface SdcMonitoringItem {
   selector: 'app-camera-sdc-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent],
+  imports: [CommonModule, RouterModule, PageHeaderComponent, TableComponent, ButtonComponent, IconComponent, PageShellComponent],
   template: `
-    <div class="w-full min-h-full bg-background text-primary font-sans">
-      <div class="p-4 sm:p-5 space-y-3 font-sans">
+    <app-page-shell>
         <app-page-header
           title="Camera Monitoring - SDCs"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Camera Monitoring', url: '/admin/camera-monitoring' }, { label: 'SDCs' }]"
@@ -53,7 +52,7 @@ interface SdcMonitoringItem {
             <div class="font-normal text-slate-800 text-[13px] leading-snug">
               {{ item.name }}
             </div>
-            <div class="text-[11.5px] text-slate-500 mt-0.5 font-mono">
+            <div class="text-[11.5px] text-slate-500 mt-0.5 tabular-nums">
               Code: {{ item.code }}
             </div>
           </div>
@@ -61,9 +60,7 @@ interface SdcMonitoringItem {
 
         <ng-template #locationTemplate let-item>
           <div class="flex items-center gap-1.5 text-slate-600 text-[13px] font-normal justify-start">
-            <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-            </svg>
+            <app-icon name="map-pin" solid class="text-slate-400" />
             {{ item.location }}
           </div>
         </ng-template>
@@ -76,27 +73,22 @@ interface SdcMonitoringItem {
 
         <ng-template #configuredFeedsTemplate let-item>
           <span class="inline-flex items-center gap-1.5 text-green-700 text-[13px] font-normal tracking-wide">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4zM5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-            </svg>
+            <app-icon name="video-camera" solid />
             {{ item.configuredFeeds }} Active Feeds
           </span>
         </ng-template>
 
         <ng-template #actionTemplate let-item>
           <a
+            appButton
+            size="sm"
             [routerLink]="['/admin/camera-monitoring/batches', item.id]"
-            class="btn btn-primary btn-sm inline-flex items-center justify-center gap-1"
-            style="color: white !important;"
           >
-            <span style="color: white !important;">View Batches</span>
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: white !important;">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
+            <span>View Batches</span>
+            <app-icon name="chevron-right" size="sm" />
           </a>
         </ng-template>
-      </div>
-    </div>
+    </app-page-shell>
   `
 })
 export class CameraSdcListComponent {

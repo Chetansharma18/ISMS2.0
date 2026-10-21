@@ -1,7 +1,6 @@
-import { Component, input, output, computed, signal, HostListener } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { Component, input, output, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActionModalComponent } from '../../../shared';
+import { ActionModalComponent, DropdownComponent, InputDirective } from '../../../shared';
 import { UserFormData } from '../user-management.util';
 import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.model';
 
@@ -12,7 +11,7 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
 @Component({
   selector: 'app-user-form-modal',
   standalone: true,
-  imports: [NgClass, FormsModule, ActionModalComponent],
+  imports: [FormsModule, ActionModalComponent, DropdownComponent, InputDirective],
   template: `
     @let f = formData();
     @let isSubmitted = submitted();
@@ -40,11 +39,13 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
           <div>
             <label class="block text-slate-700 font-medium mb-1">SSO ID*</label>
             <input
+              appInput
+              size="sm"
               type="text"
               placeholder="e.g. SSO_1008"
               [(ngModel)]="f.ssoId"
-              [ngClass]="{'border-red-500': isSubmitted && !f.ssoId, 'border-field-border': !(isSubmitted && !f.ssoId)}"
-              class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 font-mono text-xs"
+              [invalid]="isSubmitted && !f.ssoId"
+              class="w-full tabular-nums"
             />
             @if (isSubmitted && !f.ssoId) {
               <div class="text-xs text-red-500 mt-0.5 font-medium">SSO ID is required</div>
@@ -54,9 +55,11 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
           <div>
             <label class="block text-slate-700 font-medium mb-1">Role Type*</label>
             <select
+              appInput
+              size="sm"
               [(ngModel)]="f.roleType"
-              [ngClass]="{'border-red-500': isSubmitted && !f.roleType, 'border-field-border': !(isSubmitted && !f.roleType)}"
-              class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800 bg-white"
+              [invalid]="isSubmitted && !f.roleType"
+              class="w-full"
             >
               <option value="" disabled selected>Select Role Type</option>
               @for (role of activeRoleOptions(); track role) {
@@ -74,11 +77,13 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
           <div>
             <label class="block text-slate-700 font-medium mb-1">First Name*</label>
             <input
+              appInput
+              size="sm"
               type="text"
               placeholder="e.g. John"
               [(ngModel)]="f.firstName"
-              [ngClass]="{'border-red-500': isSubmitted && !f.firstName, 'border-field-border': !(isSubmitted && !f.firstName)}"
-              class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800"
+              [invalid]="isSubmitted && !f.firstName"
+              class="w-full"
             />
             @if (isSubmitted && !f.firstName) {
               <div class="text-xs text-red-500 mt-0.5 font-medium">First Name is required</div>
@@ -88,11 +93,13 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
           <div>
             <label class="block text-slate-700 font-medium mb-1">Last Name*</label>
             <input
+              appInput
+              size="sm"
               type="text"
               placeholder="e.g. Doe"
               [(ngModel)]="f.lastName"
-              [ngClass]="{'border-red-500': isSubmitted && !f.lastName, 'border-field-border': !(isSubmitted && !f.lastName)}"
-              class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800"
+              [invalid]="isSubmitted && !f.lastName"
+              class="w-full"
             />
             @if (isSubmitted && !f.lastName) {
               <div class="text-xs text-red-500 mt-0.5 font-medium">Last Name is required</div>
@@ -103,11 +110,13 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
           <div>
             <label class="block text-slate-700 font-medium mb-1">E-Mail*</label>
             <input
+              appInput
+              size="sm"
               type="email"
               placeholder="name@example.com"
               [(ngModel)]="f.email"
-              [ngClass]="{'border-red-500': isSubmitted && !f.email, 'border-field-border': !(isSubmitted && !f.email)}"
-              class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800"
+              [invalid]="isSubmitted && !f.email"
+              class="w-full"
             />
             @if (isSubmitted && !f.email) {
               <div class="text-xs text-red-500 mt-0.5 font-medium">E-Mail is required</div>
@@ -117,12 +126,14 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
           <div>
             <label class="block text-slate-700 font-medium mb-1">Mobile No.*</label>
             <input
+              appInput
+              size="sm"
               type="text"
               maxlength="10"
               placeholder="10-digit mobile number"
               [(ngModel)]="f.mobileNo"
-              [ngClass]="{'border-red-500': isSubmitted && !f.mobileNo, 'border-field-border': !(isSubmitted && !f.mobileNo)}"
-              class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800"
+              [invalid]="isSubmitted && !f.mobileNo"
+              class="w-full"
             />
             @if (isSubmitted && !f.mobileNo) {
               <div class="text-xs text-red-500 mt-0.5 font-medium">Mobile No. is required</div>
@@ -133,20 +144,24 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
           <div>
             <label class="block text-slate-700 font-medium mb-1">Date Of Birth</label>
             <input
+              appInput
+              size="sm"
               type="date"
               [(ngModel)]="f.dateOfBirth"
-              class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800"
+              class="w-full"
             />
           </div>
 
           <div>
             <label class="block text-slate-700 font-medium mb-1">Aadhaar Id</label>
             <input
+              appInput
+              size="sm"
               type="text"
               maxlength="12"
               placeholder="12-digit Aadhaar number"
               [(ngModel)]="f.aadhaarId"
-              class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:border-primary text-slate-800 font-mono text-xs"
+              class="w-full tabular-nums"
             />
           </div>
 
@@ -154,8 +169,10 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
           <div>
             <label class="block text-slate-700 font-medium mb-1">Designation</label>
             <select
+              appInput
+              size="sm"
               [(ngModel)]="f.designation"
-              class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800 bg-white"
+              class="w-full"
             >
               <option value="" disabled>Select Designation</option>
               @for (desig of activeDesignationOptions(); track desig) {
@@ -164,73 +181,31 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
             </select>
           </div>
 
-          <div class="relative scheme-dropdown-container">
+          <div>
             <label class="block text-slate-700 font-medium mb-1">Scheme Name</label>
-            <button
-              type="button"
-              (click)="toggleSchemeDropdown($event)"
-              class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:border-primary text-slate-800 bg-white flex items-center justify-between text-left cursor-pointer transition-colors"
-            >
-              <span class="truncate text-xs sm:text-[13px]" [class.text-slate-400]="getSelectedSchemes().length === 0">
-                {{ getSchemeDisplayLabel() }}
-              </span>
-              <svg
-                class="w-4 h-4 text-slate-400 shrink-0 ml-2 transition-transform duration-200"
-                [class.rotate-180]="isSchemeDropdownOpen()"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
-            @if (isSchemeDropdownOpen()) {
-              <div
-                class="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-lg border border-slate-200 shadow-xl overflow-hidden font-sans max-h-56 overflow-y-auto"
-                role="listbox"
-                (click)="$event.stopPropagation()"
-              >
-                <div class="py-1 divide-y divide-slate-100 text-xs sm:text-[13px]">
-                  <!-- All Schemes tick option -->
-                  <label
-                    class="flex items-center gap-2.5 px-3 py-2 hover:bg-slate-50 cursor-pointer text-slate-800 font-semibold select-none transition-colors bg-slate-50/70"
-                  >
-                    <input
-                      type="checkbox"
-                      [checked]="isAllSchemesSelected()"
-                      (change)="toggleAllSchemes()"
-                      class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary cursor-pointer accent-primary"
-                    />
-                    <span>All Schemes</span>
-                  </label>
-
-                  <!-- Individual Scheme Options from Scheme Master -->
-                  @for (scheme of activeSchemeOptions(); track scheme) {
-                    <label
-                      class="flex items-center gap-2.5 px-3 py-2 hover:bg-slate-50 cursor-pointer text-slate-700 select-none transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        [checked]="isSchemeSelected(scheme)"
-                        (change)="toggleSchemeOption(scheme)"
-                        class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary cursor-pointer accent-primary"
-                      />
-                      <span class="truncate">{{ scheme }}</span>
-                    </label>
-                  }
-                </div>
-              </div>
-            }
+            <!-- "All Schemes" row first, then the individual schemes from Scheme Master -->
+            <app-dropdown
+              multiple
+              size="sm"
+              placeholder="Select Scheme Name"
+              selectAllLabel="All Schemes"
+              [options]="activeSchemeOptions()"
+              [values]="schemeValues()"
+              [summary]="getSchemeDisplayLabel()"
+              (optionToggled)="toggleSchemeOption($event)"
+              (selectAllToggled)="toggleAllSchemes()"
+            />
           </div>
 
           <!-- ROW 6 (Col 1: District, Col 2: Block Name) -->
           <div>
             <label class="block text-slate-700 font-medium mb-1">District</label>
             <select
+              appInput
+              size="sm"
               [(ngModel)]="f.district"
               (ngModelChange)="onDistrictChange($event)"
-              class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800 bg-white"
+              class="w-full"
             >
               <option value="All Districts">All Districts</option>
               @for (district of activeDistrictOptions(); track district) {
@@ -242,8 +217,10 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
           <div>
             <label class="block text-slate-700 font-medium mb-1">Block Name</label>
             <select
+              appInput
+              size="sm"
               [(ngModel)]="f.blockName"
-              class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800 bg-white"
+              class="w-full"
             >
               <option value="All Blocks">All Blocks</option>
               @for (block of activeBlockOptions(); track block) {
@@ -275,17 +252,6 @@ export class UserFormModalComponent {
   readonly save = output<void>();
   readonly cancelled = output<void>();
 
-  isSchemeDropdownOpen = signal<boolean>(false);
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement | null;
-    if (!target) return;
-    if (!target.closest('.scheme-dropdown-container')) {
-      this.isSchemeDropdownOpen.set(false);
-    }
-  }
-
   isRoleDisabled(role: string): boolean {
     const r = (role || '').trim().toLowerCase();
     return r === 'training partner' || r === 'tp';
@@ -311,11 +277,6 @@ export class UserFormModalComponent {
     ];
   });
 
-  toggleSchemeDropdown(event?: Event): void {
-    if (event) event.stopPropagation();
-    this.isSchemeDropdownOpen.update(v => !v);
-  }
-
   getSelectedSchemes(): string[] {
     const f = this.formData();
     if (Array.isArray(f.schemeNames)) {
@@ -328,6 +289,12 @@ export class UserFormModalComponent {
       return f.schemeDepartment.split(',').map(s => s.trim()).filter(Boolean);
     }
     return [];
+  }
+
+  /** Ticked schemes for the dropdown: every option while "All Schemes" is on, else the chosen ones. */
+  schemeValues(): string[] {
+    if (this.isAllSchemesSelected()) return [...this.activeSchemeOptions()];
+    return this.getSelectedSchemes().filter(s => s !== 'All Schemes' && s !== 'ALL' && s !== 'all');
   }
 
   isAllSchemesSelected(): boolean {

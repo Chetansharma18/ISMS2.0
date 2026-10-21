@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { ShortfallRequest, SubmittedTender } from '../../../core/models/tender.model';
+import { ButtonComponent, TableColumn, TableComponent } from '../../../shared';
+import { ShortfallRequest, ShortfallUpload, SubmittedTender } from '../../../core/models/tender.model';
 import { TenderDocViewRequest } from './tender-doc-card.component';
 import { isShortfallOverdue, openShortfalls, shortfallsOf } from './tender-shortfall.util';
 
@@ -10,6 +11,7 @@ import { isShortfallOverdue, openShortfalls, shortfallsOf } from './tender-short
 @Component({
   selector: 'app-tender-shortfall-section',
   standalone: true,
+  imports: [TableComponent, ButtonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
@@ -49,11 +51,7 @@ import { isShortfallOverdue, openShortfalls, shortfallsOf } from './tender-short
                 }
               </div>
               @if (notice.status === 'Open') {
-                <button
-                  type="button"
-                  (click)="respond.emit(notice)"
-                  class="px-3 py-1.5 rounded-md bg-navy hover:bg-navy-dark text-white text-xs font-semibold cursor-pointer transition-colors"
-                >
+                <button appButton size="sm" type="button" (click)="respond.emit(notice)">
                   Respond
                 </button>
               }
@@ -91,9 +89,12 @@ import { isShortfallOverdue, openShortfalls, shortfallsOf } from './tender-short
                               <span class="text-[11px] text-slate-500"> &bull; {{ doc.fileName }} ({{ doc.fileSize }})</span>
                             </span>
                             <button
+                              appButton
+                              variant="ghost"
+                              size="sm"
                               type="button"
                               (click)="viewDoc.emit({ fileName: doc.fileName, title: doc.title, fileSize: doc.fileSize })"
-                              class="shrink-0 text-xs font-semibold text-ocean hover:underline cursor-pointer"
+                              class="shrink-0"
                             >
                               View
                             </button>
@@ -115,35 +116,23 @@ import { isShortfallOverdue, openShortfalls, shortfallsOf } from './tender-short
                       <p class="m-0 mt-1 text-slate-700 leading-relaxed whitespace-pre-line">{{ reply.remarks }}</p>
                     }
 
-                    <div class="mt-2 overflow-x-auto border border-slate-200 rounded-md">
-                      <table class="w-full text-xs text-left border-collapse">
-                        <thead class="bg-surface-muted text-[11px] font-semibold text-slate-600 border-b border-slate-200">
-                          <tr>
-                            <th class="py-2 px-3">Document</th>
-                            <th class="py-2 px-3">Uploaded File</th>
-                            <th class="py-2 px-3">Uploaded On</th>
-                            <th class="py-2 px-3 text-center w-20">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-200 text-slate-700 bg-white">
-                          @for (up of reply.uploads; track up.requiredDoc) {
-                            <tr>
-                              <td class="py-2 px-3">{{ up.requiredDoc }}</td>
-                              <td class="py-2 px-3">{{ up.fileName }} <span class="text-slate-500">({{ up.fileSize }})</span></td>
-                              <td class="py-2 px-3 whitespace-nowrap">{{ up.uploadedOn }}</td>
-                              <td class="py-2 px-3 text-center">
-                                <button
-                                  type="button"
-                                  (click)="viewDoc.emit({ fileName: up.fileName, title: up.requiredDoc, fileSize: up.fileSize })"
-                                  class="text-xs font-semibold text-ocean hover:underline cursor-pointer"
-                                >
-                                  View
-                                </button>
-                              </td>
-                            </tr>
-                          }
-                        </tbody>
-                      </table>
+                    <div class="mt-2">
+                      <app-table
+                        [columns]="uploadColumns"
+                        [data]="reply.uploads"
+                        [customTemplates]="{ action: uploadActionTemplate }"
+                      />
+                      <ng-template #uploadActionTemplate let-up>
+                        <button
+                          appButton
+                          variant="ghost"
+                          size="sm"
+                          type="button"
+                          (click)="viewDoc.emit({ fileName: up.fileName, title: up.requiredDoc, fileSize: up.fileSize })"
+                        >
+                          View
+                        </button>
+                      </ng-template>
                     </div>
                   </li>
                 } @else {
@@ -165,6 +154,13 @@ export class TenderShortfallSectionComponent {
 
   readonly respond = output<ShortfallRequest>();
   readonly viewDoc = output<TenderDocViewRequest>();
+
+  protected readonly uploadColumns: TableColumn<ShortfallUpload>[] = [
+    { key: 'requiredDoc', label: 'Document' },
+    { key: 'fileName', label: 'Uploaded File', format: (_value, up) => `${up.fileName} (${up.fileSize})` },
+    { key: 'uploadedOn', label: 'Uploaded On', cellClass: 'whitespace-nowrap' },
+    { key: 'action', label: 'Action', align: 'center', width: 'w-20', type: 'custom' }
+  ];
 
   /** Newest request first. */
   protected readonly notices = computed(() => [...shortfallsOf(this.app())].reverse());

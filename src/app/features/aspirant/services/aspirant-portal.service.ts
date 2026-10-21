@@ -1,5 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { StorageService } from '../../../core/services/storage.service';
+import { UserPersona } from '../../../core/models/user.model';
 import { AspirantFormData } from '../../sdc/config/aspirant-form.config';
 import { createEmptyAspirantFormData } from '../../sdc/components/aspirant-mapping/aspirant-form-data.factory';
 
@@ -179,7 +180,7 @@ export class AspirantPortalService {
     this.storage.setItem(this.PROFILE_DATA_KEY, data);
     this.storage.setItem(this.PROFILE_COMPLETE_KEY, true);
 
-    const authUser = this.storage.getItem<any>('isms_user');
+    const authUser = this.storage.getItem<UserPersona>('isms_user');
     if (authUser) {
       authUser.isProfileComplete = true;
       this.storage.setItem('isms_user', authUser);

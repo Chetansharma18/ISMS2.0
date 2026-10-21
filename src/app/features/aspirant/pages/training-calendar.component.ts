@@ -6,7 +6,11 @@ import {
   TableComponent,
   TableColumn,
   PageHeaderComponent,
-  ActionModalComponent
+  ActionModalComponent,
+  ButtonComponent,
+  IconComponent,
+  InputDirective,
+  PageShellComponent
 } from '../../../shared';
 import { AspirantPortalService, TrainingCalendarItem } from '../services/aspirant-portal.service';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -22,10 +26,14 @@ import { StorageService } from '../../../core/services/storage.service';
     RouterModule,
     TableComponent,
     PageHeaderComponent,
-    ActionModalComponent
+    ActionModalComponent,
+    ButtonComponent,
+    IconComponent,
+    InputDirective,
+    PageShellComponent
   ],
   template: `
-    <div class="w-full min-h-full text-slate-800 font-sans p-4 sm:p-5 space-y-5" style="background-color: #ffffff; font-family: 'Inter', sans-serif;">
+    <app-page-shell>
 
       <!-- ====================================================================
            1. TOP HERO HEADER (Using Reusable PageHeaderComponent with Rajasthan Banner)
@@ -33,25 +41,23 @@ import { StorageService } from '../../../core/services/storage.service';
       <app-page-header
         title="Training Calendar"
         [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Training Calendar' }]"
+        [searchable]="true"
+        searchPlaceholder="Search course, partner, SDC..."
+        [(searchQuery)]="searchQuery"
       >
         <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
 
           <!-- Dropdown Filter: District -->
           <div class="relative w-full sm:w-44 md:w-48 shrink-0">
             <span class="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 z-10 flex items-center">
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+              <app-icon name="map-pin" size="sm" [stroke]="2" />
             </span>
             <select
+              appInput
+              size="sm"
               [ngModel]="selectedDistrict()"
               (ngModelChange)="selectedDistrict.set($event)"
-              class="w-full h-[38px] pl-8 pr-8 text-xs sm:text-[13px] text-slate-800 font-medium bg-white border rounded-lg shadow-2xs hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer truncate transition-all"
-              [class.border-navy]="selectedDistrict()"
-              [class.ring-1]="selectedDistrict()"
-              [class.ring-navy/20]="selectedDistrict()"
-              [class.border-slate-300]="!selectedDistrict()"
+              class="w-full pl-8 truncate"
               style="-webkit-appearance: none; -moz-appearance: none; appearance: none;"
               title="Filter by District"
               aria-label="Filter by District"
@@ -62,27 +68,21 @@ import { StorageService } from '../../../core/services/storage.service';
               }
             </select>
             <span class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 z-10 flex items-center">
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
+              <app-icon name="chevron-down" size="sm" [stroke]="2" />
             </span>
           </div>
 
           <!-- Dropdown Filter: Sector -->
           <div class="relative w-full sm:w-48 md:w-56 shrink-0">
             <span class="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 z-10 flex items-center">
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
+              <app-icon name="suitcase" size="sm" [stroke]="2" />
             </span>
             <select
+              appInput
+              size="sm"
               [ngModel]="selectedSector()"
               (ngModelChange)="selectedSector.set($event)"
-              class="w-full h-[38px] pl-8 pr-8 text-xs sm:text-[13px] text-slate-800 font-medium bg-white border rounded-lg shadow-2xs hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer truncate transition-all"
-              [class.border-navy]="selectedSector()"
-              [class.ring-1]="selectedSector()"
-              [class.ring-navy/20]="selectedSector()"
-              [class.border-slate-300]="!selectedSector()"
+              class="w-full pl-8 truncate"
               style="-webkit-appearance: none; -moz-appearance: none; appearance: none;"
               title="Filter by Sector"
               aria-label="Filter by Sector"
@@ -93,55 +93,22 @@ import { StorageService } from '../../../core/services/storage.service';
               }
             </select>
             <span class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 z-10 flex items-center">
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
+              <app-icon name="chevron-down" size="sm" [stroke]="2" />
             </span>
-          </div>
-
-          <!-- Integrated Keyword Search Box -->
-          <div class="w-full sm:w-auto min-w-0 sm:min-w-56 md:min-w-64 shrink-0">
-            <div class="relative flex items-center h-[38px] bg-white rounded-lg border border-slate-300 shadow-2xs overflow-hidden focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-              <input
-                type="text"
-                [ngModel]="searchQuery()"
-                (ngModelChange)="searchQuery.set($event)"
-                placeholder="Search course, partner, SDC..."
-                class="w-full h-full pl-3 pr-2 text-xs sm:text-[13px] placeholder:text-slate-400 focus:outline-none bg-transparent"
-              />
-              @if (searchQuery().trim()) {
-                <button
-                  type="button"
-                  (click)="clearSearch()"
-                  class="px-1.5 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer text-xs"
-                  title="Clear text search"
-                >
-                  ✕
-                </button>
-              }
-              <button
-                type="button"
-                class="h-full px-3.5 bg-navy hover:bg-navy-dark text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
-                title="Search"
-              >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-            </div>
           </div>
 
           <!-- Reset Filters Button (visible when any filter or query is active) -->
           @if (hasActiveFilters()) {
             <button
+              appButton
+              size="sm"
+              variant="danger"
               type="button"
               (click)="resetFilters()"
-              class="inline-flex items-center gap-1.5 h-[38px] px-3 bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold shadow-2xs transition-all cursor-pointer shrink-0 active:scale-95"
+              class="shrink-0"
               title="Reset all filters"
             >
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
+              <app-icon name="refresh" size="sm" [stroke]="2" />
               <span>Reset</span>
             </button>
           }
@@ -154,9 +121,7 @@ import { StorageService } from '../../../core/services/storage.service';
         <div class="flex flex-wrap items-center justify-between gap-2.5 px-3.5 py-2 bg-slate-50 border border-slate-200/90 rounded-lg text-xs text-slate-600 transition-all">
           <div class="flex flex-wrap items-center gap-2">
             <span class="font-semibold text-slate-700 text-[11px] uppercase tracking-wider flex items-center gap-1">
-              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
+              <app-icon name="filter" size="sm" [stroke]="2" class="text-slate-500" />
               Active Filters:
             </span>
 
@@ -164,9 +129,11 @@ import { StorageService } from '../../../core/services/storage.service';
               <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-800 border border-blue-200">
                 <span>District: <strong class="font-semibold">{{ selectedDistrict() }}</strong></span>
                 <button
+                  appButton
+                  variant="ghost"
+                  size="sm"
                   type="button"
                   (click)="clearDistrictFilter()"
-                  class="text-blue-600 hover:text-blue-900 cursor-pointer text-xs"
                   title="Remove district filter"
                 >
                   ✕
@@ -178,9 +145,11 @@ import { StorageService } from '../../../core/services/storage.service';
               <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-800 border border-indigo-200">
                 <span>Sector: <strong class="font-semibold">{{ selectedSector() }}</strong></span>
                 <button
+                  appButton
+                  variant="ghost"
+                  size="sm"
                   type="button"
                   (click)="clearSectorFilter()"
-                  class="text-indigo-600 hover:text-indigo-900 cursor-pointer text-xs"
                   title="Remove sector filter"
                 >
                   ✕
@@ -192,9 +161,11 @@ import { StorageService } from '../../../core/services/storage.service';
               <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-300">
                 <span>Search: <strong class="font-semibold">"{{ searchQuery() }}"</strong></span>
                 <button
+                  appButton
+                  variant="ghost"
+                  size="sm"
                   type="button"
                   (click)="clearSearch()"
-                  class="text-slate-600 hover:text-slate-900 cursor-pointer text-xs"
                   title="Clear search text"
                 >
                   ✕
@@ -203,9 +174,12 @@ import { StorageService } from '../../../core/services/storage.service';
             }
 
             <button
+              appButton
+              variant="ghost"
+              size="sm"
               type="button"
               (click)="resetFilters()"
-              class="text-xs text-rose-600 hover:text-rose-800 font-semibold hover:underline cursor-pointer ml-1"
+              class="ml-1"
             >
               Clear All
             </button>
@@ -251,21 +225,19 @@ import { StorageService } from '../../../core/services/storage.service';
       <ng-template #actionTemplate let-item>
         @if (portalService.isExpressed(item.id)) {
           <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
+            <app-icon name="check" size="sm" [stroke]="2.5" class="text-emerald-600" />
             <span>Expressed</span>
           </span>
         } @else {
           <button
+            appButton
+            size="sm"
             type="button"
             (click)="onExpressInterestClick(item)"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-navy hover:bg-[#07243c] text-white rounded-md text-xs font-medium cursor-pointer shadow-2xs transition-all active:scale-95 whitespace-nowrap"
+            class="whitespace-nowrap"
           >
             <span>Express Interest</span>
-            <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
+            <app-icon name="forward" size="sm" />
           </button>
         }
       </ng-template>
@@ -319,7 +291,7 @@ import { StorageService } from '../../../core/services/storage.service';
         (close)="showConfirmExpressModal.set(false)"
       ></app-action-modal>
 
-    </div>
+    </app-page-shell>
   `
 })
 export class TrainingCalendarComponent implements OnInit {

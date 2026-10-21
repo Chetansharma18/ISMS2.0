@@ -10,6 +10,8 @@ import type {
 } from './eoi-state.models';
 import { buildSamarthResponses } from './eoi-state.seed-samarth';
 import { withSeedHistory } from './eoi-state.seed-history';
+import { createDefaultTerms } from '../pages/eoi-sanction-editor/eoi-sanction-editor.util';
+import { createDefaultCopyTo as createDefaultIpaCopyTo, createDefaultTerms as createDefaultIpaTerms } from '../pages/ipa-editor/ipa-editor.util';
 
 /** Initial schemes matching Screenshot 1. */
 export function buildInitialSchemes(): Scheme[] {
@@ -252,10 +254,10 @@ export function buildInitialResponses(): ApplicantResponse[] {
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
       eoiRefNo: 'RSLDC/EOI/2026/MMKVY-01',
       submissionDate: '07/09/2026 09:15 AM',
-      status: 'UNDER_SCRUTINY',
-      statusDisplay: 'Under Review',
+      status: 'REJECTED',
+      statusDisplay: 'Rejected',
       emdFee: 50000,
-      emdStatus: 'PAID',
+      emdStatus: 'REFUNDED',
       processingFee: 2000,
       processingFeeStatus: 'PAID',
 
@@ -351,7 +353,13 @@ export function buildInitialResponses(): ApplicantResponse[] {
         { id: 'doc-207', title: 'Additional Supporting Document', fileSize: '3.1 MB PDF', category: 'Annexures', verified: true }
       ],
 
-      scrutinyDetails: undefined
+      scrutinyDetails: {
+        technicalScore: 58,
+        grade: 'Grade C',
+        remarks: 'Placement proofs for the last two years are incomplete and the practical room norms are not met at one proposed centre.',
+        scrutinyOfficer: 'Committee Member 1',
+        decisionTimestamp: '10/09/2026 12:40 PM'
+      }
     },
 
     {
@@ -605,35 +613,24 @@ export function buildInitialResponses(): ApplicantResponse[] {
 export function buildDefaultSanctionOrderData(schemeId: string = 'MMKVY-01'): SanctionOrderDocumentData {
   return {
     schemeId,
-    headerTitle: 'RAJASTHAN SKILL AND LIVELIHOODS DEVELOPMENT CORPORATION',
+    headerTitle: 'Rajasthan Skill and Livelihoods Development Corporation',
     headerSubtitle: '(A Government of Rajasthan Enterprise)',
-    headerAddress: 'EMI Campus, J-8-A, Jhalana Institutional Area, Jaipur - 302004 (Rajasthan)',
-    fileNo: 'File No: F () RSLDC/Skills/MMKVY/RAJKViK/SO/2026-2027/ 1358',
+    headerAddress: 'EMI Campus, J-8-A, Jhalana Institutional Area, Jaipur- 302004 (Rajasthan)',
+    fileNo: 'F () RSLDC/Skills/MMKVY/RAJKViK/SO/2026-2027/ 1358',
     sanctionDate: '30/07/2026',
-    documentTitle: 'SANCTION ORDER',
-    subjectText: 'Sanction order for allocation of physical targets for Financial Year 2026-27 to PIAs under "Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)".',
+    documentTitle: 'Sanction Order',
+    subjectText: 'Sanction order for allocation of physical targets for Financial Year 2026-27 to PIAs under "Mukhya Mantri Kaushal Vikas Yojna" (MMKVY), Cat:I - RAJKViK.',
     referenceText: 'No. RSLDC/EOI/MMKVY, Cat. I, II, III /2026-27/01, dated 22nd January 2026.',
-    preambleText: 'Based on the approved selection criteria of PIA\'s, Sanction Order is accorded to the following empanelled eligible PIAs for FY 2026-27 along with allocation of physical targets under Mukhya Mantri Kaushal Vikas Yojna" (MMKVY), Category. I- RAJKViK as per the details given below:',
+    preambleText: 'Based on the approved selection criteria of PIA\'s, Sanction Order is accorded to the following empanelled eligible PIAs for FY 2026-27 along with allocation of physical targets under Mukhya Mantri Kaushal Vikas Yojna" (MMKVY), Category: I- RAJKViK as per the details given below:',
     tableRows: [
       { id: '1', appId: 'APP-004661', agencyName: 'Apex Technical & Infrastructure Solutions Pvt Ltd', district: 'Alwar', sector: 'Apparel, Agriculture', category: 'A-1 (Skill)', grade: 'A', target: 150 },
       { id: '2', appId: 'APP-004662', agencyName: 'Marwar Skill Foundation', district: 'Jodhpur', sector: 'Textile & Handloom', category: 'A-1 (Skill)', grade: 'A', target: 150 },
       { id: '3', appId: 'APP-004663', agencyName: 'Singhania Vocational Institute', district: 'Udaipur', sector: 'Automotive', category: 'A-1 (Skill)', grade: 'A', target: 150 },
       { id: '4', appId: 'APP-004664', agencyName: 'DMR Enterprises Private Limited', district: 'Alwar', sector: 'Healthcare', category: 'A-1 (Skill)', grade: 'A', target: 150 }
     ],
-    termsAndConditions: [
-      'PIA shall be allowed to conduct training in any one of the given two sectors or in both sectors, but PIA cannot exceed the ceiling given as above.',
-      'PIA Shall be allowed to conduct residential training of 45 candidates only against the sanctioned target of 150, and 30 candidates only against the sanctioned target of 105.',
-      'PIA shall ensure that only job roles with a duration of 1060 hours or less are selected. Job roles exceeding 1060 hours shall not be allotted under any case.',
-      'All PIAs are required to sign the MoU within 10 (ten) working days from the date of issuance of this Sanction Order, failing which the sanction may be liable for cancellation.',
-      'PIA will submit a Demand Draft (DD) of Rs. 10,000/- (Ten thousand) issued in the favor of Managing Director, Rajasthan Skill and Livelihoods Development Corporation (RSLDC) at the time of MoU signing.',
-      'The PIA shall comply to Mukhya Mantri Kaushal Vikash Yojana- Cat.I, RAJKViK guidelines applicable from 01 April 2021 (as amended from time to time or revised guideline), branding guidelines and office orders, circulars & directions issued by RSLDC.',
-      'PIA will enroll only targeted beneficiaries as mentioned in scheme guidelines, "Mukhya Mantri Kaushal Vikash Yojana- Cat.I, RAJKViK", and with reference to the course module.',
-      'All PIAs will strictly comply the directives for the Aadhaar enabled Biometric Attendance System (AEBAS) for using the newly developed AEBAS process for marking the attendance of SDCs daily on the ISMS portal (Ref. No. : RSLDC/AEBAS/2026).',
-      'The following are mandatory for the issuance of In-Principle Approval (IPA) from RSLDC (per batch):- Installation of IP camera-based face recognition system in classrooms and domain labs of SDC.',
-      'To install IRIS / latest version of Aadhar Enabled Biometric Attendance System (AEBAS) for daily attendance (in & out) at the SDC and Hostel, as applicable, which has to be integrated with ISMS system of RSLDC.',
-      'Mandatory Use of Masked Aadhaar: In compliance with UIDAI Regulations 2021, it is mandatory for all TPs to use masked Aadhaar displaying only the last four digits in all official documentation.'
-    ],
-    dispatchRef: 'RSLDC/Skills/MMKVY/RAJKViK/SO/2026-2027',
+    // Worded exactly as in the printed order; the same list is the default of the sanction order editor.
+    termsAndConditions: createDefaultTerms(),
+    dispatchRef: 'RSLDC/Skills/MMKVY/RAJKViK/SO/2026-2027/1359-66',
     copyToList: [
       'PS to Hon\'ble Minister, DSEE, GoR',
       'PS to ACS, DSEE, GoR',
@@ -654,19 +651,19 @@ export function buildDefaultIpaData(schemeId: string = 'MMKVY-01', appId: string
   return {
     schemeId,
     appId,
-    headerTitle: 'RAJASTHAN SKILL AND LIVELIHOODS DEVELOPMENT CORPORATION',
+    headerTitle: 'Rajasthan Skill and Livelihoods Development Corporation',
     headerSubtitle: '(A Government of Rajasthan Enterprise)',
     headerAddress: 'EMI Campus, J-8-A, Jhalana Institutional Area, Jaipur- 302004 (Rajasthan)',
-    fileNo: 'FORSLDC/Skills/MMKVY-Cat.II: SAKSHM/2026-27/2895-97',
-    ipaDate: '15/9/26',
+    fileNo: 'F () RSLDC/Skills/MMKVY: Cat-I/RAJKViK/IPA/2026-27/',
+    ipaDate: '28/09/2026',
     // The company's own name is filled in from the sanction order when the IPA is opened.
     recipientName: '',
     recipientAddress1: '',
     recipientAddress2: 'Sri Ganganagar, Rajasthan, Pin Code-335001',
     sarNumber: 'SAR: 2200-099-001',
-    referenceNo: 'F () RSLDC/SKILL/MMKVY-Cat.-II: SAKSHM/2026-27/535, Dated: 15/07/2026',
-    subjectText: 'In-Principal Approval (IPA-1)- MMKVY-Cat. II / SAKSHM sponsored by RSLDC for F.Y. 2026-27.',
-    preambleText: 'In reference to your request and based on the recommendation from inspection team, in-principal approval is hereby accorded for conducting cycles (as detailed below) for following courses during financial year 2026-27, as per the terms and conditions stipulated in relevant guidelines.',
+    referenceNo: '-Sanction order no. F()RSLDC/Skills/MMKVY/RAJKViK/2026-27/1358 dated: 30.07.2026',
+    subjectText: 'In-Principal Approval (IPA-1)-MMKVY/RAJKViK sponsored by RSLDC for F.Y 2026-27',
+    preambleText: 'In reference to your request and based on the recommendation from inspection team, 1st in-principal approval is hereby accorded for conducting cycles (as detailed below) for following courses during financial year 2026-27, as per the terms and conditions stipulated in relevant guidelines.',
     piaName: '',
     sdcAddress: 'Near Panchayati Mandir, Opposite Government Hospital, Kesisinghpur, Sriganganagar, 335027',
     courseRows: [
@@ -743,22 +740,11 @@ export function buildDefaultIpaData(schemeId: string = 'MMKVY-01', appId: string
       { sNo: 3, particular: 'Target Allocation in this First IPA', value: '90' },
       { sNo: 4, particular: 'Remaining Targets', value: '00' }
     ],
-    termsAndConditions: [
-      'TP shall ensure to initiation of batches within 15 days from the date issuance the IPA.',
-      'TP shall ensure to work in accordance with the (MMKVY-Cat-II-SAKSHM) guideline issued on 1st April 2021 and further direction given by RSLDC.',
-      'TP shall ensure to functional IP cameras at SDC before the commencement of batches.',
-      'TP shall Submit Performance Security Deposit (PSD) to RSLDC A/C on or before batch Commencement (In case of new SDC).',
-      'TP will have to maintain video footage of complete skill training in Lab/classroom from IP Camera for each batch until the payment for the batch.',
-      'TP shall ensure installation of Aadhaar linked Biometric for daily attendance of trainees & trainers (In & Out) at the SDC & Hostel (if applicable), which must be compatible with ISMS system of RSLDC.',
-      'PIA must ensure compliance of the condition mentioned in the MoU, Sanction Order, Scheme Guideline and other applicable directives.',
-      'The IEC & branding should be available as per the scheme guidelines.'
-    ],
-    ccList: [
-      'CAO, RSLDC',
-      'District Skill Coordinator'
-    ],
+    // Worded exactly as in the printed IPA; the same lists are the defaults of the IPA editor.
+    termsAndConditions: createDefaultIpaTerms(),
+    ccList: createDefaultIpaCopyTo(),
     signatoryTitle: 'Scheme OIC',
-    signatorySub: 'RSLDC',
+    signatorySub: 'RAJKViK, RSLDC',
     leftLogoUrl: '/rsldc-logo.png',
     rightLogoUrl: '/Rajasthan-Sarkar.png'
   };

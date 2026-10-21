@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { NgClass } from '@angular/common';
+import { IconComponent } from '../../../shared';
 import { SubmittedTender } from '../../../core/models/tender.model';
 import { remainingEdits } from './tender-status.util';
 
 @Component({
   selector: 'app-tender-edit-status',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block space-y-5' },
   template: `
@@ -27,9 +28,7 @@ import { remainingEdits } from './tender-status.util';
 
       @if (isEditing()) {
         <div class="p-3 bg-amber-100/70 border border-amber-300 rounded-lg text-amber-950 flex items-start gap-2.5 text-xs font-sans">
-          <svg class="w-4 h-4 text-amber-700 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <app-icon name="info-circle" [stroke]="2" class="text-amber-700 shrink-0 mt-0.5" />
           <div class="leading-relaxed">
             <span class="font-bold text-amber-950 block">Document Replacement Active:</span>
             <span class="text-amber-900">You can edit and replace <strong>only documents and PDFs</strong>. Organization and profile particulars are verified and read-only. Saving replacements will consume 1 edit attempt ({{ remainingEdits(tender()) }} remaining before <strong>{{ tender().closingDate }}</strong>).</span>

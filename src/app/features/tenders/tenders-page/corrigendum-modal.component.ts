@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActionModalComponent } from '../../../shared';
+import { ActionModalComponent, InputDirective } from '../../../shared';
 import { validateUploadFile } from './tenders-page.util';
 
 /** Payload emitted when the optional corrigendum form is submitted. */
@@ -17,7 +17,7 @@ export interface CorrigendumSubmission {
   selector: 'app-corrigendum-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ActionModalComponent],
+  imports: [FormsModule, ActionModalComponent, InputDirective],
   template: `
     <app-action-modal
       [isOpen]="isOpen()"
@@ -39,11 +39,12 @@ export interface CorrigendumSubmission {
         <div>
           <label class="block text-slate-700 font-medium mb-1">Corrigendum Title</label>
           <input
+            appInput
             type="text"
             maxlength="100"
             placeholder="e.g. Corrigendum-1: Extension of Submission Date"
             [(ngModel)]="corrigendumFormData.title"
-            class="w-full px-2.5 py-1.5 border border-field-border rounded focus:outline-none focus:ring-1 focus:ring-primary text-slate-800"
+            class="w-full"
           />
         </div>
         <div>

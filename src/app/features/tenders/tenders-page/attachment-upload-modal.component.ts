@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
-import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActionModalComponent } from '../../../shared';
+import { ActionModalComponent, InputDirective } from '../../../shared';
 import { EoiAttachment } from '../tenders.models';
 import { createAttachment, validateUploadFile } from './tenders-page.util';
 
@@ -13,7 +12,7 @@ import { createAttachment, validateUploadFile } from './tenders-page.util';
   selector: 'app-attachment-upload-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass, FormsModule, ActionModalComponent],
+  imports: [FormsModule, ActionModalComponent, InputDirective],
   template: `
     <app-action-modal
       [isOpen]="isOpen()"
@@ -34,7 +33,7 @@ import { createAttachment, validateUploadFile } from './tenders-page.util';
       <div class="mt-4 font-sans text-[13px] space-y-4">
         <div>
           <label class="block text-slate-700 font-medium mb-1">File Title*</label>
-          <input type="text" maxlength="100" [(ngModel)]="attachmentFormData.title" [ngClass]="{'border-red-500': attachmentSubmitted() && !attachmentFormData.title, 'border-field-border': !(attachmentSubmitted() && !attachmentFormData.title)}" class="w-full px-2.5 py-1.5 border rounded focus:outline-none focus:border-primary text-slate-800" />
+          <input appInput type="text" maxlength="100" [(ngModel)]="attachmentFormData.title" [invalid]="attachmentSubmitted() && !attachmentFormData.title" class="w-full" />
         </div>
         <div>
           <label class="block text-slate-700 font-medium mb-1">Upload Document*</label>

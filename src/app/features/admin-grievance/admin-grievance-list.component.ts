@@ -6,12 +6,13 @@ import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PermissionService } from '../../core/permissions/permission.service';
 import {
-  PageHeaderComponent,
-  TableComponent,
+  ListPageComponent,
   ButtonComponent,
   ActionModalComponent,
   StatusBadgeComponent,
   EmptyStateComponent,
+  IconComponent,
+  InputDirective,
   TableColumn
 } from '../../shared';
 import { DataEngineService } from '../../core/services/data-engine.service';
@@ -29,69 +30,53 @@ export type { AdminGrievance };
     CommonModule,
     RouterModule,
     FormsModule,
-    PageHeaderComponent,
-    TableComponent,
+    ListPageComponent,
     ButtonComponent,
     ActionModalComponent,
-    StatusBadgeComponent
+    StatusBadgeComponent,
+    IconComponent,
+    InputDirective
   ],
   template: `
-    <div class="w-full min-h-full bg-white text-slate-800 font-sans" style="font-family: 'Inter', sans-serif;">
-      <div class="p-4 sm:p-5 space-y-3 font-sans">
-        
-        <app-page-header
-          title="Grievance Management"
-          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Grievance Management' }]"
-          [searchable]="true"
-          [(searchQuery)]="searchQuery"
-          searchPlaceholder="Search User, Title, Description, Issue Type..."
-        >
-        </app-page-header>
+    <app-list-page
+      title="Grievance Management"
+      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Grievance Management' }]"
+      [(searchQuery)]="searchQuery"
+      searchPlaceholder="Search User, Title, Description, Issue Type..."
+      [columns]="grievanceColumns"
+      [data]="filteredGrievances()"
+      [pageSize]="10"
+      itemUnit="grievances"
+      emptyMessage="No grievances match your search query."
+      [customTemplates]="{
+        viewAction: viewActionTemplate,
+        submittedAt: dateTimeTemplate,
+        attachment: attachmentTemplate
+      }"
+    />
 
-        <app-table
-          [columns]="grievanceColumns"
-          [data]="filteredGrievances()"
-          [pagination]="true"
-          [pageSize]="10"
-          itemUnit="grievances"
-          emptyMessage="No grievances match your search query."
-          [customTemplates]="{
-            viewAction: viewActionTemplate,
-            submittedAt: dateTimeTemplate,
-            attachment: attachmentTemplate
-          }"
-        >
-        </app-table>
-
-        <ng-template #dateTimeTemplate let-item>
-          <div class="flex flex-col text-center">
-            <span class="text-slate-800 font-normal whitespace-nowrap">{{ item.submittedAt | date:'dd MMM yyyy' }}</span>
-            <span class="text-slate-500 text-[11px] whitespace-nowrap">{{ item.submittedAt | date:'hh:mm a' }}</span>
-          </div>
-        </ng-template>
-        
-        <ng-template #attachmentTemplate let-item>
-          @if (item.attachment && item.attachment !== 'None') {
-            <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-normal text-sky-600 hover:text-sky-700 hover:underline break-all max-w-37.5 inline-block">
-              {{ item.attachment }}
-            </a>
-          } @else {
-            <span class="text-slate-400">-</span>
-          }
-        </ng-template>
-
-
-        <ng-template #viewActionTemplate let-item>
-          <app-button
-            variant="pdf-view"
-            size="sm"
-            (click)="viewTicket(item)"
-          >
-            View
-          </app-button>
-        </ng-template>
-
+    <ng-template #dateTimeTemplate let-item>
+      <div class="flex flex-col text-center">
+        <span class="text-slate-800 font-normal whitespace-nowrap">{{ item.submittedAt | date:'dd MMM yyyy' }}</span>
+        <span class="text-slate-500 text-[11px] whitespace-nowrap">{{ item.submittedAt | date:'hh:mm a' }}</span>
       </div>
+    </ng-template>
+
+    <ng-template #attachmentTemplate let-item>
+      @if (item.attachment && item.attachment !== 'None') {
+        <a href="#" (click)="openPreview(item); $event.preventDefault(); $event.stopPropagation();" class="text-[13px] font-normal text-sky-600 hover:text-sky-700 hover:underline break-all max-w-37.5 inline-block">
+          {{ item.attachment }}
+        </a>
+      } @else {
+        <span class="text-slate-400">-</span>
+      }
+    </ng-template>
+
+    <ng-template #viewActionTemplate let-item>
+      <button appButton variant="outline" size="sm" (click)="viewTicket(item)">
+        View
+      </button>
+    </ng-template>
 
       <!-- View Ticket Modal -->
       <app-action-modal
@@ -147,7 +132,7 @@ export type { AdminGrievance };
               <div>
                 <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Attachment</label>
                 <a href="#" (click)="openPreview(selectedTicket()!); $event.preventDefault();" class="text-[13px] font-medium text-sky-600 hover:text-sky-700 hover:underline flex items-center gap-1.5 w-fit break-all">
-                  <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                  <app-icon name="paperclip" [stroke]="2" class="shrink-0" />
                   {{ selectedTicket()!.attachment }}
                 </a>
               </div>
@@ -166,16 +151,14 @@ export type { AdminGrievance };
             @if (isForwarding()) {
               <div class="mt-6 pt-5 border-t border-slate-200">
                 <h4 class="text-[14px] font-bold text-navy mb-4 flex items-center gap-2">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
+                  <app-icon name="forward" [stroke]="2" />
                   Forward Ticket
                 </h4>
                 <div class="space-y-4">
                   <div class="grid grid-cols-2 gap-4">
                     <div>
                       <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Priority <span class="text-rose-500">*</span></label>
-                      <select [(ngModel)]="forwardForm.priority" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 transition-all text-slate-700 bg-white">
+                      <select appInput [(ngModel)]="forwardForm.priority" class="w-full">
                         <option value="" disabled selected>Select priority</option>
                         <option value="Low">Low</option>
                         <option value="Medium">Medium</option>
@@ -184,7 +167,7 @@ export type { AdminGrievance };
                     </div>
                     <div>
                       <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Concerned User <span class="text-rose-500">*</span></label>
-                      <select [(ngModel)]="forwardForm.concernedUser" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 transition-all text-slate-700 bg-white">
+                      <select appInput [(ngModel)]="forwardForm.concernedUser" class="w-full">
                         <option value="" disabled selected>Select admin user</option>
                         <option value="Admin User 1">Admin User 1</option>
                         <option value="Admin User 2">Admin User 2</option>
@@ -194,7 +177,7 @@ export type { AdminGrievance };
                   </div>
                   <div>
                     <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Comments <span class="text-rose-500">*</span></label>
-                    <textarea [(ngModel)]="forwardForm.comments" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 transition-all placeholder:text-slate-400 bg-white" rows="3" placeholder="Enter comments for forwarding"></textarea>
+                    <textarea appInput [(ngModel)]="forwardForm.comments" class="w-full" rows="3" placeholder="Enter comments for forwarding"></textarea>
                   </div>
                 </div>
               </div>
@@ -204,22 +187,18 @@ export type { AdminGrievance };
             @if (isCommenting()) {
               <div class="mt-6 pt-5 border-t border-slate-200">
                 <h4 class="text-[14px] font-bold text-navy mb-4 flex items-center gap-2">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
+                  <app-icon name="chat-bubble" [stroke]="2" />
                   Add Comment
                 </h4>
                 <div>
                   <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Your Comments <span class="text-rose-500">*</span></label>
-                  <textarea [(ngModel)]="commentForm.comments" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/30 transition-all placeholder:text-slate-400 bg-white" rows="4" placeholder="Enter your response or remarks here"></textarea>
+                  <textarea appInput [(ngModel)]="commentForm.comments" class="w-full" rows="4" placeholder="Enter your response or remarks here"></textarea>
                 </div>
               </div>
             }
           </div>
         }
       </app-action-modal>
-
-    </div>
   `
 })
 export class AdminGrievanceListComponent {

@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Output, signal, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
-import { ActionModalComponent } from '../../../../shared/components/action-modal/action-modal.component';
+import { ActionModalComponent, ButtonComponent, ModalComponent } from '../../../../shared';
 
 interface Tender {
   date: string;
@@ -17,39 +17,17 @@ interface Tender {
   selector: 'app-tenders-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ActionModalComponent],
+  imports: [CommonModule, ActionModalComponent, ModalComponent, ButtonComponent],
   template: `
-    <div class="fixed top-[64px] sm:top-[76px] lg:top-[80px] inset-x-0 bottom-0 z-50 flex items-center justify-center p-3 sm:p-5 animate-in fade-in duration-150">
-      
-      <!-- Backdrop with blur and click-to-close -->
-      <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" (click)="close.emit()" aria-hidden="true"></div>
+    <app-modal
+      title="Official Tenders & RFP Notices"
+      subtitle="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)"
+      widthOverride="max-w-3xl"
+      (close)="onModalClose()"
+    >
+        <div class="space-y-3">
+          <p class="text-[11px] sm:text-xs font-medium text-slate-500 text-right m-0">Total Tenders: <span class="text-slate-900 font-bold">{{ tenders.length }}</span></p>
 
-      <!-- Modal Container -->
-      <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[calc(100vh-110px)] sm:max-h-[580px] overflow-hidden border border-slate-200 z-10 animate-in zoom-in-95 duration-150">
-        
-        <!-- Header -->
-        <div class="bg-primary text-white px-4 sm:px-6 py-3 sm:py-3.5 flex items-center justify-between shrink-0" style="background-color: var(--color-primary, #174A6E);">
-          <div>
-            <h3 class="text-sm sm:text-base font-bold leading-tight text-white m-0">Official Tenders & RFP Notices</h3>
-            <p class="text-[11px] text-blue-100 mt-0.5 m-0">Rajasthan Skill and Livelihoods Development Corporation (RSLDC)</p>
-          </div>
-          
-          <div class="flex items-center gap-3 sm:gap-4">
-            <span class="text-[11px] sm:text-xs font-medium text-slate-200 hidden xs:inline">Total Tenders: <span class="text-white font-bold">{{ tenders.length }}</span></span>
-            <button
-              type="button"
-              (click)="close.emit()"
-              class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 flex items-center justify-center transition-colors cursor-pointer text-lg sm:text-xl leading-none text-white focus:outline-none focus:ring-2 focus:ring-white/40"
-              aria-label="Close modal"
-            >
-              &times;
-            </button>
-          </div>
-        </div>
-
-        <!-- Body / Scrollable List -->
-        <div class="flex-1 overflow-y-auto modal-custom-scroll p-3.5 sm:p-5 space-y-3 bg-slate-50">
-          
           @for (item of tenders; track item.id) {
             <div (click)="openLoginPrompt(item)" class="group relative bg-white border border-navy/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-navy/40 transition-all cursor-pointer">
               
@@ -61,7 +39,7 @@ interface Tender {
                 <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
                   <span class="text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
                   <span class="text-slate-300">•</span>
-                  <span class="text-[11px] text-slate-500 font-mono truncate max-w-[200px] sm:max-w-none">{{ item.id }}</span>
+                  <span class="text-[11px] text-slate-500 tabular-nums truncate max-w-[200px] sm:max-w-none">{{ item.id }}</span>
                   <span class="text-slate-300">•</span>
                   <span class="text-[10px] font-semibold text-brand bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">{{ item.category }}</span>
                 </div>
@@ -73,7 +51,7 @@ interface Tender {
 
               <!-- Action -->
               <div class="shrink-0">
-                <button (click)="openLoginPrompt(item); $event.stopPropagation()" class="w-full sm:w-auto inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md text-xs font-semibold transition-colors cursor-pointer shadow-xs">
+                <button appButton size="sm" (click)="openLoginPrompt(item); $event.stopPropagation()" class="w-full sm:w-auto">
                   <span>Login to View</span>
                 </button>
               </div>
@@ -82,8 +60,7 @@ interface Tender {
           }
 
         </div>
-      </div>
-    </div>
+    </app-modal>
 
     <!-- Login Required Modal -->
     <app-action-modal
@@ -108,8 +85,8 @@ export class TendersModalComponent {
   readonly showLoginModal = signal(false);
   readonly selectedTender = signal<Tender | null>(null);
 
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
+  /** Fired by the modal shell on Escape, backdrop click and the close button. */
+  onModalClose(): void {
     if (this.showLoginModal()) {
       this.closeLoginPrompt();
     } else {

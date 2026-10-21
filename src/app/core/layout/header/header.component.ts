@@ -17,12 +17,14 @@ import { AuthService, AssignedRole, UserRole } from '../../auth/auth.service';
 import { PermissionService } from '../../permissions/permission.service';
 import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
 import { HeaderNotificationComponent } from './header-notification.component';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, ClickOutsideDirective, HeaderNotificationComponent],
+  imports: [CommonModule, RouterModule, ClickOutsideDirective, HeaderNotificationComponent, ButtonComponent, IconComponent],
   host: {
     class: 'block w-full relative z-50'
   },
@@ -33,21 +35,23 @@ import { HeaderNotificationComponent } from './header-notification.component';
       [class.top-0]="isSticky"
       role="banner"
     >
-      <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-['Inter',sans-serif]">
+      <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-sans">
 
         <!-- LEFT SIDE: Mobile Menu Toggle + Emblem + ISMS Logo + Separator + Identity -->
         <div class="flex items-center gap-2 sm:gap-3 shrink-0">
           @if (currentUser() && !isLandingPage() && !isSsoPage()) {
             <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
               type="button"
               (click)="toggleMobileMenu.emit()"
-              class="md:hidden p-1.5 -ml-1 text-slate-700 hover:text-navy hover:bg-slate-100 rounded-lg transition-colors cursor-pointer shrink-0"
+              class="md:hidden -ml-1 shrink-0"
               aria-label="Toggle navigation menu"
               title="Open Navigation Menu"
             >
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              <app-icon name="menu" size="lg" [stroke]="2" />
             </button>
           }
 
@@ -92,14 +96,11 @@ import { HeaderNotificationComponent } from './header-notification.component';
           <div class="flex items-center gap-1.5 sm:gap-2.5 text-xs sm:text-[14px]" aria-label="Language selection">
             <!-- English -->
             <button
+              appButton
+              size="sm"
+              [variant]="selectedLanguage() === 'en' ? 'secondary' : 'ghost'"
               type="button"
               (click)="onLanguageChange('en')"
-              class="border-0 bg-transparent cursor-pointer p-0 text-xs sm:text-[14px] transition-colors leading-none font-['Inter',sans-serif]"
-              [class.text-[#12365A]]="selectedLanguage() === 'en'"
-              [class.font-bold]="selectedLanguage() === 'en'"
-              [class.text-[#344256]]="selectedLanguage() !== 'en'"
-              [class.font-medium]="selectedLanguage() !== 'en'"
-              [class.hover:text-[#12365A]]="selectedLanguage() !== 'en'"
             >
               English
             </button>
@@ -109,14 +110,11 @@ import { HeaderNotificationComponent } from './header-notification.component';
 
             <!-- हिंदी -->
             <button
+              appButton
+              size="sm"
+              [variant]="selectedLanguage() === 'hi' ? 'secondary' : 'ghost'"
               type="button"
               (click)="onLanguageChange('hi')"
-              class="border-0 bg-transparent cursor-pointer p-0 text-xs sm:text-[14px] transition-colors leading-none font-['Noto_Sans_Devanagari','Inter',sans-serif]"
-              [class.text-[#12365A]]="selectedLanguage() === 'hi'"
-              [class.font-bold]="selectedLanguage() === 'hi'"
-              [class.text-[#344256]]="selectedLanguage() !== 'hi'"
-              [class.font-medium]="selectedLanguage() !== 'hi'"
-              [class.hover:text-[#12365A]]="selectedLanguage() !== 'hi'"
             >
               हिंदी
             </button>
@@ -135,10 +133,11 @@ import { HeaderNotificationComponent } from './header-notification.component';
 
             <div class="relative z-[100]" id="user-menu-container" (appClickOutside)="closeDropdown()">
               <button
+                appButton
+                variant="outline"
                 type="button"
                 id="user-menu-btn"
                 (click)="toggleDropdown()"
-                class="inline-flex items-center gap-2 sm:gap-2.5 bg-white hover:bg-[#F5F8FA] border border-[#DCE4ED] hover:border-slate-300 rounded-full py-1 pl-1.5 pr-2.5 sm:py-1.5 sm:pl-2 sm:pr-3.5 transition-all cursor-pointer h-[36px] sm:h-[42px] shadow-2xs"
                 [attr.aria-expanded]="dropdownOpen()"
                 aria-haspopup="true"
                 aria-label="User profile and role menu"
@@ -160,13 +159,12 @@ import { HeaderNotificationComponent } from './header-notification.component';
                 </div>
 
                 <!-- Chevron -->
-                <svg
-                  class="w-3.5 h-3.5 text-[#344256] shrink-0 transition-transform duration-200"
+                <app-icon
+                  name="chevron-down"
+                  size="sm"
+                  class="transition-transform duration-200"
                   [class.rotate-180]="dropdownOpen()"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
+                />
               </button>
 
               <!-- Dropdown Menu -->
@@ -193,14 +191,16 @@ import { HeaderNotificationComponent } from './header-notification.component';
                   <div class="p-1.5 space-y-0.5">
                     <!-- Profile Link -->
                     <a
+                      appButton
+                      variant="ghost"
+                      size="sm"
+                      block
                       routerLink="/profile"
                       (click)="closeDropdown()"
-                      class="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-700 hover:bg-[#F0F5FA] hover:text-navy rounded-lg transition-colors cursor-pointer no-underline font-medium"
+                      class="justify-start"
                       role="menuitem"
                     >
-                      <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
+                      <app-icon name="user" />
                       <span>View Profile</span>
                     </a>
 
@@ -209,26 +209,25 @@ import { HeaderNotificationComponent } from './header-notification.component';
                       <div class="my-1 border-t border-slate-100"></div>
 
                       <div class="px-3 pt-1 pb-0.5 text-[10.5px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 text-navy" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                        </svg>
+                        <app-icon name="switch-horizontal" size="sm" [stroke]="2" class="text-navy" />
                         <span>Switch Role</span>
                       </div>
 
                       @for (role of assignedRoles(); track role.id) {
                         <button
+                          appButton
+                          size="sm"
+                          block
+                          [variant]="isActiveRole(role.id) ? 'secondary' : 'ghost'"
                           type="button"
                           (click)="onSelectRole(role.id)"
-                          class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-left transition-colors cursor-pointer border-0"
-                          [ngClass]="isActiveRole(role.id) ? 'bg-navy/10 text-navy font-bold' : 'text-slate-700 hover:bg-[#F0F5FA] hover:text-navy font-medium'"
+                          class="justify-between"
                           [attr.aria-current]="isActiveRole(role.id) ? 'true' : null"
                         >
-                          <span class="truncate text-xs leading-tight">{{ role.label }}</span>
+                          <span class="truncate">{{ role.label }}</span>
 
                           @if (isActiveRole(role.id)) {
-                            <svg class="w-4 h-4 text-navy shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                            </svg>
+                            <app-icon name="check" />
                           }
                         </button>
                       }
@@ -238,14 +237,16 @@ import { HeaderNotificationComponent } from './header-notification.component';
 
                     <!-- Sign Out -->
                     <button
+                      appButton
+                      variant="danger"
+                      size="sm"
+                      block
                       type="button"
                       (click)="onLogout()"
-                      class="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors cursor-pointer border-0 bg-transparent text-left font-medium"
+                      class="justify-start"
                       role="menuitem"
                     >
-                      <svg class="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                      </svg>
+                      <app-icon name="logout" [stroke]="2" />
                       <span>Sign Out</span>
                     </button>
                   </div>
@@ -255,22 +256,18 @@ import { HeaderNotificationComponent } from './header-notification.component';
           } @else if (!isSsoPage()) {
             <!-- Login Button with user icon and right-arrow icon -->
             <button
+              appButton
               type="button"
               (click)="onLoginClick()"
-              class="inline-flex items-center justify-center gap-1.5 sm:gap-2.5 bg-[#12365A] hover:bg-[#0B2440] text-white text-xs sm:text-[14px] font-semibold h-[36px] sm:h-[42px] px-3 sm:px-5 rounded-[6px] transition-colors cursor-pointer shadow-xs border-0 select-none"
               aria-label="Sign in to ISMS 2.0 Portal"
             >
               <!-- User Icon -->
-              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
+              <app-icon name="user" />
 
               <span>Login</span>
 
               <!-- Right Arrow Icon -->
-              <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
+              <app-icon name="forward" />
             </button>
           }
 

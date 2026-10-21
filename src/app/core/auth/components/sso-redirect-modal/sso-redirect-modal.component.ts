@@ -2,20 +2,24 @@ import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject } from '@
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth.service';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
+import { BackdropComponent } from '../../../../shared/components/backdrop/backdrop.component';
 
 @Component({
   selector: 'app-sso-redirect-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, LoaderComponent],
+  imports: [CommonModule, LoaderComponent, BackdropComponent],
   host: {
     class: 'block'
   },
   template: `
     <!-- Fullscreen Blurred Backdrop Overlay (No Cards, No Popup Box) -->
-    <div
-      class="fixed inset-0 z-100 flex flex-col items-center justify-center p-4 select-none font-sans"
-      style="backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); background-color: rgba(11, 23, 42, 0.55);"
+    <app-backdrop
+      z="z-100"
+      blur="lg"
+      tone="deep"
+      [hasContent]="true"
+      class="flex flex-col items-center justify-center p-4 select-none font-sans"
       role="status"
       aria-live="polite"
       aria-label="Redirecting SSO Login Screen"
@@ -35,12 +39,12 @@ import { LoaderComponent } from '../../../../shared/components/loader/loader.com
         </p>
       
       </div>
-    </div>
+    </app-backdrop>
   `
 })
 export class SsoRedirectModalComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
-  private timerRedirect: any = null;
+  private timerRedirect: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void {
     // Smooth, clean transition directly to SSO login

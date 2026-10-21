@@ -10,6 +10,7 @@ import {
   REGEX
 } from '../../models/otr-form.model';
 
+import { ButtonComponent, IconComponent } from '../../../../shared';
 import { FormInputComponent } from '../../../../shared/components/form-controls/form-input/form-input.component';
 import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
 import { FormFileUploadComponent } from '../../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
@@ -23,7 +24,9 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
     FormsModule,
     FormInputComponent,
     FormSelectComponent,
-    FormFileUploadComponent
+    FormFileUploadComponent,
+    ButtonComponent,
+    IconComponent
   ],
   template: `
     <div class="w-full space-y-4 font-sans">
@@ -49,15 +52,8 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
 
             <!-- Remove Button for additional officers -->
             @if (idx > 0) {
-              <button
-                type="button"
-                (click)="removeOfficer(idx)"
-                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-md border border-rose-200 transition-colors cursor-pointer"
-                title="Remove this officer"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
+              <button appButton variant="danger" size="sm" type="button" (click)="removeOfficer(idx)" title="Remove this officer">
+                <app-icon name="trash" size="sm" />
                 <span>Remove</span>
               </button>
             }
@@ -231,14 +227,8 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
         <p class="text-xs text-slate-500 font-normal">
           Click below to add more Officers In-Charge if applicable for your organization.
         </p>
-        <button
-          type="button"
-          (click)="addNewOfficer()"
-          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white border border-navy hover:bg-navy/5 text-navy text-xs sm:text-[13px] font-semibold transition-all shadow-2xs active:scale-95 cursor-pointer"
-        >
-          <svg class="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
+        <button appButton variant="outline" type="button" (click)="addNewOfficer()">
+          <app-icon name="plus" />
           <span>Add Officer In-Charge</span>
         </button>
       </div>

@@ -1,9 +1,45 @@
 import { CreateBatchDto } from '../../models/batch.model';
 
 export interface FacultyItem {
+  /** SSO ID of the trainer; the name below is the one SSO returns for it. */
+  ssoId: string;
   facultyName: string;
   trainerType: string;
   qualification: string;
+}
+
+/** One camera of the centre that records the batch: its vendor, address, credentials and live feed link. */
+export interface CameraItem {
+  vendor: string;
+  ipAddress: string;
+  username: string;
+  password: string;
+  liveFeedUrl: string;
+}
+
+export const CAMERA_VENDORS = ['Hikvision', 'CP Plus', 'Dahua', 'Axis', 'Bosch', 'Honeywell', 'Other'];
+
+/** An empty camera row to fill in. */
+export function createCameraRow(): CameraItem {
+  return { vendor: '', ipAddress: '', username: '', password: '', liveFeedUrl: '' };
+}
+
+/** A camera row with nothing filled in. */
+export function isCameraRowBlank(camera: CameraItem): boolean {
+  return !camera.vendor && !camera.ipAddress.trim() && !camera.username.trim() && !camera.password && !camera.liveFeedUrl.trim();
+}
+
+const LIVE_FEED_PATTERN = /^(rtsp|rtmp|http|https):\/\/\S+$/i;
+
+/** Message for each camera row, or an empty text when the row is fine. At least one camera is required. */
+export function validateCameras(cameras: CameraItem[]): string[] {
+  return cameras.map(camera => {
+    if (isCameraRowBlank(camera)) return 'Enter the camera details.';
+    if (!camera.vendor) return 'Select the camera vendor.';
+    if (!camera.username.trim() || !camera.password) return 'Enter the camera user name and password.';
+    if (!LIVE_FEED_PATTERN.test(camera.liveFeedUrl.trim())) return 'Enter a live feed link starting with rtsp://, rtmp://, http:// or https://.';
+    return '';
+  });
 }
 
 export interface HostelItem {
@@ -29,6 +65,8 @@ export interface BatchFormData {
   endTime: string;
   approvedBatchStrength: number;
   remarks: string;
+  /** "allocationId|courseRowId" of the IPA course this batch runs under (centres with IPA allocations). */
+  ipaSlot?: string;
 }
 
 /** SDC / scheme context copied onto the created batch. */
@@ -46,6 +84,10 @@ export interface BatchValidationResult {
   facultyErrors: boolean[];
   hasError: boolean;
 }
+
+/** Performance Security Deposit (PSD) taken before a batch is created. It is separate from the batch fee. */
+export const PSD_AMOUNT = 500;
+export const PSD_AMOUNT_IN_WORDS = 'Five Hundred Rupees Only';
 
 export const DEFAULT_QUALIFICATION = 'Graduate (B.A / B.Sc / B.Com / B.Tech)';
 
@@ -67,8 +109,24 @@ export function toIsoDateOnly(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
+/**
+ * A saved time ("09:00 AM", "5:30 PM" or "17:30") as the 24-hour "HH:mm" a time field takes.
+ * An empty text is returned when the value cannot be read.
+ */
+export function toTimeInput(value: string | undefined): string {
+  const match = /^\s*(\d{1,2}):(\d{2})\s*(AM|PM)?\s*$/i.exec(value ?? '');
+  if (!match) return '';
+  let hours = Number(match[1]);
+  const meridiem = match[3]?.toUpperCase();
+  if (meridiem === 'PM' && hours < 12) hours += 12;
+  if (meridiem === 'AM' && hours === 12) hours = 0;
+  if (hours > 23) return '';
+  return `${String(hours).padStart(2, '0')}:${match[2]}`;
+}
+
 export function createFacultyRow(trainerType: string = 'Primary Trainer'): FacultyItem {
   return {
+    ssoId: '',
     facultyName: '',
     trainerType,
     qualification: DEFAULT_QUALIFICATION
@@ -140,7 +198,8 @@ export function buildCreateBatchDto(
   ctx: BatchFormContext,
   batch: BatchFormData,
   facultyList: FacultyItem[],
-  hostelList: HostelItem[]
+  hostelList: HostelItem[],
+  cameraList: CameraItem[] = []
 ): CreateBatchDto {
   return {
     sdcId: ctx.sdcId,
@@ -168,7 +227,9 @@ export function buildCreateBatchDto(
     psdPaymentRef: batch.psdPaymentRef,
     psdPaymentMode: batch.psdPaymentMode,
     psdPaymentDate: batch.psdPaymentDate,
+    cameras: cameraList.map(c => ({ ...c })),
     faculty: facultyList.map(f => ({
+      ssoId: f.ssoId,
       name: f.facultyName,
       facultyName: f.facultyName,
       type: f.trainerType as any,

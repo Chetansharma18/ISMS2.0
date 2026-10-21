@@ -16,40 +16,40 @@ export class HttpService {
 
   get<T>(url: string, options?: RequestOptions): Observable<T> {
     return this.http.get<T>(url, {
-      headers: options?.headers as any,
-      params: options?.params as any,
+      headers: options?.headers,
+      params: options?.params,
       withCredentials: options?.withCredentials
     });
   }
 
-  post<T>(url: string, body: any, options?: RequestOptions): Observable<T> {
+  post<T>(url: string, body: unknown, options?: RequestOptions): Observable<T> {
     return this.http.post<T>(url, body, {
-      headers: options?.headers as any,
-      params: options?.params as any,
+      headers: options?.headers,
+      params: options?.params,
       withCredentials: options?.withCredentials
     });
   }
 
-  put<T>(url: string, body: any, options?: RequestOptions): Observable<T> {
+  put<T>(url: string, body: unknown, options?: RequestOptions): Observable<T> {
     return this.http.put<T>(url, body, {
-      headers: options?.headers as any,
-      params: options?.params as any,
+      headers: options?.headers,
+      params: options?.params,
       withCredentials: options?.withCredentials
     });
   }
 
-  patch<T>(url: string, body: any, options?: RequestOptions): Observable<T> {
+  patch<T>(url: string, body: unknown, options?: RequestOptions): Observable<T> {
     return this.http.patch<T>(url, body, {
-      headers: options?.headers as any,
-      params: options?.params as any,
+      headers: options?.headers,
+      params: options?.params,
       withCredentials: options?.withCredentials
     });
   }
 
   delete<T>(url: string, options?: RequestOptions): Observable<T> {
     return this.http.delete<T>(url, {
-      headers: options?.headers as any,
-      params: options?.params as any,
+      headers: options?.headers,
+      params: options?.params,
       withCredentials: options?.withCredentials
     });
   }

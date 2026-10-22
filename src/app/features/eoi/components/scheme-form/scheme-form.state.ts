@@ -75,7 +75,7 @@ export class SchemeFormState {
 
   readonly wizardSteps: StepperStep[] = [
     { label: 'Processing Fee' },
-    { label: 'OTR Profile' },
+    { label: 'Registration Profile' },
     { label: 'Upload Documents' },
     { label: 'Complete Preview' },
     { label: 'EMD Payment' },
@@ -158,7 +158,10 @@ export class SchemeFormState {
   editableStep3: Step3AuthorizedPerson = JSON.parse(JSON.stringify(this.otrFormService.formData().step3));
   editableStep4: Step4BankDetails = JSON.parse(JSON.stringify(this.otrFormService.formData().step4));
 
-  // Step 4: Inline OTR Editing in Complete Preview
+  // Step 2: Registration Profile View / Edit Mode (Disabled by default, unlock via Edit button)
+  isEditingStep2 = signal<boolean>(false);
+
+  // Step 4: Inline Registration Profile Editing in Complete Preview
   isEditingOtrInPreview = signal<boolean>(false);
 
   // Step 3: Documents Tab Filter
@@ -297,11 +300,25 @@ export class SchemeFormState {
     }, 600);
   }
 
-  saveAndProceedToStep3(): void {
+  saveStep2Changes(): void {
     this.otrFormService.updateStep1(this.editableStep1);
     this.otrFormService.updateStep2(this.editableStep2);
     this.otrFormService.updateStep3(this.editableStep3);
     this.otrFormService.updateStep4(this.editableStep4);
+  }
+
+  toggleStep2Edit(): void {
+    if (this.isEditingStep2()) {
+      this.saveStep2Changes();
+      this.isEditingStep2.set(false);
+    } else {
+      this.isEditingStep2.set(true);
+    }
+  }
+
+  saveAndProceedToStep3(): void {
+    this.saveStep2Changes();
+    this.isEditingStep2.set(false);
     this.goToStep(3);
   }
 

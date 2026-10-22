@@ -398,7 +398,7 @@ describe('DynamicFormBuilderComponent', () => {
         { id: 'eoi-1', label: 'EOI Reference No.', type: 'text', mandatory: true },
         { id: 'eoi-2', label: 'Scheme', type: 'dropdown', mandatory: true },
         { id: 'eoi-3', label: 'Scheme Category', type: 'dropdown', mandatory: false },
-        { id: 'eoi-4', label: 'Date of EoI Published', type: 'datepicker', mandatory: true },
+        { id: 'eoi-4', label: 'EOI Publication Date', type: 'datepicker', mandatory: true },
         { id: 'eoi-5', label: 'Last Date of EoI Submission', type: 'datepicker', mandatory: true },
         { id: 'eoi-6', label: 'EOI Category', type: 'dropdown', mandatory: true },
         { id: 'eoi-7', label: 'EOI Description', type: 'text', mandatory: false },

@@ -292,17 +292,16 @@ export class OtrPdfService {
     // SECTION 2: AUTHORIZED PERSON DETAILS
     drawSectionHeader('Authorized Person Details', '2');
     drawTableRow('Full Name', s3.name || '-', 'Designation', s3.designation || '-');
-    drawTableRow('Date of Birth', s3.dob || '-', 'Age', s3.age ? `${s3.age} Years` : '-');
-    drawTableRow('Personal PAN', s3.pan || '-', 'Aadhaar Number', s3.aadhaarNo || '-');
     drawTableRow('Mobile Number', s3.mobileNo || '-', 'Email Address', s3.emailId || '-');
-    drawTableRow('Bhamashah No.', s3.bhamashahNo || 'Not Provided', 'Voter ID No.', s3.voterIdNo || 'Not Provided');
-    drawTableRow('Passport No.', s3.passportNo || 'Not Provided', 'Domicile / State', s3.state || '-');
-    drawTableRow('Residential Address', s3.residenceAddress || '-');
+    const idDocType = s3.identityDocType || (s3.aadhaarNo ? 'Aadhaar Card' : s3.pan ? 'PAN Card' : 'Not Provided');
+    const idDocNum = s3.identityDocNumber || s3.aadhaarNo || s3.pan || s3.voterIdNo || s3.bhamashahNo || s3.passportNo || 'Not Provided';
+    drawTableRow('Identity Document Type', idDocType, 'Identity Document No.', idDocNum);
+    drawTableRow('State / UT', s3.state || '-', 'Residential Address', s3.residenceAddress || '-');
 
     y += 4;
 
-    // SECTION 3: BANK DETAILS
-    drawSectionHeader('Bank Details & Payment Settlement', '3');
+    // SECTION 3: ORGANISATION BANK DETAILS
+    drawSectionHeader('Organisation Bank Details & Payment Settlement', '3');
     drawTableRow('Name of the Bank', s4.bankName || '-', 'Branch Name', s4.branchName || '-');
     drawTableRow('Account Holder Name', s4.accountHolderName || '-', 'Account Number', s4.accountNo || '-');
     drawTableRow('Account Type', s4.accountType || '-', 'Transfer Mode', s4.transferMode || 'NEFT');
@@ -418,7 +417,7 @@ export class OtrPdfService {
             <tr><td class="lbl">Residence Address:</td><td class="val" colspan="3">${s3.residenceAddress || '-'}</td></tr>
           </table>
 
-          <div class="sec-header">3. Bank Details</div>
+          <div class="sec-header">3. Organisation Bank Details</div>
           <table class="tbl">
             <tr><td class="lbl">Bank Name:</td><td class="val" style="font-weight:700;">${s4.bankName || '-'}</td><td class="lbl">Branch Name:</td><td class="val">${s4.branchName || '-'}</td></tr>
             <tr><td class="lbl">Account Holder:</td><td class="val">${s4.accountHolderName || '-'}</td><td class="lbl">Account Number:</td><td class="val" style="font-weight:700;">${s4.accountNo || '-'}</td></tr>

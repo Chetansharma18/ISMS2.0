@@ -12,10 +12,12 @@ import { FormSelectComponent } from '../../../../../../shared/components/form-co
 import { FormTextareaComponent } from '../../../../../../shared/components/form-controls/form-textarea/form-textarea.component';
 import { FormFileUploadComponent } from '../../../../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
 
+import { ButtonComponent, IconComponent } from '../../../../../../shared';
+
 const NO_DISTRICTS: string[] = [];
 
 /**
- * Step 2: company particulars and registration documents (editable).
+ * Step 2: company particulars and registration documents (editable when unlocked).
  * Deliberately stays on default change detection: the state objects are mutated in place.
  */
 @Component({
@@ -26,7 +28,9 @@ const NO_DISTRICTS: string[] = [];
     FormInputComponent,
     FormSelectComponent,
     FormTextareaComponent,
-    FormFileUploadComponent
+    FormFileUploadComponent,
+    ButtonComponent,
+    IconComponent
   ],
   host: { class: 'block' },
   template: `

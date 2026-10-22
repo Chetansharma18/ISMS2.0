@@ -430,7 +430,7 @@ export class TendersPageComponent {
     },
     {
       key: 'datePublished',
-      label: 'Date of EOI Published',
+      label: 'EOI Publication Date',
       align: 'center',
       cellClass: 'whitespace-nowrap font-normal text-slate-700'
     },

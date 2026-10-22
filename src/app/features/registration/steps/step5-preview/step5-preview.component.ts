@@ -155,8 +155,8 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
         </div>
 
         @if (isSection2Open()) {
-          <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
-            <!-- Row 1 -->
+          <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <!-- Row 1: Personal & Contact Details -->
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Full Name</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().name || '-' }}</span>
@@ -166,54 +166,48 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().designation || '-' }}</span>
             </div>
             <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Date of Birth</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().dob || '-' }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Age</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().age ? (step3().age + ' Years') : (step3().dob ? 'Calculated' : '-') }}</span>
-            </div>
-
-            <!-- Row 2 -->
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">PAN</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step3().pan || '-' }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Aadhaar No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step3().aadhaarNo || '-' }}</span>
-            </div>
-            <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Mobile No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().mobileNo || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step3().mobileNo || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Email Address</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().emailId || '-' }}</span>
             </div>
 
-            <!-- Row 3 -->
+            <!-- Row 2: Identity Verification -->
             <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Bhamashah No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().bhamashahNo || '-' }}</span>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Identity Document Type</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">
+                {{ step3().identityDocType || (step3().aadhaarNo ? 'Aadhaar Card' : step3().pan ? 'PAN Card' : '-') }}
+              </span>
             </div>
             <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Voter ID No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().voterIdNo || '-' }}</span>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Document Number</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">
+                {{ step3().identityDocNumber || step3().aadhaarNo || step3().pan || step3().voterIdNo || step3().bhamashahNo || step3().passportNo || '-' }}
+              </span>
             </div>
             <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Passport No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().passportNo || '-' }}</span>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Identity Document Upload</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 truncate">
+                {{ step3().idProofDoc?.fileName || '-' }}
+              </span>
             </div>
             <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">State</span>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">State / UT</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().state || '-' }}</span>
             </div>
 
-            <!-- Row 4 Address -->
-            <div class="sm:col-span-4">
+            <!-- Row 3: Residential Address & Authorization Document -->
+            <div class="sm:col-span-3">
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Residential Address</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ step3().residenceAddress || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Authorization Letter</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 truncate">
+                {{ step3().authorizationLetterDoc?.fileName || '-' }}
+              </span>
             </div>
           </div>
         }
@@ -228,12 +222,12 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
           <div class="flex items-center gap-2.5 cursor-pointer select-none" (click)="toggleSection(3)">
             <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">3</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">
-              Bank Details
+              Organisation Bank Details
             </h2>
           </div>
 
           <div class="flex items-center gap-2">
-            <button appButton variant="outline" size="sm" type="button" (click)="onEditStep(3)" title="Edit Bank Details">
+            <button appButton variant="outline" size="sm" type="button" (click)="onEditStep(3)" title="Edit Organisation Bank Details">
               <span>Edit Details</span>
             </button>
 

@@ -34,22 +34,46 @@ import { IconComponent } from '../../icon/icon.component';
         class="hidden"
       />
 
-      <!-- 1. EMPTY STATE: Compact & Professional Upload Button -->
+      <!-- 1. EMPTY STATE: Compact & Professional Upload Button or Dropzone Card -->
       @if (!fileDoc || fileDoc.status !== 'uploaded') {
-        <div class="flex items-center gap-2.5 flex-wrap">
-          <button
-            type="button"
+        @if (dropzoneStyle) {
+          <div
             (click)="triggerFileSelect(fileInput)"
-            [disabled]="disabled"
-            class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-2xs shrink-0 flex items-center gap-1.5"
+            [class.opacity-50]="disabled"
+            [class.cursor-not-allowed]="disabled"
+            class="w-full flex items-center justify-between p-3 sm:p-3.5 rounded-lg border border-slate-200/90 bg-white hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs group"
           >
-            <app-icon name="upload" size="sm" [stroke]="2" class="text-slate-600" />
-            <span>Upload Document</span>
-          </button>
-          <span class="text-[11px] text-slate-500 truncate">
-            (PDF, JPG, PNG &bull; Max {{ maxSizeMb }}MB)
-          </span>
-        </div>
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-8.5 h-8.5 rounded-md bg-slate-100 flex items-center justify-center text-slate-600 group-hover:text-navy group-hover:bg-sky-50 transition-colors shrink-0">
+                <app-icon name="document" size="sm" [stroke]="2" />
+              </div>
+              <div class="min-w-0 text-left">
+                <span class="block text-xs sm:text-[13px] font-semibold text-slate-800 group-hover:text-navy truncate">
+                  {{ uploadPrompt || ('Upload ' + (label || 'document')) }}
+                </span>
+                <span class="block text-[11px] text-slate-500 font-normal mt-0.5">
+                  PDF, JPG, PNG &bull; Max {{ maxSizeMb }} MB
+                </span>
+              </div>
+            </div>
+            <app-icon name="upload" size="sm" [stroke]="2" class="text-slate-400 group-hover:text-navy shrink-0" />
+          </div>
+        } @else {
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <button
+              type="button"
+              (click)="triggerFileSelect(fileInput)"
+              [disabled]="disabled"
+              class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-2xs shrink-0 flex items-center gap-1.5"
+            >
+              <app-icon name="upload" size="sm" [stroke]="2" class="text-slate-600" />
+              <span>Upload Document</span>
+            </button>
+            <span class="text-[11px] text-slate-500 truncate">
+              (PDF, JPG, PNG &bull; Max {{ maxSizeMb }}MB)
+            </span>
+          </div>
+        }
       }
 
       <!-- 2. UPLOADED STATE: Document Name, Size, View & Change Actions -->
@@ -136,6 +160,8 @@ export class FormFileUploadComponent {
   @Input() maxSizeMb: number = 5;
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;
+  @Input() dropzoneStyle: boolean = false;
+  @Input() uploadPrompt?: string;
   @Input() hint?: string;
   @Input() error?: string;
 

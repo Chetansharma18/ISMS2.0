@@ -8,9 +8,6 @@
   "features/profile/profile-page.component.ts": {
     "page-frame": 1
   },
-  "features/sdc/components/aspirant-detail.component.ts": {
-    "page-frame": 1
-  },
   "features/tenders/tender-status.component.ts": {
     "page-frame": 1
   },

@@ -68,7 +68,7 @@ export class SchemeDetailPdfService {
       { l: 'Document Title', v: docItem.name },
       { l: 'Scheme Name', v: `${s.schemeTitle || s.schemeName} (${s.schemeName})` },
       { l: 'EOI Reference No.', v: s.refNo },
-      { l: 'Date of EOI Published', v: s.datePublished },
+      { l: 'EOI Publication Date', v: s.datePublished },
       { l: 'Last Date of Submission', v: s.closingDate },
       { l: 'Document Format & Size', v: `PDF (${docItem.size})` }
     ];
@@ -336,7 +336,7 @@ export class SchemeDetailPdfService {
     const tableRows = [
       { l1: 'EOI Reference No.', v1: s.refNo || 'N/A', l2: 'Scheme Code / Name', v2: s.schemeName || 'N/A' },
       { l1: 'Scheme Category', v1: s.schemeCategory || s.category || 'ALL', l2: 'EOI Category', v2: s.eoiCategory || 'General' },
-      { l1: 'Date of EOI Published', v1: s.datePublished || 'N/A', l2: 'Last Date of Submission', v2: s.closingDate || 'N/A', alert2: true },
+      { l1: 'EOI Publication Date', v1: s.datePublished || 'N/A', l2: 'Last Date of Submission', v2: s.closingDate || 'N/A', alert2: true },
       { l1: 'EMD Fee (Refundable)', v1: `${s.emdFee || '₹50,000'}`, l2: 'Processing Fee (Non-Refundable)', v2: `${s.processFee || '₹2,000'}` }
     ];
 

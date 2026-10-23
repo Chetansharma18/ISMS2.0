@@ -94,7 +94,7 @@ export type { SubmittedTender, SubmittedTenderDoc };
                 {{ selectedTender()!.rejectionReason || 'Technical qualification criteria not met.' }}
               </p>
               <button appButton size="sm" type="button" (click)="startAppeal(selectedTender()!)" class="shrink-0">
-                Appeal
+                Request for Appeal
               </button>
             </div>
           }

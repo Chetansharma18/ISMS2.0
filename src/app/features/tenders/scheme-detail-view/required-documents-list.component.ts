@@ -22,11 +22,10 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           <h2 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-navy transition-colors">
             Required Supporting Documents
           </h2>
-          <span class="text-slate-500 font-normal text-xs sm:text-sm">({{ requiredInfo().length }} Documents)</span>
         </div>
 
-        <div class="flex items-center gap-2 text-slate-500 text-xs font-medium">
-          <span class="hidden sm:inline">{{ isOpen() ? 'Hide Documents' : 'View Documents' }}</span>
+        <div class="flex items-center gap-1.5 text-slate-500 text-xs font-medium">
+          <span class="hidden sm:inline">{{ isOpen() ? 'Hide' : 'View' }}</span>
           <app-icon
             name="chevron-down"
             size="md"

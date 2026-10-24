@@ -13,7 +13,6 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
     <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs h-full">
       <div class="bg-slate-50/80 px-4 py-2.5 border-b border-slate-200 flex items-center justify-between">
         <h3 class="text-sm font-bold text-slate-900">Scheme Documents</h3>
-        <span class="text-xs text-slate-500 font-normal">2 Documents</span>
       </div>
 
       <table class="w-full text-left border-collapse text-xs sm:text-[13px]">

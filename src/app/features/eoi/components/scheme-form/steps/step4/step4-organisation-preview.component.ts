@@ -16,7 +16,6 @@ import { SchemeFormState } from '../../scheme-form.state';
           <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">2</span>
           <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Organisation Details</h2>
         </div>
-        <button appButton variant="outline" size="sm" (click)="state.goToStep(2)">Edit Details</button>
       </div>
 
       <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">

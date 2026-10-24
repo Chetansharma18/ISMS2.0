@@ -12,12 +12,10 @@ import { FormSelectComponent } from '../../../../../../shared/components/form-co
 import { FormTextareaComponent } from '../../../../../../shared/components/form-controls/form-textarea/form-textarea.component';
 import { FormFileUploadComponent } from '../../../../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
 
-import { ButtonComponent, IconComponent } from '../../../../../../shared';
-
 const NO_DISTRICTS: string[] = [];
 
 /**
- * Step 2: company particulars and registration documents (editable when unlocked).
+ * Step 2: company particulars and registration documents (read-only verification).
  * Deliberately stays on default change detection: the state objects are mutated in place.
  */
 @Component({
@@ -28,9 +26,7 @@ const NO_DISTRICTS: string[] = [];
     FormInputComponent,
     FormSelectComponent,
     FormTextareaComponent,
-    FormFileUploadComponent,
-    ButtonComponent,
-    IconComponent
+    FormFileUploadComponent
   ],
   host: { class: 'block' },
   template: `
@@ -54,6 +50,7 @@ const NO_DISTRICTS: string[] = [];
               placeholder="Enter organisation name"
               [required]="true"
               [maxLength]="200"
+              [disabled]="isReadOnly"
             ></app-form-input>
           </div>
 
@@ -66,6 +63,7 @@ const NO_DISTRICTS: string[] = [];
               [options]="natureOfEntitiesList"
               placeholder="Select nature of entity"
               [required]="true"
+              [disabled]="isReadOnly"
             ></app-form-select>
           </div>
 
@@ -79,6 +77,7 @@ const NO_DISTRICTS: string[] = [];
               [required]="true"
               [uppercase]="true"
               [maxLength]="50"
+              [disabled]="isReadOnly"
             ></app-form-input>
           </div>
 
@@ -90,6 +89,7 @@ const NO_DISTRICTS: string[] = [];
               [value]="state.editableStep1.dateOfRegistration"
               (valueChange)="state.editableStep1.dateOfRegistration = $event"
               [required]="true"
+              [disabled]="isReadOnly"
             ></app-form-input>
           </div>
 
@@ -102,6 +102,7 @@ const NO_DISTRICTS: string[] = [];
               [options]="statesList"
               placeholder="Select state / UT"
               [required]="true"
+              [disabled]="isReadOnly"
             ></app-form-select>
           </div>
 
@@ -112,6 +113,7 @@ const NO_DISTRICTS: string[] = [];
               [fileDoc]="state.editableStep1.registrationCertDoc"
               (fileChange)="state.editableStep1.registrationCertDoc = $event"
               [required]="true"
+              [disabled]="isReadOnly"
             ></app-form-file-upload>
           </div>
 
@@ -125,6 +127,7 @@ const NO_DISTRICTS: string[] = [];
               [required]="true"
               [uppercase]="true"
               [maxLength]="10"
+              [disabled]="isReadOnly"
             ></app-form-input>
           </div>
 
@@ -135,6 +138,7 @@ const NO_DISTRICTS: string[] = [];
               [fileDoc]="state.editableStep1.panCardDoc"
               (fileChange)="state.editableStep1.panCardDoc = $event"
               [required]="true"
+              [disabled]="isReadOnly"
             ></app-form-file-upload>
           </div>
 
@@ -146,6 +150,7 @@ const NO_DISTRICTS: string[] = [];
               (valueChange)="onGstRegisteredChange($event)"
               [options]="yesNo"
               [required]="true"
+              [disabled]="isReadOnly"
             ></app-form-select>
           </div>
 
@@ -157,6 +162,7 @@ const NO_DISTRICTS: string[] = [];
               (valueChange)="onMsmeRegisteredChange($event)"
               [options]="yesNo"
               [required]="true"
+              [disabled]="isReadOnly"
             ></app-form-select>
           </div>
 
@@ -171,6 +177,7 @@ const NO_DISTRICTS: string[] = [];
                 [required]="true"
                 [uppercase]="true"
                 [maxLength]="15"
+                [disabled]="isReadOnly"
               ></app-form-input>
             </div>
 
@@ -180,6 +187,7 @@ const NO_DISTRICTS: string[] = [];
                 [fileDoc]="state.editableStep1.gstCertDoc"
                 (fileChange)="state.editableStep1.gstCertDoc = $event"
                 [required]="true"
+                [disabled]="isReadOnly"
               ></app-form-file-upload>
             </div>
           }
@@ -195,6 +203,7 @@ const NO_DISTRICTS: string[] = [];
                 [required]="true"
                 [uppercase]="true"
                 [maxLength]="19"
+                [disabled]="isReadOnly"
               ></app-form-input>
             </div>
 
@@ -204,6 +213,7 @@ const NO_DISTRICTS: string[] = [];
                 [fileDoc]="state.editableStep1.msmeCertDoc"
                 (fileChange)="state.editableStep1.msmeCertDoc = $event"
                 [required]="true"
+                [disabled]="isReadOnly"
               ></app-form-file-upload>
             </div>
           }
@@ -217,6 +227,7 @@ const NO_DISTRICTS: string[] = [];
               [options]="nsdcPartnersList"
               placeholder="Select"
               [required]="false"
+              [disabled]="isReadOnly"
             ></app-form-select>
           </div>
 
@@ -229,6 +240,7 @@ const NO_DISTRICTS: string[] = [];
               placeholder="Enter contact number"
               [required]="true"
               [maxLength]="15"
+              [disabled]="isReadOnly"
             ></app-form-input>
           </div>
 
@@ -240,6 +252,7 @@ const NO_DISTRICTS: string[] = [];
               (valueChange)="state.editableStep1.emailId = $event"
               placeholder="Enter email address"
               [required]="true"
+              [disabled]="isReadOnly"
             ></app-form-input>
           </div>
 
@@ -249,6 +262,7 @@ const NO_DISTRICTS: string[] = [];
               [value]="state.editableStep1.website"
               (valueChange)="state.editableStep1.website = $event"
               placeholder="Enter website (https://www.example.com)"
+              [disabled]="isReadOnly"
             ></app-form-input>
           </div>
         </div>
@@ -263,6 +277,7 @@ const NO_DISTRICTS: string[] = [];
                 (valueChange)="state.editableStep1.registeredAddress = $event"
                 placeholder="Enter address, locality, building name and number"
                 [required]="true"
+                [disabled]="isReadOnly"
               ></app-form-textarea>
             </div>
 
@@ -274,6 +289,7 @@ const NO_DISTRICTS: string[] = [];
                 [options]="statesList"
                 placeholder="Select state / UT"
                 [required]="true"
+                [disabled]="isReadOnly"
               ></app-form-select>
             </div>
 
@@ -283,7 +299,7 @@ const NO_DISTRICTS: string[] = [];
                 [value]="state.editableStep1.registeredDistrict"
                 (valueChange)="state.editableStep1.registeredDistrict = $event"
                 [options]="districtsFor(state.editableStep1.registeredState)"
-                [disabled]="!state.editableStep1.registeredState"
+                [disabled]="isReadOnly || !state.editableStep1.registeredState"
                 placeholder="Select district"
                 [required]="true"
               ></app-form-select>
@@ -298,6 +314,7 @@ const NO_DISTRICTS: string[] = [];
                 placeholder="Enter PIN code"
                 [required]="true"
                 [maxLength]="6"
+                [disabled]="isReadOnly"
               ></app-form-input>
             </div>
           </div>
@@ -309,7 +326,8 @@ const NO_DISTRICTS: string[] = [];
                 type="checkbox"
                 [ngModel]="state.editableStep1.sameAsRegistered"
                 (ngModelChange)="state.editableStep1.sameAsRegistered = $event"
-                class="w-4 h-4 text-navy border-slate-300 rounded focus:ring-navy accent-navy"
+                [disabled]="isReadOnly"
+                class="w-4 h-4 text-navy border-slate-300 rounded focus:ring-navy accent-navy disabled:opacity-60 disabled:cursor-not-allowed"
               />
               <span>Office Address is same as Registered Address</span>
             </label>
@@ -324,6 +342,7 @@ const NO_DISTRICTS: string[] = [];
                   (valueChange)="state.editableStep1.officeAddress = $event"
                   placeholder="Enter office address, locality, building name and number"
                   [required]="true"
+                  [disabled]="isReadOnly"
                 ></app-form-textarea>
               </div>
 
@@ -335,6 +354,7 @@ const NO_DISTRICTS: string[] = [];
                   [options]="statesList"
                   placeholder="Select state / UT"
                   [required]="true"
+                  [disabled]="isReadOnly"
                 ></app-form-select>
               </div>
 
@@ -344,7 +364,7 @@ const NO_DISTRICTS: string[] = [];
                   [value]="state.editableStep1.officeDistrict"
                   (valueChange)="state.editableStep1.officeDistrict = $event"
                   [options]="districtsFor(state.editableStep1.officeState)"
-                  [disabled]="!state.editableStep1.officeState"
+                  [disabled]="isReadOnly || !state.editableStep1.officeState"
                   placeholder="Select district"
                   [required]="true"
                 ></app-form-select>
@@ -359,6 +379,7 @@ const NO_DISTRICTS: string[] = [];
                   placeholder="Enter PIN code"
                   [required]="true"
                   [maxLength]="6"
+                  [disabled]="isReadOnly"
                 ></app-form-input>
               </div>
             </div>
@@ -370,6 +391,7 @@ const NO_DISTRICTS: string[] = [];
 })
 export class Step2OrganisationComponent {
   protected readonly state = inject(SchemeFormState);
+  protected readonly isReadOnly = true;
 
   protected readonly natureOfEntitiesList = NATURE_OF_ENTITIES;
   protected readonly statesList = STATES_MASTER;

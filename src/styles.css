@@ -22,8 +22,8 @@
   --color-primary: #174A6E;
   --color-primary-dark: #123B59;
   --color-primary-light: #EAF2F6;
-  --color-background: #FEFEFD;
-  --color-surface: #FEFEFD;
+  --color-background: #FFFFFF;
+  --color-surface: #FFFFFF;
   --color-border: #D9E1E7;
   --color-text-primary: #1F2933;
   --color-text-secondary: #5F6B76;
@@ -75,8 +75,8 @@
   --color-primary-light: #EAF2F6;
 
   /* Backgrounds */
-  --color-background: #FEFEFD;
-  --color-surface: #FEFEFD;
+  --color-background: #FFFFFF;
+  --color-surface: #FFFFFF;
 
   /* Text */
   --color-text-primary: #1F2933;
@@ -164,7 +164,7 @@ body {
   padding: 0;
   overflow-x: hidden;
   max-width: 100vw;
-  background-color: #FEFEFD !important;
+  background-color: #FFFFFF !important;
   color: var(--color-text-primary);
   font-family: var(--font-sans);
   font-size: 15px;

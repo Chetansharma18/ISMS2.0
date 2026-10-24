@@ -7,6 +7,7 @@ import {
   Step3AuthorizedPerson,
   DESIGNATIONS_MASTER,
   STATES_MASTER,
+  IDENTITY_DOCUMENT_TYPES,
   FileDoc,
   REGEX
 } from '../../models/otr-form.model';
@@ -15,6 +16,60 @@ import { FormInputComponent } from '../../../../shared/components/form-controls/
 import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
 import { FormTextareaComponent } from '../../../../shared/components/form-controls/form-textarea/form-textarea.component';
 import { FormFileUploadComponent } from '../../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
+
+interface DocConfig {
+  label: string;
+  placeholder: string;
+  type: 'text' | 'tel';
+  uppercase: boolean;
+  maxLength: number;
+}
+
+const DOC_CONFIGS: Record<string, DocConfig> = {
+  'Aadhaar Card': {
+    label: 'Aadhaar Number',
+    placeholder: 'Enter Aadhaar number',
+    type: 'tel',
+    uppercase: false,
+    maxLength: 12
+  },
+  'PAN Card': {
+    label: 'PAN Number',
+    placeholder: 'Enter PAN number',
+    type: 'text',
+    uppercase: true,
+    maxLength: 10
+  },
+  'Voter ID Card': {
+    label: 'Voter ID Number',
+    placeholder: 'Enter Voter ID number',
+    type: 'text',
+    uppercase: true,
+    maxLength: 20
+  },
+  'Jan Aadhaar Card': {
+    label: 'Jan Aadhaar Number',
+    placeholder: 'Enter Jan Aadhaar number',
+    type: 'text',
+    uppercase: true,
+    maxLength: 16
+  },
+  'Passport': {
+    label: 'Passport Number',
+    placeholder: 'Enter passport number',
+    type: 'text',
+    uppercase: true,
+    maxLength: 8
+  }
+};
+
+const DEFAULT_DOC_CONFIG: DocConfig = {
+  label: 'Document Number',
+  placeholder: 'Enter document number',
+  type: 'text',
+  uppercase: false,
+  maxLength: 50
+};
 
 @Component({
   selector: 'app-step3-auth-person',
@@ -29,10 +84,18 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
     FormFileUploadComponent
   ],
   template: `
-    <div class="w-full font-sans">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-3.5 gap-y-2.5">
-        <!-- First Name & Last Name -> 5 cols (Split in half) -->
-        <div class="lg:col-span-5 sm:col-span-1 grid grid-cols-2 gap-x-3.5">
+    <div class="w-full space-y-6 font-sans">
+
+      <!-- ====================================================================
+           1. PERSONAL INFORMATION
+           ==================================================================== -->
+      <section class="space-y-4">
+        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
+          1. Personal Information
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+          <!-- Row 1: First Name * (50%) -->
           <div>
             <app-form-input
               label="First Name"
@@ -44,6 +107,8 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               [error]="getFieldError('firstName')"
             ></app-form-input>
           </div>
+
+          <!-- Row 1: Last Name (50%) -->
           <div>
             <app-form-input
               label="Last Name"
@@ -55,171 +120,173 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               [error]="getFieldError('lastName')"
             ></app-form-input>
           </div>
-        </div>
 
-        <!-- Designation -> 3 cols -->
-        <div class="lg:col-span-3 sm:col-span-1">
-          <app-form-select
-            label="Designation"
-            [value]="data().designation"
-            (valueChange)="update('designation', $event)"
-            [options]="designations"
-            placeholder="Select designation"
-            [required]="false"
-          ></app-form-select>
+          <!-- Row 2: Designation (Full width or Col 1) -->
+          <div class="col-span-1 md:col-span-2">
+            <app-form-select
+              label="Designation"
+              [value]="data().designation"
+              (valueChange)="update('designation', $event)"
+              [options]="designations"
+              placeholder="Select designation"
+              [required]="false"
+              [error]="getFieldError('designation')"
+            ></app-form-select>
+          </div>
         </div>
+      </section>
 
-        <!-- DOB -> 2 cols -->
-        <div class="lg:col-span-2 sm:col-span-1">
-          <app-form-input
-            label="Date of Birth"
-            type="date"
-            [value]="data().dob"
-            (valueChange)="update('dob', $event)"
-            [required]="true"
-            [error]="getFieldError('dob')"
-          ></app-form-input>
+      <!-- Divider -->
+      <div class="pt-2 border-t border-slate-100"></div>
+
+      <!-- ====================================================================
+           2. CONTACT INFORMATION
+           ==================================================================== -->
+      <section class="space-y-4">
+        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
+          2. Contact Information
+        </h3>
+
+        <div class="space-y-4">
+          <!-- Row 1: Mobile Number * (50%) & Email Address * (50%) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+            <div>
+              <app-form-input
+                label="Mobile Number"
+                type="tel"
+                [value]="data().mobileNo"
+                (valueChange)="update('mobileNo', $event)"
+                placeholder="10-digit mobile number"
+                [required]="true"
+                [maxLength]="10"
+                [error]="getFieldError('mobileNo')"
+              ></app-form-input>
+            </div>
+
+            <div>
+              <app-form-input
+                label="Email Address"
+                type="email"
+                [value]="data().emailId"
+                (valueChange)="update('emailId', $event)"
+                placeholder="Enter email address"
+                [required]="true"
+                [error]="getFieldError('emailId')"
+              ></app-form-input>
+            </div>
+          </div>
+
+          <!-- Row 2: State (smaller column) & Residential Address (remaining width) -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5">
+            <div class="md:col-span-4">
+              <app-form-select
+                label="State"
+                [value]="data().state"
+                (valueChange)="update('state', $event)"
+                [options]="states"
+                placeholder="Select state"
+                [required]="false"
+                [error]="getFieldError('state')"
+              ></app-form-select>
+            </div>
+
+            <div class="md:col-span-8">
+              <app-form-textarea
+                label="Residential Address"
+                [value]="data().residenceAddress"
+                (valueChange)="update('residenceAddress', $event)"
+                placeholder="Enter house/flat no., street, locality, city, PIN code"
+                [rows]="1"
+                [maxLength]="500"
+                [required]="false"
+                [error]="getFieldError('residenceAddress')"
+              ></app-form-textarea>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <!-- Age -> 2 cols -->
-        <div class="lg:col-span-2 sm:col-span-1">
-          <app-form-input
-            label="Age"
-            [value]="data().age ? data().age : 'Auto-calculated'"
-            [disabled]="true"
-          ></app-form-input>
+      <!-- Divider -->
+      <div class="pt-2 border-t border-slate-100"></div>
+
+      <!-- ====================================================================
+           3. IDENTITY VERIFICATION
+           ==================================================================== -->
+      <section class="space-y-4">
+        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
+          3. Identity Verification
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+          <!-- A. Identity Document Type * -->
+          <div>
+            <app-form-select
+              label="Identity Document Type"
+              [value]="selectedDocType()"
+              (valueChange)="onDocTypeChange($event)"
+              [options]="identityDocTypes"
+              placeholder="Select identity document"
+              [required]="true"
+              [error]="getFieldError('identityDocType')"
+            ></app-form-select>
+          </div>
+
+          <!-- B. Corresponding Document Number * -->
+          <div>
+            <app-form-input
+              [label]="currentDocConfig().label"
+              [type]="currentDocConfig().type"
+              [value]="currentDocNumber()"
+              (valueChange)="onDocNumberChange($event)"
+              [placeholder]="currentDocConfig().placeholder"
+              [required]="true"
+              [uppercase]="currentDocConfig().uppercase"
+              [maxLength]="currentDocConfig().maxLength"
+              [disabled]="!selectedDocType()"
+              [error]="getFieldError('identityDocNumber')"
+            ></app-form-input>
+          </div>
+
+          <!-- C. Upload Identity Document * (Full width) -->
+          <div class="col-span-1 md:col-span-2">
+            <app-form-file-upload
+              label="Upload Identity Document"
+              [dropzoneStyle]="true"
+              [uploadPrompt]="'Upload ' + (selectedDocType() || 'Identity Document')"
+              [fileDoc]="data().idProofDoc"
+              (fileChange)="updateFileDoc('idProofDoc', $event)"
+              [required]="true"
+              [disabled]="!selectedDocType()"
+              [error]="getFieldError('idProofDoc')"
+            ></app-form-file-upload>
+          </div>
         </div>
+      </section>
 
-        <!-- PAN -> 3 cols -->
-        <div class="lg:col-span-3 sm:col-span-1">
-          <app-form-input
-            label="PAN"
-            [value]="data().pan"
-            (valueChange)="update('pan', $event)"
-            placeholder="Enter PAN number"
-            [required]="true"
-            [uppercase]="true"
-            [maxLength]="10"
-            [error]="getFieldError('pan')"
-          ></app-form-input>
-        </div>
+      <!-- Divider -->
+      <div class="pt-2 border-t border-slate-100"></div>
 
-        <!-- Mobile -> 3 cols -->
-        <div class="lg:col-span-3 sm:col-span-1">
-          <app-form-input
-            label="Mobile No."
-            type="tel"
-            [value]="data().mobileNo"
-            (valueChange)="update('mobileNo', $event)"
-            placeholder="Enter mobile number"
-            [required]="true"
-            [maxLength]="10"
-            [error]="getFieldError('mobileNo')"
-          ></app-form-input>
-        </div>
+      <!-- ====================================================================
+           4. AUTHORIZATION DOCUMENTS
+           ==================================================================== -->
+      <section class="space-y-4">
+        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
+          4. Authorization Documents
+        </h3>
 
-        <!-- Email -> 3 cols -->
-        <div class="lg:col-span-3 sm:col-span-1">
-          <app-form-input
-            label="Email Address"
-            type="email"
-            [value]="data().emailId"
-            (valueChange)="update('emailId', $event)"
-            placeholder="Enter email address"
-            [required]="true"
-            [error]="getFieldError('emailId')"
-          ></app-form-input>
-        </div>
-
-        <!-- Aadhaar -> 3 cols -->
-        <div class="lg:col-span-3 sm:col-span-1">
-          <app-form-input
-            label="Aadhaar No."
-            type="tel"
-            [value]="data().aadhaarNo"
-            (valueChange)="update('aadhaarNo', $event)"
-            placeholder="Enter Aadhaar number"
-            [required]="true"
-            [maxLength]="12"
-            [error]="getFieldError('aadhaarNo')"
-          ></app-form-input>
-        </div>
-
-        <div class="lg:col-span-4 sm:col-span-1">
-          <app-form-input
-            label="Bhamashah No. (Optional)"
-            [value]="data().bhamashahNo"
-            (valueChange)="update('bhamashahNo', $event)"
-            placeholder="Enter Bhamashah number"
-            [maxLength]="20"
-          ></app-form-input>
-        </div>
-
-        <div class="lg:col-span-4 sm:col-span-1">
-          <app-form-input
-            label="Voter ID No. (Optional)"
-            [value]="data().voterIdNo"
-            (valueChange)="update('voterIdNo', $event)"
-            placeholder="Enter voter ID number"
-            [uppercase]="true"
-            [maxLength]="20"
-          ></app-form-input>
-        </div>
-
-        <div class="lg:col-span-4 sm:col-span-1">
-          <app-form-input
-            label="Passport No. (Optional)"
-            [value]="data().passportNo"
-            (valueChange)="update('passportNo', $event)"
-            placeholder="Enter passport number"
-            [uppercase]="true"
-            [maxLength]="8"
-          ></app-form-input>
-        </div>
-
-        <!-- State -> 3 cols -->
-        <div class="lg:col-span-3 sm:col-span-1">
-          <app-form-select
-            label="State"
-            [value]="data().state"
-            (valueChange)="update('state', $event)"
-            [options]="states"
-            placeholder="Select state"
-          ></app-form-select>
-        </div>
-
-        <!-- Residence Address -> 9 cols -->
-        <div class="lg:col-span-9 sm:col-span-1">
-          <app-form-textarea
-            label="Residential Address"
-            [value]="data().residenceAddress"
-            (valueChange)="update('residenceAddress', $event)"
-            placeholder="Enter house/flat no., street, locality, city, PIN code"
-            [rows]="1"
-            [maxLength]="500"
-          ></app-form-textarea>
-        </div>
-
-        <!-- Documents: Authorization letter (6 cols) & Identity Proof (6 cols) -->
-        <div class="lg:col-span-6 sm:col-span-1 pt-1 border-t border-slate-100">
+        <div>
           <app-form-file-upload
             label="Authorization Letter / Board Resolution"
+            [dropzoneStyle]="true"
+            uploadPrompt="Upload Authorization Letter / Board Resolution"
             [fileDoc]="data().authorizationLetterDoc"
             (fileChange)="updateFileDoc('authorizationLetterDoc', $event)"
             [required]="true"
             [error]="getFieldError('authorizationLetterDoc')"
           ></app-form-file-upload>
         </div>
+      </section>
 
-        <div class="lg:col-span-6 sm:col-span-1 pt-1 border-t border-slate-100">
-          <app-form-file-upload
-            label="Authorized Person Identity Proof"
-            [fileDoc]="data().idProofDoc"
-            (fileChange)="updateFileDoc('idProofDoc', $event)"
-            [required]="false"
-          ></app-form-file-upload>
-        </div>
-      </div>
     </div>
   `
 })
@@ -229,6 +296,8 @@ export class Step3AuthPersonComponent {
 
   readonly designations = DESIGNATIONS_MASTER;
   readonly states = STATES_MASTER;
+  readonly identityDocTypes = IDENTITY_DOCUMENT_TYPES;
+
   readonly data = computed(() => this.otrFormService.step3());
   readonly isSubmitted = computed(() => this.validationService.submittedSteps().has(2));
 
@@ -256,6 +325,38 @@ export class Step3AuthPersonComponent {
     return '';
   });
 
+  readonly selectedDocType = computed(() => {
+    const d = this.data();
+    if (d.identityDocType) return d.identityDocType;
+    if (d.aadhaarNo) return 'Aadhaar Card';
+    if (d.pan) return 'PAN Card';
+    if (d.voterIdNo) return 'Voter ID Card';
+    if (d.bhamashahNo) return 'Jan Aadhaar Card';
+    if (d.passportNo) return 'Passport';
+    return 'Aadhaar Card';
+  });
+
+  readonly currentDocConfig = computed(() => {
+    const type = this.selectedDocType();
+    return DOC_CONFIGS[type] || DEFAULT_DOC_CONFIG;
+  });
+
+  readonly currentDocNumber = computed(() => {
+    const d = this.data();
+    if (d.identityDocNumber !== undefined && d.identityDocNumber !== null && d.identityDocNumber !== '') {
+      return d.identityDocNumber;
+    }
+    const type = this.selectedDocType();
+    switch (type) {
+      case 'Aadhaar Card': return d.aadhaarNo || '';
+      case 'PAN Card': return d.pan || '';
+      case 'Voter ID Card': return d.voterIdNo || '';
+      case 'Jan Aadhaar Card': return d.bhamashahNo || '';
+      case 'Passport': return d.passportNo || '';
+      default: return '';
+    }
+  });
+
   onFirstNameChange(value: string): void {
     const first = value;
     const last = this.lastName();
@@ -278,6 +379,46 @@ export class Step3AuthPersonComponent {
     });
   }
 
+  onDocTypeChange(newType: string): void {
+    // When document type changes:
+    // 1. Clear previous document number
+    // 2. Clear mapped numbers
+    // 3. Reset uploaded identity file so mismatched file isn't submitted
+    this.otrFormService.updateStep3({
+      identityDocType: newType,
+      identityDocNumber: '',
+      pan: '',
+      aadhaarNo: '',
+      voterIdNo: '',
+      bhamashahNo: '',
+      passportNo: '',
+      idProofDoc: null
+    });
+  }
+
+  onDocNumberChange(value: string): void {
+    const clean = value.trim();
+    const type = this.selectedDocType();
+    const updates: Partial<Step3AuthorizedPerson> = {
+      identityDocNumber: clean
+    };
+
+    // Synchronize to statutory backend fields for complete compatibility
+    if (type === 'Aadhaar Card') {
+      updates.aadhaarNo = clean;
+    } else if (type === 'PAN Card') {
+      updates.pan = clean.toUpperCase();
+    } else if (type === 'Voter ID Card') {
+      updates.voterIdNo = clean.toUpperCase();
+    } else if (type === 'Jan Aadhaar Card') {
+      updates.bhamashahNo = clean.toUpperCase();
+    } else if (type === 'Passport') {
+      updates.passportNo = clean.toUpperCase();
+    }
+
+    this.otrFormService.updateStep3(updates);
+  }
+
   getFieldError(field: string): string | undefined {
     if (!this.isSubmitted()) return undefined;
     const d = this.data();
@@ -288,24 +429,45 @@ export class Step3AuthPersonComponent {
         return undefined;
       case 'lastName':
         return undefined;
-      case 'dob':
-        if (!d.dob) return 'Date of Birth is required';
-        if (new Date(d.dob) > new Date()) return 'Date cannot be in the future';
-        return undefined;
-      case 'pan':
-        if (!d.pan?.trim()) return 'Personal PAN is required';
-        if (!REGEX.PAN.test(d.pan.toUpperCase())) return 'Invalid PAN format (e.g. ABCDE1234F)';
-        return undefined;
       case 'mobileNo':
         if (!d.mobileNo?.trim()) return 'Mobile Number is required';
         if (!REGEX.INDIAN_MOBILE.test(d.mobileNo)) return 'Invalid 10-digit Mobile Number';
         return undefined;
       case 'emailId':
-        if (!d.emailId?.trim()) return 'Email-ID is required';
-        if (!REGEX.EMAIL.test(d.emailId)) return 'Invalid Email ID format';
+        if (!d.emailId?.trim()) return 'Email Address is required';
+        if (!REGEX.EMAIL.test(d.emailId)) return 'Invalid Email Address format';
         return undefined;
-      case 'aadhaarNo':
-        if (d.aadhaarNo?.trim() && !REGEX.AADHAAR.test(d.aadhaarNo)) return 'Invalid 12-digit Aadhaar Number';
+      case 'identityDocType':
+        if (!this.selectedDocType()) return 'Identity Document Type is required';
+        return undefined;
+      case 'identityDocNumber': {
+        const type = this.selectedDocType();
+        const num = this.currentDocNumber().trim();
+        if (!type) return 'Identity Document Type is required';
+        if (!num) return `${this.currentDocConfig().label} is required`;
+        switch (type) {
+          case 'Aadhaar Card':
+            if (!REGEX.AADHAAR.test(num)) return 'Invalid 12-digit Aadhaar Number';
+            break;
+          case 'PAN Card':
+            if (!REGEX.PAN.test(num.toUpperCase())) return 'Invalid PAN format (e.g. ABCDE1234F)';
+            break;
+          case 'Voter ID Card':
+            if (!REGEX.VOTER_ID.test(num.toUpperCase())) return 'Invalid Voter ID format';
+            break;
+          case 'Jan Aadhaar Card':
+            if (!/^[0-9A-Za-z-]{7,16}$/.test(num)) return 'Invalid Jan Aadhaar Number format';
+            break;
+          case 'Passport':
+            if (!REGEX.PASSPORT.test(num.toUpperCase())) return 'Invalid Passport Number format';
+            break;
+        }
+        return undefined;
+      }
+      case 'idProofDoc':
+        if (!d.idProofDoc || d.idProofDoc.status !== 'uploaded') {
+          return 'Identity Document upload is required';
+        }
         return undefined;
       case 'authorizationLetterDoc':
         if (!d.authorizationLetterDoc || d.authorizationLetterDoc.status !== 'uploaded') {

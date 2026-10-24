@@ -40,9 +40,9 @@ export class OtrValidationService {
   }
 
   /* ==========================================================================
-     Step 1: Organization Details Validation
+     Step 1: Organization Details Validation (Sub-sections 1 to 4)
      ========================================================================== */
-  validateStep1(step1: Step1OrgDetails): string[] {
+  validateStep1SubStep1(step1: Step1OrgDetails): string[] {
     const errors: string[] = [];
 
     if (!step1.fullName?.trim()) {
@@ -51,6 +51,41 @@ export class OtrValidationService {
     if (!step1.natureOfEntity?.trim()) {
       errors.push('Nature of Entity selection is mandatory.');
     }
+    if (!step1.preferredSector?.trim()) {
+      errors.push('Preferred Sector selection is mandatory.');
+    }
+    if (!step1.gstRegistered) {
+      errors.push('GST Registered selection is mandatory.');
+    } else if (step1.gstRegistered === 'Yes') {
+      if (!step1.gstin?.trim()) {
+        errors.push('GSTIN Number is mandatory when GST Registered is Yes.');
+      } else if (!REGEX.GSTIN.test(step1.gstin.toUpperCase())) {
+        errors.push('Invalid GSTIN format (15 characters statutory format, e.g. 08ABCDE1234F1Z5).');
+      }
+      if (!step1.gstCertDoc || step1.gstCertDoc.status !== 'uploaded') {
+        errors.push('GST Registration Certificate upload is mandatory.');
+      }
+    }
+
+    if (!step1.msmeRegistered) {
+      errors.push('MSME / Udyam Registered selection is mandatory.');
+    } else if (step1.msmeRegistered === 'Yes') {
+      if (!step1.udyamNumber?.trim()) {
+        errors.push('Udyam Registration Number is mandatory when MSME Registered is Yes.');
+      } else if (!REGEX.UDYAM.test(step1.udyamNumber)) {
+        errors.push('Invalid Udyam Number format (Required: UDYAM-XX-00-0000000).');
+      }
+      if (!step1.msmeCertDoc || step1.msmeCertDoc.status !== 'uploaded') {
+        errors.push('MSME / Udyam Certificate upload is mandatory.');
+      }
+    }
+
+    return errors;
+  }
+
+  validateStep1SubStep2(step1: Step1OrgDetails): string[] {
+    const errors: string[] = [];
+
     if (!step1.registrationNumber?.trim()) {
       errors.push('Registration / CIN Number is mandatory.');
     }
@@ -62,46 +97,24 @@ export class OtrValidationService {
     if (!step1.stateOfLegalReg?.trim()) {
       errors.push('State/UT of Legal Registration is mandatory.');
     }
-    if (!step1.registrationCertDoc || step1.registrationCertDoc.status !== 'uploaded') {
-      errors.push('Certificate of Registration Document upload is mandatory.');
-    }
-    if (!step1.preferredSector?.trim()) {
-      errors.push('Preferred Sector selection is mandatory.');
-    }
-
-    // Statutory & Tax
     if (!step1.companyPan?.trim()) {
       errors.push('Company PAN is mandatory.');
     } else if (!REGEX.PAN.test(step1.companyPan.toUpperCase())) {
       errors.push('Invalid Company PAN format (Required: 5 letters, 4 digits, 1 letter, e.g. ABCDE1234F).');
     }
+    if (!step1.registrationCertDoc || step1.registrationCertDoc.status !== 'uploaded') {
+      errors.push('Certificate of Registration Document upload is mandatory.');
+    }
     if (!step1.panCardDoc || step1.panCardDoc.status !== 'uploaded') {
       errors.push('Organization PAN Card Document upload is mandatory.');
     }
 
-    if (step1.gstRegistered === 'Yes') {
-      if (!step1.gstin?.trim()) {
-        errors.push('GSTIN Number is mandatory when GST Registered is Yes.');
-      } else if (!REGEX.GSTIN.test(step1.gstin.toUpperCase())) {
-        errors.push('Invalid GSTIN format (15 characters statutory format, e.g. 08ABCDE1234F1Z5).');
-      }
-      if (!step1.gstCertDoc || step1.gstCertDoc.status !== 'uploaded') {
-        errors.push('GST Registration Certificate upload is mandatory.');
-      }
-    }
+    return errors;
+  }
 
-    if (step1.msmeRegistered === 'Yes') {
-      if (!step1.udyamNumber?.trim()) {
-        errors.push('Udyam Registration Number is mandatory when MSME Registered is Yes.');
-      } else if (!REGEX.UDYAM.test(step1.udyamNumber)) {
-        errors.push('Invalid Udyam Number format (Required: UDYAM-XX-00-0000000).');
-      }
-      if (!step1.msmeCertDoc || step1.msmeCertDoc.status !== 'uploaded') {
-        errors.push('MSME / Udyam Certificate upload is mandatory.');
-      }
-    }
+  validateStep1SubStep3(step1: Step1OrgDetails): string[] {
+    const errors: string[] = [];
 
-    // Contact Details
     if (!step1.contactNo?.trim()) {
       errors.push('Company Contact Number is mandatory.');
     } else if (!REGEX.INDIAN_MOBILE.test(step1.contactNo) && !/^[0-9]{7,12}$/.test(step1.contactNo.replace(/[-\s]/g, ''))) {
@@ -116,7 +129,12 @@ export class OtrValidationService {
       errors.push('Invalid Website URL format.');
     }
 
-    // Registered Address
+    return errors;
+  }
+
+  validateStep1SubStep4(step1: Step1OrgDetails): string[] {
+    const errors: string[] = [];
+
     if (!step1.registeredAddress?.trim()) {
       errors.push('Registered Premise Address is mandatory.');
     }
@@ -132,7 +150,6 @@ export class OtrValidationService {
       errors.push('Invalid Registered PIN Code (Must be 6 numeric digits not starting with 0).');
     }
 
-    // Operational Address
     if (!step1.sameAsRegistered) {
       if (!step1.officeAddress?.trim()) {
         errors.push('Operational Office Address is mandatory.');
@@ -151,6 +168,30 @@ export class OtrValidationService {
     }
 
     return errors;
+  }
+
+  validateStep1SubStep(subStep: number, step1: Step1OrgDetails): string[] {
+    switch (subStep) {
+      case 1:
+        return this.validateStep1SubStep1(step1);
+      case 2:
+        return this.validateStep1SubStep2(step1);
+      case 3:
+        return this.validateStep1SubStep3(step1);
+      case 4:
+        return this.validateStep1SubStep4(step1);
+      default:
+        return [];
+    }
+  }
+
+  validateStep1(step1: Step1OrgDetails): string[] {
+    return [
+      ...this.validateStep1SubStep1(step1),
+      ...this.validateStep1SubStep2(step1),
+      ...this.validateStep1SubStep3(step1),
+      ...this.validateStep1SubStep4(step1)
+    ];
   }
 
   /* ==========================================================================
@@ -244,44 +285,90 @@ export class OtrValidationService {
   validateStep3(step3: Step3AuthorizedPerson): string[] {
     const errors: string[] = [];
 
+    // 1. Personal Information
     const hasName = (step3.firstName?.trim() || step3.name?.trim());
     if (!hasName || hasName.length < 2) {
       errors.push('Authorized Person First Name is mandatory (min 2 chars).');
     }
-    if (!step3.dob) {
-      errors.push('Date of Birth is mandatory.');
-    } else if (new Date(step3.dob) > new Date()) {
-      errors.push('Date of Birth cannot be a future date.');
-    }
-    if (!step3.pan?.trim()) {
-      errors.push('Personal PAN of Signatory is mandatory.');
-    } else if (!REGEX.PAN.test(step3.pan.toUpperCase())) {
-      errors.push('Invalid Personal PAN format (e.g. ABCDE1234F).');
-    }
+
+    // 2. Contact Information
     if (!step3.mobileNo?.trim()) {
-      errors.push('Signatory Mobile Number is mandatory.');
+      errors.push('Mobile Number is mandatory.');
     } else if (!REGEX.INDIAN_MOBILE.test(step3.mobileNo)) {
       errors.push('Invalid Mobile Number (10 digits starting with 6-9).');
     }
-    if (step3.emailId?.trim() && !REGEX.EMAIL.test(step3.emailId)) {
-      errors.push('Invalid Email-ID format for Authorized Signatory.');
+    if (!step3.emailId?.trim()) {
+      errors.push('Email Address is mandatory.');
+    } else if (!REGEX.EMAIL.test(step3.emailId)) {
+      errors.push('Invalid Email Address format.');
     }
-    if (!step3.aadhaarNo?.trim()) {
-      errors.push('Aadhaar Number is mandatory.');
-    } else if (!REGEX.AADHAAR.test(step3.aadhaarNo)) {
-      errors.push('Invalid Aadhaar Number (Must be 12 numeric digits).');
+
+    // 3. Dynamic Identity Verification
+    const docType = step3.identityDocType?.trim() || (step3.aadhaarNo ? 'Aadhaar Card' : step3.pan ? 'PAN Card' : '');
+    const docNumber = (
+      step3.identityDocNumber?.trim() ||
+      (docType === 'Aadhaar Card' ? step3.aadhaarNo :
+       docType === 'PAN Card' ? step3.pan :
+       docType === 'Voter ID Card' ? step3.voterIdNo :
+       docType === 'Jan Aadhaar Card' ? step3.bhamashahNo :
+       docType === 'Passport' ? step3.passportNo : '')
+    )?.trim();
+
+    if (!docType) {
+      errors.push('Identity Document Type selection is mandatory.');
+    } else if (!docNumber) {
+      errors.push(`${this.getDocNumberName(docType)} is mandatory.`);
+    } else {
+      switch (docType) {
+        case 'Aadhaar Card':
+          if (!REGEX.AADHAAR.test(docNumber)) {
+            errors.push('Invalid Aadhaar Number (Must be 12 numeric digits).');
+          }
+          break;
+        case 'PAN Card':
+          if (!REGEX.PAN.test(docNumber.toUpperCase())) {
+            errors.push('Invalid Personal PAN format (e.g. ABCDE1234F).');
+          }
+          break;
+        case 'Voter ID Card':
+          if (!REGEX.VOTER_ID.test(docNumber.toUpperCase())) {
+            errors.push('Invalid Voter ID format (e.g. ABC1234567).');
+          }
+          break;
+        case 'Jan Aadhaar Card':
+          if (!/^[0-9A-Za-z-]{7,16}$/.test(docNumber)) {
+            errors.push('Invalid Jan Aadhaar Number format.');
+          }
+          break;
+        case 'Passport':
+          if (!REGEX.PASSPORT.test(docNumber.toUpperCase())) {
+            errors.push('Invalid Passport Number format.');
+          }
+          break;
+      }
     }
-    if (step3.voterIdNo?.trim() && !REGEX.VOTER_ID.test(step3.voterIdNo.toUpperCase())) {
-      errors.push('Invalid Voter ID format for Authorized Signatory.');
+
+    if (!step3.idProofDoc || step3.idProofDoc.status !== 'uploaded') {
+      errors.push('Identity Document upload is mandatory.');
     }
-    if (step3.passportNo?.trim() && !REGEX.PASSPORT.test(step3.passportNo.toUpperCase())) {
-      errors.push('Invalid Passport Number for Authorized Signatory.');
-    }
+
+    // 4. Authorization Documents
     if (!step3.authorizationLetterDoc || step3.authorizationLetterDoc.status !== 'uploaded') {
       errors.push('Authorization Letter / Board Resolution document upload is mandatory.');
     }
 
     return errors;
+  }
+
+  private getDocNumberName(docType: string): string {
+    switch (docType) {
+      case 'Aadhaar Card': return 'Aadhaar Number';
+      case 'PAN Card': return 'PAN Number';
+      case 'Voter ID Card': return 'Voter ID Number';
+      case 'Jan Aadhaar Card': return 'Jan Aadhaar Number';
+      case 'Passport': return 'Passport Number';
+      default: return 'Document Number';
+    }
   }
 
   /* ==========================================================================

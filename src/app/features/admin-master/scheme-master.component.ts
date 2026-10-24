@@ -51,7 +51,7 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
   fields: [
     { key: 'schemeName', label: 'Scheme Name', type: 'text', required: true, maxLength: 120, placeholder: 'Enter scheme name', colSpan: 3 },
     { key: 'schemeCategory', label: 'Scheme Category', type: 'multiselect', required: true, options: SCHEME_CATEGORY_OPTIONS, colSpan: 2 },
-    { key: 'categoryName', label: 'Category Name', type: 'select', required: true, options: CATEGORY_NAME_OPTIONS, colSpan: 1 },
+    { key: 'categoryName', label: 'EOI Category', type: 'select', required: true, options: CATEGORY_NAME_OPTIONS, colSpan: 1 },
     { key: 'amount', label: 'EMD amount (\u20B9)', type: 'number', required: true, min: 0, placeholder: 'Enter amount', colSpan: 2 },
     { key: 'processFees', label: 'Process Fees (\u20B9)', type: 'number', required: true, min: 0, placeholder: 'Enter process fees', colSpan: 1 }
   ],

@@ -1,5 +1,5 @@
 // ui-guard-allow: page-frame - the registration wizard has its own stepper layout
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -132,72 +132,75 @@ export interface StepMeta {
         <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-7 space-y-6">
 
           <!-- Step 1 Container: Organization Details -->
-          <div [class.hidden]="activeStep() !== 1" class="space-y-4">
+          <!-- Step 1 Container: Organization Details -->
+          <div [class.hidden]="activeStep() !== 1" class="space-y-6">
             <!-- Step 1 Card Header -->
-            <div class="flex items-center gap-3 pb-3.5 border-b border-slate-100">
-              <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
-                1
+            <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0 leading-tight">
+                  Organisation Details
+                </h2>
+                <p class="text-xs text-slate-500 m-0 mt-0.5">
+                  Step 1 of the application
+                </p>
+              </div>
+              <span class="text-xs text-slate-500 font-medium shrink-0">
+                Required fields marked <span class="text-rose-500 font-bold">*</span>
               </span>
-              <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">
-                Organisation Details
-              </h2>
             </div>
             <app-step1-org-details></app-step1-org-details>
           </div>
 
           <!-- Step 2 Container: Authorized Person Details -->
-          <div [class.hidden]="activeStep() !== 2" class="space-y-4">
+          <div [class.hidden]="activeStep() !== 2" class="space-y-6">
             <!-- Step 2 Card Header -->
-            <div class="pb-3.5 border-b border-slate-100 space-y-1">
-              <div class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
-                  2
-                </span>
-                <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">
+            <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0 leading-tight">
                   Authorized Person Details
                 </h2>
+                <p class="text-xs text-slate-500 m-0 mt-0.5">
+                  Step 2 of the application
+                </p>
               </div>
-              <p class="text-xs sm:text-sm text-slate-500 pl-10 m-0">
-                Provide details of the person authorized to sign and represent the organization.
-              </p>
+              <span class="text-xs text-slate-500 font-medium shrink-0">
+                Required fields marked <span class="text-rose-500 font-bold">*</span>
+              </span>
             </div>
             <app-step3-auth-person></app-step3-auth-person>
           </div>
 
-          <!-- Step 3 Container: Bank Details (Now Step 3!) -->
+          <!-- Step 3 Container: Organisation Bank Details -->
           <div [class.hidden]="activeStep() !== 3" class="space-y-4">
             <!-- Step 3 Card Header -->
-            <div class="pb-3.5 border-b border-slate-100 space-y-1">
-              <div class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
-                  3
-                </span>
-                <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">
-                  Bank Details
+            <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0 leading-tight">
+                  Organisation Bank Details
                 </h2>
+                <p class="text-xs text-slate-500 m-0 mt-0.5">
+                  Step 3 of the application
+                </p>
               </div>
-              <p class="text-xs sm:text-sm text-slate-500 pl-10 m-0">
-                Provide bank account details for receiving payments under the scheme.
-              </p>
+              <span class="text-xs text-slate-500 font-medium shrink-0">
+                Required fields marked <span class="text-rose-500 font-bold">*</span>
+              </span>
             </div>
             <app-step4-bank-details></app-step4-bank-details>
           </div>
 
-          <!-- Step 4 Container: Preview & Submit (Now Step 4!) -->
+          <!-- Step 4 Container: Preview & Submit -->
           <div [class.hidden]="activeStep() !== 4" class="space-y-4">
             <!-- Step 4 Card Header -->
-            <div class="pb-3.5 border-b border-slate-100 space-y-1">
-              <div class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
-                  4
-                </span>
-                <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">
+            <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0 leading-tight">
                   Review &amp; Submit
                 </h2>
+                <p class="text-xs text-slate-500 m-0 mt-0.5">
+                  Step 4 of the application
+                </p>
               </div>
-              <p class="text-xs sm:text-sm text-slate-500 pl-10 m-0">
-                Please verify the information provided below. You can edit any section if required.
-              </p>
             </div>
             <app-step5-preview (editStep)="goToStep($event)"></app-step5-preview>
           </div>
@@ -206,25 +209,23 @@ export interface StepMeta {
           <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
             <!-- Left Side: Previous Button (Steps 2, 3, 4) / Back to Profile (Step 1) -->
             <div>
-              @if (activeStep() > 1) {
-                <button appButton variant="outline" size="lg" type="button" (click)="previousStep()">
-                  <app-icon name="chevron-left" />
-                  <span>Previous</span>
-                </button>
-              } @else {
+              @if (activeStep() === 1) {
                 <button appButton variant="outline" size="lg" type="button" (click)="goBack()">
                   <app-icon name="chevron-left" />
                   <span>Back to Profile</span>
+                </button>
+              } @else if (activeStep() > 1) {
+                <button appButton variant="outline" size="lg" type="button" (click)="previousStep()">
+                  <app-icon name="chevron-left" />
+                  <span>Previous</span>
                 </button>
               }
             </div>
 
             <!-- Right Side: Action Buttons -->
             <div class="flex items-center gap-2.5 sm:gap-3 ml-auto justify-end">
-              <!-- STEP 1 NAVIGATION: [Save as Draft] [Next Step ->] -->
+              <!-- STEP 1 NAVIGATION: [Next Step ->] -->
               @if (activeStep() === 1) {
-          
-
                 <button appButton size="lg" type="button" (click)="nextStep()">
                   <span>Next Step</span>
                   <app-icon name="chevron-right" />
@@ -354,6 +355,7 @@ export class RegistrationShellComponent {
 
   readonly activeStep = signal<number>(1);
   readonly submittedRegId = signal<string | null>(null);
+  readonly step1CompRef = viewChild<Step1OrgDetailsComponent>('step1Comp');
 
   readonly isAlreadySubmitted = computed(() => {
     const data = this.otrFormService.formData();
@@ -372,7 +374,7 @@ export class RegistrationShellComponent {
   readonly steps: StepMeta[] = [
     { number: 1, label: 'Organisation Details' },
     { number: 2, label: 'Authorized Person' },
-    { number: 3, label: 'Bank Details' },
+    { number: 3, label: 'Organisation Bank Details' },
     { number: 4, label: 'Preview & Submit' }
   ];
 
@@ -408,13 +410,17 @@ export class RegistrationShellComponent {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  /**
-   * Moves to the next step without blocking on incomplete fields, so applicants can fill
-   * the sections in any order. Mandatory fields are still validated on final submission
-   * (see submitApplication) and are marked with * on every step.
-   */
   nextStep(): void {
     const current = this.activeStep();
+
+    if (current === 1) {
+      this.validationService.markStepSubmitted(1);
+      const errors = this.validationService.validateStep1(this.otrFormService.step1());
+      if (errors.length > 0) {
+        this.validationService.showToast('Please fill all mandatory fields marked with * in Organisation Details', 'error', 1);
+        return;
+      }
+    }
 
     if (current < 4) {
       this.activeStep.set(current + 1);

@@ -434,7 +434,7 @@ export const MOCK_DYNAMIC_FORM_BUILDER_ITEMS: DynamicFormBuilderItem[] = resolve
         options: ['Rajvik', 'samarth', 'saksham', 'na', 'ALL'],
         optionsText: 'Rajvik, samarth, saksham, na, ALL'
       },
-      { id: 'eoi-4', label: 'Date of EoI Published', type: 'datepicker', mandatory: true },
+      { id: 'eoi-4', label: 'EOI Publication Date', type: 'datepicker', mandatory: true },
       { id: 'eoi-5', label: 'Last Date of EoI Submission', type: 'datepicker', mandatory: true },
       {
         id: 'eoi-6',

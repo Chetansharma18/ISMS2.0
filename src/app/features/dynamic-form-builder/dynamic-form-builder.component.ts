@@ -733,11 +733,11 @@ interface FormBuilderFormData {
                     <div class="w-6 sm:w-12 h-0.5 bg-emerald-500 ml-1"></div>
                   </div>
 
-                  <!-- Step 2: OTR Profile -->
+                  <!-- Step 2: Registration Profile -->
                   <div class="flex items-center gap-2 shrink-0 cursor-pointer" (click)="applyEoiStep.set(1)">
                     @if (applyEoiStep() === 1) {
                       <span class="w-5 h-5 rounded-full bg-navy text-white flex items-center justify-center text-[11px] font-bold shadow-xs">2</span>
-                      <span class="font-bold text-navy text-xs">2. OTR Profile</span>
+                      <span class="font-bold text-navy text-xs">2. Registration Profile</span>
                     } @else {
                       <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[11px] font-bold">
                         <app-icon name="check" size="sm" [stroke]="3" />
@@ -1361,8 +1361,8 @@ interface FormBuilderFormData {
                     <app-icon name="chevron-down" [stroke]="2" class="text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
 
-                  <!-- 4. Date of EoI Published* -->
-                  <label class="text-slate-700 font-medium text-xs sm:text-[13px]">Date of EoI Published*</label>
+                  <!-- 4. EOI Publication Date* -->
+                  <label class="text-slate-700 font-medium text-xs sm:text-[13px]">EOI Publication Date*</label>
                   <input
                     appInput size="sm"
                     type="text"
@@ -1538,7 +1538,7 @@ interface FormBuilderFormData {
                 </button>
 
                 <button appButton type="button" (click)="publishEoi()">
-                  Publish EOI
+                    Submit EOI
                 </button>
               </div>
             </div>
@@ -2217,7 +2217,7 @@ interface FormBuilderFormData {
                           <div class="w-5 h-5 rounded-full border border-sky-500 text-sky-600 flex items-center justify-center text-[11px] font-bold">
                             3
                           </div>
-                          <span class="text-sm font-bold text-slate-900">Bank Details</span>
+                          <span class="text-sm font-bold text-slate-900">Organisation Bank Details</span>
                         </div>
                         <button appButton variant="outline" size="sm" type="button" (click)="goToPreviewStep(2)">
                           <span>Edit Details</span>
@@ -2585,7 +2585,7 @@ export class DynamicFormBuilderComponent {
         if (this.fieldsScrollContainer?.nativeElement) {
           this.fieldsScrollContainer.nativeElement.scrollTop = 0;
         }
-      } catch (err) {}
+      } catch (err) { }
     }, 0);
   }
 
@@ -2792,7 +2792,7 @@ export class DynamicFormBuilderComponent {
             }
           }
         }
-      } catch (err) {}
+      } catch (err) { }
     }, 60);
 
     setTimeout(() => {
@@ -2820,7 +2820,7 @@ export class DynamicFormBuilderComponent {
             inputs[0].focus({ preventScroll: true });
           }
         }
-      } catch (err) {}
+      } catch (err) { }
     }, 60);
 
     setTimeout(() => {
@@ -2952,7 +2952,7 @@ export class DynamicFormBuilderComponent {
         if (this.fieldsScrollContainer?.nativeElement) {
           this.fieldsScrollContainer.nativeElement.scrollTop = 0;
         }
-      } catch (e) {}
+      } catch (e) { }
     }, 50);
   }
 
@@ -2999,7 +2999,7 @@ export class DynamicFormBuilderComponent {
         if (this.fieldsScrollContainer?.nativeElement) {
           this.fieldsScrollContainer.nativeElement.scrollTop = 0;
         }
-      } catch (e) {}
+      } catch (e) { }
     }, 50);
   }
 

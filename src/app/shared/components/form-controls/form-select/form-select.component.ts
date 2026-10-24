@@ -11,6 +11,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../icon/icon.component';
+import { ButtonComponent } from '../../button/button.component';
 
 /** One choice of a select: the value it stores and the text it shows. */
 export interface SelectItem {
@@ -23,7 +24,7 @@ export interface SelectItem {
   selector: 'app-form-select',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [CommonModule, FormsModule, IconComponent, ButtonComponent],
   template: `
     <div class="w-full flex flex-col relative">
       <!-- Label Row -->
@@ -57,14 +58,14 @@ export interface SelectItem {
         aria-haspopup="listbox"
         [attr.aria-expanded]="isOpen()"
       >
-        <span [class.text-muted]="!value" [class.text-primary]="!!value" class="truncate">
+        <span [class.text-muted]="!selectedLabel()" [class.text-primary]="!!selectedLabel()" class="truncate">
           {{ selectedLabel() || placeholder }}
         </span>
 
         <app-icon
           name="chevron-down"
           [stroke]="2"
-          class="text-muted transition-transform duration-200 ml-2"
+          class="text-muted transition-transform duration-200 ml-2 shrink-0"
           [class.rotate-180]="isOpen()"
         />
       </button>
@@ -77,7 +78,7 @@ export interface SelectItem {
         >
           <!-- Search input for large lists -->
           @if (shouldShowSearch()) {
-            <div class="p-2 border-b border-theme bg-surface-muted">
+            <div class="p-2 border-b border-theme bg-surface-muted flex items-center gap-2">
               <input
                 type="text"
                 [(ngModel)]="searchQuery"
@@ -85,6 +86,18 @@ export interface SelectItem {
                 class="w-full h-[32px] px-2.5 text-[13px] rounded-[4px] border border-theme focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-white text-primary"
                 (click)="$event.stopPropagation()"
               />
+              @if (multiple) {
+                <button
+                  appButton
+                  size="sm"
+                  variant="outline"
+                  type="button"
+                  class="shrink-0 text-xs whitespace-nowrap"
+                  (click)="toggleSelectAll($event)"
+                >
+                  {{ areAllFilteredSelected() ? 'Clear' : 'Select All' }}
+                </button>
+              }
             </div>
           }
 
@@ -92,22 +105,34 @@ export interface SelectItem {
           <ul class="max-h-56 overflow-y-auto py-1 divide-y divide-border/40 text-[13px]">
             @for (opt of filteredEntries(); track opt.value) {
               <li
-                (click)="selectOption(opt)"
-                class="px-3 py-2 cursor-pointer transition-colors flex items-center justify-between"
-                [class.bg-primary-light]="opt.value === value"
-                [class.text-brand]="opt.value === value"
-                [class.font-medium]="opt.value === value"
-                [class.hover:bg-surface-muted]="opt.value !== value && !opt.disabled"
-                [class.text-primary]="opt.value !== value"
+                (click)="toggleOption(opt, $event)"
+                class="px-3 py-2 cursor-pointer transition-colors flex items-center justify-between gap-2.5"
+                [class.bg-primary-light]="isOptionSelected(opt.value)"
+                [class.text-brand]="isOptionSelected(opt.value)"
+                [class.font-medium]="isOptionSelected(opt.value)"
+                [class.hover:bg-surface-muted]="!isOptionSelected(opt.value) && !opt.disabled"
+                [class.text-primary]="!isOptionSelected(opt.value)"
                 [class.opacity-50]="opt.disabled"
                 [class.cursor-not-allowed]="opt.disabled"
                 role="option"
-                [attr.aria-selected]="opt.value === value"
+                [attr.aria-selected]="isOptionSelected(opt.value)"
                 [attr.aria-disabled]="opt.disabled ? true : null"
               >
-                <span class="truncate">{{ opt.label }}</span>
-                @if (opt.value === value) {
-                  <app-icon name="check" [stroke]="2" class="text-brand" />
+                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                  @if (multiple) {
+                    <input
+                      type="checkbox"
+                      tabindex="-1"
+                      aria-hidden="true"
+                      class="w-4 h-4 rounded text-navy border-slate-300 accent-navy shrink-0 pointer-events-none"
+                      [checked]="isOptionSelected(opt.value)"
+                      [disabled]="opt.disabled"
+                    />
+                  }
+                  <span class="truncate">{{ opt.label }}</span>
+                </div>
+                @if (!multiple && isOptionSelected(opt.value)) {
+                  <app-icon name="check" [stroke]="2" class="text-brand shrink-0" />
                 }
               </li>
             } @empty {
@@ -116,6 +141,21 @@ export interface SelectItem {
               </li>
             }
           </ul>
+
+          <!-- Footer for Multiple Selection -->
+          @if (multiple) {
+            <div class="p-2 border-t border-theme bg-surface-muted flex items-center justify-between text-xs font-sans">
+              <span class="text-slate-600 font-medium">{{ selectedValues().length }} selected</span>
+              <button
+                appButton
+                size="sm"
+                type="button"
+                (click)="isOpen.set(false)"
+              >
+                Done
+              </button>
+            </div>
+          }
         </div>
       }
 
@@ -152,6 +192,8 @@ export class FormSelectComponent {
 
   @Input() label: string = '';
   @Input() value: string = '';
+  @Input() multiple: boolean = false;
+  @Input() values: string[] = [];
   /** Plain options: the text is both what is shown and the value. */
   @Input() options: string[] = [];
   /** Options whose shown text differs from the value; used instead of `options` when given. */
@@ -163,6 +205,7 @@ export class FormSelectComponent {
   @Input() error?: string;
 
   @Output() valueChange = new EventEmitter<string>();
+  @Output() valuesChange = new EventEmitter<string[]>();
 
   isOpen = signal<boolean>(false);
   searchQuery = '';
@@ -178,8 +221,34 @@ export class FormSelectComponent {
     return this.entries().length > 6;
   }
 
-  /** The shown text of the chosen option (the value itself when the list has no such option). */
+  /** Resolved selected values in multiple or single mode. */
+  selectedValues(): string[] {
+    if (this.values && this.values.length > 0) {
+      return this.values;
+    }
+    if (this.value) {
+      return this.value.split(',').map(s => s.trim()).filter(Boolean);
+    }
+    return [];
+  }
+
+  isOptionSelected(val: string): boolean {
+    if (this.multiple) {
+      return this.selectedValues().includes(val);
+    }
+    return this.value === val;
+  }
+
+  /** The shown text of the chosen option(s). */
   selectedLabel(): string {
+    if (this.multiple) {
+      const list = this.selectedValues();
+      if (list.length === 0) return '';
+      if (list.length <= 2) {
+        return list.join(', ');
+      }
+      return `${list[0]}, ${list[1]} (+${list.length - 2} more)`;
+    }
     if (!this.value) return '';
     return this.entries().find(entry => entry.value === this.value)?.label ?? this.value;
   }
@@ -197,11 +266,58 @@ export class FormSelectComponent {
     }
   }
 
-  selectOption(option: SelectItem): void {
+  toggleOption(option: SelectItem, event?: MouseEvent): void {
     if (option.disabled) return;
-    this.value = option.value;
-    this.valueChange.emit(option.value);
-    this.isOpen.set(false);
+    if (event) {
+      event.stopPropagation();
+    }
+
+    if (!this.multiple) {
+      this.value = option.value;
+      this.valueChange.emit(option.value);
+      this.isOpen.set(false);
+      return;
+    }
+
+    const current = [...this.selectedValues()];
+    const idx = current.indexOf(option.value);
+    if (idx >= 0) {
+      current.splice(idx, 1);
+    } else {
+      current.push(option.value);
+    }
+
+    this.values = current;
+    this.value = current.join(', ');
+    this.valueChange.emit(this.value);
+    this.valuesChange.emit(current);
+  }
+
+  areAllFilteredSelected(): boolean {
+    const list = this.filteredEntries().filter(e => !e.disabled);
+    if (list.length === 0) return false;
+    const current = this.selectedValues();
+    return list.every(e => current.includes(e.value));
+  }
+
+  toggleSelectAll(event: MouseEvent): void {
+    event.stopPropagation();
+    const list = this.filteredEntries().filter(e => !e.disabled).map(e => e.value);
+    const current = this.selectedValues();
+    const allSelected = list.length > 0 && list.every(v => current.includes(v));
+
+    let updated: string[];
+    if (allSelected) {
+      updated = current.filter(v => !list.includes(v));
+    } else {
+      const set = new Set([...current, ...list]);
+      updated = Array.from(set);
+    }
+
+    this.values = updated;
+    this.value = updated.join(', ');
+    this.valueChange.emit(this.value);
+    this.valuesChange.emit(updated);
   }
 
   @HostListener('document:click', ['$event'])

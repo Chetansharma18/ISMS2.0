@@ -30,10 +30,9 @@ import { canAppeal } from './tender-appeal.util';
         schemeTitle: schemeTitleTemplate,
         schemeCategory: schemeCategoryTemplate,
         submittedStatus: submittedStatusTemplate,
-        eoiStatus: eoiStatusTemplate,
         rejectionReason: rejectionReasonTemplate,
-        shortfall: shortfallTemplate,
         appeal: appealTemplate,
+        shortfall: shortfallTemplate,
         view: viewTemplate
       }"
     >
@@ -74,17 +73,6 @@ import { canAppeal } from './tender-appeal.util';
         <span class="text-slate-800 font-normal text-[13px]">{{ tender.submittedStatus }}</span>
       </ng-template>
 
-      <!-- Custom EOI Stage Template -->
-      <ng-template #eoiStatusTemplate let-tender>
-        @if (tender.eoiStatus === 'Reviewed') {
-          <span class="text-slate-800 font-normal text-[13px]">{{ tender.eoiStatus }}</span>
-        } @else if (tender.eoiStatus === 'Under Review') {
-          <span class="text-slate-800 font-normal text-[13px]">{{ tender.eoiStatus }}</span>
-        } @else {
-          <span class="text-slate-500 font-normal text-[13px]">-</span>
-        }
-      </ng-template>
-
       <!-- Custom Rejection Reason Template -->
       <ng-template #rejectionReasonTemplate let-tender>
         @if (tender.submittedStatus === 'Rejected') {
@@ -96,7 +84,22 @@ import { canAppeal } from './tender-appeal.util';
         }
       </ng-template>
 
-      <!-- Revert requests raised by the department -->
+      <!-- Request for Appeal against a rejection -->
+      <ng-template #appealTemplate let-tender>
+        @if (canAppeal(tender)) {
+          <button appButton variant="secondary" size="sm" type="button" (click)="appeal.emit(tender)" title="Answer the rejection remarks and submit request for appeal">
+            Request for Appeal
+          </button>
+        } @else if (tender.appeal) {
+          <button appButton variant="ghost" size="sm" type="button" (click)="open.emit(tender)" title="View your appeal request">
+            Appeal Submitted
+          </button>
+        } @else {
+          <span class="text-slate-400 text-[13px]">-</span>
+        }
+      </ng-template>
+
+      <!-- Response to Appeal / Shortfall requests raised by the department -->
       <ng-template #shortfallTemplate let-tender>
         @switch (shortfallState(tender)) {
           @case ('open') {
@@ -106,7 +109,7 @@ import { canAppeal } from './tender-appeal.util';
               size="sm"
               type="button"
               (click)="respond.emit(tender)"
-              title="The department has asked for more documents. Click to respond."
+              title="The department has requested additional documents or clarification. Click to respond."
             >
               <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
               Respond ({{ openCount(tender) }})
@@ -119,7 +122,7 @@ import { canAppeal } from './tender-appeal.util';
               size="sm"
               type="button"
               (click)="open.emit(tender)"
-              title="View the shortfall requests and your responses"
+              title="View responses"
             >
               Responded
             </button>
@@ -127,21 +130,6 @@ import { canAppeal } from './tender-appeal.util';
           @default {
             <span class="text-slate-400 text-[13px]">-</span>
           }
-        }
-      </ng-template>
-
-      <!-- Appeal against a rejection -->
-      <ng-template #appealTemplate let-tender>
-        @if (canAppeal(tender)) {
-          <button appButton variant="secondary" size="sm" type="button" (click)="appeal.emit(tender)" title="Answer the rejection remarks and upload documents">
-            Appeal
-          </button>
-        } @else if (tender.appeal) {
-          <button appButton variant="ghost" size="sm" type="button" (click)="open.emit(tender)" title="View your appeal">
-            Appealed
-          </button>
-        } @else {
-          <span class="text-slate-400 text-[13px]">-</span>
         }
       </ng-template>
 
@@ -170,14 +158,14 @@ export class TenderListComponent {
 
   // Clean Table Columns without Closing Date / Edits Used
   readonly tenderColumns: TableColumn<SubmittedTender>[] = [
-    { key: '$index',           label: 'S. No.',               type: 'number', align: 'center', width: 'w-12' },
-    { key: 'appRef',           label: 'Application Ref. No.', cellClass: 'whitespace-nowrap font-normal text-slate-800', type: 'custom' },
-    { key: 'schemeTitle',      label: 'Scheme Name',          cellClass: 'whitespace-nowrap font-normal text-slate-800', type: 'custom' },
-    { key: 'schemeCategory',   label: 'Scheme Category',      align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700', type: 'custom' },
-    { key: 'appliedDate',      label: 'Applied Date',         align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
+    { key: 'appRef', label: 'Application Ref. No.', cellClass: 'whitespace-nowrap font-normal text-slate-800', type: 'custom' },
+    { key: 'schemeTitle', label: 'Scheme Name', cellClass: 'whitespace-nowrap font-normal text-slate-800', type: 'custom' },
+    { key: 'schemeCategory', label: 'Scheme Category', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700', type: 'custom' },
+    { key: 'appliedDate', label: 'Applied Date', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     {
       key: 'submittedStatus',
-      label: 'Submitted Status',
+      label: 'Status',
       align: 'center',
       type: 'status',
       badgeVariantMap: {
@@ -188,11 +176,10 @@ export class TenderListComponent {
         'Rejected': 'danger'
       }
     },
-    { key: 'eoiStatus',        label: 'EOI Stage',            align: 'center', type: 'custom', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
-    { key: 'rejectionReason',  label: 'Remarks', align: 'center', type: 'custom', cellClass: 'min-w-[200px]' },
-    { key: 'shortfall',        label: 'Shortfall Request',    align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
-    { key: 'appeal',           label: 'Appeal',               align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
-    { key: 'view',             label: 'View',                 align: 'center', width: 'w-20', type: 'custom' }
+    { key: 'rejectionReason', label: 'Remarks', align: 'center', type: 'custom', cellClass: 'min-w-[200px]' },
+    { key: 'appeal', label: 'Request for Appeal', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
+    { key: 'shortfall', label: 'Appeal Response', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
+    { key: 'view', label: 'View', align: 'center', width: 'w-20', type: 'custom' }
   ];
 
   protected canAppeal(tender: SubmittedTender): boolean {

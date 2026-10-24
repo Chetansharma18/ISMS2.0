@@ -16,7 +16,7 @@ import { TenderDocViewRequest } from './tender-doc-card.component';
         <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3 flex-wrap">
           <div class="flex items-center gap-3">
             <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">7</span>
-            <h2 id="appeal-heading" class="text-base sm:text-lg font-bold text-slate-900 m-0">Appeal</h2>
+            <h2 id="appeal-heading" class="text-base sm:text-lg font-bold text-slate-900 m-0">Request for Appeal</h2>
           </div>
           <span class="text-[11px] text-slate-500">Submitted on {{ appeal.submittedOn }}</span>
         </div>

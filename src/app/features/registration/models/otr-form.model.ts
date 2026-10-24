@@ -70,13 +70,21 @@ export interface OfficerInCharge {
   isExpanded?: boolean;
 }
 
+export const IDENTITY_DOCUMENT_TYPES: string[] = [
+  'Aadhaar Card',
+  'PAN Card',
+  'Voter ID Card',
+  'Jan Aadhaar Card',
+  'Passport'
+];
+
 export interface Step3AuthorizedPerson {
   firstName?: string;
   lastName?: string;
   name: string;
-  dob: string;
-  age: string;
   designation: string;
+  identityDocType?: string;
+  identityDocNumber?: string;
   pan: string;
   emailId: string;
   mobileNo: string;
@@ -88,6 +96,8 @@ export interface Step3AuthorizedPerson {
   residenceAddress: string;
   authorizationLetterDoc: FileDoc | null;
   idProofDoc: FileDoc | null;
+  dob: string;
+  age: string;
 }
 
 export interface Step4BankDetails {
@@ -336,9 +346,9 @@ export function createInitialOtrFormData(): OtrFormData {
       firstName: '',
       lastName: '',
       name: '',
-      dob: '',
-      age: '',
       designation: '',
+      identityDocType: 'Aadhaar Card',
+      identityDocNumber: '',
       pan: '',
       emailId: '',
       mobileNo: '',
@@ -349,7 +359,9 @@ export function createInitialOtrFormData(): OtrFormData {
       state: 'Rajasthan',
       residenceAddress: '',
       authorizationLetterDoc: null,
-      idProofDoc: null
+      idProofDoc: null,
+      dob: '',
+      age: ''
     },
     step4: {
       bankName: '',
@@ -485,9 +497,9 @@ export function createExistingUserOtrData(): OtrFormData {
       firstName: 'Vikram',
       lastName: 'Singh Mehta',
       name: 'Vikram Singh Mehta',
-      dob: '1982-08-14',
-      age: '44',
       designation: 'Authorized Representative',
+      identityDocType: 'Aadhaar Card',
+      identityDocNumber: '765432109876',
       pan: 'BNYPM9876Q',
       emailId: 'vikram.mehta@skilltech.org',
       mobileNo: '9829154321',
@@ -508,7 +520,9 @@ export function createExistingUserOtrData(): OtrFormData {
         fileSize: '1.2 MB',
         uploadDate: '01-May-2022',
         status: 'uploaded'
-      }
+      },
+      dob: '1982-08-14',
+      age: '44'
     },
     step4: {
       bankName: 'State Bank of India',

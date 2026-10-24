@@ -43,7 +43,7 @@ import { SchemeTender } from '../tenders.models';
         </div>
 
         <div class="px-3 py-1 sm:py-0">
-          <span class="text-[11px] text-slate-500 block leading-tight">Date of EOI Published</span>
+          <span class="text-[11px] text-slate-500 block leading-tight">EOI Publication Date</span>
           <span class="text-xs sm:text-[12.5px] font-medium text-slate-900 block mt-1">{{ scheme().datePublished }}</span>
         </div>
 

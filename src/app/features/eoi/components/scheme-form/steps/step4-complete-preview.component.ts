@@ -1,14 +1,16 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent, TableColumn, TableComponent } from '../../../../../shared';
 import { EoiDocumentItem } from '../scheme-form.model';
 import { SchemeFormState } from '../scheme-form.state';
+import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
 
 /**
  * Step 4: Complete Application Preview
  *
  * Consolidates all applicant-submitted details (fee, verified profile, and proposal documents)
  * into a structured, read-only verification view before the applicant proceeds to EMD payment.
+ * Profile sections are strictly read-only; document section allows replacement via the Edit option.
  */
 @Component({
   selector: 'app-step4-complete-preview',
@@ -49,7 +51,7 @@ import { SchemeFormState } from '../scheme-form.state';
       </section>
 
       <!-- ====================================================================
-           2. ORGANISATION DETAILS PREVIEW
+           2. ORGANISATION DETAILS PREVIEW (Read-Only)
            ==================================================================== -->
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
@@ -57,9 +59,6 @@ import { SchemeFormState } from '../scheme-form.state';
             <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">2</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Organisation Details</h2>
           </div>
-          <button appButton variant="outline" size="sm" (click)="state.goToStep(2)">
-            Edit Details
-          </button>
         </div>
 
         <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
@@ -207,7 +206,7 @@ import { SchemeFormState } from '../scheme-form.state';
       </section>
 
       <!-- ====================================================================
-           3. AUTHORIZED SIGNATORY PREVIEW
+           3. AUTHORIZED SIGNATORY PREVIEW (Read-Only)
            ==================================================================== -->
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
@@ -215,9 +214,6 @@ import { SchemeFormState } from '../scheme-form.state';
             <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">3</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Authorized Signatory</h2>
           </div>
-          <button appButton variant="outline" size="sm" (click)="state.goToStep(2)">
-            Edit Details
-          </button>
         </div>
 
         <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
@@ -291,7 +287,7 @@ import { SchemeFormState } from '../scheme-form.state';
       </section>
 
       <!-- ====================================================================
-           4. BANK DETAILS PREVIEW
+           4. BANK DETAILS PREVIEW (Read-Only)
            ==================================================================== -->
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
@@ -299,9 +295,6 @@ import { SchemeFormState } from '../scheme-form.state';
             <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">4</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Organisation Bank Details</h2>
           </div>
-          <button appButton variant="outline" size="sm" (click)="state.goToStep(2)">
-            Edit Details
-          </button>
         </div>
 
         <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
@@ -359,7 +352,7 @@ import { SchemeFormState } from '../scheme-form.state';
       </section>
 
       <!-- ====================================================================
-           5. PROPOSAL DOCUMENTS TABLE PREVIEW
+           5. PROPOSAL DOCUMENTS TABLE PREVIEW (Replace only on Edit)
            ==================================================================== -->
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
@@ -367,12 +360,24 @@ import { SchemeFormState } from '../scheme-form.state';
             <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">5</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Documents ({{ state.attachedDocsCount() }} / {{ state.eoiDocuments().length }} Uploaded)</h2>
           </div>
-          <button appButton variant="outline" size="sm" (click)="state.goToStep(3)">
-            Edit Details
+          <button
+            appButton
+            [variant]="isEditingDocs() ? 'primary' : 'outline'"
+            size="sm"
+            (click)="toggleDocEdit()"
+          >
+            {{ isEditingDocs() ? 'Done' : 'Edit' }}
           </button>
         </div>
 
         <div class="p-4 sm:p-5">
+          @if (isEditingDocs()) {
+            <div class="mb-3.5 p-3 bg-sky-50/80 border border-sky-200 rounded-lg text-xs text-sky-900 flex items-center justify-between gap-3">
+              <span>Replace mode active: click <strong>Replace</strong> against any document to upload a replacement file.</span>
+              <button appButton variant="primary" size="sm" (click)="toggleDocEdit()">Done</button>
+            </div>
+          }
+
           <app-table
             [columns]="documentColumns"
             [data]="state.eoiDocuments()"
@@ -385,6 +390,9 @@ import { SchemeFormState } from '../scheme-form.state';
           <span class="font-medium text-slate-900 text-[12.5px]">{{ doc.name }}</span>
           @if (doc.isMandatory) {
             <span class="text-rose-600 font-bold" title="Mandatory"> *</span>
+          }
+          @if (errors()[doc.id]) {
+            <p class="text-[11.5px] text-red-600 m-0 mt-1" role="alert">{{ errors()[doc.id] }}</p>
           }
         </ng-template>
 
@@ -401,11 +409,26 @@ import { SchemeFormState } from '../scheme-form.state';
         </ng-template>
 
         <ng-template #actionTemplate let-doc>
-          @if (doc.status === 'uploaded') {
-            <button appButton variant="ghost" size="sm" (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)">
-              View
-            </button>
-          }
+          <div class="flex items-center gap-1.5 justify-center">
+            @if (doc.status === 'uploaded') {
+              <button appButton variant="ghost" size="sm" (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)">
+                View
+              </button>
+            }
+            @if (isEditingDocs()) {
+              @if (doc.status === 'uploaded') {
+                <button appButton variant="secondary" size="sm" (click)="replaceInput.click()">
+                  Replace
+                </button>
+                <input #replaceInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
+              } @else {
+                <button appButton size="sm" (click)="uploadInput.click()">
+                  Upload
+                </button>
+                <input #uploadInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
+              }
+            }
+          </div>
         </ng-template>
       </section>
 
@@ -448,6 +471,10 @@ import { SchemeFormState } from '../scheme-form.state';
 export class Step4CompletePreviewComponent {
   protected readonly state = inject(SchemeFormState);
 
+  protected readonly isEditingDocs = signal<boolean>(false);
+  protected readonly accept = DOC_ACCEPT;
+  protected readonly errors = signal<Record<number, string>>({});
+
   protected readonly documentColumns: TableColumn<EoiDocumentItem>[] = [
     { key: 'id', label: '#', align: 'center', width: 'w-10' },
     { key: 'name', label: 'Document Name', type: 'custom' },
@@ -456,4 +483,39 @@ export class Step4CompletePreviewComponent {
     { key: 'status', label: 'Status', type: 'custom' },
     { key: 'action', label: 'Action', type: 'custom', align: 'center' }
   ];
+
+  protected toggleDocEdit(): void {
+    this.isEditingDocs.update(val => !val);
+  }
+
+  protected onFileChange(event: Event, doc: EoiDocumentItem): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    const error = validateDocFile(file);
+    if (error) {
+      this.setError(doc.id, error);
+      input.value = '';
+      return;
+    }
+
+    this.setError(doc.id, null);
+    this.state.onFileSelected(event, doc);
+  }
+
+  private setError(id: number, message: string | null): void {
+    this.errors.update(current => {
+      const next = { ...current };
+      if (message) {
+        next[id] = message;
+      } else {
+        delete next[id];
+      }
+      return next;
+    });
+  }
 }
+

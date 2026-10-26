@@ -46,7 +46,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               [options]="banks"
               placeholder="Select bank"
               [required]="true"
-              [disabled]="!state.isEditingStep2()"
+              [disabled]="isReadOnly"
             ></app-form-select>
           </div>
 
@@ -58,7 +58,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               placeholder="Enter branch name"
               [required]="true"
               [maxLength]="150"
-              [disabled]="!state.isEditingStep2()"
+              [disabled]="isReadOnly"
             ></app-form-input>
           </div>
 
@@ -70,7 +70,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               [options]="transferModes"
               placeholder="Select mode"
               [required]="true"
-              [disabled]="!state.isEditingStep2()"
+              [disabled]="isReadOnly"
             ></app-form-select>
           </div>
 
@@ -82,7 +82,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               [options]="accountTypes"
               placeholder="Select account type"
               [required]="true"
-              [disabled]="!state.isEditingStep2()"
+              [disabled]="isReadOnly"
             ></app-form-select>
           </div>
 
@@ -95,7 +95,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               placeholder="Enter account holder name"
               [required]="true"
               [maxLength]="200"
-              [disabled]="!state.isEditingStep2()"
+              [disabled]="isReadOnly"
             ></app-form-input>
           </div>
 
@@ -108,7 +108,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               placeholder="Enter account number"
               [required]="true"
               [maxLength]="30"
-              [disabled]="!state.isEditingStep2()"
+              [disabled]="isReadOnly"
             ></app-form-input>
           </div>
 
@@ -122,7 +122,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               [uppercase]="true"
               [maxLength]="11"
               [infoTooltip]="'11-character alphanumeric code (e.g. SBIN0031804)'"
-              [disabled]="!state.isEditingStep2()"
+              [disabled]="isReadOnly"
             ></app-form-input>
           </div>
 
@@ -134,7 +134,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               (valueChange)="state.editableStep4.micrCode = $event"
               placeholder="Enter MICR code (9 digits)"
               [maxLength]="9"
-              [disabled]="!state.isEditingStep2()"
+              [disabled]="isReadOnly"
             ></app-form-input>
           </div>
 
@@ -146,7 +146,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               (valueChange)="state.editableStep4.branchAddress = $event"
               placeholder="Enter branch address, street, locality, city, PIN code"
               [required]="true"
-              [disabled]="!state.isEditingStep2()"
+              [disabled]="isReadOnly"
             ></app-form-textarea>
           </div>
 
@@ -159,7 +159,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               [required]="true"
               accept=".pdf,.jpg,.jpeg,.png"
               [maxSizeMb]="5"
-              [disabled]="!state.isEditingStep2()"
+              [disabled]="isReadOnly"
             ></app-form-file-upload>
           </div>
         </div>
@@ -169,6 +169,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
 })
 export class Step2BankDetailsComponent {
   protected readonly state = inject(SchemeFormState);
+  protected readonly isReadOnly = true;
 
   protected readonly banks = BANKS_MASTER;
   protected readonly transferModes = TRANSFER_MODES;

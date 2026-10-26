@@ -43,7 +43,7 @@ export const DEPT_ADMIN_NAV: NavItem[] = [
 /** Training partner who already has an approved registration. */
 export const EXISTING_USER_NAV: NavItem[] = [
   ACTIVE_SCHEMES,
-  { key: 'tender-status', label: 'Tender Status', link: '/tender-status', icon: 'clock' },
+  { key: 'tender-status', label: 'EOI Status', link: '/tender-status', icon: 'clock' },
   { key: 'sanction-order', label: 'Sanction Order', link: '/tp/sanction-orders', icon: 'inbox' },
   { key: 'ipa', label: 'In-Principal Approval (IPA)', link: '/ipa', icon: 'document' },
   { key: 'sdc-management', label: 'SDC Management', link: '/sdcs', icon: 'building' },

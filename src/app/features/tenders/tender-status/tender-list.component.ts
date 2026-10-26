@@ -15,8 +15,8 @@ import { canAppeal } from './tender-appeal.util';
   template: `
     <!-- Page header with search + status table via the shared list page -->
     <app-list-page
-      title="Tender Status"
-      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Tender Status' }]"
+      title="EOI Status"
+      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'EOI Status' }]"
       [searchable]="true"
       [(searchQuery)]="searchQuery"
       searchPlaceholder="Search Ref, Scheme, Category..."
@@ -24,7 +24,7 @@ import { canAppeal } from './tender-appeal.util';
       [data]="filteredTenders()"
       [pagination]="true"
       [pageSize]="pageSize"
-      emptyMessage="No tender applications match your search query."
+      emptyMessage="No EOI applications match your search query."
       [customTemplates]="{
         appRef: appRefTemplate,
         schemeTitle: schemeTitleTemplate,

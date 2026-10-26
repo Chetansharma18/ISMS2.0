@@ -14,7 +14,7 @@ import { canEditTender } from './tender-status.util';
   template: `
     <div class="space-y-3">
       <div>
-        <button appButton variant="outline" size="sm" type="button" (click)="back.emit()" title="Back to Tender Status">
+        <button appButton variant="outline" size="sm" type="button" (click)="back.emit()" title="Back to EOI Status">
           <app-icon name="back" />
           <span>Back</span>
         </button>

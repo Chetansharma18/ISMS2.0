@@ -24,7 +24,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
   imports: [ButtonComponent, IconComponent, ActionModalComponent, StepperComponent, SchemeHeaderCardComponent, Step1ProcessingFeeComponent, Step2OtrProfileComponent, Step3UploadDocumentsComponent, Step4CompletePreviewComponent, Step5EmdPaymentComponent, Step6ReceiptsComponent],
   providers: [SchemeFormState],
   template: `
-    <div class="min-h-screen bg-[#FEFEFD] flex flex-col selection:bg-navy selection:text-white font-sans text-slate-800" >
+    <div class="min-h-screen bg-white flex flex-col selection:bg-navy selection:text-white font-sans text-slate-800" >
 
       <main class="flex-1 w-full px-4 sm:px-5 lg:px-6 py-4 sm:py-5">
 

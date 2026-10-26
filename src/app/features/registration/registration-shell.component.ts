@@ -35,7 +35,7 @@ export interface StepMeta {
     IconComponent
   ],
   template: `
-    <div class="min-h-screen bg-[#FEFEFD] flex flex-col justify-between selection:bg-navy selection:text-white font-sans" >
+    <div class="min-h-screen bg-white flex flex-col justify-between selection:bg-navy selection:text-white font-sans" >
 
       <!-- ====================================================================
            Main Content Area

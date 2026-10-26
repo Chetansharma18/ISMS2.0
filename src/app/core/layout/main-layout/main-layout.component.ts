@@ -14,7 +14,7 @@ import { BackdropComponent } from '../../../shared/components/backdrop/backdrop.
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, HeaderComponent, SidebarComponent, FooterComponent, BackdropComponent],
   template: `
-    <div class="h-screen overflow-hidden flex flex-col text-slate-900 antialiased font-sans" style="background-color: #FEFEFD;">
+    <div class="h-screen overflow-hidden flex flex-col text-slate-900 antialiased font-sans" style="background-color: #FFFFFF;">
       <app-header
         class="shrink-0 z-40"
         (toggleMobileMenu)="toggleMobileSidebar()"
@@ -42,7 +42,7 @@ import { BackdropComponent } from '../../../shared/components/backdrop/backdrop.
           </div>
         }
         
-        <main class="flex-1 min-w-0 h-full overflow-y-auto flex flex-col" style="background-color: #FEFEFD;">
+        <main class="flex-1 min-w-0 h-full overflow-y-auto flex flex-col" style="background-color: #FFFFFF;">
           <ng-content></ng-content>
           @if (showFooter) {
             <app-footer class="shrink-0 mt-auto"></app-footer>

@@ -29,7 +29,7 @@ export interface RegistrationStepItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, DocumentViewerModalComponent, AspirantProfileFormComponent, ButtonComponent, IconComponent, ProgressRingComponent],
   template: `
-    <div class="w-full min-h-full font-sans p-4 sm:p-5 space-y-4" style="background-color: #FEFEFD;">
+    <div class="w-full min-h-full font-sans p-4 sm:p-5 space-y-4" style="background-color: #FFFFFF;">
 
       @if (isAspirant()) {
         <!-- ====================================================================

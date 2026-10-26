@@ -42,7 +42,7 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
     ScrutinyDocViewerComponent
   ],
   template: `
-    <div class="w-full min-h-screen bg-[#FEFEFD] text-slate-800 font-sans px-4 sm:px-5 lg:px-6 py-4 sm:py-5 space-y-5" >
+    <div class="w-full min-h-screen bg-white text-slate-800 font-sans px-4 sm:px-5 lg:px-6 py-4 sm:py-5 space-y-5" >
 
       <app-scrutiny-toolbar
         [applicant]="applicant()"

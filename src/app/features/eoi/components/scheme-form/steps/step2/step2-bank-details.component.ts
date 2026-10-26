@@ -11,8 +11,9 @@ import { FormTextareaComponent } from '../../../../../../shared/components/form-
 import { FormFileUploadComponent } from '../../../../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
 
 /**
- * Step 2: bank account details and cancelled cheque (editable).
- * Deliberately stays on default change detection: the state objects are mutated in place.
+ * Step 2: Bank Account Details and Cancelled Cheque
+ *
+ * Displays verified OTR bank details and allows editing when Step 2 edit mode is active.
  */
 @Component({
   selector: 'app-step2-bank-details',
@@ -45,7 +46,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               [options]="banks"
               placeholder="Select bank"
               [required]="true"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-select>
           </div>
 
@@ -57,7 +58,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               placeholder="Enter branch name"
               [required]="true"
               [maxLength]="150"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-input>
           </div>
 
@@ -69,7 +70,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               [options]="transferModes"
               placeholder="Select mode"
               [required]="true"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-select>
           </div>
 
@@ -81,7 +82,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               [options]="accountTypes"
               placeholder="Select account type"
               [required]="true"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-select>
           </div>
 
@@ -94,7 +95,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               placeholder="Enter account holder name"
               [required]="true"
               [maxLength]="200"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-input>
           </div>
 
@@ -107,7 +108,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               placeholder="Enter account number"
               [required]="true"
               [maxLength]="30"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-input>
           </div>
 
@@ -121,7 +122,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               [uppercase]="true"
               [maxLength]="11"
               [infoTooltip]="'11-character alphanumeric code (e.g. SBIN0031804)'"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-input>
           </div>
 
@@ -133,7 +134,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               (valueChange)="state.editableStep4.micrCode = $event"
               placeholder="Enter MICR code (9 digits)"
               [maxLength]="9"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-input>
           </div>
 
@@ -145,7 +146,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               (valueChange)="state.editableStep4.branchAddress = $event"
               placeholder="Enter branch address, street, locality, city, PIN code"
               [required]="true"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-textarea>
           </div>
 
@@ -158,7 +159,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               [required]="true"
               accept=".pdf,.jpg,.jpeg,.png"
               [maxSizeMb]="5"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-file-upload>
           </div>
         </div>

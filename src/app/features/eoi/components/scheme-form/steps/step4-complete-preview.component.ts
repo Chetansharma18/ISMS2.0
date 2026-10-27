@@ -325,22 +325,6 @@ import { SchemeFormState } from '../scheme-form.state';
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">IFSC</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep4.ifscCode || '-' }}</span>
           </div>
-          <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Account Type</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep4.accountType || '-' }}</span>
-          </div>
-          @if (state.editableStep4.transferMode) {
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Transfer Mode</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep4.transferMode }}</span>
-            </div>
-          }
-          @if (state.editableStep4.branchAddress) {
-            <div class="sm:col-span-2">
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Branch Address</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ state.editableStep4.branchAddress }}</span>
-            </div>
-          }
 
           @if (state.editableStep4.cancelledChequeDoc; as doc) {
             @if (doc.status === 'uploaded') {

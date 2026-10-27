@@ -36,20 +36,12 @@ import {
   applyOtrDocument,
   canEditTender,
   formatUploadedFileSize,
-  remainingEdits
+  remainingEdits,
+  TenderDetailTab,
+  TenderOpenEvent
 } from './tender-status/tender-status.util';
 
-export type { SubmittedTender, SubmittedTenderDoc };
-
-export type TenderDetailTab =
-  | 'overview'
-  | 'organisation'
-  | 'signatory'
-  | 'bank'
-  | 'documents'
-  | 'fees'
-  | 'shortfall'
-  | 'all';
+export type { SubmittedTender, SubmittedTenderDoc, TenderDetailTab, TenderOpenEvent };
 
 interface TenderDetailTabItem {
   id: TenderDetailTab;
@@ -86,9 +78,9 @@ interface TenderDetailTabItem {
         <app-tender-list
           [tenders]="tenders()"
           [(searchQuery)]="searchQuery"
-          (open)="openApplicationPage($event)"
-          (respond)="startShortfallResponse($event)"
-          (appeal)="startAppeal($event)"
+          (open)="openApplicationPage($event.tender, $event.tab)"
+          (respond)="openShortfallFromList($event)"
+          (appeal)="openAppealFromList($event)"
         />
       }
 
@@ -476,7 +468,6 @@ export class TenderStatusComponent {
         id: 'shortfall',
         label: 'Shortfall & Appeal',
         icon: 'alert-triangle',
-        badge: shortfalls > 0 ? shortfalls : (hasAppeal ? 'Notice' : undefined),
         badgeColor: shortfalls > 0 ? 'amber' : (hasAppeal ? 'rose' : undefined)
       },
       { id: 'all', label: 'All Sections', icon: 'list' }
@@ -508,12 +499,22 @@ export class TenderStatusComponent {
     if (tender) this.startShortfallResponse(tender);
   }
 
-  openApplicationPage(tender: SubmittedTender): void {
+  openApplicationPage(tender: SubmittedTender, initialTab: TenderDetailTab = 'overview'): void {
     this.selectedTender.set(tender);
     this.editableTender = null;
     this.isEditing.set(false);
-    this.activeTab.set('overview');
+    this.activeTab.set(initialTab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  openAppealFromList(tender: SubmittedTender): void {
+    this.openApplicationPage(tender, 'shortfall');
+    this.startAppeal(tender);
+  }
+
+  openShortfallFromList(tender: SubmittedTender): void {
+    this.openApplicationPage(tender, 'shortfall');
+    this.startShortfallResponse(tender);
   }
 
   backToTenderList(): void {

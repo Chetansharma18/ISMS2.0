@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, model, output } fr
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent, IconComponent, ListPageComponent, TableColumn } from '../../../shared';
 import { SubmittedTender } from '../../../core/models/tender.model';
-import { filterTenders } from './tender-status.util';
+import { filterTenders, TenderOpenEvent } from './tender-status.util';
 import { openShortfalls, shortfallSummary } from './tender-shortfall.util';
 import { canAppeal } from './tender-appeal.util';
 
@@ -44,7 +44,7 @@ import { canAppeal } from './tender-appeal.util';
           variant="ghost"
           size="sm"
           type="button"
-          (click)="open.emit(tender)"
+          (click)="open.emit({ tender, tab: 'overview' })"
           class="tabular-nums"
           title="Open Application Details Page"
         >
@@ -55,7 +55,7 @@ import { canAppeal } from './tender-appeal.util';
       <!-- Custom Scheme Title Template -->
       <ng-template #schemeTitleTemplate let-tender>
         <span
-          (click)="open.emit(tender)"
+          (click)="open.emit({ tender, tab: 'overview' })"
           class="font-normal text-slate-800 hover:text-navy hover:underline cursor-pointer transition-colors text-[13px]"
           title="Open {{ tender.schemeTitle }}"
         >
@@ -91,7 +91,7 @@ import { canAppeal } from './tender-appeal.util';
             Request for Appeal
           </button>
         } @else if (tender.appeal) {
-          <button appButton variant="ghost" size="sm" type="button" (click)="open.emit(tender)" title="View your appeal request">
+          <button appButton variant="ghost" size="sm" type="button" (click)="open.emit({ tender, tab: 'shortfall' })" title="View your appeal request">
             Appeal Submitted
           </button>
         } @else {
@@ -121,7 +121,7 @@ import { canAppeal } from './tender-appeal.util';
               variant="ghost"
               size="sm"
               type="button"
-              (click)="open.emit(tender)"
+              (click)="open.emit({ tender, tab: 'shortfall' })"
               title="View responses"
             >
               Responded
@@ -135,7 +135,7 @@ import { canAppeal } from './tender-appeal.util';
 
       <!-- Custom View Action Button Template -->
       <ng-template #viewTemplate let-tender>
-        <button appButton size="sm" type="button" (click)="open.emit(tender)" title="Open Application Details Page">
+        <button appButton size="sm" type="button" (click)="open.emit({ tender, tab: 'overview' })" title="Open Application Details Page">
           <app-icon name="eye" size="sm" />
           <span>View</span>
         </button>
@@ -148,7 +148,7 @@ export class TenderListComponent {
   readonly tenders = input.required<SubmittedTender[]>();
   /** Search text; owned by the container so it survives opening a detail page. */
   readonly searchQuery = model('');
-  readonly open = output<SubmittedTender>();
+  readonly open = output<TenderOpenEvent>();
   /** The applicant wants to answer an open revert request. */
   readonly respond = output<SubmittedTender>();
   /** The applicant wants to appeal a rejected application. */

@@ -186,7 +186,8 @@ export const MOCK_SCHEME_MASTER_ITEMS: SchemeMasterItem[] = resolveMock([
   { sNo: 1, id: 'sch-1', schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana', schemeCategory: 'Rajvik', categoryName: 'GENERAL', amount: 5000000, processFees: 10000, status: 'Active' },
   { sNo: 2, id: 'sch-2', schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)', schemeCategory: 'samarth', categoryName: 'GOVERNMENT INSTITUTION/PSU', amount: 7500000, processFees: 15000, status: 'Active' },
   { sNo: 3, id: 'sch-3', schemeName: 'Mukhyamantri Yuva Sambal Yojana', schemeCategory: 'saksham', categoryName: 'GOVERNMENT INSTITUTION/INSTITUTION', amount: 2500000, processFees: 5000, status: 'Active' },
-  { sNo: 4, id: 'sch-4', schemeName: 'Mukhya Mantri Yuva Kaushal Yojana', schemeCategory: 'Rajvik, samarth', categoryName: 'SPECIAL TARGET GROUP', amount: 10000000, processFees: 25000, status: 'Active' }
+  { sNo: 4, id: 'sch-4', schemeName: 'Mukhya Mantri Yuva Kaushal Yojana', schemeCategory: 'Rajvik, samarth', categoryName: 'SPECIAL TARGET GROUP', amount: 10000000, processFees: 25000, status: 'Active' },
+  { sNo: 5, id: 'sch-5', schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)', schemeCategory: 'Rajvik', categoryName: 'GENERAL', amount: 5000000, processFees: 2000, status: 'Active' }
 ]);
 
 export const MOCK_USER_ROLE_MASTER_ITEMS: UserRoleMasterItem[] = resolveMock([
@@ -239,6 +240,7 @@ export const MOCK_GRADING_MASTER_ITEMS: GradingMasterItem[] = resolveMock([
   {
     sNo: 1,
     id: 'grade-1',
+    schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
     grade: 'A+',
     minimum: 85,
     maximum: 100,
@@ -248,6 +250,7 @@ export const MOCK_GRADING_MASTER_ITEMS: GradingMasterItem[] = resolveMock([
   {
     sNo: 2,
     id: 'grade-2',
+    schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
     grade: 'A',
     minimum: 70,
     maximum: 84,
@@ -257,6 +260,7 @@ export const MOCK_GRADING_MASTER_ITEMS: GradingMasterItem[] = resolveMock([
   {
     sNo: 3,
     id: 'grade-3',
+    schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
     grade: 'B',
     minimum: 55,
     maximum: 69,
@@ -266,6 +270,7 @@ export const MOCK_GRADING_MASTER_ITEMS: GradingMasterItem[] = resolveMock([
   {
     sNo: 4,
     id: 'grade-4',
+    schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
     grade: 'C',
     minimum: 40,
     maximum: 54,
@@ -275,6 +280,207 @@ export const MOCK_GRADING_MASTER_ITEMS: GradingMasterItem[] = resolveMock([
   {
     sNo: 5,
     id: 'grade-5',
+    schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
+    grade: 'D',
+    minimum: 0,
+    maximum: 39,
+    range: '0 - 39',
+    status: 'Active'
+  },
+  {
+    sNo: 6,
+    id: 'grade-6',
+    schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana',
+    grade: 'A+',
+    minimum: 85,
+    maximum: 100,
+    range: '85 - 100',
+    status: 'Active'
+  },
+  {
+    sNo: 7,
+    id: 'grade-7',
+    schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana',
+    grade: 'A',
+    minimum: 70,
+    maximum: 84,
+    range: '70 - 84',
+    status: 'Active'
+  },
+  {
+    sNo: 8,
+    id: 'grade-8',
+    schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana',
+    grade: 'B',
+    minimum: 55,
+    maximum: 69,
+    range: '55 - 69',
+    status: 'Active'
+  },
+  {
+    sNo: 9,
+    id: 'grade-9',
+    schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana',
+    grade: 'C',
+    minimum: 40,
+    maximum: 54,
+    range: '40 - 54',
+    status: 'Active'
+  },
+  {
+    sNo: 10,
+    id: 'grade-10',
+    schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana',
+    grade: 'D',
+    minimum: 0,
+    maximum: 39,
+    range: '0 - 39',
+    status: 'Active'
+  },
+  {
+    sNo: 11,
+    id: 'grade-11',
+    schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+    grade: 'A+',
+    minimum: 85,
+    maximum: 100,
+    range: '85 - 100',
+    status: 'Active'
+  },
+  {
+    sNo: 12,
+    id: 'grade-12',
+    schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+    grade: 'A',
+    minimum: 70,
+    maximum: 84,
+    range: '70 - 84',
+    status: 'Active'
+  },
+  {
+    sNo: 13,
+    id: 'grade-13',
+    schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+    grade: 'B',
+    minimum: 55,
+    maximum: 69,
+    range: '55 - 69',
+    status: 'Active'
+  },
+  {
+    sNo: 14,
+    id: 'grade-14',
+    schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+    grade: 'C',
+    minimum: 40,
+    maximum: 54,
+    range: '40 - 54',
+    status: 'Active'
+  },
+  {
+    sNo: 15,
+    id: 'grade-15',
+    schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+    grade: 'D',
+    minimum: 0,
+    maximum: 39,
+    range: '0 - 39',
+    status: 'Active'
+  },
+  {
+    sNo: 16,
+    id: 'grade-16',
+    schemeName: 'Mukhyamantri Yuva Sambal Yojana',
+    grade: 'A+',
+    minimum: 85,
+    maximum: 100,
+    range: '85 - 100',
+    status: 'Active'
+  },
+  {
+    sNo: 17,
+    id: 'grade-17',
+    schemeName: 'Mukhyamantri Yuva Sambal Yojana',
+    grade: 'A',
+    minimum: 70,
+    maximum: 84,
+    range: '70 - 84',
+    status: 'Active'
+  },
+  {
+    sNo: 18,
+    id: 'grade-18',
+    schemeName: 'Mukhyamantri Yuva Sambal Yojana',
+    grade: 'B',
+    minimum: 55,
+    maximum: 69,
+    range: '55 - 69',
+    status: 'Active'
+  },
+  {
+    sNo: 19,
+    id: 'grade-19',
+    schemeName: 'Mukhyamantri Yuva Sambal Yojana',
+    grade: 'C',
+    minimum: 40,
+    maximum: 54,
+    range: '40 - 54',
+    status: 'Active'
+  },
+  {
+    sNo: 20,
+    id: 'grade-20',
+    schemeName: 'Mukhyamantri Yuva Sambal Yojana',
+    grade: 'D',
+    minimum: 0,
+    maximum: 39,
+    range: '0 - 39',
+    status: 'Active'
+  },
+  {
+    sNo: 21,
+    id: 'grade-21',
+    schemeName: 'Mukhya Mantri Yuva Kaushal Yojana',
+    grade: 'A+',
+    minimum: 85,
+    maximum: 100,
+    range: '85 - 100',
+    status: 'Active'
+  },
+  {
+    sNo: 22,
+    id: 'grade-22',
+    schemeName: 'Mukhya Mantri Yuva Kaushal Yojana',
+    grade: 'A',
+    minimum: 70,
+    maximum: 84,
+    range: '70 - 84',
+    status: 'Active'
+  },
+  {
+    sNo: 23,
+    id: 'grade-23',
+    schemeName: 'Mukhya Mantri Yuva Kaushal Yojana',
+    grade: 'B',
+    minimum: 55,
+    maximum: 69,
+    range: '55 - 69',
+    status: 'Active'
+  },
+  {
+    sNo: 24,
+    id: 'grade-24',
+    schemeName: 'Mukhya Mantri Yuva Kaushal Yojana',
+    grade: 'C',
+    minimum: 40,
+    maximum: 54,
+    range: '40 - 54',
+    status: 'Active'
+  },
+  {
+    sNo: 25,
+    id: 'grade-25',
+    schemeName: 'Mukhya Mantri Yuva Kaushal Yojana',
     grade: 'D',
     minimum: 0,
     maximum: 39,

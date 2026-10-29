@@ -141,6 +141,25 @@ export class MockDatabaseService {
           } else {
             this.store.set(key, stored);
           }
+        } else if (key === 'GRADING_MASTERS') {
+          const hasInvalidGrades = stored.some(
+            (item: any) =>
+              item?.grade === 'Grade I' ||
+              item?.grade === 'Grade II' ||
+              item?.grade === 'Grade III' ||
+              item?.grade === 'Grade 1' ||
+              item?.grade === 'Grade 2' ||
+              item?.grade === 'Grade 3' ||
+              String(item?.grade || '').startsWith('Grade ') ||
+              !item?.schemeName
+          );
+          if (hasInvalidGrades || stored.length < 25) {
+            const fresh = this.deepClone(this.seeds[key]);
+            this.store.set(key, fresh);
+            this.saveToStorage(key, fresh);
+          } else {
+            this.store.set(key, stored);
+          }
         } else if (key === 'EOI_CATEGORIES') {
           const hasOldItems = stored.some(
             item => item?.categoryTitle === 'Empanelment' || item?.categoryTitle === 'RTD (Recruit-Train-Deploy)'
@@ -222,11 +241,16 @@ export class MockDatabaseService {
         } else if (key === 'SUBMITTED_TENDERS') {
           // Sessions saved before shortfall notices existed pick up the seeded notices of the same record.
           const seeded = new Map<string, any>((this.seeds[key] as any[]).map(s => [s.id, s]));
-          const sanitized = stored.map(item => ({
-            ...item,
-            submittedStatus: item.submittedStatus === 'Accepted' ? 'Approved' : item.submittedStatus,
-            shortfalls: item.shortfalls ?? seeded.get(item.id)?.shortfalls
-          }));
+          const sanitized = stored.map(item => {
+            const seedItem = seeded.get(item.id);
+            return {
+              ...item,
+              submittedStatus: item.id === 't-1' && seedItem?.submittedStatus ? seedItem.submittedStatus : (item.submittedStatus === 'Accepted' ? 'Approved' : item.submittedStatus),
+              rejectionReason: item.rejectionReason ?? seedItem?.rejectionReason,
+              appeal: item.appeal ?? seedItem?.appeal,
+              shortfalls: item.id === 't-3' ? [] : (item.shortfalls ?? seedItem?.shortfalls)
+            };
+          });
           this.store.set(key, sanitized);
           this.saveToStorage(key, sanitized);
         } else {

@@ -66,6 +66,9 @@ export interface TenderAppeal {
   submittedOn: string;
   reply: string;
   files: AppealFile[];
+  status?: 'Pending' | 'Accepted' | 'Rejected';
+  rejectionReason?: string;
+  decidedAt?: string;
 }
 
 export interface SubmittedTender {

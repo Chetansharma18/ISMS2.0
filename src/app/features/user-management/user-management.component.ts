@@ -39,6 +39,7 @@ import { UserActionsCellComponent } from './parts/user-actions-cell.component';
 import { UserDetailsModalComponent } from './parts/user-details-modal.component';
 import { UserFormModalComponent } from './parts/user-form-modal.component';
 import { UserConfirmModalComponent } from './parts/user-confirm-modal.component';
+import { UserBlacklistModalComponent, BlacklistConfigSubmission } from './parts/user-blacklist-modal.component';
 
 export type { UserManagementItem };
 
@@ -60,7 +61,8 @@ export type { UserManagementItem };
     UserActionsCellComponent,
     UserDetailsModalComponent,
     UserFormModalComponent,
-    UserConfirmModalComponent
+    UserConfirmModalComponent,
+    UserBlacklistModalComponent
   ],
   template: `
     <app-page-shell>
@@ -166,7 +168,16 @@ export type { UserManagementItem };
         (cancelled)="closeModal()"
       />
 
-      <!-- Centered Confirmation Modal (Edit / Status Change / Delete) -->
+      <!-- Step 1 Modal: Select Scheme and Years for Blacklisting -->
+      <app-user-blacklist-modal
+        [isOpen]="showBlacklistConfigModal()"
+        [user]="targetBlacklistUser()"
+        [schemeOptions]="schemeOptions()"
+        (proceed)="onBlacklistConfigProceed($event)"
+        (cancelled)="closeBlacklistConfigModal()"
+      />
+
+      <!-- Step 2 Centered Confirmation Modal (Edit / Status Change / Blacklist / Delete) -->
       <app-user-confirm-modal
         [isOpen]="showConfirmModal()"
         [data]="confirmModalData()"
@@ -182,6 +193,8 @@ export class UserManagementComponent {
   selectedRoleFilter = signal<string>('all');
   showModal = signal<boolean>(false);
   showViewModal = signal<boolean>(false);
+  showBlacklistConfigModal = signal<boolean>(false);
+  targetBlacklistUser = signal<UserManagementItem | null>(null);
   showConfirmModal = signal<boolean>(false);
   confirmModalData = signal<ConfirmModalData | null>(null);
 
@@ -313,12 +326,9 @@ export class UserManagementComponent {
       return;
     }
 
-    userToBlacklist.schemeStatus = 'Blacklisted';
-    this.users.set([...usersList]);
-    this.blacklistSuccess.set(`Successfully blacklisted user: ${userToBlacklist.username} (${userToBlacklist.ssoId || userToBlacklist.userId})`);
     this.blacklistInput.set('');
-
-    setTimeout(() => this.blacklistSuccess.set(''), 3000);
+    this.targetBlacklistUser.set(userToBlacklist);
+    this.showBlacklistConfigModal.set(true);
   }
 
   readonly columns: TableColumn<UserManagementItem>[] = [
@@ -450,16 +460,41 @@ export class UserManagementComponent {
   }
 
   requestBlacklistToggle(item: UserManagementItem): void {
-    this.openConfirm(buildBlacklistConfirm(item));
+    if (item.schemeStatus === 'Blacklisted') {
+      this.openConfirm(buildBlacklistConfirm(item));
+    } else {
+      this.targetBlacklistUser.set(item);
+      this.showBlacklistConfigModal.set(true);
+    }
   }
 
-  toggleBlacklistStatus(item: UserManagementItem): void {
-    const newStatus: UserManagementItem['schemeStatus'] =
-      item.schemeStatus === 'Blacklisted' ? 'Active' : 'Blacklisted';
+  onBlacklistConfigProceed(config: BlacklistConfigSubmission): void {
+    const user = this.targetBlacklistUser();
+    if (!user) return;
+    this.showBlacklistConfigModal.set(false);
+    this.openConfirm(buildBlacklistConfirm(user, config));
+  }
 
-    this.userRepo.update(item.id, { schemeStatus: newStatus }).subscribe(updated => {
+  closeBlacklistConfigModal(): void {
+    this.showBlacklistConfigModal.set(false);
+    this.targetBlacklistUser.set(null);
+  }
+
+  toggleBlacklistStatus(item: UserManagementItem, details?: { scheme?: string; years?: string; remarks?: string }): void {
+    const isNowBlacklisted = item.schemeStatus !== 'Blacklisted';
+    const newStatus: UserManagementItem['schemeStatus'] = isNowBlacklisted ? 'Blacklisted' : 'Active';
+
+    const updates: Partial<UserManagementItem> = {
+      schemeStatus: newStatus,
+      blacklistScheme: isNowBlacklisted ? (details?.scheme || 'All Schemes') : undefined,
+      blacklistDuration: isNowBlacklisted ? (details?.years || '3 Years') : undefined,
+      blacklistRemarks: isNowBlacklisted ? details?.remarks : undefined,
+      blacklistedAt: isNowBlacklisted ? new Date().toISOString() : undefined
+    };
+
+    this.userRepo.update(item.id, updates).subscribe(updated => {
       this.users.update(current =>
-        current.map(u => u.id === item.id ? { ...u, schemeStatus: updated?.schemeStatus || newStatus } : u)
+        current.map(u => u.id === item.id ? { ...u, ...updates, ...updated } : u)
       );
     });
   }
@@ -480,7 +515,7 @@ export class UserManagementComponent {
     } else if (data.type === 'status') {
       this.toggleUserStatus(data.user);
     } else if (data.type === 'blacklist') {
-      this.toggleBlacklistStatus(data.user);
+      this.toggleBlacklistStatus(data.user, data.metadata);
     } else if (data.type === 'delete') {
       this.deleteUser(data.user);
     }
@@ -489,6 +524,7 @@ export class UserManagementComponent {
   closeConfirmModal(): void {
     this.showConfirmModal.set(false);
     this.confirmModalData.set(null);
+    this.targetBlacklistUser.set(null);
   }
 
   deleteUser(item: UserManagementItem): void {

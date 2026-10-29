@@ -84,52 +84,58 @@ import { canAppeal } from './tender-appeal.util';
         }
       </ng-template>
 
-      <!-- Request for Appeal against a rejection -->
+      <!-- Appeal Request against a rejection: only visible in rejected status -->
       <ng-template #appealTemplate let-tender>
-        @if (canAppeal(tender)) {
-          <button appButton variant="secondary" size="sm" type="button" (click)="appeal.emit(tender)" title="Answer the rejection remarks and submit request for appeal">
-            Request for Appeal
-          </button>
-        } @else if (tender.appeal) {
-          <button appButton variant="ghost" size="sm" type="button" (click)="open.emit({ tender, tab: 'shortfall' })" title="View your appeal request">
-            Appeal Submitted
-          </button>
+        @if (tender.submittedStatus === 'Rejected') {
+          @if (!tender.appeal) {
+            <button appButton variant="secondary" size="sm" type="button" (click)="appeal.emit(tender)" title="Answer the rejection remarks and submit request for appeal">
+              Appeal Request
+            </button>
+          } @else {
+            <button appButton variant="ghost" size="sm" type="button" (click)="open.emit({ tender, tab: 'shortfall' })" title="View your appeal request">
+              Appeal Submitted
+            </button>
+          }
         } @else {
           <span class="text-slate-400 text-[13px]">-</span>
         }
       </ng-template>
 
-      <!-- Response to Appeal / Shortfall requests raised by the department -->
+      <!-- Response to Appeal / Shortfall requests raised by the department: only shown when appeal has been submitted -->
       <ng-template #shortfallTemplate let-tender>
-        @switch (shortfallState(tender)) {
-          @case ('open') {
-            <button
-              appButton
-              variant="secondary"
-              size="sm"
-              type="button"
-              (click)="respond.emit(tender)"
-              title="The department has requested additional documents or clarification. Click to respond."
-            >
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
-              Respond ({{ openCount(tender) }})
-            </button>
+        @if (tender.appeal) {
+          @switch (shortfallState(tender)) {
+            @case ('open') {
+              <button
+                appButton
+                variant="secondary"
+                size="sm"
+                type="button"
+                (click)="respond.emit(tender)"
+                title="The department has requested additional documents or clarification. Click to respond."
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
+                Respond ({{ openCount(tender) }})
+              </button>
+            }
+            @case ('responded') {
+              <button
+                appButton
+                variant="ghost"
+                size="sm"
+                type="button"
+                (click)="open.emit({ tender, tab: 'shortfall' })"
+                title="View responses"
+              >
+                Responded
+              </button>
+            }
+            @default {
+              <span class="text-slate-400 text-[13px]">-</span>
+            }
           }
-          @case ('responded') {
-            <button
-              appButton
-              variant="ghost"
-              size="sm"
-              type="button"
-              (click)="open.emit({ tender, tab: 'shortfall' })"
-              title="View responses"
-            >
-              Responded
-            </button>
-          }
-          @default {
-            <span class="text-slate-400 text-[13px]">-</span>
-          }
+        } @else {
+          <span class="text-slate-400 text-[13px]">-</span>
         }
       </ng-template>
 
@@ -177,7 +183,7 @@ export class TenderListComponent {
       }
     },
     { key: 'rejectionReason', label: 'Remarks', align: 'center', type: 'custom', cellClass: 'min-w-[200px]' },
-    { key: 'appeal', label: 'Request for Appeal', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
+    { key: 'appeal', label: 'Appeal Request', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
     { key: 'shortfall', label: 'Appeal Response', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
     { key: 'view', label: 'View', align: 'center', width: 'w-20', type: 'custom' }
   ];

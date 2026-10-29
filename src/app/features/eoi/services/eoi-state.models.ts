@@ -46,6 +46,15 @@ export interface PastEngagement {
   status: 'Completed' | 'Ongoing';
 }
 
+export interface ApplicantAppeal {
+  submittedOn: string;
+  reply: string;
+  files: { fileName: string; fileSize: string }[];
+  status: 'Pending' | 'Accepted' | 'Rejected';
+  decisionRemarks?: string;
+  decidedAt?: string;
+}
+
 export interface ApplicantResponse {
   id: string;
   anonymousLabel: string; // e.g. "Company 1"
@@ -154,6 +163,9 @@ export interface ApplicantResponse {
       priority?: 'Normal' | 'Urgent';
     }[];
   };
+
+  // Appeal request submitted by applicant against rejection
+  appeal?: ApplicantAppeal;
 
   // Full timeline audit trail of application lifecycle events & transactions
   activityLog?: ApplicationActivityLog[];
@@ -320,4 +332,5 @@ export interface ScrutinyDecisionInput {
     priority?: 'Normal' | 'Urgent';
   }[];
   activityLog?: ApplicationActivityLog[];
+  appeal?: ApplicantAppeal;
 }

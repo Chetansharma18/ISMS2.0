@@ -38,13 +38,13 @@ const COMMENT_PRESETS = [
   imports: [ButtonComponent, DropdownComponent, IconComponent, InputDirective, ModalComponent, OptionDropdownComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <app-modal title="Raise Shortfall" [subtitle]="applicantLabel()" size="md" (close)="close.emit()">
+    <app-modal [title]="modalTitle()" [subtitle]="applicantLabel()" size="md" (close)="close.emit()">
         <div class="space-y-5 text-xs">
 
           <!-- Documents asked for -->
           <div class="space-y-2">
             <label class="block text-xs font-semibold text-slate-800" for="revert-doc">
-              Shortfall Documents <span class="text-rose-600">*</span>
+              {{ docLabel() }} <span class="text-rose-600">*</span>
             </label>
             <!-- Multi-select dropdown -->
             <app-dropdown
@@ -159,7 +159,7 @@ const COMMENT_PRESETS = [
 
         <ng-container modalFooter>
           <button appButton variant="outline" (click)="close.emit()">Cancel</button>
-          <button appButton (click)="submit()" [disabled]="!isValid()">Raise Shortfall</button>
+          <button appButton (click)="submit()" [disabled]="!isValid()">{{ submitLabel() }}</button>
         </ng-container>
     </app-modal>
   `
@@ -169,9 +169,15 @@ export class ScrutinyRevertModalComponent {
   readonly applicantLabel = input('');
   /** Standard documents the department can pick from. */
   readonly documentOptions = input<string[]>([]);
+  /** Whether this modal was opened from the Accept Appeal flow */
+  readonly isAppeal = input<boolean>(true);
 
   readonly confirmed = output<RevertSubmission>();
   readonly close = output<void>();
+
+  readonly modalTitle = computed(() => (this.isAppeal() ? 'Accept Appeal' : 'Raise Shortfall'));
+  readonly submitLabel = computed(() => (this.isAppeal() ? 'Accept' : 'Raise Shortfall'));
+  readonly docLabel = computed(() => (this.isAppeal() ? 'Appeal Documents' : 'Shortfall Documents'));
 
   protected readonly other = OTHER;
   protected readonly dayOptions = RESPONSE_DAY_OPTIONS;

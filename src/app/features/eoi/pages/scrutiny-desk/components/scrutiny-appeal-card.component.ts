@@ -42,7 +42,7 @@ import type { ApplicantAppeal, ApplicantResponse } from '../../../services/eoi-s
                     Appeal Pending Review
                   } @else if (appAppeal.status === 'Accepted') {
                     <app-icon name="check" size="xs" />
-                    Appeal Accepted &bull; Shortfall Issued
+                    Appeal Accepted
                   } @else {
                     <app-icon name="close" size="xs" />
                     Appeal Rejected
@@ -149,9 +149,9 @@ import type { ApplicantAppeal, ApplicantResponse } from '../../../services/eoi-s
             <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3.5 flex items-start gap-2.5 text-emerald-900">
               <app-icon name="check" size="sm" class="text-emerald-700 mt-0.5 shrink-0" />
               <div>
-                <span class="font-bold text-xs block">Appeal Accepted &bull; Shortfall Notice Issued</span>
+                <span class="font-bold text-xs block">Appeal Accepted</span>
                 <p class="text-xs text-emerald-800 mt-0.5 m-0 leading-relaxed">
-                  The department accepted this appeal and raised a shortfall notice. The applicant has been notified on their EOI Status portal under "Appeal Response" to submit the requested documents.
+                  The department accepted this appeal. The applicant has been notified on their EOI Status portal under "Appeal Response" to submit the requested documents.
                 </p>
               </div>
             </div>

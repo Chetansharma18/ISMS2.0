@@ -101,7 +101,7 @@ import {
         <!-- Clean, Proper, Non-Colorful Status -->
         <ng-template #statusTemplate let-item>
           <span class="inline-block px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200">
-            {{ item.status === 'UNDER_SCRUTINY' ? 'Under Review' : item.status === 'APPROVED' ? 'Approved' : item.status === 'REVERTED' ? 'Reverted' : 'Rejected' }}
+            {{ (item.appeal && item.appeal.status === 'Pending') || item.status === 'REVERTED' ? 'Appeal Request' : item.status === 'UNDER_SCRUTINY' ? 'Under Review' : item.status === 'APPROVED' ? 'Approved' : 'Rejected' }}
           </span>
         </ng-template>
 
@@ -164,13 +164,13 @@ export class ApplicantSubmissionsComponent {
     { id: 'UNDER_SCRUTINY', label: 'Under Review', count: this.countPending() },
     { id: 'APPROVED', label: 'Approved', count: this.countApproved() },
     { id: 'REJECTED', label: 'Rejected', count: this.countRejected() },
-    { id: 'REVERTED', label: 'Reverted', count: this.countReverted() }
+    { id: 'REVERTED', label: 'Appeal Request', count: this.countAppealRequests() }
   ]);
 
   countPending = computed(() => this.responses().filter(r => r.status === 'UNDER_SCRUTINY').length);
   countApproved = computed(() => this.responses().filter(r => r.status === 'APPROVED').length);
-  countRejected = computed(() => this.responses().filter(r => r.status === 'REJECTED').length);
-  countReverted = computed(() => this.responses().filter(r => r.status === 'REVERTED').length);
+  countRejected = computed(() => this.responses().filter(r => r.status === 'REJECTED' && (!r.appeal || r.appeal.status !== 'Pending')).length);
+  countAppealRequests = computed(() => this.responses().filter(r => r.status === 'REVERTED' || (!!r.appeal && r.appeal.status === 'Pending')).length);
   countReviewed = computed(() => this.responses().filter(r => r.status === 'APPROVED' || r.status === 'REJECTED' || r.status === 'REVERTED').length);
 
   reviewPercentage = computed(() => {
@@ -190,7 +190,9 @@ export class ApplicantSubmissionsComponent {
     const filter = this.selectedFilter();
     const query = this.searchQuery().trim().toLowerCase();
     let list = this.responses();
-    if (filter !== 'ALL') {
+    if (filter === 'REVERTED') {
+      list = list.filter(r => r.status === 'REVERTED' || (!!r.appeal && r.appeal.status === 'Pending'));
+    } else if (filter !== 'ALL') {
       list = list.filter(r => r.status === filter);
     }
     if (!query) return list;

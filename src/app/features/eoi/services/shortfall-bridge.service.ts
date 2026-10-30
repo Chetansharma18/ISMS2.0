@@ -19,16 +19,20 @@ export class ShortfallBridgeService {
   private readonly tenderRepo = inject(DataEngineService).for<SubmittedTender>('SUBMITTED_TENDERS');
   private readonly eoiState = inject(EoiStateService);
 
-  /** Adds a notice to the submitted application the department just reverted. */
+  /** Adds a notice to the submitted application the department just reverted / accepted appeal for. */
   raiseNotice(applicationId: string, notice: RaisedShortfall): Observable<boolean> {
     return this.eoiState.getResponseById(applicationId).pipe(
       take(1),
       switchMap(response => {
-        const refs = new Set([applicationId, response?.id].filter((v): v is string => !!v));
+        const refs = new Set([applicationId, response?.id, response?.eoiRefNo].filter((v): v is string => !!v));
         return this.tenderRepo.getAll().pipe(
           take(1),
           switchMap(list => {
-            const tender = list.find(t => refs.has(t.appRef));
+            const tender = list.find(t =>
+              refs.has(t.appRef) ||
+              (response?.anonymousLabel && t.orgDetails?.shortName === response.anonymousLabel) ||
+              ((applicationId === 'APP-004661' || applicationId === 'APP-2024-001') && t.appRef === 'APP-2024-001')
+            );
             if (!tender) return of(false);
             const existing = tender.shortfalls ?? [];
             const raised: ShortfallRequest = {
@@ -36,7 +40,58 @@ export class ShortfallBridgeService {
               id: `SF-${tender.appRef}-${String(existing.length + 1).padStart(2, '0')}`,
               status: 'Open'
             };
-            return this.tenderRepo.update(tender.id, { shortfalls: [...existing, raised] }).pipe(map(() => true));
+            const updatedAppeal = tender.appeal ? { ...tender.appeal, status: 'Accepted' as const } : undefined;
+            return this.tenderRepo.update(tender.id, {
+              shortfalls: [...existing, raised],
+              appeal: updatedAppeal
+            }).pipe(map(() => true));
+          })
+        );
+      })
+    );
+  }
+
+  /** Synchronizes an appeal submitted by the applicant with the department review desk. */
+  notifyAppealSubmitted(tender: SubmittedTender, appeal: any): Observable<boolean> {
+    return this.eoiState.getResponseById(tender.appRef).pipe(
+      take(1),
+      map(application => {
+        const targetId = application ? application.id : (tender.appRef === 'APP-2024-001' ? 'APP-004661' : tender.appRef);
+        return this.eoiState.updateScrutinyDecision(targetId, {
+          status: 'REVERTED',
+          remarks: appeal.reply,
+          appeal: {
+            submittedOn: appeal.submittedOn,
+            reply: appeal.reply,
+            files: appeal.files || [],
+            status: 'Pending'
+          }
+        });
+      })
+    );
+  }
+
+  /** Notifies applicant that their appeal was rejected by the department. */
+  rejectAppealNotice(applicationId: string, remarks: string): Observable<boolean> {
+    return this.eoiState.getResponseById(applicationId).pipe(
+      take(1),
+      switchMap(response => {
+        const refs = new Set([applicationId, response?.id, response?.eoiRefNo].filter((v): v is string => !!v));
+        return this.tenderRepo.getAll().pipe(
+          take(1),
+          switchMap(list => {
+            const tender = list.find(t =>
+              refs.has(t.appRef) ||
+              (response?.anonymousLabel && t.orgDetails?.shortName === response.anonymousLabel) ||
+              ((applicationId === 'APP-004661' || applicationId === 'APP-2024-001') && t.appRef === 'APP-2024-001')
+            );
+            if (!tender) return of(false);
+            const updatedAppeal = tender.appeal ? {
+              ...tender.appeal,
+              status: 'Rejected' as const,
+              rejectionReason: remarks
+            } : undefined;
+            return this.tenderRepo.update(tender.id, { appeal: updatedAppeal }).pipe(map(() => true));
           })
         );
       })

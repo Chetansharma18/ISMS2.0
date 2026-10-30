@@ -105,7 +105,7 @@ interface TenderDetailTabItem {
                 {{ selectedTender()!.rejectionReason || 'Technical qualification criteria not met.' }}
               </p>
               <button appButton size="sm" type="button" (click)="openAppealFlow()" class="shrink-0">
-                Request for Appeal
+                Appeal Request
               </button>
             </div>
           }
@@ -113,7 +113,7 @@ interface TenderDetailTabItem {
           @if (pendingNoticeCount() > 0) {
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900" role="alert">
               <p class="m-0 text-[13px] leading-snug">
-                <strong class="font-semibold">Shortfall request:</strong>
+                <strong class="font-semibold">{{ selectedTender()?.appeal ? 'Appeal Response:' : 'Shortfall request:' }}</strong>
                 the department has asked for more documents on this application ({{ pendingNoticeCount() }} pending).
               </p>
               <button appButton size="sm" type="button" (click)="openShortfallFlow()" class="shrink-0">
@@ -599,6 +599,7 @@ export class TenderStatusComponent {
     this.tenders.update(list => list.map(t => (t.id === updated.id ? updated : t)));
     if (this.selectedTender()?.id === updated.id) this.selectedTender.set(updated);
     this.tenderRepo.update(updated.id, { appeal }).subscribe();
+    this.shortfallBridge.notifyAppealSubmitted(updated, appeal).subscribe();
 
     this.appealingTender.set(null);
     this.notify.success('Your appeal has been submitted.');

@@ -228,6 +228,14 @@ export function buildNewUser(form: UserFormData, id: string): Partial<UserManage
   };
 }
 
+export const BLACKLIST_DURATION_OPTIONS = [
+  '1 Year',
+  '2 Years',
+  '3 Years',
+  '5 Years',
+  'Permanent (Indefinite)'
+];
+
 /** Content of the generic confirmation dialog. */
 export interface ConfirmModalData {
   type: 'edit' | 'status' | 'delete' | 'blacklist';
@@ -236,6 +244,11 @@ export interface ConfirmModalData {
   message: string;
   confirmLabel: string;
   accentBarClass?: string;
+  metadata?: {
+    scheme?: string;
+    years?: string;
+    remarks?: string;
+  };
 }
 
 export function buildEditConfirm(item: UserManagementItem): ConfirmModalData {
@@ -274,7 +287,10 @@ export function buildStatusConfirm(item: UserManagementItem): ConfirmModalData {
   };
 }
 
-export function buildBlacklistConfirm(item: UserManagementItem): ConfirmModalData {
+export function buildBlacklistConfirm(
+  item: UserManagementItem,
+  details?: { scheme?: string; years?: string; remarks?: string }
+): ConfirmModalData {
   const isBlacklisted = item.schemeStatus === 'Blacklisted';
   return {
     type: 'blacklist',
@@ -284,7 +300,8 @@ export function buildBlacklistConfirm(item: UserManagementItem): ConfirmModalDat
       ? `Are you sure you want to remove Training Partner "${item.username}" (${item.userId}) from the blacklist? The account will be restored to Active status.`
       : `Are you sure you want to mark Training Partner "${item.username}" (${item.userId}) as Blacklisted? The account will be blocked from participating in schemes, tenders and batches.`,
     confirmLabel: isBlacklisted ? 'Yes, Remove Blacklist' : 'Yes, Mark Blacklisted',
-    accentBarClass: isBlacklisted ? 'bg-emerald-600' : 'bg-rose-600'
+    accentBarClass: isBlacklisted ? 'bg-emerald-600' : 'bg-rose-600',
+    metadata: details
   };
 }
 

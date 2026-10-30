@@ -23,7 +23,8 @@ export function mergeStoredResponses(
       annualActionPlan: (match.annualActionPlan && match.annualActionPlan.length > 0) ? match.annualActionPlan : init.annualActionPlan,
       bankDetails: match.bankDetails || init.bankDetails,
       organisation: { ...init.organisation, ...match.organisation },
-      authorizedSignatory: { ...init.authorizedSignatory, ...match.authorizedSignatory }
+      authorizedSignatory: { ...init.authorizedSignatory, ...match.authorizedSignatory },
+      appeal: match.appeal ?? init.appeal
     };
   });
 }
@@ -37,7 +38,8 @@ export function withCompany1UnderScrutiny(initial: ApplicantResponse[]): Applica
         ...resp,
         status: 'UNDER_SCRUTINY' as const,
         statusDisplay: 'Under Review',
-        scrutinyDetails: undefined
+        scrutinyDetails: undefined,
+        appeal: resp.appeal
       };
     }
     return resp;
@@ -132,6 +134,7 @@ export function applyScrutinyDecision(
     statusDisplay: statusDisplay,
     emdStatus: updatedEmdStatus,
     activityLog: decision.activityLog ?? target.activityLog,
+    appeal: decision.appeal !== undefined ? decision.appeal : target.appeal,
     scrutinyDetails: {
       technicalScore: Math.min(100, Math.max(0, decision.technicalScore ?? 0)),
       grade: decision.grade,

@@ -19,7 +19,18 @@ export const MOCK_SUBMITTED_TENDERS: SubmittedTender[] = resolveMock([
     processingFee: '₹ 2,000',
     transactionRef: 'CIN-SBI-9812401',
     emdTransactionRef: 'CIN-SBI-9812402',
-    submittedStatus: 'Approved',
+    submittedStatus: 'Rejected',
+    rejectionReason: 'Technical qualification criteria not met (CA turnover certificate missing valid UDIN).',
+    appeal: {
+      submittedOn: '09-Sep-2026',
+      reply: 'We have updated our audited financial statements and resolved the queries regarding our CA turnover certificate with valid UDIN. We request the committee to kindly review our appeal and allow us to submit the required shortfall documents.',
+      files: [
+        { fileName: 'Audited_Balance_Sheet_Rectified.pdf', fileSize: '2.4 MB' },
+        { fileName: 'CA_Turnover_Certificate_UDIN.pdf', fileSize: '1.2 MB' }
+      ],
+      status: 'Pending'
+    },
+    shortfalls: [],
     eoiStatus: 'Reviewed',
     editCount: 0,
     maxEdits: 3,
@@ -214,39 +225,7 @@ export const MOCK_SUBMITTED_TENDERS: SubmittedTender[] = resolveMock([
   },
   {
     id: 't-3',
-    shortfalls: [
-      {
-        id: 'SF-APP-2024-003-01',
-        raisedOn: '02-Aug-2026',
-        raisedBy: 'Department',
-        dueDate: '09-Aug-2026',
-        remarks: 'The GST registration certificate uploaded with the proposal is not legible. Please upload a clear, current copy.',
-        requiredDocs: ['GST Registration Certificate'],
-        sharedDocs: [],
-        status: 'Responded',
-        response: {
-          respondedOn: '06-Aug-2026',
-          remarks: 'Clear copy of the GST certificate is attached.',
-          uploads: [
-            { requiredDoc: 'GST Registration Certificate', fileName: 'GST_Certificate_Clear.pdf', fileSize: '1.1 MB', uploadedOn: '06-Aug-2026' }
-          ]
-        }
-      },
-      {
-        id: 'SF-APP-2024-003-02',
-        officeOrderRef: 'RSLDC/EOI/2026/SF-0302',
-        raisedOn: '05-Oct-2026',
-        raisedBy: 'Department',
-        dueDate: '15-Oct-2026',
-        remarks: 'CA turnover certificate must be for FY 2023-24 with UDIN and the CA membership seal. The training centre area proof must also be submitted as per the format shared with this notice.',
-        requiredDocs: ['CA Turnover Certificate with UDIN', 'Training Centre Infrastructure & Equipment Proof'],
-        sharedDocs: [
-          { title: 'Office Order', fileName: 'Office_Order_SF-0302.pdf', fileSize: '438 KB' },
-          { title: 'Training Centre Proof Format', fileName: 'Centre_Proof_Format.pdf', fileSize: '96 KB' }
-        ],
-        status: 'Open'
-      }
-    ],
+    shortfalls: [],
     appRef: 'APP-2024-003',
     appliedDate: '14-Jul-2026',
     closingDate: '25-Oct-2026',

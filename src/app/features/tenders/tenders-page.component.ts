@@ -172,7 +172,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
         ></app-scheme-detail-view>
       }
 
-      <!-- MODAL: ADD COMMITTEE MEMBERS -->
+      <!-- MODAL: CREATE COMMITTEE -->
       <app-committee-assignment-modal
         [isOpen]="showCommitteeModal()"
         [scheme]="selectedSchemeForCommittee()"
@@ -197,7 +197,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
         [closeOnBackdrop]="false"
         [reverseButtons]="true"
         [showAccentBar]="false"
-        primaryLabel="Publish EOI"
+        primaryLabel="Submit EOI"
         secondaryLabel="Cancel"
         maxWidthClass="max-w-[650px]"
         (primaryAction)="submitNewEoi()"
@@ -243,7 +243,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
         [showCloseButton]="false"
         title="Confirm Submission"
         description="Are you sure you want to submit this EOI configuration?"
-        primaryLabel="Publish EOI"
+        primaryLabel="Submit EOI"
         secondaryLabel="No, Cancel"
         (primaryAction)="confirmSubmitNewEoi()"
         (secondaryAction)="closeConfirmSubmitEoiModal()"

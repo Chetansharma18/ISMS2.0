@@ -128,6 +128,13 @@ export class AspirantPortalService {
   }
 
   private restoreState(): void {
+    const authUser = this.storage.getItem<UserPersona>('isms_user');
+    if (authUser && authUser.role === 'aspirant' && authUser.isProfileComplete === false) {
+      this.isProfileComplete.set(false);
+      this.profileData.set(createEmptyAspirantFormData());
+      return;
+    }
+
     const savedComplete = this.storage.getItem<boolean>(this.PROFILE_COMPLETE_KEY);
     if (savedComplete !== null) {
       this.isProfileComplete.set(!!savedComplete);

@@ -44,7 +44,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
                 placeholder="Enter first name"
                 [required]="true"
                 [maxLength]="50"
-                [disabled]="isReadOnly"
+                [disabled]="!state.isEditingStep2()"
               ></app-form-input>
             </div>
             <div>
@@ -54,7 +54,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
                 (valueChange)="onLastNameChange($event)"
                 placeholder="Enter last name"
                 [maxLength]="50"
-                [disabled]="isReadOnly"
+                [disabled]="!state.isEditingStep2()"
               ></app-form-input>
             </div>
           </div>
@@ -67,7 +67,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               (valueChange)="state.editableStep3.designation = $event"
               [options]="designations"
               placeholder="Select designation"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-select>
           </div>
 
@@ -79,7 +79,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               [value]="state.editableStep3.dob"
               (valueChange)="onDobChange($event)"
               [required]="true"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-input>
           </div>
 
@@ -102,7 +102,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               [required]="true"
               [uppercase]="true"
               [maxLength]="10"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-input>
           </div>
 
@@ -116,7 +116,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               placeholder="Enter mobile number"
               [required]="true"
               [maxLength]="10"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-input>
           </div>
 
@@ -129,7 +129,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               (valueChange)="state.editableStep3.emailId = $event"
               placeholder="Enter email address"
               [required]="true"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-input>
           </div>
 
@@ -143,7 +143,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               placeholder="Enter Aadhaar number"
               [required]="true"
               [maxLength]="12"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-input>
           </div>
 
@@ -154,7 +154,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               (valueChange)="state.editableStep3.bhamashahNo = $event"
               placeholder="Enter Bhamashah number"
               [maxLength]="20"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-input>
           </div>
 
@@ -166,7 +166,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               placeholder="Enter voter ID number"
               [uppercase]="true"
               [maxLength]="20"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-input>
           </div>
 
@@ -178,7 +178,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               placeholder="Enter passport number"
               [uppercase]="true"
               [maxLength]="8"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-input>
           </div>
 
@@ -190,7 +190,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               (valueChange)="state.editableStep3.state = $event"
               [options]="states"
               placeholder="Select state"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-select>
           </div>
 
@@ -203,7 +203,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               placeholder="Enter house/flat no., street, locality, city, PIN code"
               [rows]="1"
               [maxLength]="500"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-textarea>
           </div>
 
@@ -214,7 +214,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               [fileDoc]="state.editableStep3.authorizationLetterDoc"
               (fileChange)="state.editableStep3.authorizationLetterDoc = $event"
               [required]="true"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-file-upload>
           </div>
 
@@ -224,7 +224,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               [fileDoc]="state.editableStep3.idProofDoc"
               (fileChange)="state.editableStep3.idProofDoc = $event"
               [required]="false"
-              [disabled]="isReadOnly"
+              [disabled]="!state.isEditingStep2()"
             ></app-form-file-upload>
           </div>
         </div>

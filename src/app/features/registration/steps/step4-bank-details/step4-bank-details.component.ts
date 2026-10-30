@@ -14,7 +14,6 @@ import {
 
 import { FormInputComponent } from '../../../../shared/components/form-controls/form-input/form-input.component';
 import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
-import { FormTextareaComponent } from '../../../../shared/components/form-controls/form-textarea/form-textarea.component';
 import { FormFileUploadComponent } from '../../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
 
 @Component({
@@ -26,15 +25,14 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
     FormsModule,
     FormInputComponent,
     FormSelectComponent,
-    FormTextareaComponent,
     FormFileUploadComponent
   ],
   template: `
     <div class="w-full font-sans">
       <!-- 12-column Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-3.5 gap-y-2.5">
-        <!-- Row 1: Bank Name (4 cols), Branch Name (4 cols), Transfer Mode (2 cols), Account Type (2 cols) -->
-        <div class="lg:col-span-4">
+        <!-- Row 1: Bank Name (6 cols), Branch Name (6 cols) -->
+        <div class="lg:col-span-6">
           <app-form-select
             label="Name of the Bank"
             [value]="data().bankName"
@@ -46,7 +44,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
           ></app-form-select>
         </div>
 
-        <div class="lg:col-span-4">
+        <div class="lg:col-span-6">
           <app-form-input
             label="Branch Name"
             [value]="data().branchName"
@@ -56,30 +54,6 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             [maxLength]="150"
             [error]="getFieldError('branchName')"
           ></app-form-input>
-        </div>
-
-        <div class="lg:col-span-2">
-          <app-form-select
-            label="Transfer Mode"
-            [value]="data().transferMode"
-            (valueChange)="update('transferMode', $event)"
-            [options]="transferModes"
-            placeholder="Select mode"
-            [required]="true"
-            [error]="getFieldError('transferMode')"
-          ></app-form-select>
-        </div>
-
-        <div class="lg:col-span-2">
-          <app-form-select
-            label="Account Type"
-            [value]="data().accountType"
-            (valueChange)="update('accountType', $event)"
-            [options]="accountTypes"
-            placeholder="Select account type"
-            [required]="true"
-            [error]="getFieldError('accountType')"
-          ></app-form-select>
         </div>
 
         <!-- Row 2: Account Holder Name (5 cols), Account No (3 cols), IFSC (2 cols), MICR (2 cols) -->
@@ -134,18 +108,6 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
           ></app-form-input>
         </div>
 
-        <!-- Branch Address (12 cols) -->
-        <div class="lg:col-span-12">
-          <app-form-textarea
-            label="Branch Address"
-            [value]="data().branchAddress"
-            (valueChange)="update('branchAddress', $event)"
-            placeholder="Enter branch address, street, locality, city, PIN code"
-            [required]="true"
-            [error]="getFieldError('branchAddress')"
-          ></app-form-textarea>
-        </div>
-
         <!-- Row 3: Cheque Upload (12 cols) -->
         <div class="lg:col-span-12 pt-1 border-t border-slate-100">
           <app-form-file-upload
@@ -182,12 +144,6 @@ export class Step4BankDetailsComponent {
       case 'branchName':
         if (!d.branchName?.trim()) return 'Branch Name is required';
         return undefined;
-      case 'transferMode':
-        if (!d.transferMode?.trim()) return 'Mode of Transfer is required';
-        return undefined;
-      case 'accountType':
-        if (!d.accountType?.trim()) return 'Account Type is required';
-        return undefined;
       case 'accountHolderName':
         if (!d.accountHolderName?.trim()) return 'Account Holder Name is required';
         return undefined;
@@ -201,9 +157,6 @@ export class Step4BankDetailsComponent {
         return undefined;
       case 'micrCode':
         if (d.micrCode?.trim() && !REGEX.MICR.test(d.micrCode)) return 'Invalid MICR Code (9 digits)';
-        return undefined;
-      case 'branchAddress':
-        if (!d.branchAddress?.trim()) return 'Branch Address is required';
         return undefined;
       case 'cancelledChequeDoc':
         if (!d.cancelledChequeDoc || d.cancelledChequeDoc.status !== 'uploaded') {

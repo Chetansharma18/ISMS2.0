@@ -2,12 +2,12 @@
  * A batch goes to approval as soon as it is created (PENDING_APPROVAL). Aspirants are registered only after it is APPROVED.
  * RETURNED_TO_TP: sent back by the department for corrections; saving the corrections sends it for approval again.
  */
-export type BatchStatus = 'RETURNED_TO_TP' | 'APPROVED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED' | 'PENDING_APPROVAL' | 'INSPECTION_PENDING' | 'REJECTED';
-export type BatchApprovalStatus = 'RETURNED' | 'PENDING' | 'INSPECTION_PENDING' | 'APPROVED' | 'REJECTED';
+export type BatchStatus = 'RETURNED_TO_TP' | 'APPROVED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED' | 'PENDING_APPROVAL' | 'INSPECTION_PENDING' | 'REJECTED' | 'WITHDRAWN';
+export type BatchApprovalStatus = 'RETURNED' | 'PENDING' | 'INSPECTION_PENDING' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN';
 
 /** One entry of the approval history of a batch. */
 export interface BatchApprovalStep {
-  action: 'SUBMITTED' | 'FORWARDED' | 'APPROVED' | 'REJECTED' | 'RETURNED' | 'REMARKED';
+  action: 'SUBMITTED' | 'FORWARDED' | 'APPROVED' | 'REJECTED' | 'RETURNED' | 'REMARKED' | 'WITHDRAWN';
   /** Who acted: the training partner for "SUBMITTED", otherwise the designation of the approval level. */
   designation: string;
   officer: string;

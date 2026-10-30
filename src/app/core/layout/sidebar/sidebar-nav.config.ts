@@ -34,6 +34,7 @@ export const DEPT_ADMIN_NAV: NavItem[] = [
   { key: 'dept-eoi-view', label: 'EOI Responses', link: '/admin/eoi-view', icon: 'document', bold: true },
   { key: 'dept-sanction-orders', label: 'Sanction Order', link: '/admin/sanction-orders', icon: 'document', bold: true },
   { key: 'dept-ipa', label: 'In-Principal Approval (IPA)', link: '/admin/ipa', icon: 'shield-check', bold: true },
+  { key: 'dept-mou', label: 'MoU Management', link: '/admin/mou', icon: 'document', bold: true },
   { key: 'dept-sdc', label: 'SDC Approvals', link: '/sdc', icon: 'building' },
   { key: 'dept-batch-approvals', label: 'Batch Approvals', link: '/admin/batch-approvals', icon: 'clipboard-check', stroke: 2, bold: true },
   { key: 'dept-grievance', label: 'Grievance Management', link: '/admin/grievance', icon: 'users-group', stroke: 2 },

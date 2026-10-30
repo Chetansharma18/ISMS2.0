@@ -18,6 +18,7 @@ import { batchDecisionRecordOf } from './batch-review.util';
         [ngClass]="{
           'border-amber-300': r.kind === 'RETURNED',
           'border-rose-300': r.kind === 'REJECTED',
+          'border-slate-300': r.kind === 'WITHDRAWN',
           'border-slate-200/90': r.kind === 'APPROVED'
         }"
         aria-labelledby="batch-decision-heading"
@@ -27,6 +28,7 @@ import { batchDecisionRecordOf } from './batch-review.util';
             @switch (r.kind) {
               @case ('RETURNED') { Returned to Training Partner }
               @case ('REJECTED') { Rejected }
+              @case ('WITHDRAWN') { Batch Withdrawn }
               @default { Approved }
             }
           </h2>

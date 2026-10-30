@@ -3565,7 +3565,7 @@ export class DynamicFormBuilderComponent {
 
   publishEoi(): void {
     const refNo = this.previewFormValues['eoi-1'] || 'EOI/2026/001';
-    this.notification.success(`EOI "${refNo}" published successfully!`);
+    this.notification.success(`EOI "${refNo}" submitted successfully!`);
     this.closePreviewModal();
   }
 

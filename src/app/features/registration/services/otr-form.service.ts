@@ -50,7 +50,7 @@ export class OtrFormService {
 
     // Step 3: Bank Details (Max 30%)
     const s4 = data.step4;
-    const s4Fields = [s4.bankName, s4.branchName, s4.accountNo, s4.ifscCode, s4.branchAddress];
+    const s4Fields = [s4.bankName, s4.branchName, s4.accountNo, s4.ifscCode];
     const s4Filled = s4Fields.filter(f => !!f && f.trim().length > 0).length;
     score += Math.round((s4Filled / s4Fields.length) * 30);
 

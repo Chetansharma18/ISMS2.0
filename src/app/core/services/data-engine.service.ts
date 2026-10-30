@@ -64,6 +64,11 @@ export class DataEngineService {
     };
   }
 
+  /** Resets mock store and storage for a resource (or all resources). */
+  reset(dataKey?: string): void {
+    this.mockDb.reset(dataKey);
+  }
+
   // =========================================================================
   // CORE ENGINE OPERATIONS
   // =========================================================================

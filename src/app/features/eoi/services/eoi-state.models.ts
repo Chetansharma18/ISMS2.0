@@ -53,6 +53,11 @@ export interface ApplicantAppeal {
   status: 'Pending' | 'Accepted' | 'Rejected';
   decisionRemarks?: string;
   decidedAt?: string;
+  response?: {
+    respondedOn: string;
+    remarks?: string;
+    uploads: { requiredDoc: string; fileName: string; fileSize: string }[];
+  };
 }
 
 export interface ApplicantResponse {
@@ -333,4 +338,5 @@ export interface ScrutinyDecisionInput {
   }[];
   activityLog?: ApplicationActivityLog[];
   appeal?: ApplicantAppeal;
+  uploadedDocuments?: DossierDocument[];
 }

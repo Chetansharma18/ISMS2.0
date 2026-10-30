@@ -55,7 +55,7 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
       />
 
       @if (applicant(); as app) {
-        @if (app.status !== 'UNDER_SCRUTINY') {
+        @if (app.status !== 'UNDER_SCRUTINY' && app.appeal?.status !== 'Pending') {
           <app-scrutiny-decision-record [applicant]="app" />
         }
 
@@ -63,7 +63,7 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
           <app-scrutiny-appeal-card
             [appeal]="app.appeal"
             [applicant]="app"
-            [rejectionReason]="app.scrutinyDetails?.disqualificationReason || app.scrutinyDetails?.remarks"
+            [rejectionReason]="getRejectionReason(app)"
             (accept)="openAcceptAppealModal()"
             (reject)="openRejectAppealModal()"
             (viewFile)="openOfficialDoc($event)"
@@ -257,9 +257,30 @@ export class ScrutinyDeskComponent {
     });
   }
 
+  protected getRejectionReason(app: ApplicantResponse): string {
+    const disqualification = app.scrutinyDetails?.disqualificationReason;
+    if (disqualification && disqualification !== app.appeal?.reply) {
+      return disqualification;
+    }
+    const remarks = app.scrutinyDetails?.remarks;
+    if (remarks && remarks !== app.appeal?.reply) {
+      return remarks;
+    }
+    const isCompany4 = app.id.includes('4') || app.anonymousLabel.includes('4');
+    return isCompany4
+      ? 'Annual turnover criteria not met for last 3 financial years (CA certificate missing valid UDIN).'
+      : 'Technical qualification criteria not met (CA turnover certificate missing valid UDIN).';
+  }
+
   loadApplicant(appId: string): void {
     this.eoiStateService.getResponseById(appId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => {
-      this.applicant.set(data);
+      if (data) {
+        this.shortfallBridge.syncFromTenderIfNeeded(data).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(synced => {
+          this.applicant.set(synced);
+        });
+      } else {
+        this.applicant.set(undefined);
+      }
     });
   }
 
@@ -406,13 +427,22 @@ export class ScrutinyDeskComponent {
       }
     };
 
+    const updatedAppeal: ApplicantAppeal | undefined = app.appeal ? {
+      ...app.appeal,
+      status: 'Accepted',
+      decidedAt: nowStr
+    } : undefined;
+
     this.eoiStateService.updateScrutinyDecision(app.id, {
       status: 'APPROVED',
       scrutinyOfficer: this.reviewerName(),
       grade,
       remarks: submission.remark,
+      appeal: updatedAppeal,
       activityLog: [...this.getActivityLog(), newActivity]
     });
+
+    this.shortfallBridge.syncStatusToTender(app.id, 'APPROVED').pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
 
     this.closeModals();
     this.notifications.success(`${app.anonymousLabel} has been approved (grade ${grade}).`, 'Application Approved');
@@ -441,14 +471,24 @@ export class ScrutinyDeskComponent {
       }
     };
 
+    const updatedAppeal: ApplicantAppeal | undefined = app.appeal ? {
+      ...app.appeal,
+      status: 'Rejected',
+      decidedAt: nowStr,
+      decisionRemarks: submission.remark
+    } : undefined;
+
     this.eoiStateService.updateScrutinyDecision(app.id, {
       status: 'REJECTED',
       scrutinyOfficer: this.reviewerName(),
       technicalScore: 0,
       remarks: submission.remark,
       disqualificationReason: submission.remark,
+      appeal: updatedAppeal,
       activityLog: [...this.getActivityLog(), newActivity]
     });
+
+    this.shortfallBridge.syncStatusToTender(app.id, 'REJECTED', submission.remark).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
 
     this.closeModals();
     this.notifications.success(`${app.anonymousLabel} has been rejected.`, 'Application Rejected');

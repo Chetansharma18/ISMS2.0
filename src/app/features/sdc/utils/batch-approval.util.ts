@@ -13,7 +13,7 @@ export const BATCH_APPROVAL_LEVELS: readonly string[] = ['Department'];
 export const FREEZE_DAYS_BEFORE_START = 7;
 
 /** Where a batch stands, for the status shown in tables and details. */
-export type BatchDisplayStatus = 'RETURNED' | 'PENDING' | 'APPROVED' | 'REJECTED';
+export type BatchDisplayStatus = 'RETURNED' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN';
 
 /** Result of an approval click: moved to the next level, or approved by the last level. */
 export type BatchApprovalOutcome = 'FORWARDED' | 'APPROVED';
@@ -38,7 +38,11 @@ export function isBatchRejected(b: BatchRecord | undefined): boolean {
 }
 
 export function isBatchApproved(b: BatchRecord | undefined): boolean {
-  return !!b && !isBatchRejected(b) && b.approvalStatus === 'APPROVED';
+  return !!b && !isBatchRejected(b) && !isBatchWithdrawn(b) && b.approvalStatus === 'APPROVED' && b.status !== 'WITHDRAWN' && b.status !== 'CANCELLED';
+}
+
+export function isBatchWithdrawn(b: BatchRecord | undefined): boolean {
+  return !!b && (b.status === 'WITHDRAWN' || b.approvalStatus === 'WITHDRAWN');
 }
 
 /** Sent back by the department for corrections. */
@@ -79,7 +83,7 @@ export function isBatchFrozen(b: BatchRecord | undefined, today: string = todayI
 }
 
 function isRunnable(b: BatchRecord): boolean {
-  return isBatchApproved(b) && b.status !== 'COMPLETED' && b.status !== 'CANCELLED';
+  return isBatchApproved(b) && b.status !== 'COMPLETED' && b.status !== 'CANCELLED' && b.status !== 'WITHDRAWN';
 }
 
 /** New aspirants can be registered once the batch is approved, until the freeze date, and while seats are free. */
@@ -95,6 +99,7 @@ export function canRegisterReplacement(b: BatchRecord | undefined): boolean {
 /** Why aspirants cannot be registered, or an empty text when they can. */
 export function registrationBlockedReason(b: BatchRecord | undefined, today: string = todayIso(), replacement = false): string {
   if (!b) return 'Target batch not found.';
+  if (isBatchWithdrawn(b)) return 'This batch was withdrawn. Aspirants cannot be registered.';
   if (isBatchRejected(b)) return 'This batch was rejected. Aspirants cannot be registered.';
   if (isBatchReturned(b)) return 'This batch was returned to the training partner. Aspirants can be registered after it is approved.';
   if (isBatchInApproval(b)) return 'This batch is waiting for approval. Aspirants can be registered after it is approved.';
@@ -127,6 +132,7 @@ export function nextApprover(b: BatchRecord): string {
 }
 
 export function batchDisplayStatus(b: BatchRecord | undefined): BatchDisplayStatus {
+  if (isBatchWithdrawn(b)) return 'WITHDRAWN';
   if (isBatchRejected(b)) return 'REJECTED';
   if (isBatchApproved(b)) return 'APPROVED';
   if (isBatchReturned(b)) return 'RETURNED';
@@ -138,6 +144,8 @@ export function batchStatusLabel(b: BatchRecord | undefined): string {
   switch (batchDisplayStatus(b)) {
     case 'APPROVED':
       return 'Approved';
+    case 'WITHDRAWN':
+      return 'Withdrawn';
     case 'REJECTED':
       return 'Rejected';
     case 'RETURNED':

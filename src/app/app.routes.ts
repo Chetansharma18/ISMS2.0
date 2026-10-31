@@ -166,6 +166,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/mou',
+    loadComponent: () =>
+      import('./features/eoi/pages/mou-management/mou-management.component').then(
+        (m) => m.MouManagementComponent
+      )
+  },
+  {
     path: 'admin/mou-draft/:schemeId',
     loadComponent: () =>
       import('./features/eoi/pages/mou/mou-draft.component').then((m) => m.MouDraftComponent)
@@ -497,6 +504,11 @@ export const routes: Routes = [
   {
     path: 'sanction-orders',
     redirectTo: 'tp/sanction-orders',
+    pathMatch: 'full'
+  },
+  {
+    path: 'mou',
+    redirectTo: 'admin/mou',
     pathMatch: 'full'
   },
   {

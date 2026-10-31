@@ -26,7 +26,7 @@ export interface ShortfallUpload {
   requiredDoc: string;
   fileName: string;
   fileSize: string;
-  uploadedOn: string;
+  uploadedOn?: string;
 }
 
 /** The applicant's reply to a shortfall notice. */
@@ -66,6 +66,10 @@ export interface TenderAppeal {
   submittedOn: string;
   reply: string;
   files: AppealFile[];
+  status?: 'Pending' | 'Accepted' | 'Rejected';
+  rejectionReason?: string;
+  decidedAt?: string;
+  response?: ShortfallResponse;
 }
 
 export interface SubmittedTender {

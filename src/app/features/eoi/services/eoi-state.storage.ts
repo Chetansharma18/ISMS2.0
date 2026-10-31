@@ -30,6 +30,14 @@ export class EoiStorage {
     this.storage.setItem(RESPONSES_KEY, responses);
   }
 
+  getString(key: string): string | null {
+    return this.storage.getString(key);
+  }
+
+  setString(key: string, value: string): void {
+    this.storage.setString(key, value);
+  }
+
   markSanctionSubmitted(schemeId: string): void {
     this.storage.setString(`isms_sanction_submitted_${schemeId}`, 'true');
     this.storage.setString(SANCTION_SUBMITTED_LATEST_KEY, 'true');

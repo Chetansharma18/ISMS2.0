@@ -103,13 +103,13 @@ export interface Step3AuthorizedPerson {
 export interface Step4BankDetails {
   bankName: string;
   branchName: string;
-  transferMode: string;
-  accountType: string;
+  transferMode?: string;
+  accountType?: string;
   accountHolderName: string;
   accountNo: string;
   ifscCode: string;
   micrCode: string;
-  branchAddress: string;
+  branchAddress?: string;
   cancelledChequeDoc: FileDoc | null;
 }
 
@@ -366,8 +366,8 @@ export function createInitialOtrFormData(): OtrFormData {
     step4: {
       bankName: '',
       branchName: '',
-      transferMode: 'NEFT',
-      accountType: 'Current',
+      transferMode: '',
+      accountType: '',
       accountHolderName: '',
       accountNo: '',
       ifscCode: '',
@@ -527,8 +527,6 @@ export function createExistingUserOtrData(): OtrFormData {
     step4: {
       bankName: 'State Bank of India',
       branchName: 'Secretariat Branch, Jaipur',
-      transferMode: 'NEFT',
-      accountType: 'Current',
       accountHolderName: 'Company 1',
       accountNo: '3948201948201',
       ifscCode: 'SBIN0001234',

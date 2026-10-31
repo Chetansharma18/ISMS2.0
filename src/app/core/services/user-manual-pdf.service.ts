@@ -467,7 +467,7 @@ export class UserManualPdfService {
     const faqs = [
       {
         q: 'Q1: What should I do if my e-GRAS payment is debited but challan is not reflected?',
-        a: 'The portal performs automated treasury reconciliation every 15 minutes. Check Tender Status to refresh status.'
+        a: 'The portal performs automated treasury reconciliation every 15 minutes. Check EOI Status to refresh status.'
       },
       {
         q: 'Q2: Can I edit an EOI application after submission?',
@@ -475,7 +475,7 @@ export class UserManualPdfService {
       },
       {
         q: 'Q3: Where can I track my submitted proposals?',
-        a: 'Navigate to "Tender Status" (/tender-status). Enter your EOI Application ID to view live stage scrutiny progress.'
+        a: 'Navigate to "EOI Status" (/tender-status). Enter your EOI Application ID to view live stage scrutiny progress.'
       }
     ];
 

@@ -32,7 +32,7 @@ import { filterAdmins } from './tenders-page.util';
       [closeOnBackdrop]="true"
       [showAccentBar]="true"
       accentBarClass="bg-purple-600"
-      title="Add Committee Members"
+      title="Create Committee"
       primaryLabel="Save Committee"
       secondaryLabel="Cancel"
       maxWidthClass="max-w-[560px]"

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, model, output } fr
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent, IconComponent, ListPageComponent, TableColumn } from '../../../shared';
 import { SubmittedTender } from '../../../core/models/tender.model';
-import { filterTenders } from './tender-status.util';
+import { filterTenders, TenderOpenEvent } from './tender-status.util';
 import { openShortfalls, shortfallSummary } from './tender-shortfall.util';
 import { canAppeal } from './tender-appeal.util';
 
@@ -15,8 +15,8 @@ import { canAppeal } from './tender-appeal.util';
   template: `
     <!-- Page header with search + status table via the shared list page -->
     <app-list-page
-      title="Tender Status"
-      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Tender Status' }]"
+      title="EOI Status"
+      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'EOI Status' }]"
       [searchable]="true"
       [(searchQuery)]="searchQuery"
       searchPlaceholder="Search Ref, Scheme, Category..."
@@ -24,7 +24,7 @@ import { canAppeal } from './tender-appeal.util';
       [data]="filteredTenders()"
       [pagination]="true"
       [pageSize]="pageSize"
-      emptyMessage="No tender applications match your search query."
+      emptyMessage="No EOI applications match your search query."
       [customTemplates]="{
         appRef: appRefTemplate,
         schemeTitle: schemeTitleTemplate,
@@ -44,7 +44,7 @@ import { canAppeal } from './tender-appeal.util';
           variant="ghost"
           size="sm"
           type="button"
-          (click)="open.emit(tender)"
+          (click)="open.emit({ tender, tab: 'overview' })"
           class="tabular-nums"
           title="Open Application Details Page"
         >
@@ -55,7 +55,7 @@ import { canAppeal } from './tender-appeal.util';
       <!-- Custom Scheme Title Template -->
       <ng-template #schemeTitleTemplate let-tender>
         <span
-          (click)="open.emit(tender)"
+          (click)="open.emit({ tender, tab: 'overview' })"
           class="font-normal text-slate-800 hover:text-navy hover:underline cursor-pointer transition-colors text-[13px]"
           title="Open {{ tender.schemeTitle }}"
         >
@@ -84,58 +84,72 @@ import { canAppeal } from './tender-appeal.util';
         }
       </ng-template>
 
-      <!-- Request for Appeal against a rejection -->
+      <!-- Appeal Request against a rejection: only visible in rejected status -->
       <ng-template #appealTemplate let-tender>
-        @if (canAppeal(tender)) {
-          <button appButton variant="secondary" size="sm" type="button" (click)="appeal.emit(tender)" title="Answer the rejection remarks and submit request for appeal">
-            Request for Appeal
-          </button>
-        } @else if (tender.appeal) {
-          <button appButton variant="ghost" size="sm" type="button" (click)="open.emit(tender)" title="View your appeal request">
-            Appeal Submitted
-          </button>
+        @if (tender.submittedStatus === 'Rejected') {
+          @if (!tender.appeal) {
+            <button appButton variant="secondary" size="sm" type="button" (click)="appeal.emit(tender)" title="Request appeal against rejection">
+              Appeal Request
+            </button>
+          } @else if (tender.appeal.status === 'Rejected') {
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+              Appeal Rejected
+            </span>
+          } @else if (tender.appeal.status === 'Accepted') {
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              Appeal Accepted
+            </span>
+          } @else {
+            <button appButton variant="ghost" size="sm" type="button" (click)="open.emit({ tender, tab: 'shortfall' })" title="View your appeal request">
+              Appeal Submitted
+            </button>
+          }
         } @else {
           <span class="text-slate-400 text-[13px]">-</span>
         }
       </ng-template>
 
-      <!-- Response to Appeal / Shortfall requests raised by the department -->
+      <!-- Response to Appeal / Shortfall requests raised by the department: only shown when appeal has been submitted -->
       <ng-template #shortfallTemplate let-tender>
-        @switch (shortfallState(tender)) {
-          @case ('open') {
-            <button
-              appButton
-              variant="secondary"
-              size="sm"
-              type="button"
-              (click)="respond.emit(tender)"
-              title="The department has requested additional documents or clarification. Click to respond."
-            >
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
-              Respond ({{ openCount(tender) }})
-            </button>
+        @if (tender.appeal && tender.appeal.status !== 'Rejected') {
+          @switch (shortfallState(tender)) {
+            @case ('open') {
+              <button
+                appButton
+                variant="secondary"
+                size="sm"
+                type="button"
+                (click)="respond.emit(tender)"
+                title="The department has requested additional documents or clarification. Click to respond."
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
+                Respond ({{ openCount(tender) }})
+              </button>
+            }
+            @case ('responded') {
+              <button
+                appButton
+                variant="ghost"
+                size="sm"
+                type="button"
+                (click)="open.emit({ tender, tab: 'shortfall' })"
+                title="View responses"
+              >
+                Responded
+              </button>
+            }
+            @default {
+              <span class="text-slate-400 text-[13px]">-</span>
+            }
           }
-          @case ('responded') {
-            <button
-              appButton
-              variant="ghost"
-              size="sm"
-              type="button"
-              (click)="open.emit(tender)"
-              title="View responses"
-            >
-              Responded
-            </button>
-          }
-          @default {
-            <span class="text-slate-400 text-[13px]">-</span>
-          }
+        } @else {
+          <span class="text-slate-400 text-[13px]">-</span>
         }
       </ng-template>
 
       <!-- Custom View Action Button Template -->
       <ng-template #viewTemplate let-tender>
-        <button appButton size="sm" type="button" (click)="open.emit(tender)" title="Open Application Details Page">
+        <button appButton size="sm" type="button" (click)="open.emit({ tender, tab: 'overview' })" title="Open Application Details Page">
           <app-icon name="eye" size="sm" />
           <span>View</span>
         </button>
@@ -148,7 +162,7 @@ export class TenderListComponent {
   readonly tenders = input.required<SubmittedTender[]>();
   /** Search text; owned by the container so it survives opening a detail page. */
   readonly searchQuery = model('');
-  readonly open = output<SubmittedTender>();
+  readonly open = output<TenderOpenEvent>();
   /** The applicant wants to answer an open revert request. */
   readonly respond = output<SubmittedTender>();
   /** The applicant wants to appeal a rejected application. */
@@ -177,7 +191,7 @@ export class TenderListComponent {
       }
     },
     { key: 'rejectionReason', label: 'Remarks', align: 'center', type: 'custom', cellClass: 'min-w-[200px]' },
-    { key: 'appeal', label: 'Request for Appeal', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
+    { key: 'appeal', label: 'Appeal Request', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
     { key: 'shortfall', label: 'Appeal Response', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
     { key: 'view', label: 'View', align: 'center', width: 'w-20', type: 'custom' }
   ];

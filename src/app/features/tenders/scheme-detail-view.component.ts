@@ -34,30 +34,36 @@ import { RequiredDocumentsListComponent } from './scheme-detail-view/required-do
         (apply)="onApply()"
       ></app-scheme-detail-toolbar>
 
-      <!-- 2 & 3. SCHEME TITLE, DESCRIPTION & METADATA STATS BAR -->
-      <app-scheme-detail-summary [scheme]="scheme"></app-scheme-detail-summary>
-
-      <!-- 4. MIDDLE SECTION: SCHEME DOCUMENTS & ANNEXURES -->
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 pt-3">
-        
-        <!-- Left Column: Scheme Documents (4 of 12 columns) -->
-        <div class="md:col-span-5 lg:col-span-4 md:pr-6 md:border-r border-slate-200">
-          <app-scheme-documents-panel
-            [scheme]="scheme"
-            (downloadRfp)="downloadRfp()"
-            (downloadSop)="downloadSop()"
-          ></app-scheme-documents-panel>
-        </div>
-
-        <!-- Right Column: Annexures (Numbered List, No Download Buttons) -->
-        <div class="md:col-span-7 lg:col-span-8">
-          <app-scheme-annexures-list [annexures]="annexures"></app-scheme-annexures-list>
-        </div>
-
+      <!-- 2. SCHEME TITLE & DESCRIPTION -->
+      <div class="mt-4">
+        <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-snug">
+          {{ scheme.schemeTitle || scheme.schemeName }}
+        </h1>
+        <p class="text-xs sm:text-[13px] text-slate-600 mt-1 leading-relaxed">
+          {{ scheme.eoiDescription }}
+        </p>
       </div>
 
-      <!-- 5. BOTTOM SECTION: REQUIRED SUPPORTING DOCUMENTS -->
-      <div class="border-t border-slate-200 mt-6 pt-5">
+      <!-- 3. TWO 2-COLUMN TABLES: SCHEME DETAILS & SCHEME DOCUMENTS -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-4 items-stretch">
+        <!-- Table 1: Scheme Details -->
+        <app-scheme-detail-summary [scheme]="scheme"></app-scheme-detail-summary>
+
+        <!-- Table 2: Scheme Documents (PDF) -->
+        <app-scheme-documents-panel
+          [scheme]="scheme"
+          (downloadRfp)="downloadRfp()"
+          (downloadSop)="downloadSop()"
+        ></app-scheme-documents-panel>
+      </div>
+
+      <!-- 4. ANNEXURES (DROPDOWN ACCORDION) -->
+      <div class="mt-4">
+        <app-scheme-annexures-list [annexures]="annexures"></app-scheme-annexures-list>
+      </div>
+
+      <!-- 5. REQUIRED SUPPORTING DOCUMENTS (DROPDOWN ACCORDION) -->
+      <div class="mt-3">
         <app-required-documents-list [requiredInfo]="requiredInfo"></app-required-documents-list>
       </div>
 

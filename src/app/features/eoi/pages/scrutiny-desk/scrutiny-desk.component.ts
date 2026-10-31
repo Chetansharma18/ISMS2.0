@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import {
   EoiStateService,
   ApplicantResponse,
+  ApplicantAppeal,
   DossierDocument,
   ApplicationActivityLog
 } from '../../services/eoi-state.service';
@@ -12,6 +13,7 @@ import { formatDateMedium } from '../../../../shared/utils';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { ShortfallBridgeService } from '../../services/shortfall-bridge.service';
 import { ScrutinyToolbarComponent } from './components/scrutiny-toolbar.component';
+import { ScrutinyAppealCardComponent } from './components/scrutiny-appeal-card.component';
 import { ScrutinyDocViewerComponent } from './components/scrutiny-doc-viewer.component';
 import { ScrutinyDecisionRecordComponent } from './components/scrutiny-decision-record.component';
 import { ScrutinyReviewSectionsComponent } from './components/scrutiny-review-sections.component';
@@ -33,6 +35,7 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
   standalone: true,
   imports: [
     ScrutinyToolbarComponent,
+    ScrutinyAppealCardComponent,
     ScrutinyDecisionRecordComponent,
     ScrutinyReviewSectionsComponent,
     ScrutinyPastPerformanceComponent,
@@ -42,19 +45,29 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
     ScrutinyDocViewerComponent
   ],
   template: `
-    <div class="w-full min-h-screen bg-[#FEFEFD] text-slate-800 font-sans px-4 sm:px-5 lg:px-6 py-4 sm:py-5 space-y-5" >
+    <div class="w-full min-h-screen bg-white text-slate-800 font-sans px-4 sm:px-5 lg:px-6 py-4 sm:py-5 space-y-5" >
 
       <app-scrutiny-toolbar
         [applicant]="applicant()"
-        (revert)="openRevertModal()"
         (remarks)="openRemarksModal()"
         (reject)="openRejectModal()"
         (approve)="openApproveModal()"
       />
 
       @if (applicant(); as app) {
-        @if (app.status !== 'UNDER_SCRUTINY') {
+        @if (app.status !== 'UNDER_SCRUTINY' && app.appeal?.status !== 'Pending') {
           <app-scrutiny-decision-record [applicant]="app" />
+        }
+
+        @if (app.appeal) {
+          <app-scrutiny-appeal-card
+            [appeal]="app.appeal"
+            [applicant]="app"
+            [rejectionReason]="getRejectionReason(app)"
+            (accept)="openAcceptAppealModal()"
+            (reject)="openRejectAppealModal()"
+            (viewFile)="openOfficialDoc($event)"
+          />
         }
 
         <app-scrutiny-review-sections
@@ -83,6 +96,7 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
       <app-scrutiny-revert-modal
         [applicantLabel]="applicant()?.anonymousLabel ?? ''"
         [documentOptions]="shortfallDocTitles()"
+        [isAppeal]="!!applicant()?.appeal"
         (confirmed)="confirmRevert($event)"
         (close)="closeModals()"
       />
@@ -106,11 +120,20 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
       />
     }
 
+    @if (showRejectAppealModal()) {
+      <app-scrutiny-decision-modal
+        mode="reject"
+        [applicantLabel]="applicant()?.anonymousLabel ?? ''"
+        (confirmed)="confirmRejectAppeal($event)"
+        (close)="closeModals()"
+      />
+    }
+
     @if (showApproveModal()) {
       <app-scrutiny-decision-modal
         mode="approve"
         [applicantLabel]="applicant()?.anonymousLabel ?? ''"
-        [grades]="grades()"
+        [grades]="schemeGrades()"
         (confirmed)="confirmApprove($event)"
         (close)="closeModals()"
       />
@@ -145,10 +168,25 @@ export class ScrutinyDeskComponent {
   showApproveModal = signal<boolean>(false);
   showRejectModal = signal<boolean>(false);
   showRevertModal = signal<boolean>(false);
+  showRejectAppealModal = signal<boolean>(false);
   showRemarksModal = signal<boolean>(false);
 
   /** Active grades from the Grading Master, highest first. */
   readonly grades = signal<GradeOption[]>([]);
+
+  /** Grades specifically linked to the applicant's scheme (or general/all schemes). */
+  readonly schemeGrades = computed<GradeOption[]>(() => {
+    const app = this.applicant();
+    const all = this.grades();
+    if (!app?.schemeName) return all;
+    const scheme = app.schemeName.toLowerCase().trim();
+    const matched = all.filter(g => {
+      if (!g.schemeName || g.schemeName === 'ALL Schemes' || g.schemeName === 'ALL') return true;
+      const s = g.schemeName.toLowerCase().trim();
+      return s === scheme || scheme.includes(s) || s.includes(scheme);
+    });
+    return matched.length > 0 ? matched : all;
+  });
 
   // Document Viewer State
   activeDoc = signal<ActivePreviewDocument | null>(null);
@@ -207,7 +245,7 @@ export class ScrutinyDeskComponent {
           items
             .filter(item => item.status !== 'Inactive')
             .sort((a, b) => b.maximum - a.maximum)
-            .map(({ grade, minimum, maximum, range }) => ({ grade, minimum, maximum, range }))
+            .map(({ grade, minimum, maximum, range, schemeName }) => ({ grade, minimum, maximum, range, schemeName }))
         )
       );
 
@@ -219,9 +257,30 @@ export class ScrutinyDeskComponent {
     });
   }
 
+  protected getRejectionReason(app: ApplicantResponse): string {
+    const disqualification = app.scrutinyDetails?.disqualificationReason;
+    if (disqualification && disqualification !== app.appeal?.reply) {
+      return disqualification;
+    }
+    const remarks = app.scrutinyDetails?.remarks;
+    if (remarks && remarks !== app.appeal?.reply) {
+      return remarks;
+    }
+    const isCompany4 = app.id.includes('4') || app.anonymousLabel.includes('4');
+    return isCompany4
+      ? 'Annual turnover criteria not met for last 3 financial years (CA certificate missing valid UDIN).'
+      : 'Technical qualification criteria not met (CA turnover certificate missing valid UDIN).';
+  }
+
   loadApplicant(appId: string): void {
     this.eoiStateService.getResponseById(appId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => {
-      this.applicant.set(data);
+      if (data) {
+        this.shortfallBridge.syncFromTenderIfNeeded(data).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(synced => {
+          this.applicant.set(synced);
+        });
+      } else {
+        this.applicant.set(undefined);
+      }
     });
   }
 
@@ -257,15 +316,18 @@ export class ScrutinyDeskComponent {
     ];
 
     if (app?.status === 'REVERTED' && app.scrutinyDetails?.shortfall) {
+      const isAppeal = !!app.appeal;
       initial.push({
         id: 'ACT-3',
         timestamp: app.scrutinyDetails.decisionTimestamp || '10/09/2026 11:30 AM',
         action: 'REVERTED',
-        title: 'Shortfall Notice Issued (Reverted to Applicant)',
+        title: isAppeal ? 'Appeal Accepted' : 'Shortfall Notice Issued (Reverted to Applicant)',
         actor: app.scrutinyDetails.scrutinyOfficer || 'Committee Member 1',
         actorRole: 'Department Scrutiny Officer',
-        description: `Shortfall notice issued for ${app.scrutinyDetails.shortfall.documents.length} document(s).${app.scrutinyDetails.shortfall.officeOrderRef ? ` Office Order Ref: ${app.scrutinyDetails.shortfall.officeOrderRef}.` : ''} Rectification window: ${app.scrutinyDetails.shortfall.deadlineDays} Days. Remarks: "${app.scrutinyDetails.remarks}"`,
-        badgeClass: 'bg-amber-50 text-amber-800 border-amber-200',
+        description: isAppeal
+          ? `Appeal accepted. Response time: ${app.scrutinyDetails.shortfall.deadlineDays} Days. Remarks: "${app.scrutinyDetails.remarks}"`
+          : `Shortfall notice issued for ${app.scrutinyDetails.shortfall.documents.length} document(s).${app.scrutinyDetails.shortfall.officeOrderRef ? ` Office Order Ref: ${app.scrutinyDetails.shortfall.officeOrderRef}.` : ''} Rectification window: ${app.scrutinyDetails.shortfall.deadlineDays} Days. Remarks: "${app.scrutinyDetails.remarks}"`,
+        badgeClass: isAppeal ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200',
         meta: {
           documents: app.scrutinyDetails.shortfall.documents,
           officeOrderRef: app.scrutinyDetails.shortfall.officeOrderRef,
@@ -316,6 +378,14 @@ export class ScrutinyDeskComponent {
     this.showRejectModal.set(true);
   }
 
+  openAcceptAppealModal(): void {
+    this.showRevertModal.set(true);
+  }
+
+  openRejectAppealModal(): void {
+    this.showRejectAppealModal.set(true);
+  }
+
   openRevertModal(): void {
     this.showRevertModal.set(true);
   }
@@ -328,6 +398,7 @@ export class ScrutinyDeskComponent {
     this.showApproveModal.set(false);
     this.showRejectModal.set(false);
     this.showRevertModal.set(false);
+    this.showRejectAppealModal.set(false);
     this.showRemarksModal.set(false);
   }
 
@@ -356,13 +427,22 @@ export class ScrutinyDeskComponent {
       }
     };
 
+    const updatedAppeal: ApplicantAppeal | undefined = app.appeal ? {
+      ...app.appeal,
+      status: 'Accepted',
+      decidedAt: nowStr
+    } : undefined;
+
     this.eoiStateService.updateScrutinyDecision(app.id, {
       status: 'APPROVED',
       scrutinyOfficer: this.reviewerName(),
       grade,
       remarks: submission.remark,
+      appeal: updatedAppeal,
       activityLog: [...this.getActivityLog(), newActivity]
     });
+
+    this.shortfallBridge.syncStatusToTender(app.id, 'APPROVED').pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
 
     this.closeModals();
     this.notifications.success(`${app.anonymousLabel} has been approved (grade ${grade}).`, 'Application Approved');
@@ -391,14 +471,24 @@ export class ScrutinyDeskComponent {
       }
     };
 
+    const updatedAppeal: ApplicantAppeal | undefined = app.appeal ? {
+      ...app.appeal,
+      status: 'Rejected',
+      decidedAt: nowStr,
+      decisionRemarks: submission.remark
+    } : undefined;
+
     this.eoiStateService.updateScrutinyDecision(app.id, {
       status: 'REJECTED',
       scrutinyOfficer: this.reviewerName(),
       technicalScore: 0,
       remarks: submission.remark,
       disqualificationReason: submission.remark,
+      appeal: updatedAppeal,
       activityLog: [...this.getActivityLog(), newActivity]
     });
+
+    this.shortfallBridge.syncStatusToTender(app.id, 'REJECTED', submission.remark).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
 
     this.closeModals();
     this.notifications.success(`${app.anonymousLabel} has been rejected.`, 'Application Rejected');
@@ -416,20 +506,32 @@ export class ScrutinyDeskComponent {
     const due = new Date(now);
     due.setDate(due.getDate() + submission.dueDays);
 
+    const isAppealFlow = !!app.appeal;
+    const title = isAppealFlow ? 'Appeal Accepted' : 'Shortfall Raised';
+    const actionDesc = isAppealFlow
+      ? `Appeal accepted. Response time: ${submission.dueDays} days.`
+      : `Shortfall raised for ${submission.documents.length} document(s). Response time: ${submission.dueDays} days.`;
+
     const newActivity: ApplicationActivityLog = {
       id: `ACT-${Date.now()}`,
       timestamp: nowStr,
       action: 'REVERTED',
-      title: 'Shortfall Raised',
+      title,
       actor: this.reviewerName(),
       actorRole: 'Department Scrutiny Officer',
-      description: `Shortfall raised for ${submission.documents.length} document(s). Response time: ${submission.dueDays} days.`,
-      badgeClass: 'bg-amber-50 text-amber-800 border-amber-200',
+      description: actionDesc,
+      badgeClass: isAppealFlow ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200',
       meta: {
         documents: submission.documents,
         remarks: submission.comment
       }
     };
+
+    const updatedAppeal: ApplicantAppeal | undefined = app.appeal ? {
+      ...app.appeal,
+      status: 'Accepted',
+      decidedAt: nowStr
+    } : undefined;
 
     this.eoiStateService.updateScrutinyDecision(app.id, {
       status: 'REVERTED',
@@ -437,6 +539,7 @@ export class ScrutinyDeskComponent {
       technicalScore: 0,
       grade: 'Grade E',
       remarks: submission.comment,
+      appeal: updatedAppeal,
       shortfall: {
         documents: submission.documents,
         deadlineDays: submission.dueDays,
@@ -459,7 +562,53 @@ export class ScrutinyDeskComponent {
       .subscribe();
 
     this.closeModals();
-    this.notifications.success('Shortfall sent to the applicant.', 'Shortfall Raised');
+    const successMsg = isAppealFlow
+      ? 'Appeal accepted and shortfall notice sent to applicant.'
+      : 'Shortfall sent to the applicant.';
+    this.notifications.success(successMsg, isAppealFlow ? 'Appeal Accepted' : 'Shortfall Raised');
+    this.loadApplicant(app.id);
+  }
+
+  /** Rejects the applicant's appeal against a rejection. */
+  confirmRejectAppeal(submission: DecisionSubmission): void {
+    const app = this.applicant();
+    if (!app) return;
+
+    const now = new Date();
+    const nowStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const remark = submission.remark.trim() || 'Appeal criteria not met.';
+
+    const newActivity: ApplicationActivityLog = {
+      id: `ACT-${Date.now()}`,
+      timestamp: nowStr,
+      action: 'REJECTED',
+      title: 'Appeal Rejected',
+      actor: this.reviewerName(),
+      actorRole: 'Department Scrutiny Officer',
+      description: `Applicant's appeal rejected. Reason: "${remark}".`,
+      badgeClass: 'bg-rose-50 text-rose-800 border-rose-200',
+      meta: { remarks: remark }
+    };
+
+    const updatedAppeal: ApplicantAppeal = {
+      ...(app.appeal || { submittedOn: nowStr, reply: '', files: [] }),
+      status: 'Rejected',
+      decisionRemarks: remark,
+      decidedAt: nowStr
+    };
+
+    this.eoiStateService.updateScrutinyDecision(app.id, {
+      status: 'REJECTED',
+      scrutinyOfficer: this.reviewerName(),
+      remarks: remark,
+      appeal: updatedAppeal,
+      activityLog: [...this.getActivityLog(), newActivity]
+    });
+
+    this.shortfallBridge.rejectAppealNotice(app.id, remark).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+
+    this.closeModals();
+    this.notifications.info('Applicant appeal has been rejected.', 'Appeal Rejected');
     this.loadApplicant(app.id);
   }
 
@@ -503,7 +652,7 @@ export class ScrutinyDeskComponent {
 
 
   /** Opens the Document / PDF Viewer for a dossier document directly in another tab in Chrome. */
-  openOfficialDoc(doc: DossierDocument): void {
+  openOfficialDoc(doc?: { title?: string; fileName?: string } | DossierDocument): void {
     window.open(encodeURI('/document/ISMS RFP.pdf'), '_blank');
   }
 

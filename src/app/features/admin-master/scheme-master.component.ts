@@ -21,7 +21,7 @@ const COLUMNS: TableColumn<SchemeMasterItem>[] = [
   { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
   { key: 'schemeName', label: 'Scheme Name', cellClass: 'whitespace-nowrap font-semibold text-slate-800' },
   { key: 'schemeCategory', label: 'Scheme Category', cellClass: 'whitespace-nowrap font-medium text-slate-700' },
-  { key: 'categoryName', label: 'Category Name', cellClass: 'whitespace-nowrap font-medium text-slate-700' },
+  { key: 'categoryName', label: 'EOI Category', cellClass: 'whitespace-nowrap font-medium text-slate-700' },
   {
     key: 'amount',
     label: 'EMD amount',
@@ -42,7 +42,7 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
   dataKey: 'SCHEME_MASTERS',
   entityLabel: 'Scheme',
   title: 'Scheme Master',
-  searchPlaceholder: 'Search by scheme name, category, or category name...',
+  searchPlaceholder: 'Search by scheme name, category, or EOI category...',
   searchFields: ['schemeName', 'schemeCategory', 'categoryName'],
   itemUnit: 'schemes',
   columns: COLUMNS,

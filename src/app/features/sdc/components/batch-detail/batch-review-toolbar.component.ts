@@ -35,7 +35,8 @@ import { canDecideBatch } from './batch-review.util';
             [ngClass]="{
               'bg-sky-50 text-navy border-sky-200': display() === 'APPROVED',
               'bg-rose-50 text-rose-800 border-rose-200': display() === 'REJECTED',
-              'bg-amber-50 text-amber-800 border-amber-200': display() !== 'APPROVED' && display() !== 'REJECTED'
+              'bg-slate-100 text-slate-700 border-slate-300': display() === 'WITHDRAWN',
+              'bg-amber-50 text-amber-800 border-amber-200': display() !== 'APPROVED' && display() !== 'REJECTED' && display() !== 'WITHDRAWN'
             }"
           >
             {{ statusLabel() }}

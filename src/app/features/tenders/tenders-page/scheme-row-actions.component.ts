@@ -48,17 +48,17 @@ import { isEditDisabled } from './tenders-page.util';
       @if (isSuperAdmin()) {
         <div class="h-3.5 w-px bg-slate-300 shrink-0"></div>
 
-        <!-- Add Committee Button (Super Admin Only) -->
+        <!-- Create Committee Button (Super Admin Only) -->
         <button
           appButton
           variant="ghost"
           size="sm"
           type="button"
           (click)="$event.stopPropagation(); manageCommittee.emit(item())"
-          title="Add / Manage Committee Members"
+          title="Create / Manage Committee Members"
         >
           <app-icon name="users-committee" size="sm" [stroke]="2" />
-          <span>Add Committee</span>
+          <span>Create Committee</span>
           @if ((item().committeeMembers && item().committeeMembers!.length > 0) || item().committeeApprover) {
             <span class="ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-300">
               {{ (item().committeeMembers?.length || 0) + (item().committeeApprover ? 1 : 0) }}

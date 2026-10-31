@@ -78,7 +78,7 @@ interface ReceiptRow {
       <!-- Footer Navigation Bar -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-end gap-3">
         <button appButton size="lg" (click)="state.goToTenderStatus()">
-          <span>Track Tender Status</span>
+          <span>Track EOI Status</span>
         </button>
       </div>
 

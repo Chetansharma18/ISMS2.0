@@ -49,7 +49,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
 
         @if (isSection1Open()) {
           <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
-            <!-- Row 1 -->
+            <!-- Row 1: Basic Organisation Details -->
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Organisation Name</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().fullName || '-' }}</span>
@@ -59,6 +59,16 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().natureOfEntity || '-' }}</span>
             </div>
             <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Preferred Sector</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().preferredSector || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">NSDC Partner</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().nsdcPartner || '-' }}</span>
+            </div>
+
+            <!-- Row 2: Registrations & Status -->
+            <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Registration No. (CIN / Reg. No.)</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step1().registrationNumber || '-' }}</span>
             </div>
@@ -66,8 +76,6 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Date of Registration</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().dateOfRegistration || '-' }}</span>
             </div>
-
-            <!-- Row 2 -->
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">State / UT of Registration</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().stateOfLegalReg || '-' }}</span>
@@ -75,6 +83,16 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Organisation PAN</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step1().companyPan || '-' }}</span>
+            </div>
+
+            <!-- Row 3: Documents & GST / MSME Status -->
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Certificate of Registration</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 truncate">{{ step1().registrationCertDoc?.fileName || '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Organisation PAN Card</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 truncate">{{ step1().panCardDoc?.fileName || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">GST Registered</span>
@@ -85,29 +103,45 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().msmeRegistered || '-' }}</span>
             </div>
 
-            <!-- Row 3 -->
+            <!-- Conditional GST Fields (if GST Registered is Yes) -->
+            @if (step1().gstRegistered === 'Yes') {
+              <div>
+                <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">GSTIN</span>
+                <span class="font-medium text-slate-900 text-[12.5px] block mt-1 uppercase">{{ step1().gstin || '-' }}</span>
+              </div>
+              <div class="sm:col-span-3">
+                <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">GST Registration Certificate</span>
+                <span class="font-medium text-slate-900 text-[12.5px] block mt-1 truncate">{{ step1().gstCertDoc?.fileName || '-' }}</span>
+              </div>
+            }
+
+            <!-- Conditional MSME Fields (if MSME Registered is Yes) -->
+            @if (step1().msmeRegistered === 'Yes') {
+              <div>
+                <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Udyam Registration Number</span>
+                <span class="font-medium text-slate-900 text-[12.5px] block mt-1 uppercase">{{ step1().udyamNumber || '-' }}</span>
+              </div>
+              <div class="sm:col-span-3">
+                <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">MSME / Udyam Certificate</span>
+                <span class="font-medium text-slate-900 text-[12.5px] block mt-1 truncate">{{ step1().msmeCertDoc?.fileName || '-' }}</span>
+              </div>
+            }
+
+            <!-- Row 4: Contact Information -->
             <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Preferred Sector</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().preferredSector || '-' }}</span>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Contact Number</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step1().contactNo || '-' }}</span>
             </div>
             <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">NSDC Partner</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().nsdcPartner || '-' }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Contact No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().contactNo || '-' }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Email ID</span>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Organisation Email ID</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().emailId || '-' }}</span>
             </div>
-            <div>
+            <div class="sm:col-span-2">
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Website</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1 break-all">{{ step1().website || '-' }}</span>
             </div>
 
-            <!-- Row 4 Addresses -->
+            <!-- Row 5: Addresses -->
             <div class="sm:col-span-2">
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Registered Address</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ registeredAddressDisplay() }}</span>
@@ -155,18 +189,18 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
         </div>
 
         @if (isSection2Open()) {
-          <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
             <!-- Row 1: Personal & Contact Details -->
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Full Name</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().name || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ authPersonFullName() }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Designation</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().designation || '-' }}</span>
             </div>
             <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Mobile No.</span>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Mobile Number</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step3().mobileNo || '-' }}</span>
             </div>
             <div>
@@ -194,20 +228,20 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
               </span>
             </div>
             <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">State / UT</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().state || '-' }}</span>
-            </div>
-
-            <!-- Row 3: Residential Address & Authorization Document -->
-            <div class="sm:col-span-3">
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Residential Address</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ step3().residenceAddress || '-' }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Authorization Letter</span>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Authorization Letter / Board Resolution</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1 truncate">
                 {{ step3().authorizationLetterDoc?.fileName || '-' }}
               </span>
+            </div>
+
+            <!-- Row 3: Address & State -->
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">State</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step3().state || '-' }}</span>
+            </div>
+            <div class="sm:col-span-3">
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Residential Address</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ step3().residenceAddress || '-' }}</span>
             </div>
           </div>
         }
@@ -247,12 +281,11 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
           </div>
         </div>
 
-
         @if (isSection3Open()) {
           <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
-            <!-- Row 1 -->
+            <!-- Row 1: Bank & Branch -->
             <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Bank Name</span>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Name of the Bank</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step4().bankName || '-' }}</span>
             </div>
             <div>
@@ -268,28 +301,18 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step4().accountNo || '-' }}</span>
             </div>
 
-            <!-- Row 2 -->
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Account Type</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step4().accountType || '-' }}</span>
-            </div>
+            <!-- Row 2: Codes & Document -->
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">IFSC Code</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step4().ifscCode || '-' }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums uppercase">{{ step4().ifscCode || '-' }}</span>
             </div>
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">MICR Code</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step4().micrCode || '-' }}</span>
             </div>
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Transfer Mode</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step4().transferMode || '-' }}</span>
-            </div>
-
-            <!-- Row 3 Address -->
-            <div class="sm:col-span-4">
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Branch Address</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ step4().branchAddress || '-' }}</span>
+            <div class="sm:col-span-2">
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Upload Cancelled Cheque / Bank Passbook</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 truncate">{{ step4().cancelledChequeDoc?.fileName || '-' }}</span>
             </div>
           </div>
         }
@@ -316,8 +339,18 @@ export class Step5PreviewComponent {
     if (section === 3) this.isSection3Open.set(!this.isSection3Open());
   }
 
+  readonly authPersonFullName = computed(() => {
+    const s = this.step3();
+    if (s.name?.trim()) return s.name.trim();
+    const parts = [s.firstName?.trim(), s.lastName?.trim()].filter(Boolean);
+    return parts.length ? parts.join(' ') : '-';
+  });
+
   readonly registeredAddressDisplay = computed(() => {
     const s = this.step1();
+    if (!s.registeredAddress?.trim() && !s.registeredDistrict?.trim() && !s.registeredPincode?.trim()) {
+      return '-';
+    }
     const parts: string[] = [];
     if (s.registeredAddress?.trim()) parts.push(s.registeredAddress.trim());
     if (s.registeredDistrict?.trim()) parts.push(s.registeredDistrict.trim());
@@ -331,6 +364,9 @@ export class Step5PreviewComponent {
     const s = this.step1();
     if (s.sameAsRegistered) {
       return 'Same as registered address';
+    }
+    if (!s.officeAddress?.trim() && !s.officeDistrict?.trim() && !s.officePincode?.trim()) {
+      return '-';
     }
     const parts: string[] = [];
     if (s.officeAddress?.trim()) parts.push(s.officeAddress.trim());

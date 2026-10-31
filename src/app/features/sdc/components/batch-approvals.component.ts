@@ -11,7 +11,8 @@ import {
   isBatchApproved,
   isBatchInApproval,
   isBatchRejected,
-  isBatchReturned
+  isBatchReturned,
+  isBatchWithdrawn
 } from '../utils/batch-approval.util';
 import {
   ButtonComponent,
@@ -20,7 +21,8 @@ import {
   PageHeaderComponent,
   PageShellComponent,
   TableComponent,
-  TableColumn
+  TableColumn,
+  ActionModalComponent
 } from '../../../shared';
 import { FilterTabsComponent } from '../../../shared';
 
@@ -38,7 +40,8 @@ import { FilterTabsComponent } from '../../../shared';
     InputDirective,
     PageHeaderComponent,
     PageShellComponent,
-    TableComponent
+    TableComponent,
+    ActionModalComponent
   ],
   template: `
     <app-page-shell>
@@ -199,6 +202,8 @@ import { FilterTabsComponent } from '../../../shared';
           <div class="flex items-center justify-center">
             @if (isApproved(batch)) {
               <span class="whitespace-nowrap font-normal text-[13px] text-emerald-700">{{ statusLabel(batch) }}</span>
+            } @else if (isWithdrawn(batch)) {
+              <span class="whitespace-nowrap font-normal text-[13px] text-slate-500">{{ statusLabel(batch) }}</span>
             } @else if (isRejected(batch)) {
               <span class="whitespace-nowrap font-normal text-[13px] text-red-600">{{ statusLabel(batch) }}</span>
             } @else {
@@ -210,7 +215,7 @@ import { FilterTabsComponent } from '../../../shared';
         <!-- Template: Actions (Approve Batch + View Details) -->
         <ng-template #actionsTemplate let-batch>
           <!-- The department only views a batch here; it decides on the details screen. -->
-          <div class="flex items-center justify-center whitespace-nowrap py-0.5">
+          <div class="flex items-center justify-center gap-2 whitespace-nowrap py-0.5">
             <button
               appButton
               variant="outline"
@@ -223,9 +228,77 @@ import { FilterTabsComponent } from '../../../shared';
               <app-icon name="eye" size="sm" />
               <span>View</span>
             </button>
+
+            @if (isApproved(batch)) {
+              <button
+                appButton
+                variant="outline"
+                size="sm"
+                class="shrink-0 text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200"
+                type="button"
+                (click)="openWithdrawModal(batch)"
+                title="Withdraw Batch"
+              >
+                <app-icon name="ban" size="sm" />
+                <span>Withdraw</span>
+              </button>
+            }
           </div>
         </ng-template>
 
+      <!-- Confirmation Modal for Withdrawing Batch -->
+      <app-action-modal
+        [isOpen]="!!batchToWithdraw()"
+        [showCloseButton]="true"
+        [closeOnBackdrop]="true"
+        [showAccentBar]="true"
+        accentBarClass="bg-rose-600"
+        title="Withdraw Batch"
+        primaryLabel="Withdraw Batch"
+        primaryVariant="danger"
+        secondaryLabel="Cancel"
+        maxWidthClass="max-w-[460px]"
+        (primaryAction)="confirmWithdraw()"
+        (secondaryAction)="cancelWithdraw()"
+        (close)="cancelWithdraw()"
+      >
+        @if (batchToWithdraw(); as b) {
+          <div class="space-y-3 mt-2">
+            <p class="text-sm text-slate-700 m-0 leading-relaxed font-sans">
+              Are you sure you want to withdraw batch <strong class="text-slate-900 font-semibold tabular-nums">{{ b.batchCode }}</strong>?
+            </p>
+
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-1.5">
+              <div class="flex justify-between items-center">
+                <span class="text-slate-500">Course</span>
+                <span class="font-medium text-slate-800">{{ b.courseName }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-500">Center</span>
+                <span class="font-medium text-slate-800">{{ b.sdcName }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-500">Schedule</span>
+                <span class="font-medium text-slate-800 tabular-nums">{{ b.startDate }} to {{ b.endDate }}</span>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <label class="block text-xs font-semibold text-slate-700">Reason for Withdrawal (Optional)</label>
+              <input
+                type="text"
+                class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 focus:outline-hidden focus:ring-1 focus:ring-navy focus:border-navy"
+                placeholder="e.g. Schedule cancellation or administrative decision"
+                [(ngModel)]="withdrawReason"
+              />
+            </div>
+
+            <p class="text-[11.5px] text-amber-700 m-0">
+              Once withdrawn, this batch will be inactive and further trainee registrations will be stopped.
+            </p>
+          </div>
+        }
+      </app-action-modal>
     </app-page-shell>
   `
 })
@@ -243,6 +316,31 @@ export class BatchApprovalsComponent {
 
   readonly pageSize = 10;
 
+  readonly batchToWithdraw = signal<BatchRecord | null>(null);
+  withdrawReason = '';
+
+  isWithdrawn(b: BatchRecord): boolean {
+    return isBatchWithdrawn(b);
+  }
+
+  openWithdrawModal(batch: BatchRecord): void {
+    this.batchToWithdraw.set(batch);
+    this.withdrawReason = '';
+  }
+
+  cancelWithdraw(): void {
+    this.batchToWithdraw.set(null);
+    this.withdrawReason = '';
+  }
+
+  confirmWithdraw(): void {
+    const batch = this.batchToWithdraw();
+    if (!batch) return;
+
+    this.batchService.withdrawBatch(batch.id, this.withdrawReason.trim() || undefined, 'Department Admin');
+    this.cancelWithdraw();
+  }
+
   readonly batchColumns: TableColumn<BatchRecord>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-14' },
     { key: 'batchCode', label: 'Batch Code', align: 'center', type: 'custom', width: 'w-32' },
@@ -252,7 +350,7 @@ export class BatchApprovalsComponent {
     { key: 'size', label: 'Batch Size', align: 'center', type: 'custom', width: 'w-24' },
     { key: 'schedule', label: 'Start & End Date', align: 'center', type: 'custom', width: 'w-36' },
     { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[140px]' },
-    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-32' }
+    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[210px]' }
   ];
 
   /** The batch size the partner entered (the capacity once the department has approved). */
@@ -304,6 +402,7 @@ export class BatchApprovalsComponent {
       { id: 'All', label: 'All', count: all.length },
       { id: 'Pending', label: 'Pending', count: pending.length },
       { id: 'Approved', label: 'Approved', count: approved.length },
+      { id: 'Withdrawn', label: 'Withdrawn', count: all.filter(b => this.isWithdrawn(b)).length },
       { id: 'Returned', label: 'Returned to TP', count: all.filter(b => this.isReturned(b)).length },
       { id: 'Rejected', label: 'Rejected', count: rejected.length }
     ];
@@ -317,6 +416,8 @@ export class BatchApprovalsComponent {
       list = list.filter(b => isBatchInApproval(b));
     } else if (filter === 'Approved') {
       list = list.filter(b => this.isApproved(b));
+    } else if (filter === 'Withdrawn') {
+      list = list.filter(b => this.isWithdrawn(b));
     } else if (filter === 'Returned') {
       list = list.filter(b => this.isReturned(b));
     } else if (filter === 'Rejected') {

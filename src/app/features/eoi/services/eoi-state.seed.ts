@@ -121,8 +121,8 @@ export function buildInitialResponses(): ApplicantResponse[] {
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
       eoiRefNo: 'RSLDC/EOI/2026/MMKVY-01',
       submissionDate: '08/09/2026 14:30 PM',
-      status: 'UNDER_SCRUTINY',
-      statusDisplay: 'Under Review',
+      status: 'REJECTED',
+      statusDisplay: 'Rejected',
       emdFee: 50000,
       emdStatus: 'PAID',
       processingFee: 2000,
@@ -242,7 +242,12 @@ export function buildInitialResponses(): ApplicantResponse[] {
         { id: 'doc-7', title: 'Additional Supporting Document', fileSize: '4.5 MB PDF', category: 'Annexures', verified: true }
       ],
 
-      scrutinyDetails: undefined
+      scrutinyDetails: {
+        disqualificationReason: 'Technical qualification criteria not met (CA turnover certificate missing valid UDIN).',
+        remarks: 'Technical qualification criteria not met (CA turnover certificate missing valid UDIN).',
+        scrutinyOfficer: 'Committee Member 1',
+        decisionTimestamp: '08/09/2026 05:30 PM'
+      }
     },
 
     {
@@ -600,7 +605,8 @@ export function buildInitialResponses(): ApplicantResponse[] {
       scrutinyDetails: {
         technicalScore: 54,
         grade: 'Grade C',
-        remarks: 'Documentation non-compliance: deficient technical infrastructure and missing verified audit statements for Category I placement requirements.',
+        disqualificationReason: 'Annual turnover criteria not met for last 3 financial years (CA certificate missing valid UDIN).',
+        remarks: 'Annual turnover criteria not met for last 3 financial years (CA certificate missing valid UDIN).',
         scrutinyOfficer: 'Committee Member 1',
         decisionTimestamp: '25/08/2026 14:15 PM'
       }

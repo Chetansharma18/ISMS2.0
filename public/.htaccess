@@ -7,9 +7,6 @@
   RewriteRule . /index.html [L]
 </IfModule>
 
-# Handle POST requests gracefully on static index.html
-ErrorDocument 405 /index.html
-
 # Browser Caching & Performance
 <IfModule mod_expires.c>
   ExpiresActive On

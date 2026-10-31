@@ -108,29 +108,29 @@ import { IconComponent } from '../../icon/icon.component';
               <span>View</span>
             </button>
 
-            <!-- Change Option -->
-            <button
-              type="button"
-              (click)="triggerFileSelect(fileInput)"
-              [disabled]="disabled"
-              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer disabled:opacity-50"
-              title="Change/Replace Document"
-            >
-              <app-icon name="refresh" size="sm" [stroke]="2" />
-              <span>Change</span>
-            </button>
+            @if (!disabled) {
+              <!-- Change Option -->
+              <button
+                type="button"
+                (click)="triggerFileSelect(fileInput)"
+                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                title="Change/Replace Document"
+              >
+                <app-icon name="refresh" size="sm" [stroke]="2" />
+                <span>Change</span>
+              </button>
 
-            <!-- Remove Option -->
-            <button
-              type="button"
-              (click)="removeFile(fileInput)"
-              [disabled]="disabled"
-              class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer disabled:opacity-50"
-              title="Remove File"
-            >
-              <app-icon name="trash" size="sm" [stroke]="2" />
-              <span>Remove</span>
-            </button>
+              <!-- Remove Option -->
+              <button
+                type="button"
+                (click)="removeFile(fileInput)"
+                class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                title="Remove File"
+              >
+                <app-icon name="trash" size="sm" [stroke]="2" />
+                <span>Remove</span>
+              </button>
+            }
           </div>
         </div>
       }

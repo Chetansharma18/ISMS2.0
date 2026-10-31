@@ -296,9 +296,9 @@ export class SidebarComponent {
       return 'dept-ipa';
     }
 
-    // MoU draft opens from the Sanction Order list, so keep that item highlighted
-    if (url.startsWith('/admin/mou-draft')) {
-      return 'dept-sanction-orders';
+    // MoU Management (department admin): list, upload and MoU draft
+    if (url.startsWith('/admin/mou') || url.startsWith('/mou')) {
+      return 'dept-mou';
     }
 
     // 4. Sanction Order

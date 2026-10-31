@@ -31,7 +31,7 @@ export interface ShortfallSubmission {
       [reverseButtons]="true"
       [showAccentBar]="true"
       accentBarClass="bg-amber-500"
-      title="Shortfall Request"
+      [title]="isAppeal() ? 'Appeal Response' : 'Shortfall Request'"
       primaryLabel="Submit"
       secondaryLabel="Cancel"
       maxWidthClass="max-w-2xl"
@@ -109,6 +109,7 @@ export class ShortfallResponseModalComponent {
 
   readonly isOpen = input(false);
   readonly request = input<ShortfallRequest | null>(null);
+  readonly isAppeal = input(false);
 
   readonly submitted = output<ShortfallSubmission>();
   readonly close = output<void>();

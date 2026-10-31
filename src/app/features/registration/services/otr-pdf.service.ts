@@ -304,9 +304,7 @@ export class OtrPdfService {
     drawSectionHeader('Organisation Bank Details & Payment Settlement', '3');
     drawTableRow('Name of the Bank', s4.bankName || '-', 'Branch Name', s4.branchName || '-');
     drawTableRow('Account Holder Name', s4.accountHolderName || '-', 'Account Number', s4.accountNo || '-');
-    drawTableRow('Account Type', s4.accountType || '-', 'Transfer Mode', s4.transferMode || 'NEFT');
     drawTableRow('IFSC Code', s4.ifscCode || '-', 'MICR Code', s4.micrCode || 'Optional / -');
-    drawTableRow('Branch Address', s4.branchAddress || '-');
 
     y += 4;
 
@@ -421,9 +419,7 @@ export class OtrPdfService {
           <table class="tbl">
             <tr><td class="lbl">Bank Name:</td><td class="val" style="font-weight:700;">${s4.bankName || '-'}</td><td class="lbl">Branch Name:</td><td class="val">${s4.branchName || '-'}</td></tr>
             <tr><td class="lbl">Account Holder:</td><td class="val">${s4.accountHolderName || '-'}</td><td class="lbl">Account Number:</td><td class="val" style="font-weight:700;">${s4.accountNo || '-'}</td></tr>
-            <tr><td class="lbl">Account Type:</td><td class="val">${s4.accountType || '-'}</td><td class="lbl">Transfer Mode:</td><td class="val">${s4.transferMode || '-'}</td></tr>
             <tr><td class="lbl">IFSC Code:</td><td class="val" style="font-weight:700;">${s4.ifscCode || '-'}</td><td class="lbl">MICR Code:</td><td class="val">${s4.micrCode || '-'}</td></tr>
-            <tr><td class="lbl">Branch Address:</td><td class="val" colspan="3">${s4.branchAddress || '-'}</td></tr>
           </table>
         </body>
       </html>

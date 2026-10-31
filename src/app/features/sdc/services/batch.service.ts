@@ -13,13 +13,14 @@ import {
   currentApprovalLevel,
   freezeDateOf,
   isBatchApproved,
+  isBatchWithdrawn,
   isBatchInApproval,
   isBatchRejected,
   isBatchReturned,
   isFinalApprovalLevel
 } from '../utils/batch-approval.util';
 
-export { isBatchApproved, isBatchRejected, batchDisplayStatus as getBatchDisplayStatus } from '../utils/batch-approval.util';
+export { isBatchApproved, isBatchRejected, isBatchWithdrawn, batchDisplayStatus as getBatchDisplayStatus } from '../utils/batch-approval.util';
 
 /** Marks batches that are on the create-then-approve flow (see BatchRecord.approvalFlowVersion). */
 const APPROVAL_FLOW_VERSION = 4;
@@ -214,14 +215,14 @@ export class BatchService {
       batchId,
       final
         ? {
-            approvalStatus: 'APPROVED',
-            status: 'APPROVED',
-            approvalLevel: level,
-            approvalTrail: trail,
-            approvedAt: at,
-            approvedBy: officer,
-            approvalRemarks: remarks?.trim() || 'Batch approved after infrastructure & inspection verification.'
-          }
+          approvalStatus: 'APPROVED',
+          status: 'APPROVED',
+          approvalLevel: level,
+          approvalTrail: trail,
+          approvedAt: at,
+          approvedBy: officer,
+          approvalRemarks: remarks?.trim() || 'Batch approved after infrastructure & inspection verification.'
+        }
         : { approvalLevel: level + 1, approvalTrail: trail }
     );
     return final ? 'APPROVED' : 'FORWARDED';
@@ -378,6 +379,28 @@ export class BatchService {
    * Gives an approved batch its Attender User. Only one can be assigned: returns false when the batch is not approved,
    * already has one, or does not exist.
    */
+  /** Withdraw an approved batch. Stops candidate registration and marks batch as withdrawn. */
+  withdrawBatch(batchId: string, reason?: string, byUser?: string): boolean {
+    const batch = this.getBatchById(batchId);
+    if (!batch || !isBatchApproved(batch)) return false;
+
+    const designation = byUser || 'Department';
+    return this.updateBatch(batchId, {
+      status: 'WITHDRAWN',
+      approvalStatus: 'WITHDRAWN',
+      approvalTrail: [
+        ...(batch.approvalTrail ?? []),
+        {
+          action: 'WITHDRAWN',
+          designation,
+          officer: designation,
+          at: new Date().toISOString(),
+          remarks: reason ? `Batch Withdrawn: ${reason}` : 'Batch Withdrawn'
+        }
+      ]
+    });
+  }
+
   assignAttender(batchId: string, attender: Omit<BatchAttender, 'assignedAt'>): boolean {
     const batch = this.getBatchById(batchId);
     if (!batch || !isBatchApproved(batch) || batch.attender) return false;

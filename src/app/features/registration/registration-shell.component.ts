@@ -35,7 +35,7 @@ export interface StepMeta {
     IconComponent
   ],
   template: `
-    <div class="min-h-screen bg-[#FEFEFD] flex flex-col justify-between selection:bg-navy selection:text-white font-sans" >
+    <div class="min-h-screen bg-white flex flex-col justify-between selection:bg-navy selection:text-white font-sans" >
 
       <!-- ====================================================================
            Main Content Area
@@ -55,7 +55,7 @@ export interface StepMeta {
           <!-- Title and Subtitle Row -->
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">
-              Organization Registration Form
+              Organization Registration
             </h1>
             <span class="text-xs text-slate-500 font-medium select-none">
               Fields marked with <span class="text-rose-500 font-bold">*</span> are mandatory

@@ -27,7 +27,7 @@ export const MAIN_NAV_ITEMS: MenuItem[] = [
     icon: 'gavel'
   },
   {
-    label: 'Tender Status',
+    label: 'EOI Status',
     route: '/tender-status',
     icon: 'fact_check',
     roles: ['existing_user']

@@ -114,6 +114,7 @@ export interface RemarkMasterItem {
 export interface GradingMasterItem {
   id: string;
   sNo?: number;
+  schemeName?: string;
   grade: string;
   minimum: number;
   maximum: number;

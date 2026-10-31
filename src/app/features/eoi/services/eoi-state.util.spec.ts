@@ -55,6 +55,29 @@ describe('eoi-state.util', () => {
     expect(merged[0].statusDisplay).toBe('Legacy');
   });
 
+  it('mergeStoredResponses matches Company 4 aliases and preserves appeal response', () => {
+    const initial = buildInitialResponses();
+    const comp4Stored = {
+      ...initial[3],
+      id: 'APP-004664',
+      status: 'UNDER_SCRUTINY' as const,
+      appeal: {
+        submittedOn: '30-Oct-2026',
+        reply: 'Justification text',
+        files: [],
+        status: 'Accepted' as const,
+        response: {
+          respondedOn: '30-Oct-2026',
+          remarks: 'Submitted board resolution',
+          uploads: [{ requiredDoc: 'Board Resolution', fileName: 'resolution.pdf', fileSize: '1.2 MB' }]
+        }
+      }
+    };
+    const merged = mergeStoredResponses(initial, [comp4Stored]);
+    expect(merged[3].appeal?.response?.remarks).toBe('Submitted board resolution');
+    expect(merged[3].appeal?.response?.uploads[0].fileName).toBe('resolution.pdf');
+  });
+
   it('findSchemeById matches by id or ref number', () => {
     const schemes = buildInitialSchemes();
     expect(findSchemeById(schemes, 'MMKVY-01')?.id).toBe('MMKVY-01');

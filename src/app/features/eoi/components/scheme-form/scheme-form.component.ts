@@ -30,15 +30,12 @@ export type { EoiDocumentItem } from './scheme-form.model';
 
         <!-- 1. Header row: Back button, page title, mandatory indicator, subtitle (same as Organization Registration Form) -->
         <div class="mb-5 space-y-3">
-          <!-- No Back from Step 2: the paid processing fee step cannot be reopened -->
-          @if (state.currentStep() !== 2) {
-            <div>
-              <button appButton variant="outline" size="sm" (click)="goBack()">
-                <app-icon name="back" />
-                <span>Back</span>
-              </button>
-            </div>
-          }
+          <div>
+            <button appButton variant="outline" size="sm" (click)="goBack()">
+              <app-icon name="back" />
+              <span>Back</span>
+            </button>
+          </div>
 
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">
@@ -91,10 +88,10 @@ export type { EoiDocumentItem } from './scheme-form.model';
           </div>
 
           @switch (state.currentStep()) {
-            @case (1) { <app-step1-processing-fee /> }
-            @case (2) { <app-step2-otr-profile /> }
-            @case (3) { <app-step3-upload-documents /> }
-            @case (4) { <app-step4-complete-preview /> }
+            @case (1) { <app-step2-otr-profile /> }
+            @case (2) { <app-step3-upload-documents /> }
+            @case (3) { <app-step4-complete-preview /> }
+            @case (4) { <app-step1-processing-fee /> }
             @case (5) { <app-step5-emd-payment /> }
             @case (6) { <app-step6-receipts /> }
           }
@@ -148,7 +145,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
 
           <p class="flex items-center justify-center gap-2 text-xs text-slate-500 m-0" role="status">
             <span class="inline-block w-3.5 h-3.5 rounded-full border-2 border-slate-300 border-t-navy animate-spin" aria-hidden="true"></span>
-            Taking you to Step 2...
+            Taking you to Step 5 (EMD Payment)...
           </p>
         </div>
       </app-action-modal>
@@ -212,13 +209,13 @@ export class SchemeFormComponent {
   protected stepSubtitle(): string {
     switch (this.state.currentStep()) {
       case 1:
-        return `As per RSLDC EOI guidelines, all applicants must pay the non-refundable processing fee of ${this.state.formattedProcessFee()} before submitting their proposal application.`;
-      case 2:
         return 'Verify the organisation, authorized signatory and bank details that will accompany your EOI application.';
-      case 3:
+      case 2:
         return 'Upload the required proposal documents in the supported format and size shown against each one.';
+      case 3:
+        return 'Please verify the information provided below before proceeding to the processing fee payment.';
       case 4:
-        return 'Please verify the information provided below before proceeding to the EMD payment.';
+        return `As per RSLDC EOI guidelines, all applicants must pay the non-refundable processing fee of ${this.state.formattedProcessFee()} before submitting their proposal application.`;
       case 5:
         return 'Pay the refundable Earnest Money Deposit (EMD) to complete your application.';
       default:
@@ -226,7 +223,7 @@ export class SchemeFormComponent {
     }
   }
 
-  /** The payment success screen cannot be dismissed (Escape included); it moves on to Step 2 by itself. */
+  /** The payment success screen cannot be dismissed (Escape included); it moves on to Step 5 by itself. */
   protected keepOpen(): void {
     // intentionally empty
   }

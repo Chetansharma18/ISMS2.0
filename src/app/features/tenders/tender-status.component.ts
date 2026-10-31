@@ -108,6 +108,27 @@ interface TenderDetailTabItem {
                 Appeal Request
               </button>
             </div>
+          } @else if (selectedTender()?.submittedStatus === 'Rejected' && selectedTender()?.appeal?.status === 'Rejected') {
+            <div class="flex items-start gap-2.5 px-4 py-2.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-900" role="alert">
+              <app-icon name="close" size="sm" class="text-rose-600 shrink-0 mt-0.5" />
+              <div class="space-y-0.5">
+                <p class="m-0 text-[13px] leading-snug">
+                  <strong class="font-semibold">Application Rejected:</strong>
+                  {{ selectedTender()!.rejectionReason || 'Appeal rejected after review.' }}
+                </p>
+                <p class="m-0 text-[11.5px] text-rose-700">
+                  Your appeal has been reviewed and rejected by the scrutiny committee. Only one appeal is permitted per application.
+                </p>
+              </div>
+            </div>
+          } @else if (selectedTender()?.submittedStatus === 'Rejected' && selectedTender()?.appeal?.status === 'Pending') {
+            <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900" role="alert">
+              <app-icon name="alert-triangle" size="sm" class="text-amber-600 shrink-0" />
+              <p class="m-0 text-[13px] leading-snug">
+                <strong class="font-semibold">Appeal Under Review:</strong>
+                Your appeal request submitted on {{ selectedTender()!.appeal!.submittedOn }} is currently under review by the department scrutiny committee.
+              </p>
+            </div>
           }
 
           @if (pendingNoticeCount() > 0) {
@@ -119,6 +140,14 @@ interface TenderDetailTabItem {
               <button appButton size="sm" type="button" (click)="openShortfallFlow()" class="shrink-0">
                 Respond
               </button>
+            </div>
+          } @else if (selectedTender()?.appeal?.response || (selectedTender()?.appeal?.status === 'Accepted' && (selectedTender()?.shortfalls?.length ?? 0) > 0)) {
+            <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-sky-300 bg-sky-50 text-sky-950" role="alert">
+              <app-icon name="check" size="sm" class="text-sky-700 shrink-0" />
+              <p class="m-0 text-[13px] leading-snug">
+                <strong class="font-semibold">Appeal Response Submitted:</strong>
+                Your response and documents for the appeal have been submitted successfully. The department scrutiny committee will review them and issue the final decision.
+              </p>
             </div>
           }
 
@@ -303,7 +332,7 @@ interface TenderDetailTabItem {
                       <div class="flex items-center justify-between">
                         <span class="text-xs font-bold text-slate-900 flex items-center gap-2">
                           <app-icon name="alert-triangle" size="sm" class="text-amber-600" />
-                          <span>Scrutiny &amp; Shortfalls</span>
+                          <span>{{ selectedTender()?.appeal ? 'Appeal & Response' : 'Scrutiny &amp; Shortfalls' }}</span>
                         </span>
                         <span
                           class="inline-flex items-center px-2 py-0.5 rounded-full font-semibold text-[11px] border"
@@ -386,7 +415,7 @@ interface TenderDetailTabItem {
                 (viewDoc)="onViewDoc($event)"
               />
 
-              <app-tender-appeal-section [app]="selectedTender()!" (viewDoc)="onViewDoc($event)" />
+              <app-tender-appeal-section [app]="selectedTender()!" />
             }
 
           </div>
@@ -404,6 +433,7 @@ interface TenderDetailTabItem {
       <app-shortfall-response-modal
         [isOpen]="!!respondingRequest()"
         [request]="respondingRequest()"
+        [isAppeal]="!!selectedTender()?.appeal"
         (submitted)="submitShortfallResponse($event)"
         (close)="closeShortfallModal()"
       />
@@ -466,7 +496,7 @@ export class TenderStatusComponent {
       { id: 'fees', label: 'Payments & Receipts', icon: 'document-download', badge: 3 },
       {
         id: 'shortfall',
-        label: 'Shortfall & Appeal',
+        label: hasAppeal ? 'Appeal' : 'Shortfall',
         icon: 'alert-triangle',
         badgeColor: shortfalls > 0 ? 'amber' : (hasAppeal ? 'rose' : undefined)
       },
@@ -475,7 +505,25 @@ export class TenderStatusComponent {
   });
 
   constructor() {
-    this.tenderRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => this.tenders.set(list));
+    this.refreshTenders();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (event: StorageEvent) => {
+        if (event.key === 'isms_mock_db_SUBMITTED_TENDERS') {
+          this.refreshTenders();
+        }
+      });
+    }
+  }
+
+  refreshTenders(): void {
+    this.tenderRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => {
+      this.tenders.set(list);
+      const curr = this.selectedTender();
+      if (curr) {
+        const found = list.find(t => t.id === curr.id);
+        if (found) this.selectedTender.set(found);
+      }
+    });
   }
 
   currentApplication(): SubmittedTender {
@@ -588,7 +636,11 @@ export class TenderStatusComponent {
   // ---- Appeal against a rejection ------------------------------------------
 
   startAppeal(tender: SubmittedTender): void {
-    if (canAppeal(tender)) this.appealingTender.set(tender);
+    if (canAppeal(tender)) {
+      this.appealingTender.set(tender);
+    } else {
+      this.notify.warning('An appeal has already been submitted for this application. Only one appeal is allowed.');
+    }
   }
 
   submitAppeal(appeal: TenderAppeal): void {
@@ -630,19 +682,33 @@ export class TenderStatusComponent {
     if (!tender || !notice) return;
 
     const shortfalls = withShortfallResponse(tender, submission.shortfallId, submission.response);
-    const updated: SubmittedTender = { ...tender, shortfalls };
+    const updatedAppeal = tender.appeal ? {
+      ...tender.appeal,
+      status: 'Accepted' as const,
+      response: {
+        respondedOn: submission.response.respondedOn,
+        remarks: submission.response.remarks,
+        uploads: submission.response.uploads
+      }
+    } : undefined;
+
+    const updated: SubmittedTender = { ...tender, shortfalls, appeal: updatedAppeal };
 
     this.tenders.update(list => list.map(t => (t.id === updated.id ? updated : t)));
     if (this.selectedTender()?.id === updated.id) this.selectedTender.set(updated);
 
-    this.tenderRepo.update(updated.id, { shortfalls }).subscribe();
+    this.tenderRepo.update(updated.id, { shortfalls, appeal: updatedAppeal }).subscribe();
     this.shortfallBridge
       .notifyDepartment(updated, notice, submission.response)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
 
     this.closeShortfallModal();
-    this.notify.success('Your response to the shortfall request has been submitted.');
+    this.notify.success(
+      tender.appeal
+        ? 'Your response to the appeal document request has been submitted.'
+        : 'Your response to the shortfall request has been submitted.'
+    );
   }
 
   // Document Viewer Helpers

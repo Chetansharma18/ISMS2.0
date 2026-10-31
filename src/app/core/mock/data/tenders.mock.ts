@@ -21,15 +21,6 @@ export const MOCK_SUBMITTED_TENDERS: SubmittedTender[] = resolveMock([
     emdTransactionRef: 'CIN-SBI-9812402',
     submittedStatus: 'Rejected',
     rejectionReason: 'Technical qualification criteria not met (CA turnover certificate missing valid UDIN).',
-    appeal: {
-      submittedOn: '09-Sep-2026',
-      reply: 'We have updated our audited financial statements and resolved the queries regarding our CA turnover certificate with valid UDIN. We request the committee to kindly review our appeal and allow us to submit the required shortfall documents.',
-      files: [
-        { fileName: 'Audited_Balance_Sheet_Rectified.pdf', fileSize: '2.4 MB' },
-        { fileName: 'CA_Turnover_Certificate_UDIN.pdf', fileSize: '1.2 MB' }
-      ],
-      status: 'Pending'
-    },
     shortfalls: [],
     eoiStatus: 'Reviewed',
     editCount: 0,

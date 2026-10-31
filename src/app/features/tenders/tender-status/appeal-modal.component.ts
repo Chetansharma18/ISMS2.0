@@ -1,20 +1,19 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
-import type { AppealFile, SubmittedTender, TenderAppeal } from '../../../core/models/tender.model';
+import type { SubmittedTender, TenderAppeal } from '../../../core/models/tender.model';
 import { ActionModalComponent } from '../../../shared/components/action-modal/action-modal.component';
-import { ButtonComponent, IconComponent, InputDirective } from '../../../shared';
+import { IconComponent, InputDirective } from '../../../shared';
 import { formatDateMedium } from '../../../shared/utils';
-import { MAX_APPEAL_FILES, buildAppeal, isAppealReady } from './tender-appeal.util';
-import { formatUploadedFileSize } from './tender-status.util';
+import { buildAppeal } from './tender-appeal.util';
 
 /**
- * Appeal against a rejected application: shows the rejection remarks, takes the applicant's answer to them and
- * optional supporting files.
+ * Appeal request confirmation modal: confirms appeal against rejection and captures
+ * the applicant's appeal remarks (no documents requested at this stage).
  */
 @Component({
   selector: 'app-appeal-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ActionModalComponent, ButtonComponent, IconComponent, InputDirective],
+  imports: [ActionModalComponent, IconComponent, InputDirective],
   template: `
     <app-action-modal
       [isOpen]="isOpen()"
@@ -23,8 +22,8 @@ import { formatUploadedFileSize } from './tender-status.util';
       [reverseButtons]="true"
       [showAccentBar]="true"
       accentBarClass="bg-navy"
-      title="Appeal against Rejection"
-      primaryLabel="Submit Appeal"
+      title="Request for Appeal"
+      primaryLabel="Confirm Appeal Request"
       secondaryLabel="Cancel"
       maxWidthClass="max-w-2xl"
       [disablePrimary]="!canSubmit()"
@@ -34,59 +33,39 @@ import { formatUploadedFileSize } from './tender-status.util';
     >
       @if (tender(); as t) {
         <div class="space-y-4 text-left text-xs max-h-[62vh] overflow-y-auto pr-1">
-          <div class="p-3.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-900 space-y-1.5">
-            <div class="text-[11px] font-semibold">{{ t.appRef }} &bull; {{ t.schemeTitle }}</div>
-            <p class="m-0 text-xs leading-relaxed whitespace-pre-line">
-              <span class="font-semibold">Rejection remarks: </span>{{ t.rejectionReason || 'Technical qualification criteria not met.' }}
-            </p>
+          <!-- Confirmation Banner -->
+          <div class="p-4 rounded-xl border border-amber-300 bg-amber-50/80 text-amber-950 space-y-2">
+            <div class="flex items-start gap-2.5">
+              <app-icon name="alert-triangle" size="sm" class="text-amber-600 mt-0.5 shrink-0" />
+              <div class="space-y-1">
+                <h4 class="m-0 text-[13px] font-bold text-amber-900">
+                  Are you sure you want to request for an appeal?
+                </h4>
+                <p class="m-0 text-xs text-amber-800 leading-relaxed">
+                  Your application <span class="font-semibold">{{ t.appRef }} &bull; {{ t.schemeTitle }}</span> was rejected with remarks:
+                  <span class="font-semibold italic">"{{ t.rejectionReason || 'Technical qualification criteria not met.' }}"</span>
+                </p>
+                <p class="m-0 text-[11.5px] text-amber-700 leading-relaxed pt-1">
+                  Once submitted, the department scrutiny committee will review your appeal. If accepted, the department may ask for shortfall documents to be uploaded.
+                </p>
+              </div>
+            </div>
           </div>
 
           <div class="space-y-1.5">
             <label class="block text-xs font-semibold text-slate-800" for="appeal-reply">
-              Your answer to the remarks <span class="text-rose-600">*</span>
+              Remarks <span class="text-rose-600">*</span>
             </label>
             <textarea
               appInput
               id="appeal-reply"
-              rows="5"
+              rows="4"
               maxlength="1000"
               [value]="reply()"
               (input)="reply.set($any($event.target).value)"
-              placeholder="Explain how the rejection remarks are met"
+              placeholder="Enter your remarks for the appeal request..."
               class="w-full"
             ></textarea>
-          </div>
-
-          <div class="space-y-2">
-            <label class="block text-xs font-semibold text-slate-800" for="appeal-files">
-              Supporting documents <span class="text-slate-400 font-normal">(optional, up to {{ maxFiles }})</span>
-            </label>
-            <input
-              id="appeal-files"
-              type="file"
-              multiple
-              accept=".pdf,.jpg,.jpeg,.png"
-              (change)="addFiles($event)"
-              class="block w-full text-xs text-slate-600 file:mr-3 file:rounded-md file:border file:border-slate-300 file:bg-white file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-slate-800"
-            />
-            @if (files().length > 0) {
-              <ul class="m-0 p-0 list-none border border-slate-200 rounded-lg divide-y divide-slate-200 bg-white">
-                @for (file of files(); track file.fileName; let i = $index) {
-                  <li class="flex items-center justify-between gap-3 px-3 py-2">
-                    <span class="min-w-0 truncate">
-                      <span class="font-medium text-slate-800">{{ file.fileName }}</span>
-                      <span class="text-[11px] text-slate-500"> &bull; {{ file.fileSize }}</span>
-                    </span>
-                    <button appButton variant="ghost" size="sm" iconOnly type="button" [attr.aria-label]="'Remove ' + file.fileName" (click)="removeFile(i)">
-                      <app-icon name="close" size="xs" />
-                    </button>
-                  </li>
-                }
-              </ul>
-            }
-            @if (fileNote()) {
-              <p class="m-0 text-[11px] text-rose-600">{{ fileNote() }}</p>
-            }
           </div>
         </div>
       }
@@ -100,42 +79,20 @@ export class AppealModalComponent {
   readonly submitted = output<TenderAppeal>();
   readonly close = output<void>();
 
-  protected readonly maxFiles = MAX_APPEAL_FILES;
   protected readonly reply = signal('');
-  protected readonly files = signal<AppealFile[]>([]);
-  protected readonly fileNote = signal('');
 
-  protected readonly canSubmit = computed(() => !!this.tender() && isAppealReady(this.reply()));
+  protected readonly canSubmit = computed(() => !!this.tender() && this.reply().trim().length > 0);
 
   constructor() {
-    // Start every appeal with an empty form.
+    // Reset remark on open
     effect(() => {
       this.tender();
       this.reply.set('');
-      this.files.set([]);
-      this.fileNote.set('');
     });
-  }
-
-  protected addFiles(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const chosen = Array.from(input.files ?? []);
-    input.value = '';
-
-    const room = MAX_APPEAL_FILES - this.files().length;
-    const known = new Set(this.files().map(f => f.fileName));
-    const fresh = chosen.filter(f => !known.has(f.name)).slice(0, Math.max(0, room));
-    this.fileNote.set(chosen.length > fresh.length ? `Only ${MAX_APPEAL_FILES} different files can be attached.` : '');
-    this.files.update(list => [...list, ...fresh.map(f => ({ fileName: f.name, fileSize: formatUploadedFileSize(f.size) }))]);
-  }
-
-  protected removeFile(index: number): void {
-    this.files.update(list => list.filter((_, i) => i !== index));
-    this.fileNote.set('');
   }
 
   protected submit(): void {
     if (!this.canSubmit()) return;
-    this.submitted.emit(buildAppeal(this.reply(), this.files(), formatDateMedium(new Date(), '-')));
+    this.submitted.emit(buildAppeal(this.reply().trim(), [], formatDateMedium(new Date(), '-')));
   }
 }

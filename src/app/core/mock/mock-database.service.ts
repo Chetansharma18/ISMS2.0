@@ -94,6 +94,16 @@ export class MockDatabaseService {
 
   constructor() {
     this.initializeStore();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (event: StorageEvent) => {
+        if (event.key === `${MOCK_CONFIG.storagePrefix}SUBMITTED_TENDERS`) {
+          const fresh = this.loadFromStorage('SUBMITTED_TENDERS');
+          if (fresh && Array.isArray(fresh)) {
+            this.store.set('SUBMITTED_TENDERS', fresh);
+          }
+        }
+      });
+    }
   }
 
   /**
@@ -450,7 +460,7 @@ export class MockDatabaseService {
    * A copy cached in the browser session is discarded when the seed changes, so updated
    * reference data shows up without the user having to clear their session storage.
    */
-  private static readonly SEED_VERSIONED_RESOURCES = new Set(['SECTORS', 'COURSES']);
+  private static readonly SEED_VERSIONED_RESOURCES = new Set(['SECTORS', 'COURSES', 'SUBMITTED_TENDERS']);
 
   private seedFingerprint(resourceKey: string): string {
     const json = JSON.stringify(this.seeds[resourceKey] ?? []);
@@ -468,21 +478,35 @@ export class MockDatabaseService {
   private saveToStorage(resourceKey: string, data: any[]): void {
     if (!MOCK_CONFIG.persistInStorage) return;
     this.storage.setSessionItem(`${MOCK_CONFIG.storagePrefix}${resourceKey}`, data);
+    if (resourceKey === 'SUBMITTED_TENDERS') {
+      this.storage.setItem(`${MOCK_CONFIG.storagePrefix}${resourceKey}`, data);
+    }
     if (MockDatabaseService.SEED_VERSIONED_RESOURCES.has(resourceKey)) {
-      this.storage.setSessionString(this.fingerprintKey(resourceKey), this.seedFingerprint(resourceKey));
+      const fp = this.seedFingerprint(resourceKey);
+      this.storage.setSessionString(this.fingerprintKey(resourceKey), fp);
+      if (resourceKey === 'SUBMITTED_TENDERS') {
+        this.storage.setString(this.fingerprintKey(resourceKey), fp);
+      }
     }
   }
 
   private loadFromStorage(resourceKey: string): any[] | null {
     if (!this.isMockActive(resourceKey) || !MOCK_CONFIG.persistInStorage) return null;
 
-    if (
-      MockDatabaseService.SEED_VERSIONED_RESOURCES.has(resourceKey) &&
-      this.storage.getSessionString(this.fingerprintKey(resourceKey)) !== this.seedFingerprint(resourceKey)
-    ) {
-      // Cached copy was saved from an older seed (or before versioning existed): drop it.
-      this.removeFromStorage(resourceKey);
-      return null;
+    if (MockDatabaseService.SEED_VERSIONED_RESOURCES.has(resourceKey)) {
+      const expected = this.seedFingerprint(resourceKey);
+      const sessionFp = this.storage.getSessionString(this.fingerprintKey(resourceKey));
+      const localFp = this.storage.getString(this.fingerprintKey(resourceKey));
+      if ((sessionFp && sessionFp !== expected) || (localFp && localFp !== expected) || (!sessionFp && !localFp)) {
+        // Cached copy was saved from an older seed (or before versioning existed): drop it.
+        this.removeFromStorage(resourceKey);
+        return null;
+      }
+    }
+
+    if (resourceKey === 'SUBMITTED_TENDERS') {
+      const fromLocal = this.storage.getItem<any[]>(`${MOCK_CONFIG.storagePrefix}${resourceKey}`);
+      if (fromLocal && Array.isArray(fromLocal) && fromLocal.length > 0) return fromLocal;
     }
 
     return this.storage.getSessionItem<any[]>(`${MOCK_CONFIG.storagePrefix}${resourceKey}`);
@@ -490,6 +514,11 @@ export class MockDatabaseService {
 
   private removeFromStorage(resourceKey: string): void {
     this.storage.removeSessionItem(`${MOCK_CONFIG.storagePrefix}${resourceKey}`);
+    if (resourceKey === 'SUBMITTED_TENDERS') {
+      this.storage.removeItem(`${MOCK_CONFIG.storagePrefix}${resourceKey}`);
+      this.storage.removeItem(this.fingerprintKey(resourceKey));
+      this.storage.removeSessionItem(this.fingerprintKey(resourceKey));
+    }
   }
 
   private deepClone<T>(obj: T): T {

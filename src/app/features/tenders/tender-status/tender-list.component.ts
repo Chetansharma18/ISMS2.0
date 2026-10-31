@@ -88,9 +88,17 @@ import { canAppeal } from './tender-appeal.util';
       <ng-template #appealTemplate let-tender>
         @if (tender.submittedStatus === 'Rejected') {
           @if (!tender.appeal) {
-            <button appButton variant="secondary" size="sm" type="button" (click)="appeal.emit(tender)" title="Answer the rejection remarks and submit request for appeal">
+            <button appButton variant="secondary" size="sm" type="button" (click)="appeal.emit(tender)" title="Request appeal against rejection">
               Appeal Request
             </button>
+          } @else if (tender.appeal.status === 'Rejected') {
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+              Appeal Rejected
+            </span>
+          } @else if (tender.appeal.status === 'Accepted') {
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              Appeal Accepted
+            </span>
           } @else {
             <button appButton variant="ghost" size="sm" type="button" (click)="open.emit({ tender, tab: 'shortfall' })" title="View your appeal request">
               Appeal Submitted
@@ -103,7 +111,7 @@ import { canAppeal } from './tender-appeal.util';
 
       <!-- Response to Appeal / Shortfall requests raised by the department: only shown when appeal has been submitted -->
       <ng-template #shortfallTemplate let-tender>
-        @if (tender.appeal) {
+        @if (tender.appeal && tender.appeal.status !== 'Rejected') {
           @switch (shortfallState(tender)) {
             @case ('open') {
               <button

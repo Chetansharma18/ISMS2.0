@@ -121,8 +121,8 @@ export function buildInitialResponses(): ApplicantResponse[] {
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
       eoiRefNo: 'RSLDC/EOI/2026/MMKVY-01',
       submissionDate: '08/09/2026 14:30 PM',
-      status: 'UNDER_SCRUTINY',
-      statusDisplay: 'Under Review',
+      status: 'REJECTED',
+      statusDisplay: 'Rejected',
       emdFee: 50000,
       emdStatus: 'PAID',
       processingFee: 2000,
@@ -241,16 +241,6 @@ export function buildInitialResponses(): ApplicantResponse[] {
         { id: 'doc-6', title: 'NSDC Partner Certificate', fileSize: '1.9 MB PDF', category: 'Affiliation', verified: true },
         { id: 'doc-7', title: 'Additional Supporting Document', fileSize: '4.5 MB PDF', category: 'Annexures', verified: true }
       ],
-
-      appeal: {
-        submittedOn: '09/09/2026',
-        reply: 'We have updated our audited financial statements and resolved the queries regarding our CA turnover certificate with valid UDIN. We request the committee to kindly review our appeal and allow us to submit the required shortfall documents.',
-        files: [
-          { fileName: 'Audited_Balance_Sheet_Rectified.pdf', fileSize: '2.4 MB' },
-          { fileName: 'CA_Turnover_Certificate_UDIN.pdf', fileSize: '1.2 MB' }
-        ],
-        status: 'Pending'
-      },
 
       scrutinyDetails: {
         disqualificationReason: 'Technical qualification criteria not met (CA turnover certificate missing valid UDIN).',
@@ -615,7 +605,8 @@ export function buildInitialResponses(): ApplicantResponse[] {
       scrutinyDetails: {
         technicalScore: 54,
         grade: 'Grade C',
-        remarks: 'Documentation non-compliance: deficient technical infrastructure and missing verified audit statements for Category I placement requirements.',
+        disqualificationReason: 'Annual turnover criteria not met for last 3 financial years (CA certificate missing valid UDIN).',
+        remarks: 'Annual turnover criteria not met for last 3 financial years (CA certificate missing valid UDIN).',
         scrutinyOfficer: 'Committee Member 1',
         decisionTimestamp: '25/08/2026 14:15 PM'
       }

@@ -38,15 +38,16 @@ describe('Step4CompletePreviewComponent', () => {
     fixture.detectChanges();
   });
 
-  it('renders all sections and does not have edit buttons on profile sections', () => {
+  it('renders all sections without processing fee and does not have edit buttons on profile sections', () => {
     const compiled = fixture.nativeElement as HTMLElement;
 
-    // Check headings
-    expect(compiled.textContent).toContain('Processing Fee');
-    expect(compiled.textContent).toContain('Organisation Details');
-    expect(compiled.textContent).toContain('Authorized Signatory');
-    expect(compiled.textContent).toContain('Organisation Bank Details');
-    expect(compiled.textContent).toContain('Documents');
+    // Check headings: Processing fee is excluded from complete preview
+    const headings = Array.from(compiled.querySelectorAll('h2')).map(h => h.textContent?.trim());
+    expect(headings).not.toContain('Processing Fee');
+    expect(headings).toContain('Organisation Details');
+    expect(headings).toContain('Authorized Signatory');
+    expect(headings).toContain('Organisation Bank Details');
+    expect(headings.some(h => h?.includes('Documents'))).toBe(true);
 
     // Profile sections must NOT have edit buttons
     const buttons = Array.from(compiled.querySelectorAll('button')).map(b => b.textContent?.trim());

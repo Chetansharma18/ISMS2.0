@@ -23,7 +23,6 @@ import {
   findSchemeById,
   matchesApplicationId,
   mergeStoredResponses,
-  withCompany1UnderScrutiny,
   withCompany2SeedDecision
 } from './eoi-state.util';
 
@@ -50,8 +49,25 @@ export class EoiStateService {
   private responsesSubject = new BehaviorSubject<ApplicantResponse[]>(environment.useMockData ? this.initialResponses : []);
   public responses$ = this.responsesSubject.asObservable();
 
+  private static readonly SEED_VERSION_KEY = 'isms_dept_seed_v8_rejection_fix';
+
   constructor() {
     this.loadFromStorage();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (event: StorageEvent) => {
+        if (event.key === 'isms_dept_admin_responses') {
+          this.loadFromStorage();
+        }
+      });
+    }
+  }
+
+  /** Clears stored scrutiny decisions and re-seeds with fresh initial responses. */
+  resetResponses(): void {
+    this.initialResponses = buildInitialResponses();
+    this.saveToStorage(this.initialResponses);
+    this.storage.setString(EoiStateService.SEED_VERSION_KEY, 'v8');
+    this.responsesSubject.next(this.initialResponses);
   }
 
   private loadFromStorage(): void {
@@ -60,22 +76,24 @@ export class EoiStateService {
       this.responsesSubject.next([]);
       return;
     }
+
+    if (this.storage.getString(EoiStateService.SEED_VERSION_KEY) !== 'v8') {
+      this.resetResponses();
+      return;
+    }
+
     try {
       const parsed = this.storage.loadResponses();
       if (Array.isArray(parsed) && parsed.length > 0) {
-        const merged = withCompany1UnderScrutiny(
-          withCompany2SeedDecision(mergeStoredResponses(this.initialResponses, parsed), this.initialResponses)
-        );
+        const merged = withCompany2SeedDecision(mergeStoredResponses(this.initialResponses, parsed), this.initialResponses);
         this.responsesSubject.next(merged);
         return;
       }
     } catch (e) {
       console.error('Error loading stored responses', e);
     }
-    // Default fallback: only Company 1 is left UNDER_SCRUTINY
-    const defaultList = withCompany1UnderScrutiny(this.initialResponses);
-    this.responsesSubject.next(defaultList);
-    this.saveToStorage(defaultList);
+    this.responsesSubject.next(this.initialResponses);
+    this.saveToStorage(this.initialResponses);
   }
 
   private saveToStorage(responses: ApplicantResponse[]): void {

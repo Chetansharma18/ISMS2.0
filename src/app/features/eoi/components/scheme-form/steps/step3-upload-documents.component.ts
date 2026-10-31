@@ -4,7 +4,7 @@ import { SchemeFormState } from '../scheme-form.state';
 import { EoiDocumentItem } from '../scheme-form.model';
 import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from './step3-document-rules';
 
-/** Step 3: upload the 16 proposal documents. */
+/** Step 2: upload the proposal documents. */
 @Component({
   selector: 'app-step3-upload-documents',
   standalone: true,
@@ -77,11 +77,11 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
 
       <!-- Footer Action Bar -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <button appButton variant="outline" size="lg" (click)="state.goToStep(2)">
+        <button appButton variant="outline" size="lg" (click)="state.goToStep(1)">
           &larr; Back to Registration Profile
         </button>
 
-        <button appButton size="lg" (click)="state.goToStep(4)">
+        <button appButton size="lg" (click)="state.goToStep(3)">
           Proceed to Complete Preview &rarr;
         </button>
       </div>

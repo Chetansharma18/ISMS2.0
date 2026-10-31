@@ -30,9 +30,12 @@ import type { ApplicantAppeal, ApplicantResponse } from '../../../services/eoi-s
                   [class.bg-amber-100]="appAppeal.status === 'Pending'"
                   [class.text-amber-900]="appAppeal.status === 'Pending'"
                   [class.border-amber-300]="appAppeal.status === 'Pending'"
-                  [class.bg-emerald-50]="appAppeal.status === 'Accepted'"
-                  [class.text-emerald-800]="appAppeal.status === 'Accepted'"
-                  [class.border-emerald-200]="appAppeal.status === 'Accepted'"
+                  [class.bg-sky-50]="appAppeal.status === 'Accepted' && !!appAppeal.response"
+                  [class.text-sky-800]="appAppeal.status === 'Accepted' && !!appAppeal.response"
+                  [class.border-sky-200]="appAppeal.status === 'Accepted' && !!appAppeal.response"
+                  [class.bg-emerald-50]="appAppeal.status === 'Accepted' && !appAppeal.response"
+                  [class.text-emerald-800]="appAppeal.status === 'Accepted' && !appAppeal.response"
+                  [class.border-emerald-200]="appAppeal.status === 'Accepted' && !appAppeal.response"
                   [class.bg-rose-50]="appAppeal.status === 'Rejected'"
                   [class.text-rose-800]="appAppeal.status === 'Rejected'"
                   [class.border-rose-200]="appAppeal.status === 'Rejected'"
@@ -41,8 +44,13 @@ import type { ApplicantAppeal, ApplicantResponse } from '../../../services/eoi-s
                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                     Appeal Pending Review
                   } @else if (appAppeal.status === 'Accepted') {
-                    <app-icon name="check" size="xs" />
-                    Appeal Accepted
+                    @if (appAppeal.response) {
+                      <app-icon name="check" size="xs" />
+                      Appeal Response Submitted
+                    } @else {
+                      <app-icon name="check" size="xs" />
+                      Appeal Accepted
+                    }
                   } @else {
                     <app-icon name="close" size="xs" />
                     Appeal Rejected
@@ -98,63 +106,86 @@ import type { ApplicantAppeal, ApplicantResponse } from '../../../services/eoi-s
             </div>
           }
 
-          <!-- Applicant's justification statement -->
+          <!-- Applicant's remarks -->
           <div class="bg-slate-50 border border-slate-200/80 rounded-lg p-3.5 space-y-1">
             <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wide block">
-              Applicant's Appeal Statement &amp; Justification
+              Applicant's Appeal Remarks
             </span>
-            <p class="m-0 text-slate-800 leading-relaxed whitespace-pre-line text-[12.5px]">
+            <p class="m-0 text-slate-800 leading-relaxed whitespace-pre-line text-[12.5px] font-medium">
               {{ appAppeal.reply }}
             </p>
           </div>
 
-          <!-- Attached Documents -->
-          @if (appAppeal.files && appAppeal.files.length > 0) {
-            <div class="space-y-2">
-              <span class="text-[11.5px] font-bold text-slate-800 uppercase tracking-wide block">
-                Attached Appeal Documents ({{ appAppeal.files.length }})
-              </span>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                @for (file of appAppeal.files; track file.fileName) {
-                  <div class="flex items-center justify-between gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:border-sky-300 transition-colors shadow-2xs">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                      <div class="w-7 h-7 rounded bg-red-50 text-red-600 border border-red-200 flex items-center justify-center shrink-0 font-bold text-[10px]">
-                        PDF
-                      </div>
-                      <div class="min-w-0">
-                        <span class="text-xs font-semibold text-slate-900 block truncate" [title]="file.fileName">
-                          {{ file.fileName }}
-                        </span>
-                        <span class="text-[11px] text-slate-500 block">{{ file.fileSize }}</span>
-                      </div>
-                    </div>
-                    <button
-                      appButton
-                      variant="ghost"
-                      size="sm"
-                      type="button"
-                      (click)="viewFile.emit({ title: file.fileName, fileName: file.fileName, fileSize: file.fileSize })"
-                      class="text-navy hover:text-sky-700 hover:bg-sky-50 shrink-0"
-                    >
-                      <span>View</span>
-                    </button>
+          <!-- Outcome Notice & Resubmitted Documents -->
+          @if (appAppeal.status === 'Accepted') {
+            @if (appAppeal.response; as res) {
+              <div class="bg-sky-50/70 border border-sky-300 rounded-xl p-4 space-y-3">
+                <div class="flex items-center justify-between gap-2 flex-wrap">
+                  <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-navy text-white flex items-center justify-center font-bold text-xs">✓</span>
+                    <span class="font-bold text-xs text-navy">Applicant's Appeal Response Documents Submitted</span>
+                  </div>
+                  <span class="text-[11px] text-slate-500 font-medium">Submitted on {{ res.respondedOn }}</span>
+                </div>
+
+                @if (res.remarks) {
+                  <div class="bg-white border border-sky-200 rounded-lg p-3 text-xs">
+                    <span class="text-[11px] font-semibold text-slate-600 block mb-1">Applicant Remarks:</span>
+                    <p class="m-0 text-slate-800 leading-relaxed font-medium">{{ res.remarks }}</p>
                   </div>
                 }
-              </div>
-            </div>
-          }
 
-          <!-- Outcome Notice if already decided -->
-          @if (appAppeal.status === 'Accepted') {
-            <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3.5 flex items-start gap-2.5 text-emerald-900">
-              <app-icon name="check" size="sm" class="text-emerald-700 mt-0.5 shrink-0" />
-              <div>
-                <span class="font-bold text-xs block">Appeal Accepted</span>
-                <p class="text-xs text-emerald-800 mt-0.5 m-0 leading-relaxed">
-                  The department accepted this appeal. The applicant has been notified on their EOI Status portal under "Appeal Response" to submit the requested documents.
-                </p>
+                @if (res.uploads && res.uploads.length > 0) {
+                  <div class="space-y-2">
+                    <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wide block">
+                      Uploaded Documents ({{ res.uploads.length }})
+                    </span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      @for (up of res.uploads; track up.fileName) {
+                        <div class="flex items-center justify-between gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:border-sky-300 transition-colors shadow-2xs">
+                          <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="w-7 h-7 rounded bg-red-50 text-red-600 border border-red-200 flex items-center justify-center shrink-0 font-bold text-[10px]">
+                              PDF
+                            </div>
+                            <div class="min-w-0">
+                              <span class="text-xs font-semibold text-slate-900 block truncate" [title]="up.requiredDoc">
+                                {{ up.requiredDoc }}
+                              </span>
+                              <span class="text-[11px] text-slate-500 block truncate">{{ up.fileName }} &bull; {{ up.fileSize }}</span>
+                            </div>
+                          </div>
+                          <button
+                            appButton
+                            variant="ghost"
+                            size="sm"
+                            type="button"
+                            (click)="viewFile.emit({ title: up.requiredDoc, fileName: up.fileName, fileSize: up.fileSize })"
+                            class="text-navy hover:text-sky-700 hover:bg-sky-50 shrink-0"
+                          >
+                            <span>View</span>
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <div class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center gap-2">
+                  <app-icon name="check" size="xs" class="text-emerald-700 shrink-0" />
+                  <span>Applicant has submitted the requested documents. Review them above and take final action using the <strong>Approve</strong> or <strong>Reject</strong> buttons above.</span>
+                </div>
               </div>
-            </div>
+            } @else {
+              <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3.5 flex items-start gap-2.5 text-emerald-900">
+                <app-icon name="check" size="sm" class="text-emerald-700 mt-0.5 shrink-0" />
+                <div>
+                  <span class="font-bold text-xs block">Appeal Accepted</span>
+                  <p class="text-xs text-emerald-800 mt-0.5 m-0 leading-relaxed">
+                    The department accepted this appeal. The applicant has been notified on their EOI Status portal under "Appeal Response" to submit the requested documents.
+                  </p>
+                </div>
+              </div>
+            }
           } @else if (appAppeal.status === 'Rejected') {
             <div class="bg-rose-50 border border-rose-200 rounded-lg p-3.5 flex items-start gap-2.5 text-rose-900">
               <app-icon name="close" size="sm" class="text-rose-700 mt-0.5 shrink-0" />

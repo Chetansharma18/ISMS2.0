@@ -5,7 +5,7 @@ import { Step2OrganisationComponent } from './step2/step2-organisation.component
 import { Step2AuthorizedPersonComponent } from './step2/step2-authorized-person.component';
 import { Step2BankDetailsComponent } from './step2/step2-bank-details.component';
 
-/** Step 2: Registration Profile (verified organisation, signatory and bank details). */
+/** Step 1: Registration Profile (verified organisation, signatory and bank details). */
 @Component({
   selector: 'app-step2-otr-profile',
   standalone: true,
@@ -40,14 +40,13 @@ import { Step2BankDetailsComponent } from './step2/step2-bank-details.component'
       <app-step2-bank-details />
 
       <!-- Footer Action Bar -->
-      <!-- Forward only: the processing fee step is closed once paid -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
         <span class="text-xs text-slate-500 flex items-center gap-1.5">
           <app-icon name="check-circle" size="xs" class="text-emerald-600" />
           Verified from One-Time Registration
         </span>
 
-        <button appButton size="lg" (click)="state.saveAndProceedToStep3()">
+        <button appButton size="lg" (click)="state.saveAndProceedToDocuments()">
           Proceed to Upload Documents &rarr;
         </button>
       </div>

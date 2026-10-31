@@ -6,10 +6,10 @@ import { SchemeFormState } from '../scheme-form.state';
 import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
 
 /**
- * Step 4: Complete Application Preview
+ * Step 3: Complete Application Preview
  *
- * Consolidates all applicant-submitted details (fee, verified profile, and proposal documents)
- * into a structured, read-only verification view before the applicant proceeds to EMD payment.
+ * Consolidates verified profile and proposal documents into a structured, read-only
+ * verification view before the applicant proceeds to processing fee payment.
  * Profile sections are strictly read-only; document section allows replacement via the Edit option.
  */
 @Component({
@@ -22,41 +22,12 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
     <div class="w-full space-y-4 font-sans">
 
       <!-- ====================================================================
-           1. PROCESSING FEE STATUS
+           1. ORGANISATION DETAILS PREVIEW (Read-Only)
            ==================================================================== -->
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
             <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">1</span>
-            <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Processing Fee</h2>
-          </div>
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
-            Paid
-          </span>
-        </div>
-        <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-4 text-xs">
-          <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Amount Paid</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.formattedProcessFee() }}</span>
-          </div>
-          <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Paid On</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.procFeeDate() }}</span>
-          </div>
-          <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Transaction ID</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">CIN-SBI-9912081</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- ====================================================================
-           2. ORGANISATION DETAILS PREVIEW (Read-Only)
-           ==================================================================== -->
-      <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
-        <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
-          <div class="flex items-center gap-2.5">
-            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">2</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Organisation Details</h2>
           </div>
         </div>
@@ -206,12 +177,12 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
       </section>
 
       <!-- ====================================================================
-           3. AUTHORIZED SIGNATORY PREVIEW (Read-Only)
+           2. AUTHORIZED SIGNATORY PREVIEW (Read-Only)
            ==================================================================== -->
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
-            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">3</span>
+            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">2</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Authorized Signatory</h2>
           </div>
         </div>
@@ -287,12 +258,12 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
       </section>
 
       <!-- ====================================================================
-           4. BANK DETAILS PREVIEW (Read-Only)
+           3. BANK DETAILS PREVIEW (Read-Only)
            ==================================================================== -->
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
-            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">4</span>
+            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">3</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Organisation Bank Details</h2>
           </div>
         </div>
@@ -336,12 +307,12 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
       </section>
 
       <!-- ====================================================================
-           5. PROPOSAL DOCUMENTS TABLE PREVIEW (Replace only on Edit)
+           4. PROPOSAL DOCUMENTS TABLE PREVIEW (Replace only on Edit)
            ==================================================================== -->
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
-            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">5</span>
+            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">4</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Documents ({{ state.attachedDocsCount() }} / {{ state.eoiDocuments().length }} Uploaded)</h2>
           </div>
           <button
@@ -440,12 +411,12 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
            FOOTER ACTION BAR
            ==================================================================== -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <button appButton variant="outline" size="lg" (click)="state.goToStep(3)">
+        <button appButton variant="outline" size="lg" (click)="state.goToStep(2)">
           &larr; Back to Upload Documents
         </button>
 
-        <button appButton size="lg" (click)="state.goToStep(5)" [disabled]="!state.declarationAgreed()">
-          Proceed to EMD Fee Payment ({{ state.formattedEmdFee() }}) &rarr;
+        <button appButton size="lg" (click)="state.goToStep(4)" [disabled]="!state.declarationAgreed()">
+          Proceed to Processing Fee Payment ({{ state.formattedProcessFee() }}) &rarr;
         </button>
       </div>
 

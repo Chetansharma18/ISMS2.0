@@ -74,18 +74,19 @@ export class SchemeFormState {
   );
 
   readonly wizardSteps: StepperStep[] = [
-    { label: 'Processing Fee' },
     { label: 'Registration Profile' },
     { label: 'Upload Documents' },
     { label: 'Complete Preview' },
+    { label: 'Processing Fee' },
     { label: 'EMD Payment' },
     { label: 'Submission Receipt' }
   ];
 
-  /** Step 1 is done once the fee is paid; the final step is done once reached. */
+  /** Step 4 (Processing Fee) is done once the fee is paid; Step 5 is done once submitted; the final step is done once reached. */
   readonly completedWizardSteps = computed(() => {
     const done: number[] = [];
-    if (this.procFeePaid()) done.push(1);
+    if (this.procFeePaid()) done.push(4);
+    if (this.submitted()) done.push(5);
     if (this.currentStep() === this.wizardSteps.length) done.push(this.wizardSteps.length);
     return done;
   });
@@ -229,7 +230,7 @@ export class SchemeFormState {
       }
     });
 
-    // Keep a draft up to date once the applicant has started (paid the processing fee) and until they submit,
+    // Keep a draft up to date as the applicant fills their application,
     // so the Active Schemes page can flag this application as pending.
     effect(() => {
       const paid = this.procFeePaid();
@@ -237,13 +238,13 @@ export class SchemeFormState {
       const docs = this.eoiDocuments();
       const refNo = this.schemeRefNo();
       const procFeeDate = this.procFeeDate();
-      if (!paid || this.submitted() || step >= this.wizardSteps.length) return;
+      if (this.submitted() || step >= this.wizardSteps.length) return;
       this.draftStore.save({
         refNo,
         schemeName: this.schemeName(),
         queryParams: this.schemeQueryParams,
-        step: Math.max(step, 2),
-        procFeePaid: true,
+        step: Math.max(step, 1),
+        procFeePaid: paid,
         procFeeDate,
         documents: docs
           .filter(d => d.status === 'uploaded')
@@ -265,12 +266,11 @@ export class SchemeFormState {
         return saved ? { ...doc, ...saved, status: 'uploaded' as const } : doc;
       })
     );
-    this.currentStep.set(Math.min(Math.max(draft.step, 2), this.wizardSteps.length - 1));
+    this.currentStep.set(Math.min(Math.max(draft.step, 1), this.wizardSteps.length - 1));
   }
 
   goToStep(step: number): void {
-    // Once the processing fee is paid the applicant moves forward only: Step 1 cannot be reopened.
-    if (step < 2 && this.procFeePaid()) return;
+    if (step < 1 || step > this.wizardSteps.length) return;
     this.currentStep.set(step);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -292,10 +292,10 @@ export class SchemeFormState {
       this.procFeePaid.set(true);
       this.procFeeDate.set(formatDateTime(new Date()));
       this.showProcFeeSuccessModal.set(true);
-      // The success screen cannot be dismissed: it carries the applicant on to Step 2 by itself.
+      // The success screen carries the applicant on to Step 5 (EMD Payment) by itself.
       setTimeout(() => {
         this.showProcFeeSuccessModal.set(false);
-        this.goToStep(2);
+        this.goToStep(5);
       }, PROC_FEE_SUCCESS_REDIRECT_MS);
     }, 600);
   }
@@ -316,10 +316,14 @@ export class SchemeFormState {
     }
   }
 
-  saveAndProceedToStep3(): void {
+  saveAndProceedToDocuments(): void {
     this.saveStep2Changes();
     this.isEditingStep2.set(false);
-    this.goToStep(3);
+    this.goToStep(2);
+  }
+
+  saveAndProceedToStep3(): void {
+    this.saveAndProceedToDocuments();
   }
 
   togglePreviewOtrEdit(): void {

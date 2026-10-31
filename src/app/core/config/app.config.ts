@@ -6,6 +6,7 @@ export interface PortalConfig {
   supportEmail: string;
   helplineNumber: string;
   sessionTimeoutMinutes: number;
+  ssoUrl: string;
 }
 
 export const PORTAL_CONFIG: PortalConfig = {
@@ -15,5 +16,6 @@ export const PORTAL_CONFIG: PortalConfig = {
   departmentName: 'Skill, Employment & Entrepreneurship Department',
   supportEmail: 'support-isms@rajasthan.gov.in',
   helplineNumber: '0141-2792600',
-  sessionTimeoutMinutes: 30
+  sessionTimeoutMinutes: 30,
+  ssoUrl: 'https://sso.rajasthan.gov.in'
 };

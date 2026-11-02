@@ -121,14 +121,12 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           </div>
 
           <!-- When Logged In (and on internal portal page): Notification Bell + User Profile Menu & Role Switcher -->
-          @if (currentUser() && !isLandingPage()) {
-            @if (!isSsoPage()) {
-              <!-- Thin Vertical Divider between Language & Notifications -->
-              <div class="w-px h-5 sm:h-6 bg-[#DCE4ED] shrink-0"></div>
+          @if (currentUser() && !isLandingPage() && !isSsoPage()) {
+            <!-- Thin Vertical Divider between Language & Notifications -->
+            <div class="w-px h-5 sm:h-6 bg-[#DCE4ED] shrink-0"></div>
 
-              <!-- Notification Option (Role-Specific Portal Notifications) -->
-              <app-header-notification></app-header-notification>
-            }
+            <!-- Notification Option (Role-Specific Portal Notifications) -->
+            <app-header-notification></app-header-notification>
 
             <!-- Thin Vertical Divider between Notifications/Language & Username -->
             <div class="w-px h-5 sm:h-6 bg-[#DCE4ED] shrink-0"></div>

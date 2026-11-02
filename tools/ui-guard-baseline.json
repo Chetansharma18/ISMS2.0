@@ -2,11 +2,36 @@
   "features/eoi/pages/mou/mou-draft.component.ts": {
     "page-frame": 1
   },
+  "features/eoi/pages/scrutiny-desk/components/scrutiny-appeal-card.component.ts": {
+    "button-style": 3
+  },
+  "features/eoi/pages/scrutiny-desk/components/scrutiny-past-performance.component.ts": {
+    "raw-button": 1
+  },
+  "features/eoi/pages/scrutiny-desk/components/scrutiny-remarks.component.ts": {
+    "raw-button": 1
+  },
+  "features/eoi/pages/scrutiny-desk/components/scrutiny-review-sections.component.ts": {
+    "raw-button": 4
+  },
   "features/eoi/pages/scrutiny-desk/scrutiny-desk.component.ts": {
     "page-frame": 1
   },
   "features/profile/profile-page.component.ts": {
     "page-frame": 1
+  },
+  "features/tenders/scheme-detail-view/required-documents-list.component.ts": {
+    "raw-button": 1
+  },
+  "features/tenders/scheme-detail-view/scheme-annexures-list.component.ts": {
+    "raw-button": 1
+  },
+  "features/tenders/scheme-detail-view/scheme-detail-summary.component.ts": {
+    "raw-table": 1
+  },
+  "features/tenders/scheme-detail-view/scheme-documents-panel.component.ts": {
+    "raw-button": 2,
+    "raw-table": 1
   },
   "features/tenders/tender-status.component.ts": {
     "page-frame": 1

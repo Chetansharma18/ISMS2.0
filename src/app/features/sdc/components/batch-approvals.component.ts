@@ -232,9 +232,8 @@ import { FilterTabsComponent } from '../../../shared';
             @if (isApproved(batch)) {
               <button
                 appButton
-                variant="outline"
+                variant="danger"
                 size="sm"
-                class="shrink-0 text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200"
                 type="button"
                 (click)="openWithdrawModal(batch)"
                 title="Withdraw Batch"
@@ -286,8 +285,10 @@ import { FilterTabsComponent } from '../../../shared';
             <div class="space-y-1">
               <label class="block text-xs font-semibold text-slate-700">Reason for Withdrawal (Optional)</label>
               <input
+                appInput
                 type="text"
-                class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 focus:outline-hidden focus:ring-1 focus:ring-navy focus:border-navy"
+                size="sm"
+                class="w-full"
                 placeholder="e.g. Schedule cancellation or administrative decision"
                 [(ngModel)]="withdrawReason"
               />

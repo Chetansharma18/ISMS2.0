@@ -47,7 +47,7 @@ describe('HeaderComponent', () => {
     expect(compiled.querySelector('#user-menu-container')).not.toBeNull();
   });
 
-  it('removes app-header-notification on sso-login page', async () => {
+  it('removes app-header-notification and user-menu-container on sso-login page', async () => {
     authService.currentUser.set({
       id: 'test-user',
       ssoId: 'test-user',
@@ -62,10 +62,9 @@ describe('HeaderComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    // Notification option must not show on SSO login screen
+    // Notification option and user profile menu must not show on SSO login screen
     expect(compiled.querySelector('app-header-notification')).toBeNull();
-    // User menu is still retained
-    expect(compiled.querySelector('#user-menu-container')).not.toBeNull();
+    expect(compiled.querySelector('#user-menu-container')).toBeNull();
   });
 
   it('does not render app-header-notification on landing page', async () => {

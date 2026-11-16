@@ -35,6 +35,9 @@ let nextId = 0;
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ButtonComponent, IconComponent],
+  host: {
+    '[attr.title]': 'null'
+  },
   template: `
     <div
       class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto font-sans print:static print:p-0 print:block print:bg-white"
@@ -73,7 +76,7 @@ let nextId = 0;
           <ng-content />
         </div>
 
-        <div class="px-5 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/70 flex items-center justify-end gap-2.5 shrink-0 empty:hidden print:hidden">
+        <div class="px-5 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/70 flex items-center justify-end gap-2.5 shrink-0 whitespace-nowrap empty:hidden print:hidden">
           <ng-content select="[modalFooter]" />
         </div>
       </div>

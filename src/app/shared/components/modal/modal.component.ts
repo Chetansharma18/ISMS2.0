@@ -37,12 +37,12 @@ let nextId = 0;
   imports: [ButtonComponent, IconComponent],
   template: `
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto font-sans print:static print:p-0 print:block print:bg-white"
+      class="fixed inset-0 z-50 flex justify-center p-3 sm:p-4 md:p-6 overflow-y-auto font-sans print:static print:p-0 print:block print:bg-white"
       style="background: rgba(10, 20, 40, 0.5); backdrop-filter: blur(4px);"
       (click)="onBackdrop($event)"
     >
       <div
-        class="w-full bg-white rounded-xl border border-slate-200 shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col"
+        class="w-full bg-white rounded-xl border border-slate-200 shadow-2xl overflow-hidden my-auto max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3.5rem)] flex flex-col"
         [class]="widthClass()"
         role="dialog"
         aria-modal="true"

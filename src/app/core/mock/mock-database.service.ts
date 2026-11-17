@@ -183,6 +183,17 @@ export class MockDatabaseService {
           } else {
             this.store.set(key, stored);
           }
+        } else if (key === 'GRIEVANCES' || key === 'ADMIN_GRIEVANCES') {
+          const hasLoginIssue = stored.some(
+            (item: any) => item?.title === 'Login Issue' || (item?.description && String(item.description).includes('Unable to login'))
+          );
+          if (hasLoginIssue) {
+            const fresh = this.deepClone(this.seeds[key]);
+            this.store.set(key, fresh);
+            this.saveToStorage(key, fresh);
+          } else {
+            this.store.set(key, stored);
+          }
         } else if (key === 'USERS') {
           const hasOldRoles = stored.some(
             item =>

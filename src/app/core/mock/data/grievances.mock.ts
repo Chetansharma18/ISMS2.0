@@ -9,10 +9,10 @@ export const MOCK_GRIEVANCES: GrievanceItem[] = resolveMock([
   {
     sNo: 1,
     submittedAt: '2026-09-27T10:15:30Z',
-    title: 'Login Issue',
-    description: 'Unable to login to the portal using my credentials. It shows invalid password every time.',
+    title: 'Biometric Attendance Sync Delay',
+    description: 'AEBAS biometric attendance punches are not reflecting in the daily attendance punch log for Batch B-26-0001.',
     issueType: 'Technical',
-    attachment: 'screenshot.png',
+    attachment: 'device_sync_log.pdf',
     status: 'Open'
   },
   {
@@ -52,10 +52,10 @@ export const MOCK_ADMIN_GRIEVANCES: AdminGrievanceItem[] = resolveMock([
     sNo: 1,
     userName: 'Alice Smith',
     submittedAt: '2026-09-27T10:15:30Z',
-    title: 'Login Issue',
-    description: 'Unable to login to the portal using my credentials. It shows invalid password every time.',
+    title: 'Biometric Attendance Sync Delay',
+    description: 'AEBAS biometric attendance punches are not reflecting in the daily attendance punch log for Batch B-26-0001.',
     issueType: 'Technical',
-    attachment: 'screenshot.png',
+    attachment: 'device_sync_log.pdf',
     status: 'Open'
   },
   {

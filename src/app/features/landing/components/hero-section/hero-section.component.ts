@@ -13,7 +13,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
     class: 'block w-full'
   },
   template: `
-    <section class="relative w-full overflow-hidden bg-[#0B2440] flex items-center min-h-120 sm:min-h-125 lg:min-h-130">
+    <section class="relative w-full overflow-hidden bg-[#2E1065] flex items-center min-h-120 sm:min-h-125 lg:min-h-130">
       
       <!-- Authentic Panoramic Rajasthan Heritage Architecture Background -->
       <div 
@@ -22,10 +22,10 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
         aria-hidden="true"
       ></div>
 
-      <!-- High-Contrast Directional Deep Navy Overlay -->
+      <!-- High-Contrast Directional Violet & Sunset Orange Overlay -->
       <div 
         class="absolute inset-0 pointer-events-none"
-        style="background: linear-gradient(90deg, rgba(11, 36, 64, 0.96) 0%, rgba(11, 36, 64, 0.92) 52%, rgba(18, 54, 90, 0.85) 100%);"
+        style="background: linear-gradient(135deg, rgba(46, 16, 101, 0.95) 0%, rgba(88, 28, 135, 0.92) 50%, rgba(194, 65, 12, 0.85) 100%);"
         aria-hidden="true"
       ></div>
 
@@ -43,12 +43,12 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
 
             <!-- Small Orange Underline -->
             <div 
-              class="w-10.5 h-[3.5px] bg-[#F28C28] rounded-full my-4" 
+              class="w-10.5 h-[3.5px] bg-[#EA580C] rounded-full my-4" 
               aria-hidden="true"
             ></div>
 
             <!-- Hero Description -->
-            <p class="hero-desc font-normal text-[#E8EFF7] leading-[1.6]">
+            <p class="hero-desc font-normal text-[#F5EEF8] leading-[1.6]">
               A unified, transparent digital ecosystem empowering skill development schemes, training operations, biometric verification, assessments, certifications, and sustainable placements across Rajasthan.
             </p>
 

@@ -18,40 +18,40 @@
      font-serif is left as it is: it is used only by the printed letters (sanction order, IPA, MoU). */
   --font-mono: var(--font-sans);
 
-  /* ISMS Centralized Design System Palette */
-  --color-primary: #174A6E;
-  --color-primary-dark: #123B59;
-  --color-primary-light: #EAF2F6;
+  /* ISMS Centralized Design System Palette - Violet & Sunset Orange Theme */
+  --color-primary: #6B21A8;
+  --color-primary-dark: #581C87;
+  --color-primary-light: #F5EEF8;
   --color-background: #FFFFFF;
   --color-surface: #FFFFFF;
-  --color-border: #D9E1E7;
-  --color-text-primary: #1F2933;
-  --color-text-secondary: #5F6B76;
-  --color-text-muted: #7A8792;
+  --color-border: #E5D9EC;
+  --color-text-primary: #1F162B;
+  --color-text-secondary: #5F5268;
+  --color-text-muted: #7E7188;
 
   /* Theme-aligned aliases */
-  --color-gov-blue: #174A6E;
-  --color-gov-blue-dark: #123B59;
-  --color-header-blue: #174A6E;
-  --color-table-header: #EAF2F6;
-  --color-sso-blue: #131862;
+  --color-gov-blue: #6B21A8;
+  --color-gov-blue-dark: #581C87;
+  --color-header-blue: #6B21A8;
+  --color-table-header: #FAF5FF;
+  --color-sso-blue: #4C1D95;
 
   /* Aliases kept for existing markup: text-brand / text-brand-dark / border-theme */
-  --color-brand: #174A6E;
-  --color-brand-dark: #123B59;
-  --color-theme: #D9E1E7;
+  --color-brand: #6B21A8;
+  --color-brand-dark: #581C87;
+  --color-theme: #E5D9EC;
 
-  /* Deep navy used for headers, primary CTAs and document chrome */
-  --color-navy: #0B3558;
-  --color-navy-dark: #07233B;
+  /* Deep regal violet-navy used for headers, primary CTAs and document chrome */
+  --color-navy: #4C1D95;
+  --color-navy-dark: #3B0764;
 
-  /* Accent blues used for links, back buttons and highlights */
-  --color-ocean: #0483AC;
-  --color-ocean-dark: #036C8F;
+  /* Accent warm sunset coral/orange used for highlights, tags and badges */
+  --color-ocean: #EA580C;
+  --color-ocean-dark: #C2410C;
 
   /* Neutral surfaces and form borders */
-  --color-surface-muted: #F5F7F9;
-  --color-field-border: #8FA3B6;
+  --color-surface-muted: #FAF5FF;
+  --color-field-border: #C4B5CD;
 }
 
 /* Horizontal scrollers (steppers, tab strips) that should scroll without a visible bar.
@@ -70,21 +70,21 @@
    --------------------------------------------------------- */
 :root {
   /* Brand */
-  --color-primary: #174A6E;
-  --color-primary-dark: #123B59;
-  --color-primary-light: #EAF2F6;
+  --color-primary: #6B21A8;
+  --color-primary-dark: #581C87;
+  --color-primary-light: #F5EEF8;
 
   /* Backgrounds */
   --color-background: #FFFFFF;
   --color-surface: #FFFFFF;
 
   /* Text */
-  --color-text-primary: #1F2933;
-  --color-text-secondary: #5F6B76;
-  --color-text-muted: #7A8792;
+  --color-text-primary: #1F162B;
+  --color-text-secondary: #5F5268;
+  --color-text-muted: #7E7188;
 
   /* Border */
-  --color-border: #D9E1E7;
+  --color-border: #E5D9EC;
 
   /* Typography System (Strict Inter Font & Standardized Clean Sizing) */
   --font-family-base: var(--font-sans);

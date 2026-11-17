@@ -72,7 +72,7 @@ export type { UserManagementItem };
         title="User Management"
         [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'User Management' }]"
         [searchable]="true"
-        searchPlaceholder="Search User ID, Username, SSO, Role, District..."
+        searchPlaceholder="Search Username, SSO ID, Role, District..."
         [(searchQuery)]="searchQuery"
       >
         <!-- Add User Button -->
@@ -333,11 +333,6 @@ export class UserManagementComponent {
 
   readonly columns: TableColumn<UserManagementItem>[] = [
     { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
-    {
-      key: 'userId',
-      label: 'User ID',
-      cellClass: 'whitespace-nowrap tabular-nums text-xs text-slate-700'
-    },
     {
       key: 'username',
       label: 'Username',

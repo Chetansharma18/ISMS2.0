@@ -46,13 +46,13 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
         <!-- Unread Count Badge -->
         @if (unreadCount() > 0) {
           <span
-            class="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[17px] h-[17px] px-1 text-[9.5px] font-bold text-white bg-[#F28C28] rounded-full shadow-xs ring-2 ring-white"
+            class="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[17px] h-[17px] px-1 text-[9.5px] font-bold text-white bg-[#EA580C] rounded-full shadow-xs ring-2 ring-white"
             aria-hidden="true"
           >
             {{ unreadCount() > 9 ? '9+' : unreadCount() }}
 
             @if (hasNewArrivals()) {
-              <span class="absolute inset-0 rounded-full bg-[#F28C28] animate-ping opacity-70"></span>
+              <span class="absolute inset-0 rounded-full bg-[#EA580C] animate-ping opacity-70"></span>
             }
           </span>
         }
@@ -61,16 +61,16 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       <!-- Dropdown Popover -->
       @if (isOpen()) {
         <div
-          class="absolute right-0 sm:right-0 top-full mt-2 w-[320px] xs:w-[360px] sm:w-[380px] max-w-[calc(100vw-24px)] bg-white border border-[#DCE4ED] rounded-xl shadow-xl z-[120] overflow-hidden flex flex-col font-sans animate-in fade-in zoom-in-95 duration-150"
+          class="absolute right-0 sm:right-0 top-full mt-2 w-[320px] xs:w-[360px] sm:w-[380px] max-w-[calc(100vw-24px)] bg-white border border-[#E5D9EC] rounded-xl shadow-xl z-[120] overflow-hidden flex flex-col font-sans animate-in fade-in zoom-in-95 duration-150"
           role="dialog"
           aria-label="Notifications"
         >
           <!-- Header: Simple title and Mark all read -->
-          <div class="px-4 py-3 bg-[#F8FAFC] border-b border-[#DCE4ED] flex items-center justify-between">
+          <div class="px-4 py-3 bg-[#FAF5FF] border-b border-[#E5D9EC] flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="text-xs sm:text-sm font-bold text-[#12365A]">Notifications</span>
+              <span class="text-xs sm:text-sm font-bold text-[#2E1065]">Notifications</span>
               @if (unreadCount() > 0) {
-                <span class="text-[10px] font-bold px-1.5 py-0.2 bg-[#F28C28]/15 text-[#B85800] rounded-full">
+                <span class="text-[10px] font-bold px-1.5 py-0.2 bg-[#EA580C]/15 text-[#C2410C] rounded-full">
                   {{ unreadCount() }} New
                 </span>
               }
@@ -96,13 +96,13 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                 (click)="onItemClick(item)"
                 class="p-3.5 transition-colors cursor-pointer flex items-start gap-3 border-l-[3px]"
                 [ngClass]="!item.isRead 
-                  ? 'bg-[#F2F7FC] hover:bg-[#EAF2F8] border-l-[#12365A]' 
+                  ? 'bg-[#F5EEF8] hover:bg-[#EDE9FE] border-l-[#6B21A8]' 
                   : 'bg-white hover:bg-slate-50 border-l-transparent'"
               >
                 <!-- Unread status dot -->
                 <div class="pt-1 shrink-0">
                   @if (!item.isRead) {
-                    <span class="block w-2 h-2 rounded-full bg-[#F28C28]"></span>
+                    <span class="block w-2 h-2 rounded-full bg-[#EA580C]"></span>
                   } @else {
                     <span class="block w-2 h-2 rounded-full bg-slate-300"></span>
                   }
@@ -113,7 +113,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                   <div class="flex items-baseline justify-between gap-2">
                     <h4
                       class="text-xs leading-snug m-0 truncate"
-                      [ngClass]="!item.isRead ? 'font-bold text-[#12365A]' : 'font-medium text-slate-700'"
+                      [ngClass]="!item.isRead ? 'font-bold text-[#2E1065]' : 'font-medium text-slate-700'"
                     >
                       {{ item.title }}
                     </h4>

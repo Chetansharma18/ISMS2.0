@@ -90,9 +90,9 @@ export interface StepMeta {
                 <!-- Number Badge / Checkmark -->
                 <span
                   class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 transition-colors shadow-2xs"
-                  [style.background-color]="(activeStep() === step.number || isStepCompleted(step.number)) ? '#0B3558' : '#ffffff'"
+                  [style.background-color]="(activeStep() === step.number || isStepCompleted(step.number)) ? 'var(--color-navy, #4C1D95)' : '#ffffff'"
                   [style.color]="(activeStep() === step.number || isStepCompleted(step.number)) ? '#ffffff' : '#64748b'"
-                  [style.border]="(activeStep() === step.number || isStepCompleted(step.number)) ? '2px solid #0B3558' : '2px solid #cbd5e1'"
+                  [style.border]="(activeStep() === step.number || isStepCompleted(step.number)) ? '2px solid var(--color-navy, #4C1D95)' : '2px solid #cbd5e1'"
                 >
                   @if (isStepCompleted(step.number) && activeStep() !== step.number) {
                     <app-icon name="check" [stroke]="3" class="text-white" />

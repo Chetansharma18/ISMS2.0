@@ -69,6 +69,8 @@ export interface TenderAppeal {
   status?: 'Pending' | 'Accepted' | 'Rejected';
   rejectionReason?: string;
   decidedAt?: string;
+  deptRemarks?: string;
+  responseDeadline?: string;
   response?: ShortfallResponse;
 }
 

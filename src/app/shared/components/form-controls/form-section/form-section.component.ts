@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   template: `
     <section class="w-full bg-white not-last:pb-3 not-last:mb-3 not-last:border-b border-slate-200/60">
       @if (title) {
-        <div class="font-bold pb-1.5 mb-2.5 border-b border-slate-200/80 flex items-center gap-2" style="font-size: 13.5px !important; color: #0B3558 !important;">
+        <div class="font-bold pb-1.5 mb-2.5 border-b border-purple-100 flex items-center gap-2" style="font-size: 13.5px !important; color: var(--color-navy, #4C1D95) !important;">
           <span class="w-1.5 h-3.5 bg-navy rounded-xs inline-block"></span>
           <span>{{ title }}</span>
         </div>

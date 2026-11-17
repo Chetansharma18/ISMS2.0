@@ -38,8 +38,8 @@ interface TenderItem {
         <div class="h-15 px-5 sm:px-6 bg-white border-b border-[#DCE4ED] flex items-center justify-between shrink-0 z-10">
           <div class="flex items-center gap-2.5">
             <!-- Small Orange Accent Bar -->
-            <span class="w-1 h-4.5 bg-[#F28C28] rounded-full inline-block" aria-hidden="true"></span>
-            <h2 class="text-[17px] font-bold text-[#12365A] tracking-wide m-0">TENDER</h2>
+            <span class="w-1 h-4.5 bg-[#EA580C] rounded-full inline-block" aria-hidden="true"></span>
+            <h2 class="text-[17px] font-bold text-[#2E1065] tracking-wide m-0">TENDER</h2>
           </div>
           
           <!-- View All Action -->
@@ -58,7 +58,7 @@ interface TenderItem {
         <!-- TENDER LIST: Clean readable rows, subtle dividers, internally scrollable -->
         <div 
           #scrollList
-          class="flex-1 overflow-y-auto divide-y divide-[#DCE4ED] bg-white tender-custom-scroll overscroll-contain" 
+          class="flex-1 overflow-y-auto divide-y divide-[#E5D9EC] bg-white tender-custom-scroll overscroll-contain" 
           (mouseenter)="pauseScroll()" 
           (mouseleave)="resumeScrollWithDelay()"
           (touchstart)="pauseScroll()"
@@ -67,7 +67,7 @@ interface TenderItem {
           @for (item of tenders; track item.id) {
             <div 
               (click)="openLoginPrompt(item)" 
-              class="p-3.5 sm:p-4 hover:bg-[#F5F8FC] transition-colors duration-150 cursor-pointer group flex flex-col gap-1.5 text-left focus:outline-none focus:bg-[#F5F8FC]"
+              class="p-3.5 sm:p-4 hover:bg-[#FAF5FF] transition-colors duration-150 cursor-pointer group flex flex-col gap-1.5 text-left focus:outline-none focus:bg-[#FAF5FF]"
               tabindex="0"
               (keydown.enter)="openLoginPrompt(item)"
               (keydown.space)="openLoginPrompt(item)"
@@ -84,13 +84,13 @@ interface TenderItem {
                     </span>
                   }
                 </div>
-                <span class="text-[11px] font-semibold text-[#12365A] bg-primary-light border border-border rounded px-2 py-0.5 shrink-0">
+                <span class="text-[11px] font-semibold text-[#6B21A8] bg-primary-light border border-border rounded px-2 py-0.5 shrink-0">
                   {{ item.category }}
                 </span>
               </div>
 
               <!-- Middle Row: Tender Title -->
-              <h4 class="text-[13px] sm:text-[13.5px] font-semibold text-[#12365A] leading-snug group-hover:text-[#F28C28] transition-colors line-clamp-2 m-0">
+              <h4 class="text-[13px] sm:text-[13.5px] font-semibold text-[#2E1065] leading-snug group-hover:text-[#EA580C] transition-colors line-clamp-2 m-0">
                 {{ item.title }}
               </h4>
 

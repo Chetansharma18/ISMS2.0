@@ -1,5 +1,6 @@
+import { describe, it, expect } from 'vitest';
 import type { SubmittedTender } from '../../../core/models/tender.model';
-import { MAX_APPEAL_FILES, buildAppeal, canAppeal, isAppealReady } from './tender-appeal.util';
+import { MAX_APPEAL_FILES, buildAppeal, canAppeal, isAppealReady, remainingDaysText } from './tender-appeal.util';
 
 const tender = (overrides: Partial<SubmittedTender>): SubmittedTender => ({ submittedStatus: 'Rejected', ...overrides }) as SubmittedTender;
 
@@ -23,5 +24,13 @@ describe('tender appeal', () => {
     expect(appeal.reply).toBe('Attached.');
     expect(appeal.submittedOn).toBe('10-Oct-2026');
     expect(appeal.files).toHaveLength(MAX_APPEAL_FILES);
+  });
+
+  it('calculates remaining days for appeal response deadline', () => {
+    const now = new Date(2026, 9, 12); // 12-Oct-2026
+    expect(remainingDaysText('19-Oct-2026', now)).toBe('7 days remaining');
+    expect(remainingDaysText('13-Oct-2026', now)).toBe('1 day remaining');
+    expect(remainingDaysText('12-Oct-2026', now)).toBe('Due today');
+    expect(remainingDaysText('10-Oct-2026', now)).toBe('Deadline passed (Overdue)');
   });
 });

@@ -16,7 +16,7 @@ import { ShortfallResponseModalComponent, ShortfallSubmission } from './tender-s
 import { openShortfalls, withShortfallResponse } from './tender-status/tender-shortfall.util';
 import { TenderAppealSectionComponent } from './tender-status/tender-appeal-section.component';
 import { AppealModalComponent } from './tender-status/appeal-modal.component';
-import { canAppeal } from './tender-status/tender-appeal.util';
+import { canAppeal, remainingDaysText } from './tender-status/tender-appeal.util';
 import { DataEngineService } from '../../core/services/data-engine.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { TenderListComponent } from './tender-status/tender-list.component';
@@ -133,10 +133,13 @@ interface TenderDetailTabItem {
 
           @if (pendingNoticeCount() > 0) {
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900" role="alert">
-              <p class="m-0 text-[13px] leading-snug">
-                <strong class="font-semibold">{{ selectedTender()?.appeal ? 'Appeal Response:' : 'Shortfall request:' }}</strong>
-                the department has asked for more documents on this application ({{ pendingNoticeCount() }} pending).
-              </p>
+              <div class="flex items-center gap-2">
+                <app-icon name="alert-triangle" size="sm" class="text-amber-600 shrink-0" />
+                <p class="m-0 text-[13px] leading-snug">
+                  <strong class="font-semibold">{{ selectedTender()?.appeal ? 'Department Appeal Response:' : 'Shortfall request:' }}</strong>
+                  {{ selectedTender()?.appeal ? 'Clarification requested by department. Action required within 7 days.' : 'the department has asked for more documents on this application (' + pendingNoticeCount() + ' pending).' }}
+                </p>
+              </div>
               <button appButton size="sm" type="button" (click)="openShortfallFlow()" class="shrink-0">
                 Respond
               </button>
@@ -352,7 +355,7 @@ interface TenderDetailTabItem {
                       </div>
                     </div>
                     <button appButton variant="outline" size="sm" type="button" (click)="setActiveTab('shortfall')" class="w-full justify-center">
-                      <span>View Scrutiny Details &rarr;</span>
+                      <span>{{ selectedTender()?.appeal ? 'View Appeal Details &rarr;' : 'View Scrutiny Details &rarr;' }}</span>
                     </button>
                   </div>
                 </div>
@@ -409,13 +412,19 @@ interface TenderDetailTabItem {
 
             <!-- TAB 7: SHORTFALL REQUESTS & APPEALS -->
             @if (activeTab() === 'shortfall' || activeTab() === 'all') {
-              <app-tender-shortfall-section
-                [app]="selectedTender()!"
-                (respond)="openShortfallModal(selectedTender()!, $event)"
-                (viewDoc)="onViewDoc($event)"
-              />
-
-              <app-tender-appeal-section [app]="selectedTender()!" />
+              @if (!selectedTender()?.appeal) {
+                <app-tender-shortfall-section
+                  [app]="selectedTender()!"
+                  (respond)="openShortfallModal(selectedTender()!, $event)"
+                  (viewDoc)="onViewDoc($event)"
+                />
+              } @else {
+                <app-tender-appeal-section
+                  [app]="selectedTender()!"
+                  (respond)="openShortfallModal(selectedTender()!, $event)"
+                  (viewDoc)="onViewDoc($event)"
+                />
+              }
             }
 
           </div>
@@ -471,6 +480,15 @@ export class TenderStatusComponent {
     const tender = this.selectedTender();
     return tender ? openShortfalls(tender).length : 0;
   });
+
+  readonly latestOpenNotice = computed(() => {
+    const tender = this.selectedTender();
+    return tender ? openShortfalls(tender)[0] ?? null : null;
+  });
+
+  remainingDays(dueDate: string): string {
+    return remainingDaysText(dueDate);
+  }
 
   /** The rejected application whose appeal form is open. */
   readonly appealingTender = signal<SubmittedTender | null>(null);

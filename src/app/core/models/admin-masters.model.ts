@@ -122,7 +122,7 @@ export interface GradingMasterItem {
   status: 'Active' | 'Inactive';
 }
 
-export type AuthMethodType = 'OTP' | 'Auth App' | 'PIN';
+export type AuthMethodType = 'OTP' | 'PIN';
 
 export interface TwoStepVerificationItem {
   id: string;

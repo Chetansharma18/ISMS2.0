@@ -14,12 +14,12 @@ import { IconName } from '../icon/icons';
         <app-icon [name]="icon" size="xl" [stroke]="1.5" />
       </div>
 
-      <h3 class="text-[16px] leading-[24px] font-semibold text-[#1F2933] m-0">
+      <h3 class="text-[16px] leading-[24px] font-semibold text-[#25212A] m-0">
         {{ title }}
       </h3>
 
       @if (description) {
-        <p class="text-[13px] leading-[20px] text-[#5F6B76] mt-1.5 mb-4">
+        <p class="text-[13px] leading-[20px] text-[#625663] mt-1.5 mb-4">
           {{ description }}
         </p>
       }

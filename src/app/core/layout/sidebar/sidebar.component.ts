@@ -34,7 +34,8 @@ import {
   template: `
     <!-- Premium Sidebar -->
     <aside
-      class="shrink-0 bg-white border-r border-slate-200 h-full flex flex-col justify-between select-none overflow-y-auto font-sans w-57 max-w-full"
+      class="shrink-0 text-white border-r border-[#4A0626] h-full flex flex-col justify-between select-none overflow-y-auto font-sans w-57 max-w-full"
+      style="background: linear-gradient(180deg, #5E0832 0%, #7C0E44 50%, #4A0626 100%);"
       (click)="onNavClick($event)"
       aria-label="Portal Navigation Sidebar"
     >
@@ -42,10 +43,10 @@ import {
       <div class="flex flex-col">
         
         <!-- Mobile Sidebar Close Header (Visible only < md) -->
-        <div class="md:hidden flex items-center justify-between px-3.5 py-3 border-b border-purple-100 bg-[#FAF5FF]">
+        <div class="md:hidden flex items-center justify-between px-3.5 py-3 border-b border-white/10 bg-black/10">
           <div class="flex items-center gap-2">
-            <span class="font-bold text-sm text-[#2E1065]">ISMS <span class="text-[#EA580C]">2.0</span></span>
-            <span class="text-[11px] text-slate-500 font-medium">Menu</span>
+            <span class="font-bold text-sm text-white">ISMS <span class="text-[#F2DACE]">2.0</span></span>
+            <span class="text-[11px] text-white/70 font-medium">Menu</span>
           </div>
           <button
             appButton
@@ -72,11 +73,12 @@ import {
             @for (item of adminToolNav; track item.link) {
               <a
                 [routerLink]="item.link"
-                routerLinkActive="bg-primary-light text-brand font-medium border border-border"
+                routerLinkActive="!bg-[#F2DACE] !text-[#7C0E44] font-bold shadow-xs"
+                #adminRla="routerLinkActive"
                 [routerLinkActiveOptions]="defaultMatch"
-                class="flex items-center gap-2.5 px-3 py-2 rounded-sm text-[13px] leading-5 text-text-secondary hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
+                class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
               >
-                <app-icon [name]="item.icon" class="text-text-muted group-hover:text-brand transition-colors" />
+                <app-icon [name]="item.icon" [class]="adminRla.isActive ? '!text-[#7C0E44]' : 'text-white/80 group-hover:text-white transition-colors'" />
                 <span class="tracking-tight">{{ item.label }}</span>
               </a>
             }
@@ -100,27 +102,36 @@ import {
         </nav>
       </div>
 
+      <!-- Bottom: Rajasthan Fort Heritage Illustration -->
+      <div class="mt-auto shrink-0 w-full px-2 pt-4 pb-2 pointer-events-none opacity-60 flex justify-center items-end overflow-hidden">
+        <img
+          src="/sidebar-fort-transparent.png"
+          alt="Rajasthan Heritage"
+          class="w-full object-contain object-bottom max-h-32 select-none"
+        />
+      </div>
+
     </aside>
 
     <!-- One link: icon, label and (for Profile) the "Pending" badge -->
     <ng-template #navLink let-item let-pending="pending">
       <a
         [routerLink]="item.link"
-        [class.bg-primary-light]="isActive(item.key)"
-        [class.text-brand]="isActive(item.key)"
-        [class.font-medium]="isActive(item.key)"
-        [class.border]="isActive(item.key)"
-        [class.border-border]="isActive(item.key)"
-        [class.text-text-secondary]="!isActive(item.key)"
-        class="flex items-center justify-between px-3 py-2 rounded-sm text-[13px] leading-5 hover:bg-surface-muted hover:text-brand transition-all cursor-pointer group"
+        [class.bg-[#F2DACE]]="isActive(item.key)"
+        [class.text-[#7C0E44]]="isActive(item.key)"
+        [class.font-bold]="isActive(item.key)"
+        [class.shadow-xs]="isActive(item.key)"
+        [class.text-white/90]="!isActive(item.key)"
+        class="flex items-center justify-between px-3 py-2 rounded-lg text-[13px] leading-5 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
       >
         <div class="flex items-center gap-2.5 min-w-0">
           <app-icon
             [name]="item.icon"
             [stroke]="item.stroke ?? 1.75"
-            class="group-hover:text-brand transition-colors"
-            [class.text-brand]="isActive(item.key)"
-            [class.text-text-muted]="!isActive(item.key)"
+            class="transition-colors"
+            [class.text-[#7C0E44]]="isActive(item.key)"
+            [class.text-white/80]="!isActive(item.key)"
+            [class.group-hover:text-white]="!isActive(item.key)"
           />
           <span class="tracking-tight min-w-0" [class.font-medium]="item.bold">{{ item.label }}</span>
         </div>
@@ -143,32 +154,33 @@ import {
           block
           type="button"
           (click)="section.toggle()"
-          class="justify-between h-auto px-3 py-2 rounded-sm text-[13px] leading-5 text-text-secondary hover:bg-surface-muted hover:text-brand group"
+          class="justify-between h-auto px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white group"
         >
           <div class="flex items-center gap-2.5">
-            <app-icon [name]="section.icon" class="text-text-muted group-hover:text-brand transition-colors" />
+            <app-icon [name]="section.icon" class="text-white/80 group-hover:text-white transition-colors" />
             <span class="tracking-tight font-medium">{{ section.label }}</span>
           </div>
           <app-icon
             name="chevron-down"
             size="sm"
             [stroke]="2"
-            class="text-slate-400 group-hover:text-brand transition-transform duration-200"
+            class="text-white/60 group-hover:text-white transition-transform duration-200"
             [ngClass]="{'transform rotate-180': section.open()}"
           />
         </button>
 
         @if (section.open()) {
-          <div class="flex flex-col gap-0.5 pl-7 pr-1 pt-1 pb-1 transition-all duration-300">
+          <div class="flex flex-col gap-0.5 pl-6 pr-1 pt-1 pb-1 transition-all duration-300">
             @for (sub of section.items; track sub.label) {
               <a
                 [routerLink]="sub.link"
                 [queryParams]="sub.query"
-                routerLinkActive="bg-primary-light text-brand font-semibold"
+                routerLinkActive="!bg-[#F2DACE] !text-[#7C0E44] font-bold shadow-xs"
+                #subRla="routerLinkActive"
                 [routerLinkActiveOptions]="sub.query ? exactMatch : defaultMatch"
-                class="px-2.5 py-1.5 rounded text-[12px] text-slate-600 hover:bg-surface-muted hover:text-brand transition-colors flex items-center gap-2"
+                class="px-2.5 py-1.5 rounded-md text-[12px] text-white/80 hover:bg-white/10 hover:text-white transition-colors flex items-center gap-2"
               >
-                <span class="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></span>
+                <span class="w-1.5 h-1.5 rounded-full shrink-0" [ngClass]="subRla.isActive ? 'bg-[#7C0E44]' : 'bg-white/50'"></span>
                 <span class="truncate">{{ sub.label }}</span>
               </a>
             }

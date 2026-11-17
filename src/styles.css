@@ -18,40 +18,49 @@
      font-serif is left as it is: it is used only by the printed letters (sanction order, IPA, MoU). */
   --font-mono: var(--font-sans);
 
-  /* ISMS Centralized Design System Palette - Violet & Sunset Orange Theme */
-  --color-primary: #6B21A8;
-  --color-primary-dark: #581C87;
-  --color-primary-light: #F5EEF8;
+  /* Centralized Design System Palette - Light Burgundy, Dusty Rose, Soft Peach, White */
+  --color-primary: #7C0E44;
+  --color-primary-dark: #5E0832;
+  --color-primary-light: #F8EDF1;
+  --color-secondary: #AA5E7A;
+  --color-muted-rose: #D49A9A;
+  --color-light-peach: #F2DACE;
+
   --color-background: #FFFFFF;
   --color-surface: #FFFFFF;
-  --color-border: #E5D9EC;
-  --color-text-primary: #1F162B;
-  --color-text-secondary: #5F5268;
-  --color-text-muted: #7E7188;
+  --color-surface-soft: #FCF8FA;
+  --color-surface-blush: #F8EDF1;
+  --color-surface-rose: #F6E7EA;
+
+  --color-border: #EADCE2;
+  --color-field-border: #E5D6DE;
+
+  --color-text-primary: #25212A;
+  --color-text-secondary: #625663;
+  --color-text-muted: #89818A;
 
   /* Theme-aligned aliases */
-  --color-gov-blue: #6B21A8;
-  --color-gov-blue-dark: #581C87;
-  --color-header-blue: #6B21A8;
-  --color-table-header: #FAF5FF;
-  --color-sso-blue: #4C1D95;
+  --color-gov-blue: #7C0E44;
+  --color-gov-blue-dark: #5E0832;
+  --color-header-blue: #7C0E44;
+  --color-table-header: #F6E7EC;
+  --color-sso-blue: #7C0E44;
 
   /* Aliases kept for existing markup: text-brand / text-brand-dark / border-theme */
-  --color-brand: #6B21A8;
-  --color-brand-dark: #581C87;
-  --color-theme: #E5D9EC;
+  --color-brand: #7C0E44;
+  --color-brand-dark: #5E0832;
+  --color-theme: #EADCE2;
 
-  /* Deep regal violet-navy used for headers, primary CTAs and document chrome */
-  --color-navy: #4C1D95;
-  --color-navy-dark: #3B0764;
+  /* Deep burgundy used for headers, primary CTAs and document chrome */
+  --color-navy: #7C0E44;
+  --color-navy-dark: #5E0832;
 
-  /* Accent warm sunset coral/orange used for highlights, tags and badges */
-  --color-ocean: #EA580C;
-  --color-ocean-dark: #C2410C;
+  /* Dusty rose accent */
+  --color-ocean: #AA5E7A;
+  --color-ocean-dark: #7C0E44;
 
   /* Neutral surfaces and form borders */
-  --color-surface-muted: #FAF5FF;
-  --color-field-border: #C4B5CD;
+  --color-surface-muted: #FCF8FA;
 }
 
 /* Horizontal scrollers (steppers, tab strips) that should scroll without a visible bar.
@@ -70,21 +79,28 @@
    --------------------------------------------------------- */
 :root {
   /* Brand */
-  --color-primary: #6B21A8;
-  --color-primary-dark: #581C87;
-  --color-primary-light: #F5EEF8;
+  --color-primary: #7C0E44;
+  --color-primary-dark: #5E0832;
+  --color-primary-light: #F8EDF1;
+  --color-secondary: #AA5E7A;
+  --color-muted-rose: #D49A9A;
+  --color-light-peach: #F2DACE;
 
   /* Backgrounds */
   --color-background: #FFFFFF;
   --color-surface: #FFFFFF;
+  --color-surface-soft: #FCF8FA;
+  --color-surface-blush: #F8EDF1;
+  --color-surface-rose: #F6E7EA;
 
   /* Text */
-  --color-text-primary: #1F162B;
-  --color-text-secondary: #5F5268;
-  --color-text-muted: #7E7188;
+  --color-text-primary: #25212A;
+  --color-text-secondary: #625663;
+  --color-text-muted: #89818A;
 
   /* Border */
-  --color-border: #E5D9EC;
+  --color-border: #EADCE2;
+  --color-field-border: #E5D6DE;
 
   /* Typography System (Strict Inter Font & Standardized Clean Sizing) */
   --font-family-base: var(--font-sans);
@@ -306,35 +322,52 @@ textarea::placeholder {
     color var(--transition-fast);
 }
 
-/* Primary action: deep navy, white text. The one filled button style of the portal. */
+/* Primary action: deep burgundy, white text. */
 .btn-primary {
   color: #FFFFFF !important;
-  background-color: var(--color-navy);
-  border-color: var(--color-navy);
+  background-color: #7C0E44;
+  border-color: #7C0E44;
 }
 
 .btn-primary:hover {
-  background-color: var(--color-navy-dark);
-  border-color: var(--color-navy-dark);
+  background-color: #5E0832;
+  border-color: #5E0832;
 }
 
 .btn-secondary {
-  color: var(--color-primary);
-  background-color: var(--color-primary-light);
-  border-color: var(--color-primary-light);
+  color: #FFFFFF !important;
+  background-color: #AA5E7A;
+  border-color: #AA5E7A;
 }
 
-/* Secondary action next to a primary one: white with a neutral border (Back, View, Cancel, Close). */
+.btn-secondary:hover {
+  background-color: #8C4B64;
+  border-color: #8C4B64;
+}
+
+/* Secondary action next to a primary one: white with a dusty rose border (Back, View, Cancel, Close). */
 .btn-outline {
-  color: #334155;
+  color: #7C0E44;
   background-color: #FFFFFF;
-  border-color: #CBD5E1;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  border-color: #AA5E7A;
+  box-shadow: 0 1px 2px rgba(124, 14, 68, 0.05);
 }
 
 .btn-outline:hover {
-  background-color: #F8FAFC;
-  border-color: #94A3B8;
+  background-color: #F8EDF1;
+  border-color: #7C0E44;
+  color: #5E0832;
+}
+
+.btn-reset {
+  color: #7C0E44;
+  background-color: #FFFFFF;
+  border-color: #EADCE2;
+}
+
+.btn-reset:hover {
+  background-color: #F8EDF1;
+  border-color: #AA5E7A;
 }
 
 .btn-sm {
@@ -443,11 +476,11 @@ textarea::placeholder {
   width: 100%;
   height: var(--height-input);
   padding: 0 var(--space-3);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-field-border, #E5D6DE);
   border-radius: var(--radius-control);
   outline: none;
-  background-color: var(--color-surface);
-  color: var(--color-text-primary);
+  background-color: var(--color-surface, #FFFFFF);
+  color: var(--color-text-primary, #25212A);
   font-family: var(--font-family-base);
   font-size: var(--font-size-body);
   transition:
@@ -456,12 +489,12 @@ textarea::placeholder {
 }
 
 .form-control:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px var(--color-primary-light);
+  border-color: #AA5E7A;
+  box-shadow: 0 0 0 2px rgba(170, 94, 122, 0.2);
 }
 
 .form-control::placeholder {
-  color: var(--color-text-muted);
+  color: var(--color-text-muted, #89818A);
 }
 
 /* Compact field for filters, toolbars and table cells */
@@ -569,24 +602,29 @@ select:disabled,
   opacity: 0.75;
 }
 
-.form-select:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px var(--color-primary-light);
+.form-select:focus,
+select:focus {
+  border-color: #AA5E7A !important;
+  box-shadow: 0 0 0 2px rgba(170, 94, 122, 0.2) !important;
 }
 
 /* ---------------------------------------------------------
    9. CARDS
    --------------------------------------------------------- */
 .card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  background-color: var(--color-surface, #FFFFFF);
+  border: 1px solid var(--color-border, #EADCE2);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(37, 33, 42, 0.05);
+  overflow: hidden;
 }
 
 .card-header {
   padding: var(--space-4);
-  border-bottom: 1px solid var(--color-border);
+  background-color: #F8E9EE;
+  color: #7C0E44;
+  border-bottom: 1px solid var(--color-border, #EADCE2);
+  font-weight: 600;
 }
 
 .card-body {
@@ -600,19 +638,19 @@ select:disabled,
 table.table {
   width: 100%;
   border-collapse: collapse;
-  background-color: var(--color-surface);
+  background-color: var(--color-surface, #FFFFFF);
   font-size: 13px;
   font-family: var(--font-sans);
 }
 
 .table th,
 table.table th {
-  height: 44px;
+  height: 48px;
   padding: 0 var(--space-3);
-  background-color: #f8fafc;
-  color: #334155;
-  border-bottom: 1px solid var(--color-border);
-  font-size: 13px;
+  background-color: #F6E7EC;
+  color: #7C0E44;
+  border-bottom: 1px solid var(--color-border, #EADCE2);
+  font-size: 13.5px;
   font-weight: 600;
   text-align: left;
 }
@@ -620,10 +658,10 @@ table.table th {
 .table td,
 table.table td,
 app-table td {
-  height: 44px;
+  height: 48px;
   padding: 0 var(--space-3);
-  color: #1e293b;
-  border-bottom: 1px solid var(--color-border);
+  color: #25212A;
+  border-bottom: 1px solid var(--color-border, #EADCE2);
   font-size: 13px !important;
   font-weight: 400 !important; /* Uniform normal font inside all table data cells matching Active Schemes / Tender Status */
 }
@@ -657,7 +695,7 @@ table tbody td a:not(.btn):not([class*="btn"]):hover {
 
 .table tbody tr:hover,
 table.table tbody tr:hover {
-  background-color: #f8fafc;
+  background-color: #FAF2F5;
 }
 
 /* ---------------------------------------------------------
@@ -669,30 +707,44 @@ table.table tbody tr:hover {
   min-height: 24px;
   padding: 0 8px;
   border-radius: var(--radius-control);
-  background-color: var(--color-primary-light);
-  color: var(--color-primary);
   font-size: var(--font-size-small);
   font-weight: var(--font-weight-medium);
 }
 
 .badge-success {
-  background-color: #E6F4EA;
-  color: #137333;
+  background-color: #E4F4E8;
+  color: #18733B;
+  border: 1px solid #C3E8CC;
 }
 
 .badge-warning {
-  background-color: #FEF7E0;
-  color: #B06000;
+  background-color: #FFF0E5;
+  color: #B85B18;
+  border: 1px solid #FFD8BD;
 }
 
 .badge-danger {
-  background-color: #FCE8E6;
-  color: #C5221F;
+  background-color: #FCE8E8;
+  color: #C62828;
+  border: 1px solid #F9C5C5;
 }
 
 .badge-info {
-  background-color: var(--color-primary-light);
-  color: var(--color-primary);
+  background-color: #E8F0FE;
+  color: #2459B3;
+  border: 1px solid #C5D9F8;
+}
+
+.badge-submitted {
+  background-color: #FFF2D9;
+  color: #996000;
+  border: 1px solid #FFE1A8;
+}
+
+.badge-returned {
+  background-color: #F2EAF8;
+  color: #75409A;
+  border: 1px solid #E3CEF0;
 }
 
 /* ---------------------------------------------------------

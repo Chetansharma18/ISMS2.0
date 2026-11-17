@@ -13,14 +13,14 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   selector: 'app-section-card',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'block bg-white border border-slate-200 rounded-lg shadow-2xs' },
+  host: { class: 'block bg-white border border-[#EADCE2] rounded-[10px] shadow-2xs overflow-hidden' },
   template: `
     @if (title()) {
-      <div class="px-4 sm:px-5 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
+      <div class="px-4 sm:px-5 py-3 border-b border-[#EADCE2] bg-[#F8E9EE] flex items-center justify-between gap-3">
         <div class="min-w-0">
-          <h3 class="text-sm font-semibold text-slate-900 m-0">{{ title() }}</h3>
+          <h3 class="text-sm font-semibold text-[#7C0E44] m-0">{{ title() }}</h3>
           @if (subtitle()) {
-            <p class="text-xs text-slate-500 m-0 mt-0.5">{{ subtitle() }}</p>
+            <p class="text-xs text-[#625663] m-0 mt-0.5">{{ subtitle() }}</p>
           }
         </div>
         <div class="flex items-center gap-2 shrink-0 empty:hidden">

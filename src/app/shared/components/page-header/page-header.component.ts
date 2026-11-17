@@ -113,7 +113,7 @@ export class PageHeaderComponent {
   @Output() search = new EventEmitter<string>();
   @Output() clear = new EventEmitter<void>();
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   onSearchInput(value: string): void {
     this.searchQuery.set(value);

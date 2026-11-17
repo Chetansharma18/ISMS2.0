@@ -84,7 +84,7 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
     FormFileUploadComponent
   ],
   template: `
-    <div class="w-full space-y-6 font-sans">
+    <div class="w-full max-w-4xl space-y-6 font-sans">
 
       <!-- ====================================================================
            1. PERSONAL INFORMATION
@@ -94,8 +94,8 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
           1. Personal Information
         </h3>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-          <!-- Row 1: First Name * (50%) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
+          <!-- 1. First Name * (Col 1) -->
           <div>
             <app-form-input
               label="First Name"
@@ -108,7 +108,7 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
             ></app-form-input>
           </div>
 
-          <!-- Row 1: Last Name (50%) -->
+          <!-- 2. Last Name (Col 2) -->
           <div>
             <app-form-input
               label="Last Name"
@@ -121,8 +121,8 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
             ></app-form-input>
           </div>
 
-          <!-- Row 2: Designation (Full width or Col 1) -->
-          <div class="col-span-1 md:col-span-2">
+          <!-- 3. Designation (Col 3) -->
+          <div>
             <app-form-select
               label="Designation"
               [value]="data().designation"
@@ -147,61 +147,59 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
           2. Contact Information
         </h3>
 
-        <div class="space-y-4">
-          <!-- Row 1: Mobile Number * (50%) & Email Address * (50%) -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-            <div>
-              <app-form-input
-                label="Mobile Number"
-                type="tel"
-                [value]="data().mobileNo"
-                (valueChange)="update('mobileNo', $event)"
-                placeholder="10-digit mobile number"
-                [required]="true"
-                [maxLength]="10"
-                [error]="getFieldError('mobileNo')"
-              ></app-form-input>
-            </div>
-
-            <div>
-              <app-form-input
-                label="Email Address"
-                type="email"
-                [value]="data().emailId"
-                (valueChange)="update('emailId', $event)"
-                placeholder="Enter email address"
-                [required]="true"
-                [error]="getFieldError('emailId')"
-              ></app-form-input>
-            </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
+          <!-- Row 1: Mobile Number * (Col 1) -->
+          <div>
+            <app-form-input
+              label="Mobile Number"
+              type="tel"
+              [value]="data().mobileNo"
+              (valueChange)="update('mobileNo', $event)"
+              placeholder="10-digit mobile number"
+              [required]="true"
+              [maxLength]="10"
+              [error]="getFieldError('mobileNo')"
+            ></app-form-input>
           </div>
 
-          <!-- Row 2: State (smaller column) & Residential Address (remaining width) -->
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5">
-            <div class="md:col-span-4">
-              <app-form-select
-                label="State"
-                [value]="data().state"
-                (valueChange)="update('state', $event)"
-                [options]="states"
-                placeholder="Select state"
-                [required]="false"
-                [error]="getFieldError('state')"
-              ></app-form-select>
-            </div>
+          <!-- Row 1: Email Address * (Col 2) -->
+          <div>
+            <app-form-input
+              label="Email Address"
+              type="email"
+              [value]="data().emailId"
+              (valueChange)="update('emailId', $event)"
+              placeholder="Enter email address"
+              [required]="true"
+              [error]="getFieldError('emailId')"
+            ></app-form-input>
+          </div>
 
-            <div class="md:col-span-8">
-              <app-form-textarea
-                label="Residential Address"
-                [value]="data().residenceAddress"
-                (valueChange)="update('residenceAddress', $event)"
-                placeholder="Enter house/flat no., street, locality, city, PIN code"
-                [rows]="1"
-                [maxLength]="500"
-                [required]="false"
-                [error]="getFieldError('residenceAddress')"
-              ></app-form-textarea>
-            </div>
+          <!-- Row 1: State (Col 3) -->
+          <div>
+            <app-form-select
+              label="State"
+              [value]="data().state"
+              (valueChange)="update('state', $event)"
+              [options]="states"
+              placeholder="Select state"
+              [required]="false"
+              [error]="getFieldError('state')"
+            ></app-form-select>
+          </div>
+
+          <!-- Row 2: Residential Address (Spans across all 3 cols on desktop) -->
+          <div class="col-span-1 sm:col-span-2 md:col-span-3">
+            <app-form-textarea
+              label="Residential Address"
+              [value]="data().residenceAddress"
+              (valueChange)="update('residenceAddress', $event)"
+              placeholder="Enter house/flat no., street, locality, city, PIN code"
+              [rows]="1"
+              [maxLength]="500"
+              [required]="false"
+              [error]="getFieldError('residenceAddress')"
+            ></app-form-textarea>
           </div>
         </div>
       </section>
@@ -217,8 +215,8 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
           3. Identity Verification
         </h3>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-          <!-- A. Identity Document Type * -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
+          <!-- A. Identity Document Type * (Col 1) -->
           <div>
             <app-form-select
               label="Identity Document Type"
@@ -231,7 +229,7 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
             ></app-form-select>
           </div>
 
-          <!-- B. Corresponding Document Number * -->
+          <!-- B. Corresponding Document Number * (Col 2) -->
           <div>
             <app-form-input
               [label]="currentDocConfig().label"
@@ -247,8 +245,8 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
             ></app-form-input>
           </div>
 
-          <!-- C. Upload Identity Document * (Full width) -->
-          <div class="col-span-1 md:col-span-2">
+          <!-- C. Upload Identity Document * (Spans all 3 cols on desktop) -->
+          <div class="col-span-1 sm:col-span-2 md:col-span-3">
             <app-form-file-upload
               label="Upload Identity Document"
               [dropzoneStyle]="true"
@@ -274,16 +272,18 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
           4. Authorization Documents
         </h3>
 
-        <div>
-          <app-form-file-upload
-            label="Authorization Letter / Board Resolution"
-            [dropzoneStyle]="true"
-            uploadPrompt="Upload Authorization Letter / Board Resolution"
-            [fileDoc]="data().authorizationLetterDoc"
-            (fileChange)="updateFileDoc('authorizationLetterDoc', $event)"
-            [required]="true"
-            [error]="getFieldError('authorizationLetterDoc')"
-          ></app-form-file-upload>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
+          <div class="col-span-1 sm:col-span-2 md:col-span-3">
+            <app-form-file-upload
+              label="Authorization Letter / Board Resolution"
+              [dropzoneStyle]="true"
+              uploadPrompt="Upload Authorization Letter / Board Resolution"
+              [fileDoc]="data().authorizationLetterDoc"
+              (fileChange)="updateFileDoc('authorizationLetterDoc', $event)"
+              [required]="true"
+              [error]="getFieldError('authorizationLetterDoc')"
+            ></app-form-file-upload>
+          </div>
         </div>
       </section>
 

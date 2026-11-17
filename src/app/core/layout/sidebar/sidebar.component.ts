@@ -42,9 +42,9 @@ import {
       <div class="flex flex-col">
         
         <!-- Mobile Sidebar Close Header (Visible only < md) -->
-        <div class="md:hidden flex items-center justify-between px-3.5 py-3 border-b border-slate-200 bg-[#F5F8FA]">
+        <div class="md:hidden flex items-center justify-between px-3.5 py-3 border-b border-purple-100 bg-[#FAF5FF]">
           <div class="flex items-center gap-2">
-            <span class="font-bold text-sm text-[#12365A]">ISMS 2.0</span>
+            <span class="font-bold text-sm text-[#2E1065]">ISMS <span class="text-[#EA580C]">2.0</span></span>
             <span class="text-[11px] text-slate-500 font-medium">Menu</span>
           </div>
           <button

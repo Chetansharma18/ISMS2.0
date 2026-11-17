@@ -187,7 +187,8 @@ export class MockDatabaseService {
           const hasLoginIssue = stored.some(
             (item: any) => item?.title === 'Login Issue' || (item?.description && String(item.description).includes('Unable to login'))
           );
-          if (hasLoginIssue) {
+          const lacksScheme = stored.some((item: any) => !item?.schemeName);
+          if (hasLoginIssue || lacksScheme) {
             const fresh = this.deepClone(this.seeds[key]);
             this.store.set(key, fresh);
             this.saveToStorage(key, fresh);
@@ -268,8 +269,8 @@ export class MockDatabaseService {
               ...item,
               submittedStatus: item.id === 't-1' && seedItem?.submittedStatus ? seedItem.submittedStatus : (item.submittedStatus === 'Accepted' ? 'Approved' : item.submittedStatus),
               rejectionReason: item.rejectionReason ?? seedItem?.rejectionReason,
-              appeal: item.appeal ?? seedItem?.appeal,
-              shortfalls: item.id === 't-3' ? [] : (item.shortfalls ?? seedItem?.shortfalls)
+              appeal: (item.id === 't-1' && (!item.appeal || !item.appeal.deptRemarks)) ? seedItem?.appeal : (item.appeal ?? seedItem?.appeal),
+              shortfalls: (item.id === 't-1' && (!item.shortfalls || item.shortfalls.length === 0)) ? seedItem?.shortfalls : (item.id === 't-3' ? [] : (item.shortfalls ?? seedItem?.shortfalls))
             };
           });
           this.store.set(key, sanitized);

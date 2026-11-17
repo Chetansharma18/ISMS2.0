@@ -30,7 +30,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
   },
   template: `
     <header
-      class="w-full bg-white border-b border-[#DCE4ED] box-border relative z-50 select-none"
+      class="w-full bg-white border-b border-[#E5D9EC] box-border relative z-50 select-none"
       [class.sticky]="isSticky"
       [class.top-0]="isSticky"
       role="banner"
@@ -75,14 +75,14 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           </div>
 
           <!-- Thin Vertical Separator -->
-          <div class="w-px h-6 sm:h-8 bg-[#DCE4ED] shrink-0"></div>
+          <div class="w-px h-6 sm:h-8 bg-[#E5D9EC] shrink-0"></div>
 
           <!-- System Identity: Name above Subtitle -->
           <div class="flex flex-col justify-center leading-none">
-            <div class="text-[17px] sm:text-[21px] lg:text-[24px] font-bold text-[#12365A] tracking-tight leading-none">
-              ISMS <span class="text-[#F28C28]">2.0</span>
+            <div class="text-[17px] sm:text-[21px] lg:text-[24px] font-bold text-[#2E1065] tracking-tight leading-none">
+              ISMS <span class="text-[#EA580C]">2.0</span>
             </div>
-            <div class="hidden md:block text-[11px] sm:text-[12px] lg:text-[14px] font-normal text-[#344256] tracking-normal leading-tight mt-1 whitespace-nowrap">
+            <div class="hidden md:block text-[11px] sm:text-[12px] lg:text-[14px] font-normal text-[#5F5268] tracking-normal leading-tight mt-1 whitespace-nowrap">
               Integrated Scheme Management System
             </div>
           </div>
@@ -106,7 +106,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
             </button>
 
             <!-- Thin Vertical Divider -->
-            <div class="w-px h-3 sm:h-4 bg-[#DCE4ED] shrink-0"></div>
+            <div class="w-px h-3 sm:h-4 bg-[#E5D9EC] shrink-0"></div>
 
             <!-- हिंदी -->
             <button
@@ -123,13 +123,13 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           <!-- When Logged In (and on internal portal page): Notification Bell + User Profile Menu & Role Switcher -->
           @if (currentUser() && !isLandingPage() && !isSsoPage()) {
             <!-- Thin Vertical Divider between Language & Notifications -->
-            <div class="w-px h-5 sm:h-6 bg-[#DCE4ED] shrink-0"></div>
+            <div class="w-px h-5 sm:h-6 bg-[#E5D9EC] shrink-0"></div>
 
             <!-- Notification Option (Role-Specific Portal Notifications) -->
             <app-header-notification></app-header-notification>
 
             <!-- Thin Vertical Divider between Notifications/Language & Username -->
-            <div class="w-px h-5 sm:h-6 bg-[#DCE4ED] shrink-0"></div>
+            <div class="w-px h-5 sm:h-6 bg-[#E5D9EC] shrink-0"></div>
 
             <div class="relative z-[100]" id="user-menu-container" (appClickOutside)="closeDropdown()">
               <button
@@ -150,7 +150,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
 
                 <!-- Username and role badge -->
                 <div class="flex flex-col text-left leading-none max-w-28 sm:max-w-48 truncate">
-                  <span class="text-xs sm:text-[13px] font-bold text-[#12365A] truncate">
+                  <span class="text-xs sm:text-[13px] font-bold text-[#2E1065] truncate">
                     {{ displayName() }}
                   </span>
                   <span class="text-[9.5px] sm:text-[10px] text-slate-500 font-medium truncate mt-0.5">

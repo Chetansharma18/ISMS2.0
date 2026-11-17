@@ -74,6 +74,7 @@ export interface SchemeMasterItem {
   schemeName: string;
   schemeCategory: string;
   categoryName: string;
+  budget?: number;
   amount: number;
   processFees: number;
   status: 'Active' | 'Inactive';

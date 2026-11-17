@@ -33,13 +33,13 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
           <!-- Left Column: About Content (~55% width) -->
           <div class="w-full flex flex-col justify-center text-left">
             
-            <!-- Section Heading: Inter 700, 36px Desktop / 32px Tablet / 28px Mobile, #12365A -->
-            <h2 id="about-isms-heading" class="font-sans text-[28px] sm:text-[32px] xl:text-[36px] font-bold leading-[1.2] text-[#12365A] m-0 tracking-tight">
-              About ISMS 2.0
+            <!-- Section Heading: Inter 700, 36px Desktop / 32px Tablet / 28px Mobile, #2E1065 -->
+            <h2 id="about-isms-heading" class="font-sans text-[28px] sm:text-[32px] xl:text-[36px] font-bold leading-[1.2] text-[#2E1065] m-0 tracking-tight">
+              About ISMS <span class="text-[#EA580C]">2.0</span>
             </h2>
 
-            <!-- Small Orange Underline: 42px width, 4px height, #F28C28, 2px radius, 14–16px bottom spacing -->
-            <div class="w-10.5 h-1 bg-[#F28C28] rounded-xs mt-2.5 mb-4 sm:mb-4" aria-hidden="true"></div>
+            <!-- Small Orange Underline: 42px width, 4px height, #EA580C, 2px radius, 14–16px bottom spacing -->
+            <div class="w-10.5 h-1 bg-[#EA580C] rounded-xs mt-2.5 mb-4 sm:mb-4" aria-hidden="true"></div>
 
             <!-- Existing Description Paragraph 1: 100% original text, natural wrapping, left-aligned -->
             <p class="font-sans text-[15px] xl:text-[16px] font-normal leading-[1.65] text-[#344256] text-left max-w-175 m-0 mb-4">
@@ -75,7 +75,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
 
                 <!-- Poster / Loading Placeholder Before Video Loads -->
                 @if (!isVideoLoaded()) {
-                  <div class="absolute inset-0 bg-linear-to-br from-[#0B2440] to-[#12365A] flex flex-col items-center justify-center p-5 text-center z-5">
+                  <div class="absolute inset-0 bg-linear-to-br from-[#2E1065] to-[#581C87] flex flex-col items-center justify-center p-5 text-center z-5">
                     <div class="w-11 h-11 rounded-full bg-white/12 flex items-center justify-center mb-2.5 text-white">
                       <app-icon name="play-circle" size="lg" [stroke]="2" class="animate-pulse" />
                     </div>

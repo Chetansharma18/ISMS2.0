@@ -358,6 +358,16 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
 export class MasterCrudPageComponent<T extends { id: string; status?: string } = any> implements OnInit, AfterViewInit {
   @Input({ required: true }) config!: MasterCrudConfig<T>;
 
+  private _extraTemplates?: Record<string, TemplateRef<unknown>>;
+
+  @Input() set extraTemplates(val: Record<string, TemplateRef<unknown>> | undefined) {
+    this._extraTemplates = val;
+    this.rebuildTemplates();
+  }
+  get extraTemplates(): Record<string, TemplateRef<unknown>> | undefined {
+    return this._extraTemplates;
+  }
+
   @ViewChild('tagsTemplate', { static: true }) tagsTemplate!: TemplateRef<unknown>;
   @ViewChild('statusTemplate', { static: true }) statusTemplate!: TemplateRef<unknown>;
   @ViewChild('actionTemplate', { static: true }) actionTemplate!: TemplateRef<unknown>;
@@ -396,12 +406,20 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   }
 
   ngAfterViewInit(): void {
+    this.rebuildTemplates();
+  }
+
+  private rebuildTemplates(): void {
     const templates: Record<string, TemplateRef<unknown>> = {
-      status: this.statusTemplate,
-      action: this.actionTemplate
+      ...(this.statusTemplate ? { status: this.statusTemplate } : {}),
+      ...(this.actionTemplate ? { action: this.actionTemplate } : {}),
+      ...(this._extraTemplates || {}),
+      ...(this.config?.customTemplates || {})
     };
-    for (const key of this.config.tagsColumns || []) {
-      templates[key] = this.tagsTemplate;
+    for (const key of this.config?.tagsColumns || []) {
+      if (this.tagsTemplate) {
+        templates[key] = this.tagsTemplate;
+      }
     }
     this.customTemplates.set(templates);
     this.cdr.markForCheck();

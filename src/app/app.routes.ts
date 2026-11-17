@@ -228,10 +228,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin/camera-monitoring/batches/:sdcId',
-    loadComponent: () =>
-      import('./features/sdc/components/camera-batch-list.component').then(
-        (m) => m.CameraBatchListComponent
-      )
+    redirectTo: 'admin/camera-monitoring'
   },
   {
     path: 'admin/camera-monitoring/:tpId',

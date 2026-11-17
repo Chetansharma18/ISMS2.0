@@ -36,17 +36,17 @@ export interface RegistrationStepItem {
              ASPIRANT PROFILE VIEW
              ==================================================================== -->
         <!-- 1. HERO BANNER -->
-        <div class="relative w-full rounded-xl overflow-hidden border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-3.5 sm:px-7 sm:py-4 bg-[#edf4fa]">
+        <div class="relative w-full rounded-xl overflow-hidden border border-purple-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-3.5 sm:px-7 sm:py-4 bg-[#FAF5FF]">
           <div
             class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none"
             style="background-image: url('/hero-bg.png'); background-position: right 20%; opacity: 0.95;"
           ></div>
           <div
             class="absolute inset-0 pointer-events-none"
-            style="background: linear-gradient(90deg, #edf4fa 0%, #edf4fa 28%, rgba(237, 244, 250, 0.88) 52%, rgba(237, 244, 250, 0.28) 72%, transparent 100%);"
+            style="background: linear-gradient(90deg, #F5EEF8 0%, #FAF5FF 30%, rgba(245, 238, 248, 0.92) 54%, rgba(255, 243, 237, 0.75) 75%, rgba(254, 215, 170, 0.28) 100%);"
           ></div>
           <div class="relative z-10">
-            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#0c2d4e] m-0">
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#2E1065] m-0">
               Aspirant Profile Summary
             </h1>
             <p class="text-xs sm:text-[13px] text-slate-500 mt-1 m-0 font-normal">
@@ -79,7 +79,7 @@ export interface RegistrationStepItem {
         <!-- ====================================================================
              1. HERO BANNER: Profile Summary with Heritage Backdrop & Alert Box
              ==================================================================== -->
-        <div class="relative w-full rounded-xl overflow-hidden border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-3.5 sm:px-7 sm:py-4 bg-[#edf4fa]">
+        <div class="relative w-full rounded-xl overflow-hidden border border-purple-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-3.5 sm:px-7 sm:py-4 bg-[#FAF5FF]">
           <!-- Panoramic Fort Heritage Image -->
           <div
             class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none"
@@ -88,12 +88,12 @@ export interface RegistrationStepItem {
           <!-- Soft Gradient Overlay: seamlessly fades fort into left background -->
           <div
             class="absolute inset-0 pointer-events-none"
-            style="background: linear-gradient(90deg, #edf4fa 0%, #edf4fa 28%, rgba(237, 244, 250, 0.88) 52%, rgba(237, 244, 250, 0.28) 72%, transparent 100%);"
+            style="background: linear-gradient(90deg, #F5EEF8 0%, #FAF5FF 30%, rgba(245, 238, 248, 0.92) 54%, rgba(255, 243, 237, 0.75) 75%, rgba(254, 215, 170, 0.28) 100%);"
           ></div>
 
           <!-- Left: Title & Subtitle -->
           <div class="relative z-10">
-            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#0c2d4e] m-0">
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#2E1065] m-0">
               Profile Summary
             </h1>
             <p class="text-xs sm:text-[13px] text-slate-500 mt-1 m-0 font-normal">

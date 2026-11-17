@@ -92,28 +92,29 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
         <!-- RIGHT SIDE: Language Controls + Divider + Notification + Divider + Login / User Pill -->
         <div class="flex items-center gap-2 sm:gap-3.5 lg:gap-4 shrink-0">
 
-          <!-- Language Controls -->
-          <div class="flex items-center gap-1.5 sm:gap-2.5 text-xs sm:text-[14px]" aria-label="Language selection">
-            <!-- English -->
+          <!-- Language Controls: Segmented Pill Toggle -->
+          <div class="lang-toggle-group" aria-label="Language selection">
+            <!-- ui-guard-allow: header language segmented toggle pill -->
             <button
               appButton
+              variant="ghost"
               size="sm"
-              [variant]="selectedLanguage() === 'en' ? 'secondary' : 'ghost'"
               type="button"
+              class="lang-toggle-btn"
+              [class.active]="selectedLanguage() === 'en'"
               (click)="onLanguageChange('en')"
             >
               English
             </button>
 
-            <!-- Thin Vertical Divider -->
-            <div class="w-px h-3 sm:h-4 bg-[#EADCE2] shrink-0"></div>
-
-            <!-- हिंदी -->
+            <!-- ui-guard-allow: header language segmented toggle pill -->
             <button
               appButton
+              variant="ghost"
               size="sm"
-              [variant]="selectedLanguage() === 'hi' ? 'secondary' : 'ghost'"
               type="button"
+              class="lang-toggle-btn"
+              [class.active]="selectedLanguage() === 'hi'"
               (click)="onLanguageChange('hi')"
             >
               हिंदी

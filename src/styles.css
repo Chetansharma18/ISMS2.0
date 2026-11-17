@@ -300,6 +300,75 @@ textarea::placeholder {
 }
 
 /* ---------------------------------------------------------
+   Sidebar Navigation Overrides
+   Guarantees pure white / crisp readable text & icons for
+   inactive navigation items on the burgundy gradient background,
+   and light peach (#F2DACE) with burgundy (#7C0E44) for active item.
+   --------------------------------------------------------- */
+app-sidebar aside nav a {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+app-sidebar aside nav a:hover {
+  color: #FFFFFF !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+app-sidebar aside nav a app-icon,
+app-sidebar aside nav a span {
+  color: inherit !important;
+}
+
+app-sidebar aside nav a.active-link,
+app-sidebar aside nav a[class*="bg-[#F2DACE]"],
+app-sidebar aside nav a[class*="text-[#7C0E44]"] {
+  background-color: #F2DACE !important;
+  color: #7C0E44 !important;
+}
+
+app-sidebar aside nav a.active-link app-icon,
+app-sidebar aside nav a.active-link span,
+app-sidebar aside nav a[class*="bg-[#F2DACE]"] app-icon,
+app-sidebar aside nav a[class*="bg-[#F2DACE]"] span {
+  color: #7C0E44 !important;
+}
+
+/* Language Segmented Toggle in Header */
+.lang-toggle-group {
+  display: inline-flex;
+  align-items: center;
+  background-color: #FCF8FA;
+  border: 1px solid #EADCE2;
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.lang-toggle-btn {
+  height: 28px !important;
+  padding: 0 10px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #625663 !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 6px !important;
+  transition: all var(--transition-fast) !important;
+  cursor: pointer;
+}
+
+.lang-toggle-btn:hover {
+  color: #7C0E44 !important;
+}
+
+.lang-toggle-btn.active {
+  background-color: #FFFFFF !important;
+  color: #7C0E44 !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 2px rgba(124, 14, 68, 0.08) !important;
+}
+
+/* ---------------------------------------------------------
    7. BUTTON SYSTEM
    --------------------------------------------------------- */
 @layer components {

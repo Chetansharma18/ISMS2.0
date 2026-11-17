@@ -112,7 +112,7 @@ export class PageHeaderComponent {
   @Input() showBack = false;
   @Input() backTitle = 'Go Back';
   @Input() badge?: string;
-  @Input() bgColor = 'var(--color-primary, #174A6E)';
+  @Input() bgColor = 'var(--color-primary, #7C0E44)';
   @Input() searchable = false;
   @Input() searchPlaceholder = 'Search...';
 

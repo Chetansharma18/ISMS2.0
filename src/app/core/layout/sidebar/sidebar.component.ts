@@ -73,13 +73,24 @@ import {
             @for (item of adminToolNav; track item.link) {
               <a
                 [routerLink]="item.link"
-                routerLinkActive="!bg-[#F2DACE] !text-[#7C0E44] font-bold shadow-xs"
+                routerLinkActive="!bg-[#F2DACE] !text-[#7C0E44] font-bold shadow-xs active-link"
                 #adminRla="routerLinkActive"
                 [routerLinkActiveOptions]="defaultMatch"
+                [style.color]="adminRla.isActive ? '#7C0E44' : '#FFFFFF'"
                 class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
               >
-                <app-icon [name]="item.icon" [class]="adminRla.isActive ? '!text-[#7C0E44]' : 'text-white/80 group-hover:text-white transition-colors'" />
-                <span class="tracking-tight">{{ item.label }}</span>
+                <app-icon
+                  [name]="item.icon"
+                  [class.!text-[#7C0E44]]="adminRla.isActive"
+                  [class.text-white/80]="!adminRla.isActive"
+                  [class.group-hover:text-white]="!adminRla.isActive"
+                  [style.color]="adminRla.isActive ? '#7C0E44' : '#FFFFFF'"
+                />
+                <span
+                  class="tracking-tight"
+                  [class.!text-[#7C0E44]]="adminRla.isActive"
+                  [style.color]="adminRla.isActive ? '#7C0E44' : '#FFFFFF'"
+                >{{ item.label }}</span>
               </a>
             }
 
@@ -103,11 +114,11 @@ import {
       </div>
 
       <!-- Bottom: Rajasthan Fort Heritage Illustration -->
-      <div class="mt-auto shrink-0 w-full px-2 pt-4 pb-2 pointer-events-none opacity-60 flex justify-center items-end overflow-hidden">
+      <div class="mt-auto shrink-0 w-full px-2 pt-3 pb-1 pointer-events-none opacity-50 flex justify-center items-end overflow-hidden">
         <img
           src="/sidebar-fort-transparent.png"
           alt="Rajasthan Heritage"
-          class="w-full object-contain object-bottom max-h-32 select-none"
+          class="w-full object-contain object-bottom max-h-24 select-none"
         />
       </div>
 
@@ -117,26 +128,42 @@ import {
     <ng-template #navLink let-item let-pending="pending">
       <a
         [routerLink]="item.link"
-        [class.bg-[#F2DACE]]="isActive(item.key)"
-        [class.text-[#7C0E44]]="isActive(item.key)"
+        [class.!bg-[#F2DACE]]="isActive(item.key)"
+        [class.!text-[#7C0E44]]="isActive(item.key)"
         [class.font-bold]="isActive(item.key)"
         [class.shadow-xs]="isActive(item.key)"
-        [class.text-white/90]="!isActive(item.key)"
-        class="flex items-center justify-between px-3 py-2 rounded-lg text-[13px] leading-5 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
+        [class.active-link]="isActive(item.key)"
+        [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
+        class="flex items-center justify-between px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
       >
         <div class="flex items-center gap-2.5 min-w-0">
           <app-icon
             [name]="item.icon"
             [stroke]="item.stroke ?? 1.75"
             class="transition-colors"
-            [class.text-[#7C0E44]]="isActive(item.key)"
+            [class.!text-[#7C0E44]]="isActive(item.key)"
             [class.text-white/80]="!isActive(item.key)"
             [class.group-hover:text-white]="!isActive(item.key)"
+            [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
           />
-          <span class="tracking-tight min-w-0" [class.font-medium]="item.bold">{{ item.label }}</span>
+          <span
+            class="tracking-tight min-w-0"
+            [class.font-medium]="item.bold"
+            [class.!text-[#7C0E44]]="isActive(item.key)"
+            [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
+          >{{ item.label }}</span>
         </div>
         @if (pending) {
-          <span class="px-2 py-0.5 rounded-full text-[11px] leading-tight shrink-0 inline-flex items-center gap-1.5 transition-all select-none bg-amber-50 text-[#C2410C] border border-amber-300 font-semibold shadow-2xs">
+          <span
+            class="px-2 py-0.5 rounded-full text-[11px] leading-tight shrink-0 inline-flex items-center gap-1.5 transition-all select-none font-semibold shadow-2xs"
+            [class.bg-white/90]="isActive(item.key)"
+            [class.text-[#B85B18]]="isActive(item.key)"
+            [class.border]="isActive(item.key)"
+            [class.border-[#B85B18]/30]="isActive(item.key)"
+            [class.bg-white/20]="!isActive(item.key)"
+            [class.text-white]="!isActive(item.key)"
+            [class.border-white/30]="!isActive(item.key)"
+          >
             <span class="w-1.5 h-1.5 rounded-full bg-orange-600 shrink-0 animate-pulse"></span>
             Pending
           </span>
@@ -158,7 +185,7 @@ import {
         >
           <div class="flex items-center gap-2.5">
             <app-icon [name]="section.icon" class="text-white/80 group-hover:text-white transition-colors" />
-            <span class="tracking-tight font-medium">{{ section.label }}</span>
+            <span class="tracking-tight font-medium text-white">{{ section.label }}</span>
           </div>
           <app-icon
             name="chevron-down"
@@ -175,13 +202,14 @@ import {
               <a
                 [routerLink]="sub.link"
                 [queryParams]="sub.query"
-                routerLinkActive="!bg-[#F2DACE] !text-[#7C0E44] font-bold shadow-xs"
+                routerLinkActive="!bg-[#F2DACE] !text-[#7C0E44] font-bold shadow-xs active-link"
                 #subRla="routerLinkActive"
                 [routerLinkActiveOptions]="sub.query ? exactMatch : defaultMatch"
+                [style.color]="subRla.isActive ? '#7C0E44' : '#FFFFFF'"
                 class="px-2.5 py-1.5 rounded-md text-[12px] text-white/80 hover:bg-white/10 hover:text-white transition-colors flex items-center gap-2"
               >
                 <span class="w-1.5 h-1.5 rounded-full shrink-0" [ngClass]="subRla.isActive ? 'bg-[#7C0E44]' : 'bg-white/50'"></span>
-                <span class="truncate">{{ sub.label }}</span>
+                <span class="truncate" [class.!text-[#7C0E44]]="subRla.isActive" [style.color]="subRla.isActive ? '#7C0E44' : '#FFFFFF'">{{ sub.label }}</span>
               </a>
             }
           </div>

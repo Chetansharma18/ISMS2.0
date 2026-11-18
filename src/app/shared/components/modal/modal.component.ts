@@ -45,23 +45,23 @@ let nextId = 0;
       (click)="onBackdrop($event)"
     >
       <div
-        class="w-full bg-white rounded-xl border border-slate-200 shadow-2xl overflow-hidden my-auto max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3.5rem)] flex flex-col"
+        class="w-full bg-white rounded-xl border border-[#EADCE2] shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col"
         [class]="widthClass()"
         role="dialog"
         aria-modal="true"
         [attr.aria-labelledby]="title() ? titleId : null"
         (click)="$event.stopPropagation()"
       >
-        <div class="h-1.5 w-full bg-navy shrink-0 print:hidden"></div>
+        <div class="h-1.5 w-full bg-[#7C0E44] shrink-0 print:hidden"></div>
 
         @if (title() || showClose()) {
-          <div class="px-5 sm:px-6 pt-5 pb-4 border-b border-slate-200 flex items-start justify-between gap-3 shrink-0">
+          <div class="px-5 sm:px-6 pt-5 pb-4 border-b border-[#EADCE2] flex items-start justify-between gap-3 shrink-0">
             <div class="min-w-0">
               @if (title()) {
-                <h2 [id]="titleId" class="text-base sm:text-lg font-bold text-slate-900 m-0">{{ title() }}</h2>
+                <h2 [id]="titleId" class="text-base sm:text-lg font-bold text-[#7C0E44] m-0">{{ title() }}</h2>
               }
               @if (subtitle()) {
-                <p class="text-xs text-slate-500 m-0 mt-0.5">{{ subtitle() }}</p>
+                <p class="text-xs text-[#625663] m-0 mt-0.5">{{ subtitle() }}</p>
               }
             </div>
             @if (showClose()) {
@@ -76,7 +76,7 @@ let nextId = 0;
           <ng-content />
         </div>
 
-        <div class="px-5 sm:px-6 py-4 border-t border-slate-200 bg-slate-50/70 flex items-center justify-end gap-2.5 shrink-0 whitespace-nowrap empty:hidden print:hidden">
+        <div class="px-5 sm:px-6 py-4 border-t border-[#EADCE2] bg-[#FCF8FA] flex items-center justify-end gap-2.5 shrink-0 whitespace-nowrap empty:hidden print:hidden">
           <ng-content select="[modalFooter]" />
         </div>
       </div>

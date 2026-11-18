@@ -30,7 +30,7 @@ export interface SelectItem {
       <!-- Label Row -->
       @if (label) {
         <div class="flex items-center justify-between mb-1 font-sans">
-          <label [for]="id" class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#1F2933] select-none">
+          <label [for]="id" class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#25212A] select-none">
             {{ label }}
             @if (required) {
               <span class="text-rose-600 font-bold ml-0.5">*</span>

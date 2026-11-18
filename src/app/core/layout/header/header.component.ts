@@ -30,7 +30,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
   },
   template: `
     <header
-      class="w-full bg-white border-b border-[#E5D9EC] box-border relative z-50 select-none"
+      class="w-full bg-white border-b border-[#EADCE2] box-border relative z-50 select-none"
       [class.sticky]="isSticky"
       [class.top-0]="isSticky"
       role="banner"
@@ -75,14 +75,14 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           </div>
 
           <!-- Thin Vertical Separator -->
-          <div class="w-px h-6 sm:h-8 bg-[#E5D9EC] shrink-0"></div>
+          <div class="w-px h-6 sm:h-8 bg-[#EADCE2] shrink-0"></div>
 
           <!-- System Identity: Name above Subtitle -->
           <div class="flex flex-col justify-center leading-none">
-            <div class="text-[17px] sm:text-[21px] lg:text-[24px] font-bold text-[#2E1065] tracking-tight leading-none">
-              ISMS <span class="text-[#EA580C]">2.0</span>
+            <div class="text-[17px] sm:text-[21px] lg:text-[24px] font-bold text-[#25212A] tracking-tight leading-none">
+              ISMS <span class="text-[#E26D24]">2.0</span>
             </div>
-            <div class="hidden md:block text-[11px] sm:text-[12px] lg:text-[14px] font-normal text-[#5F5268] tracking-normal leading-tight mt-1 whitespace-nowrap">
+            <div class="hidden md:block text-[11px] sm:text-[12px] lg:text-[14px] font-normal text-[#625663] tracking-normal leading-tight mt-1 whitespace-nowrap">
               Integrated Scheme Management System
             </div>
           </div>
@@ -92,28 +92,29 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
         <!-- RIGHT SIDE: Language Controls + Divider + Notification + Divider + Login / User Pill -->
         <div class="flex items-center gap-2 sm:gap-3.5 lg:gap-4 shrink-0">
 
-          <!-- Language Controls -->
-          <div class="flex items-center gap-1.5 sm:gap-2.5 text-xs sm:text-[14px]" aria-label="Language selection">
-            <!-- English -->
+          <!-- Language Controls: Segmented Pill Toggle -->
+          <div class="lang-toggle-group" aria-label="Language selection">
+            <!-- ui-guard-allow: header language segmented toggle pill -->
             <button
               appButton
+              variant="ghost"
               size="sm"
-              [variant]="selectedLanguage() === 'en' ? 'secondary' : 'ghost'"
               type="button"
+              class="lang-toggle-btn"
+              [class.active]="selectedLanguage() === 'en'"
               (click)="onLanguageChange('en')"
             >
               English
             </button>
 
-            <!-- Thin Vertical Divider -->
-            <div class="w-px h-3 sm:h-4 bg-[#E5D9EC] shrink-0"></div>
-
-            <!-- हिंदी -->
+            <!-- ui-guard-allow: header language segmented toggle pill -->
             <button
               appButton
+              variant="ghost"
               size="sm"
-              [variant]="selectedLanguage() === 'hi' ? 'secondary' : 'ghost'"
               type="button"
+              class="lang-toggle-btn"
+              [class.active]="selectedLanguage() === 'hi'"
               (click)="onLanguageChange('hi')"
             >
               हिंदी
@@ -123,13 +124,13 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           <!-- When Logged In (and on internal portal page): Notification Bell + User Profile Menu & Role Switcher -->
           @if (currentUser() && !isLandingPage() && !isSsoPage()) {
             <!-- Thin Vertical Divider between Language & Notifications -->
-            <div class="w-px h-5 sm:h-6 bg-[#E5D9EC] shrink-0"></div>
+            <div class="w-px h-5 sm:h-6 bg-[#EADCE2] shrink-0"></div>
 
             <!-- Notification Option (Role-Specific Portal Notifications) -->
             <app-header-notification></app-header-notification>
 
             <!-- Thin Vertical Divider between Notifications/Language & Username -->
-            <div class="w-px h-5 sm:h-6 bg-[#E5D9EC] shrink-0"></div>
+            <div class="w-px h-5 sm:h-6 bg-[#EADCE2] shrink-0"></div>
 
             <div class="relative z-[100]" id="user-menu-container" (appClickOutside)="closeDropdown()">
               <button
@@ -150,10 +151,10 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
 
                 <!-- Username and role badge -->
                 <div class="flex flex-col text-left leading-none max-w-28 sm:max-w-48 truncate">
-                  <span class="text-xs sm:text-[13px] font-bold text-[#2E1065] truncate">
+                  <span class="text-xs sm:text-[13px] font-bold text-[#25212A] truncate">
                     {{ displayName() }}
                   </span>
-                  <span class="text-[9.5px] sm:text-[10px] text-slate-500 font-medium truncate mt-0.5">
+                  <span class="text-[9.5px] sm:text-[10px] text-[#625663] font-medium truncate mt-0.5">
                     {{ userSubLabel() }}
                   </span>
                 </div>
@@ -170,19 +171,19 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               <!-- Dropdown Menu -->
               @if (dropdownOpen()) {
                 <div
-                  class="absolute right-0 top-full mt-2 w-56 sm:w-64 bg-white border border-slate-200 rounded-xl shadow-xl z-[100] overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150 font-sans"
+                  class="absolute right-0 top-full mt-2 w-56 sm:w-64 bg-white border border-[#EADCE2] rounded-xl shadow-xl z-[100] overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-150 font-sans"
                   role="menu"
                 >
                   <!-- 1. User Info Header -->
-                  <div class="px-3.5 py-2.5 border-b border-slate-100 bg-slate-50">
+                  <div class="px-3.5 py-2.5 border-b border-[#EADCE2] bg-[#FCF8FA]">
                     <div class="flex items-center gap-2.5">
                       <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase shrink-0 shadow-xs text-white"
                         [ngClass]="avatarBgClass()">
                         {{ avatarChar() }}
                       </div>
                       <div class="min-w-0 flex-1">
-                        <p class="text-xs font-bold text-slate-800 truncate m-0">{{ displayName() }}</p>
-                        <p class="text-[11px] text-slate-500 truncate m-0 mt-0.5 font-medium">{{ userSubLabel() }}</p>
+                        <p class="text-xs font-bold text-[#25212A] truncate m-0">{{ displayName() }}</p>
+                        <p class="text-[11px] text-[#625663] truncate m-0 mt-0.5 font-medium">{{ userSubLabel() }}</p>
                       </div>
                     </div>
                   </div>
@@ -206,10 +207,10 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
 
                     <!-- SWITCH ROLE: shown only when the user holds more than one role -->
                     @if (canSwitchRole()) {
-                      <div class="my-1 border-t border-slate-100"></div>
+                      <div class="my-1 border-t border-[#EADCE2]"></div>
 
                       <div class="px-3 pt-1 pb-0.5 text-[10.5px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                        <app-icon name="switch-horizontal" size="sm" [stroke]="2" class="text-navy" />
+                        <app-icon name="switch-horizontal" size="sm" [stroke]="2" class="text-[#7C0E44]" />
                         <span>Switch Role</span>
                       </div>
 
@@ -233,7 +234,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                       }
                     }
 
-                    <div class="my-1 border-t border-slate-100"></div>
+                    <div class="my-1 border-t border-[#EADCE2]"></div>
 
                     <!-- Sign Out -->
                     <button

@@ -84,17 +84,19 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
     FormFileUploadComponent
   ],
   template: `
-    <div class="w-full max-w-4xl space-y-6 font-sans">
+    <div class="w-full space-y-6 font-sans">
 
       <!-- ====================================================================
            1. PERSONAL INFORMATION
            ==================================================================== -->
       <section class="space-y-4">
-        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
-          1. Personal Information
-        </h3>
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            1. Personal Information
+          </h3>
+        </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
           <!-- 1. First Name * (Col 1) -->
           <div>
             <app-form-input
@@ -137,17 +139,19 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
       </section>
 
       <!-- Divider -->
-      <div class="pt-2 border-t border-slate-100"></div>
+      <div class="pt-2 border-t border-[#E8EEF5]"></div>
 
       <!-- ====================================================================
            2. CONTACT INFORMATION
            ==================================================================== -->
       <section class="space-y-4">
-        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
-          2. Contact Information
-        </h3>
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            2. Contact Information
+          </h3>
+        </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
           <!-- Row 1: Mobile Number * (Col 1) -->
           <div>
             <app-form-input
@@ -189,7 +193,7 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
           </div>
 
           <!-- Row 2: Residential Address (Spans across all 3 cols on desktop) -->
-          <div class="col-span-1 sm:col-span-2 md:col-span-3">
+          <div class="col-span-1 md:col-span-3">
             <app-form-textarea
               label="Residential Address"
               [value]="data().residenceAddress"
@@ -205,17 +209,19 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
       </section>
 
       <!-- Divider -->
-      <div class="pt-2 border-t border-slate-100"></div>
+      <div class="pt-2 border-t border-[#E8EEF5]"></div>
 
       <!-- ====================================================================
            3. IDENTITY VERIFICATION
            ==================================================================== -->
       <section class="space-y-4">
-        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
-          3. Identity Verification
-        </h3>
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            3. Identity Verification
+          </h3>
+        </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
           <!-- A. Identity Document Type * (Col 1) -->
           <div>
             <app-form-select
@@ -245,8 +251,8 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
             ></app-form-input>
           </div>
 
-          <!-- C. Upload Identity Document * (Spans all 3 cols on desktop) -->
-          <div class="col-span-1 sm:col-span-2 md:col-span-3">
+          <!-- C. Upload Identity Document * (Col 1 of row 2, side-by-side balanced) -->
+          <div class="col-span-1">
             <app-form-file-upload
               label="Upload Identity Document"
               [dropzoneStyle]="true"
@@ -262,18 +268,20 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
       </section>
 
       <!-- Divider -->
-      <div class="pt-2 border-t border-slate-100"></div>
+      <div class="pt-2 border-t border-[#E8EEF5]"></div>
 
       <!-- ====================================================================
            4. AUTHORIZATION DOCUMENTS
            ==================================================================== -->
       <section class="space-y-4">
-        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
-          4. Authorization Documents
-        </h3>
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            4. Authorization Documents
+          </h3>
+        </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
-          <div class="col-span-1 sm:col-span-2 md:col-span-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+          <div class="col-span-1">
             <app-form-file-upload
               label="Authorization Letter / Board Resolution"
               [dropzoneStyle]="true"
@@ -288,7 +296,116 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
       </section>
 
     </div>
-  `
+  `,
+  styles: [`
+    :host {
+      display: block;
+      width: 100%;
+    }
+
+    :host ::ng-deep app-form-input label,
+    :host ::ng-deep app-form-select label,
+    :host ::ng-deep app-form-textarea label,
+    :host ::ng-deep app-form-file-upload label {
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      color: #334155 !important;
+      margin-bottom: 6px !important;
+    }
+
+    :host ::ng-deep app-form-input label .text-rose-600,
+    :host ::ng-deep app-form-select label .text-rose-600,
+    :host ::ng-deep app-form-textarea label .text-rose-600,
+    :host ::ng-deep app-form-file-upload label .text-rose-500 {
+      color: #DC2626 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative {
+      height: 44px !important;
+      min-height: 44px !important;
+      border-radius: 6px !important;
+      border-color: #D6E3F0 !important;
+      background-color: #FFFFFF !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative:hover:not(.cursor-not-allowed) {
+      border-color: #B5CBE0 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative:focus-within {
+      border-color: #477DAF !important;
+      box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-input input {
+      font-size: 14px !important;
+      color: #334155 !important;
+    }
+
+    :host ::ng-deep app-form-input input::placeholder {
+      color: #94A3B8 !important;
+      font-size: 14px !important;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"] {
+      height: 44px !important;
+      min-height: 44px !important;
+      border-radius: 6px !important;
+      border-color: #D6E3F0 !important;
+      background-color: #FFFFFF !important;
+      font-size: 14px !important;
+      color: #334155 !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"]:hover:not(:disabled) {
+      border-color: #B5CBE0 !important;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"]:focus {
+      border-color: #477DAF !important;
+      box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-textarea textarea {
+      min-height: 72px !important;
+      border-radius: 6px !important;
+      border-color: #D6E3F0 !important;
+      background-color: #FFFFFF !important;
+      font-size: 14px !important;
+      color: #334155 !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-textarea textarea:hover:not(:disabled) {
+      border-color: #B5CBE0 !important;
+    }
+
+    :host ::ng-deep app-form-textarea textarea:focus {
+      border-color: #477DAF !important;
+      box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-textarea textarea::placeholder {
+      color: #94A3B8 !important;
+      font-size: 14px !important;
+    }
+
+    :host ::ng-deep app-form-file-upload .rounded-lg.border,
+    :host ::ng-deep app-form-file-upload .rounded-md.border {
+      min-height: 72px !important;
+      border-color: #D6E3F0 !important;
+      border-radius: 6px !important;
+      background-color: #FFFFFF !important;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-file-upload .rounded-lg.border:hover:not(.cursor-not-allowed) {
+      border-color: #B5CBE0 !important;
+      background-color: #F8FAFC !important;
+    }
+  `]
 })
 export class Step3AuthPersonComponent {
   private otrFormService = inject(OtrFormService);

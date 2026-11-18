@@ -632,7 +632,7 @@ export class ScrutinyDeskComponent {
       actor: this.reviewerName(),
       actorRole: 'Department Scrutiny Officer',
       description: remark,
-      badgeClass: 'bg-purple-50 text-purple-800 border-purple-200',
+      badgeClass: 'bg-[#F8EDF1] text-[#7C0E44] border-[#EADCE2]',
       meta: {
         remarks: remark
       }

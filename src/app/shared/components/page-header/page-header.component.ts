@@ -21,7 +21,7 @@ export interface BreadcrumbItem {
   `],
   template: `
     <div
-      class="relative w-full rounded-lg overflow-hidden border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 px-3.5 sm:px-6 md:px-7 py-2.5 sm:py-3 bg-[#edf4fa]"
+      class="relative w-full rounded-[10px] overflow-hidden border border-[#EADCE2] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3 px-3.5 sm:px-6 md:px-7 py-2.5 sm:py-3 bg-[#FCF0F2]"
       style="min-height: 56px;"
     >
       <!-- Background Panoramic Fort Image with soft fade to the left -->
@@ -29,20 +29,20 @@ export interface BreadcrumbItem {
         class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none"
         style="background-image: url('/hero-bg.png'); background-position: right 18%; opacity: 0.95;"
       ></div>
-      <!-- Soft Gradient Overlay: blends fort image into light sky/white background on the left -->
+      <!-- Soft Gradient Overlay: blends fort image into #FCF0F2 background on the left -->
       <div
         class="absolute inset-0 pointer-events-none"
-        style="background: linear-gradient(90deg, #edf4fa 0%, #edf4fa 28%, rgba(237, 244, 250, 0.88) 52%, rgba(237, 244, 250, 0.28) 72%, transparent 100%);"
+        style="background: linear-gradient(90deg, #FCF0F2 0%, #FCF0F2 28%, rgba(252, 240, 242, 0.90) 52%, rgba(252, 240, 242, 0.30) 72%, transparent 100%);"
       ></div>
 
-      <!-- Left: Title & Breadcrumbs -->
+      <!-- Left: Title, Accent Bar & Breadcrumbs -->
       <div class="relative z-10 flex items-center gap-2.5 sm:gap-3 min-w-0 w-full md:w-auto">
         <!-- Optional Back Button -->
         @if (backUrl || showBack) {
           <button
             type="button"
             (click)="onBackClick()"
-            class="w-8 h-8 rounded-full border border-slate-300 bg-white/90 hover:bg-white flex items-center justify-center text-brand-dark shadow-sm transition-all cursor-pointer shrink-0"
+            class="w-8 h-8 rounded-full border border-[#EADCE2] bg-white/90 hover:bg-white flex items-center justify-center text-[#7C0E44] shadow-2xs transition-all cursor-pointer shrink-0"
             [title]="backTitle"
             [attr.aria-label]="backTitle"
           >
@@ -50,19 +50,27 @@ export interface BreadcrumbItem {
           </button>
         }
 
+        <!-- Subtle Orange/Peach Accent Line -->
+        <span class="w-1.5 h-7 sm:h-8 bg-[#E26D24] rounded-full shrink-0"></span>
+
         <div class="flex flex-col justify-center leading-tight min-w-0 flex-1">
           <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
             <h1
-              class="header-title m-0 text-[18px] sm:text-[21px] md:text-[24px] font-extrabold text-[#0c2d4e] tracking-tight leading-tight"
+              class="header-title m-0 text-[18px] sm:text-[21px] md:text-[24px] font-extrabold text-[#7C0E44] tracking-tight leading-tight"
             >
               {{ title }}
             </h1>
             @if (badge) {
-              <span class="px-2 py-0.5 text-xs font-bold rounded-md bg-primary text-white select-none tracking-wide shrink-0">
+              <span class="px-2 py-0.5 text-xs font-bold rounded-md bg-[#7C0E44] text-white select-none tracking-wide shrink-0">
                 {{ badge }}
               </span>
             }
           </div>
+          @if (subtitle) {
+            <p class="text-xs sm:text-[13px] text-[#625663] m-0 mt-0.5 font-normal">
+              {{ subtitle }}
+            </p>
+          }
         </div>
       </div>
 
@@ -76,7 +84,7 @@ export interface BreadcrumbItem {
               [ngModel]="searchQuery()"
               (ngModelChange)="onSearchInput($event)"
               [placeholder]="searchPlaceholder"
-              class="w-full pl-9 pr-7 py-2 text-[13px] bg-white border border-slate-300 rounded-md placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-navy transition-colors font-normal shadow-2xs"
+              class="w-full pl-9 pr-7 py-2 text-[13px] bg-white border border-[#E5D6DE] rounded-md placeholder:text-slate-400 focus:outline-none focus:border-[#AA5E7A] focus:ring-1 focus:ring-[#AA5E7A] transition-colors font-normal shadow-2xs text-[#25212A]"
             />
             @if (searchQuery()) {
               <button
@@ -97,13 +105,14 @@ export interface BreadcrumbItem {
 })
 export class PageHeaderComponent {
   @Input({ required: true }) title = '';
+  @Input() subtitle?: string;
   @Input() breadcrumbs: BreadcrumbItem[] = [];
   @Input() showBreadcrumbs = false;
   @Input() backUrl?: string;
   @Input() showBack = false;
   @Input() backTitle = 'Go Back';
   @Input() badge?: string;
-  @Input() bgColor = 'var(--color-primary, #174A6E)';
+  @Input() bgColor = 'var(--color-primary, #7C0E44)';
   @Input() searchable = false;
   @Input() searchPlaceholder = 'Search...';
 

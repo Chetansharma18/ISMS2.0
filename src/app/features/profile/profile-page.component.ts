@@ -36,27 +36,30 @@ export interface RegistrationStepItem {
              ASPIRANT PROFILE VIEW
              ==================================================================== -->
         <!-- 1. HERO BANNER -->
-        <div class="relative w-full rounded-xl overflow-hidden border border-purple-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-3.5 sm:px-7 sm:py-4 bg-[#FAF5FF]">
+        <div class="relative w-full rounded-[10px] overflow-hidden border border-[#EADCE2] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-3.5 sm:px-7 sm:py-4 bg-[#FCF0F2]">
           <div
             class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none"
             style="background-image: url('/hero-bg.png'); background-position: right 20%; opacity: 0.95;"
           ></div>
           <div
             class="absolute inset-0 pointer-events-none"
-            style="background: linear-gradient(90deg, #F5EEF8 0%, #FAF5FF 30%, rgba(245, 238, 248, 0.92) 54%, rgba(255, 243, 237, 0.75) 75%, rgba(254, 215, 170, 0.28) 100%);"
+            style="background: linear-gradient(90deg, #FCF0F2 0%, #FCF0F2 28%, rgba(252, 240, 242, 0.90) 52%, rgba(252, 240, 242, 0.30) 72%, transparent 100%);"
           ></div>
-          <div class="relative z-10">
-            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#2E1065] m-0">
-              Aspirant Profile Summary
-            </h1>
-            <p class="text-xs sm:text-[13px] text-slate-500 mt-1 m-0 font-normal">
-              Complete your candidate registration steps to become eligible to express interest in training programs under RSLDC.
-            </p>
+          <div class="relative z-10 flex items-center gap-3">
+            <span class="w-1.5 h-7 sm:h-8 bg-[#E26D24] rounded-full shrink-0"></span>
+            <div>
+              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#7C0E44] m-0">
+                Aspirant Profile Summary
+              </h1>
+              <p class="text-xs sm:text-[13px] text-[#625663] mt-1 m-0 font-normal">
+                Complete your candidate registration steps to become eligible to express interest in training programs under RSLDC.
+              </p>
+            </div>
           </div>
         </div>
 
         <!-- 2. ASPIRANT OTR PROGRESS CARD: Circular Donut Chart + Details -->
-        <div class="w-full bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
+        <div class="w-full bg-white border border-[#EADCE2] rounded-[10px] p-4 sm:p-6 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
           <div class="flex flex-col sm:flex-row items-center sm:items-start md:items-center text-center sm:text-left gap-4 sm:gap-6 flex-1 min-w-0">
             <app-progress-ring
               [value]="aspirantCompletionPercentage()"
@@ -65,8 +68,8 @@ export interface RegistrationStepItem {
             />
 
             <div class="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
-              <h2 class="text-base sm:text-[17px] font-bold text-slate-900 m-0">Aspirant Registration</h2>
-              <p class="text-xs sm:text-[13px] text-slate-500 leading-relaxed m-0 max-w-3xl">
+              <h2 class="text-base sm:text-[17px] font-bold text-[#25212A] m-0">Aspirant Registration</h2>
+              <p class="text-xs sm:text-[13px] text-[#625663] leading-relaxed m-0 max-w-3xl">
                 Complete all mandatory candidate registration steps to become eligible for skill training admissions. Once complete, you can express interest for all open training programs.
               </p>
             </div>
@@ -79,7 +82,7 @@ export interface RegistrationStepItem {
         <!-- ====================================================================
              1. HERO BANNER: Profile Summary with Heritage Backdrop & Alert Box
              ==================================================================== -->
-        <div class="relative w-full rounded-xl overflow-hidden border border-purple-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-3.5 sm:px-7 sm:py-4 bg-[#FAF5FF]">
+        <div class="relative w-full rounded-[10px] overflow-hidden border border-[#EADCE2] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-3.5 sm:px-7 sm:py-4 bg-[#FCF0F2]">
           <!-- Panoramic Fort Heritage Image -->
           <div
             class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none"
@@ -88,17 +91,20 @@ export interface RegistrationStepItem {
           <!-- Soft Gradient Overlay: seamlessly fades fort into left background -->
           <div
             class="absolute inset-0 pointer-events-none"
-            style="background: linear-gradient(90deg, #F5EEF8 0%, #FAF5FF 30%, rgba(245, 238, 248, 0.92) 54%, rgba(255, 243, 237, 0.75) 75%, rgba(254, 215, 170, 0.28) 100%);"
+            style="background: linear-gradient(90deg, #FCF0F2 0%, #FCF0F2 28%, rgba(252, 240, 242, 0.90) 52%, rgba(252, 240, 242, 0.30) 72%, transparent 100%);"
           ></div>
 
           <!-- Left: Title & Subtitle -->
-          <div class="relative z-10">
-            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#2E1065] m-0">
-              Profile Summary
-            </h1>
-            <p class="text-xs sm:text-[13px] text-slate-500 mt-1 m-0 font-normal">
-              Complete your registration steps to become eligible for scheme proposals under RSLDC.
-            </p>
+          <div class="relative z-10 flex items-center gap-3">
+            <span class="w-1.5 h-7 sm:h-8 bg-[#E26D24] rounded-full shrink-0"></span>
+            <div>
+              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#7C0E44] m-0">
+                Profile Summary
+              </h1>
+              <p class="text-xs sm:text-[13px] text-[#625663] mt-1 m-0 font-normal">
+                Complete your registration steps to become eligible for scheme proposals under RSLDC.
+              </p>
+            </div>
           </div>
 
         </div>
@@ -106,7 +112,7 @@ export interface RegistrationStepItem {
         <!-- ====================================================================
              2. OTR PROGRESS CARD: Circular Donut Chart + Details + CTA
              ==================================================================== -->
-        <div class="w-full bg-white border border-slate-200 rounded-xl p-4 sm:p-6 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
+        <div class="w-full bg-white border border-[#EADCE2] rounded-[10px] p-4 sm:p-6 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
           <!-- Left: Donut Chart + Information + Progress Bar -->
           <div class="flex flex-col sm:flex-row items-center sm:items-start md:items-center text-center sm:text-left gap-4 sm:gap-6 flex-1 min-w-0">
           
@@ -119,8 +125,8 @@ export interface RegistrationStepItem {
 
           <!-- Text Details -->
           <div class="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
-            <h2 class="text-base sm:text-[17px] font-bold text-slate-900 m-0">Organization Registration</h2>
-            <p class="text-xs sm:text-[13px] text-slate-500 leading-relaxed m-0 max-w-3xl">
+            <h2 class="text-base sm:text-[17px] font-bold text-[#25212A] m-0">Organization Registration</h2>
+            <p class="text-xs sm:text-[13px] text-[#625663] leading-relaxed m-0 max-w-3xl">
               Complete all mandatory registration steps to become eligible for scheme proposals under RSLDC. Once complete, you can apply for all open EOI opportunities.
             </p>
           </div>
@@ -175,7 +181,7 @@ export interface RegistrationStepItem {
 
               <!-- Step Card Box -->
               <div
-                class="flex-1 bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs hover:shadow-xs transition-all mb-4"
+                class="flex-1 bg-white rounded-[10px] border border-[#EADCE2] p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs hover:shadow-xs transition-all mb-4"
               >
                 <!-- Left: Icon Box + Title & Description -->
                 <div class="flex items-center gap-3.5 sm:gap-4 min-w-0">
@@ -183,9 +189,9 @@ export interface RegistrationStepItem {
                   <div
                     class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors"
                     [ngClass]="{
-                      'bg-[#ECFDF5] text-green-700': step.isCompleted,
-                      'bg-[#EFF6FF] text-[#1D4ED8]': !step.isCompleted && isCurrentStep(step.stepNumber),
-                      'bg-slate-50 text-slate-400 border border-slate-100': !step.isCompleted && !isCurrentStep(step.stepNumber)
+                      'bg-[#E4F4E8] text-[#18733B]': step.isCompleted,
+                      'bg-[#E8F0FE] text-[#2459B3]': !step.isCompleted && isCurrentStep(step.stepNumber),
+                      'bg-[#FCF8FA] text-[#89818A] border border-[#EADCE2]': !step.isCompleted && !isCurrentStep(step.stepNumber)
                     }"
                   >
                     @switch (step.icon) {

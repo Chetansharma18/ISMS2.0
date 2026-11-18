@@ -173,7 +173,7 @@ interface TwoStepFormData {
         [closeOnBackdrop]="false"
         [reverseButtons]="true"
         [showAccentBar]="true"
-        accentBarClass="bg-purple-600"
+        accentBarClass="bg-primary"
         primaryLabel="Save"
         secondaryLabel="Cancel"
         maxWidthClass="max-w-[480px]"
@@ -233,7 +233,7 @@ interface TwoStepFormData {
             @if (formData.authTypes.length > 0) {
               <div class="mt-2.5 flex flex-wrap gap-1.5">
                 @for (type of formData.authTypes; track type) {
-                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200 shadow-2xs">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2] shadow-2xs">
                     <span>{{ type }}</span>
                     <button
                       appButton
@@ -263,7 +263,7 @@ interface TwoStepFormData {
         [showCloseButton]="true"
         [closeOnBackdrop]="true"
         [showAccentBar]="true"
-        accentBarClass="bg-sky-600"
+        accentBarClass="bg-primary"
         title="Two Step Verification Details"
         primaryLabel=""
         secondaryLabel="Close"
@@ -282,7 +282,7 @@ interface TwoStepFormData {
               <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Authentication Methods</span>
               <div class="flex flex-wrap gap-2">
                 @for (type of item.authTypes; track type) {
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-purple-100 text-purple-900 border border-purple-200">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
                     {{ type }}
                   </span>
                 }

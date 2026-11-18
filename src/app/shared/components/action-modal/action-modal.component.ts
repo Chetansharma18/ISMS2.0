@@ -22,7 +22,7 @@ import { IconComponent } from '../icon/icon.component';
         (click)="onBackdropClick($event)"
       >
         <div
-          class="w-full bg-white rounded-xl border border-slate-200 relative font-sans overflow-hidden my-auto max-h-[90vh] flex flex-col"
+          class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans overflow-hidden my-auto max-h-[90vh] flex flex-col"
           [ngClass]="maxWidthClass"
           style="box-shadow: 0 20px 60px rgba(0,0,0,0.18);"
           role="dialog"
@@ -60,14 +60,14 @@ import { IconComponent } from '../icon/icon.component';
 
             <!-- Title -->
             @if (title) {
-              <h2 [id]="titleId" class="m-0 text-navy pr-6" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+              <h2 [id]="titleId" class="m-0 text-[#7C0E44] pr-6" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
                 {{ title }}
               </h2>
             }
 
             <!-- Description -->
             @if (description) {
-              <p class="m-0 mt-2 text-slate-500 font-normal leading-relaxed" style="font-size: 13.5px;">
+              <p class="m-0 mt-2 text-[#625663] font-normal leading-relaxed" style="font-size: 13.5px;">
                 {{ description }}
               </p>
             }
@@ -80,14 +80,14 @@ import { IconComponent } from '../icon/icon.component';
             <!-- Action Buttons Footer -->
             @if (primaryLabel || secondaryLabel) {
               <div class="mt-auto">
-                <div class="mt-6 mb-5 border-t border-slate-100"></div>
+                <div class="mt-6 mb-5 border-t border-[#EADCE2]"></div>
 
                 <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" [class.sm:flex-row-reverse]="!secondaryLabel">
                   @if (secondaryLabel) {
                     <button
                       type="button"
                       (click)="onSecondaryAction()"
-                      class="w-full sm:flex-1 py-2.5 px-4 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors cursor-pointer"
+                      class="w-full sm:flex-1 py-2.5 px-4 rounded-lg border border-[#AA5E7A] text-[#7C0E44] text-sm font-medium hover:bg-[#F8EDF1] transition-colors cursor-pointer"
                     >
                       {{ secondaryLabel }}
                     </button>

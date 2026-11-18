@@ -61,14 +61,14 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       <!-- Dropdown Popover -->
       @if (isOpen()) {
         <div
-          class="absolute right-0 sm:right-0 top-full mt-2 w-[320px] xs:w-[360px] sm:w-[380px] max-w-[calc(100vw-24px)] bg-white border border-[#E5D9EC] rounded-xl shadow-xl z-[120] overflow-hidden flex flex-col font-sans animate-in fade-in zoom-in-95 duration-150"
+          class="absolute right-0 sm:right-0 top-full mt-2 w-[320px] xs:w-[360px] sm:w-[380px] max-w-[calc(100vw-24px)] bg-white border border-[#EADCE2] rounded-xl shadow-xl z-[120] overflow-hidden flex flex-col font-sans animate-in fade-in zoom-in-95 duration-150"
           role="dialog"
           aria-label="Notifications"
         >
           <!-- Header: Simple title and Mark all read -->
-          <div class="px-4 py-3 bg-[#FAF5FF] border-b border-[#E5D9EC] flex items-center justify-between">
+          <div class="px-4 py-3 bg-[#FCF8FA] border-b border-[#EADCE2] flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="text-xs sm:text-sm font-bold text-[#2E1065]">Notifications</span>
+              <span class="text-xs sm:text-sm font-bold text-[#7C0E44]">Notifications</span>
               @if (unreadCount() > 0) {
                 <span class="text-[10px] font-bold px-1.5 py-0.2 bg-[#EA580C]/15 text-[#C2410C] rounded-full">
                   {{ unreadCount() }} New
@@ -90,13 +90,13 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           </div>
 
           <!-- Notification Items List -->
-          <div class="max-h-[360px] overflow-y-auto divide-y divide-slate-100 overscroll-contain">
+          <div class="max-h-[360px] overflow-y-auto divide-y divide-[#EADCE2] overscroll-contain">
             @for (item of notifications(); track item.id) {
               <div
                 (click)="onItemClick(item)"
                 class="p-3.5 transition-colors cursor-pointer flex items-start gap-3 border-l-[3px]"
                 [ngClass]="!item.isRead 
-                  ? 'bg-[#F5EEF8] hover:bg-[#EDE9FE] border-l-[#6B21A8]' 
+                  ? 'bg-[#FAF2F5] hover:bg-[#F8EDF1] border-l-[#7C0E44]' 
                   : 'bg-white hover:bg-slate-50 border-l-transparent'"
               >
                 <!-- Unread status dot -->
@@ -113,7 +113,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                   <div class="flex items-baseline justify-between gap-2">
                     <h4
                       class="text-xs leading-snug m-0 truncate"
-                      [ngClass]="!item.isRead ? 'font-bold text-[#2E1065]' : 'font-medium text-slate-700'"
+                      [ngClass]="!item.isRead ? 'font-bold text-[#7C0E44]' : 'font-medium text-[#25212A]'"
                     >
                       {{ item.title }}
                     </h4>

@@ -28,101 +28,217 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
     FormFileUploadComponent
   ],
   template: `
-    <div class="w-full font-sans">
-      <!-- 12-column Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-3.5 gap-y-2.5">
-        <!-- Row 1: Bank Name (6 cols), Branch Name (6 cols) -->
-        <div class="lg:col-span-6">
-          <app-form-select
-            label="Name of the Bank"
-            [value]="data().bankName"
-            (valueChange)="update('bankName', $event)"
-            [options]="banks"
-            placeholder="Select bank"
-            [required]="true"
-            [error]="getFieldError('bankName')"
-          ></app-form-select>
+    <div class="w-full space-y-6 font-sans">
+
+      <!-- ====================================================================
+           1. BANK & ACCOUNT DETAILS
+           ==================================================================== -->
+      <section class="space-y-4">
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            1. Bank &amp; Account Details
+          </h3>
         </div>
 
-        <div class="lg:col-span-6">
-          <app-form-input
-            label="Branch Name"
-            [value]="data().branchName"
-            (valueChange)="update('branchName', $event)"
-            placeholder="Enter branch name"
-            [required]="true"
-            [maxLength]="150"
-            [error]="getFieldError('branchName')"
-          ></app-form-input>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+          <!-- Row 1: Bank Name * (Col 1) -->
+          <div>
+            <app-form-select
+              label="Name of the Bank"
+              [value]="data().bankName"
+              (valueChange)="update('bankName', $event)"
+              [options]="banks"
+              placeholder="Select bank"
+              [required]="true"
+              [error]="getFieldError('bankName')"
+            ></app-form-select>
+          </div>
+
+          <!-- Row 1: Branch Name * (Col 2) -->
+          <div>
+            <app-form-input
+              label="Branch Name"
+              [value]="data().branchName"
+              (valueChange)="update('branchName', $event)"
+              placeholder="Enter branch name"
+              [required]="true"
+              [maxLength]="150"
+              [error]="getFieldError('branchName')"
+            ></app-form-input>
+          </div>
+
+          <!-- Row 2: Account Holder Name * (Col 1) -->
+          <div>
+            <app-form-input
+              label="Account Holder Name"
+              [value]="data().accountHolderName"
+              (valueChange)="update('accountHolderName', $event)"
+              placeholder="Enter account holder name"
+              [required]="true"
+              [maxLength]="200"
+              [error]="getFieldError('accountHolderName')"
+            ></app-form-input>
+          </div>
+
+          <!-- Row 2: Account Number * (Col 2) -->
+          <div>
+            <app-form-input
+              label="Account Number"
+              type="tel"
+              [value]="data().accountNo"
+              (valueChange)="update('accountNo', $event)"
+              placeholder="Enter account number"
+              [required]="true"
+              [maxLength]="30"
+              [error]="getFieldError('accountNo')"
+            ></app-form-input>
+          </div>
+
+          <!-- Row 3: IFSC Code * (Col 1) -->
+          <div>
+            <app-form-input
+              label="IFSC Code"
+              [value]="data().ifscCode"
+              (valueChange)="update('ifscCode', $event)"
+              placeholder="Enter IFSC code"
+              [required]="true"
+              [uppercase]="true"
+              [maxLength]="11"
+              [infoTooltip]="'11-character alphanumeric code (e.g. SBIN0031804)'"
+              [error]="getFieldError('ifscCode')"
+            ></app-form-input>
+          </div>
+
+          <!-- Row 3: MICR Code (Optional) (Col 2) -->
+          <div>
+            <app-form-input
+              label="MICR Code (Optional)"
+              type="tel"
+              [value]="data().micrCode"
+              (valueChange)="update('micrCode', $event)"
+              placeholder="Enter MICR code (9 digits)"
+              [maxLength]="9"
+              [error]="getFieldError('micrCode')"
+            ></app-form-input>
+          </div>
+        </div>
+      </section>
+
+      <!-- Divider -->
+      <div class="pt-2 border-t border-[#E8EEF5]"></div>
+
+      <!-- ====================================================================
+           2. BANK VERIFICATION DOCUMENT
+           ==================================================================== -->
+      <section class="space-y-4">
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            2. Bank Verification Document
+          </h3>
         </div>
 
-        <!-- Row 2: Account Holder Name (5 cols), Account No (3 cols), IFSC (2 cols), MICR (2 cols) -->
-        <div class="lg:col-span-5">
-          <app-form-input
-            label="Account Holder Name"
-            [value]="data().accountHolderName"
-            (valueChange)="update('accountHolderName', $event)"
-            placeholder="Enter account holder name"
-            [required]="true"
-            [maxLength]="200"
-            [error]="getFieldError('accountHolderName')"
-          ></app-form-input>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+          <div class="col-span-1">
+            <app-form-file-upload
+              label="Upload Cancelled Cheque / Bank Passbook"
+              [dropzoneStyle]="true"
+              uploadPrompt="Upload Cancelled Cheque / Bank Passbook"
+              [fileDoc]="data().cancelledChequeDoc"
+              (fileChange)="updateFileDoc('cancelledChequeDoc', $event)"
+              [required]="true"
+              accept=".pdf,.jpg,.jpeg,.png"
+              [maxSizeMb]="5"
+              [error]="getFieldError('cancelledChequeDoc')"
+            ></app-form-file-upload>
+          </div>
         </div>
+      </section>
 
-        <div class="lg:col-span-3">
-          <app-form-input
-            label="Account Number"
-            type="tel"
-            [value]="data().accountNo"
-            (valueChange)="update('accountNo', $event)"
-            placeholder="Enter account number"
-            [required]="true"
-            [maxLength]="30"
-            [error]="getFieldError('accountNo')"
-          ></app-form-input>
-        </div>
-
-        <div class="lg:col-span-2">
-          <app-form-input
-            label="IFSC Code"
-            [value]="data().ifscCode"
-            (valueChange)="update('ifscCode', $event)"
-            placeholder="Enter IFSC code"
-            [required]="true"
-            [uppercase]="true"
-            [maxLength]="11"
-            [infoTooltip]="'11-character alphanumeric code (e.g. SBIN0031804)'"
-            [error]="getFieldError('ifscCode')"
-          ></app-form-input>
-        </div>
-
-        <div class="lg:col-span-2">
-          <app-form-input
-            label="MICR Code (Optional)"
-            type="tel"
-            [value]="data().micrCode"
-            (valueChange)="update('micrCode', $event)"
-            placeholder="Enter MICR code (9 digits)"
-            [maxLength]="9"
-            [error]="getFieldError('micrCode')"
-          ></app-form-input>
-        </div>
-
-        <!-- Row 3: Cheque Upload (12 cols) -->
-        <div class="lg:col-span-12 pt-1 border-t border-slate-100">
-          <app-form-file-upload
-            label="Upload Cancelled Cheque / Bank Passbook"
-            [fileDoc]="data().cancelledChequeDoc"
-            (fileChange)="updateFileDoc('cancelledChequeDoc', $event)"
-            [required]="true"
-            accept=".pdf,.jpg,.jpeg,.png"
-            [maxSizeMb]="5"
-            [error]="getFieldError('cancelledChequeDoc')"
-          ></app-form-file-upload>
-        </div>
-      </div>
     </div>
-  `
+  `,
+  styles: [`
+    :host {
+      display: block;
+      width: 100%;
+    }
+
+    :host ::ng-deep app-form-input label,
+    :host ::ng-deep app-form-select label,
+    :host ::ng-deep app-form-file-upload label {
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      color: #334155 !important;
+      margin-bottom: 6px !important;
+    }
+
+    :host ::ng-deep app-form-input label .text-rose-600,
+    :host ::ng-deep app-form-select label .text-rose-600,
+    :host ::ng-deep app-form-file-upload label .text-rose-500 {
+      color: #DC2626 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative {
+      height: 44px !important;
+      min-height: 44px !important;
+      border-radius: 6px !important;
+      border-color: #D6E3F0 !important;
+      background-color: #FFFFFF !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative:hover:not(.cursor-not-allowed) {
+      border-color: #B5CBE0 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative:focus-within {
+      border-color: #477DAF !important;
+      box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-input input {
+      font-size: 14px !important;
+      color: #334155 !important;
+    }
+
+    :host ::ng-deep app-form-input input::placeholder {
+      color: #94A3B8 !important;
+      font-size: 14px !important;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"] {
+      height: 44px !important;
+      min-height: 44px !important;
+      border-radius: 6px !important;
+      border-color: #D6E3F0 !important;
+      background-color: #FFFFFF !important;
+      font-size: 14px !important;
+      color: #334155 !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"]:hover:not(:disabled) {
+      border-color: #B5CBE0 !important;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"]:focus {
+      border-color: #477DAF !important;
+      box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-file-upload .rounded-lg.border,
+    :host ::ng-deep app-form-file-upload .rounded-md.border {
+      min-height: 72px !important;
+      border-color: #D6E3F0 !important;
+      border-radius: 6px !important;
+      background-color: #FFFFFF !important;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-file-upload .rounded-lg.border:hover:not(.cursor-not-allowed) {
+      border-color: #B5CBE0 !important;
+      background-color: #F8FAFC !important;
+    }
+  `]
 })
 export class Step4BankDetailsComponent {
   private otrFormService = inject(OtrFormService);

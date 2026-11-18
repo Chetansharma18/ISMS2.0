@@ -31,7 +31,7 @@ import { filterAdmins } from './tenders-page.util';
       [showCloseButton]="true"
       [closeOnBackdrop]="true"
       [showAccentBar]="true"
-      accentBarClass="bg-purple-600"
+      accentBarClass="bg-primary"
       title="Create Committee"
       primaryLabel="Save Committee"
       secondaryLabel="Cancel"
@@ -43,10 +43,10 @@ import { filterAdmins } from './tenders-page.util';
       @if (scheme(); as s) {
         <div class="mt-3 font-sans text-xs space-y-4">
           <!-- Scheme Info Header Banner -->
-          <div class="bg-purple-50/80 border border-purple-200 rounded-lg p-3 flex flex-col gap-1">
+          <div class="bg-[#F8EDF1] border border-[#EADCE2] rounded-lg p-3 flex flex-col gap-1">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-semibold text-purple-900">{{ s.schemeName }}</span>
-              <span class="tabular-nums text-[11px] px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-semibold border border-purple-200">
+              <span class="text-xs font-semibold text-[#7C0E44]">{{ s.schemeName }}</span>
+              <span class="tabular-nums text-[11px] px-2 py-0.5 rounded bg-[#F2DACE] text-[#7C0E44] font-semibold border border-[#EADCE2]">
                 {{ s.refNo }}
               </span>
             </div>
@@ -78,7 +78,7 @@ import { filterAdmins } from './tenders-page.util';
                   @if (selectedApprover()) {
                     <span class="font-semibold text-slate-800 text-xs truncate">{{ selectedApprover() }}</span>
                     @if (getAdminByName(selectedApprover()); as adm) {
-                      <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-100 text-purple-800 border border-purple-200 shrink-0">
+                      <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#F2DACE] text-[#7C0E44] border border-[#EADCE2] shrink-0">
                         {{ adm.role }}
                       </span>
                     }
@@ -161,7 +161,7 @@ import { filterAdmins } from './tenders-page.util';
                           <!-- Radio Indicator -->
                           <div
                             class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors"
-                            [ngClass]="selectedApprover() === adm.name ? 'border-purple-600 bg-purple-600' : 'border-slate-300 bg-white'"
+                            [ngClass]="selectedApprover() === adm.name ? 'border-[#7C0E44] bg-[#7C0E44]' : 'border-slate-300 bg-white'"
                           >
                             @if (selectedApprover() === adm.name) {
                               <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
@@ -265,15 +265,15 @@ import { filterAdmins } from './tenders-page.util';
                   <div class="max-h-52 overflow-y-auto p-1.5 space-y-1">
                     @for (adm of filteredMemberAdmins(); track adm.id) {
                       <label
-                        class="flex items-center justify-between px-2.5 py-2 rounded-md hover:bg-purple-50/70 cursor-pointer transition-colors text-xs select-none"
-                        [ngClass]="{'bg-purple-50/50': isMemberSelected(adm.name)}"
+                        class="flex items-center justify-between px-2.5 py-2 rounded-md hover:bg-[#F8EDF1] cursor-pointer transition-colors text-xs select-none"
+                        [ngClass]="{'bg-[#F8EDF1]': isMemberSelected(adm.name)}"
                       >
                         <div class="flex items-center gap-2.5 min-w-0">
                           <input
                             type="checkbox"
                             [checked]="isMemberSelected(adm.name)"
                             (change)="toggleMemberSelection(adm.name)"
-                            class="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 border-slate-300 cursor-pointer accent-purple-600"
+                            class="w-4 h-4 rounded text-[#7C0E44] focus:ring-[#AA5E7A] border-slate-300 cursor-pointer accent-[#7C0E44]"
                           />
                           <div class="flex flex-col min-w-0">
                             <span class="font-semibold text-slate-800 truncate">{{ adm.name }}</span>
@@ -304,11 +304,11 @@ import { filterAdmins } from './tenders-page.util';
                 <span class="block text-slate-500 font-semibold text-[11px] mb-1">
                   Assigned Approver
                 </span>
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-50 border border-purple-200 text-xs">
-                  <app-icon name="shield-check" size="sm" [stroke]="2.5" class="text-purple-600 shrink-0" />
-                  <span class="font-semibold text-purple-900">{{ selectedApprover() }}</span>
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F8EDF1] border border-[#EADCE2] text-xs">
+                  <app-icon name="shield-check" size="sm" [stroke]="2.5" class="text-[#7C0E44] shrink-0" />
+                  <span class="font-semibold text-[#7C0E44]">{{ selectedApprover() }}</span>
                   @if (getAdminByName(selectedApprover()); as adm) {
-                    <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-white text-purple-800 border border-purple-200">
+                    <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-white text-[#7C0E44] border border-[#EADCE2]">
                       {{ adm.role }}
                     </span>
                   }
@@ -349,7 +349,7 @@ import { filterAdmins } from './tenders-page.util';
               } @else {
                 <div class="flex flex-wrap gap-1.5 bg-slate-50 border border-slate-200 p-2.5 rounded-md max-h-36 overflow-y-auto">
                   @for (name of selectedAdminIds(); track name) {
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200 shadow-2xs">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2] shadow-2xs">
                       <span>{{ name }}</span>
                       <button
                         appButton

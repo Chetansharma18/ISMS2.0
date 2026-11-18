@@ -114,11 +114,11 @@ import {
       </div>
 
       <!-- Bottom: Rajasthan Fort Heritage Illustration -->
-      <div class="mt-auto shrink-0 w-full px-2 pt-3 pb-1 pointer-events-none opacity-50 flex justify-center items-end overflow-hidden">
+      <div class="mt-auto shrink-0 w-full px-0 pt-4 pb-3 pointer-events-none opacity-90 flex justify-center items-end overflow-hidden">
         <img
-          src="/sidebar-fort-transparent.png"
+          src="/sidebar-fort-transparent.png?v=3"
           alt="Rajasthan Heritage"
-          class="w-full object-contain object-bottom max-h-24 select-none"
+          class="w-full h-28 object-bottom select-none"
         />
       </div>
 

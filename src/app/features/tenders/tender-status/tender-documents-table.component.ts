@@ -14,7 +14,7 @@ import { documentCategoryLabel } from './tender-status.util';
         <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4">
           <div class="pb-3.5 border-b border-slate-100 flex items-center gap-3">
             <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">4</span>
-            <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">Proposal Documents</h2>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">Supporting Documents</h2>
           </div>
 
           <app-table

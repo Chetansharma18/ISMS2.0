@@ -1150,7 +1150,7 @@ interface FormBuilderFormData {
                     <div class="flex items-start sm:items-center justify-between flex-col sm:flex-row gap-4 pb-4 border-b border-slate-100">
                       <div>
                         <h3 class="text-sm sm:text-base font-bold text-navy tracking-tight m-0">
-                          Mandatory EOI Proposal Documents Checklist (16 Documents)
+                          Mandatory EOI Supporting Documents Checklist (16 Documents)
                         </h3>
                         <p class="text-xs text-slate-500 mt-1 mb-0">
                           Separated into Mandatory Statutory Documents, Official Scheme Annexures, and Supporting Documents.

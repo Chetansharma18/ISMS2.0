@@ -2,6 +2,7 @@ import {
   CommitteeAdmin,
   EoiAttachment,
   EoiDocumentItem,
+  EoiDurationUnit,
   EoiFormData,
   SchemeTender
 } from '../tenders.models';
@@ -144,6 +145,27 @@ export function toDisplayDate(dt: string): string {
   return dt ? dt.split('-').reverse().join('/') : '';
 }
 
+/** Formats an EOI duration value in years for display (e.g. "1 Year", "3 Years"). */
+export function formatEoiDuration(
+  value: string | number | null | undefined,
+  unit: EoiDurationUnit = 'Years'
+): string {
+  const trimmed = String(value ?? '').trim();
+  if (!trimmed) return '';
+  const num = Number(trimmed);
+  if (!Number.isFinite(num) || num <= 0) return '';
+  const singular = unit.endsWith('s') ? unit.slice(0, -1) : unit;
+  return `${num} ${num === 1 ? singular : unit}`;
+}
+
+/** Parses a persisted EOI duration string (e.g. "3 Years", "1 Year") into value + unit. */
+export function parseEoiDuration(duration?: string): { value: string; unit: EoiDurationUnit } {
+  if (!duration) return { value: '', unit: 'Years' };
+  const match = duration.trim().match(/^(\d+(?:\.\d+)?)\s*(year|years)?$/i);
+  if (!match) return { value: '', unit: 'Years' };
+  return { value: match[1], unit: 'Years' };
+}
+
 /** Blank form model for "Configure New EOI". */
 export function createEmptyEoiForm(): EoiFormData {
   return {
@@ -152,6 +174,8 @@ export function createEmptyEoiForm(): EoiFormData {
     schemeCategory: '',
     publishedDate: '',
     submissionDate: '',
+    eoiDurationValue: '',
+    eoiDurationUnit: 'Years',
     eoiCategory: '',
     description: '',
     emdFee: '',
@@ -168,6 +192,7 @@ export function eoiFormFromScheme(scheme: SchemeTender, now: number = Date.now()
     { sNo: 1, name: 'Request for Proposal (RFP)', size: scheme.rfpDocSize || '2.4 MB' },
     { sNo: 2, name: 'Standard Operating Procedure (SOP) for Training Partners', size: scheme.sopDocSize || '1.8 MB' }
   ];
+  const parsedDuration = parseEoiDuration(scheme.eoiDuration);
 
   return {
     refNo: scheme.refNo,
@@ -175,6 +200,8 @@ export function eoiFormFromScheme(scheme: SchemeTender, now: number = Date.now()
     schemeCategory: scheme.schemeCategory || scheme.category || '',
     publishedDate: toInputDate(scheme.datePublished),
     submissionDate: toInputDate(scheme.closingDate),
+    eoiDurationValue: parsedDuration.value,
+    eoiDurationUnit: parsedDuration.unit,
     eoiCategory: scheme.eoiCategory || '',
     description: scheme.eoiDescription || '',
     emdFee: scheme.emdFee || '',
@@ -196,11 +223,15 @@ export function eoiFormFromScheme(scheme: SchemeTender, now: number = Date.now()
  * "required document" row has a selection.
  */
 export function isEoiFormValid(d: EoiFormData): boolean {
+  const durationNum = Number(String(d.eoiDurationValue ?? '').trim());
   if (
     !d.refNo ||
     !d.scheme ||
     !d.publishedDate ||
     !d.submissionDate ||
+    !String(d.eoiDurationValue ?? '').trim() ||
+    !Number.isFinite(durationNum) ||
+    durationNum <= 0 ||
     !d.eoiCategory ||
     !d.emdFee ||
     !d.processFee ||
@@ -258,6 +289,7 @@ export function buildSchemeFromForm(
     category: d.schemeCategory,
     datePublished: toDisplayDate(d.publishedDate),
     closingDate: toDisplayDate(d.submissionDate),
+    eoiDuration: formatEoiDuration(d.eoiDurationValue, d.eoiDurationUnit),
     eoiCategory: d.eoiCategory,
     eoiDescription: d.description || '',
     status: 'Open',

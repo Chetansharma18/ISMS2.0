@@ -1,17 +1,17 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { SchemeFormState } from '../scheme-form.state';
 
-/** Scheme parameters strip shown on Step 1. */
+/** Scheme parameters strip shown at the top of all Apply for EOI steps. */
 @Component({
   selector: 'app-scheme-header-card',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <section class="bg-white border border-slate-200/90 rounded-xl shadow-2xs overflow-hidden">
+    <section class="bg-white border border-[#EADCE2] rounded-xl shadow-2xs overflow-hidden">
       <div class="p-4 sm:p-5 space-y-3.5">
         <div class="space-y-1">
-          <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">
+          <h2 class="text-base sm:text-lg font-bold text-[#7C0E44] m-0">
             {{ state.schemeTitle() }}
           </h2>
           <p class="text-xs sm:text-sm text-slate-500 leading-relaxed m-0">
@@ -20,7 +20,7 @@ import { SchemeFormState } from '../scheme-form.state';
         </div>
 
         <!-- Parameters Strip -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-x-6 gap-y-4 pt-3.5 border-t border-slate-100 text-xs">
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-x-6 gap-y-4 pt-3.5 border-t border-[#EADCE2]/70 text-xs">
           <div>
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">EOI Reference No.</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1 break-all tabular-nums">{{ state.schemeRefNo() }}</span>

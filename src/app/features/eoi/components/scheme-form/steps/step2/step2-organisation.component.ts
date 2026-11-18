@@ -32,11 +32,11 @@ const NO_DISTRICTS: string[] = [];
   ],
   host: { class: 'block' },
   template: `
-    <section class="border border-[#D6E3F0] rounded-xl overflow-hidden bg-white shadow-2xs">
-      <div class="bg-white px-5 py-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
+    <section class="border border-[#EADCE2] rounded-xl overflow-hidden bg-white shadow-2xs">
+      <div class="bg-white px-5 py-3.5 border-b border-[#EADCE2] flex items-center justify-between gap-3">
         <div class="flex items-center gap-2.5 min-w-0">
-          <span class="w-6 h-6 rounded-full bg-[#1E3A5F] text-white flex items-center justify-center text-xs font-bold shrink-0">1</span>
-          <h2 class="text-base sm:text-[17px] font-bold text-[#1E3A5F] m-0">Company Particulars &amp; Registration Details</h2>
+          <span class="w-6 h-6 rounded-full bg-[#7C0E44] text-white flex items-center justify-center text-xs font-bold shrink-0">1</span>
+          <h2 class="text-base sm:text-[17px] font-bold text-[#7C0E44] m-0">Company Particulars &amp; Registration Details</h2>
         </div>
         <span class="text-xs text-slate-500 tabular-nums font-semibold truncate">CIN: {{ state.editableStep1.registrationNumber || '-' }}</span>
       </div>
@@ -44,8 +44,8 @@ const NO_DISTRICTS: string[] = [];
       <div class="p-5 sm:p-6 w-full space-y-6 font-sans">
         <!-- 1. Basic Organisation Details -->
         <div class="space-y-4">
-          <div class="pb-2 border-b border-[#E8EEF5]">
-            <h3 class="text-[16px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+          <div class="pb-2 border-b border-[#EADCE2]">
+            <h3 class="text-[16px] font-semibold text-[#7C0E44] tracking-tight m-0">
               Basic Organisation Details
             </h3>
           </div>
@@ -160,12 +160,12 @@ const NO_DISTRICTS: string[] = [];
         </div>
 
         <!-- Divider -->
-        <div class="pt-1 border-t border-[#E8EEF5]"></div>
+        <div class="pt-1 border-t border-[#EADCE2]"></div>
 
         <!-- 2. Registration & Documents -->
         <div class="space-y-4">
-          <div class="pb-2 border-b border-[#E8EEF5]">
-            <h3 class="text-[16px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+          <div class="pb-2 border-b border-[#EADCE2]">
+            <h3 class="text-[16px] font-semibold text-[#7C0E44] tracking-tight m-0">
               Registration &amp; Statutory Documents
             </h3>
           </div>
@@ -252,12 +252,12 @@ const NO_DISTRICTS: string[] = [];
         </div>
 
         <!-- Divider -->
-        <div class="pt-1 border-t border-[#E8EEF5]"></div>
+        <div class="pt-1 border-t border-[#EADCE2]"></div>
 
         <!-- 3. Contact Information -->
         <div class="space-y-4">
-          <div class="pb-2 border-b border-[#E8EEF5]">
-            <h3 class="text-[16px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+          <div class="pb-2 border-b border-[#EADCE2]">
+            <h3 class="text-[16px] font-semibold text-[#7C0E44] tracking-tight m-0">
               Contact Information
             </h3>
           </div>
@@ -317,19 +317,19 @@ const NO_DISTRICTS: string[] = [];
         </div>
 
         <!-- Divider -->
-        <div class="pt-1 border-t border-[#E8EEF5]"></div>
+        <div class="pt-1 border-t border-[#EADCE2]"></div>
 
         <!-- 4. Registered & Office Address -->
         <div class="space-y-4">
-          <div class="pb-2 border-b border-[#E8EEF5]">
-            <h3 class="text-[16px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+          <div class="pb-2 border-b border-[#EADCE2]">
+            <h3 class="text-[16px] font-semibold text-[#7C0E44] tracking-tight m-0">
               Registered &amp; Office Address
             </h3>
           </div>
 
           <!-- Subsection A: Registered Address -->
           <div class="space-y-3.5 pt-1">
-            <h4 class="text-[15px] font-semibold text-[#1E3A5F] m-0">
+            <h4 class="text-[15px] font-semibold text-[#7C0E44] m-0">
               A. Registered Address
             </h4>
 
@@ -388,14 +388,14 @@ const NO_DISTRICTS: string[] = [];
           </div>
 
           <!-- Same as registered Checkbox Row -->
-          <div class="w-full flex items-center justify-between p-3 rounded-lg border border-[#D6E3F0] bg-slate-50/70 transition-colors">
+          <div class="w-full flex items-center justify-between p-3 rounded-lg border border-[#EADCE2] bg-slate-50/70 transition-colors">
             <label class="inline-flex items-center gap-2.5 text-xs sm:text-[13px] font-medium text-[#334155] cursor-pointer select-none">
               <input
                 type="checkbox"
                 [ngModel]="state.editableStep1.sameAsRegistered"
                 (ngModelChange)="state.editableStep1.sameAsRegistered = $event"
                 [disabled]="!state.isEditingStep2()"
-                class="w-4 h-4 text-[#8B104D] border-[#D6E3F0] rounded focus:ring-[#477DAF] accent-[#8B104D]"
+                class="w-4 h-4 text-[#7C0E44] border-[#EADCE2] rounded focus:ring-[#AA5E7A] accent-[#7C0E44]"
               />
               <span>Office address is the same as registered address</span>
             </label>
@@ -409,7 +409,7 @@ const NO_DISTRICTS: string[] = [];
           <!-- Subsection B: Office Address -->
           @if (!state.editableStep1.sameAsRegistered) {
             <div class="space-y-3.5 pt-1">
-              <h4 class="text-[15px] font-semibold text-[#1E3A5F] m-0">
+              <h4 class="text-[15px] font-semibold text-[#7C0E44] m-0">
                 B. Office Address
               </h4>
 
@@ -498,17 +498,17 @@ const NO_DISTRICTS: string[] = [];
       height: 44px !important;
       min-height: 44px !important;
       border-radius: 6px !important;
-      border-color: #D6E3F0 !important;
+      border-color: #EADCE2 !important;
       background-color: #FFFFFF !important;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
     :host ::ng-deep app-form-input > div > div.relative:hover:not(.cursor-not-allowed) {
-      border-color: #B5CBE0 !important;
+      border-color: #D49A9A !important;
     }
 
     :host ::ng-deep app-form-input > div > div.relative:focus-within {
-      border-color: #477DAF !important;
+      border-color: #AA5E7A !important;
       box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
     }
 
@@ -526,7 +526,7 @@ const NO_DISTRICTS: string[] = [];
       height: 44px !important;
       min-height: 44px !important;
       border-radius: 6px !important;
-      border-color: #D6E3F0 !important;
+      border-color: #EADCE2 !important;
       background-color: #FFFFFF !important;
       font-size: 14px !important;
       color: #334155 !important;
@@ -534,18 +534,18 @@ const NO_DISTRICTS: string[] = [];
     }
 
     :host ::ng-deep app-form-select button[type="button"]:hover:not(:disabled) {
-      border-color: #B5CBE0 !important;
+      border-color: #D49A9A !important;
     }
 
     :host ::ng-deep app-form-select button[type="button"]:focus {
-      border-color: #477DAF !important;
+      border-color: #AA5E7A !important;
       box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
     }
 
     :host ::ng-deep app-form-textarea textarea {
       min-height: 72px !important;
       border-radius: 6px !important;
-      border-color: #D6E3F0 !important;
+      border-color: #EADCE2 !important;
       background-color: #FFFFFF !important;
       font-size: 14px !important;
       color: #334155 !important;
@@ -553,11 +553,11 @@ const NO_DISTRICTS: string[] = [];
     }
 
     :host ::ng-deep app-form-textarea textarea:hover:not(:disabled) {
-      border-color: #B5CBE0 !important;
+      border-color: #D49A9A !important;
     }
 
     :host ::ng-deep app-form-textarea textarea:focus {
-      border-color: #477DAF !important;
+      border-color: #AA5E7A !important;
       box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
     }
 
@@ -569,14 +569,14 @@ const NO_DISTRICTS: string[] = [];
     :host ::ng-deep app-form-file-upload .rounded-lg.border,
     :host ::ng-deep app-form-file-upload .rounded-md.border {
       min-height: 72px !important;
-      border-color: #D6E3F0 !important;
+      border-color: #EADCE2 !important;
       border-radius: 6px !important;
       background-color: #FFFFFF !important;
       transition: border-color 0.15s ease, background-color 0.15s ease;
     }
 
     :host ::ng-deep app-form-file-upload .rounded-lg.border:hover:not(.cursor-not-allowed) {
-      border-color: #B5CBE0 !important;
+      border-color: #D49A9A !important;
       background-color: #F8FAFC !important;
     }
   `]

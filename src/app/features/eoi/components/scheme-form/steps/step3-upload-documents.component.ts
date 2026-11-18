@@ -1,78 +1,85 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { ButtonComponent } from '../../../../../shared';
+import { FormsModule } from '@angular/forms';
+import { ButtonComponent, InputDirective, TableColumn, TableComponent } from '../../../../../shared';
 import { SchemeFormState } from '../scheme-form.state';
 import { EoiDocumentItem } from '../scheme-form.model';
 import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from './step3-document-rules';
 
-/** Step 2: upload the proposal documents. */
+/** Step 2: upload the supporting documents and optional per-document comments. */
 @Component({
   selector: 'app-step3-upload-documents',
   standalone: true,
-  imports: [ButtonComponent],
+  imports: [FormsModule, ButtonComponent, InputDirective, TableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
     <div class="space-y-5 font-sans">
 
       <!-- Documents section block -->
-      <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
-        <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-2.5">
-          <div class="flex items-center gap-2.5">
-            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy text-xs font-bold flex items-center justify-center shrink-0">1</span>
-            <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Proposal Documents</h2>
-          </div>
-          <span class="text-[11.5px] font-medium text-slate-500 shrink-0">
+      <section class="border border-[#EADCE2] rounded-xl overflow-hidden bg-white shadow-2xs">
+        <div class="bg-[#F8E9EE] px-4 py-3 border-b border-[#EADCE2] flex items-center justify-between gap-2.5">
+          <h2 class="text-sm sm:text-base font-bold text-[#7C0E44] m-0">Supporting Documents</h2>
+          <span class="text-[11.5px] font-medium text-[#625663] shrink-0">
             {{ state.attachedDocsCount() }} / {{ state.eoiDocuments().length }} uploaded
           </span>
         </div>
 
-        <div class="divide-y divide-slate-100">
-          @for (doc of state.eoiDocuments(); track doc.id) {
-            <div class="px-4 sm:px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-
-              <!-- Left: number, name, requirement hint, file info -->
-              <div class="flex items-start gap-3 min-w-0">
-                <span class="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
-                  {{ doc.id }}
-                </span>
-
-                <div class="min-w-0">
-                  <div class="text-[12.5px] font-medium text-slate-900 leading-tight">
-                    {{ doc.name }}@if (doc.isMandatory) { <span class="text-red-600 font-bold"> *</span> }
-                  </div>
-
-                  <div class="text-[11.5px] text-slate-500 mt-0.5">
-                    Supported: {{ formatLabel }} &nbsp;|&nbsp; Max size: {{ maxSizeMb }} MB
-                  </div>
-
-                  @if (doc.status === 'uploaded' && doc.fileName) {
-                    <span class="text-[11.5px] tabular-nums text-slate-600 block mt-1 truncate" title="{{ doc.fileName }} ({{ doc.fileSize }})">
-                      {{ doc.fileName }} ({{ doc.fileSize }})
-                    </span>
-                  }
-
-                  @if (errors()[doc.id]) {
-                    <p class="text-[11.5px] text-red-600 m-0 mt-1" role="alert">{{ errors()[doc.id] }}</p>
-                  }
-                </div>
-              </div>
-
-              <!-- Right: actions -->
-              <div class="flex items-center gap-1.5 shrink-0 sm:ml-0 ml-9">
-                @if (doc.status === 'pending') {
-                  <button appButton size="sm" (click)="uploadInput.click()">Upload</button>
-                  <input #uploadInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
-                } @else {
-                  <button appButton variant="outline" size="sm" (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)">View</button>
-                  <button appButton variant="secondary" size="sm" (click)="replaceInput.click()">Replace</button>
-                  <input #replaceInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
-                  <button appButton variant="danger" size="sm" (click)="onRemove(doc)">Remove</button>
-                }
-              </div>
-
-            </div>
-          }
+        <div class="p-3 sm:p-4">
+          <app-table
+            [columns]="documentColumns"
+            [data]="state.eoiDocuments()"
+            [customTemplates]="{ name: nameTemplate, comment: commentTemplate, action: actionTemplate }"
+          >
+          </app-table>
         </div>
+
+        <ng-template #nameTemplate let-doc>
+          <div class="py-1 min-w-0">
+            <div class="text-[12.5px] font-medium text-slate-900 leading-tight">
+              {{ doc.name }}@if (doc.isMandatory) { <span class="text-red-600 font-bold"> *</span> }
+            </div>
+            <div class="text-[11.5px] text-slate-500 mt-0.5">
+              Supported: {{ formatLabel }} &nbsp;|&nbsp; Max size: {{ maxSizeMb }} MB
+            </div>
+            @if (doc.status === 'uploaded' && doc.fileName) {
+              <span class="text-[11.5px] tabular-nums text-emerald-700 font-medium block mt-1 truncate max-w-[320px]" title="{{ doc.fileName }} ({{ doc.fileSize }})">
+                {{ doc.fileName }} ({{ doc.fileSize }})
+              </span>
+            }
+            @if (errors()[doc.id]) {
+              <p class="text-[11.5px] text-red-600 m-0 mt-1" role="alert">{{ errors()[doc.id] }}</p>
+            }
+          </div>
+        </ng-template>
+
+        <ng-template #commentTemplate let-doc>
+          <input
+            appInput
+            size="sm"
+            type="text"
+            maxlength="500"
+            placeholder="Add comment..."
+            [attr.aria-label]="'Comment for ' + doc.name"
+            [ngModel]="doc.comment ?? ''"
+            (ngModelChange)="state.updateDocComment(doc.id, $event)"
+            (blur)="state.updateDocComment(doc.id, doc.comment ?? '', true)"
+            class="w-full"
+          />
+        </ng-template>
+
+        <ng-template #actionTemplate let-doc>
+          <div class="flex items-center justify-center gap-1.5 flex-nowrap whitespace-nowrap">
+            @if (doc.status === 'pending') {
+              <button appButton size="sm" (click)="uploadInput.click()">Upload</button>
+              <input #uploadInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
+            } @else {
+              <button appButton variant="outline" size="sm" (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)">View</button>
+              <button appButton variant="secondary" size="sm" (click)="replaceInput.click()">Replace</button>
+              <input #replaceInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
+              <button appButton variant="danger" size="sm" (click)="onRemove(doc)">Remove</button>
+            }
+          </div>
+        </ng-template>
       </section>
 
       <!-- Footer Action Bar -->
@@ -95,6 +102,13 @@ export class Step3UploadDocumentsComponent {
   protected readonly accept = DOC_ACCEPT;
   protected readonly formatLabel = DOC_FORMAT_LABEL;
   protected readonly maxSizeMb = DOC_MAX_SIZE_MB;
+
+  protected readonly documentColumns: TableColumn<EoiDocumentItem>[] = [
+    { key: 'id', label: 'S. No.', align: 'center', width: 'w-14' },
+    { key: 'name', label: 'Supporting Document', type: 'custom', width: 'min-w-[240px]' },
+    { key: 'comment', label: 'Comment', type: 'custom', width: 'min-w-[200px] w-[250px]' },
+    { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'w-[270px] whitespace-nowrap' }
+  ];
 
   /** Inline validation messages keyed by document id. */
   protected readonly errors = signal<Record<number, string>>({});

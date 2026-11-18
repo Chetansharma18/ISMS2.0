@@ -14,7 +14,7 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
         <div class="flex items-center gap-2 flex-wrap">
           <h2 class="text-base font-bold text-slate-900 m-0">
-            Uploaded Proposal Documents
+            Uploaded Supporting Documents
           </h2>
           <span class="text-slate-500 font-normal text-xs sm:text-sm">
             ({{ applicant()?.uploadedDocuments?.length || 7 }} Documents Verified)
@@ -30,7 +30,7 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
             [loading]="isDownloadingZip()"
             (click)="downloadZip.emit()"
             [disabled]="isDownloadingZip() || !applicant()?.uploadedDocuments?.length"
-            title="Download all verified proposal documents in a single ZIP file"
+            title="Download all verified supporting documents in a single ZIP file"
           >
             @if (isDownloadingZip()) {
               <span>Creating ZIP...</span>

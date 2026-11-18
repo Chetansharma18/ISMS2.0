@@ -1,7 +1,8 @@
-import { Component, input, output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
+import { EoiAttachment, EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
 import { SchemeMasterItem, DocMasterItem } from '../../../core/models/admin-masters.model';
+import { DocumentViewerService } from '../../../core/services/document-viewer.service';
 import { ButtonComponent, IconComponent, InputDirective, formatInr } from '../../../shared';
 
 /**
@@ -22,10 +23,10 @@ import { ButtonComponent, IconComponent, InputDirective, formatInr } from '../..
     </h2>
     <div class="mt-4 font-sans text-[13px] max-h-[60vh] overflow-y-auto overflow-x-hidden pr-1 sm:pr-3">
       <div class="grid grid-cols-1 sm:grid-cols-[180px_1fr] md:grid-cols-[200px_1fr] items-start sm:items-center gap-y-3 gap-x-4">
-        <label class="text-slate-700 font-medium">EOI Reference No.*</label>
+        <label class="text-slate-700 font-medium">EOI Reference No.<span class="text-red-600">*</span></label>
         <input appInput type="text" maxlength="100" [(ngModel)]="data().refNo" [invalid]="submitted() && !data().refNo" class="w-full" />
         
-        <label class="text-slate-700 font-medium">Scheme*</label>
+        <label class="text-slate-700 font-medium">Scheme<span class="text-red-600">*</span></label>
         <select
           appInput
           [(ngModel)]="data().scheme"
@@ -47,13 +48,30 @@ import { ButtonComponent, IconComponent, InputDirective, formatInr } from '../..
           }
         </select>
 
-        <label class="text-slate-700 font-medium">Date of Eol Published*</label>
+        <label class="text-slate-700 font-medium">Date of Eol Published<span class="text-red-600">*</span></label>
         <input appInput type="date" [(ngModel)]="data().publishedDate" [invalid]="submitted() && !data().publishedDate" class="w-full" />
 
-        <label class="text-slate-700 font-medium">Last Date of Eol Submission*</label>
+        <label class="text-slate-700 font-medium">Last Date of Eol Submission<span class="text-red-600">*</span></label>
         <input appInput type="date" [(ngModel)]="data().submissionDate" [invalid]="submitted() && !data().submissionDate" class="w-full" />
 
-        <label class="text-slate-700 font-medium">EOI Category*</label>
+        <label class="text-slate-700 font-medium">EOI Duration (in Years)<span class="text-red-600">*</span></label>
+        <div class="relative w-full">
+          <input
+            appInput
+            type="number"
+            min="1"
+            max="100"
+            placeholder="e.g. 2"
+            [(ngModel)]="data().eoiDurationValue"
+            [invalid]="submitted() && (!data().eoiDurationValue || +data().eoiDurationValue <= 0)"
+            class="w-full pr-16"
+          />
+          <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-500">
+            Years
+          </span>
+        </div>
+
+        <label class="text-slate-700 font-medium">EOI Category<span class="text-red-600">*</span></label>
         <select appInput [(ngModel)]="data().eoiCategory" [invalid]="submitted() && !data().eoiCategory" class="w-full">
           <option value="" disabled [selected]="!data().eoiCategory">-- Select EOI Category --</option>
           @for (eoiCat of eoiCategoryOptions(); track eoiCat) {
@@ -64,13 +82,13 @@ import { ButtonComponent, IconComponent, InputDirective, formatInr } from '../..
         <label class="text-slate-700 font-medium">EOI Description</label>
         <input appInput type="text" maxlength="100" [(ngModel)]="data().description" class="w-full" />
 
-        <label class="text-slate-700 font-medium">EMD Fee*</label>
+        <label class="text-slate-700 font-medium">EMD Fee<span class="text-red-600">*</span></label>
         <input appInput type="text" maxlength="100" [(ngModel)]="data().emdFee" [invalid]="submitted() && !data().emdFee" class="w-full" />
 
-        <label class="text-slate-700 font-medium">Process Fee*</label>
+        <label class="text-slate-700 font-medium">Process Fee<span class="text-red-600">*</span></label>
         <input appInput type="text" maxlength="100" [(ngModel)]="data().processFee" [invalid]="submitted() && !data().processFee" class="w-full" />
 
-        <label class="text-slate-700 font-medium self-start pt-1">Attach File*</label>
+        <label class="text-slate-700 font-medium self-start pt-1">Attach File<span class="text-red-600">*</span></label>
         <div class="space-y-2 overflow-hidden w-full">
           <div class="flex items-center gap-2">
             <button appButton variant="outline" size="sm" type="button" (click)="attach.emit()">
@@ -93,19 +111,32 @@ import { ButtonComponent, IconComponent, InputDirective, formatInr } from '../..
                     <span class="font-medium text-slate-800 truncate shrink-0 max-w-35" [title]="att.title">{{ att.title }}</span>
                     <span class="text-[11px] text-slate-500 truncate min-w-0">({{ att.fileName }})</span>
                   </div>
-                  <button
-                    appButton
-                    variant="ghost"
-                    size="sm"
-                    iconOnly
-                    type="button"
-                    (click)="removeAttachment.emit(idx)"
-                    class="shrink-0 ml-1"
-                    title="Remove attachment"
-                    aria-label="Remove attachment"
-                  >
-                    <app-icon name="close" size="sm" />
-                  </button>
+                  <div class="flex items-center gap-1 shrink-0 ml-1">
+                    <button
+                      appButton
+                      variant="ghost"
+                      size="sm"
+                      type="button"
+                      (click)="viewAttachment(att)"
+                      title="View attached PDF"
+                      aria-label="View attached PDF"
+                    >
+                      <app-icon name="eye" size="sm" />
+                      <span>View</span>
+                    </button>
+                    <button
+                      appButton
+                      variant="ghost"
+                      size="sm"
+                      iconOnly
+                      type="button"
+                      (click)="removeAttachment.emit(idx)"
+                      title="Remove attachment"
+                      aria-label="Remove attachment"
+                    >
+                      <app-icon name="close" size="sm" />
+                    </button>
+                  </div>
                 </div>
               }
             </div>
@@ -120,6 +151,9 @@ import { ButtonComponent, IconComponent, InputDirective, formatInr } from '../..
   `
 })
 export class ConfigureEoiFormComponent {
+  private readonly docViewer = inject(DocumentViewerService);
+  private readonly objectUrls = new WeakMap<File, string>();
+
   /** Parent-owned form model, edited in place via ngModel. */
   readonly data = input.required<EoiFormData>();
   readonly submitted = input(false);
@@ -139,6 +173,24 @@ export class ConfigureEoiFormComponent {
   readonly removeAttachment = output<number>();
   readonly addDocument = output<void>();
   readonly removeDocument = output<number>();
+
+  viewAttachment(att: EoiAttachment): void {
+    if (att.file instanceof File && att.file.size > 0) {
+      let url = this.objectUrls.get(att.file);
+      if (!url) {
+        url = URL.createObjectURL(att.file);
+        this.objectUrls.set(att.file, url);
+      }
+      window.open(url, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    this.docViewer.openDocument({
+      title: att.title,
+      fileName: att.fileName,
+      fileSize: att.size
+    });
+  }
 
   onSchemeChange(schemeName: string): void {
     if (!schemeName) return;

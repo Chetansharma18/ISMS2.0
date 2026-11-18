@@ -15,8 +15,8 @@ export interface EoiDraft {
   step: number;
   procFeePaid: boolean;
   procFeeDate: string;
-  /** Per-document upload progress (Step 3). */
-  documents: { id: number; fileName: string; fileSize: string; uploadedDate: string }[];
+  /** Per-document upload progress & optional applicant comment (Step 2). */
+  documents: { id: number; fileName: string; fileSize: string; uploadedDate: string; comment?: string }[];
   updatedAt: string;
 }
 

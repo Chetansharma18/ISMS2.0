@@ -247,8 +247,14 @@ export class SchemeFormState {
         procFeePaid: paid,
         procFeeDate,
         documents: docs
-          .filter(d => d.status === 'uploaded')
-          .map(d => ({ id: d.id, fileName: d.fileName, fileSize: d.fileSize, uploadedDate: d.uploadedDate })),
+          .filter(d => d.status === 'uploaded' || !!d.comment?.trim())
+          .map(d => ({
+            id: d.id,
+            fileName: d.fileName,
+            fileSize: d.fileSize,
+            uploadedDate: d.uploadedDate,
+            comment: d.comment
+          })),
         updatedAt: new Date().toISOString()
       });
     });
@@ -263,7 +269,9 @@ export class SchemeFormState {
     this.eoiDocuments.update(docs =>
       docs.map(doc => {
         const saved = draft.documents.find(d => d.id === doc.id);
-        return saved ? { ...doc, ...saved, status: 'uploaded' as const } : doc;
+        return saved
+          ? { ...doc, ...saved, status: saved.fileName ? ('uploaded' as const) : doc.status }
+          : doc;
       })
     );
     this.currentStep.set(Math.min(Math.max(draft.step, 1), this.wizardSteps.length - 1));
@@ -403,6 +411,13 @@ export class SchemeFormState {
   removeSchemeDoc(doc: EoiDocumentItem): void {
     this.eoiDocuments.update(docs =>
       docs.map(d => (d.id === doc.id ? { ...d, status: 'pending' as const, fileName: '', fileSize: '', uploadedDate: '' } : d))
+    );
+  }
+
+  updateDocComment(docId: number, comment: string, trim = false): void {
+    const nextValue = trim ? comment.trim() : comment;
+    this.eoiDocuments.update(docs =>
+      docs.map(d => (d.id === docId ? { ...d, comment: nextValue || undefined } : d))
     );
   }
 

@@ -31,6 +31,7 @@ export interface DossierDocument {
   category: string;
   previewUrl?: string;
   verified: boolean;
+  comment?: string;
 }
 
 /** Result of an earlier EOI the same organisation was empanelled under, measured against its target. */

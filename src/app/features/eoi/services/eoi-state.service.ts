@@ -123,6 +123,20 @@ export class EoiStateService {
   }
 
   /**
+   * Registers a newly submitted EOI applicant response so the Department Scrutiny Desk
+   * immediately sees the application, uploaded supporting documents, and document comments.
+   */
+  submitApplicantResponse(response: ApplicantResponse): void {
+    const currentList = this.responsesSubject.getValue();
+    if (currentList.some(r => r.id === response.id)) {
+      return;
+    }
+    const updatedList = [response, ...currentList];
+    this.responsesSubject.next(updatedList);
+    this.saveToStorage(updatedList);
+  }
+
+  /**
    * Business Logic for Scrutiny Decision:
    * - If status is REJECTED -> automatically update emdStatus = 'REFUNDED'
    * - If status is APPROVED -> set emdStatus = 'PAID'

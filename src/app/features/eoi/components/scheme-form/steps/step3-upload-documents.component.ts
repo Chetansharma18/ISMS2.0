@@ -13,74 +13,68 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <div class="space-y-5 font-sans">
+    <div class="space-y-4 font-sans">
 
-      <!-- Documents section block -->
-      <section class="border border-[#EADCE2] rounded-xl overflow-hidden bg-white shadow-2xs">
-        <div class="bg-[#F8E9EE] px-4 py-3 border-b border-[#EADCE2] flex items-center justify-between gap-2.5">
-          <h2 class="text-sm sm:text-base font-bold text-[#7C0E44] m-0">Supporting Documents</h2>
-          <span class="text-[11.5px] font-medium text-[#625663] shrink-0">
-            {{ state.attachedDocsCount() }} / {{ state.eoiDocuments().length }} uploaded
-          </span>
-        </div>
+      <div class="flex items-center justify-end">
+        <span class="text-xs font-medium text-[#625663]">
+          {{ state.attachedDocsCount() }} / {{ state.eoiDocuments().length }} uploaded
+        </span>
+      </div>
 
-        <div class="p-3 sm:p-4">
-          <app-table
-            [columns]="documentColumns"
-            [data]="state.eoiDocuments()"
-            [customTemplates]="{ name: nameTemplate, comment: commentTemplate, action: actionTemplate }"
-          >
-          </app-table>
-        </div>
+      <app-table
+        [columns]="documentColumns"
+        [data]="state.eoiDocuments()"
+        [customTemplates]="{ name: nameTemplate, comment: commentTemplate, action: actionTemplate }"
+      >
+      </app-table>
 
-        <ng-template #nameTemplate let-doc>
-          <div class="py-1 min-w-0">
-            <div class="text-[12.5px] font-medium text-slate-900 leading-tight">
-              {{ doc.name }}@if (doc.isMandatory) { <span class="text-red-600 font-bold"> *</span> }
-            </div>
-            <div class="text-[11.5px] text-slate-500 mt-0.5">
-              Supported: {{ formatLabel }} &nbsp;|&nbsp; Max size: {{ maxSizeMb }} MB
-            </div>
-            @if (doc.status === 'uploaded' && doc.fileName) {
-              <span class="text-[11.5px] tabular-nums text-emerald-700 font-medium block mt-1 truncate max-w-[320px]" title="{{ doc.fileName }} ({{ doc.fileSize }})">
-                {{ doc.fileName }} ({{ doc.fileSize }})
-              </span>
-            }
-            @if (errors()[doc.id]) {
-              <p class="text-[11.5px] text-red-600 m-0 mt-1" role="alert">{{ errors()[doc.id] }}</p>
-            }
+      <ng-template #nameTemplate let-doc>
+        <div class="py-1 min-w-0">
+          <div class="text-[12.5px] font-medium text-slate-900 leading-tight">
+            {{ doc.name }}@if (doc.isMandatory) { <span class="text-red-600 font-bold"> *</span> }
           </div>
-        </ng-template>
-
-        <ng-template #commentTemplate let-doc>
-          <input
-            appInput
-            size="sm"
-            type="text"
-            maxlength="500"
-            placeholder="Add comment..."
-            [attr.aria-label]="'Comment for ' + doc.name"
-            [ngModel]="doc.comment ?? ''"
-            (ngModelChange)="state.updateDocComment(doc.id, $event)"
-            (blur)="state.updateDocComment(doc.id, doc.comment ?? '', true)"
-            class="w-full"
-          />
-        </ng-template>
-
-        <ng-template #actionTemplate let-doc>
-          <div class="flex items-center justify-center gap-1.5 flex-nowrap whitespace-nowrap">
-            @if (doc.status === 'pending') {
-              <button appButton size="sm" (click)="uploadInput.click()">Upload</button>
-              <input #uploadInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
-            } @else {
-              <button appButton variant="outline" size="sm" (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)">View</button>
-              <button appButton variant="secondary" size="sm" (click)="replaceInput.click()">Replace</button>
-              <input #replaceInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
-              <button appButton variant="danger" size="sm" (click)="onRemove(doc)">Remove</button>
-            }
+          <div class="text-[11.5px] text-slate-500 mt-0.5">
+            Supported: {{ formatLabel }} &nbsp;|&nbsp; Max size: {{ maxSizeMb }} MB
           </div>
-        </ng-template>
-      </section>
+          @if (doc.status === 'uploaded' && doc.fileName) {
+            <span class="text-[11.5px] tabular-nums text-emerald-700 font-medium block mt-1 truncate max-w-[320px]" title="{{ doc.fileName }} ({{ doc.fileSize }})">
+              {{ doc.fileName }} ({{ doc.fileSize }})
+            </span>
+          }
+          @if (errors()[doc.id]) {
+            <p class="text-[11.5px] text-red-600 m-0 mt-1" role="alert">{{ errors()[doc.id] }}</p>
+          }
+        </div>
+      </ng-template>
+
+      <ng-template #commentTemplate let-doc>
+        <input
+          appInput
+          size="sm"
+          type="text"
+          maxlength="500"
+          placeholder="Add comment..."
+          [attr.aria-label]="'Comment for ' + doc.name"
+          [ngModel]="doc.comment ?? ''"
+          (ngModelChange)="state.updateDocComment(doc.id, $event)"
+          (blur)="state.updateDocComment(doc.id, doc.comment ?? '', true)"
+          class="w-full"
+        />
+      </ng-template>
+
+      <ng-template #actionTemplate let-doc>
+        <div class="flex items-center justify-center gap-1.5 flex-nowrap whitespace-nowrap">
+          @if (doc.status === 'pending') {
+            <button appButton size="sm" (click)="uploadInput.click()">Upload</button>
+            <input #uploadInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
+          } @else {
+            <button appButton variant="outline" size="sm" (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)">View</button>
+            <button appButton variant="secondary" size="sm" (click)="replaceInput.click()">Replace</button>
+            <input #replaceInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
+            <button appButton variant="danger" size="sm" (click)="onRemove(doc)">Remove</button>
+          }
+        </div>
+      </ng-template>
 
       <!-- Footer Action Bar -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">

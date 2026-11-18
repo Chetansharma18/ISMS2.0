@@ -281,8 +281,16 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
 
         @if (isDocsOpen()) {
           <div class="p-5 sm:p-6 space-y-4 animate-in fade-in duration-150">
-            <app-table [columns]="documentColumns" [data]="app.uploadedDocuments" [customTemplates]="{ view: viewTemplate }">
+            <app-table [columns]="documentColumns" [data]="app.uploadedDocuments" [customTemplates]="{ comment: commentTemplate, view: viewTemplate }">
             </app-table>
+
+            <ng-template #commentTemplate let-doc>
+              @if (doc.comment) {
+                <span class="text-[12px] text-[#25212A] whitespace-pre-wrap break-words block max-w-[320px]">{{ doc.comment }}</span>
+              } @else {
+                <span class="text-slate-400 text-xs">—</span>
+              }
+            </ng-template>
 
             <ng-template #viewTemplate let-doc>
               <button appButton variant="outline" size="sm" (click)="viewDoc.emit(doc)">View</button>
@@ -332,6 +340,7 @@ export class ScrutinyReviewSectionsComponent {
   protected readonly documentColumns: TableColumn<DossierDocument>[] = [
     { key: '$index', label: '#', type: 'number', align: 'center', width: 'w-10' },
     { key: 'title', label: 'Document' },
+    { key: 'comment', label: 'Applicant Comment', type: 'custom' },
     { key: 'view', label: 'Action', type: 'custom', align: 'center', width: 'w-28' }
   ];
 }

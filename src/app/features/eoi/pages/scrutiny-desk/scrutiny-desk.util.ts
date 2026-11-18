@@ -8,6 +8,7 @@ export interface ActivePreviewDocument {
   fileSize: string;
   category: string;
   refCode: string;
+  comment?: string;
 }
 
 export type GradeLabel = 'Grade A' | 'Grade B' | 'Grade C' | 'Grade D' | 'Grade E';
@@ -71,7 +72,8 @@ export function toActivePreviewDocument(doc: DossierDocument, applicantId: strin
     fileName: buildDocFileName(doc.title),
     fileSize: doc.fileSize,
     category: doc.category,
-    refCode: buildRefCode(applicantId, doc.id)
+    refCode: buildRefCode(applicantId, doc.id),
+    comment: doc.comment
   };
 }
 

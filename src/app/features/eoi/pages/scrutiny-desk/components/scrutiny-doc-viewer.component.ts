@@ -63,6 +63,13 @@ import type { ActivePreviewDocument } from '../scrutiny-desk.util';
                 <span class="text-[11px] tabular-nums text-slate-600">Certificate Reference: {{ doc()?.refCode }}</span>
               </div>
 
+              @if (doc()?.comment) {
+                <div class="p-3 rounded-lg bg-[#FCF8FA] border border-[#EADCE2] text-xs">
+                  <span class="font-bold text-[#7C0E44] uppercase tracking-wider text-[10.5px] block mb-1">Applicant Comment</span>
+                  <p class="m-0 text-[#25212A] whitespace-pre-wrap break-words leading-relaxed">{{ doc()?.comment }}</p>
+                </div>
+              }
+
               <!-- Official Attestation Notice -->
               <div class="text-xs text-slate-700 leading-relaxed font-normal space-y-2">
                 <p>

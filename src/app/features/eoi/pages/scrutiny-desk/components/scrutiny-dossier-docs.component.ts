@@ -47,27 +47,36 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
         @for (doc of applicant()?.uploadedDocuments; track doc.id; let idx = $index) {
           <div
             (click)="viewDocument.emit(doc)"
-            class="p-3.5 rounded-lg border border-slate-200 bg-white hover:border-navy hover:shadow-xs transition-all flex items-center justify-between gap-3 text-xs cursor-pointer group"
+            class="p-3.5 rounded-lg border border-slate-200 bg-white hover:border-navy hover:shadow-xs transition-all flex flex-col justify-between gap-2.5 text-xs cursor-pointer group"
             title="Click to view {{ doc.title }}"
           >
-            <div class="flex items-start gap-3 min-w-0">
-              <!-- Red PDF Icon matching Image 4 -->
-              <div class="w-8 h-8 rounded bg-[#D92D20] flex items-center justify-center text-white text-[10px] font-bold tracking-tight shrink-0 mt-0.5 shadow-2xs group-hover:scale-105 transition-transform">
-                PDF
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-start gap-3 min-w-0">
+                <!-- Red PDF Icon matching Image 4 -->
+                <div class="w-8 h-8 rounded bg-[#D92D20] flex items-center justify-center text-white text-[10px] font-bold tracking-tight shrink-0 mt-0.5 shadow-2xs group-hover:scale-105 transition-transform">
+                  PDF
+                </div>
+
+                <div class="min-w-0">
+                  <span class="font-semibold text-slate-900 group-hover:text-navy transition-colors block text-[13px] leading-snug truncate" [title]="doc.title">
+                    {{ doc.title }}
+                  </span>
+                  <span class="text-[11px] text-slate-500 mt-0.5 block">
+                    PDF ({{ doc.fileSize }}) &bull; <span class="text-emerald-700 font-medium">Verified</span>
+                  </span>
+                </div>
               </div>
 
-              <div class="min-w-0">
-                <span class="font-semibold text-slate-900 group-hover:text-navy transition-colors block text-[13px] leading-snug truncate" [title]="doc.title">
-                  {{ doc.title }}
-                </span>
-                <span class="text-[11px] text-slate-500 mt-0.5 block">
-                  PDF ({{ doc.fileSize }}) &bull; <span class="text-emerald-700 font-medium">Verified</span>
-                </span>
-              </div>
+              <!-- View Document Button -->
+              <button appButton variant="secondary" size="sm" class="shrink-0" (click)="viewDocument.emit(doc); $event.stopPropagation()">View</button>
             </div>
 
-            <!-- View Document Button -->
-            <button appButton variant="secondary" size="sm" class="shrink-0" (click)="viewDocument.emit(doc); $event.stopPropagation()">View</button>
+            @if (doc.comment) {
+              <div class="px-2.5 py-1.5 rounded bg-[#FCF8FA] border border-[#EADCE2] text-[11.5px] text-[#25212A] leading-snug">
+                <span class="font-semibold text-[#7C0E44]">Comment:</span>
+                <span class="ml-1 break-words">{{ doc.comment }}</span>
+              </div>
+            }
           </div>
         }
       </div>

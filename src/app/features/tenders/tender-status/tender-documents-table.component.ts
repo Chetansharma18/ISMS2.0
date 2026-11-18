@@ -20,8 +20,16 @@ import { documentCategoryLabel } from './tender-status.util';
           <app-table
             [columns]="columns"
             [data]="documents()"
-            [customTemplates]="{ action: actionTemplate }"
+            [customTemplates]="{ comment: commentTemplate, action: actionTemplate }"
           />
+
+          <ng-template #commentTemplate let-doc>
+            @if (doc.comment) {
+              <span class="text-[12px] text-[#25212A] whitespace-pre-wrap break-words block max-w-[240px]">{{ doc.comment }}</span>
+            } @else {
+              <span class="text-slate-400 text-xs">—</span>
+            }
+          </ng-template>
 
           <ng-template #actionTemplate let-doc>
             <div class="flex items-center justify-center gap-1.5">
@@ -68,6 +76,7 @@ export class TenderDocumentsTableComponent {
       cellClass: 'tabular-nums text-[11px] text-slate-600',
       format: (_value, doc) => `${doc.fileName} (${doc.fileSize})`
     },
+    { key: 'comment', label: 'Comment', type: 'custom' },
     { key: 'action', label: 'Action', align: 'center', type: 'custom' }
   ];
 }

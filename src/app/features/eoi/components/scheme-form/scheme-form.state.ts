@@ -12,9 +12,10 @@ import {
   Step4BankDetails,
   FileDoc
 } from '../../../registration/models/otr-form.model';
-import { SubmittedTender, createSampleDocs } from '../../../../core/models/tender.model';
+import { SubmittedTender, SubmittedTenderDoc, createSampleDocs } from '../../../../core/models/tender.model';
 import { DataEngineService } from '../../../../core/services/data-engine.service';
 import { EoiDraftService } from '../../../../core/services/eoi-draft.service';
+import { ApplicantResponse, DossierDocument, EoiStateService } from '../../services/eoi-state.service';
 import { EoiDocumentItem, createInitialEoiDocuments } from './scheme-form.model';
 import { SchemeFormReceiptsService, SchemeReceiptData } from './scheme-form-receipts.service';
 import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
@@ -505,10 +506,29 @@ export class SchemeFormState {
   }
 
   private readonly tenderRepo = inject(DataEngineService).for<SubmittedTender>('SUBMITTED_TENDERS');
+  private readonly eoiStateService = inject(EoiStateService);
 
   private recordSubmittedTender(now: Date): void {
     const appRef = this.eoiApplicationId();
     const appliedDateStr = formatDateMedium(now, '-');
+    const sampleDocs = createSampleDocs();
+    const currentDocs = this.eoiDocuments();
+
+    const submittedDocs: SubmittedTenderDoc[] = currentDocs.map((doc, idx) => {
+      const sample = sampleDocs[idx];
+      const category: SubmittedTenderDoc['category'] =
+        doc.category === 'mandatory' ? 'mandatory' : doc.category === 'annexure' ? 'annexure' : 'supporting';
+      return {
+        id: doc.id,
+        name: doc.name,
+        category,
+        fileName: doc.fileName || sample?.fileName || `Document_${doc.id}.pdf`,
+        fileSize: doc.fileSize || sample?.fileSize || '1.2 MB',
+        status: doc.status === 'uploaded' ? 'uploaded' : sample?.status || 'pending',
+        comment: doc.comment?.trim() || undefined
+      };
+    });
+
     const newSubmission: SubmittedTender = {
       id: `t-${Date.now()}`,
       appRef: this.eoiApplicationId(),
@@ -530,13 +550,113 @@ export class SchemeFormState {
       signatoryDetails: this.editableStep3,
       officers: this.editableStep2,
       bankDetails: this.editableStep4,
-      documents: createSampleDocs()
+      documents: submittedDocs
     };
     // Idempotent: only create the submission once per application reference.
     this.tenderRepo
       .getAll()
       .pipe(switchMap(list => (list.some(t => t.appRef === appRef) ? of(null) : this.tenderRepo.create(newSubmission))))
       .subscribe();
+
+    // Also register the submitted application on the Department side (EoiStateService)
+    // so Department officers immediately see all uploaded supporting documents & applicant comments.
+    const dossierDocs: DossierDocument[] = currentDocs
+      .filter(doc => doc.status === 'uploaded' || !!doc.comment?.trim())
+      .map(doc => ({
+        id: `doc-${doc.id}`,
+        title: doc.name,
+        fileSize: doc.fileSize ? `${doc.fileSize}` : '1.2 MB PDF',
+        category:
+          doc.category === 'mandatory' ? 'Statutory' : doc.category === 'annexure' ? 'Annexures' : 'Supporting',
+        verified: doc.status === 'uploaded',
+        comment: doc.comment?.trim() || undefined
+      }));
+
+    const uploadedDocuments: DossierDocument[] =
+      dossierDocs.length > 0
+        ? dossierDocs
+        : submittedDocs.map(doc => ({
+            id: `doc-${doc.id}`,
+            title: doc.name,
+            fileSize: doc.fileSize,
+            category:
+              doc.category === 'mandatory' ? 'Statutory' : doc.category === 'annexure' ? 'Annexures' : 'Supporting',
+            verified: true,
+            comment: doc.comment
+          }));
+
+    const refLower = (this.schemeRefNo() || '').toLowerCase();
+    const nameLower = (this.schemeName() || '').toLowerCase();
+    const schemeId =
+      refLower.includes('samarth') || nameLower.includes('samarth')
+        ? 'SAMARTH-02'
+        : refLower.includes('saksham') || nameLower.includes('saksham')
+          ? 'SAKSHAM-03'
+          : 'MMKVY-01';
+
+    const deptResponse: ApplicantResponse = {
+      id: appRef,
+      anonymousLabel: this.editableStep1.fullName || this.editableStep1.shortName || 'Applicant Organisation',
+      actualLegalName: this.editableStep1.fullName || this.editableStep1.shortName || 'Applicant Organisation',
+      regNumber: this.editableStep1.registrationNumber || appRef,
+      schemeId,
+      schemeName: this.schemeName(),
+      eoiRefNo: this.schemeRefNo(),
+      submissionDate: formatDateTime(now),
+      status: 'UNDER_SCRUTINY',
+      statusDisplay: 'Under Review',
+      emdFee: this.paymentMethod() === 'exemption' ? 0 : this.numericEmdFee(),
+      emdStatus: 'PAID',
+      processingFee: this.numericProcessFee(),
+      processingFeeStatus: 'PAID',
+      organisation: {
+        legalName: this.editableStep1.fullName,
+        tradeName: this.editableStep1.shortName || this.editableStep1.fullName,
+        entityType: this.editableStep1.natureOfEntity || 'Private Limited Company',
+        registrationNumber: this.editableStep1.registrationNumber,
+        dateOfRegistration: this.editableStep1.dateOfRegistration,
+        stateOfRegistration: this.editableStep1.stateOfLegalReg || 'Rajasthan',
+        panNumber: this.editableStep1.companyPan,
+        gstin: this.editableStep1.gstin || 'Not Applicable',
+        turnover: this.editableStep1.turnOver || '₹ 12.50 Cr (Avg. 3 FY)',
+        registeredAddress: this.registeredAddressText,
+        operationalAddress: this.officeAddressText,
+        website: this.editableStep1.website || '',
+        email: this.editableStep1.emailId,
+        contactNumber: this.editableStep1.contactNo
+      },
+      authorizedSignatory: {
+        name: this.editableStep3.name,
+        designation: this.editableStep3.designation,
+        email: this.editableStep3.emailId,
+        contactNumber: this.editableStep3.mobileNo,
+        residenceAddress: this.residenceAddressText,
+        state: this.editableStep3.state || 'Rajasthan',
+        pan: this.editableStep3.pan,
+        aadhaarNo: this.editableStep3.aadhaarNo,
+        typeIdProof: this.editableStep3.identityDocType || 'PAN Card',
+        idNo: this.editableStep3.identityDocNumber || this.editableStep3.pan,
+        bhamashahNo: this.editableStep3.bhamashahNo || 'N/A',
+        voterIdNo: this.editableStep3.voterIdNo || 'N/A',
+        passportNo: this.editableStep3.passportNo || 'N/A',
+        serviceTaxNo: 'N/A'
+      },
+      bankDetails: {
+        bankName: this.editableStep4.bankName,
+        branchName: this.editableStep4.branchName,
+        accountHolderName: this.editableStep4.accountHolderName,
+        accountNumber: this.editableStep4.accountNo,
+        ifscCode: this.editableStep4.ifscCode,
+        accountType: this.editableStep4.accountType || 'Current Account'
+      },
+      trainingCentres: [],
+      financialYears: this.editableStep1.financialYears || [],
+      placementTrackRecord: [],
+      annualActionPlan: [],
+      uploadedDocuments
+    };
+
+    this.eoiStateService.submitApplicantResponse(deptResponse);
   }
 
   goToTenderStatus(): void {

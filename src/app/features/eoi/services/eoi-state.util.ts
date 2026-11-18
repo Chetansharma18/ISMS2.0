@@ -11,14 +11,21 @@ export function mergeStoredResponses(
   initial: ApplicantResponse[],
   stored: ApplicantResponse[]
 ): ApplicantResponse[] {
-  return initial.map(init => {
+  const merged = initial.map(init => {
     const match = stored.find(
       p => matchesApplicationId(p, init.id) || matchesApplicationId(init, p.id)
     );
     if (!match) return init;
+    const uploadedDocuments = match.uploadedDocuments?.length
+      ? match.uploadedDocuments.map(doc => {
+          const seedDoc = init.uploadedDocuments.find(d => d.id === doc.id || d.title === doc.title);
+          return doc.comment === undefined && seedDoc?.comment ? { ...doc, comment: seedDoc.comment } : doc;
+        })
+      : init.uploadedDocuments;
     return {
       ...init,
       ...match,
+      uploadedDocuments,
       activityLog: match.activityLog || init.activityLog,
       annualActionPlan: (match.annualActionPlan && match.annualActionPlan.length > 0) ? match.annualActionPlan : init.annualActionPlan,
       bankDetails: match.bankDetails || init.bankDetails,
@@ -31,6 +38,11 @@ export function mergeStoredResponses(
       } : init.appeal
     };
   });
+
+  const extras = stored.filter(
+    p => !initial.some(init => matchesApplicationId(p, init.id) || matchesApplicationId(init, p.id))
+  );
+  return extras.length > 0 ? [...merged, ...extras] : merged;
 }
 
 /** Seed list with Company 1 set to "Under Review" for presentation: the one application left to review. */

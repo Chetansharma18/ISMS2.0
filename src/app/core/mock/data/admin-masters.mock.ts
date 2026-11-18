@@ -494,14 +494,14 @@ export const MOCK_TWO_STEP_VERIFICATION_ITEMS: TwoStepVerificationItem[] = resol
     sNo: 1,
     id: '2fa-1',
     roleType: 'Super Admin',
-    authTypes: ['OTP', 'Auth App', 'PIN'],
+    authTypes: ['OTP', 'PIN'],
     status: 'Active'
   },
   {
     sNo: 2,
     id: '2fa-2',
     roleType: 'Department Officer',
-    authTypes: ['OTP', 'Auth App'],
+    authTypes: ['OTP'],
     status: 'Active'
   },
   {

@@ -40,7 +40,7 @@ let nextId = 0;
   },
   template: `
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto font-sans print:static print:p-0 print:block print:bg-white"
+      class="fixed inset-0 z-50 flex justify-center p-3 sm:p-4 md:p-6 overflow-y-auto font-sans print:static print:p-0 print:block print:bg-white"
       style="background: rgba(10, 20, 40, 0.5); backdrop-filter: blur(4px);"
       (click)="onBackdrop($event)"
     >

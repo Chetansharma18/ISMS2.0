@@ -22,7 +22,7 @@ import { AuthMethodType, TwoStepVerificationItem, UserRoleMasterItem } from '../
 
 export type { TwoStepVerificationItem, AuthMethodType };
 
-const ALL_AUTH_TYPES: AuthMethodType[] = ['OTP', 'Auth App', 'PIN'];
+const ALL_AUTH_TYPES: AuthMethodType[] = ['OTP', 'PIN'];
 
 interface TwoStepFormData {
   roleType: string;
@@ -86,7 +86,7 @@ interface TwoStepFormData {
       >
       </app-table>
 
-      <!-- Custom Template: Authentication Type (3 Checkboxes: OTP, Auth App, PIN) -->
+      <!-- Custom Template: Authentication Type (2 Checkboxes: OTP, PIN) -->
       <ng-template #authTypeTemplate let-item>
         <div class="flex items-center gap-5 whitespace-nowrap select-none" (click)="$event.stopPropagation()">
           <!-- OTP Tickbox -->
@@ -98,17 +98,6 @@ interface TwoStepFormData {
               class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
             />
             <span [ngClass]="hasAuthType(item, 'OTP') ? 'font-semibold text-primary' : 'text-slate-600'">OTP</span>
-          </label>
-
-          <!-- Auth App Tickbox -->
-          <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-medium text-slate-700 hover:text-primary transition-colors">
-            <input
-              type="checkbox"
-              [checked]="hasAuthType(item, 'Auth App')"
-              (change)="toggleItemAuthType(item, 'Auth App')"
-              class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
-            />
-            <span [ngClass]="hasAuthType(item, 'Auth App') ? 'font-semibold text-primary' : 'text-slate-600'">Auth App</span>
           </label>
 
           <!-- PIN Tickbox -->

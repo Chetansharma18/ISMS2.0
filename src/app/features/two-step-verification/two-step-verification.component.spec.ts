@@ -56,11 +56,10 @@ describe('TwoStepVerificationComponent', () => {
     const item: TwoStepVerificationItem = {
       id: '2fa-1',
       roleType: 'Super Admin',
-      authTypes: ['OTP', 'Auth App']
+      authTypes: ['OTP']
     };
 
     expect(comp.hasAuthType(item, 'OTP')).toBe(true);
-    expect(comp.hasAuthType(item, 'Auth App')).toBe(true);
     expect(comp.hasAuthType(item, 'PIN')).toBe(false);
   });
 
@@ -72,10 +71,10 @@ describe('TwoStepVerificationComponent', () => {
     };
 
     expect(comp.isFormAuthSelected('OTP')).toBe(true);
-    expect(comp.isFormAuthSelected('Auth App')).toBe(false);
+    expect(comp.isFormAuthSelected('PIN')).toBe(false);
 
-    comp.toggleFormAuth('Auth App');
-    expect(comp.formData.authTypes).toContain('Auth App');
+    comp.toggleFormAuth('PIN');
+    expect(comp.formData.authTypes).toContain('PIN');
 
     comp.toggleFormAuth('OTP');
     expect(comp.formData.authTypes).not.toContain('OTP');
@@ -95,7 +94,7 @@ describe('TwoStepVerificationComponent', () => {
   it('filters items by search query matching roleType or authType', () => {
     const { comp } = createComponentFixture();
     comp.items.set([
-      { id: '1', roleType: 'Super Admin', authTypes: ['OTP', 'Auth App', 'PIN'] },
+      { id: '1', roleType: 'Super Admin', authTypes: ['OTP', 'PIN'] },
       { id: '2', roleType: 'Training Partner', authTypes: ['OTP'] }
     ]);
 
@@ -141,13 +140,13 @@ describe('TwoStepVerificationComponent', () => {
     comp.openAddModal();
     comp.formData = {
       roleType: 'Training Partner',
-      authTypes: ['OTP', 'Auth App']
+      authTypes: ['OTP', 'PIN']
     };
 
     comp.submitForm();
     expect(mockRepo.create).toHaveBeenCalledWith({
       roleType: 'Training Partner',
-      authTypes: ['OTP', 'Auth App'],
+      authTypes: ['OTP', 'PIN'],
       status: 'Active'
     });
     expect(comp.showModal()).toBe(false);

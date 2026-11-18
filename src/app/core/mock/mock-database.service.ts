@@ -275,6 +275,22 @@ export class MockDatabaseService {
           });
           this.store.set(key, sanitized);
           this.saveToStorage(key, sanitized);
+        } else if (key === 'TWO_STEP_VERIFICATION') {
+          const hasAuthApp = stored.some((item: any) =>
+            Array.isArray(item?.authTypes) && item.authTypes.includes('Auth App')
+          );
+          if (hasAuthApp) {
+            const sanitized = stored.map((item: any) => ({
+              ...item,
+              authTypes: Array.isArray(item?.authTypes)
+                ? item.authTypes.filter((t: string) => t !== 'Auth App')
+                : []
+            }));
+            this.store.set(key, sanitized);
+            this.saveToStorage(key, sanitized);
+          } else {
+            this.store.set(key, stored);
+          }
         } else {
           this.store.set(key, stored);
         }

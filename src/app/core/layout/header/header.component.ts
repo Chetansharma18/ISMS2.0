@@ -36,16 +36,14 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       role="banner"
     >
       @if (isLandingPage()) {
-        <!-- Landing Page Full-Width Responsive Header Banner -->
-        <div class="w-full bg-white flex justify-center">
-          <a routerLink="/" class="block w-full max-w-360 mx-auto px-2 sm:px-4" aria-label="ISMS 2.0 Home">
-            <img
-              src="/headingimage.png"
-              alt="ISMS 2.0 - Rajasthan Skill and Livelihoods Development Corporation"
-              class="w-full h-auto block object-contain"
-            />
-          </a>
-        </div>
+        <!-- Landing Page Full-Width Responsive Header Banner (Edge-to-Edge) -->
+        <a routerLink="/" class="block w-full" aria-label="ISMS 2.0 Home">
+          <img
+            src="/headingimage.png"
+            alt="ISMS 2.0 - Rajasthan Skill and Livelihoods Development Corporation"
+            class="w-full h-auto block"
+          />
+        </a>
       } @else {
         <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-sans">
           <!-- LEFT SIDE: Mobile Menu Toggle + Emblem + ISMS Logo + Separator + Identity -->

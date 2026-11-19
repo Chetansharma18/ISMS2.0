@@ -56,37 +56,45 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           }
 
           <a routerLink="/" class="flex items-center gap-2 sm:gap-3.5 md:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
-          
-          <!-- Logos Group -->
-          <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            <!-- Government of Rajasthan Emblem -->
-            <img
-              src="/Rajasthan-Sarkar.png"
-              alt="Government of Rajasthan"
-              class="h-7 sm:h-9 lg:h-[38px] w-auto object-contain shrink-0"
-            />
-            <!-- ISMS Logo -->
-            <img
-              src="/rsldc-logo.png"
-              alt="ISMS"
-              class="h-7 sm:h-9 lg:h-[38px] w-auto object-contain shrink-0"
-              onerror="this.src='/Rajasthan-Sarkar.png'"
-            />
-          </div>
+            @if (isLandingPage()) {
+              <!-- Official Landing Header Graphic -->
+              <img
+                src="/headingimage.png"
+                alt="ISMS 2.0 - Rajasthan Skill and Livelihoods Development Corporation"
+                class="h-10 sm:h-12 lg:h-[58px] w-auto object-contain shrink-0"
+              />
+            } @else {
+              <!-- Logos Group -->
+              <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                <!-- Government of Rajasthan Emblem -->
+                <img
+                  src="/Rajasthan-Sarkar.png"
+                  alt="Government of Rajasthan"
+                  class="h-7 sm:h-9 lg:h-[38px] w-auto object-contain shrink-0"
+                />
+                <!-- ISMS Logo -->
+                <img
+                  src="/rsldc-logo.png"
+                  alt="ISMS"
+                  class="h-7 sm:h-9 lg:h-[38px] w-auto object-contain shrink-0"
+                  onerror="this.src='/Rajasthan-Sarkar.png'"
+                />
+              </div>
 
-          <!-- Thin Vertical Separator -->
-          <div class="w-px h-6 sm:h-8 bg-[#EADCE2] shrink-0"></div>
+              <!-- Thin Vertical Separator -->
+              <div class="w-px h-6 sm:h-8 bg-[#EADCE2] shrink-0"></div>
 
-          <!-- System Identity: Name above Subtitle -->
-          <div class="flex flex-col justify-center leading-none">
-            <div class="text-[17px] sm:text-[21px] lg:text-[24px] font-bold text-[#25212A] tracking-tight leading-none">
-              ISMS <span class="text-[#E26D24]">2.0</span>
-            </div>
-            <div class="hidden md:block text-[11px] sm:text-[12px] lg:text-[14px] font-normal text-[#625663] tracking-normal leading-tight mt-1 whitespace-nowrap">
-              Integrated Scheme Management System
-            </div>
-          </div>
-        </a>
+              <!-- System Identity: Name above Subtitle -->
+              <div class="flex flex-col justify-center leading-none">
+                <div class="text-[17px] sm:text-[21px] lg:text-[24px] font-bold text-[#25212A] tracking-tight leading-none">
+                  ISMS <span class="text-[#E26D24]">2.0</span>
+                </div>
+                <div class="hidden md:block text-[11px] sm:text-[12px] lg:text-[14px] font-normal text-[#625663] tracking-normal leading-tight mt-1 whitespace-nowrap">
+                  Integrated Scheme Management System
+                </div>
+              </div>
+            }
+          </a>
         </div>
 
         <!-- RIGHT SIDE: Language Controls + Divider + Notification + Divider + Login / User Pill -->

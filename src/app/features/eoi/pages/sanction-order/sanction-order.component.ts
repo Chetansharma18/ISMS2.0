@@ -258,7 +258,7 @@ export class SanctionOrderComponent implements OnInit {
         district: resp.trainingCentres?.[0]?.district || this.availableDistricts[idx % this.availableDistricts.length],
         sector: resp.placementTrackRecord?.[0]?.sector || this.availableSectors[idx % this.availableSectors.length],
         category: 'A-1 (Skill)',
-        grade: resp.scrutinyDetails?.grade === 'Grade A' ? 'A' : (resp.scrutinyDetails?.grade === 'Grade B' ? 'B' : 'A'),
+        grade: resp.scrutinyDetails?.grade ? resp.scrutinyDetails.grade.replace(/^Grade\s+/i, '') : 'A',
         target: 150
       }));
 

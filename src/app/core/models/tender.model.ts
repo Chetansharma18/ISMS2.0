@@ -12,6 +12,7 @@ export interface SubmittedTenderDoc {
   fileName: string;
   fileSize: string;
   status: 'uploaded' | 'pending';
+  comment?: string;
 }
 
 /** A file shared by the department along with a shortfall notice (office order, format, sample...). */
@@ -26,7 +27,7 @@ export interface ShortfallUpload {
   requiredDoc: string;
   fileName: string;
   fileSize: string;
-  uploadedOn: string;
+  uploadedOn?: string;
 }
 
 /** The applicant's reply to a shortfall notice. */
@@ -66,6 +67,12 @@ export interface TenderAppeal {
   submittedOn: string;
   reply: string;
   files: AppealFile[];
+  status?: 'Pending' | 'Accepted' | 'Rejected';
+  rejectionReason?: string;
+  decidedAt?: string;
+  deptRemarks?: string;
+  responseDeadline?: string;
+  response?: ShortfallResponse;
 }
 
 export interface SubmittedTender {

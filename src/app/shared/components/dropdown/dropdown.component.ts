@@ -59,6 +59,7 @@ let nextDropdownId = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'block relative',
+    '[class.z-40]': 'isOpen()',
     '(keydown)': 'onKeydown($event)',
     '(keyup)': 'onKeyup($event)',
     '(document:click)': 'onOutside($event)',
@@ -112,12 +113,15 @@ let nextDropdownId = 0;
 
     @if (isOpen()) {
       <div
-        class="mt-1 bg-white border border-slate-300 rounded-lg overflow-hidden"
+        class="bg-white border border-slate-300 rounded-lg overflow-hidden"
+        [class.mt-1]="!overlay() || resolvedDirection() === 'down'"
+        [class.mb-1]="overlay() && resolvedDirection() === 'up'"
         [class.shadow-xs]="!overlay()"
         [class.absolute]="overlay()"
         [class.left-0]="overlay()"
         [class.right-0]="overlay()"
-        [class.top-full]="overlay()"
+        [class.top-full]="overlay() && resolvedDirection() === 'down'"
+        [class.bottom-full]="overlay() && resolvedDirection() === 'up'"
         [class.z-50]="overlay()"
         [class.shadow-xl]="overlay()"
       >
@@ -244,9 +248,22 @@ export class DropdownComponent {
   readonly overlay = input(false, { transform: booleanAttribute });
   /** Multi mode: footer with the selected count and a Done button. */
   readonly footer = input(false, { transform: booleanAttribute });
+  /** Opening direction: 'down' (default), 'up' (drop-up), or 'auto' (detects available space in viewport). */
+  readonly direction = input<'down' | 'up' | 'auto'>('auto');
   /** `id` of the trigger, so a <label for="..."> points at it. */
   readonly inputId = input('');
   readonly ariaLabel = input('');
+
+  protected readonly resolvedDirection = computed(() => {
+    const d = this.direction();
+    if (d !== 'auto') return d;
+    if (typeof window === 'undefined') return 'down';
+    const el = this.host.nativeElement;
+    const rect = el.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    return spaceBelow < 280 && spaceAbove > spaceBelow ? 'up' : 'down';
+  });
 
   /** The "Other" row was clicked. */
   readonly other = output<void>();

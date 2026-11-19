@@ -22,29 +22,34 @@ interface Tender {
     <app-modal
       title="Official Tenders & RFP Notices"
       subtitle="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)"
-      widthOverride="max-w-3xl"
+      size="lg"
       (close)="onModalClose()"
     >
-        <div class="space-y-3">
-          <p class="text-[11px] sm:text-xs font-medium text-slate-500 text-right m-0">Total Tenders: <span class="text-slate-900 font-bold">{{ tenders.length }}</span></p>
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+            <span class="text-xs font-semibold text-slate-700">Active Notices</span>
+            <span class="text-xs font-medium text-slate-500">Total Tenders: <strong class="text-slate-900 tabular-nums">{{ tenders.length }}</strong></span>
+          </div>
 
           @for (item of tenders; track item.id) {
-            <div (click)="openLoginPrompt(item)" class="group relative bg-white border border-navy/20 shadow-[0_0_15px_rgba(11,53,88,0.08)] rounded-lg p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 hover:shadow-[0_0_20px_rgba(11,53,88,0.15)] hover:border-navy/40 transition-all cursor-pointer">
-              
+            <div
+              (click)="openLoginPrompt(item)"
+              class="group relative bg-white border border-slate-200/90 shadow-2xs rounded-lg p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3.5 hover:border-navy/40 hover:bg-slate-50/40 transition-all cursor-pointer"
+            >
               @if (item.isNew) {
-                <img src="/new.png" alt="New Tender" class="absolute -top-1.5 -left-1.5 w-8 sm:w-9 h-8 sm:h-9 object-cover z-10 pointer-events-none drop-shadow-xs rounded-tl-lg" />
+                <img src="/new.png" alt="New Tender" class="absolute -top-1 -left-1 w-6 sm:w-7 h-6 sm:h-7 object-cover z-10 pointer-events-none drop-shadow-2xs rounded-tl-lg" />
               }
 
-              <div class="flex-1 min-w-0 pl-1.5 sm:pl-0">
+              <div class="flex-1 min-w-0" [class.pl-2]="item.isNew">
                 <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
                   <span class="text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
                   <span class="text-slate-300">•</span>
-                  <span class="text-[11px] text-slate-500 tabular-nums truncate max-w-[200px] sm:max-w-none">{{ item.id }}</span>
+                  <span class="text-[11px] text-slate-500 tabular-nums truncate max-w-[190px] sm:max-w-none">{{ item.id }}</span>
                   <span class="text-slate-300">•</span>
                   <span class="text-[10px] font-semibold text-brand bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">{{ item.category }}</span>
                 </div>
-                
-                <h4 class="text-xs sm:text-sm font-bold text-slate-800 leading-snug group-hover:text-brand transition-all m-0">
+
+                <h4 class="text-xs sm:text-[13px] font-semibold text-slate-800 leading-snug group-hover:text-brand transition-colors line-clamp-2 m-0">
                   {{ item.title }}
                 </h4>
               </div>
@@ -55,10 +60,8 @@ interface Tender {
                   <span>Login to View</span>
                 </button>
               </div>
-
             </div>
           }
-
         </div>
     </app-modal>
 

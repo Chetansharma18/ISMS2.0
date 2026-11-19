@@ -10,6 +10,7 @@ export interface GradeOption {
   minimum: number;
   maximum: number;
   range: string;
+  schemeName?: string;
 }
 
 /** What the committee member fills in. The grade is only set when approving. */

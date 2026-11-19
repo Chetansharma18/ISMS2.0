@@ -8,6 +8,7 @@ export interface EoiDocumentItem {
   isMandatory: boolean;
   status: 'uploaded' | 'pending';
   category: 'mandatory' | 'annexure' | 'remaining';
+  comment?: string;
 }
 
 /** The 16 proposal documents the applicant has to upload (Step 3). */

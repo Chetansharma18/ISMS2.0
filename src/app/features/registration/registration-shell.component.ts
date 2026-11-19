@@ -35,7 +35,7 @@ export interface StepMeta {
     IconComponent
   ],
   template: `
-    <div class="min-h-screen bg-[#FEFEFD] flex flex-col justify-between selection:bg-navy selection:text-white font-sans" >
+    <div class="min-h-screen bg-white flex flex-col justify-between selection:bg-navy selection:text-white font-sans" >
 
       <!-- ====================================================================
            Main Content Area
@@ -53,13 +53,10 @@ export interface StepMeta {
           </div>
 
           <!-- Title and Subtitle Row -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">
-              Organization Registration Form
+          <div>
+            <h1 class="text-2xl sm:text-[28px] font-bold text-[#172554] tracking-tight m-0">
+              Organization Registration
             </h1>
-            <span class="text-xs text-slate-500 font-medium select-none">
-              Fields marked with <span class="text-rose-500 font-bold">*</span> are mandatory
-            </span>
           </div>
 
           <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
@@ -90,9 +87,9 @@ export interface StepMeta {
                 <!-- Number Badge / Checkmark -->
                 <span
                   class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 transition-colors shadow-2xs"
-                  [style.background-color]="(activeStep() === step.number || isStepCompleted(step.number)) ? '#0B3558' : '#ffffff'"
+                  [style.background-color]="(activeStep() === step.number || isStepCompleted(step.number)) ? 'var(--color-primary, #7C0E44)' : '#ffffff'"
                   [style.color]="(activeStep() === step.number || isStepCompleted(step.number)) ? '#ffffff' : '#64748b'"
-                  [style.border]="(activeStep() === step.number || isStepCompleted(step.number)) ? '2px solid #0B3558' : '2px solid #cbd5e1'"
+                  [style.border]="(activeStep() === step.number || isStepCompleted(step.number)) ? '2px solid var(--color-primary, #7C0E44)' : '2px solid #cbd5e1'"
                 >
                   @if (isStepCompleted(step.number) && activeStep() !== step.number) {
                     <app-icon name="check" [stroke]="3" class="text-white" />
@@ -129,15 +126,14 @@ export interface StepMeta {
         </nav>
 
         <!-- 3. Main Form Card Container -->
-        <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-7 space-y-6">
+        <div class="bg-white rounded-xl border border-[#D6E3F0] shadow-xs p-5 sm:p-7 space-y-6">
 
-          <!-- Step 1 Container: Organization Details -->
           <!-- Step 1 Container: Organization Details -->
           <div [class.hidden]="activeStep() !== 1" class="space-y-6">
             <!-- Step 1 Card Header -->
-            <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3">
+            <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
               <div class="min-w-0">
-                <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0 leading-tight">
+                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
                   Organisation Details
                 </h2>
                 <p class="text-xs text-slate-500 m-0 mt-0.5">
@@ -145,7 +141,7 @@ export interface StepMeta {
                 </p>
               </div>
               <span class="text-xs text-slate-500 font-medium shrink-0">
-                Required fields marked <span class="text-rose-500 font-bold">*</span>
+                Required fields marked <span class="text-[#DC2626] font-bold">*</span>
               </span>
             </div>
             <app-step1-org-details></app-step1-org-details>
@@ -154,9 +150,9 @@ export interface StepMeta {
           <!-- Step 2 Container: Authorized Person Details -->
           <div [class.hidden]="activeStep() !== 2" class="space-y-6">
             <!-- Step 2 Card Header -->
-            <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3">
+            <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
               <div class="min-w-0">
-                <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0 leading-tight">
+                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
                   Authorized Person Details
                 </h2>
                 <p class="text-xs text-slate-500 m-0 mt-0.5">
@@ -164,18 +160,18 @@ export interface StepMeta {
                 </p>
               </div>
               <span class="text-xs text-slate-500 font-medium shrink-0">
-                Required fields marked <span class="text-rose-500 font-bold">*</span>
+                Required fields marked <span class="text-[#DC2626] font-bold">*</span>
               </span>
             </div>
             <app-step3-auth-person></app-step3-auth-person>
           </div>
 
           <!-- Step 3 Container: Organisation Bank Details -->
-          <div [class.hidden]="activeStep() !== 3" class="space-y-4">
+          <div [class.hidden]="activeStep() !== 3" class="space-y-6">
             <!-- Step 3 Card Header -->
-            <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3">
+            <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
               <div class="min-w-0">
-                <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0 leading-tight">
+                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
                   Organisation Bank Details
                 </h2>
                 <p class="text-xs text-slate-500 m-0 mt-0.5">
@@ -183,18 +179,18 @@ export interface StepMeta {
                 </p>
               </div>
               <span class="text-xs text-slate-500 font-medium shrink-0">
-                Required fields marked <span class="text-rose-500 font-bold">*</span>
+                Required fields marked <span class="text-[#DC2626] font-bold">*</span>
               </span>
             </div>
             <app-step4-bank-details></app-step4-bank-details>
           </div>
 
           <!-- Step 4 Container: Preview & Submit -->
-          <div [class.hidden]="activeStep() !== 4" class="space-y-4">
+          <div [class.hidden]="activeStep() !== 4" class="space-y-6">
             <!-- Step 4 Card Header -->
-            <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3">
+            <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
               <div class="min-w-0">
-                <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0 leading-tight">
+                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
                   Review &amp; Submit
                 </h2>
                 <p class="text-xs text-slate-500 m-0 mt-0.5">
@@ -206,7 +202,7 @@ export interface StepMeta {
           </div>
 
           <!-- 4. Form Action Buttons (Per Step Navigation) -->
-          <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="pt-4 border-t border-[#E8EEF5] flex flex-col sm:flex-row items-center justify-between gap-3">
             <!-- Left Side: Previous Button (Steps 2, 3, 4) / Back to Profile (Step 1) -->
             <div>
               @if (activeStep() === 1) {

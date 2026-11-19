@@ -37,9 +37,10 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
           <span
             class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border"
             [ngClass]="{
-              'bg-amber-50 text-amber-800 border-amber-200': applicant()?.status === 'UNDER_SCRUTINY' || applicant()?.status === 'REVERTED',
-              'bg-sky-50 text-navy border-sky-200': applicant()?.status === 'APPROVED',
-              'bg-rose-50 text-rose-800 border-rose-200': applicant()?.status === 'REJECTED'
+              'bg-sky-50 text-sky-800 border-sky-200': applicant()?.appeal?.status === 'Accepted' && !!applicant()?.appeal?.response,
+              'bg-emerald-50 text-emerald-800 border-emerald-200': (applicant()?.appeal?.status === 'Accepted' && !applicant()?.appeal?.response) || applicant()?.status === 'APPROVED',
+              'bg-amber-50 text-amber-800 border-amber-200': (applicant()?.status === 'UNDER_SCRUTINY' || applicant()?.status === 'REVERTED') && applicant()?.appeal?.status !== 'Accepted',
+              'bg-rose-50 text-rose-800 border-rose-200': applicant()?.status === 'REJECTED' || applicant()?.appeal?.status === 'Rejected'
             }"
           >
             {{ statusLabel() }}
@@ -48,15 +49,6 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
 
         <!-- Review actions -->
         <div class="flex items-center gap-2 flex-wrap">
-          <button
-            appButton
-            variant="secondary"
-            size="sm"
-            (click)="revert.emit()"
-            title="Raise a shortfall and return the application to the applicant"
-          >
-            Revert
-          </button>
           <button appButton variant="outline" size="sm" (click)="remarks.emit()" title="Add a remark">Remarks</button>
           <button appButton variant="danger" size="sm" (click)="reject.emit()" title="Reject application">Reject</button>
           <button appButton size="sm" (click)="approve.emit()" title="Approve application">Approve</button>
@@ -93,16 +85,23 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
 })
 export class ScrutinyToolbarComponent {
   readonly applicant = input<ApplicantResponse | undefined>();
-  readonly revert = output<void>();
   readonly remarks = output<void>();
   readonly reject = output<void>();
   readonly approve = output<void>();
 
   protected statusLabel(): string {
-    switch (this.applicant()?.status) {
+    const app = this.applicant();
+    if (app?.appeal) {
+      if (app.appeal.status === 'Pending') return 'Appeal Request';
+      if (app.appeal.status === 'Accepted') {
+        return app.appeal.response ? 'Appeal Response Submitted' : 'Appeal Accepted';
+      }
+      if (app.appeal.status === 'Rejected') return 'Appeal Rejected';
+    }
+    switch (app?.status) {
       case 'APPROVED': return 'Approved';
       case 'REJECTED': return 'Rejected';
-      case 'REVERTED': return 'Shortfall Raised';
+      case 'REVERTED': return 'Appeal Request';
       default: return 'Under Review';
     }
   }

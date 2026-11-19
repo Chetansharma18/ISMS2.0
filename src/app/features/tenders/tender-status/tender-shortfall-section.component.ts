@@ -3,6 +3,7 @@ import { ButtonComponent, TableColumn, TableComponent } from '../../../shared';
 import { ShortfallRequest, ShortfallUpload, SubmittedTender } from '../../../core/models/tender.model';
 import { TenderDocViewRequest } from './tender-doc-card.component';
 import { isShortfallOverdue, openShortfalls, shortfallsOf } from './tender-shortfall.util';
+import { remainingDaysText } from './tender-appeal.util';
 
 /**
  * "Revert Requests" section of the application detail page: every shortfall notice the
@@ -67,9 +68,11 @@ import { isShortfallOverdue, openShortfalls, shortfallsOf } from './tender-short
                     <span class="text-[11px] text-slate-500">{{ notice.raisedOn }} &bull; {{ notice.raisedBy }}</span>
                   </div>
                   <p class="m-0 mt-1 text-slate-700 leading-relaxed whitespace-pre-line">{{ notice.remarks }}</p>
-                  <p class="m-0 mt-1 text-[11px]" [class]="overdue(notice) ? 'text-rose-700 font-semibold' : 'text-slate-500'">
-                    Respond by {{ notice.dueDate }}
-                  </p>
+                  <div class="mt-2 flex items-center gap-2 flex-wrap">
+                    <span class="text-[11.5px]" [class]="overdue(notice) ? 'text-rose-700 font-semibold' : 'text-slate-600 font-medium'">
+                      Respond by <strong>{{ notice.dueDate }}</strong> ({{ remainingDays(notice.dueDate) }})
+                    </span>
+                  </div>
 
                   <div class="mt-2 flex flex-wrap items-center gap-1.5">
                     <span class="text-[11px] font-semibold text-slate-600">Documents required:</span>
@@ -168,5 +171,9 @@ export class TenderShortfallSectionComponent {
 
   protected overdue(notice: ShortfallRequest): boolean {
     return isShortfallOverdue(notice);
+  }
+
+  protected remainingDays(dueDate: string): string {
+    return remainingDaysText(dueDate);
   }
 }

@@ -15,4 +15,8 @@ export interface UserManagementItem {
   email?: string;
   mobileNo?: string;
   schemeStatus: 'Active' | 'Inactive' | 'Blacklisted';
+  blacklistScheme?: string;
+  blacklistDuration?: string;
+  blacklistRemarks?: string;
+  blacklistedAt?: string;
 }

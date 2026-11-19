@@ -22,7 +22,7 @@ import { AuthMethodType, TwoStepVerificationItem, UserRoleMasterItem } from '../
 
 export type { TwoStepVerificationItem, AuthMethodType };
 
-const ALL_AUTH_TYPES: AuthMethodType[] = ['OTP', 'Auth App', 'PIN'];
+const ALL_AUTH_TYPES: AuthMethodType[] = ['OTP', 'PIN'];
 
 interface TwoStepFormData {
   roleType: string;
@@ -86,7 +86,7 @@ interface TwoStepFormData {
       >
       </app-table>
 
-      <!-- Custom Template: Authentication Type (3 Checkboxes: OTP, Auth App, PIN) -->
+      <!-- Custom Template: Authentication Type (2 Checkboxes: OTP, PIN) -->
       <ng-template #authTypeTemplate let-item>
         <div class="flex items-center gap-5 whitespace-nowrap select-none" (click)="$event.stopPropagation()">
           <!-- OTP Tickbox -->
@@ -98,17 +98,6 @@ interface TwoStepFormData {
               class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
             />
             <span [ngClass]="hasAuthType(item, 'OTP') ? 'font-semibold text-primary' : 'text-slate-600'">OTP</span>
-          </label>
-
-          <!-- Auth App Tickbox -->
-          <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-medium text-slate-700 hover:text-primary transition-colors">
-            <input
-              type="checkbox"
-              [checked]="hasAuthType(item, 'Auth App')"
-              (change)="toggleItemAuthType(item, 'Auth App')"
-              class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
-            />
-            <span [ngClass]="hasAuthType(item, 'Auth App') ? 'font-semibold text-primary' : 'text-slate-600'">Auth App</span>
           </label>
 
           <!-- PIN Tickbox -->
@@ -184,7 +173,7 @@ interface TwoStepFormData {
         [closeOnBackdrop]="false"
         [reverseButtons]="true"
         [showAccentBar]="true"
-        accentBarClass="bg-purple-600"
+        accentBarClass="bg-primary"
         primaryLabel="Save"
         secondaryLabel="Cancel"
         maxWidthClass="max-w-[480px]"
@@ -244,7 +233,7 @@ interface TwoStepFormData {
             @if (formData.authTypes.length > 0) {
               <div class="mt-2.5 flex flex-wrap gap-1.5">
                 @for (type of formData.authTypes; track type) {
-                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200 shadow-2xs">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2] shadow-2xs">
                     <span>{{ type }}</span>
                     <button
                       appButton
@@ -274,7 +263,7 @@ interface TwoStepFormData {
         [showCloseButton]="true"
         [closeOnBackdrop]="true"
         [showAccentBar]="true"
-        accentBarClass="bg-sky-600"
+        accentBarClass="bg-primary"
         title="Two Step Verification Details"
         primaryLabel=""
         secondaryLabel="Close"
@@ -293,7 +282,7 @@ interface TwoStepFormData {
               <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Authentication Methods</span>
               <div class="flex flex-wrap gap-2">
                 @for (type of item.authTypes; track type) {
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-purple-100 text-purple-900 border border-purple-200">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
                     {{ type }}
                   </span>
                 }

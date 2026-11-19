@@ -41,11 +41,13 @@ import { IconComponent } from '../../../../shared';
            1. BASIC ORGANISATION DETAILS
            ==================================================================== -->
       <section class="space-y-4">
-        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
-          1. Basic Organisation Details
-        </h3>
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            1. Basic Organisation Details
+          </h3>
+        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
           <!-- 1. Organisation Name * -->
           <div>
             <app-form-input
@@ -124,7 +126,7 @@ import { IconComponent } from '../../../../shared';
             ></app-form-select>
           </div>
 
-          <!-- Conditional GST Fields (When GST Registered is Yes) -->
+          <!-- Conditional GST Fields (When GST Registered is Yes) -> Side-by-side in 2 columns -->
           @if (data().gstRegistered === 'Yes') {
             <div>
               <app-form-input
@@ -152,7 +154,7 @@ import { IconComponent } from '../../../../shared';
             </div>
           }
 
-          <!-- Conditional MSME Fields (When MSME / Udyam Registered is Yes) -->
+          <!-- Conditional MSME Fields (When MSME / Udyam Registered is Yes) -> Side-by-side in 2 columns -->
           @if (data().msmeRegistered === 'Yes') {
             <div>
               <app-form-input
@@ -183,17 +185,20 @@ import { IconComponent } from '../../../../shared';
       </section>
 
       <!-- Divider -->
-      <div class="pt-2 border-t border-slate-100"></div>
+      <div class="border-t border-[#E8EEF5]"></div>
 
       <!-- ====================================================================
            2. REGISTRATION & DOCUMENTS
            ==================================================================== -->
       <section class="space-y-4">
-        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
-          2. Registration &amp; Documents
-        </h3>
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            2. Registration &amp; Documents
+          </h3>
+        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+        <!-- 2-column balanced grid with uploads side-by-side -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
           <!-- 1. Registration Number * -->
           <div>
             <app-form-input
@@ -247,8 +252,8 @@ import { IconComponent } from '../../../../shared';
             ></app-form-input>
           </div>
 
-          <!-- 5. Certificate of Registration / Incorporation * (Full width) -->
-          <div class="col-span-1 md:col-span-2">
+          <!-- 5. Certificate of Registration / Incorporation * (Side-by-side, equal width) -->
+          <div>
             <app-form-file-upload
               label="Certificate of Registration / Incorporation"
               [dropzoneStyle]="true"
@@ -260,8 +265,8 @@ import { IconComponent } from '../../../../shared';
             ></app-form-file-upload>
           </div>
 
-          <!-- 6. Organisation PAN Card * (Full width) -->
-          <div class="col-span-1 md:col-span-2">
+          <!-- 6. Organisation PAN Card * (Side-by-side, equal width) -->
+          <div>
             <app-form-file-upload
               label="Organisation PAN Card"
               [dropzoneStyle]="true"
@@ -276,17 +281,20 @@ import { IconComponent } from '../../../../shared';
       </section>
 
       <!-- Divider -->
-      <div class="pt-2 border-t border-slate-100"></div>
+      <div class="border-t border-[#E8EEF5]"></div>
 
       <!-- ====================================================================
            3. CONTACT INFORMATION
            ==================================================================== -->
       <section class="space-y-4">
-        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
-          3. Contact Information
-        </h3>
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            3. Contact Information
+          </h3>
+        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+        <!-- 2-column balanced grid: Contact No & Email in row 1, Website in col 1 row 2 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
           <!-- 1. Contact Number * (10-digit mobile) -->
           <div>
             <app-form-input
@@ -314,8 +322,8 @@ import { IconComponent } from '../../../../shared';
             ></app-form-input>
           </div>
 
-          <!-- 3. Website (Optional) (Full width) -->
-          <div class="col-span-1 md:col-span-2">
+          <!-- 3. Website (Optional) (Column 1 of row 2, leaving column 2 clean/empty) -->
+          <div>
             <app-form-input
               label="Website (Optional)"
               type="text"
@@ -326,25 +334,30 @@ import { IconComponent } from '../../../../shared';
               [error]="getFieldError('website')"
             ></app-form-input>
           </div>
+
+          <!-- Empty column to balance row 2 without inventing fields -->
+          <div class="hidden md:block"></div>
         </div>
       </section>
 
       <!-- Divider -->
-      <div class="pt-2 border-t border-slate-100"></div>
+      <div class="border-t border-[#E8EEF5]"></div>
 
       <!-- ====================================================================
            4. REGISTERED & OFFICE ADDRESS
            ==================================================================== -->
-      <section class="space-y-4">
-        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
-          4. Registered &amp; Office Address
-        </h3>
+      <section class="space-y-5">
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            4. Registered &amp; Office Address
+          </h3>
+        </div>
 
         <!-- Subsection A: Registered Address -->
         <div class="space-y-3.5">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-700 block">
+          <h4 class="text-[15px] font-semibold text-[#1E3A5F] m-0">
             A. Registered Address
-          </span>
+          </h4>
 
           <!-- 1. Registered Address * (Full width) -->
           <div>
@@ -359,7 +372,7 @@ import { IconComponent } from '../../../../shared';
           </div>
 
           <!-- 2, 3, 4: State / UT *, District *, PIN Code * (3-column layout) -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 sm:gap-y-4.5">
             <div>
               <app-form-select
                 label="State / UT"
@@ -401,18 +414,18 @@ import { IconComponent } from '../../../../shared';
         </div>
 
         <!-- Middle Checkbox: Office Address Same as Registered Address -->
-        <div class="py-2.5 px-3.5 bg-slate-50 border border-slate-200/90 rounded-lg flex items-center justify-between">
-          <label class="inline-flex items-center gap-2.5 text-xs sm:text-[13px] font-semibold text-slate-700 cursor-pointer select-none">
+        <div class="py-3 px-4 bg-slate-50/70 border border-[#D6E3F0] rounded-lg flex items-center justify-between">
+          <label class="inline-flex items-center gap-2.5 text-sm font-medium text-[#334155] cursor-pointer select-none">
             <input
               type="checkbox"
               [ngModel]="data().sameAsRegistered"
               (ngModelChange)="toggleSameAsRegistered($event)"
-              class="w-4 h-4 text-navy border-slate-300 rounded focus:ring-navy accent-navy cursor-pointer"
+              class="w-4.5 h-4.5 text-[#8B104D] border-[#D6E3F0] rounded focus:ring-[#8B104D] accent-[#8B104D] cursor-pointer"
             />
             <span>Office address is the same as registered address</span>
           </label>
           @if (data().sameAsRegistered) {
-            <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+            <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-full">
               Synchronized
             </span>
           }
@@ -421,9 +434,9 @@ import { IconComponent } from '../../../../shared';
         <!-- Subsection B: Office Address (Displayed when unselected) -->
         @if (!data().sameAsRegistered) {
           <div class="space-y-3.5 pt-1">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-700 block">
+            <h4 class="text-[15px] font-semibold text-[#1E3A5F] m-0">
               B. Office Address
-            </span>
+            </h4>
 
             <!-- 1. Office Address * (Full width) -->
             <div>
@@ -438,7 +451,7 @@ import { IconComponent } from '../../../../shared';
             </div>
 
             <!-- 2, 3, 4: State / UT *, District *, PIN Code * (3-column layout) -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 sm:gap-y-4.5">
               <div>
                 <app-form-select
                   label="State / UT"
@@ -482,7 +495,116 @@ import { IconComponent } from '../../../../shared';
       </section>
 
     </div>
-  `
+  `,
+  styles: [`
+    :host {
+      display: block;
+      width: 100%;
+    }
+
+    :host ::ng-deep app-form-input label,
+    :host ::ng-deep app-form-select label,
+    :host ::ng-deep app-form-textarea label,
+    :host ::ng-deep app-form-file-upload label {
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      color: #334155 !important;
+      margin-bottom: 6px !important;
+    }
+
+    :host ::ng-deep app-form-input label .text-rose-600,
+    :host ::ng-deep app-form-select label .text-rose-600,
+    :host ::ng-deep app-form-textarea label .text-rose-600,
+    :host ::ng-deep app-form-file-upload label .text-rose-500 {
+      color: #DC2626 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative {
+      height: 44px !important;
+      min-height: 44px !important;
+      border-radius: 6px !important;
+      border-color: #D6E3F0 !important;
+      background-color: #FFFFFF !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative:hover:not(.cursor-not-allowed) {
+      border-color: #B5CBE0 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative:focus-within {
+      border-color: #477DAF !important;
+      box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-input input {
+      font-size: 14px !important;
+      color: #334155 !important;
+    }
+
+    :host ::ng-deep app-form-input input::placeholder {
+      color: #94A3B8 !important;
+      font-size: 14px !important;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"] {
+      height: 44px !important;
+      min-height: 44px !important;
+      border-radius: 6px !important;
+      border-color: #D6E3F0 !important;
+      background-color: #FFFFFF !important;
+      font-size: 14px !important;
+      color: #334155 !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"]:hover:not(:disabled) {
+      border-color: #B5CBE0 !important;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"]:focus {
+      border-color: #477DAF !important;
+      box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-textarea textarea {
+      min-height: 72px !important;
+      border-radius: 6px !important;
+      border-color: #D6E3F0 !important;
+      background-color: #FFFFFF !important;
+      font-size: 14px !important;
+      color: #334155 !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-textarea textarea:hover:not(:disabled) {
+      border-color: #B5CBE0 !important;
+    }
+
+    :host ::ng-deep app-form-textarea textarea:focus {
+      border-color: #477DAF !important;
+      box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-textarea textarea::placeholder {
+      color: #94A3B8 !important;
+      font-size: 14px !important;
+    }
+
+    :host ::ng-deep app-form-file-upload .rounded-lg.border,
+    :host ::ng-deep app-form-file-upload .rounded-md.border {
+      min-height: 72px !important;
+      border-color: #D6E3F0 !important;
+      border-radius: 6px !important;
+      background-color: #FFFFFF !important;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-file-upload .rounded-lg.border:hover:not(.cursor-not-allowed) {
+      border-color: #B5CBE0 !important;
+      background-color: #F8FAFC !important;
+    }
+  `]
 })
 export class Step1OrgDetailsComponent {
   private otrFormService = inject(OtrFormService);

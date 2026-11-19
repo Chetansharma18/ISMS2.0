@@ -59,16 +59,16 @@ export class ExpressedInterestComponent {
   readonly pageSize = 8;
 
   readonly expressedColumns: TableColumn<TrainingCalendarItem>[] = [
-    { key: '$index',           label: 'S. No.',            type: 'number', align: 'center', width: 'w-12' },
-    { key: 'district',         label: 'District',          cellClass: 'whitespace-nowrap font-normal text-slate-800' },
-    { key: 'sector',           label: 'Sector',            cellClass: 'whitespace-nowrap font-normal text-slate-700' },
-    { key: 'course',           label: 'Course',            cellClass: 'min-w-[200px]', type: 'custom' },
-    { key: 'trainingPartner',  label: 'Training Partner',  cellClass: 'min-w-[180px] font-normal text-slate-800' },
-    { key: 'sdcName',          label: 'SDC Name',          cellClass: 'min-w-[180px] font-normal text-slate-700' },
-    { key: 'batchDate',        label: 'Batch Date',        align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-800' },
-    { key: 'batchTime',        label: 'Batch Time',        align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
-    { key: 'expressedDate',    label: 'Expressed On',      align: 'center', cellClass: 'whitespace-nowrap font-medium text-slate-900' },
-    { key: 'status',           label: 'Status',            align: 'center', type: 'custom', width: 'w-36' }
+    { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
+    { key: 'district', label: 'District', cellClass: 'whitespace-nowrap font-normal text-slate-800' },
+    { key: 'sector', label: 'Sector', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: 'course', label: 'Course', cellClass: 'min-w-[200px]', type: 'custom' },
+    { key: 'trainingPartner', label: 'Training Partner', cellClass: 'min-w-[180px] font-normal text-slate-800' },
+    { key: 'sdcName', label: 'SDC Name', cellClass: 'min-w-[180px] font-normal text-slate-700' },
+    { key: 'batchDate', label: 'Batch Date', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-800' },
+    { key: 'batchTime', label: 'Batch Time', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: 'expressedDate', label: 'Expressed On', align: 'center', cellClass: 'whitespace-nowrap font-medium text-slate-900' },
+    { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[170px]', cellClass: 'whitespace-nowrap text-center min-w-[170px]' }
   ];
 
   readonly filteredExpressed = computed(() => {

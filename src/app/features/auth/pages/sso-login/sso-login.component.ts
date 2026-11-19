@@ -6,6 +6,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService, UserRole, USER_ROLES } from '../../../../core/auth/auth.service';
 import { StorageService } from '../../../../core/services/storage.service';
 import { OtrFormService } from '../../../registration/services/otr-form.service';
+import { AspirantPortalService } from '../../../aspirant/services/aspirant-portal.service';
 import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dept-admin-otp-modal/dept-admin-otp-modal.component';
 import { ButtonComponent, IconComponent, InputDirective } from '../../../../shared';
 
@@ -227,6 +228,7 @@ import { ButtonComponent, IconComponent, InputDirective } from '../../../../shar
 export class SsoLoginComponent {
   private authService = inject(AuthService);
   private otrFormService = inject(OtrFormService);
+  private aspirantPortal = inject(AspirantPortalService);
   private router = inject(Router);
   private storage = inject(StorageService);
 
@@ -274,11 +276,17 @@ export class SsoLoginComponent {
         return;
       }
 
-      // Seed prefilled data for existing_user or clean draft for new_user
+      // Seed prefilled data for existing_user or clean draft for new_user / aspirant
       if (role === 'existing_user') {
         this.otrFormService.loadExistingUserData();
       } else if (role === 'new_user') {
         this.otrFormService.resetToInitialDraft();
+      } else if (role === 'aspirant') {
+        this.aspirantPortal.resetProfile();
+        this.storage.removeItem('isms_aspirant_profile_complete');
+        this.storage.removeItem('isms_aspirant_profile_data');
+        this.storage.removeItem('isms_aspirant_expressed_interests');
+        this.storage.removeSessionItem('isms_aspirant_prompt_dismissed');
       }
 
       // Authenticate user session

@@ -1,5 +1,5 @@
 import type { BatchApprovalStep, BatchRecord } from '../../models/batch.model';
-import { isBatchApproved, isBatchInApproval, isBatchRejected, isBatchReturned } from '../../utils/batch-approval.util';
+import { isBatchApproved, isBatchInApproval, isBatchRejected, isBatchReturned, isBatchWithdrawn } from '../../utils/batch-approval.util';
 
 /** The department can revert, reject or approve a batch only while it waits for a decision. */
 export function canDecideBatch(b: BatchRecord | undefined): boolean {
@@ -8,7 +8,7 @@ export function canDecideBatch(b: BatchRecord | undefined): boolean {
 
 /** What the department decided, for the card shown once the batch is approved, rejected or returned. */
 export interface BatchDecisionRecord {
-  kind: 'APPROVED' | 'REJECTED' | 'RETURNED';
+  kind: 'APPROVED' | 'REJECTED' | 'RETURNED' | 'WITHDRAWN';
   /** ISO date-time; empty when it is not known. */
   at: string;
   /** The remark of the decision. */
@@ -20,6 +20,10 @@ export interface BatchDecisionRecord {
 /** The decision on a batch that is approved, rejected or returned, or null while it is still waiting for one. */
 export function batchDecisionRecordOf(b: BatchRecord): BatchDecisionRecord | null {
   const trail = [...(b.approvalTrail ?? [])].reverse();
+  if (isBatchWithdrawn(b)) {
+    const step = trail.find(s => s.action === 'WITHDRAWN');
+    return { kind: 'WITHDRAWN', at: step?.at ?? '', text: step?.remarks || 'Batch Withdrawn' };
+  }
   if (isBatchRejected(b)) {
     const step = trail.find(s => s.action === 'REJECTED');
     return { kind: 'REJECTED', at: step?.at ?? '', text: b.rejectionReason || step?.remarks || '' };

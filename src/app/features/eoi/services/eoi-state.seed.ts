@@ -121,8 +121,8 @@ export function buildInitialResponses(): ApplicantResponse[] {
       schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
       eoiRefNo: 'RSLDC/EOI/2026/MMKVY-01',
       submissionDate: '08/09/2026 14:30 PM',
-      status: 'UNDER_SCRUTINY',
-      statusDisplay: 'Under Review',
+      status: 'REJECTED',
+      statusDisplay: 'Rejected',
       emdFee: 50000,
       emdStatus: 'PAID',
       processingFee: 2000,
@@ -233,16 +233,21 @@ export function buildInitialResponses(): ApplicantResponse[] {
       ],
 
       uploadedDocuments: [
-        { id: 'doc-1', title: 'Organisation Registration Certificate', fileSize: '1.4 MB PDF', category: 'Statutory', verified: true },
-        { id: 'doc-2', title: 'Organisation PAN Card', fileSize: '850 KB PDF', category: 'Taxation', verified: true },
-        { id: 'doc-3', title: 'GST Registration Certificate', fileSize: '1.1 MB PDF', category: 'Taxation', verified: true },
-        { id: 'doc-4', title: 'Audited Balance Sheet / Turnover Certificate', fileSize: '3.8 MB PDF · CA Certified', category: 'Financial', verified: true },
-        { id: 'doc-5', title: 'Board Resolution / Power of Attorney', fileSize: '2.1 MB PDF', category: 'Legal', verified: true },
+        { id: 'doc-1', title: 'Organisation Registration Certificate', fileSize: '1.4 MB PDF', category: 'Statutory', verified: true, comment: 'MCA certified incorporation certificate with updated registered office address.' },
+        { id: 'doc-2', title: 'Organisation PAN Card', fileSize: '850 KB PDF', category: 'Taxation', verified: true, comment: 'Self-attested copy stamped by authorized signatory.' },
+        { id: 'doc-3', title: 'GST Registration Certificate', fileSize: '1.1 MB PDF', category: 'Taxation', verified: true, comment: 'Active Rajasthan GSTIN certificate valid for FY 2026-27.' },
+        { id: 'doc-4', title: 'Audited Balance Sheet / Turnover Certificate', fileSize: '3.8 MB PDF · CA Certified', category: 'Financial', verified: true, comment: 'Includes last 3 FY audited statements along with CA turnover summary.' },
+        { id: 'doc-5', title: 'Board Resolution / Power of Attorney', fileSize: '2.1 MB PDF', category: 'Legal', verified: true, comment: 'Board resolution authorizing Director for EOI submission & MoU signing.' },
         { id: 'doc-6', title: 'NSDC Partner Certificate', fileSize: '1.9 MB PDF', category: 'Affiliation', verified: true },
-        { id: 'doc-7', title: 'Additional Supporting Document', fileSize: '4.5 MB PDF', category: 'Annexures', verified: true }
+        { id: 'doc-7', title: 'Additional Supporting Document', fileSize: '4.5 MB PDF', category: 'Annexures', verified: true, comment: 'Past RSLDC & PMKVY training center accreditation proofs attached.' }
       ],
 
-      scrutinyDetails: undefined
+      scrutinyDetails: {
+        disqualificationReason: 'Technical qualification criteria not met (CA turnover certificate missing valid UDIN).',
+        remarks: 'Technical qualification criteria not met (CA turnover certificate missing valid UDIN).',
+        scrutinyOfficer: 'Committee Member 1',
+        decisionTimestamp: '08/09/2026 05:30 PM'
+      }
     },
 
     {
@@ -344,12 +349,12 @@ export function buildInitialResponses(): ApplicantResponse[] {
       ],
 
       uploadedDocuments: [
-        { id: 'doc-201', title: 'Organisation Registration Certificate', fileSize: '1.2 MB PDF', category: 'Statutory', verified: true },
+        { id: 'doc-201', title: 'Organisation Registration Certificate', fileSize: '1.2 MB PDF', category: 'Statutory', verified: true, comment: 'Societies Registration Act certificate renewed up to 2029.' },
         { id: 'doc-202', title: 'Organisation PAN Card', fileSize: '650 KB PDF', category: 'Taxation', verified: true },
-        { id: 'doc-203', title: 'GST Registration Certificate', fileSize: '980 KB PDF', category: 'Taxation', verified: true },
-        { id: 'doc-204', title: 'Audited Balance Sheet / Turnover Certificate', fileSize: '2.9 MB PDF · CA Certified', category: 'Financial', verified: true },
+        { id: 'doc-203', title: 'GST Registration Certificate', fileSize: '980 KB PDF', category: 'Taxation', verified: true, comment: 'Regular GST registration active in Jaipur division.' },
+        { id: 'doc-204', title: 'Audited Balance Sheet / Turnover Certificate', fileSize: '2.9 MB PDF · CA Certified', category: 'Financial', verified: true, comment: 'UDIN verified CA turnover certificate for FY 2023-24 to FY 2025-26.' },
         { id: 'doc-205', title: 'Board Resolution / Power of Attorney', fileSize: '1.5 MB PDF', category: 'Legal', verified: true },
-        { id: 'doc-206', title: 'NSDC Partner Certificate', fileSize: '1.4 MB PDF', category: 'Affiliation', verified: true },
+        { id: 'doc-206', title: 'NSDC Partner Certificate', fileSize: '1.4 MB PDF', category: 'Affiliation', verified: true, comment: 'Valid SMART portal TP ID certificate enclosed.' },
         { id: 'doc-207', title: 'Additional Supporting Document', fileSize: '3.1 MB PDF', category: 'Annexures', verified: true }
       ],
 
@@ -600,7 +605,8 @@ export function buildInitialResponses(): ApplicantResponse[] {
       scrutinyDetails: {
         technicalScore: 54,
         grade: 'Grade C',
-        remarks: 'Documentation non-compliance: deficient technical infrastructure and missing verified audit statements for Category I placement requirements.',
+        disqualificationReason: 'Annual turnover criteria not met for last 3 financial years (CA certificate missing valid UDIN).',
+        remarks: 'Annual turnover criteria not met for last 3 financial years (CA certificate missing valid UDIN).',
         scrutinyOfficer: 'Committee Member 1',
         decisionTimestamp: '25/08/2026 14:15 PM'
       }

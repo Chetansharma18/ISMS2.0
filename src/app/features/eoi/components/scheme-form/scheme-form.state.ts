@@ -12,9 +12,10 @@ import {
   Step4BankDetails,
   FileDoc
 } from '../../../registration/models/otr-form.model';
-import { SubmittedTender, createSampleDocs } from '../../../../core/models/tender.model';
+import { SubmittedTender, SubmittedTenderDoc, createSampleDocs } from '../../../../core/models/tender.model';
 import { DataEngineService } from '../../../../core/services/data-engine.service';
 import { EoiDraftService } from '../../../../core/services/eoi-draft.service';
+import { ApplicantResponse, DossierDocument, EoiStateService } from '../../services/eoi-state.service';
 import { EoiDocumentItem, createInitialEoiDocuments } from './scheme-form.model';
 import { SchemeFormReceiptsService, SchemeReceiptData } from './scheme-form-receipts.service';
 import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
@@ -74,18 +75,19 @@ export class SchemeFormState {
   );
 
   readonly wizardSteps: StepperStep[] = [
-    { label: 'Processing Fee' },
     { label: 'Registration Profile' },
     { label: 'Upload Documents' },
     { label: 'Complete Preview' },
+    { label: 'Processing Fee' },
     { label: 'EMD Payment' },
     { label: 'Submission Receipt' }
   ];
 
-  /** Step 1 is done once the fee is paid; the final step is done once reached. */
+  /** Step 4 (Processing Fee) is done once the fee is paid; Step 5 is done once submitted; the final step is done once reached. */
   readonly completedWizardSteps = computed(() => {
     const done: number[] = [];
-    if (this.procFeePaid()) done.push(1);
+    if (this.procFeePaid()) done.push(4);
+    if (this.submitted()) done.push(5);
     if (this.currentStep() === this.wizardSteps.length) done.push(this.wizardSteps.length);
     return done;
   });
@@ -229,7 +231,7 @@ export class SchemeFormState {
       }
     });
 
-    // Keep a draft up to date once the applicant has started (paid the processing fee) and until they submit,
+    // Keep a draft up to date as the applicant fills their application,
     // so the Active Schemes page can flag this application as pending.
     effect(() => {
       const paid = this.procFeePaid();
@@ -237,17 +239,23 @@ export class SchemeFormState {
       const docs = this.eoiDocuments();
       const refNo = this.schemeRefNo();
       const procFeeDate = this.procFeeDate();
-      if (!paid || this.submitted() || step >= this.wizardSteps.length) return;
+      if (this.submitted() || step >= this.wizardSteps.length) return;
       this.draftStore.save({
         refNo,
         schemeName: this.schemeName(),
         queryParams: this.schemeQueryParams,
-        step: Math.max(step, 2),
-        procFeePaid: true,
+        step: Math.max(step, 1),
+        procFeePaid: paid,
         procFeeDate,
         documents: docs
-          .filter(d => d.status === 'uploaded')
-          .map(d => ({ id: d.id, fileName: d.fileName, fileSize: d.fileSize, uploadedDate: d.uploadedDate })),
+          .filter(d => d.status === 'uploaded' || !!d.comment?.trim())
+          .map(d => ({
+            id: d.id,
+            fileName: d.fileName,
+            fileSize: d.fileSize,
+            uploadedDate: d.uploadedDate,
+            comment: d.comment
+          })),
         updatedAt: new Date().toISOString()
       });
     });
@@ -262,15 +270,16 @@ export class SchemeFormState {
     this.eoiDocuments.update(docs =>
       docs.map(doc => {
         const saved = draft.documents.find(d => d.id === doc.id);
-        return saved ? { ...doc, ...saved, status: 'uploaded' as const } : doc;
+        return saved
+          ? { ...doc, ...saved, status: saved.fileName ? ('uploaded' as const) : doc.status }
+          : doc;
       })
     );
-    this.currentStep.set(Math.min(Math.max(draft.step, 2), this.wizardSteps.length - 1));
+    this.currentStep.set(Math.min(Math.max(draft.step, 1), this.wizardSteps.length - 1));
   }
 
   goToStep(step: number): void {
-    // Once the processing fee is paid the applicant moves forward only: Step 1 cannot be reopened.
-    if (step < 2 && this.procFeePaid()) return;
+    if (step < 1 || step > this.wizardSteps.length) return;
     this.currentStep.set(step);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -292,10 +301,10 @@ export class SchemeFormState {
       this.procFeePaid.set(true);
       this.procFeeDate.set(formatDateTime(new Date()));
       this.showProcFeeSuccessModal.set(true);
-      // The success screen cannot be dismissed: it carries the applicant on to Step 2 by itself.
+      // The success screen carries the applicant on to Step 5 (EMD Payment) by itself.
       setTimeout(() => {
         this.showProcFeeSuccessModal.set(false);
-        this.goToStep(2);
+        this.goToStep(5);
       }, PROC_FEE_SUCCESS_REDIRECT_MS);
     }, 600);
   }
@@ -316,10 +325,14 @@ export class SchemeFormState {
     }
   }
 
-  saveAndProceedToStep3(): void {
+  saveAndProceedToDocuments(): void {
     this.saveStep2Changes();
     this.isEditingStep2.set(false);
-    this.goToStep(3);
+    this.goToStep(2);
+  }
+
+  saveAndProceedToStep3(): void {
+    this.saveAndProceedToDocuments();
   }
 
   togglePreviewOtrEdit(): void {
@@ -399,6 +412,13 @@ export class SchemeFormState {
   removeSchemeDoc(doc: EoiDocumentItem): void {
     this.eoiDocuments.update(docs =>
       docs.map(d => (d.id === doc.id ? { ...d, status: 'pending' as const, fileName: '', fileSize: '', uploadedDate: '' } : d))
+    );
+  }
+
+  updateDocComment(docId: number, comment: string, trim = false): void {
+    const nextValue = trim ? comment.trim() : comment;
+    this.eoiDocuments.update(docs =>
+      docs.map(d => (d.id === docId ? { ...d, comment: nextValue || undefined } : d))
     );
   }
 
@@ -486,10 +506,29 @@ export class SchemeFormState {
   }
 
   private readonly tenderRepo = inject(DataEngineService).for<SubmittedTender>('SUBMITTED_TENDERS');
+  private readonly eoiStateService = inject(EoiStateService);
 
   private recordSubmittedTender(now: Date): void {
     const appRef = this.eoiApplicationId();
     const appliedDateStr = formatDateMedium(now, '-');
+    const sampleDocs = createSampleDocs();
+    const currentDocs = this.eoiDocuments();
+
+    const submittedDocs: SubmittedTenderDoc[] = currentDocs.map((doc, idx) => {
+      const sample = sampleDocs[idx];
+      const category: SubmittedTenderDoc['category'] =
+        doc.category === 'mandatory' ? 'mandatory' : doc.category === 'annexure' ? 'annexure' : 'supporting';
+      return {
+        id: doc.id,
+        name: doc.name,
+        category,
+        fileName: doc.fileName || sample?.fileName || `Document_${doc.id}.pdf`,
+        fileSize: doc.fileSize || sample?.fileSize || '1.2 MB',
+        status: doc.status === 'uploaded' ? 'uploaded' : sample?.status || 'pending',
+        comment: doc.comment?.trim() || undefined
+      };
+    });
+
     const newSubmission: SubmittedTender = {
       id: `t-${Date.now()}`,
       appRef: this.eoiApplicationId(),
@@ -511,13 +550,113 @@ export class SchemeFormState {
       signatoryDetails: this.editableStep3,
       officers: this.editableStep2,
       bankDetails: this.editableStep4,
-      documents: createSampleDocs()
+      documents: submittedDocs
     };
     // Idempotent: only create the submission once per application reference.
     this.tenderRepo
       .getAll()
       .pipe(switchMap(list => (list.some(t => t.appRef === appRef) ? of(null) : this.tenderRepo.create(newSubmission))))
       .subscribe();
+
+    // Also register the submitted application on the Department side (EoiStateService)
+    // so Department officers immediately see all uploaded supporting documents & applicant comments.
+    const dossierDocs: DossierDocument[] = currentDocs
+      .filter(doc => doc.status === 'uploaded' || !!doc.comment?.trim())
+      .map(doc => ({
+        id: `doc-${doc.id}`,
+        title: doc.name,
+        fileSize: doc.fileSize ? `${doc.fileSize}` : '1.2 MB PDF',
+        category:
+          doc.category === 'mandatory' ? 'Statutory' : doc.category === 'annexure' ? 'Annexures' : 'Supporting',
+        verified: doc.status === 'uploaded',
+        comment: doc.comment?.trim() || undefined
+      }));
+
+    const uploadedDocuments: DossierDocument[] =
+      dossierDocs.length > 0
+        ? dossierDocs
+        : submittedDocs.map(doc => ({
+            id: `doc-${doc.id}`,
+            title: doc.name,
+            fileSize: doc.fileSize,
+            category:
+              doc.category === 'mandatory' ? 'Statutory' : doc.category === 'annexure' ? 'Annexures' : 'Supporting',
+            verified: true,
+            comment: doc.comment
+          }));
+
+    const refLower = (this.schemeRefNo() || '').toLowerCase();
+    const nameLower = (this.schemeName() || '').toLowerCase();
+    const schemeId =
+      refLower.includes('samarth') || nameLower.includes('samarth')
+        ? 'SAMARTH-02'
+        : refLower.includes('saksham') || nameLower.includes('saksham')
+          ? 'SAKSHAM-03'
+          : 'MMKVY-01';
+
+    const deptResponse: ApplicantResponse = {
+      id: appRef,
+      anonymousLabel: this.editableStep1.fullName || this.editableStep1.shortName || 'Applicant Organisation',
+      actualLegalName: this.editableStep1.fullName || this.editableStep1.shortName || 'Applicant Organisation',
+      regNumber: this.editableStep1.registrationNumber || appRef,
+      schemeId,
+      schemeName: this.schemeName(),
+      eoiRefNo: this.schemeRefNo(),
+      submissionDate: formatDateTime(now),
+      status: 'UNDER_SCRUTINY',
+      statusDisplay: 'Under Review',
+      emdFee: this.paymentMethod() === 'exemption' ? 0 : this.numericEmdFee(),
+      emdStatus: 'PAID',
+      processingFee: this.numericProcessFee(),
+      processingFeeStatus: 'PAID',
+      organisation: {
+        legalName: this.editableStep1.fullName,
+        tradeName: this.editableStep1.shortName || this.editableStep1.fullName,
+        entityType: this.editableStep1.natureOfEntity || 'Private Limited Company',
+        registrationNumber: this.editableStep1.registrationNumber,
+        dateOfRegistration: this.editableStep1.dateOfRegistration,
+        stateOfRegistration: this.editableStep1.stateOfLegalReg || 'Rajasthan',
+        panNumber: this.editableStep1.companyPan,
+        gstin: this.editableStep1.gstin || 'Not Applicable',
+        turnover: this.editableStep1.turnOver || '₹ 12.50 Cr (Avg. 3 FY)',
+        registeredAddress: this.registeredAddressText,
+        operationalAddress: this.officeAddressText,
+        website: this.editableStep1.website || '',
+        email: this.editableStep1.emailId,
+        contactNumber: this.editableStep1.contactNo
+      },
+      authorizedSignatory: {
+        name: this.editableStep3.name,
+        designation: this.editableStep3.designation,
+        email: this.editableStep3.emailId,
+        contactNumber: this.editableStep3.mobileNo,
+        residenceAddress: this.residenceAddressText,
+        state: this.editableStep3.state || 'Rajasthan',
+        pan: this.editableStep3.pan,
+        aadhaarNo: this.editableStep3.aadhaarNo,
+        typeIdProof: this.editableStep3.identityDocType || 'PAN Card',
+        idNo: this.editableStep3.identityDocNumber || this.editableStep3.pan,
+        bhamashahNo: this.editableStep3.bhamashahNo || 'N/A',
+        voterIdNo: this.editableStep3.voterIdNo || 'N/A',
+        passportNo: this.editableStep3.passportNo || 'N/A',
+        serviceTaxNo: 'N/A'
+      },
+      bankDetails: {
+        bankName: this.editableStep4.bankName,
+        branchName: this.editableStep4.branchName,
+        accountHolderName: this.editableStep4.accountHolderName,
+        accountNumber: this.editableStep4.accountNo,
+        ifscCode: this.editableStep4.ifscCode,
+        accountType: this.editableStep4.accountType || 'Current Account'
+      },
+      trainingCentres: [],
+      financialYears: this.editableStep1.financialYears || [],
+      placementTrackRecord: [],
+      annualActionPlan: [],
+      uploadedDocuments
+    };
+
+    this.eoiStateService.submitApplicantResponse(deptResponse);
   }
 
   goToTenderStatus(): void {

@@ -251,10 +251,6 @@ interface TurnoverRow {
                   <span class="text-slate-800">{{ step4().branchName || '-' }}</span>
                 </div>
                 <div>
-                  <span class="text-slate-400 block text-[10.5px]">Account Type</span>
-                  <span class="text-slate-800">{{ step4().accountType || '-' }}</span>
-                </div>
-                <div>
                   <span class="text-slate-400 block text-[10.5px]">Account Holder Name</span>
                   <span class="font-medium text-slate-800">{{ step4().accountHolderName || '-' }}</span>
                 </div>
@@ -265,10 +261,6 @@ interface TurnoverRow {
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">IFSC Code</span>
                   <span class="tabular-nums text-slate-800">{{ step4().ifscCode || '-' }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-400 block text-[10.5px]">Transfer Mode</span>
-                  <span class="text-slate-800">{{ step4().transferMode || '-' }}</span>
                 </div>
                 <div>
                   <span class="text-slate-400 block text-[10.5px]">Cancelled Cheque Doc</span>

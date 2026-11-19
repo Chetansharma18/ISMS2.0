@@ -201,6 +201,8 @@ export class BatchDetailComponent implements OnInit {
     switch (batchDisplayStatus(b)) {
       case 'APPROVED':
         return 'text-emerald-700';
+      case 'WITHDRAWN':
+        return 'text-slate-500';
       case 'REJECTED':
         return 'text-red-600';
       default:

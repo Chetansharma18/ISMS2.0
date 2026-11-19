@@ -43,14 +43,12 @@ describe('AspirantProfileFormComponent', () => {
 
   it('contains all required fields across the 5 sections', () => {
     const totalFields = component.formSections.reduce((acc, sec) => acc + sec.fields.length, 0);
-    expect(totalFields).toBe(28);
+    expect(totalFields).toBe(26);
 
-    // Section 1: 17 fields (with Other IDs and dynamic relationName)
-    expect(component.formSections[0].fields.length).toBe(17);
+    // Section 1: 15 fields (unified ID dropdown and compulsory ID number)
+    expect(component.formSections[0].fields.length).toBe(15);
     const sec1Keys = component.formSections[0].fields.map(f => f.key);
     expect(sec1Keys).toEqual([
-      'aadhaarNo',
-      'janaadhaarId',
       'otherIdType',
       'otherIdNo',
       'aspirantName',
@@ -68,16 +66,27 @@ describe('AspirantProfileFormComponent', () => {
       'interestedSector'
     ]);
 
-    // Other IDs options
+    // Unified ID dropdown options
     const otherIdField = component.formSections[0].fields.find(f => f.key === 'otherIdType');
+    expect(otherIdField?.required).toBe(true);
     expect(otherIdField?.options?.map(o => o.value)).toEqual([
-      'None',
+      'Aadhaar Card',
+      'Jan Aadhaar',
       'PAN Card',
       'Voter ID (EPIC)',
       'Driving License',
       'Passport',
       'Ration Card'
     ]);
+
+    // Compulsory ID number field
+    const otherIdNoField = component.formSections[0].fields.find(f => f.key === 'otherIdNo');
+    expect(otherIdNoField?.required).toBe(true);
+    if (typeof otherIdNoField?.label === 'function') {
+      expect(otherIdNoField.label({ otherIdType: 'Aadhaar Card' } as any)).toBe('Aadhaar No.');
+      expect(otherIdNoField.label({ otherIdType: 'Jan Aadhaar' } as any)).toBe('Jan Aadhaar ID');
+      expect(otherIdNoField.label({ otherIdType: 'PAN Card' } as any)).toBe('PAN Card No.');
+    }
 
     // Relation type excludes Mother
     const relationField = component.formSections[0].fields.find(f => f.key === 'relationType');

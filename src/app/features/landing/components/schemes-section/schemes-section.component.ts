@@ -156,7 +156,7 @@ export class SchemesSectionComponent {
       eligibility: 'Female Candidates (Age 18-45)',
       targetGroup: 'Self-Help Groups & Rural Women',
       status: 'Ongoing',
-      statusColor: 'bg-purple-50 text-purple-800 border border-purple-200',
+      statusColor: 'bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]',
       highlight: 'Micro-entrepreneurship kit & bank linkage'
     }
   ];

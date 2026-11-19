@@ -11,7 +11,8 @@ import {
   buildUserChanges,
   buildNewUser,
   buildBlacklistConfirm,
-  buildStatusConfirm
+  buildStatusConfirm,
+  BLACKLIST_DURATION_OPTIONS
 } from './user-management.util';
 
 function makeUser(overrides: Partial<UserManagementItem> = {}): UserManagementItem {
@@ -102,9 +103,11 @@ describe('user-management.util', () => {
 
   it('confirm builders describe the requested action', () => {
     const tp = makeUser({ userType: 'TP', roleType: 'tp' });
-    const block = buildBlacklistConfirm(tp);
+    const block = buildBlacklistConfirm(tp, { scheme: 'MMKVY', years: '3 Years' });
     expect(block.title).toBe('Mark as Blacklisted');
     expect(block.accentBarClass).toBe('bg-rose-600');
+    expect(block.metadata?.scheme).toBe('MMKVY');
+    expect(block.metadata?.years).toBe('3 Years');
 
     const restore = buildBlacklistConfirm({ ...tp, schemeStatus: 'Blacklisted' });
     expect(restore.title).toBe('Remove from Blacklist');
@@ -112,5 +115,9 @@ describe('user-management.util', () => {
 
     expect(buildStatusConfirm(makeUser()).confirmLabel).toBe('Mark Inactive');
     expect(buildStatusConfirm(tp).confirmLabel).toBe('Mark Blacklisted');
+
+    expect(BLACKLIST_DURATION_OPTIONS).toContain('1 Year');
+    expect(BLACKLIST_DURATION_OPTIONS).toContain('3 Years');
+    expect(BLACKLIST_DURATION_OPTIONS).toContain('Permanent (Indefinite)');
   });
 });

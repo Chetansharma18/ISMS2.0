@@ -496,8 +496,8 @@ interface FormBuilderFormData {
 
                           <!-- Sub-options: Photo Upload -->
                           @if (field.type === 'photo') {
-                            <div class="mt-3 p-3 rounded-md bg-purple-50/50 border border-purple-200/70 space-y-2">
-                              <div class="text-xs font-semibold text-purple-900">Photo Upload Constraints</div>
+                            <div class="mt-3 p-3 rounded-md bg-[#F8EDF1] border border-[#EADCE2] space-y-2">
+                              <div class="text-xs font-semibold text-[#7C0E44]">Photo Upload Constraints</div>
                               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <div>
                                   <label class="block text-[11px] font-semibold text-slate-700 mb-1">Min Photos*</label>
@@ -671,8 +671,8 @@ interface FormBuilderFormData {
 
                       <!-- Conditional: Photo -->
                       @if (field.type === 'photo') {
-                        <div class="mt-3 p-3 rounded-md bg-purple-50/50 border border-purple-200/70 space-y-2">
-                          <div class="text-xs font-semibold text-purple-900">Photo Upload Constraints</div>
+                        <div class="mt-3 p-3 rounded-md bg-[#F8EDF1] border border-[#EADCE2] space-y-2">
+                          <div class="text-xs font-semibold text-[#7C0E44]">Photo Upload Constraints</div>
                           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
                               <label class="block text-[11px] font-semibold text-slate-700 mb-1">Min Photos*</label>
@@ -1150,7 +1150,7 @@ interface FormBuilderFormData {
                     <div class="flex items-start sm:items-center justify-between flex-col sm:flex-row gap-4 pb-4 border-b border-slate-100">
                       <div>
                         <h3 class="text-sm sm:text-base font-bold text-navy tracking-tight m-0">
-                          Mandatory EOI Proposal Documents Checklist (16 Documents)
+                          Mandatory EOI Supporting Documents Checklist (16 Documents)
                         </h3>
                         <p class="text-xs text-slate-500 mt-1 mb-0">
                           Separated into Mandatory Statutory Documents, Official Scheme Annexures, and Supporting Documents.
@@ -1457,77 +1457,6 @@ interface FormBuilderFormData {
                       }
                     </div>
                   </div>
-                </div>
-
-                <!-- 11. EOI DOCUMENTS SECTION (From Image 1 & Image 2) -->
-                <div class="mt-4 pt-3 border-t border-slate-200">
-                  <div class="flex items-center justify-between mb-2">
-                    <div>
-                      <h3 class="text-[#0e2138] font-bold text-xs uppercase tracking-wide m-0">EOI DOCUMENTS</h3>
-                      <p class="text-[11px] text-slate-500 mt-0.5 mb-0">Required documents for proposal upload (Upload PDF, image, or TXT - max 25 MB)</p>
-                    </div>
-                    <button
-                      appButton
-                      size="sm"
-                      iconOnly
-                      type="button"
-                      (click)="addEoiDocumentRow()"
-                      title="Add Document"
-                      aria-label="Add Document"
-                    >
-                      <app-icon name="plus" size="xs" />
-                    </button>
-                  </div>
-
-                  @if (eoiDocumentRows.length === 0) {
-                    <div class="p-4 border border-dashed border-slate-300 rounded-lg text-center text-xs text-slate-500 italic bg-white">
-                      Select a scheme above to automatically load required documents from Doc Master, or click + to add manually.
-                    </div>
-                  } @else {
-                    <div class="space-y-2 mt-2">
-                      @for (row of eoiDocumentRows; track $index; let idx = $index) {
-                        <div class="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-lg">
-                          <span class="text-xs font-semibold text-slate-500 w-5 text-center shrink-0">{{ idx + 1 }}.</span>
-                          <select
-                            appInput
-                            size="sm"
-                            [(ngModel)]="row.docName"
-                            class="flex-1"
-                          >
-                            <option value="">-- Select Document Required --</option>
-                            @for (docOpt of availableEoiDocs; track docOpt) {
-                              <option [value]="docOpt">{{ docOpt }}</option>
-                            }
-                          </select>
-
-                          @if (!row.uploadedFile) {
-                            <button appButton size="sm" type="button" (click)="simulateRowDocUpload(idx)" class="shrink-0">
-                              <app-icon name="upload" size="xs" />
-                              <span>Upload</span>
-                            </button>
-                          } @else {
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-medium">
-                              <span>{{ row.uploadedFile }}</span>
-                              <button appButton variant="ghost" size="sm" type="button" (click)="row.uploadedFile = ''" class="ml-1">✕</button>
-                            </span>
-                          }
-
-                          <button
-                            appButton
-                            variant="danger"
-                            size="sm"
-                            iconOnly
-                            type="button"
-                            (click)="removeEoiDocumentRow(idx)"
-                            title="Delete document"
-                            aria-label="Delete document"
-                          >
-                            <app-icon name="trash" size="xs" />
-                          </button>
-                        </div>
-                      }
-                    </div>
-                  }
                 </div>
               </div>
 
@@ -2877,7 +2806,7 @@ export class DynamicFormBuilderComponent {
       case 'number': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
       case 'datepicker': return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'dropdown': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
-      case 'photo': return 'bg-purple-50 text-purple-700 border-purple-200';
+      case 'photo': return 'bg-[#F8EDF1] text-[#7C0E44] border-[#EADCE2]';
       default: return 'bg-slate-100 text-slate-700 border-slate-200';
     }
   }
@@ -3565,7 +3494,7 @@ export class DynamicFormBuilderComponent {
 
   publishEoi(): void {
     const refNo = this.previewFormValues['eoi-1'] || 'EOI/2026/001';
-    this.notification.success(`EOI "${refNo}" published successfully!`);
+    this.notification.success(`EOI "${refNo}" submitted successfully!`);
     this.closePreviewModal();
   }
 

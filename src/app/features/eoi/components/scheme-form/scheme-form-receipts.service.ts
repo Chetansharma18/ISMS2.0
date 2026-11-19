@@ -131,7 +131,7 @@ export class SchemeFormReceiptsService {
     <tr><td style="font-weight: bold; background: #f8fafc;">Authorized Signatory</td><td>${data.signatory.name} (${data.signatory.designation})</td><td style="font-weight: bold; background: #f8fafc;">Signatory Contact</td><td>${data.signatory.mobileNo} | ${data.signatory.emailId}</td></tr>
   </table>
 
-  <div class="section-title">2. Mandatory Proposal Documents Checklist (16 Documents)</div>
+  <div class="section-title">2. Mandatory Supporting Documents Checklist (16 Documents)</div>
   <table>
     <thead><tr><th style="width: 35px; text-align: center;">#</th><th>Document Name</th><th>Classification</th><th>Attached File</th></tr></thead>
     <tbody>${docRows}</tbody>
@@ -262,7 +262,7 @@ export class SchemeFormReceiptsService {
     <tr><td style="font-weight: bold; background: #f8fafc; padding: 6px 10px; border: 1px solid #cbd5e1;">Authorized Signatory</td><td style="padding: 6px 10px; border: 1px solid #cbd5e1;">${data.signatory.name} (${data.signatory.designation})</td><td style="font-weight: bold; background: #f8fafc; padding: 6px 10px; border: 1px solid #cbd5e1;">Contact / Email</td><td style="padding: 6px 10px; border: 1px solid #cbd5e1;">${data.signatory.mobileNo} | ${data.signatory.emailId}</td></tr>
   </table>
 
-  <div class="section-title">2. Mandatory Proposal Documents Checklist (16 Documents)</div>
+  <div class="section-title">2. Mandatory Supporting Documents Checklist (16 Documents)</div>
   <table>
     <thead><tr><th style="width: 35px; text-align: center;">#</th><th>Document Name</th><th>Category</th><th>Attached File</th></tr></thead>
     <tbody>${docRows}</tbody>

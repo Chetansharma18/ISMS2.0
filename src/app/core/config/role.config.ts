@@ -28,8 +28,8 @@ export const USER_ROLES_CONFIG: RoleConfig[] = [
   {
     role: 'aspirant',
     label: 'Aspirant',
-    badge: 'Aspirant',
-    description: 'Aspirant candidate looking for skill training programs'
+    badge: 'First Time User',
+    description: 'First time candidate looking for skill training programs'
   }
 ];
 

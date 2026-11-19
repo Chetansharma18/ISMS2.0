@@ -35,6 +35,8 @@ export interface AspirantFormData {
   janaadhaarId: string;
   otherIdType?: string;
   otherIdNo?: string;
+  idType?: string;
+  idNumber?: string;
   aadhaarDocUrl?: string;
   aadhaarDocName?: string;
   aadhaarDocSize?: string;

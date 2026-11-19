@@ -61,32 +61,15 @@ export class AspirantProfileFormComponent implements OnInit {
       gridCols: 4,
       fields: [
         {
-          key: 'aadhaarNo',
-          label: 'Aadhaar No.',
-          type: 'text',
-          required: true,
-          maxLength: 12,
-          pattern: '^[0-9]{12}$',
-          patternMessage: 'Aadhaar number must be exactly 12 digits',
-          placeholder: 'Enter 12-digit Aadhaar No.',
-          colSpan: 1
-        },
-        {
-          key: 'janaadhaarId',
-          label: 'Janaadhaar Id',
-          type: 'text',
-          required: true,
-          maxLength: 10,
-          placeholder: 'Enter 10-digit Jan Aadhaar ID',
-          colSpan: 1
-        },
-        {
           key: 'otherIdType',
-          label: 'Other IDs',
+          label: 'Select ID Type',
           type: 'select',
+          required: true,
           colSpan: 1,
+          placeholder: 'Select ID Type',
           options: [
-            { label: 'None', value: 'None' },
+            { label: 'Aadhaar Card', value: 'Aadhaar Card' },
+            { label: 'Jan Aadhaar', value: 'Jan Aadhaar' },
             { label: 'PAN Card', value: 'PAN Card' },
             { label: 'Voter ID (EPIC)', value: 'Voter ID (EPIC)' },
             { label: 'Driving License', value: 'Driving License' },
@@ -97,12 +80,20 @@ export class AspirantProfileFormComponent implements OnInit {
         {
           key: 'otherIdNo',
           label: (m: AspirantFormData) => {
-            const t = (m?.otherIdType || '').trim();
-            if (!t || t === 'None') return 'Other ID Nos.';
-            return t;
+            const t = (m?.otherIdType || 'Aadhaar Card').trim();
+            if (t === 'Aadhaar Card') return 'Aadhaar No.';
+            if (t === 'Jan Aadhaar') return 'Jan Aadhaar ID';
+            if (t === 'PAN Card') return 'PAN Card No.';
+            if (t === 'Voter ID (EPIC)') return 'Voter ID (EPIC) No.';
+            if (t === 'Driving License') return 'Driving License No.';
+            if (t === 'Passport') return 'Passport No.';
+            if (t === 'Ration Card') return 'Ration Card No.';
+            return t ? `${t} No.` : 'ID Number';
           },
           placeholder: (m: AspirantFormData) => {
-            const t = (m?.otherIdType || '').trim();
+            const t = (m?.otherIdType || 'Aadhaar Card').trim();
+            if (t === 'Aadhaar Card') return 'Enter 12-digit Aadhaar No.';
+            if (t === 'Jan Aadhaar') return 'Enter 10-digit Jan Aadhaar ID';
             if (t === 'PAN Card') return 'e.g. ABCDE1234F  (10 chars)';
             if (t.includes('Voter')) return 'e.g. ABC1234567  (10 chars)';
             if (t === 'Driving License') return 'e.g. RJ01 20110012345  (up to 16 chars)';
@@ -112,8 +103,47 @@ export class AspirantProfileFormComponent implements OnInit {
           },
           type: 'text',
           uppercase: true,
+          required: true,
+          requiredMessage: 'Document ID number is compulsory to fill',
+          maxLength: 20,
           colSpan: 1,
-          visible: (m: AspirantFormData) => !!m?.otherIdType && m.otherIdType !== 'None'
+          validator: (value: any, model: AspirantFormData) => {
+            const t = (model?.otherIdType || 'Aadhaar Card').trim();
+            const val = (value || '').toString().trim();
+            if (!val) {
+              return `${t} number is compulsory to fill`;
+            }
+            if (t === 'Aadhaar Card') {
+              if (!/^[0-9]{12}$/.test(val)) {
+                return 'Aadhaar number must be exactly 12 digits';
+              }
+            } else if (t === 'Jan Aadhaar') {
+              if (!/^[0-9]{10}$/.test(val)) {
+                return 'Jan Aadhaar ID must be exactly 10 digits';
+              }
+            } else if (t === 'PAN Card') {
+              if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(val.toUpperCase())) {
+                return 'PAN number must be 10 characters (e.g. ABCDE1234F)';
+              }
+            } else if (t === 'Passport') {
+              if (!/^[A-Z0-9]{7,9}$/i.test(val)) {
+                return 'Passport number must be 7 to 9 alphanumeric characters';
+              }
+            } else if (t.includes('Voter')) {
+              if (val.length < 6 || val.length > 16) {
+                return 'Voter ID must be between 6 and 16 characters';
+              }
+            } else if (t === 'Driving License') {
+              if (val.length < 8 || val.length > 20) {
+                return 'Driving License must be between 8 and 20 characters';
+              }
+            } else if (t === 'Ration Card') {
+              if (val.length < 6 || val.length > 20) {
+                return 'Ration Card number must be between 6 and 20 characters';
+              }
+            }
+            return null;
+          }
         },
         {
           key: 'aspirantName',
@@ -454,8 +484,21 @@ export class AspirantProfileFormComponent implements OnInit {
 
   ngOnInit(): void {
     const existing = this.portalService.profileData();
-    if (existing && existing.aadhaarNo) {
+    if (existing && this.portalService.isProfileComplete()) {
       this.formData = { ...existing };
+      if (!this.formData.otherIdType) {
+        if (this.formData.aadhaarNo) {
+          this.formData.otherIdType = 'Aadhaar Card';
+          this.formData.otherIdNo = this.formData.aadhaarNo;
+        } else if (this.formData.janaadhaarId) {
+          this.formData.otherIdType = 'Jan Aadhaar';
+          this.formData.otherIdNo = this.formData.janaadhaarId;
+        } else {
+          this.formData.otherIdType = 'Aadhaar Card';
+        }
+      }
+    } else {
+      this.formData = createEmptyAspirantFormData();
     }
     if (!this.formData.registrationNo) {
       this.formData.registrationNo = 'ASP/' + new Date().getFullYear() + '/08421';
@@ -466,6 +509,22 @@ export class AspirantProfileFormComponent implements OnInit {
   }
 
   onFieldChange(event: { key: string; value: string; model: object }): void {
+    if (event.key === 'otherIdType') {
+      this.formData.otherIdNo = '';
+      this.formData.aadhaarNo = '';
+      this.formData.janaadhaarId = '';
+      this.formData.idNumber = '';
+      this.formData.idType = event.value;
+    }
+    if (event.key === 'otherIdNo') {
+      const type = this.formData.otherIdType || 'Aadhaar Card';
+      if (type === 'Aadhaar Card') {
+        this.formData.aadhaarNo = event.value;
+      } else if (type === 'Jan Aadhaar') {
+        this.formData.janaadhaarId = event.value;
+      }
+      this.formData.idNumber = event.value;
+    }
     if (event.key === 'dob' && event.value) {
       this.formData.age = calculateAgeFromDob(event.value);
     }
@@ -509,6 +568,17 @@ export class AspirantProfileFormComponent implements OnInit {
       }
       if (data.ruralUrban) {
         data.areaType = data.ruralUrban;
+      }
+
+      // Sync identity fields for backward compatibility
+      const selectedType = data.otherIdType || 'Aadhaar Card';
+      const docNo = data.otherIdNo || '';
+      data.idType = selectedType;
+      data.idNumber = docNo;
+      if (selectedType === 'Aadhaar Card') {
+        data.aadhaarNo = docNo;
+      } else if (selectedType === 'Jan Aadhaar') {
+        data.janaadhaarId = docNo;
       }
 
       this.portalService.saveProfile(data);

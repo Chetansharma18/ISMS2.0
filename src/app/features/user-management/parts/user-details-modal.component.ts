@@ -68,6 +68,26 @@ import { roleTypeLabel } from '../user-management.util';
               {{ u.schemeStatus }}
             </span>
           </div>
+          @if (u.schemeStatus === 'Blacklisted') {
+            @if (u.blacklistScheme) {
+              <div>
+                <span class="text-slate-500 font-medium block text-xs">Blacklist Scheme</span>
+                <span class="font-semibold text-rose-800">{{ u.blacklistScheme }}</span>
+              </div>
+            }
+            @if (u.blacklistDuration) {
+              <div>
+                <span class="text-slate-500 font-medium block text-xs">Blacklist Duration</span>
+                <span class="font-semibold text-rose-800 tabular-nums">{{ u.blacklistDuration }}</span>
+              </div>
+            }
+            @if (u.blacklistRemarks) {
+              <div class="col-span-2">
+                <span class="text-slate-500 font-medium block text-xs">Blacklist Remarks</span>
+                <span class="text-slate-700 italic">{{ u.blacklistRemarks }}</span>
+              </div>
+            }
+          }
         </div>
       }
     </app-action-modal>

@@ -11,21 +11,38 @@ export function mergeStoredResponses(
   initial: ApplicantResponse[],
   stored: ApplicantResponse[]
 ): ApplicantResponse[] {
-  return initial.map(init => {
+  const merged = initial.map(init => {
     const match = stored.find(
-      p => p.id === init.id || p.regNumber === init.regNumber || (p.id === 'APP-004661' && init.id === 'APP-2024-001')
+      p => matchesApplicationId(p, init.id) || matchesApplicationId(init, p.id)
     );
     if (!match) return init;
+    const uploadedDocuments = match.uploadedDocuments?.length
+      ? match.uploadedDocuments.map(doc => {
+          const seedDoc = init.uploadedDocuments.find(d => d.id === doc.id || d.title === doc.title);
+          return doc.comment === undefined && seedDoc?.comment ? { ...doc, comment: seedDoc.comment } : doc;
+        })
+      : init.uploadedDocuments;
     return {
       ...init,
       ...match,
+      uploadedDocuments,
       activityLog: match.activityLog || init.activityLog,
       annualActionPlan: (match.annualActionPlan && match.annualActionPlan.length > 0) ? match.annualActionPlan : init.annualActionPlan,
       bankDetails: match.bankDetails || init.bankDetails,
       organisation: { ...init.organisation, ...match.organisation },
-      authorizedSignatory: { ...init.authorizedSignatory, ...match.authorizedSignatory }
+      authorizedSignatory: { ...init.authorizedSignatory, ...match.authorizedSignatory },
+      appeal: match.appeal ? {
+        ...init.appeal,
+        ...match.appeal,
+        response: match.appeal.response ?? init.appeal?.response
+      } : init.appeal
     };
   });
+
+  const extras = stored.filter(
+    p => !initial.some(init => matchesApplicationId(p, init.id) || matchesApplicationId(init, p.id))
+  );
+  return extras.length > 0 ? [...merged, ...extras] : merged;
 }
 
 /** Seed list with Company 1 set to "Under Review" for presentation: the one application left to review. */
@@ -37,7 +54,8 @@ export function withCompany1UnderScrutiny(initial: ApplicantResponse[]): Applica
         ...resp,
         status: 'UNDER_SCRUTINY' as const,
         statusDisplay: 'Under Review',
-        scrutinyDetails: undefined
+        scrutinyDetails: undefined,
+        appeal: resp.appeal
       };
     }
     return resp;
@@ -93,15 +111,7 @@ export function matchesApplicationId(r: ApplicantResponse, applicationId: string
 
 /** Index of the response a scrutiny decision applies to (narrower alias set than `matchesApplicationId`). */
 export function findDecisionTargetIndex(list: ApplicantResponse[], applicationId: string): number {
-  return list.findIndex(r =>
-    r.id === applicationId ||
-    r.regNumber === applicationId ||
-    (applicationId === 'APP-004661' && r.id === 'APP-2024-001') ||
-    (applicationId === 'APP-004662' && r.id === 'APP-2024-002') ||
-    (applicationId === 'APP-004663' && r.id === 'APP-2024-003') ||
-    (applicationId === 'APP-004664' && r.id === 'APP-2024-004') ||
-    (applicationId === 'APP-2024-001' && r.id === 'APP-004661')
-  );
+  return list.findIndex(r => matchesApplicationId(r, applicationId));
 }
 
 /**
@@ -132,15 +142,19 @@ export function applyScrutinyDecision(
     statusDisplay: statusDisplay,
     emdStatus: updatedEmdStatus,
     activityLog: decision.activityLog ?? target.activityLog,
+    appeal: decision.appeal !== undefined ? decision.appeal : target.appeal,
+    uploadedDocuments: decision.uploadedDocuments ?? target.uploadedDocuments,
     scrutinyDetails: {
-      technicalScore: Math.min(100, Math.max(0, decision.technicalScore ?? 0)),
-      grade: decision.grade,
-      remarks: decision.remarks,
-      disqualificationReason: decision.disqualificationReason,
-      approvalDocument: decision.approvalDocument,
+      technicalScore: Math.min(100, Math.max(0, decision.technicalScore ?? target.scrutinyDetails?.technicalScore ?? 0)),
+      grade: decision.grade ?? target.scrutinyDetails?.grade,
+      remarks: decision.remarks ?? target.scrutinyDetails?.remarks,
+      disqualificationReason: decision.disqualificationReason !== undefined
+        ? decision.disqualificationReason
+        : target.scrutinyDetails?.disqualificationReason,
+      approvalDocument: decision.approvalDocument ?? target.scrutinyDetails?.approvalDocument,
       shortfall: decision.shortfall ?? target.scrutinyDetails?.shortfall,
       remarksHistory: decision.remarksHistory ?? target.scrutinyDetails?.remarksHistory,
-      scrutinyOfficer: decision.scrutinyOfficer || 'Committee Member 1',
+      scrutinyOfficer: decision.scrutinyOfficer || target.scrutinyDetails?.scrutinyOfficer || 'Committee Member 1',
       decisionTimestamp: `${formatDate(now)} ${formatTime(now)}`
     }
   };

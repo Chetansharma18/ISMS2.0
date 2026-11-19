@@ -17,7 +17,7 @@ import { SchemeFormState } from '../scheme-form.state';
 
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center gap-2.5">
-          <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">1</span>
+          <span class="w-5 h-5 rounded-full bg-[#7C0E44] text-white flex items-center justify-center text-xs font-bold shrink-0">1</span>
           <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Fee Details</h2>
         </div>
 
@@ -32,7 +32,7 @@ import { SchemeFormState } from '../scheme-form.state';
             <span class="font-semibold text-emerald-700 text-[12.5px] block mt-1">Refundable</span>
           </div>
 
-          <div class="p-4 rounded-xl bg-sky-50/60 border border-sky-200">
+          <div class="p-4 rounded-xl bg-[#FCF8FA] border border-[#EADCE2]">
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Amount Payable</span>
             @if (claimExemption()) {
               <span class="text-xl font-extrabold text-navy block mt-1">&#8377;0</span>
@@ -67,7 +67,7 @@ import { SchemeFormState } from '../scheme-form.state';
       <!-- Footer Action Bar -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
         <button appButton variant="outline" size="lg" (click)="state.goToStep(4)">
-          &larr; Back
+          &larr; Back to Processing Fee
         </button>
 
         <button

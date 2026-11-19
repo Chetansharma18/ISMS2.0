@@ -383,12 +383,6 @@ export class OtrValidationService {
     if (!step4.branchName?.trim()) {
       errors.push('Branch Name is mandatory.');
     }
-    if (!step4.transferMode?.trim()) {
-      errors.push('Mode of Transfer selection is mandatory.');
-    }
-    if (!step4.accountType?.trim()) {
-      errors.push('Type of Account selection is mandatory.');
-    }
     if (!step4.accountHolderName?.trim()) {
       errors.push('Account Holder Name is mandatory.');
     }
@@ -404,9 +398,6 @@ export class OtrValidationService {
     }
     if (step4.micrCode?.trim() && !REGEX.MICR.test(step4.micrCode)) {
       errors.push('Invalid MICR Code (Must be exactly 9 numeric digits).');
-    }
-    if (!step4.branchAddress?.trim()) {
-      errors.push('Branch Full Postal Address is mandatory.');
     }
     if (!step4.cancelledChequeDoc || step4.cancelledChequeDoc.status !== 'uploaded') {
       errors.push('Upload of Cancelled Cheque or First Page of Bank Passbook is mandatory.');

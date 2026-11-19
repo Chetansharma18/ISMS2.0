@@ -29,7 +29,7 @@ import { BackdropComponent } from './shared/components/backdrop/backdrop.compone
     BackdropComponent
   ],
   template: `
-    <div class="h-screen overflow-hidden flex flex-col text-slate-900 antialiased relative" style="background-color: #FEFEFD;">
+    <div class="h-screen overflow-hidden flex flex-col text-slate-900 antialiased relative" style="background-color: #FFFFFF;">
       <!-- Global toast notifications (NotificationService) -->
       <app-toast-outlet></app-toast-outlet>
 
@@ -86,16 +86,16 @@ import { BackdropComponent } from './shared/components/backdrop/backdrop.compone
             </div>
           }
 
-          <main class="flex-1 min-w-0 overflow-y-auto flex flex-col" style="background-color: #FEFEFD;">
+          <main class="flex-1 min-w-0 overflow-y-auto flex flex-col" style="background-color: #FFFFFF;">
             <router-outlet></router-outlet>
           </main>
         </div>
       } @else {
         <main 
           class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col relative" 
-          [style.background-color]="isLandingRoute() ? '#070e18' : '#FEFEFD'"
+          [style.background-color]="isLandingRoute() ? '#070e18' : '#FFFFFF'"
         >
-          <div class="w-full flex-1 flex flex-col bg-[#FEFEFD]">
+          <div class="w-full flex-1 flex flex-col bg-white">
             <router-outlet></router-outlet>
           </div>
           <!-- Main Portal Footer (Displayed on landing page) -->

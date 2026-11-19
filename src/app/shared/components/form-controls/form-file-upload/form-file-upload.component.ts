@@ -13,14 +13,14 @@ import { IconComponent } from '../../icon/icon.component';
     <div class="w-full flex flex-col font-sans">
       <!-- Label -->
       <div class="flex items-center justify-between mb-1.5">
-        <label class="text-xs sm:text-[13px] font-semibold text-slate-700 select-none">
+        <label class="text-xs sm:text-[13px] font-semibold text-[#25212A] select-none">
           {{ label }}
           @if (required) {
             <span class="text-rose-500 font-bold ml-0.5">*</span>
           }
         </label>
         @if (hint) {
-          <span class="text-[11px] text-slate-400 font-normal">{{ hint }}</span>
+          <span class="text-[11px] text-[#89818A] font-normal">{{ hint }}</span>
         }
       </div>
 
@@ -41,22 +41,22 @@ import { IconComponent } from '../../icon/icon.component';
             (click)="triggerFileSelect(fileInput)"
             [class.opacity-50]="disabled"
             [class.cursor-not-allowed]="disabled"
-            class="w-full flex items-center justify-between p-3 sm:p-3.5 rounded-lg border border-slate-200/90 bg-white hover:bg-slate-50 transition-colors cursor-pointer shadow-2xs group"
+            class="w-full flex items-center justify-between p-3 sm:p-3.5 rounded-lg border border-[#EADCE2] bg-white hover:bg-[#FCF8FA] transition-colors cursor-pointer shadow-2xs group"
           >
             <div class="flex items-center gap-3 min-w-0">
-              <div class="w-8.5 h-8.5 rounded-md bg-slate-100 flex items-center justify-center text-slate-600 group-hover:text-navy group-hover:bg-sky-50 transition-colors shrink-0">
+              <div class="w-8.5 h-8.5 rounded-md bg-[#FCF8FA] flex items-center justify-center text-[#625663] group-hover:text-[#7C0E44] group-hover:bg-[#F8EDF1] transition-colors shrink-0">
                 <app-icon name="document" size="sm" [stroke]="2" />
               </div>
               <div class="min-w-0 text-left">
-                <span class="block text-xs sm:text-[13px] font-semibold text-slate-800 group-hover:text-navy truncate">
+                <span class="block text-xs sm:text-[13px] font-semibold text-[#25212A] group-hover:text-[#7C0E44] truncate">
                   {{ uploadPrompt || ('Upload ' + (label || 'document')) }}
                 </span>
-                <span class="block text-[11px] text-slate-500 font-normal mt-0.5">
+                <span class="block text-[11px] text-[#625663] font-normal mt-0.5">
                   PDF, JPG, PNG &bull; Max {{ maxSizeMb }} MB
                 </span>
               </div>
             </div>
-            <app-icon name="upload" size="sm" [stroke]="2" class="text-slate-400 group-hover:text-navy shrink-0" />
+            <app-icon name="upload" size="sm" [stroke]="2" class="text-slate-400 group-hover:text-[#7C0E44] shrink-0" />
           </div>
         } @else {
           <div class="flex items-center gap-2.5 flex-wrap">
@@ -64,12 +64,12 @@ import { IconComponent } from '../../icon/icon.component';
               type="button"
               (click)="triggerFileSelect(fileInput)"
               [disabled]="disabled"
-              class="px-3 py-1.5 rounded border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-2xs shrink-0 flex items-center gap-1.5"
+              class="px-3 py-1.5 rounded border border-[#EADCE2] bg-white hover:bg-[#FCF8FA] text-xs font-semibold text-[#25212A] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-2xs shrink-0 flex items-center gap-1.5"
             >
               <app-icon name="upload" size="sm" [stroke]="2" class="text-slate-600" />
               <span>Upload Document</span>
             </button>
-            <span class="text-[11px] text-slate-500 truncate">
+            <span class="text-[11px] text-[#625663] truncate">
               (PDF, JPG, PNG &bull; Max {{ maxSizeMb }}MB)
             </span>
           </div>
@@ -78,18 +78,18 @@ import { IconComponent } from '../../icon/icon.component';
 
       <!-- 2. UPLOADED STATE: Document Name, Size, View & Change Actions -->
       @if (fileDoc && fileDoc.status === 'uploaded') {
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-xs shadow-2xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 px-3 py-2 bg-[#FCF8FA] border border-[#EADCE2] rounded-md text-xs shadow-2xs">
           <!-- File info: Icon, Name and Size Badge -->
           <div class="flex items-center gap-2.5 min-w-0 flex-1">
             <!-- Authentic Adobe PDF Icon -->
             <app-icon name="pdf-badge" solid size="auto" class="w-4.5 h-4.5 text-[#E5252A] select-none" />
 
             <div class="flex items-center gap-2 min-w-0 flex-wrap">
-              <span class="font-medium text-slate-800 truncate max-w-[180px] sm:max-w-xs" [title]="fileDoc.fileName">
+              <span class="font-medium text-[#25212A] truncate max-w-[180px] sm:max-w-xs" [title]="fileDoc.fileName">
                 {{ fileDoc.fileName }}
               </span>
               <!-- Prominent Size Badge -->
-              <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-white border border-slate-200 text-slate-700 shadow-2xs shrink-0">
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-white border border-[#EADCE2] text-[#25212A] shadow-2xs shrink-0">
                 {{ fileDoc.fileSize }}
               </span>
             </div>
@@ -101,36 +101,36 @@ import { IconComponent } from '../../icon/icon.component';
             <button
               type="button"
               (click)="openPreview()"
-              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-ocean hover:text-ocean-dark bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded transition-colors cursor-pointer"
+              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#7C0E44] hover:text-[#5E0832] bg-[#F8EDF1] hover:bg-[#F2DACE] border border-[#EADCE2] rounded transition-colors cursor-pointer"
               title="Open {{ fileDoc.fileName }} in new tab"
             >
               <app-icon name="external-link" size="sm" [stroke]="2" />
               <span>View</span>
             </button>
 
-            <!-- Change Option -->
-            <button
-              type="button"
-              (click)="triggerFileSelect(fileInput)"
-              [disabled]="disabled"
-              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer disabled:opacity-50"
-              title="Change/Replace Document"
-            >
-              <app-icon name="refresh" size="sm" [stroke]="2" />
-              <span>Change</span>
-            </button>
+            @if (!disabled) {
+              <!-- Change Option -->
+              <button
+                type="button"
+                (click)="triggerFileSelect(fileInput)"
+                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
+                title="Change/Replace Document"
+              >
+                <app-icon name="refresh" size="sm" [stroke]="2" />
+                <span>Change</span>
+              </button>
 
-            <!-- Remove Option -->
-            <button
-              type="button"
-              (click)="removeFile(fileInput)"
-              [disabled]="disabled"
-              class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer disabled:opacity-50"
-              title="Remove File"
-            >
-              <app-icon name="trash" size="sm" [stroke]="2" />
-              <span>Remove</span>
-            </button>
+              <!-- Remove Option -->
+              <button
+                type="button"
+                (click)="removeFile(fileInput)"
+                class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                title="Remove File"
+              >
+                <app-icon name="trash" size="sm" [stroke]="2" />
+                <span>Remove</span>
+              </button>
+            }
           </div>
         </div>
       }

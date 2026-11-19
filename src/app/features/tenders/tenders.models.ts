@@ -12,6 +12,7 @@ export interface SchemeTender {
   schemeCategory: string;
   datePublished: string;
   closingDate: string;
+  eoiDuration?: string;
   eoiCategory: string;
   eoiDescription: string;
   category?: string;
@@ -64,6 +65,8 @@ export interface EoiDocumentUpload {
   file?: File;
 }
 
+export type EoiDurationUnit = 'Years';
+
 /** Form model used by the "Configure New EOI / Edit EOI" modal. */
 export interface EoiFormData {
   refNo: string;
@@ -71,6 +74,8 @@ export interface EoiFormData {
   schemeCategory: string;
   publishedDate: string;
   submissionDate: string;
+  eoiDurationValue: string;
+  eoiDurationUnit: EoiDurationUnit;
   eoiCategory: string;
   description: string;
   emdFee: string;

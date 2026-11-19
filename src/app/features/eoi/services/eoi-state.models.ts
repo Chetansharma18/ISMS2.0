@@ -31,6 +31,7 @@ export interface DossierDocument {
   category: string;
   previewUrl?: string;
   verified: boolean;
+  comment?: string;
 }
 
 /** Result of an earlier EOI the same organisation was empanelled under, measured against its target. */
@@ -44,6 +45,20 @@ export interface PastEngagement {
   certified: number;
   placed: number;
   status: 'Completed' | 'Ongoing';
+}
+
+export interface ApplicantAppeal {
+  submittedOn: string;
+  reply: string;
+  files: { fileName: string; fileSize: string }[];
+  status: 'Pending' | 'Accepted' | 'Rejected';
+  decisionRemarks?: string;
+  decidedAt?: string;
+  response?: {
+    respondedOn: string;
+    remarks?: string;
+    uploads: { requiredDoc: string; fileName: string; fileSize: string }[];
+  };
 }
 
 export interface ApplicantResponse {
@@ -154,6 +169,9 @@ export interface ApplicantResponse {
       priority?: 'Normal' | 'Urgent';
     }[];
   };
+
+  // Appeal request submitted by applicant against rejection
+  appeal?: ApplicantAppeal;
 
   // Full timeline audit trail of application lifecycle events & transactions
   activityLog?: ApplicationActivityLog[];
@@ -320,4 +338,6 @@ export interface ScrutinyDecisionInput {
     priority?: 'Normal' | 'Urgent';
   }[];
   activityLog?: ApplicationActivityLog[];
+  appeal?: ApplicantAppeal;
+  uploadedDocuments?: DossierDocument[];
 }

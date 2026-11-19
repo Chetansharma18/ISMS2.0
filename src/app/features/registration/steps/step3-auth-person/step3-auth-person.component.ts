@@ -90,12 +90,14 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
            1. PERSONAL INFORMATION
            ==================================================================== -->
       <section class="space-y-4">
-        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
-          1. Personal Information
-        </h3>
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            1. Personal Information
+          </h3>
+        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-          <!-- Row 1: First Name * (50%) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+          <!-- 1. First Name * (Col 1) -->
           <div>
             <app-form-input
               label="First Name"
@@ -108,7 +110,7 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
             ></app-form-input>
           </div>
 
-          <!-- Row 1: Last Name (50%) -->
+          <!-- 2. Last Name (Col 2) -->
           <div>
             <app-form-input
               label="Last Name"
@@ -121,8 +123,8 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
             ></app-form-input>
           </div>
 
-          <!-- Row 2: Designation (Full width or Col 1) -->
-          <div class="col-span-1 md:col-span-2">
+          <!-- 3. Designation (Col 3) -->
+          <div>
             <app-form-select
               label="Designation"
               [value]="data().designation"
@@ -137,88 +139,90 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
       </section>
 
       <!-- Divider -->
-      <div class="pt-2 border-t border-slate-100"></div>
+      <div class="pt-2 border-t border-[#E8EEF5]"></div>
 
       <!-- ====================================================================
            2. CONTACT INFORMATION
            ==================================================================== -->
       <section class="space-y-4">
-        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
-          2. Contact Information
-        </h3>
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            2. Contact Information
+          </h3>
+        </div>
 
-        <div class="space-y-4">
-          <!-- Row 1: Mobile Number * (50%) & Email Address * (50%) -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-            <div>
-              <app-form-input
-                label="Mobile Number"
-                type="tel"
-                [value]="data().mobileNo"
-                (valueChange)="update('mobileNo', $event)"
-                placeholder="10-digit mobile number"
-                [required]="true"
-                [maxLength]="10"
-                [error]="getFieldError('mobileNo')"
-              ></app-form-input>
-            </div>
-
-            <div>
-              <app-form-input
-                label="Email Address"
-                type="email"
-                [value]="data().emailId"
-                (valueChange)="update('emailId', $event)"
-                placeholder="Enter email address"
-                [required]="true"
-                [error]="getFieldError('emailId')"
-              ></app-form-input>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+          <!-- Row 1: Mobile Number * (Col 1) -->
+          <div>
+            <app-form-input
+              label="Mobile Number"
+              type="tel"
+              [value]="data().mobileNo"
+              (valueChange)="update('mobileNo', $event)"
+              placeholder="10-digit mobile number"
+              [required]="true"
+              [maxLength]="10"
+              [error]="getFieldError('mobileNo')"
+            ></app-form-input>
           </div>
 
-          <!-- Row 2: State (smaller column) & Residential Address (remaining width) -->
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5">
-            <div class="md:col-span-4">
-              <app-form-select
-                label="State"
-                [value]="data().state"
-                (valueChange)="update('state', $event)"
-                [options]="states"
-                placeholder="Select state"
-                [required]="false"
-                [error]="getFieldError('state')"
-              ></app-form-select>
-            </div>
+          <!-- Row 1: Email Address * (Col 2) -->
+          <div>
+            <app-form-input
+              label="Email Address"
+              type="email"
+              [value]="data().emailId"
+              (valueChange)="update('emailId', $event)"
+              placeholder="Enter email address"
+              [required]="true"
+              [error]="getFieldError('emailId')"
+            ></app-form-input>
+          </div>
 
-            <div class="md:col-span-8">
-              <app-form-textarea
-                label="Residential Address"
-                [value]="data().residenceAddress"
-                (valueChange)="update('residenceAddress', $event)"
-                placeholder="Enter house/flat no., street, locality, city, PIN code"
-                [rows]="1"
-                [maxLength]="500"
-                [required]="false"
-                [error]="getFieldError('residenceAddress')"
-              ></app-form-textarea>
-            </div>
+          <!-- Row 1: State (Col 3) -->
+          <div>
+            <app-form-select
+              label="State"
+              [value]="data().state"
+              (valueChange)="update('state', $event)"
+              [options]="states"
+              placeholder="Select state"
+              [required]="false"
+              [error]="getFieldError('state')"
+            ></app-form-select>
+          </div>
+
+          <!-- Row 2: Residential Address (Spans across all 3 cols on desktop) -->
+          <div class="col-span-1 md:col-span-3">
+            <app-form-textarea
+              label="Residential Address"
+              [value]="data().residenceAddress"
+              (valueChange)="update('residenceAddress', $event)"
+              placeholder="Enter house/flat no., street, locality, city, PIN code"
+              [rows]="1"
+              [maxLength]="500"
+              [required]="false"
+              [error]="getFieldError('residenceAddress')"
+            ></app-form-textarea>
           </div>
         </div>
       </section>
 
       <!-- Divider -->
-      <div class="pt-2 border-t border-slate-100"></div>
+      <div class="pt-2 border-t border-[#E8EEF5]"></div>
 
       <!-- ====================================================================
            3. IDENTITY VERIFICATION
            ==================================================================== -->
       <section class="space-y-4">
-        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
-          3. Identity Verification
-        </h3>
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            3. Identity Verification
+          </h3>
+        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-          <!-- A. Identity Document Type * -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+          <!-- A. Identity Document Type * (Col 1) -->
           <div>
             <app-form-select
               label="Identity Document Type"
@@ -231,7 +235,7 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
             ></app-form-select>
           </div>
 
-          <!-- B. Corresponding Document Number * -->
+          <!-- B. Corresponding Document Number * (Col 2) -->
           <div>
             <app-form-input
               [label]="currentDocConfig().label"
@@ -247,8 +251,8 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
             ></app-form-input>
           </div>
 
-          <!-- C. Upload Identity Document * (Full width) -->
-          <div class="col-span-1 md:col-span-2">
+          <!-- C. Upload Identity Document * (Col 1 of row 2, side-by-side balanced) -->
+          <div class="col-span-1">
             <app-form-file-upload
               label="Upload Identity Document"
               [dropzoneStyle]="true"
@@ -264,31 +268,144 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
       </section>
 
       <!-- Divider -->
-      <div class="pt-2 border-t border-slate-100"></div>
+      <div class="pt-2 border-t border-[#E8EEF5]"></div>
 
       <!-- ====================================================================
            4. AUTHORIZATION DOCUMENTS
            ==================================================================== -->
       <section class="space-y-4">
-        <h3 class="text-sm sm:text-base font-bold text-slate-900 tracking-tight m-0">
-          4. Authorization Documents
-        </h3>
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            4. Authorization Documents
+          </h3>
+        </div>
 
-        <div>
-          <app-form-file-upload
-            label="Authorization Letter / Board Resolution"
-            [dropzoneStyle]="true"
-            uploadPrompt="Upload Authorization Letter / Board Resolution"
-            [fileDoc]="data().authorizationLetterDoc"
-            (fileChange)="updateFileDoc('authorizationLetterDoc', $event)"
-            [required]="true"
-            [error]="getFieldError('authorizationLetterDoc')"
-          ></app-form-file-upload>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+          <div class="col-span-1">
+            <app-form-file-upload
+              label="Authorization Letter / Board Resolution"
+              [dropzoneStyle]="true"
+              uploadPrompt="Upload Authorization Letter / Board Resolution"
+              [fileDoc]="data().authorizationLetterDoc"
+              (fileChange)="updateFileDoc('authorizationLetterDoc', $event)"
+              [required]="true"
+              [error]="getFieldError('authorizationLetterDoc')"
+            ></app-form-file-upload>
+          </div>
         </div>
       </section>
 
     </div>
-  `
+  `,
+  styles: [`
+    :host {
+      display: block;
+      width: 100%;
+    }
+
+    :host ::ng-deep app-form-input label,
+    :host ::ng-deep app-form-select label,
+    :host ::ng-deep app-form-textarea label,
+    :host ::ng-deep app-form-file-upload label {
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      color: #334155 !important;
+      margin-bottom: 6px !important;
+    }
+
+    :host ::ng-deep app-form-input label .text-rose-600,
+    :host ::ng-deep app-form-select label .text-rose-600,
+    :host ::ng-deep app-form-textarea label .text-rose-600,
+    :host ::ng-deep app-form-file-upload label .text-rose-500 {
+      color: #DC2626 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative {
+      height: 44px !important;
+      min-height: 44px !important;
+      border-radius: 6px !important;
+      border-color: #D6E3F0 !important;
+      background-color: #FFFFFF !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative:hover:not(.cursor-not-allowed) {
+      border-color: #B5CBE0 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative:focus-within {
+      border-color: #477DAF !important;
+      box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-input input {
+      font-size: 14px !important;
+      color: #334155 !important;
+    }
+
+    :host ::ng-deep app-form-input input::placeholder {
+      color: #94A3B8 !important;
+      font-size: 14px !important;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"] {
+      height: 44px !important;
+      min-height: 44px !important;
+      border-radius: 6px !important;
+      border-color: #D6E3F0 !important;
+      background-color: #FFFFFF !important;
+      font-size: 14px !important;
+      color: #334155 !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"]:hover:not(:disabled) {
+      border-color: #B5CBE0 !important;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"]:focus {
+      border-color: #477DAF !important;
+      box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-textarea textarea {
+      min-height: 72px !important;
+      border-radius: 6px !important;
+      border-color: #D6E3F0 !important;
+      background-color: #FFFFFF !important;
+      font-size: 14px !important;
+      color: #334155 !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-textarea textarea:hover:not(:disabled) {
+      border-color: #B5CBE0 !important;
+    }
+
+    :host ::ng-deep app-form-textarea textarea:focus {
+      border-color: #477DAF !important;
+      box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-textarea textarea::placeholder {
+      color: #94A3B8 !important;
+      font-size: 14px !important;
+    }
+
+    :host ::ng-deep app-form-file-upload .rounded-lg.border,
+    :host ::ng-deep app-form-file-upload .rounded-md.border {
+      min-height: 72px !important;
+      border-color: #D6E3F0 !important;
+      border-radius: 6px !important;
+      background-color: #FFFFFF !important;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-file-upload .rounded-lg.border:hover:not(.cursor-not-allowed) {
+      border-color: #B5CBE0 !important;
+      background-color: #F8FAFC !important;
+    }
+  `]
 })
 export class Step3AuthPersonComponent {
   private otrFormService = inject(OtrFormService);

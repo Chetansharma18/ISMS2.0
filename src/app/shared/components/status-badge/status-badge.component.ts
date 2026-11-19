@@ -22,16 +22,20 @@ export class StatusBadgeComponent {
   get variantClasses(): string {
     switch (this.variant) {
       case 'success':
-        return 'bg-primary-light text-brand border border-theme';
-      case 'warning':
-        return 'bg-[#FFFBEB] text-[#92400E] border border-[#FDE68A]';
+        return 'bg-[#E4F4E8] text-[#18733B] border border-[#C3E8CC]';
       case 'danger':
-        return 'bg-[#FEF2F2] text-[#991B1B] border border-[#FECACA]';
+        return 'bg-[#FCE8E8] text-[#C62828] border border-[#F9C5C5]';
       case 'info':
-        return 'bg-primary-light text-brand border border-theme';
+        return 'bg-[#E8F0FE] text-[#2459B3] border border-[#C5D9F8]';
+      case 'submitted':
+        return 'bg-[#FFF2D9] text-[#996000] border border-[#FFE1A8]';
+      case 'warning':
+        return 'bg-[#FFF0E5] text-[#B85B18] border border-[#FFD8BD]';
+      case 'returned':
+        return 'bg-[#F2EAF8] text-[#75409A] border border-[#E3CEF0]';
       case 'neutral':
       default:
-        return 'bg-surface-muted text-[#5F6B76] border border-border';
+        return 'bg-[#F8F9FA] text-[#5F6B76] border border-[#EADCE2]';
     }
   }
 }

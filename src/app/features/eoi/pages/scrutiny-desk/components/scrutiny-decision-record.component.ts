@@ -14,7 +14,8 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
       <section
         class="bg-white rounded-xl border shadow-2xs p-5 sm:p-6 space-y-3"
         [ngClass]="{
-          'border-amber-300': applicant()?.status === 'REVERTED',
+          'border-emerald-300': applicant()?.appeal?.status === 'Accepted' || (applicant()?.status === 'REVERTED' && !!applicant()?.appeal),
+          'border-amber-300': applicant()?.status === 'REVERTED' && !applicant()?.appeal,
           'border-rose-300': applicant()?.status === 'REJECTED',
           'border-slate-200/90': applicant()?.status === 'APPROVED'
         }"
@@ -22,10 +23,20 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
       >
         <div class="flex items-center justify-between gap-3 flex-wrap">
           <h2 id="decision-heading" class="text-base sm:text-lg font-bold text-slate-900 m-0">
-            @switch (applicant()?.status) {
-              @case ('REVERTED') { Shortfall Raised }
-              @case ('REJECTED') { Rejected }
-              @default { Approved }
+            @if (applicant()?.appeal) {
+              @if (applicant()?.appeal?.status === 'Accepted') {
+                Appeal Accepted
+              } @else if (applicant()?.appeal?.status === 'Rejected') {
+                Appeal Rejected
+              } @else {
+                Appeal Request
+              }
+            } @else {
+              @switch (applicant()?.status) {
+                @case ('REVERTED') { Appeal Accepted }
+                @case ('REJECTED') { Rejected }
+                @default { Approved }
+              }
             }
           </h2>
           <span class="text-xs text-slate-500">{{ details.decisionTimestamp }}</span>

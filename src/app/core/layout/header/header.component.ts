@@ -39,11 +39,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
     >
       @if (isLandingPage()) {
         <!-- Landing Page Full-Width Responsive Header Banner (Edge-to-Edge in Code) -->
-        <a
-          routerLink="/"
-          class="block w-full no-underline cursor-pointer bg-[#FDF8F2] relative overflow-hidden select-none group"
-          aria-label="ISMS 2.0 - Rajasthan Skill and Livelihoods Development Corporation"
-        >
+        <div class="block w-full bg-[#FDF8F2] relative overflow-hidden select-none">
           <!-- Subtle Heritage Palace Watermark for Mobile (< md) -->
           <div class="md:hidden absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden" aria-hidden="true">
             <img
@@ -57,7 +53,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           <div class="w-full max-w-[1920px] mx-auto px-3 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-1.5 sm:py-2 md:py-2.5 lg:py-3 flex items-center justify-between gap-2 sm:gap-4 lg:gap-6 relative z-10">
 
             <!-- 1. LEFT SECTION: State Emblem + Department & Government Identity -->
-            <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 shrink-0">
+            <a routerLink="/" class="flex items-center gap-2 sm:gap-3 lg:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
               <!-- State Emblem of India (Ashok Stambh) -->
               <img
                 src="/emblem-ashok-stambh.png"
@@ -75,39 +71,60 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                   Government of Rajasthan
                 </span>
               </div>
-            </div>
+            </a>
 
             <!-- 2. LEFT VERTICAL DIVIDER -->
             <div class="hidden md:block w-[1.5px] lg:w-[2px] h-8 md:h-9 lg:h-10 xl:h-12 bg-[#8C1B3F] shrink-0 mx-1 lg:mx-3 xl:mx-4 opacity-80" aria-hidden="true"></div>
 
             <!-- 3. CENTER SECTION: Authentic Rajasthan Heritage Architecture Illustration -->
-            <div class="hidden md:flex flex-1 items-center justify-center px-1 lg:px-4 min-w-0 overflow-hidden" aria-hidden="true">
+            <a routerLink="/" class="hidden md:flex flex-1 items-center justify-center px-1 lg:px-4 min-w-0 overflow-hidden no-underline cursor-pointer" aria-hidden="true" tabindex="-1">
               <img
                 src="/rajasthan-heritage-palace.png"
                 alt=""
-                class="h-10 sm:h-12 md:h-15 lg:h-19 xl:h-[84px] w-auto max-w-full object-contain pointer-events-none select-none transition-transform duration-300 group-hover:scale-[1.01]"
+                class="h-10 sm:h-12 md:h-15 lg:h-19 xl:h-[84px] w-auto max-w-full object-contain pointer-events-none select-none transition-transform duration-300 hover:scale-[1.01]"
               />
-            </div>
+            </a>
 
             <!-- 4. RIGHT VERTICAL DIVIDER -->
             <div class="hidden md:block w-[1.5px] lg:w-[2px] h-8 md:h-9 lg:h-10 xl:h-12 bg-[#8C1B3F] shrink-0 mx-1 lg:mx-3 xl:mx-4 opacity-80" aria-hidden="true"></div>
 
-            <!-- 5. RIGHT SECTION: ISMS 2.0 Branding & Subtitle -->
-            <div class="flex flex-col items-end justify-center shrink-0 text-right">
-              <!-- Top Row: ISMS + 2.0 Badge -->
-              <div class="flex items-center gap-1 sm:gap-1.5 lg:gap-2 leading-none">
-                <span class="text-[#9C214A] font-black text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-[36px] tracking-tight">
-                  ISMS
-                </span>
-                <span class="bg-[#881C43] text-white font-black text-xs sm:text-base md:text-lg lg:text-xl xl:text-[25px] px-1.5 sm:px-2 lg:px-2.5 py-0.5 sm:py-0.5 lg:py-0.5 rounded-sm sm:rounded-md lg:rounded-md shadow-xs leading-none">
-                  2.0
-                </span>
-              </div>
+            <!-- 5. RIGHT SECTION: ISMS 2.0 Branding & SSO Login Button -->
+            <div class="flex items-center gap-2 sm:gap-3.5 lg:gap-4.5 shrink-0">
+              
+              <!-- Branding: ISMS 2.0 & Subtitle -->
+              <a routerLink="/" class="flex flex-col items-end justify-center text-right no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
+                <!-- Top Row: ISMS + 2.0 Badge -->
+                <div class="flex items-center gap-1 sm:gap-1.5 lg:gap-2 leading-none">
+                  <span class="text-[#9C214A] font-black text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-[36px] tracking-tight">
+                    ISMS
+                  </span>
+                  <span class="bg-[#881C43] text-white font-black text-xs sm:text-base md:text-lg lg:text-xl xl:text-[25px] px-1.5 sm:px-2 lg:px-2.5 py-0.5 sm:py-0.5 lg:py-0.5 rounded-sm sm:rounded-md lg:rounded-md shadow-xs leading-none">
+                    2.0
+                  </span>
+                </div>
 
-              <!-- Subtitle: Integrated Scheme Management System -->
-              <div class="text-[#133553] font-bold text-[8.5px] sm:text-[9.5px] md:text-[10.5px] lg:text-[12px] xl:text-[13.5px] tracking-tight sm:tracking-normal mt-0.5 sm:mt-1 lg:mt-1 whitespace-nowrap">
-                Integrated Scheme Management System
-              </div>
+                <!-- Subtitle: Integrated Scheme Management System -->
+                <div class="text-[#133553] font-bold text-[8.5px] sm:text-[9.5px] md:text-[10.5px] lg:text-[12px] xl:text-[13.5px] tracking-tight sm:tracking-normal mt-0.5 sm:mt-1 lg:mt-1 whitespace-nowrap">
+                  Integrated Scheme Management System
+                </div>
+              </a>
+
+              <!-- Divider between ISMS & SSO Login -->
+              <div class="hidden sm:block w-[1.5px] h-7 sm:h-8 lg:h-9 bg-[#8C1B3F]/25 shrink-0" aria-hidden="true"></div>
+
+              <!-- Premium SSO Login Button -->
+              <button
+                appButton
+                size="sm"
+                type="button"
+                (click)="onLoginClick()"
+                class="header-sso-btn"
+                aria-label="SSO Login"
+              >
+                <app-icon name="user" size="sm" />
+                <span class="whitespace-nowrap">SSO Login</span>
+                <app-icon name="forward" size="sm" />
+              </button>
 
             </div>
 
@@ -120,7 +137,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
             <div class="w-[20%] bg-[#276CA1]"></div>
             <div class="w-[29%] bg-[#47CA6E]"></div>
           </div>
-        </a>
+        </div>
       } @else {
         <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-sans">
           <!-- LEFT SIDE: Mobile Menu Toggle + Emblem + ISMS Logo + Separator + Identity -->
@@ -368,6 +385,25 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
     :host {
       display: block;
       width: 100%;
+    }
+
+    .header-sso-btn {
+      background: linear-gradient(135deg, #7C0E44 0%, #5E0832 100%) !important;
+      color: #FFFFFF !important;
+      border: 1px solid rgba(255, 255, 255, 0.25) !important;
+      box-shadow: 0 2px 8px rgba(124, 14, 68, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.025em;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .header-sso-btn:hover {
+      background: linear-gradient(135deg, #680E30 0%, #4D0822 100%) !important;
+      box-shadow: 0 4px 14px rgba(124, 14, 68, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+      transform: translateY(-1px);
+    }
+    .header-sso-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 4px rgba(124, 14, 68, 0.2) !important;
     }
   `]
 })

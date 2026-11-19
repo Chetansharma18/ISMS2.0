@@ -110,8 +110,6 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                 Integrated Scheme Management System
               </div>
 
-              <!-- Blue Underline Accent Bar -->
-              <div class="w-full h-[1.5px] sm:h-[2px] lg:h-[2.5px] bg-[#276CA1] mt-0.5 sm:mt-1 lg:mt-1.5 rounded-full" aria-hidden="true"></div>
             </div>
 
           </div>

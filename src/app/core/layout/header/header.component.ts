@@ -30,19 +30,99 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
   },
   template: `
     <header
-      class="w-full bg-white border-b border-[#EADCE2] box-border relative z-50 select-none"
+      class="w-full bg-white box-border relative z-50 select-none"
+      [class.border-b]="!isLandingPage()"
+      [class.border-[#EADCE2]]="!isLandingPage()"
       [class.sticky]="isSticky"
       [class.top-0]="isSticky"
       role="banner"
     >
       @if (isLandingPage()) {
-        <!-- Landing Page Full-Width Responsive Header Banner (Edge-to-Edge) -->
-        <a routerLink="/" class="block w-full" aria-label="ISMS 2.0 Home">
-          <img
-            src="/headingimage.png"
-            alt="ISMS 2.0 - Rajasthan Skill and Livelihoods Development Corporation"
-            class="w-full h-[65px] sm:h-[85px] md:h-[110px] lg:h-[135px] xl:h-[155px] object-fill block"
-          />
+        <!-- Landing Page Full-Width Responsive Header Banner (Edge-to-Edge in Code) -->
+        <a
+          routerLink="/"
+          class="block w-full no-underline cursor-pointer bg-[#FDF8F2] relative overflow-hidden select-none group"
+          aria-label="ISMS 2.0 - Rajasthan Skill and Livelihoods Development Corporation"
+        >
+          <!-- Subtle Heritage Palace Watermark for Mobile (< md) -->
+          <div class="md:hidden absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden" aria-hidden="true">
+            <img
+              src="/rajasthan-heritage-palace.png"
+              alt=""
+              class="h-16 w-auto object-contain select-none"
+            />
+          </div>
+
+          <!-- Main Responsive Banner Container -->
+          <div class="w-full max-w-[1920px] mx-auto px-3 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-2.5 sm:py-3.5 lg:py-4 flex items-center justify-between gap-2 sm:gap-4 lg:gap-6 relative z-10">
+
+            <!-- 1. LEFT SECTION: State Emblem + Department & Government Identity -->
+            <div class="flex items-center gap-2 sm:gap-3.5 lg:gap-4.5 shrink-0">
+              <!-- State Emblem of India (Ashok Stambh) -->
+              <img
+                src="/emblem-ashok-stambh.png"
+                alt="Emblem of India"
+                class="h-11 sm:h-14 md:h-16 lg:h-18 xl:h-[76px] w-auto object-contain shrink-0"
+              />
+
+              <!-- Text Hierarchy -->
+              <div class="flex flex-col justify-center leading-none">
+                <span class="text-[#062442] font-black text-[11px] sm:text-[13px] md:text-[15px] lg:text-[18px] xl:text-[20px] leading-[1.18] tracking-tight">
+                  Rajasthan Skill and<br class="hidden sm:inline" />
+                  Livelihoods Development<br class="hidden sm:inline" />
+                  Corporation
+                </span>
+                <span class="text-[#062442] font-bold text-[9px] sm:text-[11px] md:text-[12px] lg:text-[14px] xl:text-[15px] leading-tight tracking-normal mt-0.5 sm:mt-1 lg:mt-1.5">
+                  Government of Rajasthan
+                </span>
+              </div>
+            </div>
+
+            <!-- 2. LEFT VERTICAL DIVIDER -->
+            <div class="hidden md:block w-[1.5px] lg:w-[2px] h-10 md:h-12 lg:h-14 xl:h-16 bg-[#8C1B3F] shrink-0 mx-1 lg:mx-3 xl:mx-4 opacity-80" aria-hidden="true"></div>
+
+            <!-- 3. CENTER SECTION: Authentic Rajasthan Heritage Architecture Illustration -->
+            <div class="hidden md:flex flex-1 items-center justify-center px-1 lg:px-4 min-w-0 overflow-hidden" aria-hidden="true">
+              <img
+                src="/rajasthan-heritage-palace.png"
+                alt=""
+                class="h-12 sm:h-16 md:h-20 lg:h-24 xl:h-[105px] w-auto max-w-full object-contain pointer-events-none select-none transition-transform duration-300 group-hover:scale-[1.01]"
+              />
+            </div>
+
+            <!-- 4. RIGHT VERTICAL DIVIDER -->
+            <div class="hidden md:block w-[1.5px] lg:w-[2px] h-10 md:h-12 lg:h-14 xl:h-16 bg-[#8C1B3F] shrink-0 mx-1 lg:mx-3 xl:mx-4 opacity-80" aria-hidden="true"></div>
+
+            <!-- 5. RIGHT SECTION: ISMS 2.0 Branding & Subtitle -->
+            <div class="flex flex-col items-end justify-center shrink-0 text-right">
+              <!-- Top Row: ISMS + 2.0 Badge -->
+              <div class="flex items-center gap-1 sm:gap-2 lg:gap-2.5 leading-none">
+                <span class="text-[#9C214A] font-black text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-[46px] tracking-tight">
+                  ISMS
+                </span>
+                <span class="bg-[#881C43] text-white font-black text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-[32px] px-1.5 sm:px-2.5 lg:px-3 py-0.5 sm:py-0.5 lg:py-1 rounded-sm sm:rounded-md lg:rounded-lg shadow-xs leading-none">
+                  2.0
+                </span>
+              </div>
+
+              <!-- Subtitle: Integrated Scheme Management System -->
+              <div class="text-[#133553] font-bold text-[9px] sm:text-[11px] md:text-[12px] lg:text-[14px] xl:text-[16px] tracking-tight sm:tracking-normal mt-0.5 sm:mt-1 lg:mt-1.5 whitespace-nowrap">
+                Integrated Scheme Management System
+              </div>
+
+              <!-- Blue Underline Accent Bar -->
+              <div class="w-full h-[1.5px] sm:h-[2px] lg:h-[2.5px] bg-[#276CA1] mt-0.5 sm:mt-1 lg:mt-1.5 rounded-full" aria-hidden="true"></div>
+            </div>
+
+          </div>
+
+          <!-- 6. BOTTOM MULTI-COLOR ACCENT STRIPE (Rajasthan Government Palette) -->
+          <div class="w-full flex h-[3px] sm:h-[4px] lg:h-[5px]" aria-hidden="true">
+            <div class="w-[35%] bg-[#FE992B]"></div>
+            <div class="w-[16%] bg-[#9B2243]"></div>
+            <div class="w-[20%] bg-[#276CA1]"></div>
+            <div class="w-[29%] bg-[#47CA6E]"></div>
+          </div>
         </a>
       } @else {
         <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-sans">

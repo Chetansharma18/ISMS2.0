@@ -41,7 +41,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           <img
             src="/headingimage.png"
             alt="ISMS 2.0 - Rajasthan Skill and Livelihoods Development Corporation"
-            class="w-full h-auto block"
+            class="w-full h-[65px] sm:h-[85px] md:h-[110px] lg:h-[135px] xl:h-[155px] object-fill block"
           />
         </a>
       } @else {

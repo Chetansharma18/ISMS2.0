@@ -46,7 +46,6 @@ export interface RegistrationStepItem {
             style="background: linear-gradient(90deg, #FCF0F2 0%, #FCF0F2 28%, rgba(252, 240, 242, 0.90) 52%, rgba(252, 240, 242, 0.30) 72%, transparent 100%);"
           ></div>
           <div class="relative z-10 flex items-center gap-3">
-            <span class="w-1.5 h-7 sm:h-8 bg-[#E26D24] rounded-full shrink-0"></span>
             <div>
               <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#7C0E44] m-0">
                 Aspirant Profile Summary
@@ -96,7 +95,6 @@ export interface RegistrationStepItem {
 
           <!-- Left: Title & Subtitle -->
           <div class="relative z-10 flex items-center gap-3">
-            <span class="w-1.5 h-7 sm:h-8 bg-[#E26D24] rounded-full shrink-0"></span>
             <div>
               <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#7C0E44] m-0">
                 Profile Summary

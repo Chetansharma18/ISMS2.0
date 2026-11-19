@@ -35,7 +35,7 @@ export interface BreadcrumbItem {
         style="background: linear-gradient(90deg, #FCF0F2 0%, #FCF0F2 28%, rgba(252, 240, 242, 0.90) 52%, rgba(252, 240, 242, 0.30) 72%, transparent 100%);"
       ></div>
 
-      <!-- Left: Title, Accent Bar & Breadcrumbs -->
+      <!-- Left: Title & Subtitle -->
       <div class="relative z-10 flex items-center gap-2.5 sm:gap-3 min-w-0 w-full md:w-auto">
         <!-- Optional Back Button -->
         @if (backUrl || showBack) {
@@ -49,9 +49,6 @@ export interface BreadcrumbItem {
             <app-icon name="chevron-left" [stroke]="2.5" />
           </button>
         }
-
-        <!-- Subtle Orange/Peach Accent Line -->
-        <span class="w-1.5 h-7 sm:h-8 bg-[#E26D24] rounded-full shrink-0"></span>
 
         <div class="flex flex-col justify-center leading-tight min-w-0 flex-1">
           <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
@@ -74,30 +71,8 @@ export interface BreadcrumbItem {
         </div>
       </div>
 
-      <!-- Right Action / Search Slot -->
+      <!-- Right Action Slot -->
       <div class="relative z-10 flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto shrink-0 justify-end">
-        @if (searchable) {
-          <div class="relative w-full sm:w-80">
-            <app-icon name="search" size="sm" [stroke]="2" class="text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              [ngModel]="searchQuery()"
-              (ngModelChange)="onSearchInput($event)"
-              [placeholder]="searchPlaceholder"
-              class="w-full pl-9 pr-7 py-2 text-[13px] bg-white border border-[#E5D6DE] rounded-md placeholder:text-slate-400 focus:outline-none focus:border-[#AA5E7A] focus:ring-1 focus:ring-[#AA5E7A] transition-colors font-normal shadow-2xs text-[#25212A]"
-            />
-            @if (searchQuery()) {
-              <button
-                type="button"
-                (click)="onClearSearch()"
-                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs"
-                title="Clear search"
-              >
-                ✕
-              </button>
-            }
-          </div>
-        }
         <ng-content></ng-content>
       </div>
     </div>

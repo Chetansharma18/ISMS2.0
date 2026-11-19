@@ -217,8 +217,8 @@ describe('tenders-page.util', () => {
       expect(isEoiFormValid(validForm())).toBe(true);
     });
 
-    it('requires at least one attachment', () => {
-      expect(isEoiFormValid({ ...validForm(), attachments: [] })).toBe(false);
+    it('allows empty attachments when documents are configured', () => {
+      expect(isEoiFormValid({ ...validForm(), attachments: [] })).toBe(true);
     });
 
     it('requires every added document row to have a selection', () => {

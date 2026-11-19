@@ -98,12 +98,12 @@ export function filterActiveSchemes(schemes: SchemeTender[], query: string, now:
   const list = !q
     ? active
     : active.filter(
-        s =>
-          s.schemeName.toLowerCase().includes(q) ||
-          s.refNo.toLowerCase().includes(q) ||
-          s.eoiDescription.toLowerCase().includes(q) ||
-          (s.schemeTitle && s.schemeTitle.toLowerCase().includes(q))
-      );
+      s =>
+        s.schemeName.toLowerCase().includes(q) ||
+        s.refNo.toLowerCase().includes(q) ||
+        s.eoiDescription.toLowerCase().includes(q) ||
+        (s.schemeTitle && s.schemeTitle.toLowerCase().includes(q))
+    );
 
   return list.map((item, idx) => ({
     ...item,
@@ -234,8 +234,7 @@ export function isEoiFormValid(d: EoiFormData): boolean {
     durationNum <= 0 ||
     !d.eoiCategory ||
     !d.emdFee ||
-    !d.processFee ||
-    d.attachments.length === 0
+    !d.processFee
   ) {
     return false;
   }

@@ -67,12 +67,11 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
 
               <!-- Text Hierarchy -->
               <div class="flex flex-col justify-center leading-none">
-                <span class="text-[#062442] font-black text-[9.5px] sm:text-[11px] md:text-[12px] lg:text-[14.5px] xl:text-[16px] leading-[1.18] tracking-tight">
-                  Rajasthan Skill and<br class="hidden sm:inline" />
-                  Livelihoods Development<br class="hidden sm:inline" />
-                  Corporation
+                <span class="text-[#062442] font-black text-[9.5px] sm:text-[11px] md:text-[12px] lg:text-[14.5px] xl:text-[16px] leading-[1.2] tracking-tight">
+                  <span class="block whitespace-nowrap">Rajasthan Skill and Livelihoods</span>
+                  <span class="block whitespace-nowrap">Development Corporation</span>
                 </span>
-                <span class="text-[#062442] font-bold text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12.5px] leading-tight tracking-normal mt-0.5 sm:mt-0.5 lg:mt-1">
+                <span class="text-[#062442] font-bold text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12.5px] leading-tight tracking-normal mt-0.5 sm:mt-1 whitespace-nowrap">
                   Government of Rajasthan
                 </span>
               </div>

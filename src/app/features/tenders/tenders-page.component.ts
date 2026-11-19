@@ -120,18 +120,23 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
 
           <!-- Scheme name, with a "pending" tag when the applicant left this application unfinished -->
           <ng-template #schemeNameTemplate let-item>
-            <span class="text-slate-800 font-normal text-[13px]">{{ item.schemeName }}</span>
-            @if (draftFor(item.refNo); as draft) {
-              <span class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-amber-300 bg-amber-100 text-amber-800 text-[10.5px] font-semibold align-middle">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
-                Pending &bull; Step {{ draft.step }} of {{ draftStepCount }}
-              </span>
-            }
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-slate-800 font-medium text-[13px] leading-snug">{{ item.schemeName }}</span>
+              @if (draftFor(item.refNo); as draft) {
+                <span
+                  class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-amber-300 bg-amber-100 text-amber-800 text-[10px] font-semibold shrink-0"
+                  title="Application Pending &bull; Step {{ draft.step }} of {{ draftStepCount }}"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
+                  Pending
+                </span>
+              }
+            </div>
           </ng-template>
 
           <!-- Custom Template for Closing Date -->
           <ng-template #closingDateTemplate let-item>
-            <span class="text-slate-800 font-normal text-[13px]">{{ item.closingDate }}</span>
+            <span class="text-slate-700 font-normal text-[12.5px] whitespace-nowrap">{{ item.closingDate }}</span>
           </ng-template>
 
           <ng-template #descTemplate let-item>
@@ -410,48 +415,53 @@ export class TendersPageComponent {
   readonly eoiRequiredInfo = this.schemeService.getRequiredInfo();
 
   readonly schemeColumns = computed<TableColumn<SchemeTender>[]>(() => [
-    { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-20 min-w-[75px]' },
+    { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-14 min-w-[50px] max-w-[60px]' },
     {
       key: 'refNo',
       label: 'EOI Reference No.',
-      cellClass: 'whitespace-nowrap font-normal text-slate-800'
+      width: 'w-36 min-w-[120px]',
+      cellClass: 'text-[12.5px] font-normal text-slate-800 break-words'
     },
     {
       key: 'schemeName',
       label: 'Scheme Name',
       type: 'custom',
-      cellClass: 'whitespace-nowrap font-normal text-slate-800'
+      cellClass: 'text-[13px] font-medium text-slate-800'
     },
     {
       key: 'schemeCategory',
       label: 'Scheme Category',
       align: 'center',
-      cellClass: 'whitespace-nowrap font-normal text-slate-700'
+      width: 'w-28 min-w-[90px]',
+      cellClass: 'text-[12.5px] font-normal text-slate-700'
     },
     {
       key: 'datePublished',
       label: 'EOI Publication Date',
       align: 'center',
-      cellClass: 'whitespace-nowrap font-normal text-slate-700'
+      width: 'w-28 min-w-[100px]',
+      cellClass: 'whitespace-nowrap text-[12.5px] font-normal text-slate-700'
     },
     {
       key: 'closingDate',
       label: 'Date of Closing',
       align: 'center',
       type: 'custom',
-      cellClass: 'whitespace-nowrap'
+      width: 'w-28 min-w-[100px]',
+      cellClass: 'whitespace-nowrap text-[12.5px] font-normal text-slate-700'
     },
     {
       key: 'eoiCategory',
       label: 'EOI Category',
       align: 'center',
-      cellClass: 'whitespace-nowrap font-normal text-slate-700'
+      width: 'w-24 min-w-[80px]',
+      cellClass: 'whitespace-nowrap text-[12.5px] font-normal text-slate-700'
     },
     {
       key: 'viewAction',
       label: 'Action',
       align: 'center',
-      width: this.isSuperAdmin() ? 'min-w-[280px]' : 'min-w-[100px]',
+      width: this.isSuperAdmin() ? 'w-40 min-w-[145px]' : 'w-20 min-w-[65px]',
       type: 'custom'
     }
   ]);

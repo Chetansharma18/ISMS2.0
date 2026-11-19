@@ -54,59 +54,59 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           </div>
 
           <!-- Main Responsive Banner Container -->
-          <div class="w-full max-w-[1920px] mx-auto px-3 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-2.5 sm:py-3.5 lg:py-4 flex items-center justify-between gap-2 sm:gap-4 lg:gap-6 relative z-10">
+          <div class="w-full max-w-[1920px] mx-auto px-3 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-1.5 sm:py-2 md:py-2.5 lg:py-3 flex items-center justify-between gap-2 sm:gap-4 lg:gap-6 relative z-10">
 
             <!-- 1. LEFT SECTION: State Emblem + Department & Government Identity -->
-            <div class="flex items-center gap-2 sm:gap-3.5 lg:gap-4.5 shrink-0">
+            <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 shrink-0">
               <!-- State Emblem of India (Ashok Stambh) -->
               <img
                 src="/emblem-ashok-stambh.png"
                 alt="Emblem of India"
-                class="h-11 sm:h-14 md:h-16 lg:h-18 xl:h-[76px] w-auto object-contain shrink-0"
+                class="h-9 sm:h-11 md:h-13 lg:h-15 xl:h-[64px] w-auto object-contain shrink-0"
               />
 
               <!-- Text Hierarchy -->
               <div class="flex flex-col justify-center leading-none">
-                <span class="text-[#062442] font-black text-[11px] sm:text-[13px] md:text-[15px] lg:text-[18px] xl:text-[20px] leading-[1.18] tracking-tight">
+                <span class="text-[#062442] font-black text-[10px] sm:text-[11.5px] md:text-[13px] lg:text-[15.5px] xl:text-[17.5px] leading-[1.18] tracking-tight">
                   Rajasthan Skill and<br class="hidden sm:inline" />
                   Livelihoods Development<br class="hidden sm:inline" />
                   Corporation
                 </span>
-                <span class="text-[#062442] font-bold text-[9px] sm:text-[11px] md:text-[12px] lg:text-[14px] xl:text-[15px] leading-tight tracking-normal mt-0.5 sm:mt-1 lg:mt-1.5">
+                <span class="text-[#062442] font-bold text-[8.5px] sm:text-[9.5px] md:text-[10.5px] lg:text-[12px] xl:text-[13.5px] leading-tight tracking-normal mt-0.5 sm:mt-1 lg:mt-1">
                   Government of Rajasthan
                 </span>
               </div>
             </div>
 
             <!-- 2. LEFT VERTICAL DIVIDER -->
-            <div class="hidden md:block w-[1.5px] lg:w-[2px] h-10 md:h-12 lg:h-14 xl:h-16 bg-[#8C1B3F] shrink-0 mx-1 lg:mx-3 xl:mx-4 opacity-80" aria-hidden="true"></div>
+            <div class="hidden md:block w-[1.5px] lg:w-[2px] h-8 md:h-9 lg:h-11 xl:h-13 bg-[#8C1B3F] shrink-0 mx-1 lg:mx-3 xl:mx-4 opacity-80" aria-hidden="true"></div>
 
             <!-- 3. CENTER SECTION: Authentic Rajasthan Heritage Architecture Illustration -->
             <div class="hidden md:flex flex-1 items-center justify-center px-1 lg:px-4 min-w-0 overflow-hidden" aria-hidden="true">
               <img
                 src="/rajasthan-heritage-palace.png"
                 alt=""
-                class="h-12 sm:h-16 md:h-20 lg:h-24 xl:h-[105px] w-auto max-w-full object-contain pointer-events-none select-none transition-transform duration-300 group-hover:scale-[1.01]"
+                class="h-10 sm:h-13 md:h-16 lg:h-20 xl:h-[86px] w-auto max-w-full object-contain pointer-events-none select-none transition-transform duration-300 group-hover:scale-[1.01]"
               />
             </div>
 
             <!-- 4. RIGHT VERTICAL DIVIDER -->
-            <div class="hidden md:block w-[1.5px] lg:w-[2px] h-10 md:h-12 lg:h-14 xl:h-16 bg-[#8C1B3F] shrink-0 mx-1 lg:mx-3 xl:mx-4 opacity-80" aria-hidden="true"></div>
+            <div class="hidden md:block w-[1.5px] lg:w-[2px] h-8 md:h-9 lg:h-11 xl:h-13 bg-[#8C1B3F] shrink-0 mx-1 lg:mx-3 xl:mx-4 opacity-80" aria-hidden="true"></div>
 
             <!-- 5. RIGHT SECTION: ISMS 2.0 Branding & Subtitle -->
             <div class="flex flex-col items-end justify-center shrink-0 text-right">
               <!-- Top Row: ISMS + 2.0 Badge -->
-              <div class="flex items-center gap-1 sm:gap-2 lg:gap-2.5 leading-none">
-                <span class="text-[#9C214A] font-black text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-[46px] tracking-tight">
+              <div class="flex items-center gap-1 sm:gap-1.5 lg:gap-2 leading-none">
+                <span class="text-[#9C214A] font-black text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-[38px] tracking-tight">
                   ISMS
                 </span>
-                <span class="bg-[#881C43] text-white font-black text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-[32px] px-1.5 sm:px-2.5 lg:px-3 py-0.5 sm:py-0.5 lg:py-1 rounded-sm sm:rounded-md lg:rounded-lg shadow-xs leading-none">
+                <span class="bg-[#881C43] text-white font-black text-xs sm:text-base md:text-lg lg:text-xl xl:text-[26px] px-1.5 sm:px-2 lg:px-2.5 py-0.5 sm:py-0.5 lg:py-0.5 rounded-sm sm:rounded-md lg:rounded-md shadow-xs leading-none">
                   2.0
                 </span>
               </div>
 
               <!-- Subtitle: Integrated Scheme Management System -->
-              <div class="text-[#133553] font-bold text-[9px] sm:text-[11px] md:text-[12px] lg:text-[14px] xl:text-[16px] tracking-tight sm:tracking-normal mt-0.5 sm:mt-1 lg:mt-1.5 whitespace-nowrap">
+              <div class="text-[#133553] font-bold text-[8.5px] sm:text-[9.5px] md:text-[10.5px] lg:text-[12px] xl:text-[14px] tracking-tight sm:tracking-normal mt-0.5 sm:mt-1 lg:mt-1 whitespace-nowrap">
                 Integrated Scheme Management System
               </div>
 
@@ -115,7 +115,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           </div>
 
           <!-- 6. BOTTOM MULTI-COLOR ACCENT STRIPE (Rajasthan Government Palette) -->
-          <div class="w-full flex h-[3px] sm:h-[4px] lg:h-[5px]" aria-hidden="true">
+          <div class="w-full flex h-[2.5px] sm:h-[3px] lg:h-[4px]" aria-hidden="true">
             <div class="w-[35%] bg-[#FE992B]"></div>
             <div class="w-[16%] bg-[#9B2243]"></div>
             <div class="w-[20%] bg-[#276CA1]"></div>

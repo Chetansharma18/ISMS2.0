@@ -35,35 +35,38 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       [class.top-0]="isSticky"
       role="banner"
     >
-      <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-sans">
+      @if (isLandingPage()) {
+        <!-- Landing Page Full-Width Responsive Header Banner -->
+        <div class="w-full bg-white flex justify-center">
+          <a routerLink="/" class="block w-full max-w-360 mx-auto px-2 sm:px-4" aria-label="ISMS 2.0 Home">
+            <img
+              src="/headingimage.png"
+              alt="ISMS 2.0 - Rajasthan Skill and Livelihoods Development Corporation"
+              class="w-full h-auto block object-contain"
+            />
+          </a>
+        </div>
+      } @else {
+        <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-sans">
+          <!-- LEFT SIDE: Mobile Menu Toggle + Emblem + ISMS Logo + Separator + Identity -->
+          <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+            @if (currentUser() && !isLandingPage() && !isSsoPage()) {
+              <button
+                appButton
+                variant="ghost"
+                size="sm"
+                iconOnly
+                type="button"
+                (click)="toggleMobileMenu.emit()"
+                class="md:hidden -ml-1 shrink-0"
+                aria-label="Toggle navigation menu"
+                title="Open Navigation Menu"
+              >
+                <app-icon name="menu" size="lg" [stroke]="2" />
+              </button>
+            }
 
-        <!-- LEFT SIDE: Mobile Menu Toggle + Emblem + ISMS Logo + Separator + Identity -->
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-          @if (currentUser() && !isLandingPage() && !isSsoPage()) {
-            <button
-              appButton
-              variant="ghost"
-              size="sm"
-              iconOnly
-              type="button"
-              (click)="toggleMobileMenu.emit()"
-              class="md:hidden -ml-1 shrink-0"
-              aria-label="Toggle navigation menu"
-              title="Open Navigation Menu"
-            >
-              <app-icon name="menu" size="lg" [stroke]="2" />
-            </button>
-          }
-
-          <a routerLink="/" class="flex items-center gap-2 sm:gap-3.5 md:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
-            @if (isLandingPage()) {
-              <!-- Official Landing Header Graphic -->
-              <img
-                src="/headingimage.png"
-                alt="ISMS 2.0 - Rajasthan Skill and Livelihoods Development Corporation"
-                class="h-10 sm:h-12 lg:h-[58px] w-auto object-contain shrink-0"
-              />
-            } @else {
+            <a routerLink="/" class="flex items-center gap-2 sm:gap-3.5 md:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
               <!-- Logos Group -->
               <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
                 <!-- Government of Rajasthan Emblem -->
@@ -93,9 +96,8 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                   Integrated Scheme Management System
                 </div>
               </div>
-            }
-          </a>
-        </div>
+            </a>
+          </div>
 
         <!-- RIGHT SIDE: Language Controls + Divider + Notification + Divider + Login / User Pill -->
         <div class="flex items-center gap-2 sm:gap-3.5 lg:gap-4 shrink-0">
@@ -283,6 +285,8 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
         </div>
 
       </div>
+    
+      }
     </header>
   `,
   styles: [`

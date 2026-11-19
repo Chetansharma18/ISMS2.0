@@ -32,14 +32,14 @@ interface TenderItem {
   template: `
     <!-- Right Column Panel: 540–600px desktop width, 410–430px height, clean official government card -->
     <div class="w-full max-w-135 lg:max-w-145 xl:max-w-150 mx-auto lg:ml-auto">
-      <div class="w-full h-102.5 sm:h-106.25 lg:h-107.5 bg-white rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.18)] border border-[#DCE4ED] flex flex-col overflow-hidden relative">
+      <div class="w-full h-102.5 sm:h-106.25 lg:h-107.5 bg-white rounded-xl shadow-[0_10px_25px_rgba(124,14,68,0.08)] border border-[#EADCE2] flex flex-col overflow-hidden relative">
         
-        <!-- PANEL HEADER (Height 58–66px, clean white background, dark navy text with orange accent) -->
-        <div class="h-15 px-5 sm:px-6 bg-white border-b border-[#DCE4ED] flex items-center justify-between shrink-0 z-10">
+        <!-- PANEL HEADER (Height 58–66px, clean white background, primary burgundy text with orange accent) -->
+        <div class="h-15 px-5 sm:px-6 bg-white border-b border-[#EADCE2] flex items-center justify-between shrink-0 z-10">
           <div class="flex items-center gap-2.5">
             <!-- Small Orange Accent Bar -->
-            <span class="w-1 h-4.5 bg-[#F28C28] rounded-full inline-block" aria-hidden="true"></span>
-            <h2 class="text-[17px] font-bold text-[#12365A] tracking-wide m-0">TENDER</h2>
+            <span class="w-1 h-4.5 bg-[#EA580C] rounded-full inline-block" aria-hidden="true"></span>
+            <h2 class="text-[17px] font-bold text-[#7C0E44] tracking-wide m-0">TENDER</h2>
           </div>
           
           <!-- View All Action -->
@@ -58,7 +58,7 @@ interface TenderItem {
         <!-- TENDER LIST: Clean readable rows, subtle dividers, internally scrollable -->
         <div 
           #scrollList
-          class="flex-1 overflow-y-auto divide-y divide-[#DCE4ED] bg-white tender-custom-scroll overscroll-contain" 
+          class="flex-1 overflow-y-auto divide-y divide-[#EADCE2] bg-white tender-custom-scroll overscroll-contain" 
           (mouseenter)="pauseScroll()" 
           (mouseleave)="resumeScrollWithDelay()"
           (touchstart)="pauseScroll()"
@@ -67,7 +67,7 @@ interface TenderItem {
           @for (item of tenders; track item.id) {
             <div 
               (click)="openLoginPrompt(item)" 
-              class="p-3.5 sm:p-4 hover:bg-[#F5F8FC] transition-colors duration-150 cursor-pointer group flex flex-col gap-1.5 text-left focus:outline-none focus:bg-[#F5F8FC]"
+              class="p-3.5 sm:p-4 hover:bg-[#FAF2F5] transition-colors duration-150 cursor-pointer group flex flex-col gap-1.5 text-left focus:outline-none focus:bg-[#FAF2F5]"
               tabindex="0"
               (keydown.enter)="openLoginPrompt(item)"
               (keydown.space)="openLoginPrompt(item)"
@@ -84,13 +84,13 @@ interface TenderItem {
                     </span>
                   }
                 </div>
-                <span class="text-[11px] font-semibold text-[#12365A] bg-primary-light border border-border rounded px-2 py-0.5 shrink-0">
+                <span class="text-[11px] font-semibold text-[#7C0E44] bg-primary-light border border-border rounded px-2 py-0.5 shrink-0">
                   {{ item.category }}
                 </span>
               </div>
 
               <!-- Middle Row: Tender Title -->
-              <h4 class="text-[13px] sm:text-[13.5px] font-semibold text-[#12365A] leading-snug group-hover:text-[#F28C28] transition-colors line-clamp-2 m-0">
+              <h4 class="text-[13px] sm:text-[13.5px] font-semibold text-[#25212A] leading-snug group-hover:text-[#7C0E44] transition-colors line-clamp-2 m-0">
                 {{ item.title }}
               </h4>
 

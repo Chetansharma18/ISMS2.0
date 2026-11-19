@@ -17,7 +17,7 @@ import {
 import { DataEngineService } from '../../core/services/data-engine.service';
 import { DocumentViewerService } from '../../core/services/document-viewer.service';
 
-import { Grievance, GRIEVANCE_STATUS_BADGE, grievanceStatusVariant } from './grievance.shared';
+import { DEFAULT_GRIEVANCE_SCHEMES, Grievance, GRIEVANCE_STATUS_BADGE, grievanceStatusVariant } from './grievance.shared';
 
 export type { Grievance };
 
@@ -41,14 +41,15 @@ export type { Grievance };
       title="Grievance"
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Grievance' }]"
       [(searchQuery)]="searchQuery"
-      searchPlaceholder="Search Title, Description, Issue Type..."
+      searchPlaceholder="Search Scheme, Title, Description, Issue Type..."
       [columns]="grievanceColumns"
       [data]="filteredGrievances()"
       [pageSize]="10"
       itemUnit="grievances"
-      emptyMessage="No grievances match your search query."
+      emptyMessage="No grievances match your search query or filters."
       [customTemplates]="{
         viewAction: viewActionTemplate,
+        schemeName: schemeTemplate,
         submittedAt: dateTimeTemplate,
         attachment: attachmentTemplate
       }"
@@ -57,7 +58,92 @@ export type { Grievance };
         <app-icon name="plus" size="sm" />
         <span>Raise Ticket</span>
       </button>
+
+      <!-- Scheme-wise Filter Toolbar -->
+      <div beforeTable class="bg-slate-50 border border-slate-200/90 rounded-lg p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs shadow-2xs">
+        <div class="flex items-center gap-2.5 sm:gap-3.5 flex-wrap">
+          <!-- Scheme Filter -->
+          <div class="flex items-center gap-1.5">
+            <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider flex items-center gap-1">
+              <app-icon name="filter" size="xs" class="text-slate-500" />
+              <span>Scheme:</span>
+            </label>
+            <select
+              appInput
+              size="sm"
+              [ngModel]="selectedScheme()"
+              (ngModelChange)="selectedScheme.set($event)"
+              class="min-w-[220px] max-w-[340px] text-xs font-medium text-slate-800"
+            >
+              <option value="ALL">All Schemes ({{ grievances().length }})</option>
+              @for (s of schemeOptions(); track s) {
+                <option [value]="s">{{ s }} ({{ getSchemeCount(s) }})</option>
+              }
+            </select>
+          </div>
+
+          <!-- Issue Type Filter -->
+          <div class="flex items-center gap-1.5">
+            <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Issue Type:</label>
+            <select
+              appInput
+              size="sm"
+              [ngModel]="selectedIssueType()"
+              (ngModelChange)="selectedIssueType.set($event)"
+              class="min-w-[130px] text-xs font-medium text-slate-800"
+            >
+              <option value="ALL">All Issue Types</option>
+              @for (type of issueTypeOptions; track type) {
+                <option [value]="type">{{ type }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div class="flex items-center gap-1.5">
+            <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Status:</label>
+            <select
+              appInput
+              size="sm"
+              [ngModel]="selectedStatus()"
+              (ngModelChange)="selectedStatus.set($event)"
+              class="min-w-[120px] text-xs font-medium text-slate-800"
+            >
+              <option value="ALL">All Status</option>
+              @for (st of statusOptions; track st) {
+                <option [value]="st">{{ st }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Reset Filters Button -->
+          @if (isFiltered()) {
+            <button
+              appButton
+              variant="ghost"
+              size="xs"
+              (click)="resetFilters()"
+              title="Reset all filters"
+            >
+              <app-icon name="close" size="xs" />
+              <span>Reset Filters</span>
+            </button>
+          }
+        </div>
+
+        <div class="text-[11px] text-slate-500 font-medium whitespace-nowrap">
+          Showing <span class="font-bold text-slate-800">{{ filteredGrievances().length }}</span> of {{ grievances().length }} grievances
+        </div>
+      </div>
     </app-list-page>
+
+    <ng-template #schemeTemplate let-item>
+      <div class="max-w-[220px]" [title]="item.schemeName || 'General / All Schemes'">
+        <span class="text-[13px] font-medium text-slate-800 block leading-snug line-clamp-2">
+          {{ item.schemeName || 'General' }}
+        </span>
+      </div>
+    </ng-template>
 
     <ng-template #dateTimeTemplate let-item>
       <div class="flex flex-col text-center">
@@ -95,6 +181,15 @@ export type { Grievance };
         (close)="closeModal()"
       >
         <div class="mt-5 space-y-4 text-left">
+          <div>
+            <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Scheme <span class="text-rose-500">*</span></label>
+            <select appInput [(ngModel)]="newTicket.schemeName" class="w-full" [invalid]="isFieldInvalid('schemeName')">
+              <option value="" disabled selected>Select scheme</option>
+              @for (scheme of schemeOptions(); track scheme) {
+                <option [value]="scheme">{{ scheme }}</option>
+              }
+            </select>
+          </div>
           <div>
             <div class="flex justify-between items-end mb-1.5">
               <label class="block text-[13px] font-semibold text-slate-700">Title <span class="text-rose-500">*</span></label>
@@ -164,6 +259,11 @@ export type { Grievance };
                 <div class="text-[13px] font-semibold text-slate-800">{{ selectedTicket()!.issueType }}</div>
               </div>
             </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Scheme</label>
+              <div class="text-[13px] font-semibold text-slate-800">{{ selectedTicket()!.schemeName || 'General / All Schemes' }}</div>
+            </div>
             
             <div>
               <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Date & Time</label>
@@ -220,6 +320,7 @@ export class GrievanceListComponent {
   readonly attachmentError = signal('');
 
   newTicket = {
+    schemeName: '',
     title: '',
     description: '',
     issueType: '' as 'Enquire' | 'Technical' | 'accounts' | '',
@@ -228,9 +329,22 @@ export class GrievanceListComponent {
   };
 
   readonly searchQuery = signal<string>('');
+  readonly selectedScheme = signal<string>('ALL');
+  readonly selectedIssueType = signal<string>('ALL');
+  readonly selectedStatus = signal<string>('ALL');
+
+  readonly issueTypeOptions = ['Technical', 'accounts', 'Enquire'] as const;
+  readonly statusOptions = ['Open', 'In progress', 'Resolved', 'closed'] as const;
+
+  readonly isFiltered = computed(() =>
+    this.selectedScheme() !== 'ALL' ||
+    this.selectedIssueType() !== 'ALL' ||
+    this.selectedStatus() !== 'ALL'
+  );
 
   readonly grievanceColumns: TableColumn<Grievance>[] = [
     { key: 'sNo', label: 'Sr No.', type: 'number', align: 'center', width: 'w-12' },
+    { key: 'schemeName', label: 'Scheme', type: 'custom', cellClass: 'font-normal min-w-[170px]' },
     { key: 'submittedAt', label: 'Date & Time', align: 'center', type: 'custom', width: 'w-24' },
     { key: 'title', label: 'Title', cellClass: 'font-normal text-slate-800 min-w-[120px]' },
     { key: 'description', label: 'Description', cellClass: 'font-normal text-slate-700 min-w-[180px]' },
@@ -244,15 +358,45 @@ export class GrievanceListComponent {
 
   readonly grievances = signal<Grievance[]>([]);
 
+  readonly schemeOptions = computed(() => {
+    const set = new Set<string>(DEFAULT_GRIEVANCE_SCHEMES);
+    for (const g of this.grievances()) {
+      if (g.schemeName) set.add(g.schemeName);
+    }
+    return Array.from(set);
+  });
+
+  getSchemeCount(scheme: string): number {
+    return this.grievances().filter(g => g.schemeName === scheme).length;
+  }
+
+  resetFilters(): void {
+    this.selectedScheme.set('ALL');
+    this.selectedIssueType.set('ALL');
+    this.selectedStatus.set('ALL');
+  }
+
   readonly filteredGrievances = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    if (!q) return this.grievances();
-    return this.grievances().filter(g =>
-      (g.title && g.title.toLowerCase().includes(q)) ||
-      (g.description && g.description.toLowerCase().includes(q)) ||
-      (g.issueType && g.issueType.toLowerCase().includes(q)) ||
-      (g.status && g.status.toLowerCase().includes(q))
-    );
+    const scheme = this.selectedScheme();
+    const issue = this.selectedIssueType();
+    const status = this.selectedStatus();
+
+    return this.grievances().filter(g => {
+      if (scheme !== 'ALL' && g.schemeName !== scheme) return false;
+      if (issue !== 'ALL' && g.issueType !== issue) return false;
+      if (status !== 'ALL' && g.status !== status) return false;
+      if (q) {
+        const matches =
+          (g.schemeName && g.schemeName.toLowerCase().includes(q)) ||
+          (g.title && g.title.toLowerCase().includes(q)) ||
+          (g.description && g.description.toLowerCase().includes(q)) ||
+          (g.issueType && g.issueType.toLowerCase().includes(q)) ||
+          (g.status && g.status.toLowerCase().includes(q));
+        if (!matches) return false;
+      }
+      return true;
+    });
   });
 
   constructor() {
@@ -264,7 +408,7 @@ export class GrievanceListComponent {
   }
 
   openRaiseTicket() {
-    this.newTicket = { title: '', description: '', issueType: '', attachment: '', attachmentUrl: null };
+    this.newTicket = { schemeName: '', title: '', description: '', issueType: '', attachment: '', attachmentUrl: null };
     this.attachmentError.set('');
     this.isSubmitted.set(false);
     this.isModalOpen.set(true);
@@ -303,20 +447,24 @@ export class GrievanceListComponent {
   }
 
   isFormValid(): boolean {
-    return this.newTicket.title.trim().length > 0 &&
+    return this.newTicket.schemeName.trim().length > 0 &&
+           this.newTicket.title.trim().length > 0 &&
            this.getWordCount(this.newTicket.title) <= 100 &&
            this.newTicket.description.trim().length > 0 &&
            this.getWordCount(this.newTicket.description) <= 500 &&
            this.newTicket.issueType !== '';
   }
 
-  isFieldInvalid(field: 'title' | 'description' | 'issueType'): boolean {
+  isFieldInvalid(field: 'schemeName' | 'title' | 'description' | 'issueType'): boolean {
     if (!this.isSubmitted()) {
       if (field === 'title') return this.getWordCount(this.newTicket.title) > 100;
       if (field === 'description') return this.getWordCount(this.newTicket.description) > 500;
       return false;
     }
     
+    if (field === 'schemeName') {
+      return this.newTicket.schemeName.trim().length === 0;
+    }
     if (field === 'title') {
       return this.newTicket.title.trim().length === 0 || this.getWordCount(this.newTicket.title) > 100;
     }
@@ -356,6 +504,7 @@ export class GrievanceListComponent {
     const attachmentUrl = this.newTicket.attachmentUrl || undefined;
     const record: Partial<Grievance> = {
       submittedAt: new Date().toISOString(),
+      schemeName: this.newTicket.schemeName,
       title: this.newTicket.title,
       description: this.newTicket.description,
       issueType: this.newTicket.issueType as 'Enquire' | 'Technical' | 'accounts',

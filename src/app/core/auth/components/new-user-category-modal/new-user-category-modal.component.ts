@@ -41,13 +41,13 @@ export type NewUserCategory = 'student' | 'citizen';
             <div
               (click)="selectCategory('student')"
               class="group relative rounded-xl border-2 p-4 sm:p-4.5 transition-all cursor-pointer select-none"
-              [class.border-indigo-600]="selectedCategory() === 'student'"
-              [class.bg-indigo-50/50]="selectedCategory() === 'student'"
+              [class.border-[#7C0E44]]="selectedCategory() === 'student'"
+              [class.bg-[#F8EDF1]]="selectedCategory() === 'student'"
               [class.ring-2]="selectedCategory() === 'student'"
-              [class.ring-indigo-600/15]="selectedCategory() === 'student'"
+              [class.ring-[#7C0E44]/15]="selectedCategory() === 'student'"
               [class.border-slate-200]="selectedCategory() !== 'student'"
               [class.bg-white]="selectedCategory() !== 'student'"
-              [class.hover:border-indigo-300]="selectedCategory() !== 'student'"
+              [class.hover:border-[#AA5E7A]]="selectedCategory() !== 'student'"
               [class.hover:bg-slate-50]="selectedCategory() !== 'student'"
             >
               <div class="flex items-start gap-3.5">
@@ -55,9 +55,9 @@ export type NewUserCategory = 'student' | 'citizen';
                 <div class="mt-0.5 shrink-0">
                   <div
                     class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
-                    [class.border-indigo-600]="selectedCategory() === 'student'"
+                    [class.border-[#7C0E44]]="selectedCategory() === 'student'"
                     [class.border-slate-300]="selectedCategory() !== 'student'"
-                    [class.bg-indigo-600]="selectedCategory() === 'student'"
+                    [class.bg-[#7C0E44]]="selectedCategory() === 'student'"
                   >
                     @if (selectedCategory() === 'student') {
                       <div class="w-2 h-2 rounded-full bg-white"></div>
@@ -66,7 +66,7 @@ export type NewUserCategory = 'student' | 'citizen';
                 </div>
 
                 <!-- Icon -->
-                <div class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
+                <div class="w-10 h-10 rounded-lg bg-[#F8EDF1] text-[#7C0E44] flex items-center justify-center shrink-0">
                   <app-icon name="academic-cap" size="lg" [stroke]="2" />
                 </div>
 
@@ -78,7 +78,7 @@ export type NewUserCategory = 'student' | 'citizen';
                     </h3>
                   </div>
 
-                  <div class="mt-1 text-xs font-semibold text-indigo-700">
+                  <div class="mt-1 text-xs font-semibold text-[#7C0E44]">
                     Training Related Interest
                   </div>
 
@@ -94,7 +94,7 @@ export type NewUserCategory = 'student' | 'citizen';
               (click)="selectCategory('citizen')"
               class="group relative rounded-xl border-2 p-4 sm:p-4.5 transition-all cursor-pointer select-none"
               [class.border-navy]="selectedCategory() === 'citizen'"
-              [class.bg-blue-50/40]="selectedCategory() === 'citizen'"
+              [class.bg-[#F8EDF1]]="selectedCategory() === 'citizen'"
               [class.ring-2]="selectedCategory() === 'citizen'"
               [class.ring-navy/15]="selectedCategory() === 'citizen'"
               [class.border-slate-200]="selectedCategory() !== 'citizen'"

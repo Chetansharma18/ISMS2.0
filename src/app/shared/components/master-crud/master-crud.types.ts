@@ -37,6 +37,8 @@ export interface MasterCrudConfig<T extends { id: string; status?: string } = an
   columns: TableColumn<T>[];
   /** Keys of columns whose values are string[] and should render as pill tags */
   tagsColumns?: string[];
+  /** Optional custom cell templates keyed by column key */
+  customTemplates?: Record<string, import('@angular/core').TemplateRef<unknown>>;
   /** Whether this entity supports an Active/Inactive status toggle */
   hasStatus?: boolean;
   /** Primary submit button label in the modal (defaults to 'Save') */

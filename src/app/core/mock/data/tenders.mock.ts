@@ -21,7 +21,36 @@ export const MOCK_SUBMITTED_TENDERS: SubmittedTender[] = resolveMock([
     emdTransactionRef: 'CIN-SBI-9812402',
     submittedStatus: 'Rejected',
     rejectionReason: 'Technical qualification criteria not met (CA turnover certificate missing valid UDIN).',
-    shortfalls: [],
+    appeal: {
+      submittedOn: '10-Oct-2026',
+      reply: 'We have re-verified with our chartered accountant and obtained a newly generated CA turnover certificate with a valid UDIN. Please reconsider our qualification.',
+      files: [{ fileName: 'CA_Turnover_With_UDIN.pdf', fileSize: '1.2 MB' }],
+      status: 'Accepted',
+      decidedAt: '12-Oct-2026, 03:45 PM',
+      deptRemarks: 'Appeal has been considered by the scrutiny committee. Please upload the verified CA Certificate with QR-coded UDIN and the latest ITR acknowledgment within 7 days.',
+      responseDeadline: '19-Oct-2026'
+    },
+    shortfalls: [
+      {
+        id: 'SF-APP-2024-001-01',
+        raisedOn: '12-Oct-2026, 03:45 PM',
+        raisedBy: 'Department Scrutiny Committee',
+        dueDate: '19-Oct-2026',
+        remarks: 'Appeal has been considered by the scrutiny committee. Please upload the verified CA Certificate with QR-coded UDIN and the latest ITR acknowledgment within 7 days.',
+        requiredDocs: [
+          'CA Certificate with QR-coded UDIN',
+          'Latest ITR Acknowledgment'
+        ],
+        sharedDocs: [
+          {
+            title: 'UDIN Verification Format Guideline',
+            fileName: 'UDIN_Guidelines_2026.pdf',
+            fileSize: '450 KB'
+          }
+        ],
+        status: 'Open'
+      }
+    ],
     eoiStatus: 'Reviewed',
     editCount: 0,
     maxEdits: 3,

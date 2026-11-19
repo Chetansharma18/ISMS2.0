@@ -26,3 +26,11 @@ export const GRIEVANCE_STATUS_BADGE: Record<GrievanceStatus, BadgeVariant> = {
 export function grievanceStatusVariant(status: GrievanceStatus | string | undefined): BadgeVariant {
   return GRIEVANCE_STATUS_BADGE[status as GrievanceStatus] ?? 'neutral';
 }
+
+export const DEFAULT_GRIEVANCE_SCHEMES: readonly string[] = [
+  'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
+  'Vishwakarma Yuva Udyami Protsahan Yojana',
+  'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+  'Mukhyamantri Yuva Sambal Yojana',
+  'Mukhya Mantri Yuva Kaushal Yojana'
+];

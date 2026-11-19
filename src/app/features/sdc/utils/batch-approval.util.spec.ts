@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import type { BatchRecord } from '../models/batch.model';
 import {
   BATCH_APPROVAL_LEVELS,

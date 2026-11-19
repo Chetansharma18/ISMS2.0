@@ -11,7 +11,6 @@ interface CameraUser {
   tpName: string;
   tpCode: string;
   sdcCount: number;
-  totalBatches: number;
   totalCameras: number;
 }
 
@@ -34,7 +33,6 @@ interface CameraUser {
       [customTemplates]="{
         tpInfo: tpInfoTemplate,
         sdcCount: sdcCountTemplate,
-        totalBatches: totalBatchesTemplate,
         totalCameras: totalCamerasTemplate,
         action: actionTemplate
       }"
@@ -56,12 +54,6 @@ interface CameraUser {
             <span>{{ user.sdcCount }} SDC</span>
             <span>Center(s)</span>
           </div>
-        </ng-template>
-
-        <ng-template #totalBatchesTemplate let-user>
-          <span class="inline-flex items-center text-slate-600 text-[13px] font-normal tracking-wide">
-            {{ user.totalBatches }} Batches
-          </span>
         </ng-template>
 
         <ng-template #totalCamerasTemplate let-user>
@@ -89,7 +81,6 @@ export class CameraMonitoringComponent {
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
     { key: 'tpInfo', label: 'Training Partner Name', width: 'min-w-[220px]', type: 'custom' },
     { key: 'sdcCount', label: 'SDC Centers', align: 'center', type: 'custom' },
-    { key: 'totalBatches', label: 'Total Batches', align: 'center', type: 'custom' },
     { key: 'totalCameras', label: 'Total Cameras', align: 'center', type: 'custom' },
     { key: 'action', label: 'Action', align: 'center', width: 'w-28', type: 'custom' }
   ];
@@ -103,7 +94,6 @@ export class CameraMonitoringComponent {
       tpName: 'TP 1',
       tpCode: 'TP 001',
       sdcCount: 2,
-      totalBatches: 3,
       totalCameras: 6
     },
     {
@@ -112,7 +102,6 @@ export class CameraMonitoringComponent {
       tpName: 'TP 2',
       tpCode: 'TP 002',
       sdcCount: 2,
-      totalBatches: 2,
       totalCameras: 2
     },
     {
@@ -121,7 +110,6 @@ export class CameraMonitoringComponent {
       tpName: 'TP 3',
       tpCode: 'TP 003',
       sdcCount: 1,
-      totalBatches: 1,
       totalCameras: 1
     }
   ] : []);

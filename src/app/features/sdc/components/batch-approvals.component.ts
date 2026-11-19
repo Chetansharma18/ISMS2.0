@@ -236,10 +236,10 @@ import { FilterTabsComponent } from '../../../shared';
                 size="sm"
                 type="button"
                 (click)="openWithdrawModal(batch)"
-                title="Withdraw Batch"
+                title="Withdraw Request"
               >
                 <app-icon name="ban" size="sm" />
-                <span>Withdraw</span>
+                <span>Withdraw Request</span>
               </button>
             }
           </div>
@@ -252,8 +252,8 @@ import { FilterTabsComponent } from '../../../shared';
         [closeOnBackdrop]="true"
         [showAccentBar]="true"
         accentBarClass="bg-rose-600"
-        title="Withdraw Batch"
-        primaryLabel="Withdraw Batch"
+        title="Withdraw Request"
+        primaryLabel="Submit Withdraw Request"
         primaryVariant="danger"
         secondaryLabel="Cancel"
         maxWidthClass="max-w-[460px]"
@@ -351,7 +351,7 @@ export class BatchApprovalsComponent {
     { key: 'size', label: 'Batch Size', align: 'center', type: 'custom', width: 'w-24' },
     { key: 'schedule', label: 'Start & End Date', align: 'center', type: 'custom', width: 'w-36' },
     { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[140px]' },
-    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[210px]' }
+    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[230px]' }
   ];
 
   /** The batch size the partner entered (the capacity once the department has approved). */

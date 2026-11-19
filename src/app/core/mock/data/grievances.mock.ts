@@ -8,15 +8,17 @@ export type { GrievanceItem, AdminGrievanceItem };
 export const MOCK_GRIEVANCES: GrievanceItem[] = resolveMock([
   {
     sNo: 1,
+    schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
     submittedAt: '2026-09-27T10:15:30Z',
-    title: 'Login Issue',
-    description: 'Unable to login to the portal using my credentials. It shows invalid password every time.',
+    title: 'Biometric Attendance Sync Delay',
+    description: 'AEBAS biometric attendance punches are not reflecting in the daily attendance punch log for Batch B-26-0001.',
     issueType: 'Technical',
-    attachment: 'screenshot.png',
+    attachment: 'device_sync_log.pdf',
     status: 'Open'
   },
   {
     sNo: 2,
+    schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana',
     submittedAt: '2026-09-26T14:45:00Z',
     title: 'Payment Failure',
     description: 'Amount deducted from my bank account but the receipt was not generated on the portal.',
@@ -27,6 +29,7 @@ export const MOCK_GRIEVANCES: GrievanceItem[] = resolveMock([
   },
   {
     sNo: 3,
+    schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)',
     submittedAt: '2026-09-25T09:12:00Z',
     title: 'Document Upload Error',
     description: 'Getting a 500 internal server error while uploading the Aadhar card in the profile section.',
@@ -37,6 +40,7 @@ export const MOCK_GRIEVANCES: GrievanceItem[] = resolveMock([
   },
   {
     sNo: 4,
+    schemeName: 'Mukhyamantri Yuva Sambal Yojana',
     submittedAt: '2026-09-24T16:30:00Z',
     title: 'Process Inquiry',
     description: 'How long does the standard scheme approval process take after submission?',
@@ -44,6 +48,16 @@ export const MOCK_GRIEVANCES: GrievanceItem[] = resolveMock([
     attachment: 'query.pdf',
     status: 'closed',
     comments: 'Standard approval takes 3-5 business days. Your application is currently under review.'
+  },
+  {
+    sNo: 5,
+    schemeName: 'Mukhya Mantri Yuva Kaushal Yojana',
+    submittedAt: '2026-09-23T11:20:00Z',
+    title: 'Trainer Onboarding Verification',
+    description: 'Verification of certified ToT trainer credentials is pending for Handicraft & Local Resource Based Skills sector.',
+    issueType: 'Technical',
+    attachment: 'trainer_cert.pdf',
+    status: 'Open'
   }
 ]);
 
@@ -51,16 +65,18 @@ export const MOCK_ADMIN_GRIEVANCES: AdminGrievanceItem[] = resolveMock([
   {
     sNo: 1,
     userName: 'Alice Smith',
+    schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)',
     submittedAt: '2026-09-27T10:15:30Z',
-    title: 'Login Issue',
-    description: 'Unable to login to the portal using my credentials. It shows invalid password every time.',
+    title: 'Biometric Attendance Sync Delay',
+    description: 'AEBAS biometric attendance punches are not reflecting in the daily attendance punch log for Batch B-26-0001.',
     issueType: 'Technical',
-    attachment: 'screenshot.png',
+    attachment: 'device_sync_log.pdf',
     status: 'Open'
   },
   {
     sNo: 2,
     userName: 'Bob Jones',
+    schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana',
     submittedAt: '2026-09-26T14:45:00Z',
     title: 'Payment Failure',
     description: 'Amount deducted from my bank account but the receipt was not generated on the portal.',
@@ -72,6 +88,7 @@ export const MOCK_ADMIN_GRIEVANCES: AdminGrievanceItem[] = resolveMock([
   {
     sNo: 3,
     userName: 'Carol White',
+    schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)',
     submittedAt: '2026-09-25T09:12:00Z',
     title: 'Document Upload Error',
     description: 'Getting a 500 internal server error while uploading the Aadhar card in the profile section.',
@@ -83,6 +100,7 @@ export const MOCK_ADMIN_GRIEVANCES: AdminGrievanceItem[] = resolveMock([
   {
     sNo: 4,
     userName: 'David Brown',
+    schemeName: 'Mukhyamantri Yuva Sambal Yojana',
     submittedAt: '2026-09-24T16:30:00Z',
     title: 'Process Inquiry',
     description: 'How long does the standard scheme approval process take after submission?',
@@ -90,5 +108,16 @@ export const MOCK_ADMIN_GRIEVANCES: AdminGrievanceItem[] = resolveMock([
     attachment: 'query.pdf',
     status: 'closed',
     comments: 'Standard approval takes 3-5 business days. Your application is currently under review.'
+  },
+  {
+    sNo: 5,
+    userName: 'Vikram Singh',
+    schemeName: 'Mukhya Mantri Yuva Kaushal Yojana',
+    submittedAt: '2026-09-23T11:20:00Z',
+    title: 'Trainer Onboarding Verification',
+    description: 'Verification of certified ToT trainer credentials is pending for Handicraft & Local Resource Based Skills sector.',
+    issueType: 'Technical',
+    attachment: 'trainer_cert.pdf',
+    status: 'Open'
   }
 ]);

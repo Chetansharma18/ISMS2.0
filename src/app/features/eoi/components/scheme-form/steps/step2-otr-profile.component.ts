@@ -16,12 +16,12 @@ import { Step2BankDetailsComponent } from './step2/step2-bank-details.component'
     <div class="space-y-6 font-sans">
 
       <!-- Profile Verification Banner (Read-only / Non-editable) -->
-      <div class="flex items-start sm:items-center gap-3 p-3.5 sm:p-4 bg-slate-50 border border-slate-200/90 rounded-xl shadow-2xs">
-        <div class="w-8.5 h-8.5 rounded-lg flex items-center justify-center shrink-0 bg-sky-100 text-navy">
+      <div class="flex items-start sm:items-center gap-3 p-3.5 sm:p-4 bg-[#F8FAFC] border border-[#D6E3F0] rounded-xl shadow-xs">
+        <div class="w-8.5 h-8.5 rounded-lg flex items-center justify-center shrink-0 bg-sky-100 text-[#1E3A5F]">
           <app-icon name="lock" size="sm" [stroke]="2" />
         </div>
         <div class="min-w-0">
-          <div class="text-xs sm:text-sm font-bold text-slate-900 leading-tight">
+          <div class="text-xs sm:text-sm font-bold text-[#172554] leading-tight">
             Registration Profile Verification
           </div>
           <p class="text-xs text-slate-500 m-0 mt-0.5 truncate sm:whitespace-normal">
@@ -40,7 +40,7 @@ import { Step2BankDetailsComponent } from './step2/step2-bank-details.component'
       <app-step2-bank-details />
 
       <!-- Footer Action Bar -->
-      <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="pt-4 border-t border-[#E8EEF5] flex flex-col sm:flex-row items-center justify-between gap-3">
         <span class="text-xs text-slate-500 flex items-center gap-1.5">
           <app-icon name="check-circle" size="xs" class="text-emerald-600" />
           Verified from One-Time Registration

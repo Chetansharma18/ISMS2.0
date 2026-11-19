@@ -183,6 +183,18 @@ export class MockDatabaseService {
           } else {
             this.store.set(key, stored);
           }
+        } else if (key === 'GRIEVANCES' || key === 'ADMIN_GRIEVANCES') {
+          const hasLoginIssue = stored.some(
+            (item: any) => item?.title === 'Login Issue' || (item?.description && String(item.description).includes('Unable to login'))
+          );
+          const lacksScheme = stored.some((item: any) => !item?.schemeName);
+          if (hasLoginIssue || lacksScheme) {
+            const fresh = this.deepClone(this.seeds[key]);
+            this.store.set(key, fresh);
+            this.saveToStorage(key, fresh);
+          } else {
+            this.store.set(key, stored);
+          }
         } else if (key === 'USERS') {
           const hasOldRoles = stored.some(
             item =>
@@ -257,12 +269,28 @@ export class MockDatabaseService {
               ...item,
               submittedStatus: item.id === 't-1' && seedItem?.submittedStatus ? seedItem.submittedStatus : (item.submittedStatus === 'Accepted' ? 'Approved' : item.submittedStatus),
               rejectionReason: item.rejectionReason ?? seedItem?.rejectionReason,
-              appeal: item.appeal ?? seedItem?.appeal,
-              shortfalls: item.id === 't-3' ? [] : (item.shortfalls ?? seedItem?.shortfalls)
+              appeal: (item.id === 't-1' && (!item.appeal || !item.appeal.deptRemarks)) ? seedItem?.appeal : (item.appeal ?? seedItem?.appeal),
+              shortfalls: (item.id === 't-1' && (!item.shortfalls || item.shortfalls.length === 0)) ? seedItem?.shortfalls : (item.id === 't-3' ? [] : (item.shortfalls ?? seedItem?.shortfalls))
             };
           });
           this.store.set(key, sanitized);
           this.saveToStorage(key, sanitized);
+        } else if (key === 'TWO_STEP_VERIFICATION') {
+          const hasAuthApp = stored.some((item: any) =>
+            Array.isArray(item?.authTypes) && item.authTypes.includes('Auth App')
+          );
+          if (hasAuthApp) {
+            const sanitized = stored.map((item: any) => ({
+              ...item,
+              authTypes: Array.isArray(item?.authTypes)
+                ? item.authTypes.filter((t: string) => t !== 'Auth App')
+                : []
+            }));
+            this.store.set(key, sanitized);
+            this.saveToStorage(key, sanitized);
+          } else {
+            this.store.set(key, stored);
+          }
         } else {
           this.store.set(key, stored);
         }

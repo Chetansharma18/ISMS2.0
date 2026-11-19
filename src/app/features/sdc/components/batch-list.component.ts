@@ -251,10 +251,10 @@ import { FilterTabsComponent } from '../../../shared';
                 size="sm"
                 type="button"
                 (click)="openWithdrawModal(b)"
-                title="Withdraw Batch"
+                title="Withdraw Request"
               >
                 <app-icon name="ban" size="sm" />
-                <span>Withdraw</span>
+                <span>Withdraw Request</span>
               </button>
             }
           </div>
@@ -286,8 +286,8 @@ import { FilterTabsComponent } from '../../../shared';
       [closeOnBackdrop]="true"
       [showAccentBar]="true"
       accentBarClass="bg-rose-600"
-      title="Withdraw Batch"
-      primaryLabel="Withdraw Batch"
+      title="Withdraw Request"
+      primaryLabel="Submit Withdraw Request"
       primaryVariant="danger"
       secondaryLabel="Cancel"
       maxWidthClass="max-w-[460px]"

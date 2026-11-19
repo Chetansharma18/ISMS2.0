@@ -9,7 +9,7 @@ import {
   ApplicationActivityLog
 } from '../../services/eoi-state.service';
 import { NotificationService } from '../../../../core/services/notification.service';
-import { formatDateMedium } from '../../../../shared/utils';
+import { formatDateMedium, formatTime } from '../../../../shared/utils';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { ShortfallBridgeService } from '../../services/shortfall-bridge.service';
 import { ScrutinyToolbarComponent } from './components/scrutiny-toolbar.component';
@@ -502,15 +502,17 @@ export class ScrutinyDeskComponent {
     if (!app) return;
 
     const now = new Date();
+    const raisedOnWithTime = `${formatDateMedium(now, '-')}, ${formatTime(now)}`;
     const nowStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const due = new Date(now);
-    due.setDate(due.getDate() + submission.dueDays);
-
     const isAppealFlow = !!app.appeal;
+    const dueDays = isAppealFlow ? 7 : submission.dueDays;
+    const due = new Date(now);
+    due.setDate(due.getDate() + dueDays);
+
     const title = isAppealFlow ? 'Appeal Accepted' : 'Shortfall Raised';
     const actionDesc = isAppealFlow
-      ? `Appeal accepted. Response time: ${submission.dueDays} days.`
-      : `Shortfall raised for ${submission.documents.length} document(s). Response time: ${submission.dueDays} days.`;
+      ? `Appeal accepted. Response time: ${dueDays} days.`
+      : `Shortfall raised for ${submission.documents.length} document(s). Response time: ${dueDays} days.`;
 
     const newActivity: ApplicationActivityLog = {
       id: `ACT-${Date.now()}`,
@@ -530,7 +532,8 @@ export class ScrutinyDeskComponent {
     const updatedAppeal: ApplicantAppeal | undefined = app.appeal ? {
       ...app.appeal,
       status: 'Accepted',
-      decidedAt: nowStr
+      decidedAt: raisedOnWithTime,
+      decisionRemarks: submission.comment
     } : undefined;
 
     this.eoiStateService.updateScrutinyDecision(app.id, {
@@ -542,7 +545,7 @@ export class ScrutinyDeskComponent {
       appeal: updatedAppeal,
       shortfall: {
         documents: submission.documents,
-        deadlineDays: submission.dueDays,
+        deadlineDays: dueDays,
         revertedAt: now.toLocaleDateString('en-GB')
       },
       activityLog: [...this.getActivityLog(), newActivity]
@@ -551,7 +554,7 @@ export class ScrutinyDeskComponent {
     // Show the shortfall, with the files shared by the department, on the applicant's Tender Status page.
     this.shortfallBridge
       .raiseNotice(app.id, {
-        raisedOn: formatDateMedium(now, '-'),
+        raisedOn: raisedOnWithTime,
         raisedBy: 'Department',
         dueDate: formatDateMedium(due, '-'),
         remarks: submission.comment,
@@ -629,7 +632,7 @@ export class ScrutinyDeskComponent {
       actor: this.reviewerName(),
       actorRole: 'Department Scrutiny Officer',
       description: remark,
-      badgeClass: 'bg-purple-50 text-purple-800 border-purple-200',
+      badgeClass: 'bg-[#F8EDF1] text-[#7C0E44] border-[#EADCE2]',
       meta: {
         remarks: remark
       }

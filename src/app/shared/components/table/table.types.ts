@@ -10,7 +10,7 @@ export type ColumnType =
   | 'custom'
   | 'action';
 
-export type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+export type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'submitted' | 'returned';
 
 export interface TableColumn<T = any> {
   /** Property key on data item, or dot-notation path, or arbitrary key for custom/action */

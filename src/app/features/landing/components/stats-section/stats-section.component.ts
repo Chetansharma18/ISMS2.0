@@ -28,7 +28,7 @@ interface StatMetric {
           <span class="text-xs font-bold text-orange-600 uppercase tracking-wider bg-orange-50 px-3 py-1 rounded-full border border-orange-200/60">
             Real-Time Governance Metrics
           </span>
-          <div style="font-size: 2.4rem; line-height: 1.15; font-weight: 900; color: #0B3558; margin-top: 10px; letter-spacing: -0.025em;">
+          <div style="font-size: 2.4rem; line-height: 1.15; font-weight: 900; color: #7C0E44; margin-top: 10px; letter-spacing: -0.025em;">
             Impact Across Rajasthan
           </div>
           <p class="text-[14px] sm:text-[15px] text-slate-500 mt-2 mx-auto max-w-2xl">
@@ -39,7 +39,7 @@ interface StatMetric {
         <!-- 4 Column Stats Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           @for (stat of stats; track stat.label) {
-            <div class="p-6 rounded-xl border border-slate-200/80 bg-slate-50/40 hover:bg-white hover:border-navy/30 transition-all duration-200 shadow-2xs hover:shadow-xs flex flex-col justify-between">
+            <div class="p-6 rounded-xl border border-[#EADCE2] bg-white hover:border-[#AA5E7A] transition-all duration-200 shadow-2xs hover:shadow-xs flex flex-col justify-between">
               <div>
                 <div class="flex items-center justify-between mb-3">
                   <span class="text-xs font-bold px-2 py-0.5 rounded {{ stat.badge }}">
@@ -50,7 +50,7 @@ interface StatMetric {
                   </div>
                 </div>
 
-                <div style="font-size: 2.4rem; line-height: 1.05; font-weight: 800; color: #0B3558; letter-spacing: -0.02em;" class="tabular-nums mt-1">
+                <div style="font-size: 2.4rem; line-height: 1.05; font-weight: 800; color: #7C0E44; letter-spacing: -0.02em;" class="tabular-nums mt-1">
                   {{ stat.count }}
                 </div>
                 <p class="text-[13px] sm:text-[14px] font-bold text-slate-700 mt-1.5 leading-snug">
@@ -98,9 +98,9 @@ export class StatsSectionComponent {
       count: '₹248.5 Cr',
       label: 'Direct Scheme Benefits Disbursed',
       description: 'Aadhaar-linked DBT payouts to training partners and youth stipends.',
-      badge: 'bg-indigo-50 text-indigo-800',
-      iconBg: 'bg-indigo-100',
-      iconColor: 'text-indigo-700'
+      badge: 'bg-[#F8EDF1] text-[#7C0E44]',
+      iconBg: 'bg-[#F8EDF1]',
+      iconColor: 'text-[#7C0E44]'
     }
   ];
 }

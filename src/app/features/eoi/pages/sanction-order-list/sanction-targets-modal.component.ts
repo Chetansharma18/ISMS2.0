@@ -9,7 +9,7 @@ import { ButtonComponent, ModalComponent, TableColumn, TableComponent } from '..
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ModalComponent, TableComponent, ButtonComponent],
   template: `
-    <app-modal title="Approved TPs" [subtitle]="schemeTitle()" size="xl" (close)="close.emit()">
+    <app-modal title="Approved TPs" [subtitle]="schemeTitle()" size="2xl" (close)="close.emit()">
       <app-table
         [columns]="columns"
         [data]="rows()"
@@ -35,13 +35,13 @@ export class SanctionTargetsModalComponent {
   readonly close = output<void>();
 
   protected readonly columns: TableColumn<SanctionTableRow>[] = [
-    { key: '$index', label: 'Sr. No', type: 'number', align: 'center', width: 'w-14' },
-    { key: 'appId', label: 'Application ID', cellClass: 'whitespace-nowrap tabular-nums text-[12px] text-slate-700' },
+    { key: '$index', label: 'Sr. No', type: 'number', align: 'center', width: 'w-16' },
+    { key: 'appId', label: 'Application ID', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap tabular-nums text-[12px] text-slate-700' },
     { key: 'agencyName', label: 'Name of the Agency / PIA', cellClass: 'font-normal text-slate-800' },
-    { key: 'district', label: 'Sanction District', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: 'district', label: 'Sanction District', width: 'w-36', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'sector', label: 'Sanction Sector(s)', cellClass: 'font-normal text-slate-700' },
-    { key: 'grade', label: 'Grade', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
-    { key: 'target', label: 'Sanction Target', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' }
+    { key: 'grade', label: 'Grade', align: 'center', width: 'w-20', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+    { key: 'target', label: 'Sanction Target', align: 'center', width: 'w-36', cellClass: 'whitespace-nowrap font-normal text-slate-700' }
   ];
 
   protected readonly total = computed(() => this.rows().reduce((sum, row) => sum + (Number(row.target) || 0), 0));

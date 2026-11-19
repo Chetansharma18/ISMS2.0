@@ -166,6 +166,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
           [annexures]="annexureDocuments"
           [requiredInfo]="eoiRequiredInfo"
           [hideApplyButton]="isSuperAdmin()"
+          [hideDownloadDetails]="isNewOrExistingUser()"
           (back)="backToList()"
           (apply)="handleApplyForScheme()"
           (download)="downloadDoc($event)"
@@ -326,6 +327,7 @@ export class TendersPageComponent {
   readonly isProfileIncomplete = computed(() => this.permissions.hasRole('new_user'));
 
   readonly isSuperAdmin = computed(() => this.permissions.hasRole('super_admin'));
+  readonly isNewOrExistingUser = computed(() => this.permissions.hasRole(['new_user', 'existing_user']));
 
   // Schemes reactive state managed via SchemeService (connected to central Mock/API engine)
   readonly schemes = this.schemeService.schemes;

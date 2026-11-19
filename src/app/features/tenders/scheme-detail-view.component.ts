@@ -29,6 +29,7 @@ import { RequiredDocumentsListComponent } from './scheme-detail-view/required-do
       <app-scheme-detail-toolbar
         [isClosed]="isClosed"
         [hideApplyButton]="hideApplyButton"
+        [hideDownloadDetails]="hideDownloadDetails"
         (back)="onBack()"
         (downloadDetails)="handleViewDetailsClick()"
         (apply)="onApply()"
@@ -79,6 +80,7 @@ export class SchemeDetailViewComponent {
   @Input() annexures: EoiDocumentItem[] = [];
   @Input() requiredInfo: EoiRequiredInfoItem[] = [];
   @Input() hideApplyButton = false;
+  @Input() hideDownloadDetails = false;
 
   @Output() back = new EventEmitter<void>();
   @Output() apply = new EventEmitter<SchemeTender>();

@@ -112,18 +112,21 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               <!-- Divider between ISMS & SSO Login -->
               <div class="hidden sm:block w-[1.5px] h-7 sm:h-8 lg:h-9 bg-[#8C1B3F]/25 shrink-0" aria-hidden="true"></div>
 
-              <!-- Premium SSO Login Button -->
+              <!-- SSO Login Icon Button -->
               <button
                 appButton
-                size="sm"
+                variant="ghost"
                 type="button"
                 (click)="onLoginClick()"
-                class="header-sso-btn"
+                class="sso-icon-btn"
+                title="SSO Login"
                 aria-label="SSO Login"
               >
-                <app-icon name="user" size="sm" />
-                <span class="whitespace-nowrap">SSO Login</span>
-                <app-icon name="forward" size="sm" />
+                <img
+                  src="/sso-login-icon.png"
+                  alt="SSO Login"
+                  class="h-7 sm:h-8.5 lg:h-9.5 w-auto object-contain select-none"
+                />
               </button>
 
             </div>
@@ -387,23 +390,21 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       width: 100%;
     }
 
-    .header-sso-btn {
-      background: linear-gradient(135deg, #7C0E44 0%, #5E0832 100%) !important;
-      color: #FFFFFF !important;
-      border: 1px solid rgba(255, 255, 255, 0.25) !important;
-      box-shadow: 0 2px 8px rgba(124, 14, 68, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
-      font-weight: 700 !important;
-      letter-spacing: 0.025em;
+    .sso-icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      cursor: pointer;
+      border-radius: 8px;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .header-sso-btn:hover {
-      background: linear-gradient(135deg, #680E30 0%, #4D0822 100%) !important;
-      box-shadow: 0 4px 14px rgba(124, 14, 68, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
-      transform: translateY(-1px);
+    .sso-icon-btn:hover {
+      background-color: rgba(124, 14, 68, 0.08);
+      transform: scale(1.08);
     }
-    .header-sso-btn:active {
-      transform: translateY(0);
-      box-shadow: 0 1px 4px rgba(124, 14, 68, 0.2) !important;
+    .sso-icon-btn:active {
+      transform: scale(0.96);
     }
   `]
 })

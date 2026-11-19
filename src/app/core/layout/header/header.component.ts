@@ -123,9 +123,9 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                 aria-label="SSO Login"
               >
                 <img
-                  src="/sso-login-icon.png"
+                  src="/sso-login-icon-burgundy.png"
                   alt="SSO Login"
-                  class="h-7 sm:h-8.5 lg:h-9.5 w-auto object-contain select-none"
+                  class="h-7 sm:h-8.5 lg:h-9.5 w-auto object-contain select-none transition-transform duration-200"
                 />
               </button>
 
@@ -394,17 +394,27 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 5px;
+      padding: 6px 8px;
       cursor: pointer;
-      border-radius: 8px;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(136, 28, 67, 0.06) 0%, rgba(136, 28, 67, 0.1) 100%);
+      border: 1px solid rgba(136, 28, 67, 0.22);
+      box-shadow: 0 1px 3px rgba(136, 28, 67, 0.08);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .sso-icon-btn:hover {
-      background-color: rgba(124, 14, 68, 0.08);
+      background: linear-gradient(135deg, rgba(136, 28, 67, 0.14) 0%, rgba(136, 28, 67, 0.22) 100%);
+      border-color: rgba(136, 28, 67, 0.45);
+      box-shadow: 0 4px 14px rgba(136, 28, 67, 0.24);
+      transform: translateY(-1.5px) scale(1.06);
+    }
+    .sso-icon-btn:hover img {
+      filter: drop-shadow(0 2px 4px rgba(136, 28, 67, 0.3));
       transform: scale(1.08);
     }
     .sso-icon-btn:active {
-      transform: scale(0.96);
+      transform: translateY(0) scale(0.96);
+      box-shadow: 0 1px 2px rgba(136, 28, 67, 0.12);
     }
   `]
 })

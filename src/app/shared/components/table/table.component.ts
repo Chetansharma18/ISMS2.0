@@ -21,11 +21,11 @@ import { IconComponent } from '../icon/icon.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule, RouterModule, StatusBadgeComponent, IconComponent],
   template: `
-    <div class="bg-white border border-slate-200 rounded-lg overflow-hidden font-sans" style="box-shadow: 0 1px 4px rgba(0,0,0,0.06);">
+    <div class="bg-white border border-[#EADCE2] rounded-[10px] overflow-hidden font-sans" style="box-shadow: 0 1px 3px rgba(37, 33, 42, 0.05);">
       
       <!-- Optional Search & Toolbar -->
       @if (searchable) {
-        <div class="p-3 bg-white border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="p-3 bg-white border-b border-[#EADCE2] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="relative w-full sm:max-w-xs">
             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
               <app-icon name="search" [stroke]="2" />
@@ -48,14 +48,14 @@ import { IconComponent } from '../icon/icon.component';
         <table class="table w-full text-left border-collapse text-[13px] bg-white">
           <!-- Themed Table Header -->
           <thead>
-            <tr class="bg-gray-50 text-slate-700 text-[13px] font-semibold select-none border-b border-slate-200">
+            <tr class="bg-[#F6E7EC] text-[#7C0E44] text-[13.5px] font-semibold select-none border-b border-[#EADCE2]">
               @for (col of columns; track col.key; let last = $last) {
                 <th
-                  class="h-11 px-3.5 select-none whitespace-nowrap"
+                  class="h-12 px-3.5 select-none whitespace-nowrap"
                   [ngClass]="[
                     col.width || '',
                     (col.headerAlign || col.align) === 'center' ? 'text-center' : (col.headerAlign || col.align) === 'right' ? 'text-right' : 'text-left',
-                    !last ? 'border-r border-slate-200' : '',
+                    !last ? 'border-r border-[#EADCE2]' : '',
                     col.headerClass || ''
                   ]"
                 >
@@ -80,8 +80,8 @@ import { IconComponent } from '../icon/icon.component';
             </tr>
           </thead>
 
-          <!-- Table Body (Pure White background, gray hover) -->
-          <tbody class="divide-y divide-gray-100 bg-white font-normal text-slate-800">
+          <!-- Table Body (Pure White background, blush hover) -->
+          <tbody class="divide-y divide-[#EADCE2] bg-white font-normal text-[#25212A]">
             @if (loading) {
               <tr class="bg-white">
                 <td [attr.colspan]="columns.length" class="py-12 text-center text-secondary bg-white">
@@ -94,7 +94,7 @@ import { IconComponent } from '../icon/icon.component';
             } @else {
               @for (item of paginatedData(); track getTrackBy(item, $index); let idx = $index) {
                 <tr
-                  class="h-11 bg-white transition-colors duration-100 hover:bg-gray-50"
+                  class="h-12 bg-white transition-colors duration-100 hover:bg-[#FAF2F5]"
                   [ngClass]="rowClass ? rowClass(item, idx) : ''"
                   (click)="rowClick.emit(item)"
                 >
@@ -103,7 +103,7 @@ import { IconComponent } from '../icon/icon.component';
                       class="px-3.5 text-[13px]"
                       [ngClass]="[
                         col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left',
-                        !last ? 'border-r border-slate-200' : '',
+                        !last ? 'border-r border-[#EADCE2]' : '',
                         getCellClass(col, item)
                       ]"
                     >
@@ -198,9 +198,9 @@ import { IconComponent } from '../icon/icon.component';
 
       <!-- Table Pagination Bar -->
       @if (pagination && filteredData().length > 0) {
-        <div class="px-4 py-2.5 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-[13px] text-slate-600 select-none font-sans">
+        <div class="px-4 py-2.5 bg-white border-t border-[#EADCE2] flex flex-col sm:flex-row items-center justify-between gap-3 text-[13px] text-[#625663] select-none font-sans">
           <span>
-            Showing <strong class="text-slate-800 font-semibold">{{ (currentPage() - 1) * pageSize + 1 }}</strong> to <strong class="text-slate-800 font-semibold">{{ Math.min(currentPage() * pageSize, filteredData().length) }}</strong> of <strong class="text-slate-800 font-semibold">{{ filteredData().length }}</strong> {{ itemUnit }}
+            Showing <strong class="text-[#25212A] font-semibold">{{ (currentPage() - 1) * pageSize + 1 }}</strong> to <strong class="text-[#25212A] font-semibold">{{ Math.min(currentPage() * pageSize, filteredData().length) }}</strong> of <strong class="text-[#25212A] font-semibold">{{ filteredData().length }}</strong> {{ itemUnit }}
           </span>
 
           <div class="flex items-center gap-1.5">
@@ -208,7 +208,7 @@ import { IconComponent } from '../icon/icon.component';
               type="button"
               (click)="setPage(currentPage() - 1)"
               [disabled]="currentPage() === 1"
-              class="h-7.5 px-2.5 rounded-sm border border-slate-300 bg-white text-[12px] font-medium transition-colors disabled:opacity-40 disabled:pointer-events-none hover:bg-slate-100 cursor-pointer"
+              class="h-7.5 px-2.5 rounded-sm border border-[#EADCE2] bg-white text-[12px] text-[#25212A] font-medium transition-colors disabled:opacity-40 disabled:pointer-events-none hover:bg-[#FAF2F5] cursor-pointer"
             >
               Previous
             </button>
@@ -225,9 +225,9 @@ import { IconComponent } from '../icon/icon.component';
                   [class.text-white]="currentPage() === p"
                   [class.border-primary]="currentPage() === p"
                   [class.bg-white]="currentPage() !== p"
-                  [class.text-slate-700]="currentPage() !== p"
-                  [class.border-slate-300]="currentPage() !== p"
-                  [class.hover:bg-slate-100]="currentPage() !== p"
+                  [class.text-[#25212A]]="currentPage() !== p"
+                  [class.border-[#EADCE2]]="currentPage() !== p"
+                  [class.hover:bg-[#FAF2F5]]="currentPage() !== p"
                 >
                   {{ p }}
                 </button>
@@ -238,7 +238,7 @@ import { IconComponent } from '../icon/icon.component';
               type="button"
               (click)="setPage(currentPage() + 1)"
               [disabled]="currentPage() === totalPages()"
-              class="h-7.5 px-2.5 rounded-sm border border-slate-300 bg-white text-[12px] font-medium transition-colors disabled:opacity-40 disabled:pointer-events-none hover:bg-slate-100 cursor-pointer"
+              class="h-7.5 px-2.5 rounded-sm border border-[#EADCE2] bg-white text-[12px] text-[#25212A] font-medium transition-colors disabled:opacity-40 disabled:pointer-events-none hover:bg-[#FAF2F5] cursor-pointer"
             >
               Next
             </button>
@@ -416,10 +416,19 @@ export class TableComponent {
     }
 
     const val = String(value || '').toLowerCase();
-    if (val.includes('open') || val.includes('active') || val.includes('approved') || val.includes('accepted')) {
+    if (val.includes('submit')) {
+      return 'submitted';
+    }
+    if (val.includes('return')) {
+      return 'returned';
+    }
+    if (val.includes('open') || val.includes('active') || val.includes('approve') || val.includes('accept') || val.includes('resolve')) {
       return 'success';
     }
-    if (val.includes('pending') || val.includes('review') || val.includes('evaluation')) {
+    if (val.includes('review') || val.includes('evaluat')) {
+      return 'info';
+    }
+    if (val.includes('pending') || val.includes('progress') || val.includes('process') || val.includes('enquir')) {
       return 'warning';
     }
     if (val.includes('reject') || val.includes('cancel') || val.includes('inactive')) {
@@ -467,17 +476,17 @@ export class TableComponent {
     switch (act.variant) {
       case 'primary':
       case 'pdf-view':
-        return base + 'bg-navy hover:bg-navy-dark text-white';
+        return base + 'bg-[#7C0E44] hover:bg-[#5E0832] text-white';
       case 'secondary':
-        return base + 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300';
+        return base + 'bg-[#AA5E7A] hover:bg-[#8C4B64] text-white';
       case 'outline':
-        return base + 'border border-primary text-brand hover:bg-primary-light';
+        return base + 'border border-[#AA5E7A] text-[#7C0E44] bg-white hover:bg-[#F8EDF1]';
       case 'danger':
-        return base + 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200';
+        return base + 'bg-[#FCE8E8] text-[#C62828] hover:bg-[#F9C5C5] border border-[#F9C5C5]';
       case 'ghost':
-        return 'p-1 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded transition-colors';
+        return 'p-1 text-[#7C0E44] hover:bg-[#F8EDF1] rounded transition-colors';
       default:
-        return base + 'bg-navy hover:bg-navy-dark text-white';
+        return base + 'bg-[#7C0E44] hover:bg-[#5E0832] text-white';
     }
   }
 }

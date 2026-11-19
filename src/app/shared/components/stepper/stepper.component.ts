@@ -25,7 +25,7 @@ export interface StepperStep {
   template: `
     @if (variant === 'wizard') {
       <nav
-        class="bg-white rounded-xl border border-slate-200/90 shadow-2xs px-4 sm:px-8 py-3.5 sm:py-4 overflow-x-auto no-scrollbar"
+        class="bg-white rounded-xl border border-[#EADCE2] shadow-2xs px-4 sm:px-8 py-3.5 sm:py-4 overflow-x-auto no-scrollbar"
         [attr.aria-label]="ariaLabel"
       >
         <ol

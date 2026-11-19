@@ -24,7 +24,7 @@ import { IconComponent } from '../../icon/icon.component';
       <!-- Label Row -->
       @if (label) {
         <div class="flex items-center justify-between gap-2 mb-1">
-          <label [for]="id" class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#1F2933] select-none">
+          <label [for]="id" class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#25212A] select-none">
             {{ label }}
             @if (required) {
               <span class="text-rose-600 font-bold ml-0.5">*</span>

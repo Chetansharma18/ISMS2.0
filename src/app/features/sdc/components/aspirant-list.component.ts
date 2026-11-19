@@ -229,7 +229,7 @@ export function aspirantStatusClass(status: AspirantTrainingStatus): string {
         <app-modal
           title="Drop Student"
           [subtitle]="target.aspirantName + ' · Batch ' + target.batchCode"
-          size="sm"
+          widthOverride="max-w-[580px]"
           [closeOnBackdrop]="false"
           (close)="dropping.set(null)"
         >

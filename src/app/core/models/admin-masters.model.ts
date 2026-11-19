@@ -74,6 +74,7 @@ export interface SchemeMasterItem {
   schemeName: string;
   schemeCategory: string;
   categoryName: string;
+  budget?: number;
   amount: number;
   processFees: number;
   status: 'Active' | 'Inactive';
@@ -122,7 +123,7 @@ export interface GradingMasterItem {
   status: 'Active' | 'Inactive';
 }
 
-export type AuthMethodType = 'OTP' | 'Auth App' | 'PIN';
+export type AuthMethodType = 'OTP' | 'PIN';
 
 export interface TwoStepVerificationItem {
   id: string;

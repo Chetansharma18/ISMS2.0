@@ -72,7 +72,13 @@ export class ShortfallBridgeService {
               id: `SF-${tender.appRef}-${String(existing.length + 1).padStart(2, '0')}`,
               status: 'Open'
             };
-            const updatedAppeal = tender.appeal ? { ...tender.appeal, status: 'Accepted' as const } : undefined;
+            const updatedAppeal = tender.appeal ? {
+              ...tender.appeal,
+              status: 'Accepted' as const,
+              decidedAt: notice.raisedOn,
+              deptRemarks: notice.remarks,
+              responseDeadline: notice.dueDate
+            } : undefined;
             return this.tenderRepo.update(tender.id, {
               shortfalls: [...existing, raised],
               appeal: updatedAppeal

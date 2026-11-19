@@ -183,11 +183,11 @@ export const MOCK_PERMISSION_MASTER_ITEMS: PermissionMasterItem[] = resolveMock(
 ]);
 
 export const MOCK_SCHEME_MASTER_ITEMS: SchemeMasterItem[] = resolveMock([
-  { sNo: 1, id: 'sch-1', schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana', schemeCategory: 'Rajvik', categoryName: 'GENERAL', amount: 5000000, processFees: 10000, status: 'Active' },
-  { sNo: 2, id: 'sch-2', schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)', schemeCategory: 'samarth', categoryName: 'GOVERNMENT INSTITUTION/PSU', amount: 7500000, processFees: 15000, status: 'Active' },
-  { sNo: 3, id: 'sch-3', schemeName: 'Mukhyamantri Yuva Sambal Yojana', schemeCategory: 'saksham', categoryName: 'GOVERNMENT INSTITUTION/INSTITUTION', amount: 2500000, processFees: 5000, status: 'Active' },
-  { sNo: 4, id: 'sch-4', schemeName: 'Mukhya Mantri Yuva Kaushal Yojana', schemeCategory: 'Rajvik, samarth', categoryName: 'SPECIAL TARGET GROUP', amount: 10000000, processFees: 25000, status: 'Active' },
-  { sNo: 5, id: 'sch-5', schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)', schemeCategory: 'Rajvik', categoryName: 'GENERAL', amount: 5000000, processFees: 2000, status: 'Active' }
+  { sNo: 1, id: 'sch-1', schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana', schemeCategory: 'Rajvik', categoryName: 'GENERAL', budget: 50000000, amount: 5000000, processFees: 10000, status: 'Active' },
+  { sNo: 2, id: 'sch-2', schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)', schemeCategory: 'samarth', categoryName: 'GOVERNMENT INSTITUTION/PSU', budget: 75000000, amount: 7500000, processFees: 15000, status: 'Active' },
+  { sNo: 3, id: 'sch-3', schemeName: 'Mukhyamantri Yuva Sambal Yojana', schemeCategory: 'saksham', categoryName: 'GOVERNMENT INSTITUTION/INSTITUTION', budget: 25000000, amount: 2500000, processFees: 5000, status: 'Active' },
+  { sNo: 4, id: 'sch-4', schemeName: 'Mukhya Mantri Yuva Kaushal Yojana', schemeCategory: 'Rajvik, samarth', categoryName: 'SPECIAL TARGET GROUP', budget: 100000000, amount: 10000000, processFees: 25000, status: 'Active' },
+  { sNo: 5, id: 'sch-5', schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)', schemeCategory: 'Rajvik', categoryName: 'GENERAL', budget: 50000000, amount: 5000000, processFees: 2000, status: 'Active' }
 ]);
 
 export const MOCK_USER_ROLE_MASTER_ITEMS: UserRoleMasterItem[] = resolveMock([
@@ -494,14 +494,14 @@ export const MOCK_TWO_STEP_VERIFICATION_ITEMS: TwoStepVerificationItem[] = resol
     sNo: 1,
     id: '2fa-1',
     roleType: 'Super Admin',
-    authTypes: ['OTP', 'Auth App', 'PIN'],
+    authTypes: ['OTP', 'PIN'],
     status: 'Active'
   },
   {
     sNo: 2,
     id: '2fa-2',
     roleType: 'Department Officer',
-    authTypes: ['OTP', 'Auth App'],
+    authTypes: ['OTP'],
     status: 'Active'
   },
   {

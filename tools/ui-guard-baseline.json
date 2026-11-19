@@ -20,14 +20,6 @@
   "features/profile/profile-page.component.ts": {
     "page-frame": 1
   },
-  "features/sdc/components/batch-approvals.component.ts": {
-    "raw-input": 1,
-    "button-style": 1
-  },
-  "features/sdc/components/batch-list.component.ts": {
-    "raw-input": 1,
-    "button-style": 1
-  },
   "features/tenders/scheme-detail-view/required-documents-list.component.ts": {
     "raw-button": 1
   },

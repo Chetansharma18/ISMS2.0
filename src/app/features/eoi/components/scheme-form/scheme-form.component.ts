@@ -38,11 +38,11 @@ export type { EoiDocumentItem } from './scheme-form.model';
           </div>
 
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">
+            <h1 class="text-2xl sm:text-[28px] font-bold text-[#172554] tracking-tight m-0">
               Apply for EOI
             </h1>
             <span class="text-xs text-slate-500 font-medium select-none">
-              Fields marked with <span class="text-rose-500 font-bold">*</span> are mandatory
+              Fields marked with <span class="text-[#DC2626] font-bold">*</span> are mandatory
             </span>
           </div>
 
@@ -71,14 +71,14 @@ export type { EoiDocumentItem } from './scheme-form.model';
         }
 
         <!-- 3. Main form card: numbered step title + the active step -->
-        <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-7 space-y-6">
+        <div class="bg-white rounded-xl border border-[#D6E3F0] shadow-xs p-5 sm:p-7 space-y-6">
 
-          <div class="pb-3.5 border-b border-slate-100 space-y-1">
+          <div class="pb-3.5 border-b border-[#E8EEF5] space-y-1">
             <div class="flex items-center gap-3">
-              <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
+              <span class="w-7 h-7 rounded-full bg-[#1E3A5F] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
                 {{ state.currentStep() }}
               </span>
-              <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">
+              <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0">
                 {{ stepTitle() }}
               </h2>
             </div>

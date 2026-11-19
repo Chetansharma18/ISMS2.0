@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import type { CourseMasterItem } from '../../../../core/models/admin-masters.model';
 import type { BatchRecord } from '../../models/batch.model';
 import { courseDetailsOf, masterFor, sumHours } from './course-details.util';

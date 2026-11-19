@@ -3,6 +3,7 @@ export type GrievanceIssueType = 'Enquire' | 'Technical' | 'accounts';
 
 export interface GrievanceItem {
   sNo: number;
+  schemeName?: string;
   submittedAt: string;
   title: string;
   description: string;

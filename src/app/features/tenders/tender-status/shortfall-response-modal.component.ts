@@ -33,7 +33,7 @@ export interface ShortfallSubmission {
       accentBarClass="bg-amber-500"
       [title]="isAppeal() ? 'Appeal Response' : 'Shortfall Request'"
       primaryLabel="Submit"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       maxWidthClass="max-w-2xl"
       [disablePrimary]="!canSubmit()"
       (primaryAction)="submit()"

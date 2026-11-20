@@ -292,7 +292,7 @@ import { FilterTabsComponent } from '../../../shared';
       title="Withdraw Request"
       primaryLabel="Submit Withdraw Request"
       primaryVariant="danger"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       maxWidthClass="max-w-[460px]"
       (primaryAction)="confirmWithdraw()"
       (secondaryAction)="cancelWithdraw()"

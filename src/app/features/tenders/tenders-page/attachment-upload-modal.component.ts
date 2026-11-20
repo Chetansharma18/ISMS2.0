@@ -21,7 +21,7 @@ import { createAttachment, validateUploadFile } from './tenders-page.util';
       [reverseButtons]="true"
       [showAccentBar]="false"
       primaryLabel="Submit"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       maxWidthClass="max-w-[500px]"
       (primaryAction)="submitAttachment()"
       (secondaryAction)="close.emit()"

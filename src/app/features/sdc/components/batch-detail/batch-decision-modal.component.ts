@@ -108,7 +108,6 @@ const CONTENT: Record<BatchDecisionMode, { title: string; label: string; require
       </div>
 
       <ng-container modalFooter>
-        <button appButton variant="outline" (click)="close.emit()">Cancel</button>
         <button appButton [variant]="mode() === 'reject' ? 'danger' : 'primary'" (click)="submit()" [disabled]="!isValid()">
           {{ actionLabel() }}
         </button>

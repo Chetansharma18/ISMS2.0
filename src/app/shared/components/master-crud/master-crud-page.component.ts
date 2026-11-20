@@ -311,35 +311,50 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
         [showAccentBar]="false"
         primaryLabel=""
         secondaryLabel=""
-        [maxWidthClass]="config.modalWidthClass || 'max-w-[500px]'"
+        [maxWidthClass]="config.viewModalWidthClass || (config.modalWidthClass ? 'max-w-[620px]' : 'max-w-[540px]')"
         (secondaryAction)="closeViewModal()"
         (close)="closeViewModal()"
       >
-        <h2 class="m-0 text-brand-dark" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+        <h2 class="m-0 text-brand-dark pb-2.5 border-b border-slate-100" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
           {{ config.entityLabel }} Details
         </h2>
 
         @if (selectedViewItem(); as viewItem) {
-          <div class="mt-4 font-sans text-[13px] space-y-3.5 divide-y divide-slate-100 max-h-[65vh] overflow-y-auto pr-1">
+          <div class="mt-2.5 font-sans text-xs divide-y divide-slate-100">
             @for (col of viewableColumns(); track col.key) {
-              <div class="pt-2.5 flex flex-col gap-1 first:pt-0">
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">{{ col.label }}</span>
-                @if (isTagArray(col.key, viewItem)) {
-                  <div class="flex flex-wrap gap-1.5 pt-0.5">
-                    @for (tag of viewItem[col.key]; track tag) {
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-sky-50 text-brand border border-sky-200">
-                        {{ tag }}
-                      </span>
-                    }
-                  </div>
-                } @else {
-                  <span class="text-sm font-medium text-slate-800 break-words">{{ formatViewValue(col, viewItem) }}</span>
-                }
-              </div>
+              @if (isLongText(col, viewItem)) {
+                <div class="py-1.5 flex flex-col gap-0.5 text-xs first:pt-0">
+                  <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                    {{ col.label }}
+                  </span>
+                  <span class="text-xs font-semibold text-slate-800 break-words leading-relaxed">
+                    {{ formatViewValue(col, viewItem) }}
+                  </span>
+                </div>
+              } @else {
+                <div class="py-1.5 flex items-center justify-between gap-4 text-xs first:pt-0">
+                  <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider shrink-0 max-w-[55%]">
+                    {{ col.label }}
+                  </span>
+                  @if (isTagArray(col.key, viewItem)) {
+                    <div class="flex flex-wrap justify-end gap-1.5 max-w-[45%]">
+                      @for (tag of viewItem[col.key]; track tag) {
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-sky-50 text-brand border border-sky-200">
+                          {{ tag }}
+                        </span>
+                      }
+                    </div>
+                  } @else {
+                    <span class="text-xs sm:text-[13px] font-semibold text-slate-800 text-right break-words max-w-[45%]">
+                      {{ formatViewValue(col, viewItem) }}
+                    </span>
+                  }
+                </div>
+              }
             }
 
-            <div class="pt-3 flex items-center justify-between">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</span>
+            <div class="py-1.5 flex items-center justify-between gap-4 text-xs last:pb-0">
+              <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Status</span>
               <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border select-none"
                 [ngClass]="viewItem.status === 'Inactive' ? 'bg-slate-50 text-slate-600 border-slate-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'"
@@ -647,6 +662,11 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
 
   isTagArray(key: string, item: Record<string, unknown>): boolean {
     return this.isTagsColumn(key) && Array.isArray(item[key]);
+  }
+
+  isLongText(col: TableColumn<T>, item: any): boolean {
+    const val = item[col.key];
+    return typeof val === 'string' && val.length > 70;
   }
 
   formatViewValue(col: TableColumn<T>, item: any): string {

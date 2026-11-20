@@ -16,7 +16,7 @@ import { ConfirmModalData } from '../user-management.util';
       [accentBarClass]="data()?.accentBarClass || 'bg-primary'"
       [title]="data()?.title || 'Confirmation'"
       [primaryLabel]="data()?.confirmLabel || 'Confirm'"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       maxWidthClass="max-w-[460px]"
       (primaryAction)="confirmed.emit()"
       (secondaryAction)="dismissed.emit()"

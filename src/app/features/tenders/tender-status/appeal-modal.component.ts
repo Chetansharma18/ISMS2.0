@@ -24,7 +24,7 @@ import { buildAppeal } from './tender-appeal.util';
       accentBarClass="bg-navy"
       title="Request for Appeal"
       primaryLabel="Confirm Appeal Request"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       maxWidthClass="max-w-2xl"
       [disablePrimary]="!canSubmit()"
       (primaryAction)="submit()"

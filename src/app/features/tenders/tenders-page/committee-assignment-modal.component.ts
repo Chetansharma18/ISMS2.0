@@ -34,7 +34,7 @@ import { filterAdmins } from './tenders-page.util';
       accentBarClass="bg-primary"
       title="Create Committee"
       primaryLabel="Save Committee"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       maxWidthClass="max-w-[560px]"
       (primaryAction)="onSave()"
       (secondaryAction)="close.emit()"
@@ -114,7 +114,7 @@ import { filterAdmins } from './tenders-page.util';
               @if (isApproverDropdownOpen()) {
                 <div
                   (click)="$event.stopPropagation()"
-                  class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 flex flex-col font-sans"
+                  class="mt-1.5 bg-white border border-slate-200 rounded-lg shadow-xs flex flex-col font-sans animate-in fade-in duration-150"
                 >
                   <!-- Search Bar -->
                   <div class="p-2 border-b border-slate-100 shrink-0 bg-slate-50/60 rounded-t-lg">
@@ -229,7 +229,7 @@ import { filterAdmins } from './tenders-page.util';
               @if (isMemberDropdownOpen()) {
                 <div
                   (click)="$event.stopPropagation()"
-                  class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 flex flex-col font-sans"
+                  class="mt-1.5 bg-white border border-slate-200 rounded-lg shadow-xs flex flex-col font-sans animate-in fade-in duration-150"
                 >
                   <!-- Search Bar -->
                   <div class="p-2 border-b border-slate-100 shrink-0 bg-slate-50/60 rounded-t-lg">

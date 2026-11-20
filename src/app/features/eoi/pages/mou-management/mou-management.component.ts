@@ -143,7 +143,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
       title="Delete MoU"
       primaryLabel="Delete MoU"
       primaryVariant="danger"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       maxWidthClass="max-w-[460px]"
       (primaryAction)="confirmDelete()"
       (secondaryAction)="cancelDelete()"

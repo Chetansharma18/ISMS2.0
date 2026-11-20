@@ -26,7 +26,6 @@ import { ButtonComponent, FormInputComponent, IconComponent, ModalComponent } fr
       </div>
 
       <ng-container modalFooter>
-        <button appButton variant="outline" type="button" (click)="closed.emit()">Cancel</button>
         <button appButton type="button" [disabled]="!serial().trim()" (click)="link.emit(serial())">
           <app-icon name="check" size="sm" />
           <span>Link Device</span>

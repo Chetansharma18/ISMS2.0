@@ -158,7 +158,6 @@ const COMMENT_PRESETS = [
         </div>
 
         <ng-container modalFooter>
-          <button appButton variant="outline" (click)="close.emit()">Cancel</button>
           <button appButton (click)="submit()" [disabled]="!isValid()">{{ submitLabel() }}</button>
         </ng-container>
     </app-modal>

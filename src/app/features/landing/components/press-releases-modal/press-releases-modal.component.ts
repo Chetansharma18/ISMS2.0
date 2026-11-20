@@ -14,7 +14,7 @@ interface PressRelease {
   selector: 'app-press-releases-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ModalComponent, ButtonComponent],
+  imports: [CommonModule, ModalComponent],
   template: `
     <app-modal
       title="Press Releases & Official Statements"
@@ -46,7 +46,6 @@ interface PressRelease {
 
         <ng-container modalFooter>
           <span class="text-xs text-slate-500 font-medium mr-auto">Source: RSLDC Public Relations & Media</span>
-          <button appButton (click)="close.emit()">Close</button>
         </ng-container>
     </app-modal>
   `

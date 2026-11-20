@@ -32,7 +32,8 @@ import {
   createEmptyEoiForm,
   eoiFormFromScheme,
   filterActiveSchemes,
-  isEoiFormValid
+  isEoiFormValid,
+  validateEoiFormComplete
 } from './tenders-page/tenders-page.util';
 import { ConfigureEoiFormComponent } from './tenders-page/configure-eoi-form.component';
 import { CommitteeAssignmentModalComponent } from './tenders-page/committee-assignment-modal.component';
@@ -123,7 +124,11 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
               [requiredInfo]="eoiRequiredInfo"
               [schemeMasterItems]="schemeMasterItems()"
               [docMasterItems]="docMasterItems()"
+              [existingRefNos]="existingRefNos()"
+              [currentRefNo]="editingSchemeRefNo()"
+              [externalVersion]="eoiFormVersion()"
               (schemeChange)="onSchemeSelected($event)"
+              (formChange)="autoSaveDraft()"
               (attach)="openAttachmentModal()"
               (removeAttachment)="removeAttachment($event)"
               (addDocument)="addEoiDocument()"
@@ -137,21 +142,25 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
                 variant="outline"
                 size="md"
                 type="button"
+                [disabled]="isSubmitting()"
                 (click)="closeConfigureScreen()"
               >
                 <app-icon name="chevron-left" />
                 <span>Cancel</span>
               </button>
-              <button
-                appButton
-                variant="primary"
-                size="md"
-                type="button"
-                (click)="submitNewEoi()"
-              >
-                <span>{{ editingSchemeRefNo() ? 'Update EOI' : 'Submit EOI' }}</span>
-                <app-icon name="chevron-right" />
-              </button>
+              <div class="flex items-center gap-2">
+                <button
+                  appButton
+                  variant="primary"
+                  size="md"
+                  type="button"
+                  [disabled]="isSubmitting()"
+                  (click)="submitNewEoi()"
+                >
+                  <span>{{ editingSchemeRefNo() ? 'Update EOI' : 'Submit EOI' }}</span>
+                  <app-icon name="chevron-right" />
+                </button>
+              </div>
             </div>
 
           </div>
@@ -381,10 +390,15 @@ export class TendersPageComponent {
     return list;
   });
 
+  static readonly EOI_DRAFT_STORAGE_KEY = 'isms_eoi_configure_draft';
+
   newEoiData: EoiFormData = createEmptyEoiForm();
+  readonly eoiFormVersion = signal<number>(0);
   newEoiSubmitted = signal<boolean>(false);
+  isSubmitting = signal<boolean>(false);
   fileError = signal<string>('');
   editingSchemeRefNo = signal<string | null>(null);
+  readonly existingRefNos = computed(() => this.schemes().map(s => s.refNo));
 
   readonly showAttachmentModal = signal<boolean>(false);
   readonly showCorrigendumModal = signal<boolean>(false);
@@ -730,6 +744,28 @@ export class TendersPageComponent {
         this.newEoiData.documentFiles = {};
       }
     }
+
+    this.eoiFormVersion.update((v) => v + 1);
+    this.autoSaveDraft();
+  }
+
+  autoSaveDraft(): void {
+    if (this.editingSchemeRefNo()) return; // Don't overwrite new EOI draft when editing an existing scheme
+    const hasInput =
+      !!this.newEoiData.refNo ||
+      !!this.newEoiData.scheme ||
+      !!this.newEoiData.eoiCategory ||
+      !!this.newEoiData.publishedDate ||
+      !!this.newEoiData.submissionDate ||
+      !!this.newEoiData.eoiDurationValue ||
+      !!this.newEoiData.description;
+
+    if (hasInput) {
+      this.storage.setItem(TendersPageComponent.EOI_DRAFT_STORAGE_KEY, {
+        ...this.newEoiData,
+        documentFiles: {}
+      });
+    }
   }
 
   openConfigureScreen(updateUrl = true): void {
@@ -737,7 +773,19 @@ export class TendersPageComponent {
     this.editingSchemeRefNo.set(null);
     this.newEoiSubmitted.set(false);
     this.fileError.set('');
-    this.newEoiData = createEmptyEoiForm();
+
+    const savedDraft = this.storage.getItem<EoiFormData>(TendersPageComponent.EOI_DRAFT_STORAGE_KEY);
+    if (savedDraft) {
+      this.newEoiData = {
+        ...createEmptyEoiForm(),
+        ...savedDraft,
+        documentFiles: {}
+      };
+    } else {
+      this.newEoiData = createEmptyEoiForm();
+    }
+
+    this.eoiFormVersion.update((v) => v + 1);
     this.selectedScheme.set(null);
     this.showConfigureScreen.set(true);
     if (updateUrl) {
@@ -756,6 +804,7 @@ export class TendersPageComponent {
     this.newEoiSubmitted.set(false);
     this.fileError.set('');
     this.newEoiData = eoiFormFromScheme(scheme);
+    this.eoiFormVersion.update((v) => v + 1);
     this.selectedScheme.set(null);
     this.showConfigureScreen.set(true);
     if (updateUrl) {
@@ -781,6 +830,8 @@ export class TendersPageComponent {
 
   addEoiDocument(): void {
     this.newEoiData.documents.push('');
+    this.eoiFormVersion.update((v) => v + 1);
+    this.autoSaveDraft();
   }
 
   removeEoiDocument(index: number): void {
@@ -797,6 +848,8 @@ export class TendersPageComponent {
       }
       this.newEoiData.documentFiles = newFiles;
     }
+    this.eoiFormVersion.update((v) => v + 1);
+    this.autoSaveDraft();
   }
 
   // ---- Row actions ---------------------------------------------------------
@@ -846,10 +899,14 @@ export class TendersPageComponent {
   onAttachmentAdded(attachment: EoiAttachment): void {
     this.newEoiData.attachments.push(attachment);
     this.showAttachmentModal.set(false);
+    this.eoiFormVersion.update((v) => v + 1);
+    this.autoSaveDraft();
   }
 
   removeAttachment(index: number): void {
     this.newEoiData.attachments.splice(index, 1);
+    this.eoiFormVersion.update((v) => v + 1);
+    this.autoSaveDraft();
   }
 
   // ---- Corrigendum (edit mode) ---------------------------------------------
@@ -890,12 +947,77 @@ export class TendersPageComponent {
   submitNewEoi(): void {
     this.newEoiSubmitted.set(true);
 
-    // Invalid: fields turn red / show required error
-    if (!isEoiFormValid(this.newEoiData)) {
+    const validation = validateEoiFormComplete(this.newEoiData, {
+      existingRefNos: this.existingRefNos(),
+      currentRefNo: this.editingSchemeRefNo(),
+      activeSchemeNames: this.schemeNameOptions(),
+      activeEoiCategories: [...this.eoiCategoryOptions()],
+      schemeMasterItems: this.schemeMasterItems()
+    });
+
+    if (!validation.isValid) {
+      const firstInvalidKey = Object.keys(validation.errors)[0];
+      if (firstInvalidKey) {
+        const fieldMap: Record<string, string> = {
+          refNo: 'eoiRefNoInput',
+          scheme: 'eoiSchemeSelect',
+          schemeCategory: 'eoiSchemeCategorySelect',
+          eoiCategory: 'eoiCategorySelect',
+          publishedDate: 'eoiPublishedDateInput',
+          submissionDate: 'eoiSubmissionDateInput',
+          eoiDurationValue: 'eoiDurationInput',
+          description: 'eoiDescriptionInput',
+          emdFee: 'eoiEmdFeeInput',
+          processFee: 'eoiProcessFeeInput'
+        };
+        const elId = fieldMap[firstInvalidKey];
+        if (elId) {
+          const el = document.getElementById(elId);
+          el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el?.focus();
+        }
+      }
       return;
     }
 
     this.showConfirmSubmitEoiModal.set(true);
+  }
+
+  saveDraftEoi(): void {
+    if (!this.newEoiData.refNo?.trim()) {
+      this.newEoiSubmitted.set(true);
+      return;
+    }
+    this.newEoiData.status = 'Draft';
+    const targetRef = this.editingSchemeRefNo();
+    const existingScheme = targetRef ? this.schemes().find(s => s.refNo === targetRef) : null;
+    const draftScheme = buildSchemeFromForm(this.newEoiData, existingScheme);
+    draftScheme.status = 'Draft';
+
+    this.isSubmitting.set(true);
+    if (targetRef) {
+      this.schemeService.updateScheme(targetRef, draftScheme).subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.closeConfigureScreen();
+        },
+        error: (err: any) => {
+          this.isSubmitting.set(false);
+          this.fileError.set(err?.message || 'Failed to save draft');
+        }
+      });
+    } else {
+      this.schemeService.createScheme(draftScheme).subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.closeConfigureScreen();
+        },
+        error: (err: any) => {
+          this.isSubmitting.set(false);
+          this.fileError.set(err?.message || 'Failed to save draft');
+        }
+      });
+    }
   }
 
   confirmSubmitNewEoi(): void {
@@ -903,17 +1025,28 @@ export class TendersPageComponent {
     const existingScheme = targetRef ? this.schemes().find(s => s.refNo === targetRef) : null;
     const newScheme = buildSchemeFromForm(this.newEoiData, existingScheme);
 
+    this.isSubmitting.set(true);
     if (targetRef) {
       // Edit mode: save updated scheme object into pendingEditScheme & open optional Corrigendum modal
       this.pendingEditScheme = newScheme;
+      this.isSubmitting.set(false);
       this.showConfigureScreen.set(false);
       this.showCorrigendumModal.set(true);
     } else {
       // New EOI mode: save directly via SchemeService
-      this.schemeService.createScheme(newScheme).subscribe();
-      this.showConfigureScreen.set(false);
-      this.editingSchemeRefNo.set(null);
-      this.router.navigate([], { relativeTo: this.route, queryParams: {} });
+      this.schemeService.createScheme(newScheme).subscribe({
+        next: () => {
+          this.storage.removeItem(TendersPageComponent.EOI_DRAFT_STORAGE_KEY);
+          this.isSubmitting.set(false);
+          this.showConfigureScreen.set(false);
+          this.editingSchemeRefNo.set(null);
+          this.router.navigate([], { relativeTo: this.route, queryParams: {} });
+        },
+        error: (err: any) => {
+          this.isSubmitting.set(false);
+          this.fileError.set(err?.message || 'Failed to configure EOI');
+        }
+      });
     }
 
     this.showConfirmSubmitEoiModal.set(false);

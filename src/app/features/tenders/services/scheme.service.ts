@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, throwError } from 'rxjs';
 import { DataEngineService, ResourceRepository } from '../../../core/services/data-engine.service';
 import {
   SchemeTenderItem,
@@ -8,6 +8,17 @@ import {
   MOCK_ANNEXURE_DOCUMENTS,
   MOCK_EOI_REQUIRED_INFO
 } from '../../../core/mock/data';
+import {
+  validateEoiRefNo,
+  validateSubmissionDate,
+  validatePublishedDate,
+  validateFee,
+  validateEoiDuration,
+  validateDocuments,
+  toInputDate,
+  parseEoiDuration,
+  sanitizeInput
+} from '../tenders-page/tenders-page.util';
 
 @Injectable({
   providedIn: 'root'
@@ -47,10 +58,70 @@ export class SchemeService {
   }
 
   /**
-   * Creates / Configures a new Scheme
+   * Creates / Configures a new Scheme with backend-grade validation and audit tracking
    */
   createScheme(data: Partial<SchemeTenderItem>): Observable<SchemeTenderItem> {
-    return this.repo.create(data).pipe(
+    const existingRefNos = this.schemes().map(s => s.refNo);
+    const refError = validateEoiRefNo(data.refNo, existingRefNos);
+    if (refError) {
+      return throwError(() => new Error(refError));
+    }
+
+    if (!data.schemeName?.trim()) {
+      return throwError(() => new Error('Please select a valid scheme.'));
+    }
+
+    const isDraft = data.status === 'Draft';
+    if (!isDraft) {
+      const pubIso = toInputDate(data.datePublished);
+      const isScheduled = data.status === 'Scheduled';
+      const pubError = validatePublishedDate(pubIso, isScheduled);
+      if (pubError) {
+        return throwError(() => new Error(pubError));
+      }
+
+      const subIso = toInputDate(data.closingDate);
+      const subError = validateSubmissionDate(subIso, pubIso);
+      if (subError) {
+        return throwError(() => new Error(subError));
+      }
+
+      const durVal = parseEoiDuration(data.eoiDuration).value;
+      const durError = validateEoiDuration(durVal);
+      if (durError) {
+        return throwError(() => new Error(durError));
+      }
+
+      const emdError = validateFee(data.emdFee, 'EMD Fee', undefined, data.isFeeExempted);
+      if (emdError) {
+        return throwError(() => new Error(emdError));
+      }
+
+      const procError = validateFee(data.processFee, 'Process Fee', undefined, data.isFeeExempted);
+      if (procError) {
+        return throwError(() => new Error(procError));
+      }
+
+      const docCheck = validateDocuments(data.requiredDocs || []);
+      if (!docCheck.isValid) {
+        const firstDocErr = Object.values(docCheck.errors)[0];
+        return throwError(() => new Error(firstDocErr));
+      }
+    }
+
+    const now = Date.now();
+    const enriched: Partial<SchemeTenderItem> = {
+      ...data,
+      refNo: data.refNo?.trim(),
+      eoiDescription: sanitizeInput(data.eoiDescription),
+      createdAt: data.createdAt || now,
+      updatedAt: now,
+      publishedAt: data.status === 'Open' ? (data.publishedAt || now) : undefined,
+      status: data.status || 'Open',
+      isActive: data.isActive !== undefined ? data.isActive : true
+    };
+
+    return this.repo.create(enriched).pipe(
       tap(created => {
         this.schemes.update(current => [created, ...current].map((s, i) => ({ ...s, sNo: i + 1 })));
       })
@@ -58,10 +129,26 @@ export class SchemeService {
   }
 
   /**
-   * Updates an existing scheme
+   * Updates an existing scheme with uniqueness and integrity validation
    */
   updateScheme(refNo: string, patch: Partial<SchemeTenderItem>): Observable<SchemeTenderItem> {
-    return this.repo.update(refNo, patch).pipe(
+    if (patch.refNo && patch.refNo.trim().toLowerCase() !== refNo.trim().toLowerCase()) {
+      const existingRefNos = this.schemes().map(s => s.refNo);
+      const refError = validateEoiRefNo(patch.refNo, existingRefNos, refNo);
+      if (refError) {
+        return throwError(() => new Error(refError));
+      }
+    }
+
+    const now = Date.now();
+    const enrichedPatch: Partial<SchemeTenderItem> = {
+      ...patch,
+      ...(patch.refNo ? { refNo: patch.refNo.trim() } : {}),
+      ...(patch.eoiDescription !== undefined ? { eoiDescription: sanitizeInput(patch.eoiDescription) } : {}),
+      updatedAt: now
+    };
+
+    return this.repo.update(refNo, enrichedPatch).pipe(
       tap(updated => {
         this.schemes.update(current =>
           current.map(s => (s.refNo === refNo ? { ...s, ...updated } : s))

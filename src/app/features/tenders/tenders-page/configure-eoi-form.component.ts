@@ -5,14 +5,19 @@ import { SchemeMasterItem, DocMasterItem } from '../../../core/models/admin-mast
 import { INITIAL_DOC_ITEMS } from '../../admin-master/doc-master.component';
 import { DocumentViewerService } from '../../../core/services/document-viewer.service';
 import { ButtonComponent, DropdownComponent, IconComponent, InputDirective, formatInr } from '../../../shared';
-import { formatBytes } from './tenders-page.util';
+import {
+  formatBytes,
+  getTodayKolkataDate,
+  parseFeeNumber,
+  validateEoiFormComplete,
+  validateUploadFile
+} from './tenders-page.util';
 
 /**
  * Body of the "Configure New EOI / Edit EOI" form screen.
  *
- * Edits the parent-owned `data` object in place through ngModel, so it stays on
- * Default change detection. Document list changes are delegated to
- * the parent via outputs.
+ * Implements government portal standard validation, dynamic dependent auto-fill,
+ * real-time duplicate checks, date-picker boundaries, and inline error handling.
  */
 @Component({
   selector: 'app-configure-eoi-form',
@@ -25,33 +30,38 @@ import { formatBytes } from './tenders-page.util';
 
         <!-- Row 1, Col 1: EOI Reference No. * -->
         <div>
-          <label class="block text-slate-700 font-medium mb-1.5">
+          <label class="block text-slate-700 font-medium mb-1.5" for="eoiRefNoInput">
             EOI Reference No. <span class="text-[#DC2626] font-bold">*</span>
           </label>
           <input
+            id="eoiRefNoInput"
             appInput
             type="text"
             maxlength="100"
             placeholder="e.g. RSLDC/EOI/2026-27/01"
             [(ngModel)]="data().refNo"
-            [invalid]="submitted() && !data().refNo"
+            (blur)="onRefNoBlur()"
+            (ngModelChange)="onFieldChange('refNo')"
+            [invalid]="hasError('refNo')"
             class="w-full"
           />
-          @if (submitted() && !data().refNo) {
-            <p class="text-xs text-red-500 font-medium m-0 mt-1">EOI Reference No. is required</p>
+          @if (hasError('refNo')) {
+            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('refNo') }}</p>
           }
         </div>
 
         <!-- Row 1, Col 2: Scheme * -->
         <div>
-          <label class="block text-slate-700 font-medium mb-1.5">
+          <label class="block text-slate-700 font-medium mb-1.5" for="eoiSchemeSelect">
             Scheme <span class="text-[#DC2626] font-bold">*</span>
           </label>
           <select
+            id="eoiSchemeSelect"
             appInput
             [(ngModel)]="data().scheme"
             (ngModelChange)="onSchemeChange($event)"
-            [invalid]="submitted() && !data().scheme"
+            (blur)="onBlur('scheme')"
+            [invalid]="hasError('scheme')"
             class="w-full"
           >
             <option value="" disabled [selected]="!data().scheme">-- Select Scheme --</option>
@@ -59,149 +69,201 @@ import { formatBytes } from './tenders-page.util';
               <option [value]="name">{{ name }}</option>
             }
           </select>
-          @if (submitted() && !data().scheme) {
-            <p class="text-xs text-red-500 font-medium m-0 mt-1">Scheme is required</p>
+          @if (hasError('scheme')) {
+            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('scheme') }}</p>
           }
         </div>
 
         <!-- Row 2, Col 1: Scheme Category -->
         <div>
-          <label class="block text-slate-700 font-medium mb-1.5">
+          <label class="block text-slate-700 font-medium mb-1.5" for="eoiSchemeCategorySelect">
             Scheme Category
           </label>
-          <select appInput [(ngModel)]="data().schemeCategory" class="w-full">
+          <select
+            id="eoiSchemeCategorySelect"
+            appInput
+            [(ngModel)]="data().schemeCategory"
+            (ngModelChange)="onFieldChange('schemeCategory')"
+            [disabled]="isCategoryLocked()"
+            [class.bg-slate-50]="isCategoryLocked()"
+            [class.cursor-not-allowed]="isCategoryLocked()"
+            [invalid]="hasError('schemeCategory')"
+            class="w-full"
+          >
             <option value="" [selected]="!data().schemeCategory">-- Select Scheme Category --</option>
             @for (cat of schemeCategoryOptions(); track cat) {
               <option [value]="cat">{{ cat }}</option>
             }
           </select>
+          @if (hasError('schemeCategory')) {
+            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('schemeCategory') }}</p>
+          }
         </div>
 
         <!-- Row 2, Col 2: EOI Category * -->
         <div>
-          <label class="block text-slate-700 font-medium mb-1.5">
+          <label class="block text-slate-700 font-medium mb-1.5" for="eoiCategorySelect">
             EOI Category <span class="text-[#DC2626] font-bold">*</span>
           </label>
-          <select appInput [(ngModel)]="data().eoiCategory" [invalid]="submitted() && !data().eoiCategory" class="w-full">
+          <select
+            id="eoiCategorySelect"
+            appInput
+            [(ngModel)]="data().eoiCategory"
+            (blur)="onBlur('eoiCategory')"
+            (ngModelChange)="onFieldChange('eoiCategory')"
+            [invalid]="hasError('eoiCategory')"
+            class="w-full"
+          >
             <option value="" disabled [selected]="!data().eoiCategory">-- Select EOI Category --</option>
             @for (eoiCat of eoiCategoryOptions(); track eoiCat) {
               <option [value]="eoiCat">{{ eoiCat }}</option>
             }
           </select>
-          @if (submitted() && !data().eoiCategory) {
-            <p class="text-xs text-red-500 font-medium m-0 mt-1">EOI Category is required</p>
+          @if (hasError('eoiCategory')) {
+            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('eoiCategory') }}</p>
           }
         </div>
 
         <!-- Row 3, Col 1: Date of EOI Published * -->
         <div>
-          <label class="block text-slate-700 font-medium mb-1.5">
+          <label class="block text-slate-700 font-medium mb-1.5" for="eoiPublishedDateInput">
             Date of EOI Published <span class="text-[#DC2626] font-bold">*</span>
           </label>
           <input
+            id="eoiPublishedDateInput"
             appInput
             type="date"
+            [max]="todayKolkata"
             [(ngModel)]="data().publishedDate"
-            [invalid]="submitted() && !data().publishedDate"
+            (blur)="onBlur('publishedDate')"
+            (ngModelChange)="onPublishedDateChange($event)"
+            [invalid]="hasError('publishedDate')"
             class="w-full"
           />
-          @if (submitted() && !data().publishedDate) {
-            <p class="text-xs text-red-500 font-medium m-0 mt-1">Date of EOI Published is required</p>
+          @if (hasError('publishedDate')) {
+            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('publishedDate') }}</p>
           }
         </div>
 
         <!-- Row 3, Col 2: Last Date of EOI Submission * -->
         <div>
-          <label class="block text-slate-700 font-medium mb-1.5">
+          <label class="block text-slate-700 font-medium mb-1.5" for="eoiSubmissionDateInput">
             Last Date of EOI Submission <span class="text-[#DC2626] font-bold">*</span>
           </label>
           <input
+            id="eoiSubmissionDateInput"
             appInput
             type="date"
+            [min]="minSubmissionDate()"
+            [max]="maxSubmissionDate()"
             [(ngModel)]="data().submissionDate"
-            [invalid]="submitted() && !data().submissionDate"
+            (blur)="onBlur('submissionDate')"
+            (ngModelChange)="onFieldChange('submissionDate')"
+            [invalid]="hasError('submissionDate')"
             class="w-full"
           />
-          @if (submitted() && !data().submissionDate) {
-            <p class="text-xs text-red-500 font-medium m-0 mt-1">Last Date of EOI Submission is required</p>
+          @if (hasError('submissionDate')) {
+            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('submissionDate') }}</p>
           }
         </div>
 
         <!-- Row 4, Col 1: EOI Duration (in Years) * -->
         <div>
-          <label class="block text-slate-700 font-medium mb-1.5">
+          <label class="block text-slate-700 font-medium mb-1.5" for="eoiDurationInput">
             EOI Duration (in Years) <span class="text-[#DC2626] font-bold">*</span>
           </label>
           <div class="relative w-full">
             <input
+              id="eoiDurationInput"
               appInput
               type="number"
               min="1"
-              max="100"
+              max="15"
+              step="1"
               placeholder="e.g. 2"
               [(ngModel)]="data().eoiDurationValue"
-              [invalid]="submitted() && (!data().eoiDurationValue || +data().eoiDurationValue <= 0)"
+              (blur)="onBlur('eoiDurationValue')"
+              (ngModelChange)="onFieldChange('eoiDurationValue')"
+              [invalid]="hasError('eoiDurationValue')"
               class="w-full pr-16"
             />
             <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-500">
               Years
             </span>
           </div>
-          @if (submitted() && (!data().eoiDurationValue || +data().eoiDurationValue <= 0)) {
-            <p class="text-xs text-red-500 font-medium m-0 mt-1">Valid duration in years is required</p>
+          @if (hasError('eoiDurationValue')) {
+            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('eoiDurationValue') }}</p>
           }
         </div>
 
         <!-- Row 4, Col 2: EOI Description -->
         <div>
-          <label class="block text-slate-700 font-medium mb-1.5">
-            EOI Description
-          </label>
-          <input
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-slate-700 font-medium" for="eoiDescriptionInput">
+              EOI Description
+            </label>
+            <span class="text-xs text-slate-400 font-normal">
+              {{ (data().description || '').length }}/250
+            </span>
+          </div>
+          <textarea
+            id="eoiDescriptionInput"
             appInput
-            type="text"
+            rows="2"
             maxlength="250"
             placeholder="Brief description of the EOI"
             [(ngModel)]="data().description"
-            class="w-full"
-          />
+            (blur)="onBlur('description')"
+            (ngModelChange)="onFieldChange('description')"
+            [invalid]="hasError('description')"
+            class="w-full resize-none"
+          ></textarea>
+          @if (hasError('description')) {
+            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('description') }}</p>
+          }
         </div>
 
         <!-- Row 5, Col 1: EMD Fee * -->
         <div>
-          <label class="block text-slate-700 font-medium mb-1.5">
+          <label class="block text-slate-700 font-medium mb-1.5" for="eoiEmdFeeInput">
             EMD Fee <span class="text-[#DC2626] font-bold">*</span>
           </label>
           <input
+            id="eoiEmdFeeInput"
             appInput
             type="text"
             maxlength="100"
             placeholder="e.g. ₹50,000"
             [(ngModel)]="data().emdFee"
-            [invalid]="submitted() && !data().emdFee"
+            (blur)="onFeeBlur('emdFee')"
+            (ngModelChange)="onFieldChange('emdFee')"
+            [invalid]="hasError('emdFee')"
             class="w-full"
           />
-          @if (submitted() && !data().emdFee) {
-            <p class="text-xs text-red-500 font-medium m-0 mt-1">EMD Fee is required</p>
+          @if (hasError('emdFee')) {
+            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('emdFee') }}</p>
           }
         </div>
 
         <!-- Row 5, Col 2: Process Fee * -->
         <div>
-          <label class="block text-slate-700 font-medium mb-1.5">
+          <label class="block text-slate-700 font-medium mb-1.5" for="eoiProcessFeeInput">
             Process Fee <span class="text-[#DC2626] font-bold">*</span>
           </label>
           <input
+            id="eoiProcessFeeInput"
             appInput
             type="text"
             maxlength="100"
             placeholder="e.g. ₹10,000"
             [(ngModel)]="data().processFee"
-            [invalid]="submitted() && !data().processFee"
+            (blur)="onFeeBlur('processFee')"
+            (ngModelChange)="onFieldChange('processFee')"
+            [invalid]="hasError('processFee')"
             class="w-full"
           />
-          @if (submitted() && !data().processFee) {
-            <p class="text-xs text-red-500 font-medium m-0 mt-1">Process Fee is required</p>
+          @if (hasError('processFee')) {
+            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('processFee') }}</p>
           }
         </div>
       </div>
@@ -236,34 +298,49 @@ import { formatBytes } from './tenders-page.util';
         } @else {
           <div class="space-y-2 mt-2">
             @for (doc of data().documents; track $index; let idx = $index) {
-              <div class="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-lg">
-                <span class="text-xs font-semibold text-slate-500 w-5 text-center shrink-0">{{ idx + 1 }}.</span>
-                <div class="flex-1 min-w-0">
-                  <app-dropdown
-                    [options]="availableDocumentOptions()"
-                    [(value)]="data().documents[idx]"
-                    placeholder="-- Select Document Required --"
-                    size="sm"
-                    direction="up"
-                    [overlay]="true"
-                    [invalid]="submitted() && !data().documents[idx]"
-                    class="w-full"
-                  />
-                </div>
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                  <span class="text-xs font-semibold text-slate-500 w-5 text-center shrink-0">{{ idx + 1 }}.</span>
+                  <div class="flex-1 min-w-0">
+                    <app-dropdown
+                      [options]="getAvailableOptionsForIndex(idx)"
+                      [(value)]="data().documents[idx]"
+                      (valueChange)="onDocChange(idx)"
+                      placeholder="-- Select Document Required --"
+                      size="sm"
+                      direction="up"
+                      [overlay]="true"
+                      [invalid]="hasDocError(idx)"
+                      class="w-full"
+                    />
+                  </div>
 
-                <button
-                  appButton
-                  variant="ghost"
-                  size="sm"
-                  iconOnly
-                  type="button"
-                  (click)="removeDocument.emit(idx)"
-                  class="shrink-0"
-                  title="Remove Document"
-                  aria-label="Remove Document"
-                >
-                  <app-icon name="close" size="xs" />
-                </button>
+                  @if (isDocMandatory(data().documents[idx])) {
+                    <span
+                      class="text-[11px] font-semibold text-slate-600 bg-slate-200/70 border border-slate-300 px-2 py-1 rounded shrink-0"
+                      title="Mandatory document requirements cannot be removed."
+                    >
+                      Mandatory
+                    </span>
+                  } @else {
+                    <button
+                      appButton
+                      variant="ghost"
+                      size="sm"
+                      iconOnly
+                      type="button"
+                      (click)="removeDocument.emit(idx)"
+                      class="shrink-0"
+                      title="Remove Document"
+                      aria-label="Remove Document"
+                    >
+                      <app-icon name="close" size="xs" />
+                    </button>
+                  }
+                </div>
+                @if (hasDocError(idx)) {
+                  <p class="text-xs text-red-500 font-medium m-0 ml-7">{{ getDocError(idx) }}</p>
+                }
               </div>
             }
           </div>
@@ -276,6 +353,9 @@ export class ConfigureEoiFormComponent {
   private readonly docViewer = inject(DocumentViewerService);
   private readonly objectUrls = new WeakMap<File, string>();
 
+  /** Current Indian Standard Time (Asia/Kolkata) date for date boundary constraints. */
+  readonly todayKolkata = getTodayKolkataDate();
+
   /** Parent-owned form model, edited in place via ngModel. */
   readonly data = input.required<EoiFormData>();
   readonly submitted = input(false);
@@ -287,8 +367,12 @@ export class ConfigureEoiFormComponent {
   readonly requiredInfo = input<EoiRequiredInfoItem[]>([]);
   readonly schemeMasterItems = input<SchemeMasterItem[]>([]);
   readonly docMasterItems = input<DocMasterItem[]>([]);
+  readonly existingRefNos = input<string[]>([]);
+  readonly currentRefNo = input<string | null>(null);
+  readonly externalVersion = input<number>(0);
 
   readonly schemeChange = output<string>();
+  readonly formChange = output<void>();
 
   /** Open the "Upload Attachment" modal. */
   readonly attach = output<void>();
@@ -298,11 +382,66 @@ export class ConfigureEoiFormComponent {
 
   readonly docFileError = signal<string>('');
 
+  /** Reactive version counter ensuring computed validation re-evaluates on any in-place mutation. */
+  readonly formVersion = signal<number>(0);
+
+  /** Tracking touched state per field for clean UX blur-based error display. */
+  readonly touchedFields = signal<Record<string, boolean>>({});
+  readonly touchedDocFields = signal<Record<number, boolean>>({});
+
+  /** Minimum date selectable for submission deadline (publication date or today). */
+  readonly minSubmissionDate = computed(() => {
+    this.formVersion();
+    this.externalVersion();
+    const pub = this.data()?.publishedDate;
+    return pub ? pub : this.todayKolkata;
+  });
+
+  /** Maximum permitted submission date (within 1 year of publication date). */
+  readonly maxSubmissionDate = computed(() => {
+    this.formVersion();
+    this.externalVersion();
+    const base = this.data()?.publishedDate || this.todayKolkata;
+    const parts = base.split('-');
+    if (parts.length === 3) {
+      const y = parseInt(parts[0], 10) + 1;
+      return `${y}-${parts[1]}-${parts[2]}`;
+    }
+    return '2099-12-31';
+  });
+
+  /** Whether the Scheme Category is locked because the Scheme has a single designated category. */
+  readonly isCategoryLocked = computed(() => {
+    this.formVersion();
+    this.externalVersion();
+    const schemeName = this.data()?.scheme?.trim().toLowerCase();
+    if (!schemeName) return false;
+    const match = this.schemeMasterItems().find(
+      s => s.schemeName?.trim().toLowerCase() === schemeName
+    );
+    return !!match?.schemeCategory;
+  });
+
+  /** Real-time form validation state using government standards. */
+  readonly validation = computed(() => {
+    this.formVersion();
+    this.externalVersion();
+    return validateEoiFormComplete(this.data(), {
+      existingRefNos: this.existingRefNos(),
+      currentRefNo: this.currentRefNo(),
+      activeSchemeNames: this.schemeNameOptions(),
+      activeEoiCategories: [...this.eoiCategoryOptions()],
+      schemeMasterItems: this.schemeMasterItems(),
+      todayStr: this.todayKolkata
+    });
+  });
+
   readonly availableDocumentOptions = computed(() => {
+    this.formVersion();
+    this.externalVersion();
     const set = new Set<string>();
     const masterList = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
 
-    // 1. Supporting documents from Doc Master ONLY
     masterList.forEach(item => {
       if (item.documents) {
         item.documents.split(',').forEach(d => {
@@ -312,7 +451,6 @@ export class ConfigureEoiFormComponent {
       }
     });
 
-    // 2. Keep any document already selected in the form data so it stays visible
     (this.data()?.documents || []).forEach(doc => {
       if (doc?.trim()) set.add(doc.trim());
     });
@@ -320,8 +458,99 @@ export class ConfigureEoiFormComponent {
     return Array.from(set);
   });
 
-  getUploadedDoc(index: number): EoiDocumentUpload | undefined {
-    return this.data()?.documentFiles?.[index];
+  getAvailableOptionsForIndex(idx: number): string[] {
+    const allOptions = this.availableDocumentOptions();
+    const currentVal = (this.data().documents[idx] || '').trim().toLowerCase();
+    const otherSelected = new Set(
+      this.data()
+        .documents.filter((d, i) => i !== idx && d && d.trim())
+        .map(d => d.trim().toLowerCase())
+    );
+    return allOptions.filter(
+      opt => opt.trim().toLowerCase() === currentVal || !otherSelected.has(opt.trim().toLowerCase())
+    );
+  }
+
+  isDocMandatory(docName?: string): boolean {
+    if (!docName) return false;
+    const schemeName = this.data()?.scheme?.trim().toLowerCase();
+    if (!schemeName) return false;
+    const masterList = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
+    const docItem = masterList.find(d => {
+      const s = (d.schemeName || '').trim().toLowerCase();
+      return s === schemeName || s.includes(schemeName) || schemeName.includes(s);
+    });
+    if (!docItem?.documents) return false;
+    const requiredList = docItem.documents.split(',').map(d => d.trim().toLowerCase());
+    return requiredList.includes(docName.trim().toLowerCase());
+  }
+
+  private notifyMutation(field?: string): void {
+    if (field) {
+      this.touchedFields.update(t => ({ ...t, [field]: true }));
+    }
+    this.formVersion.update(v => v + 1);
+    this.formChange.emit();
+  }
+
+  onBlur(field: string): void {
+    this.notifyMutation(field);
+  }
+
+  onRefNoBlur(): void {
+    if (this.data()?.refNo) {
+      this.data().refNo = this.data().refNo.trim();
+    }
+    this.notifyMutation('refNo');
+  }
+
+  onFeeBlur(field: 'emdFee' | 'processFee'): void {
+    const current = this.data()[field];
+    if (current) {
+      const num = parseFeeNumber(current);
+      if (!isNaN(num) && num >= 0) {
+        this.data()[field] = formatInr(num);
+      }
+    }
+    this.notifyMutation(field);
+  }
+
+  onFieldChange(field: string): void {
+    this.notifyMutation(field);
+  }
+
+  onPublishedDateChange(date: string): void {
+    // If submission date is now before or equal to publication date, mark touched to prompt correction
+    if (this.data().submissionDate && this.data().submissionDate <= date) {
+      this.touchedFields.update(t => ({ ...t, submissionDate: true }));
+    }
+    this.notifyMutation('publishedDate');
+  }
+
+  onDocChange(index: number): void {
+    this.touchedDocFields.update(t => ({ ...t, [index]: true }));
+    this.formVersion.update(v => v + 1);
+    this.formChange.emit();
+  }
+
+  hasError(field: string): boolean {
+    if (!this.submitted() && !this.touchedFields()[field]) return false;
+    return !!this.validation().errors[field];
+  }
+
+  getError(field: string): string {
+    if (!this.submitted() && !this.touchedFields()[field]) return '';
+    return this.validation().errors[field] || '';
+  }
+
+  hasDocError(index: number): boolean {
+    if (!this.submitted() && !this.touchedDocFields()[index]) return false;
+    return !!this.validation().docErrors[index];
+  }
+
+  getDocError(index: number): string {
+    if (!this.submitted() && !this.touchedDocFields()[index]) return '';
+    return this.validation().docErrors[index] || '';
   }
 
   onDocFileUpload(index: number, event: Event): void {
@@ -329,17 +558,9 @@ export class ConfigureEoiFormComponent {
     if (!input.files || input.files.length === 0) return;
     const file = input.files[0];
 
-    const ext = file.name.split('.').pop()?.toLowerCase() || '';
-    const allowed = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'bmp', 'gif', 'svg', 'txt'];
-    const isImage = file.type.startsWith('image/');
-    if (!allowed.includes(ext) && !isImage && file.type !== 'text/plain') {
-      this.docFileError.set(`Invalid file format for "${file.name}". Please upload a PDF, image, or TXT file.`);
-      input.value = '';
-      return;
-    }
-
-    if (file.size > 25 * 1024 * 1024) {
-      this.docFileError.set(`File "${file.name}" exceeds the 25 MB limit.`);
+    const error = validateUploadFile(file);
+    if (error) {
+      this.docFileError.set(error);
       input.value = '';
       return;
     }
@@ -352,7 +573,7 @@ export class ConfigureEoiFormComponent {
       name: this.data().documents[index] || file.name,
       fileName: file.name,
       size: formatBytes(file.size),
-      file: file
+      file
     };
 
     input.value = '';
@@ -383,7 +604,17 @@ export class ConfigureEoiFormComponent {
   }
 
   onSchemeChange(schemeName: string): void {
-    if (!schemeName) return;
+    if (!schemeName) {
+      // Clear dependent values
+      this.data().schemeCategory = '';
+      this.data().emdFee = '';
+      this.data().processFee = '';
+      this.data().documents = [];
+      this.data().documentFiles = {};
+      this.notifyMutation('scheme');
+      this.schemeChange.emit(schemeName);
+      return;
+    }
 
     // 1. Auto-fill EMD Fee, Process Fee & Scheme Category from Scheme Master
     const schemeItem = this.schemeMasterItems().find(
@@ -401,7 +632,7 @@ export class ConfigureEoiFormComponent {
       }
     }
 
-    // 2. Auto-fill required documents from Doc Master (robust match)
+    // 2. Auto-fill required documents from Doc Master
     const masterList = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
     const target = schemeName.trim().toLowerCase();
     const docItem = masterList.find(d => {
@@ -415,12 +646,15 @@ export class ConfigureEoiFormComponent {
         .map(d => d.trim())
         .filter(Boolean);
       if (docs.length > 0) {
-        this.data().documents = [...docs];
+        // Disallow duplicates from the master list
+        const uniqueDocs = Array.from(new Set(docs));
+        this.data().documents = [...uniqueDocs];
         this.data().documentFiles = {};
         this.docFileError.set('');
       }
     }
 
+    this.notifyMutation('scheme');
     this.schemeChange.emit(schemeName);
   }
 }

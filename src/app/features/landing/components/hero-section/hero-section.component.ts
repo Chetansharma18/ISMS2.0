@@ -28,29 +28,15 @@ export interface HeroSlide {
     class: 'block w-full'
   },
   template: `
-    <section class="relative w-full overflow-hidden bg-[#5E0832] flex items-center min-h-120 sm:min-h-125 lg:min-h-130 py-8 sm:py-10 lg:py-12">
+    <section class="relative w-full bg-[#F8F9FA] py-4 sm:py-5 lg:py-6 border-b border-[#E2E8F0]">
       
-      <!-- Authentic Panoramic Rajasthan Heritage Architecture Background -->
-      <div 
-        class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none select-none"
-        style="background-image: url('/raj.png');"
-        aria-hidden="true"
-      ></div>
-
-      <!-- High-Contrast Directional Burgundy & Sunset Peach Overlay -->
-      <div 
-        class="absolute inset-0 pointer-events-none"
-        style="background: linear-gradient(135deg, rgba(94, 8, 50, 0.95) 0%, rgba(124, 14, 68, 0.92) 50%, rgba(170, 94, 122, 0.85) 100%);"
-        aria-hidden="true"
-      ></div>
-
-      <!-- Centered Inner Container (Max-Width ~1440px) -->
-      <div class="max-w-360 mx-auto w-full px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-8 xl:gap-10 w-full">
+      <!-- Inner Container: Full Width up to 1920px (Left Half: Image, Right Half: Tender) -->
+      <div class="w-full max-w-[1920px] mx-auto px-3 sm:px-6 md:px-8 lg:px-10 xl:px-12 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-6 xl:gap-8 items-stretch w-full">
           
-          <!-- LEFT COLUMN: Premium Dynamic Auto-Sliding Image Showcase (~54% width) -->
+          <!-- LEFT HALF (50%): Premium Dynamic Auto-Sliding Image Showcase -->
           <div 
-            class="w-full lg:w-[54%] xl:w-[55%] flex flex-col justify-center"
+            class="w-full h-full flex flex-col justify-center"
             (mouseenter)="pauseAutoplay()"
             (mouseleave)="resumeAutoplay()"
             (touchstart)="pauseAutoplay()"
@@ -157,9 +143,9 @@ export interface HeroSlide {
             </div>
           </div>
 
-          <!-- RIGHT COLUMN: Official Government Tenders (~46% width) -->
-          <div class="w-full lg:w-[46%] xl:w-[45%] flex justify-center lg:justify-end">
-            <app-hero-tenders class="w-full"></app-hero-tenders>
+          <!-- RIGHT HALF (50%): Official Government Tenders -->
+          <div class="w-full h-full flex flex-col justify-center">
+            <app-hero-tenders class="w-full h-full"></app-hero-tenders>
           </div>
 
         </div>
@@ -172,22 +158,27 @@ export interface HeroSlide {
       position: relative;
       width: 100%;
       height: 410px;
-      border-radius: 14px;
+      border-radius: 12px;
       overflow: hidden;
-      background-color: #1a0814;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      background-color: #0f172a;
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
       user-select: none;
     }
     @media (min-width: 640px) {
       .hero-slider-card {
-        height: 425px;
-        border-radius: 16px;
+        height: 430px;
+        border-radius: 14px;
       }
     }
     @media (min-width: 1024px) {
       .hero-slider-card {
-        height: 430px;
+        height: 440px;
+      }
+    }
+    @media (min-width: 1280px) {
+      .hero-slider-card {
+        height: 450px;
       }
     }
 
@@ -223,7 +214,7 @@ export interface HeroSlide {
       position: absolute;
       inset: 0;
       bottom: 50%;
-      background: linear-gradient(to bottom, rgba(15, 5, 15, 0.6) 0%, rgba(15, 5, 15, 0.2) 60%, transparent 100%);
+      background: linear-gradient(to bottom, rgba(15, 23, 42, 0.55) 0%, rgba(15, 23, 42, 0.15) 60%, transparent 100%);
       pointer-events: none;
     }
 
@@ -231,7 +222,7 @@ export interface HeroSlide {
       position: absolute;
       inset: 0;
       top: 25%;
-      background: linear-gradient(to top, rgba(18, 4, 14, 0.95) 0%, rgba(30, 8, 22, 0.72) 45%, rgba(0, 0, 0, 0.1) 85%, transparent 100%);
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.68) 45%, rgba(0, 0, 0, 0.1) 85%, transparent 100%);
       pointer-events: none;
     }
 
@@ -253,7 +244,7 @@ export interface HeroSlide {
       gap: 7px;
       padding: 4px 12px;
       border-radius: 9999px;
-      background: rgba(0, 0, 0, 0.45);
+      background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.22);
@@ -279,7 +270,7 @@ export interface HeroSlide {
       gap: 4px;
       padding: 4px 10px;
       border-radius: 9999px;
-      background: rgba(0, 0, 0, 0.45);
+      background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.22);
@@ -351,7 +342,7 @@ export interface HeroSlide {
       width: 38px !important;
       height: 38px !important;
       border-radius: 9999px !important;
-      background: rgba(0, 0, 0, 0.42) !important;
+      background: rgba(0, 0, 0, 0.45) !important;
       backdrop-filter: blur(8px) !important;
       -webkit-backdrop-filter: blur(8px) !important;
       border: 1px solid rgba(255, 255, 255, 0.28) !important;
@@ -365,7 +356,7 @@ export interface HeroSlide {
       opacity: 1;
     }
     .slider-nav-btn:hover {
-      background: rgba(124, 14, 68, 0.85) !important;
+      background: rgba(13, 53, 87, 0.9) !important;
       border-color: rgba(255, 255, 255, 0.5) !important;
       transform: translateY(-50%) scale(1.08) !important;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;

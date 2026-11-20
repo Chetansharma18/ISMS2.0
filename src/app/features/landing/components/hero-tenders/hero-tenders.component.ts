@@ -30,9 +30,9 @@ interface TenderItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, TendersModalComponent, ActionModalComponent, ButtonComponent, IconComponent],
   template: `
-    <!-- Right Column Panel: 540–600px desktop width, 410–430px height, clean official government card -->
-    <div class="w-full max-w-135 lg:max-w-145 xl:max-w-150 mx-auto lg:ml-auto">
-      <div class="w-full h-102.5 sm:h-106.25 lg:h-107.5 bg-white rounded-xl shadow-[0_10px_25px_rgba(124,14,68,0.08)] border border-[#EADCE2] flex flex-col overflow-hidden relative">
+    <!-- Right Column Panel: 50% width on desktop, matching height with slider, clean official government card -->
+    <div class="w-full h-full flex flex-col">
+      <div class="w-full h-[410px] sm:h-[430px] lg:h-[440px] xl:h-[450px] bg-white rounded-xl sm:rounded-[14px] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.07),0_2px_6px_-1px_rgba(0,0,0,0.04)] border border-[#E2E8F0] flex flex-col overflow-hidden relative">
         
         <!-- PANEL HEADER (Height 58–66px, clean white background, primary burgundy text with orange accent) -->
         <div class="h-15 px-5 sm:px-6 bg-white border-b border-[#EADCE2] flex items-center justify-between shrink-0 z-10">

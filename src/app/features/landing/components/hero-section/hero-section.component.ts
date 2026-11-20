@@ -164,6 +164,7 @@ export interface HeroSlide {
       border: 1px solid #E2E8F0;
       box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
       user-select: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     @media (min-width: 640px) {
       .hero-slider-card {
@@ -180,6 +181,12 @@ export interface HeroSlide {
       .hero-slider-card {
         height: 450px;
       }
+    }
+
+    .hero-slider-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(136, 28, 67, 0.22);
+      box-shadow: 0 12px 30px -4px rgba(136, 28, 67, 0.1), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
     }
 
     .slide-item {
@@ -208,13 +215,17 @@ export interface HeroSlide {
       object-fit: cover;
       object-position: center;
       display: block;
+      transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .hero-slider-card:hover .slide-item.active .slide-img {
+      transform: scale(1.05);
     }
 
     .slide-overlay-top {
       position: absolute;
       inset: 0;
       bottom: 50%;
-      background: linear-gradient(to bottom, rgba(15, 23, 42, 0.55) 0%, rgba(15, 23, 42, 0.15) 60%, transparent 100%);
+      background: linear-gradient(to bottom, rgba(15, 23, 42, 0.6) 0%, rgba(15, 23, 42, 0.15) 60%, transparent 100%);
       pointer-events: none;
     }
 
@@ -253,6 +264,12 @@ export interface HeroSlide {
       font-weight: 600;
       letter-spacing: 0.02em;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+    .hero-slider-card:hover .slide-badge {
+      background: rgba(0, 0, 0, 0.65);
+      border-color: rgba(234, 88, 12, 0.5);
+      box-shadow: 0 0 12px rgba(234, 88, 12, 0.25);
     }
 
     .slide-badge-dot {
@@ -288,6 +305,7 @@ export interface HeroSlide {
       right: 20px;
       z-index: 3;
       padding-bottom: 20px;
+      transition: transform 0.3s ease;
     }
     @media (min-width: 640px) {
       .slide-bottom-content {
@@ -296,6 +314,9 @@ export interface HeroSlide {
         bottom: 24px;
         padding-bottom: 22px;
       }
+    }
+    .hero-slider-card:hover .slide-bottom-content {
+      transform: translateY(-2px);
     }
 
     .slide-title {
@@ -306,6 +327,7 @@ export interface HeroSlide {
       letter-spacing: -0.015em;
       margin: 0;
       text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      transition: text-shadow 0.3s ease;
     }
     @media (min-width: 640px) {
       .slide-title {
@@ -316,6 +338,9 @@ export interface HeroSlide {
       .slide-title {
         font-size: 25px;
       }
+    }
+    .hero-slider-card:hover .slide-title {
+      text-shadow: 0 4px 16px rgba(0, 0, 0, 0.65);
     }
 
     .slide-subtitle {
@@ -338,7 +363,7 @@ export interface HeroSlide {
     .slider-nav-btn {
       position: absolute !important;
       top: 50% !important;
-      transform: translateY(-50%) !important;
+      transform: translateY(-50%) scale(0.9) !important;
       width: 38px !important;
       height: 38px !important;
       border-radius: 9999px !important;
@@ -349,17 +374,23 @@ export interface HeroSlide {
       color: #FFFFFF !important;
       z-index: 10 !important;
       cursor: pointer !important;
-      opacity: 0.7;
-      transition: all 0.2s ease !important;
+      opacity: 0.6;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    @media (min-width: 1024px) {
+      .slider-nav-btn {
+        opacity: 0;
+      }
     }
     .hero-slider-card:hover .slider-nav-btn {
       opacity: 1;
+      transform: translateY(-50%) scale(1) !important;
     }
     .slider-nav-btn:hover {
-      background: rgba(13, 53, 87, 0.9) !important;
-      border-color: rgba(255, 255, 255, 0.5) !important;
-      transform: translateY(-50%) scale(1.08) !important;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+      background: rgba(13, 53, 87, 0.95) !important;
+      border-color: rgba(255, 255, 255, 0.6) !important;
+      transform: translateY(-50%) scale(1.1) !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
     }
     .slider-nav-btn.prev {
       left: 12px !important;

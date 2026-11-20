@@ -32,14 +32,28 @@ interface TenderItem {
   template: `
     <!-- Right Column Panel: 50% width on desktop, matching height with slider, clean official government card -->
     <div class="w-full h-full flex flex-col">
-      <div class="w-full h-[410px] sm:h-[430px] lg:h-[440px] xl:h-[450px] bg-white rounded-xl sm:rounded-[14px] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.07),0_2px_6px_-1px_rgba(0,0,0,0.04)] border border-[#E2E8F0] flex flex-col overflow-hidden relative">
+      <div class="tender-panel-card w-full h-[410px] sm:h-[430px] lg:h-[440px] xl:h-[450px] rounded-xl sm:rounded-[14px] flex flex-col overflow-hidden relative">
         
-        <!-- PANEL HEADER (Height 58–66px, clean white background, primary burgundy text with orange accent) -->
-        <div class="h-15 px-5 sm:px-6 bg-white border-b border-[#EADCE2] flex items-center justify-between shrink-0 z-10">
+        <!-- Authentic Rajasthan Heritage Architecture Background Watermark -->
+        <div class="tender-watermark" aria-hidden="true">
+          <img
+            src="/rajasthan-heritage-palace.png"
+            alt=""
+            class="tender-watermark-img"
+          />
+        </div>
+
+        <!-- PANEL HEADER -->
+        <div class="tender-panel-header px-5 sm:px-6 border-b border-[#EADCE2] flex items-center justify-between shrink-0 z-10">
           <div class="flex items-center gap-2.5">
             <!-- Small Orange Accent Bar -->
-            <span class="w-1 h-4.5 bg-[#EA580C] rounded-full inline-block" aria-hidden="true"></span>
-            <h2 class="text-[17px] font-bold text-[#7C0E44] tracking-wide m-0">TENDER</h2>
+            <span class="w-1.5 h-4.5 bg-[#EA580C] rounded-full inline-block" aria-hidden="true"></span>
+            <h2 class="text-[15.5px] sm:text-[16.5px] font-bold text-[#7C0E44] tracking-wide m-0">TENDER NOTICES</h2>
+            <!-- Live Indicator Badge -->
+            <span class="tender-live-badge">
+              <span class="tender-live-dot"></span>
+              <span class="hidden sm:inline">Active</span>
+            </span>
           </div>
           
           <!-- View All Action -->
@@ -58,7 +72,7 @@ interface TenderItem {
         <!-- TENDER LIST: Clean readable rows, subtle dividers, internally scrollable -->
         <div 
           #scrollList
-          class="flex-1 overflow-y-auto divide-y divide-[#EADCE2] bg-white tender-custom-scroll overscroll-contain" 
+          class="flex-1 overflow-y-auto divide-y divide-[#F1F5F9] bg-transparent tender-custom-scroll overscroll-contain relative z-10" 
           (mouseenter)="pauseScroll()" 
           (mouseleave)="resumeScrollWithDelay()"
           (touchstart)="pauseScroll()"
@@ -67,41 +81,56 @@ interface TenderItem {
           @for (item of tenders; track item.id) {
             <div 
               (click)="openLoginPrompt(item)" 
-              class="p-3.5 sm:p-4 hover:bg-[#FAF2F5] transition-colors duration-150 cursor-pointer group flex flex-col gap-1.5 text-left focus:outline-none focus:bg-[#FAF2F5]"
+              class="tender-item-row"
               tabindex="0"
               (keydown.enter)="openLoginPrompt(item)"
               (keydown.space)="openLoginPrompt(item)"
               role="button"
               [attr.aria-label]="'Tender: ' + item.title">
               
-              <!-- Top Row: Date & Category Badge -->
-              <div class="flex items-center justify-between gap-2">
-                <div class="flex items-center gap-2">
-                  <span class="text-[12px] sm:text-[12.5px] text-[#556987] font-medium">{{ item.date }}</span>
-                  @if (item.isNew) {
-                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-1.5 py-0.2 rounded font-sans tracking-wide">
-                      NEW
+              <!-- Left Accent Indicator Bar (Glows on Hover) -->
+              <div class="tender-accent-bar" aria-hidden="true"></div>
+
+              <!-- Content Column -->
+              <div class="flex-1 min-w-0 pr-1">
+                <!-- Top Row: Date & Category Badge -->
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-2">
+                    <span class="tender-date-chip">
+                      <app-icon name="calendar" size="xs" class="text-slate-400" />
+                      <span>{{ item.date }}</span>
                     </span>
-                  }
+                    @if (item.isNew) {
+                      <span class="tender-new-badge">
+                        NEW
+                      </span>
+                    }
+                  </div>
+                  <span class="tender-category-badge">
+                    {{ item.category }}
+                  </span>
                 </div>
-                <span class="text-[11px] font-semibold text-[#7C0E44] bg-primary-light border border-border rounded px-2 py-0.5 shrink-0">
-                  {{ item.category }}
-                </span>
+
+                <!-- Middle Row: Tender Title -->
+                <h4 class="tender-title">
+                  {{ item.title }}
+                </h4>
+
+                <!-- Bottom Row: Reference Number & Login Required Indicator -->
+                <div class="flex items-center justify-between gap-3 pt-1">
+                  <p class="tender-ref-id" [title]="item.id">
+                    {{ item.id }}
+                  </p>
+                  <span class="tender-login-link">
+                    <app-icon name="lock" size="xs" />
+                    <span>Login Required</span>
+                  </span>
+                </div>
               </div>
 
-              <!-- Middle Row: Tender Title -->
-              <h4 class="text-[13px] sm:text-[13.5px] font-semibold text-[#25212A] leading-snug group-hover:text-[#7C0E44] transition-colors line-clamp-2 m-0">
-                {{ item.title }}
-              </h4>
-
-              <!-- Bottom Row: Reference Number & Login Required Indicator -->
-              <div class="flex items-center justify-between gap-3 pt-0.5">
-                <p class="text-[11.5px] tabular-nums text-slate-500 truncate max-w-[62%]" [title]="item.id">
-                  {{ item.id }}
-                </p>
-                <span class="text-[11.5px] sm:text-[12px] font-semibold text-[#F28C28] group-hover:text-[#d9771e] shrink-0">
-                  <span>Login Required</span>
-                </span>
+              <!-- Hover Arrow Action Indicator -->
+              <div class="tender-row-arrow" aria-hidden="true">
+                <app-icon name="chevron-right" size="sm" />
               </div>
 
             </div>
@@ -131,6 +160,209 @@ interface TenderItem {
     }
   `,
   styles: [`
+    .tender-panel-card {
+      background: linear-gradient(180deg, #FFFFFF 0%, #FDFCFD 60%, #FCF8FA 100%);
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .tender-panel-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(136, 28, 67, 0.22);
+      box-shadow: 0 12px 30px -4px rgba(136, 28, 67, 0.1), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .tender-watermark {
+      position: absolute;
+      bottom: -15px;
+      right: -25px;
+      width: 340px;
+      height: 180px;
+      pointer-events: none;
+      opacity: 0.07;
+      overflow: hidden;
+      z-index: 1;
+      transition: opacity 0.3s ease;
+    }
+    .tender-panel-card:hover .tender-watermark {
+      opacity: 0.12;
+    }
+    .tender-watermark-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: bottom right;
+      filter: grayscale(1);
+    }
+
+    .tender-panel-header {
+      height: 60px;
+      position: relative;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFF9FA 100%);
+    }
+
+    .tender-live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: rgba(234, 88, 12, 0.09);
+      border: 1px solid rgba(234, 88, 12, 0.25);
+      color: #EA580C;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .tender-live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 9999px;
+      background-color: #EA580C;
+      box-shadow: 0 0 6px #EA580C;
+      animation: tenderPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes tenderPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    .tender-item-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 18px;
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .tender-item-row:hover {
+      background: linear-gradient(90deg, rgba(136, 28, 67, 0.04) 0%, rgba(255, 255, 255, 0.95) 100%);
+      transform: translateX(4px);
+    }
+
+    .tender-accent-bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3.5px;
+      background: transparent;
+      transition: all 0.22s ease;
+    }
+    .tender-item-row:hover .tender-accent-bar {
+      background: linear-gradient(180deg, #EA580C 0%, #881C43 100%);
+      box-shadow: 0 0 8px rgba(136, 28, 67, 0.35);
+    }
+
+    .tender-date-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11.5px;
+      color: #556987;
+      font-weight: 500;
+      background: #F1F5F9;
+      padding: 1.5px 7px;
+      border-radius: 5px;
+      transition: all 0.2s ease;
+    }
+    .tender-item-row:hover .tender-date-chip {
+      background: rgba(136, 28, 67, 0.08);
+      color: #881C43;
+    }
+
+    .tender-new-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: #047857;
+      background: #ECFDF5;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 1px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.03em;
+    }
+
+    .tender-category-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #7C0E44;
+      background: rgba(136, 28, 67, 0.06);
+      border: 1px solid rgba(136, 28, 67, 0.2);
+      border-radius: 6px;
+      padding: 2px 8px;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    .tender-item-row:hover .tender-category-badge {
+      background: #881C43;
+      color: #FFFFFF;
+      border-color: #881C43;
+      box-shadow: 0 2px 6px rgba(136, 28, 67, 0.25);
+    }
+
+    .tender-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #25212A;
+      line-height: 1.45;
+      margin: 4px 0 0 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      transition: color 0.2s ease;
+    }
+    @media (min-width: 640px) {
+      .tender-title {
+        font-size: 13.5px;
+      }
+    }
+    .tender-item-row:hover .tender-title {
+      color: #7C0E44;
+    }
+
+    .tender-ref-id {
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+      color: #64748B;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 65%;
+    }
+
+    .tender-login-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #EA580C;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    .tender-item-row:hover .tender-login-link {
+      color: #C2410C;
+      transform: translateX(-2px);
+    }
+
+    .tender-row-arrow {
+      color: #CBD5E1;
+      flex-shrink: 0;
+      transform: translateX(0);
+      opacity: 0.4;
+      transition: all 0.22s ease;
+    }
+    .tender-item-row:hover .tender-row-arrow {
+      color: #7C0E44;
+      opacity: 1;
+      transform: translateX(3px);
+    }
+
     .tender-custom-scroll {
       scrollbar-width: thin;
       scrollbar-color: #CBD5E1 #F8FAFC;
@@ -143,7 +375,7 @@ interface TenderItem {
     }
     .tender-custom-scroll::-webkit-scrollbar-thumb {
       background: #CBD5E1;
-      border-radius: 4px;
+      border-radius: 3px;
     }
     .tender-custom-scroll::-webkit-scrollbar-thumb:hover {
       background: #94A3B8;

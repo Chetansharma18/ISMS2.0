@@ -40,6 +40,15 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       @if (isLandingPage()) {
         <!-- Landing Page Full-Width Responsive Header Banner (Edge-to-Edge in Code) -->
         <div class="block w-full bg-[#FDF8F2] relative overflow-hidden select-none">
+          <!-- Rajasthan Heritage Palace Architectural Skyline Background (Anchored seamlessly to bottom baseline) -->
+          <div class="hidden md:flex absolute inset-x-0 bottom-[2.5px] sm:bottom-[3px] lg:bottom-[4px] top-0 items-end justify-center pointer-events-none select-none overflow-hidden z-0" aria-hidden="true">
+            <img
+              src="/rajasthan-heritage-palace.png"
+              alt=""
+              class="h-[80%] md:h-[84%] lg:h-[88%] xl:h-[92%] w-auto max-w-[46%] md:max-w-[48%] lg:max-w-[52%] xl:max-w-[56%] object-contain object-bottom pointer-events-none select-none transition-all duration-300"
+            />
+          </div>
+
           <!-- Subtle Heritage Palace Watermark for Mobile (< md) -->
           <div class="md:hidden absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden" aria-hidden="true">
             <img
@@ -73,22 +82,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               </div>
             </a>
 
-            <!-- 2. LEFT VERTICAL DIVIDER -->
-            <div class="hidden md:block w-[1.5px] lg:w-[2px] h-7 md:h-7.5 lg:h-9 xl:h-10 bg-[#8C1B3F] shrink-0 mx-1 lg:mx-3 xl:mx-4 opacity-80" aria-hidden="true"></div>
-
-            <!-- 3. CENTER SECTION: Authentic Rajasthan Heritage Architecture Illustration -->
-            <a routerLink="/" class="hidden md:flex flex-1 items-center justify-center px-1 lg:px-4 min-w-0 overflow-hidden no-underline cursor-pointer" aria-hidden="true" tabindex="-1">
-              <img
-                src="/rajasthan-heritage-palace.png"
-                alt=""
-                class="h-9 sm:h-11 md:h-13.5 lg:h-16 xl:h-[72px] w-auto max-w-full object-contain pointer-events-none select-none transition-transform duration-300 hover:scale-[1.01]"
-              />
-            </a>
-
-            <!-- 4. RIGHT VERTICAL DIVIDER -->
-            <div class="hidden md:block w-[1.5px] lg:w-[2px] h-7 md:h-7.5 lg:h-9 xl:h-10 bg-[#8C1B3F] shrink-0 mx-1 lg:mx-3 xl:mx-4 opacity-80" aria-hidden="true"></div>
-
-            <!-- 5. RIGHT SECTION: ISMS 2.0 Branding & SSO Login Button -->
+            <!-- 2. RIGHT SECTION: ISMS 2.0 Branding & SSO Login Button -->
             <div class="flex items-center gap-2 sm:gap-3.5 lg:gap-4.5 shrink-0">
               
               <!-- Branding: ISMS 2.0 & Subtitle -->

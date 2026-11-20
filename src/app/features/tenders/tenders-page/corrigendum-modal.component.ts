@@ -26,7 +26,7 @@ export interface CorrigendumSubmission {
       [reverseButtons]="true"
       [showAccentBar]="false"
       primaryLabel="Submit"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       maxWidthClass="max-w-[540px]"
       (primaryAction)="submitCorrigendum()"
       (secondaryAction)="close.emit()"

@@ -175,7 +175,6 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
           [annexures]="annexureDocuments"
           [requiredInfo]="eoiRequiredInfo"
           [hideApplyButton]="isSuperAdmin()"
-          [hideDownloadDetails]="isNewOrExistingUser()"
           (back)="backToList()"
           (apply)="handleApplyForScheme()"
           (download)="downloadDoc($event)"

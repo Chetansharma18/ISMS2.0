@@ -1,7 +1,7 @@
 // ui-guard-allow: page-frame - the Apply-for-EOI wizard has its own stepper layout
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DocumentViewerModalComponent } from '../../../../shared/components/document-viewer-modal/document-viewer-modal.component';
 import { ActionModalComponent } from '../../../../shared/components/action-modal/action-modal.component';
 import { StepperComponent } from '../../../../shared/components/stepper/stepper.component';
@@ -24,7 +24,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
   imports: [ButtonComponent, IconComponent, ActionModalComponent, StepperComponent, SchemeHeaderCardComponent, Step1ProcessingFeeComponent, Step2OtrProfileComponent, Step3UploadDocumentsComponent, Step4CompletePreviewComponent, Step5EmdPaymentComponent, Step6ReceiptsComponent],
   providers: [SchemeFormState],
   template: `
-    <div class="min-h-screen bg-white flex flex-col selection:bg-navy selection:text-white font-sans text-slate-800" >
+    <div class="min-h-screen bg-white flex flex-col selection:bg-[#7C0E44] selection:text-white font-sans text-slate-800" >
 
       <main class="flex-1 w-full px-4 sm:px-5 lg:px-6 py-4 sm:py-5">
 
@@ -194,6 +194,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
 export class SchemeFormComponent {
   protected readonly state = inject(SchemeFormState);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   /** Title of the active step, taken from the stepper definition. */
   protected stepTitle(): string {
@@ -227,9 +228,14 @@ export class SchemeFormComponent {
     if (this.state.currentStep() > 1) {
       this.state.goToStep(this.state.currentStep() - 1);
     } else {
-      this.router.navigate(['/tenders'], {
-        queryParams: { viewRefNo: this.state.schemeRefNo() }
-      });
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+      if (returnUrl) {
+        void this.router.navigateByUrl(returnUrl);
+      } else {
+        void this.router.navigate(['/tenders'], {
+          queryParams: { viewRefNo: this.state.schemeRefNo() }
+        });
+      }
     }
   }
 }

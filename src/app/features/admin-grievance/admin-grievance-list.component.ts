@@ -168,8 +168,8 @@ export type { AdminGrievance };
       <app-action-modal
         [isOpen]="isViewModalOpen()"
         [title]="'Ticket Details'"
-        [primaryLabel]="selectedTicket()?.status === 'Open' ? ((isForwarding() || isCommenting()) ? 'Submit' : 'Forward') : 'Close'"
-        [secondaryLabel]="selectedTicket()?.status === 'Open' ? ((isForwarding() || isCommenting()) ? 'Cancel' : (isDeptAdmin() ? 'Comment' : 'Close')) : ''"
+        [primaryLabel]="selectedTicket()?.status === 'Open' ? ((isForwarding() || isCommenting()) ? 'Submit' : 'Forward') : ''"
+        [secondaryLabel]="selectedTicket()?.status === 'Open' && !isForwarding() && !isCommenting() && isDeptAdmin() ? 'Comment' : ''"
         [showPrimaryArrow]="false"
         [showCloseButton]="true"
         [showAccentBar]="false"

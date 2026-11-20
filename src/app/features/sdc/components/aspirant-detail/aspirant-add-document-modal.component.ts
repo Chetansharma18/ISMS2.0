@@ -72,14 +72,6 @@ import { formatFileSize, stripFileExtension, todayIsoDate } from './aspirant-doc
   <ng-container modalFooter>
     <button
       appButton
-      variant="outline"
-      type="button"
-      (click)="close.emit()"
-    >
-      Cancel
-    </button>
-    <button
-      appButton
       type="button"
       (click)="save.emit(newDocForm)"
     >

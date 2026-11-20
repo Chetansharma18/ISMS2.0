@@ -449,9 +449,6 @@ import { SdcCameraFeed, SdcMonitoringItem } from '../../../core/models/camera.mo
                 <app-icon name="download" size="sm" />
                 <span>Download</span>
               </a>
-              <button appButton variant="outline" size="sm" (click)="closeRecordingPreview()">
-                Close
-              </button>
             </ng-container>
           </app-modal>
         }

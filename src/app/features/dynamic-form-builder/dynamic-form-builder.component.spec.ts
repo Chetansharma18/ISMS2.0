@@ -1,6 +1,7 @@
 import '@angular/compiler';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createEnvironmentInjector, runInInjectionContext } from '@angular/core';
+import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import {
   DynamicFormBuilderComponent,
@@ -612,6 +613,52 @@ describe('DynamicFormBuilderComponent', () => {
 
     comp.toggleStepFormMode();
     expect(comp.formData.isStepForm).toBe(false);
+  });
+
+  it('navigates to full screen for Organisation Registration Form and Apply for EOI Form when router is available', () => {
+    const mockRouter = {
+      navigate: vi.fn().mockResolvedValue(true)
+    };
+    const injector = createEnvironmentInjector([
+      { provide: DataEngineService, useValue: mockDataEngine },
+      { provide: NotificationService, useClass: NotificationService },
+      { provide: Router, useValue: mockRouter }
+    ], null as any);
+
+    const comp = runInInjectionContext(injector, () => new DynamicFormBuilderComponent());
+
+    const companyForm: DynamicFormBuilderItem = {
+      sNo: 1,
+      id: 'form-company-reg',
+      formType: 'Organisation Registration Form',
+      isStepForm: true,
+      status: 'Active',
+      steps: [],
+      fields: []
+    };
+
+    comp.openPreviewModal(companyForm);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/registration'], {
+      queryParams: { returnUrl: '/admin/dynamic-form-builder' }
+    });
+
+    const applyForm: DynamicFormBuilderItem = {
+      sNo: 2,
+      id: 'form-apply-eoi',
+      formType: 'Apply for EOI Form',
+      isStepForm: true,
+      status: 'Active',
+      steps: [],
+      fields: []
+    };
+
+    comp.openPreviewModal(applyForm);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/scheme-form'], expect.objectContaining({
+      queryParams: expect.objectContaining({
+        returnUrl: '/admin/dynamic-form-builder',
+        refNo: 'RSLDC/EOI/VYUPY/2026-27/01'
+      })
+    }));
   });
 });
 

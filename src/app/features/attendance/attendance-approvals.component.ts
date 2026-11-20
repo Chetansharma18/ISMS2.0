@@ -106,7 +106,7 @@ interface PendingRow {
       [closeOnBackdrop]="false"
       maxWidthClass="max-w-lg"
       primaryLabel="Reject"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       (primaryAction)="reject()"
       (secondaryAction)="closeReject()"
       (close)="closeReject()"

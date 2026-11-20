@@ -50,7 +50,6 @@ const OTP_LENGTH = 6;
       </div>
 
       <ng-container modalFooter>
-        <button appButton variant="outline" (click)="close.emit()">Cancel</button>
         @if (step() === 'choose') {
           <button appButton (click)="sendOtp()">Send OTP</button>
         } @else {

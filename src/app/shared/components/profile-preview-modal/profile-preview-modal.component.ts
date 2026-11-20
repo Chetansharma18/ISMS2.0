@@ -287,16 +287,6 @@ interface TurnoverRow {
               <div class="flex items-center gap-2.5 justify-end">
                 <button
                   appButton
-                  variant="outline"
-                  type="button"
-                  (click)="onClose()"
-                  class="flex-1 sm:flex-none"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  appButton
                   type="button"
                   (click)="onProceed()"
                   class="flex-1 sm:flex-none"

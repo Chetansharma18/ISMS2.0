@@ -94,7 +94,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
     <!-- File Info Template -->
     <ng-template #fileInfoTemplate let-row>
       <div class="flex items-center gap-2">
-        <app-icon name="document" size="xs" class="text-rose-600 shrink-0" />
+        <app-icon name="pdf-badge" solid size="auto" class="w-4.5 h-4.5 text-[#E5252A] select-none shrink-0" />
         <span class="truncate font-normal text-slate-800 text-[13px]">{{ row.fileName }}</span>
         <span class="text-[11px] text-slate-500 shrink-0">({{ row.fileSize }})</span>
       </div>
@@ -155,7 +155,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
             Are you sure you want to delete the MoU <strong class="text-slate-900 font-semibold">"{{ doc.title }}"</strong>?
           </p>
           <div class="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700">
-            <app-icon name="document" size="xs" class="text-rose-600 shrink-0" />
+            <app-icon name="pdf-badge" solid size="auto" class="w-4.5 h-4.5 text-[#E5252A] select-none shrink-0" />
             <span class="truncate font-medium">{{ doc.fileName }}</span>
             <span class="text-slate-500 text-[11px] shrink-0">({{ doc.fileSize }})</span>
           </div>

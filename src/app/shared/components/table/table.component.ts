@@ -159,15 +159,20 @@ import { IconComponent } from '../icon/icon.component';
                                   }
                                   @case ('pdf') {
                                     <app-icon name="download" size="sm" [stroke]="2" />
+                                    <span>{{ act.label }}</span>
                                   }
                                   @case ('edit') {
                                     <app-icon name="edit" size="sm" [stroke]="2" />
+                                    <span>{{ act.label }}</span>
                                   }
                                   @case ('delete') {
                                     <app-icon name="trash" size="sm" [stroke]="2" />
+                                    <span>{{ act.label }}</span>
+                                  }
+                                  @default {
+                                    <span>{{ act.label }}</span>
                                   }
                                 }
-                                <span>{{ act.label }}</span>
                               </button>
                             }
                           }
@@ -472,6 +477,9 @@ export class TableComponent {
   }
 
   getActionBtnClass(act: TableAction): string {
+    if (act.icon === 'view' || act.variant === 'ghost') {
+      return 'p-1 text-[#7C0E44] hover:bg-[#F8EDF1] rounded transition-colors cursor-pointer inline-flex items-center justify-center';
+    }
     const base = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold cursor-pointer transition-colors shadow-2xs ';
     switch (act.variant) {
       case 'primary':
@@ -483,8 +491,6 @@ export class TableComponent {
         return base + 'border border-[#AA5E7A] text-[#7C0E44] bg-white hover:bg-[#F8EDF1]';
       case 'danger':
         return base + 'bg-[#FCE8E8] text-[#C62828] hover:bg-[#F9C5C5] border border-[#F9C5C5]';
-      case 'ghost':
-        return 'p-1 text-[#7C0E44] hover:bg-[#F8EDF1] rounded transition-colors';
       default:
         return base + 'bg-[#7C0E44] hover:bg-[#5E0832] text-white';
     }

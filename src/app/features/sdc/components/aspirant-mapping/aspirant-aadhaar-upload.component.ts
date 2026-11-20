@@ -36,7 +36,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
             <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="fileSelected.emit($event)" class="hidden" />
           </label>
           <span class="text-[11px] text-slate-500 truncate">
-            (PDF, JPG, PNG &bull; Max 5MB)
+            (PDF, JPG, PNG &bull; Max 25MB)
           </span>
         </div>
 
@@ -72,37 +72,38 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
             <!-- View Option -->
             <button
               appButton
-              variant="secondary"
+              variant="ghost"
               size="sm"
+              iconOnly
               type="button"
               (click)="viewDocument.emit()"
               title="Preview Aadhaar Card"
+              aria-label="Preview Aadhaar Card"
             >
               <app-icon name="eye" size="sm" />
-              <span>View</span>
             </button>
 
-            <!-- Change Option -->
-            <label
-              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer shadow-2xs"
-              title="Change/Replace Document"
+            <!-- Replace Option -->
+            <button
+              appButton
+              variant="secondary"
+              size="sm"
+              type="button"
+              (click)="replaceAadhaarInput.click()"
             >
-              <app-icon name="refresh" size="sm" [stroke]="2" />
-              <span>Change</span>
-              <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="fileSelected.emit($event)" class="hidden" />
-            </label>
+              Replace
+            </button>
+            <input #replaceAadhaarInput type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="fileSelected.emit($event)" class="hidden" />
 
             <!-- Remove Option -->
             <button
               appButton
-              variant="ghost"
+              variant="danger"
               size="sm"
               type="button"
               (click)="removeDocument.emit()"
-              title="Remove Document"
             >
-              <app-icon name="trash" size="sm" />
-              <span>Remove</span>
+              Remove
             </button>
           </div>
         </div>

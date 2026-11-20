@@ -2,13 +2,14 @@ import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, inject
 import { CommonModule } from '@angular/common';
 import { FileDoc } from '../../../../features/registration/models/otr-form.model';
 import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
+import { ButtonComponent } from '../../button/button.component';
 import { IconComponent } from '../../icon/icon.component';
 
 @Component({
   selector: 'app-form-file-upload',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, ButtonComponent, IconComponent],
   template: `
     <div class="w-full flex flex-col font-sans">
       <!-- Label -->
@@ -95,40 +96,43 @@ import { IconComponent } from '../../icon/icon.component';
             </div>
           </div>
 
-          <!-- Actions Toolbar: View, Change, Remove -->
+          <!-- Actions Toolbar: View, Replace, Remove matching Image 2 -->
           <div class="flex items-center gap-1.5 shrink-0 sm:ml-auto">
             <!-- View Option -> Opens in Chrome Tab -->
             <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
               type="button"
               (click)="openPreview()"
-              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#7C0E44] hover:text-[#5E0832] bg-[#F8EDF1] hover:bg-[#F2DACE] border border-[#EADCE2] rounded transition-colors cursor-pointer"
-              title="Open {{ fileDoc.fileName }} in new tab"
+              title="View Document"
+              aria-label="View Document"
             >
-              <app-icon name="external-link" size="sm" [stroke]="2" />
-              <span>View</span>
+              <app-icon name="eye" size="sm" />
             </button>
 
             @if (!disabled) {
-              <!-- Change Option -->
+              <!-- Replace Option -->
               <button
+                appButton
+                variant="secondary"
+                size="sm"
                 type="button"
                 (click)="triggerFileSelect(fileInput)"
-                class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded transition-colors cursor-pointer"
-                title="Change/Replace Document"
               >
-                <app-icon name="refresh" size="sm" [stroke]="2" />
-                <span>Change</span>
+                Replace
               </button>
 
               <!-- Remove Option -->
               <button
+                appButton
+                variant="danger"
+                size="sm"
                 type="button"
                 (click)="removeFile(fileInput)"
-                class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition-colors cursor-pointer"
-                title="Remove File"
               >
-                <app-icon name="trash" size="sm" [stroke]="2" />
-                <span>Remove</span>
+                Remove
               </button>
             }
           </div>
@@ -157,7 +161,7 @@ export class FormFileUploadComponent {
   @Input() label: string = '';
   @Input() fileDoc: FileDoc | null = null;
   @Input() accept: string = '.pdf,.png,.jpg,.jpeg';
-  @Input() maxSizeMb: number = 5;
+  @Input() maxSizeMb: number = 25;
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;
   @Input() dropzoneStyle: boolean = false;

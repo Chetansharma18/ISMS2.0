@@ -11,7 +11,6 @@ import {
   TenderAppeal
 } from '../../core/models/tender.model';
 import { ShortfallBridgeService } from '../eoi/services/shortfall-bridge.service';
-import { TenderShortfallSectionComponent } from './tender-status/tender-shortfall-section.component';
 import { ShortfallResponseModalComponent, ShortfallSubmission } from './tender-status/shortfall-response-modal.component';
 import { openShortfalls, withShortfallResponse } from './tender-status/tender-shortfall.util';
 import { TenderAppealSectionComponent } from './tender-status/tender-appeal-section.component';
@@ -65,7 +64,6 @@ interface TenderDetailTabItem {
     TenderBankSectionComponent,
     TenderDocumentsTableComponent,
     TenderStep5EmdComponent,
-    TenderShortfallSectionComponent,
     TenderAppealSectionComponent,
     ShortfallResponseModalComponent,
     AppealModalComponent
@@ -95,70 +93,75 @@ interface TenderDetailTabItem {
             (edit)="startEditing()"
             (save)="saveEdits()"
             (cancel)="cancelEditing()"
-            (print)="printApplication()"
           />
 
-          @if (canAppealSelected()) {
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-900" role="alert">
-              <p class="m-0 text-[13px] leading-snug">
-                <strong class="font-semibold">Rejected:</strong>
-                {{ selectedTender()!.rejectionReason || 'Technical qualification criteria not met.' }}
-              </p>
-              <button appButton size="sm" type="button" (click)="openAppealFlow()" class="shrink-0">
-                Appeal Request
-              </button>
-            </div>
-          } @else if (selectedTender()?.submittedStatus === 'Rejected' && selectedTender()?.appeal?.status === 'Rejected') {
-            <div class="flex items-start gap-2.5 px-4 py-2.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-900" role="alert">
-              <app-icon name="close" size="sm" class="text-rose-600 shrink-0 mt-0.5" />
-              <div class="space-y-0.5">
-                <p class="m-0 text-[13px] leading-snug">
-                  <strong class="font-semibold">Application Rejected:</strong>
-                  {{ selectedTender()!.rejectionReason || 'Appeal rejected after review.' }}
-                </p>
-                <p class="m-0 text-[11.5px] text-rose-700">
-                  Your appeal has been reviewed and rejected by the scrutiny committee. Only one appeal is permitted per application.
-                </p>
-              </div>
-            </div>
-          } @else if (selectedTender()?.submittedStatus === 'Rejected' && selectedTender()?.appeal?.status === 'Pending') {
-            <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900" role="alert">
-              <app-icon name="alert-triangle" size="sm" class="text-amber-600 shrink-0" />
-              <p class="m-0 text-[13px] leading-snug">
-                <strong class="font-semibold">Appeal Under Review:</strong>
-                Your appeal request submitted on {{ selectedTender()!.appeal!.submittedOn }} is currently under review by the department scrutiny committee.
-              </p>
+          @if (hasAlerts()) {
+            <div class="space-y-1.5">
+              @if (canAppealSelected()) {
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-900 text-xs" role="alert">
+                  <p class="m-0 text-xs leading-snug">
+                    <strong class="font-semibold">Rejected:</strong>
+                    {{ selectedTender()!.rejectionReason || 'Technical qualification criteria not met.' }}
+                  </p>
+                  <button appButton size="xs" type="button" (click)="openAppealFlow()" class="shrink-0">
+                    Appeal Request
+                  </button>
+                </div>
+              } @else if (selectedTender()?.submittedStatus === 'Rejected' && selectedTender()?.appeal?.status === 'Rejected') {
+                <div class="flex items-start gap-2 px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-900 text-xs" role="alert">
+                  <app-icon name="close" size="sm" class="text-rose-600 shrink-0 mt-0.5" />
+                  <div class="space-y-0.5">
+                    <p class="m-0 text-xs leading-snug">
+                      <strong class="font-semibold">Application Rejected:</strong>
+                      {{ selectedTender()!.rejectionReason || 'Appeal rejected after review.' }}
+                    </p>
+                    <p class="m-0 text-[11px] text-rose-700">
+                      Your appeal has been reviewed and rejected by the scrutiny committee. Only one appeal is permitted per application.
+                    </p>
+                  </div>
+                </div>
+              } @else if (selectedTender()?.submittedStatus === 'Rejected' && selectedTender()?.appeal?.status === 'Pending') {
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900 text-xs" role="alert">
+                  <app-icon name="alert-triangle" size="sm" class="text-amber-600 shrink-0" />
+                  <p class="m-0 text-xs leading-snug">
+                    <strong class="font-semibold">Appeal Under Review:</strong>
+                    Your appeal request submitted on {{ selectedTender()!.appeal!.submittedOn }} is currently under review by the department scrutiny committee.
+                  </p>
+                </div>
+              }
+
+              @if (pendingNoticeCount() > 0) {
+                <div class="flex items-center justify-between gap-3 px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900 text-xs" role="alert">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <app-icon name="alert-triangle" size="sm" class="text-amber-600 shrink-0" />
+                    <p class="m-0 text-xs leading-snug">
+                      <strong class="font-semibold text-amber-950">Department Appeal Response:</strong>
+                      {{ selectedTender()?.appeal ? 'Clarification requested by department. Action required within 7 days.' : 'Clarification requested by department (' + pendingNoticeCount() + ' pending). Action required within 7 days.' }}
+                    </p>
+                  </div>
+                  <button appButton size="xs" type="button" (click)="openShortfallFlow()" class="shrink-0">
+                    Respond
+                  </button>
+                </div>
+              } @else if (selectedTender()?.appeal?.response || (selectedTender()?.appeal?.status === 'Accepted' && (selectedTender()?.shortfalls?.length ?? 0) > 0)) {
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-sky-300 bg-sky-50 text-sky-950 text-xs" role="alert">
+                  <app-icon name="check" size="sm" class="text-sky-700 shrink-0" />
+                  <p class="m-0 text-xs leading-snug">
+                    <strong class="font-semibold">Appeal Response Submitted:</strong>
+                    Your response and documents for the appeal have been submitted successfully. The department scrutiny committee will review them and issue the final decision.
+                  </p>
+                </div>
+              }
+
+              @if (isEditing()) {
+                <app-tender-edit-status [tender]="selectedTender()!" [isEditing]="isEditing()" />
+              }
             </div>
           }
-
-          @if (pendingNoticeCount() > 0) {
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900" role="alert">
-              <div class="flex items-center gap-2">
-                <app-icon name="alert-triangle" size="sm" class="text-amber-600 shrink-0" />
-                <p class="m-0 text-[13px] leading-snug">
-                  <strong class="font-semibold">{{ selectedTender()?.appeal ? 'Department Appeal Response:' : 'Shortfall request:' }}</strong>
-                  {{ selectedTender()?.appeal ? 'Clarification requested by department. Action required within 7 days.' : 'the department has asked for more documents on this application (' + pendingNoticeCount() + ' pending).' }}
-                </p>
-              </div>
-              <button appButton size="sm" type="button" (click)="openShortfallFlow()" class="shrink-0">
-                Respond
-              </button>
-            </div>
-          } @else if (selectedTender()?.appeal?.response || (selectedTender()?.appeal?.status === 'Accepted' && (selectedTender()?.shortfalls?.length ?? 0) > 0)) {
-            <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-sky-300 bg-sky-50 text-sky-950" role="alert">
-              <app-icon name="check" size="sm" class="text-sky-700 shrink-0" />
-              <p class="m-0 text-[13px] leading-snug">
-                <strong class="font-semibold">Appeal Response Submitted:</strong>
-                Your response and documents for the appeal have been submitted successfully. The department scrutiny committee will review them and issue the final decision.
-              </p>
-            </div>
-          }
-
-          <app-tender-edit-status [tender]="selectedTender()!" [isEditing]="isEditing()" />
 
           <!-- HORIZONTAL NAVIGATION TABS -->
           <div class="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-slate-200/90 py-2 -mx-4 sm:-mx-5 lg:-mx-6 px-4 sm:px-5 lg:px-6 shadow-2xs">
-            <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar">
+            <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar w-full">
               @for (tab of tabs(); track tab.id) {
                 <button
                   appButton
@@ -166,7 +169,7 @@ interface TenderDetailTabItem {
                   size="sm"
                   type="button"
                   (click)="setActiveTab(tab.id)"
-                  class="shrink-0 text-xs font-semibold whitespace-nowrap"
+                  class="flex-1 min-w-fit justify-center text-xs font-semibold whitespace-nowrap"
                 >
                   <app-icon [name]="tab.icon" size="sm" />
                   <span>{{ tab.label }}</span>
@@ -193,177 +196,8 @@ interface TenderDetailTabItem {
           <!-- TAB CONTENT PANELS -->
           <div class="space-y-5 text-xs">
 
-            <!-- TAB 1: OVERVIEW -->
-            @if (activeTab() === 'overview') {
-              <div class="space-y-4">
-                <!-- Processing Fee Status Card -->
-                <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
-                  <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2.5">
-                      <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">1</span>
-                      <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Processing Fee Status</h2>
-                    </div>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
-                      Paid
-                    </span>
-                  </div>
-                  <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-4 text-xs">
-                    <div>
-                      <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Amount Paid</span>
-                      <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ currentApplication().processingFee || '₹2,000.00' }}</span>
-                    </div>
-                    <div>
-                      <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Paid On</span>
-                      <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ currentApplication().appliedDate }}</span>
-                    </div>
-                    <div>
-                      <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Transaction ID</span>
-                      <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ currentApplication().transactionRef || 'CIN-SBI-9912081' }}</span>
-                    </div>
-                  </div>
-                </section>
-
-                <!-- Section Summary & Quick-Access Cards Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <!-- Organisation Card -->
-                  <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 flex flex-col justify-between space-y-3">
-                    <div class="space-y-2">
-                      <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-slate-900 flex items-center gap-2">
-                          <app-icon name="building" size="sm" class="text-navy" />
-                          <span>Organisation</span>
-                        </span>
-                        <span class="text-[11px] font-medium text-slate-500 tabular-nums">CIN: {{ currentApplication().orgDetails.registrationNumber || '-' }}</span>
-                      </div>
-                      <div class="text-xs space-y-1">
-                        <span class="font-semibold text-slate-900 block truncate">{{ currentApplication().orgDetails.fullName || currentApplication().orgDetails.shortName || '-' }}</span>
-                        <span class="text-slate-500 block text-[11.5px]">Entity: {{ currentApplication().orgDetails.natureOfEntity || '-' }} &bull; PAN: {{ currentApplication().orgDetails.companyPan || '-' }}</span>
-                      </div>
-                    </div>
-                    <button appButton variant="outline" size="sm" type="button" (click)="setActiveTab('organisation')" class="w-full justify-center">
-                      <span>View Organisation &rarr;</span>
-                    </button>
-                  </div>
-
-                  <!-- Signatory Card -->
-                  <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 flex flex-col justify-between space-y-3">
-                    <div class="space-y-2">
-                      <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-slate-900 flex items-center gap-2">
-                          <app-icon name="identification" size="sm" class="text-navy" />
-                          <span>Authorized Person</span>
-                        </span>
-                        <span class="text-[11px] font-medium text-slate-500">Signatory</span>
-                      </div>
-                      <div class="text-xs space-y-1">
-                        <span class="font-semibold text-slate-900 block truncate">{{ currentApplication().signatoryDetails.name || '-' }}</span>
-                        <span class="text-slate-500 block text-[11.5px]">{{ currentApplication().signatoryDetails.designation || '-' }} &bull; {{ currentApplication().signatoryDetails.mobileNo || '-' }}</span>
-                      </div>
-                    </div>
-                    <button appButton variant="outline" size="sm" type="button" (click)="setActiveTab('signatory')" class="w-full justify-center">
-                      <span>View Signatory &rarr;</span>
-                    </button>
-                  </div>
-
-                  <!-- Bank Card -->
-                  <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 flex flex-col justify-between space-y-3">
-                    <div class="space-y-2">
-                      <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-slate-900 flex items-center gap-2">
-                          <app-icon name="bank" size="sm" class="text-navy" />
-                          <span>Bank Account</span>
-                        </span>
-                        <span class="text-[11px] font-medium text-slate-500 tabular-nums">IFSC: {{ currentApplication().bankDetails.ifscCode || '-' }}</span>
-                      </div>
-                      <div class="text-xs space-y-1">
-                        <span class="font-semibold text-slate-900 block truncate">{{ currentApplication().bankDetails.bankName || '-' }}</span>
-                        <span class="text-slate-500 block text-[11.5px]">A/C: {{ currentApplication().bankDetails.accountNo || '-' }}</span>
-                      </div>
-                    </div>
-                    <button appButton variant="outline" size="sm" type="button" (click)="setActiveTab('bank')" class="w-full justify-center">
-                      <span>View Bank Details &rarr;</span>
-                    </button>
-                  </div>
-
-                  <!-- Documents Card -->
-                  <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 flex flex-col justify-between space-y-3">
-                    <div class="space-y-2">
-                      <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-slate-900 flex items-center gap-2">
-                          <app-icon name="document" size="sm" class="text-navy" />
-                          <span>Supporting Documents</span>
-                        </span>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-sky-50 text-navy font-semibold text-[11px] border border-sky-200">
-                          {{ currentApplication().documents.length }} Files
-                        </span>
-                      </div>
-                      <div class="text-xs space-y-1">
-                        <span class="font-semibold text-slate-900 block">Mandatory &amp; Annexure Documents</span>
-                        <span class="text-slate-500 block text-[11.5px]">All 16 supporting documents attached &amp; verified</span>
-                      </div>
-                    </div>
-                    <button appButton variant="outline" size="sm" type="button" (click)="setActiveTab('documents')" class="w-full justify-center">
-                      <span>View Documents Table &rarr;</span>
-                    </button>
-                  </div>
-
-                  <!-- Payments Card -->
-                  <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 flex flex-col justify-between space-y-3">
-                    <div class="space-y-2">
-                      <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-slate-900 flex items-center gap-2">
-                          <app-icon name="document-download" size="sm" class="text-navy" />
-                          <span>Statutory Payments</span>
-                        </span>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold text-[11px] border border-emerald-200">
-                          Complete
-                        </span>
-                      </div>
-                      <div class="text-xs space-y-1">
-                        <span class="font-semibold text-slate-900 block">EMD: {{ currentApplication().emdAmount || '₹50,000' }} &bull; Fee: {{ currentApplication().processingFee || '₹2,000' }}</span>
-                        <span class="text-slate-500 block text-[11.5px]">Download official receipts and submission acknowledgement</span>
-                      </div>
-                    </div>
-                    <button appButton variant="outline" size="sm" type="button" (click)="setActiveTab('fees')" class="w-full justify-center">
-                      <span>View &amp; Download Receipts &rarr;</span>
-                    </button>
-                  </div>
-
-                  <!-- Shortfalls Card -->
-                  <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 flex flex-col justify-between space-y-3">
-                    <div class="space-y-2">
-                      <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-slate-900 flex items-center gap-2">
-                          <app-icon name="alert-triangle" size="sm" class="text-amber-600" />
-                          <span>{{ selectedTender()?.appeal ? 'Appeal & Response' : 'Scrutiny &amp; Shortfalls' }}</span>
-                        </span>
-                        <span
-                          class="inline-flex items-center px-2 py-0.5 rounded-full font-semibold text-[11px] border"
-                          [class.bg-amber-50]="pendingNoticeCount() > 0"
-                          [class.text-amber-800]="pendingNoticeCount() > 0"
-                          [class.border-amber-200]="pendingNoticeCount() > 0"
-                          [class.bg-slate-50]="pendingNoticeCount() === 0"
-                          [class.text-slate-700]="pendingNoticeCount() === 0"
-                          [class.border-slate-200]="pendingNoticeCount() === 0"
-                        >
-                          {{ pendingNoticeCount() > 0 ? (pendingNoticeCount() + ' Pending') : 'Clear' }}
-                        </span>
-                      </div>
-                      <div class="text-xs space-y-1">
-                        <span class="font-semibold text-slate-900 block">Department Status: {{ currentApplication().submittedStatus }}</span>
-                        <span class="text-slate-500 block text-[11.5px]">View revert requests history and appeal filing status</span>
-                      </div>
-                    </div>
-                    <button appButton variant="outline" size="sm" type="button" (click)="setActiveTab('shortfall')" class="w-full justify-center">
-                      <span>{{ selectedTender()?.appeal ? 'View Appeal Details &rarr;' : 'View Scrutiny Details &rarr;' }}</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            }
-
-            <!-- TAB 2: ORGANISATION DETAILS -->
-            @if (activeTab() === 'organisation' || activeTab() === 'all') {
+            <!-- TAB: ORGANISATION DETAILS -->
+            @if (activeTab() === 'organisation') {
               <app-tender-org-section
                 [app]="currentApplication()"
                 [editable]="editableTender"
@@ -373,8 +207,8 @@ interface TenderDetailTabItem {
               />
             }
 
-            <!-- TAB 3: AUTHORIZED SIGNATORY -->
-            @if (activeTab() === 'signatory' || activeTab() === 'all') {
+            <!-- TAB: AUTHORIZED SIGNATORY -->
+            @if (activeTab() === 'signatory') {
               <app-tender-signatory-section
                 [app]="currentApplication()"
                 [editable]="editableTender"
@@ -384,8 +218,8 @@ interface TenderDetailTabItem {
               />
             }
 
-            <!-- TAB 4: BANK DETAILS -->
-            @if (activeTab() === 'bank' || activeTab() === 'all') {
+            <!-- TAB: BANK DETAILS -->
+            @if (activeTab() === 'bank') {
               <app-tender-bank-section
                 [app]="currentApplication()"
                 [editable]="editableTender"
@@ -395,8 +229,8 @@ interface TenderDetailTabItem {
               />
             }
 
-            <!-- TAB 5: MANDATED PROPOSAL DOCUMENTS -->
-            @if (activeTab() === 'documents' || activeTab() === 'all') {
+            <!-- TAB: MANDATED PROPOSAL DOCUMENTS -->
+            @if (activeTab() === 'documents') {
               <app-tender-documents-table
                 [documents]="currentApplication().documents"
                 [isEditing]="isEditing()"
@@ -405,26 +239,19 @@ interface TenderDetailTabItem {
               />
             }
 
-            <!-- TAB 6: STATUTORY PAYMENTS & RECEIPTS -->
-            @if (activeTab() === 'fees' || activeTab() === 'all') {
+            <!-- TAB: STATUTORY PAYMENTS & RECEIPTS -->
+            @if (activeTab() === 'fees') {
               <app-tender-step5-emd [app]="currentApplication()" />
             }
 
-            <!-- TAB 7: SHORTFALL REQUESTS & APPEALS -->
-            @if (activeTab() === 'shortfall' || activeTab() === 'all') {
-              @if (!selectedTender()?.appeal) {
-                <app-tender-shortfall-section
-                  [app]="selectedTender()!"
-                  (respond)="openShortfallModal(selectedTender()!, $event)"
-                  (viewDoc)="onViewDoc($event)"
-                />
-              } @else {
-                <app-tender-appeal-section
-                  [app]="selectedTender()!"
-                  (respond)="openShortfallModal(selectedTender()!, $event)"
-                  (viewDoc)="onViewDoc($event)"
-                />
-              }
+            <!-- TAB: APPEAL REQUEST & DEPARTMENT RESPONSE -->
+            @if (activeTab() === 'shortfall') {
+              <app-tender-appeal-section
+                [app]="selectedTender()!"
+                (respond)="openShortfallModal(selectedTender()!, $event)"
+                (requestAppeal)="startAppeal(selectedTender()!)"
+                (viewDoc)="onViewDoc($event)"
+              />
             }
 
           </div>
@@ -462,7 +289,7 @@ export class TenderStatusComponent {
   isEditing = signal<boolean>(false);
 
   // Active navigation tab
-  readonly activeTab = signal<TenderDetailTab>('overview');
+  readonly activeTab = signal<TenderDetailTab>('organisation');
 
   private readonly docViewer = inject(DocumentViewerService);
 
@@ -499,6 +326,20 @@ export class TenderStatusComponent {
     return !!tender && canAppeal(tender);
   });
 
+  /** Whether any notification, status or edit mode banner is active. */
+  readonly hasAlerts = computed(() => {
+    const t = this.selectedTender();
+    if (!t) return false;
+    return (
+      this.canAppealSelected() ||
+      t.submittedStatus === 'Rejected' ||
+      this.pendingNoticeCount() > 0 ||
+      !!t.appeal?.response ||
+      (t.appeal?.status === 'Accepted' && (t.shortfalls?.length ?? 0) > 0) ||
+      this.isEditing()
+    );
+  });
+
   /** Dynamic tabs for the application detail view */
   readonly tabs = computed<TenderDetailTabItem[]>(() => {
     const tender = this.selectedTender();
@@ -506,19 +347,17 @@ export class TenderStatusComponent {
     const hasAppeal = tender ? !!tender.appeal || tender.submittedStatus === 'Rejected' : false;
 
     return [
-      { id: 'overview', label: 'Overview', icon: 'clipboard' },
       { id: 'organisation', label: 'Organisation', icon: 'building' },
       { id: 'signatory', label: 'Authorized Person', icon: 'identification' },
       { id: 'bank', label: 'Bank Details', icon: 'bank' },
-      { id: 'documents', label: 'Documents', icon: 'document', badge: tender?.documents?.length || 16 },
+      { id: 'documents', label: 'Documents', icon: 'document', badge: tender?.documents?.length ?? 26 },
       { id: 'fees', label: 'Payments & Receipts', icon: 'document-download', badge: 3 },
       {
         id: 'shortfall',
-        label: hasAppeal ? 'Appeal' : 'Shortfall',
+        label: 'Appeal',
         icon: 'alert-triangle',
         badgeColor: shortfalls > 0 ? 'amber' : (hasAppeal ? 'rose' : undefined)
-      },
-      { id: 'all', label: 'All Sections', icon: 'list' }
+      }
     ];
   });
 
@@ -565,7 +404,7 @@ export class TenderStatusComponent {
     if (tender) this.startShortfallResponse(tender);
   }
 
-  openApplicationPage(tender: SubmittedTender, initialTab: TenderDetailTab = 'overview'): void {
+  openApplicationPage(tender: SubmittedTender, initialTab: TenderDetailTab = 'organisation'): void {
     this.selectedTender.set(tender);
     this.editableTender = null;
     this.isEditing.set(false);
@@ -587,7 +426,7 @@ export class TenderStatusComponent {
     this.selectedTender.set(null);
     this.editableTender = null;
     this.isEditing.set(false);
-    this.activeTab.set('overview');
+    this.activeTab.set('organisation');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -607,10 +446,6 @@ export class TenderStatusComponent {
     // Deep clone active tender for editing
     this.editableTender = JSON.parse(JSON.stringify(tender));
     this.isEditing.set(true);
-    // If on overview, guide user to the editable Organisation tab
-    if (this.activeTab() === 'overview') {
-      this.activeTab.set('organisation');
-    }
     this.notify.warning(`Document replacement enabled. You have ${remainingEdits(tender)} edit(s) remaining.`);
   }
 
@@ -641,14 +476,6 @@ export class TenderStatusComponent {
     this.editableTender = null;
     this.isEditing.set(false);
     this.notify.warning('Edit discarded. No changes made.');
-  }
-
-  printApplication(): void {
-    // When printing, switch to all sections for a full printout
-    this.activeTab.set('all');
-    setTimeout(() => {
-      window.print();
-    }, 200);
   }
 
   // ---- Appeal against a rejection ------------------------------------------
@@ -725,7 +552,7 @@ export class TenderStatusComponent {
     this.notify.success(
       tender.appeal
         ? 'Your response to the appeal document request has been submitted.'
-        : 'Your response to the shortfall request has been submitted.'
+        : 'Your response to the department appeal request has been submitted.'
     );
   }
 

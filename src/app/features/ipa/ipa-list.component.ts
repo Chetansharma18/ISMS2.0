@@ -56,11 +56,19 @@ interface IpaRow {
     </ng-template>
 
     <ng-template #actionTemplate let-row>
-      <div class="flex items-center justify-center gap-2">
-        <button appButton variant="outline" size="sm" (click)="viewIpa(row)" title="Open the IPA">
+      <div class="flex items-center justify-center gap-1 sm:gap-1.5">
+        <button
+          appButton
+          variant="ghost"
+          size="sm"
+          iconOnly
+          (click)="viewIpa(row)"
+          title="Open the IPA"
+          aria-label="View IPA"
+        >
           <app-icon name="eye" size="sm" />
-          <span>View</span>
         </button>
+        <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
         <button
           appButton
           size="sm"

@@ -102,18 +102,21 @@ import { NotificationService } from '../../../../core/services/notification.serv
 
     <!-- Action Template: View & Delete -->
     <ng-template #actionTemplate let-row>
-      <div class="flex items-center justify-center gap-2">
+      <div class="flex items-center justify-center gap-1 sm:gap-1.5">
         <button
           appButton
-          variant="outline"
+          variant="ghost"
           size="sm"
+          iconOnly
           type="button"
           (click)="viewDocument(row)"
           [title]="'View ' + row.fileName"
+          [attr.aria-label]="'View ' + row.fileName"
         >
           <app-icon name="eye" size="sm" />
-          <span>View</span>
         </button>
+
+        <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
 
         <button
           appButton
@@ -125,7 +128,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
           title="Delete MoU"
           aria-label="Delete MoU"
         >
-          <app-icon name="close" size="xs" />
+          <app-icon name="close" size="sm" class="text-rose-600" />
         </button>
       </div>
     </ng-template>

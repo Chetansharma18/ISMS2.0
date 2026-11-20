@@ -238,60 +238,56 @@ import { FilterTabsComponent } from '../../../shared';
 
         <!-- Template: Actions (View Details in the exact same vertical column line) -->
         <ng-template #actionsTemplate let-sdc>
-          <div class="flex items-center justify-center gap-3 whitespace-nowrap py-2 px-1">
-            
-            <!-- Slot 1 (fixed width, training partner only): '+ Create Batch', or 'Edit' when the department returned the SDC.
-                 The department only views an SDC here; it decides on the details screen. -->
+          <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap py-1">
+            <!-- Training Partner Actions: '+ Create Batch', or 'Edit' when returned -->
             @if (!isAdmin()) {
-            <div class="w-36 flex justify-center shrink-0">
-              <!-- If the center is APPROVED, show "+ Create Batch" -->
               @if (sdc.status === 'APPROVED' || sdc.status === 'Approved') {
                 <button
                   appButton
+                  variant="ghost"
                   size="sm"
-                  block
+                  iconOnly
                   type="button"
                   [disabled]="batchLimitReached(sdc)"
                   (click)="createBatch(sdc)"
                   [title]="batchLimitReached(sdc) ? 'All batches of this center are registered' : 'Create Batch'"
+                  aria-label="Create Batch"
                 >
                   <app-icon name="plus" size="sm" />
-                  <span>Create Batch</span>
                 </button>
+                <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
               }
 
-              <!-- Edit: only when the department returned the SDC for corrections -->
               @if (sdc.status === 'RETURNED_TO_TP') {
                 <button
                   appButton
+                  variant="ghost"
                   size="sm"
-                  block
+                  iconOnly
                   type="button"
                   (click)="editSdc(sdc)"
-                  title="Edit the SDC details the department asked to correct"
+                  title="Edit SDC Details"
+                  aria-label="Edit SDC Details"
                 >
                   <app-icon name="edit" size="sm" />
-                  <span>Edit</span>
                 </button>
+                <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
               }
-
-            </div>
             }
 
-            <!-- View Details button (same fixed width, always in the same vertical line) -->
+            <!-- View Details button -->
             <button
               appButton
-              variant="outline"
+              variant="ghost"
               size="sm"
-              class="w-24 shrink-0"
+              iconOnly
               type="button"
               (click)="viewDetails(sdc)"
               title="View Center Details"
+              aria-label="View Center Details"
             >
               <app-icon name="eye" size="sm" />
-              <span>View</span>
             </button>
-
           </div>
         </ng-template>
 
@@ -345,7 +341,7 @@ export class SdcListComponent {
         { key: 'batches', label: 'Batches Registered', align: 'center', type: 'custom', width: 'w-32' },
         { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[140px]' },
         { key: 'centerHead', label: 'Center Head', align: 'center', type: 'custom', width: 'min-w-[160px]' },
-        { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-32' }
+        { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-24' }
       ];
     } else {
       return [
@@ -359,7 +355,7 @@ export class SdcListComponent {
         { key: 'batches', label: 'Batches Registered', align: 'center', type: 'custom', width: 'w-32' },
         { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[140px]' },
         { key: 'centerHead', label: 'Center Head', align: 'center', type: 'custom', width: 'min-w-[190px]' },
-        { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[300px]' }
+        { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-32 min-w-[110px]' }
       ];
     }
   });

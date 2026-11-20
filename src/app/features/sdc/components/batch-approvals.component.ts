@@ -215,31 +215,33 @@ import { FilterTabsComponent } from '../../../shared';
         <!-- Template: Actions (Approve Batch + View Details) -->
         <ng-template #actionsTemplate let-batch>
           <!-- The department only views a batch here; it decides on the details screen. -->
-          <div class="flex items-center justify-center gap-2 whitespace-nowrap py-0.5">
+          <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap py-0.5">
             <button
               appButton
-              variant="outline"
+              variant="ghost"
               size="sm"
-              class="w-24 shrink-0"
+              iconOnly
               type="button"
               (click)="viewDetails(batch)"
               title="View Batch Details"
+              aria-label="View Batch Details"
             >
               <app-icon name="eye" size="sm" />
-              <span>View</span>
             </button>
 
             @if (isApproved(batch)) {
+              <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
               <button
                 appButton
-                variant="danger"
+                variant="ghost"
                 size="sm"
+                iconOnly
                 type="button"
                 (click)="openWithdrawModal(batch)"
                 title="Withdraw Request"
+                aria-label="Withdraw Request"
               >
-                <app-icon name="ban" size="sm" />
-                <span>Withdraw Request</span>
+                <app-icon name="ban" size="sm" class="text-rose-600" />
               </button>
             }
           </div>
@@ -351,7 +353,7 @@ export class BatchApprovalsComponent {
     { key: 'size', label: 'Batch Size', align: 'center', type: 'custom', width: 'w-24' },
     { key: 'schedule', label: 'Start & End Date', align: 'center', type: 'custom', width: 'w-36' },
     { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[140px]' },
-    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[230px]' }
+    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-32 min-w-[100px]' }
   ];
 
   /** The batch size the partner entered (the capacity once the department has approved). */

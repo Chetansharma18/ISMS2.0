@@ -149,9 +149,17 @@ import { canAppeal } from './tender-appeal.util';
 
       <!-- Custom View Action Button Template -->
       <ng-template #viewTemplate let-tender>
-        <button appButton size="sm" type="button" (click)="open.emit({ tender, tab: 'overview' })" title="Open Application Details Page">
+        <button
+          appButton
+          variant="ghost"
+          size="sm"
+          iconOnly
+          type="button"
+          (click)="open.emit({ tender, tab: 'overview' })"
+          title="Open Application Details Page"
+          aria-label="View Details"
+        >
           <app-icon name="eye" size="sm" />
-          <span>View</span>
         </button>
       </ng-template>
 

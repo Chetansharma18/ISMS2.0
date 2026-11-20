@@ -29,7 +29,7 @@ export interface ShortfallSubmission {
       [showCloseButton]="true"
       [closeOnBackdrop]="false"
       [reverseButtons]="true"
-      [showAccentBar]="true"
+      [showAccentBar]="false"
       accentBarClass="bg-amber-500"
       [title]="isAppeal() ? 'Appeal Response' : 'Shortfall Request'"
       primaryLabel="Submit"

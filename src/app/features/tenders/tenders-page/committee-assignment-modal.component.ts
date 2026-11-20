@@ -30,7 +30,7 @@ import { filterAdmins } from './tenders-page.util';
       [isOpen]="isOpen()"
       [showCloseButton]="true"
       [closeOnBackdrop]="true"
-      [showAccentBar]="true"
+      [showAccentBar]="false"
       accentBarClass="bg-primary"
       title="Create Committee"
       primaryLabel="Save Committee"

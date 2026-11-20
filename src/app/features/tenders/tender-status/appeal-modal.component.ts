@@ -20,7 +20,7 @@ import { buildAppeal } from './tender-appeal.util';
       [showCloseButton]="true"
       [closeOnBackdrop]="false"
       [reverseButtons]="true"
-      [showAccentBar]="true"
+      [showAccentBar]="false"
       accentBarClass="bg-navy"
       title="Request for Appeal"
       primaryLabel="Confirm Appeal Request"

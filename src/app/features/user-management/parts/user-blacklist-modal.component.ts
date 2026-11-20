@@ -20,7 +20,7 @@ export interface BlacklistConfigSubmission {
       [isOpen]="isOpen()"
       [showCloseButton]="true"
       [closeOnBackdrop]="true"
-      [showAccentBar]="true"
+      [showAccentBar]="false"
       accentBarClass="bg-rose-600"
       title="Blacklist Training Partner"
       description="Configure the scheme and duration for blacklisting this Training Partner before final confirmation."

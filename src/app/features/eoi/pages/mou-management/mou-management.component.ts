@@ -138,7 +138,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
       [isOpen]="!!documentToDelete()"
       [showCloseButton]="true"
       [closeOnBackdrop]="true"
-      [showAccentBar]="true"
+      [showAccentBar]="false"
       accentBarClass="bg-rose-600"
       title="Delete MoU"
       primaryLabel="Delete MoU"

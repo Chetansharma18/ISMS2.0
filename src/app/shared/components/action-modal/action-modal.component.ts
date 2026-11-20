@@ -127,7 +127,7 @@ export class ActionModalComponent {
   @Input() primaryLabel = 'Confirm';
   @Input() secondaryLabel = 'Cancel';
   @Input() showPrimaryArrow = true;
-  @Input() showAccentBar = true;
+  @Input() showAccentBar = false;
   @Input() accentBarClass = 'bg-navy';
   @Input() showCloseButton = false;
   @Input() maxWidthClass = 'max-w-[490px]';

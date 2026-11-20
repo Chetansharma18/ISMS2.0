@@ -287,7 +287,7 @@ import { FilterTabsComponent } from '../../../shared';
       [isOpen]="!!batchToWithdraw()"
       [showCloseButton]="true"
       [closeOnBackdrop]="true"
-      [showAccentBar]="true"
+      [showAccentBar]="false"
       accentBarClass="bg-rose-600"
       title="Withdraw Request"
       primaryLabel="Submit Withdraw Request"

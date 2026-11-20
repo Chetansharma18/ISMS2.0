@@ -12,7 +12,7 @@ import { ConfirmModalData } from '../user-management.util';
       [isOpen]="isOpen()"
       [showCloseButton]="true"
       [closeOnBackdrop]="true"
-      [showAccentBar]="true"
+      [showAccentBar]="false"
       [accentBarClass]="data()?.accentBarClass || 'bg-primary'"
       [title]="data()?.title || 'Confirmation'"
       [primaryLabel]="data()?.confirmLabel || 'Confirm'"

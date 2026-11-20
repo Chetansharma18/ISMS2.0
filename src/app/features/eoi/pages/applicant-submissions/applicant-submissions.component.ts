@@ -106,8 +106,16 @@ import {
         </ng-template>
 
         <ng-template #actionTemplate let-item>
-          <a appButton size="sm" [routerLink]="['/admin/review', item.id]">
-            <span>Review</span>
+          <a
+            appButton
+            variant="ghost"
+            size="sm"
+            iconOnly
+            [routerLink]="['/admin/review', item.id]"
+            title="Review Submission"
+            aria-label="Review Submission"
+          >
+            <app-icon name="eye" size="sm" />
           </a>
         </ng-template>
 

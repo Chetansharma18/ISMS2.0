@@ -119,51 +119,50 @@ export const INITIAL_DOC_ITEMS: DocMasterItem[] = [
 
       <!-- Action Cell Template: View, Edit, Active/Inactive Toggle -->
       <ng-template #actionTemplate let-item>
-        <div class="flex items-center justify-center whitespace-nowrap">
+        <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
           <!-- View Button -->
           <button
             appButton
             variant="ghost"
             size="sm"
+            iconOnly
             type="button"
             (click)="$event.stopPropagation(); openViewModal(item)"
             title="View Details"
+            aria-label="View Details"
           >
             <app-icon name="eye" size="sm" />
-            <span>View</span>
           </button>
 
-          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
+          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
 
           <!-- Edit Button -->
           <button
             appButton
             variant="ghost"
             size="sm"
+            iconOnly
             type="button"
             (click)="$event.stopPropagation(); openEditModal(item)"
             title="Edit Document"
+            aria-label="Edit Document"
           >
             <app-icon name="edit" size="sm" />
-            <span>Edit</span>
           </button>
 
-          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
+          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
 
           <!-- Active / Inactive Toggle -->
-          <div class="inline-flex items-center gap-1.5" title="Toggle Status" (click)="$event.stopPropagation()">
+          <div
+            class="inline-flex items-center"
+            [title]="item.status === 'Inactive' ? 'Status: Inactive (Click to activate)' : 'Status: Active (Click to deactivate)'"
+            (click)="$event.stopPropagation()"
+          >
             <app-switch
               [checked]="item.status === 'Active'"
-              label="Toggle Active Status"
+              [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
               (toggled)="toggleStatus(item)"
             />
-            <span
-              class="font-medium text-[12px] select-none transition-colors cursor-pointer"
-              (click)="toggleStatus(item)"
-              [ngClass]="item.status === 'Inactive' ? 'text-slate-700 font-semibold hover:text-slate-900' : 'text-emerald-600 hover:text-emerald-700'"
-            >
-              {{ item.status === 'Inactive' ? 'Inactive' : 'Active' }}
-            </span>
           </div>
         </div>
       </ng-template>
@@ -352,7 +351,7 @@ export class DocMasterComponent implements OnInit, AfterViewInit {
     { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
     { key: 'schemeName', label: 'Scheme Name', cellClass: 'whitespace-nowrap font-semibold text-slate-800 min-w-[220px]' },
     { key: 'documents', label: 'Documents', cellClass: 'font-medium text-slate-700 min-w-[260px]' },
-    { key: 'action', label: 'Action', align: 'center', width: 'min-w-[210px]', cellClass: 'whitespace-nowrap' }
+    { key: 'action', label: 'Action', align: 'center', width: 'w-40 min-w-[140px]', cellClass: 'whitespace-nowrap' }
   ];
 
   searchQuery = signal<string>('');

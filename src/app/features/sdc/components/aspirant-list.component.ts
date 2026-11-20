@@ -201,25 +201,49 @@ export function aspirantStatusClass(status: AspirantTrainingStatus): string {
       </ng-template>
 
       <ng-template #actionsTemplate let-a>
-        <div class="flex items-center justify-center py-2 px-1 whitespace-nowrap">
-          <button appButton variant="outline" size="sm" class="w-24 shrink-0" type="button" (click)="viewDetails(a)" title="View aspirant details">
+        <div class="flex items-center justify-center gap-1 sm:gap-1.5 py-1 whitespace-nowrap">
+          <button
+            appButton
+            variant="ghost"
+            size="sm"
+            iconOnly
+            type="button"
+            (click)="viewDetails(a)"
+            title="View Details"
+            aria-label="View Details"
+          >
             <app-icon name="eye" size="sm" />
-            <span>View</span>
           </button>
-          <!-- Drop an active student, or register a replacement for one who has dropped. One fixed slot keeps the rows in line. -->
-          <div class="w-28 shrink-0 ml-2">
-            @if (canDrop(a)) {
-              <button appButton variant="outline" size="sm" block type="button" (click)="askToDrop(a)" title="Drop this student from the batch">
-                <app-icon name="close" size="sm" />
-                <span>Drop</span>
-              </button>
-            } @else if (canReplace(a)) {
-              <button appButton variant="primary" size="sm" block type="button" (click)="registerReplacement(a)" title="Register a student in the seat this student left">
-                <app-icon name="plus" size="sm" />
-                <span>Replace</span>
-              </button>
-            }
-          </div>
+
+          @if (canDrop(a)) {
+            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              (click)="askToDrop(a)"
+              title="Drop student from batch"
+              aria-label="Drop student"
+            >
+              <app-icon name="close" size="sm" class="text-rose-600" />
+            </button>
+          } @else if (canReplace(a)) {
+            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              (click)="registerReplacement(a)"
+              title="Register replacement student"
+              aria-label="Register replacement"
+            >
+              <app-icon name="plus" size="sm" />
+            </button>
+          }
         </div>
       </ng-template>
 
@@ -283,7 +307,7 @@ export class AspirantListComponent {
     { key: 'scheme', label: 'Scheme & Category', type: 'custom', width: 'min-w-[140px]' },
     { key: 'enrollmentDate', label: 'Enrolled On', align: 'center', cellClass: 'whitespace-nowrap tabular-nums font-normal text-slate-800 text-[13px]', width: 'w-28' },
     { key: 'status', label: 'Status', type: 'custom', width: 'min-w-[110px]' },
-    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[260px]' }
+    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-28 min-w-[90px]' }
   ];
 
   readonly sdcOptions = computed(() => {

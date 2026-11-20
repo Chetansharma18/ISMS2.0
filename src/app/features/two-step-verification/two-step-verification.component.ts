@@ -115,51 +115,50 @@ interface TwoStepFormData {
 
       <!-- Custom Template: Action Column -->
       <ng-template #actionTemplate let-item>
-        <div class="flex items-center justify-center whitespace-nowrap" (click)="$event.stopPropagation()">
+        <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap" (click)="$event.stopPropagation()">
           <!-- View Button -->
           <button
             appButton
             variant="ghost"
             size="sm"
+            iconOnly
             type="button"
             (click)="openViewModal(item)"
             title="View Details"
+            aria-label="View Details"
           >
             <app-icon name="eye" size="sm" />
-            <span>View</span>
           </button>
 
-          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
+          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
 
           <!-- Edit Button -->
           <button
             appButton
             variant="ghost"
             size="sm"
+            iconOnly
             type="button"
             (click)="openEditModal(item)"
             title="Edit"
+            aria-label="Edit"
           >
             <app-icon name="edit" size="sm" />
-            <span>Edit</span>
           </button>
 
-          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
+          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
 
           <!-- Active / Inactive Toggle -->
-          <div class="inline-flex items-center gap-1.5" title="Toggle Status" (click)="$event.stopPropagation()">
+          <div
+            class="inline-flex items-center"
+            [title]="item.status === 'Inactive' ? 'Status: Inactive (Click to activate)' : 'Status: Active (Click to deactivate)'"
+            (click)="$event.stopPropagation()"
+          >
             <app-switch
               [checked]="item.status !== 'Inactive'"
-              label="Toggle Active Status"
+              [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
               (toggled)="toggleStatus(item)"
             />
-            <span
-              class="font-medium text-[12px] select-none transition-colors cursor-pointer"
-              (click)="toggleStatus(item)"
-              [ngClass]="item.status === 'Inactive' ? 'text-slate-700 font-semibold hover:text-slate-900' : 'text-emerald-600 hover:text-emerald-700'"
-            >
-              {{ item.status === 'Inactive' ? 'Inactive' : 'Active' }}
-            </span>
           </div>
         </div>
       </ng-template>
@@ -336,7 +335,7 @@ export class TwoStepVerificationComponent implements OnInit {
     { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
     { key: 'roleType', label: 'Role type', cellClass: 'whitespace-nowrap font-semibold text-slate-800', width: 'w-56 min-w-[180px]' },
     { key: 'authTypes', label: 'Authentication type', type: 'custom', cellClass: 'min-w-[280px]' },
-    { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'w-56 min-w-[210px]' }
+    { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'w-40 min-w-[140px]' }
   ];
 
   readonly availableRoles = computed(() => {

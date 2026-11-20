@@ -234,6 +234,7 @@ import { IconComponent } from '../../../../shared';
               [options]="statesList"
               placeholder="Select state / UT"
               [required]="true"
+              [clearable]="true"
               [error]="getFieldError('stateOfLegalReg')"
             ></app-form-select>
           </div>
@@ -302,8 +303,10 @@ import { IconComponent } from '../../../../shared';
               type="tel"
               [value]="data().contactNo"
               (valueChange)="update('contactNo', $event)"
+              (blur)="markTouched('contactNo')"
               placeholder="10-digit mobile number"
               [required]="true"
+              [numericOnly]="true"
               [maxLength]="10"
               [error]="getFieldError('contactNo')"
             ></app-form-input>
@@ -316,6 +319,7 @@ import { IconComponent } from '../../../../shared';
               type="email"
               [value]="data().emailId"
               (valueChange)="update('emailId', $event)"
+              (blur)="markTouched('emailId')"
               placeholder="Enter official email"
               [required]="true"
               [error]="getFieldError('emailId')"
@@ -329,6 +333,7 @@ import { IconComponent } from '../../../../shared';
               type="text"
               [value]="data().website"
               (valueChange)="update('website', $event)"
+              (blur)="markTouched('website')"
               placeholder="https://www.example.com"
               [required]="false"
               [error]="getFieldError('website')"
@@ -381,6 +386,7 @@ import { IconComponent } from '../../../../shared';
                 [options]="statesList"
                 placeholder="Select state"
                 [required]="true"
+                [clearable]="true"
                 [error]="getFieldError('registeredState')"
               ></app-form-select>
             </div>
@@ -404,8 +410,10 @@ import { IconComponent } from '../../../../shared';
                 type="tel"
                 [value]="data().registeredPincode"
                 (valueChange)="update('registeredPincode', $event)"
+                (blur)="markTouched('registeredPincode')"
                 placeholder="6-digit PIN code"
                 [required]="true"
+                [numericOnly]="true"
                 [maxLength]="6"
                 [error]="getFieldError('registeredPincode')"
               ></app-form-input>
@@ -460,6 +468,7 @@ import { IconComponent } from '../../../../shared';
                   [options]="statesList"
                   placeholder="Select state"
                   [required]="true"
+                  [clearable]="true"
                   [error]="getFieldError('officeState')"
                 ></app-form-select>
               </div>
@@ -483,8 +492,10 @@ import { IconComponent } from '../../../../shared';
                   type="tel"
                   [value]="data().officePincode"
                   (valueChange)="update('officePincode', $event)"
+                  (blur)="markTouched('officePincode')"
                   placeholder="6-digit PIN code"
                   [required]="true"
+                  [numericOnly]="true"
                   [maxLength]="6"
                   [error]="getFieldError('officePincode')"
                 ></app-form-input>
@@ -633,6 +644,16 @@ export class Step1OrgDetailsComponent {
 
   readonly data = computed(() => this.otrFormService.step1());
   readonly isSubmitted = computed(() => this.validationService.submittedSteps().has(1));
+  readonly touchedFields = signal<Set<string>>(new Set<string>());
+
+  markTouched(field: string): void {
+    this.touchedFields.update(set => {
+      if (set.has(field)) return set;
+      const next = new Set(set);
+      next.add(field);
+      return next;
+    });
+  }
 
   readonly registeredDistricts = computed(() => {
     const state = this.data().registeredState;
@@ -645,11 +666,65 @@ export class Step1OrgDetailsComponent {
   });
 
   getFieldError(field: string): string | undefined {
-    if (!this.isSubmitted()) {
+    const isSubmitted = this.isSubmitted();
+    const isTouched = this.touchedFields().has(field);
+    const d = this.data();
+
+    // Specific live/blur format validations when user has entered content or touched field
+    if (field === 'emailId') {
+      if (d.emailId?.trim() && !REGEX.EMAIL.test(d.emailId)) {
+        return 'Invalid Email ID format';
+      }
+      if ((isSubmitted || isTouched) && !d.emailId?.trim()) {
+        return 'Organisation Email ID is required';
+      }
       return undefined;
     }
 
-    const d = this.data();
+    if (field === 'website') {
+      if (d.website?.trim() && !REGEX.URL.test(d.website)) {
+        return 'Invalid Website URL format';
+      }
+      return undefined;
+    }
+
+    if (field === 'contactNo') {
+      if ((isSubmitted || isTouched) && !d.contactNo?.trim()) {
+        return 'Contact Number is required';
+      }
+      if (d.contactNo?.trim() && (!REGEX.INDIAN_MOBILE.test(d.contactNo) && !/^[0-9]{10}$/.test(d.contactNo.replace(/[-\s]/g, '')))) {
+        return 'Invalid 10-digit mobile number';
+      }
+      return undefined;
+    }
+
+    if (field === 'registeredPincode') {
+      if ((isSubmitted || isTouched) && !d.registeredPincode?.trim()) {
+        return 'PIN Code is required';
+      }
+      if (d.registeredPincode?.trim() && !REGEX.INDIAN_PIN.test(d.registeredPincode)) {
+        return 'Invalid 6-digit PIN Code';
+      }
+      return undefined;
+    }
+
+    if (field === 'officePincode') {
+      if (!d.sameAsRegistered) {
+        if ((isSubmitted || isTouched) && !d.officePincode?.trim()) {
+          return 'Office PIN Code is required';
+        }
+        if (d.officePincode?.trim() && !REGEX.INDIAN_PIN.test(d.officePincode)) {
+          return 'Invalid 6-digit PIN Code';
+        }
+      }
+      return undefined;
+    }
+
+    // For other required fields, only evaluate if form has been submitted
+    if (!isSubmitted) {
+      return undefined;
+    }
+
     switch (field) {
       case 'fullName':
         return !d.fullName?.trim() ? 'Organization Name is required' : undefined;
@@ -705,31 +780,12 @@ export class Step1OrgDetailsComponent {
           return 'Organisation PAN Card is required';
         }
         return undefined;
-      case 'contactNo':
-        if (!d.contactNo?.trim()) return 'Contact Number is required';
-        if (!REGEX.INDIAN_MOBILE.test(d.contactNo) && !/^[0-9]{7,12}$/.test(d.contactNo.replace(/[-\s]/g, ''))) {
-          return 'Invalid 10-digit mobile number';
-        }
-        return undefined;
-      case 'emailId':
-        if (!d.emailId?.trim()) return 'Organisation Email ID is required';
-        if (!REGEX.EMAIL.test(d.emailId)) return 'Invalid Email ID format';
-        return undefined;
-      case 'website':
-        if (d.website?.trim() && !REGEX.URL.test(d.website)) {
-          return 'Invalid Website URL format';
-        }
-        return undefined;
       case 'registeredAddress':
         return !d.registeredAddress?.trim() ? 'Registered Address is required' : undefined;
       case 'registeredState':
         return !d.registeredState?.trim() ? 'Registered State is required' : undefined;
       case 'registeredDistrict':
         return !d.registeredDistrict?.trim() ? 'Registered District is required' : undefined;
-      case 'registeredPincode':
-        if (!d.registeredPincode?.trim()) return 'PIN Code is required';
-        if (!REGEX.INDIAN_PIN.test(d.registeredPincode)) return 'Invalid 6-digit PIN Code';
-        return undefined;
       case 'officeAddress':
         if (!d.sameAsRegistered && !d.officeAddress?.trim()) return 'Office Address is required';
         return undefined;
@@ -738,12 +794,6 @@ export class Step1OrgDetailsComponent {
         return undefined;
       case 'officeDistrict':
         if (!d.sameAsRegistered && !d.officeDistrict?.trim()) return 'Office District is required';
-        return undefined;
-      case 'officePincode':
-        if (!d.sameAsRegistered) {
-          if (!d.officePincode?.trim()) return 'Office PIN Code is required';
-          if (!REGEX.INDIAN_PIN.test(d.officePincode)) return 'Invalid 6-digit PIN Code';
-        }
         return undefined;
       default:
         return undefined;

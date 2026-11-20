@@ -30,7 +30,7 @@ export interface SelectItem {
       <!-- Label Row -->
       @if (label) {
         <div class="flex items-center justify-between mb-1 font-sans">
-          <label [for]="id" class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#25212A] select-none">
+          <label class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#25212A] select-none">
             {{ label }}
             @if (required) {
               <span class="text-rose-600 font-bold ml-0.5">*</span>
@@ -62,12 +62,29 @@ export interface SelectItem {
           {{ selectedLabel() || placeholder }}
         </span>
 
-        <app-icon
-          name="chevron-down"
-          [stroke]="2"
-          class="text-muted transition-transform duration-200 ml-2 shrink-0"
-          [class.rotate-180]="isOpen()"
-        />
+        <div class="flex items-center gap-1 shrink-0 ml-2">
+          @if (clearable && !disabled && (multiple ? selectedValues().length > 0 : !!value)) {
+            <span
+              role="button"
+              tabindex="0"
+              class="text-slate-400 hover:text-slate-600 cursor-pointer p-0.5 rounded transition-colors inline-flex items-center justify-center"
+              (click)="clearSelection($event)"
+              (keydown.enter)="clearSelection($event)"
+              (keydown.space)="clearSelection($event)"
+              title="Clear selection"
+              aria-label="Clear selection"
+            >
+              <app-icon name="close" size="xs" [stroke]="2.5" />
+            </span>
+          }
+
+          <app-icon
+            name="chevron-down"
+            [stroke]="2"
+            class="text-muted transition-transform duration-200"
+            [class.rotate-180]="isOpen()"
+          />
+        </div>
       </button>
 
       <!-- Dropdown Popup Menu with Outside-Click Detector -->
@@ -137,7 +154,7 @@ export interface SelectItem {
               </li>
             } @empty {
               <li class="px-3 py-3 text-center text-[12px] text-muted">
-                No matching options found
+                No results found
               </li>
             }
           </ul>
@@ -201,6 +218,7 @@ export class FormSelectComponent {
   @Input() placeholder: string = 'Please select';
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;
+  @Input() clearable: boolean = false;
   @Input() hint?: string;
   @Input() error?: string;
 
@@ -263,6 +281,16 @@ export class FormSelectComponent {
     if (!this.disabled) {
       this.isOpen.update(v => !v);
       this.searchQuery = '';
+    }
+  }
+
+  clearSelection(event: Event): void {
+    event.stopPropagation();
+    this.value = '';
+    this.valueChange.emit('');
+    if (this.multiple) {
+      this.values = [];
+      this.valuesChange.emit([]);
     }
   }
 

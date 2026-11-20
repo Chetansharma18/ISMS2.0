@@ -16,9 +16,13 @@ import {
   EOI_CONFIGURATION_NAV,
   EXACT_MATCH,
   EXISTING_USER_NAV,
+  HELP_SUPPORT_NAV,
   MASTER_ICON,
   MASTER_NAV,
+  NavItem,
   NEW_USER_NAV,
+  PRIVACY_POLICY_NAV,
+  TERMS_AND_CONDITIONS_NAV,
   USER_MANAGEMENT_ICON,
   USER_MANAGEMENT_NAV
 } from './sidebar-nav.config';
@@ -63,7 +67,9 @@ import {
 
         <!-- Navigation Links -->
         <nav class="flex flex-col gap-1 px-2.5 py-3" aria-label="Main Navigation">
-          @if (isAspirant()) {
+          @if (activeContextItem(); as contextItem) {
+            <ng-container *ngTemplateOutlet="navLink; context: { $implicit: contextItem }" />
+          } @else if (isAspirant()) {
             @for (item of aspirantNav; track item.key) {
               <ng-container *ngTemplateOutlet="navLink; context: { $implicit: item, pending: item.key === 'profile' && isAspirantProfilePending() }" />
             }
@@ -109,7 +115,6 @@ import {
               <ng-container *ngTemplateOutlet="navLink; context: { $implicit: item, pending: item.key === 'profile' && isProfilePending() }" />
             }
           }
-
         </nav>
       </div>
 
@@ -273,7 +278,13 @@ export class SidebarComponent {
     toggle: () => this.toggleUserManagement()
   };
 
-  readonly currentUrl = signal<string>(this.router.url);
+  readonly currentUrl = signal<string>(
+    this.router.url && this.router.url !== '/'
+      ? this.router.url
+      : (typeof window !== 'undefined' && window.location?.pathname && window.location.pathname !== '/'
+          ? window.location.pathname
+          : (this.router.url || ''))
+  );
 
   constructor() {
     this.router.events
@@ -287,12 +298,38 @@ export class SidebarComponent {
   }
 
   private cleanUrl(): string {
-    const raw = this.currentUrl() || this.router.url || '';
+    const browserPath = typeof window !== 'undefined' ? window.location?.pathname : '';
+    const raw = this.currentUrl() || this.router.url || browserPath || '';
     return raw.split('?')[0].split('#')[0];
   }
 
+  readonly activeContextItem = computed<NavItem | null>(() => {
+    const key = this.activeKey();
+    if (key === 'terms-and-conditions') {
+      return TERMS_AND_CONDITIONS_NAV;
+    }
+    if (key === 'help-support') {
+      return HELP_SUPPORT_NAV;
+    }
+    if (key === 'privacy-policy') {
+      return PRIVACY_POLICY_NAV;
+    }
+    return null;
+  });
+
   readonly activeKey = computed<string>(() => {
     const url = this.cleanUrl();
+
+    // Legal & Support routes
+    if (url === '/terms-and-conditions' || url.startsWith('/terms-and-conditions/')) {
+      return 'terms-and-conditions';
+    }
+    if (url === '/help-support' || url.startsWith('/help-support/')) {
+      return 'help-support';
+    }
+    if (url === '/privacy-policy' || url.startsWith('/privacy-policy/')) {
+      return 'privacy-policy';
+    }
 
     // 0. Aspirant Portal routes
     if (url === '/training-calendar' || url.startsWith('/training-calendar')) {

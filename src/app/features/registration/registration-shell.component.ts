@@ -1,5 +1,5 @@
 // ui-guard-allow: page-frame - the registration wizard has its own stepper layout
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, viewChild, OnInit, OnDestroy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -261,7 +261,7 @@ export interface StepMeta {
                     <span>Back to Profile</span>
                   </button>
                 } @else {
-                  <button appButton size="lg" type="button" (click)="submitApplication()">
+                  <button appButton size="lg" type="button" [disabled]="!canSubmit()" (click)="submitApplication()">
                     <span>Register</span>
                   </button>
                 }
@@ -343,7 +343,7 @@ export interface StepMeta {
     </div>
   `
 })
-export class RegistrationShellComponent {
+export class RegistrationShellComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
@@ -365,9 +365,21 @@ export class RegistrationShellComponent {
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const step = parseInt(params['step'], 10);
       if (step >= 1 && step <= 4) {
-        this.activeStep.set(step);
+        if (step === 1) {
+          this.activeStep.set(1);
+        } else {
+          this.goToStep(step);
+        }
       }
     });
+  }
+
+  ngOnInit(): void {
+    this.validationService.resetSubmittedSteps();
+  }
+
+  ngOnDestroy(): void {
+    this.validationService.resetSubmittedSteps();
   }
 
   readonly steps: StepMeta[] = [
@@ -405,18 +417,53 @@ export class RegistrationShellComponent {
 
   goToStep(stepNumber: number): void {
     if (stepNumber < 1 || stepNumber > 4) return;
+    const current = this.activeStep();
+
+    // Allow backward navigation at any time
+    if (stepNumber <= current) {
+      this.activeStep.set(stepNumber);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Forward navigation: validate all preceding steps
+    const data = this.otrFormService.formData();
+    for (let s = 1; s < stepNumber; s++) {
+      if (!this.validationService.isStepValid(s, data)) {
+        this.validationService.markStepSubmitted(s);
+        const stepName = s === 1 ? 'Organisation Details' : s === 2 ? 'Authorized Person Details' : 'Bank Details';
+        this.validationService.showToast(`Please complete mandatory fields in ${stepName} before proceeding.`, 'error', s);
+        return;
+      }
+    }
+
     this.activeStep.set(stepNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   nextStep(): void {
     const current = this.activeStep();
+    const data = this.otrFormService.formData();
 
     if (current === 1) {
       this.validationService.markStepSubmitted(1);
-      const errors = this.validationService.validateStep1(this.otrFormService.step1());
+      const errors = this.validationService.validateStep1(data.step1);
       if (errors.length > 0) {
         this.validationService.showToast('Please fill all mandatory fields marked with * in Organisation Details', 'error', 1);
+        return;
+      }
+    } else if (current === 2) {
+      this.validationService.markStepSubmitted(2);
+      const errors = this.validationService.validateStep3(data.step3);
+      if (errors.length > 0) {
+        this.validationService.showToast('Please fill all mandatory fields marked with * in Authorized Person Details', 'error', 2);
+        return;
+      }
+    } else if (current === 3) {
+      this.validationService.markStepSubmitted(3);
+      const errors = this.validationService.validateStep4(data.step4);
+      if (errors.length > 0) {
+        this.validationService.showToast('Please fill all mandatory fields marked with * in Organisation Bank Details', 'error', 3);
         return;
       }
     }
@@ -447,8 +494,9 @@ export class RegistrationShellComponent {
       this.validationService.markStepSubmitted(s);
       const errors = this.validationService.getStepErrors(s, data);
       if (errors.length > 0) {
-        this.validationService.showToast('Please fill all mandatory fields marked with *', 'error', s);
-        this.goToStep(s);
+        this.validationService.showToast(errors[0] || 'Please fill all mandatory fields marked with *', 'error', s);
+        this.activeStep.set(s);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
     }
@@ -483,6 +531,7 @@ export class RegistrationShellComponent {
   }
 
   goBack(): void {
+    this.validationService.resetSubmittedSteps();
     if (this.activeStep() > 1) {
       this.previousStep();
     } else {
@@ -491,10 +540,12 @@ export class RegistrationShellComponent {
   }
 
   backToProfile(): void {
+    this.validationService.resetSubmittedSteps();
     this.router.navigate(['/profile']);
   }
 
   navigateToExistingUserProfile(): void {
+    this.validationService.resetSubmittedSteps();
     const data = this.otrFormService.formData();
     const orgName = data.step1.fullName?.trim() || data.step1.shortName?.trim() || 'Approved Citizen (TP)';
 
@@ -515,6 +566,7 @@ export class RegistrationShellComponent {
   }
 
   navigateToHome(): void {
+    this.validationService.resetSubmittedSteps();
     this.submittedRegId.set(null);
     this.router.navigate(['/']);
   }

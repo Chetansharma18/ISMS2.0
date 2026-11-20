@@ -88,6 +88,27 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'privacy-policy',
+    loadComponent: () =>
+      import('./features/legal/privacy-policy.component').then(
+        (m) => m.PrivacyPolicyComponent
+      )
+  },
+  {
+    path: 'terms-and-conditions',
+    loadComponent: () =>
+      import('./features/legal/terms-and-conditions.component').then(
+        (m) => m.TermsAndConditionsComponent
+      )
+  },
+  {
+    path: 'help-support',
+    loadComponent: () =>
+      import('./features/help-support/help-support.component').then(
+        (m) => m.HelpSupportComponent
+      )
+  },
+  {
     path: 'history',
     redirectTo: 'payment-history',
     pathMatch: 'full'

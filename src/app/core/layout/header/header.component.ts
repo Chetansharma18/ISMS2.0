@@ -24,7 +24,14 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
   selector: 'app-header',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, ClickOutsideDirective, HeaderNotificationComponent, ButtonComponent, IconComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ClickOutsideDirective,
+    HeaderNotificationComponent,
+    ButtonComponent,
+    IconComponent
+  ],
   host: {
     class: 'block w-full relative z-50'
   },

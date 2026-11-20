@@ -98,6 +98,27 @@ export const USER_MANAGEMENT_NAV: NavSubItem[] = [
   { label: 'Permission Management', link: '/admin/master/permission' }
 ];
 
+export const TERMS_AND_CONDITIONS_NAV: NavItem = {
+  key: 'terms-and-conditions',
+  label: 'Terms & Conditions',
+  link: '/terms-and-conditions',
+  icon: 'document'
+};
+
+export const HELP_SUPPORT_NAV: NavItem = {
+  key: 'help-support',
+  label: 'Help & Support',
+  link: '/help-support',
+  icon: 'info-circle'
+};
+
+export const PRIVACY_POLICY_NAV: NavItem = {
+  key: 'privacy-policy',
+  label: 'Privacy Policy',
+  link: '/privacy-policy',
+  icon: 'shield-check'
+};
+
 /** Icons of the two collapsible sections. */
 export const MASTER_ICON: IconName = 'list';
 export const USER_MANAGEMENT_ICON: IconName = 'users';

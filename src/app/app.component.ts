@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { HeaderComponent } from './core/layout/header/header.component';
-import { FooterComponent } from './core/layout/footer/footer.component';
 import { SidebarComponent } from './core/layout/sidebar/sidebar.component';
 import { AuthService } from './core/auth/auth.service';
 import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-modal/sso-redirect-modal.component';
@@ -12,6 +11,8 @@ import { ToastOutletComponent } from './shared/components/toast-outlet/toast-out
 import { ButtonComponent } from './shared/components/button/button.component';
 import { IconComponent } from './shared/components/icon/icon.component';
 import { BackdropComponent } from './shared/components/backdrop/backdrop.component';
+import { ActionModalComponent } from './shared/components/action-modal/action-modal.component';
+import { ConnectivityService } from './core/services/connectivity.service';
 
 @Component({
   selector: 'app-root',
@@ -20,13 +21,13 @@ import { BackdropComponent } from './shared/components/backdrop/backdrop.compone
     CommonModule,
     RouterOutlet,
     HeaderComponent,
-    FooterComponent,
     SidebarComponent,
     SsoRedirectModalComponent,
     ToastOutletComponent,
     ButtonComponent,
     IconComponent,
-    BackdropComponent
+    BackdropComponent,
+    ActionModalComponent
   ],
   template: `
     <div class="h-screen overflow-hidden flex flex-col text-slate-900 antialiased relative" style="background-color: #FFFFFF;">
@@ -98,27 +99,42 @@ import { BackdropComponent } from './shared/components/backdrop/backdrop.compone
           <div class="w-full flex-1 flex flex-col bg-white">
             <router-outlet></router-outlet>
           </div>
-          <!-- Main Portal Footer (Displayed on landing page) -->
-          @if (showFooter()) {
-            <app-footer class="shrink-0"></app-footer>
-          }
         </main>
       }
+
+      <!-- Global Offline Alert Modal (Centrally blocks the entire application) -->
+      <app-action-modal
+        [isOpen]="!connectivityService.isOnline()"
+        title="No Internet Connection"
+        description="Please enable your internet connection and try again."
+        [showCloseButton]="false"
+        [closeOnBackdrop]="false"
+        maxWidthClass="max-w-md"
+        primaryLabel=""
+        secondaryLabel=""
+      ></app-action-modal>
     </div>
   `
 })
 export class AppComponent {
   authService = inject(AuthService);
+  connectivityService = inject(ConnectivityService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
-  isLandingRoute = signal<boolean>(true);
-  isSsoRoute = signal<boolean>(false);
-  isMobileSidebarOpen = signal<boolean>(false);
+  private getInitialRoute(): { isLanding: boolean; isSso: boolean } {
+    if (typeof window !== 'undefined' && window.location && window.location.pathname) {
+      const cleanPath = window.location.pathname.split('?')[0].split('#')[0];
+      const isLanding = cleanPath === '/' || cleanPath === '';
+      const isSso = cleanPath.includes('/sso-login');
+      return { isLanding, isSso };
+    }
+    return { isLanding: false, isSso: false };
+  }
 
-  readonly showFooter = () => {
-    return this.isLandingRoute();
-  };
+  isLandingRoute = signal<boolean>(this.getInitialRoute().isLanding);
+  isSsoRoute = signal<boolean>(this.getInitialRoute().isSso);
+  isMobileSidebarOpen = signal<boolean>(false);
 
   readonly showSidebar = () => {
     return !!this.authService.currentUser() && !this.isLandingRoute() && !this.isSsoRoute();

@@ -1,12 +1,12 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, delay, of } from 'rxjs';
-import {
-  EMPLOYMENT_DEPT_RECORDS,
-  EXPRESSED_INTEREST_APPLICANTS,
-  EmploymentDeptRecord,
-  ExpressedInterestApplicant,
-  AspirantSourceProfile
-} from '../../../core/mock/data/aspirant-sources.mock';
+import { Observable, delay, map, of } from 'rxjs';
+import { API_ENDPOINTS } from '../../../core/config/api.config';
+import { HttpService } from '../../../core/http/http.service';
+import { toItems } from '../../../core/http/response-adapter';
+import { EMPLOYMENT_DEPT_RECORDS, EXPRESSED_INTEREST_APPLICANTS } from '../../../core/mock/data/aspirant-sources.mock';
+import { isMockEnabled } from '../../../core/mock/mock.config';
+import { createPersistedStore } from '../../../core/services/persisted-store';
+import type { AspirantSourceProfile, EmploymentDeptRecord, ExpressedInterestApplicant } from '../models/aspirant-source.model';
 import { AspirantFormData, calculateAgeFromDob } from '../config/aspirant-form.config';
 import { createEmptyAspirantFormData } from '../components/aspirant-mapping/aspirant-form-data.factory';
 import { BatchRecord } from '../models/batch.model';
@@ -17,14 +17,21 @@ import { SdcService } from './sdc.service';
 
 /**
  * Where a training partner can get an aspirant's details from when registering one in a batch: the aspirants who
- * expressed interest on the portal, or the Employment Department. Both read dummy data for now and answer like a real
- * call would; swap the bodies for the real requests when the APIs are available.
+ * expressed interest on the portal (resource `EXPRESSED_INTEREST`), or the Employment Department (resource
+ * `EMPLOYMENT_DEPT_RECORDS`). Each follows its mock flag in mock.config.ts.
  */
 @Injectable({ providedIn: 'root' })
 export class AspirantSourceService {
   private readonly aspirants = inject(AspirantService);
   private readonly batches = inject(BatchService);
   private readonly sdcs = inject(SdcService);
+  private readonly http = inject(HttpService);
+
+  private readonly expressedInterest = createPersistedStore<ExpressedInterestApplicant>({
+    dataKey: 'EXPRESSED_INTEREST',
+    seed: EXPRESSED_INTEREST_APPLICANTS,
+    writable: false
+  });
 
   /**
    * Aspirants who expressed interest in the course (or the sector) of the batch and are not registered in it yet.
@@ -39,7 +46,7 @@ export class AspirantSourceService {
         .filter(a => a.batchId === batch.id && a.trainingStatus !== 'DROPOUT')
         .map(a => a.aadhaarNo)
     );
-    return EXPRESSED_INTEREST_APPLICANTS.filter(
+    return this.expressedInterest.items().filter(
       a =>
         !registered.has(a.aadhaarNo) &&
         (a.course.trim().toLowerCase() === course || a.sector.trim().toLowerCase() === sector)
@@ -51,6 +58,13 @@ export class AspirantSourceService {
    * in the district of its center. The call answers after a short delay, like the real API would.
    */
   fetchFromEmploymentDept(batch: BatchRecord): Observable<EmploymentDeptRecord[]> {
+    if (!isMockEnabled('EMPLOYMENT_DEPT_RECORDS')) {
+      return this.http
+        .call<unknown>(API_ENDPOINTS.EMPLOYMENT_DEPT_RECORDS.LIST, {
+          params: { sector: batch.sector, district: batch.sdcDistrict }
+        })
+        .pipe(map(res => toItems<EmploymentDeptRecord>(res)));
+    }
     const sector = (batch.sector || '').trim().toLowerCase();
     const district = (batch.sdcDistrict || '').trim().toLowerCase();
     return of(

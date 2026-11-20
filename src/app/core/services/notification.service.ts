@@ -10,13 +10,21 @@ export interface AppNotification {
   duration?: number;
 }
 
+export interface NotificationOptions extends Omit<AppNotification, 'id'> {
+  /** Skip it when a notification of the same type and message is already on screen. */
+  unique?: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
   notifications = signal<AppNotification[]>([]);
 
-  show(notification: Omit<AppNotification, 'id'>): void {
+  show({ unique, ...notification }: NotificationOptions): void {
+    if (unique && this.notifications().some(n => n.type === notification.type && n.message === notification.message)) {
+      return;
+    }
     const id = Math.random().toString(36).substring(2, 9);
     const newNotification: AppNotification = {
       ...notification,

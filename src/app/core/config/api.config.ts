@@ -1,7 +1,6 @@
 import { environment } from '../../../environments/environment';
 
 export type ApiMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-
 export type EndpointUrlResolver = string | ((id: string | number) => string);
 
 export interface EndpointDef {
@@ -9,247 +8,193 @@ export interface EndpointDef {
   method: ApiMethod;
 }
 
-export interface CrudEndpoints {
+// A type alias (not an interface) so it fits the `Record<string, EndpointDef>` check on API_ENDPOINTS.
+export type CrudEndpoints = {
   LIST: EndpointDef;
-  GET?: EndpointDef;
+  GET: EndpointDef;
   ADD: EndpointDef;
   UPDATE: EndpointDef;
   DELETE: EndpointDef;
+};
+
+export type CrudAction = keyof CrudEndpoints;
+
+// ---- Builders: one line per resource instead of five --------------------------------------------
+
+const endpoint = (method: ApiMethod, url: EndpointUrlResolver): EndpointDef => ({ url, method });
+const byId = (base: string) => (id: string | number) => `${base}/${encodeURIComponent(String(id))}`;
+
+/** The five standard REST endpoints of a collection: GET/POST `base`, GET/PUT/DELETE `base/{id}`. */
+function crud(base: string): CrudEndpoints {
+  return {
+    LIST: endpoint('GET', base),
+    GET: endpoint('GET', byId(base)),
+    ADD: endpoint('POST', base),
+    UPDATE: endpoint('PUT', byId(base)),
+    DELETE: endpoint('DELETE', byId(base))
+  };
+}
+
+/** A read-only collection: GET `base` and GET `base/{id}`. */
+function readOnly(base: string): Pick<CrudEndpoints, 'LIST' | 'GET'> {
+  return { LIST: endpoint('GET', base), GET: endpoint('GET', byId(base)) };
 }
 
 /**
- * Centralized API Endpoints Registry
- * Describes all backend API resources, their URLs, and HTTP methods across the application.
+ * Centralized API Endpoints Registry: every backend URL the frontend calls, and its HTTP method.
+ *
+ * - Each top-level key is a "dataKey". `DataEngineService.for(dataKey)` and `createPersistedStore({ dataKey })`
+ *   look their CRUD endpoints up here, and `mock.config.ts` has a mock on/off flag with the same key.
+ * - Non-CRUD actions (e.g. `SCHEMES.ASSIGN_COMMITTEE`) are called with `HttpService.call(API_ENDPOINTS.X.Y, ...)`.
+ * - Paths are relative to `environment.apiUrl`. Never hardcode a URL anywhere else.
  */
 export const API_ENDPOINTS = {
   // Authentication & Session
+  // RajSSO posts to /auth/verify-sso-token itself (not called by the frontend); the backend then redirects to the
+  // frontend with ?verifylogin=true and a login_callback_token cookie, which VERIFY_LOGIN_TOKEN exchanges.
   AUTH: {
-    SSO_LOGIN: { url: '/auth/sso-login', method: 'POST' as ApiMethod },
-    LOGOUT: { url: '/auth/logout', method: 'POST' as ApiMethod },
-    SESSION: { url: '/auth/session', method: 'GET' as ApiMethod },
-    REFRESH_TOKEN: { url: '/auth/refresh', method: 'POST' as ApiMethod }
+    VERIFY_LOGIN_TOKEN: endpoint('POST', '/auth/verify-login-token'),
+    SELECT_ROLE: endpoint('POST', '/auth/select-role'),
+    TWO_STEP_SEND_OTP: endpoint('POST', '/auth/two-step/send-otp'),
+    TWO_STEP_VERIFY: endpoint('POST', '/auth/two-step/verify'),
+    /** Needs a signed-in session: the PIN cannot be set during sign-in. */
+    TWO_STEP_SET_PIN: endpoint('POST', '/auth/two-step/pin/set'),
+    REFRESH_TOKEN: endpoint('POST', '/auth/refresh-token'),
+    SESSION: endpoint('GET', '/auth/me'),
+    CHECK: endpoint('GET', '/auth/check'),
+    PERMISSIONS: endpoint('GET', '/auth/permissions'),
+    KEEP_ALIVE: endpoint('POST', '/auth/sso/keep-alive'),
+    LOGOUT: endpoint('POST', '/auth/logout')
   },
 
   // One Time Registration (OTR)
   REGISTRATION: {
-    OTR_SAVE: { url: '/registration/otr/save', method: 'POST' as ApiMethod },
-    OTR_SUBMIT: { url: '/registration/otr/submit', method: 'POST' as ApiMethod },
-    OTR_DETAILS: { url: '/registration/otr', method: 'GET' as ApiMethod },
-    VERIFY_AADHAAR: { url: '/registration/verify-aadhaar', method: 'POST' as ApiMethod },
-    VERIFY_PAN: { url: '/registration/verify-pan', method: 'POST' as ApiMethod }
+    OTR_SAVE: endpoint('POST', '/registration/otr/save'),
+    OTR_SUBMIT: endpoint('POST', '/registration/otr/submit'),
+    OTR_DETAILS: endpoint('GET', '/registration/otr'),
+    VERIFY_AADHAAR: endpoint('POST', '/registration/verify-aadhaar'),
+    VERIFY_PAN: endpoint('POST', '/registration/verify-pan')
   },
 
-  // Schemes & Tenders Management (DataKey: 'SCHEMES')
+  // Schemes & Tenders
   SCHEMES: {
-    LIST: { url: '/schemes', method: 'GET' as ApiMethod },
-    GET: { url: (id: string | number) => `/schemes/${id}`, method: 'GET' as ApiMethod },
-    ADD: { url: '/schemes', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/schemes/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/schemes/${id}`, method: 'DELETE' as ApiMethod },
-    ASSIGN_COMMITTEE: { url: (id: string | number) => `/schemes/${id}/committee`, method: 'POST' as ApiMethod }
+    ...crud('/schemes'),
+    ASSIGN_COMMITTEE: endpoint('POST', (id: string | number) => `/schemes/${id}/committee`)
   },
 
-  // Expression of Interest Submissions & Scrutiny (DataKey: 'EOI')
+  // Expression of Interest submissions & scrutiny
   EOI: {
-    LIST: { url: '/eoi/submissions', method: 'GET' as ApiMethod },
-    GET: { url: (id: string | number) => `/eoi/submissions/${id}`, method: 'GET' as ApiMethod },
-    ADD: { url: '/eoi/submissions', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/eoi/submissions/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/eoi/submissions/${id}`, method: 'DELETE' as ApiMethod },
-    SCRUTINY_DETAIL: { url: (id: string | number) => `/eoi/scrutiny/${id}`, method: 'GET' as ApiMethod },
-    UPDATE_SCRUTINY: { url: (id: string | number) => `/eoi/scrutiny/${id}`, method: 'PUT' as ApiMethod }
+    ...crud('/eoi/submissions'),
+    SCRUTINY_DETAIL: endpoint('GET', byId('/eoi/scrutiny')),
+    UPDATE_SCRUTINY: endpoint('PUT', byId('/eoi/scrutiny'))
+  },
+  /** Schemes as the EOI scrutiny / sanction workflow sees them */
+  EOI_SCHEMES: readOnly('/eoi/schemes'),
+  /** Applicant responses under department scrutiny */
+  EOI_RESPONSES: crud('/eoi/responses'),
+  /** Sanction order document of each scheme (id = schemeId), draft or released */
+  SANCTION_DOCUMENTS: crud('/eoi/sanction-documents'),
+  /** IPA document of each application (id = `${schemeId}__${appId}`), draft, released and issued copies */
+  IPA_DOCUMENTS: crud('/eoi/ipa-documents'),
+  /** Applicant EOI submissions shown on Tender Status */
+  SUBMITTED_TENDERS: crud('/eoi/submitted-tenders'),
+  /** Department sanction orders */
+  SANCTION_ORDERS: crud('/sanction-orders'),
+  /** Sanction orders that sanction the signed-in training partner */
+  TP_SANCTION_ORDERS: readOnly('/tp/sanction-orders'),
+  /** Signed MoU documents */
+  MOU_DOCUMENTS: crud('/mou/documents'),
+
+  // In-Principle Approvals
+  IPA: crud('/ipa/items'),
+  /** IPAs issued to the signed-in training partner */
+  TP_IPAS: readOnly('/tp/ipas'),
+  /** IPA allowance tied to the SDCs registered for it */
+  IPA_ALLOCATIONS: crud('/ipa/allocations'),
+
+  // Users
+  USERS: crud('/users'),
+  /** SSO directory lookup by SSO ID */
+  SSO_DIRECTORY: readOnly('/sso/users'),
+
+  // Skill Development Centres, batches, aspirants
+  SDC: crud('/sdc/centres'),
+  BATCHES: crud('/batches'),
+  CAMERA_BATCHES: crud('/camera/batches'),
+  ASPIRANTS: crud('/aspirants'),
+  /** Aspirants who expressed interest on the aspirant portal */
+  EXPRESSED_INTEREST: readOnly('/aspirants/expressed-interest'),
+  /** Aspirants registered with the Employment Department (filtered by `sector` / `district` query params) */
+  EMPLOYMENT_DEPT_RECORDS: readOnly('/aspirants/employment-dept'),
+  /** Training calendar shown on the aspirant portal */
+  TRAINING_CALENDAR: readOnly('/aspirants/training-calendar'),
+
+  // Attendance
+  ATTENDANCE_MARKS: crud('/attendance/marks'),
+  ATTENDANCE_DEVICES: crud('/attendance/devices'),
+  ATTENDANCE_NOTICES: crud('/attendance/notices'),
+  /** DoITC biometric device registry */
+  DOITC_DEVICES: readOnly('/attendance/doitc-devices'),
+
+  // Payments
+  PAYMENTS: crud('/payments/transactions'),
+
+  // Portal notifications (bell icon)
+  NOTIFICATIONS: {
+    LIST: endpoint('GET', '/notifications'),
+    MARK_READ: endpoint('PUT', (id: string | number) => `/notifications/${encodeURIComponent(String(id))}/read`),
+    MARK_ALL_READ: endpoint('POST', '/notifications/read-all')
   },
 
-  // User Management & Roles (DataKey: 'USERS')
-  USERS: {
-    LIST: { url: '/users', method: 'GET' as ApiMethod },
-    GET: { url: (id: string | number) => `/users/${id}`, method: 'GET' as ApiMethod },
-    ADD: { url: '/users', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/users/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/users/${id}`, method: 'DELETE' as ApiMethod }
-  },
+  // Grievance redressal
+  GRIEVANCES: crud('/grievances'),
+  ADMIN_GRIEVANCES: crud('/admin/grievances'),
 
-  // Skill Development Centres (DataKey: 'SDC')
-  SDC: {
-    LIST: { url: '/sdc/centres', method: 'GET' as ApiMethod },
-    GET: { url: (id: string | number) => `/sdc/centres/${id}`, method: 'GET' as ApiMethod },
-    ADD: { url: '/sdc/centres', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/sdc/centres/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/sdc/centres/${id}`, method: 'DELETE' as ApiMethod }
-  },
+  // Masters
+  MASTERS: crud('/master'),
+  SECTORS: crud('/master/sectors'),
+  DESIGNATIONS: crud('/master/designations'),
+  COURSES: crud('/master/courses'),
+  DISTRICTS: crud('/master/district-blocks'),
+  EOI_CATEGORIES: crud('/master/eoi-categories'),
+  PERMISSIONS: crud('/permissions'),
+  SCHEME_MASTERS: crud('/master/schemes'),
+  SCHEME_CATEGORIES: crud('/master/scheme-categories'),
+  USER_ROLES: crud('/roles'),
+  REMARK_MASTERS: crud('/master/remarks'),
+  GRADING_MASTERS: crud('/master/gradings'),
 
-  // Batches (DataKey: 'BATCHES')
-  BATCHES: {
-    LIST: { url: '/batches', method: 'GET' as ApiMethod },
-    GET: { url: (id: string | number) => `/batches/${id}`, method: 'GET' as ApiMethod },
-    ADD: { url: '/batches', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/batches/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/batches/${id}`, method: 'DELETE' as ApiMethod }
-  },
+  // Administration
+  TWO_STEP_VERIFICATION: crud('/admin/two-step-verification'),
+  DYNAMIC_FORM_BUILDER: crud('/admin/dynamic-form-builder'),
 
-  // Aspirants / Candidates (DataKey: 'ASPIRANTS')
-  ASPIRANTS: {
-    LIST: { url: '/aspirants', method: 'GET' as ApiMethod },
-    GET: { url: (id: string | number) => `/aspirants/${id}`, method: 'GET' as ApiMethod },
-    ADD: { url: '/aspirants', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/aspirants/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/aspirants/${id}`, method: 'DELETE' as ApiMethod }
-  },
-
-  // Initial Project Approvals / Verification (DataKey: 'IPA')
-  IPA: {
-    LIST: { url: '/ipa/items', method: 'GET' as ApiMethod },
-    GET: { url: (id: string | number) => `/ipa/items/${id}`, method: 'GET' as ApiMethod },
-    ADD: { url: '/ipa/items', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/ipa/items/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/ipa/items/${id}`, method: 'DELETE' as ApiMethod }
-  },
-
-  // Masters (DataKey: 'MASTERS')
-  MASTERS: {
-    LIST: { url: '/masters', method: 'GET' as ApiMethod },
-    GET: { url: (id: string | number) => `/masters/${id}`, method: 'GET' as ApiMethod },
-    ADD: { url: '/masters', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/masters/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/masters/${id}`, method: 'DELETE' as ApiMethod }
-  },
-
-  // Admin Master Lookup Tables (DataKeys used by MasterCrudPageComponent)
-  SECTORS: {
-    LIST: { url: '/masters/sectors', method: 'GET' as ApiMethod },
-    ADD: { url: '/masters/sectors', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/masters/sectors/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/masters/sectors/${id}`, method: 'DELETE' as ApiMethod }
-  },
-  DESIGNATIONS: {
-    LIST: { url: '/masters/designations', method: 'GET' as ApiMethod },
-    ADD: { url: '/masters/designations', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/masters/designations/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/masters/designations/${id}`, method: 'DELETE' as ApiMethod }
-  },
-  COURSES: {
-    LIST: { url: '/masters/courses', method: 'GET' as ApiMethod },
-    ADD: { url: '/masters/courses', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/masters/courses/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/masters/courses/${id}`, method: 'DELETE' as ApiMethod }
-  },
-  DISTRICTS: {
-    LIST: { url: '/masters/district-blocks', method: 'GET' as ApiMethod },
-    ADD: { url: '/masters/district-blocks', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/masters/district-blocks/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/masters/district-blocks/${id}`, method: 'DELETE' as ApiMethod }
-  },
-  EOI_CATEGORIES: {
-    LIST: { url: '/masters/eoi-categories', method: 'GET' as ApiMethod },
-    ADD: { url: '/masters/eoi-categories', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/masters/eoi-categories/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/masters/eoi-categories/${id}`, method: 'DELETE' as ApiMethod }
-  },
-  PERMISSIONS: {
-    LIST: { url: '/masters/permissions', method: 'GET' as ApiMethod },
-    ADD: { url: '/masters/permissions', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/masters/permissions/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/masters/permissions/${id}`, method: 'DELETE' as ApiMethod }
-  },
-  SCHEME_MASTERS: {
-    LIST: { url: '/masters/schemes', method: 'GET' as ApiMethod },
-    ADD: { url: '/masters/schemes', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/masters/schemes/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/masters/schemes/${id}`, method: 'DELETE' as ApiMethod }
-  },
-  SCHEME_CATEGORIES: {
-    LIST: { url: '/masters/scheme-categories', method: 'GET' as ApiMethod },
-    ADD: { url: '/masters/scheme-categories', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/masters/scheme-categories/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/masters/scheme-categories/${id}`, method: 'DELETE' as ApiMethod }
-  },
-  USER_ROLES: {
-    LIST: { url: '/masters/user-roles', method: 'GET' as ApiMethod },
-    ADD: { url: '/masters/user-roles', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/masters/user-roles/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/masters/user-roles/${id}`, method: 'DELETE' as ApiMethod }
-  },
-  REMARK_MASTERS: {
-    LIST: { url: '/masters/remarks', method: 'GET' as ApiMethod },
-    ADD: { url: '/masters/remarks', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/masters/remarks/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/masters/remarks/${id}`, method: 'DELETE' as ApiMethod }
-  },
-  GRADING_MASTERS: {
-    LIST: { url: '/masters/gradings', method: 'GET' as ApiMethod },
-    ADD: { url: '/masters/gradings', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/masters/gradings/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/masters/gradings/${id}`, method: 'DELETE' as ApiMethod }
-  },
-  TWO_STEP_VERIFICATION: {
-    LIST: { url: '/admin/two-step-verification', method: 'GET' as ApiMethod },
-    ADD: { url: '/admin/two-step-verification', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/admin/two-step-verification/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/admin/two-step-verification/${id}`, method: 'DELETE' as ApiMethod }
-  },
-  DYNAMIC_FORM_BUILDER: {
-    LIST: { url: '/admin/dynamic-form-builder', method: 'GET' as ApiMethod },
-    GET: { url: (id: string | number) => `/admin/dynamic-form-builder/${id}`, method: 'GET' as ApiMethod },
-    ADD: { url: '/admin/dynamic-form-builder', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/admin/dynamic-form-builder/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/admin/dynamic-form-builder/${id}`, method: 'DELETE' as ApiMethod }
-  },
-
-  // Grievance Redressal (DataKey: 'GRIEVANCES')
-  GRIEVANCES: {
-    LIST: { url: '/grievances', method: 'GET' as ApiMethod },
-    GET: { url: (id: string | number) => `/grievances/${id}`, method: 'GET' as ApiMethod },
-    ADD: { url: '/grievances', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/grievances/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/grievances/${id}`, method: 'DELETE' as ApiMethod }
-  },
-
-  // Admin grievance desk (DataKey: 'ADMIN_GRIEVANCES')
-  ADMIN_GRIEVANCES: {
-    LIST: { url: '/admin/grievances', method: 'GET' as ApiMethod },
-    GET: { url: (id: string | number) => `/admin/grievances/${id}`, method: 'GET' as ApiMethod },
-    ADD: { url: '/admin/grievances', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/admin/grievances/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/admin/grievances/${id}`, method: 'DELETE' as ApiMethod }
-  },
-
-  // Applicant EOI submissions shown on Tender Status (DataKey: 'SUBMITTED_TENDERS')
-  SUBMITTED_TENDERS: {
-    LIST: { url: '/eoi/submitted-tenders', method: 'GET' as ApiMethod },
-    GET: { url: (id: string | number) => `/eoi/submitted-tenders/${id}`, method: 'GET' as ApiMethod },
-    ADD: { url: '/eoi/submitted-tenders', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/eoi/submitted-tenders/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/eoi/submitted-tenders/${id}`, method: 'DELETE' as ApiMethod }
-  },
-
-  // Camera / CCTV batch list (DataKey: 'CAMERA_BATCHES')
-  CAMERA_BATCHES: {
-    LIST: { url: '/camera/batches', method: 'GET' as ApiMethod },
-    GET: { url: (id: string | number) => `/camera/batches/${id}`, method: 'GET' as ApiMethod },
-    ADD: { url: '/camera/batches', method: 'POST' as ApiMethod },
-    UPDATE: { url: (id: string | number) => `/camera/batches/${id}`, method: 'PUT' as ApiMethod },
-    DELETE: { url: (id: string | number) => `/camera/batches/${id}`, method: 'DELETE' as ApiMethod }
-  },
-
-  // File Uploads & Downloads
+  // File uploads & downloads
   FILES: {
-    UPLOAD: { url: '/files/upload', method: 'POST' as ApiMethod },
-    DOWNLOAD: { url: (id: string | number) => `/files/${id}/download`, method: 'GET' as ApiMethod }
+    UPLOAD: endpoint('POST', '/files/upload'),
+    DOWNLOAD: endpoint('GET', (id: string | number) => `/files/${encodeURIComponent(String(id))}/download`)
   }
-};
+} satisfies Record<string, Record<string, EndpointDef>>;
 
-/**
- * Resolves full API URL with environment base URL
- */
-export function buildApiUrl(path: string): string {
-  const base = environment.apiUrl.replace(/\/+$/, '');
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return `${base}${cleanPath}`;
+export type ApiDataKey = keyof typeof API_ENDPOINTS;
+
+/** Base URL of the API without a trailing slash. */
+export function apiBaseUrl(): string {
+  return environment.apiUrl.replace(/\/+$/, '');
 }
 
-/**
- * Resolves dynamic endpoint URL from string or callback function
- */
+/** Resolves full API URL with environment base URL. */
+export function buildApiUrl(path: string): string {
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${apiBaseUrl()}${cleanPath}`;
+}
+
+/** True when the URL points at our backend API (absolute or relative), so API-only headers can be added. */
+export function isApiUrl(url: string): boolean {
+  const base = apiBaseUrl();
+  return url === base || url.startsWith(`${base}/`) || url.startsWith(`${base}?`);
+}
+
+/** Resolves dynamic endpoint URL from string or callback function. */
 export function resolveEndpointUrl(urlOrFn: EndpointUrlResolver, id?: string | number): string {
   if (typeof urlOrFn === 'function') {
     if (id === undefined) {
@@ -260,13 +205,10 @@ export function resolveEndpointUrl(urlOrFn: EndpointUrlResolver, id?: string | n
   return urlOrFn;
 }
 
-/**
- * Returns the EndpointDef for a given dataKey and CRUD action.
- * Modeled after the GeoTree Admin architecture getEndpointForDataKey.
- */
+/** The EndpointDef for a dataKey and CRUD action, or null when the resource has no such endpoint. */
 export function getEndpointForDataKey(
   dataKey: string,
-  action: 'LIST' | 'GET' | 'ADD' | 'UPDATE' | 'DELETE' = 'LIST',
+  action: CrudAction = 'LIST',
   _id?: string | number
 ): EndpointDef | null {
   const resource = (API_ENDPOINTS as Record<string, Record<string, EndpointDef> | undefined>)[dataKey];

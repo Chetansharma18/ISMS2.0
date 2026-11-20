@@ -6,7 +6,7 @@ import type {
   AspirantSourceProfile,
   EmploymentDeptRecord,
   ExpressedInterestApplicant
-} from '../../../../core/mock/data/aspirant-sources.mock';
+} from '../../models/aspirant-source.model';
 import { BatchRecord } from '../../models/batch.model';
 import { AspirantSourceService } from '../../services/aspirant-source.service';
 

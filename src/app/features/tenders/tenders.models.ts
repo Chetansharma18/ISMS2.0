@@ -84,3 +84,32 @@ export interface EoiFormData {
   documents: string[];
   documentFiles?: Record<number, EoiDocumentUpload>;
 }
+
+/** A scheme / tender as stored by the SCHEMES resource. */
+export interface SchemeTenderItem {
+  id?: string;
+  sNo: number;
+  refNo: string;
+  schemeName: string;
+  schemeTitle?: string;
+  schemeCategory: string;
+  datePublished: string;
+  closingDate: string;
+  eoiCategory: string;
+  eoiDescription: string;
+  category?: string;
+  code?: string;
+  status?: 'Open' | 'Closed';
+  rfpDocSize?: string;
+  sopDocSize?: string;
+  preBidDate?: string;
+  techBidDate?: string;
+  emdFee?: string;
+  processFee?: string;
+  attachedDocs?: Array<{ sNo: number; name: string; size: string }>;
+  committeeMembers?: string[];
+  committeeApprover?: string;
+  createdAt?: number;
+  isActive?: boolean;
+  isFrozen?: boolean;
+}

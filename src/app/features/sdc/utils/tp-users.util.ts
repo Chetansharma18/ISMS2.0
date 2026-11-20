@@ -1,6 +1,6 @@
 import type { BatchRecord } from '../models/batch.model';
 import type { SdcRecord } from '../models/sdc.model';
-import type { SsoProfile } from '../../../core/mock/data/sso-users.mock';
+import type { SsoProfile } from '../models/sso-profile.model';
 import { batchStatusLabel } from './batch-approval.util';
 
 export type TpUserRole = 'Center Head' | 'Faculty' | 'Attender User';

@@ -1,5 +1,7 @@
 import { Injectable, inject } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { createPersistedStore } from '../../../core/services/persisted-store';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import type {
@@ -43,15 +45,35 @@ export class EoiStateService {
   private initialSchemes: Scheme[] = buildInitialSchemes();
   private initialResponses: ApplicantResponse[] = buildInitialResponses();
 
-  private schemesSubject = new BehaviorSubject<Scheme[]>(environment.useMockData ? this.initialSchemes : []);
+  /** Resource EOI_SCHEMES (read-only): the seed in mock mode, the API list otherwise. */
+  private readonly schemeStore = createPersistedStore<Scheme>({
+    dataKey: 'EOI_SCHEMES',
+    seed: this.initialSchemes,
+    writable: false
+  });
+
+  private schemesSubject = new BehaviorSubject<Scheme[]>(this.schemeStore.items());
   public schemes$ = this.schemesSubject.asObservable();
 
-  private responsesSubject = new BehaviorSubject<ApplicantResponse[]>(environment.useMockData ? this.initialResponses : []);
+  private responsesSubject = new BehaviorSubject<ApplicantResponse[]>(
+    environment.useMockData && !this.storage.responsesRemote ? this.initialResponses : []
+  );
   public responses$ = this.responsesSubject.asObservable();
 
   private static readonly SEED_VERSION_KEY = 'isms_dept_seed_v8_rejection_fix';
 
   constructor() {
+    // API mode: the lists follow the stores as they load from the server.
+    toObservable(this.schemeStore.items).subscribe(list => {
+      if (list !== this.schemesSubject.value) this.schemesSubject.next(list);
+    });
+    if (this.storage.responsesRemote) {
+      toObservable(this.storage.remoteResponses.items).subscribe(list => {
+        if (list !== this.responsesSubject.value) this.responsesSubject.next(list);
+      });
+      return;
+    }
+
     this.loadFromStorage();
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', (event: StorageEvent) => {
@@ -64,6 +86,11 @@ export class EoiStateService {
 
   /** Clears stored scrutiny decisions and re-seeds with fresh initial responses. */
   resetResponses(): void {
+    if (this.storage.responsesRemote) {
+      // Server data is never overwritten with demo seeds; just re-read it.
+      this.storage.remoteResponses.reload();
+      return;
+    }
     this.initialResponses = buildInitialResponses();
     this.saveToStorage(this.initialResponses);
     this.storage.setString(EoiStateService.SEED_VERSION_KEY, 'v8');
@@ -72,7 +99,6 @@ export class EoiStateService {
 
   private loadFromStorage(): void {
     if (!environment.useMockData) {
-      this.schemesSubject.next([]);
       this.responsesSubject.next([]);
       return;
     }

@@ -13,3 +13,13 @@ export interface PaginatedResponse<T = any> {
   pageSize: number;
   totalPages: number;
 }
+
+/** List query understood by both the mock store and the API (see `queryOptionsToParams`). */
+export interface QueryOptions {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  searchFields?: string[];
+  filter?: Record<string, unknown>;
+  sort?: { key: string; direction: 'asc' | 'desc' };
+}

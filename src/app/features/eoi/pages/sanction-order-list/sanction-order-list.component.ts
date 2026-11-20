@@ -5,7 +5,7 @@ import { SanctionTargetsModalComponent } from './sanction-targets-modal.componen
 import { ApplicantResponse, EoiStateService, Scheme } from '../../services/eoi-state.service';
 import { SanctionPdfService } from '../eoi-sanction-editor/sanction-pdf.service';
 import { formatDateTime } from '../../../../shared/utils';
-import { TP_SANCTION_ORDERS } from '../../../../core/mock/data/tp-sanction-orders.mock';
+import { TpSanctionOrderService } from '../../services/tp-sanction-order.service';
 import { ButtonComponent, IconComponent, ListPageComponent, TableColumn } from '../../../../shared';
 
 /** One scheme with a released sanction order. */
@@ -96,6 +96,7 @@ export class SanctionOrderListComponent {
   private eoiStateService = inject(EoiStateService);
   private pdfService = inject(SanctionPdfService);
   private router = inject(Router);
+  private tpSanctionOrders = inject(TpSanctionOrderService);
 
   private schemes = signal<Scheme[]>([]);
   private responses = signal<ApplicantResponse[]>([]);
@@ -107,7 +108,7 @@ export class SanctionOrderListComponent {
 
     // Training partner: dummy orders, shown as that partner sees them (not linked to the real applications yet).
     if (this.viewOnly) {
-      return TP_SANCTION_ORDERS.map(order => ({
+      return this.tpSanctionOrders.orders().map(order => ({
         id: order.id,
         orderNo: order.orderNo,
         schemeTitle: order.schemeTitle,

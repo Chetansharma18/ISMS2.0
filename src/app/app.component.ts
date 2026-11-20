@@ -8,6 +8,8 @@ import { FooterComponent } from './core/layout/footer/footer.component';
 import { SidebarComponent } from './core/layout/sidebar/sidebar.component';
 import { AuthService } from './core/auth/auth.service';
 import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-modal/sso-redirect-modal.component';
+import { SsoLoginStepsModalComponent } from './core/auth/components/sso-login-steps-modal/sso-login-steps-modal.component';
+import { SsoLoginFlowService } from './core/auth/sso-login-flow.service';
 import { ToastOutletComponent } from './shared/components/toast-outlet/toast-outlet.component';
 import { ButtonComponent } from './shared/components/button/button.component';
 import { IconComponent } from './shared/components/icon/icon.component';
@@ -23,6 +25,7 @@ import { BackdropComponent } from './shared/components/backdrop/backdrop.compone
     FooterComponent,
     SidebarComponent,
     SsoRedirectModalComponent,
+    SsoLoginStepsModalComponent,
     ToastOutletComponent,
     ButtonComponent,
     IconComponent,
@@ -37,6 +40,10 @@ import { BackdropComponent } from './shared/components/backdrop/backdrop.compone
       @if (authService.isRedirecting()) {
         <app-sso-redirect-modal></app-sso-redirect-modal>
       }
+
+      <!-- Sign-in steps after the return from RajSSO (role choice, OTP / PIN); renders nothing when idle -->
+      <app-sso-login-steps-modal />
+
 
       <!-- Main Portal Header (Always visible across all pages) -->
       <app-header
@@ -125,6 +132,9 @@ export class AppComponent {
   };
 
   constructor() {
+    // RajSSO sends the user back through the backend with ?verifylogin=...; finish the sign-in from here.
+    inject(SsoLoginFlowService).handleReturn();
+
     this.router.events
       .pipe(
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),

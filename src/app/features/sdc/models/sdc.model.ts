@@ -468,5 +468,3 @@ export interface SanctionOrder {
   approvedSdcCount: number;
 }
 
-export { MOCK_SANCTION_ORDERS } from '../../../core/mock/data/sanction-orders.mock';
-

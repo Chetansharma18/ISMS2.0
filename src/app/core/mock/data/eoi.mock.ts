@@ -1,24 +1,10 @@
 import { resolveMock } from '../mock.config';
+import type { EoiSubmissionItem } from '../../../features/eoi/services/eoi-submission.model';
 
-export interface MockEoiApplicantItem {
-  id: string;
-  anonymousLabel: string;
-  actualLegalName: string;
-  regNumber: string;
-  schemeId: string;
-  schemeName: string;
-  eoiRefNo: string;
-  submissionDate: string;
-  status: 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED' | 'REVERTED';
-  statusDisplay: string;
-  emdFee: number;
-  emdStatus: 'PAID' | 'REFUNDED';
-  processingFee: number;
-  processingFeeStatus: 'PAID';
-  score?: number;
-  proposedCentresCount: number;
-  proposedTargetCount: number;
-}
+/** Kept for existing callers; the canonical name is EoiSubmissionItem. */
+export type MockEoiApplicantItem = EoiSubmissionItem;
+
+
 
 export const MOCK_EOI_APPLICANTS: MockEoiApplicantItem[] = resolveMock([
   {

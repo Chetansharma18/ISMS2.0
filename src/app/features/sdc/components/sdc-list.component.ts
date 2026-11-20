@@ -7,7 +7,7 @@ import { BatchService } from '../services/batch.service';
 import { maxBatchesFor, sdcTarget } from '../utils/batch-limit.util';
 import { SdcRecord } from '../models/sdc.model';
 import { categoryLabel } from '../../eoi/pages/sanction-order-list/sanction-order-list.component';
-import type { SsoProfile } from '../../../core/mock/data/sso-users.mock';
+import type { SsoProfile } from '../models/sso-profile.model';
 import { CenterHeadAssignModalComponent } from './center-head-assign-modal.component';
 import { AuthService } from '../../../core/auth/auth.service';
 import { PermissionService } from '../../../core/permissions/permission.service';

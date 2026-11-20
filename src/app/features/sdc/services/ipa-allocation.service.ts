@@ -3,7 +3,7 @@ import { createPersistedStore } from '../../../core/services/persisted-store';
 import { EoiStateService } from '../../eoi/services/eoi-state.service';
 import type { IpaCourseRow } from '../../eoi/services/eoi-state.models';
 import type { AllocationStatus, IpaAllocation, IpaAllocationCourse, ResolvedIpa } from '../models/ipa-allocation.model';
-import { TP_IPAS } from '../../../core/mock/data/tp-ipas.mock';
+import { TpIpaService } from '../../ipa/tp-ipa.service';
 import { BatchService } from './batch.service';
 import { SdcService } from './sdc.service';
 
@@ -41,8 +41,13 @@ export class IpaAllocationService {
   private readonly eoi = inject(EoiStateService);
   private readonly sdcService = inject(SdcService);
   private readonly batchService = inject(BatchService);
+  private readonly tpIpas = inject(TpIpaService);
 
-  private readonly store = createPersistedStore<IpaAllocation>({ key: 'isms_ipa_allocations', seed: [] });
+  private readonly store = createPersistedStore<IpaAllocation>({
+    key: 'isms_ipa_allocations',
+    dataKey: 'IPA_ALLOCATIONS',
+    seed: []
+  });
 
   readonly allocations = this.store.items.asReadonly();
 
@@ -56,7 +61,7 @@ export class IpaAllocationService {
   /** The issued IPA with its allowance, or null when it does not exist. */
   resolveIpa(ipaId: string): ResolvedIpa | null {
     // Dummy IPAs of the training partner (not linked to the released sanction orders yet).
-    const dummy = TP_IPAS.find(ipa => ipa.ipaId === ipaId);
+    const dummy = this.tpIpas.find(ipaId);
     if (dummy) {
       return {
         ipaId: dummy.ipaId,

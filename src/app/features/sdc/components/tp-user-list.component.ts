@@ -7,7 +7,7 @@ import {
   ListPageComponent,
   TableColumn
 } from '../../../shared';
-import type { SsoProfile } from '../../../core/mock/data/sso-users.mock';
+import type { SsoProfile } from '../models/sso-profile.model';
 import { BatchService } from '../services/batch.service';
 import { SdcService } from '../services/sdc.service';
 import { SsoDirectoryService } from '../services/sso-directory.service';

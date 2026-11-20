@@ -138,6 +138,7 @@ export class BatchService {
 
   private readonly store = createPersistedStore<BatchRecord>({
     key: 'isms_batch_records',
+    dataKey: 'BATCHES',
     seed: INITIAL_BATCH_RECORDS,
     reconcile: reconcileBatches
   });

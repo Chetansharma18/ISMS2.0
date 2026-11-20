@@ -7,7 +7,7 @@ import { SdcService } from '../services/sdc.service';
 import { categoryLabel } from '../../eoi/pages/sanction-order-list/sanction-order-list.component';
 import { BatchRecord } from '../models/batch.model';
 import { canUploadStudyMaterial } from '../utils/study-material.util';
-import type { SsoProfile } from '../../../core/mock/data/sso-users.mock';
+import type { SsoProfile } from '../models/sso-profile.model';
 import { CenterHeadAssignModalComponent } from './center-head-assign-modal.component';
 import { BatchStudyMaterialModalComponent } from './batch-study-material-modal.component';
 import {

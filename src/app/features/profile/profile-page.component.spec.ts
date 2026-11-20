@@ -24,7 +24,7 @@ describe('ProfilePageComponent - Sequential Steps', () => {
         },
         {
           provide: AuthService,
-          useValue: { currentUser: signal({ role: 'new_user', isProfileComplete: false }) }
+          useValue: { currentUser: signal({ role: 'new_user', isProfileComplete: false }), isMockAuth: () => true }
         },
         {
           provide: PermissionService,

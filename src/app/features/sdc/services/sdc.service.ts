@@ -81,6 +81,7 @@ function withEntry(
 export class SdcService {
   private readonly store = createPersistedStore<SdcRecord>({
     key: 'isms_sdc_records',
+    dataKey: 'SDC',
     seed: INITIAL_SDC_RECORDS,
     reconcile: reconcileSdcs
   });

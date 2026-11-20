@@ -13,6 +13,7 @@ import { formatDate } from '../../shared/utils';
 import { ButtonComponent, IconComponent, ProgressRingComponent } from '../../shared';
 import { AspirantProfileFormComponent } from '../aspirant/components/aspirant-profile-form.component';
 import { AspirantPortalService } from '../aspirant/services/aspirant-portal.service';
+import { SecurityPinCardComponent } from './parts/security-pin-card.component';
 
 export interface RegistrationStepItem {
   id: string;
@@ -27,7 +28,7 @@ export interface RegistrationStepItem {
   selector: 'app-profile-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, DocumentViewerModalComponent, AspirantProfileFormComponent, ButtonComponent, IconComponent, ProgressRingComponent],
+  imports: [CommonModule, RouterModule, DocumentViewerModalComponent, AspirantProfileFormComponent, ButtonComponent, IconComponent, ProgressRingComponent, SecurityPinCardComponent],
   template: `
     <div class="w-full min-h-full font-sans p-4 sm:p-5 space-y-4" style="background-color: #FFFFFF;">
 
@@ -259,6 +260,11 @@ export interface RegistrationStepItem {
       </div>
     }
 
+      <!-- Security PIN for PIN sign-in: only with real (RajSSO) sign-in, the backend owns the PIN -->
+      @if (showSecurityPin) {
+        <app-security-pin-card />
+      }
+
       <!-- Reusable Document Preview Modal (preserved for document review) -->
       <app-document-viewer-modal
         [isOpen]="isDocViewerOpen()"
@@ -273,6 +279,7 @@ export interface RegistrationStepItem {
 export class ProfilePageComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
+  protected readonly showSecurityPin = !this.authService.isMockAuth() && !!this.authService.currentUser();
   private permissions = inject(PermissionService);
   private otrFormService = inject(OtrFormService);
   private validationService = inject(OtrValidationService);

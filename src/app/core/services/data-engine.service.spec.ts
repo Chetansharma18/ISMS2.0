@@ -1,8 +1,23 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { DataEngineService } from './data-engine.service';
 import { HttpService } from '../http/http.service';
+import { isMockEnabled, setResourceMock } from '../mock/mock.config';
+
+import { environment } from '../../../environments/environment';
+
+// These specs exercise the mock store, whatever useMockData and the SECTORS flag are set to for `ng serve`.
+const savedUseMock = environment.useMockData;
+const sectorsWereMocked = isMockEnabled('SECTORS');
+beforeAll(() => {
+  environment.useMockData = true;
+  setResourceMock('SECTORS', true);
+});
+afterAll(() => {
+  setResourceMock('SECTORS', sectorsWereMocked);
+  environment.useMockData = savedUseMock;
+});
 
 interface Sector {
   id: string;

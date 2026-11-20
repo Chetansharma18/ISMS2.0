@@ -1,11 +1,6 @@
-export type BiometricDeviceType = 'Fingerprint' | 'Face Recognition' | 'IRIS';
+import type { DoitcDevice } from '../../../features/attendance/models/attendance.model';
 
-/** A biometric device issued by DoITC, as its registry knows it. */
-export interface DoitcDevice {
-  serialNo: string;
-  type: BiometricDeviceType;
-  model: string;
-}
+export type { BiometricDeviceType, DoitcDevice } from '../../../features/attendance/models/attendance.model';
 
 /**
  * Dummy DoITC device registry: a training partner's Attender User links a device to a batch by its serial number, and

@@ -1,5 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { TestBed } from '@angular/core/testing';
+import { environment } from '../../../../../environments/environment';
+
+// Mock-mode behaviour, whatever useMockData is set to for `ng serve`.
+const savedUseMock = environment.useMockData;
+beforeAll(() => (environment.useMockData = true));
+afterAll(() => (environment.useMockData = savedUseMock));
 import { MouService } from './mou.service';
 import { StorageService } from '../../../../core/services/storage.service';
 import { DocumentViewerService } from '../../../../core/services/document-viewer.service';

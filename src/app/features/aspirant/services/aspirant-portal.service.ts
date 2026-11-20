@@ -1,5 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { StorageService } from '../../../core/services/storage.service';
+import { createPersistedStore } from '../../../core/services/persisted-store';
 import { UserPersona } from '../../../core/models/user.model';
 import { AspirantFormData } from '../../sdc/config/aspirant-form.config';
 import { createEmptyAspirantFormData } from '../../sdc/components/aspirant-mapping/aspirant-form-data.factory';
@@ -118,7 +119,14 @@ export class AspirantPortalService {
   private readonly PROFILE_DATA_KEY = 'isms_aspirant_profile_data';
   private readonly EXPRESSED_INTERESTS_KEY = 'isms_aspirant_expressed_interests';
 
-  readonly calendarItems = signal<TrainingCalendarItem[]>(INITIAL_TRAINING_CALENDAR);
+  /** Resource `TRAINING_CALENDAR` (read-only): the open batches an aspirant can express interest in. */
+  private readonly calendarStore = createPersistedStore<TrainingCalendarItem>({
+    dataKey: 'TRAINING_CALENDAR',
+    seed: INITIAL_TRAINING_CALENDAR,
+    writable: false
+  });
+
+  readonly calendarItems = this.calendarStore.items.asReadonly();
   readonly isProfileComplete = signal<boolean>(false);
   readonly profileData = signal<AspirantFormData>(createEmptyAspirantFormData());
   readonly expressedInterests = signal<TrainingCalendarItem[]>([]);

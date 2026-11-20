@@ -1,4 +1,11 @@
-import type { BiometricDeviceType } from '../../../core/mock/data/doitc-devices.mock';
+export type BiometricDeviceType = 'Fingerprint' | 'Face Recognition' | 'IRIS';
+
+/** A biometric device issued by DoITC, as its registry knows it. */
+export interface DoitcDevice {
+  serialNo: string;
+  type: BiometricDeviceType;
+  model: string;
+}
 
 /** A day of a batch has two attendance marks: one at the start of the day and one at the end. */
 export type AttendanceSlot = 'START' | 'END';

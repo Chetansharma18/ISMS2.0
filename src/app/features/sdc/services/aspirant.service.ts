@@ -46,6 +46,7 @@ export class AspirantService {
 
   private readonly store = createPersistedStore<AspirantRecord>({
     key: 'isms_aspirant_records',
+    dataKey: 'ASPIRANTS',
     seed: INITIAL_ASPIRANTS,
     reconcile: reconcileAspirants
   });

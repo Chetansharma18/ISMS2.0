@@ -3,6 +3,11 @@ import { Router } from '@angular/router';
 import { UserRole, RoleConfig } from '../models/role.model';
 import { UserPersona } from '../models/user.model';
 import { StorageService } from '../services/storage.service';
+import { isMockEnabled } from '../mock/mock.config';
+import { environment } from '../../../environments/environment';
+import { AuthApiService } from './auth-api.service';
+import { landingRouteFor } from './sso-session.util';
+import { TokenService } from './token.service';
 
 // Canonical definitions live in core/models. Re-exported here so existing
 // `import { UserRole } from '.../auth.service'` call sites keep working.
@@ -87,6 +92,8 @@ export const SWITCHABLE_ROLES: AssignedRole[] = [
 export class AuthService {
   private router = inject(Router);
   private storage = inject(StorageService);
+  private tokens = inject(TokenService);
+  private authApi = inject(AuthApiService);
   private readonly STORAGE_KEY = 'isms_user';
   private readonly OTP_VERIFIED_KEY = 'isms_dept_admin_otp_verified';
   private readonly OTR_PROMPT_DISMISSED_KEY = 'isms_otr_prompt_dismissed';
@@ -132,14 +139,17 @@ export class AuthService {
     try {
       const parsed = this.storage.getItem<UserPersona>(this.STORAGE_KEY);
       if (parsed) {
-        // Normalize admin personas saved under an older build that stored a
-        // person's name/designation instead of a plain role identifier.
-        if (parsed.role === 'dept_admin' || parsed.role === 'super_admin') {
+        // Mock sign-in only: normalize admin personas saved under an older build that stored a
+        // person's name/designation instead of a plain role identifier. Real users keep their SSO name.
+        if (this.isMockAuth() && (parsed.role === 'dept_admin' || parsed.role === 'super_admin')) {
           parsed.label = ACCOUNT_LABELS[parsed.role];
           parsed.subLabel = USER_ROLES.find(r => r.role === parsed.role)?.label ?? parsed.subLabel;
           this.storage.setItem(this.STORAGE_KEY, parsed);
         }
         this.currentUser.set(parsed);
+      } else if (!this.isMockAuth()) {
+        // Real sign-in: nobody is signed in until RajSSO says so.
+        this.currentUser.set(null);
       } else {
         this.currentUser.set({
           id: 'Approved Citizen (TP)',
@@ -166,9 +176,35 @@ export class AuthService {
     this.isRedirecting.set(false);
   }
 
+  /**
+   * Real sign-in (AUTH not mocked): leaves the app for the RajSSO login page. After sign-in, RajSSO posts the user
+   * to the backend callback (`/api/auth/verify-sso-token`), which redirects back to the frontend.
+   * Mock sign-in: opens the local persona picker.
+   */
   proceedToSsoLogin(): void {
     this.isRedirecting.set(false);
+    if (!this.isMockAuth() && environment.sso.loginUrl) {
+      window.location.assign(environment.sso.loginUrl);
+      return;
+    }
     this.router.navigate(['/sso-login']);
+  }
+
+  /** True while sign-in is the local persona picker (resource AUTH mocked). */
+  isMockAuth(): boolean {
+    return isMockEnabled('AUTH');
+  }
+
+  /**
+   * Opens the portal session for a user signed in through RajSSO (called by SsoLoginFlowService once the backend
+   * session exists). The backend already ran the second-factor check, so the department OTP is not asked again.
+   */
+  completeSignIn(persona: UserPersona): void {
+    this.storage.removeSessionItem(this.OTR_PROMPT_DISMISSED_KEY);
+    this.login(persona, null);
+    this.setDeptAdminOtpVerified(persona.role === 'dept_admin' || persona.role === 'super_admin');
+    const target = landingRouteFor(persona.role);
+    this.router.navigate([target.path], target.queryParams ? { queryParams: target.queryParams } : undefined);
   }
 
   login(persona: UserPersona, redirectUrl: string | null = '/registration'): void {
@@ -227,11 +263,34 @@ export class AuthService {
   }
 
   logout(): void {
+    this.clearLocalSession();
+
+    if (this.isMockAuth()) {
+      this.router.navigate(['/sso-login']);
+      return;
+    }
+
+    // Real sign-in: end the server session, then finish the sign-out at RajSSO through the page the backend returns.
+    // Whatever the server answers, the user is already signed out here.
+    this.authApi.logout().subscribe({
+      next: res => {
+        const target = res?.redirectUrl;
+        if (target && /^https?:\/\//i.test(target)) {
+          window.location.assign(target);
+        } else {
+          this.router.navigate(['/']);
+        }
+      },
+      error: () => this.router.navigate(['/'])
+    });
+  }
+
+  private clearLocalSession(): void {
+    this.tokens.clear();
     this.currentUser.set(null);
     this.setDeptAdminOtpVerified(false);
     this.storage.removeItem(this.STORAGE_KEY);
     this.storage.removeSessionItem(this.OTR_PROMPT_DISMISSED_KEY);
-    this.router.navigate(['/sso-login']);
   }
 
   getRoleConfig(role: UserRole): RoleConfig {

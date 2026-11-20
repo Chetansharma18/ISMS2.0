@@ -3,6 +3,7 @@ import { Observable, of } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { ShortfallRequest, ShortfallResponse, SubmittedTender } from '../../../core/models/tender.model';
 import { DataEngineService } from '../../../core/services/data-engine.service';
+import { StorageService } from '../../../core/services/storage.service';
 import { ApplicationActivityLog, ApplicantResponse, ApplicantAppeal } from './eoi-state.models';
 import { EoiStateService } from './eoi-state.service';
 
@@ -19,6 +20,7 @@ export class ShortfallBridgeService {
   private readonly dataEngine = inject(DataEngineService);
   private readonly tenderRepo = this.dataEngine.for<SubmittedTender>('SUBMITTED_TENDERS');
   private readonly eoiState = inject(EoiStateService);
+  private readonly storage = inject(StorageService);
 
   /**
    * Resets both submitted tenders and department scrutiny records back to clean initial state.
@@ -26,15 +28,11 @@ export class ShortfallBridgeService {
    */
   resetAppealDemo(): void {
     this.dataEngine.reset('SUBMITTED_TENDERS');
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('isms_mock_db_SUBMITTED_TENDERS');
-      localStorage.removeItem('isms_mock_db_SUBMITTED_TENDERS__seed');
-      localStorage.removeItem('isms_dept_admin_responses');
-    }
-    if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.removeItem('isms_mock_db_SUBMITTED_TENDERS');
-      sessionStorage.removeItem('isms_mock_db_SUBMITTED_TENDERS__seed');
-    }
+    this.storage.removeItem('isms_mock_db_SUBMITTED_TENDERS');
+    this.storage.removeItem('isms_mock_db_SUBMITTED_TENDERS__seed');
+    this.storage.removeItem('isms_dept_admin_responses');
+    this.storage.removeSessionItem('isms_mock_db_SUBMITTED_TENDERS');
+    this.storage.removeSessionItem('isms_mock_db_SUBMITTED_TENDERS__seed');
     this.eoiState.resetResponses();
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new StorageEvent('storage', { key: 'isms_mock_db_SUBMITTED_TENDERS' }));

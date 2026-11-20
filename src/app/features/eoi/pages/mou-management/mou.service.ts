@@ -1,33 +1,31 @@
 import { Injectable, inject } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { StorageService } from '../../../../core/services/storage.service';
+import { createPersistedStore } from '../../../../core/services/persisted-store';
 import { INITIAL_MOU_DOCUMENTS, MouDocument } from './mou.model';
 import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
 
-const STORAGE_KEY = 'isms_mou_documents';
-
+/** Signed MoU documents (resource `MOU_DOCUMENTS`: mock storage or the API, per mock.config.ts). */
 @Injectable({
   providedIn: 'root'
 })
 export class MouService {
-  private readonly storage = inject(StorageService);
   private readonly docViewer = inject(DocumentViewerService);
 
-  private readonly documentsSubject = new BehaviorSubject<MouDocument[]>(this.loadInitial());
+  private readonly store = createPersistedStore<MouDocument>({
+    key: 'isms_mou_documents',
+    dataKey: 'MOU_DOCUMENTS',
+    seed: INITIAL_MOU_DOCUMENTS
+  });
+
+  private readonly documentsSubject = new BehaviorSubject<MouDocument[]>(this.store.items());
   readonly documents$ = this.documentsSubject.asObservable();
 
-  private loadInitial(): MouDocument[] {
-    try {
-      const stored = this.storage.getItem<MouDocument[]>(STORAGE_KEY);
-      if (Array.isArray(stored) && stored.length > 0) {
-        return stored;
-      }
-    } catch {
-      // Fallback to initial seeds
-    }
-    const initial = [...INITIAL_MOU_DOCUMENTS];
-    this.storage.setItem(STORAGE_KEY, initial);
-    return initial;
+  constructor() {
+    // Follows the store when it changes on its own (API load, another tab).
+    toObservable(this.store.items).subscribe(list => {
+      if (list !== this.documentsSubject.value) this.documentsSubject.next(list);
+    });
   }
 
   getDocuments(): Observable<MouDocument[]> {
@@ -52,18 +50,19 @@ export class MouService {
       uploadedBy: 'Department User'
     };
 
-    const updated = [newDoc, ...list];
-    this.documentsSubject.next(updated);
-    this.storage.setItem(STORAGE_KEY, updated);
+    this.save([newDoc, ...list]);
     return of(newDoc);
   }
 
   deleteDocument(id: string): Observable<boolean> {
-    const list = this.documentsSubject.value;
-    const filtered = list.filter(d => d.id !== id);
-    this.documentsSubject.next(filtered);
-    this.storage.setItem(STORAGE_KEY, filtered);
+    this.save(this.documentsSubject.value.filter(d => d.id !== id));
     return of(true);
+  }
+
+  private save(list: MouDocument[]): void {
+    this.store.items.set(list);
+    this.store.persist(list);
+    this.documentsSubject.next(list);
   }
 
   private formatFileSize(bytes: number): string {

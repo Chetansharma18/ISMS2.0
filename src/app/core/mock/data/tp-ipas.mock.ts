@@ -1,4 +1,7 @@
 import type { IpaCourseRow } from '../../../features/eoi/services/eoi-state.models';
+import type { TpIpa } from '../../../features/ipa/tp-ipa.model';
+
+export type { TpIpa };
 
 /**
  * Dummy In-Principal Approvals shown to the training partner, as the partner sees them. Not linked to the real
@@ -7,20 +10,7 @@ import type { IpaCourseRow } from '../../../features/eoi/services/eoi-state.mode
  * - IPA 1: one district and one sector, so the new SDC form has both already selected and locked.
  * - IPA 2: two districts and two sectors, so the partner picks from those only.
  */
-export interface TpIpa {
-  ipaId: string;
-  ipaNumber: string;
-  schemeId: string;
-  schemeTitle: string;
-  refNo: string;
-  /** Category as shown in tables ("Rajvik"). */
-  category: string;
-  /** Scheme and category codes handed to the SDC form. */
-  scheme: string;
-  schemeCategory: string;
-  tpName: string;
-  courses: IpaCourseRow[];
-}
+
 
 /** One course row of an IPA; the totals are worked out from the cost and trainees. */
 function course(

@@ -1,19 +1,24 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { DataEngineService, ResourceRepository } from '../../../core/services/data-engine.service';
+import { API_ENDPOINTS } from '../../../core/config/api.config';
+import { HttpService } from '../../../core/http/http.service';
+import { unwrapData } from '../../../core/http/response-adapter';
+import { isMockEnabled } from '../../../core/mock/mock.config';
 import {
-  SchemeTenderItem,
   MOCK_AVAILABLE_ADMINS,
   MOCK_RFP_DOCUMENTS,
   MOCK_ANNEXURE_DOCUMENTS,
   MOCK_EOI_REQUIRED_INFO
-} from '../../../core/mock/data';
+} from '../../../core/mock/data/schemes.mock';
+import type { SchemeTenderItem } from '../tenders.models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SchemeService {
   private dataEngine = inject(DataEngineService);
+  private http = inject(HttpService);
   private repo: ResourceRepository<SchemeTenderItem>;
 
   // Reactive state signals
@@ -89,10 +94,19 @@ export class SchemeService {
    * Assigns committee members to a scheme
    */
   assignCommittee(refNo: string, members: string[], approver?: string): Observable<SchemeTenderItem> {
-    return this.updateScheme(refNo, {
+    const patch: Partial<SchemeTenderItem> = {
       committeeMembers: members,
       ...(approver !== undefined ? { committeeApprover: approver } : {})
-    });
+    };
+    if (isMockEnabled('SCHEMES')) {
+      return this.updateScheme(refNo, patch);
+    }
+    return this.http.call<unknown>(API_ENDPOINTS.SCHEMES.ASSIGN_COMMITTEE, { id: refNo, body: patch }).pipe(
+      map(res => ({ ...patch, ...(unwrapData(res) as Partial<SchemeTenderItem> | null) }) as SchemeTenderItem),
+      tap(updated => {
+        this.schemes.update(current => current.map(s => (s.refNo === refNo ? { ...s, ...updated } : s)));
+      })
+    );
   }
 
   /**

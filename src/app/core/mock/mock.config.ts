@@ -43,7 +43,7 @@ export const MOCK_CONFIG: MockConfigSettings = {
     ADMIN_GRIEVANCES: true,
     SUBMITTED_TENDERS: true,
     CAMERA_BATCHES: true,
-    SECTORS: true,
+    SECTORS: false,
     DESIGNATIONS: true,
     COURSES: true,
     DISTRICTS: true,
@@ -54,7 +54,27 @@ export const MOCK_CONFIG: MockConfigSettings = {
     USER_ROLES: true,
     REMARK_MASTERS: true,
     GRADING_MASTERS: true,
-    TWO_STEP_VERIFICATION: true
+    TWO_STEP_VERIFICATION: true,
+    DYNAMIC_FORM_BUILDER: true,
+    EOI_SCHEMES: true,
+    EOI_RESPONSES: true,
+    SANCTION_DOCUMENTS: true,
+    IPA_DOCUMENTS: true,
+    SANCTION_ORDERS: true,
+    TP_SANCTION_ORDERS: true,
+    MOU_DOCUMENTS: true,
+    TP_IPAS: true,
+    IPA_ALLOCATIONS: true,
+    SSO_DIRECTORY: true,
+    EXPRESSED_INTEREST: true,
+    EMPLOYMENT_DEPT_RECORDS: true,
+    TRAINING_CALENDAR: true,
+    ATTENDANCE_MARKS: true,
+    ATTENDANCE_DEVICES: true,
+    ATTENDANCE_NOTICES: true,
+    DOITC_DEVICES: true,
+    PAYMENTS: true,
+    NOTIFICATIONS: true
   }
 };
 
@@ -84,10 +104,10 @@ export function setGlobalMock(enabled: boolean): void {
 }
 
 /**
- * Universal Mock Data Resolver:
- * Wraps mock data arrays so they automatically return empty arrays when
- * environment.useMockData is set to false.
+ * Marks an array as mock seed data. It no longer empties the data when mock mode is off: every reader
+ * (MockDatabaseService, PersistedStore) checks `isMockEnabled(dataKey)` when it reads, so the seed is never shown
+ * for a resource served by the API, and a resource can be switched at runtime or in tests.
  */
 export function resolveMock<T>(data: T[]): T[] {
-  return (environment.useMockData ?? true) ? data : [];
+  return data;
 }

@@ -1,13 +1,8 @@
-/** Dummy SSO directory: what the SSO returns for an SSO ID. Replace with the real SSO lookup later. */
-export interface SsoProfile {
-  ssoId: string;
-  name: string;
-  mobile: string;
-  email: string;
-  designation: string;
-  department: string;
-}
+import type { SsoProfile } from '../../../features/sdc/models/sso-profile.model';
 
+export type { SsoProfile };
+
+/** Dummy SSO directory: what the SSO returns for an SSO ID (mock data for resource `SSO_DIRECTORY`). */
 export const SSO_USERS: SsoProfile[] = [
   {
     ssoId: 'CENTERHEAD1',

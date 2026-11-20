@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from '../services/storage.service';
 import { MOCK_CONFIG, isMockEnabled } from './mock.config';
-import { PaginatedResponse } from '../models/common.model';
+import { PaginatedResponse, QueryOptions } from '../models/common.model';
 import {
   MOCK_SCHEMES,
   MOCK_USERS,
@@ -34,14 +34,8 @@ import {
   MOCK_DYNAMIC_FORM_BUILDER_ITEMS
 } from './data';
 
-export interface QueryOptions {
-  page?: number;
-  pageSize?: number;
-  search?: string;
-  searchFields?: string[];
-  filter?: Record<string, unknown>;
-  sort?: { key: string; direction: 'asc' | 'desc' };
-}
+/** Canonical definition lives in core/models; re-exported for existing callers. */
+export type { QueryOptions };
 
 /** Same shape as the canonical PaginatedResponse in core/models; kept as an alias for existing callers. */
 export type QueryResult<T> = PaginatedResponse<T>;

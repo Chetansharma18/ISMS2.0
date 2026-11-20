@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { EoiStateService } from '../eoi/services/eoi-state.service';
 import { IpaPdfService } from '../eoi/pages/ipa-editor/ipa-pdf.service';
 import { IpaAllocationService } from '../sdc/services/ipa-allocation.service';
-import { TP_IPAS, type TpIpa } from '../../core/mock/data/tp-ipas.mock';
+import type { TpIpa } from './tp-ipa.model';
+import { TpIpaService } from './tp-ipa.service';
 import { ButtonComponent, IconComponent, ListPageComponent, TableColumn } from '../../shared';
 
 /** One In-Principal Approval of the training partner. */
@@ -79,12 +80,13 @@ export class IpaListComponent {
   private allocationService = inject(IpaAllocationService);
   private pdfService = inject(IpaPdfService);
   private router = inject(Router);
+  private tpIpaService = inject(TpIpaService);
 
   searchQuery = signal('');
 
   readonly rows = computed<IpaRow[]>(() => {
     const query = this.searchQuery().trim().toLowerCase();
-    return TP_IPAS.flatMap(source => this.toRow(source)).filter(
+    return this.tpIpaService.ipas().flatMap(source => this.toRow(source)).filter(
       row =>
         !query ||
         row.ipaNo.toLowerCase().includes(query) ||

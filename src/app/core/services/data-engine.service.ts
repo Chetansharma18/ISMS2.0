@@ -1,21 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
-import { delay, map, catchError } from 'rxjs/operators';
+import { delay, map } from 'rxjs/operators';
 import { HttpService } from '../http/http.service';
-import { MockDatabaseService, QueryOptions, asRecord } from '../mock/mock-database.service';
+import { queryOptionsToParams, QueryParamInput } from '../http/query-params';
+import { toItems, toPaginated, unwrapData } from '../http/response-adapter';
+import { MockDatabaseService, asRecord } from '../mock/mock-database.service';
 import { isMockEnabled, MOCK_CONFIG } from '../mock/mock.config';
-import {
-  getEndpointForDataKey,
-  resolveEndpointUrl,
-  buildApiUrl
-} from '../config/api.config';
-import { ApiResponse, PaginatedResponse } from '../models/common.model';
-
-/** Returns `res.data` when the response is wrapped in a `{ data }` envelope, otherwise the response itself. */
-function unwrapData(res: unknown): unknown {
-  const data = (res as { data?: unknown } | null | undefined)?.data;
-  return data !== undefined ? data : res;
-}
+import { CrudAction, EndpointDef, getEndpointForDataKey } from '../config/api.config';
+import { PaginatedResponse, QueryOptions } from '../models/common.model';
 
 export interface ResourceRepositoryOptions<T> {
   idKey?: string;
@@ -32,12 +24,14 @@ export interface ResourceRepository<T> {
 }
 
 /**
- * Universal Data Engine Service (Inspired by GeoTree Admin Architecture)
- * 
- * Provides an identical, unified CRUD interface for every resource in the application.
- * - When in Mock mode: reads and mutates data via the Centralized MockDatabaseService.
- * - When real API URLs are plugged in: transparently switches to HttpService calls 
- *   resolved from API_ENDPOINTS without changing any component logic!
+ * Universal Data Engine Service
+ *
+ * One CRUD interface for every resource (`dataKey`) of the application:
+ * - mock mode (`isMockEnabled(dataKey)`): reads and writes the centralized MockDatabaseService;
+ * - API mode: calls the endpoints registered for the dataKey in API_ENDPOINTS through HttpService.
+ *
+ * Components never see the difference. Failed API calls error with an `ApiError` (the error interceptor has
+ * already shown a toast), so callers can react instead of silently receiving an empty list.
  */
 @Injectable({
   providedIn: 'root'
@@ -64,6 +58,11 @@ export class DataEngineService {
     };
   }
 
+  /** True when the resource is served from the mock store rather than the API. */
+  isMock(dataKey: string): boolean {
+    return isMockEnabled(dataKey);
+  }
+
   /** Resets mock store and storage for a resource (or all resources). */
   reset(dataKey?: string): void {
     this.mockDb.reset(dataKey);
@@ -73,9 +72,7 @@ export class DataEngineService {
   // CORE ENGINE OPERATIONS
   // =========================================================================
 
-  /**
-   * LIST / QUERY: Returns paginated response with search, filter, and sorting
-   */
+  /** LIST / QUERY: paginated response with search, filter and sorting. */
   list<T = any>(
     dataKey: string,
     queryOpts: QueryOptions = {},
@@ -83,47 +80,23 @@ export class DataEngineService {
   ): Observable<PaginatedResponse<T>> {
     const normalizer = options.normalizer || ((item: unknown) => item as T);
 
-    // Path A: Centralized Mock
     if (isMockEnabled(dataKey)) {
       const mockResult = this.mockDb.query<T>(dataKey, queryOpts);
-      const paginated: PaginatedResponse<T> = {
-        items: mockResult.items.map(normalizer),
-        total: mockResult.total,
-        page: mockResult.page,
-        pageSize: mockResult.pageSize,
-        totalPages: mockResult.totalPages
-      };
-
-      return of(paginated).pipe(
-        delay(MOCK_CONFIG.simulatedDelayMs)
-      );
+      return this.mockReply({ ...mockResult, items: mockResult.items.map(normalizer) });
     }
 
-    // Path B: Real Backend API
-    const endpoint = getEndpointForDataKey(dataKey, 'LIST');
-    if (!endpoint) {
-      return throwError(() => new Error(`No LIST endpoint configured for resource: ${dataKey}`));
-    }
+    const endpoint = this.endpoint(dataKey, 'LIST');
+    if (!endpoint) return this.missingEndpoint(dataKey, 'LIST');
 
-    const fullUrl = buildApiUrl(resolveEndpointUrl(endpoint.url));
-    const isPost = endpoint.method === 'POST';
+    // A POST list endpoint takes the query as its body; a GET one as flat query params.
+    const req$ = endpoint.method === 'POST'
+      ? this.http.call<unknown>(endpoint, { body: queryOpts })
+      : this.http.call<unknown>(endpoint, { params: queryOptionsToParams(queryOpts) });
 
-    const req$ = isPost
-      ? this.http.post<any>(fullUrl, queryOpts)
-      : this.http.get<any>(fullUrl, { params: queryOpts as any });
-
-    return req$.pipe(
-      map(res => this.extractPaginatedResponse<T>(res, normalizer)),
-      catchError(err => {
-        console.warn(`[DataEngine] Backend API unavailable for ${dataKey} (${fullUrl}):`, err?.message || err);
-        return of({ items: [], total: 0, page: 1, pageSize: 10, totalPages: 0 });
-      })
-    );
+    return req$.pipe(map(res => toPaginated<T>(res, normalizer)));
   }
 
-  /**
-   * GET ALL: Returns all items for a resource
-   */
+  /** GET ALL: every record of a resource, optionally filtered by exact field values. */
   getAll<T = any>(
     dataKey: string,
     filter?: Record<string, unknown>,
@@ -134,36 +107,20 @@ export class DataEngineService {
     if (isMockEnabled(dataKey)) {
       let raw = this.mockDb.getAll<T>(dataKey);
       if (filter && Object.keys(filter).length > 0) {
-        raw = raw.filter(item => {
-          return Object.entries(filter).every(([k, v]) => asRecord(item)[k] === v);
-        });
+        raw = raw.filter(item => Object.entries(filter).every(([k, v]) => asRecord(item)[k] === v));
       }
-      return of(raw.map(normalizer)).pipe(
-        delay(MOCK_CONFIG.simulatedDelayMs)
-      );
+      return this.mockReply(raw.map(normalizer));
     }
 
-    const endpoint = getEndpointForDataKey(dataKey, 'LIST');
-    if (!endpoint) {
-      return of([]);
-    }
+    const endpoint = this.endpoint(dataKey, 'LIST');
+    if (!endpoint) return this.missingEndpoint(dataKey, 'LIST');
 
-    const fullUrl = buildApiUrl(resolveEndpointUrl(endpoint.url));
-    return this.http.get<any>(fullUrl, { params: filter as Record<string, string | number | boolean> }).pipe(
-      map(res => {
-        const items = Array.isArray(res) ? res : res?.data?.items || res?.data || [];
-        return items.map(normalizer);
-      }),
-      catchError(err => {
-        console.warn(`[DataEngine] Backend API unavailable for ${dataKey} (${fullUrl}):`, err?.message || err);
-        return of([]);
-      })
-    );
+    return this.http
+      .call<unknown>(endpoint, { params: filter as QueryParamInput | undefined })
+      .pipe(map(res => toItems<T>(res, normalizer)));
   }
 
-  /**
-   * GET BY ID: Returns single item
-   */
+  /** GET BY ID: a single record. */
   getById<T = any>(
     dataKey: string,
     id: string | number,
@@ -177,28 +134,16 @@ export class DataEngineService {
       if (!item) {
         return throwError(() => new Error(`Item ${id} not found in ${dataKey}`));
       }
-      return of(normalizer(item)).pipe(
-        delay(MOCK_CONFIG.simulatedDelayMs)
-      );
+      return this.mockReply(normalizer(item));
     }
 
-    const endpoint = getEndpointForDataKey(dataKey, 'GET', id);
-    if (!endpoint) {
-      return throwError(() => new Error(`No GET endpoint configured for resource: ${dataKey}`));
-    }
+    const endpoint = this.endpoint(dataKey, 'GET');
+    if (!endpoint) return this.missingEndpoint(dataKey, 'GET');
 
-    const fullUrl = buildApiUrl(resolveEndpointUrl(endpoint.url, id));
-    return this.http.get<unknown>(fullUrl).pipe(
-      map(res => {
-        const item = unwrapData(res);
-        return normalizer(item);
-      })
-    );
+    return this.http.call<unknown>(endpoint, { id }).pipe(map(res => normalizer(unwrapData(res))));
   }
 
-  /**
-   * CREATE: Adds a new record
-   */
+  /** CREATE: adds a new record and returns it as saved. */
   create<T = any>(
     dataKey: string,
     payload: Partial<T>,
@@ -208,29 +153,16 @@ export class DataEngineService {
     const normalizer = options.normalizer || ((item: unknown) => item as T);
 
     if (isMockEnabled(dataKey)) {
-      const created = this.mockDb.create<T>(dataKey, payload, idKey);
-      return of(normalizer(created)).pipe(
-        delay(MOCK_CONFIG.simulatedDelayMs)
-      );
+      return this.mockReply(normalizer(this.mockDb.create<T>(dataKey, payload, idKey)));
     }
 
-    const endpoint = getEndpointForDataKey(dataKey, 'ADD');
-    if (!endpoint) {
-      return throwError(() => new Error(`No ADD endpoint configured for resource: ${dataKey}`));
-    }
+    const endpoint = this.endpoint(dataKey, 'ADD');
+    if (!endpoint) return this.missingEndpoint(dataKey, 'ADD');
 
-    const fullUrl = buildApiUrl(resolveEndpointUrl(endpoint.url));
-    return this.http.post<unknown>(fullUrl, payload).pipe(
-      map(res => {
-        const item = unwrapData(res);
-        return normalizer(item);
-      })
-    );
+    return this.http.call<unknown>(endpoint, { body: payload }).pipe(map(res => normalizer(unwrapData(res))));
   }
 
-  /**
-   * UPDATE: Updates existing record
-   */
+  /** UPDATE: saves changes to an existing record and returns it as saved. */
   update<T = any>(
     dataKey: string,
     id: string | number,
@@ -241,29 +173,16 @@ export class DataEngineService {
     const normalizer = options.normalizer || ((item: unknown) => item as T);
 
     if (isMockEnabled(dataKey)) {
-      const updated = this.mockDb.update<T>(dataKey, id, patch, idKey);
-      return of(normalizer(updated)).pipe(
-        delay(MOCK_CONFIG.simulatedDelayMs)
-      );
+      return this.mockReply(normalizer(this.mockDb.update<T>(dataKey, id, patch, idKey)));
     }
 
-    const endpoint = getEndpointForDataKey(dataKey, 'UPDATE', id);
-    if (!endpoint) {
-      return throwError(() => new Error(`No UPDATE endpoint configured for resource: ${dataKey}`));
-    }
+    const endpoint = this.endpoint(dataKey, 'UPDATE');
+    if (!endpoint) return this.missingEndpoint(dataKey, 'UPDATE');
 
-    const fullUrl = buildApiUrl(resolveEndpointUrl(endpoint.url, id));
-    return this.http.put<unknown>(fullUrl, patch).pipe(
-      map(res => {
-        const item = unwrapData(res);
-        return normalizer(item);
-      })
-    );
+    return this.http.call<unknown>(endpoint, { id, body: patch }).pipe(map(res => normalizer(unwrapData(res))));
   }
 
-  /**
-   * DELETE: Removes record
-   */
+  /** DELETE: removes a record. True when it was removed. */
   delete(
     dataKey: string,
     id: string | number,
@@ -272,67 +191,28 @@ export class DataEngineService {
     const idKey = options.idKey || 'id';
 
     if (isMockEnabled(dataKey)) {
-      const success = this.mockDb.delete(dataKey, id, idKey);
-      return of(success).pipe(
-        delay(MOCK_CONFIG.simulatedDelayMs)
-      );
+      return this.mockReply(this.mockDb.delete(dataKey, id, idKey));
     }
 
-    const endpoint = getEndpointForDataKey(dataKey, 'DELETE', id);
-    if (!endpoint) {
-      return throwError(() => new Error(`No DELETE endpoint configured for resource: ${dataKey}`));
-    }
+    const endpoint = this.endpoint(dataKey, 'DELETE');
+    if (!endpoint) return this.missingEndpoint(dataKey, 'DELETE');
 
-    const fullUrl = buildApiUrl(resolveEndpointUrl(endpoint.url, id));
-    return this.http.delete<{ success?: boolean } | null>(fullUrl).pipe(
-      map(res => res?.success ?? true)
-    );
+    return this.http
+      .call<{ success?: boolean } | null>(endpoint, { id })
+      .pipe(map(res => res?.success ?? true));
   }
 
-  // --- Normalization & Response Adapter ---
+  // --- helpers ---
 
-  private extractPaginatedResponse<T>(
-    res: any,
-    normalizer: (item: unknown) => T
-  ): PaginatedResponse<T> {
-    if (!res) {
-      return { items: [], total: 0, page: 1, pageSize: 10, totalPages: 1 };
-    }
+  private endpoint(dataKey: string, action: CrudAction): EndpointDef | null {
+    return getEndpointForDataKey(dataKey, action);
+  }
 
-    let itemsRaw: unknown[] = [];
-    let total = 0;
-    let page = 1;
-    let pageSize = 10;
+  private missingEndpoint(dataKey: string, action: CrudAction): Observable<never> {
+    return throwError(() => new Error(`No ${action} endpoint configured for resource: ${dataKey}`));
+  }
 
-    // Defense-in-depth extraction matching GeoTree architecture
-    if (Array.isArray(res)) {
-      itemsRaw = res;
-      total = res.length;
-    } else if (res.data && Array.isArray(res.data)) {
-      itemsRaw = res.data;
-      total = res.total ?? res.pagination?.total ?? res.data.length;
-      page = res.page ?? res.pagination?.page ?? 1;
-      pageSize = res.pageSize ?? res.pagination?.pageSize ?? itemsRaw.length;
-    } else if (res.data?.items && Array.isArray(res.data.items)) {
-      itemsRaw = res.data.items;
-      total = res.data.total ?? res.data.pagination?.total ?? itemsRaw.length;
-      page = res.data.page ?? 1;
-      pageSize = res.data.pageSize ?? itemsRaw.length;
-    } else if (res.items && Array.isArray(res.items)) {
-      itemsRaw = res.items;
-      total = res.total ?? itemsRaw.length;
-      page = res.page ?? 1;
-      pageSize = res.pageSize ?? itemsRaw.length;
-    }
-
-    const totalPages = Math.ceil(total / (pageSize || 1)) || 1;
-
-    return {
-      items: itemsRaw.map(normalizer),
-      total,
-      page,
-      pageSize,
-      totalPages
-    };
+  private mockReply<R>(value: R): Observable<R> {
+    return of(value).pipe(delay(MOCK_CONFIG.simulatedDelayMs));
   }
 }

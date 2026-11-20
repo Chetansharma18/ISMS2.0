@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, input, output, signal } fro
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime, filter, map, switchMap, tap } from 'rxjs';
 import { ActionModalComponent, IconComponent, InputDirective } from '../../../shared';
-import type { SsoProfile } from '../../../core/mock/data/sso-users.mock';
+import type { SsoProfile } from '../models/sso-profile.model';
 import { SsoDirectoryService } from '../services/sso-directory.service';
 
 /** An SSO ID shorter than this is not looked up yet. */

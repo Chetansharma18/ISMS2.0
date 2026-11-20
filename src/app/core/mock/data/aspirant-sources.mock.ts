@@ -1,43 +1,10 @@
-import type { AspirantFormData } from '../../../features/sdc/config/aspirant-form.config';
+import type {
+  AspirantSourceProfile,
+  EmploymentDeptRecord,
+  ExpressedInterestApplicant
+} from '../../../features/sdc/models/aspirant-source.model';
 
-/** The details an outside source (Expressed Interest, Employment Department) can give about an aspirant. */
-export type AspirantSourceProfile = Pick<
-  AspirantFormData,
-  | 'aadhaarNo'
-  | 'aspirantName'
-  | 'gender'
-  | 'relationType'
-  | 'relationName'
-  | 'dob'
-  | 'educationalQualification'
-  | 'religion'
-  | 'category'
-  | 'areaType'
-  | 'mobileNo'
-  | 'email'
-  | 'permCity'
-  | 'permDistrict'
-  | 'permPincode'
->;
-
-/** An aspirant who expressed interest in a course on the aspirant portal. */
-export interface ExpressedInterestApplicant extends AspirantSourceProfile {
-  id: string;
-  course: string;
-  sector: string;
-  /** dd/mm/yyyy */
-  expressedOn: string;
-}
-
-/** An aspirant registered with the Employment Department. */
-export interface EmploymentDeptRecord extends AspirantSourceProfile {
-  /** Registration number the Employment Department knows the aspirant by. */
-  registrationNo: string;
-  /** Sector the aspirant is looking for work in. */
-  sector: string;
-  /** dd/mm/yyyy */
-  registeredOn: string;
-}
+export type { AspirantSourceProfile, EmploymentDeptRecord, ExpressedInterestApplicant };
 
 interface Person {
   name: string;

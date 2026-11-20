@@ -4,7 +4,7 @@ import { DOITC_DEVICES } from '../../../core/mock/data/doitc-devices.mock';
 import { createPersistedStore } from '../../../core/services/persisted-store';
 import { AspirantService } from '../../sdc/services/aspirant.service';
 import { BatchService } from '../../sdc/services/batch.service';
-import type { AttendanceMark, AttendanceNotice, AttendanceNoticeType, AttendanceSlot, BiometricDevice } from '../models/attendance.model';
+import type { AttendanceMark, AttendanceNotice, AttendanceNoticeType, AttendanceSlot, BiometricDevice, DoitcDevice } from '../models/attendance.model';
 import { absentText, buildMarkIndex, confirmationText, dayStatus, liveMark, marksOfDay, reminderText } from '../utils/attendance.util';
 
 /**
@@ -17,9 +17,29 @@ export class AttendanceService {
   private readonly aspirantService = inject(AspirantService);
   private readonly batchService = inject(BatchService);
 
-  private readonly markStore = createPersistedStore<AttendanceMark>({ key: 'isms_attendance_marks', seed: INITIAL_ATTENDANCE_MARKS });
-  private readonly deviceStore = createPersistedStore<BiometricDevice>({ key: 'isms_attendance_devices', seed: INITIAL_ATTENDANCE_DEVICES });
-  private readonly noticeStore = createPersistedStore<AttendanceNotice>({ key: 'isms_attendance_notices', seed: [] });
+  private readonly markStore = createPersistedStore<AttendanceMark>({
+    key: 'isms_attendance_marks',
+    dataKey: 'ATTENDANCE_MARKS',
+    seed: INITIAL_ATTENDANCE_MARKS
+  });
+  private readonly deviceStore = createPersistedStore<BiometricDevice>({
+    key: 'isms_attendance_devices',
+    dataKey: 'ATTENDANCE_DEVICES',
+    idKey: 'serialNo',
+    seed: INITIAL_ATTENDANCE_DEVICES
+  });
+  private readonly noticeStore = createPersistedStore<AttendanceNotice>({
+    key: 'isms_attendance_notices',
+    dataKey: 'ATTENDANCE_NOTICES',
+    seed: []
+  });
+  /** DoITC device registry (read-only), checked when a device is linked. */
+  private readonly registryStore = createPersistedStore<DoitcDevice>({
+    dataKey: 'DOITC_DEVICES',
+    idKey: 'serialNo',
+    seed: DOITC_DEVICES,
+    writable: false
+  });
 
   readonly marks = this.markStore.items.asReadonly();
   readonly devices = this.deviceStore.items.asReadonly();
@@ -58,7 +78,7 @@ export class AttendanceService {
   linkDevice(batchId: string, serialNo: string, linkedBy: string): string {
     const serial = serialNo.trim().toUpperCase();
     if (!serial) return 'Enter the serial number of the device.';
-    const registered = DOITC_DEVICES.find(device => device.serialNo === serial);
+    const registered = this.registryStore.items().find(device => device.serialNo === serial);
     if (!registered) return 'This serial number is not in the DoITC device registry. Check it and try again.';
     if (this.deviceOf(batchId)) return 'This batch already has a device. Unlink it first.';
     const other = this.devices().find(device => device.serialNo === serial);

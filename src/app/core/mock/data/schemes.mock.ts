@@ -13,17 +13,26 @@ export interface SchemeTenderItem {
   eoiDescription: string;
   category?: string;
   code?: string;
-  status?: 'Open' | 'Closed';
+  status?: 'Open' | 'Closed' | 'Draft' | 'Scheduled' | 'Cancelled';
   rfpDocSize?: string;
   sopDocSize?: string;
   preBidDate?: string;
   techBidDate?: string;
   emdFee?: string;
   processFee?: string;
+  eoiDuration?: string;
+  emdAmount?: number;
+  processFeeAmount?: number;
+  isFeeExempted?: boolean;
+  requiredDocs?: string[];
   attachedDocs?: Array<{ sNo: number; name: string; size: string }>;
   committeeMembers?: string[];
   committeeApprover?: string;
   createdAt?: number;
+  updatedAt?: number;
+  publishedAt?: number;
+  scheduledDate?: string;
+  createdBy?: string;
   isActive?: boolean;
   isFrozen?: boolean;
 }

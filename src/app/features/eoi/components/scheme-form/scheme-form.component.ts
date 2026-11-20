@@ -1,7 +1,7 @@
 // ui-guard-allow: page-frame - the Apply-for-EOI wizard has its own stepper layout
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DocumentViewerModalComponent } from '../../../../shared/components/document-viewer-modal/document-viewer-modal.component';
 import { ActionModalComponent } from '../../../../shared/components/action-modal/action-modal.component';
 import { StepperComponent } from '../../../../shared/components/stepper/stepper.component';
@@ -24,7 +24,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
   imports: [ButtonComponent, IconComponent, ActionModalComponent, StepperComponent, SchemeHeaderCardComponent, Step1ProcessingFeeComponent, Step2OtrProfileComponent, Step3UploadDocumentsComponent, Step4CompletePreviewComponent, Step5EmdPaymentComponent, Step6ReceiptsComponent],
   providers: [SchemeFormState],
   template: `
-    <div class="min-h-screen bg-white flex flex-col selection:bg-navy selection:text-white font-sans text-slate-800" >
+    <div class="min-h-screen bg-white flex flex-col selection:bg-[#7C0E44] selection:text-white font-sans text-slate-800" >
 
       <main class="flex-1 w-full px-4 sm:px-5 lg:px-6 py-4 sm:py-5">
 
@@ -37,13 +37,10 @@ export type { EoiDocumentItem } from './scheme-form.model';
             </button>
           </div>
 
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <h1 class="text-2xl sm:text-[28px] font-bold text-[#172554] tracking-tight m-0">
+          <div>
+            <h1 class="text-2xl sm:text-[28px] font-bold text-[#7C0E44] tracking-tight m-0">
               Apply for EOI
             </h1>
-            <span class="text-xs text-slate-500 font-medium select-none">
-              Fields marked with <span class="text-[#DC2626] font-bold">*</span> are mandatory
-            </span>
           </div>
 
           <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
@@ -63,22 +60,20 @@ export type { EoiDocumentItem } from './scheme-form.model';
           ></app-stepper>
         </div>
 
-        <!-- Scheme summary strip (step 1 only) -->
-        @if (state.currentStep() === 1) {
-          <div class="mb-5">
-            <app-scheme-header-card />
-          </div>
-        }
+        <!-- Scheme summary strip (shown at the top of all steps) -->
+        <div class="mb-5">
+          <app-scheme-header-card />
+        </div>
 
         <!-- 3. Main form card: numbered step title + the active step -->
-        <div class="bg-white rounded-xl border border-[#D6E3F0] shadow-xs p-5 sm:p-7 space-y-6">
+        <div class="bg-white rounded-xl border border-[#EADCE2] shadow-xs p-5 sm:p-7 space-y-6">
 
-          <div class="pb-3.5 border-b border-[#E8EEF5] space-y-1">
+          <div class="pb-3.5 border-b border-[#EADCE2] space-y-1">
             <div class="flex items-center gap-3">
-              <span class="w-7 h-7 rounded-full bg-[#1E3A5F] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
+              <span class="w-7 h-7 rounded-full bg-[#7C0E44] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
                 {{ state.currentStep() }}
               </span>
-              <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0">
+              <h2 class="text-lg sm:text-[19px] font-bold text-[#7C0E44] m-0">
                 {{ stepTitle() }}
               </h2>
             </div>
@@ -199,6 +194,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
 export class SchemeFormComponent {
   protected readonly state = inject(SchemeFormState);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   /** Title of the active step, taken from the stepper definition. */
   protected stepTitle(): string {
@@ -211,7 +207,7 @@ export class SchemeFormComponent {
       case 1:
         return 'Verify the organisation, authorized signatory and bank details that will accompany your EOI application.';
       case 2:
-        return 'Upload the required proposal documents in the supported format and size shown against each one.';
+        return 'Upload the required supporting documents in the supported format and size shown against each one.';
       case 3:
         return 'Please verify the information provided below before proceeding to the processing fee payment.';
       case 4:
@@ -232,9 +228,14 @@ export class SchemeFormComponent {
     if (this.state.currentStep() > 1) {
       this.state.goToStep(this.state.currentStep() - 1);
     } else {
-      this.router.navigate(['/tenders'], {
-        queryParams: { viewRefNo: this.state.schemeRefNo() }
-      });
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+      if (returnUrl) {
+        void this.router.navigateByUrl(returnUrl);
+      } else {
+        void this.router.navigate(['/tenders'], {
+          queryParams: { viewRefNo: this.state.schemeRefNo() }
+        });
+      }
     }
   }
 }

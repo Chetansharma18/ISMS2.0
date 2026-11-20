@@ -191,7 +191,7 @@ interface MethodOption {
       [closeOnBackdrop]="false"
       maxWidthClass="max-w-lg"
       [primaryLabel]="'Register ' + selectedCount() + (selectedCount() === 1 ? ' Aspirant' : ' Aspirants')"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       (primaryAction)="registerSelected()"
       (secondaryAction)="confirmOpen.set(false)"
       (close)="confirmOpen.set(false)"

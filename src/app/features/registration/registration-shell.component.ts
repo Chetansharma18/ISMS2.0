@@ -35,7 +35,7 @@ export interface StepMeta {
     IconComponent
   ],
   template: `
-    <div class="min-h-screen bg-white flex flex-col justify-between selection:bg-navy selection:text-white font-sans" >
+    <div class="min-h-screen bg-white flex flex-col justify-between selection:bg-[#7C0E44] selection:text-white font-sans" >
 
       <!-- ====================================================================
            Main Content Area
@@ -53,13 +53,10 @@ export interface StepMeta {
           </div>
 
           <!-- Title and Subtitle Row -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <h1 class="text-2xl sm:text-[28px] font-bold text-[#172554] tracking-tight m-0">
+          <div>
+            <h1 class="text-2xl sm:text-[28px] font-bold text-[#7C0E44] tracking-tight m-0">
               Organization Registration
             </h1>
-            <span class="text-xs text-slate-500 font-medium select-none">
-              Fields marked with <span class="text-[#DC2626] font-bold">*</span> are mandatory
-            </span>
           </div>
 
           <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
@@ -107,7 +104,7 @@ export interface StepMeta {
                 <span
                   class="text-xs sm:text-[13.5px] tracking-tight whitespace-nowrap"
                   [class.font-extrabold]="activeStep() === step.number"
-                  [class.text-navy]="activeStep() === step.number"
+                  [class.text-[#7C0E44]]="activeStep() === step.number"
                   [class.text-slate-800]="isStepCompleted(step.number) && activeStep() !== step.number"
                   [class.font-semibold]="activeStep() !== step.number"
                   [class.text-slate-600]="!isStepCompleted(step.number) && activeStep() !== step.number"
@@ -120,7 +117,7 @@ export interface StepMeta {
               @if (!last) {
                 <div
                   class="flex-1 h-0.5 mx-2.5 sm:mx-6 transition-colors duration-200"
-                  [class.bg-navy]="isStepCompleted(step.number)"
+                  [class.bg-[#7C0E44]]="isStepCompleted(step.number)"
                   [class.bg-slate-200]="!isStepCompleted(step.number)"
                 ></div>
               }
@@ -136,7 +133,7 @@ export interface StepMeta {
             <!-- Step 1 Card Header -->
             <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
               <div class="min-w-0">
-                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
+                <h2 class="text-lg sm:text-[19px] font-bold text-[#7C0E44] m-0 leading-tight">
                   Organisation Details
                 </h2>
                 <p class="text-xs text-slate-500 m-0 mt-0.5">
@@ -155,7 +152,7 @@ export interface StepMeta {
             <!-- Step 2 Card Header -->
             <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
               <div class="min-w-0">
-                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
+                <h2 class="text-lg sm:text-[19px] font-bold text-[#7C0E44] m-0 leading-tight">
                   Authorized Person Details
                 </h2>
                 <p class="text-xs text-slate-500 m-0 mt-0.5">
@@ -174,7 +171,7 @@ export interface StepMeta {
             <!-- Step 3 Card Header -->
             <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
               <div class="min-w-0">
-                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
+                <h2 class="text-lg sm:text-[19px] font-bold text-[#7C0E44] m-0 leading-tight">
                   Organisation Bank Details
                 </h2>
                 <p class="text-xs text-slate-500 m-0 mt-0.5">
@@ -193,7 +190,7 @@ export interface StepMeta {
             <!-- Step 4 Card Header -->
             <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
               <div class="min-w-0">
-                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
+                <h2 class="text-lg sm:text-[19px] font-bold text-[#7C0E44] m-0 leading-tight">
                   Review &amp; Submit
                 </h2>
                 <p class="text-xs text-slate-500 m-0 mt-0.5">
@@ -535,7 +532,12 @@ export class RegistrationShellComponent implements OnInit, OnDestroy {
     if (this.activeStep() > 1) {
       this.previousStep();
     } else {
-      this.router.navigate(['/profile']);
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+      if (returnUrl) {
+        void this.router.navigateByUrl(returnUrl);
+      } else {
+        void this.router.navigate(['/profile']);
+      }
     }
   }
 

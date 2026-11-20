@@ -37,7 +37,6 @@ export const FACULTY_QUALIFICATIONS = [
       </app-form-section>
 
       <ng-container modalFooter>
-        <button appButton variant="outline" type="button" (click)="closed.emit()">Cancel</button>
         <button appButton type="button" [disabled]="!trainerType() || !qualification()" (click)="save()">
           <app-icon name="check" size="sm" />
           <span>Save Changes</span>

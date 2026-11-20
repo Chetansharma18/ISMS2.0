@@ -30,7 +30,6 @@ import { RequiredDocumentsListComponent } from './scheme-detail-view/required-do
         [isClosed]="isClosed"
         [hideApplyButton]="hideApplyButton"
         (back)="onBack()"
-        (downloadDetails)="handleViewDetailsClick()"
         (apply)="onApply()"
       ></app-scheme-detail-toolbar>
 
@@ -94,10 +93,6 @@ export class SchemeDetailViewComponent {
 
   onApply(): void {
     this.apply.emit(this.scheme);
-  }
-
-  handleViewDetailsClick(): void {
-    this.generateOfficialPdf();
   }
 
   downloadRfp(): void {

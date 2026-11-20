@@ -73,10 +73,10 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
   itemUnit: 'schemes',
   columns: COLUMNS,
   hasStatus: true,
-  modalWidthClass: 'max-w-[680px]',
+  modalWidthClass: 'max-w-[840px]',
   fields: [
-    { key: 'schemeName', label: 'Scheme Name', type: 'text', required: true, maxLength: 120, placeholder: 'Enter scheme name', colSpan: 3 },
-    { key: 'schemeCategory', label: 'Scheme Category', type: 'multiselect', required: true, options: SCHEME_CATEGORY_OPTIONS, colSpan: 2 },
+    { key: 'schemeName', label: 'Scheme Name', type: 'text', required: true, maxLength: 120, placeholder: 'Enter scheme name', colSpan: 1 },
+    { key: 'schemeCategory', label: 'Scheme Category', type: 'multiselect', required: true, options: SCHEME_CATEGORY_OPTIONS, colSpan: 1 },
     { key: 'categoryName', label: 'EOI Category', type: 'select', required: true, options: CATEGORY_NAME_OPTIONS, colSpan: 1 },
     { key: 'budget', label: 'Budget (\u20B9)', type: 'number', required: true, min: 0, placeholder: 'Enter budget amount', colSpan: 1 },
     { key: 'amount', label: 'EMD amount (\u20B9)', type: 'number', required: true, min: 0, placeholder: 'Enter amount', colSpan: 1 },

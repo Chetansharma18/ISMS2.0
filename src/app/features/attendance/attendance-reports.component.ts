@@ -152,7 +152,6 @@ interface ParticipantRow {
             <app-icon name="download" size="sm" />
             <span>Export CSV</span>
           </button>
-          <button appButton variant="outline" type="button" (click)="openDate.set(null)">Close</button>
         </ng-container>
       </app-modal>
     }

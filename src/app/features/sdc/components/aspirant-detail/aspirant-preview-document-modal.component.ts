@@ -85,13 +85,6 @@ import { ButtonComponent, IconComponent, ModalComponent } from '../../../../shar
     >
       Download
     </button>
-    <button
-      appButton
-      type="button"
-      (click)="close.emit()"
-    >
-      Close
-    </button>
   </ng-container>
     </app-modal>
   `

@@ -22,7 +22,7 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
       [reverseButtons]="true"
       [showAccentBar]="false"
       [primaryLabel]="editing() ? 'Save Changes' : 'Submit'"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       maxWidthClass="max-w-[780px]"
       (primaryAction)="save.emit()"
       (secondaryAction)="cancelled.emit()"

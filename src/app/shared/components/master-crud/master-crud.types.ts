@@ -47,6 +47,8 @@ export interface MasterCrudConfig<T extends { id: string; status?: string } = an
   fields: MasterFieldConfig<T>[];
   /** Max-width tailwind class for the add/edit modal */
   modalWidthClass?: string;
+  /** Max-width tailwind class for the view details modal */
+  viewModalWidthClass?: string;
   /** Builds the blank form data object used when opening the "Add" modal */
   createDefaults: () => Record<string, any>;
   /** Transforms submitted form data into the final entity payload sent to the API/mock store.

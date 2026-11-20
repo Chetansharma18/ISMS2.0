@@ -291,7 +291,7 @@ interface TenderDetailTabItem {
                       <div class="flex items-center justify-between">
                         <span class="text-xs font-bold text-slate-900 flex items-center gap-2">
                           <app-icon name="document" size="sm" class="text-navy" />
-                          <span>Proposal Documents</span>
+                          <span>Supporting Documents</span>
                         </span>
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-sky-50 text-navy font-semibold text-[11px] border border-sky-200">
                           {{ currentApplication().documents.length }} Files
@@ -299,7 +299,7 @@ interface TenderDetailTabItem {
                       </div>
                       <div class="text-xs space-y-1">
                         <span class="font-semibold text-slate-900 block">Mandatory &amp; Annexure Documents</span>
-                        <span class="text-slate-500 block text-[11.5px]">All 16 technical proposal documents attached &amp; verified</span>
+                        <span class="text-slate-500 block text-[11.5px]">All 16 supporting documents attached &amp; verified</span>
                       </div>
                     </div>
                     <button appButton variant="outline" size="sm" type="button" (click)="setActiveTab('documents')" class="w-full justify-center">

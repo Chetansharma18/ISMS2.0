@@ -173,7 +173,7 @@ export type { Grievance };
         [isOpen]="isModalOpen()"
         [title]="'Raise Ticket'"
         primaryLabel="Forward"
-        secondaryLabel="Cancel"
+        secondaryLabel=""
         [showCloseButton]="true"
         [showAccentBar]="false"
         (primaryAction)="submitTicket()"

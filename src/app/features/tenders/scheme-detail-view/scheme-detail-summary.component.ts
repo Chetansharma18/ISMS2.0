@@ -39,6 +39,12 @@ import { formatFeeDisplay } from './scheme-detail-view.util';
             <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">Last Date of EOI Submission</td>
             <td class="px-4 py-2.5 font-bold text-red-600">{{ scheme().closingDate }}</td>
           </tr>
+          @if (scheme().eoiDuration) {
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">EOI Duration</td>
+              <td class="px-4 py-2.5 font-semibold text-slate-900">{{ scheme().eoiDuration }}</td>
+            </tr>
+          }
           <tr class="hover:bg-slate-50/50 transition-colors">
             <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">EMD Fee</td>
             <td class="px-4 py-2.5 font-semibold text-slate-900">

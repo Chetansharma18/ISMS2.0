@@ -38,38 +38,35 @@ import {
   template: `
     <!-- Premium Sidebar -->
     <aside
-      class="shrink-0 text-white border-r border-[#4A0626] h-full flex flex-col justify-between select-none overflow-y-auto font-sans w-57 max-w-full"
+      class="relative shrink-0 text-white border-r border-[#4A0626] h-full flex flex-col select-none overflow-hidden font-sans w-57 max-w-full"
       style="background: linear-gradient(180deg, #5E0832 0%, #7C0E44 50%, #4A0626 100%);"
       (click)="onNavClick($event)"
       aria-label="Portal Navigation Sidebar"
     >
-      <!-- Top: Brand + Nav -->
-      <div class="flex flex-col">
-        
-        <!-- Mobile Sidebar Close Header (Visible only < md) -->
-        <div class="md:hidden flex items-center justify-between px-3.5 py-3 border-b border-white/10 bg-black/10">
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-sm text-white">ISMS <span class="text-[#F2DACE]">2.0</span></span>
-            <span class="text-[11px] text-white/70 font-medium">Menu</span>
-          </div>
-          <button
-            appButton
-            variant="ghost"
-            size="sm"
-            iconOnly
-            (click)="closeMobileNav.emit()"
-            aria-label="Close navigation menu"
-            title="Close menu"
-          >
-            <app-icon name="close" />
-          </button>
+      <!-- Mobile Sidebar Close Header (Visible only < md) -->
+      <div class="md:hidden shrink-0 flex items-center justify-between px-3.5 py-3 border-b border-white/10 bg-black/10 z-20">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-sm text-white">ISMS <span class="text-[#F2DACE]">2.0</span></span>
+          <span class="text-[11px] text-white/70 font-medium">Menu</span>
         </div>
+        <button
+          appButton
+          variant="ghost"
+          size="sm"
+          iconOnly
+          (click)="closeMobileNav.emit()"
+          aria-label="Close navigation menu"
+          title="Close menu"
+        >
+          <app-icon name="close" />
+        </button>
+      </div>
 
+      <!-- Scrollable Nav Container: menu scrolls smoothly behind the fixed bottom fort -->
+      <div class="flex-1 min-h-0 overflow-y-auto flex flex-col relative z-0">
         <!-- Navigation Links -->
-        <nav class="flex flex-col gap-1 px-2.5 py-3" aria-label="Main Navigation">
-          @if (activeContextItem(); as contextItem) {
-            <ng-container *ngTemplateOutlet="navLink; context: { $implicit: contextItem }" />
-          } @else if (isAspirant()) {
+        <nav class="flex flex-col gap-1 px-2.5 py-3 pb-32" aria-label="Main Navigation">
+          @if (isAspirant()) {
             @for (item of aspirantNav; track item.key) {
               <ng-container *ngTemplateOutlet="navLink; context: { $implicit: item, pending: item.key === 'profile' && isAspirantProfilePending() }" />
             }
@@ -118,12 +115,15 @@ import {
         </nav>
       </div>
 
-      <!-- Bottom: Rajasthan Fort Heritage Illustration -->
-      <div class="mt-auto shrink-0 w-full px-2 pt-3 pb-1 pointer-events-none opacity-50 flex justify-center items-end overflow-hidden">
+      <!-- Bottom: Fixed Rajasthan Fort Heritage Illustration with Smooth Gradient Mask -->
+      <div
+        class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 w-full flex flex-col justify-end items-center overflow-hidden"
+        style="height: 120px; background: linear-gradient(to top, rgba(74, 6, 38, 1) 0%, rgba(74, 6, 38, 0.96) 40%, rgba(74, 6, 38, 0.7) 70%, rgba(74, 6, 38, 0) 100%);"
+      >
         <img
-          src="/sidebar-fort-transparent.png"
+          src="/sidebar-fort-transparent.png?v=3"
           alt="Rajasthan Heritage"
-          class="w-full object-contain object-bottom max-h-24 select-none"
+          class="w-full h-28 object-bottom select-none opacity-90"
         />
       </div>
 
@@ -349,6 +349,9 @@ export class SidebarComponent {
       url.startsWith('/otr/') ||
       url === '/dashboard'
     ) {
+      if (this.isSuperAdmin() && this.currentUrl().includes('dynamic-form-builder')) {
+        return 'admin-dynamic-form-builder';
+      }
       return 'profile';
     }
 
@@ -360,6 +363,9 @@ export class SidebarComponent {
       url.startsWith('/tenders/') ||
       url.startsWith('/eoi')
     ) {
+      if (this.isSuperAdmin() && this.currentUrl().includes('dynamic-form-builder')) {
+        return 'admin-dynamic-form-builder';
+      }
       return 'active-schemes';
     }
 

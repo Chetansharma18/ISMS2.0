@@ -180,7 +180,6 @@ export interface AcceptedCompanyRow {
               <app-icon name="print-ipa" [stroke]="2" />
               <span>Print IPA Letter</span>
             </button>
-            <button appButton variant="outline" (click)="closeIpaModal()">Close</button>
           </ng-container>
       </app-modal>
     }

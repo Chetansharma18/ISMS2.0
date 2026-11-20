@@ -172,7 +172,7 @@ import { TpUserViewModalComponent } from './tp-user-view-modal.component';
       [closeOnBackdrop]="false"
       maxWidthClass="max-w-lg"
       primaryLabel="Unmap"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       (primaryAction)="confirmUnmap()"
       (secondaryAction)="unmapping.set(null)"
       (close)="unmapping.set(null)"

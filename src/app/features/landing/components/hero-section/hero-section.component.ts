@@ -1,8 +1,23 @@
-import { ChangeDetectionStrategy, Component, inject, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  PLATFORM_ID,
+  signal,
+  ViewChild
+} from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HeroTendersComponent } from '../hero-tenders/hero-tenders.component';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { ButtonComponent, IconComponent } from '../../../../shared';
+
+export interface HeroSlide {
+  image: string;
+  badge: string;
+  title: string;
+  subtitle: string;
+}
 
 @Component({
   selector: 'app-hero-section',
@@ -13,7 +28,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
     class: 'block w-full'
   },
   template: `
-    <section class="relative w-full overflow-hidden bg-[#5E0832] flex items-center min-h-120 sm:min-h-125 lg:min-h-130">
+    <section class="relative w-full overflow-hidden bg-[#5E0832] flex items-center min-h-120 sm:min-h-125 lg:min-h-130 py-8 sm:py-10 lg:py-12">
       
       <!-- Authentic Panoramic Rajasthan Heritage Architecture Background -->
       <div 
@@ -30,62 +45,120 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
       ></div>
 
       <!-- Centered Inner Container (Max-Width ~1440px) -->
-      <div class="max-w-360 mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-14 relative z-10">
-        <div class="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-12 xl:gap-14 w-full">
+      <div class="max-w-360 mx-auto w-full px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-8 xl:gap-10 w-full">
           
-          <!-- LEFT COLUMN (~55% width on desktop) -->
-          <div class="w-full lg:w-[55%] text-left flex flex-col justify-center">
-            
-            <!-- Main Hero Heading -->
-            <h1 class="hero-title font-bold text-white tracking-tight leading-[1.14]">
-              Integrated Scheme Management System
-            </h1>
-
-            <!-- Small Orange Underline -->
-            <div 
-              class="w-10.5 h-[3.5px] bg-[#EA580C] rounded-full my-4" 
-              aria-hidden="true"
-            ></div>
-
-            <!-- Hero Description -->
-            <p class="hero-desc font-normal text-[#FCF8FA] leading-[1.6]">
-              A unified, transparent digital ecosystem empowering skill development schemes, training operations, biometric verification, assessments, certifications, and sustainable placements across Rajasthan.
-            </p>
-
-            <!-- Hero CTA Buttons -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-3.5 mt-6 sm:mt-8">
+          <!-- LEFT COLUMN: Premium Dynamic Auto-Sliding Image Showcase (~54% width) -->
+          <div 
+            class="w-full lg:w-[54%] xl:w-[55%] flex flex-col justify-center"
+            (mouseenter)="pauseAutoplay()"
+            (mouseleave)="resumeAutoplay()"
+            (touchstart)="pauseAutoplay()"
+            (touchend)="resumeAutoplay()"
+          >
+            <div class="hero-slider-card">
               
-              <!-- Primary: Login to Portal -->
+              <!-- SLIDES -->
+              @for (slide of slides; track slide.image; let i = $index) {
+                <div 
+                  class="slide-item"
+                  [class.active]="currentSlideIndex() === i"
+                  [attr.aria-hidden]="currentSlideIndex() !== i"
+                >
+                  <!-- Background Image -->
+                  <img
+                    [src]="slide.image"
+                    [alt]="slide.title"
+                    class="slide-img"
+                    loading="eager"
+                  />
+
+                  <!-- Deep Dual Gradient Overlays (Ensures high contrast & readability) -->
+                  <div class="slide-overlay-top" aria-hidden="true"></div>
+                  <div class="slide-overlay-bottom" aria-hidden="true"></div>
+
+                  <!-- TOP BAR: Badge & Slide Counter -->
+                  <div class="slide-top-bar">
+                    <div class="slide-badge">
+                      <span class="slide-badge-dot"></span>
+                      <span>{{ slide.badge }}</span>
+                    </div>
+
+                    <div class="slide-counter">
+                      <span>0{{ i + 1 }}</span>
+                      <span class="opacity-50">/</span>
+                      <span class="opacity-75">0{{ slides.length }}</span>
+                    </div>
+                  </div>
+
+                  <!-- BOTTOM CONTENT: Title & Subtitle -->
+                  <div class="slide-bottom-content">
+                    <h2 class="slide-title">
+                      {{ slide.title }}
+                    </h2>
+                    <p class="slide-subtitle">
+                      {{ slide.subtitle }}
+                    </p>
+                  </div>
+                </div>
+              }
+
+              <!-- NAVIGATION ARROWS (Prev & Next) -->
+              <!-- ui-guard-allow: hero slider navigation controls -->
               <button
                 appButton
-                size="lg"
+                variant="ghost"
+                size="sm"
+                iconOnly
                 type="button"
-                (click)="onLoginClick()"
-                aria-label="Login to Portal"
+                (click)="prevSlide($event)"
+                class="slider-nav-btn prev"
+                aria-label="Previous slide"
+                title="Previous slide"
               >
-                <span>Login to Portal</span>
-                <app-icon name="forward" />
+                <app-icon name="chevron-left" />
               </button>
 
-              <!-- Secondary: View Tenders -->
+              <!-- ui-guard-allow: hero slider navigation controls -->
               <button
                 appButton
-                variant="outline"
-                size="lg"
+                variant="ghost"
+                size="sm"
+                iconOnly
                 type="button"
-                (click)="onViewTendersClick()"
-                aria-label="View Tenders"
+                (click)="nextSlide($event)"
+                class="slider-nav-btn next"
+                aria-label="Next slide"
+                title="Next slide"
               >
-                <span>View Tenders</span>
-                <app-icon name="forward" />
+                <app-icon name="chevron-right" />
               </button>
+
+              <!-- BOTTOM SLIDE INDICATORS (Expanding Pill Dots) -->
+              <div class="slider-indicators" aria-label="Slide navigation">
+                @for (slide of slides; track slide.image; let i = $index) {
+                  <!-- ui-guard-allow: hero slider dot indicator -->
+                  <button
+                    appButton
+                    variant="ghost"
+                    size="xs"
+                    iconOnly
+                    type="button"
+                    (click)="goToSlide(i, $event)"
+                    class="slider-dot-btn"
+                    [class.active]="currentSlideIndex() === i"
+                    [attr.aria-label]="'Go to slide ' + (i + 1)"
+                    [attr.aria-current]="currentSlideIndex() === i ? 'true' : null"
+                  >
+                  </button>
+                }
+              </div>
 
             </div>
-
           </div>
 
-          <!-- RIGHT COLUMN (~45% width on desktop) -->
-          <div class="w-full lg:w-[45%] flex justify-center lg:justify-end">
+          <!-- RIGHT COLUMN: Official Government Tenders (~46% width) -->
+          <div class="w-full lg:w-[46%] xl:w-[45%] flex justify-center lg:justify-end">
             <app-hero-tenders class="w-full"></app-hero-tenders>
           </div>
 
@@ -95,53 +168,336 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
     </section>
   `,
   styles: [`
-    .hero-title {
-      font-family: var(--font-sans, 'Inter', sans-serif);
-      font-size: 24px;
-      max-width: 650px;
-    }
-    @media (min-width: 480px) {
-      .hero-title {
-        font-size: 30px;
-      }
+    .hero-slider-card {
+      position: relative;
+      width: 100%;
+      height: 410px;
+      border-radius: 14px;
+      overflow: hidden;
+      background-color: #1a0814;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      user-select: none;
     }
     @media (min-width: 640px) {
-      .hero-title {
-        font-size: 38px;
+      .hero-slider-card {
+        height: 425px;
+        border-radius: 16px;
       }
     }
     @media (min-width: 1024px) {
-      .hero-title {
-        font-size: 46px;
-      }
-    }
-    @media (min-width: 1280px) {
-      .hero-title {
-        font-size: 48px;
+      .hero-slider-card {
+        height: 430px;
       }
     }
 
-    .hero-desc {
-      font-family: var(--font-sans, 'Inter', sans-serif);
-      font-size: 15px;
-      max-width: 620px;
+    .slide-item {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(1.04);
+      transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  visibility 0.8s;
+      z-index: 1;
+    }
+    .slide-item.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1);
+      z-index: 2;
+    }
+
+    .slide-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    .slide-overlay-top {
+      position: absolute;
+      inset: 0;
+      bottom: 50%;
+      background: linear-gradient(to bottom, rgba(15, 5, 15, 0.6) 0%, rgba(15, 5, 15, 0.2) 60%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .slide-overlay-bottom {
+      position: absolute;
+      inset: 0;
+      top: 25%;
+      background: linear-gradient(to top, rgba(18, 4, 14, 0.95) 0%, rgba(30, 8, 22, 0.72) 45%, rgba(0, 0, 0, 0.1) 85%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .slide-top-bar {
+      position: absolute;
+      top: 16px;
+      left: 18px;
+      right: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 3;
+    }
+
+    .slide-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #FFFFFF;
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .slide-badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 9999px;
+      background-color: #EA580C;
+      box-shadow: 0 0 8px #EA580C;
+      flex-shrink: 0;
+    }
+
+    .slide-counter {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.05em;
+    }
+
+    .slide-bottom-content {
+      position: absolute;
+      bottom: 22px;
+      left: 20px;
+      right: 20px;
+      z-index: 3;
+      padding-bottom: 20px;
     }
     @media (min-width: 640px) {
-      .hero-desc {
-        font-size: 16px;
+      .slide-bottom-content {
+        left: 26px;
+        right: 26px;
+        bottom: 24px;
+        padding-bottom: 22px;
+      }
+    }
+
+    .slide-title {
+      color: #FFFFFF;
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.015em;
+      margin: 0;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+    @media (min-width: 640px) {
+      .slide-title {
+        font-size: 23px;
       }
     }
     @media (min-width: 1024px) {
-      .hero-desc {
-        font-size: 17px;
+      .slide-title {
+        font-size: 25px;
       }
+    }
+
+    .slide-subtitle {
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.5;
+      margin-top: 6px;
+      margin-bottom: 0;
+      max-width: 540px;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    }
+    @media (min-width: 640px) {
+      .slide-subtitle {
+        font-size: 13.5px;
+        margin-top: 8px;
+      }
+    }
+
+    .slider-nav-btn {
+      position: absolute !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      width: 38px !important;
+      height: 38px !important;
+      border-radius: 9999px !important;
+      background: rgba(0, 0, 0, 0.42) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.28) !important;
+      color: #FFFFFF !important;
+      z-index: 10 !important;
+      cursor: pointer !important;
+      opacity: 0.7;
+      transition: all 0.2s ease !important;
+    }
+    .hero-slider-card:hover .slider-nav-btn {
+      opacity: 1;
+    }
+    .slider-nav-btn:hover {
+      background: rgba(124, 14, 68, 0.85) !important;
+      border-color: rgba(255, 255, 255, 0.5) !important;
+      transform: translateY(-50%) scale(1.08) !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+    }
+    .slider-nav-btn.prev {
+      left: 12px !important;
+    }
+    .slider-nav-btn.next {
+      right: 12px !important;
+    }
+
+    .slider-indicators {
+      position: absolute;
+      bottom: 12px;
+      left: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 10;
+    }
+    @media (min-width: 640px) {
+      .slider-indicators {
+        left: 26px;
+        bottom: 14px;
+        gap: 7px;
+      }
+    }
+
+    .slider-dot-btn {
+      width: 8px !important;
+      height: 6px !important;
+      min-width: 8px !important;
+      padding: 0 !important;
+      border-radius: 4px !important;
+      background: rgba(255, 255, 255, 0.45) !important;
+      border: none !important;
+      cursor: pointer !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .slider-dot-btn.active {
+      width: 26px !important;
+      background: #EA580C !important;
+      box-shadow: 0 0 8px rgba(234, 88, 12, 0.6) !important;
+    }
+    .slider-dot-btn:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.75) !important;
     }
   `]
 })
 export class HeroSectionComponent {
+  private platformId = inject(PLATFORM_ID);
+  private destroyRef = inject(DestroyRef);
   private authService = inject(AuthService);
 
   @ViewChild(HeroTendersComponent) heroTendersComponent?: HeroTendersComponent;
+
+  readonly slides: readonly HeroSlide[] = [
+    {
+      image: '/center-photos/practical-training.jpg',
+      badge: 'Kaushal Vikas Mission',
+      title: 'Industry-Aligned Practical Training',
+      subtitle: 'Hands-on technical workshops and placement-oriented vocational courses across Rajasthan'
+    },
+    {
+      image: '/center-photos/computer-lab.jpg',
+      badge: 'Digital Education',
+      title: 'Modern Hi-Tech Computer Labs',
+      subtitle: 'State-of-the-art computing facilities for advanced digital literacy and software trades'
+    },
+    {
+      image: '/center-photos/center-building.jpg',
+      badge: 'RSLDC Campuses',
+      title: 'World-Class Skill Development Centers',
+      subtitle: 'Certified, standardized skill institutes established across every district of Rajasthan'
+    },
+    {
+      image: '/hero-bg.png',
+      badge: 'Integrated Scheme Management',
+      title: 'Empowering Youth, Building Futures',
+      subtitle: 'Transparent biometric tracking, scheme assessments and sustainable employment opportunities'
+    }
+  ];
+
+  readonly currentSlideIndex = signal(0);
+  private timer: ReturnType<typeof setInterval> | null = null;
+  private readonly autoplayInterval = 3500; // 3.5 seconds
+
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.startAutoplay();
+      this.destroyRef.onDestroy(() => this.stopAutoplay());
+    }
+  }
+
+  nextSlide(event?: Event): void {
+    if (event) event.stopPropagation();
+    this.currentSlideIndex.update(i => (i + 1) % this.slides.length);
+  }
+
+  prevSlide(event?: Event): void {
+    if (event) event.stopPropagation();
+    this.currentSlideIndex.update(i => (i - 1 + this.slides.length) % this.slides.length);
+  }
+
+  goToSlide(index: number, event?: Event): void {
+    if (event) event.stopPropagation();
+    this.currentSlideIndex.set(index);
+  }
+
+  pauseAutoplay(): void {
+    this.stopAutoplay();
+  }
+
+  resumeAutoplay(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.startAutoplay();
+    }
+  }
+
+  private startAutoplay(): void {
+    this.stopAutoplay();
+    this.timer = setInterval(() => {
+      this.nextSlide();
+    }, this.autoplayInterval);
+  }
+
+  private stopAutoplay(): void {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+  }
 
   onLoginClick(): void {
     this.authService.triggerSsoRedirect();

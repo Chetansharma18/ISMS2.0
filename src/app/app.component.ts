@@ -39,13 +39,15 @@ import { ConnectivityService } from './core/services/connectivity.service';
         <app-sso-redirect-modal></app-sso-redirect-modal>
       }
 
-      <!-- Main Portal Header (Always visible across all pages) -->
-      <app-header
-        [isSticky]="false"
-        class="shrink-0 relative z-50"
-        (loginClicked)="onLoginClick()"
-        (toggleMobileMenu)="toggleMobileSidebar()"
-      ></app-header>
+      <!-- Main Portal Header (Always visible across all pages except standalone pages) -->
+      @if (showHeader()) {
+        <app-header
+          [isSticky]="false"
+          class="shrink-0 relative z-50"
+          (loginClicked)="onLoginClick()"
+          (toggleMobileMenu)="toggleMobileSidebar()"
+        ></app-header>
+      }
 
       <!-- Main Content Area: Flex layout with Fixed Sidebar when logged in -->
       @if (showSidebar()) {
@@ -122,22 +124,28 @@ export class AppComponent {
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
-  private getInitialRoute(): { isLanding: boolean; isSso: boolean } {
+  private getInitialRoute(): { isLanding: boolean; isSso: boolean; isHelpSupport: boolean } {
     if (typeof window !== 'undefined' && window.location && window.location.pathname) {
       const cleanPath = window.location.pathname.split('?')[0].split('#')[0];
       const isLanding = cleanPath === '/' || cleanPath === '';
       const isSso = cleanPath.includes('/sso-login');
-      return { isLanding, isSso };
+      const isHelpSupport = cleanPath === '/help-support' || cleanPath.startsWith('/help-support/');
+      return { isLanding, isSso, isHelpSupport };
     }
-    return { isLanding: false, isSso: false };
+    return { isLanding: false, isSso: false, isHelpSupport: false };
   }
 
   isLandingRoute = signal<boolean>(this.getInitialRoute().isLanding);
   isSsoRoute = signal<boolean>(this.getInitialRoute().isSso);
+  isHelpSupportRoute = signal<boolean>(this.getInitialRoute().isHelpSupport);
   isMobileSidebarOpen = signal<boolean>(false);
 
+  readonly showHeader = () => {
+    return !this.isHelpSupportRoute();
+  };
+
   readonly showSidebar = () => {
-    return !!this.authService.currentUser() && !this.isLandingRoute() && !this.isSsoRoute();
+    return !!this.authService.currentUser() && !this.isLandingRoute() && !this.isSsoRoute() && !this.isHelpSupportRoute();
   };
 
   constructor() {
@@ -150,9 +158,11 @@ export class AppComponent {
         const cleanUrl = event.urlAfterRedirects.split('?')[0].split('#')[0];
         const isLanding = cleanUrl === '/' || cleanUrl === '';
         const isSso = cleanUrl.includes('/sso-login');
+        const isHelpSupport = cleanUrl === '/help-support' || cleanUrl.startsWith('/help-support/');
 
         this.isLandingRoute.set(isLanding);
         this.isSsoRoute.set(isSso);
+        this.isHelpSupportRoute.set(isHelpSupport);
         this.isMobileSidebarOpen.set(false);
       });
   }

@@ -11,6 +11,8 @@ export interface NavItem {
   stroke?: number;
   /** Label in medium weight. */
   bold?: boolean;
+  /** Whether this link points to an external URL (opens in a new tab). */
+  external?: boolean;
 }
 
 /** A link inside a collapsible section. */
@@ -98,11 +100,14 @@ export const USER_MANAGEMENT_NAV: NavSubItem[] = [
   { label: 'Permission Management', link: '/admin/master/permission' }
 ];
 
+export const EXTERNAL_LEGAL_URL = 'https://livelihoods.rajasthan.gov.in/rsldc/#/home/dptHome';
+
 export const TERMS_AND_CONDITIONS_NAV: NavItem = {
   key: 'terms-and-conditions',
   label: 'Terms & Conditions',
-  link: '/terms-and-conditions',
-  icon: 'document'
+  link: EXTERNAL_LEGAL_URL,
+  icon: 'document',
+  external: true
 };
 
 export const HELP_SUPPORT_NAV: NavItem = {
@@ -115,8 +120,9 @@ export const HELP_SUPPORT_NAV: NavItem = {
 export const PRIVACY_POLICY_NAV: NavItem = {
   key: 'privacy-policy',
   label: 'Privacy Policy',
-  link: '/privacy-policy',
-  icon: 'shield-check'
+  link: EXTERNAL_LEGAL_URL,
+  icon: 'shield-check',
+  external: true
 };
 
 /** Icons of the two collapsible sections. */

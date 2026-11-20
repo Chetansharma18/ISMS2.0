@@ -15,6 +15,7 @@ import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
 import { UserManualPdfService } from '../../services/user-manual-pdf.service';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
 
 @Component({
   selector: 'app-footer',
@@ -419,9 +420,11 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                     <a
                       appButton
                       variant="inverse"
-                      routerLink="/privacy-policy"
+                      [href]="externalLegalUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       class="footer-link h-auto px-0 text-left"
-                      aria-label="View Privacy Policy">
+                      aria-label="View Privacy Policy (opens in a new tab)">
                       Privacy Policy
                     </a>
                   </li>
@@ -431,9 +434,11 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                     <a
                       appButton
                       variant="inverse"
-                      routerLink="/terms-and-conditions"
+                      [href]="externalLegalUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       class="footer-link h-auto px-0 text-left"
-                      aria-label="View Terms & Conditions">
+                      aria-label="View Terms & Conditions (opens in a new tab)">
                       Terms &amp; Conditions
                     </a>
                   </li>
@@ -603,6 +608,7 @@ export class FooterComponent implements AfterViewInit, OnDestroy {
   private userManualService = inject(UserManualPdfService);
   
   helplineGlobal = HELPLINE_GLOBAL;
+  readonly externalLegalUrl = EXTERNAL_LEGAL_URL;
 
   @ViewChild('footerRef') footerRef?: ElementRef<HTMLElement>;
 

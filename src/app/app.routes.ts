@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { EXTERNAL_LEGAL_URL } from './core/layout/sidebar/sidebar-nav.config';
 
 export const routes: Routes = [
   {
@@ -89,17 +90,27 @@ export const routes: Routes = [
   },
   {
     path: 'privacy-policy',
-    loadComponent: () =>
-      import('./features/legal/privacy-policy.component').then(
-        (m) => m.PrivacyPolicyComponent
-      )
+    canActivate: [
+      () => {
+        if (typeof window !== 'undefined') {
+          window.location.replace(EXTERNAL_LEGAL_URL);
+        }
+        return false;
+      }
+    ],
+    children: []
   },
   {
     path: 'terms-and-conditions',
-    loadComponent: () =>
-      import('./features/legal/terms-and-conditions.component').then(
-        (m) => m.TermsAndConditionsComponent
-      )
+    canActivate: [
+      () => {
+        if (typeof window !== 'undefined') {
+          window.location.replace(EXTERNAL_LEGAL_URL);
+        }
+        return false;
+      }
+    ],
+    children: []
   },
   {
     path: 'help-support',

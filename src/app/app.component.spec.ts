@@ -22,7 +22,8 @@ describe('AppComponent - Global Offline Detection', () => {
         provideRouter([
           { path: '', component: DummyRouteComponent },
           { path: 'profile', component: DummyRouteComponent },
-          { path: 'tenders', component: DummyRouteComponent }
+          { path: 'tenders', component: DummyRouteComponent },
+          { path: 'help-support', component: DummyRouteComponent }
         ])
       ]
     }).compileComponents();
@@ -92,6 +93,18 @@ describe('AppComponent - Global Offline Detection', () => {
       fixture.detectChanges();
 
       expect(component.isLandingRoute()).toBe(true);
+    });
+
+    it('suppresses ISMS header and sidebar on /help-support route', async () => {
+      await router.navigateByUrl('/help-support');
+      fixture.detectChanges();
+
+      expect(component.isHelpSupportRoute()).toBe(true);
+      expect(component.showHeader()).toBe(false);
+      expect(component.showSidebar()).toBe(false);
+
+      const headerEl = fixture.nativeElement.querySelector('app-header');
+      expect(headerEl).toBeNull();
     });
   });
 });

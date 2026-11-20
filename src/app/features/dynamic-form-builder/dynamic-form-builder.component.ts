@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ButtonComponent, IconComponent, InputDirective, PageShellComponent, SwitchComponent } from '../../shared';
@@ -71,127 +72,45 @@ interface FormBuilderFormData {
   template: `
     <app-page-shell>
 
-      <!-- Page Header -->
-      <app-page-header
-        title="Dynamic Form Builder"
-        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Dynamic Form Builder' }]"
-        [searchable]="true"
-        searchPlaceholder="Search by form name, step title, or field label..."
-        [(searchQuery)]="searchQuery"
-      >
-        <!-- "Add new Form" button is hidden for now -->
-      </app-page-header>
+      @if (showBuilderModal()) {
+        <!-- Full-Screen Dynamic Form Builder Screen -->
+        <div class="space-y-5 animate-in fade-in duration-150">
+          <!-- Top Bar: Back Button and Actions -->
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <button
+              appButton
+              variant="outline"
+              size="sm"
+              type="button"
+              (click)="closeBuilderModal()"
+              class="group inline-flex items-center gap-2"
+            >
+              <app-icon name="back" size="sm" />
+              <span>Back</span>
+            </button>
 
-      <!-- Forms Table -->
-      <!-- Forms Table -->
-      <app-table
-        [rowClass]="getRowClass"
-        [columns]="tableColumns"
-        [data]="filteredForms()"
-        [pagination]="true"
-        [pageSize]="10"
-        itemUnit="forms"
-        emptyMessage="No dynamic forms found. Click '+ Add new Form' to create one."
-        [customTemplates]="{
-          formType: formTypeTemplate,
-          actions: actionsTemplate
-        }"
-      >
-      </app-table>
-
-      <!-- Template: Form Type Column (Title + Step Form / Direct Form without background) -->
-      <ng-template #formTypeTemplate let-item>
-        <div class="flex flex-col gap-1 py-1">
-          <span class="font-bold text-slate-800 text-[13.5px]">{{ item.formType }}</span>
-          <div class="flex items-center gap-2">
-            @if (item.isStepForm) {
-              <span class="inline-flex items-center gap-1 text-[11.5px] font-semibold text-indigo-700">
-                <app-icon name="chevron-right" size="sm" [stroke]="2" class="text-indigo-600" />
-                <span>Step Form ({{ item.steps?.length || 0 }} Steps)</span>
-              </span>
-            } @else {
-              <span class="inline-flex items-center text-[11.5px] font-medium text-slate-500">
-                Direct Form (Single Step)
-              </span>
-            }
+            <div class="flex items-center gap-2.5">
+              <button appButton variant="outline" size="sm" type="button" (click)="closeBuilderModal()">
+                Cancel
+              </button>
+              <button appButton variant="primary" size="sm" type="button" (click)="submitForm()">
+                {{ isEditing() ? 'Update Form' : 'Save Form' }}
+              </button>
+            </div>
           </div>
-        </div>
-      </ng-template>
 
-      <!-- Template: Form Actions (View, Edit, Active/Inactive Toggle - matching other masters) -->
-      <ng-template #actionsTemplate let-item>
-        <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
-          <!-- View Button -->
-          <button
-            appButton
-            variant="ghost"
-            size="sm"
-            iconOnly
-            type="button"
-            (click)="$event.stopPropagation(); openPreviewModal(item)"
-            title="View Details"
-            aria-label="View Details"
-          >
-            <app-icon name="eye" size="sm" />
-          </button>
-
-          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
-
-          <!-- Edit Button -->
-          <button
-            appButton
-            variant="ghost"
-            size="sm"
-            iconOnly
-            type="button"
-            (click)="$event.stopPropagation(); openEditModal(item)"
-            title="Edit"
-            aria-label="Edit"
-          >
-            <app-icon name="edit" size="sm" />
-          </button>
-
-          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
-
-          <!-- Active / Inactive Toggle -->
-          <div
-            class="inline-flex items-center"
-            [title]="item.status === 'Inactive' ? 'Status: Inactive (Click to activate)' : 'Status: Active (Click to deactivate)'"
-            (click)="$event.stopPropagation()"
-          >
-            <app-switch
-              [checked]="item.status !== 'Inactive'"
-              [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
-              (toggled)="toggleStatus(item)"
-            />
-          </div>
-        </div>
-      </ng-template>
-
-      <!-- Modal: Add / Edit Dynamic Form Builder -->
-      <app-action-modal
-        [isOpen]="showBuilderModal()"
-        [showCloseButton]="true"
-        [closeOnBackdrop]="false"
-        [reverseButtons]="true"
-        [showAccentBar]="false"
-        [primaryLabel]="isEditing() ? 'Update Form' : 'Save Form'"
-        secondaryLabel="Cancel"
-        maxWidthClass="max-w-[860px] min-h-[85vh] max-h-[92vh] flex flex-col"
-        (primaryAction)="submitForm()"
-        (secondaryAction)="closeBuilderModal()"
-        (close)="closeBuilderModal()"
-      >
-        <div class="flex flex-col h-full min-h-0 font-sans text-[13px]">
-          <!-- FROZEN TOP SECTION: Title, Description, Form Name, Step Toggle, Steps Tabs, Step/Field Headers & Add Buttons -->
-          <div class="shrink-0 space-y-3 pb-3 border-b border-slate-100">
-            <h2 class="m-0 text-navy" style="font-size: 19px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
-              {{ isEditing() ? 'Edit Dynamic Form' : 'Add new Form' }}
-            </h2>
-            <p class="m-0 text-xs text-slate-500">
+          <!-- Page Title & Subtitle Matching Government Theme -->
+          <div>
+            <h1 class="text-2xl sm:text-[28px] font-bold text-[#7C0E44] tracking-tight m-0">
+              {{ isEditing() ? 'Edit Dynamic Form' : 'Create Dynamic Form' }}
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-600 mt-1 m-0">
               Configure form name, choose whether it's a step-form wizard, and design fields. Drag fields to reorder.
             </p>
+          </div>
 
+          <!-- Main White Card Container -->
+          <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-7 space-y-6 font-sans text-[13px]">
             <!-- 1. Form Name -->
             <div>
               <label class="block text-slate-700 font-semibold mb-1">
@@ -211,7 +130,7 @@ interface FormBuilderFormData {
             </div>
 
             <!-- 2. Step Form (Yes / No) Tick Box & Toggle -->
-            <div class="p-3.5 rounded-lg border border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="p-4 rounded-lg border border-slate-200 bg-[#FCF8FA] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span class="block text-xs font-bold text-slate-800">
                   Step Form (Yes / No)?
@@ -231,7 +150,7 @@ interface FormBuilderFormData {
                 <span
                   (click)="toggleStepFormMode()"
                   class="text-xs font-bold cursor-pointer select-none transition-colors"
-                  [ngClass]="formData.isStepForm ? 'text-[#0e2138]' : 'text-slate-600 hover:text-slate-800'"
+                  [ngClass]="formData.isStepForm ? 'text-[#7C0E44]' : 'text-slate-600 hover:text-slate-800'"
                 >
                   {{ formData.isStepForm ? 'Yes (Step Form)' : 'No (Direct Form)' }}
                 </span>
@@ -240,12 +159,12 @@ interface FormBuilderFormData {
 
             <!-- STEP FORM: Steps bar + tabs + step title + step fields header -->
             @if (formData.isStepForm) {
-              <div class="space-y-2.5 pt-1">
+              <div class="space-y-4 pt-1">
                 <!-- Steps Bar Header -->
-                <div class="flex items-center justify-between pb-1 border-b border-slate-200">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200">
                   <div class="flex items-center gap-2">
                     <h3 class="font-bold text-slate-800 text-sm m-0">Form Steps</h3>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-[#F8EDF1] text-[#7C0E44]">
                       {{ formData.steps.length }} {{ formData.steps.length === 1 ? 'step' : 'steps' }}
                     </span>
                   </div>
@@ -258,17 +177,17 @@ interface FormBuilderFormData {
                 </div>
 
                 <!-- Steps Tabs Navigation -->
-                <div #stepTabsContainer class="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-100">
+                <div #stepTabsContainer class="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-100 no-scrollbar">
                   @for (step of formData.steps; track step.id; let sIdx = $index) {
                     <div
                       (click)="selectStep(sIdx)"
-                      class="group inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all shrink-0 select-none"
+                      class="group inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border text-xs font-semibold cursor-pointer transition-all shrink-0 select-none"
                       [ngClass]="activeStepIndex() === sIdx
-                        ? 'bg-primary text-white border-primary shadow-xs'
-                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900'"
+                        ? 'bg-[#7C0E44] text-white border-[#7C0E44] shadow-xs'
+                        : 'bg-white text-slate-600 border-slate-200 hover:bg-[#FCF0F2] hover:text-[#7C0E44] hover:border-[#EADCE2]'"
                     >
                       <span>Step {{ sIdx + 1 }}: {{ step.title || 'Untitled Step' }}</span>
-                      <span class="text-[10.5px] opacity-80">({{ step.fields.length }} fields)</span>
+                      <span class="text-[10.5px]" [ngClass]="activeStepIndex() === sIdx ? 'text-white/80' : 'text-slate-400'">({{ step.fields.length }} fields)</span>
 
                       <!-- Delete Step Button (if > 1 step) -->
                       @if (formData.steps.length > 1) {
@@ -281,6 +200,8 @@ interface FormBuilderFormData {
                           (click)="deleteStep(sIdx, $event)"
                           title="Delete this step"
                           aria-label="Delete this step"
+                          [class.text-white]="activeStepIndex() === sIdx"
+                          [class.hover:bg-white/20]="activeStepIndex() === sIdx"
                         >
                           <app-icon name="close" size="xs" />
                         </button>
@@ -310,7 +231,7 @@ interface FormBuilderFormData {
                   </div>
 
                   <!-- Step Fields Header -->
-                  <div class="flex items-center justify-between pb-1 border-b border-slate-200">
+                  <div class="flex items-center justify-between pb-2 border-b border-slate-200">
                     <span class="text-xs font-bold text-slate-800">
                       Fields for Step {{ activeStepIndex() + 1 }} ({{ activeStep.fields.length }})
                     </span>
@@ -326,10 +247,10 @@ interface FormBuilderFormData {
 
             <!-- DIRECT FORM: Form Fields Header + Add Field button -->
             @if (!formData.isStepForm) {
-              <div class="flex items-center justify-between pb-1 border-b border-slate-200 pt-1">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-200 pt-1">
                 <div class="flex items-center gap-2">
                   <h3 class="font-bold text-slate-800 text-sm m-0">Form Fields</h3>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-light text-brand">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-[#F8EDF1] text-[#7C0E44]">
                     {{ formData.fields.length }} {{ formData.fields.length === 1 ? 'field' : 'fields' }}
                   </span>
                 </div>
@@ -340,21 +261,20 @@ interface FormBuilderFormData {
                 </button>
               </div>
             }
-          </div>
 
-          <!-- SCROLLABLE FIELDS LIST -->
-          <div #fieldsScrollContainer class="flex-1 min-h-0 overflow-y-auto pr-1 pt-3 pb-2 space-y-3">
-            @if (formData.isStepForm) {
-              @if (getActiveStep(); as activeStep) {
-                <!-- Fields List for Active Step -->
-                @if (activeStep.fields.length === 0) {
-                  <div class="p-6 border-2 border-dashed border-slate-200 rounded-lg text-center bg-white space-y-1">
-                    <div class="text-xs font-semibold text-slate-600">No fields in this step yet</div>
-                    <div class="text-[11px] text-slate-400">Click "+ Add Field to this Step" above to add fields.</div>
-                  </div>
-                } @else {
-                  <div class="space-y-3">
-                    @for (field of activeStep.fields; track field.id; let fIdx = $index) {
+            <!-- FIELDS LIST -->
+            <div #fieldsScrollContainer class="space-y-3">
+              @if (formData.isStepForm) {
+                @if (getActiveStep(); as activeStep) {
+                  <!-- Fields List for Active Step -->
+                  @if (activeStep.fields.length === 0) {
+                    <div class="p-8 border-2 border-dashed border-slate-200 rounded-lg text-center bg-white space-y-1">
+                      <div class="text-xs font-semibold text-slate-600">No fields in this step yet</div>
+                      <div class="text-[11px] text-slate-400">Click "+ Add Field to this Step" above to add fields.</div>
+                    </div>
+                  } @else {
+                    <div class="space-y-3">
+                      @for (field of activeStep.fields; track field.id; let fIdx = $index) {
                         <!-- Field Card Component (Reusable Markup) -->
                         <div
                           draggable="true"
@@ -363,12 +283,12 @@ interface FormBuilderFormData {
                           (dragleave)="onStepDragLeave(fIdx, $event)"
                           (drop)="onStepDrop(fIdx, $event)"
                           (dragend)="onStepDragEnd()"
-                          class="p-3.5 rounded-lg border transition-all duration-150 relative bg-white"
+                          class="p-4 rounded-lg border transition-all duration-150 relative bg-white"
                           [ngClass]="{
-                            'border-primary bg-primary-light/30 shadow-md ring-2 ring-primary/20': dragOverIndex === fIdx,
+                            'border-[#7C0E44] bg-[#FCF8FA] shadow-md ring-2 ring-[#7C0E44]/20': dragOverIndex === fIdx,
                             'border-slate-200 shadow-2xs': dragOverIndex !== fIdx && recentlyAddedFieldId !== field.id,
                             'opacity-50 border-dashed': draggedIndex === fIdx,
-                            'border-primary ring-2 ring-primary/30 shadow-md': recentlyAddedFieldId === field.id
+                            'border-[#7C0E44] ring-2 ring-[#7C0E44]/30 shadow-md': recentlyAddedFieldId === field.id
                           }"
                         >
                           <!-- Field Card Top Bar -->
@@ -470,7 +390,7 @@ interface FormBuilderFormData {
                                 <input
                                   type="checkbox"
                                   [(ngModel)]="field.mandatory"
-                                  class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
+                                  class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-[#7C0E44] cursor-pointer"
                                 />
                                 <span>Mandatory</span>
                               </label>
@@ -516,193 +436,309 @@ interface FormBuilderFormData {
                         </div>
                       }
                     </div>
+                  }
+                }
+              } @else {
+                <!-- Empty state for direct fields -->
+                @if (formData.fields.length === 0) {
+                  <div class="p-8 border-2 border-dashed border-slate-200 rounded-lg text-center bg-white space-y-2">
+                    <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                      <app-icon name="plus-small" size="lg" [stroke]="2" />
+                    </div>
+                    <div class="text-sm font-semibold text-slate-700">No fields added yet</div>
+                    <div class="text-xs text-slate-500 max-w-sm mx-auto">
+                      Click the "+ Add Field" button above to add text, number, date picker, dropdown list, or photo upload fields.
+                    </div>
+                  </div>
+                } @else {
+                  <div class="space-y-3">
+                    @for (field of formData.fields; track field.id; let idx = $index) {
+                      <div
+                        draggable="true"
+                        (dragstart)="onDragStart(idx, $event)"
+                        (dragover)="onDragOver(idx, $event)"
+                        (dragleave)="onDragLeave(idx, $event)"
+                        (drop)="onDrop(idx, $event)"
+                        (dragend)="onDragEnd()"
+                        class="p-4 rounded-lg border transition-all duration-150 relative bg-white"
+                        [ngClass]="{
+                          'border-[#7C0E44] bg-[#FCF8FA] shadow-md ring-2 ring-[#7C0E44]/20': dragOverIndex === idx,
+                          'border-slate-200 shadow-2xs': dragOverIndex !== idx && recentlyAddedFieldId !== field.id,
+                          'opacity-50 border-dashed': draggedIndex === idx,
+                          'border-[#7C0E44] ring-2 ring-[#7C0E44]/30 shadow-md': recentlyAddedFieldId === field.id
+                        }"
+                      >
+                        <!-- Field Top Bar -->
+                        <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-slate-200/80">
+                          <div class="flex items-center gap-2">
+                            <div
+                              class="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/60 text-slate-400 hover:text-slate-700 transition-colors"
+                              title="Drag to reorder field"
+                            >
+                              <app-icon name="grip-dots" solid />
+                            </div>
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-200/80 text-[11px] font-bold text-slate-700">
+                              #{{ idx + 1 }}
+                            </span>
+                            <span class="text-xs font-semibold text-slate-600">
+                              {{ field.label ? field.label : 'Untitled Field' }}
+                            </span>
+                          </div>
+
+                          <div class="flex items-center gap-1.5">
+                            <button
+                              appButton
+                              variant="ghost"
+                              size="sm"
+                              iconOnly
+                              type="button"
+                              (click)="moveFieldUp(idx)"
+                              [disabled]="idx === 0"
+                              title="Move field up"
+                              aria-label="Move field up"
+                            >
+                              <app-icon name="chevron-up" size="sm" [stroke]="2.5" />
+                            </button>
+                            <button
+                              appButton
+                              variant="ghost"
+                              size="sm"
+                              iconOnly
+                              type="button"
+                              (click)="moveFieldDown(idx)"
+                              [disabled]="idx === formData.fields.length - 1"
+                              title="Move field down"
+                              aria-label="Move field down"
+                            >
+                              <app-icon name="chevron-down" size="xs" />
+                            </button>
+                            <div class="h-4 w-px bg-slate-200 mx-0.5"></div>
+                            <button
+                              appButton
+                              variant="danger"
+                              size="sm"
+                              iconOnly
+                              type="button"
+                              (click)="deleteField(idx)"
+                              title="Delete this field"
+                              aria-label="Delete this field"
+                            >
+                              <app-icon name="trash" size="xs" />
+                            </button>
+                          </div>
+                        </div>
+
+                        <!-- Field Inputs Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-start">
+                          <div class="sm:col-span-6">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Label Name*</label>
+                            <input
+                              appInput
+                              size="sm"
+                              type="text"
+                              [(ngModel)]="field.label"
+                              placeholder="e.g. Candidate Name, Center Photo"
+                              class="w-full"
+                              [invalid]="submitted() && !field.label.trim()"
+                            />
+                          </div>
+
+                          <div class="sm:col-span-4">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Field Type*</label>
+                            <select
+                              appInput
+                              size="sm"
+                              [(ngModel)]="field.type"
+                              (ngModelChange)="onFieldTypeChange(field)"
+                              class="w-full"
+                            >
+                              <option value="text">Text</option>
+                              <option value="number">Number</option>
+                              <option value="datepicker">Date Picker</option>
+                              <option value="dropdown">Dropdown List</option>
+                              <option value="photo">Photo Upload</option>
+                            </select>
+                          </div>
+
+                          <div class="sm:col-span-2 sm:pt-6">
+                            <label class="inline-flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-700">
+                              <input
+                                type="checkbox"
+                                [(ngModel)]="field.mandatory"
+                                class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary cursor-pointer accent-[#7C0E44]"
+                              />
+                              <span>Mandatory</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <!-- Conditional: Dropdown -->
+                        @if (field.type === 'dropdown') {
+                          <div class="mt-3 p-2.5 rounded-md bg-white border border-slate-200 space-y-1.5">
+                            <label class="block text-xs font-semibold text-slate-700">Dropdown Options (comma-separated)*</label>
+                            <input
+                              appInput
+                              size="sm"
+                              type="text"
+                              [(ngModel)]="field.optionsText"
+                              (blur)="updateFieldOptions(field)"
+                              placeholder="e.g. Option 1, Option 2, Option 3"
+                              class="w-full"
+                            />
+                          </div>
+                        }
+
+                        <!-- Conditional: Photo -->
+                        @if (field.type === 'photo') {
+                          <div class="mt-3 p-3 rounded-md bg-[#F8EDF1] border border-[#EADCE2] space-y-2">
+                            <div class="text-xs font-semibold text-[#7C0E44]">Photo Upload Constraints</div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                              <div>
+                                <label class="block text-[11px] font-semibold text-slate-700 mb-1">Min Photos*</label>
+                                <input appInput size="sm" type="number" min="1" [(ngModel)]="field.minPhotos" class="w-full" />
+                              </div>
+                              <div>
+                                <label class="block text-[11px] font-semibold text-slate-700 mb-1">Max Photos*</label>
+                                <input appInput size="sm" type="number" min="1" [(ngModel)]="field.maxPhotos" class="w-full" />
+                              </div>
+                              <div>
+                                <label class="block text-[11px] font-semibold text-slate-700 mb-1">Max Size (MB)*</label>
+                                <input appInput size="sm" type="number" min="1" [(ngModel)]="field.maxSizeMb" class="w-full" />
+                              </div>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
                 }
               }
-            } @else {
-              <!-- Empty state for direct fields -->
-              @if (formData.fields.length === 0) {
-                <div class="p-8 border-2 border-dashed border-slate-200 rounded-lg text-center bg-white space-y-2">
-                  <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
-                    <app-icon name="plus-small" size="lg" [stroke]="2" />
-                  </div>
-                  <div class="text-sm font-semibold text-slate-700">No fields added yet</div>
-                  <div class="text-xs text-slate-500 max-w-sm mx-auto">
-                    Click the "+ Add Field" button above to add text, number, date picker, dropdown list, or photo upload fields.
-                  </div>
-                </div>
-              } @else {
-                <div class="space-y-3">
-                  @for (field of formData.fields; track field.id; let idx = $index) {
-                    <div
-                      draggable="true"
-                      (dragstart)="onDragStart(idx, $event)"
-                      (dragover)="onDragOver(idx, $event)"
-                      (dragleave)="onDragLeave(idx, $event)"
-                      (drop)="onDrop(idx, $event)"
-                      (dragend)="onDragEnd()"
-                      class="p-3.5 rounded-lg border transition-all duration-150 relative bg-white"
-                      [ngClass]="{
-                        'border-primary bg-primary-light/30 shadow-md ring-2 ring-primary/20': dragOverIndex === idx,
-                        'border-slate-200 shadow-2xs': dragOverIndex !== idx && recentlyAddedFieldId !== field.id,
-                        'opacity-50 border-dashed': draggedIndex === idx,
-                        'border-primary ring-2 ring-primary/30 shadow-md': recentlyAddedFieldId === field.id
-                      }"
-                    >
-                      <!-- Field Top Bar -->
-                      <div class="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-slate-200/80">
-                        <div class="flex items-center gap-2">
-                          <div
-                            class="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-slate-200/60 text-slate-400 hover:text-slate-700 transition-colors"
-                            title="Drag to reorder field"
-                          >
-                            <app-icon name="grip-dots" solid />
-                          </div>
-                          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-200/80 text-[11px] font-bold text-slate-700">
-                            #{{ idx + 1 }}
-                          </span>
-                          <span class="text-xs font-semibold text-slate-600">
-                            {{ field.label ? field.label : 'Untitled Field' }}
-                          </span>
-                        </div>
-
-                        <div class="flex items-center gap-1.5">
-                          <button
-                            appButton
-                            variant="ghost"
-                            size="sm"
-                            iconOnly
-                            type="button"
-                            (click)="moveFieldUp(idx)"
-                            [disabled]="idx === 0"
-                            title="Move field up"
-                            aria-label="Move field up"
-                          >
-                            <app-icon name="chevron-up" size="sm" [stroke]="2.5" />
-                          </button>
-                          <button
-                            appButton
-                            variant="ghost"
-                            size="sm"
-                            iconOnly
-                            type="button"
-                            (click)="moveFieldDown(idx)"
-                            [disabled]="idx === formData.fields.length - 1"
-                            title="Move field down"
-                            aria-label="Move field down"
-                          >
-                            <app-icon name="chevron-down" size="xs" />
-                          </button>
-                          <div class="h-4 w-px bg-slate-200 mx-0.5"></div>
-                          <button
-                            appButton
-                            variant="danger"
-                            size="sm"
-                            iconOnly
-                            type="button"
-                            (click)="deleteField(idx)"
-                            title="Delete this field"
-                            aria-label="Delete this field"
-                          >
-                            <app-icon name="trash" size="xs" />
-                          </button>
-                        </div>
-                      </div>
-
-                      <!-- Field Inputs Grid -->
-                      <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-start">
-                        <div class="sm:col-span-6">
-                          <label class="block text-xs font-semibold text-slate-700 mb-1">Label Name*</label>
-                          <input
-                            appInput
-                            size="sm"
-                            type="text"
-                            [(ngModel)]="field.label"
-                            placeholder="e.g. Candidate Name, Center Photo"
-                            class="w-full"
-                            [invalid]="submitted() && !field.label.trim()"
-                          />
-                        </div>
-
-                        <div class="sm:col-span-4">
-                          <label class="block text-xs font-semibold text-slate-700 mb-1">Field Type*</label>
-                          <select
-                            appInput
-                            size="sm"
-                            [(ngModel)]="field.type"
-                            (ngModelChange)="onFieldTypeChange(field)"
-                            class="w-full"
-                          >
-                            <option value="text">Text</option>
-                            <option value="number">Number</option>
-                            <option value="datepicker">Date Picker</option>
-                            <option value="dropdown">Dropdown List</option>
-                            <option value="photo">Photo Upload</option>
-                          </select>
-                        </div>
-
-                        <div class="sm:col-span-2 sm:pt-6">
-                          <label class="inline-flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-700">
-                            <input
-                              type="checkbox"
-                              [(ngModel)]="field.mandatory"
-                              class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary cursor-pointer accent-primary"
-                            />
-                            <span>Mandatory</span>
-                          </label>
-                        </div>
-                      </div>
-
-                      <!-- Conditional: Dropdown -->
-                      @if (field.type === 'dropdown') {
-                        <div class="mt-3 p-2.5 rounded-md bg-white border border-slate-200 space-y-1.5">
-                          <label class="block text-xs font-semibold text-slate-700">Dropdown Options (comma-separated)*</label>
-                          <input
-                            appInput
-                            size="sm"
-                            type="text"
-                            [(ngModel)]="field.optionsText"
-                            (blur)="updateFieldOptions(field)"
-                            placeholder="e.g. Option 1, Option 2, Option 3"
-                            class="w-full"
-                          />
-                        </div>
-                      }
-
-                      <!-- Conditional: Photo -->
-                      @if (field.type === 'photo') {
-                        <div class="mt-3 p-3 rounded-md bg-[#F8EDF1] border border-[#EADCE2] space-y-2">
-                          <div class="text-xs font-semibold text-[#7C0E44]">Photo Upload Constraints</div>
-                          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                              <label class="block text-[11px] font-semibold text-slate-700 mb-1">Min Photos*</label>
-                              <input appInput size="sm" type="number" min="1" [(ngModel)]="field.minPhotos" class="w-full" />
-                            </div>
-                            <div>
-                              <label class="block text-[11px] font-semibold text-slate-700 mb-1">Max Photos*</label>
-                              <input appInput size="sm" type="number" min="1" [(ngModel)]="field.maxPhotos" class="w-full" />
-                            </div>
-                            <div>
-                              <label class="block text-[11px] font-semibold text-slate-700 mb-1">Max Size (MB)*</label>
-                              <input appInput size="sm" type="number" min="1" [(ngModel)]="field.maxSizeMb" class="w-full" />
-                            </div>
-                          </div>
-                        </div>
-                      }
-                    </div>
-                  }
-                </div>
-              }
-            }
-          </div>
-
-          <!-- Form Global Warnings -->
-          @if (submitted() && !hasAtLeastOneField()) {
-            <div class="shrink-0 mt-2 p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-600 font-medium">
-              Please add at least one form field before saving.
             </div>
-          }
+
+            <!-- Form Global Warnings -->
+            @if (submitted() && !hasAtLeastOneField()) {
+              <div class="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-600 font-medium">
+                Please add at least one form field before saving.
+              </div>
+            }
+
+            <!-- Bottom Action Buttons inside the card -->
+            <div class="flex items-center justify-end gap-3 pt-5 border-t border-slate-200">
+              <button appButton variant="outline" size="md" type="button" (click)="closeBuilderModal()">
+                Cancel
+              </button>
+              <button appButton variant="primary" size="md" type="button" (click)="submitForm()">
+                {{ isEditing() ? 'Update Form' : 'Save Form' }}
+              </button>
+            </div>
+          </div>
         </div>
-      </app-action-modal>
+      } @else {
+        <!-- Dynamic Form Builder Table List View -->
+        <app-page-header
+          title="Dynamic Form Builder"
+          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Dynamic Form Builder' }]"
+          [searchable]="true"
+          searchPlaceholder="Search by form name, step title, or field label..."
+          [(searchQuery)]="searchQuery"
+        >
+          <button
+            appButton
+            size="sm"
+            type="button"
+            (click)="openAddModal()"
+            class="shrink-0"
+          >
+            <app-icon name="plus" size="sm" />
+            <span>Add new Form</span>
+          </button>
+        </app-page-header>
+
+        <!-- Template: Form Type Column (Title + Step Form / Direct Form without background) -->
+        <ng-template #formTypeTemplate let-item>
+          <div class="flex flex-col gap-1 py-1">
+            <span class="font-bold text-slate-800 text-[13.5px]">{{ item.formType }}</span>
+            <div class="flex items-center gap-2">
+              @if (item.isStepForm) {
+                <span class="inline-flex items-center gap-1 text-[11.5px] font-semibold text-indigo-700">
+                  <app-icon name="chevron-right" size="sm" [stroke]="2" class="text-indigo-600" />
+                  <span>Step Form ({{ item.steps?.length || 0 }} Steps)</span>
+                </span>
+              } @else {
+                <span class="inline-flex items-center text-[11.5px] font-medium text-slate-500">
+                  Direct Form (Single Step)
+                </span>
+              }
+            </div>
+          </div>
+        </ng-template>
+
+        <!-- Template: Form Actions (View, Edit, Active/Inactive Toggle - matching other masters) -->
+        <ng-template #actionsTemplate let-item>
+          <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
+            <!-- View Button -->
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              (click)="$event.stopPropagation(); openPreviewModal(item)"
+              title="View Details"
+              aria-label="View Details"
+            >
+              <app-icon name="eye" size="sm" />
+            </button>
+
+            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+
+            <!-- Edit Button -->
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              (click)="$event.stopPropagation(); openEditModal(item)"
+              title="Edit"
+              aria-label="Edit"
+            >
+              <app-icon name="edit" size="sm" />
+            </button>
+
+            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+
+            <!-- Active / Inactive Toggle -->
+            <div
+              class="inline-flex items-center"
+              [title]="item.status === 'Inactive' ? 'Status: Inactive (Click to activate)' : 'Status: Active (Click to deactivate)'"
+              (click)="$event.stopPropagation()"
+            >
+              <app-switch
+                [checked]="item.status !== 'Inactive'"
+                [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
+                (toggled)="toggleStatus(item)"
+              />
+            </div>
+          </div>
+        </ng-template>
+
+        <!-- Forms Table -->
+        <app-table
+          [rowClass]="getRowClass"
+          [columns]="tableColumns"
+          [data]="filteredForms()"
+          [pagination]="true"
+          [pageSize]="10"
+          itemUnit="forms"
+          emptyMessage="No dynamic forms found. Click '+ Add new Form' to create one."
+          [customTemplates]="{
+            formType: formTypeTemplate,
+            actions: actionsTemplate
+          }"
+        >
+        </app-table>
+      }
 
       <!-- Modal: Interactive Form Preview (matching Company Registration Form & Dynamic Forms) -->
       <app-action-modal
@@ -2275,7 +2311,7 @@ interface FormBuilderFormData {
         [reverseButtons]="true"
         [showAccentBar]="false"
         primaryLabel="Delete Form"
-        secondaryLabel="Cancel"
+        secondaryLabel=""
         primaryVariantClass="bg-rose-600 hover:bg-rose-700 shadow-sm"
         maxWidthClass="max-w-[440px]"
         (primaryAction)="confirmDeleteForm()"
@@ -2305,6 +2341,7 @@ export class DynamicFormBuilderComponent {
   private dataEngine = inject(DataEngineService);
   private destroyRef = inject(DestroyRef);
   private notification = inject(NotificationService);
+  private router = inject(Router, { optional: true });
   private formRepo = this.dataEngine.for<DynamicFormBuilderItem>('DYNAMIC_FORM_BUILDER');
 
   @ViewChild('fieldsScrollContainer') fieldsScrollContainer?: ElementRef<HTMLDivElement>;
@@ -2875,6 +2912,9 @@ export class DynamicFormBuilderComponent {
       ]
     };
     this.showBuilderModal.set(true);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     setTimeout(() => {
       try {
         if (this.fieldsScrollContainer?.nativeElement) {
@@ -2922,6 +2962,9 @@ export class DynamicFormBuilderComponent {
     };
 
     this.showBuilderModal.set(true);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     setTimeout(() => {
       try {
         if (this.fieldsScrollContainer?.nativeElement) {
@@ -2934,6 +2977,9 @@ export class DynamicFormBuilderComponent {
   closeBuilderModal(): void {
     this.showBuilderModal.set(false);
     this.submitted.set(false);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   submitForm(): void {
@@ -3041,7 +3087,43 @@ export class DynamicFormBuilderComponent {
 
   // --- Preview Modal ---
 
+  isOrgRegForm(form: DynamicFormBuilderItem): boolean {
+    const name = (form.formType || '').toLowerCase();
+    const id = (form.id || '').toLowerCase();
+    return id === 'form-company-reg' ||
+      name.includes('organisation registration') ||
+      name.includes('organization registration') ||
+      name.includes('company registration');
+  }
+
   openPreviewModal(item: DynamicFormBuilderItem): void {
+    if (this.router && this.isOrgRegForm(item)) {
+      void this.router.navigate(['/registration'], {
+        queryParams: { returnUrl: '/admin/dynamic-form-builder' }
+      });
+      return;
+    }
+
+    if (this.router && this.isApplyEoiForm(item)) {
+      void this.router.navigate(['/scheme-form'], {
+        queryParams: {
+          refNo: 'RSLDC/EOI/VYUPY/2026-27/01',
+          title: 'Vishwakarma Yuva Udyami Protsahan Yojana',
+          schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana',
+          category: 'Rajvik',
+          schemeCategory: 'Rajvik',
+          eoiCategory: 'General',
+          datePublished: '15/09/2026',
+          closingDate: '30/11/2026',
+          emdFee: '₹50,000',
+          processFee: '₹10,000',
+          eoiDescription: 'Expression of Interest for submission of proposal to undertake Skill Training under Vishwakarma Yuva Udyami Protsahan Yojana',
+          returnUrl: '/admin/dynamic-form-builder'
+        }
+      });
+      return;
+    }
+
     this.selectedPreviewForm.set(item);
     this.previewStepIndex.set(0);
     this.isOfficeSameAsRegistered = false;

@@ -314,6 +314,9 @@ export class SidebarComponent {
       url.startsWith('/otr/') ||
       url === '/dashboard'
     ) {
+      if (this.isSuperAdmin() && this.currentUrl().includes('dynamic-form-builder')) {
+        return 'admin-dynamic-form-builder';
+      }
       return 'profile';
     }
 
@@ -325,6 +328,9 @@ export class SidebarComponent {
       url.startsWith('/tenders/') ||
       url.startsWith('/eoi')
     ) {
+      if (this.isSuperAdmin() && this.currentUrl().includes('dynamic-form-builder')) {
+        return 'admin-dynamic-form-builder';
+      }
       return 'active-schemes';
     }
 

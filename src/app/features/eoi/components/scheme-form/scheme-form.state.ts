@@ -661,7 +661,12 @@ export class SchemeFormState {
 
   goToTenderStatus(): void {
     this.showEmdSuccessModal.set(false);
-    this.router.navigate(['/tender-status']);
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (returnUrl) {
+      void this.router.navigateByUrl(returnUrl);
+    } else {
+      this.router.navigate(['/tender-status']);
+    }
   }
 
   printReceipt(): void {

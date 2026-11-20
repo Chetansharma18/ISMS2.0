@@ -97,8 +97,11 @@ import { IconComponent } from '../icon/icon.component';
                       type="button"
                       (click)="onPrimaryAction()"
                       [disabled]="disablePrimary"
-                      class="w-full sm:flex-1 py-2.5 px-4 rounded-lg text-white! text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+                      class="w-full py-2.5 px-5 rounded-lg text-white! text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
                       [ngClass]="primaryVariantClass"
+                      [class.sm:flex-1]="secondaryLabel"
+                      [class.sm:w-auto]="!secondaryLabel"
+                      [class.sm:min-w-[130px]]="!secondaryLabel"
                     >
                       {{ primaryLabel }}
                     </button>

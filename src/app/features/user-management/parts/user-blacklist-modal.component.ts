@@ -25,7 +25,7 @@ export interface BlacklistConfigSubmission {
       title="Blacklist Training Partner"
       description="Configure the scheme and duration for blacklisting this Training Partner before final confirmation."
       primaryLabel="Next"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       maxWidthClass="max-w-[480px]"
       (primaryAction)="onProceed()"
       (secondaryAction)="cancelled.emit()"

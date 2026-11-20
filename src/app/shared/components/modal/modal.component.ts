@@ -40,12 +40,12 @@ let nextId = 0;
   },
   template: `
     <div
-      class="fixed inset-0 z-50 flex justify-center p-3 sm:p-4 md:p-6 overflow-y-auto font-sans print:static print:p-0 print:block print:bg-white"
-      style="background: rgba(10, 20, 40, 0.5); backdrop-filter: blur(4px);"
+      class="fixed inset-0 z-[100] flex justify-center p-3 sm:p-5 md:p-8 overflow-y-auto font-sans print:static print:p-0 print:block print:bg-white"
+      style="background: rgba(10, 20, 40, 0.65); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);"
       (click)="onBackdrop($event)"
     >
       <div
-        class="w-full bg-white rounded-xl border border-[#EADCE2] shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col"
+        class="w-full bg-white rounded-xl sm:rounded-2xl border border-[#EADCE2] shadow-2xl overflow-hidden my-auto max-h-[85vh] sm:max-h-[86vh] flex flex-col"
         [class]="widthClass()"
         role="dialog"
         aria-modal="true"
@@ -65,8 +65,17 @@ let nextId = 0;
               }
             </div>
             @if (showClose()) {
-              <button appButton variant="ghost" size="sm" iconOnly aria-label="Close" title="Close" (click)="close.emit()">
-                <app-icon name="close" />
+              <button
+                appButton
+                variant="ghost"
+                size="sm"
+                iconOnly
+                aria-label="Close"
+                title="Close"
+                (click)="close.emit()"
+                class="hover:bg-[#F8EDF1] hover:text-[#7C0E44] text-[#625663] rounded-lg transition-colors shrink-0 -mr-1 -mt-1 cursor-pointer"
+              >
+                <app-icon name="close" size="lg" />
               </button>
             }
           </div>
@@ -91,6 +100,7 @@ export class ModalComponent {
   readonly widthOverride = input('');
   readonly showClose = input(true);
   readonly closeOnBackdrop = input(true);
+  readonly closeOnEscape = input(true);
   /** Turn off when the body manages its own scrolling. */
   readonly scrollBody = input(true);
 
@@ -101,7 +111,9 @@ export class ModalComponent {
 
   @HostListener('document:keydown.escape')
   protected onEscape(): void {
-    this.close.emit();
+    if (this.closeOnEscape()) {
+      this.close.emit();
+    }
   }
 
   protected onBackdrop(event: MouseEvent): void {

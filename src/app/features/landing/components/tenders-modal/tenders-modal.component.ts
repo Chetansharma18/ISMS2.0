@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal, injec
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
-import { ActionModalComponent, ButtonComponent, ModalComponent } from '../../../../shared';
+import { ActionModalComponent, ButtonComponent, IconComponent, ModalComponent } from '../../../../shared';
 
 interface Tender {
   date: string;
@@ -17,51 +17,78 @@ interface Tender {
   selector: 'app-tenders-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ActionModalComponent, ModalComponent, ButtonComponent],
+  imports: [CommonModule, ActionModalComponent, ModalComponent, ButtonComponent, IconComponent],
   template: `
     <app-modal
       title="Official Tenders & RFP Notices"
       subtitle="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)"
       size="lg"
+      [closeOnBackdrop]="false"
+      [closeOnEscape]="false"
       (close)="onModalClose()"
     >
-        <div class="space-y-2.5">
-          <div class="flex items-center justify-between pb-1 border-b border-slate-100">
-            <span class="text-xs font-semibold text-slate-700">Active Notices</span>
-            <span class="text-xs font-medium text-slate-500">Total Tenders: <strong class="text-slate-900 tabular-nums">{{ tenders.length }}</strong></span>
+        <div class="space-y-3">
+          <!-- Filter / Counter Bar -->
+          <div class="flex items-center justify-between pb-2 border-b border-[#EADCE2]/80 px-0.5">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-[#16A34A] animate-pulse" aria-hidden="true"></span>
+              <span class="text-xs font-bold text-slate-800 tracking-wide uppercase">Active Notices</span>
+            </div>
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F8EDF1] border border-[#EADCE2]">
+              <span class="text-[11px] font-medium text-[#7C0E44]">Total Tenders:</span>
+              <strong class="text-xs font-bold text-[#7C0E44] tabular-nums">{{ tenders.length }}</strong>
+            </div>
           </div>
 
-          @for (item of tenders; track item.id) {
-            <div
-              (click)="openLoginPrompt(item)"
-              class="group relative bg-white border border-slate-200/90 shadow-2xs rounded-lg p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3.5 hover:border-navy/40 hover:bg-slate-50/40 transition-all cursor-pointer"
-            >
-              @if (item.isNew) {
-                <img src="/new.png" alt="New Tender" class="absolute -top-1 -left-1 w-6 sm:w-7 h-6 sm:h-7 object-cover z-10 pointer-events-none drop-shadow-2xs rounded-tl-lg" />
-              }
+          <!-- Tenders List -->
+          <div class="space-y-2.5">
+            @for (item of tenders; track item.id) {
+              <div
+                (click)="openLoginPrompt(item)"
+                class="group relative bg-white border border-[#E2E8F0] hover:border-[#7C0E44]/40 hover:bg-[#FFFDFC] shadow-2xs hover:shadow-md rounded-xl p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all duration-200 cursor-pointer overflow-hidden"
+              >
+                <!-- Left Accent Line on Hover -->
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#7C0E44] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></div>
 
-              <div class="flex-1 min-w-0" [class.pl-2]="item.isNew">
-                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
-                  <span class="text-[11px] text-slate-500 font-medium">{{ item.date }}</span>
-                  <span class="text-slate-300">•</span>
-                  <span class="text-[11px] text-slate-500 tabular-nums truncate max-w-[190px] sm:max-w-none">{{ item.id }}</span>
-                  <span class="text-slate-300">•</span>
-                  <span class="text-[10px] font-semibold text-brand bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">{{ item.category }}</span>
+                @if (item.isNew) {
+                  <img src="/new.png" alt="New Tender" class="absolute -top-1 -left-1 w-6 sm:w-7 h-6 sm:h-7 object-cover z-10 pointer-events-none drop-shadow-2xs rounded-tl-xl" />
+                }
+
+                <div class="flex-1 min-w-0" [class.pl-2]="item.isNew">
+                  <!-- Meta Row: Date, ID, Category -->
+                  <div class="flex flex-wrap items-center gap-2 mb-1">
+                    <span class="inline-flex items-center gap-1 text-[11px] text-slate-500 font-medium">
+                      <app-icon name="calendar" size="xs" />
+                      <span>{{ item.date }}</span>
+                    </span>
+                    <span class="text-slate-300">•</span>
+                    <span class="text-[11px] font-medium text-slate-600 tabular-nums truncate max-w-[200px] sm:max-w-none">{{ item.id }}</span>
+                    <span class="text-slate-300">•</span>
+                    <span class="text-[10.5px] font-semibold text-[#7C0E44] bg-[#F8EDF1] px-2 py-0.5 rounded-md border border-[#EADCE2]">{{ item.category }}</span>
+                  </div>
+
+                  <!-- Title -->
+                  <h4 class="text-xs sm:text-[13px] font-semibold text-slate-800 leading-snug group-hover:text-[#7C0E44] transition-colors line-clamp-2 m-0">
+                    {{ item.title }}
+                  </h4>
                 </div>
 
-                <h4 class="text-xs sm:text-[13px] font-semibold text-slate-800 leading-snug group-hover:text-brand transition-colors line-clamp-2 m-0">
-                  {{ item.title }}
-                </h4>
+                <!-- Action Button -->
+                <div class="shrink-0 flex sm:items-center">
+                  <button
+                    appButton
+                    size="sm"
+                    variant="primary"
+                    (click)="openLoginPrompt(item); $event.stopPropagation()"
+                    class="w-full sm:w-auto"
+                  >
+                    <app-icon name="lock" size="xs" />
+                    <span>Login to View</span>
+                  </button>
+                </div>
               </div>
-
-              <!-- Action -->
-              <div class="shrink-0">
-                <button appButton size="sm" (click)="openLoginPrompt(item); $event.stopPropagation()" class="w-full sm:w-auto">
-                  <span>Login to View</span>
-                </button>
-              </div>
-            </div>
-          }
+            }
+          </div>
         </div>
     </app-modal>
 

@@ -17,8 +17,8 @@ import { IconComponent } from '../icon/icon.component';
   template: `
     @if (isOpen) {
       <div
-        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
-        style="background: rgba(10,20,40,0.45); backdrop-filter: blur(3px);"
+        class="fixed inset-0 z-[110] flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+        style="background: rgba(10,20,40,0.55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);"
         (click)="onBackdropClick($event)"
       >
         <div

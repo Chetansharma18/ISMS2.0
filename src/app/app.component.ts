@@ -41,7 +41,7 @@ import { BackdropComponent } from './shared/components/backdrop/backdrop.compone
       <!-- Main Portal Header (Always visible across all pages) -->
       <app-header
         [isSticky]="false"
-        class="shrink-0 relative z-50"
+        class="shrink-0 relative z-30"
         (loginClicked)="onLoginClick()"
         (toggleMobileMenu)="toggleMobileSidebar()"
       ></app-header>
@@ -92,7 +92,7 @@ import { BackdropComponent } from './shared/components/backdrop/backdrop.compone
         </div>
       } @else {
         <main 
-          class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col relative" 
+          class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col" 
           [style.background-color]="isLandingRoute() ? '#070e18' : '#FFFFFF'"
         >
           <div class="w-full flex-1 flex flex-col bg-white">

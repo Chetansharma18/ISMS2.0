@@ -112,21 +112,23 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               <!-- Divider between ISMS & SSO Login -->
               <div class="hidden sm:block w-[1.5px] h-7 sm:h-8 lg:h-9 bg-[#8C1B3F]/25 shrink-0" aria-hidden="true"></div>
 
-              <!-- SSO Login Icon Button -->
+              <!-- SSO Login Button (Themed Icon + Text) -->
               <button
                 appButton
                 variant="ghost"
+                size="sm"
                 type="button"
                 (click)="onLoginClick()"
-                class="sso-icon-btn"
+                class="header-sso-btn"
                 title="SSO Login"
                 aria-label="SSO Login"
               >
                 <img
                   src="/sso-login-icon-burgundy.png"
-                  alt="SSO Login"
-                  class="h-7 sm:h-8.5 lg:h-9.5 w-auto object-contain select-none transition-transform duration-200"
+                  alt=""
+                  class="sso-icon"
                 />
+                <span class="sso-text">SSO Login</span>
               </button>
 
             </div>
@@ -390,31 +392,96 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       width: 100%;
     }
 
-    .sso-icon-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 6px 8px;
-      cursor: pointer;
-      border-radius: 10px;
-      background: linear-gradient(135deg, rgba(136, 28, 67, 0.06) 0%, rgba(136, 28, 67, 0.1) 100%);
-      border: 1px solid rgba(136, 28, 67, 0.22);
-      box-shadow: 0 1px 3px rgba(136, 28, 67, 0.08);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    .header-sso-btn {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 5px !important;
+      height: 28px !important;
+      padding: 0 9px !important;
+      cursor: pointer !important;
+      border-radius: 6px !important;
+      background: linear-gradient(135deg, rgba(136, 28, 67, 0.05) 0%, rgba(136, 28, 67, 0.12) 100%) !important;
+      border: 1.5px solid rgba(136, 28, 67, 0.3) !important;
+      color: #881C43 !important;
+      box-shadow: 0 1px 3px rgba(136, 28, 67, 0.08) !important;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
-    .sso-icon-btn:hover {
-      background: linear-gradient(135deg, rgba(136, 28, 67, 0.14) 0%, rgba(136, 28, 67, 0.22) 100%);
-      border-color: rgba(136, 28, 67, 0.45);
-      box-shadow: 0 4px 14px rgba(136, 28, 67, 0.24);
-      transform: translateY(-1.5px) scale(1.06);
+
+    @media (min-width: 640px) {
+      .header-sso-btn {
+        gap: 6px !important;
+        height: 30px !important;
+        padding: 0 11px !important;
+        border-radius: 7px !important;
+      }
     }
-    .sso-icon-btn:hover img {
-      filter: drop-shadow(0 2px 4px rgba(136, 28, 67, 0.3));
-      transform: scale(1.08);
+
+    @media (min-width: 1024px) {
+      .header-sso-btn {
+        gap: 7px !important;
+        height: 32px !important;
+        padding: 0 12px !important;
+        border-radius: 8px !important;
+      }
     }
-    .sso-icon-btn:active {
-      transform: translateY(0) scale(0.96);
-      box-shadow: 0 1px 2px rgba(136, 28, 67, 0.12);
+
+    .header-sso-btn .sso-icon {
+      height: 14px;
+      width: auto;
+      object-fit: contain;
+      user-select: none;
+      transition: all 0.22s ease;
+    }
+
+    @media (min-width: 640px) {
+      .header-sso-btn .sso-icon {
+        height: 15.5px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .header-sso-btn .sso-icon {
+        height: 16.5px;
+      }
+    }
+
+    .header-sso-btn .sso-text {
+      font-weight: 700;
+      font-size: 11px;
+      line-height: 1;
+      white-space: nowrap;
+      letter-spacing: 0.015em;
+    }
+
+    @media (min-width: 640px) {
+      .header-sso-btn .sso-text {
+        font-size: 11.5px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .header-sso-btn .sso-text {
+        font-size: 12px;
+      }
+    }
+
+    .header-sso-btn:hover {
+      background: linear-gradient(135deg, #881C43 0%, #681132 100%) !important;
+      border-color: #681132 !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 3px 10px rgba(136, 28, 67, 0.26) !important;
+      transform: translateY(-1px);
+    }
+
+    .header-sso-btn:hover .sso-icon {
+      filter: brightness(0) invert(1);
+      transform: scale(1.05);
+    }
+
+    .header-sso-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 2px rgba(136, 28, 67, 0.15) !important;
     }
   `]
 })

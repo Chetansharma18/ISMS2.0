@@ -17,18 +17,25 @@ export interface SchemeTender {
   eoiDescription: string;
   category?: string;
   code?: string;
-  status?: 'Open' | 'Closed';
+  status?: 'Open' | 'Closed' | 'Draft' | 'Scheduled' | 'Cancelled';
   rfpDocSize?: string;
   sopDocSize?: string;
   preBidDate?: string;
   techBidDate?: string;
   emdFee?: string;
   processFee?: string;
+  emdAmount?: number;
+  processFeeAmount?: number;
+  isFeeExempted?: boolean;
   attachedDocs?: EoiDocumentItem[];
   requiredDocs?: string[];
   committeeMembers?: string[];
   committeeApprover?: string;
   createdAt?: number;
+  updatedAt?: number;
+  publishedAt?: number;
+  createdBy?: string;
+  scheduledDate?: string;
   isActive?: boolean;
   isFrozen?: boolean;
 }
@@ -83,4 +90,6 @@ export interface EoiFormData {
   attachments: EoiAttachment[];
   documents: string[];
   documentFiles?: Record<number, EoiDocumentUpload>;
+  status?: 'Open' | 'Closed' | 'Draft' | 'Scheduled' | 'Cancelled';
+  isFeeExempted?: boolean;
 }

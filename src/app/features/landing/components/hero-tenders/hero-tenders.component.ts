@@ -34,13 +34,14 @@ interface TenderItem {
     <div class="w-full h-full flex flex-col">
       <div class="tender-panel-card w-full h-[410px] sm:h-[430px] lg:h-[440px] xl:h-[450px] rounded-xl sm:rounded-[14px] flex flex-col overflow-hidden relative">
         
-        <!-- Authentic Rajasthan Heritage Architecture Background Watermark -->
-        <div class="tender-watermark" aria-hidden="true">
+        <!-- Full-Cover Authentic Rajasthan Background Image (Centered & Covering Entire Card) -->
+        <div class="tender-card-bg-wrap" aria-hidden="true">
           <img
-            src="/rajasthan-heritage-palace.png"
+            src="/raj.png"
             alt=""
-            class="tender-watermark-img"
+            class="tender-card-bg-img"
           />
+          <div class="tender-card-bg-overlay"></div>
         </div>
 
         <!-- PANEL HEADER -->
@@ -172,33 +173,39 @@ interface TenderItem {
       box-shadow: 0 12px 30px -4px rgba(136, 28, 67, 0.1), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
     }
 
-    .tender-watermark {
+    .tender-card-bg-wrap {
       position: absolute;
-      bottom: -15px;
-      right: -25px;
-      width: 340px;
-      height: 180px;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
-      opacity: 0.07;
       overflow: hidden;
-      z-index: 1;
-      transition: opacity 0.3s ease;
+      z-index: 0;
     }
-    .tender-panel-card:hover .tender-watermark {
-      opacity: 0.12;
-    }
-    .tender-watermark-img {
+    .tender-card-bg-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: bottom right;
-      filter: grayscale(1);
+      object-position: center;
+      transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .tender-panel-card:hover .tender-card-bg-img {
+      transform: scale(1.04);
+    }
+    .tender-card-bg-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.78) 45%, rgba(255, 255, 255, 0.88) 100%);
+      backdrop-filter: blur(1.5px);
+      -webkit-backdrop-filter: blur(1.5px);
     }
 
     .tender-panel-header {
       height: 60px;
       position: relative;
-      background: linear-gradient(135deg, #FFFFFF 0%, #FFF9FA 100%);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
 
     .tender-live-badge {

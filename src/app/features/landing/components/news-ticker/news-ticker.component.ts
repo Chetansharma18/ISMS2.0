@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { PressReleasesModalComponent } from '../press-releases-modal/press-releases-modal.component';
-import { ButtonComponent, IconComponent } from '../../../../shared';
+import { ButtonComponent } from '../../../../shared';
 
 export interface AnnouncementItem {
   id: string;
@@ -26,7 +26,7 @@ export interface AnnouncementItem {
   selector: 'app-news-ticker',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, PressReleasesModalComponent, ButtonComponent, IconComponent],
+  imports: [CommonModule, PressReleasesModalComponent, ButtonComponent],
   host: {
     class: 'block w-full'
   },
@@ -124,31 +124,7 @@ export interface AnnouncementItem {
           </div>
         </div>
 
-        <!-- ============================================================
-             3. FIXED RIGHT: PAUSE / RESUME CONTROL
-             ============================================================ -->
-        <div class="flex items-center gap-2 shrink-0 z-20 bg-[#0D3557] pl-2 sm:pl-3">
-          <div class="w-px h-4 sm:h-5 bg-white/25 shrink-0 hidden sm:block"></div>
-          <button
-            appButton
-            variant="secondary"
-            size="sm"
-            iconOnly
-            type="button"
-            (click)="togglePauseResume()"
-            class="shrink-0"
-            [attr.aria-label]="isPaused() ? 'Resume news announcements' : 'Pause news announcements'"
-            [attr.title]="isPaused() ? 'Resume news announcements' : 'Pause news announcements'"
-          >
-            @if (isPaused()) {
-              <!-- Play / Resume Icon -->
-              <app-icon name="play" solid size="sm" class="translate-x-0.5" />
-            } @else {
-              <!-- Pause Icon -->
-              <app-icon name="pause" solid size="sm" />
-            }
-          </button>
-        </div>
+        
 
       </div>
     </div>

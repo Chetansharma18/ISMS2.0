@@ -63,26 +63,17 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
                 <!-- Actual Video Element -->
                 <video 
                   #videoRef
-                  class="w-full h-full object-cover object-center transition-opacity duration-300 transform-[translateZ(0)]"
-                  [class.opacity-0]="!isVideoLoaded()"
-                  [class.opacity-100]="isVideoLoaded()"
-                  playsinline
+                  src="/video.mp4"
+                  class="w-full h-full object-cover object-center"
+                  autoplay
                   loop
                   muted
-                  preload="none"
+                  playsinline
+                  preload="auto"
+                  (play)="isPlaying.set(true)"
+                  (pause)="isPlaying.set(false)"
                   aria-label="ISMS 2.0 Skill Development Overview Video">
                 </video>
-
-                <!-- Poster / Loading Placeholder Before Video Loads -->
-                @if (!isVideoLoaded()) {
-                  <div class="absolute inset-0 bg-linear-to-br from-[#5E0832] to-[#7C0E44] flex flex-col items-center justify-center p-5 text-center z-5">
-                    <div class="w-11 h-11 rounded-full bg-white/12 flex items-center justify-center mb-2.5 text-white">
-                      <app-icon name="play-circle" size="lg" [stroke]="2" class="animate-pulse" />
-                    </div>
-                    <p class="text-[12px] font-semibold text-slate-100 uppercase tracking-wider m-0">RSLDC Skill Training in Action</p>
-                    <p class="text-[11px] text-slate-300 mt-1 mb-0">Scroll into view to play video</p>
-                  </div>
-                }
 
                 <!-- Play / Pause Overlay Control (Top Left) -->
                 <div class="absolute top-3 left-3 z-20">
@@ -147,85 +138,40 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
   @ViewChild('sectionRef') sectionRef?: ElementRef<HTMLElement>;
   @ViewChild('videoRef') videoRef?: ElementRef<HTMLVideoElement>;
 
-  readonly isVideoLoaded = signal<boolean>(false);
-  readonly isPlaying = signal<boolean>(false);
+  readonly isPlaying = signal<boolean>(true);
   readonly isMuted = signal<boolean>(true); // Strictly sound off by default
 
   readonly fullQuote = 'ISMS 2.0 is an integrated MIS system of RSLDC to provide a single platform to Youths, Training providers, Govt. Departments, Convergence Departments, and Certification agencies for Skill Development Schemes.';
 
-  private observer?: IntersectionObserver;
-  private isVisible = false;
   private visibilityHandler?: () => void;
 
   ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    const el = this.sectionRef?.nativeElement;
     const video = this.videoRef?.nativeElement;
-    if (!el || !video) return;
+    if (!video) return;
 
     // Ensure audio starts muted
     video.muted = true;
     video.volume = 0;
     this.isMuted.set(true);
 
-    // Setup IntersectionObserver to lazy load & play only when visible
-    this.observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          this.isVisible = entry.isIntersecting;
-          if (entry.isIntersecting) {
-            this.handleEnterViewport();
-          } else {
-            this.handleExitViewport();
-          }
-        });
-      },
-      {
-        root: null,
-        rootMargin: '120px 0px', // Preload just slightly before reaching it
-        threshold: 0.15
-      }
-    );
-
-    this.observer.observe(el);
+    // Auto-play muted video directly
+    video.play().then(() => {
+      this.isPlaying.set(true);
+    }).catch(() => {
+      this.isPlaying.set(false);
+    });
 
     // Page visibility listener: pause when browser tab is inactive
     this.visibilityHandler = () => {
       if (document.hidden) {
         this.pauseVideo();
-      } else if (this.isVisible && this.isVideoLoaded()) {
+      } else {
         this.playVideo();
       }
     };
     document.addEventListener('visibilitychange', this.visibilityHandler);
-  }
-
-  private handleEnterViewport(): void {
-    const video = this.videoRef?.nativeElement;
-    if (!video) return;
-
-    if (!this.isVideoLoaded()) {
-      video.src = '/video.mp4';
-      video.load();
-      video.onloadeddata = () => {
-        this.isVideoLoaded.set(true);
-        this.playVideo();
-      };
-      // Fallback in case onloadeddata was already ready
-      setTimeout(() => {
-        if (!this.isVideoLoaded()) {
-          this.isVideoLoaded.set(true);
-          this.playVideo();
-        }
-      }, 500);
-    } else {
-      this.playVideo();
-    }
-  }
-
-  private handleExitViewport(): void {
-    this.pauseVideo();
   }
 
   private playVideo(): void {
@@ -267,17 +213,12 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.observer) {
-      this.observer.disconnect();
-    }
     if (this.visibilityHandler) {
       document.removeEventListener('visibilitychange', this.visibilityHandler);
     }
     const video = this.videoRef?.nativeElement;
     if (video) {
       video.pause();
-      video.src = '';
-      video.load();
     }
   }
 }

@@ -50,7 +50,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           </div>
 
           <!-- Main Responsive Banner Container -->
-          <div class="w-full max-w-[1920px] mx-auto px-3 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-1.5 sm:py-2 md:py-2.5 lg:py-3 flex items-center justify-between gap-2 sm:gap-4 lg:gap-6 relative z-10">
+          <div class="w-full max-w-[1920px] mx-auto px-3 sm:px-6 md:px-8 lg:px-10 xl:px-12 py-1 sm:py-1.5 md:py-2 lg:py-2 flex items-center justify-between gap-2 sm:gap-4 lg:gap-6 relative z-10">
 
             <!-- 1. LEFT SECTION: State Emblem + Department & Government Identity -->
             <a routerLink="/" class="flex items-center gap-2 sm:gap-3 lg:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
@@ -58,35 +58,35 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               <img
                 src="/emblem-ashok-stambh.png"
                 alt="Emblem of India"
-                class="h-8.5 sm:h-10.5 md:h-12 lg:h-14 xl:h-[62px] w-auto object-contain shrink-0"
+                class="h-7.5 sm:h-9 md:h-10.5 lg:h-12.5 xl:h-[55px] w-auto object-contain shrink-0"
               />
 
               <!-- Text Hierarchy -->
               <div class="flex flex-col justify-center leading-none">
-                <span class="text-[#062442] font-black text-[10px] sm:text-[11.5px] md:text-[12.5px] lg:text-[15px] xl:text-[17px] leading-[1.2] tracking-tight">
+                <span class="text-[#062442] font-black text-[9.5px] sm:text-[11px] md:text-[12px] lg:text-[14px] xl:text-[15.5px] leading-[1.2] tracking-tight">
                   <span class="block whitespace-nowrap">Rajasthan Skill and Livelihoods</span>
                   <span class="block whitespace-nowrap">Development Corporation</span>
                 </span>
-                <span class="text-[#062442] font-bold text-[8.5px] sm:text-[9.5px] md:text-[10.5px] lg:text-[11.5px] xl:text-[13px] leading-tight tracking-normal mt-0.5 sm:mt-1 whitespace-nowrap">
+                <span class="text-[#062442] font-bold text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] leading-tight tracking-normal mt-0.5 sm:mt-0.5 whitespace-nowrap">
                   Government of Rajasthan
                 </span>
               </div>
             </a>
 
             <!-- 2. LEFT VERTICAL DIVIDER -->
-            <div class="hidden md:block w-[1.5px] lg:w-[2px] h-8 md:h-9 lg:h-10 xl:h-12 bg-[#8C1B3F] shrink-0 mx-1 lg:mx-3 xl:mx-4 opacity-80" aria-hidden="true"></div>
+            <div class="hidden md:block w-[1.5px] lg:w-[2px] h-7 md:h-7.5 lg:h-9 xl:h-10 bg-[#8C1B3F] shrink-0 mx-1 lg:mx-3 xl:mx-4 opacity-80" aria-hidden="true"></div>
 
             <!-- 3. CENTER SECTION: Authentic Rajasthan Heritage Architecture Illustration -->
             <a routerLink="/" class="hidden md:flex flex-1 items-center justify-center px-1 lg:px-4 min-w-0 overflow-hidden no-underline cursor-pointer" aria-hidden="true" tabindex="-1">
               <img
                 src="/rajasthan-heritage-palace.png"
                 alt=""
-                class="h-10 sm:h-12 md:h-15 lg:h-19 xl:h-[84px] w-auto max-w-full object-contain pointer-events-none select-none transition-transform duration-300 hover:scale-[1.01]"
+                class="h-9 sm:h-11 md:h-13.5 lg:h-16 xl:h-[72px] w-auto max-w-full object-contain pointer-events-none select-none transition-transform duration-300 hover:scale-[1.01]"
               />
             </a>
 
             <!-- 4. RIGHT VERTICAL DIVIDER -->
-            <div class="hidden md:block w-[1.5px] lg:w-[2px] h-8 md:h-9 lg:h-10 xl:h-12 bg-[#8C1B3F] shrink-0 mx-1 lg:mx-3 xl:mx-4 opacity-80" aria-hidden="true"></div>
+            <div class="hidden md:block w-[1.5px] lg:w-[2px] h-7 md:h-7.5 lg:h-9 xl:h-10 bg-[#8C1B3F] shrink-0 mx-1 lg:mx-3 xl:mx-4 opacity-80" aria-hidden="true"></div>
 
             <!-- 5. RIGHT SECTION: ISMS 2.0 Branding & SSO Login Button -->
             <div class="flex items-center gap-2 sm:gap-3.5 lg:gap-4.5 shrink-0">
@@ -95,19 +95,19 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               <a routerLink="/" class="flex flex-col items-end justify-center text-right no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
                 <!-- Top Row: ISMS 2.0 (No background box) -->
                 <div class="leading-none">
-                  <span class="text-[#9C214A] font-black text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-[36px] tracking-tight">
+                  <span class="text-[#9C214A] font-black text-base sm:text-lg md:text-xl lg:text-2xl xl:text-[31px] tracking-tight">
                     ISMS 2.0
                   </span>
                 </div>
 
                 <!-- Subtitle: Integrated Scheme Management System -->
-                <div class="text-[#133553] font-bold text-[8.5px] sm:text-[9.5px] md:text-[10.5px] lg:text-[12px] xl:text-[13.5px] tracking-tight sm:tracking-normal mt-0.5 sm:mt-1 lg:mt-1 whitespace-nowrap">
+                <div class="text-[#133553] font-bold text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] xl:text-[12px] tracking-tight sm:tracking-normal mt-0.5 sm:mt-0.5 lg:mt-0.5 whitespace-nowrap">
                   Integrated Scheme Management System
                 </div>
               </a>
 
               <!-- Divider between ISMS & SSO Login -->
-              <div class="hidden sm:block w-[1.5px] h-7 sm:h-8 lg:h-9 bg-[#8C1B3F]/25 shrink-0" aria-hidden="true"></div>
+              <div class="hidden sm:block w-[1.5px] h-6 sm:h-7 lg:h-7.5 bg-[#8C1B3F]/25 shrink-0" aria-hidden="true"></div>
 
               <!-- SSO Login Button (Themed Icon + Text) -->
               <button
@@ -393,9 +393,9 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       display: inline-flex !important;
       align-items: center !important;
       justify-content: center !important;
-      gap: 6px !important;
-      height: 30px !important;
-      padding: 0 11px !important;
+      gap: 5px !important;
+      height: 29px !important;
+      padding: 0 10px !important;
       cursor: pointer !important;
       border-radius: 7px !important;
       background: linear-gradient(135deg, #FFFFFF 0%, #FFF9FA 100%) !important;
@@ -407,6 +407,15 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
 
     @media (min-width: 640px) {
       .header-sso-btn {
+        gap: 6px !important;
+        height: 31px !important;
+        padding: 0 12px !important;
+        border-radius: 7px !important;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .header-sso-btn {
         gap: 7px !important;
         height: 33px !important;
         padding: 0 13px !important;
@@ -414,17 +423,8 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       }
     }
 
-    @media (min-width: 1024px) {
-      .header-sso-btn {
-        gap: 8px !important;
-        height: 36px !important;
-        padding: 0 15px !important;
-        border-radius: 8px !important;
-      }
-    }
-
     .header-sso-btn .sso-icon {
-      height: 16px;
+      height: 15px;
       width: auto;
       object-fit: contain;
       user-select: none;
@@ -433,19 +433,19 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
 
     @media (min-width: 640px) {
       .header-sso-btn .sso-icon {
-        height: 17.5px;
+        height: 16.5px;
       }
     }
 
     @media (min-width: 1024px) {
       .header-sso-btn .sso-icon {
-        height: 19px;
+        height: 17.5px;
       }
     }
 
     .header-sso-btn .sso-text {
       font-weight: 700;
-      font-size: 11.5px;
+      font-size: 11px;
       line-height: 1;
       white-space: nowrap;
       letter-spacing: 0.015em;
@@ -453,13 +453,13 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
 
     @media (min-width: 640px) {
       .header-sso-btn .sso-text {
-        font-size: 12.5px;
+        font-size: 12px;
       }
     }
 
     @media (min-width: 1024px) {
       .header-sso-btn .sso-text {
-        font-size: 13.5px;
+        font-size: 12.5px;
       }
     }
 

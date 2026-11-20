@@ -41,7 +41,7 @@ let nextId = 0;
   template: `
     <div
       class="fixed inset-0 z-[100] flex justify-center p-3 sm:p-5 md:p-8 overflow-y-auto font-sans print:static print:p-0 print:block print:bg-white"
-      style="background: rgba(10, 20, 40, 0.65); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);"
+      style="background: rgba(6, 14, 28, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);"
       (click)="onBackdrop($event)"
     >
       <div

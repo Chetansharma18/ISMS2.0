@@ -20,8 +20,8 @@ interface Tender {
   imports: [CommonModule, ActionModalComponent, ModalComponent, ButtonComponent, IconComponent],
   template: `
     <app-modal
-      title="Official Tenders & RFP Notices"
-      subtitle="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)"
+      title="Tender Notices & EOI"
+      subtitle="Active procurement notices and expression of interest"
       size="lg"
       [closeOnBackdrop]="false"
       [closeOnEscape]="false"

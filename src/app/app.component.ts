@@ -92,7 +92,7 @@ import { BackdropComponent } from './shared/components/backdrop/backdrop.compone
         </div>
       } @else {
         <main 
-          class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col" 
+          class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col relative z-50" 
           [style.background-color]="isLandingRoute() ? '#070e18' : '#FFFFFF'"
         >
           <div class="w-full flex-1 flex flex-col bg-white">

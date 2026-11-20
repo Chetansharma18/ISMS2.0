@@ -221,6 +221,8 @@ import { IconComponent } from '../../../../shared';
               (valueChange)="update('dateOfRegistration', $event)"
               placeholder="DD-MM-YYYY"
               [required]="true"
+              [max]="maxRegistrationDate"
+              (blur)="markTouched('dateOfRegistration')"
               [error]="getFieldError('dateOfRegistration')"
             ></app-form-input>
           </div>
@@ -543,9 +545,14 @@ import { IconComponent } from '../../../../shared';
       border-color: #B5CBE0 !important;
     }
 
-    :host ::ng-deep app-form-input > div > div.relative:focus-within {
+    :host ::ng-deep app-form-input > div > div.relative:not(.border-rose-600):focus-within {
       border-color: #477DAF !important;
       box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative.border-rose-600:focus-within {
+      border-color: #DC2626 !important;
+      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2) !important;
     }
 
     :host ::ng-deep app-form-input input {
@@ -665,10 +672,27 @@ export class Step1OrgDetailsComponent {
     return state && DISTRICTS_BY_STATE[state] ? DISTRICTS_BY_STATE[state] : [];
   });
 
+  readonly maxRegistrationDate = new Date().toISOString().split('T')[0];
+
   getFieldError(field: string): string | undefined {
     const isSubmitted = this.isSubmitted();
     const isTouched = this.touchedFields().has(field);
     const d = this.data();
+
+    if (field === 'dateOfRegistration') {
+      if ((isSubmitted || isTouched) && !d.dateOfRegistration?.trim()) {
+        return 'Date of Registration is required';
+      }
+      if (d.dateOfRegistration?.trim()) {
+        const selected = new Date(d.dateOfRegistration);
+        const today = new Date();
+        today.setHours(23, 59, 59, 999);
+        if (selected > today) {
+          return 'Date cannot be in the future';
+        }
+      }
+      return undefined;
+    }
 
     // Specific live/blur format validations when user has entered content or touched field
     if (field === 'emailId') {
@@ -760,10 +784,6 @@ export class Step1OrgDetailsComponent {
         return undefined;
       case 'registrationNumber':
         return !d.registrationNumber?.trim() ? 'Registration Number is required' : undefined;
-      case 'dateOfRegistration':
-        if (!d.dateOfRegistration) return 'Date of Registration is required';
-        if (new Date(d.dateOfRegistration) > new Date()) return 'Date cannot be in the future';
-        return undefined;
       case 'stateOfLegalReg':
         return !d.stateOfLegalReg?.trim() ? 'State/UT of Registration is required' : undefined;
       case 'companyPan':

@@ -207,4 +207,22 @@ describe('Step1OrgDetailsComponent - Heading-wise Grouping', () => {
       expect(component.officeDistricts()).toEqual(DISTRICTS_BY_STATE[state]);
     }
   });
+
+  it('verifies Bug 8: Date of Registration limits picker to today and rejects future dates', () => {
+    expect(component.maxRegistrationDate).toBe(new Date().toISOString().split('T')[0]);
+
+    // Future date
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 5);
+    const futureStr = futureDate.toISOString().split('T')[0];
+
+    formService.updateStep1({ dateOfRegistration: futureStr });
+    fixture.detectChanges();
+    expect(component.getFieldError('dateOfRegistration')).toBe('Date cannot be in the future');
+
+    // Valid past/current date
+    formService.updateStep1({ dateOfRegistration: '2020-01-15' });
+    fixture.detectChanges();
+    expect(component.getFieldError('dateOfRegistration')).toBeUndefined();
+  });
 });

@@ -48,6 +48,8 @@ import { IconComponent } from '../../icon/icon.component';
         [class.focus-within:border-primary]="!error && !disabled"
         [class.focus-within:ring-2]="!error && !disabled"
         [class.focus-within:ring-primary-light]="!error && !disabled"
+        [class.focus-within:border-rose-600]="!!error && !disabled"
+        [class.focus-within:ring-rose-200]="!!error && !disabled"
       >
         <!-- Optional Prefix Tag -->
         @if (prefixText) {
@@ -69,8 +71,11 @@ import { IconComponent } from '../../icon/icon.component';
           [disabled]="disabled"
           [readOnly]="readonly"
           [attr.maxlength]="maxLength || null"
+          [attr.max]="max || null"
+          [attr.min]="min || null"
+          [attr.aria-invalid]="!!error"
           [style.color-scheme]="type === 'date' ? 'light' : null"
-          class="flex-1 min-w-0 w-full h-full px-2.5 text-xs sm:text-[13px] leading-[20px] text-primary placeholder:text-muted focus:outline-none bg-transparent placeholder:normal-case"
+          class="flex-1 min-w-0 w-full h-full px-2.5 text-xs sm:text-[13px] leading-[20px] text-primary placeholder:text-muted focus:outline-none focus-visible:outline-none bg-transparent placeholder:normal-case"
           [class.uppercase]="uppercase"
           [class.cursor-not-allowed]="disabled"
           [class.text-muted]="disabled"
@@ -104,6 +109,9 @@ import { IconComponent } from '../../icon/icon.component';
     input::placeholder {
       text-transform: none !important;
     }
+    input:focus-visible {
+      outline: none !important;
+    }
     .form-error-text {
       font-size: 11px !important;
       line-height: 14px !important;
@@ -128,6 +136,8 @@ export class FormInputComponent {
   @Input() uppercase: boolean = false;
   @Input() numericOnly: boolean = false;
   @Input() maxLength?: number;
+  @Input() max?: string;
+  @Input() min?: string;
   @Input() prefixText?: string;
   @Input() suffixText?: string;
   @Input() hint?: string;

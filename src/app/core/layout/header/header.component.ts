@@ -93,13 +93,10 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               
               <!-- Branding: ISMS 2.0 & Subtitle -->
               <a routerLink="/" class="flex flex-col items-end justify-center text-right no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
-                <!-- Top Row: ISMS + 2.0 Badge -->
-                <div class="flex items-center gap-1 sm:gap-1.5 lg:gap-2 leading-none">
+                <!-- Top Row: ISMS 2.0 (No background box) -->
+                <div class="leading-none">
                   <span class="text-[#9C214A] font-black text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-[36px] tracking-tight">
-                    ISMS
-                  </span>
-                  <span class="bg-[#881C43] text-white font-black text-xs sm:text-base md:text-lg lg:text-xl xl:text-[25px] px-1.5 sm:px-2 lg:px-2.5 py-0.5 sm:py-0.5 lg:py-0.5 rounded-sm sm:rounded-md lg:rounded-md shadow-xs leading-none">
-                    2.0
+                    ISMS 2.0
                   </span>
                 </div>
 
@@ -396,38 +393,38 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       display: inline-flex !important;
       align-items: center !important;
       justify-content: center !important;
-      gap: 5px !important;
-      height: 28px !important;
-      padding: 0 9px !important;
+      gap: 6px !important;
+      height: 30px !important;
+      padding: 0 11px !important;
       cursor: pointer !important;
-      border-radius: 6px !important;
-      background: linear-gradient(135deg, rgba(136, 28, 67, 0.05) 0%, rgba(136, 28, 67, 0.12) 100%) !important;
-      border: 1.5px solid rgba(136, 28, 67, 0.3) !important;
+      border-radius: 7px !important;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFF9FA 100%) !important;
+      border: 1.5px solid rgba(136, 28, 67, 0.25) !important;
       color: #881C43 !important;
-      box-shadow: 0 1px 3px rgba(136, 28, 67, 0.08) !important;
+      box-shadow: 0 1px 3px rgba(136, 28, 67, 0.06) !important;
       transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
     @media (min-width: 640px) {
       .header-sso-btn {
-        gap: 6px !important;
-        height: 30px !important;
-        padding: 0 11px !important;
-        border-radius: 7px !important;
+        gap: 7px !important;
+        height: 33px !important;
+        padding: 0 13px !important;
+        border-radius: 8px !important;
       }
     }
 
     @media (min-width: 1024px) {
       .header-sso-btn {
-        gap: 7px !important;
-        height: 32px !important;
-        padding: 0 12px !important;
+        gap: 8px !important;
+        height: 36px !important;
+        padding: 0 15px !important;
         border-radius: 8px !important;
       }
     }
 
     .header-sso-btn .sso-icon {
-      height: 14px;
+      height: 16px;
       width: auto;
       object-fit: contain;
       user-select: none;
@@ -436,19 +433,19 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
 
     @media (min-width: 640px) {
       .header-sso-btn .sso-icon {
-        height: 15.5px;
+        height: 17.5px;
       }
     }
 
     @media (min-width: 1024px) {
       .header-sso-btn .sso-icon {
-        height: 16.5px;
+        height: 19px;
       }
     }
 
     .header-sso-btn .sso-text {
       font-weight: 700;
-      font-size: 11px;
+      font-size: 11.5px;
       line-height: 1;
       white-space: nowrap;
       letter-spacing: 0.015em;
@@ -456,32 +453,33 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
 
     @media (min-width: 640px) {
       .header-sso-btn .sso-text {
-        font-size: 11.5px;
+        font-size: 12.5px;
       }
     }
 
     @media (min-width: 1024px) {
       .header-sso-btn .sso-text {
-        font-size: 12px;
+        font-size: 13.5px;
       }
     }
 
     .header-sso-btn:hover {
-      background: linear-gradient(135deg, #881C43 0%, #681132 100%) !important;
-      border-color: #681132 !important;
-      color: #FFFFFF !important;
-      box-shadow: 0 3px 10px rgba(136, 28, 67, 0.26) !important;
-      transform: translateY(-1px);
+      background: linear-gradient(135deg, #FFF0F4 0%, #FDE4EB 100%) !important;
+      border-color: #881C43 !important;
+      color: #751235 !important;
+      box-shadow: 0 4px 14px rgba(136, 28, 67, 0.16), 0 0 0 1px rgba(136, 28, 67, 0.08) !important;
+      transform: translateY(-1.5px);
     }
 
     .header-sso-btn:hover .sso-icon {
-      filter: brightness(0) invert(1);
-      transform: scale(1.05);
+      filter: drop-shadow(0 1px 2px rgba(136, 28, 67, 0.25));
+      transform: scale(1.08);
     }
 
     .header-sso-btn:active {
       transform: translateY(0);
-      box-shadow: 0 1px 2px rgba(136, 28, 67, 0.15) !important;
+      background: #FAD3DF !important;
+      box-shadow: 0 1px 3px rgba(136, 28, 67, 0.12) !important;
     }
   `]
 })

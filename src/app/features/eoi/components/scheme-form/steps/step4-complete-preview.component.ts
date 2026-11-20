@@ -27,7 +27,7 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
-            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">1</span>
+            <span class="w-5 h-5 rounded-full bg-[#7C0E44] text-white flex items-center justify-center text-xs font-bold shrink-0">1</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Organisation Details</h2>
           </div>
         </div>
@@ -182,7 +182,7 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
-            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">2</span>
+            <span class="w-5 h-5 rounded-full bg-[#7C0E44] text-white flex items-center justify-center text-xs font-bold shrink-0">2</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Authorized Signatory</h2>
           </div>
         </div>
@@ -263,7 +263,7 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
-            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">3</span>
+            <span class="w-5 h-5 rounded-full bg-[#7C0E44] text-white flex items-center justify-center text-xs font-bold shrink-0">3</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Organisation Bank Details</h2>
           </div>
         </div>
@@ -312,7 +312,7 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
-            <span class="w-5 h-5 rounded-full border border-sky-400 text-navy flex items-center justify-center text-xs font-bold shrink-0">4</span>
+            <span class="w-5 h-5 rounded-full bg-[#7C0E44] text-white flex items-center justify-center text-xs font-bold shrink-0">4</span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Documents ({{ state.attachedDocsCount() }} / {{ state.eoiDocuments().length }} Uploaded)</h2>
           </div>
           <button
@@ -327,7 +327,7 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
 
         <div class="p-4 sm:p-5">
           @if (isEditingDocs()) {
-            <div class="mb-3.5 p-3 bg-sky-50/80 border border-sky-200 rounded-lg text-xs text-sky-900 flex items-center justify-between gap-3">
+            <div class="mb-3.5 p-3 bg-[#F8EDF1] border border-[#EADCE2] rounded-lg text-xs text-[#7C0E44] flex items-center justify-between gap-3">
               <span>Replace mode active: click <strong>Replace</strong> against any document to upload a replacement file.</span>
               <button appButton variant="primary" size="sm" (click)="toggleDocEdit()">Done</button>
             </div>
@@ -336,7 +336,7 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
           <app-table
             [columns]="documentColumns"
             [data]="state.eoiDocuments()"
-            [customTemplates]="{ name: nameTemplate, status: statusTemplate, action: actionTemplate }"
+            [customTemplates]="{ name: nameTemplate, comment: commentTemplate, status: statusTemplate, action: actionTemplate }"
           >
           </app-table>
         </div>
@@ -348,6 +348,14 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
           }
           @if (errors()[doc.id]) {
             <p class="text-[11.5px] text-red-600 m-0 mt-1" role="alert">{{ errors()[doc.id] }}</p>
+          }
+        </ng-template>
+
+        <ng-template #commentTemplate let-doc>
+          @if (doc.comment) {
+            <span class="text-[12px] text-[#25212A] whitespace-pre-wrap break-words block max-w-[240px]">{{ doc.comment }}</span>
+          } @else {
+            <span class="text-slate-400 text-xs">—</span>
           }
         </ng-template>
 
@@ -435,6 +443,7 @@ export class Step4CompletePreviewComponent {
     { key: 'name', label: 'Document Name', type: 'custom' },
     { key: 'fileName', label: 'File Name', cellClass: 'break-all' },
     { key: 'fileSize', label: 'Size', cellClass: 'whitespace-nowrap' },
+    { key: 'comment', label: 'Comment', type: 'custom' },
     { key: 'status', label: 'Status', type: 'custom' },
     { key: 'action', label: 'Action', type: 'custom', align: 'center' }
   ];

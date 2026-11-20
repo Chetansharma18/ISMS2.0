@@ -55,7 +55,7 @@ export class TenderReceiptsService {
     <tr><td class="label">Authorized Person</td><td>${app.signatoryDetails.name} (${app.signatoryDetails.designation})</td><td class="label">Contact</td><td>${app.signatoryDetails.mobileNo} | ${app.signatoryDetails.emailId}</td></tr>
   </table>
 
-  <div class="section-title">2. Proposal Documents</div>
+  <div class="section-title">2. Supporting Documents</div>
   <table>
     <thead><tr><th style="width: 35px; text-align: center;">#</th><th>Document</th><th>Category</th><th>Attached File</th></tr></thead>
     <tbody>${docRows}</tbody>

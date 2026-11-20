@@ -12,6 +12,7 @@ export interface SubmittedTenderDoc {
   fileName: string;
   fileSize: string;
   status: 'uploaded' | 'pending';
+  comment?: string;
 }
 
 /** A file shared by the department along with a shortfall notice (office order, format, sample...). */

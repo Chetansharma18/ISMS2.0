@@ -32,11 +32,11 @@ import { createAttachment, validateUploadFile } from './tenders-page.util';
       </h2>
       <div class="mt-4 font-sans text-[13px] space-y-4">
         <div>
-          <label class="block text-slate-700 font-medium mb-1">File Title*</label>
+          <label class="block text-slate-700 font-medium mb-1">File Title<span class="text-red-600">*</span></label>
           <input appInput type="text" maxlength="100" [(ngModel)]="attachmentFormData.title" [invalid]="attachmentSubmitted() && !attachmentFormData.title" class="w-full" />
         </div>
         <div>
-          <label class="block text-slate-700 font-medium mb-1">Upload Document*</label>
+          <label class="block text-slate-700 font-medium mb-1">Upload Document<span class="text-red-600">*</span></label>
           <input type="file" accept=".pdf,.txt,.jpeg,.jpg,.png,.doc,.docx,.xls,.xlsx" (change)="onAttachmentFileSelected($event)" class="w-full file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-navy cursor-pointer" />
           @if (attachmentSubmitted() && !attachmentFormData.file) {
             <div class="text-xs text-red-500 mt-1">Required</div>

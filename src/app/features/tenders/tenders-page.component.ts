@@ -12,6 +12,7 @@ import {
   ActionModalComponent,
   ButtonComponent,
   IconComponent,
+  PageHeaderComponent,
   TableColumn,
   formatInr
 } from '../../shared';
@@ -54,6 +55,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
     ActionModalComponent,
     ButtonComponent,
     IconComponent,
+    PageHeaderComponent,
     SchemeDetailViewComponent,
     ConfigureEoiFormComponent,
     CommitteeAssignmentModalComponent,
@@ -67,16 +69,119 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
     <div class="w-full min-h-full text-slate-800 font-sans" style="background-color: #ffffff;">
       
       <!-- ====================================================================
-           VIEW 1: ACTIVE EOI TABLE (Using Reusable PageHeader & DataTable)
+           VIEW 1: CONFIGURE / EDIT EOI SCREEN (Full Page View)
            ==================================================================== -->
-      @if (!selectedScheme()) {
+      @if (showConfigureScreen()) {
+        <div class="p-4 sm:p-5 space-y-4 font-sans" style="background-color: #ffffff;">
+          <app-page-header
+            [title]="editingSchemeRefNo() ? 'Edit EOI Configuration' : 'Configure New EOI'"
+            [breadcrumbs]="[
+              { label: 'Home', url: '/' },
+              { label: 'Active Schemes', url: '/admin/eoi-configuration' },
+              { label: editingSchemeRefNo() ? 'Edit EOI' : 'Configure New EOI' }
+            ]"
+            [showBack]="true"
+            (back)="closeConfigureScreen()"
+            backTitle="Back to Active Schemes"
+          >
+          </app-page-header>
+
+          <!-- Main Form Card Container - Styled exactly like Registration Form Box -->
+          <div class="bg-white rounded-xl border border-[#D6E3F0] shadow-xs p-5 sm:p-7 space-y-6">
+
+            <!-- Card Header Strip -->
+            <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
+                  {{ editingSchemeRefNo() ? 'Edit Expression of Interest' : 'Expression of Interest Details' }}
+                </h2>
+                <p class="text-xs text-slate-500 m-0 mt-0.5">
+                  {{ editingSchemeRefNo() ? 'Update scheme parameters and required documents' : 'Enter the required scheme parameters and EOI details' }}
+                </p>
+              </div>
+              <div class="flex items-center gap-3 shrink-0">
+                @if (editingSchemeRefNo()) {
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
+                    Ref: {{ editingSchemeRefNo() }}
+                  </span>
+                }
+                <span class="text-xs text-slate-500 font-medium">
+                  Required fields marked <span class="text-[#DC2626] font-bold">*</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Form Content Component -->
+            <app-configure-eoi-form
+              [data]="newEoiData"
+              [submitted]="newEoiSubmitted()"
+              [fileError]="fileError()"
+              [isEditing]="!!editingSchemeRefNo()"
+              [schemeNameOptions]="schemeNameOptions()"
+              [schemeCategoryOptions]="schemeCategoryOptions()"
+              [eoiCategoryOptions]="eoiCategoryOptions()"
+              [requiredInfo]="eoiRequiredInfo"
+              [schemeMasterItems]="schemeMasterItems()"
+              [docMasterItems]="docMasterItems()"
+              (schemeChange)="onSchemeSelected($event)"
+              (attach)="openAttachmentModal()"
+              (removeAttachment)="removeAttachment($event)"
+              (addDocument)="addEoiDocument()"
+              (removeDocument)="removeEoiDocument($event)"
+            ></app-configure-eoi-form>
+
+            <!-- Card Footer / Actions -->
+            <div class="pt-4 border-t border-[#E8EEF5] flex items-center justify-between gap-3">
+              <button
+                appButton
+                variant="outline"
+                size="md"
+                type="button"
+                (click)="closeConfigureScreen()"
+              >
+                <app-icon name="chevron-left" />
+                <span>Cancel</span>
+              </button>
+              <button
+                appButton
+                variant="primary"
+                size="md"
+                type="button"
+                (click)="submitNewEoi()"
+              >
+                <span>{{ editingSchemeRefNo() ? 'Update EOI' : 'Submit EOI' }}</span>
+                <app-icon name="chevron-right" />
+              </button>
+            </div>
+
+          </div>
+        </div>
+      } @else if (selectedScheme(); as s) {
+        <!-- ====================================================================
+             VIEW 2: SCHEME DETAILS VIEW (Tabular Layout matching Government eProcurement)
+             ==================================================================== -->
+        <app-scheme-detail-view
+          [scheme]="s"
+          [rfpDocs]="rfpDocuments"
+          [annexures]="annexureDocuments"
+          [requiredInfo]="eoiRequiredInfo"
+          [hideApplyButton]="isSuperAdmin()"
+          [hideDownloadDetails]="isNewOrExistingUser()"
+          (back)="backToList()"
+          (apply)="handleApplyForScheme()"
+          (download)="downloadDoc($event)"
+        ></app-scheme-detail-view>
+      } @else {
+        <!-- ====================================================================
+           VIEW 3: ACTIVE EOI TABLE (Using Reusable PageHeader & DataTable)
+           ==================================================================== -->
         <div class="p-4 sm:p-5 space-y-4 font-sans" style="background-color: #ffffff;">
           
           <app-schemes-header
             [searchQuery]="searchQuery()"
             [isSuperAdmin]="isSuperAdmin()"
             (searchChange)="onSearchChange($event)"
-            (configureEoi)="openConfigureEoiModal()"
+            (configureEoi)="openConfigureScreen()"
           ></app-schemes-header>
 
           <!-- Unfinished EOI applications of the signed-in applicant -->
@@ -161,22 +266,6 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
         </div>
       }
 
-      <!-- ====================================================================
-           VIEW 2: SCHEME DETAILS VIEW (Tabular Layout matching Government eProcurement)
-           ==================================================================== -->
-      @if (selectedScheme(); as s) {
-        <app-scheme-detail-view
-          [scheme]="s"
-          [rfpDocs]="rfpDocuments"
-          [annexures]="annexureDocuments"
-          [requiredInfo]="eoiRequiredInfo"
-          [hideApplyButton]="isSuperAdmin()"
-          (back)="backToList()"
-          (apply)="handleApplyForScheme()"
-          (download)="downloadDoc($event)"
-        ></app-scheme-detail-view>
-      }
-
       <!-- MODAL: CREATE COMMITTEE -->
       <app-committee-assignment-modal
         [isOpen]="showCommitteeModal()"
@@ -192,41 +281,6 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
         (completeRegistration)="goToRegistration()"
         (dismiss)="dismissOtrPrompt()"
       ></app-otr-prompt-modal>
-
-      <!-- ====================================================================
-           MODAL: CONFIGURE NEW EOI / EDIT EOI
-           ==================================================================== -->
-      <app-action-modal
-        [isOpen]="showConfigureEoiModal()"
-        [showCloseButton]="true"
-        [closeOnBackdrop]="false"
-        [reverseButtons]="true"
-        [showAccentBar]="false"
-        primaryLabel="Submit EOI"
-        secondaryLabel="Cancel"
-        maxWidthClass="max-w-[650px]"
-        (primaryAction)="submitNewEoi()"
-        (secondaryAction)="closeConfigureEoiModal()"
-        (close)="closeConfigureEoiModal()"
-      >
-        <app-configure-eoi-form
-          [data]="newEoiData"
-          [submitted]="newEoiSubmitted()"
-          [fileError]="fileError()"
-          [isEditing]="!!editingSchemeRefNo()"
-          [schemeNameOptions]="schemeNameOptions()"
-          [schemeCategoryOptions]="schemeCategoryOptions()"
-          [eoiCategoryOptions]="eoiCategoryOptions()"
-          [requiredInfo]="eoiRequiredInfo"
-          [schemeMasterItems]="schemeMasterItems()"
-          [docMasterItems]="docMasterItems()"
-          (schemeChange)="onSchemeSelected($event)"
-          (attach)="openAttachmentModal()"
-          (removeAttachment)="removeAttachment($event)"
-          (addDocument)="addEoiDocument()"
-          (removeDocument)="removeEoiDocument($event)"
-        ></app-configure-eoi-form>
-      </app-action-modal>
 
       <!-- MODAL: UPLOAD ATTACHMENT -->
       <app-attachment-upload-modal
@@ -273,13 +327,16 @@ export class TendersPageComponent {
   readonly isProfileIncomplete = computed(() => this.permissions.hasRole('new_user'));
 
   readonly isSuperAdmin = computed(() => this.permissions.hasRole('super_admin'));
+  readonly isNewOrExistingUser = computed(() => this.permissions.hasRole(['new_user', 'existing_user']));
 
   // Schemes reactive state managed via SchemeService (connected to central Mock/API engine)
   readonly schemes = this.schemeService.schemes;
 
   selectedScheme = signal<SchemeTender | null>(null);
   readonly showOtrPromptModal = signal<boolean>(false);
-  readonly showConfigureEoiModal = signal<boolean>(false);
+  readonly showConfigureScreen = signal<boolean>(false);
+  /** Alias for backward compatibility */
+  readonly showConfigureEoiModal = this.showConfigureScreen;
   readonly showConfirmSubmitEoiModal = signal<boolean>(false);
   readonly showCommitteeModal = signal<boolean>(false);
   readonly selectedSchemeForCommittee = signal<SchemeTender | null>(null);
@@ -366,8 +423,24 @@ export class TendersPageComponent {
       }
       this.evaluateOtrModalPrompt();
 
+      const action = params['action'];
+      const configure = params['configure'] === 'true' || action === 'create' || action === 'configure';
+      if (configure) {
+        if (!this.showConfigureScreen()) {
+          this.openConfigureScreen(false);
+        }
+      } else if (action === 'edit' && params['refNo']) {
+        const found = this.schemes().find(s => s.refNo === params['refNo']);
+        if (found && (!this.showConfigureScreen() || this.editingSchemeRefNo() !== found.refNo)) {
+          this.editScheme(found, false);
+        }
+      } else if (!action && !configure && this.showConfigureScreen()) {
+        this.showConfigureScreen.set(false);
+        this.editingSchemeRefNo.set(null);
+      }
+
       const viewRefNo = params['viewRefNo'] || params['refNo'];
-      if (viewRefNo) {
+      if (viewRefNo && action !== 'edit' && !this.showConfigureScreen()) {
         const found = this.schemes().find(s => s.refNo === viewRefNo);
         if (found) {
           this.selectedScheme.set(found);
@@ -380,8 +453,17 @@ export class TendersPageComponent {
       this.evaluateOtrModalPrompt();
 
       const list = this.schemes();
-      const viewRefNo = this.route.snapshot.queryParams['viewRefNo'] || this.route.snapshot.queryParams['refNo'];
-      if (viewRefNo && list.length > 0 && !this.selectedScheme()) {
+      const action = this.route.snapshot.queryParams['action'];
+      const refNo = this.route.snapshot.queryParams['refNo'];
+      if (action === 'edit' && refNo && list.length > 0 && !this.showConfigureScreen()) {
+        const found = list.find(s => s.refNo === refNo);
+        if (found) {
+          this.editScheme(found, false);
+        }
+      }
+
+      const viewRefNo = this.route.snapshot.queryParams['viewRefNo'] || (action !== 'edit' ? refNo : null);
+      if (viewRefNo && list.length > 0 && !this.selectedScheme() && !this.showConfigureScreen()) {
         const found = list.find(s => s.refNo === viewRefNo);
         if (found) {
           this.selectedScheme.set(found);
@@ -633,9 +715,12 @@ export class TendersPageComponent {
     }
 
     // 2. Auto-fill required documents from Doc Master
-    const docItem = this.docMasterItems().find(
-      (d) => d.schemeName?.trim().toLowerCase() === schemeName.trim().toLowerCase()
-    );
+    const masterList = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
+    const target = schemeName.trim().toLowerCase();
+    const docItem = masterList.find((d) => {
+      const s = (d.schemeName || '').trim().toLowerCase();
+      return s === target || s.includes(target) || target.includes(s);
+    });
     if (docItem && docItem.documents) {
       const docs = docItem.documents
         .split(',')
@@ -648,26 +733,51 @@ export class TendersPageComponent {
     }
   }
 
-  openConfigureEoiModal(): void {
+  openConfigureScreen(updateUrl = true): void {
     this.loadMasterOptions();
     this.editingSchemeRefNo.set(null);
     this.newEoiSubmitted.set(false);
     this.fileError.set('');
     this.newEoiData = createEmptyEoiForm();
-    this.showConfigureEoiModal.set(true);
+    this.selectedScheme.set(null);
+    this.showConfigureScreen.set(true);
+    if (updateUrl) {
+      this.router.navigate([], { relativeTo: this.route, queryParams: { action: 'create' } });
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  editScheme(scheme: SchemeTender): void {
+  openConfigureEoiModal(): void {
+    this.openConfigureScreen();
+  }
+
+  editScheme(scheme: SchemeTender, updateUrl = true): void {
     this.loadMasterOptions();
     this.editingSchemeRefNo.set(scheme.refNo);
     this.newEoiSubmitted.set(false);
     this.fileError.set('');
     this.newEoiData = eoiFormFromScheme(scheme);
-    this.showConfigureEoiModal.set(true);
+    this.selectedScheme.set(null);
+    this.showConfigureScreen.set(true);
+    if (updateUrl) {
+      this.router.navigate([], { relativeTo: this.route, queryParams: { action: 'edit', refNo: scheme.refNo } });
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  closeConfigureScreen(): void {
+    this.showConfigureScreen.set(false);
+    this.editingSchemeRefNo.set(null);
+    this.newEoiSubmitted.set(false);
+    this.fileError.set('');
+    const action = this.route.snapshot.queryParams['action'];
+    if (action === 'create' || action === 'edit') {
+      this.router.navigate([], { relativeTo: this.route, queryParams: {} });
+    }
   }
 
   closeConfigureEoiModal(): void {
-    this.showConfigureEoiModal.set(false);
+    this.closeConfigureScreen();
   }
 
   addEoiDocument(): void {
@@ -764,12 +874,16 @@ export class TendersPageComponent {
     }
 
     this.pendingEditScheme = null;
+    this.editingSchemeRefNo.set(null);
     this.showCorrigendumModal.set(false);
+    this.router.navigate([], { relativeTo: this.route, queryParams: {} });
   }
 
   closeCorrigendumModal(): void {
     this.pendingEditScheme = null;
+    this.editingSchemeRefNo.set(null);
     this.showCorrigendumModal.set(false);
+    this.router.navigate([], { relativeTo: this.route, queryParams: {} });
   }
 
   // ---- Submit --------------------------------------------------------------
@@ -793,12 +907,14 @@ export class TendersPageComponent {
     if (targetRef) {
       // Edit mode: save updated scheme object into pendingEditScheme & open optional Corrigendum modal
       this.pendingEditScheme = newScheme;
-      this.showConfigureEoiModal.set(false);
+      this.showConfigureScreen.set(false);
       this.showCorrigendumModal.set(true);
     } else {
       // New EOI mode: save directly via SchemeService
       this.schemeService.createScheme(newScheme).subscribe();
-      this.showConfigureEoiModal.set(false);
+      this.showConfigureScreen.set(false);
+      this.editingSchemeRefNo.set(null);
+      this.router.navigate([], { relativeTo: this.route, queryParams: {} });
     }
 
     this.showConfirmSubmitEoiModal.set(false);

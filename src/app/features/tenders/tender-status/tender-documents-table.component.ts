@@ -14,14 +14,22 @@ import { documentCategoryLabel } from './tender-status.util';
         <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4">
           <div class="pb-3.5 border-b border-slate-100 flex items-center gap-3">
             <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">4</span>
-            <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">Proposal Documents</h2>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">Supporting Documents</h2>
           </div>
 
           <app-table
             [columns]="columns"
             [data]="documents()"
-            [customTemplates]="{ action: actionTemplate }"
+            [customTemplates]="{ comment: commentTemplate, action: actionTemplate }"
           />
+
+          <ng-template #commentTemplate let-doc>
+            @if (doc.comment) {
+              <span class="text-[12px] text-[#25212A] whitespace-pre-wrap break-words block max-w-[240px]">{{ doc.comment }}</span>
+            } @else {
+              <span class="text-slate-400 text-xs">—</span>
+            }
+          </ng-template>
 
           <ng-template #actionTemplate let-doc>
             <div class="flex items-center justify-center gap-1.5">
@@ -68,6 +76,7 @@ export class TenderDocumentsTableComponent {
       cellClass: 'tabular-nums text-[11px] text-slate-600',
       format: (_value, doc) => `${doc.fileName} (${doc.fileSize})`
     },
+    { key: 'comment', label: 'Comment', type: 'custom' },
     { key: 'action', label: 'Action', align: 'center', type: 'custom' }
   ];
 }

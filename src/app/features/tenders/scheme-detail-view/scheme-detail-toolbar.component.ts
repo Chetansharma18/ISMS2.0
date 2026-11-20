@@ -20,10 +20,12 @@ import { ButtonComponent, IconComponent } from '../../../shared';
       <!-- Right Action Buttons -->
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5">
         <!-- Download Scheme Details Button -->
-        <button appButton variant="outline" size="sm" type="button" (click)="downloadDetails.emit()" title="Download Scheme Details PDF">
-          <app-icon name="document" />
-          <span>Download Scheme Details</span>
-        </button>
+        @if (!hideDownloadDetails()) {
+          <button appButton variant="outline" size="sm" type="button" (click)="downloadDetails.emit()" title="Download Scheme Details PDF">
+            <app-icon name="document" />
+            <span>Download Scheme Details</span>
+          </button>
+        }
 
         <!-- Apply for EOI Button -->
         @if (!hideApplyButton()) {
@@ -46,6 +48,7 @@ import { ButtonComponent, IconComponent } from '../../../shared';
 export class SchemeDetailToolbarComponent {
   readonly isClosed = input(false);
   readonly hideApplyButton = input(false);
+  readonly hideDownloadDetails = input(false);
 
   readonly back = output<void>();
   readonly downloadDetails = output<void>();

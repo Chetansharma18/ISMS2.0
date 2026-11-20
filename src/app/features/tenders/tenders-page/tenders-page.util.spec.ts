@@ -7,10 +7,12 @@ import {
   filterActiveSchemes,
   filterAdmins,
   formatBytes,
+  formatEoiDuration,
   isEditDisabled,
   isEoiFormValid,
   isSchemeClosed,
   normalizeSchemeCategory,
+  parseEoiDuration,
   toDisplayDate,
   toInputDate,
   validateUploadFile
@@ -177,6 +179,21 @@ describe('tenders-page.util', () => {
     });
   });
 
+  describe('formatEoiDuration / parseEoiDuration', () => {
+    it('formats singular and plural year duration strings', () => {
+      expect(formatEoiDuration('1', 'Years')).toBe('1 Year');
+      expect(formatEoiDuration('3', 'Years')).toBe('3 Years');
+      expect(formatEoiDuration('', 'Years')).toBe('');
+      expect(formatEoiDuration('0', 'Years')).toBe('');
+    });
+
+    it('parses stored year duration strings back into value and unit', () => {
+      expect(parseEoiDuration('3 Years')).toEqual({ value: '3', unit: 'Years' });
+      expect(parseEoiDuration('1 Year')).toEqual({ value: '1', unit: 'Years' });
+      expect(parseEoiDuration(undefined)).toEqual({ value: '', unit: 'Years' });
+    });
+  });
+
   describe('isEoiFormValid', () => {
     const validForm = (): EoiFormData => ({
       ...createEmptyEoiForm(),
@@ -184,6 +201,8 @@ describe('tenders-page.util', () => {
       scheme: 'Vishwakarma Yuva Udyami Protsahan Yojana',
       publishedDate: '2026-01-01',
       submissionDate: '2026-02-01',
+      eoiDurationValue: '2',
+      eoiDurationUnit: 'Years',
       eoiCategory: 'General',
       emdFee: '50000',
       processFee: '2000',
@@ -198,8 +217,8 @@ describe('tenders-page.util', () => {
       expect(isEoiFormValid(validForm())).toBe(true);
     });
 
-    it('requires at least one attachment', () => {
-      expect(isEoiFormValid({ ...validForm(), attachments: [] })).toBe(false);
+    it('allows empty attachments when documents are configured', () => {
+      expect(isEoiFormValid({ ...validForm(), attachments: [] })).toBe(true);
     });
 
     it('requires every added document row to have a selection', () => {
@@ -212,6 +231,8 @@ describe('tenders-page.util', () => {
       expect(isEoiFormValid({ ...validForm(), scheme: '' })).toBe(false);
       expect(isEoiFormValid({ ...validForm(), publishedDate: '' })).toBe(false);
       expect(isEoiFormValid({ ...validForm(), submissionDate: '' })).toBe(false);
+      expect(isEoiFormValid({ ...validForm(), eoiDurationValue: '' })).toBe(false);
+      expect(isEoiFormValid({ ...validForm(), eoiDurationValue: '0' })).toBe(false);
       expect(isEoiFormValid({ ...validForm(), eoiCategory: '' })).toBe(false);
       expect(isEoiFormValid({ ...validForm(), emdFee: '' })).toBe(false);
       expect(isEoiFormValid({ ...validForm(), processFee: '' })).toBe(false);
@@ -238,6 +259,8 @@ describe('tenders-page.util', () => {
       schemeCategory: 'SAMARTH',
       publishedDate: '2026-03-05',
       submissionDate: '2026-04-15',
+      eoiDurationValue: '3',
+      eoiDurationUnit: 'Years',
       eoiCategory: 'General',
       description: 'Desc',
       emdFee: '50000',
@@ -254,6 +277,7 @@ describe('tenders-page.util', () => {
       expect(result.schemeTitle).toBe('SAMARTH');
       expect(result.datePublished).toBe('05/03/2026');
       expect(result.closingDate).toBe('15/04/2026');
+      expect(result.eoiDuration).toBe('3 Years');
       expect(result.status).toBe('Open');
       expect(result.createdAt).toBe(123);
       expect(result.isActive).toBe(true);

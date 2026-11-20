@@ -53,13 +53,10 @@ export interface StepMeta {
           </div>
 
           <!-- Title and Subtitle Row -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
             <h1 class="text-2xl sm:text-[28px] font-bold text-[#172554] tracking-tight m-0">
               Organization Registration
             </h1>
-            <span class="text-xs text-slate-500 font-medium select-none">
-              Fields marked with <span class="text-[#DC2626] font-bold">*</span> are mandatory
-            </span>
           </div>
 
           <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">

@@ -300,7 +300,7 @@ export class ScrutinyDeskComponent {
         title: 'EOI Proposal Submitted & Statutory Fee Paid',
         actor: `${app?.authorizedSignatory?.name || 'Applicant'} (${app?.authorizedSignatory?.designation || 'Authorized Signatory'})`,
         actorRole: 'Applicant / TP',
-        description: `Complete proposal submitted under ${app?.schemeName || 'MMKVY'}. EMD Fee (₹${app?.emdFee?.toLocaleString() || '50,000'}) and Processing Fee (₹${app?.processingFee?.toLocaleString() || '2,000'}) successfully deposited via e-Challan. 7 Proposal documents uploaded.`,
+        description: `Complete proposal submitted under ${app?.schemeName || 'MMKVY'}. EMD Fee (₹${app?.emdFee?.toLocaleString() || '50,000'}) and Processing Fee (₹${app?.processingFee?.toLocaleString() || '2,000'}) successfully deposited via e-Challan. 7 Supporting documents uploaded.`,
         badgeClass: 'bg-blue-50 text-blue-800 border-blue-200'
       },
       {

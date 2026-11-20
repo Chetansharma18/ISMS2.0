@@ -176,27 +176,32 @@ interface TenderItem {
 
     .tender-card-bg-wrap {
       position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
+      top: 60px;
+      bottom: 0;
+      left: 0;
+      right: 0;
       pointer-events: none;
       overflow: hidden;
       z-index: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 12px;
     }
     .tender-card-bg-img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       object-position: center;
       transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
     .tender-panel-card:hover .tender-card-bg-img {
-      transform: scale(1.03);
+      transform: scale(1.02);
     }
     .tender-card-bg-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.68) 50%, rgba(255, 255, 255, 0.80) 100%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.65) 50%, rgba(255, 255, 255, 0.78) 100%);
     }
 
     .tender-panel-header {

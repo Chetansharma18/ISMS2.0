@@ -41,11 +41,11 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
         <!-- Landing Page Full-Width Responsive Header Banner (Edge-to-Edge in Code) -->
         <div class="block w-full bg-[#FDF8F2] relative overflow-hidden select-none">
           <!-- Rajasthan Heritage Palace Architectural Skyline Background (Anchored seamlessly to bottom baseline) -->
-          <div class="hidden md:flex absolute inset-x-0 bottom-[2.5px] sm:bottom-[3px] lg:bottom-[4px] top-0 items-end justify-center pointer-events-none select-none overflow-hidden z-0" aria-hidden="true">
+          <div class="hidden md:flex absolute inset-x-0 bottom-[1px] sm:bottom-[1px] lg:bottom-[1.5px] top-0 items-end justify-center pointer-events-none select-none overflow-hidden z-0" aria-hidden="true">
             <img
               src="/rajasthan-heritage-palace.png"
               alt=""
-              class="h-[80%] md:h-[84%] lg:h-[88%] xl:h-[92%] w-auto max-w-[46%] md:max-w-[48%] lg:max-w-[52%] xl:max-w-[56%] object-contain object-bottom pointer-events-none select-none transition-all duration-300"
+              class="h-[88%] md:h-[93%] lg:h-[97%] xl:h-full w-auto max-w-[48%] md:max-w-[52%] lg:max-w-[55%] xl:max-w-[58%] object-contain object-bottom pointer-events-none select-none transition-all duration-300"
             />
           </div>
 

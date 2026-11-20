@@ -77,5 +77,7 @@
   "volume-off": "volume-x",
   "volume-on": "volume-2",
   "warning-triangle": "triangle-alert",
-  "zoom-in": "zoom-in"
+  "zoom-in": "zoom-in",
+  "pause": "pause",
+  "play": "play"
 }

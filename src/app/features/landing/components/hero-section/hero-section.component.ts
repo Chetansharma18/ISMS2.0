@@ -29,11 +29,11 @@ export interface HeroSlide {
     class: 'block w-full'
   },
   template: `
-    <section class="relative w-full bg-[#F8F9FA] py-3 sm:py-3.5 lg:py-4 border-b border-[#E2E8F0]">
+    <section class="hero-main-section relative w-full bg-[#F8F9FA] border-b border-[#E2E8F0] flex flex-col justify-between">
       
       <!-- Inner Container: Full Width up to 1920px (Left Half: Image, Right Half: Tender) -->
-      <div class="w-full max-w-[1920px] mx-auto px-3 sm:px-6 md:px-8 lg:px-10 xl:px-12 relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-6 xl:gap-8 items-stretch w-full">
+      <div class="w-full max-w-[1920px] mx-auto px-3 sm:px-6 md:px-8 lg:px-10 xl:px-12 relative z-10 flex-1 flex flex-col justify-between">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-6 xl:gap-8 items-stretch w-full my-auto">
           
           <!-- LEFT HALF (50%): Premium Dynamic Auto-Sliding Image Showcase -->
           <div 
@@ -152,12 +152,34 @@ export interface HeroSlide {
         </div>
 
         <!-- 4 Key Governance Stats Strip (Youth Registered, Youth Trained, Youth Placed, Training Partners) -->
-        <app-hero-stats class="block w-full mt-3 sm:mt-3.5 lg:mt-4"></app-hero-stats>
+        <app-hero-stats class="block w-full mt-5 sm:mt-6 lg:mt-7 xl:mt-8"></app-hero-stats>
       </div>
 
     </section>
   `,
   styles: [`
+    .hero-main-section {
+      min-height: auto;
+      padding-top: 14px;
+      padding-bottom: 18px;
+    }
+    @media (min-width: 768px) {
+      .hero-main-section {
+        min-height: calc(100vh - 124px);
+        min-height: calc(100dvh - 124px);
+        padding-top: 16px;
+        padding-bottom: 22px;
+      }
+    }
+    @media (min-width: 1024px) {
+      .hero-main-section {
+        min-height: calc(100vh - 130px);
+        min-height: calc(100dvh - 130px);
+        padding-top: 18px;
+        padding-bottom: 24px;
+      }
+    }
+
     .hero-slider-card {
       position: relative;
       width: 100%;

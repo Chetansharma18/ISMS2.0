@@ -39,10 +39,10 @@ interface StatMetric {
       </div>
 
       <!-- 4 Stat Metrics Grid -->
-      <div class="relative z-10 grid grid-cols-2 lg:grid-cols-4 items-center py-2 sm:py-2.5 lg:py-2 px-3 sm:px-6 lg:px-8">
+      <div class="relative z-10 grid grid-cols-2 lg:grid-cols-4 items-center py-2.5 sm:py-3 lg:py-2.5 px-4 sm:px-6 lg:px-8">
         @for (stat of stats; track stat.label; let i = $index; let last = $last) {
           <div 
-            class="stat-metric-col group flex items-center justify-start sm:justify-center gap-2.5 sm:gap-3 lg:gap-3.5 py-1.5 sm:py-2 lg:py-1 px-2 sm:px-3 lg:px-4 cursor-default select-none relative"
+            class="stat-metric-col group flex items-center justify-start sm:justify-center gap-2.5 sm:gap-3 lg:gap-3.5 py-2 sm:py-2.5 lg:py-1.5 px-2 sm:px-3 lg:px-4 cursor-default select-none relative"
             [class.border-r]="!last"
             [class.border-[#F0D5C7]]="!last"
           >

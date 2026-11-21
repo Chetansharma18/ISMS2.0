@@ -33,7 +33,7 @@ export interface AnnouncementItem {
   template: `
     <div
       #tickerSection
-      class="w-full bg-[#1E40AF] text-white border-b border-black/15 shadow-inner relative z-10 select-none overflow-hidden"
+      class="w-full bg-[#224599] text-white border-b border-black/15 shadow-inner relative z-10 select-none overflow-hidden"
       role="region"
       aria-label="Government News Announcements Ticker"
     >
@@ -42,7 +42,7 @@ export interface AnnouncementItem {
         <!-- ============================================================
              1. FIXED LEFT: ORANGE NEWS LABEL + SEPARATOR
              ============================================================ -->
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0 z-20 bg-[#1E40AF] pr-2 sm:pr-3">
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0 z-20 bg-[#224599] pr-2 sm:pr-3">
           <button
             appButton
             size="sm"

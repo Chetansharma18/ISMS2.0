@@ -189,7 +189,7 @@ export interface AboutStatCard {
               <img 
                 [src]="card.waveSrc" 
                 alt="" 
-                class="absolute bottom-0 inset-x-0 w-full h-5 sm:h-6 object-cover object-bottom pointer-events-none select-none opacity-85 z-0" 
+                class="absolute bottom-0 inset-x-0 w-full h-4 sm:h-5 object-cover object-bottom pointer-events-none select-none opacity-60 z-0" 
                 aria-hidden="true"
               />
             </div>
@@ -221,11 +221,11 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
       icon: 'layers',
       bgImage: '/card-bg-schemes.png',
       waveSrc: '/stat-wave-pink.png',
-      cardClass: 'bg-linear-to-b from-[#FFF5F8] to-[#FFF9FB] border border-[#F8DCE6] shadow-card',
-      iconBoxClass: 'bg-[#FDF0F6] border-[#F8D5E3]',
-      iconColorClass: 'text-[#920129]',
-      dividerClass: 'bg-[#F0CBD8]',
-      textColorClass: 'text-[#920129]'
+      cardClass: 'bg-white hover:bg-[#FFFDFE] border border-[#F5E1EB] hover:border-[#D73389]/40 shadow-xs hover:shadow-md',
+      iconBoxClass: 'bg-[#FFF5F8] border border-[#F8D5E3]',
+      iconColorClass: 'text-[#9F1239]',
+      dividerClass: 'bg-[#F3D5E2]',
+      textColorClass: 'text-[#9F1239]'
     },
     {
       label: 'Courses',
@@ -233,11 +233,11 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
       icon: 'graduation-cap',
       bgImage: '/card-bg-courses.png',
       waveSrc: '/stat-wave-blue.png',
-      cardClass: 'bg-linear-to-b from-[#F0F7FF] to-[#F8FAFF] border border-[#DBEAFE] shadow-card',
-      iconBoxClass: 'bg-[#EFF6FF] border-[#BFDBFE]',
-      iconColorClass: 'text-[#022483]',
+      cardClass: 'bg-white hover:bg-[#FBFDFF] border border-[#E0E7FF] hover:border-[#224599]/40 shadow-xs hover:shadow-md',
+      iconBoxClass: 'bg-[#F0F7FF] border border-[#BFDBFE]',
+      iconColorClass: 'text-[#224599]',
       dividerClass: 'bg-[#BFDBFE]',
-      textColorClass: 'text-[#022483]'
+      textColorClass: 'text-[#224599]'
     },
     {
       label: 'Training Partners',
@@ -245,8 +245,8 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
       icon: 'school',
       bgImage: '/card-bg-training-partners.png',
       waveSrc: '/stat-wave-green.png',
-      cardClass: 'bg-linear-to-b from-[#F0FDF4] to-[#F9FDF9] border border-[#DCFCE7] shadow-card',
-      iconBoxClass: 'bg-[#F0FDF4] border-[#BBF7D0]',
+      cardClass: 'bg-white hover:bg-[#FBFFFD] border border-[#DCFCE7] hover:border-[#05831F]/40 shadow-xs hover:shadow-md',
+      iconBoxClass: 'bg-[#F0FDF4] border border-[#BBF7D0]',
       iconColorClass: 'text-[#05831F]',
       dividerClass: 'bg-[#BBF7D0]',
       textColorClass: 'text-[#05831F]'
@@ -257,11 +257,11 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
       icon: 'users',
       bgImage: '/card-bg-users.png',
       waveSrc: '/stat-wave-purple.png',
-      cardClass: 'bg-linear-to-b from-[#FAF5FF] to-[#FCFAFF] border border-[#EDE9FE] shadow-card',
-      iconBoxClass: 'bg-[#FAF5FF] border-[#DDD6FE]',
-      iconColorClass: 'text-[#370A7A]',
+      cardClass: 'bg-white hover:bg-[#FDFBFF] border border-[#EDE9FE] hover:border-[#6B21A8]/40 shadow-xs hover:shadow-md',
+      iconBoxClass: 'bg-[#FAF5FF] border border-[#DDD6FE]',
+      iconColorClass: 'text-[#6B21A8]',
       dividerClass: 'bg-[#DDD6FE]',
-      textColorClass: 'text-[#370A7A]'
+      textColorClass: 'text-[#6B21A8]'
     }
   ];
 

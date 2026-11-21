@@ -43,7 +43,7 @@ interface TenderItem {
           <!-- Subtle Heritage Watermark Background Image Layer -->
           <div class="tender-header-bg-wrap" aria-hidden="true">
             <img 
-              src="/rajasthan-heritage-palace.png" 
+              src="/tender-header-artwork.png" 
               alt="" 
               class="tender-header-bg-art"
             />
@@ -222,10 +222,10 @@ interface TenderItem {
     .tender-header-bg-art {
       height: 100%;
       width: auto;
-      max-width: 58%;
+      max-width: 65%;
       object-fit: contain;
       object-position: bottom right;
-      opacity: 0.22;
+      opacity: 0.28;
       filter: saturate(0.85) contrast(1.05);
       mix-blend-mode: multiply;
       pointer-events: none;
@@ -233,7 +233,7 @@ interface TenderItem {
       transition: opacity 0.3s ease;
     }
     .tender-panel-card:hover .tender-header-bg-art {
-      opacity: 0.30;
+      opacity: 0.38;
     }
 
     .tender-icon-box {
